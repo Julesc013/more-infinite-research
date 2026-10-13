@@ -178,7 +178,8 @@ fixtures:
     qualification_status: unqualified
     validates:
       - exact-available-f200-seven-fourteen-and-forty-six-mod-selections
-      - actual-classic-setting-and-nonempty-generated-research
+      - actual-full-default-and-selected-setting-readback
+      - matched-published-422-complete-catalogue-and-definition-preservation
       - four-completed-native-mir-stage-spans-with-sixty-second-total-ceiling
       - native-logs-resource-ledgers-and-archive-settings-engine-candidate-bindings
       - no-reporter-313-mod-or-ordinary-menu-claim-from-headless-diagnostics

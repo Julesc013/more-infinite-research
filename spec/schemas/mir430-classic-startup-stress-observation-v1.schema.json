@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://more-infinite-research.invalid/schemas/mir430-classic-startup-stress-observation-v1.schema.json",
-  "title": "MIR 4.3.0 Classic named startup stress observation",
+  "title": "MIR 4.3.0 Full/default named startup stress observation",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -20,7 +20,7 @@
       "const": 1
     },
     "kind": {
-      "const": "MIR430ClassicStartupStressObservationV1"
+      "const": "MIR430FullStartupStressObservationV1"
     },
     "status": {
       "const": "completed"
@@ -52,7 +52,7 @@
       }
     },
     "compiler_profile": {
-      "const": "classic"
+      "const": "full"
     },
     "profiles": {
       "type": "array",
@@ -268,6 +268,7 @@
         "engine",
         "candidate",
         "observer",
+        "full_catalogue_capture",
         "samples"
       ],
       "properties": {
@@ -395,15 +396,15 @@
               "const": "mir430-compiler-profile-ablation"
             },
             "version": {
-              "const": "1.0.0"
+              "const": "1.0.4"
             },
             "archive_sha256": {
               "$ref": "#/$defs/sha256"
             },
             "source_files": {
               "type": "array",
-              "minItems": 3,
-              "maxItems": 3,
+              "minItems": 4,
+              "maxItems": 4,
               "items": {
                 "type": "object",
                 "additionalProperties": false,
@@ -426,6 +427,27 @@
                   }
                 }
               }
+            }
+          }
+        },
+        "full_catalogue_capture": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "record_sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "record_sha256": {
+              "$ref": "#/$defs/sha256"
             }
           }
         },

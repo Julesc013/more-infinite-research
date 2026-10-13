@@ -1,1 +1,1 @@
-{"name":"mir430-compiler-profile-ablation","version":"1.0.0","title":"MIR private compiler profile ablation","author":"MIR","factorio_version":"2.0","dependencies":["base >= 2.0.0","? more-infinite-research"]}
+{"name":"mir430-compiler-profile-ablation","version":"1.0.4","title":"MIR private compiler profile ablation","author":"MIR","factorio_version":"2.0","dependencies":["base >= 2.0.0","? more-infinite-research"]}

@@ -745,7 +745,7 @@ function Assert-MIR430PerformancePropertyNames {
 }
 
 function Get-MIR430PerformanceTextSha256 {
-  param([Parameter(Mandatory)][string]$Text)
+  param([Parameter(Mandatory)][AllowEmptyString()][string]$Text)
   return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.UTF8Encoding]::new($false).GetBytes($Text)))
 }
 
@@ -760,22 +760,23 @@ function Get-MIR430EmergencyPerformanceAuthority {
     throw '[mir430-performance-authority-schema]'
   }
   Assert-MIR430PerformancePropertyNames -Value $authority -Expected @(
-    'schema','kind','authority_id','source_version','status','max_mir_startup_seconds','minimum_samples_per_profile','minimum_generated_mir_technologies',
-    'compiler_profile','required_stages','required_profiles','allowed_observer','ordinary_menu_status','library_first_use_status',
+    'schema','kind','authority_id','source_version','status','max_mir_startup_seconds','minimum_samples_per_profile',
+    'compiler_profile','default_settings_mode','catalogue_definition_capture_kind','required_stages','required_profiles','allowed_observer','ordinary_menu_status','library_first_use_status',
     'relative_overhead_status','timeout_status','reporter_environment_status','basis','release_deadline_utc','record_sha256'
   ) -Code 'mir430-performance-authority-shape'
   if ([int]$authority.schema -ne 1 -or [string]$authority.kind -cne 'MIR430EmergencyPerformanceAcceptanceV1' -or
       [string]$authority.authority_id -cne 'MIR430-EMERGENCY-PERFORMANCE-V1' -or [string]$authority.source_version -cne '4.3.0' -or
       [string]$authority.status -cne 'adopted-maintainer-emergency-acceptance-not-evidence' -or
-      [double]$authority.max_mir_startup_seconds -ne 60.0 -or [int]$authority.minimum_samples_per_profile -ne 1 -or [int]$authority.minimum_generated_mir_technologies -lt 1 -or
-      [string]$authority.compiler_profile -cne 'classic' -or
+      [double]$authority.max_mir_startup_seconds -ne 60.0 -or [int]$authority.minimum_samples_per_profile -ne 1 -or
+      [string]$authority.compiler_profile -cne 'full' -or [string]$authority.default_settings_mode -cne 'canonical-absent-default' -or
+      [string]$authority.catalogue_definition_capture_kind -cne 'MIR430FullDefaultPrototypeCaptureV1' -or
       (@($authority.required_stages | ForEach-Object { [string]$_ }) -join '|') -cne ($script:MIR430EmergencyPerformanceStages -join '|')) {
     throw '[mir430-performance-authority-binding]'
   }
   Assert-MIR430PerformancePropertyNames -Value $authority.allowed_observer -Expected @('name','version','archive_sha256','source_files') -Code 'mir430-performance-authority-observer-shape'
   if ([string]$authority.allowed_observer.name -cne 'mir430-compiler-profile-ablation' -or
-      [string]$authority.allowed_observer.version -cne '1.0.0' -or [string]$authority.allowed_observer.archive_sha256 -notmatch '^[A-F0-9]{64}$' -or
-      @($authority.allowed_observer.source_files).Count -ne 3) {
+      [string]$authority.allowed_observer.version -cne '1.0.4' -or [string]$authority.allowed_observer.archive_sha256 -notmatch '^[A-F0-9]{64}$' -or
+      @($authority.allowed_observer.source_files).Count -ne 4) {
     throw '[mir430-performance-authority-observer-binding]'
   }
   foreach ($sourceFile in @($authority.allowed_observer.source_files)) {
@@ -875,8 +876,10 @@ function Get-MIR430PerformanceParsedStages {
   $marker = [regex]::new('(?m)^\s*(?<seconds>[0-9]+(?:\.[0-9]+)?)\s+.*\[more-infinite-research\] startup-stage=(?<stage>settings|data|data-updates|data-final-fixes) (?<edge>begin|end)\s*$')
   $events = @($marker.Matches($text))
   if ($events.Count -ne ($Stages.Count * 2)) { throw '[mir430-performance-stage-marker-count]' }
-  $profileMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] actual-profile=classic\s*$')
-  if ($profileMarker.Matches($text).Count -ne 1) { throw '[mir430-performance-classic-selection]' }
+  $profileMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] actual-profile=full\s*$')
+  if ($profileMarker.Matches($text).Count -ne 1) { throw '[mir430-performance-full-selection]' }
+  $defaultMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] declared-default=full\s*$')
+  if ($defaultMarker.Matches($text).Count -ne 1) { throw '[mir430-performance-default-selection]' }
   $parsed = [Collections.Generic.List[object]]::new()
   $eventIndex = 0
   $last = -1.0
@@ -899,8 +902,330 @@ function Get-MIR430PerformanceParsedStages {
   $technologyMarker = [regex]::new('(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] technology-names=(?<names>.*)\s*$')
   $technologyLines = @($technologyMarker.Matches($text))
   if ($technologyLines.Count -ne 1) { throw '[mir430-performance-generated-technology-marker]' }
-  $technologyNames = @([regex]::Matches($technologyLines[0].Groups['names'].Value,'["''](?<name>recipe-prod-research_[^"'']+)["'']') | ForEach-Object { [string]$_.Groups['name'].Value } | Sort-Object -Unique)
-  return [pscustomobject][ordered]@{stages=@($parsed);generated_mir_technologies=$technologyNames.Count}
+  $technologyNames = @([regex]::Matches($technologyLines[0].Groups['names'].Value,'["''](?<name>[^"'']+)["'']') | ForEach-Object { [string]$_.Groups['name'].Value } | Sort-Object -Unique)
+  return [pscustomobject][ordered]@{
+    stages = @($parsed)
+    technology_names = @($technologyNames)
+    technology_ids_sha256 = Get-MIR430PerformanceTextSha256 -Text ($technologyNames -join "`n")
+  }
+}
+
+function Get-MIR430FullSnapshotProjection {
+  param(
+    [Parameter(Mandatory)][string]$ObservationPath,[Parameter(Mandatory)]$Descriptor,
+    [Parameter(Mandatory)][ValidateSet('source','upgrade','candidate')][string]$Stage,
+    [Parameter(Mandatory)][string[]]$ExpectedActiveSelection,[Parameter(Mandatory)][string]$ExpectedCompilerProfile,
+    [Parameter(Mandatory)][string]$Code,
+    [ValidateSet('upgrade-preservation-proof','matched-startup-capture')][string]$CaptureMode = 'upgrade-preservation-proof',
+    [string]$ExpectedPackageVersion = ''
+  )
+
+  Assert-MIR430PerformancePropertyNames -Value $Descriptor -Expected @('path','sha256','stage') -Code "$Code-raw-snapshot-shape"
+  if ([string]$Descriptor.stage -cne $Stage) { throw "[$Code-raw-snapshot-stage]" }
+  $path = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $ObservationPath -Descriptor ([pscustomobject][ordered]@{path=[string]$Descriptor.path;sha256=[string]$Descriptor.sha256}) -Code "$Code-raw-snapshot"
+  try { $snapshot = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[$Code-raw-snapshot-json]" }
+  $requiredSnapshotFields = if ($CaptureMode -ceq 'matched-startup-capture') {
+    @('schema','kind','stage','package_version','active_mods','forces')
+  } else {
+    @('from_version','to_version','stage','active_mods','forces')
+  }
+  foreach ($field in $requiredSnapshotFields) {
+    if ($snapshot.PSObject.Properties.Name -notcontains $field) { throw "[$Code-raw-snapshot-shape]" }
+  }
+  if ($CaptureMode -ceq 'matched-startup-capture' -and ([int]$snapshot.schema -ne 1 -or [string]$snapshot.kind -cne 'MIR430FullTechnologySnapshotV1' -or [string]$snapshot.package_version -cne $ExpectedPackageVersion)) {
+    throw "[$Code-raw-snapshot-binding]"
+  }
+  if ([string]$snapshot.stage -cne $Stage -or $null -eq $snapshot.forces -or $snapshot.forces.PSObject.Properties.Name -notcontains 'player') { throw "[$Code-raw-snapshot-binding]" }
+  $active = @($snapshot.active_mods.PSObject.Properties | ForEach-Object { [string]$_.Name + '@' + [string]$_.Value } | Sort-Object)
+  if (($active -join '|') -cne (@($ExpectedActiveSelection | Sort-Object) -join '|')) { throw "[$Code-raw-snapshot-active-mods]" }
+  $force = $snapshot.forces.player
+  foreach ($field in @('technologies','settings')) {
+    if ($force.PSObject.Properties.Name -notcontains $field) { throw "[$Code-raw-snapshot-force]" }
+  }
+  $actualCompilerProfile = if ($force.settings.PSObject.Properties.Name -contains 'mir-compiler-profile') { [string]$force.settings.'mir-compiler-profile' } else { 'absent' }
+  if ($actualCompilerProfile -cne $ExpectedCompilerProfile) { throw "[$Code-raw-snapshot-settings]" }
+  $settingsRows = [ordered]@{}
+  foreach ($setting in @($force.settings.PSObject.Properties | Sort-Object Name)) {
+    if ([string]$setting.Name -cne 'mir-compiler-profile') { $settingsRows[[string]$setting.Name] = $setting.Value }
+  }
+  $rows = [Collections.Generic.List[object]]::new()
+  foreach ($property in @($force.technologies.PSObject.Properties | Sort-Object Name)) {
+    $technology = $property.Value
+    foreach ($field in @('enabled','visible_when_disabled','prototype')) {
+      if ($technology.PSObject.Properties.Name -notcontains $field) { throw "[$Code-raw-snapshot-technology]" }
+    }
+    $prototype = $technology.prototype
+    foreach ($field in @('order','hidden','max_level','prerequisites','ingredients','effects','unit_count','unit_count_formula','unit_energy')) {
+      if ($prototype.PSObject.Properties.Name -notcontains $field) { throw "[$Code-raw-snapshot-prototype]" }
+    }
+    $effects = @($prototype.effects | ForEach-Object { ConvertTo-MIR4BootstrapCanonicalJson -Value $_ } | Sort-Object)
+    $ingredients = @($prototype.ingredients | ForEach-Object { ConvertTo-MIR4BootstrapCanonicalJson -Value $_ } | Sort-Object)
+    $rows.Add([pscustomobject][ordered]@{
+      id=[string]$property.Name
+      order=[string]$prototype.order
+      hidden=[bool]$prototype.hidden
+      effects=@($effects)
+      prerequisites=@($prototype.prerequisites | ForEach-Object { [string]$_ } | Sort-Object)
+      science_ingredients=@($ingredients)
+      unit_count=$prototype.unit_count
+      unit_count_formula=$prototype.unit_count_formula
+      unit_time=$prototype.unit_energy
+      max_level=$prototype.max_level
+      enabled=[bool]$technology.enabled
+      visible_when_disabled=[bool]$technology.visible_when_disabled
+    })
+  }
+  if ($rows.Count -eq 0) { throw "[$Code-raw-snapshot-technologies]" }
+  $canonical = ConvertTo-MIR4BootstrapCanonicalJson -Value @($rows)
+  return [pscustomobject][ordered]@{
+    path=$path;sha256=(Get-MIR4Sha256File -Path $path);snapshot=$snapshot;technology_ids=@($rows | ForEach-Object { [string]$_.id });technology_ids_sha256=(Get-MIR430PerformanceTextSha256 -Text ((@($rows | ForEach-Object { [string]$_.id }) -join "`n")));semantic_definitions_sha256=(Get-MIR430PerformanceTextSha256 -Text $canonical);settings_sha256=(Get-MIR430PerformanceTextSha256 -Text (ConvertTo-MIR4BootstrapCanonicalJson -Value $settingsRows))
+  }
+}
+
+function Get-MIR430PerformanceActivationSelection {
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$Code)
+  if ($Activation.PSObject.Properties.Name -notcontains 'selected') { throw "[$Code-shape]" }
+  $rows = @($Activation.selected)
+  if ($rows.Count -eq 0) { throw "[$Code-empty]" }
+  $selection = @(
+    foreach ($row in $rows) {
+      if ($null -eq $row -or $row.PSObject.Properties.Name -notcontains 'name' -or $row.PSObject.Properties.Name -notcontains 'version' -or
+          [string]::IsNullOrWhiteSpace([string]$row.name) -or [string]::IsNullOrWhiteSpace([string]$row.version)) {
+        throw "[$Code-shape]"
+      }
+      [string]$row.name + '@' + [string]$row.version
+    }
+  )
+  if (@($selection | Sort-Object -Unique).Count -ne $selection.Count) { throw "[$Code-duplicate]" }
+  return @($selection | Sort-Object)
+}
+
+function Assert-MIR430MatchedStartupCaptureRun {
+  param(
+    [Parameter(Mandatory)][string]$ObservationPath,[Parameter(Mandatory)]$Descriptor,
+    [Parameter(Mandatory)]$Expected,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Authority,
+    [Parameter(Mandatory)][string[]]$BaselineSelection,[Parameter(Mandatory)][string[]]$CandidateSelection,
+    [Parameter(Mandatory)][string]$BaselineRawPath,[Parameter(Mandatory)][string]$CandidateRawPath,
+    [Parameter(Mandatory)][string]$Code
+  )
+
+  Assert-MIR430PerformancePropertyNames -Value $Descriptor -Expected @('path','sha256','source_sample_label','candidate_sample_label') -Code "$Code-matched-run-shape"
+  $path = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $ObservationPath -Descriptor ([pscustomobject][ordered]@{path=[string]$Descriptor.path;sha256=[string]$Descriptor.sha256}) -Code "$Code-matched-run"
+  try { $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[$Code-matched-run-json]" }
+  foreach ($field in @('kind','status','mode','source_observation','factorio','inputs','resource_context','samples')) {
+    if ($record.PSObject.Properties.Name -notcontains $field) { throw "[$Code-matched-run-shape]" }
+  }
+  if ([string]$record.kind -cne 'MIRDirectLibraryStartupMeasurementV1' -or [string]$record.status -cne 'completed' -or [string]$record.mode -cne 'matched-three-input' -or
+      [string]$record.factorio.sha256 -cne [string]$Expected.profile.engine.sha256 -or
+      [string]$record.factorio.base_version -cne [string]$Expected.profile.engine.version -or
+      [string]$record.inputs.published_422.archive.version -cne '4.2.20002' -or
+      [string]$record.inputs.published_422.archive.sha256 -cne '14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65' -or
+      [string]$record.inputs.candidate.source_version -cne [string]$CandidateTarget.source_version -or
+      [string]$record.inputs.candidate.archive.sha256 -cne [string]$CandidateTarget.archive.sha256 -or
+      [string]$record.inputs.candidate.materialization.source_version -cne [string]$CandidateTarget.source_version -or
+      [string]$record.inputs.candidate.materialization.archive_sha256 -cne [string]$CandidateTarget.archive.sha256 -or
+      [string]$record.inputs.candidate.materialization.package_source_sha256 -cne [string]$CandidateTarget.package_source_sha256 -or
+      [string]$record.source_observation.requested_commit -cne [string]$Candidate.source.commit -or
+      [string]$record.source_observation.head_commit -cne [string]$Candidate.source.commit) {
+    throw "[$Code-matched-run-binding]"
+  }
+  $completedProcesses = @($record.resource_context.processes | Where-Object { [string]$_.status -ceq 'passed' -and [bool]$_.result.passed -and [int]$_.result.exit_code -eq 0 -and -not [bool]$_.result.timed_out })
+  if ($completedProcesses.Count -lt 2) { throw "[$Code-matched-run-completion]" }
+
+  $bindSample = {
+    param([string]$Label,[string]$Stage,[string]$ExpectedVersion,[string[]]$ExpectedSelection,[string]$ExpectedRawPath)
+    $matches = @($record.samples | Where-Object { [string]$_.label -ceq $Label -and [string]$_.cache_state -ceq 'changed-configuration' })
+    if ($matches.Count -ne 1) { throw "[$Code-matched-run-sample]" }
+    $sample = $matches[0]
+    $selection = @($sample.loaded_selection | ForEach-Object { [string]$_ } | Sort-Object)
+    if ([int]$sample.exit_code -ne 0 -or [string]$sample.endpoint_class -cne 'headless-create-diagnostic' -or
+        ($selection -join '|') -cne (@($ExpectedSelection | Sort-Object) -join '|')) {
+      throw "[$Code-matched-run-sample]"
+    }
+    $runRoot = [string]$sample.run_relative_path
+    $log = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($runRoot + '/' + [string]$sample.log) -Code "$Code-matched-run-log"
+    $config = Resolve-MIR430PerformanceInvocationArtifact -InvocationPath $path -RelativePath ($runRoot + '/' + [string]$sample.execution_controls.config.path) -Code "$Code-matched-run-config"
+    $identity = Get-MIR430PerformanceLogIdentity -Path $log -ObserverName ([string]$Authority.record.allowed_observer.name) -Code "$Code-matched-run-log"
+    if ([string]$identity.engine_version -cne [string]$Expected.profile.engine.version -or ($identity.active_selection -join '|') -cne ($selection -join '|')) { throw "[$Code-matched-run-log]" }
+    $text = Get-Content -Raw -LiteralPath $log
+    $profile = if ($ExpectedVersion -ceq '4.2.20002') {'absent'} else {[string]$Authority.record.compiler_profile}
+    if ([regex]::Matches($text,'(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] actual-profile=' + [regex]::Escape($profile) + '\s*$').Count -ne 1 -or
+        [regex]::Matches($text,'(?m)^\s*[0-9]+(?:\.[0-9]+)?\s+.*\[MIR430-ABLATION\] declared-default=' + [regex]::Escape($profile) + '\s*$').Count -ne 1 -or
+        [regex]::Matches($text,'(?m)^\s*.*\[MIR430-CAPTURE\] stage=' + [regex]::Escape($Stage) + '\s+package=' + [regex]::Escape($ExpectedVersion) + '\s+technologies=[0-9]+\s+output=mir430-full-technology-' + [regex]::Escape($Stage) + '[.]json\s*$').Count -ne 1) {
+      throw "[$Code-matched-run-capture-log]"
+    }
+    $configText = Get-Content -Raw -LiteralPath $config
+    $writeData = [regex]::Match($configText,'(?m)^write-data=(?<path>[^\r\n]+)\s*$')
+    if (-not $writeData.Success) { throw "[$Code-matched-run-config]" }
+    $expectedRaw = [IO.Path]::GetFullPath((Join-Path $writeData.Groups['path'].Value ('script-output/mir430-full-technology-' + $Stage + '.json')))
+    if ([IO.Path]::GetFullPath($ExpectedRawPath) -cne $expectedRaw) { throw "[$Code-matched-run-capture-path]" }
+  }
+  & $bindSample ([string]$Descriptor.source_sample_label) 'source' '4.2.20002' $BaselineSelection $BaselineRawPath
+  & $bindSample ([string]$Descriptor.candidate_sample_label) 'candidate' ([string]$CandidateTarget.distribution_version) $CandidateSelection $CandidateRawPath
+  return [pscustomobject][ordered]@{path=$path;record=$record}
+}
+
+function New-MIR430MatchedStartupCaptureRecord {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$MeasurementPath,
+    [Parameter(Mandatory)][string]$OutputPath,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)][string]$ProfileId,
+    [Parameter(Mandatory)][string]$Code
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $measurement = (Resolve-Path -LiteralPath $MeasurementPath).Path
+  $resultPath = Join-Path $measurement 'result.json'
+  if (-not (Test-Path -LiteralPath $resultPath -PathType Leaf)) { throw "[$Code-matched-run-missing]" }
+  $output = [IO.Path]::GetFullPath($OutputPath)
+  if ((Split-Path -Parent $output) -cne $measurement) { throw "[$Code-output-path]" }
+  $authority = Get-MIR430EmergencyPerformanceAuthority -RepoRoot $repo
+  $expected = @($authority.profiles | Where-Object { [string]$_.id -ceq $ProfileId })
+  if ($expected.Count -ne 1) { throw "[$Code-profile]" }
+  $expected = $expected[0]
+  $target = Get-MIR430PerformanceCandidateTarget -Candidate $Candidate -Target ([string]$expected.target) -Code $Code
+  $candidateSelection = @(Get-MIR430ExpectedProfileLoadedSelection -ProfileDefinition $expected.profile -CandidateTarget $target -Authority $authority -Code $Code)
+  $baselineSelection = @($candidateSelection | ForEach-Object { if ($_ -match '^more-infinite-research@') { 'more-infinite-research@4.2.20002' } else { $_ } })
+  try { $result = Get-Content -Raw -LiteralPath $resultPath | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[$Code-matched-run-json]" }
+  $sourceSamples = @($result.samples | Where-Object { [string]$_.label -ceq 'released-4.2.2' -and [string]$_.cache_state -ceq 'changed-configuration' })
+  $candidateSamples = @($result.samples | Where-Object { [string]$_.label -ceq 'candidate-4.3.0' -and [string]$_.cache_state -ceq 'changed-configuration' })
+  if ($sourceSamples.Count -ne 1 -or $candidateSamples.Count -ne 1) { throw "[$Code-matched-run-sample]" }
+  $rawPathFor = {
+    param($Sample,[string]$Stage)
+    $run = Join-Path $measurement ([string]$Sample.run_relative_path)
+    $config = Join-Path $run ([string]$Sample.execution_controls.config.path)
+    if (-not (Test-Path -LiteralPath $config -PathType Leaf)) { throw "[$Code-matched-run-config]" }
+    $writeData = [regex]::Match((Get-Content -Raw -LiteralPath $config),'(?m)^write-data=(?<path>[^\r\n]+)\s*$')
+    if (-not $writeData.Success) { throw "[$Code-matched-run-config]" }
+    return [IO.Path]::GetFullPath((Join-Path $writeData.Groups['path'].Value ('script-output/mir430-full-technology-' + $Stage + '.json')))
+  }
+  $sourceRaw = & $rawPathFor $sourceSamples[0] 'source'
+  $candidateRaw = & $rawPathFor $candidateSamples[0] 'candidate'
+  foreach ($path in @($sourceRaw,$candidateRaw)) { if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "[$Code-raw-snapshot-missing]" } }
+  $relative = { param([string]$Path) return [IO.Path]::GetRelativePath($measurement,$Path).Replace('\','/') }
+  $upstream = @($candidateSelection | Where-Object { $_ -notmatch '^more-infinite-research@' -and $_ -notmatch ('^' + [regex]::Escape([string]$authority.record.allowed_observer.name) + '@') })
+  $upstreamSha = Get-MIR430PerformanceTextSha256 -Text ($upstream -join "`n")
+  $capture = [pscustomobject][ordered]@{
+    schema = 1
+    kind = [string]$authority.record.catalogue_definition_capture_kind
+    status = 'completed'
+    source = $Candidate.source
+    candidate_manifest = $Candidate.candidate_manifest
+    profile = [ordered]@{ id=[string]$expected.id; target=[string]$expected.target; definition=$expected.definition; engine=$expected.profile.engine; loaded_selection=$candidateSelection }
+    compiler_profile = [string]$authority.record.compiler_profile
+    settings = [ordered]@{ kind=[string]$authority.record.default_settings_mode }
+    capture_mode = 'matched-startup-capture'
+    baseline = [ordered]@{
+      source_version='4.2.2'; distribution_version='4.2.20002'; profile_definition_sha256=[string]$expected.definition.sha256; engine_sha256=[string]$expected.profile.engine.sha256
+      settings_kind=[string]$authority.record.default_settings_mode; compiler_profile_marker='absent'; upstream_selection_sha256=$upstreamSha
+      raw_snapshot=[ordered]@{path=(& $relative $sourceRaw);sha256=(Get-MIR4Sha256File -Path $sourceRaw);stage='source'}
+    }
+    candidate_catalogue = [ordered]@{
+      compiler_profile_marker=[string]$authority.record.compiler_profile; settings_kind=[string]$authority.record.default_settings_mode; upstream_selection_sha256=$upstreamSha
+      raw_snapshot=[ordered]@{path=(& $relative $candidateRaw);sha256=(Get-MIR4Sha256File -Path $candidateRaw);stage='candidate'}
+    }
+    native_run = [ordered]@{path='result.json';sha256=(Get-MIR4Sha256File -Path $resultPath);source_sample_label='released-4.2.2';candidate_sample_label='candidate-4.3.0'}
+    record_sha256 = ''
+  }
+  Write-MIR4BootstrapRecord -Record $capture -Path $output | Out-Null
+  $descriptor = [pscustomobject][ordered]@{path=[IO.Path]::GetFileName($output);sha256=(Get-MIR4Sha256File -Path $output);record_sha256=[string]$capture.record_sha256}
+  return Assert-MIR430FullCatalogueDefinitionCapture -ObservationPath $output -Descriptor $descriptor -Profile $expected -Expected $expected -Candidate $Candidate -CandidateTarget $target -Authority $authority -Code $Code
+}
+
+function Assert-MIR430FullCatalogueDefinitionCapture {
+  param(
+    [Parameter(Mandatory)][string]$ObservationPath,[Parameter(Mandatory)]$Descriptor,
+    [Parameter(Mandatory)]$Profile,[Parameter(Mandatory)]$Expected,[Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Authority,[Parameter(Mandatory)][string]$Code
+  )
+
+  Assert-MIR430PerformancePropertyNames -Value $Descriptor -Expected @('path','sha256','record_sha256') -Code "$Code-catalogue-capture-shape"
+  $capturePath = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $ObservationPath -Descriptor ([pscustomobject][ordered]@{path=[string]$Descriptor.path;sha256=[string]$Descriptor.sha256}) -Code "$Code-catalogue-capture"
+  $capture = Read-MIR42QualificationBootstrapRecord -Path $capturePath -Code "$Code-catalogue-capture"
+  Assert-MIR430PerformancePropertyNames -Value $capture -Expected @(
+    'schema','kind','status','source','candidate_manifest','profile','compiler_profile','settings','capture_mode','baseline','candidate_catalogue','native_run','record_sha256'
+  ) -Code "$Code-catalogue-capture-shape"
+  if ([int]$capture.schema -ne 1 -or [string]$capture.kind -cne [string]$Authority.record.catalogue_definition_capture_kind -or
+      [string]$capture.status -cne 'completed' -or [string]$capture.compiler_profile -cne [string]$Authority.record.compiler_profile -or
+      [string]$capture.source.commit -cne [string]$Candidate.source.commit -or [string]$capture.source.tree -cne [string]$Candidate.source.tree -or
+      [string]$capture.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256 -or
+      [string]$capture.candidate_manifest.sha256 -cne [string]$Candidate.candidate_manifest.sha256 -or
+      [string]$capture.candidate_manifest.record_sha256 -cne [string]$Candidate.candidate_manifest.record_sha256 -or
+      [string]$capture.record_sha256 -cne [string]$Descriptor.record_sha256) {
+    throw "[$Code-catalogue-capture-binding]"
+  }
+  Assert-MIR430PerformancePropertyNames -Value $capture.profile -Expected @('id','target','definition','engine','loaded_selection') -Code "$Code-catalogue-capture-profile-shape"
+  $expectedSelection = Get-MIR430ExpectedProfileLoadedSelection -ProfileDefinition $Expected.profile -CandidateTarget $CandidateTarget -Authority $Authority -Code $Code
+  if ([string]$capture.profile.id -cne [string]$Profile.id -or [string]$capture.profile.target -cne [string]$Profile.target -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $capture.profile.definition) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $Expected.definition) -or
+      (ConvertTo-MIR4BootstrapCanonicalJson -Value $capture.profile.engine) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $Expected.profile.engine) -or
+      ((@($capture.profile.loaded_selection | ForEach-Object { [string]$_ } | Sort-Object) -join '|') -cne ($expectedSelection -join '|'))) {
+    throw "[$Code-catalogue-capture-profile-binding]"
+  }
+  Assert-MIR430PerformancePropertyNames -Value $capture.settings -Expected @('kind') -Code "$Code-catalogue-capture-settings-shape"
+  if ([string]$capture.settings.kind -cne [string]$Authority.record.default_settings_mode) { throw "[$Code-catalogue-capture-settings-binding]" }
+  if ([string]$capture.capture_mode -cnotin @('upgrade-preservation-proof','matched-startup-capture')) { throw "[$Code-catalogue-capture-mode]" }
+  Assert-MIR430PerformancePropertyNames -Value $capture.baseline -Expected @('source_version','distribution_version','profile_definition_sha256','engine_sha256','settings_kind','compiler_profile_marker','upstream_selection_sha256','raw_snapshot') -Code "$Code-catalogue-capture-baseline-shape"
+  Assert-MIR430PerformancePropertyNames -Value $capture.candidate_catalogue -Expected @('compiler_profile_marker','settings_kind','upstream_selection_sha256','raw_snapshot') -Code "$Code-catalogue-capture-candidate-shape"
+  $nativeDescriptorFields = if ([string]$capture.capture_mode -ceq 'matched-startup-capture') {
+    @('path','sha256','source_sample_label','candidate_sample_label')
+  } else { @('path','sha256') }
+  Assert-MIR430PerformancePropertyNames -Value $capture.native_run -Expected $nativeDescriptorFields -Code "$Code-catalogue-capture-native-run-shape"
+  $expectedUpstreamSelection = @(
+    Get-MIR430ExpectedProfileLoadedSelection -ProfileDefinition $Expected.profile -CandidateTarget $CandidateTarget -Authority $Authority -Code $Code |
+      Where-Object { $_ -notmatch '^more-infinite-research@' -and $_ -notmatch ('^' + [regex]::Escape([string]$Authority.record.allowed_observer.name) + '@') }
+  )
+  $expectedUpstreamSelectionSha = Get-MIR430PerformanceTextSha256 -Text ($expectedUpstreamSelection -join "`n")
+  if ([string]$capture.baseline.source_version -cne '4.2.2' -or [string]$capture.baseline.distribution_version -cne '4.2.20002' -or
+      [string]$capture.baseline.profile_definition_sha256 -cne [string]$Expected.definition.sha256 -or
+      [string]$capture.baseline.engine_sha256 -cne [string]$Expected.profile.engine.sha256 -or
+      [string]$capture.baseline.settings_kind -cne [string]$Authority.record.default_settings_mode -or
+      [string]$capture.baseline.compiler_profile_marker -cne 'absent' -or
+      [string]$capture.baseline.upstream_selection_sha256 -cne $expectedUpstreamSelectionSha -or
+      [string]$capture.candidate_catalogue.compiler_profile_marker -cne [string]$Authority.record.compiler_profile -or
+      [string]$capture.candidate_catalogue.settings_kind -cne [string]$Authority.record.default_settings_mode -or
+      [string]$capture.candidate_catalogue.upstream_selection_sha256 -cne $expectedUpstreamSelectionSha) {
+    throw "[$Code-catalogue-definition-binding]"
+  }
+  $baselineActive = @($expectedSelection | ForEach-Object { if ($_ -match '^more-infinite-research@') { 'more-infinite-research@4.2.20002' } else { $_ } })
+  $candidateActive = @($expectedSelection)
+  $candidateStage = if ([string]$capture.capture_mode -ceq 'matched-startup-capture') {'candidate'} else {'upgrade'}
+  $baselineRaw = Get-MIR430FullSnapshotProjection -ObservationPath $capturePath -Descriptor $capture.baseline.raw_snapshot -Stage source -ExpectedActiveSelection $baselineActive -ExpectedCompilerProfile 'absent' -Code "$Code-catalogue-capture-baseline" -CaptureMode ([string]$capture.capture_mode) -ExpectedPackageVersion '4.2.20002'
+  $candidateRaw = Get-MIR430FullSnapshotProjection -ObservationPath $capturePath -Descriptor $capture.candidate_catalogue.raw_snapshot -Stage $candidateStage -ExpectedActiveSelection $candidateActive -ExpectedCompilerProfile ([string]$Authority.record.compiler_profile) -Code "$Code-catalogue-capture-candidate" -CaptureMode ([string]$capture.capture_mode) -ExpectedPackageVersion ([string]$CandidateTarget.distribution_version)
+  $upgradeSnapshotMismatch = [string]$capture.capture_mode -ceq 'upgrade-preservation-proof' -and (
+    [string]$baselineRaw.snapshot.from_version -cne '4.2.20002' -or [string]$baselineRaw.snapshot.to_version -cne [string]$CandidateTarget.distribution_version -or
+    [string]$candidateRaw.snapshot.from_version -cne '4.2.20002' -or [string]$candidateRaw.snapshot.to_version -cne [string]$CandidateTarget.distribution_version)
+  if ($upgradeSnapshotMismatch -or
+      [string]$baselineRaw.technology_ids_sha256 -cne [string]$candidateRaw.technology_ids_sha256 -or
+      [string]$baselineRaw.semantic_definitions_sha256 -cne [string]$candidateRaw.semantic_definitions_sha256 -or
+      [string]$baselineRaw.settings_sha256 -cne [string]$candidateRaw.settings_sha256) { throw "[$Code-catalogue-definition-binding]" }
+  if ([string]$capture.capture_mode -ceq 'matched-startup-capture') {
+    $matched = Assert-MIR430MatchedStartupCaptureRun -ObservationPath $capturePath -Descriptor $capture.native_run -Expected $Expected -CandidateTarget $CandidateTarget -Authority $Authority -BaselineSelection $baselineActive -CandidateSelection $candidateActive -BaselineRawPath $baselineRaw.path -CandidateRawPath $candidateRaw.path -Code "$Code-catalogue-capture"
+    return [pscustomobject][ordered]@{path=$capturePath;record=$capture;baseline=$baselineRaw;candidate=$candidateRaw;native_run=$matched.record}
+  }
+  $nativeRunPath = Resolve-MIR430PerformanceEvidenceFile -ObservationPath $capturePath -Descriptor $capture.native_run -Code "$Code-catalogue-capture-native-run"
+  try { $nativeRun = Get-Content -Raw -LiteralPath $nativeRunPath | ConvertFrom-Json -Depth 100 -DateKind String } catch { throw "[$Code-catalogue-capture-native-run-json]" }
+  foreach ($field in @('status','factorio_binary_version','factorio_binary_sha256','from','to','assertions','full_state_evaluator_snapshots','source_library_activation','library_activation')) { if ($nativeRun.PSObject.Properties.Name -notcontains $field) { throw "[$Code-catalogue-capture-native-run-shape]" } }
+  $requiredAssertions = @('all-existing-technology-state-and-definitions-retained','all-exposed-earned-effects-retained','all-supported-research-queue-retained','full-state-oracle-executed-upgrade-and-two-reloads')
+  $nativeRows = @($nativeRun.full_state_evaluator_snapshots)
+  $sourceRow = @($nativeRows | Where-Object { [string]$_.stage -ceq 'source' -and [string]$_.sha256 -ceq [string]$baselineRaw.sha256 })
+  $upgradeRow = @($nativeRows | Where-Object { [string]$_.stage -ceq 'upgrade' -and [string]$_.sha256 -ceq [string]$candidateRaw.sha256 })
+  if ([string]$nativeRun.status -cne 'passed' -or [string]$nativeRun.factorio_binary_sha256 -cne [string]$Expected.profile.engine.sha256 -or
+      [string]$nativeRun.factorio_binary_version -notmatch ('^' + [regex]::Escape([string]$Expected.profile.engine.version) + '(?:[.]|$)') -or
+      [string]$nativeRun.from.version -cne '4.2.20002' -or [string]$nativeRun.from.sha256 -cne '14C2B23E0F4657F9F79585A982639463678D640C04916FEECC365D93B6894A65' -or
+      [string]$nativeRun.to.version -cne [string]$CandidateTarget.distribution_version -or [string]$nativeRun.to.sha256 -cne [string]$CandidateTarget.archive.sha256 -or
+      @($requiredAssertions | Where-Object { $_ -cnotin @($nativeRun.assertions | ForEach-Object { [string]$_ }) }).Count -ne 0 -or $sourceRow.Count -ne 1 -or $upgradeRow.Count -ne 1) {
+    throw "[$Code-catalogue-capture-native-run-binding]"
+  }
+  $nativeSourceSelection = Get-MIR430PerformanceActivationSelection -Activation $nativeRun.source_library_activation -Code "$Code-catalogue-capture-source-activation"
+  $nativeCandidateSelection = Get-MIR430PerformanceActivationSelection -Activation $nativeRun.library_activation -Code "$Code-catalogue-capture-candidate-activation"
+  if (($nativeSourceSelection -join '|') -cne (@($baselineActive | Sort-Object) -join '|') -or
+      ($nativeCandidateSelection -join '|') -cne (@($candidateActive | Sort-Object) -join '|')) {
+    throw "[$Code-catalogue-capture-native-run-selection]"
+  }
+  return [pscustomobject][ordered]@{path=$capturePath;record=$capture;baseline=$baselineRaw;candidate=$candidateRaw;native_run=$nativeRun}
 }
 
 function Get-MIR430PerformanceCandidateTarget {
@@ -1115,7 +1440,7 @@ function Get-MIR430PerformanceInvocationSample {
       @($logIdentity.loaded_selection | Where-Object { $_ -cnotin $expectedSelection }).Count -ne 0) { throw "[$Code-invocation-log-binding]" }
   return [pscustomobject][ordered]@{path=$path;sample=$sample}
 }
-function Assert-MIR430ClassicStartupStressObservation {
+function Assert-MIR430FullStartupStressObservation {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$Path,
@@ -1133,7 +1458,7 @@ function Assert-MIR430ClassicStartupStressObservation {
   Assert-MIR430PerformancePropertyNames -Value $record -Expected @(
     'schema','kind','status','source','candidate_manifest','authority','compiler_profile','profiles','record_sha256'
   ) -Code "$Code-shape"
-  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR430ClassicStartupStressObservationV1' -or [string]$record.status -cne 'completed' -or
+  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR430FullStartupStressObservationV1' -or [string]$record.status -cne 'completed' -or
       [string]$record.compiler_profile -cne [string]$authority.record.compiler_profile -or
       [string]$record.source.commit -cne [string]$Candidate.source.commit -or [string]$record.source.tree -cne [string]$Candidate.source.tree -or
       [string]$record.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256 -or
@@ -1152,7 +1477,7 @@ function Assert-MIR430ClassicStartupStressObservation {
   }
   foreach ($expected in $authority.profiles) {
     $profile = @($profiles | Where-Object { [string]$_.id -ceq [string]$expected.id })[0]
-    Assert-MIR430PerformancePropertyNames -Value $profile -Expected @('id','target','definition','settings','engine','candidate','observer','samples') -Code "$Code-profile-shape"
+    Assert-MIR430PerformancePropertyNames -Value $profile -Expected @('id','target','definition','settings','engine','candidate','observer','full_catalogue_capture','samples') -Code "$Code-profile-shape"
     if ([string]$profile.target -cne [string]$expected.target -or
         (ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.definition) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected.definition) -or
         (ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.engine) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $expected.profile.engine) -or
@@ -1177,6 +1502,7 @@ function Assert-MIR430ClassicStartupStressObservation {
     if ((ConvertTo-MIR4BootstrapCanonicalJson -Value $profile.candidate) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $candidateClaim)) {
       throw "[$Code-candidate-binding] $([string]$expected.id)"
     }
+    $catalogueCapture = Assert-MIR430FullCatalogueDefinitionCapture -ObservationPath $Path -Descriptor $profile.full_catalogue_capture -Profile $profile -Expected $expected -Candidate $Candidate -CandidateTarget $candidateTarget -Authority $authority -Code "$Code-$([string]$expected.id)"
     $samples = @($profile.samples)
     if ($samples.Count -lt [int]$authority.record.minimum_samples_per_profile -or @($samples | ForEach-Object { [string]$_.label } | Sort-Object -Unique).Count -ne $samples.Count) {
       throw "[$Code-samples] $([string]$expected.id)"
@@ -1195,7 +1521,10 @@ function Assert-MIR430ClassicStartupStressObservation {
       # evidence that this invocation used that file.
       if ($rawSettingsClaim) { throw "[$Code-settings-binding] $([string]$expected.id)" }
       $parsedResult = Get-MIR430PerformanceParsedStages -Path $logPath -Stages @($authority.record.required_stages)
-      if ([int]$parsedResult.generated_mir_technologies -lt [int]$authority.record.minimum_generated_mir_technologies) { throw "[$Code-generated-technology-count] $([string]$expected.id)" }
+      if (@($parsedResult.technology_names).Count -ne @($catalogueCapture.candidate.technology_ids).Count -or
+          [string]$parsedResult.technology_ids_sha256 -cne [string]$catalogueCapture.candidate.technology_ids_sha256) {
+        throw "[$Code-catalogue-capture-log-binding] $([string]$expected.id)"
+      }
       $parsed = @($parsedResult.stages)
       $reported = @($sample.stages)
       if ($reported.Count -ne $parsed.Count) { throw "[$Code-stage-count] $([string]$expected.id)" }
@@ -1221,6 +1550,18 @@ function Assert-MIR430ClassicStartupStressObservation {
     }
   }
   return [pscustomobject][ordered]@{path=(Resolve-Path -LiteralPath $Path).Path;sha256=(Get-MIR4Sha256File -Path $Path);record=$record;authority=$authority}
+}
+
+# Retain the former exported name for callers that have not yet been migrated.
+# It validates the Full/default record above; Classic observations cannot pass it.
+function Assert-MIR430ClassicStartupStressObservation {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)][string]$Code
+  )
+  return Assert-MIR430FullStartupStressObservation -RepoRoot $RepoRoot -Path $Path -Candidate $Candidate -Code $Code
 }
 
 function Resolve-MIR42CriterionEvidenceOutputPath {
@@ -1345,8 +1686,8 @@ function Get-MIR42CriterionEvidenceObservation {
     'deterministic-reconstruction' { $candidateConstruction -and [bool]$record.build_complete }
     'performance-telemetry' {
       if ($SourceVersion -cin @('4.3.0','4.3.1')) {
-        $candidateBound -and [string]$record.kind -ceq 'MIR430ClassicStartupStressObservationV1' -and
-          [string]$record.status -ceq 'completed' -and [string]$record.compiler_profile -ceq 'classic'
+        $candidateBound -and [string]$record.kind -ceq 'MIR430FullStartupStressObservationV1' -and
+          [string]$record.status -ceq 'completed' -and [string]$record.compiler_profile -ceq 'full'
       } else {
         $candidateBound -and [string]$record.kind -ceq 'MIR42NineTargetCriterionObservationV1' -and
           [string]$record.status -ceq 'passed' -and [string]$record.criterion -ceq $Criterion -and
@@ -1363,7 +1704,7 @@ function Get-MIR42CriterionEvidenceObservation {
     Assert-MIR42MaintenanceCriterionObservation -Record $record -Criterion $Criterion -PublishedInputs $PublishedMaintenanceInputs
   }
   if ($Criterion -ceq 'performance-telemetry' -and $SourceVersion -cin @('4.3.0','4.3.1')) {
-    $null = Assert-MIR430ClassicStartupStressObservation -RepoRoot $mir42QualificationRoot -Path $Path -Candidate $Candidate -Code $Code
+    $null = Assert-MIR430FullStartupStressObservation -RepoRoot $mir42QualificationRoot -Path $Path -Candidate $Candidate -Code $Code
   }
   return [pscustomobject][ordered]@{
     path = (Resolve-Path -LiteralPath $Path).Path
