@@ -335,9 +335,13 @@ try {
         'prototypes/mir/stage/data.lua'='source/prototypes/mir/stage/data.lua'
         'prototypes/mir/stage/control.lua'='source/prototypes/mir/stage/control.lua'
         'prototypes/mir/runtime/scripted_techs.lua'="source/adapters/$target/prototypes/mir/runtime/scripted_techs.lua"
+        'prototypes/mir/settings/compiler_profile.lua'='source/prototypes/mir/settings/compiler_profile.lua'
+        'prototypes/mir/platform/factorio/target_line.lua'='source/prototypes/mir/platform/factorio/target_line.lua'
         'prototypes/mir/platform/factorio/target_profiles.lua'="source/adapters/$target/prototypes/mir/platform/factorio/target_profiles.lua"
       }
       foreach($name in $capabilitySources.Keys){
+        if(($Variant -ceq 'missing-compiler-profile' -and $name -ceq 'prototypes/mir/settings/compiler_profile.lua') -or
+           ($Variant -ceq 'missing-target-line' -and $name -ceq 'prototypes/mir/platform/factorio/target_line.lua')){continue}
         $bytes=[IO.File]::ReadAllBytes((Join-Path $repo $capabilitySources[$name]))
         if($Variant -ceq 'changed-coordinator' -and $name.EndsWith('/scripted_techs.lua')){$bytes[0]=$bytes[0] -bxor 1}
         if($Variant -ceq 'changed-capability' -and $name.EndsWith('/target_profiles.lua')){$bytes[0]=$bytes[0] -bxor 1}
@@ -380,12 +384,13 @@ try {
       @{variant='root-case';error='candidate-identity'},@{variant='traversal';error='candidate-identity'},
       @{variant='backslash';error='candidate-identity'},@{variant='duplicate-info';error='one mod identity'},
       @{variant='info-budget';error='info-budget'},@{variant='missing-module';error='exactly one'},
+       @{variant='missing-compiler-profile';error='exactly one'},@{variant='missing-target-line';error='exactly one'},
       @{variant='nested-module';error='exactly one'},@{variant='duplicate-module';error='exactly one'},
       @{variant='changed-module';error='differs from the controlled source'}
     )) {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error
-      if($line -ceq '2.1'){Refuses-Probe {Test-TinBrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error}
+      if($line -ceq '2.1' -and $case.variant -notin @('missing-compiler-profile','missing-target-line')){Refuses-Probe {Test-TinBrowserCandidate -Candidate $invalid -Line $line -Identity $identity -Repository $repo} $case.error}
     }
     $currentIdentity=& $browserBinding -RepoRoot $repo -Target $line -SourceVersion '4.2.2'
     $currentArchive=New-ControlledBrowserArchive -Line $line -Identity $currentIdentity
