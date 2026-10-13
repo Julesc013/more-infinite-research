@@ -120,6 +120,7 @@
       "id": "mir42-candidate-construction",
       "patterns": [
         "^fixtures/release-inputs/mir42(?:1-published-420|2-published-421|3-published-422)-manifest[.]json$",
+        "^fixtures/release-inputs/mir431-published-430-manifest[.]json$",
         "^tests/release/Test-MIR42FourTargetCandidateBuild[.]ps1$",
         "^tools/commands/release/New-MIR42(?:FourTarget|HistoricalPlaytest)Candidate[.]ps1$",
         "^tools/mir/application/package/TargetMaterializer[.]ps1$",
