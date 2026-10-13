@@ -311,11 +311,15 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     [Parameter(Mandatory)][ValidateSet('f210','f110','f100')][string]$Target,
     [Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$FromVersion,
-    [Parameter(Mandatory)][string]$ToVersion
+    [Parameter(Mandatory)][string]$ToVersion,
+    [switch]$BaseDefaultCompleteState
   )
   $code=$Target.Substring(1)
   if($FromVersion-cnotin@("4.2.${code}00","4.2.${code}01","4.2.${code}02")-or$ToVersion-cnotin@("4.3.${code}00","4.3.${code}01")){
     throw '[mir430-full-upgrade-setting-transition]'
+  }
+  if($BaseDefaultCompleteState-and($Target-cne'f210'-or$FromVersion-cne'4.2.21002'-or$ToVersion-cne'4.3.21000')){
+    throw '[mir430-full-upgrade-base-snapshot-transition]'
   }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   if($Target-ceq'f210'){
@@ -324,14 +328,17 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     $anchor='local added_422_setting_defaults = {}'
     $completeStateGate='  and to_version:match("^4%.2%.210%d%d$")'
     $completeStateArchetype='archetype == "space-age-native-owner"'
+    $completeStateReportedRows='  for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
     $completeStateHooks=@('    export_state("source")','    export_state("upgrade")','      export_state("reload")')
     if([regex]::Matches($text,[regex]::Escape($anchor)).Count-ne1){throw '[mir430-full-upgrade-setting-anchor]'}
     if([regex]::Matches($text,[regex]::Escape($completeStateGate)).Count-ne1-or
        @($completeStateHooks|Where-Object {-not$text.Contains($_)}).Count){
       throw '[mir430-full-upgrade-complete-state-anchor]'
     }
-    $baseFullSnapshot=$FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000'
-    if($baseFullSnapshot-and[regex]::Matches($text,[regex]::Escape($completeStateArchetype)).Count-ne1){
+    $baseFullSnapshot=[bool]$BaseDefaultCompleteState
+    if($baseFullSnapshot-and(
+        [regex]::Matches($text,[regex]::Escape($completeStateArchetype)).Count-ne1-or
+        [regex]::Matches($text,[regex]::Escape($completeStateReportedRows)).Count-ne1)){
       throw '[mir430-full-upgrade-base-snapshot-anchor]'
     }
     $text=$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
@@ -345,6 +352,10 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
       # upgrade and reload proof as the Space Age lane.  Do not admit Base
       # snapshots for another predecessor or destination through this hook.
       $text=$text.Replace($completeStateArchetype,'(archetype == "space-age-native-owner" or archetype == "base-default")')
+      # These three named rows are a Space Age incident regression check.  The
+      # complete comparator above remains exhaustive for Base; its source
+      # snapshot proves these Space Age-only technologies were never present.
+      $text=$text.Replace($completeStateReportedRows,'  for _, name in ipairs({}) do')
     }
     [IO.File]::WriteAllText($path,$text,[Text.UTF8Encoding]::new($false))
     return
