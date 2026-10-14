@@ -221,6 +221,10 @@ function Invoke-MIRUpgradeMonitoredProcess {
   $script:upgradeProcessIndex++
   $prefix=Join-Path $root ('process-'+$script:upgradeProcessIndex)
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $script:upgradeResourceContext
+  # Library validation builds temporary archive inventories. Release completed
+  # host allocations before native admission, as the shared probe runner does.
+  # The active lease, required inputs and all resource limits remain live.
+  [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
     -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradeResourcePolicy -EstimatedPeakBytes $remaining `
     -ExpectedPeakMemoryBytes $upgradePeakBytes -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) `

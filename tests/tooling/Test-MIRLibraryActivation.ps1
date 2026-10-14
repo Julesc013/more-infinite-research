@@ -661,7 +661,7 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       [IO.Directory]::CreateDirectory($root)|Out-Null
       $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
       Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $activation
-      $upgradePolicy=@{};$upgradePeakBytes=1MB
+      $upgradeResourcePolicy=@{};$upgradePeakBytes=1MB
       [IO.Directory]::CreateDirectory((Join-Path $root 'userdata'))|Out-Null
       $upgradeConfig=Join-Path $root 'upgrade-config.ini'
       [IO.File]::WriteAllLines($upgradeConfig,@('[path]',('read-data='+$data),('write-data='+(Join-Path $root 'userdata')),'[other]','enable-new-mods=false'))
