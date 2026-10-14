@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -17,6 +18,50 @@ FIXTURE = Path("tests/compiler/recipe_productivity_permissions.lua")
 SEMANTICS = Path("source/prototypes/mir/domain/facts/recipe_semantics.lua")
 MATCHER = Path("source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua")
 PLANNER = Path("source/prototypes/mir/capabilities/recipe_productivity/planner.lua")
+PUBLISHED_PRODUCTIVITY = "source/prototypes/streams/productivity.lua"
+PUBLISHED_MINING_GROUPS = (
+    '{ change = 0.20, items = { "burner-mining-drill" } },',
+    '{ change = 0.10, items = { "electric-mining-drill" } },',
+    '{ change = 0.05, items = { "big-mining-drill" }, item_patterns = {',
+)
+
+
+def mining_stream_block(source: str, origin: str) -> str:
+    start = source.find('  research_mining_drill = {')
+    end = source.find('\n\n  research_electric_energy = {', start)
+    if start < 0 or end < 0:
+        raise RuntimeError(f"Mining-drill stream is unavailable in {origin}")
+    return source[start:end]
+
+
+def git_output(repo: Path, args: list[str], description: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(repo), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode:
+        raise RuntimeError(f"{description} is unavailable: {result.stderr.strip()}")
+    return result.stdout
+
+
+def published_productivity(repo: Path, tag: str) -> tuple[str, dict[str, str]]:
+    source = git_output(
+        repo,
+        ["show", f"{tag}:{PUBLISHED_PRODUCTIVITY}"],
+        f"Published mining baseline {tag}",
+    )
+    return source, {
+        "tag": tag,
+        "commit": git_output(repo, ["rev-list", "-n", "1", tag], f"Published tag {tag}").strip(),
+        "blob": git_output(
+            repo,
+            ["rev-parse", f"{tag}:{PUBLISHED_PRODUCTIVITY}"],
+            f"Published productivity blob {tag}",
+        ).strip(),
+        "sha256": hashlib.sha256(source.encode()).hexdigest(),
+    }
 
 
 def main() -> int:
@@ -38,14 +83,36 @@ def main() -> int:
     semantics_source = (repo / SEMANTICS).read_text(encoding="utf-8")
     matcher_source = (repo / MATCHER).read_text(encoding="utf-8")
     planner_source = (repo / PLANNER).read_text(encoding="utf-8")
+    published_baseline_assertions = 0
+    published_baselines: dict[str, dict[str, str]] = {}
+    published_mining_blocks: dict[str, str] = {}
+    for tag in ("v4.2.2", "v4.3.0"):
+        published_source, published_identity = published_productivity(repo, tag)
+        published_block = mining_stream_block(published_source, tag)
+        published_baselines[tag] = published_identity
+        published_mining_blocks[tag] = published_block
+        if "reject_explicit_productivity_denial" in published_block:
+            raise RuntimeError(f"Published mining baseline {tag} unexpectedly rejects explicit recipe productivity declarations")
+        published_baseline_assertions += 1
+        for group in PUBLISHED_MINING_GROUPS:
+            if group not in published_block:
+                raise RuntimeError(f"Published mining baseline {tag} is missing its declared group: {group}")
+            published_baseline_assertions += 1
+    current_mining_block = mining_stream_block(streams, str(STREAMS))
+    if "reject_explicit_productivity_denial" in current_mining_block:
+        raise RuntimeError(
+            "Current mining-drill stream changes the published explicit-productivity emission contract"
+        )
+    published_baseline_assertions += 1
+    for group in PUBLISHED_MINING_GROUPS:
+        if group not in current_mining_block:
+            raise RuntimeError(f"Current mining-drill stream no longer retains its published group: {group}")
+        published_baseline_assertions += 1
     for required in (
         '{name = "burner-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true}',
         '{name = "electric-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true}',
         '{name = "big-mining-drill", required_mods = {"space-age"}, only_if_implicit_productivity = true}',
         '{name = "se-core-miner-drill", required_mods = {"space-exploration"}, only_if_implicit_productivity = true}',
-        '{ change = 0.20, items = { "burner-mining-drill" }, reject_explicit_productivity_denial = true }',
-        '{ change = 0.10, items = { "electric-mining-drill" }, reject_explicit_productivity_denial = true }',
-        '{ change = 0.05, items = { "big-mining-drill" }, reject_explicit_productivity_denial = true, item_patterns = {',
     ):
         if required not in streams:
             raise RuntimeError(f"Mining stream is missing required implicit-only permission: {required}")
@@ -53,6 +120,16 @@ def main() -> int:
         raise RuntimeError("Stream descriptor does not validate the implicit-only permission field")
 
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+    current_mining_groups = runtime.execute("return {\n" + current_mining_block + "\n}")["research_mining_drill"]["groups"]
+    published_422_groups = runtime.execute(
+        "return {\n" + published_mining_blocks["v4.2.2"] + "\n}"
+    )["research_mining_drill"]["groups"]
+    published_430_groups = runtime.execute(
+        "return {\n" + published_mining_blocks["v4.3.0"] + "\n}"
+    )["research_mining_drill"]["groups"]
+    runtime.globals().MIR_CURRENT_MINING_GROUPS = current_mining_groups
+    runtime.globals().MIR_PUBLISHED_422_MINING_GROUPS = published_422_groups
+    runtime.globals().MIR_PUBLISHED_430_MINING_GROUPS = published_430_groups
     runtime.execute(
         """
 package.preload["prototypes.mir.platform.factorio.data_raw"] = function()
@@ -116,7 +193,12 @@ package.preload["prototypes.mir.domain.technology.technology_risk"] = function()
 local registry = package.loaded["prototypes.mir.streams.registry"]
 registry.shared = {per_level_default = 0.10}
 package.preload["prototypes.mir.platform.factorio.prototype_lookup"] = function()
-  return {each_item_prototype=function() end, each_fluid_prototype=function() end}
+  return {
+    each_item_prototype=function(callback)
+      for name, prototype in pairs(_G.MIR_ITEM_PROTOTYPES or {}) do callback(name, prototype, "item") end
+    end,
+    each_fluid_prototype=function() end
+  }
 end
 package.preload["prototypes.mir.domain.facts.recipe_semantics"] = function() return _G.MIR_RECIPE_SEMANTICS end
 package.preload["prototypes.mir.index.recipe_facts"] = function()
@@ -178,7 +260,7 @@ local function materialize(name, recipe, enabled)
   _G.MIR_PERMISSION_STREAMS={research_mining_drill={productivity_permission_recipes={{name=name,required_mods={"space-age"},only_if_implicit_productivity=true}}}}
   permissions.apply()
   _G.MIR_MATCH_FACTS={[name]=fact(name, recipe)}
-  local buckets=matcher.recipes_for_stream({groups={{change=0.05,items={name},reject_explicit_productivity_denial=true}}},0.10)
+  local buckets=matcher.recipes_for_stream({groups={{change=0.05,items={name}}}},0.10)
   return recipe, planner.effects_from_buckets("research_mining_drill",buckets)
 end
 local enabled, effects = materialize("big-mining-drill", {}, true)
@@ -186,11 +268,11 @@ check(enabled.allow_productivity == true, "actual permission pipeline grants an 
 check(#effects == 1 and effects[1].type == "change-recipe-productivity" and effects[1].recipe == "big-mining-drill" and effects[1].change == 0.05,
   "actual matcher buckets feed the existing productivity-effect emitter with the declared 5 percent drill effect")
 local denied, denied_effects = materialize("big-mining-drill", {allow_productivity=false}, true)
-check(denied.allow_productivity == false and #denied_effects == 0,
-  "explicit productivity denials stay byte-for-value false and produce no drill effect")
+check(denied.allow_productivity == false and #denied_effects == 1 and denied_effects[1].recipe == "big-mining-drill",
+  "explicit productivity denials stay byte-for-value false while retaining the published drill effect")
 local capped, capped_effects = materialize("big-mining-drill", {maximum_productivity=0}, true)
-check(capped.maximum_productivity == 0 and #capped_effects == 0,
-  "an explicit zero cap stays byte-for-value zero and produces no drill effect")
+check(capped.maximum_productivity == 0 and #capped_effects == 1 and capped_effects[1].recipe == "big-mining-drill",
+  "an explicit zero cap stays byte-for-value zero while retaining the published drill effect")
 _G.mods={base="2.1.21",["space-age"]="2.1.21"}
 _G.data={raw={recipe={["big-mining-drill"]={}}}}
 _G.MIR_ENABLED_STREAMS={research_mining_drill=false}
@@ -198,16 +280,65 @@ _G.MIR_PERMISSION_STREAMS={research_mining_drill={productivity_permission_recipe
 permissions.apply()
 check(_G.data.raw.recipe["big-mining-drill"].allow_productivity == nil,
   "a disabled stream leaves the implicit recipe unmutated before the normal planner skips that stream")
+local legacy_recipes = {
+  ["burner-mining-drill"]={allow_productivity=false},
+  ["electric-mining-drill"]={normal={allow_productivity=false}},
+  ["big-mining-drill"]={maximum_productivity=0},
+  ["se-core-miner-drill"]={expensive={maximum_productivity=0}}
+}
+_G.MIR_MATCH_FACTS={}
+_G.MIR_ITEM_PROTOTYPES={
+  ["burner-mining-drill"]={}, ["electric-mining-drill"]={},
+  ["big-mining-drill"]={}, ["se-core-miner-drill"]={}
+}
+for name, recipe in pairs(legacy_recipes) do _G.MIR_MATCH_FACTS[name]=fact(name,recipe) end
+local function normalized_groups(groups)
+  local rows = {}
+  for ordinal, group in ipairs(groups) do
+    rows[#rows + 1] = table.concat({
+      ordinal, group.change, table.concat(group.items or {}, ","),
+      table.concat(group.item_patterns or {}, ","), tostring(group.reject_explicit_productivity_denial)
+    }, "|")
+  end
+  return table.concat(rows, ";")
+end
+local published_422_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_PUBLISHED_422_MINING_GROUPS},0.10))
+local published_430_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_PUBLISHED_430_MINING_GROUPS},0.10))
+local current_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_CURRENT_MINING_GROUPS},0.10))
+check(normalized_groups(_G.MIR_PUBLISHED_422_MINING_GROUPS) == normalized_groups(_G.MIR_PUBLISHED_430_MINING_GROUPS),
+  "published 4.2.2 and 4.3.0 mining groups agree on exact membership, changes, patterns, and denial policy")
+check(normalized_groups(_G.MIR_CURRENT_MINING_GROUPS) == normalized_groups(_G.MIR_PUBLISHED_430_MINING_GROUPS),
+  "current parsed mining groups preserve the published explicit-productivity emission contract")
+check(#current_effects == #published_422_effects and #current_effects == #published_430_effects,
+  "current parsed mining groups retain all published native and Space Exploration drill effects")
+local expected_changes={
+  ["burner-mining-drill"]=0.20, ["electric-mining-drill"]=0.10,
+  ["big-mining-drill"]=0.05, ["se-core-miner-drill"]=0.05
+}
+local emitted={}
+local published_422_emitted, published_430_emitted = {}, {}
+for _, effect in ipairs(current_effects) do emitted[effect.recipe]=effect.change end
+for _, effect in ipairs(published_422_effects) do published_422_emitted[effect.recipe]=effect.change end
+for _, effect in ipairs(published_430_effects) do published_430_emitted[effect.recipe]=effect.change end
+for recipe, change in pairs(expected_changes) do
+  check(emitted[recipe] == change, "published mining emission retains the exact drill effect: " .. recipe)
+  check(published_422_emitted[recipe] == change and published_430_emitted[recipe] == change,
+    "published baseline mining emission remains independently pinned: " .. recipe)
+end
+check(emitted["iron-ore"] == nil and emitted["copper-ore"] == nil,
+  "published mining productivity effects target drill recipes and never ore yield")
 return assertions
 """
     )
-    if int(pipeline_assertions) != 5:
+    if int(pipeline_assertions) != 17:
         raise RuntimeError(f"Unexpected actual permission-to-effect assertion count: {pipeline_assertions}")
     record = {
         "status": "MIR-RECIPE-PRODUCTIVITY-PERMISSIONS-CONTROLS-PASSED",
         "assertions": int(result["assertions"]),
         "pipeline_sha256": hashlib.sha256(source.encode()).hexdigest(),
         "streams_sha256": hashlib.sha256(streams.encode()).hexdigest(),
+        "published_baseline_assertions": published_baseline_assertions,
+        "published_baselines": published_baselines,
         "descriptor_sha256": hashlib.sha256(descriptor.encode()).hexdigest(),
         "fixture_sha256": hashlib.sha256(fixture.encode()).hexdigest(),
         "semantics_sha256": hashlib.sha256(semantics_source.encode()).hexdigest(),

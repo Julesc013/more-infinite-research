@@ -555,9 +555,9 @@ local streams = {
       {name = "se-core-miner-drill", required_mods = {"space-exploration"}, only_if_implicit_productivity = true}
     },
     groups = {
-    { change = 0.20, items = { "burner-mining-drill" }, reject_explicit_productivity_denial = true },
-    { change = 0.10, items = { "electric-mining-drill" }, reject_explicit_productivity_denial = true },
-    { change = 0.05, items = { "big-mining-drill" }, reject_explicit_productivity_denial = true, item_patterns = {
+    { change = 0.20, items = { "burner-mining-drill" } },
+    { change = 0.10, items = { "electric-mining-drill" } },
+    { change = 0.05, items = { "big-mining-drill" }, item_patterns = {
       "^big%-mining%-drill$",
       "^omega%-drill$",
       "^omega%-tau$",

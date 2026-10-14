@@ -90,7 +90,9 @@ end
 for _, subject in ipairs({
   {label = "root denial", recipe = {allow_productivity = false}},
   {label = "normal denial", recipe = {normal = {allow_productivity = false}}},
+  {label = "expensive denial", recipe = {expensive = {allow_productivity = false}}},
   {label = "root cap", recipe = {maximum_productivity = 0}},
+  {label = "normal cap", recipe = {normal = {maximum_productivity = 0}}},
   {label = "expensive cap", recipe = {expensive = {maximum_productivity = 0}}}
 }) do
   local recipe = subject.recipe

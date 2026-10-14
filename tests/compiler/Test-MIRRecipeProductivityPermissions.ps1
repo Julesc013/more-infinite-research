@@ -20,18 +20,20 @@ $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-RECIPE-PRODUC
 if(-not$recordLine){throw "Productivity-permission controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
 if (
-  [int]$record.assertions -lt 13 -or
+  [int]$record.assertions -lt 15 -or
+  [int]$record.published_baseline_assertions -lt 8 -or
   [int]$record.descriptor_assertions -lt 1 -or
-  [int]$record.pipeline_assertions -lt 5 -or
+  [int]$record.pipeline_assertions -lt 11 -or
   [int]$record.factorio_processes -ne 0
 ){
-  throw 'Productivity-permission controls did not retain the implicit-only, descriptor, effect-emission, and upstream-policy boundaries.'
+  throw 'Productivity-permission controls did not retain the published mining-emission, implicit-only, descriptor, and upstream-policy boundaries.'
 }
 [pscustomobject]@{
   status=[string]$record.status
   assertions=[int]$record.assertions
   pipeline_sha256=[string]$record.pipeline_sha256
   streams_sha256=[string]$record.streams_sha256
+  published_baseline_assertions=[int]$record.published_baseline_assertions
   descriptor_sha256=[string]$record.descriptor_sha256
   fixture_sha256=[string]$record.fixture_sha256
   runtime=[string]$record.runtime
