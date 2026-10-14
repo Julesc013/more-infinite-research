@@ -1111,9 +1111,9 @@ local function research_unlocked_output_witness(identity, options, state, visiti
     memo_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
     for _, entry in ipairs(positive_memo[memo_key] or {}) do
       if positive_witness_reusable(entry, context, state, identity_key(identity)) then
-        -- This memo owns a copied, immutable witness for this route query.
-        -- Callers only inspect it or attach it to another immutable witness;
-        -- cloning its full ingredient tree on every hit repeats proved work.
+        -- This memo owns the completed witness for this route query. Internal
+        -- consumers only read it or attach it to another immutable witness.
+        -- Public returns copy data; diagnostics bypass this private memo.
         return entry.witness
       end
     end
@@ -1147,7 +1147,7 @@ local function research_unlocked_output_witness(identity, options, state, visiti
               < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
             local dependencies = {pairs = {}, required_technologies = {}}
             witness_unlock_dependencies(result, context.technologies, dependencies)
-            local owned_witness = deepcopy(result)
+            local owned_witness = result
             table.insert(entries, {
               witness = owned_witness,
               output_identities = memo_witness_identity_summary(owned_witness),

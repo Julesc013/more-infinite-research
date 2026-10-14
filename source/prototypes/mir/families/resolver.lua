@@ -103,15 +103,13 @@ local function build()
       if not classified.eligible then
         action = classified.risk_disposition == "REVIEW_REQUIRED" and "review-required" or "diagnose"
       end
-      local decision_row = provider_decision.build(
-        rule, target_stream, candidate, classified, pack_decision, change, action)
       local earliest_depth
       for _, unlocker in ipairs(recipe_unlocks.for_recipe(candidate.recipe)) do
         local depth = researchability.unlock_depths[unlocker]
         if type(depth) == "number" then earliest_depth = earliest_depth and math.min(earliest_depth, depth) or depth end
       end
-      decision_row.unlock_depth = earliest_depth
-      provider_decision.refresh_fingerprint(decision_row)
+      local decision_row = provider_decision.build(
+        rule, target_stream, candidate, classified, pack_decision, change, action, earliest_depth)
       table.insert(rule_decisions, decision_row)
     end
 

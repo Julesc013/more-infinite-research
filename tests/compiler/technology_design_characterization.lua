@@ -580,6 +580,60 @@ expect_error(function() fingerprint.canonical(mixed_cycle) end,
 check(fingerprint.canonical({true, {}, false}) == '[true,[],false]',
   "a diagnostic failure cannot retain another call's buffer cursor")
 
+-- Cached numeric text must preserve the engine's exact formatting, including
+-- signed zero and NaN, without retaining any containing mutable record.
+do
+  local values = {0, -1 / math.huge, 1, -1, 0.1, -0.1, 1 / 3, -1 / 3,
+    2 ^ 53, -2 ^ 53, 1e-308, -1e-308, 1e308, -1e308, math.huge, -math.huge, 0 / 0}
+  for index, value in ipairs(values) do
+    local expected = string.format("%.17g", value)
+    check(fingerprint.canonical(value) == expected, "numeric canonical bytes " .. index)
+    check(fingerprint.of(value) == scalar_digest(expected), "numeric scalar digest " .. index)
+    check(fingerprint.canonical_length(value) == #expected, "numeric canonical length " .. index)
+  end
+  local map = {[-3.25] = math.huge, [2.5] = -1 / math.huge, tag = {1 / 3}}
+  local expected_map = '{[-3.25]:' .. string.format("%.17g", math.huge)
+    .. ',[2.5]:' .. string.format("%.17g", -1 / math.huge)
+    .. ',"tag":[' .. string.format("%.17g", 1 / 3) .. ']}'
+  check(fingerprint.canonical(map) == expected_map, "cached numeric mixed-map bytes and ordering")
+  check(fingerprint.of(map) == scalar_digest(expected_map), "cached numeric mixed-map digest")
+
+  fingerprint.canonical(12345.625)
+  local warm_before = fingerprint.metrics()
+  fingerprint.canonical(12345.625)
+  fingerprint.canonical(12345.625)
+  local warm_after = fingerprint.metrics()
+  check(warm_after.numeric_text_computations == warm_before.numeric_text_computations,
+    "warm numeric values do not repeat formatting")
+  check(warm_after.numeric_text_cache_hits == warm_before.numeric_text_cache_hits + 2,
+    "numeric cache reports actual scalar reuse")
+  local record = {nested = {amount = 1 / 3}}
+  local old_text, old_digest = fingerprint.canonical(record), fingerprint.of(record)
+  record.nested.amount = -1 / 3
+  check(fingerprint.canonical(record) ~= old_text and fingerprint.of(record) ~= old_digest,
+    "numeric reuse does not hide mutations in containing records")
+
+  for index = 1, 4200 do
+    local value = 987000 + index + 0.375
+    local expected = string.format("%.17g", value)
+    check(fingerprint.canonical(value) == expected and fingerprint.of(value) == scalar_digest(expected),
+      "numeric cache capacity preserves bytes and digest " .. index)
+  end
+  local full = fingerprint.metrics()
+  check(full.numeric_text_cache_entries == 4096, "numeric text residency stops at its fixed capacity")
+  local uncached = 7777777.25
+  local expected_uncached = string.format("%.17g", uncached)
+  local first, second = fingerprint.canonical(uncached), fingerprint.canonical(uncached)
+  check(first == expected_uncached and second == expected_uncached
+    and fingerprint.metrics().numeric_text_computations == full.numeric_text_computations + 2,
+    "full numeric cache falls back to exact formatting without changing admission")
+  fingerprint.reset_metrics()
+  local reset = fingerprint.metrics()
+  check(reset.numeric_text_computations == 0 and reset.numeric_text_cache_hits == 0
+    and reset.numeric_text_cache_entries == full.numeric_text_cache_entries,
+    "metric reset preserves bounded scalar residency")
+end
+
 -- Projection composition must equal two ordinary complete serializations,
 -- including empty selections, sparse/mixed children, aliases and long fields.
 -- The expected digest uses the independent scalar recurrence above.

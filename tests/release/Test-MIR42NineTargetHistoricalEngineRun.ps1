@@ -67,9 +67,10 @@ function Assert-MIR42EngineSharedInputs {
   function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
-  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42EngineMaintenanceSelection','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
+  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42EngineMaintenanceSelection','Get-MIR42EngineMaintenanceHarnessArguments','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
+  Import-MIR42EngineRunnerFunction -Path (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1') -Name 'Assert-MIR421CurrentUpgradeInputMode'
   try {
     $null=New-Item -ItemType Directory -Path $scratch
     foreach($case in @(
@@ -213,26 +214,80 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     }
     $tokens=$null;$errors=$null
     $ast=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$tokens,[ref]$errors)
+    Check (@($errors).Count -eq 0) 'upgrade runner no longer parses.'
     $argumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Extent.Text.StartsWith('$args = @(')},$true))
     Check ($argumentNode.Count -eq 1) 'upgrade argument construction is ambiguous.'
-    $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot 'row';$row=$rows.f210;$row.engine='controlled';$row.fixture='controlled';$row.candidate_authority_path=Join-Path $scratch 'exact-construction-candidate.zip';$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
-    $target='f210';$libraryBindings=@{f210=$sourceRoot};$sourceVersion='4.2.2'
-    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-ExpectedPeakMemoryMiB')+1] -ceq '256' -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -gt 0 -and [int]$builtArguments[[Array]::IndexOf($builtArguments,'-MaxNewOutputMiB')+1] -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
-    Check ($row.candidate_authority_path -cne $row.candidate -and $builtArguments[[Array]::IndexOf($builtArguments,'-ToZip')+1] -ceq $row.candidate_authority_path -and $builtArguments[[Array]::IndexOf($builtArguments,'-LocalModLibraryDirs')+1] -ceq $sourceRoot) 'upgrade worker did not retain distinct construction authority and selected direct library.'
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.2') 'upgrade worker lost its maintenance source version.'
-    $sourceVersion='4.2.3';$target='f210'
-    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.3' -and $builtArguments[[Array]::IndexOf($builtArguments,'-Archetype')+1] -ceq 'space-age-native-owner') '423 F210 upgrade lost its complete-state native fixture.'
-    $maintenanceInputs=[pscustomobject]@{targets=@()};$CandidateManifestPath='controlled-candidate-manifest.json';$manifestPath=$CandidateManifestPath;$PublishedMaintenancePredecessorManifestPath='controlled-published.json'
-    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'if($null-ne$maintenanceInputs){$builtArguments += @(''-SelectedTarget'',$target,''-SelectedReleaseManifest'',$manifestPath,''-PublishedMaintenancePredecessorManifestPath'',$PublishedMaintenancePredecessorManifestPath)}'))
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SelectedTarget')+1] -ceq 'f210' -and $builtArguments[[Array]::IndexOf($builtArguments,'-SelectedReleaseManifest')+1] -ceq 'controlled-candidate-manifest.json' -and $builtArguments[[Array]::IndexOf($builtArguments,'-PublishedMaintenancePredecessorManifestPath')+1] -ceq 'controlled-published.json') '423 upgrade worker lost its exact current candidate or published predecessor binding.'
-    $target='f200'
-    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-Archetype')+1] -ceq 'base-default') '423 non-F210 upgrade changed the base fixture.'
-    $sourceVersion='4.2.0'
-    . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+'$builtArguments=$args'))
-    Check ($builtArguments[[Array]::IndexOf($builtArguments,'-SourceVersion')+1] -ceq '4.2.1') 'original base-upgrade invocation lost the harness historical default.'
+    $maintenanceArgumentNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.IfStatementAst] -and $n.Extent.Text.StartsWith('if ($null -ne $maintenanceInputs)') -and $n.Extent.Text.Contains('Get-MIR42EngineMaintenanceHarnessArguments')},$true))
+    Check ($maintenanceArgumentNode.Count -eq 1) 'maintenance harness argument call site is ambiguous.'
+    # The later joined-runner AST control consumes the runner's original
+    # local name.  Keep that scope setup explicit while argument construction
+    # itself runs inside the isolated helper below.
+    $repo=$RepoRoot
+    function Get-MIR42ControlledArgumentValue([string[]]$Arguments,[string]$Name){
+      $positions=@(for($index=0;$index-lt$Arguments.Count;$index++){if($Arguments[$index]-ceq$Name){$index}})
+      Check ($positions.Count-eq1) "argument $Name must occur exactly once; found $($positions.Count) in $($Arguments -join '|')."
+      Check (($positions[0]+1)-lt$Arguments.Count-and$Arguments[$positions[0]+1]-notmatch'^-') "argument $Name has no value."
+      return [string]$Arguments[$positions[0]+1]
+    }
+    function Assert-MIR42ControlledArgumentAbsent([string[]]$Arguments,[string]$Name){
+      Check (-not($Arguments -contains $Name)) "argument $Name must be absent."
+    }
+    function Invoke-MIR42ActualMaintenanceArgumentConstruction([string]$RequestedTarget,[string]$RequestedSourceVersion,[bool]$WithMaintenance){
+      $harness='controlled harness';$repo=$RepoRoot;$rowRoot=Join-Path $exactRoot ('row-'+$RequestedTarget+'-'+$RequestedSourceVersion.Replace('.','-'));$row=$rows[$RequestedTarget]
+      $row.engine='controlled';$row.fixture='controlled';$row.candidate_authority_path=Join-Path $scratch ('exact-construction-'+$RequestedTarget+'.zip');$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
+      $target=$RequestedTarget;$sourceVersion=$RequestedSourceVersion;$libraryBindings=@{};foreach($id in $rows.Keys){$libraryBindings[$id]=$sourceRoot}
+      $candidateRoot=Join-Path $scratch 'controlled-candidate';$manifestPath='controlled-candidate-manifest.json';$PublishedMaintenancePredecessorManifestPath='controlled-published.json'
+      $maintenanceInputs=if($WithMaintenance){[pscustomobject]@{targets=@()}}else{$null}
+      . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+$maintenanceArgumentNode[0].Extent.Text+"`n"+'$builtArguments=@($args)'))
+      return [pscustomobject]@{arguments=@($builtArguments);candidate_root=$candidateRoot;target=$target;source_version=$sourceVersion}
+    }
+    $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f210' -RequestedSourceVersion '4.2.2' -WithMaintenance $false
+    $builtArguments=@($built.arguments)
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-ExpectedPeakMemoryMiB') -ceq '256' -and [int](Get-MIR42ControlledArgumentValue $builtArguments '-MaxNewOutputMiB') -gt 0 -and [int](Get-MIR42ControlledArgumentValue $builtArguments '-MaxNewOutputMiB') -lt 4) 'upgrade worker lost the declared peak or remaining output allowance.'
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-ToZip') -ceq $rows.f210.candidate_authority_path -and (Get-MIR42ControlledArgumentValue $builtArguments '-LocalModLibraryDirs') -ceq $sourceRoot) 'upgrade worker did not retain distinct construction authority and selected direct library.'
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SourceVersion') -ceq '4.2.2') 'upgrade worker lost its maintenance source version.'
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') 'unjoined legacy upgrade lost its failure-only retention.'
+    $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f210' -RequestedSourceVersion '4.2.3' -WithMaintenance $true
+    $builtArguments=@($built.arguments)
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SourceVersion') -ceq '4.2.3' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Archetype') -ceq 'space-age-native-owner') '423 F210 upgrade lost its complete-state native fixture.'
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedTarget') -ceq 'f210' -and (Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath') -ceq 'controlled-published.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-SourceMaterializationPath') -ceq (Join-Path $built.candidate_root 'materializations/f210.json') -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'Always') '423 modern upgrade worker changed its materialization, predecessor, or retention binding.'
+    Assert-MIR42ControlledArgumentAbsent $builtArguments '-SelectedReleaseManifest'
+    $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f200' -RequestedSourceVersion '4.2.3' -WithMaintenance $true
+    Check ((Get-MIR42ControlledArgumentValue @($built.arguments) '-Archetype') -ceq 'base-default' -and (Get-MIR42ControlledArgumentValue @($built.arguments) '-Retention') -ceq 'Always') '423 non-F210 upgrade changed the base fixture or current retention.'
+    $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f017' -RequestedSourceVersion '4.2.3' -WithMaintenance $true
+    $builtArguments=@($built.arguments)
+    Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') '423 historical upgrade changed its legacy candidate or retention binding.'
+    Assert-MIR42ControlledArgumentAbsent $builtArguments '-SourceMaterializationPath'
+    foreach($currentSourceVersion in @('4.3.0','4.3.1')){
+      foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+        $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget $currentTarget -RequestedSourceVersion $currentSourceVersion -WithMaintenance $true
+        $builtArguments=@($built.arguments);$historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
+        $expectedReceipt=Join-Path $built.candidate_root ('materializations/'+$currentTarget+'.json')
+        Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedTarget') -ceq $currentTarget) "$currentTarget/$currentSourceVersion lost its target binding."
+        Check ((Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath') -ceq 'controlled-published.json') "$currentTarget/$currentSourceVersion lost its published predecessor binding."
+        Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SourceMaterializationPath') -ceq $expectedReceipt) "$currentTarget/$currentSourceVersion lost its exact materialization receipt binding."
+        Check ((Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'Always') "$currentTarget/$currentSourceVersion lost its current retention binding."
+        if($historical){
+          Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json') "$currentTarget/$currentSourceVersion lost its historical combined candidate binding."
+        }else{
+          Assert-MIR42ControlledArgumentAbsent $builtArguments '-SelectedReleaseManifest'
+        }
+        $code=$currentTarget.Substring(1);$toVersion='4.'+([version]$currentSourceVersion).Minor+'.'+$code+([version]$currentSourceVersion).Build.ToString('00')
+        $mode=@{Target=$currentTarget;FromVersion=('4.2.'+$code+'02');ToVersion=$toVersion;FixtureName=$(if($historical){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"});Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($historical){Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest'}else{''});PublishedPredecessorManifest=(Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath');Retention=(Get-MIR42ControlledArgumentValue $builtArguments '-Retention');SourceVersion=$currentSourceVersion}
+        Assert-MIR421CurrentUpgradeInputMode @mode
+        Check $true "$currentTarget/$currentSourceVersion actual callee rejected the runner's current input mode."
+        $wrongManifest=$mode.Clone();$wrongManifest.SelectedReleaseManifest=if($historical){''}else{'wrong-candidate-manifest.json'}
+        Refuses {Assert-MIR421CurrentUpgradeInputMode @wrongManifest} 'mir421-current-upgrade-input-mode'
+        $wrongPublished=$mode.Clone();$wrongPublished.PublishedPredecessorManifest=''
+        Refuses {Assert-MIR421CurrentUpgradeInputMode @wrongPublished} 'mir421-current-upgrade-input-mode'
+        $wrongRetention=$mode.Clone();$wrongRetention.Retention='OnFailure'
+        Refuses {Assert-MIR421CurrentUpgradeInputMode @wrongRetention} 'mir421-current-upgrade-input-mode'
+      }
+    }
+    Refuses {Get-MIR42EngineMaintenanceHarnessArguments -Target 'f210' -SourceVersion '4.3.1' -CandidateManifestPath 'controlled-candidate-manifest.json' -PublishedPredecessorManifestPath 'controlled-published.json'} 'mir42-engine-maintenance-materialization-required'
+    Refuses {Get-MIR42EngineMaintenanceHarnessArguments -Target 'f017' -SourceVersion '4.3.1' -CandidateManifestPath 'controlled-candidate-manifest.json' -PublishedPredecessorManifestPath 'controlled-published.json'} 'mir42-engine-maintenance-materialization-required'
+    $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f200' -RequestedSourceVersion '4.2.0' -WithMaintenance $false
+    Check ((Get-MIR42ControlledArgumentValue @($built.arguments) '-SourceVersion') -ceq '4.2.1') 'original base-upgrade invocation lost the harness historical default.'
     $authorityNode=@($ast.FindAll({param($n)$n -is [Management.Automation.Language.AssignmentStatementAst] -and $n.Left.Extent.Text -ceq '$script:MIR42HistoricalTerminalInputs'},$true))
     Check ($authorityNode.Count-eq1) 'historical engine authority assignment is ambiguous.'
     . ([scriptblock]::Create($authorityNode[0].Extent.Text))
