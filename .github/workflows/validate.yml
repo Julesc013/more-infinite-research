@@ -217,6 +217,54 @@ jobs:
           restore-keys: |
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
+      - name: Select exact Python ABI for immutable-input K2 controls
+        if: ${{ matrix.no_op != true && matrix.test_id == 'static.immutable-input-staging' }}
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.14'
+          architecture: 'x64'
+          check-latest: false
+      - name: Provision exact Lua 5.2 host for immutable-input K2 controls
+        if: ${{ matrix.no_op != true && matrix.test_id == 'static.immutable-input-staging' }}
+        shell: pwsh
+        run: |
+          $ErrorActionPreference='Stop'
+          $python=(Get-Command python -ErrorAction Stop).Source
+          $identityText=@(& $python -c 'import json, platform, sys; print(json.dumps({"implementation": sys.implementation.name, "major": sys.version_info.major, "minor": sys.version_info.minor, "architecture": platform.architecture()[0], "executable": sys.executable}, sort_keys=True))')
+          if($LASTEXITCODE-ne0-or$identityText.Count-ne1){throw '[mir-k2-lua-bootstrap-python-inspection]'}
+          $identity=$identityText[0]|ConvertFrom-Json
+          if([string]$identity.implementation-cne'cpython'-or[int]$identity.major-ne3-or[int]$identity.minor-ne14-or[string]$identity.architecture-cne'64bit'){
+            throw "[mir-k2-lua-bootstrap-python-unsupported] $($identity|ConvertTo-Json -Compress)"
+          }
+          $runtime=Join-Path $PWD 'build/tmp/mir421-lua-runtime'
+          if(Test-Path -LiteralPath $runtime){throw "[mir-k2-lua-bootstrap-runtime-preexists] $runtime"}
+          [IO.Directory]::CreateDirectory($runtime)|Out-Null
+          $requirements=Join-Path $runtime 'requirements.txt'
+          [IO.File]::WriteAllText($requirements,"lupa==2.6 --hash=sha256:b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67`n",[Text.UTF8Encoding]::new($false))
+          & $python -m pip --isolated install --disable-pip-version-check --no-cache-dir --no-deps --only-binary=:all: --require-hashes --target $runtime --requirement $requirements
+          if($LASTEXITCODE-ne0){throw '[mir-k2-lua-bootstrap-install]'}
+          $probe=@'
+          import json
+          import sys
+          from pathlib import Path
+          runtime = Path(sys.argv[1]).resolve()
+          sys.path.insert(0, str(runtime))
+          import lupa
+          from lupa import lua52
+          print(json.dumps({"implementation": sys.implementation.name, "python": sys.version,
+                            "lupa_version": getattr(lupa, "__version__", "unknown"),
+                            "lua52_module": str(Path(lua52.__file__).resolve())}, sort_keys=True))
+          '@
+          $probeText=@(& $python -c $probe $runtime)
+          if($LASTEXITCODE-ne0-or$probeText.Count-ne1){throw '[mir-k2-lua-bootstrap-import]'}
+          $probeRecord=$probeText[0]|ConvertFrom-Json
+          if([string]$probeRecord.implementation-cne'cpython'-or[string]$probeRecord.lupa_version-cne'2.6'-or[string]$probeRecord.lua52_module-notmatch'lua52[.]cp314-win_amd64[.]pyd$'){
+            throw "[mir-k2-lua-bootstrap-backend-identity] $($probeRecord|ConvertTo-Json -Compress)"
+          }
+          $record=[ordered]@{schema=1;kind='MIRK2213LuaHostBootstrapV1';python=$identity;lupa=[ordered]@{version='2.6';wheel_sha256='B74F944FE46C421E25D0F8692AEF1E842192F6F7F68034201382AC440EF9EA67';lua52_module=$probeRecord.lua52_module};status='provisioned-private-workspace-only'}
+          [IO.File]::WriteAllText((Join-Path $runtime 'bootstrap.json'),(($record|ConvertTo-Json -Depth 8)+"`n"),[Text.UTF8Encoding]::new($false))
+          "MIR_K2_LUA_RUNTIME=$runtime"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "MIR_K2_LUA_PYTHON=$python"|Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Reuse, adopt, or run exact test instance
         id: verification-instance
         if: ${{ matrix.no_op != true }}

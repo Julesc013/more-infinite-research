@@ -585,6 +585,7 @@
       "command": "./tests/tooling/Test-MIRImmutableInputStaging.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/validate.yml",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/workspace/RepoPaths.ps1",
         "tests/support/MIRNativeEntryDefaults.ps1",

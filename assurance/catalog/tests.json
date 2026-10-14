@@ -2014,6 +2014,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/validate.yml",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/workspace/RepoPaths.ps1",
         "tests/support/MIRNativeEntryDefaults.ps1",
@@ -8653,5 +8654,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2e26dc92e93425c41fbcc7ddbb21b69464b895c9f7c91d5c478cdeed2ca7024d"
+  "digest": "sha256:36c60218f1ba958fa04cf8098b630e2fb3f97a695e099e758d0eda3c8c85ab83"
 }

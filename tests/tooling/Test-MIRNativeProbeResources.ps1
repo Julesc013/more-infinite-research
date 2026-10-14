@@ -17,6 +17,65 @@ function Refuses-Probe([scriptblock]$Action,[string]$Expected) {
   try { & $Action | Out-Null } catch { $failure=$_.Exception.Message }
   Assert-Probe ($failure.Contains($Expected)) "expected $Expected; got $failure"
 }
+function Resolve-K2213LuaHost {
+  param([Parameter(Mandatory)][string]$RuntimeDirectory,[Parameter(Mandatory)][string]$PythonExe)
+  if(-not(Test-Path -LiteralPath $RuntimeDirectory -PathType Container)){
+    throw "[mir-native-probe-k2-lua-runtime-missing] $RuntimeDirectory"
+  }
+  $runtime=(Resolve-Path -LiteralPath $RuntimeDirectory).Path
+  if(-not(Test-Path -LiteralPath (Join-Path $runtime 'lupa') -PathType Container)){
+    throw "[mir-native-probe-k2-lua-runtime-package-missing] $runtime"
+  }
+  $python=(Get-Command -Name $PythonExe -ErrorAction Stop).Source
+  [pscustomobject]@{runtime=$runtime;python=$python}
+}
+function Invoke-K2213LuaVersionControls {
+  param(
+    [Parameter(Mandatory)][string]$RuntimeDirectory,
+    [Parameter(Mandatory)][string]$PythonExe,
+    [Parameter(Mandatory)][string]$DataSource,
+    [Parameter(Mandatory)][string]$ControlSource,
+    [Parameter(Mandatory)][string]$CurrentDataSource,
+    [Parameter(Mandatory)][string]$CurrentControlSource,
+    [Parameter(Mandatory)][string]$VersionControlSource,
+    [Parameter(Mandatory)][string]$WorkRoot,
+    [Parameter(Mandatory)][string]$DiagnosticPath
+  )
+  $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $RuntimeDirectory -PythonExe $PythonExe
+  $control=Join-Path $WorkRoot 'k2-version-controls.py'
+  $source=@'
+import json
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+try:
+    import lupa
+    from lupa import lua52
+    print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "imported", "python": sys.version,
+                      "lupa_version": getattr(lupa, "__version__", "unknown"),
+                      "lua52_module": str(Path(lua52.__file__).resolve())}, sort_keys=True))
+    runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+    globals_ = runtime.globals()
+    globals_.MIR_K2_DATA_SOURCE = Path(sys.argv[2]).read_text(encoding='utf-8')
+    globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
+    globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
+    globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
+    runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
+except Exception as exc:
+    print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "failed", "python": sys.version,
+                      "error_type": type(exc).__name__, "error": str(exc)}, sort_keys=True), file=sys.stderr)
+    raise
+'@
+  [IO.File]::WriteAllText($control,$source,[Text.UTF8Encoding]::new($false))
+  $output=@(& $luaHost.python $control $luaHost.runtime $DataSource $ControlSource $CurrentDataSource $CurrentControlSource $VersionControlSource 2>&1)
+  $exitCode=$LASTEXITCODE
+  $text=(@($output|ForEach-Object {[string]$_})-join"`n")
+  [IO.File]::WriteAllText($DiagnosticPath,((@{schema=1;kind='MIRK2213LuaHostExecutionV1';runtime_directory=$luaHost.runtime;python=$luaHost.python;exit_code=$exitCode;success_marker=($text-match'MIR-K2-VERSION-CONTROLS-PASS');output=$text}|ConvertTo-Json -Depth 5)+"`n"),[Text.UTF8Encoding]::new($false))
+  if($exitCode-ne0-or$text-notmatch'MIR-K2-VERSION-CONTROLS-PASS'){
+    throw "[mir-native-probe-k2-lua-version-controls] exit=$exitCode; diagnostic=$DiagnosticPath; output=$text"
+  }
+  [pscustomobject]@{diagnostic=$DiagnosticPath;host=$luaHost;exit_code=$exitCode;output=$text}
+}
 function Assert-ControlledProbeActorInventory {
   param([Parameter(Mandatory)][object[]]$Runs,[Parameter(Mandatory)][string]$RunRoot)
   # The explicit 4.4.0 package-projection control adds one owned actor to the
@@ -738,24 +797,20 @@ try {
     # Execute the actual retained and selected fixture guard sources in the
     # repository-provisioned Lua 5.2 host. This is a source/version boundary
     # control only: it neither starts Factorio nor serializes a save.
-    $luaRuntime=Join-Path $repo 'build/tmp/mir421-lua-runtime'
-    $luaControl=Join-Path $run 'k2-version-controls.py'
-    $luaSource=@"
-import sys
-from pathlib import Path
-sys.path.insert(0, sys.argv[1])
-from lupa import lua52
-runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
-globals_ = runtime.globals()
-globals_.MIR_K2_DATA_SOURCE = Path(sys.argv[2]).read_text(encoding='utf-8')
-globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
-globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
-globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
-runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
-"@
-    [IO.File]::WriteAllText($luaControl,$luaSource,[Text.UTF8Encoding]::new($false))
-    $luaOutput=@(& python $luaControl $luaRuntime (Join-Path $fixtureTemplate 'data-final-fixes.lua') (Join-Path $fixtureTemplate 'control.lua') (Join-Path $selectedFixture 'data-final-fixes.lua') (Join-Path $selectedFixture 'control.lua') (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') 2>&1)
-    Assert-Probe ($LASTEXITCODE-eq0-and($luaOutput-join "`n")-match 'MIR-K2-VERSION-CONTROLS-PASS') 'K2 retained/current fixture Lua version controls failed.'
+    $luaRuntime=if([string]::IsNullOrWhiteSpace($env:MIR_K2_LUA_RUNTIME)){Join-Path $repo 'build/tmp/mir421-lua-runtime'}else{$env:MIR_K2_LUA_RUNTIME}
+    $luaPython=if([string]::IsNullOrWhiteSpace($env:MIR_K2_LUA_PYTHON)){'python'}else{$env:MIR_K2_LUA_PYTHON}
+    Refuses-Probe {Resolve-K2213LuaHost -RuntimeDirectory (Join-Path $run 'missing-k2-lua-runtime') -PythonExe $luaPython} '[mir-native-probe-k2-lua-runtime-missing]'
+    $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $luaRuntime -PythonExe $luaPython
+    $luaDiagnostic=Join-Path $run 'k2-version-controls-diagnostic.json'
+    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic
+    $luaRecord=Get-Content -Raw -LiteralPath $luaResult.diagnostic|ConvertFrom-Json
+    Assert-Probe ([int]$luaRecord.exit_code-eq0-and[bool]$luaRecord.success_marker-and[string]$luaRecord.output-match'MIRK2213LuaHostV1') 'K2 retained/current fixture Lua control did not retain its host identity.'
+    $luaReject=Join-Path $run 'k2-version-controls-rejected.lua'
+    [IO.File]::WriteAllText($luaReject,"error('MIR-K2-DIAGNOSTIC-OPPOSING')`n",[Text.UTF8Encoding]::new($false))
+    $luaRejectDiagnostic=Join-Path $run 'k2-version-controls-rejected-diagnostic.json'
+    Refuses-Probe {Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource $luaReject -WorkRoot $run -DiagnosticPath $luaRejectDiagnostic} 'MIR-K2-DIAGNOSTIC-OPPOSING'
+    $luaRejectRecord=Get-Content -Raw -LiteralPath $luaRejectDiagnostic|ConvertFrom-Json
+    Assert-Probe ([int]$luaRejectRecord.exit_code-ne0-and[string]$luaRejectRecord.output-match'MIR-K2-DIAGNOSTIC-OPPOSING') 'K2 Lua child refusal did not retain its diagnostic output.'
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.4.0'} 'input-profile-selection:more-infinite-research'
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @((Join-Path $run 'absent-library'))} 'dependency-missing'
     $portable.archive_sha256['controlled-k2_1.0.0.zip']='0'*64;Save-ControlledK2Profile
