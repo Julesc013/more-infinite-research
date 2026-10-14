@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 235,
+  "test_count": 237,
   "tests": [
     {
       "id": "docs.check",
@@ -1632,6 +1632,56 @@
         "test-catalog",
         "scenario-harness",
         "evidence"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.approved-lab-bindings",
+      "proposition": "The governed test 'static.approved-lab-bindings' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedLabBindings.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRApprovedLabBindings.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/capabilities/science_integration/lab_bindings.lua",
+        "source:source/prototypes/mir/domain/facts/recipe_semantics.lua",
+        "tests/compiler/Test-MIRApprovedLabBindings.ps1",
+        "tests/compiler/run_lab_bindings_controls.py",
+        "tests/compiler/lab_bindings.lua",
+        "validation/tests.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.approved-pack-bindings",
+      "proposition": "The governed test 'static.approved-pack-bindings' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedPackBindings.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRApprovedPackBindings.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/**",
+        "tests/compiler/Test-MIRApprovedPackBindings.ps1",
+        "tests/compiler/run_approved_pack_bindings_controls.py",
+        "tests/compiler/approved_pack_bindings.lua",
+        "tests/compiler/approved_family_emission.lua",
+        "validation/tests.yml"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8587,10 +8637,10 @@
       "package-repository": 69,
       "tooling-release": 70,
       "runtime-upgrade": 61,
-      "compiler-static": 20,
+      "compiler-static": 22,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 222,
+    "canonical_test_commands": 224,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8603,5 +8653,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:3837e0ecf41766d14731394197b65e30b52aec8a0b74a5ed0e00889a92f6a121"
+  "digest": "sha256:9351f34bdf671349443663c7c74b95ffee24949f3e70b8b2f4b15e89597bfc28"
 }
