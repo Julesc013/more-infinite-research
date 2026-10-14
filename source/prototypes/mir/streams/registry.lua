@@ -8,6 +8,12 @@ M.shared = {
   base_cost = 8000,
   growth_factor = 2,
   research_time = 60,
+  science_binding_policy = {
+    -- Parameterized sources bind an actual same-named pack recipe and its
+    -- unique direct unlock owner. They never explore ingredient factories.
+    named_pack_recipe = true,
+    unique_direct_unlock = true
+  },
   -- Shared source declarations for the ordinary productivity-family science
   -- vector. These are authored progression bindings, not cached discoveries.
   -- The target adapter translates the roles to historical item spellings.

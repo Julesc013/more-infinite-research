@@ -549,10 +549,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/domain/facts/recipe_semantics.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 6622,
-      "source_sha256": "02959D64A366BAFFC4E04F396DC47052DE0F4DA12F3C0D2B14A3F2EB8F4226B3",
-      "output_bytes": 6622,
-      "output_sha256": "02959D64A366BAFFC4E04F396DC47052DE0F4DA12F3C0D2B14A3F2EB8F4226B3"
+      "source_bytes": 7992,
+      "source_sha256": "90AD546D217DF361376BA28E96225A6B8B6AF9AEFB7CF00DB8B0A71DDADD248F",
+      "output_bytes": 7992,
+      "output_sha256": "90AD546D217DF361376BA28E96225A6B8B6AF9AEFB7CF00DB8B0A71DDADD248F"
     },
     {
       "layer": "shared",
@@ -2943,10 +2943,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11428,
-      "source_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B",
-      "output_bytes": 11428,
-      "output_sha256": "97AC936B1E9920AC503011EF063D39FA0E59D8ACCB5B0746BB4B32D30C83E39B"
+      "source_bytes": 8226,
+      "source_sha256": "25EE1E3E436A0F4F415954B7F974AA653D2F82CDCE740B4246FABDE00F50D1E5",
+      "output_bytes": 8226,
+      "output_sha256": "25EE1E3E436A0F4F415954B7F974AA653D2F82CDCE740B4246FABDE00F50D1E5"
     },
     {
       "layer": "capability",
@@ -3070,10 +3070,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_packs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 5433,
-      "source_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D",
-      "output_bytes": 5433,
-      "output_sha256": "D1954FDFDDE5BF21D8A2082605C452A7257540768758BA40B0DE7D2D624FC26D"
+      "source_bytes": 5729,
+      "source_sha256": "97F968D4E2D2EF9D861537D19A19E082811484C895F5DFC3FF2F3C89AD3CE6BF",
+      "output_bytes": 5729,
+      "output_sha256": "97F968D4E2D2EF9D861537D19A19E082811484C895F5DFC3FF2F3C89AD3CE6BF"
     },
     {
       "layer": "capability",
@@ -6405,10 +6405,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2103,
-      "source_sha256": "B79C83DD0C2C1CCCC48DE7F30DA83C4AD1C36D5A5803F9299732179EBF6C0D8F",
-      "output_bytes": 2103,
-      "output_sha256": "B79C83DD0C2C1CCCC48DE7F30DA83C4AD1C36D5A5803F9299732179EBF6C0D8F"
+      "source_bytes": 2350,
+      "source_sha256": "2219E49C5B32E3305086A10A9A83F15C074BA336898ED87E9C1428BDFED1F406",
+      "output_bytes": 2350,
+      "output_sha256": "2219E49C5B32E3305086A10A9A83F15C074BA336898ED87E9C1428BDFED1F406"
     },
     {
       "layer": "capability",
@@ -7074,10 +7074,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/planner/stream_compiler/compile.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4808,
-      "source_sha256": "C178AB70E126F2FBC15A17A7643A9304BCAEB891915DBD2AF0A05DBDBE91E807",
-      "output_bytes": 4808,
-      "output_sha256": "C178AB70E126F2FBC15A17A7643A9304BCAEB891915DBD2AF0A05DBDBE91E807"
+      "source_bytes": 4778,
+      "source_sha256": "5441D9D0E58046713B260168904F78DF40FAE6D681B7454DCDC614ECA4BB283F",
+      "output_bytes": 4778,
+      "output_sha256": "5441D9D0E58046713B260168904F78DF40FAE6D681B7454DCDC614ECA4BB283F"
     },
     {
       "layer": "shared",
@@ -7116,10 +7116,10 @@
         "predecessor_source_path": "targets/f210/files/prototypes/mir/planner/stream_compiler/discover.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2951,
-      "source_sha256": "F2B6765C3FE178F599AF2203E5E2B4645B67F653CE1E8028C7E72028F0B70C5A",
-      "output_bytes": 2951,
-      "output_sha256": "F2B6765C3FE178F599AF2203E5E2B4645B67F653CE1E8028C7E72028F0B70C5A"
+      "source_bytes": 2961,
+      "source_sha256": "75CE1954E6C4FAE7EAA5FFA730B5CCFFFED3A3260DB688A0AB58F3483472C4A7",
+      "output_bytes": 2961,
+      "output_sha256": "75CE1954E6C4FAE7EAA5FFA730B5CCFFFED3A3260DB688A0AB58F3483472C4A7"
     },
     {
       "layer": "shared",
@@ -7828,10 +7828,32 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4065,
-      "source_sha256": "4061B31432222659B186109003B853AAE99486395CAF2F64CB714B499E11FB3C",
-      "output_bytes": 4065,
-      "output_sha256": "4061B31432222659B186109003B853AAE99486395CAF2F64CB714B499E11FB3C"
+      "source_bytes": 12534,
+      "source_sha256": "8C2279F1B2C26BC991CBEA9846558A1B4D973678E39D87FA9C9FA88C33E7D461",
+      "output_bytes": 12534,
+      "output_sha256": "8C2279F1B2C26BC991CBEA9846558A1B4D973678E39D87FA9C9FA88C33E7D461"
+    },
+    {
+      "layer": "shared",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/capabilities/science_integration/lab_bindings.lua",
+      "semantic_class": "common-semantic-source",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/lab_bindings.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR440-APPROVED-SCIENCE-BINDINGS",
+        "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 5199,
+      "source_sha256": "5A1C01CA8F57597217A8F53F207F2F329DE12AD2F0532DC24D8B4BF48811739D",
+      "output_bytes": 5199,
+      "output_sha256": "5A1C01CA8F57597217A8F53F207F2F329DE12AD2F0532DC24D8B4BF48811739D"
     }
   ],
   "invariants": {
@@ -7841,5 +7863,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "F07034C01EB12505A029DC9D7E92E493C87B71F029AE3C3A057E9C56BD9004DC"
+  "record_sha256": "932A5A38DF305993C4E4E165C1A35347F10F8FAA66589509E8AB640CFE834D29"
 }

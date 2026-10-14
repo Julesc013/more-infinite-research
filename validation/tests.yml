@@ -717,6 +717,21 @@
       ]
     },
     {
+      "id": "static.approved-lab-bindings",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedLabBindings.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/capabilities/science_integration/lab_bindings.lua",
+        "source:source/prototypes/mir/domain/facts/recipe_semantics.lua",
+        "tests/compiler/Test-MIRApprovedLabBindings.ps1",
+        "tests/compiler/run_lab_bindings_controls.py",
+        "tests/compiler/lab_bindings.lua",
+        "validation/tests.yml"
+      ]
+    },
+    {
       "id": "static.compiler-preview",
       "kind": "static",
       "layer": "F0",

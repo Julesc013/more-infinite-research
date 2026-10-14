@@ -5,6 +5,7 @@ local recipe_unlocks = require("prototypes.mir.index.recipe_unlocks")
 local pack_registry = require("prototypes.mir.capabilities.science_integration.pack_registry")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 
 local M = {}
 
@@ -25,11 +26,17 @@ local function technology_reason(name)
 end
 
 local function outputs_pack(fact, pack_name)
-  for _, output in ipairs((fact and fact.result_identities) or {}) do
-    if output.type == "item" and output.name == pack_name
-      and type(output.amount) == "number" and output.amount > 0 then return true end
+  local variants = (fact and fact.variants) or {}
+  if #variants == 0 then return false end
+  for _, variant in ipairs(variants) do
+    local possible = false
+    for _, output in ipairs(variant.results or {}) do
+      if output.type == "item" and output.name == pack_name
+        and recipe_semantics.possible_item_result(output) then possible = true; break end
+    end
+    if not possible then return false end
   end
-  return false
+  return true
 end
 
 local function binding(pack_name, declaration)
@@ -51,10 +58,16 @@ local function binding(pack_name, declaration)
     binding_id = "approved-pack/" .. pack_name,
     source_kind = "declared-recipe",
     unlockers = {},
+    ingredient_packs = {},
     -- This record validates the approved source references. It is not an
     -- acquisition proof and must never be published as one.
     acquisition_proof = false
   }
+  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
+    if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
+      out.ingredient_packs[#out.ingredient_packs + 1] = ingredient.name
+    end
+  end
   if declaration.allow_initial == true and fact.enabled_without_research == true then
     out.status, out.initial = "initial", true
     return out
@@ -96,6 +109,200 @@ end
 
 function M.technology_structural_reason(name)
   return technology_reason(name)
+end
+
+local function declared_source(pack_name, shared)
+  local declarations = shared.science_bindings or {}
+  for _, role in ipairs(pack_registry.official_order()) do
+    local declaration = M.declaration_for_role(role, declarations)
+    if declaration and declaration.pack == pack_name then
+      local result, reason = binding(pack_name, declaration)
+      if result then return result end
+      -- A different actual unlock may be admitted only by the separately
+      -- authored unique-owner rule below, never by production exploration.
+      if not (shared.science_binding_policy or {}).unique_direct_unlock then return nil, reason end
+      break
+    end
+  end
+  if not (shared.science_binding_policy or {}).named_pack_recipe then
+    return nil, "missing-approved-pack-declaration:" .. pack_name
+  end
+  local fact = recipe_facts.view(pack_name)
+  if not fact or not outputs_pack(fact, pack_name) then
+    return nil, "missing-approved-named-pack-source:" .. pack_name
+  end
+  local gates = {}
+  if fact.enabled_without_research ~= true then
+    for _, name in ipairs(recipe_unlocks.for_recipe(pack_name)) do
+      if not technology_reason(name) then gates[#gates + 1] = name end
+    end
+    if #gates ~= 1 then return nil, "ambiguous-approved-pack-unlock:" .. pack_name end
+  end
+  return binding(pack_name, {pack = pack_name, recipe = pack_name, technology = gates[1], allow_initial = true})
+end
+
+-- Positive reference rules validate only declared pack sources, direct lab
+-- placement sources and research units/prerequisites. Each established fact
+-- is propagated once. No rule recursively acquires a material, machine,
+-- power source or surface, and no complete production proof is constructed.
+local function propagate(rules)
+  local facts, watchers, queue, edge_count = {}, {}, {}, 0
+  local function establish(name)
+    if not facts[name] then facts[name] = true; queue[#queue + 1] = name end
+  end
+  for _, rule in ipairs(rules) do
+    local seen = {}
+    rule.pending = 0
+    for _, dependency in ipairs(rule.requires) do
+      if not seen[dependency] then
+        seen[dependency] = true
+        rule.pending = rule.pending + 1
+        edge_count = edge_count + 1
+        watchers[dependency] = watchers[dependency] or {}
+        watchers[dependency][#watchers[dependency] + 1] = rule
+      end
+    end
+    if rule.pending == 0 then establish(rule.result) end
+  end
+  local cursor, notifications = 1, 0
+  while cursor <= #queue do
+    local name = queue[cursor]
+    cursor = cursor + 1
+    for _, rule in ipairs(watchers[name] or {}) do
+      notifications = notifications + 1
+      rule.pending = rule.pending - 1
+      if rule.pending == 0 then establish(rule.result) end
+    end
+  end
+  return facts, {rules = #rules, dependency_edges = edge_count, facts = #queue,
+    dependency_notifications = notifications, factory_acquisition_calls = 0}
+end
+
+local function node(kind, name)
+  return kind .. ":" .. tostring(name)
+end
+
+local function sorted_names(values)
+  local names = {}
+  for name in pairs(values or {}) do names[#names + 1] = name end
+  table.sort(names)
+  return names
+end
+
+local function ingredient_names(ingredients)
+  local names, seen = {}, {}
+  for _, ingredient in ipairs(ingredients or {}) do
+    local name = ingredient.name or ingredient[1]
+    if name and not seen[name] then names[#names + 1] = name; seen[name] = true end
+  end
+  table.sort(names)
+  return names
+end
+
+local function accepts(lab, names)
+  local accepted = {}
+  for _, name in ipairs(lab.inputs or {}) do accepted[name] = true end
+  for _, name in ipairs(names) do if not accepted[name] then return false end end
+  return true
+end
+
+local function build_reference_bindings(shared, labs)
+  local result = {packs = {}, issues = {}, labs = labs, technologies = {}, rules = {}}
+  local function add(kind, name, required)
+    result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
+  end
+  for _, pack in ipairs(pack_registry.pack_list_all()) do
+    local source, reason = declared_source(pack, shared)
+    result.packs[pack], result.issues[pack] = source, reason
+    if source then
+      local required = {}
+      for _, gate in ipairs(source.unlockers) do required[#required + 1] = node("technology", gate) end
+      for _, ingredient in ipairs(source.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
+      add("pack", pack, required)
+    end
+  end
+  for _, lab in ipairs(labs) do
+    for _, source in ipairs(lab.sources or {}) do
+      local required = {}
+      for _, pack in ipairs(source.ingredient_packs or {}) do required[#required + 1] = node("pack", pack) end
+      if source.initial then
+        add("lab", lab.name, required)
+      else
+        for _, gate in ipairs(source.unlockers or {}) do
+          local dependencies = deepcopy(required)
+          dependencies[#dependencies + 1] = node("technology", gate)
+          add("lab", lab.name, dependencies)
+        end
+      end
+    end
+  end
+  local technologies = data_raw.prototypes("technology")
+  local accepting_labs_by_vector = {}
+  for _, name in ipairs(sorted_names(technologies)) do
+    local technology = technologies[name]
+    local reason = technology_reason(name)
+    result.technologies[name] = reason or false
+    if not reason then
+      local required = {}
+      for _, prerequisite in ipairs(technology.prerequisites or {}) do
+        required[#required + 1] = node("technology", prerequisite)
+      end
+      if technology.research_trigger then
+        add("technology", name, required)
+      else
+        local unit = technology.unit
+        local names = ingredient_names(unit and unit.ingredients)
+        if not unit or #names == 0 or (unit.count == nil and unit.count_formula == nil) then
+          result.technologies[name] = "missing-research-mechanism"
+        else
+          for _, pack in ipairs(names) do required[#required + 1] = node("pack", pack) end
+          local vector = table.concat(names, "\0")
+          local accepting = accepting_labs_by_vector[vector]
+          if not accepting then
+            accepting = {}
+            for _, lab in ipairs(labs) do
+              if accepts(lab, names) then
+                accepting[#accepting + 1] = lab.name
+                add("lab-vector", vector, {node("lab", lab.name)})
+              end
+            end
+            accepting_labs_by_vector[vector] = accepting
+          end
+          -- Share the OR of real accepting labs across every technology using
+          -- this vector. Do not copy its entire prerequisite list per lab.
+          required[#required + 1] = node("lab-vector", vector)
+          add("technology", name, required)
+          if #accepting == 0 then result.technologies[name] = "no-accepting-lab" end
+        end
+      end
+    end
+  end
+  result.facts, result.work = propagate(result.rules)
+  -- Rule counters are sufficient for ordinary metadata. Do not retain the
+  -- reverse propagation graph or expanded explanation inventories.
+  result.rules = nil
+  return result
+end
+
+function M.compile_references(shared, labs)
+  return build_reference_bindings(shared, labs)
+end
+
+function M.bound_pack_status(index, pack_name)
+  local source = index.packs[pack_name]
+  if not source then return nil, index.issues[pack_name] or ("missing-approved-pack-source:" .. tostring(pack_name)) end
+  if not index.facts[node("pack", pack_name)] then return nil, "unresolved-approved-pack-dependencies:" .. pack_name end
+  return source.status, source.unlocker
+end
+
+function M.bound_technology_reason(index, technology_name)
+  if index.technologies[technology_name] == nil then return "missing" end
+  if index.facts[node("technology", technology_name)] then return nil end
+  return index.technologies[technology_name] or ("unresolved-approved-research-dependencies:" .. tostring(technology_name))
+end
+
+function M.bound_lab_available(index, lab_name)
+  return index.facts[node("lab", lab_name)] == true
 end
 
 return M

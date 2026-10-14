@@ -11,9 +11,13 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local roles = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
 
 local function world(alternatives, reversed)
-  local raw = {recipe = {}, technology = {}, tool = {}, lab = {
+  local raw = {recipe = {}, technology = {}, tool = {}, item = {
+    ["lab-kit"] = {type = "item", name = "lab-kit", place_result = "lab"}
+  }, lab = {
     lab = {name = "lab", inputs = deepcopy(roles)}
   }}
+  raw.recipe["lab-kit"] = {type = "recipe", name = "lab-kit", enabled = true,
+    results = {{type = "item", name = "lab-kit", amount = 1}}}
   for index, name in ipairs(roles) do
     raw.tool[name] = {type = "tool", name = name}
     raw.recipe[name] = {type = "recipe", name = name, enabled = false,
@@ -79,6 +83,12 @@ end
 oppose(function(raw) raw.recipe[roles[1]] = nil end, "missing-approved-pack-recipe")
 oppose(function(raw) raw.recipe[roles[1]].results[1].type = "fluid" end, "output-mismatch")
 oppose(function(raw) raw.recipe[roles[1]].results[1].amount = 0 end, "output-mismatch")
+oppose(function(raw) raw.recipe[roles[1]].results[1].probability = 0 end, "output-mismatch")
+oppose(function(raw) raw.recipe[roles[1]].results[1].shared_probability = {min = 0.4, max = 0.4} end, "output-mismatch")
+oppose(function(raw)
+  raw.recipe[roles[1]].normal = {enabled = false, results = {{type = "item", name = roles[1], amount = 1}}}
+  raw.recipe[roles[1]].expensive = {enabled = false, results = {{type = "item", name = roles[1], amount = 0}}}
+end, "output-mismatch")
 oppose(function(raw) raw.technology[roles[1]].effects = {} end, "unlock-mismatch")
 oppose(function(raw) raw.technology[roles[1]].enabled = false end, "disabled-technology")
 oppose(function(raw) raw.technology[roles[1]].prerequisites = {"missing"} end, "missing-prerequisite")
@@ -97,5 +107,100 @@ Context.with_active(Context.new(), function()
   check(#bindings.bind(roles[1], declaration).unlockers == 0, "Initial output remains isolated")
   declaration.recipe = "caller-mutation"
   check(catalogue.shared.science_bindings[roles[1]].recipe == roles[1], "Copied declaration must not change catalogue")
+end)
+
+for _, size in ipairs({32, 64, 128}) do
+  world(size, false)
+  Context.with_active(Context.new(), function()
+    local index = bindings.compile_references(catalogue.shared, {
+      {name = "ordinary-lab", inputs = deepcopy(roles), sources = {{initial = true}}},
+      {name = "specialist-lab", inputs = {"exclusive-pack"}, sources = {{unlockers = {"exclusive-lab-tech"}}}}
+    })
+    for _, role in ipairs(roles) do
+      local status, gate = bindings.bound_pack_status(index, role)
+      check(status == "research" and gate == role, "Declared science graph preserves each ordinary gate")
+      check(bindings.bound_technology_reason(index, role) == nil, "Declared research units are validated")
+    end
+    check(bindings.bound_lab_available(index, "ordinary-lab"), "An ordinary declared lab remains available")
+    check(not bindings.bound_lab_available(index, "specialist-lab"), "A missing specialist gate cannot establish its lab")
+    check(index.work.factory_acquisition_calls == 0, "No factory acquisition is part of binding")
+    check(index.work.dependency_notifications <= index.work.dependency_edges,
+      "Each finite dependency edge is notified at most once")
+    check(index.work.facts == size + 12, "Each established node and shared lab vector enters the work queue once")
+  end)
+end
+
+local raw = world(0, false)
+raw.tool["exclusive-pack"] = {type = "tool", name = "exclusive-pack"}
+raw.recipe["exclusive-pack"] = {type = "recipe", name = "exclusive-pack", enabled = false,
+  results = {{type = "item", name = "exclusive-pack", amount = 1}}}
+raw.technology["exclusive-lab-tech"] = {type = "technology", name = "exclusive-lab-tech", prerequisites = {},
+  effects = {{type = "unlock-recipe", recipe = "exclusive-pack"}},
+  unit = {count = 1, ingredients = {{"exclusive-pack", 1}}}}
+raw.lab.specialist = {name = "specialist", inputs = {"exclusive-pack"}}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {
+    {name = "ordinary-lab", inputs = deepcopy(roles), sources = {{initial = true}}},
+    {name = "specialist", inputs = {"exclusive-pack"}, sources = {{unlockers = {"exclusive-lab-tech"}}}}
+  })
+  check(bindings.bound_pack_status(index, roles[4]) == "research", "Specialist self-bootstrap does not veto ordinary science")
+  check(not bindings.bound_lab_available(index, "specialist"), "An unseeded specialist science/lab cycle cannot establish itself")
+  local status, reason = bindings.bound_pack_status(index, "exclusive-pack")
+  check(status == nil and reason ~= nil, "Unresolved specialist source is explicit, not a fabricated reachable answer")
+end)
+
+raw = world(0, false)
+raw.technology[roles[1]].research_trigger = nil
+raw.technology[roles[1]].unit = {count = 1, ingredients = {{roles[4], 1}}}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {
+    {name = "ordinary-lab", inputs = deepcopy(roles), sources = {{initial = true}}}
+  })
+  check(bindings.bound_pack_status(index, roles[4]) == nil, "A research/science cycle is not seeded by pending visits")
+  check(bindings.bound_technology_reason(index, roles[4]) ~= nil, "Unestablished research retains an explicit reason")
+end)
+
+-- Exercise the actual production facade and its actual lab-source projection;
+-- former solver modules remain poisoned by the host throughout this fixture.
+world(128, false)
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local ingredients = {}
+  for _, role in ipairs(roles) do ingredients[#ingredients + 1] = {role, 1} end
+  local selected, status = science.best_lab_compatible_ingredients(ingredients, "research_iron", {})
+  check(selected and #selected == 4 and status == "full", "Actual science facade preserves the complete default iron science vector")
+  check(science.any_lab_accepts_all(roles), "Actual lab binding accepts the whole ordinary vector")
+  check(science.technology_is_enabled_and_reachable(roles[4]), "A fully bound ordinary technology remains available")
+  check(science.technology_researchability_reason("absent-upstream-technology") == "missing",
+    "An absent optional upstream technology is a reference miss, not an unresolved solver query")
+  for _, role in ipairs(roles) do
+    local gates = science.prereq_techs_for_science_pack(role)
+    check(#gates == 1 and gates[1] == role, "Actual facade preserves each published default gate")
+  end
+  local first_index = Context.current():state_view("approved_research_bindings")
+  local first_work = first_index.work.dependency_notifications
+  for _ = 1, 100 do science.technology_is_researchable(roles[4]) end
+  check(Context.current():state_view("approved_research_bindings") == first_index
+    and first_index.work.dependency_notifications == first_work,
+    "Repeated family questions reuse the same completed reference graph")
+  local snapshot = science.binding_snapshot()
+  snapshot.packs[roles[1]].unlockers[1] = "caller-mutation"
+  check(science.prereq_techs_for_science_pack(roles[1])[1] == roles[1], "Facade snapshot cannot change the binding authority")
+end)
+raw = world(0, false)
+raw.tool["exclusive-pack"] = {type = "tool", name = "exclusive-pack"}
+raw.lab.specialist = {name = "specialist", inputs = {"exclusive-pack"}}
+raw.item.specialist = {type = "item", name = "specialist", place_result = "specialist"}
+raw.recipe.specialist = {type = "recipe", name = "specialist", enabled = false,
+  results = {{type = "item", name = "specialist", amount = 1}}}
+raw.recipe["exclusive-pack"] = {type = "recipe", name = "exclusive-pack", enabled = false,
+  results = {{type = "item", name = "exclusive-pack", amount = 1}}}
+raw.technology["specialist-unlock"] = {type = "technology", name = "specialist-unlock", enabled = true,
+  prerequisites = {}, unit = {count = 1, ingredients = {{"exclusive-pack", 1}}},
+  effects = {{type = "unlock-recipe", recipe = "specialist"}, {type = "unlock-recipe", recipe = "exclusive-pack"}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not science.technology_is_enabled_and_reachable("specialist-unlock"),
+    "Structural validity alone cannot claim an unseeded specialist research/lab binding is reachable")
 end)
 return checks

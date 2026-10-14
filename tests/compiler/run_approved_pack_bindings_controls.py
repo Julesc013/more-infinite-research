@@ -40,11 +40,20 @@ def main() -> None:
     ''')
     fixture = repo / 'tests/compiler/approved_pack_bindings.lua'
     assertions = lua.execute(fixture.read_text(encoding='utf-8'))
-    module_paths = [Path('source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'),
-                    Path('source/prototypes/mir/streams/registry.lua'), fixture.relative_to(repo)]
+    stubbed_modules = {'prototypes.mir.platform.factorio.target_profiles',
+                       'prototypes.mir.domain.streams.descriptor',
+                       'prototypes.mir.platform.factorio.target_line',
+                       'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
+    module_paths = [fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo)]
+    for name, _ in lua.globals().package.loaded.items():
+        if str(name).startswith('prototypes.') and name not in stubbed_modules:
+            path = Path('source') / (str(name).replace('.', '/') + '.lua')
+            if (repo / path).is_file():
+                module_paths.append(path)
     print(json.dumps({'status': 'MIR-APPROVED-PACK-BINDINGS-PASSED', 'assertions': assertions,
-                      'scope': 'controlled-approved-references-not-factory-acquisition-or-native-qualification',
+                      'scope': 'controlled-approved-reference-graph-and-facade-not-native-qualification',
                       'factorio_processes': 0, 'runtime': 'Lua 5.2',
+                      'stubbed_module_boundaries': sorted(stubbed_modules),
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 

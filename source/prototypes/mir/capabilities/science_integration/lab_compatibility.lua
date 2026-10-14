@@ -1,28 +1,9 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
-local item_facts = require("prototypes.mir.index.item_prototype_facts")
 
 local M = {}
--- Companion service records are mutable Context tables. Retain the canonical
--- pairing in this module-private weak-key registry so Lab admission never
--- trusts fields supplied or later replaced by an external record. Values
--- deliberately retain only functions, never the record key itself.
-local known_item_acquisition_companions = setmetatable({}, {__mode = "k"})
-
-function M.install_item_acquisition_companion(context, witness, available)
-  if type(context) ~= "table" or type(context.set_service) ~= "function"
-    or type(witness) ~= "function" or type(available) ~= "function" then
-    error("MIR canonical item-acquisition companion requires Context and function services.", 2)
-  end
-  local companion = {witness = witness, available = available}
-  context:set_service("science.item_acquisition_available", companion)
-  known_item_acquisition_companions[companion] = {witness = witness, available = available}
-  return companion
-end
-
 local function pack_production_status(...)
   local service = compiler_context.current():service("science.pack_production_status")
   if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
@@ -69,54 +50,13 @@ local function lab_accepts_all(lab, packs, diagnostic_observer)
   return true
 end
 
--- The ordinary compiler needs only a yes/no answer for lab placement.  A
--- paired Boolean companion can therefore avoid copying a complete private
--- witness graph that this module never exposes.  An observer, unknown
--- companion, or replaced witness service always retains the public witness
--- path: its result and callback behavior are externally observable.
-local function item_acquisition_available(item_name, service, context, diagnostic_observer)
-  if not diagnostic_observer then
-    local companion = compiler_context.current():service("science.item_acquisition_available")
-    local registered = type(companion) == "table" and known_item_acquisition_companions[companion] or nil
-    if registered and companion.witness == registered.witness
-      and companion.available == registered.available and registered.witness == service then
-      local available, paired = registered.available(item_name,
-        context.visiting_packs or {}, context.visiting_technologies or {})
-      if paired == true then return available and true or false end
-    end
-  end
-  local witness = service(item_name, context.visiting_packs or {},
-    context.visiting_technologies or {}, diagnostic_observer)
-  return witness and true or false
-end
-
-local function lab_acquisition_available(lab_name, diagnostic_observer, reachability_context)
-  local context = reachability_context or {}
-  local service = compiler_context.current():service("science.item_acquisition_witness")
-  if not service then error("MIR item-acquisition service is not registered in CompilerContext.", 2) end
-  local items = {}
-  if diagnostic_observer then
-    -- A cold diagnostic must reserve each raw visit rather than construct the
-    -- normal comprehensive item index outside its work budget.
-    for _, item_type in ipairs(prototype_lookup.item_types()) do
-      if not diagnostic_visit(diagnostic_observer) then return nil end
-      for name, item in pairs(data_raw.prototypes(item_type)) do
-        if not diagnostic_visit(diagnostic_observer) then return nil end
-        if item.place_result == lab_name then items[#items + 1] = name end
-      end
-    end
-    table.sort(items)
-  else
-    for _, name in ipairs(item_facts.placeable_items_for_entity(lab_name)) do
-      local item = prototype_lookup.item_prototype(name)
-      if item and item.place_result == lab_name then items[#items + 1] = name end
-    end
-  end
-  for _, name in ipairs(items) do
-    if not diagnostic_visit(diagnostic_observer) then return nil end
-    if item_acquisition_available(name, service, context, diagnostic_observer) then return true end
-  end
-  return false
+-- Laboratory admission consumes the common declared-reference graph.
+-- There is no witness-producing fallback or per-item acquisition query.
+local function lab_acquisition_available(lab_name, diagnostic_observer)
+  if not diagnostic_visit(diagnostic_observer) then return false end
+  local service = compiler_context.current():service("science.lab_binding_available")
+  if not service then error("MIR approved lab-binding service is not registered in CompilerContext.", 2) end
+  return service(lab_name) == true
 end
 
 function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
