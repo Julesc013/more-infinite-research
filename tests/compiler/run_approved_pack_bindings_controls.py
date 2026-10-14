@@ -40,20 +40,39 @@ def main() -> None:
     ''')
     fixture = repo / 'tests/compiler/approved_pack_bindings.lua'
     assertions = lua.execute(fixture.read_text(encoding='utf-8'))
+    # Separate runtime: actual F200 adapters/catalogue/planner/common emitter;
+    # none of the facade fixture's module substitutions apply here.
+    emitted = lua52.LuaRuntime(unpack_returned_tuples=True)
+    emitted.globals().source_root = (repo / 'source').as_posix()
+    emitted.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
+    emitted.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
+    emission_fixture = repo / 'tests/compiler/approved_family_emission.lua'
+    emission = emitted.execute(emission_fixture.read_text(encoding='utf-8'))
     stubbed_modules = {'prototypes.mir.platform.factorio.target_profiles',
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
                        'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
-    module_paths = [fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo)]
+    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo)]
     for name, _ in lua.globals().package.loaded.items():
         if str(name).startswith('prototypes.') and name not in stubbed_modules:
             path = Path('source') / (str(name).replace('.', '/') + '.lua')
             if (repo / path).is_file():
                 module_paths.append(path)
+    for name, _ in emitted.globals().package.loaded.items():
+        if str(name).startswith('prototypes.'):
+            relative = Path(str(name).replace('.', '/') + '.lua')
+            for root in (Path('source/adapters/f200'), Path('source')):
+                if (repo / root / relative).is_file():
+                    module_paths.append(root / relative)
+                    break
     print(json.dumps({'status': 'MIR-APPROVED-PACK-BINDINGS-PASSED', 'assertions': assertions,
                       'scope': 'controlled-approved-reference-graph-and-facade-not-native-qualification',
                       'factorio_processes': 0, 'runtime': 'Lua 5.2',
                       'stubbed_module_boundaries': sorted(stubbed_modules),
+                      'emission_control': {'assertions': int(emission['assertions']),
+                                           'catalogue_rows': int(emission['rows']),
+                                           'operations': int(emission['operations']),
+                                           'stubbed_module_boundaries': [], 'target': 'f200'},
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 

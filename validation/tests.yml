@@ -708,11 +708,11 @@
       "command": "./tests/compiler/Test-MIRApprovedPackBindings.ps1",
       "requires_factorio": false,
       "inputs": [
-        "source:source/prototypes/mir/capabilities/science_integration/pack_bindings.lua",
-        "source:source/prototypes/mir/streams/registry.lua",
+        "source:source/**",
         "tests/compiler/Test-MIRApprovedPackBindings.ps1",
         "tests/compiler/run_approved_pack_bindings_controls.py",
         "tests/compiler/approved_pack_bindings.lua",
+        "tests/compiler/approved_family_emission.lua",
         "validation/tests.yml"
       ]
     },
