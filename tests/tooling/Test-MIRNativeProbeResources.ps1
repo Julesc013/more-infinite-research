@@ -260,10 +260,10 @@ try {
   foreach($case in @(
     @{target='2.1';source='4.2.1';version='4.2.21001'},@{target='2.1';source='4.2.2';version='4.2.21002'},
     @{target='2.1';source='4.2.3';version='4.2.21003'},@{target='2.1';source='4.3.0';version='4.3.21000'},
-    @{target='2.1';source='4.3.1';version='4.3.21001'},
+    @{target='2.1';source='4.3.1';version='4.3.21001'},@{target='2.1';source='4.4.0';version='4.4.21000'},
     @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'},
     @{target='2.0';source='4.2.3';version='4.2.20003'},@{target='2.0';source='4.3.0';version='4.3.20000'},
-    @{target='2.0';source='4.3.1';version='4.3.20001'}
+    @{target='2.0';source='4.3.1';version='4.3.20001'},@{target='2.0';source='4.4.0';version='4.4.20000'}
   )){
     $selected=& $browserBinding -RepoRoot $repo -Target $case.target -SourceVersion $case.source
     Assert-Probe ($selected.distribution_version-ceq$case.version) 'browser caller selected the wrong maintenance identity.'
@@ -402,7 +402,7 @@ try {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $currentIdentity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $currentIdentity -Repository $repo} $case.error
     }
-    foreach($sourceVersion in @('4.2.3','4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.2.3','4.3.0','4.3.1','4.4.0')){
       $selectedCandidate=& $browserBinding -RepoRoot $repo -Target $line -SourceVersion $sourceVersion
       $selectedArchive=New-ControlledBrowserArchive -Line $line -Identity $selectedCandidate
       $selectedChecked=Test-BrowserCandidate -Candidate $selectedArchive -Line $line -Identity $selectedCandidate -Repository $repo
@@ -412,7 +412,7 @@ try {
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
   Assert-Probe ($browserErrors.Count-eq 0) 'continuity harness syntax differs.'
   $continuityBinding=[scriptblock]::Create($continuityAst.ParamBlock.Extent.Text+'; return $SourceVersion')
-  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
     Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion $version)-ceq$version) 'continuity caller rejected a retained source version.'
   }
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
@@ -426,7 +426,7 @@ try {
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
-    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
       $sourceParts=@($sourceVersion.Split('.'))
       $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
       $ExpectedDistributionVersion=$identity.distribution_version;$ExpectedPackageRoot='more-infinite-research_'+$ExpectedDistributionVersion
@@ -594,7 +594,7 @@ try {
     $binding.output_bytes=$bytes.Length
     $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
     foreach($target in @('f210','f200','f110','f100')) {
-      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1')) {
+      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1','4.4.0')) {
         $sourceParts=$sourceVersion.Split('.')
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
         $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
@@ -954,6 +954,8 @@ function New-MIR4TargetPackage {
   Assert-Probe ($minorThreePackage.source_version-ceq'4.3.0'-and$minorThreePackage.distribution_version-ceq'4.3.20000'-and$minorThreePackage.target-ceq'f200') 'governed materializer rejected or misprojected the 4.3.0 release identity.'
   $minorThreePatchPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.3.1'
   Assert-Probe ($minorThreePatchPackage.source_version-ceq'4.3.1'-and$minorThreePatchPackage.distribution_version-ceq'4.3.21001'-and$minorThreePatchPackage.target-ceq'f210') 'governed materializer rejected or misprojected the 4.3.1 patch identity.'
+  $minorFourPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.4.0'
+  Assert-Probe ($minorFourPackage.source_version-ceq'4.4.0'-and$minorFourPackage.distribution_version-ceq'4.4.21000'-and$minorFourPackage.target-ceq'f210') 'governed materializer rejected or misprojected the 4.4.0 release identity.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
@@ -1159,13 +1161,15 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     $candidate423Input=New-BrowserInput 'more-infinite-research' '4.2.20003' 'mir-candidate'
     $candidate430Input=New-BrowserInput 'more-infinite-research' '4.3.20000' 'mir-candidate'
     $candidate431Input=New-BrowserInput 'more-infinite-research' '4.3.20001' 'mir-candidate'
-    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+    $candidate440Input=New-BrowserInput 'more-infinite-research' '4.4.20000' 'mir-candidate'
+    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
     $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $parameters.SourceVersion=$sourceVersion
     if($sourceVersion-ceq'4.2.2'){$parameters.CandidateArchive=$currentMirInput.source_path}
     if($sourceVersion-ceq'4.2.3'){$parameters.CandidateArchive=$candidate423Input.source_path}
     if($sourceVersion-ceq'4.3.0'){$parameters.CandidateArchive=$candidate430Input.source_path}
     if($sourceVersion-ceq'4.3.1'){$parameters.CandidateArchive=$candidate431Input.source_path}
+    if($sourceVersion-ceq'4.4.0'){$parameters.CandidateArchive=$candidate440Input.source_path}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
@@ -1180,7 +1184,7 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
     Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
     Assert-Probe ($fallback.source_version-ceq$sourceVersion-and$fallback.candidate.archive_sha256-ceq(Get-FileHash $parameters.CandidateArchive).Hash) 'browser owned worker lost the selected maintenance version or bytes.'
-    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'}}
+    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'};'4.4.0'{'4.4.20000'}}
     Assert-Probe ((@($fallback.library_input_receipts[0].selected|Where-Object name -CEQ 'more-infinite-research').version)-ceq$expectedVersion) 'browser worker selected a different installed maintenance version.'
     }
   }

@@ -82,7 +82,10 @@ function Assert-MIR42EngineSharedInputs {
       @{candidate='4.3.0';requested='';source='4.2.2';reader='4.2.3'},
       @{candidate='4.3.1';requested='';source='4.3.0';reader='4.3.1'},
       @{candidate='4.3.1';requested='4.3.0';source='4.3.0';reader='4.3.1'},
-      @{candidate='4.3.1';requested='4.2.2';source='4.2.2';reader='4.2.3'}
+      @{candidate='4.3.1';requested='4.2.2';source='4.2.2';reader='4.2.3'},
+      @{candidate='4.4.0';requested='';source='4.3.0';reader='4.4.0'},
+      @{candidate='4.4.0';requested='4.3.0';source='4.3.0';reader='4.4.0'},
+      @{candidate='4.4.0';requested='4.2.2';source='4.2.2';reader='4.2.3'}
     )){
       $selection=Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $case.candidate -RequestedPredecessorSourceVersion $case.requested
       Check ($selection.source_version-ceq$case.source-and$selection.reader_version-ceq$case.reader) ('frozen predecessor reader selection '+$case.candidate+'/'+$case.requested)
@@ -91,6 +94,9 @@ function Assert-MIR42EngineSharedInputs {
     }
     foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.3.1','4.3.2')){
       Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.1' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
+    }
+    foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.3','4.3.1','4.3.2','4.4.0')){
+      Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.4.0' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
     }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.2.2' -RequestedPredecessorSourceVersion '4.2.0'} 'mir42-engine-maintenance-predecessor-selection'
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.0' -RequestedPredecessorSourceVersion '4.3.0'} 'mir42-engine-maintenance-predecessor-selection'
@@ -258,7 +264,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $builtArguments=@($built.arguments)
     Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') '423 historical upgrade changed its legacy candidate or retention binding.'
     Assert-MIR42ControlledArgumentAbsent $builtArguments '-SourceMaterializationPath'
-    foreach($currentSourceVersion in @('4.3.0','4.3.1')){
+    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0')){
       foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
         $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget $currentTarget -RequestedSourceVersion $currentSourceVersion -WithMaintenance $true
         $builtArguments=@($built.arguments);$historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
@@ -301,7 +307,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
           Refuses {Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion "4.2.$patch" -EnginePath $badPath} "mir421-$historicalTarget-local-engine-binding-required"
         }
       }
-      foreach($sourceVersion in @('4.3.0','4.3.1')){
+      foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
         $source=[version]$sourceVersion
         $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion $sourceVersion -EnginePath $boundEngine
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $historicalTarget.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build
@@ -427,7 +433,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     }}
     Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 20) 'fresh definitions share identities.'
     $release43HistoricalRoots=[Collections.Generic.List[string]]::new()
-    foreach($sourceVersion in @('4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
       $source=[version]$sourceVersion;$target='f013';$freshLine='0.13'
       $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -558,7 +564,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
     }
     $release43ModernRoots=[Collections.Generic.List[string]]::new();$release431ModernCandidate='';$release431ModernInventory=$null
-    foreach($sourceVersion in @('4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
       $source=[version]$sourceVersion;$target='f200';$freshLine='2.0';$freshIsModern=$true;$freshEnableSpaceAge=$false;$freshFailure=''
       $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -570,7 +576,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($summary.status-ceq'passed'-and$summary.mir_version-ceq$freshVersion-and$summary.validation_package_sha256-ceq$release43ModernParams.CandidateSha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$sourceVersion modern fresh load did not retain exact source/target identity."
       if($sourceVersion-ceq'4.3.1'){$release431ModernCandidate=$candidate;$release431ModernInventory=$inventory}
     }
-    Check ($release43ModernRoots.Count-eq2-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) '4.3 modern fresh-load controls omitted an admitted source version.'
+    Check ($release43ModernRoots.Count-eq3-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) '4.3/4.4 modern fresh-load controls omitted an admitted source version.'
     $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
     [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
     $modernFailureParams=@{

@@ -6,7 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
- [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1',
+ [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',

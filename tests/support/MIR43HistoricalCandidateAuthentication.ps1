@@ -15,7 +15,7 @@ function Get-MIR43HistoricalCandidateAuthenticationProjection {
   param(
     [Parameter(Mandatory)][string]$Repository,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1')][string]$SourceVersion
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion
   )
 
   $repo = (Resolve-Path -LiteralPath $Repository).Path
@@ -32,7 +32,7 @@ function Get-MIR43HistoricalCandidateAuthenticationProjection {
     [string]$value.kind -ceq 'MIR42HistoricalCandidateAuthenticationProjectionV1' -and
     [string]$value.target -ceq $Target -and
     [string]$value.source_version -ceq $SourceVersion -and
-    [string]$value.distribution_root -match '^more-infinite-research_4[.]3[.][0-9]{5}$' -and
+    [string]$value.distribution_root -match '^more-infinite-research_4[.](?:3|4)[.][0-9]{5}$' -and
     [string]$value.member_projection_sha256 -match '^[0-9A-F]{64}$' -and
     @($value.members).Count -gt 0
   ) 'authentication projection contract differs'
@@ -245,7 +245,7 @@ function Read-MIR43HistoricalCurrentCandidate {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion,
     $ExpectedReceiptDescriptor = $null
   )
 
@@ -373,7 +373,7 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$WorkRoot
   )
 
