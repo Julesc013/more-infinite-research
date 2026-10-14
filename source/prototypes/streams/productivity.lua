@@ -544,10 +544,20 @@ local streams = {
     { change = 0.02, items = { "foundry", "industrial-furnace" }, item_patterns = { "^foundry$" } }
   } },
 
-  research_mining_drill = { icon_tech = "electric-mining", icon_item = "electric-mining-drill", groups = {
-    { change = 0.20, items = { "burner-mining-drill" } },
-    { change = 0.10, items = { "electric-mining-drill" } },
-    { change = 0.05, items = { "big-mining-drill" }, item_patterns = {
+  research_mining_drill = { icon_tech = "electric-mining", icon_item = "electric-mining-drill",
+    -- The native drill recipes and Space Exploration's core-miner recipe
+    -- intentionally omit productivity fields. Admit only that implicit
+    -- engine-default shape; explicit denials and caps remain upstream-owned.
+    productivity_permission_recipes = {
+      {name = "burner-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true},
+      {name = "electric-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true},
+      {name = "big-mining-drill", required_mods = {"space-age"}, only_if_implicit_productivity = true},
+      {name = "se-core-miner-drill", required_mods = {"space-exploration"}, only_if_implicit_productivity = true}
+    },
+    groups = {
+    { change = 0.20, items = { "burner-mining-drill" }, reject_explicit_productivity_denial = true },
+    { change = 0.10, items = { "electric-mining-drill" }, reject_explicit_productivity_denial = true },
+    { change = 0.05, items = { "big-mining-drill" }, reject_explicit_productivity_denial = true, item_patterns = {
       "^big%-mining%-drill$",
       "^omega%-drill$",
       "^omega%-tau$",

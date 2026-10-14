@@ -686,6 +686,22 @@
       ]
     },
     {
+      "id": "static.recipe-productivity-permissions",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+        "source:source/prototypes/mir/domain/streams/descriptor.lua",
+        "source:source/prototypes/streams/productivity.lua",
+        "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+        "tests/compiler/run_recipe_productivity_permissions_controls.py",
+        "tests/compiler/recipe_productivity_permissions.lua",
+        "validation/tests.yml"
+      ]
+    },
+    {
       "id": "static.compiler-preview",
       "kind": "static",
       "layer": "F0",
