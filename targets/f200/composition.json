@@ -3740,8 +3740,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 80485,
-      "expected_sha256": "11012FF6A21E7DBE7636A08B43A3B74C4363AD708C67EFC5B78B672CE1525C79",
+      "expected_bytes": 80505,
+      "expected_sha256": "BBD450D7758666068CFAC0D8613C80D50CAEED868972DC9AC184CCA7F519E269",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3915,5 +3915,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "39B7206EF8093E262F5D4C0F6A5DA06DDC6AF03ED5A290C092E759CD4A8BBDC4"
+  "record_sha256": "D52F700014C86F60F3BD417E3B00BD8B9518C81A5F8BF4F112D8E58872DD9763"
 }

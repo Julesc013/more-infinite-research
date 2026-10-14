@@ -207,7 +207,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
       Assert-MIR42NineGeneratorTest -Condition $rejected -Code 'criterion-v6-wrong-manifest-rejected'
 
       $wrongVersion = [pscustomobject][ordered]@{
-        schema=7;kind='MIR42FourTargetDeterministicCandidateManifestV7';status='private-deterministic-nine-target-candidate-built-unqualified'
+        schema=8;kind='MIR42FourTargetDeterministicCandidateManifestV8';status='private-deterministic-nine-target-candidate-built-unqualified'
         source=$constructionSource;package_source_sha256=$source.package_source_sha256;build_complete=$true;record_sha256=''
       }
       $wrongVersionPath = Join-Path $root 'wrong-v6-version.json'

@@ -3187,7 +3187,7 @@
     {
       "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
       "classification": "historical",
-      "sha256": "8E029F24E9E3E3146FE4180C8651C4FD4F9AFB9BB3B536D127EDA2C8B601C8F7",
+      "sha256": "AE9384480B7CA6D9BDF301CDECE4F7A327EF8CCC5EE408CE651CECE3C02DF254",
       "hash_mode": "canonical-text-v1",
       "lines": 535,
       "package_visible": false
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:44c76487fa589889bfb38bbd4c5693443f1b06bb8275b3fce53f9aec7edc0fba"
+  "digest": "sha256:c18a425d1d6def720eb7bcc0b27bc3d9504b27f82a495060ab5ffb5c9680e77e"
 }

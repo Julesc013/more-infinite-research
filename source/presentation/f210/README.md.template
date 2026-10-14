@@ -12,11 +12,11 @@ The catalogue and older release descriptions below document earlier release beha
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**MIR `4.2.x`** targets **Factorio `2.1`** and requires `base >= 2.1.18`.
+**MIR `4.4.0`** targets **Factorio `2.1`** and requires `base >= 2.1.18`.
 
 F210 targets experimental Factorio `2.1`. The matching external release manifest identifies the exact source, package checksum and validation scope.
 
-### MIR 4.2.1 maintenance update
+### Historical MIR 4.2.1 maintenance update
 
 This update corrects Space Is Fake's Weapon shooting speed 7 and Lab research speed 7 ingredients, native braking-force scaling, zero-effect continuations, and acquisition checks for science and production. The Research Library adds localized recipe/material discovery and fixes view ownership and force-merge cache cleanup. It retains the accepted layout.
 
@@ -24,7 +24,7 @@ Optional DLC artwork now requires an active provider. The saved `mir-use-install
 
 New material and Angel/Py declarations still require safe routes, available science, laboratories and compatible owners. A declaration is not a general compatibility guarantee. The matching release evidence defines the tested packages and environments; broader integrations and historical Library ports remain separate work.
 
-### Upgrading from published 4.2.0
+### Historical upgrade from published 4.2.0
 
 Source `v4.2.0-stable` uses target packages ending `00`; canonical `v4.2.1` uses `01`. Install the `01` package for the same Factorio target. Preserve original saves, keep startup values unchanged for the first load, and retain the package checksum for support. A private or previously withdrawn ZIP may share the new numeric version: replace those bytes explicitly with the matching published package and verify its checksum. A same-version file replacement does not itself rerun version-gated migrations or reset earned research.
 

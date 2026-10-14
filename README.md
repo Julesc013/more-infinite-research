@@ -8,6 +8,12 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
+## Published 4.3.0 and 4.4.0 development
+
+**[MIR 4.3.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0)** is the current published release. Its original packages and disclosed qualification limits remain unchanged. The separate 4.3.1 publication was cancelled; its retained repairs are being consolidated into 4.4.0.
+
+MIR 4.4.0 is under qualification. It uses the existing research catalogue and one emitter, with approved static and parameterized bindings replacing startup factory-acquisition discovery. Old Full and Classic setting values are retained as compatibility inputs to the same generator. Development packages are not yet qualified releases: current-package research, upgrade/reload, runtime/client and performance checks remain required. See the [active campaign and 4.4.x sequence](docs/releases/mir4-post-4.0-roadmap.md#active-campaign-mir-440-unified-research-generation). The 4.2 material below retains its historical release and recovery context.
+
 ## MIR 4.0 Whole-Platform Genesis
 
 MIR 4.0 established the shared product line. **[MIR 4.1.0 was published](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.1.0)** with four target-specific player packages. It preserves the research and settings model below while separating editable package source, target adapters, repository documentation, and release evidence.
@@ -195,7 +201,7 @@ Generated base-technology extensions use the **vanilla technology chain name** a
 
 ## Research Catalog
 
-The complete catalogue below describes the **Full** compiler. MIR 4.3.1 uses this complete compiler for every public startup selection, including a saved Classic value from 4.3.0.
+The complete catalogue below is the authored research catalogue used by the single 4.4 generation path. Saved Full and Classic values from 4.3.0 are compatibility inputs and do not select different research generators. Applicable output and saved-state preservation still require qualification on the actual enabled inputs.
 
 ### Recipe Productivity Streams
 
@@ -301,11 +307,11 @@ These extend selected finite vanilla chains into infinite continuations.
 
 ## Startup Settings
 
-MIR 4.3.1 uses one public compiler path: **Full**, including the performance optimizations developed for this update. The former **Compiler profile** startup setting is hidden and keeps its existing identity and stored values for compatibility; an old Classic value now selects Full. Recipe productivity, material progression, inferred mod support, competing-owner handling and weapon-speed policy use the complete pipeline. Existing module permissions, prototype limits, pipeline extent and supported scripted effects remain separate services.
+MIR 4.4.0 uses one approved generation path. Startup binds the existing static and parameterized declarations to actual prototypes and settings, validates their relevant references and policies, and uses the shared emitter. The former **Compiler profile** startup setting is hidden and keeps its identity and stored values for compatibility; both old values select that same generator. Recipe productivity, material progression, approved mod matching, competing-owner handling and weapon-speed policy retain their shared services. Existing module permissions, prototype limits, pipeline extent and supported scripted effects remain separate services.
 
-Historical Factorio 0.x targets retain their existing reduced compiler and numeric research-unit contracts; this new profile applies to the four modern target compositions.
+Historical Factorio 0.x targets retain their existing reduced capabilities and numeric research-unit adapters. The deprecated profile setting belongs to the four modern target compositions.
 
-**The reduced Classic option from 4.3.0 is retired because it omitted established MIR research.** Full restores the applicable definitions, but cannot reconstruct levels, bonuses or progress already erased by re-saving a factory with omitted technologies. Use an untouched backup where available. Performance and upgrade claims require qualification of the actual package and active mod configuration; switching to the complete pipeline is not a promise about every mod combination or computer.
+**The reduced Classic option from 4.3.0 is retired because it omitted established MIR research.** The single generation path is required to preserve established useful definitions, but cannot reconstruct levels, bonuses or progress already erased by re-saving a factory with omitted technologies. Use an untouched backup where available. Performance and upgrade claims require qualification of the actual package and active mod configuration; the source cutover alone does not establish those results.
 
 All settings are **startup settings**. Changing them requires a restart and affects all players in multiplayer.
 

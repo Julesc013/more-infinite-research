@@ -102,17 +102,36 @@ foreach($forgery in @(
 
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
+  $selection=Get-MIR4TargetMaterializationBindings -State $state
   $identity=@($record.target_content_identities|Where-Object{[string]$_.target-ceq$target})
   $prior=@($v6.target_content_identities|Where-Object{[string]$_.target-ceq$target})
   foreach($path in @('prototypes/mir/capabilities/science_integration/lab_bindings.lua','prototypes/mir/capabilities/science_integration/pack_bindings.lua')){
     $binding=@($state.manifest.bindings|Where-Object{[string]$_.output_path-ceq$path})
     $operation=@($state.composition.operations|Where-Object{[string]$_.path-ceq$path})
-    if($binding.Count-ne1-or$operation.Count-ne1-or$identity.Count-ne1-or$prior.Count-ne1-or
-       $target-notin@($binding[0].target_scope)-or[string]$operation[0].operation-cne'add'-or
-       [string]$operation[0].expected_sha256-cne[string]$binding[0].output_sha256-or
+    $selected=@($selection.bindings|Where-Object{[string]$_.output_path-ceq$path})
+    if($binding.Count-ne1-or$selected.Count-ne1-or$operation.Count-ne0-or$identity.Count-ne1-or$prior.Count-ne1-or
+       $target-notin@($binding[0].target_scope)-or[string]$binding[0].layer-cne'shared'-or
+       [string]$selected[0].source_path-cne[string]$binding[0].source_path-or
+       [string]$selected[0].output_sha256-cne[string]$binding[0].output_sha256-or
        [string]$identity[0].predecessor_content_sha256-cne[string]$prior[0].content_sha256-or
        [int]$identity[0].predecessor_entry_count-ne[int]$prior[0].entry_count-or
        -not[bool]$identity[0].exact_engine_qualification_required){throw "[mir4-package-presentation-v7-target-binding] $target $path"}
+    # Shared source is selected directly, not introduced by a target overlay.
+    # Read the selected bytes through the materializer's source/output hash checks.
+    $bytes=Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $selected[0]
+    if($bytes.Length-ne[int64]$binding[0].output_bytes){throw "[mir4-package-presentation-v7-target-binding-bytes] $target $path"}
+
+    $forgedState=$state|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+    $forgedState.composition.operations=@($forgedState.composition.operations)+@([pscustomobject]@{
+      path=$path;operation='add';source_path=[string]$binding[0].source_path
+      transform=[string]$binding[0].transform;semantic_class=[string]$binding[0].semantic_class
+      expected_bytes=[int64]$binding[0].output_bytes;expected_sha256=[string]$binding[0].output_sha256
+    })
+    $overlayRejected=$false
+    try{Get-MIR4TargetMaterializationBindings -State $forgedState|Out-Null}catch{
+      $overlayRejected=$_.Exception.Message-ceq"[mir4-target-materializer-operation-mismatch] ${target}:$path"
+    }
+    if(-not$overlayRejected){throw "[mir4-package-presentation-v7-shared-overlay-accepted] $target $path"}
   }
 }
 
