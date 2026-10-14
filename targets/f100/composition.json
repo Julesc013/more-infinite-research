@@ -901,38 +901,6 @@
       ]
     },
     {
-      "path": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 112361,
-      "expected_sha256": "C40004D62B295257E2F06E8F160BEAA761703F17F3D71CA8A4E65C7E0AC47005",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 91240,
-      "expected_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
       "path": "prototypes/mir/capabilities/science_integration/pack_registry.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -946,22 +914,6 @@
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 5145,
-      "expected_sha256": "8F2E2550426FBC80A5EF105FAD341D7B7790656D097DA757D4E10CECE95B58FF",
-      "proof_obligations": [
-        "exact-path-and-source-identity",
-        "complete-literal-module-dependency-closure",
-        "factorio-1-syntax-api-and-lifecycle-qualification"
       ]
     },
     {
@@ -1022,22 +974,6 @@
       "capability_disposition": "included-for-target",
       "expected_bytes": 13559,
       "expected_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 20343,
-      "expected_sha256": "4DC45FCF35F7439E0993EB41752F84590321F5C1875EC9C2D2B5399776C14BCB",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3963,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F0A3CB9B19EF0ADD71F277ABB6DF9D2555DD41C275F4A78C3927DD6FE4A3A8CC"
+  "record_sha256": "F46B2079F6CD1AE01761A97524DC61B952D0A7E67EFF722B219D2BF302BC7713"
 }

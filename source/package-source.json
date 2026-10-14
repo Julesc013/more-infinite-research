@@ -2956,49 +2956,6 @@
         "f110",
         "f100"
       ],
-      "output_path": "prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
-      "provenance": {
-        "kind": "migrated-predecessor",
-        "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
-      },
-      "transform": "copy-exact-bytes",
-      "source_bytes": 112361,
-      "source_sha256": "C40004D62B295257E2F06E8F160BEAA761703F17F3D71CA8A4E65C7E0AC47005",
-      "output_bytes": 112361,
-      "output_sha256": "C40004D62B295257E2F06E8F160BEAA761703F17F3D71CA8A4E65C7E0AC47005"
-    },
-    {
-      "layer": "capability",
-      "target_scope": [
-        "f210",
-        "f200",
-        "f110",
-        "f100"
-      ],
-      "output_path": "prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-      "provenance": {
-        "kind": "current-introduction",
-        "introduction_id": "MIR42-SCIENCE-ROUTE-FEASIBILITY",
-        "reason": "Cycle-safe recipe route feasibility for research-input acquisition."
-      },
-      "transform": "copy-exact-bytes",
-      "source_bytes": 91240,
-      "source_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D",
-      "output_bytes": 91240,
-      "output_sha256": "A3ED762280DD5B65F6001094E232DCEA3DF794F10ABE75E3F0FB371B7776E28D"
-    },
-    {
-      "layer": "capability",
-      "target_scope": [
-        "f210",
-        "f200",
-        "f110",
-        "f100"
-      ],
       "output_path": "prototypes/mir/capabilities/science_integration/pack_registry.lua",
       "semantic_class": "target-overlay",
       "source_path": "source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
@@ -3011,27 +2968,6 @@
       "source_sha256": "0C5799553CB833F8A48B5C54F47EEDAB2C2D07BA89C3C0B506A96914EDA38EED",
       "output_bytes": 6118,
       "output_sha256": "0C5799553CB833F8A48B5C54F47EEDAB2C2D07BA89C3C0B506A96914EDA38EED"
-    },
-    {
-      "layer": "capability",
-      "target_scope": [
-        "f210",
-        "f200",
-        "f110",
-        "f100"
-      ],
-      "output_path": "prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-      "provenance": {
-        "kind": "migrated-predecessor",
-        "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua"
-      },
-      "transform": "copy-exact-bytes",
-      "source_bytes": 5145,
-      "source_sha256": "8F2E2550426FBC80A5EF105FAD341D7B7790656D097DA757D4E10CECE95B58FF",
-      "output_bytes": 5145,
-      "output_sha256": "8F2E2550426FBC80A5EF105FAD341D7B7790656D097DA757D4E10CECE95B58FF"
     },
     {
       "layer": "capability",
@@ -3116,27 +3052,6 @@
       "source_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB",
       "output_bytes": 13559,
       "output_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB"
-    },
-    {
-      "layer": "capability",
-      "target_scope": [
-        "f210",
-        "f200",
-        "f110",
-        "f100"
-      ],
-      "output_path": "prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-      "provenance": {
-        "kind": "migrated-predecessor",
-        "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua"
-      },
-      "transform": "copy-exact-bytes",
-      "source_bytes": 20343,
-      "source_sha256": "4DC45FCF35F7439E0993EB41752F84590321F5C1875EC9C2D2B5399776C14BCB",
-      "output_bytes": 20343,
-      "output_sha256": "4DC45FCF35F7439E0993EB41752F84590321F5C1875EC9C2D2B5399776C14BCB"
     },
     {
       "layer": "capability",
@@ -7863,5 +7778,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "423A39EC5FAF788BBF23CF30AD04D16FF98462F8A3294395189F78967364D6D8"
+  "record_sha256": "5E9430D2829234D5A498E17C9026BF1CDD7C0E810786A74B55838BD8B2AF75E1"
 }
