@@ -4,6 +4,7 @@ param(
   [Parameter(Mandatory)][string]$CandidateZip,
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
   [ValidateSet('f210','f200')][string]$Target='f210',
+  [ValidateSet('4.2.2','4.4.0')][string]$SourceVersion='4.2.2',
   [string]$FactorioExe='',
   [string]$LibraryDirectory='',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
@@ -22,19 +23,36 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tests/support/MIR421SpaceFakeUpgrade.ps1')
 function Assert-Secretas([bool]$Condition,[string]$Message){if(-not$Condition){throw "[mir422-secretas] $Message"}}
 function Get-SecretasArtifact([string]$Path){$f=Get-Item -LiteralPath $Path;[ordered]@{path=$f.FullName;sha256=(Get-FileHash -LiteralPath $Path).Hash;bytes=$f.Length}}
-function New-SecretasSelectedFixture([string]$Source,[string]$Run,[string]$SelectedTarget){
-  if($SelectedTarget-ceq'f210'){return $Source}
+function New-SecretasSelectedFixture(
+  [string]$Source,[string]$Run,[ValidateSet('f210','f200')][string]$SelectedTarget,
+  [ValidateSet('4.2.2','4.4.0')][string]$SelectedSourceVersion,
+  [Parameter(Mandatory)][string]$SelectedMIRVersion
+){
+  # Historical fixture bytes remain selected only for their exact 4.2.2 F210
+  # tuple. Current candidates receive an explicit target/source specialization.
+  $profiles=@{
+    'f210/4.2.2'=[ordered]@{fixture_version='0.1.2';factorio_version='2.1';mir='4.2.21002';retained=$true;dependencies=@('base = 2.1.21','space-age = 2.1.21','secretas = 1.0.37','pretty-frozeta = 1.0.1','more-infinite-research = 4.2.21002');replacements=@()}
+    'f200/4.2.2'=[ordered]@{fixture_version='0.1.3';factorio_version='2.0';mir='4.2.20002';retained=$false;dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.2.20002');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.2.20002"'},[pscustomobject]@{from='"1.0.37"';to='"1.0.33"'},[pscustomobject]@{from='"1.0.1"';to='"0.1.0"'},[pscustomobject]@{from='"2.1.21"';to='"2.0.77"'})}
+    'f210/4.4.0'=[ordered]@{fixture_version='0.1.4';factorio_version='2.1';mir='4.4.21000';retained=$false;dependencies=@('base = 2.1.21','space-age = 2.1.21','secretas = 1.0.37','pretty-frozeta = 1.0.1','more-infinite-research = 4.4.21000');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.21000"'})}
+    'f200/4.4.0'=[ordered]@{fixture_version='0.1.5';factorio_version='2.0';mir='4.4.20000';retained=$false;dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.4.20000');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.20000"'},[pscustomobject]@{from='"1.0.37"';to='"1.0.33"'},[pscustomobject]@{from='"1.0.1"';to='"0.1.0"'},[pscustomobject]@{from='"2.1.21"';to='"2.0.77"'})}
+  }
+  $key=$SelectedTarget+'/'+$SelectedSourceVersion
+  Assert-Secretas ($profiles.ContainsKey($key)) 'selected fixture source/target tuple is not admitted'
+  $profile=$profiles[$key]
+  Assert-Secretas ($SelectedMIRVersion-ceq[string]$profile.mir) 'selected fixture candidate version differs'
+  if([bool]$profile.retained){return $Source}
   $selected=Join-Path $Run 'fixture-source'
   [IO.Directory]::CreateDirectory($selected)|Out-Null
   $info=Get-Content -LiteralPath (Join-Path $Source 'info.json') -Raw|ConvertFrom-Json
-  $info.version='0.1.3';$info.factorio_version='2.0'
-  $info.dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.2.20002')
+  $info.version=[string]$profile.fixture_version;$info.factorio_version=[string]$profile.factorio_version
+  $info.dependencies=@($profile.dependencies)
   $info|ConvertTo-Json -Depth 8|Set-Content -LiteralPath (Join-Path $selected 'info.json')
   $control=Get-Content -LiteralPath (Join-Path $Source 'control.lua') -Raw
-  foreach($pair in @(@('"4.2.21002"','"4.2.20002"'),@('"1.0.37"','"1.0.33"'),@('"1.0.1"','"0.1.0"'),@('"2.1.21"','"2.0.77"'))){
-    Assert-Secretas ($control.Contains($pair[0])) 'selected fixture specialization anchor missing'
-    $control=$control.Replace($pair[0],$pair[1])
+  foreach($pair in @($profile.replacements)){
+    Assert-Secretas ($control.Contains([string]$pair.from)) 'selected fixture specialization anchor missing'
+    $control=$control.Replace([string]$pair.from,[string]$pair.to)
   }
+  Assert-Secretas ($control.Contains('local MIR_VERSION = "'+[string]$profile.mir+'"')) 'selected fixture control candidate version differs'
   [IO.File]::WriteAllText((Join-Path $selected 'control.lua'),$control,[Text.UTF8Encoding]::new($false))
   Copy-Item -LiteralPath (Join-Path $Source 'data-final-fixes.lua') -Destination (Join-Path $selected 'data-final-fixes.lua')
   return $selected
@@ -60,17 +78,20 @@ $fixture=Join-Path $repo 'fixtures/assert-secretas-finite-continuation-hotfix'
 $scenarioPath=Join-Path $fixture $(if($Target-ceq'f200'){'scenario-f200.json'}else{'scenario.json'})
 $scenario=Get-Content -LiteralPath $scenarioPath -Raw|ConvertFrom-Json
 $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
-$candidate=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -Target $scenario.target -SourceVersion $scenario.source_version
+Assert-Secretas (($SourceVersion-ceq[string]$scenario.source_version)-or$SourceVersion-ceq'4.4.0') 'selected candidate source version is not admitted by this exact scenario'
+$candidateIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $scenario.target -SourceVersion $SourceVersion
+$candidate=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -Target $scenario.target -SourceVersion $SourceVersion
+Assert-Secretas ([string]$candidate.receipt.distribution_version-ceq[string]$candidateIdentity.distribution_version) 'candidate canonical distribution identity differs'
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $root=if([IO.Path]::IsPathRooted($OutputRoot)){$OutputRoot}else{Join-Path $repo $OutputRoot}
 $root=Resolve-MIR441RecoveryScratchPath -Path $root
 if($PrepareInputsOnly){
   Assert-Secretas ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($root)).AvailableFreeSpace-ge544MB) 'small fixture preparation disk headroom'
   $run=Join-Path $root ([guid]::NewGuid().ToString('N'));[IO.Directory]::CreateDirectory($run)|Out-Null
-  $fixture=New-SecretasSelectedFixture -Source $fixture -Run $run -SelectedTarget $Target
+  $fixture=New-SecretasSelectedFixture -Source $fixture -Run $run -SelectedTarget $Target -SelectedSourceVersion $SourceVersion -SelectedMIRVersion ([string]$candidateIdentity.distribution_version)
   $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
   $zip=Publish-MIRModDirectoryArchive -Source $fixture -Name $info.name -Version $info.version -ModsDir $run
-  [ordered]@{kind='MIRSecretasFinitePreparedV1';status='prepared-not-native-tested';source_commit=$source;scenario=Get-SecretasArtifact $scenarioPath;fixture=Get-SecretasArtifact $zip;candidate=$candidate.receipt;factorio_processes=0;archive_library_writes=0;dependency_payload_bytes_copied=0;archive_links_created=0}|ConvertTo-Json -Depth 40|Set-Content -LiteralPath (Join-Path $run 'result.json')
+  [ordered]@{kind='MIRSecretasFinitePreparedV1';status='prepared-not-native-tested';source_commit=$source;candidate_source_version=$SourceVersion;candidate_identity=$candidateIdentity;scenario=Get-SecretasArtifact $scenarioPath;fixture=Get-SecretasArtifact $zip;candidate=$candidate.receipt;factorio_processes=0;archive_library_writes=0;dependency_payload_bytes_copied=0;archive_links_created=0}|ConvertTo-Json -Depth 40|Set-Content -LiteralPath (Join-Path $run 'result.json')
   Write-Host "Secretas fixture prepared without Factorio or library writes: $run"
   return
 }
@@ -91,7 +112,7 @@ Assert-Secretas ((Get-FileHash -LiteralPath $installed).Hash-ceq$candidate.recei
 Assert-MIRLibraryIdle
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 $run=$resources.root;[IO.Directory]::CreateDirectory($run)|Out-Null
-$fixture=New-SecretasSelectedFixture -Source $fixture -Run $run -SelectedTarget $Target
+$fixture=New-SecretasSelectedFixture -Source $fixture -Run $run -SelectedTarget $Target -SelectedSourceVersion $SourceVersion -SelectedMIRVersion ([string]$candidateIdentity.distribution_version)
 $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
 $engineData=Join-Path $engineRoot 'data'
 # Preparing the tiny assertion archive uses the existing actual library lock.
@@ -116,7 +137,7 @@ $userdata=Join-Path $run 'userdata';[IO.Directory]::CreateDirectory((Join-Path $
 $config=Join-Path $run 'config.ini'
 "[path]`nread-data=$($engineData.Replace('\','/'))`nwrite-data=$($userdata.Replace('\','/'))`n[other]`nenable-new-mods=false`ncheck-updates=false`ndisable-blueprint-storage=true`nenable-blueprint-storage-cloud-sync=false`n[graphics]`ncache-sprite-atlas=false`n"|Set-Content -LiteralPath $config
 $server=Join-Path $run 'server-settings.json';@{name='MIR private Secretas hotfix';description='Private finite cargo continuation acceptance';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false;autosave_interval=0}|ConvertTo-Json -Depth 5|Set-Content -LiteralPath $server
-$record=[ordered]@{kind='MIRSecretasFiniteContinuationV1';status='pending';native_qualification=$false;source_commit=$source;scenario=Get-SecretasArtifact $scenarioPath;fixture=Get-SecretasArtifact $fixtureArchive;candidate=$candidate.receipt;engine=Get-SecretasArtifact $engine;scope=$scenario.scope;preparation_controls=$preparationReceipt;new_fixture_bytes_installed=$newFixtureBytes;dependency_payload_bytes_copied=0;archive_links_created=0;dependency_extractions=0}
+$record=[ordered]@{kind='MIRSecretasFiniteContinuationV1';status='pending';native_qualification=$false;source_commit=$source;candidate_source_version=$SourceVersion;candidate_identity=$candidateIdentity;scenario=Get-SecretasArtifact $scenarioPath;fixture=Get-SecretasArtifact $fixtureArchive;candidate=$candidate.receipt;engine=Get-SecretasArtifact $engine;scope=$scenario.scope;preparation_controls=$preparationReceipt;new_fixture_bytes_installed=$newFixtureBytes;dependency_payload_bytes_copied=0;archive_links_created=0;dependency_extractions=0}
 $activation=$null
 try{
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $selection.archive_hashes -SettingsMode Defaults
