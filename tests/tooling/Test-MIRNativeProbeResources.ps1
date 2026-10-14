@@ -17,9 +17,70 @@ function Refuses-Probe([scriptblock]$Action,[string]$Expected) {
   try { & $Action | Out-Null } catch { $failure=$_.Exception.Message }
   Assert-Probe ($failure.Contains($Expected)) "expected $Expected; got $failure"
 }
+function Resolve-K2213LuaHost {
+  param([Parameter(Mandatory)][string]$RuntimeDirectory,[Parameter(Mandatory)][string]$PythonExe)
+  if(-not(Test-Path -LiteralPath $RuntimeDirectory -PathType Container)){
+    throw "[mir-native-probe-k2-lua-runtime-missing] $RuntimeDirectory"
+  }
+  $runtime=(Resolve-Path -LiteralPath $RuntimeDirectory).Path
+  if(-not(Test-Path -LiteralPath (Join-Path $runtime 'lupa') -PathType Container)){
+    throw "[mir-native-probe-k2-lua-runtime-package-missing] $runtime"
+  }
+  $python=(Get-Command -Name $PythonExe -ErrorAction Stop).Source
+  [pscustomobject]@{runtime=$runtime;python=$python}
+}
+function Invoke-K2213LuaVersionControls {
+  param(
+    [Parameter(Mandatory)][string]$RuntimeDirectory,
+    [Parameter(Mandatory)][string]$PythonExe,
+    [Parameter(Mandatory)][string]$DataSource,
+    [Parameter(Mandatory)][string]$ControlSource,
+    [Parameter(Mandatory)][string]$CurrentDataSource,
+    [Parameter(Mandatory)][string]$CurrentControlSource,
+    [Parameter(Mandatory)][string]$VersionControlSource,
+    [Parameter(Mandatory)][string]$WorkRoot,
+    [Parameter(Mandatory)][string]$DiagnosticPath
+  )
+  $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $RuntimeDirectory -PythonExe $PythonExe
+  $control=Join-Path $WorkRoot 'k2-version-controls.py'
+  $source=@'
+import json
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+try:
+    import lupa
+    from lupa import lua52
+    print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "imported", "python": sys.version,
+                      "lupa_version": getattr(lupa, "__version__", "unknown"),
+                      "lua52_module": str(Path(lua52.__file__).resolve())}, sort_keys=True))
+    runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+    globals_ = runtime.globals()
+    globals_.MIR_K2_DATA_SOURCE = Path(sys.argv[2]).read_text(encoding='utf-8')
+    globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
+    globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
+    globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
+    runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
+except Exception as exc:
+    print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "failed", "python": sys.version,
+                      "error_type": type(exc).__name__, "error": str(exc)}, sort_keys=True), file=sys.stderr)
+    raise
+'@
+  [IO.File]::WriteAllText($control,$source,[Text.UTF8Encoding]::new($false))
+  $output=@(& $luaHost.python $control $luaHost.runtime $DataSource $ControlSource $CurrentDataSource $CurrentControlSource $VersionControlSource 2>&1)
+  $exitCode=$LASTEXITCODE
+  $text=(@($output|ForEach-Object {[string]$_})-join"`n")
+  [IO.File]::WriteAllText($DiagnosticPath,((@{schema=1;kind='MIRK2213LuaHostExecutionV1';runtime_directory=$luaHost.runtime;python=$luaHost.python;exit_code=$exitCode;success_marker=($text-match'MIR-K2-VERSION-CONTROLS-PASS');output=$text}|ConvertTo-Json -Depth 5)+"`n"),[Text.UTF8Encoding]::new($false))
+  if($exitCode-ne0-or$text-notmatch'MIR-K2-VERSION-CONTROLS-PASS'){
+    throw "[mir-native-probe-k2-lua-version-controls] exit=$exitCode; diagnostic=$DiagnosticPath; output=$text"
+  }
+  [pscustomobject]@{diagnostic=$DiagnosticPath;host=$luaHost;exit_code=$exitCode;output=$text}
+}
 function Assert-ControlledProbeActorInventory {
   param([Parameter(Mandatory)][object[]]$Runs,[Parameter(Mandatory)][string]$RunRoot)
-  $expectedIndices=@(1..13)
+  # The explicit 4.4.0 package-projection control adds one owned actor to the
+  # previous thirteen. Keep missing, duplicate and extra actors rejected.
+  $expectedIndices=@(1..14)
   $indices=@($Runs|ForEach-Object {[int]$_.index})
   if(@($indices|Sort-Object -Unique).Count-ne$indices.Count){throw '[native-probe-actor-duplicate]'}
   if($indices.Count-lt$expectedIndices.Count){throw '[native-probe-actor-missing]'}
@@ -260,10 +321,10 @@ try {
   foreach($case in @(
     @{target='2.1';source='4.2.1';version='4.2.21001'},@{target='2.1';source='4.2.2';version='4.2.21002'},
     @{target='2.1';source='4.2.3';version='4.2.21003'},@{target='2.1';source='4.3.0';version='4.3.21000'},
-    @{target='2.1';source='4.3.1';version='4.3.21001'},
+    @{target='2.1';source='4.3.1';version='4.3.21001'},@{target='2.1';source='4.4.0';version='4.4.21000'},
     @{target='2.0';source='4.2.1';version='4.2.20001'},@{target='2.0';source='4.2.2';version='4.2.20002'},
     @{target='2.0';source='4.2.3';version='4.2.20003'},@{target='2.0';source='4.3.0';version='4.3.20000'},
-    @{target='2.0';source='4.3.1';version='4.3.20001'}
+    @{target='2.0';source='4.3.1';version='4.3.20001'},@{target='2.0';source='4.4.0';version='4.4.20000'}
   )){
     $selected=& $browserBinding -RepoRoot $repo -Target $case.target -SourceVersion $case.source
     Assert-Probe ($selected.distribution_version-ceq$case.version) 'browser caller selected the wrong maintenance identity.'
@@ -402,7 +463,7 @@ try {
       $invalid=New-ControlledBrowserArchive -Line $line -Identity $currentIdentity -Variant $case.variant
       Refuses-Probe {Test-BrowserCandidate -Candidate $invalid -Line $line -Identity $currentIdentity -Repository $repo} $case.error
     }
-    foreach($sourceVersion in @('4.2.3','4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.2.3','4.3.0','4.3.1','4.4.0')){
       $selectedCandidate=& $browserBinding -RepoRoot $repo -Target $line -SourceVersion $sourceVersion
       $selectedArchive=New-ControlledBrowserArchive -Line $line -Identity $selectedCandidate
       $selectedChecked=Test-BrowserCandidate -Candidate $selectedArchive -Line $line -Identity $selectedCandidate -Repository $repo
@@ -412,7 +473,7 @@ try {
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
   Assert-Probe ($browserErrors.Count-eq 0) 'continuity harness syntax differs.'
   $continuityBinding=[scriptblock]::Create($continuityAst.ParamBlock.Extent.Text+'; return $SourceVersion')
-  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
     Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion $version)-ceq$version) 'continuity caller rejected a retained source version.'
   }
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
@@ -426,7 +487,7 @@ try {
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
-    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
       $sourceParts=@($sourceVersion.Split('.'))
       $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
       $ExpectedDistributionVersion=$identity.distribution_version;$ExpectedPackageRoot='more-infinite-research_'+$ExpectedDistributionVersion
@@ -539,7 +600,7 @@ try {
     $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
     $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
     Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
-    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213ProfileInputs')) {
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Get-K2213SelectedFixtureProfile','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs')) {
       $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
       Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
       . ([scriptblock]::Create($function[0].Extent.Text))
@@ -594,7 +655,7 @@ try {
     $binding.output_bytes=$bytes.Length
     $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
     foreach($target in @('f210','f200','f110','f100')) {
-      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1')) {
+      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1','4.4.0')) {
         $sourceParts=$sourceVersion.Split('.')
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
         $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
@@ -617,7 +678,7 @@ try {
         $selected=@{Repository=$repo;Archive=$candidate;ReceiptPath=$receiptPath;Target=$target;SourceVersion=$sourceVersion}
         $read=Read-MIRNativeProbeCurrentCandidate @selected
         Assert-Probe ($read.path-ceq$candidate-and$read.receipt.source_version-ceq$sourceVersion) "explicit $target/$sourceVersion reader lost its selected identity."
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           $wrapped=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
           Assert-Probe ($wrapped.receipt.archive_sha256-ceq$inventory.archive_sha256) 'F210 wrapper lost explicit source selection.'
           $tinRead=Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
@@ -626,7 +687,7 @@ try {
           Assert-Probe ($k2Read.receipt.source_version-ceq$sourceVersion-and$k2Read.receipt.archive_sha256-ceq$inventory.archive_sha256) 'K2 caller lost explicit maintenance identity.'
         }
         $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           if($sourceVersion-ceq'4.2.2') {
@@ -646,7 +707,7 @@ try {
         $record.package_source_sha256=$savedFingerprint;Save-ControlledTinRecord
         $binding.output_sha256='0'*64
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
         }
@@ -673,11 +734,14 @@ try {
     Save-ControlledK2Profile
     $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)
     Assert-Probe ($bound.inputs.Count-eq1-and$bound.inputs[0].source_path-ceq$dependency-and$bound.profile.engine_version-ceq'2.1.21'-and$bound.inputs[0].provenance.profile_sha256-ceq(Get-K2213Sha256 $portablePath)) 'Portable K2 inputs lost exact archive or profile provenance.'
-    foreach($selectedVersion in @('4.2.1','4.2.2')) {
-      $distribution='4.2.2100'+$selectedVersion.Split('.')[2]
-      $portable.mods[6].version=$distribution;Save-ControlledK2Profile
+    foreach($selectedVersion in @('4.2.1','4.2.2','4.4.0')) {
+      $selectedIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion $selectedVersion
+      $fixtureProfile=Get-K2213SelectedFixtureProfile -SourceVersion $selectedVersion
+      $portable.mods[6].version=$selectedIdentity.distribution_version
+      $portable.mods[7].version=$fixtureProfile.fixture_version
+      Save-ControlledK2Profile
       $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $selectedVersion
-      Assert-Probe ($bound.profile.mods[6].version-ceq$distribution-and$bound.inputs[0].source_path-ceq$dependency) 'K2 profile lost explicit candidate or reused dependency.'
+      Assert-Probe ($bound.profile.mods[6].version-ceq$selectedIdentity.distribution_version-and$bound.profile.mods[7].version-ceq$fixtureProfile.fixture_version-and$bound.inputs[0].source_path-ceq$dependency) 'K2 profile lost explicit candidate, fixture or reused dependency.'
       $other=if($selectedVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
       Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $other} 'input-profile-selection:more-infinite-research'
     }
@@ -685,6 +749,69 @@ try {
     $portable.mods[6].version='4.2.21001';$portable.mods[7].version='0.1.3';Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'input-profile-selection:mir-fixture'
     $portable.mods[7].version='0.1.4';Save-ControlledK2Profile
+    # Current 4.4 requires its explicit profile: V5's exact historical lock
+    # cannot be repurposed as a current-candidate input.
+    Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
+    $fixtureTemplate=Join-Path $repo 'fixtures/assert-k2-213-imersite-continuation'
+    $fixtureSpecializationRoot=Join-Path $run 'current-k2-fixture'
+    $selectedFixture=New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'
+    $selectedInfo=Get-Content -Raw -LiteralPath (Join-Path $selectedFixture 'info.json')|ConvertFrom-Json
+    Assert-Probe ($selectedInfo.version-ceq'0.1.5' -and @($selectedInfo.dependencies) -contains 'more-infinite-research = 4.4.21000') 'K2 current fixture did not retain its explicit 4.4 identity.'
+    foreach($fixtureMember in @('data-final-fixes.lua','control.lua')){
+      $selectedPath=Join-Path $selectedFixture $fixtureMember
+      $templatePath=Join-Path $fixtureTemplate $fixtureMember
+      $selectedText=Get-Content -Raw -LiteralPath $selectedPath
+      Assert-Probe ($selectedText.Contains('4.4.21000') -and -not $selectedText.Contains('4.2.21001') -and -not $selectedText.Contains('4.2.21002')) "K2 selected fixture retained an historical candidate guard: $fixtureMember"
+      Assert-Probe ((Get-K2213Sha256 $selectedPath) -cne (Get-K2213Sha256 $templatePath)) "K2 selected fixture receipt could bind retained template bytes: $fixtureMember"
+    }
+    $selectedSettings=Join-Path $selectedFixture 'settings-updates.lua'
+    $templateSettings=Join-Path $fixtureTemplate 'settings-updates.lua'
+    Assert-Probe ((Test-Path -LiteralPath $selectedSettings -PathType Leaf) -and (Get-K2213Sha256 $selectedSettings) -ceq (Get-K2213Sha256 $templateSettings)) 'K2 selected fixture omitted or changed its required diagnostic setting.'
+    Assert-Probe ((New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.2.2' -SelectedMIRVersion '4.2.21002') -ceq $fixtureTemplate) 'K2 historical fixture bytes were not retained.'
+    Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
+    # Exercise the Windows checkout that failed hosted CI as well as LF. The
+    # actual specializer must produce the same current guard without editing
+    # the retained fixture or accepting a changed historical guard.
+    foreach($lineEnding in @('LF','CRLF')){
+      $variantSource=Join-Path $run ('k2-fixture-template-'+$lineEnding)
+      [IO.Directory]::CreateDirectory($variantSource)|Out-Null
+      foreach($member in @('info.json','settings-updates.lua')){
+        [IO.File]::WriteAllBytes((Join-Path $variantSource $member),[IO.File]::ReadAllBytes((Join-Path $fixtureTemplate $member)))
+      }
+      foreach($member in @('data-final-fixes.lua','control.lua')){
+        $variantText=[IO.File]::ReadAllText((Join-Path $fixtureTemplate $member)).Replace("`r`n","`n")
+        if($lineEnding-ceq'CRLF'){$variantText=$variantText.Replace("`n","`r`n")}
+        [IO.File]::WriteAllText((Join-Path $variantSource $member),$variantText,[Text.UTF8Encoding]::new($false))
+      }
+      $beforeData=Get-K2213Sha256 (Join-Path $variantSource 'data-final-fixes.lua')
+      $beforeControl=Get-K2213Sha256 (Join-Path $variantSource 'control.lua')
+      $variantSelected=New-K2213SelectedFixture -Source $variantSource -Run (Join-Path $run ('k2-selected-'+$lineEnding)) -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'
+      foreach($member in @('data-final-fixes.lua','control.lua','settings-updates.lua')){
+        Assert-Probe ((Get-K2213Sha256 (Join-Path $variantSelected $member)) -ceq (Get-K2213Sha256 (Join-Path $selectedFixture $member))) "K2 $lineEnding selected fixture differs from the exact current oracle: $member"
+      }
+      Assert-Probe ((Get-K2213Sha256 (Join-Path $variantSource 'data-final-fixes.lua')) -ceq $beforeData -and (Get-K2213Sha256 (Join-Path $variantSource 'control.lua')) -ceq $beforeControl) "K2 $lineEnding specialization changed its source template."
+      $changedGuard=[IO.File]::ReadAllText((Join-Path $variantSource 'data-final-fixes.lua')).Replace('4.2.21001','4.2.21003')
+      [IO.File]::WriteAllText((Join-Path $variantSource 'data-final-fixes.lua'),$changedGuard,[Text.UTF8Encoding]::new($false))
+      Refuses-Probe {New-K2213SelectedFixture -Source $variantSource -Run (Join-Path $run ('k2-refused-'+$lineEnding)) -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'} 'fixture-specialization-anchor:data-final-fixes.lua'
+    }
+    # Execute the actual retained and selected fixture guard sources in the
+    # repository-provisioned Lua 5.2 host. This is a source/version boundary
+    # control only: it neither starts Factorio nor serializes a save.
+    $luaRuntime=if([string]::IsNullOrWhiteSpace($env:MIR_K2_LUA_RUNTIME)){Join-Path $repo 'build/tmp/mir421-lua-runtime'}else{$env:MIR_K2_LUA_RUNTIME}
+    $luaPython=if([string]::IsNullOrWhiteSpace($env:MIR_K2_LUA_PYTHON)){'python'}else{$env:MIR_K2_LUA_PYTHON}
+    Refuses-Probe {Resolve-K2213LuaHost -RuntimeDirectory (Join-Path $run 'missing-k2-lua-runtime') -PythonExe $luaPython} '[mir-native-probe-k2-lua-runtime-missing]'
+    $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $luaRuntime -PythonExe $luaPython
+    $luaDiagnostic=Join-Path $run 'k2-version-controls-diagnostic.json'
+    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic
+    $luaRecord=Get-Content -Raw -LiteralPath $luaResult.diagnostic|ConvertFrom-Json
+    Assert-Probe ([int]$luaRecord.exit_code-eq0-and[bool]$luaRecord.success_marker-and[string]$luaRecord.output-match'MIRK2213LuaHostV1') 'K2 retained/current fixture Lua control did not retain its host identity.'
+    $luaReject=Join-Path $run 'k2-version-controls-rejected.lua'
+    [IO.File]::WriteAllText($luaReject,"error('MIR-K2-DIAGNOSTIC-OPPOSING')`n",[Text.UTF8Encoding]::new($false))
+    $luaRejectDiagnostic=Join-Path $run 'k2-version-controls-rejected-diagnostic.json'
+    Refuses-Probe {Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource $luaReject -WorkRoot $run -DiagnosticPath $luaRejectDiagnostic} 'MIR-K2-DIAGNOSTIC-OPPOSING'
+    $luaRejectRecord=Get-Content -Raw -LiteralPath $luaRejectDiagnostic|ConvertFrom-Json
+    Assert-Probe ([int]$luaRejectRecord.exit_code-ne0-and[string]$luaRejectRecord.output-match'MIR-K2-DIAGNOSTIC-OPPOSING') 'K2 Lua child refusal did not retain its diagnostic output.'
+    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.4.0'} 'input-profile-selection:more-infinite-research'
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @((Join-Path $run 'absent-library'))} 'dependency-missing'
     $portable.archive_sha256['controlled-k2_1.0.0.zip']='0'*64;Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'dependency-hash'
@@ -954,6 +1081,8 @@ function New-MIR4TargetPackage {
   Assert-Probe ($minorThreePackage.source_version-ceq'4.3.0'-and$minorThreePackage.distribution_version-ceq'4.3.20000'-and$minorThreePackage.target-ceq'f200') 'governed materializer rejected or misprojected the 4.3.0 release identity.'
   $minorThreePatchPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.3.1'
   Assert-Probe ($minorThreePatchPackage.source_version-ceq'4.3.1'-and$minorThreePatchPackage.distribution_version-ceq'4.3.21001'-and$minorThreePatchPackage.target-ceq'f210') 'governed materializer rejected or misprojected the 4.3.1 patch identity.'
+  $minorFourPackage=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -SourceVersion '4.4.0'
+  Assert-Probe ($minorFourPackage.source_version-ceq'4.4.0'-and$minorFourPackage.distribution_version-ceq'4.4.21000'-and$minorFourPackage.target-ceq'f210') 'governed materializer rejected or misprojected the 4.4.0 release identity.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
@@ -983,14 +1112,14 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $actorRows=@(Assert-ControlledProbeActorInventory -Runs @($context.runs) -RunRoot $context.root)
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows|Select-Object -Skip 1) -RunRoot $context.root} 'native-probe-actor-missing'
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$actorRows[0]) -RunRoot $context.root} 'native-probe-actor-duplicate'
-  $extraActor=[pscustomobject]@{index=14;status='passed';ledger=(Join-Path $context.root 'process-14.resources.jsonl')}
+  $extraActor=[pscustomobject]@{index=15;status='passed';ledger=(Join-Path $context.root 'process-15.resources.jsonl')}
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$extraActor) -RunRoot $context.root} 'native-probe-actor-extra'
   $actorRecord=@($actorRows|ForEach-Object {[ordered]@{index=[int]$_.index;status=[string]$_.status;ledger=[IO.Path]::GetFileName([string]$_.ledger)}})
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$actorRecord.Count;actors=$actorRecord}
   $resultActorRows=@((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actors)
   $expectedActorIdentities=@($actorRecord|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
   $resultActorIdentities=@($resultActorRows|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
-  Assert-Probe ($resultActorRows.Count-eq13-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
+  Assert-Probe ($resultActorRows.Count-eq14-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
@@ -1159,13 +1288,15 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     $candidate423Input=New-BrowserInput 'more-infinite-research' '4.2.20003' 'mir-candidate'
     $candidate430Input=New-BrowserInput 'more-infinite-research' '4.3.20000' 'mir-candidate'
     $candidate431Input=New-BrowserInput 'more-infinite-research' '4.3.20001' 'mir-candidate'
-    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')){
+    $candidate440Input=New-BrowserInput 'more-infinite-research' '4.4.20000' 'mir-candidate'
+    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
     $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $parameters.SourceVersion=$sourceVersion
     if($sourceVersion-ceq'4.2.2'){$parameters.CandidateArchive=$currentMirInput.source_path}
     if($sourceVersion-ceq'4.2.3'){$parameters.CandidateArchive=$candidate423Input.source_path}
     if($sourceVersion-ceq'4.3.0'){$parameters.CandidateArchive=$candidate430Input.source_path}
     if($sourceVersion-ceq'4.3.1'){$parameters.CandidateArchive=$candidate431Input.source_path}
+    if($sourceVersion-ceq'4.4.0'){$parameters.CandidateArchive=$candidate440Input.source_path}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
@@ -1180,7 +1311,7 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
     Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
     Assert-Probe ($fallback.source_version-ceq$sourceVersion-and$fallback.candidate.archive_sha256-ceq(Get-FileHash $parameters.CandidateArchive).Hash) 'browser owned worker lost the selected maintenance version or bytes.'
-    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'}}
+    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'};'4.4.0'{'4.4.20000'}}
     Assert-Probe ((@($fallback.library_input_receipts[0].selected|Where-Object name -CEQ 'more-infinite-research').version)-ceq$expectedVersion) 'browser worker selected a different installed maintenance version.'
     }
   }

@@ -74,7 +74,7 @@ function M.source_snapshot()
         or {name = binding.owner, missing = true}
     end
   end
-  return streams, native_owner_inputs
+  return streams, native_owner_inputs, C.shared
 end
 
 return M

@@ -9,7 +9,7 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
-# This maintainer-authorized controlled diagnostic uses the exact pre-freeze engine lock;
+# This maintainer-authorized developer-reference characterization uses the exact pre-freeze engine lock;
 # its receipt does not grant public ecosystem/API qualification.
 # The governed resolver owns the exact Steam path, branch, manifest, build,
 # file-version and 2.1.18+ floor checks. Do not replace it with a loose version
@@ -43,13 +43,14 @@ $modules=[ordered]@{
   'prototypes.mir.capabilities.science_integration.pack_registry'='source/prototypes/mir/capabilities/science_integration/pack_registry.lua'
   'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
   'prototypes.mir.capabilities.science_integration.recipe_unlock_facts'='source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua'
-  'prototypes.mir.capabilities.science_integration.production_route_policy'='source/prototypes/mir/capabilities/science_integration/production_route_policy.lua'
-  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
-  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
+  'prototypes.mir.capabilities.science_integration.production_route_policy'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/production_route_policy.lua'
+  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
+  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')
 [void]$lua.AppendLine('env.require=function(name) local value=env.package.loaded[name]; if value~=nil then return value end; assert(loaders[name], "Unbound module: "..name); value=loaders[name](env); env.package.loaded[name]=value; return value end')
+$retiredDiscoveryReferences=@($modules.Values | Where-Object { $_ -like 'tests/reference/retired-discovery/*' })
 $identities=@()
 foreach($entry in $modules.GetEnumerator()) {
   $path=Join-Path $repo $entry.Value
@@ -82,6 +83,6 @@ $nativeLog=Join-Path $run 'userdata/factorio-current.log'
 $log=Get-Content -Raw -LiteralPath $nativeLog
 [IO.File]::WriteAllText((Join-Path $run 'stdout.txt'),$log,[Text.UTF8Encoding]::new($false))
 if($exitCode -ne 0 -or $log -notmatch 'MIR-RECIPE-SOURCE-EPOCH-PASS ([0-9]+)') { throw "Recipe source epoch regression failed: $nativeLog" }
-$receipt=[ordered]@{status='passed';scope='controlled-real-context-recipe-source-epoch-not-ecosystem-qualification';assertions=[int]$Matches[1];engine_version=[string]$engineResolution.engine.version;engine_sha256=[string]$engineResolution.engine.sha256;engine_resolution_record_sha256=[string]$engineResolution.record_sha256;test_sha256=(Get-FileHash -LiteralPath $testPath -Algorithm SHA256).Hash;modules=$identities;log_sha256=(Get-FileHash -LiteralPath (Join-Path $run 'stdout.txt') -Algorithm SHA256).Hash}
+$receipt=[ordered]@{status='passed';scope='retired-discovery-characterization-not-current-package-certification';retired_discovery_reference_modules=$retiredDiscoveryReferences;assertions=[int]$Matches[1];engine_version=[string]$engineResolution.engine.version;engine_sha256=[string]$engineResolution.engine.sha256;engine_resolution_record_sha256=[string]$engineResolution.record_sha256;test_sha256=(Get-FileHash -LiteralPath $testPath -Algorithm SHA256).Hash;modules=$identities;log_sha256=(Get-FileHash -LiteralPath (Join-Path $run 'stdout.txt') -Algorithm SHA256).Hash}
 $receipt | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $run 'result.json') -Encoding utf8
 $receipt | ConvertTo-Json -Depth 6

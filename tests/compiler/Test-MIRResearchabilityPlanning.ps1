@@ -15,7 +15,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
 . (Join-Path $repo 'tools/mir/application/release/F210QualificationPolicy.ps1')
 
-# This controlled compiler fixture has its own process/output budget and uses
+# This developer-reference characterization fixture has its own process/output budget and uses
 # one private, flat archive library. It must not extract a mod, copy a
 # dependency, or replace a player's selected-library controls.
 $context=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
@@ -48,14 +48,14 @@ $modules=[ordered]@{
   'prototypes.mir.graph.researchability_index'='source/prototypes/mir/graph/researchability_index.lua'
   'prototypes.mir.index.recipe_unlocks'='source/prototypes/mir/index/recipe_unlocks.lua'
   'prototypes.mir.capabilities.science_integration.pack_registry'='source/prototypes/mir/capabilities/science_integration/pack_registry.lua'
-  'prototypes.mir.capabilities.science_integration.lab_compatibility'='source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
+  'prototypes.mir.capabilities.science_integration.lab_compatibility'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
   'prototypes.mir.capabilities.science_integration.recipe_unlock_facts'='source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua'
-  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
-  'prototypes.mir.capabilities.science_integration.production_route_policy'='source/prototypes/mir/capabilities/science_integration/production_route_policy.lua'
-  'prototypes.mir.capabilities.science_integration.technology_researchability'='source/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
-  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
+  'prototypes.mir.capabilities.science_integration.recipe_route_feasibility'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'
+  'prototypes.mir.capabilities.science_integration.production_route_policy'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/production_route_policy.lua'
+  'prototypes.mir.capabilities.science_integration.technology_researchability'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
+  'prototypes.mir.capabilities.science_integration.pack_production_reachability'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
   'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
-  'prototypes.mir.capabilities.science_integration.science_packs'='source/prototypes/mir/capabilities/science_integration/science_packs.lua'
+  'prototypes.mir.capabilities.science_integration.science_packs'='tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/science_packs.lua'
   'prototypes.mir.capabilities.science_integration.science_selector'='source/prototypes/mir/capabilities/science_integration/science_selector.lua'
   'prototypes.mir.platform.factorio.target_line'='source/prototypes/mir/platform/factorio/target_line.lua'
   'prototypes.streams.direct-effects'='source/prototypes/streams/direct-effects.lua'
@@ -65,6 +65,7 @@ $modules=[ordered]@{
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')
 [void]$lua.AppendLine('env.require=function(name) local value=env.package.loaded[name]; if value~=nil then return value end; assert(loaders[name], "Unbound module: "..name); value=loaders[name](env); env.package.loaded[name]=value; return value end')
+$retiredDiscoveryReferences=@($modules.Values | Where-Object { $_ -like 'tests/reference/retired-discovery/*' })
 $identities=@()
 foreach($entry in $modules.GetEnumerator()) {
   $path=Join-Path $repo $entry.Value
@@ -122,7 +123,7 @@ try {
   $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $nativeLog -LatestInvocation
   $receipt=[ordered]@{
     status='passed'
-    scope='controlled-modules-not-real-ecosystem-qualification'
+    scope='retired-discovery-characterization-not-current-package-certification';retired_discovery_reference_modules=$retiredDiscoveryReferences
     assertions=$researchabilityAssertions
     lab_acquisition_assertions=$labAssertions
     engine_version=[string]$engineResolution.engine.version
@@ -153,7 +154,7 @@ try {
   if($null -ne $failure){
     $failureReceipt=[ordered]@{
       status='failed'
-      scope='controlled-modules-not-real-ecosystem-qualification'
+      scope='retired-discovery-characterization-not-current-package-certification';retired_discovery_reference_modules=$retiredDiscoveryReferences
       error=$failure.Exception.Message
       engine_version=[string]$engineResolution.engine.version
       engine_sha256=[string]$engineResolution.engine.sha256

@@ -119,6 +119,26 @@ try {
   Assert-NineAuthority ((ConvertTo-MIR4BootstrapCanonicalJson -Value $committedProgramme.record) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $programme)) 'committed-pending-programme-matches-current-authorities'
   Assert-NineAuthority (($programme.selected_targets -join '|') -ceq ($script:MIR42SealNineTargetCandidates -join '|') -and @($programme.direct_predecessors).Count -eq 9 -and @($programme.historical_predecessor_authorities).Count -eq 5) 'all-nine-predecessors'
   Assert-NineAuthority (@($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -eq 0 -and -not $programme.publication_authorized -and -not $programme.release_transition_authority) 'preparation-grants-no-transition'
+
+  # A 4.4 release-cut programme retains the five terminal historical authorities
+  # but takes its immediate rows only from the authenticated published 4.3
+  # maintenance predecessor; stale 4.2 direct-predecessor rows are forbidden.
+  $programme440Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-440.json'
+  New-Item -ItemType Directory -Force -Path (Split-Path -Parent $programme440Path) | Out-Null
+  $programme440 = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programme440Path -SourceVersion '4.4.0'
+  Assert-NineAuthority ([string]$programme440.release_line -ceq '4.4' -and [string]$programme440.candidate.version_line -ceq '4.4' -and
+    [string]$programme440.status -ceq 'active-current-4.4-release-cut-pre-freeze-no-transition-authority' -and
+    $programme440.PSObject.Properties.Name -ccontains 'published_maintenance_predecessor' -and
+    $programme440.PSObject.Properties.Name -cnotcontains 'direct_predecessor_authority' -and
+    $programme440.PSObject.Properties.Name -cnotcontains 'direct_predecessors' -and
+    [string]$programme440.published_maintenance_predecessor.source_version -ceq '4.3.0') '440-maintenance-programme-contract'
+  $programme440Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme440Path -AllowPendingTransition
+  Assert-NineAuthority ([string]$programme440Read.record.release_line -ceq '4.4') '440-maintenance-programme-reader'
+  $wrong440 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme440 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong440.candidate.version_line = '4.2'
+  Write-MIR42NormalizedRecord -Record $wrong440 -OutputPath $programme440Path -Code 'mir42-nine-test-440-wrong-line' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme440Path -AllowPendingTransition } 'mir42-seal-current-programme-schema' '440-wrong-line-rejected'
+  Remove-Item -LiteralPath $programme440Path -Force
   Assert-NineAuthority ((Get-FileHash -LiteralPath $oldPath -Algorithm SHA256).Hash -ceq $oldHash) 'old-programme-bytes-preserved'
   Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' } 'mir42-seal-current-programme-transition-not-authorized' 'actual-transition-required'
   $preparedHash=(Get-FileHash -LiteralPath $programmePath -Algorithm SHA256).Hash
@@ -217,7 +237,7 @@ try {
   $advanceCandidate = [pscustomobject][ordered]@{
     identity=[pscustomobject][ordered]@{path=$candidatePath;sha256=('C' * 64);record=[pscustomobject][ordered]@{record_sha256=('D' * 64)}}
     source=[pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('E' * 64)}
-    scope='nine-target';targets=@($script:MIR42SealNineTargetCandidates | ForEach-Object {[pscustomobject][ordered]@{target=[string]$_}})
+    source_version='4.2.0';scope='nine-target';targets=@($script:MIR42SealNineTargetCandidates | ForEach-Object {[pscustomobject][ordered]@{target=[string]$_}})
   }
   Set-Item Function:Read-MIR42NineTargetProgrammeWrittenAuthorization -Value { param($Path) if((Resolve-Path -LiteralPath $Path).Path -cne $authorizationPath){throw '[mir42-nine-test-written-go-path]'};return $authorizationFixture }
   Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value { param($RepoRoot,$CandidateManifestPath) if((Resolve-Path -LiteralPath $CandidateManifestPath).Path -cne $candidatePath){throw '[mir42-nine-test-written-go-candidate-path]'};return $advanceCandidate }

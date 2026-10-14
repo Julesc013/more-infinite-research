@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-07
+last_reviewed: 2026-10-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,72 @@ source_of_truth_for:
 ---
 
 # MIR 4.x operating programme
+
+## Active campaign: MIR 4.4.0 unified research generation
+
+The maintainer's 14 October direction supersedes the separate 4.3.1 publication attempt: skip 4.3.1 and roll its verified incident repairs into 4.4.0. The fixed requested delivery cutoff is **15 October 2026, 15:36 AEDT / 04:36 UTC**, anchored to the maintainer-confirmed original instruction at 23:36 AEDT on 14 October. Compaction, a new turn, a failed run or a handoff does not restart this clock. The deadline does not replace acceptance evidence.
+
+Published 4.3.0 remains the immediate predecessor. Direct 4.2.2 upgrades remain required for players skipping 4.3.0. Unpublished 4.3.1 candidates are preserved experiments, not released predecessors. Their observations can be reused only for their exact applicable inputs; the compiler replacement requires new affected native acceptance.
+
+### Product outcome
+
+Approve research during development and instantiate it during Factorio loading. Reuse the existing authored stream catalogue, contribution model and emitter. Ship one production generation path with narrow platform adapters; Full and Classic are retired as execution choices. Preserve old serialized selector values through a tested compatibility transition without adding another public compiler mode.
+
+Approved static and parameterized families declare identities, effects, matching rules, science, progression, ownership, finite-tail continuation, costs, caps and settings behavior. Startup builds shared indexes, binds actual prototypes and settings, validates the relevant assumptions and final prerequisite graph, and emits the approved result. New names can match a supported parameterized family; new semantics require an approved declaration.
+
+Open-ended acquisition proofs, competing production-route exploration and exhaustive diagnostic explanations leave the installed startup path. A binding miss cannot re-enter the old discovery solver. Whole-compilation work is bounded deterministically; wall-clock expiry cannot choose technologies. Unsupported relevant input receives a precise diagnosis, not a fabricated proof, silent catalogue reduction or empty compatibility placeholder. Such a failure remains a compatibility failure, not a performance success.
+
+Transfer the complete established catalogue, including Base, Space Age and existing mod integrations. Preserve 4.2.2/4.3.0 behavior on unchanged supported inputs: technology IDs and useful effects, science and prerequisites, ownership, costs and formulas, availability, caps, settings, earned bonuses, queues and fractional progress. Independently specified bug fixes require explicit expected differences. Historical 4.1 definitions are not restored merely to satisfy obsolete equality tests.
+
+### Repairs carried into 4.4.0
+
+- Keep the Library parsing-time dependency fixes and conditional idle maintenance; qualify actual first opening, settings, reload and client behavior.
+- Keep the preservation-capable handling of saved Full/Classic values while replacing both execution alternatives with the approved generation path.
+- Keep published drill-manufacturing research and clarify its presentation. The proposed new drill permission grant was removed: a retained native published-4.3.0 Base observation already produces 24 burner drills and 22 electric drills from 20 module-free crafts after one level. This is not a candidate, Space Exploration or mining-yield result.
+- Keep the Galore pathological-loading and science-rejection incident at the front of the new implementation. Record selected science, compatible labs and the failed binding without reconstructing the old proof search. A small passing Galore closure does not close the reporter's larger installation.
+- Verify the actual Secretas/Frozeta finite robot-cargo tail and one eligible continuation without duplicate infinite ownership or effects. Retain the separate mining-yield/manufacturing distinction and open reporter-specific limits.
+
+### Fixed execution sequence
+
+Work proceeds in the primary checkout with non-overlapping ownership. Native runs remain serial under the existing resource governor. Qualification and release preparation proceed alongside implementation; there are no new worktrees, dependency-copy farms or release frameworks.
+
+| Time from instruction | Required outcome |
+| --- | --- |
+| 0–1 hour | Preserve and commit ready repairs; inventory established families and exact acceptance obligations; reconcile 4.4.0 version admission, existing signing capability and resource gaps. |
+| 1–4 hours | Transfer one real existing family end to end through the shared emitter. Compare its complete output against the accepted baseline and measure a relevant native profile. Prove its old acquisition/discovery calls are absent. |
+| 4–8 hours | Transfer remaining established families, ownership/finite continuations and science policies; integrate early; remove replaced production discovery imports and the Full/Classic dispatch. Run opposing checks and representative native comparisons during transfer. |
+| 8–10 hours | Finish catalogue, package-closure and incident checks. Freeze player bytes by 09:36 AEDT or earlier if observed remaining serial qualification requires it. Unfinished optional features move to a later 4.4.x patch. |
+| 10–15 hours | Complete required destination-specific native, saved-state, first-use and client acceptance on frozen actual packages. Compare published 4.3.0 and direct 4.2.2 upgrades with both cold reloads. Reevaluate retained observations when sufficient; rerun changed, missing or incomplete cases. |
+| 15–16 hours | Complete applicable review/signing/promotion, stage all nine assets, publish canonical v4.4.0, verify anonymous downloads and hashes, and deliver matching primary-checkout dist and release materials. Report exact unmet obligations if acceptance is incomplete. |
+
+The hour-four checkpoint is an implementation and native-measurement decision, not another general architecture review. The hour-eight checkpoint must expose any remaining catalogue, semantic or resource gap before the final qualification window. A release cannot satisfy the plan by keeping the old discovery path as a hidden fallback or by reducing established research.
+
+### Performance and release acceptance
+
+Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.3.0 from cumulative improvement over 4.2.2. The destination is added startup time below both ten seconds and ten percent of the no-MIR baseline where achievable, reported per named profile. Include the available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
+
+Validate complete research definitions and saved investment, not only names or counts. Include applicable Base/Space Age and modded cases, finite-tail ownership, required historical destinations, Library cold use/reload/settings and genuine client/multiplayer behavior. A scripted remote open is not a physical shortcut test; several forces are not several clients. No catalogue suppression or freeze moved to first use is accepted as a speedup.
+
+All nine distributions retain the codec `100 * integer(CCC) + SOURCE_PATCH`: 4.4.0 uses `4.4.21000`, `4.4.20000`, `4.4.11000`, `4.4.10000`, `4.4.01700`, `4.4.01600`, `4.4.01500`, `4.4.01400` and `4.4.01300`. Required checks, actual candidate review, applicable protected signing and publication readback remain gates. Protected signing is currently an unresolved capability; the earlier 4.3.0 exception does not authorize a new exception. Resolve existing approved capability early without requesting secrets in chat or treating release permission as missing.
+
+GitHub publication, local delivery, affected-player Portal availability and completion of all nine maintainer-managed Portal uploads remain separate states. The retained six-hour upload spacing requires at least 48 hours from first to ninth Portal upload; this plan does not claim all-nine Portal completion within sixteen hours.
+
+### Follow-on 4.4.x releases
+
+| Release | Scope and admission |
+| --- | --- |
+| 4.4.0 | Unified approved generation, complete established catalogue transfer, verified incident repairs, measured startup improvement and preserved saves. |
+| 4.4.1 | First justified corrective batch from 4.4.0 qualification/player evidence: remaining incident-specific binding, migration, client or performance defects. No deferred implementation necessary for 4.4.0's claimed catalogue is hidden here. |
+| 4.4.2 | Further measured startup, memory and Library improvements within the same binder, with stronger scaling and repeatability toward the performance target. |
+| 4.4.3 | Additional approved community/mod coverage through reusable declarations and the existing science/ownership rules, with exact compatibility and migration evidence. |
+| 4.4.4 onward | Useful developer-time discovery/contributor tools, historical refinements and remaining admitted requests. MEP work requires a ready, useful production contract. |
+| Further 4.4.x | Continue the preserved request queue in useful, independently qualified batches. No empty releases, new compiler modes or parallel catalogues. |
+
+Patch suffixes are source patches: 4.4.1 uses `CCC01` and 4.4.2 uses `CCC02`; packaging retries never change them. Published assets remain unchanged. Each follow-on patch preserves the established 4.4.0 baseline except for independently justified and tested corrections.
+
+## Historical 4.0–4.1 programme and custody context
+
+The remaining sections retain the earlier operating programme and accepted historical observations. They do not reinstate the skipped 4.3.1 release, obsolete emergency deadlines or a different active 4.4.0 scope.
 
 MIR 4.0.0 proved that the project can produce a multi-target, proof-governed product line. MIR 4.x now has two simultaneous duties: keep the released 4.0 line repairable and make future development physically coherent. The programme therefore runs a stable patch lane and one development lane under shared findings, shared semantic intent, independently qualified target packages, and immutable published bytes.
 

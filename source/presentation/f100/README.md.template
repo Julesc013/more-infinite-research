@@ -1,14 +1,14 @@
-# More Infinite Research 4.2.10002
+# More Infinite Research 4.4.10000
 
-**MIR 4.3 compiler profiles — modern targets (1.0 and newer):** **Full** is the default and retains broad automatic research support with the performance optimizations in this update. **Classic** is an explicit reduced-support option. It offers five direct character bonuses and up to six validated native continuations, omitting broad automatic mod inference, material progression and recipe-productivity research. If you select Classic, previously generated research, levels, effects and progress outside this core are **not preserved**.
+**Research generation:** approved research families use one generation path within the selected engine target's capabilities. Saved Full and Classic values no longer select different compilers; the reduced Classic implementation is retired.
 
-Before opening an existing factory that needs MIR 4.2 research, choose **Full** in the `mir-compiler-profile` startup setting, restart Factorio and load an untouched backup. Full may still load slowly. If Classic has already loaded the factory, quit without saving; selecting Full after a Classic resave cannot restore lost investment. Historical Factorio 0.x packages retain their existing reduced path.
+Keep an untouched backup before upgrading. Restoring applicable definitions cannot reconstruct levels, bonuses or progress already erased by saving with omitted technologies in 4.3.0 Classic. Use a pre-update backup where available. Loading time depends on the active mods. Historical Factorio 0.x packages retain their existing target capabilities.
 
-The catalogue and older release descriptions below document Full or earlier release behavior. They do not expand Classic's supported core. The matching release notes and exact package evidence identify the tested upgrade dispositions.
+The catalogue and older release descriptions below document earlier release behavior. The matching release notes and exact package evidence identify tested configurations and upgrade outcomes.
 
-More Infinite Research 4.2.10002 is a Factorio 1.0 reduced-target maintenance package from source 4.2.2.
+More Infinite Research 4.4.10000 is a Factorio 1.0 reduced-target maintenance package.
 
-It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
+It is a reduced target-native projection from the current MIR source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.
 
 ## Requirements
 
@@ -58,13 +58,13 @@ Earlier fresh-load evidence remains bound to its original package and Factorio 1
 
 ## Upgrade
 
-The exact published 1.8.1 archive remains a historical predecessor record. The maintenance upgrade starts from the published 4.2.0 package for this target; its evidence is separate from that older predecessor.
+The exact published 1.8.1 archive remains a historical predecessor record. The following 4.2 maintenance-upgrade notes are historical; current package qualification has separate evidence.
 
-Source `v4.2.0-stable` maps to target packages ending `00`; canonical `v4.2.1` maps to `01`, and `v4.2.2` maps to `02`. Preserve original saves and keep startup settings unchanged for the first load. Replace private or withdrawn ZIPs sharing the new version explicitly and verify the published checksum. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
+For historical 4.2 package recovery, source `v4.2.0-stable` maps to target packages ending `00`; canonical `v4.2.1` maps to `01`, and `v4.2.2` maps to `02`. Preserve original saves and keep startup settings unchanged for the first load. Replace private or withdrawn ZIPs sharing the new version explicitly and verify the published checksum. Same-version replacement does not itself rerun version-gated migrations or reset earned research.
 
 ## Installation
 
-Place `more-infinite-research_4.2.10002.zip` in the Factorio 1.0 `mods` directory. Do not unpack it.
+Place `more-infinite-research_4.4.10000.zip` in the Factorio 1.0 `mods` directory. Do not unpack it.
 
 The modern Research Library is not included in this reduced package.
 

@@ -19,33 +19,64 @@ Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check|Out-Null
 
 $migrated=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introduced=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
-$scienceIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
 $historicalIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
 $repairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
-if([string]$record.predecessor.record_sha256-cne[string]$v6.record_sha256-or
-  [string]$manifest.predecessor_record_sha256-cne[string]$v6.source_manifest.record_sha256-or
-   @($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne382-or
-   $migrated.Count-ne359-or@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359-or
-   $introduced.Count-ne23-or$scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
-  [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
-  [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
-  (@($progressionIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
-  [string]$progressionPlannerIntroduced[0].source_path-cne'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
-  [string]$progressionPlannerIntroduced[0].output_path-cne'prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
-  (@($progressionPlannerIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
-  [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-   [string]$repairIntroduced[0].layer-cne'shared'-or[string]$repairIntroduced[0].semantic_class-cne'common-semantic-source'-or
-   [string]$repairIntroduced[0].source_path-cne'source/prototypes/mir/runtime/effects/passive_repair.lua'-or
-   [string]$repairIntroduced[0].output_path-cne'prototypes/mir/runtime/effects/passive_repair.lua'-or
-   [string]$repairIntroduced[0].transform-cne'copy-exact-bytes'-or
-   (@($repairIntroduced[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
-   [string]$repairIntroduced[0].provenance.kind-cne'current-introduction'-or
-  @($historicalIntroduced|Where-Object{[string]$_.source_path-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-ne0-or
-  (@($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f013|f014|f015|f016|f017'-or
-   @($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-ne359){throw '[mir4-package-presentation-v7-source-succession]'}
-
+$compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
+$approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+$retiredPredecessorSources=@(
+  'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
+  'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
+  'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
+)
+$retiredCurrentSources=@(
+  'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+  'source/prototypes/mir/pipeline/classic_compiler.lua',
+  'source/prototypes/mir/domain/compiler/classic_declarations.lua',
+  'source/prototypes/mir/planner/classic/plan.lua'
+)
+$predecessorPaths=@($predecessorManifest.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
+$currentPaths=@($manifest.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
+$missingPredecessors=@($predecessorPaths|Where-Object{$_-cnotin@($migrated.provenance.predecessor_source_path)}|Sort-Object -Unique)
+$successionChecks=@(
+  ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
+  ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
+  (@($manifest.bindings).Count-eq377),($currentPaths.Count-eq377),
+  ($migrated.Count-eq356),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq356),
+  ($introduced.Count-eq21),($compilerTransitionIntroduced.Count-eq2),($approvedBindingsIntroduced.Count-eq2),
+  ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
+  (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
+  (($missingPredecessors-join'|')-ceq(($retiredPredecessorSources|Sort-Object -Unique)-join'|')),
+  (@($retiredPredecessorSources|Where-Object{$_-cnotin$predecessorPaths}).Count-eq0),
+  (@($retiredCurrentSources|Where-Object{$_-cin$currentPaths}).Count-eq0),
+  ([string]$progressionIntroduced[0].source_path-ceq'source/prototypes/mir/families/material_progression.lua'),
+  ([string]$progressionIntroduced[0].output_path-ceq'prototypes/mir/families/material_progression.lua'),
+  ((@($progressionIntroduced[0].target_scope)-join'|')-ceq'f210|f200|f110|f100'),
+  ([string]$progressionPlannerIntroduced[0].source_path-ceq'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'),
+  ([string]$progressionPlannerIntroduced[0].output_path-ceq'prototypes/mir/planner/stream_compiler/material_continuation.lua'),
+  ((@($progressionPlannerIntroduced[0].target_scope)-join'|')-ceq'f210|f200|f110|f100'),
+  ([string]$repairIntroduced[0].layer-ceq'shared'),([string]$repairIntroduced[0].semantic_class-ceq'common-semantic-source'),
+  ([string]$repairIntroduced[0].source_path-ceq'source/prototypes/mir/runtime/effects/passive_repair.lua'),
+  ([string]$repairIntroduced[0].output_path-ceq'prototypes/mir/runtime/effects/passive_repair.lua'),
+  ([string]$repairIntroduced[0].transform-ceq'copy-exact-bytes'),
+  ((@($repairIntroduced[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-ceq'f200|f210'),
+  (@($historicalIntroduced|Where-Object{[string]$_.source_path-notmatch'^source/(?:adapters|presentation)/historical/'}).Count-eq0),
+  ((@($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-ceq'f013|f014|f015|f016|f017')
+)
+if($successionChecks-contains$false){throw '[mir4-package-presentation-v7-source-succession]'}
+foreach($source in @('source/prototypes/mir/settings/compiler_profile.lua','source/prototypes/mir/runtime/compiler_profile_notice.lua')){
+  $row=@($compilerTransitionIntroduced|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'capability'-or[string]$row[0].semantic_class-cne'target-overlay'-or
+    [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+    (@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){throw '[mir4-package-presentation-v7-source-succession]'}
+}
+foreach($source in @('source/prototypes/mir/capabilities/science_integration/lab_bindings.lua','source/prototypes/mir/capabilities/science_integration/pack_bindings.lua')){
+  $row=@($approvedBindingsIntroduced|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'shared'-or[string]$row[0].semantic_class-cne'common-semantic-source'-or
+    [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+    (@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){throw '[mir4-package-presentation-v7-source-succession]'}
+}
 Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor $predecessorManifest|Out-Null
 
 foreach($forgery in @(
@@ -58,9 +89,9 @@ foreach($forgery in @(
   @{id='browser-output';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').output_path='prototypes/mir/platform/factorio/forged.lua'}},
   @{id='browser-transform';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').transform='forged-transform'}},
   @{id='browser-identity';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').provenance.introduction_id='undeclared-introduction'}},
-  @{id='classic-scope';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/domain/compiler/classic_declarations.lua').target_scope=@('f210')}},
-  @{id='classic-substitution';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/domain/compiler/classic_declarations.lua').source_path='source/prototypes/mir/domain/compiler/forged.lua'}},
-  @{id='classic-transform';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/domain/compiler/classic_declarations.lua').transform='forged-transform'}}
+  @{id='retired-classic-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/settings/compiler_profile.lua');$row[0].source_path='source/prototypes/mir/domain/compiler/classic_declarations.lua';$row[0].output_path='prototypes/mir/domain/compiler/classic_declarations.lua'}},
+  @{id='retired-science-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].output_path='prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].provenance.introduction_id='MIR42-SCIENCE-ROUTE-FEASIBILITY'}},
+  @{id='approved-binding-substitution';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/forged.lua'}}
 )){
   $copy=$manifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
   &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy
@@ -71,16 +102,37 @@ foreach($forgery in @(
 
 foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
-  $binding=@($state.manifest.bindings|Where-Object{[string]$_.output_path-ceq'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'})
-  $operation=@($state.composition.operations|Where-Object{[string]$_.path-ceq'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'})
+  $selection=Get-MIR4TargetMaterializationBindings -State $state
   $identity=@($record.target_content_identities|Where-Object{[string]$_.target-ceq$target})
   $prior=@($v6.target_content_identities|Where-Object{[string]$_.target-ceq$target})
-  if($binding.Count-ne1-or$operation.Count-ne1-or$identity.Count-ne1-or$prior.Count-ne1-or
-     $target-notin@($binding[0].target_scope)-or[string]$operation[0].operation-cne'add'-or
-     [string]$operation[0].expected_sha256-cne[string]$binding[0].output_sha256-or
-     [string]$identity[0].predecessor_content_sha256-cne[string]$prior[0].content_sha256-or
-     [int]$identity[0].predecessor_entry_count-ne[int]$prior[0].entry_count-or
-     -not[bool]$identity[0].exact_engine_qualification_required){throw "[mir4-package-presentation-v7-target-binding] $target"}
+  foreach($path in @('prototypes/mir/capabilities/science_integration/lab_bindings.lua','prototypes/mir/capabilities/science_integration/pack_bindings.lua')){
+    $binding=@($state.manifest.bindings|Where-Object{[string]$_.output_path-ceq$path})
+    $operation=@($state.composition.operations|Where-Object{[string]$_.path-ceq$path})
+    $selected=@($selection.bindings|Where-Object{[string]$_.output_path-ceq$path})
+    if($binding.Count-ne1-or$selected.Count-ne1-or$operation.Count-ne0-or$identity.Count-ne1-or$prior.Count-ne1-or
+       $target-notin@($binding[0].target_scope)-or[string]$binding[0].layer-cne'shared'-or
+       [string]$selected[0].source_path-cne[string]$binding[0].source_path-or
+       [string]$selected[0].output_sha256-cne[string]$binding[0].output_sha256-or
+       [string]$identity[0].predecessor_content_sha256-cne[string]$prior[0].content_sha256-or
+       [int]$identity[0].predecessor_entry_count-ne[int]$prior[0].entry_count-or
+       -not[bool]$identity[0].exact_engine_qualification_required){throw "[mir4-package-presentation-v7-target-binding] $target $path"}
+    # Shared source is selected directly, not introduced by a target overlay.
+    # Read the selected bytes through the materializer's source/output hash checks.
+    $bytes=Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $selected[0]
+    if($bytes.Length-ne[int64]$binding[0].output_bytes){throw "[mir4-package-presentation-v7-target-binding-bytes] $target $path"}
+
+    $forgedState=$state|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+    $forgedState.composition.operations=@($forgedState.composition.operations)+@([pscustomobject]@{
+      path=$path;operation='add';source_path=[string]$binding[0].source_path
+      transform=[string]$binding[0].transform;semantic_class=[string]$binding[0].semantic_class
+      expected_bytes=[int64]$binding[0].output_bytes;expected_sha256=[string]$binding[0].output_sha256
+    })
+    $overlayRejected=$false
+    try{Get-MIR4TargetMaterializationBindings -State $forgedState|Out-Null}catch{
+      $overlayRejected=$_.Exception.Message-ceq"[mir4-target-materializer-operation-mismatch] ${target}:$path"
+    }
+    if(-not$overlayRejected){throw "[mir4-package-presentation-v7-shared-overlay-accepted] $target $path"}
+  }
 }
 
 foreach($forgery in @(

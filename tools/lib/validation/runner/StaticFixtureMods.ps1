@@ -139,11 +139,9 @@ Invoke-RepoCheck "fixture mods have metadata and engine entrypoints" {
     }
   }
 
-  # The F200 Bob/Angel diagnostic is explicitly allowed to prebuild the
-  # canonical recipe snapshot only in its short-lived parent context. Its
-  # child projection must borrow that snapshot, so retain a static ordering
-  # guard that catches a fixture which otherwise fails every query closed as
-  # recipe-index-unavailable.
+  # The F200 Bob/Angel diagnostic reads the finalized recipe snapshot before
+  # validating its compact declared science binding. Retain the ordering
+  # guard without importing the retired discovery projection.
   $scienceDiagnosticPath = Join-Path $fixtureRootForStatic "assert-f200-science-researchability-diagnostic/data-final-fixes.lua"
   $scienceDiagnosticText = Get-Content -Raw -LiteralPath $scienceDiagnosticPath
   $contextStart = $scienceDiagnosticText.IndexOf('compiler_context.with_active(')
@@ -153,11 +151,11 @@ Invoke-RepoCheck "fixture mods have metadata and engine entrypoints" {
   $recipeIndexBuild = if ($recipeFactsRequire -ge 0) {
     $scienceDiagnosticText.IndexOf('local parent_recipe_index = canonical_recipe_facts.index_view()', $recipeFactsRequire)
   } else { -1 }
-  $firstProjection = if ($contextStart -ge 0) {
-    $scienceDiagnosticText.IndexOf('reachability.pack_production_rejection_projection(', $contextStart)
+  $firstBinding = if ($contextStart -ge 0) {
+    $scienceDiagnosticText.IndexOf('science.production_route_for_pack(', $contextStart)
   } else { -1 }
   if ($contextStart -lt 0 -or $recipeFactsRequire -lt $contextStart -or $recipeIndexBuild -lt $recipeFactsRequire -or
-    $firstProjection -lt $recipeIndexBuild) {
-    throw "F200 science researchability diagnostic must initialize its parent recipe snapshot before projections."
+    $firstBinding -lt $recipeIndexBuild) {
+    throw "F200 science researchability diagnostic must initialize its parent recipe snapshot before declared binding validation."
   }
 }

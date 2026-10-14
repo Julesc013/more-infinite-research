@@ -8,7 +8,6 @@ local recipe_risk_facts = require("__more-infinite-research__/prototypes/mir/ind
 local recipe_matching = require("__more-infinite-research__/prototypes/mir/capabilities/recipe_productivity/recipe_matching")
 local relationships = require("__more-infinite-research__/prototypes/mir/index/relationships")
 local science = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/science_packs")
-local production_reachability = require("__more-infinite-research__/prototypes/mir/capabilities/science_integration/pack_production_reachability")
 local material_inventory = require("__mir-fixture-assert-f210-current-bob-angel-final-routes-observer__/material-outcome-inventory")
 
 -- These are candidates from the separately retained F200 closure, not an
@@ -190,29 +189,14 @@ local function observe_early_science_technology(subject)
   return ingredients
 end
 
-local function route_reason_line(route)
+local function declared_binding_line(route)
   if type(route) ~= "table" then return "-" end
-  local reachability = route.reachability or {}
-  return "recipe=" .. scalar(route.recipe)
+  return "pack=" .. scalar(route.pack_name)
+    .. ";recipe=" .. scalar(route.recipe_name)
     .. ";unlocker=" .. scalar(route.unlocker)
-    .. ";reachable=" .. scalar(route.reachable)
-    .. ";status=" .. scalar(reachability.status)
-    .. ";reason=" .. scalar(reachability.reason)
-end
-
-local function projection_reason_line(pack)
-  local projection = production_reachability.pack_production_rejection_projection(pack, {
-    limits = {candidates = 4, nodes = 64, depth = 16, bytes = 8192},
-    subject = {stream = "research_material_tin", generated_technology = "recipe-prod-research_material_tin-4"}
-  })
-  if type(projection) ~= "table" then return "-" end
-  local failure = projection.first_failure or {}
-  return "status=" .. scalar(projection.status)
-    .. ";prerequisite=" .. scalar(projection.prerequisite)
-    .. ";kind=" .. scalar(failure.kind)
-    .. ";reason=" .. scalar(failure.reason)
-    .. ";candidates=" .. scalar(projection.candidate_count)
-    .. ";truncated=" .. names_line((projection.truncation or {}).truncated)
+    .. ";status=" .. scalar(route.status)
+    .. ";initial=" .. scalar(route.initial)
+    .. ";acquisition_proof=" .. scalar(route.acquisition_proof)
 end
 
 local function observe_science_frontier()
@@ -235,22 +219,20 @@ local function observe_science_frontier()
 
   for _, pack in ipairs(selected) do
     local exists = science.science_pack_exists(pack)
-    local recipe_status = science.recipe_unlock_facts.pack_recipe_status(pack) or {}
-    local status, prerequisite = science.pack_production_status(pack, {}, {})
+    local status, prerequisite = science.pack_production_status(pack)
     local route = science.production_route_for_pack(pack)
-    local rejection = status == "unreachable" and projection_reason_line(pack) or "-"
+    local recipe_name = route and route.recipe_name
     log("[mir-f210-current-ba-final-observer] SCIENCE_PACK pack=" .. pack
       .. " required_frontier=" .. scalar(required[pack] == true)
       .. " official=" .. scalar(science.is_official_science_pack(pack))
       .. " mod_progression=" .. scalar(not science.is_official_science_pack(pack))
       .. " item_and_lab_input=" .. scalar(exists)
-      .. " has_recipe=" .. scalar(recipe_status.has_recipe)
-      .. " initially_available=" .. scalar(recipe_status.initially_available)
-      .. " recipes=" .. names_line(recipe_status.recipes)
+      .. " declared_recipe_present=" .. scalar(recipe_name and data.raw.recipe[recipe_name] ~= nil)
+      .. " initially_available=" .. scalar(route and route.initial)
+      .. " recipes=" .. scalar(recipe_name)
       .. " production_status=" .. scalar(status)
       .. " prerequisite=" .. scalar(prerequisite)
-      .. " route=" .. route_reason_line(route)
-      .. " rejection=" .. rejection)
+      .. " binding=" .. declared_binding_line(route))
   end
 
   for _, subject in ipairs(early) do
@@ -263,9 +245,7 @@ local function observe_science_frontier()
 end
 
 -- Chemical science is the first observed frontier missing in the combined
--- world. Inspect its exact final recipe and use the existing bounded
--- rejection projector once at its maximum documented work limit. A budget
--- result is still indeterminate evidence, never an admission override.
+-- world. Inspect its exact final recipe and its compact declared binding.
 local function observe_chemical_science(input)
   local name = "chemical-science-pack"
   local fact = recipe_facts.view(name)
@@ -296,86 +276,29 @@ local function observe_chemical_science(input)
       observe_bindings(producer_name, input)
     end
   end
-  local projection = production_reachability.pack_production_rejection_projection(name, {
-    limits = {candidates = 16, nodes = 1024, depth = 128, bytes = 262144},
-    subject = {stream = "research_material_aluminium",
-      generated_technology = "recipe-prod-research_material_aluminium-1"}
-  })
-  local failure = projection and projection.first_failure or {}
-  local truncation = projection and projection.truncation or {}
-  local usage = truncation.usage or {}
-  log("[mir-f210-current-ba-final-observer] SCIENCE_DIAGNOSTIC pack=" .. name
-    .. " status=" .. scalar(projection and projection.status)
-    .. " failure_kind=" .. scalar(failure.kind)
-    .. " failure_reason=" .. scalar(failure.reason)
-    .. " failure_recipe=" .. scalar(failure.recipe)
-    .. " failure_technology=" .. scalar(failure.technology)
-    .. " visits=" .. scalar(usage.visits)
-    .. " max_depth=" .. scalar(usage.maximum_depth)
-    .. " truncated=" .. names_line(truncation.truncated))
-  for _, candidate in ipairs(projection and projection.candidates or {}) do
-    local candidate_failure = candidate.first_failure or {}
-    log("[mir-f210-current-ba-final-observer] SCIENCE_CANDIDATE recipe=" .. scalar(candidate.recipe)
-      .. " structural=" .. scalar(candidate.structural_route and candidate.structural_route.status)
-      .. " failure_kind=" .. scalar(candidate_failure.kind)
-      .. " failure_reason=" .. scalar(candidate_failure.reason))
-  end
+  local status, prerequisite = science.pack_production_status(name)
+  local route = science.production_route_for_pack(name)
+  log("[mir-f210-current-ba-final-observer] SCIENCE_DECLARATION pack=" .. name
+    .. " status=" .. scalar(status)
+    .. " prerequisite=" .. scalar(prerequisite)
+    .. " binding=" .. declared_binding_line(route))
+
 end
 
--- Follow the real compiler decisions in an isolated ordinary context. The
--- capped rejection projector remains unchanged; its exhaustion is UNKNOWN.
--- These wrappers retain at most 64 distinct returned rejections, never alter
--- a result, and do not borrow or mutate the parent's acquisition/status memos.
-local function observe_normal_science_decisions()
-  local parent = compiler_context.current()
-  local parent_states = {}
-  for _, state_name in ipairs({"recipe_source", "recipe_index", "science_pack_production",
-    "science_pack_recipe_status", "technology_researchability_index", "compiler_telemetry"}) do
-    parent_states[state_name] = {value = parent:state_view(state_name), epoch = parent:state_epoch(state_name)}
-  end
-  local observation = compiler_context.new({execution_mode = parent:execution_mode()})
-  for _, state_name in ipairs({"recipe_source", "recipe_index"}) do
-    observation:set_state(state_name, assert(parent:state_view(state_name)))
-  end
-  local failures, seen = {}, {}
-  for _, service_name in ipairs({
-    "science.independent_pack_acquisition_witness",
-    "science.prereq_tech_for_science_pack", "science.prereq_techs_for_science_pack",
-    "science.production_route_for_pack"
-  }) do
-    observation:set_service(service_name, assert(parent:service(service_name)))
-  end
-  local reason_service = assert(parent:service("science.technology_researchability_reason"))
-  observation:set_service("science.technology_researchability_reason", function(name, options)
-    local reason = reason_service(name, options)
-    local recipe = options and options.unlock_recipe_name or "-"
-    local key = name .. "\0" .. recipe .. "\0" .. tostring(reason)
-    if reason and not seen[key] and #failures < 64 then
-      seen[key] = true
-      failures[#failures + 1] = {technology = name, recipe = recipe, reason = reason}
-    end
-    return reason
-  end)
-  observation:set_service("science.pack_production_status", production_reachability.pack_production_status)
-  observation:freeze_services()
-  compiler_context.with_active(observation, function()
+-- Read compact declared bindings in an isolated context. These records are
+-- declaration validation, never proof inventories or production witnesses.
+local function observe_declared_science_bindings()
+  compiler_context.with_active(compiler_context.new(), function()
+    science.ensure_services()
     for _, pack in ipairs({"logistic-science-pack", "chemical-science-pack"}) do
-      local status, prerequisite = production_reachability.pack_production_status(pack, {}, {})
-      log("[mir-f210-current-ba-final-observer] NORMAL_SCIENCE pack=" .. pack
-        .. " status=" .. scalar(status) .. " prerequisite=" .. scalar(prerequisite))
+      local status, prerequisite = science.pack_production_status(pack)
+      local route = science.production_route_for_pack(pack)
+      log("[mir-f210-current-ba-final-observer] DECLARED_SCIENCE pack=" .. pack
+        .. " status=" .. scalar(status)
+        .. " prerequisite=" .. scalar(prerequisite)
+        .. " binding=" .. declared_binding_line(route))
     end
   end)
-  for _, failure in ipairs(failures) do
-    log("[mir-f210-current-ba-final-observer] NORMAL_REJECTION technology=" .. failure.technology
-      .. " recipe=" .. failure.recipe .. " reason=" .. failure.reason)
-  end
-  assert(compiler_context.current() == parent, "normal observation did not restore parent context")
-  for state_name, before in pairs(parent_states) do
-    assert(parent:state_view(state_name) == before.value and parent:state_epoch(state_name) == before.epoch,
-      "normal observation changed parent state " .. state_name)
-  end
-  log("[mir-f210-current-ba-final-observer] NORMAL_OBSERVATION PASS parent_state_unchanged=true"
-    .. " retained_rejections=" .. tostring(#failures))
 end
 
 local function observe_hidden_output_consumers(output_targets, index)
@@ -663,7 +586,7 @@ compiler_context.with_active(compiler_context.new(), function()
   observe_visible_return_paths(index)
   observe_science_frontier()
   observe_chemical_science(input)
-  observe_normal_science_decisions()
+  observe_declared_science_bindings()
   log("[mir-f210-current-ba-final-observer] DATA PASS read-only-finalized-contract-capture"
     .. " candidates=" .. tostring(#CANDIDATES)
     .. " observed=" .. tostring(observed)

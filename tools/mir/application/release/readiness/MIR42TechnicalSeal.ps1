@@ -131,6 +131,47 @@ function Get-MIR42SealCandidateScope {
   return $derived
 }
 
+function Get-MIR42NineTargetReleaseLineContract {
+  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0')][string]$SourceVersion)
+  $releaseLine = ([version]$SourceVersion).ToString(2)
+  return [pscustomobject][ordered]@{
+    source_version = $SourceVersion
+    release_line = $releaseLine
+    programme_pending_status = "active-current-$releaseLine-release-cut-pre-freeze-no-transition-authority"
+    programme_transition_status = "active-current-$releaseLine-release-cut-transition-authorized-awaiting-technical-proof"
+    promotion_plan_status = "MIR-$releaseLine-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY"
+    main_readback_status = "MIR-$releaseLine-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST"
+    candidate_ref_prefix = "refs/heads/release/mir-$releaseLine-candidate-"
+  }
+}
+
+function Get-MIR42NineTargetCandidateReleaseLineContract {
+  param([Parameter(Mandatory)]$Candidate)
+  $sourceVersion = ''
+  if ($Candidate.PSObject.Properties.Name -contains 'source_version') {
+    $sourceVersion = [string]$Candidate.source_version
+  } elseif ($Candidate.PSObject.Properties.Name -contains 'identity' -and $null -ne $Candidate.identity -and
+            $Candidate.identity.PSObject.Properties.Name -contains 'record' -and $null -ne $Candidate.identity.record) {
+    $sourceVersion = [string](Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record).source_version
+  }
+  if ($sourceVersion -cnotin @('4.2.0','4.4.0')) { throw '[mir42-nine-target-release-line-candidate-version]' }
+  return Get-MIR42NineTargetReleaseLineContract -SourceVersion $sourceVersion
+}
+
+function Get-MIR42NineTargetPromotionPlanStatusContract {
+  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0')][string]$SourceVersion)
+  return Get-MIR42NineTargetReleaseLineContract -SourceVersion $SourceVersion
+}
+
+function Get-MIR42NineTargetPromotionPlanStatusReleaseLineContract {
+  param([Parameter(Mandatory)][string]$Status)
+  foreach ($sourceVersion in @('4.2.0','4.4.0')) {
+    $contract = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $sourceVersion
+    if ($Status -ceq [string]$contract.promotion_plan_status) { return $contract }
+  }
+  throw '[mir42-nine-target-promotion-plan-status]'
+}
+
 function Get-MIR42SealScopeContract {
   param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope)
   if ($Scope -ceq 'four-target') {
@@ -192,7 +233,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -208,7 +249,7 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
   if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
-  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1')) {
+  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1','4.4.0')) {
     throw '[mir42-individual-engine-run-source-version]'
   }
   $contract.engine_run_kind = 'MIR42NineTargetMaintenanceIndividualEngineRunV1'
@@ -1021,7 +1062,7 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
-      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1')) {
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0')) {
         $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
       }
     }
@@ -1039,7 +1080,7 @@ function Get-MIR42ExactFourTargetCandidate {
     }
     $rows.Add([pscustomobject]$returned)
   }
-  return [pscustomobject][ordered]@{identity=$candidateInput;source=$source;scope=$targetScope;targets=@($rows)}
+  return [pscustomobject][ordered]@{identity=$candidateInput;source=$source;source_version=[string]$versionContract.source_version;scope=$targetScope;targets=@($rows)}
 }
 
 function Assert-MIR42ReceiptBinding {
@@ -1684,7 +1725,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
   # The seal is release evidence, so it always binds the complete Full
   # preservation oracle. Classic remains available for private
   # characterization but cannot select a reduced snapshot field here.
-  if ($candidateSourceVersion -cin @('4.3.0','4.3.1') -and $receipt.Contains('upgrade_policy')) {
+  if ($candidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0') -and $receipt.Contains('upgrade_policy')) {
     $prefix = 'mir' + $candidateSourceVersion.Replace('.', '') + '-upgrade'
     throw "[$prefix-classic-reduced-policy-not-release-preservation]"
   }
@@ -1692,7 +1733,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target
-    predecessor_source_version = if ($candidateSourceVersion -ceq '4.3.1') { '4.3.0' } else { '4.2.2' }
+    predecessor_source_version = if ($candidateSourceVersion -cin @('4.3.1','4.4.0')) { '4.3.0' } else { '4.2.2' }
     receipt = [pscustomobject]@{path=$receiptPath;sha256=[string]$ReceiptReference.sha256}
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
@@ -1984,7 +2025,7 @@ function Assert-MIR431SealPerformanceCriterionEvidence {
   )
 
   $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-  if ([string]$version.source_version -cne '4.3.1') { return }
+  if ([string]$version.source_version -cnotin @('4.3.1','4.4.0')) { return }
   $evidence = @($Record.evidence)
   if ($evidence.Count -ne 1) { throw '[mir431-seal-performance-evidence-count]' }
   $path = Resolve-MIR42SealImmutableFile -Path ([string]$evidence[0].path) -Sha256 ([string]$evidence[0].sha256) -Code 'mir431-seal-performance-observation'
@@ -2022,7 +2063,7 @@ function Get-MIR42NineTargetCriterionEvidenceRecord {
   if ([string]$record.criterion -ceq 'performance-telemetry') {
     Assert-MIR430SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -ceq '4.3.1') {
+    if ([string]$version.source_version -cin @('4.3.1','4.4.0')) {
       if ($null -eq $PublishedMaintenanceInputs) { throw '[mir431-seal-performance-maintenance-custody-required]' }
       Assert-MIR431SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
     }
@@ -2336,10 +2377,12 @@ function New-MIR42NineTargetReleaseCutProgramme {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputPath,
+    [ValidateSet('4.2.0','4.4.0')][string]$SourceVersion = '4.2.0',
     [switch]$RefreshPendingAuthority,
     [string]$CheckpointRoot = ''
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion $SourceVersion
   $previousRelative = (Get-MIR42SealScopeContract -Scope 'four-target').programme_path
   $previous = Read-MIR42SealRecord -Path (Join-Path $repo $previousRelative) -Code 'mir42-nine-programme-superseded'
   if ([string]$previous.record.kind -cne 'MIR42ReleaseCutProgrammeV1' -or
@@ -2348,18 +2391,6 @@ function New-MIR42NineTargetReleaseCutProgramme {
     throw '[mir42-nine-programme-superseded-state]'
   }
   Assert-MIR42SealTargetSet -Rows @($previous.record.selected_targets | ForEach-Object { [pscustomobject]@{target=[string]$_} }) -Code 'mir42-nine-programme-superseded'
-  $direct = $previous.record.direct_predecessor_authority
-  $modern = Get-MIR42DirectPredecessorAuthority -RepoRoot $repo -Reference ([pscustomobject][ordered]@{
-    path=(Resolve-MIR42SealContainedArtifactPath -Root $repo -RelativePath ([string]$direct.path) -Code 'mir42-nine-programme-modern-authority')
-    sha256=[string]$direct.sha256;record_sha256=[string]$direct.record_sha256
-  })
-  $predecessors = [Collections.Generic.List[object]]::new()
-  foreach ($row in @($modern.record.targets)) {
-    $predecessors.Add([pscustomobject][ordered]@{
-      target=[string]$row.target;version=[string]$row.predecessor.version;sha256=[string]$row.predecessor.sha256
-      engine=[pscustomobject][ordered]@{file_version=[string]$row.engine.file_version;product_version=[string]$row.engine.product_version;sha256=[string]$row.engine.sha256}
-    })
-  }
   $historical = [Collections.Generic.List[object]]::new()
   foreach ($target in $script:MIR42SealHistoricalTargets) {
     $authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target
@@ -2369,32 +2400,72 @@ function New-MIR42NineTargetReleaseCutProgramme {
       target_record=[pscustomobject][ordered]@{path=[string]$authority.identity.target_record_path;sha256=[string]$authority.target_record.sha256;record_sha256=[string]$record.record_sha256}
       terminal_seal=[pscustomobject][ordered]@{path=('.mir/releases/terminal/seals/' + [string]$record.predecessor.version + '.json');sha256=[string]$authority.terminal_seal.sha256;record_sha256=[string]$authority.terminal_seal.record.record_sha256}
     })
-    $predecessors.Add([pscustomobject][ordered]@{
-      target=$target;version=[string]$record.predecessor.version;sha256=[string]$record.predecessor.sha256
-      engine=[pscustomobject][ordered]@{file_version=[string]$record.engine.version;product_version=[string]$record.engine.version;sha256=[string]$record.engine.sha256}
-    })
   }
-  Assert-MIR42SealTargetSet -Rows @($predecessors) -Scope 'nine-target' -Code 'mir42-nine-programme-predecessors'
-  $programme = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42NineTargetReleaseCutProgrammeV1'
-    status='active-current-4.2-release-cut-pre-freeze-no-transition-authority'
-    release_line='4.2';selected_targets=@($script:MIR42SealNineTargetCandidates)
-    candidate=[pscustomobject][ordered]@{version_line='4.2';state='unallocated';exact_candidate_required=$true}
-    supersedes=[pscustomobject][ordered]@{path=$previousRelative;sha256=[string]$previous.sha256;record_sha256=[string]$previous.record.record_sha256}
-    direct_predecessor_authority=$direct
-    historical_predecessor_authorities=@($historical)
-    direct_predecessors=@($predecessors)
-    required_gates=@(foreach ($gate in @($previous.record.required_gates)) {
-      $pendingState = switch ([string]$gate.id) {
-        'exact-candidate-allocation' { 'not-authorized' }
-        'protected-signing-and-recovery' { 'blocked-human' }
-        default { 'not-performed' }
+  $pendingGates = @(foreach ($gate in @($previous.record.required_gates)) {
+    $pendingState = switch ([string]$gate.id) {
+      'exact-candidate-allocation' { 'not-authorized' }
+      'protected-signing-and-recovery' { 'blocked-human' }
+      default { 'not-performed' }
+    }
+    [pscustomobject][ordered]@{id=[string]$gate.id;state=$pendingState;scope='nine-target-release-cut'}
+  })
+  if ([string]$release.release_line -ceq '4.2') {
+    $direct = $previous.record.direct_predecessor_authority
+    $modern = Get-MIR42DirectPredecessorAuthority -RepoRoot $repo -Reference ([pscustomobject][ordered]@{
+      path=(Resolve-MIR42SealContainedArtifactPath -Root $repo -RelativePath ([string]$direct.path) -Code 'mir42-nine-programme-modern-authority')
+      sha256=[string]$direct.sha256;record_sha256=[string]$direct.record_sha256
+    })
+    $predecessors = [Collections.Generic.List[object]]::new()
+    foreach ($row in @($modern.record.targets)) {
+      $predecessors.Add([pscustomobject][ordered]@{
+        target=[string]$row.target;version=[string]$row.predecessor.version;sha256=[string]$row.predecessor.sha256
+        engine=[pscustomobject][ordered]@{file_version=[string]$row.engine.file_version;product_version=[string]$row.engine.product_version;sha256=[string]$row.engine.sha256}
+      })
+    }
+    foreach ($target in $script:MIR42SealHistoricalTargets) {
+      $record = (Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target).target_record.record
+      $predecessors.Add([pscustomobject][ordered]@{
+        target=$target;version=[string]$record.predecessor.version;sha256=[string]$record.predecessor.sha256
+        engine=[pscustomobject][ordered]@{file_version=[string]$record.engine.version;product_version=[string]$record.engine.version;sha256=[string]$record.engine.sha256}
+      })
+    }
+    Assert-MIR42SealTargetSet -Rows @($predecessors) -Scope 'nine-target' -Code 'mir42-nine-programme-predecessors'
+    # Field order is part of the canonical pending authority. Preserve the
+    # established 4.2 order exactly so a historical-only refresh remains a
+    # narrow custody update rather than a record rewrite.
+    $programme = [ordered]@{
+      schema=1;kind='MIR42NineTargetReleaseCutProgrammeV1'
+      status=[string]$release.programme_pending_status
+      release_line=[string]$release.release_line;selected_targets=@($script:MIR42SealNineTargetCandidates)
+      candidate=[pscustomobject][ordered]@{version_line=[string]$release.release_line;state='unallocated';exact_candidate_required=$true}
+      supersedes=[pscustomobject][ordered]@{path=$previousRelative;sha256=[string]$previous.sha256;record_sha256=[string]$previous.record.record_sha256}
+      direct_predecessor_authority=$direct
+      historical_predecessor_authorities=@($historical)
+      direct_predecessors=@($predecessors)
+      required_gates=$pendingGates
+      transition_gate=[pscustomobject][ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;technical_seal=$false;promotion=$false;tagging=$false;publication=$false}
+      release_transition_authority=$false;publication_authorized=$false;record_sha256=''
+    }
+  } else {
+    $published = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $SourceVersion
+    $programme = [ordered]@{
+      schema=1;kind='MIR42NineTargetReleaseCutProgrammeV1'
+      status=[string]$release.programme_pending_status
+      release_line=[string]$release.release_line;selected_targets=@($script:MIR42SealNineTargetCandidates)
+      candidate=[pscustomobject][ordered]@{version_line=[string]$release.release_line;state='unallocated';exact_candidate_required=$true}
+      supersedes=[pscustomobject][ordered]@{path=$previousRelative;sha256=[string]$previous.sha256;record_sha256=[string]$previous.record.record_sha256}
+      historical_predecessor_authorities=@($historical)
+      published_maintenance_predecessor=[ordered]@{
+        source_version=[string]$published.source_version;source_tag=[string]$published.source_tag;release_id=[int64]$published.release_id
+        commit=[string]$published.commit;tree=[string]$published.tree;manifest_name=[string]$published.manifest_name
+        manifest_bytes=[int64]$published.manifest_bytes;manifest_sha256=[string]$published.manifest_sha256
       }
-      [pscustomobject][ordered]@{id=[string]$gate.id;state=$pendingState;scope='nine-target-release-cut'}
-    })
-    transition_gate=[pscustomobject][ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;technical_seal=$false;promotion=$false;tagging=$false;publication=$false}
-    release_transition_authority=$false;publication_authorized=$false;record_sha256=''
+      required_gates=$pendingGates
+      transition_gate=[pscustomobject][ordered]@{source_freeze=$false;candidate_allocation=$false;production_signing=$false;technical_seal=$false;promotion=$false;tagging=$false;publication=$false}
+      release_transition_authority=$false;publication_authorized=$false;record_sha256=''
+    }
   }
+  $programme = [pscustomobject]$programme
   # Preparation is create-only or an identical readback. An advanced gate or
   # changed provenance cannot be reset merely because transition flags are false.
   if (Test-Path -LiteralPath $OutputPath -PathType Leaf) {
@@ -2420,8 +2491,10 @@ function Test-MIR42NineTargetPendingAuthorityRefresh {
   # records after their canonical inputs changed.  Every other pending
   # authority field, including all gates and predecessor bindings, must
   # already be byte-for-byte equivalent to the current construction.
+  $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion (([string]$Existing.release_line) + '.0')
   if ($Existing.PSObject.Properties.Name -contains 'written_transition_authorization' -or
-      [string]$Existing.status -cne 'active-current-4.2-release-cut-pre-freeze-no-transition-authority' -or
+      [string]$Existing.status -cne [string]$release.programme_pending_status -or
+      [string]$Existing.candidate.version_line -cne [string]$release.release_line -or
       [string]$Existing.candidate.state -cne 'unallocated' -or
       [bool]$Existing.release_transition_authority -or [bool]$Existing.publication_authorized -or
       @($Existing.transition_gate.PSObject.Properties | Where-Object { $_.Value -isnot [bool] -or [bool]$_.Value }).Count -ne 0) {
@@ -2556,6 +2629,11 @@ function Assert-MIR42NineTargetProgrammeTransitionReference {
 function Assert-MIR42NineTargetProgrammeCandidateBinding {
   param([Parameter(Mandatory)]$Programme,[Parameter(Mandatory)]$Candidate)
   if ($Programme.record.PSObject.Properties.Name -notcontains 'written_transition_authorization') { throw '[mir42-nine-programme-transition-reference-missing]' }
+  $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $Candidate
+  if ([string]$Programme.record.release_line -cne [string]$candidateRelease.release_line -or
+      [string]$Programme.record.candidate.version_line -cne [string]$candidateRelease.release_line) {
+    throw '[mir42-nine-programme-transition-readiness-candidate-binding]'
+  }
   $binding = $Programme.record.written_transition_authorization.candidate_manifest
   if ([string]$Candidate.scope -cne 'nine-target' -or [string]$binding.sha256 -cne [string]$Candidate.identity.sha256 -or
       [string]$binding.record_sha256 -cne [string]$Candidate.identity.record.record_sha256 -or
@@ -2626,6 +2704,11 @@ function Advance-MIR42NineTargetReleaseCutProgramme {
   $authorization = Read-MIR42NineTargetProgrammeWrittenAuthorization -Path $MaintainerAuthorizationPath
   $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
   if ([string]$candidate.scope -cne 'nine-target') { throw '[mir42-nine-programme-advance-candidate-scope]' }
+  $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $candidate
+  if ([string]$current.record.release_line -cne [string]$candidateRelease.release_line -or
+      [string]$current.record.candidate.version_line -cne [string]$candidateRelease.release_line) {
+    throw '[mir42-nine-programme-advance-candidate-release-line]'
+  }
   if ($current.record.PSObject.Properties.Name -contains 'written_transition_authorization') {
     $existing = Assert-MIR42NineTargetProgrammeTransitionReference -RepoRoot $repo -Reference $current.record.written_transition_authorization
     if ([string]$existing.authorization.sha256 -cne [string]$authorization.sha256 -or [string]$existing.candidate.identity.sha256 -cne [string]$candidate.identity.sha256) {
@@ -2637,7 +2720,7 @@ function Advance-MIR42NineTargetReleaseCutProgramme {
     throw '[mir42-nine-programme-advance-pending-state]'
   }
   $programme = $current.record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
-  $programme.status = 'active-current-4.2-release-cut-transition-authorized-awaiting-technical-proof'
+  $programme.status = [string]$candidateRelease.programme_transition_status
   $programme.candidate.state = 'allocated-written-conditional-go-awaiting-technical-proof'
   $programme.required_gates[0].state = 'authorized-to-proceed-bound-to-exact-candidate'
   $programme.required_gates[3].state = 'authorized-to-proceed-existing-custody-required'
@@ -2686,46 +2769,73 @@ function Get-MIR42LiveProgrammeTransition {
   }
   $programmeReceipt = Read-MIR42SealRecord -Path $path -Code 'mir42-seal-current-programme'
   $programme = $programmeReceipt.record
-  $programmeProperties = @('schema','kind','status','release_line','selected_targets','candidate','direct_predecessor_authority','direct_predecessors','required_gates','transition_gate','release_transition_authority','publication_authorized','record_sha256')
-  if ($Scope -ceq 'nine-target') { $programmeProperties += @('supersedes','historical_predecessor_authorities') }
+  $sourceVersion = if ($Scope -ceq 'nine-target') {
+    switch ([string]$programme.release_line) {
+      '4.2' { '4.2.0' }
+      '4.4' { '4.4.0' }
+      default { throw '[mir42-seal-current-programme-state]' }
+    }
+  } else { '4.2.0' }
+  $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion $sourceVersion
+  $usesPublishedMaintenance = ($Scope -ceq 'nine-target' -and [string]$release.release_line -ceq '4.4')
+  $programmeProperties = @('schema','kind','status','release_line','selected_targets','candidate','required_gates','transition_gate','release_transition_authority','publication_authorized','record_sha256')
+  if ($usesPublishedMaintenance) {
+    $programmeProperties += @('published_maintenance_predecessor','supersedes','historical_predecessor_authorities')
+  } else {
+    $programmeProperties += @('direct_predecessor_authority','direct_predecessors')
+    if ($Scope -ceq 'nine-target') { $programmeProperties += @('supersedes','historical_predecessor_authorities') }
+  }
   $advancedWrittenTransition = ($Scope -ceq 'nine-target' -and $programme.PSObject.Properties.Name -contains 'written_transition_authorization')
   if ($advancedWrittenTransition) { $programmeProperties += 'written_transition_authorization' }
   Assert-MIR42SealPropertyNames -Value $programme -Expected $programmeProperties -Code 'mir42-seal-current-programme-shape'
   Assert-MIR42SealPropertyNames -Value $programme.candidate -Expected @('version_line','state','exact_candidate_required') -Code 'mir42-seal-current-programme-candidate-shape'
-  Assert-MIR42SealPropertyNames -Value $programme.direct_predecessor_authority -Expected @('path','kind','record_sha256','sha256') -Code 'mir42-seal-current-programme-predecessor-authority-shape'
   Assert-MIR42SealPropertyNames -Value $programme.transition_gate -Expected @('source_freeze','candidate_allocation','production_signing','technical_seal','promotion','tagging','publication') -Code 'mir42-seal-current-programme-transition-shape'
   if ($Scope -ceq 'nine-target' -and @($programme.transition_gate.PSObject.Properties | Where-Object { $_.Value -isnot [bool] }).Count -ne 0) {
     throw '[mir42-seal-current-programme-transition-type]'
   }
   if ([int]$programme.schema -ne 1 -or [string]$programme.kind -cne [string]$contract.programme_kind -or
-      [string]$programme.status -notmatch '^active-current-4[.]2-release-cut-' -or [string]$programme.release_line -cne '4.2' -or
-      [string]$programme.candidate.version_line -cne '4.2' -or -not [bool]$programme.candidate.exact_candidate_required -or
-      [string]$programme.direct_predecessor_authority.path -cne '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json' -or
-      [string]$programme.direct_predecessor_authority.kind -cne 'MIR42DirectPredecessorInputsV1' -or
+      [string]$programme.release_line -cne [string]$release.release_line -or
+      [string]$programme.candidate.version_line -cne [string]$release.release_line -or -not [bool]$programme.candidate.exact_candidate_required -or
       [bool]$programme.release_transition_authority -or [bool]$programme.publication_authorized) {
     throw '[mir42-seal-current-programme-state]'
   }
   Assert-MIR42SealTargetSet -Rows @($programme.selected_targets | ForEach-Object { [pscustomobject]@{target=[string]$_} }) -Code 'mir42-seal-current-programme' -Scope $Scope
-  $predecessorAuthority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference ([pscustomobject][ordered]@{
-    path = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$programme.direct_predecessor_authority.path) -Code 'mir42-seal-current-programme-predecessor-authority'
-    sha256 = [string]$programme.direct_predecessor_authority.sha256
-    record_sha256 = [string]$programme.direct_predecessor_authority.record_sha256
-  })
-  Assert-MIR42SealTargetSet -Rows @($programme.direct_predecessors) -Code 'mir42-seal-current-programme-predecessors' -Scope $Scope
+  $predecessorAuthority = $null
+  if ($usesPublishedMaintenance) {
+    Assert-MIR42SealPropertyNames -Value $programme.published_maintenance_predecessor -Expected @('source_version','source_tag','release_id','commit','tree','manifest_name','manifest_bytes','manifest_sha256') -Code 'mir42-seal-current-programme-maintenance-shape'
+    $expectedPublished = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $sourceVersion
+    foreach ($field in @('source_version','source_tag','release_id','commit','tree','manifest_name','manifest_bytes','manifest_sha256')) {
+      if ([string]$programme.published_maintenance_predecessor.$field -cne [string]$expectedPublished.$field) { throw "[mir42-seal-current-programme-maintenance-binding] $field" }
+    }
+  } else {
+    Assert-MIR42SealPropertyNames -Value $programme.direct_predecessor_authority -Expected @('path','kind','record_sha256','sha256') -Code 'mir42-seal-current-programme-predecessor-authority-shape'
+    if ([string]$programme.direct_predecessor_authority.path -cne '.mir/releases/governance/mir4/MIR42-Direct-Predecessor-InputsV1.json' -or
+        [string]$programme.direct_predecessor_authority.kind -cne 'MIR42DirectPredecessorInputsV1') {
+      throw '[mir42-seal-current-programme-state]'
+    }
+    $predecessorAuthority = Get-MIR42DirectPredecessorAuthority -RepoRoot $RepoRoot -Reference ([pscustomobject][ordered]@{
+      path = Resolve-MIR42SealContainedArtifactPath -Root $RepoRoot -RelativePath ([string]$programme.direct_predecessor_authority.path) -Code 'mir42-seal-current-programme-predecessor-authority'
+      sha256 = [string]$programme.direct_predecessor_authority.sha256
+      record_sha256 = [string]$programme.direct_predecessor_authority.record_sha256
+    })
+    Assert-MIR42SealTargetSet -Rows @($programme.direct_predecessors) -Code 'mir42-seal-current-programme-predecessors' -Scope $Scope
+  }
   $historical = @{}
   if ($Scope -ceq 'nine-target') {
     if ($advancedWrittenTransition) {
-      if ([string]$programme.status -cne 'active-current-4.2-release-cut-transition-authorized-awaiting-technical-proof' -or
+      if ([string]$programme.status -cne [string]$release.programme_transition_status -or
           [string]$programme.candidate.state -cne 'allocated-written-conditional-go-awaiting-technical-proof') {
         throw '[mir42-nine-programme-transition-state]'
       }
       $transitionReference = Assert-MIR42NineTargetProgrammeTransitionReference -RepoRoot $RepoRoot -Reference $programme.written_transition_authorization
+      $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $transitionReference.candidate
+      if ([string]$candidateRelease.release_line -cne [string]$release.release_line) { throw '[mir42-nine-programme-transition-candidate-release-line]' }
       foreach ($field in @('source_freeze','candidate_allocation','production_signing','technical_seal','promotion','tagging','publication')) {
         if ([bool]$programme.transition_gate.$field -ne [bool]$transitionReference.reference.authorized_transition.$field) {
           throw '[mir42-nine-programme-transition-gate-binding]'
         }
       }
-    } elseif ([string]$programme.status -ne 'active-current-4.2-release-cut-pre-freeze-no-transition-authority' -or [string]$programme.candidate.state -ne 'unallocated' -or
+    } elseif ([string]$programme.status -cne [string]$release.programme_pending_status -or [string]$programme.candidate.state -cne 'unallocated' -or
       @($programme.transition_gate.PSObject.Properties | Where-Object { [bool]$_.Value }).Count -ne 0) {
       throw '[mir42-nine-programme-pending-state]'
     }
@@ -2758,20 +2868,22 @@ function Get-MIR42LiveProgrammeTransition {
       $historical[[string]$binding.target] = $authority
     }
   }
-  foreach ($row in @($programme.direct_predecessors)) {
-    Assert-MIR42SealPropertyNames -Value $row -Expected @('target','version','sha256','engine') -Code 'mir42-seal-current-programme-predecessor-shape'
-    Assert-MIR42SealPropertyNames -Value $row.engine -Expected @('file_version','product_version','sha256') -Code 'mir42-seal-current-programme-predecessor-engine-shape'
-    $authorityRow = if ($historical.ContainsKey([string]$row.target)) {
-      $historicalRecord = $historical[[string]$row.target].target_record.record
-      @([pscustomobject]@{predecessor=$historicalRecord.predecessor;engine=[pscustomobject]@{file_version=[string]$historicalRecord.engine.version;product_version=[string]$historicalRecord.engine.version;sha256=[string]$historicalRecord.engine.sha256}})
-    } else { @($predecessorAuthority.record.targets | Where-Object { [string]$_.target -ceq [string]$row.target }) }
-    $authorityRow = @($authorityRow)
-    if ($authorityRow.Count -ne 1 -or [string]$row.version -cne [string]$authorityRow[0].predecessor.version -or
-        [string]$row.sha256 -cne [string]$authorityRow[0].predecessor.sha256 -or
-        [string]$row.engine.file_version -cne [string]$authorityRow[0].engine.file_version -or
-        [string]$row.engine.product_version -cne [string]$authorityRow[0].engine.product_version -or
-        [string]$row.engine.sha256 -cne [string]$authorityRow[0].engine.sha256) {
-      throw "[mir42-seal-current-programme-predecessor-binding] $([string]$row.target)"
+  if (-not $usesPublishedMaintenance) {
+    foreach ($row in @($programme.direct_predecessors)) {
+      Assert-MIR42SealPropertyNames -Value $row -Expected @('target','version','sha256','engine') -Code 'mir42-seal-current-programme-predecessor-shape'
+      Assert-MIR42SealPropertyNames -Value $row.engine -Expected @('file_version','product_version','sha256') -Code 'mir42-seal-current-programme-predecessor-engine-shape'
+      $authorityRow = if ($historical.ContainsKey([string]$row.target)) {
+        $historicalRecord = $historical[[string]$row.target].target_record.record
+        @([pscustomobject]@{predecessor=$historicalRecord.predecessor;engine=[pscustomobject]@{file_version=[string]$historicalRecord.engine.version;product_version=[string]$historicalRecord.engine.version;sha256=[string]$historicalRecord.engine.sha256}})
+      } else { @($predecessorAuthority.record.targets | Where-Object { [string]$_.target -ceq [string]$row.target }) }
+      $authorityRow = @($authorityRow)
+      if ($authorityRow.Count -ne 1 -or [string]$row.version -cne [string]$authorityRow[0].predecessor.version -or
+          [string]$row.sha256 -cne [string]$authorityRow[0].predecessor.sha256 -or
+          [string]$row.engine.file_version -cne [string]$authorityRow[0].engine.file_version -or
+          [string]$row.engine.product_version -cne [string]$authorityRow[0].engine.product_version -or
+          [string]$row.engine.sha256 -cne [string]$authorityRow[0].engine.sha256) {
+        throw "[mir42-seal-current-programme-predecessor-binding] $([string]$row.target)"
+      }
     }
   }
   $requiredGateIds = @($programme.required_gates | ForEach-Object { [string]$_.id })

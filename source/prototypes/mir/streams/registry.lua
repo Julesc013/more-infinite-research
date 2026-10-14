@@ -7,7 +7,34 @@ M.shared = {
   per_level_default = 0.10,
   base_cost = 8000,
   growth_factor = 2,
-  research_time = 60
+  research_time = 60,
+  science_binding_policy = {
+    -- Parameterized sources bind an actual same-named pack recipe and its
+    -- unique direct unlock owner. They never explore ingredient factories.
+    named_pack_recipe = true,
+    unique_direct_recipe = true,
+    unique_direct_unlock = true,
+    -- Preserve the published launch-source admission contract. Correcting
+    -- that historical policy is a separate semantic/migration change.
+    retained_launch_source = {pack = "space-science-pack", payload = "satellite"}
+  },
+  -- Shared source declarations for the ordinary productivity-family science
+  -- vector. These are authored progression bindings, not cached discoveries.
+  -- The target adapter translates the roles to historical item spellings.
+  science_bindings = {
+    ["automation-science-pack"] = {
+      recipe = "automation-science-pack", technology = "automation-science-pack", allow_initial = true
+    },
+    ["logistic-science-pack"] = {
+      recipe = "logistic-science-pack", technology = "logistic-science-pack", allow_initial = true
+    },
+    ["chemical-science-pack"] = {
+      recipe = "chemical-science-pack", technology = "chemical-science-pack", allow_initial = true
+    },
+    ["production-science-pack"] = {
+      recipe = "production-science-pack", technology = "production-science-pack", allow_initial = true
+    }
+  }
 }
 
 local raw_streams = require("prototypes.streams.init")

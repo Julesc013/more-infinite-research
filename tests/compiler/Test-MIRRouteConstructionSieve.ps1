@@ -19,10 +19,12 @@ if($LASTEXITCODE -ne 0){throw "Route construction sieve controls failed: $($outp
 $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-ROUTE-CONSTRUCTION-SIEVE-CONTROLS-PASSED".*\}$'} | Select-Object -Last 1
 if(-not $recordLine){throw "Route construction sieve controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
 if([int]$record.assertions -lt 25){throw "Route construction sieve control coverage unexpectedly fell to $($record.assertions) assertions."}
 if([int]$record.factorio_processes -ne 0){throw 'Route construction sieve controls must not start a Factorio process.'}
 [pscustomobject]@{
   status=[string]$record.status
+  scope=[string]$record.scope
   assertions=[int]$record.assertions
   source_sha256=[string]$record.source_sha256
   policy_sha256=[string]$record.policy_sha256

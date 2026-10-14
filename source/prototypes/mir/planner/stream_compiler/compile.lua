@@ -16,7 +16,6 @@ local discover = require("prototypes.mir.planner.stream_compiler.discover")
 local ownership = require("prototypes.mir.planner.stream_compiler.ownership")
 local qualify = require("prototypes.mir.planner.stream_compiler.qualify")
 local material_continuation = require("prototypes.mir.planner.stream_compiler.material_continuation")
-local pack_production = require("prototypes.mir.capabilities.science_integration.pack_production_reachability")
 
 local M = {}
 
@@ -24,14 +23,14 @@ local function compile_active(context, return_view)
   discover.ensure_services(context)
   local cached = context:state_view("generation_plan")
   if cached then return return_view and cached or deepcopy(cached) end
-  pack_production.prime_root_pack_statuses(context)
-  local streams, native_owner_inputs = discover.source_snapshot()
+  local streams, native_owner_inputs, shared_rules = discover.source_snapshot()
   telemetry.start_phase("stream_compiler")
   local plan = generation_plan.new({
     source_fingerprints = {
       facts = recipe_facts.fingerprint(),
       risks = recipe_risk_facts.fingerprint(),
-      rules = fingerprint.of({streams = streams, families = family_registry.view()}),
+      rules = fingerprint.of({streams = streams, families = family_registry.view(),
+        science_bindings = shared_rules.science_bindings, science_binding_policy = shared_rules.science_binding_policy}),
       providers = provider_registry.fingerprint(),
       compatibility_packs = fingerprint.of(compatibility_policy.active_packs()),
       target_profile = fingerprint.of(target_profiles.current()),

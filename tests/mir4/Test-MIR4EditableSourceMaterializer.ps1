@@ -62,13 +62,31 @@ try {
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
-$scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
+$compilerTransitionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
+$approvedScienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
-if(@($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne382-or
-   $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
-   $introducedBindings.Count-ne23-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
+$retiredCurrentSources=@(
+  'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+  'source/prototypes/mir/pipeline/classic_compiler.lua',
+  'source/prototypes/mir/domain/compiler/classic_declarations.lua',
+  'source/prototypes/mir/planner/classic/plan.lua'
+)
+$compilerTransitionSources=@(
+  'source/prototypes/mir/settings/compiler_profile.lua',
+  'source/prototypes/mir/runtime/compiler_profile_notice.lua'
+)
+$approvedScienceSources=@(
+  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
+  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
+)
+if(@($manifest.bindings).Count-ne377-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne377-or
+   $migratedBindings.Count-ne356-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne356-or
+   $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne2-or$approvedScienceBindings.Count-ne2-or
+   @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
+   @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or
+   @($retiredCurrentSources|Where-Object{Test-Path -LiteralPath (Join-Path $repo $_)}).Count-ne0-or
    [string]$progressionBindings[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
    [string]$progressionBindings[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
    (@($progressionBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
@@ -83,6 +101,18 @@ if(@($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Obj
    (@($repairBindings[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
    [string]$repairBindings[0].provenance.kind-cne'current-introduction'){
   throw '[mir4-editable-source-binding-uniqueness]'
+}
+foreach($source in $compilerTransitionSources){
+  $row=@($compilerTransitionBindings|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'capability'-or[string]$row[0].semantic_class-cne'target-overlay'-or
+     [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+     ((@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100')){throw '[mir4-editable-source-binding-uniqueness]'}
+}
+foreach($source in $approvedScienceSources){
+  $row=@($approvedScienceBindings|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'shared'-or[string]$row[0].semantic_class-cne'common-semantic-source'-or
+     [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+     ((@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100')){throw '[mir4-editable-source-binding-uniqueness]'}
 }
 Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor (Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo)|Out-Null
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
@@ -161,10 +191,10 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  # The five named Classic modules extend the earlier admitted composition;
-  # the frozen baseline identities above remain exact and adapter scopes do
-  # not overlap. Current semantic changes are not historical byte parity.
-  $expectedDelta=if($target-in@('f210','f200')){43}else{112}
+  # The current source removes the retired discovery and Classic implementations
+  # while adding the approved lab/pack reference bindings.  The frozen baseline
+  # identities remain exact; current semantic changes are not historical byte parity.
+  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

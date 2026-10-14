@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -20,7 +20,7 @@ function Set-MIR42HistoricalBaselinePackageIdentity {
   # The verified adapter remains a pinned 4.2 baseline. Project its identity
   # only in this private build tree before the normal patch writer validates
   # the requested minor. Never broaden that writer's accepted input versions.
-  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3)[.]0$') {
+  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3|4)[.]0$') {
     throw '[mir42-historical-baseline-projection]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -125,11 +125,11 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
     # The shared README is authored for the current F100 maintenance package.
     # Resolve that identity from its guarded heading instead of pinning an old
     # source patch in the historical projection.
-    $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.2\.100[0-9]{2})(?:\r?\n|$)')
+    $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.(?<minor>[234])\.100[0-9]{2})(?:\r?\n|$)')
     if (-not $readmeIdentity.Success) { throw '[mir42-historical-readme-source-identity]' }
     $replacements = @(
       @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
-      @{ from = 'It is a reduced target-native projection from the current MIR 4.2 source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a reduced target-specific projection from the current MIR 4.2 source. Emitted streams and progression depend on the actual engine and prototype capabilities.' },
+      @{ from = 'It is a reduced target-native projection from the current MIR source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a reduced target-specific projection from the current MIR source. Emitted streams and progression depend on the actual engine and prototype capabilities.' },
       @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
       @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },
       @{ from = 'Fresh installations default to `only-when-dedicated-tech-enabled`. MIR removes rocket and cannon-shell speed effects from its generated vanilla continuation only when a valid dedicated MIR or preferred exact external infinite owner exists. `off` and `always` remain available, and explicit values are preserved during the 1.8.1 to 1.8.2 upgrade.'; to = "Fresh installations default to ``only-when-dedicated-tech-enabled``. The historical $predecessorVersion predecessor remains a continuity input; upgrade qualification of this exact hotfix package is NOT RUN." },
@@ -205,7 +205,7 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     [Parameter(Mandatory)][string]$TargetRecordPath
   )
 
-  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3)[.](?<patch>[0-9]{1,2})$') {
+  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3|4)[.](?<patch>[0-9]{1,2})$') {
     throw '[mir42-historical-authentication-source-version]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -423,7 +423,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'

@@ -49,7 +49,7 @@ function Assert-MIR421NativeEngineIdentity {
 function Get-MIR42ReleaseTargetIdentity {
   param([Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion = '4.2.0')
   if ($Target -in @('f210','f200','f110','f100')) {
     return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   }
@@ -87,6 +87,7 @@ function Get-MIR42CandidateConstructionVersionContract {
     4 { '4.2.3' }
     5 { '4.3.0' }
     6 { '4.3.1' }
+    7 { '4.4.0' }
     default { throw '[mir42-candidate-construction-version-contract]' }
   }
   $kind = "MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"
@@ -103,10 +104,10 @@ function Get-MIR42CandidateConstructionVersionContract {
 }
 
 function Get-MIR42PublishedMaintenancePredecessorContract {
-  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$CandidateSourceVersion='4.2.1')
+  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
   # Select a recorded publication explicitly, never by the supplied filename or
   # by transferring a predecessor's exceptional acceptance to this candidate.
-  if ($CandidateSourceVersion -ceq '4.3.1') {
+  if ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) {
     return [pscustomobject][ordered]@{
       source_version='4.3.0';source_patch=0;source_tag='v4.3.0';release_id=411700807;asset_count=15;target_commitish='main'
       commit='0e2703d7b545b97a2bdb308a02d84857288b6dc1';tree='bb6c3df2bc76cbd9da000432e4a0ecf6dd6a585e'
@@ -140,7 +141,7 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
 
 function Read-MIR42PublishedMaintenancePredecessorManifest {
   param([Parameter(Mandatory)][string]$ManifestPath,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$CandidateSourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $path = [IO.Path]::GetFullPath($ManifestPath)
   $expectedSha = $contract.manifest_sha256
@@ -160,7 +161,7 @@ function Read-MIR42PublishedMaintenancePredecessorManifest {
 
 function Assert-MIR42PublishedMaintenancePredecessorMetadata {
   param([Parameter(Mandatory)]$PinnedManifest,[Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$CandidateSourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $manifest = $PinnedManifest.manifest
   $published430 = $contract.source_version -ceq '4.3.0'
@@ -214,7 +215,7 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
 function Get-MIR42PublishedMaintenancePredecessorInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$CandidateSourceVersion='4.2.1',
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1',
     [AllowEmptyString()][string]$SelectedTarget='',
     [AllowEmptyString()][string]$SelectedArchivePath='',
     [System.Collections.IDictionary]$ArchiveBindings=$null)
@@ -336,7 +337,7 @@ function Get-MIR42FourTargetArchiveInput {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
     [Parameter(Mandatory)][string]$Path,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.0'
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion='4.2.0'
   )
 
   if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "[mir42-preflight-archive-missing] $Target" }

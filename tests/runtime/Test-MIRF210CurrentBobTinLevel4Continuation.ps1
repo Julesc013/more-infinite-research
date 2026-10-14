@@ -11,7 +11,7 @@ param(
   [string]$SettingsPath = '',
   [string]$CandidateZip = '',
   [string]$SourceMaterializationPath = '',
-  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion = '4.2.1',
+  [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion = '4.2.1',
   [string]$OutputRoot = 'build/p/f210-tin-level4',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
@@ -70,7 +70,7 @@ function Assert-TinRuntimeApiSurface([string]$FixtureControl, [string]$EngineRoo
   Assert-Tin ($control.Contains('force.recipes[recipe_name]', [StringComparison]::Ordinal) -and $control.Contains('recipe.productivity_bonus', [StringComparison]::Ordinal)) 'fixture does not use the documented force recipe productivity bonus'
 }
 function Read-TinCurrentCandidate([string]$Repository, [string]$Archive, [string]$ReceiptPath,
-  [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1') {
+  [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion='4.2.1') {
   Read-MIRNativeProbeF210CurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -SourceVersion $SourceVersion
 }
 function Resolve-TinEngineBinding {

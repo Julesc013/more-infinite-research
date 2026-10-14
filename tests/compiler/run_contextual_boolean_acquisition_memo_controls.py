@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 
-SOURCE_PATH = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+SOURCE_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
 FIXTURE_PATH = Path("tests/compiler/contextual_boolean_acquisition_memo.lua")
 
 
@@ -207,6 +207,7 @@ def main() -> int:
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-CONTEXTUAL-BOOLEAN-ACQUISITION-MEMO-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "assertions": int(result["assertions"]),
         "acquisition_calls": int(result["calls"]),
         "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),

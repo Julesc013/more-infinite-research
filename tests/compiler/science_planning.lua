@@ -12,6 +12,11 @@ local derived_unlockers = {}
 local native_owner_rejections = {}
 local external_owner_records = {}
 local owner_diagnostics = {}
+-- These are every explicitly declared fixture laboratory. The controlled
+-- service models a known valid declared binding; it is not acquisition proof.
+local fixture_lab_bindings = {
+  a = true, early = true, earlier = true, late = true, wood = true, z = true
+}
 local active_mods = {Krastorio2='2.1.2', ['Krastorio2-spaced-out']='2.0.13'}
 local known = {'automation-science-pack','logistic-science-pack','military-science-pack',
   'chemical-science-pack','production-science-pack','utility-science-pack','space-science-pack',
@@ -24,8 +29,8 @@ local function stub(name, value) package.loaded[name] = value end
 stub('prototypes.mir.settings.effective', {get=function(n) return values[n] end})
 stub('prototypes.mir.pipeline.compiler_context', {current=function() return {
  service=function(_, name)
-  if name == 'science.item_acquisition_witness' then
-   return function() return {kind='fixture-lab-source'} end -- fixture assumption, not lab acquisition evidence
+  if name == 'science.lab_binding_available' then
+   return function(lab_name) return fixture_lab_bindings[lab_name] == true end
   end
   assert(name == 'science.pack_production_status', 'Unexpected service: '..name)
   return function(name) return unreachable[name] and 'unreachable' or 'reachable' end -- fixture assumption, not engine evidence

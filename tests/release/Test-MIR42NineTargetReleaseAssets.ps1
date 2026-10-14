@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion = '4.2.0'
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion = '4.2.0'
 )
 
 Set-StrictMode -Version Latest
@@ -15,7 +15,7 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
 . (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
 . (Join-Path $repo 'tests/support/MIR423ReleaseUpgradeControls.ps1')
-$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')
+$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')
 $releaseTag='v' + $SourceVersion
 $sourceMinor=([version]$SourceVersion).Minor
 $patchSuffix=([version]$SourceVersion).Build.ToString('D2')
@@ -35,6 +35,8 @@ $wrapperText = Get-Content -Raw -LiteralPath $wrapper
 Assert-MIR42ReleaseAssetsTest -Condition ($wrapperText -match 'Get-MIR42NineTargetProtectedMainPromotionPlan' -and $wrapperText -match '-PromotionPlan \$promotion' -and $wrapperText -notmatch '\$PublicReleaseObserver') -Code 'wrapper-reconstructs-promotion-and-hides-observer'
 $known431=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.1' -ReleaseTag 'v4.3.1'
 Assert-MIR42ReleaseAssetsTest -Condition ($known431.maintenance -and $known431.source_minor-eq3 -and $known431.source_patch-eq1) -Code '431-release-contract-admits-current-maintenance-only'
+$known440=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.4.0' -ReleaseTag 'v4.4.0'
+Assert-MIR42ReleaseAssetsTest -Condition ($known440.maintenance -and $known440.source_minor-eq4 -and $known440.source_patch-eq0) -Code '440-release-contract-admits-current-maintenance-only'
 $futureVersionRejected=$false
 try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.2' -ReleaseTag 'v4.3.2' | Out-Null } catch { $futureVersionRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
 Assert-MIR42ReleaseAssetsTest -Condition $futureVersionRejected -Code 'unknown-432-cannot-borrow-431-custody'
@@ -136,7 +138,7 @@ try {
 
   $script:mir42ReleaseAssetsFixtureCandidate = [pscustomobject][ordered]@{
     identity=[pscustomobject][ordered]@{sha256=('D' * 64);record=[pscustomobject][ordered]@{record_sha256=('E' * 64)}}
-    source=$source;scope='nine-target';targets=@($targets)
+    source=$source;source_version=$SourceVersion;scope='nine-target';targets=@($targets)
   }
   if ($maintenance) {
     . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
@@ -166,7 +168,7 @@ try {
   Write-MIR4BootstrapRecord -Record $sealRecord -Path $sealPath | Out-Null
   $sealIdentity = Read-MIR42SealRecord -Path $sealPath -Code 'mir42-release-assets-test-seal'
   $promotionPlan = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status='MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY';scope='nine-target';source=$source
+    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status=([string](Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -ceq '4.4.0') { '4.4.0' } else { '4.2.0' })).promotion_plan_status);scope='nine-target';source=$source
     technical_seal=[ordered]@{sha256=[string]$sealIdentity.sha256;record_sha256=[string]$sealIdentity.record.record_sha256}
     candidate_manifest=[ordered]@{sha256=('D' * 64);record_sha256=('E' * 64)};target_assets=@($targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
     main_before=('f' * 40);remote_mutation_performed=$false;protected_main_promotion_authorized=$false;human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false
@@ -249,6 +251,10 @@ try {
     $upgradeControls=Invoke-MIR431ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
     $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
     Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '431-full-direct-and-immediate-upgrade-evidence-opposing-controls'
+  } elseif ($SourceVersion -ceq '4.4.0') {
+    $upgradeControls=Invoke-MIR440ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '440-full-direct-and-immediate-upgrade-evidence-opposing-controls'
   }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
@@ -463,7 +469,7 @@ if (-not $maintenance) {
   # Use a fresh script scope after the legacy fixtures have been retired. The
   # module's dot-source guards must not reuse parent functions without their
   # script-scoped constants. This remains one serial test process tree.
-  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0')) {
+  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) {
     & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
     if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
   }

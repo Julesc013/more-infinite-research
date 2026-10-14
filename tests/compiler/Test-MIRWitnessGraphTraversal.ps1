@@ -19,11 +19,13 @@ if($LASTEXITCODE -ne 0){throw "Witness graph traversal controls failed: $($outpu
 $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-WITNESS-GRAPH-TRAVERSAL-CONTROLS-PASSED".*\}$'} | Select-Object -Last 1
 if(-not $recordLine){throw "Witness graph traversal controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
 if([int]$record.alias_identity_calls -ne 3 -or [int]$record.naive_alias_identity_calls -ne 257){
   throw 'Witness graph alias traversal did not retain its measured one-node-per-identity control.'
 }
 [pscustomobject]@{
   status=[string]$record.status
+  scope=[string]$record.scope
   assertions=[int]$record.assertions
   alias_identity_calls=[int]$record.alias_identity_calls
   naive_alias_identity_calls=[int]$record.naive_alias_identity_calls

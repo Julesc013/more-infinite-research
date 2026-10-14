@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 234,
+  "test_count": 237,
   "tests": [
     {
       "id": "docs.check",
@@ -1331,9 +1331,7 @@
         "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
         "source:source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+        "tests/reference/retired-discovery/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -1485,10 +1483,7 @@
         "source:source/prototypes/mir/graph/**",
         "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "tests/reference/retired-discovery/**",
         "source:source/prototypes/mir/index/recipe_unlocks.lua",
         "source:source/prototypes/mir/index/item_prototype_facts.lua",
         "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
@@ -1632,6 +1627,56 @@
         "test-catalog",
         "scenario-harness",
         "evidence"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.approved-lab-bindings",
+      "proposition": "The governed test 'static.approved-lab-bindings' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedLabBindings.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRApprovedLabBindings.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/capabilities/science_integration/lab_bindings.lua",
+        "source:source/prototypes/mir/domain/facts/recipe_semantics.lua",
+        "tests/compiler/Test-MIRApprovedLabBindings.ps1",
+        "tests/compiler/run_lab_bindings_controls.py",
+        "tests/compiler/lab_bindings.lua",
+        "validation/tests.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.approved-pack-bindings",
+      "proposition": "The governed test 'static.approved-pack-bindings' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedPackBindings.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRApprovedPackBindings.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/**",
+        "tests/compiler/Test-MIRApprovedPackBindings.ps1",
+        "tests/compiler/run_approved_pack_bindings_controls.py",
+        "tests/compiler/approved_pack_bindings.lua",
+        "tests/compiler/approved_family_emission.lua",
+        "validation/tests.yml"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -1969,6 +2014,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".github/workflows/validate.yml",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/workspace/RepoPaths.ps1",
         "tests/support/MIRNativeEntryDefaults.ps1",
@@ -1988,11 +2034,14 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/assert-k2-213-imersite-continuation/info.json",
         "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
         "fixtures/assert-k2-213-imersite-continuation/control.lua",
+        "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
         "tests/runtime/k2_imersite_version_controls.lua",
         "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
@@ -8067,6 +8116,7 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAuthority.ps1",
+        "spec/schemas/mir42-nine-target-release-cut-programme-v1.schema.json",
         "tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1",
         "tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
@@ -8367,6 +8417,32 @@
       "matrix": null
     },
     {
+      "id": "static.recipe-productivity-permissions",
+      "proposition": "The governed test 'static.recipe-productivity-permissions' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+        "source:source/prototypes/mir/domain/streams/descriptor.lua",
+        "source:source/prototypes/streams/productivity.lua",
+        "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+        "tests/compiler/run_recipe_productivity_permissions_controls.py",
+        "tests/compiler/recipe_productivity_permissions.lua",
+        "validation/tests.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.release-history",
       "proposition": "The governed test 'static.release-history' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -8501,6 +8577,7 @@
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -8561,10 +8638,10 @@
       "package-repository": 69,
       "tooling-release": 70,
       "runtime-upgrade": 61,
-      "compiler-static": 19,
+      "compiler-static": 22,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 221,
+    "canonical_test_commands": 224,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8577,5 +8654,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:cc91fa8c668c8e35d7540160c1d927aac22c6b00778078803f19b04deccfbcb4"
+  "digest": "sha256:36c60218f1ba958fa04cf8098b630e2fb3f97a695e099e758d0eda3c8c85ab83"
 }
