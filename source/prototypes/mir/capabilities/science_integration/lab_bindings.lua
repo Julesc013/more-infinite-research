@@ -11,6 +11,7 @@ local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_loo
 local item_facts = require("prototypes.mir.index.item_prototype_facts")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local recipe_unlocks = require("prototypes.mir.index.recipe_unlocks")
+local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
@@ -30,32 +31,12 @@ local function sorted_inputs(lab)
   return sorted_names(seen)
 end
 
-local function finite_positive(value)
-  return type(value) == "number" and value == value and value > 0 and value < math.huge
-end
-
--- A recipe index groups variants for lookup.  A laboratory placement binding
--- needs more: every declared difficulty variant must actually be able to
--- yield the placement item.  An aggregate amount can otherwise hide a zero
--- probability (or zero amount) result in one variant.
+-- Recipe facts aggregate variants for indexes.  A direct placement source
+-- requires a possible typed item result in every declared variant; an
+-- aggregate amount must never conceal a zero-probability result.
 local function possible_item_result(result, item_name)
-  if result.type ~= "item" or result.name ~= item_name then return false end
-  local maximum = result.amount
-  if maximum == nil then maximum = result.amount_max or result.amount_min end
-  if not finite_positive(maximum) then return false end
-  local probability = result.independent_probability
-  if probability == nil then probability = result.probability end
-  if probability == nil then probability = 1 end
-  if not finite_positive(probability) or probability > 1 then return false end
-  local shared = result.shared_probability
-  if shared ~= nil then
-    if type(shared) ~= "table" or type(shared.min) ~= "number" or type(shared.max) ~= "number"
-      or shared.min ~= shared.min or shared.max ~= shared.max
-      or shared.min < 0 or shared.max <= 0 or shared.min > shared.max or shared.max > 1 then
-      return false
-    end
-  end
-  return true
+  return result.type == "item" and result.name == item_name
+    and recipe_semantics.possible_item_result(result)
 end
 
 local function outputs_item(fact, item_name)

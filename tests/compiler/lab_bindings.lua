@@ -95,11 +95,31 @@ oppose(function(raw) raw.item["ordinary-lab-kit"].place_result = "other-lab" end
 oppose(function(raw) raw.recipe["ordinary-lab"].enabled = false; raw.technology["ordinary-lab-unlock"] = {type = "technology", name = "ordinary-lab-unlock", enabled = false, effects = {{type = "unlock-recipe", recipe = "ordinary-lab"}}} end, 0)
 oppose(function(raw) raw.recipe["ordinary-lab"].enabled = false end, 0)
 oppose(function(raw) raw.recipe["ordinary-lab"].results[1].probability = 0 end, 0)
+oppose(function(raw) raw.recipe["ordinary-lab"].results[1].shared_probability = {min = 1, max = 1} end, 0)
 oppose(function(raw)
   raw.recipe["ordinary-lab"] = {type = "recipe", name = "ordinary-lab", enabled = true,
     normal = {results = {{type = "item", name = "ordinary-lab-kit", amount = 1}}},
     expensive = {results = {{type = "item", name = "ordinary-lab-kit", amount = 1, probability = 0}}}}
 end, 0)
+
+local function admits(mutator, detail)
+  local raw = world(0, false)
+  mutator(raw)
+  Context.with_active(Context.new(), function()
+    local ordinary = find(bindings.snapshot(), "ordinary-lab")
+    check(#ordinary.sources == 1, detail)
+  end)
+end
+
+admits(function(raw)
+  raw.recipe["ordinary-lab"].results[1] = {type = "item", name = "ordinary-lab-kit", amount = 1, amount_min = 0, amount_max = 0}
+end, "Fixed positive amount takes precedence over zero range metadata")
+admits(function(raw)
+  raw.recipe["ordinary-lab"].results[1] = {type = "item", name = "ordinary-lab-kit", amount_min = 1, amount_max = 0}
+end, "Reversed range clamps to its positive minimum")
+admits(function(raw)
+  raw.recipe["ordinary-lab"].results[1] = {type = "item", name = "ordinary-lab-kit", amount = 0, extra_count_fraction = 0.25}
+end, "Positive declared extra result quantity remains a possible direct source")
 
 world(0, false)
 data.raw.recipe["specialist-lab"].enabled = true

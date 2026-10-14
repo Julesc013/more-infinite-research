@@ -52,6 +52,18 @@ end
 -- Secretas' actual shape uses separate finite definitions through level eight.
 data.raw.technology = separate_finite_tail()
 
+-- The approved science facade must be sufficient for continuation planning;
+-- loading one of the retired factory/research discovery solvers fails this
+-- source control before the real planner can run.
+for _, name in ipairs({
+  "pack_production_reachability", "recipe_route_feasibility",
+  "production_route_policy", "technology_researchability"
+}) do
+  package.preload["prototypes.mir.capabilities.science_integration." .. name] = function()
+    error("retired discovery import: " .. name)
+  end
+end
+
 local discover = require("prototypes.mir.planner.base_continuations.discover")
 local levels, _, has_infinite, terminals = discover.chain("worker-robots-storage")
 check(not has_infinite and levels[#levels] == 8 and terminals[8].name == "worker-robots-storage-8",
