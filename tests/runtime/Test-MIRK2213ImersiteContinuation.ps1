@@ -108,7 +108,9 @@ function New-K2213SelectedFixture {
     'control.lua'=@('script.active_mods["more-infinite-research"] ~= "4.2.21001"`n      and script.active_mods["more-infinite-research"] ~= "4.2.21002"',('script.active_mods["more-infinite-research"] ~= "'+[string]$profile.mir_version+'"'))
   }
   foreach($entry in $replacements.GetEnumerator()){
-    $text=[IO.File]::ReadAllText((Join-Path $Source $entry.Key))
+    # Windows checkouts may supply CRLF. Normalize only the new selected
+    # fixture; the retained template and its raw-hash provenance stay intact.
+    $text=[IO.File]::ReadAllText((Join-Path $Source $entry.Key)).Replace("`r`n","`n")
     $from=$entry.Value[0].Replace('`n',"`n")
     Assert-K2213 ($text.Contains($from,[StringComparison]::Ordinal)) "fixture-specialization-anchor:$($entry.Key)"
     $text=$text.Replace($from,$entry.Value[1])

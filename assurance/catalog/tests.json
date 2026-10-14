@@ -2033,6 +2033,7 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
@@ -8651,5 +8652,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:162a6c5810863a6bd010c6f2be0b427809453b19f423bb70d71b457940eb7240"
+  "digest": "sha256:b8a8660cc1442bcc70422f9038e93c5022ea40317c0cc11ceacf714df046363b"
 }

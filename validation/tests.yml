@@ -603,6 +603,7 @@
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tests/tooling/Test-MIRImmutableInputStaging.ps1",
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
+        "tests/runtime/Test-MIRK2213ImersiteContinuation.ps1",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",

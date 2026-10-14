@@ -710,6 +710,31 @@ try {
     Assert-Probe ((Test-Path -LiteralPath $selectedSettings -PathType Leaf) -and (Get-K2213Sha256 $selectedSettings) -ceq (Get-K2213Sha256 $templateSettings)) 'K2 selected fixture omitted or changed its required diagnostic setting.'
     Assert-Probe ((New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.2.2' -SelectedMIRVersion '4.2.21002') -ceq $fixtureTemplate) 'K2 historical fixture bytes were not retained.'
     Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
+    # Exercise the Windows checkout that failed hosted CI as well as LF. The
+    # actual specializer must produce the same current guard without editing
+    # the retained fixture or accepting a changed historical guard.
+    foreach($lineEnding in @('LF','CRLF')){
+      $variantSource=Join-Path $run ('k2-fixture-template-'+$lineEnding)
+      [IO.Directory]::CreateDirectory($variantSource)|Out-Null
+      foreach($member in @('info.json','settings-updates.lua')){
+        [IO.File]::WriteAllBytes((Join-Path $variantSource $member),[IO.File]::ReadAllBytes((Join-Path $fixtureTemplate $member)))
+      }
+      foreach($member in @('data-final-fixes.lua','control.lua')){
+        $variantText=[IO.File]::ReadAllText((Join-Path $fixtureTemplate $member)).Replace("`r`n","`n")
+        if($lineEnding-ceq'CRLF'){$variantText=$variantText.Replace("`n","`r`n")}
+        [IO.File]::WriteAllText((Join-Path $variantSource $member),$variantText,[Text.UTF8Encoding]::new($false))
+      }
+      $beforeData=Get-K2213Sha256 (Join-Path $variantSource 'data-final-fixes.lua')
+      $beforeControl=Get-K2213Sha256 (Join-Path $variantSource 'control.lua')
+      $variantSelected=New-K2213SelectedFixture -Source $variantSource -Run (Join-Path $run ('k2-selected-'+$lineEnding)) -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'
+      foreach($member in @('data-final-fixes.lua','control.lua','settings-updates.lua')){
+        Assert-Probe ((Get-K2213Sha256 (Join-Path $variantSelected $member)) -ceq (Get-K2213Sha256 (Join-Path $selectedFixture $member))) "K2 $lineEnding selected fixture differs from the exact current oracle: $member"
+      }
+      Assert-Probe ((Get-K2213Sha256 (Join-Path $variantSource 'data-final-fixes.lua')) -ceq $beforeData -and (Get-K2213Sha256 (Join-Path $variantSource 'control.lua')) -ceq $beforeControl) "K2 $lineEnding specialization changed its source template."
+      $changedGuard=[IO.File]::ReadAllText((Join-Path $variantSource 'data-final-fixes.lua')).Replace('4.2.21001','4.2.21003')
+      [IO.File]::WriteAllText((Join-Path $variantSource 'data-final-fixes.lua'),$changedGuard,[Text.UTF8Encoding]::new($false))
+      Refuses-Probe {New-K2213SelectedFixture -Source $variantSource -Run (Join-Path $run ('k2-refused-'+$lineEnding)) -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'} 'fixture-specialization-anchor:data-final-fixes.lua'
+    }
     # Execute the actual retained and selected fixture guard sources in the
     # repository-provisioned Lua 5.2 host. This is a source/version boundary
     # control only: it neither starts Factorio nor serializes a save.
