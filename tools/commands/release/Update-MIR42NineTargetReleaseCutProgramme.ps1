@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
   [ValidateSet('Prepare','RefreshPendingAuthority','AdvanceWrittenGo')][string]$Mode = 'Prepare',
+  [ValidateSet('4.2.0','4.4.0')][string]$SourceVersion = '4.2.0',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$OutputPath = '',
   [string]$MaintainerAuthorizationPath = '',
@@ -13,14 +14,14 @@ $ErrorActionPreference = 'Stop'
 if ($Mode -ceq 'Prepare') {
   if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = '.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json' }
   if (-not [IO.Path]::IsPathRooted($OutputPath)) { $OutputPath = Join-Path $RepoRoot $OutputPath }
-  New-MIR42NineTargetReleaseCutProgramme -RepoRoot $RepoRoot -OutputPath $OutputPath | ConvertTo-Json -Depth 30
+  New-MIR42NineTargetReleaseCutProgramme -RepoRoot $RepoRoot -OutputPath $OutputPath -SourceVersion $SourceVersion | ConvertTo-Json -Depth 30
   return
 }
 if ($Mode -ceq 'RefreshPendingAuthority') {
   if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = '.mir/releases/governance/mir4/MIR42-Nine-Target-Release-Cut-ProgrammeV1.json' }
   if (-not [IO.Path]::IsPathRooted($OutputPath)) { $OutputPath = Join-Path $RepoRoot $OutputPath }
   if (-not [IO.Path]::IsPathRooted($CheckpointRoot)) { $CheckpointRoot = Join-Path $RepoRoot $CheckpointRoot }
-  New-MIR42NineTargetReleaseCutProgramme -RepoRoot $RepoRoot -OutputPath $OutputPath -RefreshPendingAuthority -CheckpointRoot $CheckpointRoot | ConvertTo-Json -Depth 30
+  New-MIR42NineTargetReleaseCutProgramme -RepoRoot $RepoRoot -OutputPath $OutputPath -SourceVersion $SourceVersion -RefreshPendingAuthority -CheckpointRoot $CheckpointRoot | ConvertTo-Json -Depth 30
   return
 }
 if ([string]::IsNullOrWhiteSpace($MaintainerAuthorizationPath) -or [string]::IsNullOrWhiteSpace($CandidateManifestPath)) {

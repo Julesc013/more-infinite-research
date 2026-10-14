@@ -239,6 +239,14 @@ exit /b 13
   $nineCandidate=New-MIR4ProtectedMainCandidate -RepoRoot $testRoot -Plan $ninePlan -Scope nine-target -Rehearsal
   if((Get-MIR4A08CandidateMessage $ninePlan)-notmatch('(?m)^MIR4-Frozen-Dev-Commit: '+[regex]::Escape($source)+'$')-or(Get-MIR4A08CandidateMessage $ninePlan)-match'(?m)^MIR-Source-Commit:'){throw '[mir4-a08-nine-candidate-trailer]'}
   $ninePromotionPlan=New-A08NineTargetPromotionPlan $ninePlan
+  $ninePromotion440=$ninePromotionPlan|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+  $ninePromotion440.status='MIR-4.4-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY'
+  $ninePromotion440.candidate.ref='refs/heads/release/mir-4.4-candidate-'+$source.Substring(0,12)
+  $nineProjection440=Get-MIR4A08NineTargetPromotionPlanProjection -PromotionPlan $ninePromotion440
+  if([string]$nineProjection440.status-cne'MIR-4.4-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY'-or[string]$nineProjection440.candidate.ref-cne[string]$ninePromotion440.candidate.ref){throw '[mir4-a08-nine-440-promotion-plan]'}
+  $wrongPromotion440=$ninePromotion440|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
+  $wrongPromotion440.candidate.ref='refs/heads/release/mir-4.2-candidate-'+$source.Substring(0,12)
+  Expect-A08Failure {Get-MIR4A08NineTargetPromotionPlanProjection -PromotionPlan $wrongPromotion440} '[mir4-a08-nine-transport-plan]'
   $nineWriter=New-MIR4A08NineTargetPromotionTransportIntention -RepoRoot $testRoot -Plan $ninePlan -Candidate $nineCandidate -PromotionPlan $ninePromotionPlan -RemoteName synthetic -RemoteSourceRef refs/heads/dev -StateRoot $transportStateRoot -Rehearsal
   if([bool]$nineWriter.publication_authorized-or[bool]$nineWriter.main_mutation_performed-or-not(Test-Path -LiteralPath $nineWriter.path)){throw '[mir4-a08-nine-transport-writer]'}
   $nineRehearsal=Get-Content -Raw -LiteralPath $nineWriter.path|ConvertFrom-Json -Depth 100 -DateKind String

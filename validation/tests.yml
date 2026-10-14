@@ -237,6 +237,7 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAuthority.ps1",
+        "spec/schemas/mir42-nine-target-release-cut-programme-v1.schema.json",
         "tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1",
         "tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",

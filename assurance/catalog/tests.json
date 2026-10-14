@@ -8115,6 +8115,7 @@
       "requires_factorio": false,
       "inputs": [
         "tests/release/Test-MIR42NineTargetReleaseAuthority.ps1",
+        "spec/schemas/mir42-nine-target-release-cut-programme-v1.schema.json",
         "tools/commands/release/Invoke-MIR42NineTargetSealPromotion.ps1",
         "tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme.ps1",
         "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
@@ -8652,5 +8653,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b8a8660cc1442bcc70422f9038e93c5022ea40317c0cc11ceacf714df046363b"
+  "digest": "sha256:2e26dc92e93425c41fbcc7ddbb21b69464b895c9f7c91d5c478cdeed2ca7024d"
 }

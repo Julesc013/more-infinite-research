@@ -808,8 +808,9 @@ function Assert-MIR42NineTargetReleaseAssetPromotionPlan {
     if ($PromotionPlan.PSObject.Properties.Name -notcontains $field) { throw "[mir42-release-assets-promotion-field] $field" }
   }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $PromotionPlan -Fields @('remote_mutation_performed','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized') -Code 'mir42-release-assets-promotion'
+  $release = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ([string]$VersionContract.source_version -ceq '4.4.0') { '4.4.0' } else { '4.2.0' })
   if ([int]$PromotionPlan.schema -ne 1 -or [string]$PromotionPlan.kind -cne 'MIR42NineTargetProtectedMainPromotionPlanV1' -or
-      [string]$PromotionPlan.status -cne 'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -or
+      [string]$PromotionPlan.status -cne [string]$release.promotion_plan_status -or
       [string]$PromotionPlan.scope -cne 'nine-target' -or [bool]$PromotionPlan.remote_mutation_performed -or
       [bool]$PromotionPlan.protected_main_promotion_authorized -or -not [bool]$PromotionPlan.human_go_required_after_main_readback -or
       [bool]$PromotionPlan.tagging_authorized -or [bool]$PromotionPlan.publication_authorized) {
@@ -1147,8 +1148,9 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     if ($hash -notmatch '^[A-F0-9]{64}$') { throw '[mir42-release-assets-inventory-binding]' }
   }
   Assert-MIR42ReleaseAssetProperties -Value $Record.promotion_plan -Expected @('kind','status','main_before','source_commit','source_tree','candidate_manifest_sha256','technical_seal_sha256') -Code 'mir42-release-assets-inventory-promotion'
+  $promotionRelease = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ([string]$versionContract.source_version -ceq '4.4.0') { '4.4.0' } else { '4.2.0' })
   if ([string]$Record.promotion_plan.kind -cne 'MIR42NineTargetProtectedMainPromotionPlanV1' -or
-      [string]$Record.promotion_plan.status -cne 'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -or
+      [string]$Record.promotion_plan.status -cne [string]$promotionRelease.promotion_plan_status -or
       [string]$Record.promotion_plan.source_commit -cne [string]$Record.source.commit -or [string]$Record.promotion_plan.source_tree -cne [string]$Record.source.tree -or
       [string]$Record.promotion_plan.candidate_manifest_sha256 -cne [string]$Record.candidate_manifest.sha256 -or
       [string]$Record.promotion_plan.technical_seal_sha256 -cne [string]$Record.technical_seal.sha256) {
@@ -1336,8 +1338,9 @@ function Read-MIR42NineTargetProtectedMainReadbackForPublication {
   if ($PublishedMaintenance) { $expectedProperties += 'published_maintenance_predecessor' }
   Assert-MIR42ReleaseAssetProperties -Value $record -Expected $expectedProperties -Code 'mir42-release-go-main-readback-shape'
   if ($PublishedMaintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $record.published_maintenance_predecessor -CandidateSourceVersion $SourceVersion }
+  $release = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -ceq '4.4.0') { '4.4.0' } else { '4.2.0' })
   if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42NineTargetProtectedMainReadbackV1' -or
-      [string]$record.status -cne 'MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST' -or [string]$record.scope -cne 'nine-target' -or
+      [string]$record.status -cne [string]$release.main_readback_status -or [string]$record.scope -cne 'nine-target' -or
       $record.main_readback_verified -isnot [bool] -or -not [bool]$record.main_readback_verified -or
       $record.remote_mutation_performed -isnot [bool] -or [bool]$record.remote_mutation_performed -or
       $record.protected_main_promotion_authorized -isnot [bool] -or [bool]$record.protected_main_promotion_authorized -or

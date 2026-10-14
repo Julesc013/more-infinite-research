@@ -138,7 +138,7 @@ try {
 
   $script:mir42ReleaseAssetsFixtureCandidate = [pscustomobject][ordered]@{
     identity=[pscustomobject][ordered]@{sha256=('D' * 64);record=[pscustomobject][ordered]@{record_sha256=('E' * 64)}}
-    source=$source;scope='nine-target';targets=@($targets)
+    source=$source;source_version=$SourceVersion;scope='nine-target';targets=@($targets)
   }
   if ($maintenance) {
     . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42CandidateBuild.ps1')
@@ -168,7 +168,7 @@ try {
   Write-MIR4BootstrapRecord -Record $sealRecord -Path $sealPath | Out-Null
   $sealIdentity = Read-MIR42SealRecord -Path $sealPath -Code 'mir42-release-assets-test-seal'
   $promotionPlan = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status='MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY';scope='nine-target';source=$source
+    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status=([string](Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -ceq '4.4.0') { '4.4.0' } else { '4.2.0' })).promotion_plan_status);scope='nine-target';source=$source
     technical_seal=[ordered]@{sha256=[string]$sealIdentity.sha256;record_sha256=[string]$sealIdentity.record.record_sha256}
     candidate_manifest=[ordered]@{sha256=('D' * 64);record_sha256=('E' * 64)};target_assets=@($targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
     main_before=('f' * 40);remote_mutation_performed=$false;protected_main_promotion_authorized=$false;human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false
@@ -469,7 +469,7 @@ if (-not $maintenance) {
   # Use a fresh script scope after the legacy fixtures have been retired. The
   # module's dot-source guards must not reuse parent functions without their
   # script-scoped constants. This remains one serial test process tree.
-  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0')) {
+  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) {
     & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
     if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
   }
