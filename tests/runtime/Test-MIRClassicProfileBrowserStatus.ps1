@@ -21,8 +21,8 @@ foreach($target in @('f200','f210')){
   $line=$output|Where-Object {$_ -match '^{.*"status": "MIR-CLASSIC-PROFILE-BROWSER-STATUS-CONTROLS-PASSED".*}$'}|Select-Object -Last 1
   if(-not $line){throw "Classic browser status controls produced no success record for ${target}: $($output -join [Environment]::NewLine)"}
   $record=$line|ConvertFrom-Json
-  if([int]$record.assertions -lt 13 -or [int]$record.factorio_processes -ne 0){
-    throw "Classic browser status controls did not prove the sealed and F200 fallback scopes for $target."
+  if([int]$record.assertions -lt 14 -or [int]$record.factorio_processes -ne 0){
+    throw "Classic browser status controls did not prove public Full compatibility and the isolated legacy F200 DTO scope for $target."
   }
   $records+=$record
 }

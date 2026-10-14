@@ -18,14 +18,15 @@ local CATALOG = "prototypes.mir.settings.catalog"
 local STARTUP = "prototypes.mir.runtime.startup_settings"
 local CODEC = "prototypes.mir.settings.profile_codec"
 local COMPILER_PROFILE = "prototypes.mir.settings.compiler_profile"
+local CLASSIC_DECLARATIONS = "prototypes.mir.domain.compiler.classic_declarations"
 
 local function unload(name)
   package.loaded[name] = nil
   package.preload[name] = nil
 end
 
-local function provider_for(mod_data_supported, factorio_version)
-  for _, name in ipairs{PROVIDER, TARGET, HOST, CONTROL, CATALOG, STARTUP, CODEC, COMPILER_PROFILE} do unload(name) end
+local function provider_for(mod_data_supported, factorio_version, private_profile)
+  for _, name in ipairs{PROVIDER, TARGET, HOST, CONTROL, CATALOG, STARTUP, CODEC, COMPILER_PROFILE, CLASSIC_DECLARATIONS} do unload(name) end
   local prototype_collections = {mod_data = {}, mod_setting = {}}
   package.preload[TARGET] = function()
     return {
@@ -47,6 +48,13 @@ local function provider_for(mod_data_supported, factorio_version)
   end
   package.preload[CODEC] = function()
     return {import_setting_name = "mir-settings-profile-import", decode = function() return nil end}
+  end
+  if private_profile then
+    -- This is a legacy DTO characterization only.  Product selection uses the
+    -- real compiler-profile module below, which maps saved Classic to Full.
+    package.preload[COMPILER_PROFILE] = function()
+      return {get = function() return private_profile end}
+    end
   end
   return require(PROVIDER), prototype_collections
 end
@@ -77,7 +85,7 @@ local function sealed_profile(ids, unsupported)
 end
 
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
-local modern, modern_prototypes = provider_for(true)
+local modern, modern_prototypes = provider_for(true, nil, "classic")
 modern_prototypes.mod_data["more-infinite-research-compiler-profile"] = {
   data = sealed_profile({"base-continuation/braking-force", "research_character_reach"})
 }
@@ -115,21 +123,28 @@ check("CBR-06", unavailable and unavailable.state == "unavailable"
 check("CBR-07", browser_core.normalize_enrichment(modern.list_snapshot(force)) ~= nil,
   "an explicit unavailable scope remains a usable empty Library envelope")
 
-_G.settings = {startup = {["mir-compiler-profile"] = {value = "full"}}}
-modern.invalidate_omissions()
-check("CBR-08", modern.list_snapshot(force).compiler_scope == nil,
-  "a selected full compiler profile must not inherit a stale classic warning")
+-- The public compatibility alias is evaluated after module loading under the
+-- same no-require condition as a real shortcut callback.
+_G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
+local public_compat = provider_for(true)
+local parsing_require = require
+require = function(name) error("[mir-browser-event-require] " .. tostring(name), 2) end
+local public_ok, public_snapshot = pcall(public_compat.list_snapshot, force)
+require = parsing_require
+check("CBR-08", public_ok and public_snapshot.compiler_scope == nil,
+  "a saved Classic setting must select Full without requiring modules in a Library event")
 
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
-local legacy, legacy_prototypes = provider_for(false)
-local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
-local reach = declarations.direct_streams.research_character_reach
-local mining = declarations.direct_streams.research_character_mining_speed
+local legacy, legacy_prototypes = provider_for(false, nil, "classic")
 local legacy_force = {valid = true, technologies = {
-  [reach.technology_name] = {valid = true},
-  [mining.technology_name] = {valid = true}
+  ["recipe-prod-research_character_reach-1"] = {valid = true},
+  ["recipe-prod-research_character_mining_speed-1"] = {valid = true}
 }}
-local legacy_scope = legacy.list_snapshot(legacy_force).compiler_scope
+parsing_require = require
+require = function(name) error("[mir-browser-event-require] " .. tostring(name), 2) end
+local legacy_ok, legacy_snapshot = pcall(legacy.list_snapshot, legacy_force)
+require = parsing_require
+local legacy_scope = legacy_ok and legacy_snapshot.compiler_scope or nil
 check("CBR-09", legacy_scope and legacy_scope.state == "available"
     and #legacy_scope.supported_manifest_ids == 2
     and legacy_scope.supported_manifest_ids[1] == "research_character_mining_speed"
@@ -140,14 +155,17 @@ check("CBR-10", legacy_scope and legacy_scope.full_catalog_status == "not-evalua
   "F200 fallback must retain the reduced-support and save-preservation warning")
 check("CBR-11", next(legacy_prototypes.mod_data) == nil,
   "the F200 fallback must not fabricate unavailable mod-data transport")
+check("CBR-12", legacy_ok,
+  "the isolated legacy DTO reader must not require declarations during a Library event")
 
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "full"}}}
-check("CBR-12", legacy.list_snapshot(legacy_force).compiler_scope == nil,
+local public_legacy = provider_for(false)
+check("CBR-13", public_legacy.list_snapshot(legacy_force).compiler_scope == nil,
   "F200 full selection must not receive the classic fallback scope")
 
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
 local historical = provider_for(false, "0.18")
-check("CBR-13", historical.list_snapshot(legacy_force).compiler_scope == nil,
+check("CBR-14", historical.list_snapshot(legacy_force).compiler_scope == nil,
   "A historical line selected by the canonical full profile must not show a Classic warning")
 
 if #failures > 0 then error(table.concat(failures, "\n"), 0) end

@@ -9,6 +9,7 @@ local maximum_level_control = require("prototypes.mir.runtime.maximum_level_cont
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local browser_host = require("prototypes.mir.platform.factorio.browser_host")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local classic_declarations = require("prototypes.mir.domain.compiler.classic_declarations")
 
 local M = {schema = 2, catalogue_limit = 30000}
 
@@ -768,9 +769,8 @@ end
 -- continuation identities depend on the observed tail, so they are omitted
 -- here rather than guessed from a declaration list.
 local function f200_classic_profile(force)
-  local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
   local ids = {}
-  for _, declaration in pairs(declarations.direct_streams or {}) do
+  for _, declaration in pairs(classic_declarations.direct_streams or {}) do
     local technology = force and force.technologies and force.technologies[declaration.technology_name]
     if technology and technology.valid then table.insert(ids, declaration.manifest_id) end
   end
