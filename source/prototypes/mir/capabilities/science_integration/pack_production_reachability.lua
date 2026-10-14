@@ -1004,13 +1004,41 @@ local function positive_witness_memo_key(identity, visiting_packs, visiting_tech
   }, "\0")
 end
 
-local function negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+local function plain_active_name_set(values)
+  if values == nil then return true end
+  if type(values) ~= "table" or getmetatable(values) ~= nil then return false end
+  for name, active in pairs(values) do
+    -- Even a plain container can hold a key with an observable __tostring.
+    -- Compiler-owned active sets contain string names; other keys retain the
+    -- historical second projection rather than suppress that observation.
+    if active and type(name) ~= "string" then return false end
+  end
+  return true
+end
+
+local function can_reuse_positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+  -- A caller can supply tables with metamethods.  The historical negative-key
+  -- path evaluated the positive projection again, so retain that observation
+  -- count and order for opaque inputs rather than assuming a repeated read is
+  -- inert.  Compiler-owned route state uses ordinary plain tables.
+  return type(identity) == "table" and getmetatable(identity) == nil
+    and plain_active_name_set(visiting_packs)
+    and plain_active_name_set(visiting_technologies)
+end
+
+local function negative_witness_memo_key(
+  identity, context, state, visiting_packs, visiting_technologies, positive_key
+)
   -- A failed route is conditional on every active cycle boundary. Unlike a
   -- positive witness, it cannot be reused across sibling contexts merely
   -- because the queried output matches. This key belongs to one immutable
   -- production-route query and includes the source epoch and all active sets.
+  if positive_key == nil
+    or not can_reuse_positive_witness_memo_key(identity, visiting_packs, visiting_technologies) then
+    positive_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+  end
   return table.concat({
-    positive_witness_memo_key(identity, visiting_packs, visiting_technologies),
+    positive_key,
     tostring(state.recipe_source_epoch),
     active_set_key(state.visiting),
     active_set_key(context.pairs),
@@ -1122,7 +1150,8 @@ local function research_unlocked_output_witness(identity, options, state, visiti
       negative_memo = {}
       options.research_unlock_negative_memo = negative_memo
     end
-    negative_key = negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+    negative_key = negative_witness_memo_key(
+      identity, context, state, visiting_packs, visiting_technologies, memo_key)
     if negative_memo[negative_key] then return nil end
   end
   local witness_checkpoint = diagnostic_checkpoint(options)

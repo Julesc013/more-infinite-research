@@ -9,6 +9,14 @@ local researchability_index = require("prototypes.mir.graph.researchability_inde
 
 local M = {}
 
+-- During root priming, an unresolved science dependency prevents answer-memo
+-- reuse. Remember that preparation refusal, never the contextual answer: a
+-- hit still runs reason() and all of its acquisition work. Private weak
+-- bindings avoid putting Context/index back-references into public snapshots
+-- or retaining a discarded compiler through this module's cache.
+local root_eligibility_refusals = setmetatable({}, {__mode = "k"})
+local ROOT_ELIGIBILITY_REFUSAL_MAX_ENTRIES = 4096
+
 local function pack_production_status(...)
   local service = compiler_context.current():service("science.pack_production_status")
   if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
@@ -355,6 +363,24 @@ function M.reason_with_context(tech_name, context)
   -- current route state is part of its proof. Keep those queries exact.
   if outputs ~= "" then return reason(tech_name, context) end
   if not memo.root_qualified[tech_name] then
+    local refusal_owner
+    if context_owned and type(production_state.root_entry_generation) == "number" then
+      refusal_owner = root_eligibility_refusals[memo]
+      local index = graph_index()
+      if not refusal_owner or refusal_owner.bindings.production ~= production_state
+        or refusal_owner.source_epoch ~= epoch
+        or refusal_owner.root_generation ~= production_state.root_entry_generation
+        or refusal_owner.bindings.index ~= index then
+        refusal_owner = {
+          bindings = setmetatable({production = production_state, index = index}, {__mode = "v"}),
+          source_epoch = epoch,
+          root_generation = production_state.root_entry_generation,
+          entries = {}, count = 0
+        }
+        root_eligibility_refusals[memo] = refusal_owner
+      end
+      if refusal_owner.entries[tech_name] then return reason(tech_name, context) end
+    end
     local packs = owner:state_view("science_pack_production")
     if not packs or packs.recipe_source_epoch ~= epoch then return reason(tech_name, context) end
     for _, candidate_name in ipairs(researchability_index.reachable_names(graph_index(), tech_name)) do
@@ -362,7 +388,13 @@ function M.reason_with_context(tech_name, context)
       if candidate and not candidate.research_trigger then
         for _, ingredient in ipairs(candidate.unit and candidate.unit.ingredients or {}) do
           local pack_name = lab_compatibility.ingredient_name(ingredient)
-          if pack_name and packs.entries[pack_name] == nil then return reason(tech_name, context) end
+          if pack_name and packs.entries[pack_name] == nil then
+            if refusal_owner and refusal_owner.count < ROOT_ELIGIBILITY_REFUSAL_MAX_ENTRIES then
+              refusal_owner.entries[tech_name] = true
+              refusal_owner.count = refusal_owner.count + 1
+            end
+            return reason(tech_name, context)
+          end
         end
       end
     end

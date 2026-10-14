@@ -189,6 +189,147 @@ check("CB-ROUTE-11", after_mutation ~= warm_witness
   and pair_text(pairs_from(after_mutation)) == pair_text(cold_witness_pairs),
   "Mutating a public witness copy after Boolean warming cannot alter a later answer")
 
+-- The negative research-unlock memo includes the positive projection as a
+-- prefix.  The caller has already constructed that projection for the
+-- positive memo lookup, so an ordinary Context-owned query can reuse it.
+-- The test-only hooks are injected by the Python runner into its private Lua
+-- module copy; the player module exports no test authority.
+local r29 = production.__mir_contextual_boolean_route_policy_test_hooks
+check("CB-ROUTE-12A", type(r29) == "table"
+  and type(r29.positive_witness_memo_key) == "function"
+  and type(r29.negative_witness_memo_key) == "function"
+  and type(r29.research_unlocked_output_witness) == "function",
+  "The controlled module copy exposes the exact private key boundary")
+
+local function r29_active_set_key(values)
+  local names = {}
+  for name, active in pairs(values or {}) do if active then names[#names + 1] = tostring(name) end end
+  table.sort(names)
+  return table.concat(names, "\1")
+end
+
+local function r29_identity_key(identity)
+  local base = identity.type .. "\0" .. identity.name
+  if identity.type == "fluid"
+    and (identity.minimum_temperature ~= nil or identity.maximum_temperature ~= nil) then
+    local minimum = identity.minimum_temperature and string.format("%.17g", identity.minimum_temperature) or ""
+    local maximum = identity.maximum_temperature and string.format("%.17g", identity.maximum_temperature) or ""
+    return base .. "\0temperature\0" .. minimum .. "\0" .. maximum
+  end
+  return base
+end
+
+local function r29_old_negative_key(identity, context, state, visiting_packs, visiting_technologies)
+  return table.concat({
+    r29_identity_key(identity),
+    r29_active_set_key(visiting_packs),
+    r29_active_set_key(visiting_technologies),
+    tostring(state.recipe_source_epoch),
+    r29_active_set_key(state.visiting),
+    r29_active_set_key(context.pairs),
+    r29_active_set_key(context.technologies)
+  }, "\0")
+end
+
+local r29_identity = {type = "fluid", name = "fixture-steam", minimum_temperature = 100, maximum_temperature = 500}
+local r29_visiting_packs = {P = true, S = true}
+local r29_visiting_technologies = {Y0 = true}
+local r29_context = {pairs = {["r_y\0Y0"] = true}, technologies = {Y0 = true}}
+local r29_state = {recipe_source_epoch = 17, visiting = {["r29-active"] = true}}
+local r29_expected = r29_old_negative_key(
+  r29_identity, r29_context, r29_state, r29_visiting_packs, r29_visiting_technologies)
+r29.reset_positive_key_call_count()
+local r29_positive = r29.positive_witness_memo_key(
+  r29_identity, r29_visiting_packs, r29_visiting_technologies)
+check("CB-ROUTE-12B", r29.positive_key_call_count() == 1,
+  "The positive memo projection is prepared once before the negative lookup")
+r29.reset_positive_key_call_count()
+local r29_reused = r29.negative_witness_memo_key(
+  r29_identity, r29_context, r29_state, r29_visiting_packs, r29_visiting_technologies, r29_positive)
+local r29_key_reuse = r29_reused == r29_expected and r29.positive_key_call_count() == 0
+check("CB-ROUTE-12", r29_key_reuse,
+  "An ordinary exact negative key reuses the already prepared positive projection without changing bytes")
+
+local opaque_pairs_calls = 0
+local function opaque_active_map(values)
+  return setmetatable({}, {
+    __pairs = function()
+      opaque_pairs_calls = opaque_pairs_calls + 1
+      return next, values, nil
+    end
+  })
+end
+local r29_opaque_packs = opaque_active_map({P = true, S = true})
+local r29_opaque_technologies = opaque_active_map({Y0 = true})
+local r29_opaque_expected = r29_old_negative_key(
+  r29_identity, r29_context, r29_state, r29_opaque_packs, r29_opaque_technologies)
+local r29_opaque_positive = r29.positive_witness_memo_key(
+  r29_identity, r29_opaque_packs, r29_opaque_technologies)
+r29.reset_positive_key_call_count()
+local r29_opaque_reused = r29.negative_witness_memo_key(
+  r29_identity, r29_context, r29_state, r29_opaque_packs, r29_opaque_technologies, r29_opaque_positive)
+local opaque_identity_reads = 0
+local r29_opaque_identity = setmetatable({}, {
+  __index = function(_, key)
+    opaque_identity_reads = opaque_identity_reads + 1
+    return r29_identity[key]
+  end
+})
+local r29_opaque_identity_expected = r29_old_negative_key(
+  r29_opaque_identity, r29_context, r29_state, r29_visiting_packs, r29_visiting_technologies)
+local r29_opaque_identity_positive = r29.positive_witness_memo_key(
+  r29_opaque_identity, r29_visiting_packs, r29_visiting_technologies)
+r29.reset_positive_key_call_count()
+local r29_opaque_identity_reused = r29.negative_witness_memo_key(
+  r29_opaque_identity, r29_context, r29_state, r29_visiting_packs, r29_visiting_technologies,
+  r29_opaque_identity_positive)
+local r29_opaque_fallback = r29_opaque_reused == r29_opaque_expected
+  and r29_opaque_identity_reused == r29_opaque_identity_expected
+  and r29.positive_key_call_count() == 1 and opaque_pairs_calls >= 6 and opaque_identity_reads >= 6
+check("CB-ROUTE-13", r29_opaque_fallback,
+  "Opaque identity or active maps retain the historical second positive-key observation")
+
+local r29_opaque_key_fallback = true
+for position = 1, 2 do
+  local stringifications = 0
+  local opaque_name = setmetatable({}, {__tostring = function()
+    stringifications = stringifications + 1
+    return "opaque-active-name"
+  end})
+  local packs = position == 1 and {[opaque_name] = true} or {}
+  local technologies = position == 2 and {[opaque_name] = true} or {}
+  local expected = r29_old_negative_key(r29_identity, r29_context, r29_state, packs, technologies)
+  stringifications = 0
+  local positive = r29.positive_witness_memo_key(r29_identity, packs, technologies)
+  local actual = r29.negative_witness_memo_key(
+    r29_identity, r29_context, r29_state, packs, technologies, positive)
+  local retained = actual == expected and stringifications == 2
+  r29_opaque_key_fallback = r29_opaque_key_fallback and retained
+  check("CB-ROUTE-13-KEY-" .. position, retained,
+    "Plain active maps with opaque keys retain both historical stringifications")
+end
+
+local r29_negative_hit, r29_diagnostic_bypass = run(cold, function()
+  local state = cold:state_view("science_pack_production").route_witness_state
+  local options = {active_unlock_context = {pairs = {}, technologies = {}}, technology_reason_memo = {}}
+  local missing = {type = "item", name = "r29-no-output"}
+  r29.reset_positive_key_call_count()
+  local first = r29.research_unlocked_output_witness(missing, options, state, {}, {})
+  local entries = options.research_unlock_negative_memo_entries
+  r29.reset_positive_key_call_count()
+  local second = r29.research_unlocked_output_witness(missing, options, state, {}, {})
+  local hit = first == nil and second == nil and entries == 1
+    and options.research_unlock_negative_memo_entries == 1 and r29.positive_key_call_count() == 1
+  local diagnostic = {active_unlock_context = {pairs = {}, technologies = {}}, diagnostic_observer = {}}
+  r29.reset_positive_key_call_count()
+  local projected = r29.research_unlocked_output_witness(missing, diagnostic, state, {}, {})
+  local bypass = projected == nil and diagnostic.research_unlock_positive_memo == nil
+    and diagnostic.research_unlock_negative_memo == nil and r29.positive_key_call_count() == 0
+  return hit, bypass
+end)
+check("CB-ROUTE-14", r29_negative_hit and r29_diagnostic_bypass,
+  "A preloaded negative remains exact while diagnostics retain their cache-free path")
+
 if #failures > 0 then error(table.concat(failures, "\n"), 0) end
 
 return {
@@ -197,5 +338,9 @@ return {
   warm_available = warm_second and true or false,
   boolean_hits = hits_after - hits_before,
   cold_route = route_vector(cold_route),
-  warm_route = route_vector(warm_route)
+  warm_route = route_vector(warm_route),
+  r29_key_reuse = r29_key_reuse,
+  r29_opaque_fallback = r29_opaque_fallback,
+  r29_opaque_key_fallback = r29_opaque_key_fallback,
+  r29_negative_hit = r29_negative_hit and r29_diagnostic_bypass
 }
