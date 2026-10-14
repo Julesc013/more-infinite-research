@@ -2035,9 +2035,11 @@
         "tests/tooling/Test-MIRNativeProbeResources.ps1",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/assert-k2-213-imersite-continuation/info.json",
         "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
         "fixtures/assert-k2-213-imersite-continuation/control.lua",
+        "fixtures/assert-k2-213-imersite-continuation/settings-updates.lua",
         "tests/runtime/k2_imersite_version_controls.lua",
         "tests/runtime/Test-MIRF210CurrentBobTinLevel4Continuation.ps1",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
@@ -8572,6 +8574,7 @@
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v*.schema.json",
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -8648,5 +8651,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f91e60a47638972cb5dcc9c23eaa86cb650eee6f939bd52da825d1f31d1d8ad8"
+  "digest": "sha256:162a6c5810863a6bd010c6f2be0b427809453b19f423bb70d71b457940eb7240"
 }

@@ -58,11 +58,42 @@ if(-not $manifestPath){
 $manifest=Get-Content -Raw $manifestPath|ConvertFrom-Json -Depth 100
 $assertions=0
 foreach($row in $manifest.targets){
-  $construction=$manifest.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4')
+  $construction=[string]$manifest.kind -cmatch '^MIR42FourTargetDeterministicCandidateManifestV[0-9]+$'
   $relative=if($construction){$row.asset.path}else{$row.filename}
   $zip=Join-Path (Split-Path $manifestPath -Parent) $relative
   $version=Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $zip -Target $row.target
   if($version -cne $row.distribution_version){throw 'Actual manifest-selected package version differs'}
+  $assertions++
+}
+if ($construction) {
+  $constructionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $manifest
+  $constructionCandidateRow = @($manifest.targets | Select-Object -First 1)
+  if ($constructionCandidateRow.Count -ne 1) { throw 'Construction candidate must retain one target for version-contract controls.' }
+  $constructionCandidatePath = Join-Path (Split-Path $manifestPath -Parent) ([string]$constructionCandidateRow[0].asset.path)
+  $constructionCandidateTarget = [string]$constructionCandidateRow[0].target
+  if ($constructionContract.requires_nine_targets) {
+  $historicalCandidateRow = @($manifest.targets | Where-Object { $_.target -ceq 'f017' })
+  if ($historicalCandidateRow.Count -ne 1) { throw 'Construction candidate must retain exactly one F017 target.' }
+  $historicalCandidatePath = Join-Path (Split-Path $manifestPath -Parent) ([string]$historicalCandidateRow[0].asset.path)
+  if ((Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $historicalCandidatePath -Target 'f017') -cne [string]$historicalCandidateRow[0].distribution_version) {
+    throw 'Historical construction target did not resolve through the canonical candidate contract.'
+  }
+  $assertions++
+  $wrongTargetRejected = $false
+  try { Resolve-MIRUpgradeManifestVersion -ManifestPath $manifestPath -CandidatePath $historicalCandidatePath -Target 'f016' | Out-Null } catch { $wrongTargetRejected = $_.Exception.Message.StartsWith('[mir-upgrade-manifest-target]') }
+  if (-not $wrongTargetRejected) { throw 'Construction candidate accepted a historical archive under another target.' }
+  $assertions++
+  }
+  $unknownCandidatePath = Join-Path $testRoot 'unsupported-candidate-construction.json'
+  $unknownCandidate = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json -Depth 100
+  $unknownCandidate.schema = 8
+  $unknownCandidate.kind = 'MIR42FourTargetDeterministicCandidateManifestV8'
+  $unknownCandidate.record_sha256 = ''
+  $unknownCandidate.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $unknownCandidate
+  $unknownCandidate | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $unknownCandidatePath -Encoding utf8NoBOM
+  $unknownCandidateRejected = $false
+  try { Resolve-MIRUpgradeManifestVersion -ManifestPath $unknownCandidatePath -CandidatePath $constructionCandidatePath -Target $constructionCandidateTarget | Out-Null } catch { $unknownCandidateRejected = $_.Exception.Message.StartsWith('[mir42-candidate-construction-version-contract]') }
+  if (-not $unknownCandidateRejected) { throw 'Unsupported construction manifest version did not reach the canonical contract rejection.' }
   $assertions++
 }
 $testManifest=Join-Path $testRoot 'test-manifest.json'

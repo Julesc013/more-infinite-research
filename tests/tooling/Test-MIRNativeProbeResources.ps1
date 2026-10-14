@@ -541,7 +541,7 @@ try {
     $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
     $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
     Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
-    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213ProfileInputs')) {
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Get-K2213SelectedFixtureProfile','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs')) {
       $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
       Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
       . ([scriptblock]::Create($function[0].Extent.Text))
@@ -619,7 +619,7 @@ try {
         $selected=@{Repository=$repo;Archive=$candidate;ReceiptPath=$receiptPath;Target=$target;SourceVersion=$sourceVersion}
         $read=Read-MIRNativeProbeCurrentCandidate @selected
         Assert-Probe ($read.path-ceq$candidate-and$read.receipt.source_version-ceq$sourceVersion) "explicit $target/$sourceVersion reader lost its selected identity."
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           $wrapped=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
           Assert-Probe ($wrapped.receipt.archive_sha256-ceq$inventory.archive_sha256) 'F210 wrapper lost explicit source selection.'
           $tinRead=Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
@@ -628,7 +628,7 @@ try {
           Assert-Probe ($k2Read.receipt.source_version-ceq$sourceVersion-and$k2Read.receipt.archive_sha256-ceq$inventory.archive_sha256) 'K2 caller lost explicit maintenance identity.'
         }
         $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           if($sourceVersion-ceq'4.2.2') {
@@ -648,7 +648,7 @@ try {
         $record.package_source_sha256=$savedFingerprint;Save-ControlledTinRecord
         $binding.output_sha256='0'*64
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
-        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2')) {
+        if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
         }
@@ -675,11 +675,14 @@ try {
     Save-ControlledK2Profile
     $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)
     Assert-Probe ($bound.inputs.Count-eq1-and$bound.inputs[0].source_path-ceq$dependency-and$bound.profile.engine_version-ceq'2.1.21'-and$bound.inputs[0].provenance.profile_sha256-ceq(Get-K2213Sha256 $portablePath)) 'Portable K2 inputs lost exact archive or profile provenance.'
-    foreach($selectedVersion in @('4.2.1','4.2.2')) {
-      $distribution='4.2.2100'+$selectedVersion.Split('.')[2]
-      $portable.mods[6].version=$distribution;Save-ControlledK2Profile
+    foreach($selectedVersion in @('4.2.1','4.2.2','4.4.0')) {
+      $selectedIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion $selectedVersion
+      $fixtureProfile=Get-K2213SelectedFixtureProfile -SourceVersion $selectedVersion
+      $portable.mods[6].version=$selectedIdentity.distribution_version
+      $portable.mods[7].version=$fixtureProfile.fixture_version
+      Save-ControlledK2Profile
       $bound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $selectedVersion
-      Assert-Probe ($bound.profile.mods[6].version-ceq$distribution-and$bound.inputs[0].source_path-ceq$dependency) 'K2 profile lost explicit candidate or reused dependency.'
+      Assert-Probe ($bound.profile.mods[6].version-ceq$selectedIdentity.distribution_version-and$bound.profile.mods[7].version-ceq$fixtureProfile.fixture_version-and$bound.inputs[0].source_path-ceq$dependency) 'K2 profile lost explicit candidate, fixture or reused dependency.'
       $other=if($selectedVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
       Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion $other} 'input-profile-selection:more-infinite-research'
     }
@@ -687,6 +690,48 @@ try {
     $portable.mods[6].version='4.2.21001';$portable.mods[7].version='0.1.3';Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'input-profile-selection:mir-fixture'
     $portable.mods[7].version='0.1.4';Save-ControlledK2Profile
+    # Current 4.4 requires its explicit profile: V5's exact historical lock
+    # cannot be repurposed as a current-candidate input.
+    Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
+    $fixtureTemplate=Join-Path $repo 'fixtures/assert-k2-213-imersite-continuation'
+    $fixtureSpecializationRoot=Join-Path $run 'current-k2-fixture'
+    $selectedFixture=New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'
+    $selectedInfo=Get-Content -Raw -LiteralPath (Join-Path $selectedFixture 'info.json')|ConvertFrom-Json
+    Assert-Probe ($selectedInfo.version-ceq'0.1.5' -and @($selectedInfo.dependencies) -contains 'more-infinite-research = 4.4.21000') 'K2 current fixture did not retain its explicit 4.4 identity.'
+    foreach($fixtureMember in @('data-final-fixes.lua','control.lua')){
+      $selectedPath=Join-Path $selectedFixture $fixtureMember
+      $templatePath=Join-Path $fixtureTemplate $fixtureMember
+      $selectedText=Get-Content -Raw -LiteralPath $selectedPath
+      Assert-Probe ($selectedText.Contains('4.4.21000') -and -not $selectedText.Contains('4.2.21001') -and -not $selectedText.Contains('4.2.21002')) "K2 selected fixture retained an historical candidate guard: $fixtureMember"
+      Assert-Probe ((Get-K2213Sha256 $selectedPath) -cne (Get-K2213Sha256 $templatePath)) "K2 selected fixture receipt could bind retained template bytes: $fixtureMember"
+    }
+    $selectedSettings=Join-Path $selectedFixture 'settings-updates.lua'
+    $templateSettings=Join-Path $fixtureTemplate 'settings-updates.lua'
+    Assert-Probe ((Test-Path -LiteralPath $selectedSettings -PathType Leaf) -and (Get-K2213Sha256 $selectedSettings) -ceq (Get-K2213Sha256 $templateSettings)) 'K2 selected fixture omitted or changed its required diagnostic setting.'
+    Assert-Probe ((New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.2.2' -SelectedMIRVersion '4.2.21002') -ceq $fixtureTemplate) 'K2 historical fixture bytes were not retained.'
+    Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
+    # Execute the actual retained and selected fixture guard sources in the
+    # repository-provisioned Lua 5.2 host. This is a source/version boundary
+    # control only: it neither starts Factorio nor serializes a save.
+    $luaRuntime=Join-Path $repo 'build/tmp/mir421-lua-runtime'
+    $luaControl=Join-Path $run 'k2-version-controls.py'
+    $luaSource=@"
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from lupa import lua52
+runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+globals_ = runtime.globals()
+globals_.MIR_K2_DATA_SOURCE = Path(sys.argv[2]).read_text(encoding='utf-8')
+globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
+globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
+globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
+runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
+"@
+    [IO.File]::WriteAllText($luaControl,$luaSource,[Text.UTF8Encoding]::new($false))
+    $luaOutput=@(& python $luaControl $luaRuntime (Join-Path $fixtureTemplate 'data-final-fixes.lua') (Join-Path $fixtureTemplate 'control.lua') (Join-Path $selectedFixture 'data-final-fixes.lua') (Join-Path $selectedFixture 'control.lua') (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') 2>&1)
+    Assert-Probe ($LASTEXITCODE-eq0-and($luaOutput-join "`n")-match 'MIR-K2-VERSION-CONTROLS-PASS') 'K2 retained/current fixture Lua version controls failed.'
+    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.4.0'} 'input-profile-selection:more-infinite-research'
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @((Join-Path $run 'absent-library'))} 'dependency-missing'
     $portable.archive_sha256['controlled-k2_1.0.0.zip']='0'*64;Save-ControlledK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat)} 'dependency-hash'
