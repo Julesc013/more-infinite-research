@@ -116,7 +116,7 @@ end)
 S.technology_researchability_reason = ready(researchability_reason)
 S.technology_is_researchable = ready(function(name) return researchability_reason(name) == nil end)
 S.technology_is_enabled_and_reachable = ready(function(name)
-  return pack_bindings.bound_technology_reason(index(), name) == nil
+  return researchability_reason(name) == nil
 end)
 S.binding_snapshot = ready(function() return deepcopy(index()) end)
 

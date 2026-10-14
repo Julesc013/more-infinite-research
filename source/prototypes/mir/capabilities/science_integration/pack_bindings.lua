@@ -41,7 +41,7 @@ local function outputs_pack(fact, pack_name)
   return true
 end
 
-local function binding(pack_name, declaration)
+local function binding(pack_name, declaration, reference_only)
   if not pack_registry.science_pack_exists(pack_name) then
     return nil, "not-a-lab-input:" .. tostring(pack_name)
   end
@@ -82,7 +82,7 @@ local function binding(pack_name, declaration)
   if reason then return nil, reason end
   local technology = data_raw.technology(gate)
   for _, ingredient in ipairs(((technology.unit or {}).ingredients) or {}) do
-    if (ingredient.name or ingredient[1]) == pack_name then
+    if (ingredient.name or ingredient[1]) == pack_name and not reference_only then
       return nil, "approved-pack-gate-self-lock:" .. gate
     end
   end
@@ -186,7 +186,7 @@ local function declared_source(pack_name, shared)
   for _, role in ipairs(declared_roles) do
     local declaration = M.declaration_for_role(role, declarations)
     if declaration and declaration.pack == pack_name then
-      local result, reason = binding(pack_name, declaration)
+      local result, reason = binding(pack_name, declaration, true)
       if result then return result end
       -- A different actual unlock may be admitted only by the separately
       -- authored unique-owner rule below, never by production exploration.
@@ -226,14 +226,14 @@ local function declared_source(pack_name, shared)
     end
     if #gates ~= 1 then return nil, "ambiguous-approved-pack-unlock:" .. pack_name end
   end
-  return binding(pack_name, {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true})
+  return binding(pack_name, {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
 end
 
 -- Positive reference rules validate only declared pack sources, direct lab
 -- placement sources and research units/prerequisites. Each established fact
 -- is propagated once. No rule recursively acquires a material, machine,
 -- power source or surface, and no complete production proof is constructed.
-local function propagate(rules)
+local function propagate(rules, unknown_sources, native_source_guard)
   local facts, watchers, queue, edge_count = {}, {}, {}, 0
   local function establish(name)
     if not facts[name] then facts[name] = true; queue[#queue + 1] = name end
@@ -262,8 +262,41 @@ local function propagate(rules)
       if rule.pending == 0 then establish(rule.result) end
     end
   end
+  -- Completion of a finite positive rule set distinguishes closed unseeded
+  -- references from unsupported inputs. Reuse the reverse index to propagate
+  -- possible unknown influence, conservatively across either AND/OR branch.
+  -- A proven positive always wins over an unknown alternative.
+  local unknown, unknown_queue, unknown_notifications = {}, {}, 0
+  local function mark_unknown(name)
+    if not facts[name] and not unknown[name] then
+      unknown[name] = true; unknown_queue[#unknown_queue + 1] = name
+    end
+  end
+  for name in pairs(unknown_sources or {}) do mark_unknown(name) end
+  cursor = 1
+  local function drain_unknown()
+    while cursor <= #unknown_queue do
+      local name = unknown_queue[cursor]; cursor = cursor + 1
+      for _, rule in ipairs(watchers[name] or {}) do
+        unknown_notifications = unknown_notifications + 1
+        mark_unknown(rule.result)
+      end
+    end
+  end
+  drain_unknown()
+  -- Native-source inspection is unnecessary when references already resolve
+  -- positively or remain unknown. Only a proposed closed negative needs it.
+  local native_visits = 0
+  if native_source_guard then
+    local guarded_sources, visits = native_source_guard(facts, unknown)
+    native_visits = visits
+    for name in pairs(guarded_sources) do mark_unknown(name) end
+    drain_unknown()
+  end
   return facts, {rules = #rules, dependency_edges = edge_count, facts = #queue,
-    dependency_notifications = notifications, factory_acquisition_calls = 0}
+    dependency_notifications = notifications, unknown_facts = #unknown_queue,
+    unknown_dependency_notifications = unknown_notifications, native_source_prototype_visits = native_visits,
+    factory_acquisition_calls = 0}, unknown
 end
 
 local function node(kind, name)
@@ -294,16 +327,59 @@ local function accepts(lab, names)
   return true
 end
 
+-- A non-recipe source may supply a seed outside the approved recipe fragment.
+-- Record that possibility once for the relevant pack names; never reconstruct
+-- acquisition proofs or certify that the native source is itself obtainable.
+local function possible_native_pack_sources(pack_names)
+  local wanted, possible, visits = {}, {}, 0
+  for _, name in ipairs(pack_names) do wanted[name] = true end
+  local function products(entries)
+    for _, entry in ipairs(entries or {}) do
+      if type(entry) == "table" and (entry.type or "item") == "item" then
+        local name = entry.name or entry[1] or entry.item
+        if wanted[name] and recipe_semantics.possible_item_result(entry) then possible[name] = true end
+      end
+    end
+  end
+  for kind, prototypes in pairs(data_raw.raw()) do
+    if kind ~= "recipe" then
+      for _, prototype in pairs(prototypes) do
+        visits = visits + 1
+        local minable = prototype.minable or {}
+        if wanted[minable.result] and minable.count ~= 0 and minable.result_count ~= 0 then
+          possible[minable.result] = true
+        end
+        products(minable.results)
+        products(prototype.loot)
+        products(prototype.rocket_launch_products)
+        if prototype.rocket_launch_product then products({prototype.rocket_launch_product}) end
+        if wanted[prototype.spoil_result] then possible[prototype.spoil_result] = true end
+        if wanted[prototype.burnt_result] then possible[prototype.burnt_result] = true end
+      end
+    end
+  end
+  return possible, visits
+end
+
 local function build_reference_bindings(shared, labs)
-  local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, technologies = {}, rules = {}}
+  local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, unavailable_labs = {},
+    technologies = {}, rules = {}}
+  local unknown_sources = {}
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
   end
-  for _, pack in ipairs(pack_registry.pack_list_all()) do
+  local pack_names = pack_registry.pack_list_all()
+  for _, pack in ipairs(pack_names) do
     local source, reason = declared_source(pack, shared)
     result.packs[pack], result.issues[pack] = source, reason
+    if not source then unknown_sources[node("pack", pack)] = true end
     if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
     if source and source.status ~= "not-admitted" then
+      -- A failed approved source cannot prove absence when another raw
+      -- producer might supply a seed. No search or ranking is performed.
+      if #recipe_facts.recipes_by_output_identity_view("item", pack) > 1 then
+        unknown_sources[node("pack", pack)] = true
+      end
       local required = {}
       for _, gate in ipairs(source.unlockers) do required[#required + 1] = node("technology", gate) end
       for _, ingredient in ipairs(source.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
@@ -312,6 +388,7 @@ local function build_reference_bindings(shared, labs)
   end
   for _, lab in ipairs(labs) do
     result.lab_names[lab.name] = true
+    if #(lab.sources or {}) == 0 then unknown_sources[node("lab", lab.name)] = true end
     for _, source in ipairs(lab.sources or {}) do
       local required = {}
       for _, pack in ipairs(source.ingredient_packs or {}) do required[#required + 1] = node("pack", pack) end
@@ -367,9 +444,23 @@ local function build_reference_bindings(shared, labs)
       end
     end
   end
-  result.facts, result.work = propagate(result.rules)
-  -- Only known declared exclusions propagate a negative answer. Pending
-  -- research/lab cycles and unsupported sources remain unresolved, never false.
+  local unknown
+  result.facts, result.work, unknown = propagate(result.rules, unknown_sources, function(facts, unresolved)
+    local candidates = {}
+    for pack, source in pairs(result.packs) do
+      local key = node("pack", pack)
+      if source.status ~= "not-admitted" and not facts[key] and not unresolved[key] then
+        candidates[#candidates + 1] = pack
+      end
+    end
+    if #candidates == 0 then return {}, 0 end
+    local native, visits = possible_native_pack_sources(candidates)
+    local guarded = {}
+    for pack in pairs(native) do guarded[node("pack", pack)] = true end
+    return guarded, visits
+  end)
+  -- Retain the separately declared published launch exclusion. Completed
+  -- reference cycles are classified below; unsupported sources stay unknown.
   if result.has_policy_exclusions then
     local blocked, reverse, queue = {}, {}, {}
     local function block(name, reason)
@@ -403,6 +494,31 @@ local function build_reference_bindings(shared, labs)
     result.work.policy_exclusion_technologies = #queue
     result.work.policy_exclusion_notifications = notifications
   end
+  -- This is a completed closed-reference result, not a pending recursion or
+  -- factory-impossibility proof. Unknown inputs and unexamined alternative
+  -- pack producers remain unresolved rather than becoming exclusions.
+  local closed_exclusions = 0
+  for name, source in pairs(result.packs) do
+    local key = node("pack", name)
+    if source.status ~= "not-admitted" and not result.facts[key] and not unknown[key] then
+      source.status = "not-admitted"
+      source.policy_reason = "unseeded-approved-reference-dependencies"
+      source.reference_policy_exclusion = true
+      closed_exclusions = closed_exclusions + 1
+    end
+  end
+  for name, reason in pairs(result.technologies) do
+    local key = node("technology", name)
+    if reason == false and not result.facts[key] and not unknown[key] then
+      result.technologies[name] = "unseeded-approved-reference-dependencies:" .. name
+    end
+  end
+  for name in pairs(result.lab_names) do
+    local key = node("lab", name)
+    if not result.facts[key] and not unknown[key] then result.unavailable_labs[name] = true end
+  end
+  result.work.closed_reference_pack_exclusions = closed_exclusions
+  if closed_exclusions > 0 then result.has_policy_exclusions = true end
   -- Rule counters are sufficient for ordinary metadata. Do not retain the
   -- reverse propagation graph or expanded explanation inventories.
   result.rules = nil
@@ -429,6 +545,7 @@ end
 
 function M.bound_lab_available(index, lab_name)
   if index.facts[node("lab", lab_name)] then return true end
+  if index.unavailable_labs[lab_name] then return false end
   if index.lab_names[lab_name] then return nil, "unresolved-approved-lab-dependencies:" .. lab_name end
   return false
 end

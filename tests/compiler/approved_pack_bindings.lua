@@ -124,8 +124,12 @@ for _, size in ipairs({32, 64, 128}) do
     check(bindings.bound_lab_available(index, "ordinary-lab"), "An ordinary declared lab remains available")
     check(not bindings.bound_lab_available(index, "specialist-lab"), "A missing specialist gate cannot establish its lab")
     check(index.work.factory_acquisition_calls == 0, "No factory acquisition is part of binding")
+    check(index.work.native_source_prototype_visits == 0,
+      "Resolved ordinary sources do not trigger whole-prototype native-source inspection")
     check(index.work.dependency_notifications <= index.work.dependency_edges,
       "Each finite dependency edge is notified at most once")
+    check(index.work.unknown_dependency_notifications <= index.work.dependency_edges,
+      "Unknown influence also traverses each finite edge at most once")
     check(index.work.facts == size + 12, "Each established node and shared lab vector enters the work queue once")
   end)
 end
@@ -187,7 +191,8 @@ Context.with_active(Context.new(), function()
   check(bindings.bound_pack_status(index, roles[4]) == "research", "Specialist self-bootstrap does not veto ordinary science")
   check(not bindings.bound_lab_available(index, "specialist"), "An unseeded specialist science/lab cycle cannot establish itself")
   local status, reason = bindings.bound_pack_status(index, "exclusive-pack")
-  check(status == nil and reason ~= nil, "Unresolved specialist source is explicit, not a fabricated reachable answer")
+  check(status == "not-admitted" and index.packs["exclusive-pack"].reference_policy_exclusion == true,
+    "A completed closed specialist cycle is excluded by reference policy, not a fabricated acquisition proof")
 end)
 
 raw = world(0, false)
@@ -197,7 +202,9 @@ Context.with_active(Context.new(), function()
   local index = bindings.compile_references(catalogue.shared, {
     {name = "ordinary-lab", inputs = deepcopy(roles), sources = {{initial = true}}}
   })
-  check(bindings.bound_pack_status(index, roles[4]) == nil, "A research/science cycle is not seeded by pending visits")
+  check(bindings.bound_pack_status(index, roles[4]) == "not-admitted"
+    and index.work.closed_reference_pack_exclusions == 4,
+    "Completion of a closed research/science cycle proves no approved reference seed")
   check(bindings.bound_technology_reason(index, roles[4]) ~= nil, "Unestablished research retains an explicit reason")
 end)
 
@@ -367,5 +374,69 @@ Context.with_active(Context.new(), function()
   local science = require("prototypes.mir.capabilities.science_integration.science_packs")
   check(science.pack_production_status("space-science-pack") == "initial",
     "An actual approved direct recipe takes precedence over retained launch policy")
+end)
+local function self_cycle_world()
+  local cycle = world(0, false)
+  cycle.tool["closed-cycle-pack"] = {type = "tool", name = "closed-cycle-pack"}
+  cycle.lab.lab.inputs[#cycle.lab.lab.inputs + 1] = "closed-cycle-pack"
+  cycle.recipe["closed-cycle-pack"] = {type = "recipe", name = "closed-cycle-pack", enabled = false,
+    results = {{type = "item", name = "closed-cycle-pack", amount = 1}}}
+  cycle.technology["closed-cycle-unlocker"] = {type = "technology", name = "closed-cycle-unlocker",
+    prerequisites = {}, unit = {count = 1, ingredients = {{"closed-cycle-pack", 1}}},
+    effects = {{type = "unlock-recipe", recipe = "closed-cycle-pack"}}}
+  return cycle
+end
+self_cycle_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(science.pack_production_status("closed-cycle-pack") == "unreachable",
+    "A completed closed cycle retains the published caller enum")
+  local source = science.production_route_for_pack("closed-cycle-pack")
+  check(source.status == "not-admitted" and source.policy_reason == "unseeded-approved-reference-dependencies"
+    and source.reference_policy_exclusion == true and source.acquisition_proof == false,
+    "The detailed cycle exclusion identifies its finite reference policy, never factory impossibility")
+  local ingredients = {}
+  for _, role in ipairs(roles) do ingredients[#ingredients + 1] = {role, 1} end
+  ingredients[#ingredients + 1] = {"closed-cycle-pack", 1}
+  local selected = science.best_lab_compatible_ingredients(ingredients, "closed-reference-control", {})
+  check(selected and #selected == 4, "A closed bad science cycle does not remove the ordinary research vector")
+end)
+raw = self_cycle_world()
+raw.tool["unknown-external-pack"] = {type = "tool", name = "unknown-external-pack"}
+raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = "unknown-external-pack"
+raw.technology["closed-cycle-unlocker"].unit.ingredients[#raw.technology["closed-cycle-unlocker"].unit.ingredients + 1]
+  = {"unknown-external-pack", 1}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local ok, reason = pcall(science.pack_production_status, "closed-cycle-pack")
+  check(not ok and string.find(reason, "binding is unresolved", 1, true),
+    "An external unknown dependency prevents a closed-cycle negative conclusion")
+  check(not pcall(science.technology_is_enabled_and_reachable, "closed-cycle-unlocker"),
+    "The Boolean technology facade must not turn unknown reference dependencies into false")
+  check(science.pack_production_status(roles[4]) == "research", "An unrelated unknown cannot veto ordinary science")
+end)
+raw = self_cycle_world()
+raw.recipe["unapproved-alternative"] = {type = "recipe", name = "unapproved-alternative", enabled = false,
+  results = {{type = "item", name = "closed-cycle-pack", amount = 1}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "closed-cycle-pack"),
+    "An unexamined alternative cannot be silently disproved by a failed approved cycle")
+end)
+raw.recipe["approved-independent-source"] = {type = "recipe", name = "approved-independent-source", enabled = true,
+  results = {{type = "item", name = "closed-cycle-pack", amount = 1}}}
+Context.with_active(Context.new(), function()
+  local shared = deepcopy(catalogue.shared)
+  shared.science_bindings["closed-cycle-pack"] = {recipe = "approved-independent-source", allow_initial = true}
+  local index = bindings.compile_references(shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(bindings.bound_pack_status(index, "closed-cycle-pack") == "initial",
+    "A proven approved seed wins over unknown or cyclic alternatives")
+end)
+raw = self_cycle_world()
+raw.resource = {seed = {name = "seed", minable = {result = "closed-cycle-pack"}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "closed-cycle-pack"),
+    "A possible native seed prevents a recipe-only closed-cycle negative conclusion")
 end)
 return checks

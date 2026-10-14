@@ -13,6 +13,24 @@ bindings["mir-fixture-alternate-route-science-pack"] = {
   technology = "mir-fixture-z-early-route-unlocker",
   allow_initial = false
 }
+-- These are deliberately closed declarations. Their named sources and one
+-- direct owner must enter the finite reference graph so the current facade
+-- can distinguish this known unseeded cycle from an unknown raw alternative.
+bindings["mir-fixture-self-lock-science-pack"] = {
+  recipe = "mir-fixture-self-lock-science-pack",
+  technology = "mir-fixture-self-lock-unlocker",
+  allow_initial = false
+}
+bindings["mir-fixture-cycle-science-pack-a"] = {
+  recipe = "mir-fixture-cycle-science-pack-a",
+  technology = "mir-fixture-cycle-unlocker-a",
+  allow_initial = false
+}
+bindings["mir-fixture-cycle-science-pack-b"] = {
+  recipe = "mir-fixture-cycle-science-pack-b",
+  technology = "mir-fixture-cycle-unlocker-b",
+  allow_initial = false
+}
 
 local anchor = data.raw.technology and data.raw.technology["worker-robots-storage-3"]
 if not anchor then

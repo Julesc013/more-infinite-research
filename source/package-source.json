@@ -3006,10 +3006,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_packs.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 6024,
-      "source_sha256": "D7A5329A1079E92E79F723CE5FB44155B68DA88B0F9691A86B85062264B7E5CC",
-      "output_bytes": 6024,
-      "output_sha256": "D7A5329A1079E92E79F723CE5FB44155B68DA88B0F9691A86B85062264B7E5CC"
+      "source_bytes": 6000,
+      "source_sha256": "647B632C5101EF9D3D2B197DDA94F9DB51BA645B7DE412582B5F6FDFCF8FA085",
+      "output_bytes": 6000,
+      "output_sha256": "647B632C5101EF9D3D2B197DDA94F9DB51BA645B7DE412582B5F6FDFCF8FA085"
     },
     {
       "layer": "capability",
@@ -7677,10 +7677,10 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 19036,
-      "source_sha256": "25E4F48F04354A426B1BB8F6E97D4C41B43A3233BA723F59274A67F8238CD181",
-      "output_bytes": 19036,
-      "output_sha256": "25E4F48F04354A426B1BB8F6E97D4C41B43A3233BA723F59274A67F8238CD181"
+      "source_bytes": 24541,
+      "source_sha256": "E166D2588CBA76CD9A2F82CB92974609206BE6EE252880EDB619F6DCB781D8A5",
+      "output_bytes": 24541,
+      "output_sha256": "E166D2588CBA76CD9A2F82CB92974609206BE6EE252880EDB619F6DCB781D8A5"
     },
     {
       "layer": "shared",
@@ -7699,10 +7699,10 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 5199,
-      "source_sha256": "5A1C01CA8F57597217A8F53F207F2F329DE12AD2F0532DC24D8B4BF48811739D",
-      "output_bytes": 5199,
-      "output_sha256": "5A1C01CA8F57597217A8F53F207F2F329DE12AD2F0532DC24D8B4BF48811739D"
+      "source_bytes": 5632,
+      "source_sha256": "1E2E7E4AC236C328406FE9D1F34065BBC54998AE936E0A376335C089FD388811",
+      "output_bytes": 5632,
+      "output_sha256": "1E2E7E4AC236C328406FE9D1F34065BBC54998AE936E0A376335C089FD388811"
     }
   ],
   "invariants": {
@@ -7712,5 +7712,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "D72ACD97005B5B15E4B83504413AAECA3F7FD6EC225D28810FD25F8DB00C1006"
+  "record_sha256": "6075A2F8E41ED5219AA63D8FBCA8B6D94788AC7251BA42CDE5C06BBABAAD90C4"
 }

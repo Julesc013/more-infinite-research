@@ -57,15 +57,33 @@ if science.production_route_for_pack("mir-fixture-alternate-route-science-pack")
   fail("declared binding escaped its defensive-copy boundary.")
 end
 
-local unreachable_packs = {
-  "mir-fixture-self-lock-science-pack",
-  "mir-fixture-cycle-science-pack-a",
-  "mir-fixture-cycle-science-pack-b"
+local unseeded_reference_packs = {
+  ["mir-fixture-self-lock-science-pack"] = {
+    recipe = "mir-fixture-self-lock-science-pack", unlocker = "mir-fixture-self-lock-unlocker"
+  },
+  ["mir-fixture-cycle-science-pack-a"] = {
+    recipe = "mir-fixture-cycle-science-pack-a", unlocker = "mir-fixture-cycle-unlocker-a"
+  },
+  ["mir-fixture-cycle-science-pack-b"] = {
+    recipe = "mir-fixture-cycle-science-pack-b", unlocker = "mir-fixture-cycle-unlocker-b"
+  }
 }
-for _, unreachable_pack in ipairs(unreachable_packs) do
-  local status = science.pack_production_status(unreachable_pack)
-  if status ~= "unreachable" then
-    fail(unreachable_pack .. " should be unreachable, got " .. tostring(status) .. ".")
+for pack_name, expected in pairs(unseeded_reference_packs) do
+  local status, prerequisite = science.pack_production_status(pack_name)
+  if status ~= "unreachable" or prerequisite ~= nil then
+    fail(pack_name .. " should retain the legacy unreachable result, got " .. tostring(status)
+      .. " prerequisite=" .. tostring(prerequisite) .. ".")
+  end
+  local route = science.production_route_for_pack(pack_name)
+  if not route
+      or route.status ~= "not-admitted"
+      or route.policy_reason ~= "unseeded-approved-reference-dependencies"
+      or route.reference_policy_exclusion ~= true
+      or route.acquisition_proof ~= false
+      or route.source_kind ~= "declared-recipe"
+      or route.recipe_name ~= expected.recipe
+      or route.unlocker ~= expected.unlocker then
+    fail(pack_name .. " lost its completed closed-reference exclusion record.")
   end
 end
 

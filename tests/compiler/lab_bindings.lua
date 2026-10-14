@@ -34,7 +34,7 @@ local function world(alternatives, reversed)
   raw.recipe["ordinary-lab"] = {type = "recipe", name = "ordinary-lab", enabled = true,
     results = {{type = "item", name = "ordinary-lab-kit", amount = 1}}}
   raw.recipe["specialist-lab"] = {type = "recipe", name = "specialist-lab", enabled = false,
-    ingredients = {{type = "item", name = "special-science-pack", amount = 1}},
+    ingredients = {{type = "item", name = "automation-science-pack", amount = 1}},
     results = {{type = "item", name = "specialist-lab-kit", amount = 1}}}
   raw.technology["specialist-lab-unlock"] = {type = "technology", name = "specialist-lab-unlock", enabled = true,
     unit = {ingredients = {{"special-science-pack", 1}}}, effects = {{type = "unlock-recipe", recipe = "specialist-lab"}}}
@@ -60,14 +60,16 @@ for _, size in ipairs({0, 32, 64}) do
       local specialist = find(rows, "specialist-lab")
       check(has(ordinary.inputs, "automation-science-pack") and has(ordinary.inputs, "chemical-science-pack"),
         "Binding retains actual laboratory inputs")
+      check(not has(specialist.inputs, "automation-science-pack") and has(specialist.inputs, "special-science-pack"),
+        "A specialist laboratory keeps its own acceptance vector rather than unioning another laboratory's inputs")
       local initial = find_source(ordinary, "ordinary-lab")
       check(initial and initial.item_name == "ordinary-lab-kit" and initial.initial and #initial.unlockers == 0
           and #initial.ingredient_packs == 0,
         "Enabled placement recipe binds as an initial lab source")
       local gated = find_source(specialist, "specialist-lab")
       check(gated and gated.initial == false and #gated.unlockers == 1 and gated.unlockers[1] == "specialist-lab-unlock"
-          and #gated.ingredient_packs == 1 and gated.ingredient_packs[1] == "special-science-pack",
-        "Specialist placement source retains its direct unlock gate and consuming lab pack for graph-level self-bootstrap rejection")
+          and #gated.ingredient_packs == 1 and gated.ingredient_packs[1] == "automation-science-pack",
+        "A specialist placement source retains a science dependency accepted by another actual lab for graph-level admission")
       check(#ordinary.sources == size + 1,
         "Later direct placement recipes are represented without route selection")
       rows[1].inputs[1] = "caller-mutation"
@@ -127,8 +129,20 @@ Context.with_active(Context.new(), function()
   local specialist = find(bindings.snapshot(), "specialist-lab")
   local source = find_source(specialist, "specialist-lab")
   check(source and source.initial == true and #source.ingredient_packs == 1
-      and source.ingredient_packs[1] == "special-science-pack",
-    "Enabled specialist placement records its own lab science input for graph-level bootstrap rejection")
+      and source.ingredient_packs[1] == "automation-science-pack",
+    "Enabled specialist placement retains the cross-lab science dependency without changing its accepted inputs")
+end)
+
+-- The global physical-input set supplements, rather than replaces, the
+-- source lab's own accepted packs.  Preserve the original self-bootstrap
+-- shape for the shared graph's independent cycle classification.
+world(0, false)
+data.raw.recipe["specialist-lab"].ingredients = {{type = "item", name = "special-science-pack", amount = 1}}
+Context.with_active(Context.new(), function()
+  local specialist = find(bindings.snapshot(), "specialist-lab")
+  local source = find_source(specialist, "specialist-lab")
+  check(source and #source.ingredient_packs == 1 and source.ingredient_packs[1] == "special-science-pack",
+    "A specialist placement source retains its own accepted science dependency for graph-level bootstrap rejection")
 end)
 
 return checks

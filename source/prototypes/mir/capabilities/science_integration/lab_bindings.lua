@@ -104,14 +104,13 @@ local function source_less(left, right)
   return left.initial and not right.initial
 end
 
-local function lab_record(name, lab)
-  local sources, lab_input_set = {}, {}
-  for _, input in ipairs(sorted_inputs(lab)) do lab_input_set[input] = true end
+local function lab_record(name, lab, science_input_set)
+  local sources = {}
   for _, item_name in ipairs(item_facts.placeable_items_for_entity(name)) do
     local item = prototype_lookup.item_prototype(item_name)
     if item and item.place_result == name then
       for _, recipe_name in ipairs(recipe_facts.recipes_by_output_identity_view("item", item_name)) do
-        local source = source_binding(item_name, recipe_name, lab_input_set)
+        local source = source_binding(item_name, recipe_name, science_input_set)
         if source then sources[#sources + 1] = source end
       end
     end
@@ -122,8 +121,20 @@ end
 
 local function build_snapshot()
   local names = sorted_names(data_raw.prototypes("lab"))
+  -- A placement recipe may consume science accepted by a different physical
+  -- lab.  That dependency still belongs in the shared reference graph; the
+  -- record's own `inputs` below remains the actual acceptance vector for this
+  -- lab and is never unioned with another lab's inputs.
+  local science_input_set = {}
+  for _, name in ipairs(names) do
+    for _, input in ipairs(sorted_inputs(data_raw.prototype("lab", name))) do
+      science_input_set[input] = true
+    end
+  end
   local records = {}
-  for _, name in ipairs(names) do records[#records + 1] = lab_record(name, data_raw.prototype("lab", name)) end
+  for _, name in ipairs(names) do
+    records[#records + 1] = lab_record(name, data_raw.prototype("lab", name), science_input_set)
+  end
   return records
 end
 
