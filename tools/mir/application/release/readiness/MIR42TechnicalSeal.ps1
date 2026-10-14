@@ -1782,8 +1782,10 @@ function Get-MIR42BoundIndividualEngineRun {
       if ([string]$manifest.sha256 -cne [string]$Candidate.identity.sha256 -or [string]$manifest.record.record_sha256 -cne [string]$Candidate.identity.record.record_sha256) {
         throw '[mir42-individual-engine-run-candidate-manifest-binding]'
       }
-    } elseif ((Get-Content -Raw -LiteralPath $path) -notmatch 'Test-MIRUpgrade[.]ps1') {
-      throw "[mir42-individual-engine-run-$field-content]"
+    } elseif ($field -eq 'runner' -and (Get-Content -Raw -LiteralPath $path) -notmatch 'Test-MIRUpgrade[.]ps1') {
+      throw '[mir42-individual-engine-run-runner-content]'
+    } elseif ($field -eq 'harness' -and (Get-Content -Raw -LiteralPath $path) -notmatch 'upgraded-save-second-reload-passed') {
+      throw '[mir42-individual-engine-run-harness-content]'
     }
   }
   Assert-MIR42SealPropertyNames -Value $record.predecessor_authority -Expected @('path','sha256','record_sha256') -Code 'mir42-individual-engine-run-predecessor-authority-shape'

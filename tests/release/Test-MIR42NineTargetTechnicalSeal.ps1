@@ -651,7 +651,7 @@ function Test-MIR42IndividualNativeInputReader {
       source=$source;candidate_manifest=[pscustomobject][ordered]@{path=$manifest.path;sha256=$manifest.sha256;record_sha256=$manifest.record.record_sha256}
       predecessor_authority=[pscustomobject][ordered]@{path='host-only-predecessor-authority.json';sha256=('1' * 64);record_sha256=('2' * 64)}
       public_v410_checksum_asset=[pscustomobject][ordered]@{release_id=1;asset_id=2;digest=('sha256:' + ('3' * 64));bytes=1;download_verified=$true}
-      runner=(Write-HostText (Join-Path $root 'runner.ps1') 'Test-MIRUpgrade.ps1');harness=(Write-HostText (Join-Path $root 'harness.ps1') 'Test-MIRUpgrade.ps1 upgraded-save-second-reload-passed')
+      runner=(Write-HostText (Join-Path $root 'runner.ps1') 'Test-MIRUpgrade.ps1');harness=(Write-HostText (Join-Path $root 'harness.ps1') 'upgraded-save-second-reload-passed')
       historical_target_authorities=@($script:MIR42SealHistoricalTargets | ForEach-Object { [pscustomobject][ordered]@{target=$_;authority=[pscustomobject][ordered]@{host_only=$true;target=$_}} })
       published_maintenance_predecessor=$script:mir42IndividualReaderPublished;individual_upgrade_receipts=$receipts;fresh_loads=$fresh
       factorio_processes=46;release_qualification='not-performed';publication_authorized=$false;record_sha256=''
@@ -661,6 +661,11 @@ function Test-MIR42IndividualNativeInputReader {
     $bound = Get-MIR42BoundEngineRun -Reference $baseReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
+
+    $wrongRunner = Copy-HostValue $baseRecord;$wrongRunner.runner = Write-HostText (Join-Path $root 'runner-no-upgrade-invocation.ps1') 'upgraded-save-second-reload-passed'
+    Assert-HostReaderRefusal 'runner-without-upgrade-invocation' $wrongRunner '[mir42-individual-engine-run-runner-content]'
+    $wrongHarness = Copy-HostValue $baseRecord;$wrongHarness.harness = Write-HostText (Join-Path $root 'harness-without-reload-marker.ps1') 'Test-MIRUpgrade.ps1'
+    Assert-HostReaderRefusal 'harness-without-reload-marker' $wrongHarness '[mir42-individual-engine-run-harness-content]'
 
     $missing = Copy-HostValue $baseRecord;$missing.individual_upgrade_receipts = @($missing.individual_upgrade_receipts | Select-Object -Skip 1)
     Assert-HostReaderRefusal 'missing-receipt' $missing '[mir42-individual-engine-run-receipt-target-set]'
