@@ -289,6 +289,26 @@ local r29_opaque_fallback = r29_opaque_reused == r29_opaque_expected
 check("CB-ROUTE-13", r29_opaque_fallback,
   "Opaque identity or active maps retain the historical second positive-key observation")
 
+local r29_opaque_key_fallback = true
+for position = 1, 2 do
+  local stringifications = 0
+  local opaque_name = setmetatable({}, {__tostring = function()
+    stringifications = stringifications + 1
+    return "opaque-active-name"
+  end})
+  local packs = position == 1 and {[opaque_name] = true} or {}
+  local technologies = position == 2 and {[opaque_name] = true} or {}
+  local expected = r29_old_negative_key(r29_identity, r29_context, r29_state, packs, technologies)
+  stringifications = 0
+  local positive = r29.positive_witness_memo_key(r29_identity, packs, technologies)
+  local actual = r29.negative_witness_memo_key(
+    r29_identity, r29_context, r29_state, packs, technologies, positive)
+  local retained = actual == expected and stringifications == 2
+  r29_opaque_key_fallback = r29_opaque_key_fallback and retained
+  check("CB-ROUTE-13-KEY-" .. position, retained,
+    "Plain active maps with opaque keys retain both historical stringifications")
+end
+
 local r29_negative_hit, r29_diagnostic_bypass = run(cold, function()
   local state = cold:state_view("science_pack_production").route_witness_state
   local options = {active_unlock_context = {pairs = {}, technologies = {}}, technology_reason_memo = {}}
@@ -321,5 +341,6 @@ return {
   warm_route = route_vector(warm_route),
   r29_key_reuse = r29_key_reuse,
   r29_opaque_fallback = r29_opaque_fallback,
+  r29_opaque_key_fallback = r29_opaque_key_fallback,
   r29_negative_hit = r29_negative_hit and r29_diagnostic_bypass
 }

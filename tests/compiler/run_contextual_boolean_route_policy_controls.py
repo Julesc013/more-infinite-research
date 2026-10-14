@@ -210,6 +210,7 @@ def main() -> int:
         "boolean_hits": int(result["boolean_hits"]),
         "r29_key_reuse": bool(result["r29_key_reuse"]),
         "r29_opaque_fallback": bool(result["r29_opaque_fallback"]),
+        "r29_opaque_key_fallback": bool(result["r29_opaque_key_fallback"]),
         "r29_negative_hit": bool(result["r29_negative_hit"]),
         "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
         "fixture_sha256": hashlib.sha256(fixture.encode("utf-8")).hexdigest(),
@@ -218,7 +219,8 @@ def main() -> int:
     }
     if (record["assertions"] < 14 or not record["cold_available"] or not record["warm_available"]
             or record["boolean_hits"] < 1 or not record["r29_key_reuse"]
-            or not record["r29_opaque_fallback"] or not record["r29_negative_hit"]):
+            or not record["r29_opaque_fallback"] or not record["r29_opaque_key_fallback"]
+            or not record["r29_negative_hit"]):
         raise RuntimeError(f"Unexpected Boolean route-policy result: {record}")
     print(json.dumps(record, sort_keys=True))
     return 0

@@ -1004,16 +1004,26 @@ local function positive_witness_memo_key(identity, visiting_packs, visiting_tech
   }, "\0")
 end
 
+local function plain_active_name_set(values)
+  if values == nil then return true end
+  if type(values) ~= "table" or getmetatable(values) ~= nil then return false end
+  for name, active in pairs(values) do
+    -- Even a plain container can hold a key with an observable __tostring.
+    -- Compiler-owned active sets contain string names; other keys retain the
+    -- historical second projection rather than suppress that observation.
+    if active and type(name) ~= "string" then return false end
+  end
+  return true
+end
+
 local function can_reuse_positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
   -- A caller can supply tables with metamethods.  The historical negative-key
   -- path evaluated the positive projection again, so retain that observation
   -- count and order for opaque inputs rather than assuming a repeated read is
   -- inert.  Compiler-owned route state uses ordinary plain tables.
   return type(identity) == "table" and getmetatable(identity) == nil
-    and (visiting_packs == nil
-      or (type(visiting_packs) == "table" and getmetatable(visiting_packs) == nil))
-    and (visiting_technologies == nil
-      or (type(visiting_technologies) == "table" and getmetatable(visiting_technologies) == nil))
+    and plain_active_name_set(visiting_packs)
+    and plain_active_name_set(visiting_technologies)
 end
 
 local function negative_witness_memo_key(
