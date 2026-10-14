@@ -704,6 +704,7 @@
         "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
         "tests/compiler/run_recipe_productivity_permissions_controls.py",
         "tests/compiler/recipe_productivity_permissions.lua",
+        ".github/workflows/validate.yml",
         "validation/tests.yml"
       ]
     },
@@ -719,6 +720,7 @@
         "tests/compiler/run_approved_pack_bindings_controls.py",
         "tests/compiler/approved_pack_bindings.lua",
         "tests/compiler/approved_family_emission.lua",
+        ".github/workflows/validate.yml",
         "validation/tests.yml"
       ]
     },
@@ -734,6 +736,7 @@
         "tests/compiler/Test-MIRApprovedLabBindings.ps1",
         "tests/compiler/run_lab_bindings_controls.py",
         "tests/compiler/lab_bindings.lua",
+        ".github/workflows/validate.yml",
         "validation/tests.yml"
       ]
     },
@@ -787,7 +790,8 @@
         "source:source/prototypes/mir/runtime/maximum_level_control.lua",
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua",
-        "source:source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua"
+        "source:source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+        ".github/workflows/validate.yml"
       ]
     },
     {

@@ -106,6 +106,36 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+$developmentLuaConsumers=@(
+  'static.recipe-productivity-permissions',
+  'static.approved-pack-bindings',
+  'static.approved-lab-bindings',
+  'static.settings-catalogue-lifecycle'
+)
+$developmentProfileIds=@($actualAssurance.profiles.'mir4-development'|ForEach-Object {[string]$_})
+Assert-MIRDevelopmentCISelection -Condition ($developmentProfileIds.Count -eq 48 -and
+  @($developmentProfileIds|Sort-Object -Unique).Count -eq 48) -Message 'Development profile must retain exactly forty-eight distinct hosted static controls.'
+foreach($consumerId in $developmentLuaConsumers) {
+  Assert-MIRDevelopmentCISelection -Condition (@($developmentProfileIds|Where-Object {$_ -ceq $consumerId}).Count -eq 1) -Message "Development profile omitted its demonstrated Lua consumer: $consumerId"
+}
+Assert-MIRDevelopmentCISelection -Condition ((@($actualAssurance.profiles.'mir440-approved-bindings'|ForEach-Object {[string]$_}) -join ',') -ceq
+  'static.approved-pack-bindings,static.approved-lab-bindings') -Message 'The focused approved-bindings profile must not be broadened by development CI admission.'
+$actualLuaSelectionExpectations=[ordered]@{
+  'source/prototypes/mir/pipeline/recipe_productivity_permissions.lua'=@('static.recipe-productivity-permissions','static.approved-pack-bindings')
+  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'=@('static.approved-pack-bindings')
+  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua'=@('static.approved-pack-bindings','static.approved-lab-bindings')
+  'source/prototypes/mir/settings/catalog.lua'=@('static.approved-pack-bindings','static.settings-catalogue-lifecycle')
+}
+foreach($entry in $actualLuaSelectionExpectations.GetEnumerator()) {
+  $luaClassification=Get-MIRAssuranceClassification -Paths @([string]$entry.Key) -Config $actualAssurance
+  $luaRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $luaClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  $selectedLuaIds=@($luaRows.id|Where-Object {$_ -in $developmentLuaConsumers}|Sort-Object -Unique)
+  $expectedLuaIds=@($entry.Value|Sort-Object -Unique)
+  Assert-MIRDevelopmentCISelection -Condition (($selectedLuaIds -join ',') -ceq ($expectedLuaIds -join ',')) -Message "Development selection lost or broadened Lua consumer coverage for $($entry.Key)"
+}
+$unrelatedLuaClassification=Get-MIRAssuranceClassification -Paths @('docs/maintainer/fixture-workflow.md') -Config $actualAssurance
+$unrelatedLuaRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $unrelatedLuaClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+Assert-MIRDevelopmentCISelection -Condition (@($unrelatedLuaRows.id|Where-Object {$_ -in $developmentLuaConsumers}).Count -eq 0) -Message 'An unrelated documentation change expanded hosted Lua consumer selection.'
 $currentEnginePaths=@(
   '.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json',
   'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json',
