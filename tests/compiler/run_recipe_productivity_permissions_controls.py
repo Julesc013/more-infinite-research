@@ -162,9 +162,11 @@ local function fact(name, recipe)
     variants={{ingredients={{type="item",name="iron-plate",amount=1}}, results={{type="item",name=name,amount=1}},
       effective_allow_productivity=resolved.effective_allow_productivity,
       declared_allow_productivity=resolved.declared_allow_productivity,
+      declared_maximum_productivity=resolved.declared_maximum_productivity,
       effective_maximum_productivity=resolved.effective_maximum_productivity}},
     effective_allow_productivity=resolved.effective_allow_productivity,
     declared_allow_productivity=resolved.declared_allow_productivity,
+    declared_maximum_productivity=resolved.declared_maximum_productivity,
     effective_maximum_productivity=resolved.effective_maximum_productivity,
     allow_productivity=resolved.effective_allow_productivity
   }

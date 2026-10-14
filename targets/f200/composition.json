@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55903,
-      "expected_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
+      "expected_bytes": 55862,
+      "expected_sha256": "A84A96162E9D5A0ADC296F2A57AE1A9F560B422D4FDB0F869153660DF3979D7A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1468,8 +1468,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11425,
-      "expected_sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
+      "expected_bytes": 11707,
+      "expected_sha256": "E73F101EE6ED578983F9751169F8FFBEC4FC0B5C30C416509DE8858FDC92C65C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2604,8 +2604,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1188,
-      "expected_sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
+      "expected_bytes": 2018,
+      "expected_sha256": "3D566B152842FCC6BEC9047116C1D438AF715DC62612AAA3014D8D800D91423D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3708,8 +3708,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 435,
-      "expected_sha256": "EB24F4ADC759E0C0133B0537F79F3219B2ED73406ECEF3192712BD969845796E",
+      "expected_bytes": 133,
+      "expected_sha256": "F0C6AB72F816C59DC241734AC5BCB96992D8F221F0848074CDAE8B68FED8D24A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3788,8 +3788,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 74298,
-      "expected_sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6",
+      "expected_bytes": 75129,
+      "expected_sha256": "61BAC1E3DFF060C6B6E29F7A045165698CB91EEE8E03337417DECE3DF6DF3F4E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3804,8 +3804,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 80873,
-      "expected_sha256": "D6228357C7027B8EDE416080A4D65AF03BFB2A19E2CAC8D0A0929B6B1917A59C",
+      "expected_bytes": 80566,
+      "expected_sha256": "BB1D3A2917AB090355F354CDFDDB78BCA2E05251644CA8A4E35CE3DA7F5C61B9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3884,8 +3884,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 37501,
-      "expected_sha256": "8AC9BF88637B2C13D54CE1BADDCF2EBCBC5B42FBCAB6B9BF29E7DA4AC45EB2CA",
+      "expected_bytes": 37515,
+      "expected_sha256": "690A7831A334336D9A153EF065A353212C4EF1C87DABDB4C750D498BE0C2DEDA",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3948,8 +3948,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f200 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1246,
-      "expected_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
+      "expected_bytes": 1593,
+      "expected_sha256": "DA3588F025AC6B6A29906B7B1D315E7E2481A98B966040A36FCC5AC181334FE4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -4027,5 +4027,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "9144B12F7504940E1670D7D2A04B439B408B0CFC507711C47BA8598954CA84C1"
+  "record_sha256": "B18E496F19AD68D476DEF97E9E6272CCD2568A231BA5784795A392A4A5B9184D"
 }

@@ -37,10 +37,10 @@
       "output_path": "README.md",
       "source_path": "source/presentation/f100/README.md.template",
       "transform": "historical-readme-template-v1",
-      "source_sha256": "95E6B47E25E7224FC2077EAB3A0D5DF238E068A6F7825F236F4BEDFFC67B401F",
-      "source_bytes": 5913,
-      "output_bytes": 5780,
-      "output_sha256": "85E825FF6B6876823167DB78E2A19FA4106E3CBD8FE814A238EF1BC5BBDE9EB4"
+      "source_sha256": "521DDBA5C8DF9B27707B2B47EE9C2E29C8BD0283E8271F335B02E830A21D7096",
+      "source_bytes": 5606,
+      "output_bytes": 5473,
+      "output_sha256": "4887CDD3BCEE2A12A9E97A4DEAFCDAC80DEF0EE75E238B95F2D57037D909FC7A"
     },
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
@@ -61,5 +61,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "910A99A98E856B441ABAD7CC825866124F85DBC207DE3CEE86A4BCA233C87754"
+  "record_sha256": "D204B3E613F307198A9F16E8D6C3C3285757D4C0FCF262C9EF2947DCC3526669"
 }

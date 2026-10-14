@@ -188,8 +188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 55903,
-      "expected_sha256": "9A4C7880318A3AA1D4822754119EF8E0BB79E274C1E93367EFF6803C9DC3C678",
+      "expected_bytes": 55862,
+      "expected_sha256": "A84A96162E9D5A0ADC296F2A57AE1A9F560B422D4FDB0F869153660DF3979D7A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -1468,8 +1468,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11425,
-      "expected_sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
+      "expected_bytes": 11707,
+      "expected_sha256": "E73F101EE6ED578983F9751169F8FFBEC4FC0B5C30C416509DE8858FDC92C65C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2604,8 +2604,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1188,
-      "expected_sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
+      "expected_bytes": 2018,
+      "expected_sha256": "3D566B152842FCC6BEC9047116C1D438AF715DC62612AAA3014D8D800D91423D",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3740,8 +3740,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 435,
-      "expected_sha256": "EB24F4ADC759E0C0133B0537F79F3219B2ED73406ECEF3192712BD969845796E",
+      "expected_bytes": 133,
+      "expected_sha256": "F0C6AB72F816C59DC241734AC5BCB96992D8F221F0848074CDAE8B68FED8D24A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 74298,
-      "expected_sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6",
+      "expected_bytes": 75129,
+      "expected_sha256": "61BAC1E3DFF060C6B6E29F7A045165698CB91EEE8E03337417DECE3DF6DF3F4E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3836,8 +3836,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5904,
-      "expected_sha256": "06E67AA5119368A51379787053B85364E7145AC0CF2B44A97A406B7EF044F183",
+      "expected_bytes": 5597,
+      "expected_sha256": "93CBB97184B8C1808A935253D14017A630659224AF76968F3CAC79D1B9684169",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3884,8 +3884,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 1246,
-      "expected_sha256": "BD99F3C7430DE75F3C6F9D2F5DA73E8CCFBF84124C9819E6E918A88E346D7391",
+      "expected_bytes": 1593,
+      "expected_sha256": "DA3588F025AC6B6A29906B7B1D315E7E2481A98B966040A36FCC5AC181334FE4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3963,5 +3963,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "EBC064C6DC087F269C9A524C60BF18003FB440CAC907080379F696016192F955"
+  "record_sha256": "8B78B3FDC214643158E257CD0CA33AED53F941D27C714ADF01C001D4EA0045FF"
 }
