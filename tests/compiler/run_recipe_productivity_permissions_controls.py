@@ -26,12 +26,16 @@ PUBLISHED_MINING_GROUPS = (
 )
 
 
-def mining_stream_block(source: str, origin: str) -> str:
-    start = source.find('  research_mining_drill = {')
-    end = source.find('\n\n  research_electric_energy = {', start)
+def stream_block(source: str, key: str, next_key: str, origin: str) -> str:
+    start = source.find(f'  {key} = {{')
+    end = source.find(f'\n\n  {next_key} = {{', start)
     if start < 0 or end < 0:
-        raise RuntimeError(f"Mining-drill stream is unavailable in {origin}")
+        raise RuntimeError(f"Stream {key} is unavailable in {origin}")
     return source[start:end]
+
+
+def mining_stream_block(source: str, origin: str) -> str:
+    return stream_block(source, "research_mining_drill", "research_electric_energy", origin)
 
 
 def git_output(repo: Path, args: list[str], description: str) -> str:
@@ -86,13 +90,23 @@ def main() -> int:
     published_baseline_assertions = 0
     published_baselines: dict[str, dict[str, str]] = {}
     published_mining_blocks: dict[str, str] = {}
+    published_capture_blocks: dict[str, str] = {}
+    published_platform_blocks: dict[str, str] = {}
     for tag in ("v4.2.2", "v4.3.0"):
         published_source, published_identity = published_productivity(repo, tag)
         published_block = mining_stream_block(published_source, tag)
         published_baselines[tag] = published_identity
         published_mining_blocks[tag] = published_block
+        published_capture_blocks[tag] = stream_block(
+            published_source, "research_capture_robot_rockets", "research_grenades", tag
+        )
+        published_platform_blocks[tag] = stream_block(
+            published_source, "research_platform", "research_artificial_soil", tag
+        )
         if "reject_explicit_productivity_denial" in published_block:
             raise RuntimeError(f"Published mining baseline {tag} unexpectedly rejects explicit recipe productivity declarations")
+        if "productivity_permission_recipes" in published_block:
+            raise RuntimeError(f"Published mining baseline {tag} unexpectedly grants drill productivity permissions")
         published_baseline_assertions += 1
         for group in PUBLISHED_MINING_GROUPS:
             if group not in published_block:
@@ -104,32 +118,52 @@ def main() -> int:
             "Current mining-drill stream changes the published explicit-productivity emission contract"
         )
     published_baseline_assertions += 1
+    if "productivity_permission_recipes" in current_mining_block:
+        raise RuntimeError(
+            "Current mining-drill stream adds an unsupported productivity permission"
+        )
+    published_baseline_assertions += 1
+    if "only_if_implicit_productivity" in streams or "only_if_implicit_productivity" in source or "only_if_implicit_productivity" in descriptor:
+        raise RuntimeError("Current productivity permission pipeline retains unsupported implicit-only drill admission")
+    published_baseline_assertions += 1
     for group in PUBLISHED_MINING_GROUPS:
         if group not in current_mining_block:
             raise RuntimeError(f"Current mining-drill stream no longer retains its published group: {group}")
         published_baseline_assertions += 1
-    for required in (
-        '{name = "burner-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true}',
-        '{name = "electric-mining-drill", required_mods = {"base"}, only_if_implicit_productivity = true}',
-        '{name = "big-mining-drill", required_mods = {"space-age"}, only_if_implicit_productivity = true}',
-        '{name = "se-core-miner-drill", required_mods = {"space-exploration"}, only_if_implicit_productivity = true}',
-    ):
-        if required not in streams:
-            raise RuntimeError(f"Mining stream is missing required implicit-only permission: {required}")
-    if 'permission.only_if_implicit_productivity' not in descriptor:
-        raise RuntimeError("Stream descriptor does not validate the implicit-only permission field")
-
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
-    current_mining_groups = runtime.execute("return {\n" + current_mining_block + "\n}")["research_mining_drill"]["groups"]
-    published_422_groups = runtime.execute(
-        "return {\n" + published_mining_blocks["v4.2.2"] + "\n}"
-    )["research_mining_drill"]["groups"]
-    published_430_groups = runtime.execute(
-        "return {\n" + published_mining_blocks["v4.3.0"] + "\n}"
-    )["research_mining_drill"]["groups"]
+    def parse_stream(block: str, key: str):
+        return runtime.execute(
+            "local function space_age_setting_visibility() return {} end\nreturn {\n" + block + "\n}"
+        )[key]
+
+    current_mining_spec = parse_stream(current_mining_block, "research_mining_drill")
+    current_capture_spec = parse_stream(
+        stream_block(streams, "research_capture_robot_rockets", "research_grenades", str(STREAMS)),
+        "research_capture_robot_rockets",
+    )
+    current_platform_spec = parse_stream(
+        stream_block(streams, "research_platform", "research_artificial_soil", str(STREAMS)),
+        "research_platform",
+    )
+    published_422_mining = parse_stream(published_mining_blocks["v4.2.2"], "research_mining_drill")
+    published_430_mining = parse_stream(published_mining_blocks["v4.3.0"], "research_mining_drill")
+    published_422_capture = parse_stream(published_capture_blocks["v4.2.2"], "research_capture_robot_rockets")
+    published_430_capture = parse_stream(published_capture_blocks["v4.3.0"], "research_capture_robot_rockets")
+    published_422_platform = parse_stream(published_platform_blocks["v4.2.2"], "research_platform")
+    published_430_platform = parse_stream(published_platform_blocks["v4.3.0"], "research_platform")
+    current_mining_groups = current_mining_spec["groups"]
+    published_422_groups = published_422_mining["groups"]
+    published_430_groups = published_430_mining["groups"]
     runtime.globals().MIR_CURRENT_MINING_GROUPS = current_mining_groups
+    runtime.globals().MIR_CURRENT_MINING_SPEC = current_mining_spec
+    runtime.globals().MIR_CURRENT_CAPTURE_SPEC = current_capture_spec
+    runtime.globals().MIR_CURRENT_PLATFORM_SPEC = current_platform_spec
     runtime.globals().MIR_PUBLISHED_422_MINING_GROUPS = published_422_groups
     runtime.globals().MIR_PUBLISHED_430_MINING_GROUPS = published_430_groups
+    runtime.globals().MIR_PUBLISHED_422_CAPTURE_SPEC = published_422_capture
+    runtime.globals().MIR_PUBLISHED_430_CAPTURE_SPEC = published_430_capture
+    runtime.globals().MIR_PUBLISHED_422_PLATFORM_SPEC = published_422_platform
+    runtime.globals().MIR_PUBLISHED_430_PLATFORM_SPEC = published_430_platform
     runtime.execute(
         """
 package.preload["prototypes.mir.platform.factorio.data_raw"] = function()
@@ -165,28 +199,6 @@ end
     module = runtime.execute(source)
     runtime.globals().MIR_RECIPE_PRODUCTIVITY_PERMISSIONS = module
     result = runtime.execute(fixture)
-
-    descriptor_runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
-    descriptor_runtime.execute(
-        """
-package.preload["prototypes.mir.core.deepcopy"] = function()
-  local function copy(value)
-    if type(value) ~= "table" then return value end
-    local out = {}; for key, nested in pairs(value) do out[copy(key)] = copy(nested) end; return out
-  end
-  return copy
-end
-package.preload["prototypes.mir.domain.effects.metadata"] = function() return {numeric_descriptor = function() return nil end} end
-package.preload["prototypes.mir.domain.technology.technology_risk"] = function() return {normalize = function(value) return value end} end
-"""
-    )
-    descriptor_module = descriptor_runtime.execute(descriptor)
-    invalid_descriptor = descriptor_runtime.eval(
-        "function(descriptor) return pcall(descriptor.normalize, 'research_mining_drill', {"
-        "productivity_permission_recipes = {{name='drill', required_mods={'base'}, only_if_implicit_productivity='yes'}}, groups={{change=0.05}}}) end"
-    )(descriptor_module)
-    if invalid_descriptor[0]:
-        raise RuntimeError("Descriptor accepted a non-boolean implicit-only productivity permission")
 
     runtime.execute(
         """
@@ -232,7 +244,6 @@ package.preload["prototypes.mir.report.diagnostics_sink"] = function() return {e
 local semantics = _G.MIR_RECIPE_SEMANTICS
 local matcher = _G.MIR_RECIPE_MATCHER
 local planner = _G.MIR_RECIPE_PRODUCTIVITY_PLANNER
-local permissions = _G.MIR_RECIPE_PRODUCTIVITY_PERMISSIONS
 local profile = {prototype_shapes={recipe_property_defaults={allow_productivity=false,allow_quality=true,maximum_productivity=3.0}}}
 local assertions = 0
 local function check(value, message) assert(value, message); assertions = assertions + 1 end
@@ -253,33 +264,6 @@ local function fact(name, recipe)
     allow_productivity=resolved.effective_allow_productivity
   }
 end
-local function materialize(name, recipe, enabled)
-  _G.mods={base="2.1.21",["space-age"]="2.1.21"}
-  _G.data={raw={recipe={[name]=recipe}}}
-  _G.MIR_ENABLED_STREAMS={research_mining_drill=enabled}
-  _G.MIR_PERMISSION_STREAMS={research_mining_drill={productivity_permission_recipes={{name=name,required_mods={"space-age"},only_if_implicit_productivity=true}}}}
-  permissions.apply()
-  _G.MIR_MATCH_FACTS={[name]=fact(name, recipe)}
-  local buckets=matcher.recipes_for_stream({groups={{change=0.05,items={name}}}},0.10)
-  return recipe, planner.effects_from_buckets("research_mining_drill",buckets)
-end
-local enabled, effects = materialize("big-mining-drill", {}, true)
-check(enabled.allow_productivity == true, "actual permission pipeline grants an implicit recipe before matching")
-check(#effects == 1 and effects[1].type == "change-recipe-productivity" and effects[1].recipe == "big-mining-drill" and effects[1].change == 0.05,
-  "actual matcher buckets feed the existing productivity-effect emitter with the declared 5 percent drill effect")
-local denied, denied_effects = materialize("big-mining-drill", {allow_productivity=false}, true)
-check(denied.allow_productivity == false and #denied_effects == 1 and denied_effects[1].recipe == "big-mining-drill",
-  "explicit productivity denials stay byte-for-value false while retaining the published drill effect")
-local capped, capped_effects = materialize("big-mining-drill", {maximum_productivity=0}, true)
-check(capped.maximum_productivity == 0 and #capped_effects == 1 and capped_effects[1].recipe == "big-mining-drill",
-  "an explicit zero cap stays byte-for-value zero while retaining the published drill effect")
-_G.mods={base="2.1.21",["space-age"]="2.1.21"}
-_G.data={raw={recipe={["big-mining-drill"]={}}}}
-_G.MIR_ENABLED_STREAMS={research_mining_drill=false}
-_G.MIR_PERMISSION_STREAMS={research_mining_drill={productivity_permission_recipes={{name="big-mining-drill",required_mods={"space-age"},only_if_implicit_productivity=true}}}}
-permissions.apply()
-check(_G.data.raw.recipe["big-mining-drill"].allow_productivity == nil,
-  "a disabled stream leaves the implicit recipe unmutated before the normal planner skips that stream")
 local legacy_recipes = {
   ["burner-mining-drill"]={allow_productivity=false},
   ["electric-mining-drill"]={normal={allow_productivity=false}},
@@ -302,6 +286,13 @@ local function normalized_groups(groups)
   end
   return table.concat(rows, ";")
 end
+local function permission_shape(spec)
+  local rows = {}
+  for _, permission in ipairs(spec.productivity_permission_recipes or {}) do
+    rows[#rows + 1] = permission.name .. "|" .. table.concat(permission.required_mods or {}, ",")
+  end
+  return table.concat(rows, ";")
+end
 local published_422_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_PUBLISHED_422_MINING_GROUPS},0.10))
 local published_430_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_PUBLISHED_430_MINING_GROUPS},0.10))
 local current_effects = planner.effects_from_buckets("research_mining_drill",matcher.recipes_for_stream({groups=_G.MIR_CURRENT_MINING_GROUPS},0.10))
@@ -309,6 +300,12 @@ check(normalized_groups(_G.MIR_PUBLISHED_422_MINING_GROUPS) == normalized_groups
   "published 4.2.2 and 4.3.0 mining groups agree on exact membership, changes, patterns, and denial policy")
 check(normalized_groups(_G.MIR_CURRENT_MINING_GROUPS) == normalized_groups(_G.MIR_PUBLISHED_430_MINING_GROUPS),
   "current parsed mining groups preserve the published explicit-productivity emission contract")
+check(permission_shape(_G.MIR_CURRENT_CAPTURE_SPEC) == permission_shape(_G.MIR_PUBLISHED_422_CAPTURE_SPEC)
+    and permission_shape(_G.MIR_CURRENT_CAPTURE_SPEC) == permission_shape(_G.MIR_PUBLISHED_430_CAPTURE_SPEC),
+  "current capture-robot Space Age permission remains exactly published")
+check(permission_shape(_G.MIR_CURRENT_PLATFORM_SPEC) == permission_shape(_G.MIR_PUBLISHED_422_PLATFORM_SPEC)
+    and permission_shape(_G.MIR_CURRENT_PLATFORM_SPEC) == permission_shape(_G.MIR_PUBLISHED_430_PLATFORM_SPEC),
+  "current platform Space Age permission rows remain exactly published")
 check(#current_effects == #published_422_effects and #current_effects == #published_430_effects,
   "current parsed mining groups retain all published native and Space Exploration drill effects")
 local expected_changes={
@@ -330,7 +327,7 @@ check(emitted["iron-ore"] == nil and emitted["copper-ore"] == nil,
 return assertions
 """
     )
-    if int(pipeline_assertions) != 17:
+    if int(pipeline_assertions) != 14:
         raise RuntimeError(f"Unexpected actual permission-to-effect assertion count: {pipeline_assertions}")
     record = {
         "status": "MIR-RECIPE-PRODUCTIVITY-PERMISSIONS-CONTROLS-PASSED",
@@ -344,7 +341,7 @@ return assertions
         "semantics_sha256": hashlib.sha256(semantics_source.encode()).hexdigest(),
         "matcher_sha256": hashlib.sha256(matcher_source.encode()).hexdigest(),
         "planner_sha256": hashlib.sha256(planner_source.encode()).hexdigest(),
-        "descriptor_assertions": 1,
+        "implicit_admission_absent_assertions": 1,
         "pipeline_assertions": int(pipeline_assertions),
         "runtime": "lupa.lua52",
         "factorio_processes": 0,

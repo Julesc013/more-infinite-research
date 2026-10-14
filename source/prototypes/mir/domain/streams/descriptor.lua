@@ -222,11 +222,6 @@ function M.normalize(key, raw_spec)
         error("Raw MIR stream " .. key .. " repeats productivity permission "
           .. permission.name .. ".", 2)
       end
-      if permission.only_if_implicit_productivity ~= nil
-          and type(permission.only_if_implicit_productivity) ~= "boolean" then
-        error("Raw MIR stream " .. key .. " has invalid implicit-only productivity permission "
-          .. permission.name .. ".", 2)
-      end
       seen_permissions[permission.name] = true
       permission.required_mods = sorted_unique(permission.required_mods)
     end

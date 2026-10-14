@@ -1468,8 +1468,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11707,
-      "expected_sha256": "E73F101EE6ED578983F9751169F8FFBEC4FC0B5C30C416509DE8858FDC92C65C",
+      "expected_bytes": 11425,
+      "expected_sha256": "176D19F7F005521CDB354EB939E04DD4630DD6C96BC0AD8E6AFDC40EE3DB9D51",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2604,8 +2604,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2018,
-      "expected_sha256": "3D566B152842FCC6BEC9047116C1D438AF715DC62612AAA3014D8D800D91423D",
+      "expected_bytes": 1188,
+      "expected_sha256": "2DDB0D271E88D4036F4DF46681E908638D6AC17A0C99F11F3383453459C1B96E",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3788,8 +3788,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 74997,
-      "expected_sha256": "F68B1F362E61ECA7CBE6F83AAF9C4937F039D9F1AC566A29893C5B6A3AB05237",
+      "expected_bytes": 74298,
+      "expected_sha256": "622090A88894EECEC068B8EEF8C3663BDDC737728ACD7A47EA36B6671BD902E6",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -4027,5 +4027,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "5284E9C42A2A3289EE35A76D49005956D2139FBB2F7A537A98F0D17528B8926F"
+  "record_sha256": "93586BFBF7698D152A6522AD0B61F3F94B733E417BB833108B379D7C0996AC6C"
 }
