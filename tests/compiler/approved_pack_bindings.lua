@@ -237,4 +237,37 @@ for _, warm in ipairs({"lab", "research"}) do
       "A refused replacement leaves source facts and epoch unchanged")
   end)
 end
+for _, reversed in ipairs({false, true}) do
+  raw = world(0, reversed)
+  raw.tool["mod-science"] = {type = "tool", name = "mod-science"}
+  raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = "mod-science"
+  raw.recipe["make-unfamiliar-science"] = {type = "recipe", name = "make-unfamiliar-science", enabled = false,
+    results = {{type = "item", name = "mod-science", amount = 1}}}
+  -- A same-named fluid recipe must not enter the item producer cardinality.
+  raw.recipe["mod-science"] = {type = "recipe", name = "mod-science", enabled = true,
+    results = {{type = "fluid", name = "mod-science", amount = 1}}}
+  raw.technology["mod-science-unlock"] = {type = "technology", name = "mod-science-unlock", prerequisites = {roles[4]},
+    unit = {count = 10, time = 10, ingredients = {{roles[4], 1}}},
+    effects = {{type = "unlock-recipe", recipe = "make-unfamiliar-science"}}}
+  Context.with_active(Context.new(), function()
+    local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+    local status, gate = science.pack_production_status("mod-science")
+    check(status == "research" and gate == "mod-science-unlock", "One unfamiliar typed pack producer binds parametrically")
+    check(science.production_route_for_pack("mod-science").recipe_name == "make-unfamiliar-science",
+      "A fluid name collision cannot replace the unique actual item source")
+  end)
+end
+raw = world(0, false)
+raw.tool["mod-science"] = {type = "tool", name = "mod-science"}
+raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = "mod-science"
+for _, name in ipairs({"source-b", "source-a"}) do
+  raw.recipe[name] = {type = "recipe", name = name, enabled = true,
+    results = {{type = "item", name = "mod-science", amount = 1}}}
+end
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local ok, reason = pcall(science.pack_production_status, "mod-science")
+  check(not ok and string.find(reason, "ambiguous-approved-pack-source", 1, true),
+    "Ambiguous unfamiliar pack sources produce an explicit diagnosis without route discovery")
+end)
 return checks

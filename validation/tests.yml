@@ -5371,10 +5371,7 @@
         "source:source/prototypes/mir/graph/**",
         "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/technology_researchability.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "tests/reference/retired-discovery/**",
         "source:source/prototypes/mir/index/recipe_unlocks.lua",
         "source:source/prototypes/mir/index/item_prototype_facts.lua",
         "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
@@ -5408,9 +5405,7 @@
         "source:source/prototypes/mir/capabilities/science_integration/pack_registry.lua",
         "source:source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua",
         "source:source/prototypes/mir/capabilities/science_integration/recipe_unlock_facts.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua",
-        "source:source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua"
+        "tests/reference/retired-discovery/**"
       ]
     },
     {

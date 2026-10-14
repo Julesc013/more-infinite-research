@@ -12,6 +12,7 @@ M.shared = {
     -- Parameterized sources bind an actual same-named pack recipe and its
     -- unique direct unlock owner. They never explore ingredient factories.
     named_pack_recipe = true,
+    unique_direct_recipe = true,
     unique_direct_unlock = true
   },
   -- Shared source declarations for the ordinary productivity-family science

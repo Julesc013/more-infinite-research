@@ -113,7 +113,10 @@ end
 
 local function declared_source(pack_name, shared)
   local declarations = shared.science_bindings or {}
-  for _, role in ipairs(pack_registry.official_order()) do
+  local declared_roles = {}
+  for role in pairs(declarations) do declared_roles[#declared_roles + 1] = role end
+  table.sort(declared_roles)
+  for _, role in ipairs(declared_roles) do
     local declaration = M.declaration_for_role(role, declarations)
     if declaration and declaration.pack == pack_name then
       local result, reason = binding(pack_name, declaration)
@@ -127,18 +130,31 @@ local function declared_source(pack_name, shared)
   if not (shared.science_binding_policy or {}).named_pack_recipe then
     return nil, "missing-approved-pack-declaration:" .. pack_name
   end
-  local fact = recipe_facts.view(pack_name)
+  local recipe_name = pack_name
+  local fact = recipe_facts.view(recipe_name)
   if not fact or not outputs_pack(fact, pack_name) then
-    return nil, "missing-approved-named-pack-source:" .. pack_name
+    if not (shared.science_binding_policy or {}).unique_direct_recipe then
+      return nil, "missing-approved-named-pack-source:" .. pack_name
+    end
+    -- An approved parameterized rule may bind one actual typed producer with
+    -- an unfamiliar name. Ambiguity is explicit; it never starts a competing
+    -- route search or chooses an alternative by traversal order.
+    local producers = recipe_facts.recipes_by_output_identity_view("item", pack_name)
+    if #producers ~= 1 then return nil, "ambiguous-approved-pack-source:" .. pack_name end
+    recipe_name = producers[1]
+    fact = recipe_facts.view(recipe_name)
+    if not outputs_pack(fact, pack_name) then
+      return nil, "approved-pack-recipe-output-mismatch:" .. recipe_name
+    end
   end
   local gates = {}
   if fact.enabled_without_research ~= true then
-    for _, name in ipairs(recipe_unlocks.for_recipe(pack_name)) do
+    for _, name in ipairs(recipe_unlocks.for_recipe(recipe_name)) do
       if not technology_reason(name) then gates[#gates + 1] = name end
     end
     if #gates ~= 1 then return nil, "ambiguous-approved-pack-unlock:" .. pack_name end
   end
-  return binding(pack_name, {pack = pack_name, recipe = pack_name, technology = gates[1], allow_initial = true})
+  return binding(pack_name, {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true})
 end
 
 -- Positive reference rules validate only declared pack sources, direct lab
