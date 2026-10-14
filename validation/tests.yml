@@ -702,6 +702,21 @@
       ]
     },
     {
+      "id": "static.approved-pack-bindings",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRApprovedPackBindings.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/capabilities/science_integration/pack_bindings.lua",
+        "source:source/prototypes/mir/streams/registry.lua",
+        "tests/compiler/Test-MIRApprovedPackBindings.ps1",
+        "tests/compiler/run_approved_pack_bindings_controls.py",
+        "tests/compiler/approved_pack_bindings.lua",
+        "validation/tests.yml"
+      ]
+    },
+    {
       "id": "static.compiler-preview",
       "kind": "static",
       "layer": "F0",

@@ -7,7 +7,24 @@ M.shared = {
   per_level_default = 0.10,
   base_cost = 8000,
   growth_factor = 2,
-  research_time = 60
+  research_time = 60,
+  -- Shared source declarations for the ordinary productivity-family science
+  -- vector. These are authored progression bindings, not cached discoveries.
+  -- The target adapter translates the roles to historical item spellings.
+  science_bindings = {
+    ["automation-science-pack"] = {
+      recipe = "automation-science-pack", technology = "automation-science-pack", allow_initial = true
+    },
+    ["logistic-science-pack"] = {
+      recipe = "logistic-science-pack", technology = "logistic-science-pack", allow_initial = true
+    },
+    ["chemical-science-pack"] = {
+      recipe = "chemical-science-pack", technology = "chemical-science-pack", allow_initial = true
+    },
+    ["production-science-pack"] = {
+      recipe = "production-science-pack", technology = "production-science-pack", allow_initial = true
+    }
+  }
 }
 
 local raw_streams = require("prototypes.streams.init")

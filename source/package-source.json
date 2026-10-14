@@ -6405,10 +6405,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 1274,
-      "source_sha256": "98F9398FA7F1AE290868D424740007AE6DB73BA8539563950A0A04401555891E",
-      "output_bytes": 1274,
-      "output_sha256": "98F9398FA7F1AE290868D424740007AE6DB73BA8539563950A0A04401555891E"
+      "source_bytes": 2103,
+      "source_sha256": "B79C83DD0C2C1CCCC48DE7F30DA83C4AD1C36D5A5803F9299732179EBF6C0D8F",
+      "output_bytes": 2103,
+      "output_sha256": "B79C83DD0C2C1CCCC48DE7F30DA83C4AD1C36D5A5803F9299732179EBF6C0D8F"
     },
     {
       "layer": "capability",
@@ -7810,6 +7810,28 @@
       "source_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
       "output_bytes": 2961,
       "output_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D"
+    },
+    {
+      "layer": "shared",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/capabilities/science_integration/pack_bindings.lua",
+      "semantic_class": "common-semantic-source",
+      "source_path": "source/prototypes/mir/capabilities/science_integration/pack_bindings.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR440-APPROVED-SCIENCE-BINDINGS",
+        "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 4065,
+      "source_sha256": "4061B31432222659B186109003B853AAE99486395CAF2F64CB714B499E11FB3C",
+      "output_bytes": 4065,
+      "output_sha256": "4061B31432222659B186109003B853AAE99486395CAF2F64CB714B499E11FB3C"
     }
   ],
   "invariants": {
@@ -7819,5 +7841,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "5BD0411F12DAF93FA7640EC87D76D32B84D5BFC93BE1FABBC2BCD4894044DCBD"
+  "record_sha256": "F07034C01EB12505A029DC9D7E92E493C87B71F029AE3C3A057E9C56BD9004DC"
 }

@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Active campaign: MIR 4.4.0 unified research generation
 
-The maintainer's 14 October direction supersedes the separate 4.3.1 publication attempt: skip 4.3.1 and roll its verified incident repairs into 4.4.0. The fixed requested delivery cutoff is **15 October 2026, 15:38 AEDT / 04:38 UTC**, conservatively anchored to the first observed instruction at 23:38:31 AEDT on 14 October. Compaction, a new turn, a failed run or a handoff does not restart this clock. The deadline does not replace acceptance evidence.
+The maintainer's 14 October direction supersedes the separate 4.3.1 publication attempt: skip 4.3.1 and roll its verified incident repairs into 4.4.0. The fixed requested delivery cutoff is **15 October 2026, 15:36 AEDT / 04:36 UTC**, anchored to the maintainer-confirmed original instruction at 23:36 AEDT on 14 October. Compaction, a new turn, a failed run or a handoff does not restart this clock. The deadline does not replace acceptance evidence.
 
 Published 4.3.0 remains the immediate predecessor. Direct 4.2.2 upgrades remain required for players skipping 4.3.0. Unpublished 4.3.1 candidates are preserved experiments, not released predecessors. Their observations can be reused only for their exact applicable inputs; the compiler replacement requires new affected native acceptance.
 
@@ -47,7 +47,7 @@ Work proceeds in the primary checkout with non-overlapping ownership. Native run
 | 0–1 hour | Preserve and commit ready repairs; inventory established families and exact acceptance obligations; reconcile 4.4.0 version admission, existing signing capability and resource gaps. |
 | 1–4 hours | Transfer one real existing family end to end through the shared emitter. Compare its complete output against the accepted baseline and measure a relevant native profile. Prove its old acquisition/discovery calls are absent. |
 | 4–8 hours | Transfer remaining established families, ownership/finite continuations and science policies; integrate early; remove replaced production discovery imports and the Full/Classic dispatch. Run opposing checks and representative native comparisons during transfer. |
-| 8–10 hours | Finish catalogue, package-closure and incident checks. Freeze player bytes by 09:38 AEDT or earlier if observed remaining serial qualification requires it. Unfinished optional features move to a later 4.4.x patch. |
+| 8–10 hours | Finish catalogue, package-closure and incident checks. Freeze player bytes by 09:36 AEDT or earlier if observed remaining serial qualification requires it. Unfinished optional features move to a later 4.4.x patch. |
 | 10–15 hours | Complete required destination-specific native, saved-state, first-use and client acceptance on frozen actual packages. Compare published 4.3.0 and direct 4.2.2 upgrades with both cold reloads. Reevaluate retained observations when sufficient; rerun changed, missing or incomplete cases. |
 | 15–16 hours | Complete applicable review/signing/promotion, stage all nine assets, publish canonical v4.4.0, verify anonymous downloads and hashes, and deliver matching primary-checkout dist and release materials. Report exact unmet obligations if acceptance is incomplete. |
 
@@ -69,7 +69,9 @@ GitHub publication, local delivery, affected-player Portal availability and comp
 | --- | --- |
 | 4.4.0 | Unified approved generation, complete established catalogue transfer, verified incident repairs, measured startup improvement and preserved saves. |
 | 4.4.1 | First justified corrective batch from 4.4.0 qualification/player evidence: remaining incident-specific binding, migration, client or performance defects. No deferred implementation necessary for 4.4.0's claimed catalogue is hidden here. |
-| 4.4.2 | Additional requested integrations and bounded optimization through the same approved family model, admitted with exact compatibility, startup and migration evidence. |
+| 4.4.2 | Further measured startup, memory and Library improvements within the same binder, with stronger scaling and repeatability toward the performance target. |
+| 4.4.3 | Additional approved community/mod coverage through reusable declarations and the existing science/ownership rules, with exact compatibility and migration evidence. |
+| 4.4.4 onward | Useful developer-time discovery/contributor tools, historical refinements and remaining admitted requests. MEP work requires a ready, useful production contract. |
 | Further 4.4.x | Continue the preserved request queue in useful, independently qualified batches. No empty releases, new compiler modes or parallel catalogues. |
 
 Patch suffixes are source patches: 4.4.1 uses `CCC01` and 4.4.2 uses `CCC02`; packaging retries never change them. Published assets remain unchanged. Each follow-on patch preserves the established 4.4.0 baseline except for independently justified and tested corrections.
