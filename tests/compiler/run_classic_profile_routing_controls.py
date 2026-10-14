@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Run the source-bound classic/full routing control under Lua 5.2.
+"""Run the source-bound unified public routing control under Lua 5.2.
 
 No Factorio process or package is created.  The test exercises the actual
 profile reader and stage modules, substituting only branch sentinels so it can
-prove that selecting classic never loads the full compiler path.
+prove old Classic selections now execute Full and never load the retired path.
 """
 from __future__ import annotations
 
@@ -78,8 +78,8 @@ def main() -> int:
         "runtime": "lupa.lua52",
         "factorio_processes": 0,
     }
-    if (record["assertions"] < 16 or record["classic_calls"] != 1
-            or record["full_calls"] != 1 or record["historic_full_calls"] != 1):
+    if (record["assertions"] < 17 or record["classic_calls"] != 0
+            or record["full_calls"] != 2 or record["historic_full_calls"] != 1):
         raise RuntimeError(f"Unexpected classic profile routing result: {record}")
     print(json.dumps(record, sort_keys=True))
     return 0

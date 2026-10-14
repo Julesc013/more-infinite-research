@@ -21,8 +21,8 @@ foreach($target in @('f200','f210')){
   $line=$output|Where-Object {$_ -match '^{.*"status": "MIR-CLASSIC-PROFILE-ROUTING-CONTROLS-PASSED".*}$'}|Select-Object -Last 1
   if(-not $line){throw "Classic profile routing controls produced no success record for ${target}: $($output -join [Environment]::NewLine)"}
   $record=$line|ConvertFrom-Json
-  if([int]$record.assertions -lt 16 -or [int]$record.classic_calls -ne 1 -or [int]$record.full_calls -ne 1 -or [int]$record.historic_full_calls -ne 1 -or [int]$record.factorio_processes -ne 0){
-    throw "Classic profile routing controls did not prove both isolated compiler branches for $target."
+  if([int]$record.assertions -lt 17 -or [int]$record.classic_calls -ne 0 -or [int]$record.full_calls -ne 2 -or [int]$record.historic_full_calls -ne 1 -or [int]$record.factorio_processes -ne 0){
+    throw "Compiler routing controls did not prove Full for both old Classic and default selections for $target."
   }
   $records+=$record
 }

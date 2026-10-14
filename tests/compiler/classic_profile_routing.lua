@@ -1,9 +1,9 @@
--- Source-bound route control for the explicit classic compiler profile.
+-- Source-bound routing control for the single preservation-capable compiler.
 --
 -- This control intentionally loads the data-final-fixes stage with isolated
 -- preload sentinels.  It proves the selected branch without loading the
--- opposing compiler, which is the property needed to avoid the full science
--- and material planner when the reduced profile is explicitly selected.
+-- retired compiler. Old saved Classic values must retain the complete Full
+-- catalogue instead of silently selecting the old reduced implementation.
 
 local assertions, failures = 0, {}
 
@@ -51,19 +51,22 @@ local function load_final_stage(profile, classic, full, factorio_version)
   return require(FINAL_STAGE)
 end
 
--- Explicit Classic selection must bypass the full compiler sentinel.
+-- A stored Classic value is a compatibility alias for Full, never a cull.
 local classic_calls, full_calls = 0, 0
 local classic_stage = load_final_stage("classic", function()
   classic_calls = classic_calls + 1
   return {profile = "classic", result = "classic-emitted"}
-end, nil)
+end, function(options)
+  full_calls = full_calls + 1
+  return {profile = "full", return_snapshot = options and options.return_snapshot}
+end)
 local classic_result = classic_stage.run()
-check("CPR-01", classic_calls == 1 and classic_result and classic_result.profile == "classic",
-  "An explicit reduced profile setting must select and return the classic compiler")
-check("CPR-02", full_calls == 0 and package.loaded[FULL] == nil,
-  "Classic selection must not require full pipeline commands")
-check("CPR-03", package.loaded[CLASSIC] ~= nil,
-  "Classic selection must require the classic compiler only after selection")
+check("CPR-01", classic_calls == 0 and classic_result and classic_result.profile == "full",
+  "A stored Classic selection must use Full and preserve established research")
+check("CPR-02", full_calls == 1 and package.loaded[FULL] ~= nil,
+  "A stored Classic selection must execute the normal complete compiler")
+check("CPR-03", package.loaded[CLASSIC] == nil,
+  "Public selection must never load the retired reduced compiler")
 
 -- An absent setting in an existing configuration must retain Full.
 local full_stage = load_final_stage(nil, nil, function(options)
@@ -71,7 +74,7 @@ local full_stage = load_final_stage(nil, nil, function(options)
   return {profile = "full", return_snapshot = options and options.return_snapshot}
 end)
 local full_result = full_stage.run()
-check("CPR-04", full_calls == 1 and full_result and full_result.profile == "full"
+check("CPR-04", full_calls == 2 and full_result and full_result.profile == "full"
   and full_result.return_snapshot == false,
   "The default full profile must preserve the normal no-snapshot command invocation")
 check("CPR-05", package.loaded[CLASSIC] == nil and package.loaded[FULL] ~= nil,
@@ -99,9 +102,13 @@ local descriptor = profile.prototype()
 check("CPR-07", profile.name == "mir-compiler-profile" and profile.get() == "full",
   "An existing startup configuration without the new setting must retain the full catalogue")
 check("CPR-08", descriptor.type == "string-setting" and descriptor.setting_type == "startup"
-  and descriptor.default_value == "full" and descriptor.allowed_values[1] == "classic"
-  and descriptor.allowed_values[2] == "full",
-  "The profile setting must default to full while exposing only classic and full startup choices")
+  and descriptor.default_value == "full" and descriptor.allowed_values[1] == "full"
+  and descriptor.allowed_values[2] == "classic" and #descriptor.allowed_values == 2
+  and descriptor.hidden == true,
+  "The hidden compatibility field must retain serialized old values without exposing a second compiler")
+_G.settings = {startup = {["mir-compiler-profile"] = {value = "classic"}}}
+check("CPR-08-legacy", profile.get() == "full",
+  "Old raw Classic settings must normalize to Full independently of engine default normalization")
 _G.settings = {startup = {["mir-compiler-profile"] = {value = "unsafe-unknown"}}}
 local invalid_ok, invalid_reason = pcall(profile.get)
 check("CPR-09", invalid_ok == false and tostring(invalid_reason):find("Unsupported MIR compiler profile", 1, true) ~= nil,
@@ -136,7 +143,10 @@ check("CPR-10", #extended == 1 and extended[1].type == "shortcut"
 check("CPR-11", package.loaded["prototypes.mir.streams.registry"] == nil,
   "The data stage must not load the full stream registry for its shortcut")
 
--- Exercise the actual declared planner, common TransformationPlan compiler,
+-- Private characterization only: exercise the retired declared planner directly,
+-- without admitting it through any public startup selection. Preserve these
+-- historical opposing controls until its code is removed in the follow-up.
+-- Exercise the common TransformationPlan compiler,
 -- operation executor, and MutationJournal together.  The tiny data-stage
 -- input has only direct declared science/tool/lab facts; every generic
 -- compiler entry point below is an error sentinel.  This proves the normal
