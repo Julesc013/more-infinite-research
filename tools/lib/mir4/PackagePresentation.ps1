@@ -951,25 +951,57 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   [CmdletBinding()] param([Parameter(Mandatory)]$Current,[Parameter(Mandatory)]$Predecessor)
   $migrated=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
   $introduced=@($Current.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
-  $scienceIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
   $historicalIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
   $repairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
   $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
   $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
   $browserIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0146'})
-  $classicIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
-  $classicSources=@(
-    'source/prototypes/mir/settings/compiler_profile.lua',
+  $compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
+  $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+  $retiredPredecessorSources=@(
+    'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
+    'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
+    'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
+  )
+  $retiredCurrentSources=@(
+    'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
     'source/prototypes/mir/pipeline/classic_compiler.lua',
     'source/prototypes/mir/domain/compiler/classic_declarations.lua',
-    'source/prototypes/mir/planner/classic/plan.lua',
+    'source/prototypes/mir/planner/classic/plan.lua'
+  )
+  $predecessorPaths=@($Predecessor.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
+  $currentPaths=@($Current.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
+  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne377-or$currentPaths.Count-ne377-or
+     $migrated.Count-ne356-or$introduced.Count-ne21-or$compilerTransitionIntroduced.Count-ne2-or
+     $approvedBindingsIntroduced.Count-ne2-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
+     $progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or$browserIntroduced.Count-ne2-or
+     @($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0){
+    throw '[mir4-package-presentation-v7-source-succession]'
+  }
+  foreach($source in $retiredPredecessorSources){if($source-cnotin$predecessorPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
+  foreach($source in $retiredCurrentSources){if($source-cin$currentPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
+  $compilerTransitionSources=@(
+    'source/prototypes/mir/settings/compiler_profile.lua',
     'source/prototypes/mir/runtime/compiler_profile_notice.lua'
   )
-  if($classicIntroduced.Count-ne$classicSources.Count){throw '[mir4-package-presentation-v7-source-succession]'}
-  foreach($source in $classicSources){
-    $rows=@($classicIntroduced|Where-Object{[string]$_.source_path-ceq$source})
+  foreach($source in $compilerTransitionSources){
+    $rows=@($compilerTransitionIntroduced|Where-Object{[string]$_.source_path-ceq$source})
     if($rows.Count-ne1-or[string]$rows[0].layer-cne'capability'-or
        [string]$rows[0].semantic_class-cne'target-overlay'-or
+       [string]$rows[0].output_path-cne$source.Substring('source/'.Length)-or
+       [string]$rows[0].transform-cne'copy-exact-bytes'-or
+       (@($rows[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+      throw '[mir4-package-presentation-v7-source-succession]'
+    }
+  }
+  $approvedBindingSources=@(
+    'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
+    'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
+  )
+  foreach($source in $approvedBindingSources){
+    $rows=@($approvedBindingsIntroduced|Where-Object{[string]$_.source_path-ceq$source})
+    if($rows.Count-ne1-or[string]$rows[0].layer-cne'shared'-or
+       [string]$rows[0].semantic_class-cne'common-semantic-source'-or
        [string]$rows[0].output_path-cne$source.Substring('source/'.Length)-or
        [string]$rows[0].transform-cne'copy-exact-bytes'-or
        (@($rows[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
@@ -980,7 +1012,6 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     'source/prototypes/mir/platform/factorio/browser_host.lua'='f210|f200'
     'source/adapters/runtime-capabilities/game-browser-host.lua'='f110|f100'
   }
-  if($browserIntroduced.Count-ne2){throw '[mir4-package-presentation-v7-source-succession]'}
   foreach($expected in $browserSources.GetEnumerator()){
     $rows=@($browserIntroduced|Where-Object{[string]$_.source_path-ceq$expected.Key})
     if($rows.Count-ne1-or[string]$rows[0].layer-cne'adapter'-or
@@ -992,17 +1023,12 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     }
   }
   if([string]$Current.predecessor_record_sha256-cne[string]$Predecessor.record_sha256-or
-     @($Predecessor.bindings).Count-ne359-or$migrated.Count-ne359-or$introduced.Count-ne23-or
-     $scienceIntroduced.Count-ne1-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or$progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or
      [string]$progressionIntroduced[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
      [string]$progressionIntroduced[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
      (@($progressionIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
      [string]$progressionPlannerIntroduced[0].source_path-cne'source/prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
      [string]$progressionPlannerIntroduced[0].output_path-cne'prototypes/mir/planner/stream_compiler/material_continuation.lua'-or
      (@($progressionPlannerIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
-     [string]$scienceIntroduced[0].source_path-cne'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-     [string]$scienceIntroduced[0].output_path-cne'prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua'-or
-     (@($scienceIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
      [string]$repairIntroduced[0].layer-cne'shared'-or
      [string]$repairIntroduced[0].semantic_class-cne'common-semantic-source'-or
      [string]$repairIntroduced[0].source_path-cne'source/prototypes/mir/runtime/effects/passive_repair.lua'-or
@@ -1019,8 +1045,11 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     if([string]::IsNullOrWhiteSpace($key)-or$currentByPredecessor.ContainsKey($key)){throw '[mir4-package-presentation-v7-source-succession]'}
     $currentByPredecessor[$key]=$binding
   }
+  $missingPredecessors=@($predecessorPaths|Where-Object{-not$currentByPredecessor.ContainsKey($_)}|Sort-Object -Unique)
+  if((@($missingPredecessors)-join'|')-cne(@($retiredPredecessorSources|Sort-Object)-join'|')){throw '[mir4-package-presentation-v7-source-succession]'}
   foreach($prior in @($Predecessor.bindings)){
     $key=[string]$prior.predecessor_source_path
+    if($key-cin$retiredPredecessorSources){continue}
     if(-not$currentByPredecessor.ContainsKey($key)){throw '[mir4-package-presentation-v7-source-succession]'}
     $current=$currentByPredecessor[$key]
     $priorProjection=[pscustomobject][ordered]@{layer=[string]$prior.layer;target_scope=@($prior.target_scope);output_path=[string]$prior.output_path;semantic_class=[string]$prior.semantic_class;source_path=[string]$prior.source_path;predecessor_source_path=[string]$prior.predecessor_source_path;transform=[string]$prior.transform}
@@ -1033,7 +1062,6 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   }
   return [pscustomobject][ordered]@{predecessor=$Predecessor;migrated=$migrated;introduced=$introduced}
 }
-
 function Get-MIR4CurrentPackagePresentationV7Inputs {
   [CmdletBinding()] param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Materialize)
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path

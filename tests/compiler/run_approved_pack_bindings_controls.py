@@ -25,6 +25,7 @@ def main() -> None:
       mods = {base = '2.0.77'}
       log = function() end
       package.loaded['prototypes.mir.platform.factorio.target_profiles'] = {
+        current_factorio_version = '2.0',
         current = function() return {prototype_shapes = {}} end
       }
       package.loaded['prototypes.mir.domain.streams.descriptor'] = {normalize = function(_, value) return value end}

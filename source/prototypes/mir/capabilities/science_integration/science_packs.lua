@@ -33,6 +33,10 @@ end
 local function production_status(pack_name)
   if not pack_registry.science_pack_exists(pack_name) then return "unreachable", nil end
   local source = source_for(pack_name)
+  -- Preserve the legacy caller enum for graph/material planners. The compact
+  -- binding record explicitly distinguishes retained policy exclusion from
+  -- a factory-feasibility proof; unknown sources still throw above.
+  if source.status == "not-admitted" then return "unreachable", nil end
   return source.status, source.unlocker
 end
 

@@ -19,6 +19,7 @@ if($LASTEXITCODE -ne 0){throw "Enabled producer sieve controls failed: $($output
 $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-ENABLED-PRODUCER-SIEVE-CONTROLS-PASSED".*\}$'} | Select-Object -Last 1
 if(-not $recordLine){throw "Enabled producer sieve controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
 if([int]$record.assertions -lt 13 -or [int]$record.cold_sieved -ne 129 -or [int]$record.filtered -ne 5 `
   -or [int]$record.complete -ne 134 -or [int]$record.research_calls -ne 1 -or [int]$record.warm_bucket_reads -ne 1 `
   -or [int]$record.factorio_processes -ne 0){
@@ -26,6 +27,7 @@ if([int]$record.assertions -lt 13 -or [int]$record.cold_sieved -ne 129 -or [int]
 }
 [pscustomobject]@{
   status=[string]$record.status
+  scope=[string]$record.scope
   assertions=[int]$record.assertions
   cold_sieved=[int]$record.cold_sieved
   filtered=[int]$record.filtered

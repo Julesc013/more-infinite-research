@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 
-PACK_MODULE = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+PACK_MODULE = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
 FIXTURE = Path("tests/compiler/contextual_boolean_route_policy.lua")
 PACK_MODULE_NAME = "prototypes.mir.capabilities.science_integration.pack_production_reachability"
 
@@ -181,6 +181,9 @@ def main() -> int:
     from lupa import lua52
 
     source = (repo / PACK_MODULE).read_text(encoding="utf-8")
+    reference_root = repo / "tests/reference/retired-discovery"
+    if not reference_root.is_dir():
+        raise RuntimeError(f"Missing retired discovery reference root: {reference_root}")
     instrumented_source = instrument_pack_module(source)
     fixture = (repo / FIXTURE).read_text(encoding="utf-8")
     adapter_root = repo / "source" / "adapters" / args.target
@@ -188,7 +191,8 @@ def main() -> int:
         raise RuntimeError(f"Missing target adapter: {adapter_root}")
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
     runtime.execute(
-        'package.path = "' + escaped_lua_path(repo / "source" / "?.lua") + ';'
+        'package.path = "' + escaped_lua_path(reference_root / "?.lua") + ';'
+        + escaped_lua_path(repo / "source" / "?.lua") + ';'
         + escaped_lua_path(adapter_root / "?.lua") + ';" .. package.path'
     )
     runtime.execute(bootstrap(args.target))
@@ -203,6 +207,7 @@ def main() -> int:
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-CONTEXTUAL-BOOLEAN-ROUTE-POLICY-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "target": args.target,
         "assertions": int(result["assertions"]),
         "cold_available": bool(result["cold_available"]),

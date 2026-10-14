@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8226,
-      "expected_sha256": "25EE1E3E436A0F4F415954B7F974AA653D2F82CDCE740B4246FABDE00F50D1E5",
+      "expected_bytes": 10087,
+      "expected_sha256": "67291AF6132E0FD9D77BC2FDA1047A6F3A6CC970C7F7F573B3E930461C69A840",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5729,
-      "expected_sha256": "97F968D4E2D2EF9D861537D19A19E082811484C895F5DFC3FF2F3C89AD3CE6BF",
+      "expected_bytes": 6024,
+      "expected_sha256": "D7A5329A1079E92E79F723CE5FB44155B68DA88B0F9691A86B85062264B7E5CC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2700,8 +2700,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11287,
-      "expected_sha256": "C6D419A2F26933137FC633E4B3A6DC3573834F7A9EDC6ADAE0232BF15A94BE64",
+      "expected_bytes": 9538,
+      "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3692,8 +3692,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2383,
-      "expected_sha256": "A205ED6DEABCCB14E08D4CF7BB2F2AC01B25E9888B2A5D62D932D5D64C8F7E03",
+      "expected_bytes": 2612,
+      "expected_sha256": "B552E455707FC0802932E6FA9B5C91C2E860B817232B02DE228F670C4A48A978",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3740,8 +3740,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 80566,
-      "expected_sha256": "BB1D3A2917AB090355F354CDFDDB78BCA2E05251644CA8A4E35CE3DA7F5C61B9",
+      "expected_bytes": 80485,
+      "expected_sha256": "11012FF6A21E7DBE7636A08B43A3B74C4363AD708C67EFC5B78B672CE1525C79",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3820,8 +3820,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the separate bounded MIR enrichment provider for F200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 37515,
-      "expected_sha256": "690A7831A334336D9A153EF065A353212C4EF1C87DABDB4C750D498BE0C2DEDA",
+      "expected_bytes": 33590,
+      "expected_sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "copied-provider-dtos-only",
@@ -3893,54 +3893,6 @@
       ]
     },
     {
-      "path": "prototypes/mir/pipeline/classic_compiler.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/pipeline/classic_compiler.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f200 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4131,
-      "expected_sha256": "E04AE9C4EB3ED8BAD8EBC644ED176020C6ABB68F04E3C5D6C779559B3AA86167",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/domain/compiler/classic_declarations.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f200 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4417,
-      "expected_sha256": "43A03B8633D397DF6A1EEBEC70674900037278F8AE0AFB0CB434BAA133642617",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/classic/plan.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/planner/classic/plan.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f200 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 31440,
-      "expected_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
       "path": "prototypes/mir/runtime/compiler_profile_notice.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -3963,5 +3915,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F2B32EFC17A8B06F33E4066D6DA3A1B73B92C06BB1AAFC75873F4AF94741C2D7"
+  "record_sha256": "48098B66C2F8C45D170FCD68979CDC24D829AE28AEE2473F9216CC6A5EF850AC"
 }

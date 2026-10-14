@@ -3,14 +3,10 @@
 -- enters the player-facing MIR API surface.
 local science = require(
   "__more-infinite-research__.prototypes.mir.capabilities.science_integration.science_packs")
-local reachability = require(
-  "__more-infinite-research__.prototypes.mir.capabilities.science_integration.pack_production_reachability")
 local compiler_context = require(
   "__more-infinite-research__.prototypes.mir.pipeline.compiler_context")
 local recipe_unlocks = require(
   "__more-infinite-research__.prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
-local technology_researchability = require(
-  "__more-infinite-research__.prototypes.mir.capabilities.science_integration.technology_researchability")
 
 local function fail(message)
   error("MIR F200 science researchability diagnostic assertion failed: " .. message)
@@ -131,11 +127,7 @@ local function assert_unlocker(recipe_name, technology_name)
   if not contains(recipe_unlocks.unlockers_for_recipe(recipe_name), technology_name) then
     fail(recipe_name .. " is not unlocked by finalized technology " .. technology_name)
   end
-  local rejection = technology_researchability.reason_with_context(technology_name, {
-    visiting_packs = {},
-    visiting_technologies = {},
-    unlock_recipe_name = recipe_name
-  })
+  local rejection = science.technology_researchability_reason(technology_name)
   if rejection ~= nil then
     fail(technology_name .. " is not researchable for " .. recipe_name .. ": " .. tostring(rejection))
   end
@@ -164,15 +156,7 @@ local function prerequisite_chain_logistic_consumer(root_name)
 end
 
 compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), function()
-  -- Register only the private traversal services on the fixture's short-lived
-  -- parent context. pack_production_rejection_projection itself creates a
-  -- second fresh context for every observation, so no cache or telemetry can
-  -- escape into the normal packaged compilation context.
   science.ensure_services()
-  -- The bounded observation may borrow only an already-materialized immutable
-  -- recipe snapshot from this short-lived parent. Build that canonical parent
-  -- snapshot here, before any projection, rather than allowing the child
-  -- observation to construct recipe facts without an observer.
   local canonical_recipe_facts = require(
     "__more-infinite-research__.prototypes.mir.index.recipe_facts")
   local parent_recipe_index = canonical_recipe_facts.index_view()
@@ -211,54 +195,37 @@ compiler_context.with_active(compiler_context.new({execution_mode = "SAFE"}), fu
   assert_unlocker("bob-basic-electronic-components", "bob-electronics")
   assert_unlocker("angels-solder", "angels-solder-smelting-1")
 
-  local status, prerequisite = reachability.pack_production_status("logistic-science-pack", {})
-  local route = reachability.production_route_for_pack("logistic-science-pack")
+  local status, prerequisite = science.pack_production_status("logistic-science-pack")
+  local route = science.production_route_for_pack("logistic-science-pack")
   if status ~= "research" or prerequisite ~= "logistic-science-pack"
-    or not route or route.recipe ~= "logistic-science-pack"
-    or route.unlocker ~= "logistic-science-pack" then
-    fail("finalized logistic-science acquisition route was not selected")
-  end
-  local logistic_rejection = reachability.pack_production_rejection_projection("logistic-science-pack", {
-    limits = {candidates = 16, nodes = 1024, depth = 32, bytes = 32768}
-  })
-  if logistic_rejection ~= nil then
-    local failure = logistic_rejection.first_failure or {}
-    local truncation = logistic_rejection.truncation or {}
-    local usage = truncation.usage or {}
-    local bounded = logistic_rejection.status == "indeterminate"
-      and failure.reason == "diagnostic-work-budget-exhausted"
-      and usage.visits == 1024
-      and contains(truncation.truncated, "nodes")
-    if not bounded then
-      fail("reachable finalized logistic-science route retained a rejection projection"
-        .. " status=" .. tostring(logistic_rejection.status)
-        .. " reason=" .. tostring(failure.reason)
-        .. " visits=" .. tostring(usage.visits)
-        .. " truncated=" .. table.concat(truncation.truncated or {}, ","))
-    end
-    log("[mir-fixture-assert-f200-science-researchability-diagnostic] projection=bounded-indeterminate"
-      .. " pack=logistic-science-pack visits=" .. tostring(usage.visits)
-      .. " reason=" .. tostring(failure.reason))
+    or not route or route.pack_name ~= "logistic-science-pack"
+    or route.recipe_name ~= "logistic-science-pack"
+    or route.unlocker ~= "logistic-science-pack"
+    or route.acquisition_proof ~= false then
+    fail("finalized logistic-science declared binding differs")
   end
   log("[mir-fixture-assert-f200-science-researchability-diagnostic] final-route"
     .. " pack=logistic-science-pack status=" .. status
     .. " prerequisite=" .. prerequisite
-    .. " recipe=" .. route.recipe .. " unlocker=" .. route.unlocker
+    .. " recipe=" .. route.recipe_name .. " unlocker=" .. route.unlocker
+    .. " acquisition_proof=false"
     .. " steam_witness=boiler-conversion")
 
-  local chemical_status, chemical_prerequisite = reachability.pack_production_status("chemical-science-pack", {})
-  local chemical_route = reachability.production_route_for_pack("chemical-science-pack")
+  local chemical_status, chemical_prerequisite = science.pack_production_status("chemical-science-pack")
+  local chemical_route = science.production_route_for_pack("chemical-science-pack")
   log("[mir-fixture-assert-f200-science-researchability-diagnostic] chemical-route"
     .. " status=" .. tostring(chemical_status)
     .. " prerequisite=" .. tostring(chemical_prerequisite)
-    .. " recipe=" .. tostring(chemical_route and chemical_route.recipe)
+    .. " recipe=" .. tostring(chemical_route and chemical_route.recipe_name)
     .. " unlocker=" .. tostring(chemical_route and chemical_route.unlocker)
     .. " ingredients=" .. table.concat(recipe_ingredient_names("chemical-science-pack"), ","))
 
   for _, key in ipairs(material_keys) do observe_material(key) end
   if chemical_status ~= "research" or chemical_prerequisite ~= "chemical-science-pack"
-    or not chemical_route or chemical_route.recipe ~= "chemical-science-pack" then
-    fail("finalized chemical-science acquisition route was not selected")
+    or not chemical_route or chemical_route.pack_name ~= "chemical-science-pack"
+    or chemical_route.recipe_name ~= "chemical-science-pack"
+    or chemical_route.acquisition_proof ~= false then
+    fail("finalized chemical-science declared binding differs")
   end
 
   for index, subject in ipairs(subjects) do

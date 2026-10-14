@@ -130,6 +130,47 @@ for _, size in ipairs({32, 64, 128}) do
   end)
 end
 
+-- Unknown lab placement sources must not become an unavailable result that
+-- silently suppresses research or justifies a reduced science vector.
+for _, operation in ipairs({"any", "best"}) do
+  local missing_source = world(0, false)
+  missing_source.recipe["lab-kit"] = nil
+  for _, role in ipairs(roles) do missing_source.recipe[role].enabled = true end
+  Context.with_active(Context.new(), function()
+    local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+    local ok, reason = pcall(function()
+      if operation == "any" then return science.any_lab_accepts_all(roles) end
+      local ingredients = {}
+      for _, role in ipairs(roles) do ingredients[#ingredients + 1] = {role, 1} end
+      return science.best_lab_compatible_ingredients(ingredients, "unknown-lab-source", {})
+    end)
+    check(not ok and string.find(reason, "approved laboratory binding is unresolved", 1, true),
+      "An unresolved lab source must remain explicit in the " .. operation .. " path")
+  end)
+end
+do
+  local with_specialist = world(0, false)
+  with_specialist.lab["unresolved-specialist"] = {name = "unresolved-specialist", inputs = deepcopy(roles)}
+  Context.with_active(Context.new(), function()
+    local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+    check(science.any_lab_accepts_all(roles), "An unresolved alternative cannot veto a valid complete lab vector")
+  end)
+end
+do
+  local reduction = world(0, false)
+  reduction.lab.lab.inputs = {roles[1], roles[2]}
+  reduction.lab["unresolved-specialist"] = {name = "unresolved-specialist", inputs = deepcopy(roles)}
+  for _, role in ipairs(roles) do reduction.recipe[role].enabled = true end
+  Context.with_active(Context.new(), function()
+    local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+    local ingredients = {}
+    for _, role in ipairs(roles) do ingredients[#ingredients + 1] = {role, 1} end
+    local ok, reason = pcall(science.best_lab_compatible_ingredients, ingredients, "unknown-full-lab", {})
+    check(not ok and string.find(reason, "approved laboratory binding is unresolved", 1, true),
+      "An unresolved full-vector lab cannot justify silently reducing required research science")
+  end)
+end
+
 local raw = world(0, false)
 raw.tool["exclusive-pack"] = {type = "tool", name = "exclusive-pack"}
 raw.recipe["exclusive-pack"] = {type = "recipe", name = "exclusive-pack", enabled = false,
@@ -269,5 +310,62 @@ Context.with_active(Context.new(), function()
   local ok, reason = pcall(science.pack_production_status, "mod-science")
   check(not ok and string.find(reason, "ambiguous-approved-pack-source", 1, true),
     "Ambiguous unfamiliar pack sources produce an explicit diagnosis without route discovery")
+end)
+local function launch_world()
+  local value = world(0, false)
+  value.tool["space-science-pack"] = {type = "tool", name = "space-science-pack"}
+  value.lab.lab.inputs[#value.lab.lab.inputs + 1] = "space-science-pack"
+  value.item.satellite = {type = "item", name = "satellite", send_to_orbit_mode = "automated",
+    rocket_launch_products = {{type = "item", name = "space-science-pack", amount = 1000}}}
+  value["rocket-silo-rocket"] = {rocket = {name = "rocket", inventory_size = 0}}
+  value["rocket-silo"] = {silo = {name = "silo", rocket_entity = "rocket", fixed_recipe = "rocket-part",
+    to_be_inserted_to_rocket_inventory_size = 1, crafting_speed = 1, rocket_parts_required = 100}}
+  value["cargo-landing-pad"] = {pad = {name = "pad", inventory_size = 100}}
+  value.technology["white-research"] = {type = "technology", name = "white-research", prerequisites = {},
+    unit = {count = 1, ingredients = {{"space-science-pack", 1}}}}
+  value.technology["white-descendant"] = {type = "technology", name = "white-descendant", prerequisites = {"white-research"},
+    unit = {count = 1, ingredients = {{roles[1], 1}}}}
+  return value
+end
+raw = launch_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(science.pack_production_status("space-science-pack") == "unreachable",
+    "The published launch inventory policy is retained without inventing an acquisition proof")
+  local source = science.production_route_for_pack("space-science-pack")
+  check(source.status == "not-admitted" and source.acquisition_proof == false and source.source_kind == "retained-published-native-launch-policy"
+    and source.policy_reason ~= nil, "The retained exclusion is explicit source policy, not factory impossibility")
+  local reason = science.technology_researchability_reason("white-descendant")
+  check(string.find(reason, "science-excluded-by-published-policy:", 1, true) == 1,
+    "A known policy exclusion propagates through mandatory prerequisites without becoming an unresolved proof")
+  local requested = {}
+  for _, role in ipairs(roles) do requested[#requested + 1] = {role, 1} end
+  requested[#requested + 1] = {"space-science-pack", 1}
+  local selected = science.best_lab_compatible_ingredients(requested, "published-policy-control", {})
+  check(selected and #selected == 4, "Retained launch policy leaves the published ordinary four-pack vector unchanged")
+  check(science.best_lab_compatible_ingredients(requested, "required-policy-control", {"space-science-pack"}) == nil,
+    "A required pack cannot be silently removed to make a family pass")
+end)
+raw = launch_world()
+raw["rocket-silo-rocket"].rocket.inventory_size = 1
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "An unapproved positive launch case remains explicit and cannot be replaced by a negative policy answer")
+end)
+raw = launch_world()
+raw.resource = {ore = {name = "ore", minable = {result = "space-science-pack"}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "A new native producer cannot inherit a launch-only exclusion")
+end)
+raw = launch_world()
+raw.recipe["space-science-pack"] = {type = "recipe", name = "space-science-pack", enabled = true,
+  results = {{type = "item", name = "space-science-pack", amount = 1}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(science.pack_production_status("space-science-pack") == "initial",
+    "An actual approved direct recipe takes precedence over retained launch policy")
 end)
 return checks

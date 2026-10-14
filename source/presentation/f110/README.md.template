@@ -1,10 +1,10 @@
 # More Infinite Research 4.2.11002
 
-**MIR 4.3.1 compiler — modern targets (1.0 and newer):** **Full** is the only public compiler path and retains broad automatic research support with the performance improvements in this update. A saved Classic selection from 4.3.0 now selects Full; the reduced option that omitted established research is retired.
+**MIR 4.4.0 research generation:** approved research families use one generation path within the selected engine target's capabilities. Saved Full and Classic values no longer select different compilers; the reduced Classic implementation is retired.
 
-Keep an untouched backup before upgrading. Full restores applicable definitions but cannot reconstruct levels, bonuses or progress already erased by saving with omitted technologies in 4.3.0 Classic. Use a pre-update backup where available. Loading time depends on the active mods. Historical Factorio 0.x packages retain their existing target capabilities.
+Keep an untouched backup before upgrading. Restoring applicable definitions cannot reconstruct levels, bonuses or progress already erased by saving with omitted technologies in 4.3.0 Classic. Use a pre-update backup where available. Loading time depends on the active mods. Historical Factorio 0.x packages retain their existing target capabilities.
 
-The catalogue and older release descriptions below document Full or earlier release behavior. The matching release notes and exact package evidence identify tested configurations and upgrade outcomes.
+The catalogue and older release descriptions below document earlier release behavior. The matching release notes and exact package evidence identify tested configurations and upgrade outcomes.
 
 More Infinite Research 4.2.11002 is a Factorio 1.1 reduced-target maintenance package from source 4.2.2.
 

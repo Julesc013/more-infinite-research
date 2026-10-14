@@ -10,6 +10,11 @@ local function pack_production_status(...)
   return service(...)
 end
 
+local function pack_is_admitted(name)
+  local status = pack_production_status(name)
+  return status ~= "unreachable" and status ~= "not-admitted"
+end
+
 function M.ingredient_name(ingredient)
   if not ingredient then return nil end
   if type(ingredient) == "string" then return ingredient end
@@ -56,27 +61,53 @@ local function lab_acquisition_available(lab_name, diagnostic_observer)
   if not diagnostic_visit(diagnostic_observer) then return false end
   local service = compiler_context.current():service("science.lab_binding_available")
   if not service then error("MIR approved lab-binding service is not registered in CompilerContext.", 2) end
-  return service(lab_name) == true
+  return service(lab_name)
+end
+
+local function unresolved_lab(reason)
+  error("MIR approved laboratory binding is unresolved: " .. tostring(reason)
+    .. ". Refusing to discard established research or invoke production discovery.", 3)
+end
+
+local function first_reason(current, reason)
+  if reason and (not current or reason < current) then return reason end
+  return current
+end
+
+local function accepting_lab(packs, diagnostic_observer, reachability_context)
+  if not packs or #packs == 0 then return false end
+  local unresolved
+  for name, lab in pairs(data_raw.prototypes("lab")) do
+    if not diagnostic_visit(diagnostic_observer) then return false end
+    if lab_accepts_all(lab, packs, diagnostic_observer) then
+      local available, reason = lab_acquisition_available(name, diagnostic_observer, reachability_context)
+      if available == true then return true end
+      if available == nil then unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. name)) end
+    end
+  end
+  return false, unresolved
 end
 
 function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
-  if not packs or #packs == 0 then return false end
-  for name, lab in pairs(data_raw.prototypes("lab")) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
-    if lab_accepts_all(lab, packs, diagnostic_observer)
-      and lab_acquisition_available(name, diagnostic_observer, reachability_context) then return true end
-  end
-  return false
+  local accepted, reason = accepting_lab(packs, diagnostic_observer, reachability_context)
+  if not accepted and reason and not diagnostic_observer then unresolved_lab(reason) end
+  return accepted
 end
 
-function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
+local function accepting_ingredients(ingredients, diagnostic_observer, reachability_context)
   local packs = {}
   for _, ingredient in ipairs(ingredients or {}) do
     if not diagnostic_visit(diagnostic_observer) then return false end
     local name = M.ingredient_name(ingredient)
     if name then table.insert(packs, name) end
   end
-  return M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
+  return accepting_lab(packs, diagnostic_observer, reachability_context)
+end
+
+function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
+  local accepted, reason = accepting_ingredients(ingredients, diagnostic_observer, reachability_context)
+  if not accepted and reason and not diagnostic_observer then unresolved_lab(reason) end
+  return accepted
 end
 
 local function required_set(required_packs)
@@ -119,12 +150,16 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
     local reachable = #unchanged > 0
     for _, ingredient in ipairs(unchanged) do
       local pack_name = M.ingredient_name(ingredient)
-      if not pack_name or pack_production_status(pack_name) == "unreachable" then
+      if not pack_name or not pack_is_admitted(pack_name) then
         reachable = false
         break
       end
     end
-    if reachable and M.valid_research_ingredients(unchanged) then return unchanged, "unchanged" end
+    if reachable then
+      local accepted, reason = accepting_ingredients(unchanged)
+      if accepted then return unchanged, "unchanged" end
+      if reason then unresolved_lab(reason) end
+    end
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
       .. " because engine-default lab policy forbids ingredient rewriting and the selected set is not safely researchable.")
     return nil, "invalid"
@@ -133,12 +168,12 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
   local source = {}
   for _, ingredient in ipairs(deepcopy(ingredients or {})) do
     local pack_name = M.ingredient_name(ingredient)
-    if pack_name and pack_production_status(pack_name) ~= "unreachable" then
+    if pack_name and pack_is_admitted(pack_name) then
       table.insert(source, ingredient)
     else
       log("[more-infinite-research] Excluding science pack " .. tostring(pack_name)
         .. " from " .. tostring(context or "unknown technology")
-        .. " because it has no initially available recipe or enabled reachable unlock technology.")
+        .. " because it is not admitted by the approved science source policy.")
     end
   end
   if #source == 0 then return nil, "empty" end
@@ -149,8 +184,10 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
       .. " because required science pack " .. tostring(unreachable_required) .. " is unreachable.")
     return nil, "required-unreachable"
   end
-  if M.valid_research_ingredients(source) then return source, "full" end
+  local accepted, unresolved = accepting_ingredients(source)
+  if accepted then return source, "full" end
   if policy() == "skip" then
+    if unresolved then unresolved_lab(unresolved) end
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
       .. " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip.")
     return nil, "invalid"
@@ -169,13 +206,20 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
       if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
     end
     local candidate_has_required = contains_required(candidate, required)
-    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
-      and #candidate > 0 and lab_acquisition_available(entry.name)
-      and (not best or #candidate > #best) then
-      best, best_lab = candidate, entry.name
+    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs) and #candidate > 0 then
+      local available, reason = lab_acquisition_available(entry.name)
+      if available == true and (not best or #candidate > #best) then
+        best, best_lab = candidate, entry.name
+      elseif available == nil then
+        unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. entry.name))
+      end
     end
   end
 
+  -- An unresolved accepting source cannot be treated as a disproved route to
+  -- justify rewriting the requested science. A valid complete vector above
+  -- already returns without letting a specialist lab veto it.
+  if unresolved then unresolved_lab(unresolved) end
   if best then
     log("[more-infinite-research] Reduced science packs for " .. tostring(context or "unknown technology")
       .. " to a lab-compatible subset accepted by " .. best_lab .. ".")

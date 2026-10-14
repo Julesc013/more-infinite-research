@@ -444,7 +444,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $receipt=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
       Check ($receipt.candidate.version-ceq$freshVersion-and(Test-MIR4BootstrapRecordHash $receipt)-and$receipt.library_input_receipt.status-ceq'restored-direct-library-controls') "$sourceVersion historical fresh load did not retain its exact identity or restore controls."
     }
-    Check ($release43HistoricalRoots.Count-eq2) '4.3 historical fresh-load controls omitted an admitted source version.'
+    Check ($release43HistoricalRoots.Count-eq3) '4.3/4.4 historical fresh-load controls omitted an admitted source version.'
     $freshVersion='4.2.01301';$freshParams.SourceVersion='4.2.1'
     $freshParams.Candidate=Join-Path $sourceRoot 'more-infinite-research_4.2.01301.zip'
     $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate

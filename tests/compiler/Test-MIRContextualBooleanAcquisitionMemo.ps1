@@ -10,7 +10,7 @@ $ErrorActionPreference = 'Stop'
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 $runner = Join-Path $repo 'tests/compiler/run_contextual_boolean_acquisition_memo_controls.py'
-$source = Join-Path $repo 'source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
+$source = Join-Path $repo 'tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
 if (-not (Test-Path -LiteralPath $runner -PathType Leaf) -or -not (Test-Path -LiteralPath $source -PathType Leaf)) {
   throw 'Contextual Boolean acquisition memo control inputs are unavailable.'
 }
@@ -28,11 +28,13 @@ if (-not $recordLine) {
   throw "Contextual Boolean acquisition memo controls produced no success record: $($output -join [Environment]::NewLine)"
 }
 $record = $recordLine | ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
 if ([int]$record.assertions -lt 21 -or [int]$record.acquisition_calls -lt 20 -or [int]$record.factorio_processes -ne 0) {
   throw 'Contextual Boolean acquisition memo controls did not retain their required positive-only/cold-fallback coverage.'
 }
 [pscustomobject]@{
   status=[string]$record.status
+  scope=[string]$record.scope
   assertions=[int]$record.assertions
   acquisition_calls=[int]$record.acquisition_calls
   source_sha256=[string]$record.source_sha256

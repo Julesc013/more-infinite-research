@@ -504,15 +504,20 @@ try {
       $writtenAuthoredHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $($patchVersions[$i])`n", [StringComparison]::Ordinal) -and
       $writtenAuthoredHistory.EndsWith($authoredHistory, [StringComparison]::Ordinal)) "patch-authored-prior-changelog-preserved-$i"
   }
-  $mir43IdentityTree = Join-Path $identityRoot 'mir43-private-identity'
-  New-Item -ItemType Directory -Force -Path $mir43IdentityTree | Out-Null
-  $mir43Info = [ordered]@{ name='more-infinite-research'; version='4.3.21000'; factorio_version='2.1'; dependencies=@('base'); title='Preserved authored title' }
-  [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'info.json'), ($mir43Info | ConvertTo-Json -Depth 20), $utf8)
-  [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'changelog.txt'), "---------------------------------------------------------------------------------------------------`nVersion: 4.3.21000`n  Changes:`n    - Preserved historical entry.`n", $utf8)
-  [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'README.md'), "# Preserved authored README`n", $utf8)
   foreach ($mir43Contract in $mir43Contracts) {
     $sourceVersion = [string]$mir43Contract.source_version
-    $distributionVersion = "4.3.210$($mir43Contract.source_patch)"
+    $sourceIdentity = [version]$sourceVersion
+    $distributionVersion = [string](New-MIR4DistributionIdentityProjection -DistributionTargetCode '210' -SourceMinor $sourceIdentity.Minor -SourcePatch $sourceIdentity.Build).distribution_version
+    $baselineVersion = [string](New-MIR4DistributionIdentityProjection -DistributionTargetCode '210' -SourceMinor $sourceIdentity.Minor -SourcePatch 0).distribution_version
+    # Each source identity starts from its own baseline package. Reusing an
+    # earlier source's rewritten info/readme would turn an invalid input into
+    # an apparent later-source maintenance patch.
+    $mir43IdentityTree = Join-Path $identityRoot ("mir43-private-identity-" + $sourceVersion.Replace('.', '-'))
+    New-Item -ItemType Directory -Force -Path $mir43IdentityTree | Out-Null
+    $mir43Info = [ordered]@{ name='more-infinite-research'; version=$baselineVersion; factorio_version='2.1'; dependencies=@('base'); title='Preserved authored title' }
+    [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'info.json'), ($mir43Info | ConvertTo-Json -Depth 20), $utf8)
+    [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'changelog.txt'), "---------------------------------------------------------------------------------------------------`nVersion: $baselineVersion`n  Changes:`n    - Preserved historical entry.`n", $utf8)
+    [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'README.md'), "# Preserved authored README`n", $utf8)
     Write-MIR4PrivatePatchPackageIdentity -Tree $mir43IdentityTree -DistributionVersion $distributionVersion -SourceVersion $sourceVersion
     $mir43InfoAfter = Get-Content -Raw -LiteralPath (Join-Path $mir43IdentityTree 'info.json') | ConvertFrom-Json -Depth 20
     $mir43Readme = [IO.File]::ReadAllText((Join-Path $mir43IdentityTree 'README.md'))

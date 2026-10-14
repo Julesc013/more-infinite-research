@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8226,
-      "expected_sha256": "25EE1E3E436A0F4F415954B7F974AA653D2F82CDCE740B4246FABDE00F50D1E5",
+      "expected_bytes": 10087,
+      "expected_sha256": "67291AF6132E0FD9D77BC2FDA1047A6F3A6CC970C7F7F573B3E930461C69A840",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5729,
-      "expected_sha256": "97F968D4E2D2EF9D861537D19A19E082811484C895F5DFC3FF2F3C89AD3CE6BF",
+      "expected_bytes": 6024,
+      "expected_sha256": "D7A5329A1079E92E79F723CE5FB44155B68DA88B0F9691A86B85062264B7E5CC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2700,8 +2700,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11287,
-      "expected_sha256": "C6D419A2F26933137FC633E4B3A6DC3573834F7A9EDC6ADAE0232BF15A94BE64",
+      "expected_bytes": 9538,
+      "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3724,8 +3724,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2383,
-      "expected_sha256": "A205ED6DEABCCB14E08D4CF7BB2F2AC01B25E9888B2A5D62D932D5D64C8F7E03",
+      "expected_bytes": 2612,
+      "expected_sha256": "B552E455707FC0802932E6FA9B5C91C2E860B817232B02DE228F670C4A48A978",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5606,
-      "expected_sha256": "521DDBA5C8DF9B27707B2B47EE9C2E29C8BD0283E8271F335B02E830A21D7096",
+      "expected_bytes": 5525,
+      "expected_sha256": "C5C821D5916925760482C84AFC96EC1B55079ABDE9AC92CDAB504A62072DF21D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3829,54 +3829,6 @@
       ]
     },
     {
-      "path": "prototypes/mir/pipeline/classic_compiler.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/pipeline/classic_compiler.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4131,
-      "expected_sha256": "E04AE9C4EB3ED8BAD8EBC644ED176020C6ABB68F04E3C5D6C779559B3AA86167",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/domain/compiler/classic_declarations.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/domain/compiler/classic_declarations.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 4417,
-      "expected_sha256": "43A03B8633D397DF6A1EEBEC70674900037278F8AE0AFB0CB434BAA133642617",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
-      "path": "prototypes/mir/planner/classic/plan.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/planner/classic/plan.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 31440,
-      "expected_sha256": "E27F977788B3FECF52AAEB4374763AC4A72796833BF395D7160E07D9A1FB2296",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
-    },
-    {
       "path": "prototypes/mir/runtime/compiler_profile_notice.lua",
       "operation": "add",
       "semantic_class": "target-overlay",
@@ -3899,5 +3851,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "FD330E9526DCFC9A9DFE9B8C84C8153149FCE26E2C230AB9FD298309A12C2E89"
+  "record_sha256": "C5A412D40DEB5BE25F65DD81116D34A55C75CFF817D4CBB4EFCCCCEAA6114E6E"
 }

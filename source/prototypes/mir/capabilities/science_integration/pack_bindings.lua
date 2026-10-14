@@ -6,6 +6,8 @@ local pack_registry = require("prototypes.mir.capabilities.science_integration.p
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local researchability_index = require("prototypes.mir.graph.researchability_index")
 local recipe_semantics = require("prototypes.mir.domain.facts.recipe_semantics")
+local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
+local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 
 local M = {}
 
@@ -111,6 +113,71 @@ function M.technology_structural_reason(name)
   return technology_reason(name)
 end
 
+local function positive(value)
+  return type(value) == "number" and value == value and value > 0 and value < math.huge
+end
+
+local function has_item_output(entries, wanted)
+  for _, entry in ipairs(entries or {}) do
+    if type(entry) == "table" and (entry.type or "item") == "item"
+      and (entry.name or entry[1] or entry.item) == wanted and recipe_semantics.possible_item_result(entry) then
+      return true
+    end
+  end
+  return false
+end
+
+-- This is a declaration of the published admission policy, not a claim that
+-- Factorio cannot supply the pack. In particular, do not silently correct the
+-- old rocket inventory guard and thereby change existing research science.
+-- Positive/unfamiliar native cases remain explicit until separately approved.
+local function retained_launch_exclusion(pack_name, policy)
+  if not policy or pack_name ~= pack_registry.native_pack_name(policy.pack) then return nil end
+  local payload = prototype_lookup.item_prototype(policy.payload)
+  local products = payload and (payload.rocket_launch_products
+    or (payload.rocket_launch_product and {payload.rocket_launch_product}))
+  if not has_item_output(products, pack_name) then return nil end
+  -- A non-launch native producer is relevant new input. Do not pretend the
+  -- old launch exclusion proves that producer unavailable.
+  for kind, prototypes in pairs(data_raw.raw()) do
+    if kind ~= "recipe" then
+      for _, prototype in pairs(prototypes) do
+        local minable = prototype.minable or {}
+        if minable.result == pack_name or has_item_output(minable.results, pack_name)
+          or has_item_output(prototype.loot, pack_name)
+          or prototype.spoil_result == pack_name or prototype.burnt_result == pack_name then
+          return nil
+        end
+      end
+    end
+  end
+  local line = target_profiles.current_factorio_version
+  local reason = "published-native-launch-contract-not-supported-on-target"
+  if line == "2.0" or line == "2.1" then
+    if payload.send_to_orbit_mode ~= "manual" and payload.send_to_orbit_mode ~= "automated" then
+      reason = "published-native-launch-mode-not-admitted"
+    else
+      local receiver = false
+      for _, pad in pairs(data_raw.prototypes("cargo-landing-pad")) do
+        if positive(pad.inventory_size) then receiver = true; break end
+      end
+      for _, silo in pairs(data_raw.prototypes("rocket-silo")) do
+        local rocket = data_raw.prototypes("rocket-silo-rocket")[silo.rocket_entity]
+        if receiver and type(silo.fixed_recipe) == "string" and silo.fixed_recipe ~= "" and rocket
+          and silo.launch_to_space_platforms ~= true and positive(silo.to_be_inserted_to_rocket_inventory_size)
+          and positive(rocket.inventory_size) and positive(silo.crafting_speed)
+          and positive(silo.rocket_parts_required) and silo.rocket_parts_required % 1 == 0 then
+          return nil -- A possible positive route needs an approved binding.
+        end
+      end
+      reason = "published-native-launch-required-structure-not-admitted"
+    end
+  end
+  return {pack_name = pack_name, binding_id = "retained-launch-policy/" .. pack_name,
+    status = "not-admitted", initial = false, unlockers = {}, ingredient_packs = {},
+    source_kind = "retained-published-native-launch-policy", policy_reason = reason, acquisition_proof = false}
+end
+
 local function declared_source(pack_name, shared)
   local declarations = shared.science_bindings or {}
   local declared_roles = {}
@@ -140,6 +207,11 @@ local function declared_source(pack_name, shared)
     -- an unfamiliar name. Ambiguity is explicit; it never starts a competing
     -- route search or chooses an alternative by traversal order.
     local producers = recipe_facts.recipes_by_output_identity_view("item", pack_name)
+    if #producers == 0 then
+      local excluded = retained_launch_exclusion(pack_name, (shared.science_binding_policy or {}).retained_launch_source)
+      if excluded then return excluded end
+      return nil, "missing-approved-pack-source:" .. pack_name
+    end
     if #producers ~= 1 then return nil, "ambiguous-approved-pack-source:" .. pack_name end
     recipe_name = producers[1]
     fact = recipe_facts.view(recipe_name)
@@ -223,14 +295,15 @@ local function accepts(lab, names)
 end
 
 local function build_reference_bindings(shared, labs)
-  local result = {packs = {}, issues = {}, labs = labs, technologies = {}, rules = {}}
+  local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, technologies = {}, rules = {}}
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
   end
   for _, pack in ipairs(pack_registry.pack_list_all()) do
     local source, reason = declared_source(pack, shared)
     result.packs[pack], result.issues[pack] = source, reason
-    if source then
+    if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
+    if source and source.status ~= "not-admitted" then
       local required = {}
       for _, gate in ipairs(source.unlockers) do required[#required + 1] = node("technology", gate) end
       for _, ingredient in ipairs(source.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
@@ -238,6 +311,7 @@ local function build_reference_bindings(shared, labs)
     end
   end
   for _, lab in ipairs(labs) do
+    result.lab_names[lab.name] = true
     for _, source in ipairs(lab.sources or {}) do
       local required = {}
       for _, pack in ipairs(source.ingredient_packs or {}) do required[#required + 1] = node("pack", pack) end
@@ -294,6 +368,41 @@ local function build_reference_bindings(shared, labs)
     end
   end
   result.facts, result.work = propagate(result.rules)
+  -- Only known declared exclusions propagate a negative answer. Pending
+  -- research/lab cycles and unsupported sources remain unresolved, never false.
+  if result.has_policy_exclusions then
+    local blocked, reverse, queue = {}, {}, {}
+    local function block(name, reason)
+      if not blocked[name] then
+        blocked[name] = reason
+        if result.technologies[name] == false then result.technologies[name] = reason end
+        queue[#queue + 1] = name
+      end
+    end
+    for _, name in ipairs(sorted_names(technologies)) do
+      local technology = technologies[name]
+      for _, prerequisite in ipairs(technology.prerequisites or {}) do
+        reverse[prerequisite] = reverse[prerequisite] or {}
+        reverse[prerequisite][#reverse[prerequisite] + 1] = name
+      end
+      for _, pack in ipairs(ingredient_names(not technology.research_trigger and (technology.unit or {}).ingredients)) do
+        if result.packs[pack] and result.packs[pack].status == "not-admitted" then
+          block(name, "science-excluded-by-published-policy:" .. pack)
+          break
+        end
+      end
+    end
+    local cursor, notifications = 1, 0
+    while cursor <= #queue do
+      local name = queue[cursor]; cursor = cursor + 1
+      for _, dependent in ipairs(reverse[name] or {}) do
+        notifications = notifications + 1
+        block(dependent, blocked[name])
+      end
+    end
+    result.work.policy_exclusion_technologies = #queue
+    result.work.policy_exclusion_notifications = notifications
+  end
   -- Rule counters are sufficient for ordinary metadata. Do not retain the
   -- reverse propagation graph or expanded explanation inventories.
   result.rules = nil
@@ -307,6 +416,7 @@ end
 function M.bound_pack_status(index, pack_name)
   local source = index.packs[pack_name]
   if not source then return nil, index.issues[pack_name] or ("missing-approved-pack-source:" .. tostring(pack_name)) end
+  if source.status == "not-admitted" then return source.status, nil end
   if not index.facts[node("pack", pack_name)] then return nil, "unresolved-approved-pack-dependencies:" .. pack_name end
   return source.status, source.unlocker
 end
@@ -318,7 +428,9 @@ function M.bound_technology_reason(index, technology_name)
 end
 
 function M.bound_lab_available(index, lab_name)
-  return index.facts[node("lab", lab_name)] == true
+  if index.facts[node("lab", lab_name)] then return true end
+  if index.lab_names[lab_name] then return nil, "unresolved-approved-lab-dependencies:" .. lab_name end
+  return false
 end
 
 return M

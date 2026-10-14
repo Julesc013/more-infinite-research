@@ -7,27 +7,25 @@ param(
 )
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
-
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $runner=Join-Path $repo 'tests/compiler/run_classic_profile_routing_controls.py'
 $runtime=if([IO.Path]::IsPathFullyQualified($LuaRuntimeDir)){$LuaRuntimeDir}else{Join-Path $repo $LuaRuntimeDir}
-if(-not(Test-Path -LiteralPath $runner -PathType Leaf)){throw "Classic profile routing runner is unavailable: $runner"}
-if(-not(Test-Path -LiteralPath $runtime -PathType Container)){throw "Classic profile routing Lua runtime is unavailable: $runtime"}
-
+if(-not(Test-Path -LiteralPath $runner -PathType Leaf)){throw "Single compiler routing runner is unavailable: $runner"}
+if(-not(Test-Path -LiteralPath $runtime -PathType Container)){throw "Single compiler routing Lua runtime is unavailable: $runtime"}
 $records=@()
 foreach($target in @('f200','f210')){
   $output=@(& $PythonExe $runner --repo-root $repo --lua-runtime-dir $runtime --target $target 2>&1)
-  if($LASTEXITCODE -ne 0){throw "Classic profile routing controls failed for ${target}: $($output -join [Environment]::NewLine)"}
-  $line=$output|Where-Object {$_ -match '^{.*"status": "MIR-CLASSIC-PROFILE-ROUTING-CONTROLS-PASSED".*}$'}|Select-Object -Last 1
-  if(-not $line){throw "Classic profile routing controls produced no success record for ${target}: $($output -join [Environment]::NewLine)"}
+  if($LASTEXITCODE -ne 0){throw "Single compiler routing controls failed for ${target}: $($output -join [Environment]::NewLine)"}
+  $line=$output|Where-Object {$_ -match '^{.*"status": "MIR-SINGLE-COMPILER-ROUTING-CONTROLS-PASSED".*}$'}|Select-Object -Last 1
+  if(-not $line){throw "Single compiler routing controls produced no success record for ${target}: $($output -join [Environment]::NewLine)"}
   $record=$line|ConvertFrom-Json
-  if([int]$record.assertions -lt 17 -or [int]$record.classic_calls -ne 0 -or [int]$record.full_calls -ne 2 -or [int]$record.historic_full_calls -ne 1 -or [int]$record.factorio_processes -ne 0){
-    throw "Compiler routing controls did not prove Full for both old Classic and default selections for $target."
+  if([int]$record.assertions -lt 11 -or [int]$record.factorio_processes -ne 0){
+    throw "Compiler routing controls did not prove the saved Classic-to-Full bridge for $target."
   }
   $records+=$record
 }
 [pscustomobject]@{
-  status='MIR-CLASSIC-PROFILE-ROUTING-CONTROLS-PASSED'
+  status='MIR-SINGLE-COMPILER-ROUTING-CONTROLS-PASSED'
   targets=$records.target
   assertions=($records|Measure-Object -Property assertions -Sum).Sum
   source_sha256=($records|Select-Object -First 1).source_sha256

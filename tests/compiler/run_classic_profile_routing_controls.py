@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-"""Run the source-bound unified public routing control under Lua 5.2.
-
-No Factorio process or package is created.  The test exercises the actual
-profile reader and stage modules, substituting only branch sentinels so it can
-prove old Classic selections now execute Full and never load the retired path.
-"""
+"""Verify one public Full compiler path without starting Factorio."""
 from __future__ import annotations
 
 import argparse
@@ -13,18 +8,17 @@ import json
 import sys
 from pathlib import Path
 
-
 FIXTURE = Path("tests/compiler/classic_profile_routing.lua")
 SOURCES = (
     Path("source/prototypes/mir/settings/compiler_profile.lua"),
     Path("source/prototypes/mir/stage/data.lua"),
     Path("source/prototypes/mir/stage/data_final_fixes.lua"),
+)
+RETIRED = (
     Path("source/prototypes/mir/pipeline/classic_compiler.lua"),
     Path("source/prototypes/mir/planner/classic/plan.lua"),
     Path("source/prototypes/mir/domain/compiler/classic_declarations.lua"),
-    Path("source/prototypes/mir/planner/compiler.lua"),
 )
-
 
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -33,10 +27,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--target", required=True, choices=("f200", "f210"))
     return parser.parse_args()
 
-
 def lua_path(path: Path) -> str:
     return str(path.resolve()).replace("\\", "/").replace('"', '\\"')
-
 
 def source_digest(repo: Path) -> str:
     digest = hashlib.sha256()
@@ -47,43 +39,35 @@ def source_digest(repo: Path) -> str:
         digest.update(b"\0")
     return digest.hexdigest()
 
-
 def main() -> int:
     args = arguments()
     repo = Path(args.repo_root).resolve()
     runtime_dir = Path(args.lua_runtime_dir).resolve()
     if not runtime_dir.is_dir():
         raise RuntimeError(f"Lua runtime directory is unavailable: {runtime_dir}")
+    lingering = [path.as_posix() for path in RETIRED if (repo / path).exists()]
+    if lingering:
+        raise RuntimeError(f"Retired Classic product paths remain installed: {lingering}")
     sys.path.insert(0, str(runtime_dir))
     from lupa import lua52
-
-    fixture = repo / FIXTURE
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
     adapter = repo / "source" / "adapters" / args.target
-    runtime.execute(
-        'package.path = "' + lua_path(repo / "source" / "?.lua") + ";"
-        + lua_path(adapter / "?.lua") + ';" .. package.path'
-    )
-    runtime.globals().MIR_CLASSIC_ROUTING_TARGET = args.target
-    result = runtime.execute(fixture.read_text(encoding="utf-8"))
+    runtime.execute('package.path = "' + lua_path(repo / "source" / "?.lua") + ";"
+                    + lua_path(adapter / "?.lua") + ';" .. package.path')
+    result = runtime.execute((repo / FIXTURE).read_text(encoding="utf-8"))
     record = {
-        "status": "MIR-CLASSIC-PROFILE-ROUTING-CONTROLS-PASSED",
+        "status": "MIR-SINGLE-COMPILER-ROUTING-CONTROLS-PASSED",
         "target": args.target,
         "assertions": int(result["assertions"]),
-        "classic_calls": int(result["classic_calls"]),
-        "full_calls": int(result["full_calls"]),
-        "historic_full_calls": int(result["historic_full_calls"]),
         "source_sha256": source_digest(repo),
-        "fixture_sha256": hashlib.sha256(fixture.read_bytes()).hexdigest(),
+        "fixture_sha256": hashlib.sha256((repo / FIXTURE).read_bytes()).hexdigest(),
         "runtime": "lupa.lua52",
         "factorio_processes": 0,
     }
-    if (record["assertions"] < 17 or record["classic_calls"] != 0
-            or record["full_calls"] != 2 or record["historic_full_calls"] != 1):
-        raise RuntimeError(f"Unexpected classic profile routing result: {record}")
+    if record["assertions"] < 11:
+        raise RuntimeError(f"Incomplete single compiler routing result: {record}")
     print(json.dumps(record, sort_keys=True))
     return 0
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

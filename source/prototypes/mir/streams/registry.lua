@@ -13,7 +13,10 @@ M.shared = {
     -- unique direct unlock owner. They never explore ingredient factories.
     named_pack_recipe = true,
     unique_direct_recipe = true,
-    unique_direct_unlock = true
+    unique_direct_unlock = true,
+    -- Preserve the published launch-source admission contract. Correcting
+    -- that historical policy is a separate semantic/migration change.
+    retained_launch_source = {pack = "space-science-pack", payload = "satellite"}
   },
   -- Shared source declarations for the ordinary productivity-family science
   -- vector. These are authored progression bindings, not cached discoveries.

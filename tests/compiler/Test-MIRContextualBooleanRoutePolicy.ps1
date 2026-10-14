@@ -21,6 +21,7 @@ foreach($target in @('f200','f210')){
   $recordLine=$output|Where-Object {$_ -match '^{.*"status": "MIR-CONTEXTUAL-BOOLEAN-ROUTE-POLICY-CONTROLS-PASSED".*}$'}|Select-Object -Last 1
   if(-not $recordLine){throw "Contextual Boolean route-policy controls produced no success record for ${target}: $($output -join [Environment]::NewLine)"}
   $record=$recordLine|ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
   if([int]$record.assertions -lt 11 -or -not [bool]$record.cold_available -or -not [bool]$record.warm_available -or [int]$record.boolean_hits -lt 1 -or [int]$record.factorio_processes -ne 0){
     throw "Contextual Boolean route-policy controls did not preserve complete availability or selected-route equivalence for $target."
   }
@@ -28,6 +29,7 @@ foreach($target in @('f200','f210')){
 }
 [pscustomobject]@{
   status='MIR-CONTEXTUAL-BOOLEAN-ROUTE-POLICY-CONTROLS-PASSED'
+  scope=[string]$records[0].scope
   targets=$records.target
   assertions=($records|Measure-Object -Property assertions -Sum).Sum
   source_sha256=($records|Select-Object -First 1).source_sha256

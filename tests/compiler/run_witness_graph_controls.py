@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 
-SOURCE_PATH = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+SOURCE_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
 FIXTURE_PATH = Path("tests/compiler/witness_graph_traversal.lua")
 RETURN_MARKER = "\nreturn M"
 
@@ -90,6 +90,7 @@ end
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-WITNESS-GRAPH-TRAVERSAL-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "assertions": int(result["assertions"]),
         "alias_identity_calls": int(result["alias_identity_calls"]),
         "naive_alias_identity_calls": int(result["naive_alias_identity_calls"]),
