@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 234,
+  "test_count": 235,
   "tests": [
     {
       "id": "docs.check",
@@ -8367,6 +8367,32 @@
       "matrix": null
     },
     {
+      "id": "static.recipe-productivity-permissions",
+      "proposition": "The governed test 'static.recipe-productivity-permissions' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/prototypes/mir/pipeline/recipe_productivity_permissions.lua",
+        "source:source/prototypes/mir/domain/streams/descriptor.lua",
+        "source:source/prototypes/streams/productivity.lua",
+        "tests/compiler/Test-MIRRecipeProductivityPermissions.ps1",
+        "tests/compiler/run_recipe_productivity_permissions_controls.py",
+        "tests/compiler/recipe_productivity_permissions.lua",
+        "validation/tests.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.release-history",
       "proposition": "The governed test 'static.release-history' passes for its exact selected inputs.",
       "cohort": "tooling-release",
@@ -8561,10 +8587,10 @@
       "package-repository": 69,
       "tooling-release": 70,
       "runtime-upgrade": 61,
-      "compiler-static": 19,
+      "compiler-static": 20,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 221,
+    "canonical_test_commands": 222,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8577,5 +8603,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:cc91fa8c668c8e35d7540160c1d927aac22c6b00778078803f19b04deccfbcb4"
+  "digest": "sha256:3837e0ecf41766d14731394197b65e30b52aec8a0b74a5ed0e00889a92f6a121"
 }
