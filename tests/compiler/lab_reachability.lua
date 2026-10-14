@@ -792,6 +792,36 @@ run(raw, function(owner)
   check('LR20', not lab.valid_research_ingredients({{'A', 1}, {'B', 1}}),
     'Recipe source replacement invalidates a formerly acquired lab route')
 end)
+-- An unrelated exclusive-science lab must not poison ordinary research.
+-- This models the reported Dark Matter-style lab topology without inferring
+-- support for that mod or pretending its exclusive science is obtainable.
+raw = world()
+raw.tool['exclusive-pack'] = {type='tool', name='exclusive-pack'}
+raw.item['exclusive-lab-kit'] = {type='item', name='exclusive-lab-kit', place_result='exclusive-lab'}
+raw.lab['exclusive-lab'] = {type='lab', name='exclusive-lab', inputs={'exclusive-pack'}}
+raw.recipe['make-exclusive-pack'] = recipe('make-exclusive-pack', 'exclusive-pack')
+raw.recipe['make-exclusive-pack'].enabled = false
+raw.recipe['make-exclusive-lab'] = recipe('make-exclusive-lab', 'exclusive-lab-kit')
+raw.recipe['make-exclusive-lab'].enabled = false
+raw.technology['exclusive-unlock'] = research({'exclusive-pack'})
+raw.technology['exclusive-unlock'].effects = {
+  {type='unlock-recipe', recipe='make-exclusive-pack'},
+  {type='unlock-recipe', recipe='make-exclusive-lab'}
+}
+run(raw, function(owner)
+  production.prime_root_pack_statuses(owner)
+  check('LR-exclusive/root-isolation', production.pack_production_status('exclusive-pack') == 'unreachable'
+      and lab.valid_research_ingredients({{'A', 2}, {'B', 3}}),
+    'A self-locked exclusive science root cannot invalidate an independently obtainable ordinary laboratory')
+  local ingredients, status = lab.best_lab_compatible_ingredients(
+    {{'A', 2}, {'B', 3}, {'exclusive-pack', 7}}, 'exclusive-opposition', {'A', 'B'})
+  check('LR-exclusive/selection', ingredients and #ingredients == 2
+      and ingredients[1][1] == 'A' and ingredients[1][2] == 2
+      and ingredients[2][1] == 'B' and ingredients[2][2] == 3 and status == 'full',
+    'Ordinary mandatory science and quantities survive an unrelated unavailable exclusive pack')
+  check('LR-exclusive/no-union', not lab.valid_research_ingredients({{'A', 1}, {'exclusive-pack', 1}}),
+    'Distinct labs cannot be unioned into a fictional accepting laboratory')
+end)
 raw = world()
 run(raw, function(owner)
   local observer = {visits = 0, stopped = false}
