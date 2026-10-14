@@ -203,4 +203,38 @@ Context.with_active(Context.new(), function()
   check(not science.technology_is_enabled_and_reachable("specialist-unlock"),
     "Structural validity alone cannot claim an unseeded specialist research/lab binding is reachable")
 end)
+-- Approved reference snapshots have the same immutable-input lifetime as the
+-- other compiler snapshots. A source replacement must stop before retaining
+-- stale positive lab/pack answers; early replacements remain supported.
+raw = world(0, false)
+Context.with_active(Context.new(), function()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local original = deepcopy(raw.recipe)
+  recipes.view(roles[1])
+  local epoch = recipes.source_epoch()
+  local changed = deepcopy(original)
+  changed[roles[1]] = nil
+  check(recipes.replace_source(changed, epoch) == epoch + 1,
+    "A recipe source replacement is allowed before approved bindings exist")
+  local value, reason = bindings.bind(roles[1], bindings.declaration_for_role(roles[1], catalogue.shared.science_bindings))
+  check(value == nil and string.find(reason, "missing-approved-pack-recipe", 1, true),
+    "An early source replacement is consumed by new approved bindings")
+end)
+for _, warm in ipairs({"lab", "research"}) do
+  raw = world(0, false)
+  Context.with_active(Context.new(), function()
+    local recipes = require("prototypes.mir.index.recipe_facts")
+    if warm == "lab" then
+      require("prototypes.mir.capabilities.science_integration.lab_bindings").snapshot()
+    else
+      require("prototypes.mir.capabilities.science_integration.science_packs").binding_snapshot()
+    end
+    local epoch = recipes.source_epoch()
+    local ok, message = pcall(recipes.replace_source, {}, epoch)
+    check(not ok and string.find(message, "approved_lab_bindings", 1, true),
+      "A replacement cannot retain stale completed " .. warm .. " bindings")
+    check(recipes.source_epoch() == epoch and recipes.view(roles[1]) ~= nil,
+      "A refused replacement leaves source facts and epoch unchanged")
+  end)
+end
 return checks

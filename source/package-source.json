@@ -4731,10 +4731,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/index/recipe_facts.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 26796,
-      "source_sha256": "7FBB91E48D02190D3DE4C0328A7DC24E4010D2D6E260913F1B367B7FE274D936",
-      "output_bytes": 26796,
-      "output_sha256": "7FBB91E48D02190D3DE4C0328A7DC24E4010D2D6E260913F1B367B7FE274D936"
+      "source_bytes": 26855,
+      "source_sha256": "78027E2288117BC909E161DD00B8BFAB1FAD809B5E17AD0A8E426E5E03361542",
+      "output_bytes": 26855,
+      "output_sha256": "78027E2288117BC909E161DD00B8BFAB1FAD809B5E17AD0A8E426E5E03361542"
     },
     {
       "layer": "capability",
@@ -7863,5 +7863,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "932A5A38DF305993C4E4E165C1A35347F10F8FAA66589509E8AB640CFE834D29"
+  "record_sha256": "423A39EC5FAF788BBF23CF30AD04D16FF98462F8A3294395189F78967364D6D8"
 }
