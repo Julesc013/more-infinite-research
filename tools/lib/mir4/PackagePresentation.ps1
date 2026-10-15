@@ -965,14 +965,15 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   )
   $retiredCurrentSources=@(
     'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+    'source/prototypes/mir/runtime/compiler_profile_notice.lua',
     'source/prototypes/mir/pipeline/classic_compiler.lua',
     'source/prototypes/mir/domain/compiler/classic_declarations.lua',
     'source/prototypes/mir/planner/classic/plan.lua'
   )
   $predecessorPaths=@($Predecessor.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
   $currentPaths=@($Current.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
-  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne377-or$currentPaths.Count-ne377-or
-     $migrated.Count-ne356-or$introduced.Count-ne21-or$compilerTransitionIntroduced.Count-ne2-or
+  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne376-or$currentPaths.Count-ne376-or
+     $migrated.Count-ne356-or$introduced.Count-ne20-or$compilerTransitionIntroduced.Count-ne1-or
      $approvedBindingsIntroduced.Count-ne2-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
      $progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or$browserIntroduced.Count-ne2-or
      @($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0){
@@ -981,8 +982,7 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   foreach($source in $retiredPredecessorSources){if($source-cnotin$predecessorPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
   foreach($source in $retiredCurrentSources){if($source-cin$currentPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
   $compilerTransitionSources=@(
-    'source/prototypes/mir/settings/compiler_profile.lua',
-    'source/prototypes/mir/runtime/compiler_profile_notice.lua'
+    'source/prototypes/mir/settings/compiler_profile.lua'
   )
   foreach($source in $compilerTransitionSources){
     $rows=@($compilerTransitionIntroduced|Where-Object{[string]$_.source_path-ceq$source})

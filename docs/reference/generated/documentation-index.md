@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-15.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-16.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -285,7 +285,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/schemas/technology-lifecycle.md | Technology Lifecycle Schemas | current | developer | reference | mir-maintainers | 2026-10-13 |
 | docs/reference/settings-reference.md | Settings Reference | archived | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/settings.md | Settings Reference | current | developer | reference | mir-maintainers | 2026-10-07 |
-| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-15 |
+| docs/RELEASE-RUNBOOK.md | MIR 4 Release Runbook | current | release-manager | how-to | mir-maintainers | 2026-10-16 |
 | docs/releases/0.x-factorio-version-metadata-correction.md | MIR 0.x Factorio Version Metadata Correction | current | release-manager | reference | mir-maintainers | 2026-07-16 |
 | docs/releases/3.2.1-emergency-build-trigger.md | MIR 3.2.1 Emergency Build Trigger | historical-checkpoint | release-manager | release-plan | mir-maintainers | 2026-07-26 |
 | docs/releases/3.2.2-to-3.2.3-repository-change-report.md | MIR 3.2.2 To 3.2.3 Repository Change Report | current | release-manager | reference | mir-maintainers | 2026-07-31 |
@@ -389,7 +389,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
 | docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-14 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-10-15 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-10-16 |
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-10 |
 | docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md | MIR 4.2 nine-target rehearsal input gap | current | release-manager | reference | mir-maintainers | 2026-09-30 |

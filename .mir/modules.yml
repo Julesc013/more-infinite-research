@@ -1465,7 +1465,6 @@ modules:
     - prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua
     - prototypes/mir/compatibility/repairs/registry.lua
   runtime:
-    - prototypes/mir/runtime/compiler_profile_notice.lua
     - prototypes/mir/runtime/scripted_techs.lua
     - prototypes/mir/runtime/settings_resolver.lua
     - prototypes/mir/runtime/startup_settings.lua

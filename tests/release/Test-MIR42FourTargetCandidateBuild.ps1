@@ -46,7 +46,7 @@ function Test-MIR43HistoricalBaselineProjection {
   $utf8 = [Text.UTF8Encoding]::new($false)
   foreach ($target in @('f017','f016','f015','f014','f013')) {
     $record = Get-Content -Raw -LiteralPath (Join-Path $repo "targets/historical/$target/target.json") | ConvertFrom-Json -Depth 100 -DateKind String
-    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1','4.4.0')) {
+    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
       $tree = Join-Path $OutputRoot "$target/$sourceVersion"
       [IO.Directory]::CreateDirectory($tree) | Out-Null
       $template = Join-Path $repo "source/presentation/historical/$target/info.json.template"
@@ -93,7 +93,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
 
   . (Join-Path $repo 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
   $projectionChecks = 0
-  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0')) {
+  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
     foreach ($target in @('f017','f016','f015','f014','f013')) {
       $projection = Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target $target -SourceVersion $sourceVersion
       Assert-MIR42CandidateBuildTest (
@@ -110,7 +110,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
   }
 
   $writer = Join-Path $repo 'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
-  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.3.0' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
+  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.4.2' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
   Assert-MIR42CandidateBuildTest ($manifestRows.Count -eq 1) 'historical-authentication-fixture-manifest-count'
   $manifest = $manifestRows[0]
   $manifestPath = Join-Path $OutputRoot 'manifests/f017.json'
@@ -119,10 +119,10 @@ function Test-MIR43HistoricalCandidateAuthentication {
     (Test-Path -LiteralPath $manifestPath -PathType Leaf) -and
     (Test-Path -LiteralPath $archive -PathType Leaf) -and
     [string]$manifest.target -ceq 'f017' -and
-    [string]$manifest.candidate_row.source_version -ceq '4.3.0'
+    [string]$manifest.candidate_row.source_version -ceq '4.4.2'
   ) 'historical-authentication-fixture-identity'
   $controls = Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls -Repository $repo -Archive $archive -ManifestPath $manifestPath `
-    -Target f017 -SourceVersion '4.3.0' -WorkRoot (Join-Path $OutputRoot 'opposing')
+    -Target f017 -SourceVersion '4.4.2' -WorkRoot (Join-Path $OutputRoot 'opposing')
   Assert-MIR42CandidateBuildTest (
     [string]$controls.status -ceq 'passed' -and
     [int]$controls.assertions -eq 4 -and
@@ -303,7 +303,7 @@ function Test-MIR42IndependentConstructionInput {
 }
 
 $commit = (& git -C $repo rev-parse HEAD).Trim()
-$admittedCandidateSources = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')
+$admittedCandidateSources = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
 foreach ($entryPoint in @(
   'tools/commands/release/New-MIR42FourTargetCandidate.ps1',
   'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
@@ -337,10 +337,18 @@ $current440 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.
 Assert-MIR42CandidateBuildTest (
   [string]$current440.source_version -ceq '4.4.0' -and [int]$current440.source_minor -eq 4 -and [int]$current440.source_patch -eq 0
 ) 'current-package-metadata-admits-4-4-identity'
-$current440Rejected = $false
-try { Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.1' | Out-Null }
-catch { $current440Rejected = $_.Exception.Message -ceq '[mir4-current-package-metadata-source-version]' }
-Assert-MIR42CandidateBuildTest $current440Rejected 'current-package-metadata-refuses-unapproved-4-4-patch'
+$current441 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.1'
+Assert-MIR42CandidateBuildTest (
+  [string]$current441.source_version -ceq '4.4.1' -and [int]$current441.source_minor -eq 4 -and [int]$current441.source_patch -eq 1
+) 'current-package-metadata-admits-4-4-1-identity'
+$current442 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.2'
+Assert-MIR42CandidateBuildTest (
+  [string]$current442.source_version -ceq '4.4.2' -and [int]$current442.source_minor -eq 4 -and [int]$current442.source_patch -eq 2
+) 'current-package-metadata-admits-4-4-2-identity'
+$current443Rejected = $false
+try { Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.3' | Out-Null }
+catch { $current443Rejected = $_.Exception.Message -ceq '[mir4-current-package-metadata-source-version]' }
+Assert-MIR42CandidateBuildTest $current443Rejected 'current-package-metadata-refuses-unapproved-4-4-patch'
 
 $root = Join-Path $repo ('build/test-results/mir42-four-target-candidate-' + [guid]::NewGuid().ToString('N'))
 $partialRoot = $root + '-partial'
@@ -357,7 +365,7 @@ foreach ($target in @('f017','f016','f015','f014','f013')) {
 try {
   $historicalIdentityChecks = Test-MIR43HistoricalBaselineProjection -OutputRoot (Join-Path $identityRoot 'historical-baseline')
   if ($HistoricalIdentityProjectionOnly) {
-    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1','4.4.0');engine_runs=0;actual_candidate_zip_builds=0}
+    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2');engine_runs=0;actual_candidate_zip_builds=0}
     return
   }
   if ($HistoricalAuthenticationOnly) {
@@ -365,7 +373,7 @@ try {
     [pscustomobject][ordered]@{
       status = 'MIR-4.3-HISTORICAL-CANDIDATE-AUTHENTICATION-CONTROLS-PASSED'
       targets = 5
-      source_versions = @('4.3.0','4.3.1','4.4.0')
+      source_versions = @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
       authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
       authentication_assertions = [int]$historicalAuthentication.authentication_assertions
       authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions
@@ -410,7 +418,9 @@ try {
   $mir43Contracts = @(
     [pscustomobject][ordered]@{ source_version='4.3.0'; schema=5; source_patch='00' },
     [pscustomobject][ordered]@{ source_version='4.3.1'; schema=6; source_patch='01' },
-    [pscustomobject][ordered]@{ source_version='4.4.0'; schema=7; source_patch='00' }
+    [pscustomobject][ordered]@{ source_version='4.4.0'; schema=7; source_patch='00' },
+    [pscustomobject][ordered]@{ source_version='4.4.1'; schema=8; source_patch='01' },
+    [pscustomobject][ordered]@{ source_version='4.4.2'; schema=9; source_patch='02' }
   )
   $mir43DescriptorSets = [ordered]@{}
   $targetCodes = @('210','200','110','100','017','016','015','014','013')
@@ -440,13 +450,13 @@ try {
       ) "$sourceVersion-release-target-identity-$i"
     }
   }
-  foreach ($schemaVersion in @(1,2,3,4,5,6,7)) {
+  foreach ($schemaVersion in @(1,2,3,4,5,6,7,8,9)) {
     $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
-    $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')[$schemaVersion-1]
+    $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')[$schemaVersion-1]
     Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
   foreach ($badContract in @(
-    [pscustomobject]@{schema=8;kind='MIR42FourTargetDeterministicCandidateManifestV8'},
+    [pscustomobject]@{schema=10;kind='MIR42FourTargetDeterministicCandidateManifestV10'},
     [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
   )) {
     $rejected = $false
@@ -616,6 +626,26 @@ try {
     $crossVersionRejected = $false
     try { $crossVersion | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path | Out-Null } catch { $crossVersionRejected = $true }
     Assert-MIR42CandidateBuildTest $crossVersionRejected "$sourceVersion-schema-refuses-cross-source-authority"
+    # Exercise the complete writer output, including historical leading-zero
+    # codes. A schema accepting patch 00 in any one of these fields must fail.
+    if ($sourceVersion -cin @('4.4.1','4.4.2')) {
+      for ($i = 0; $i -lt $descriptors.Count; $i++) {
+        foreach ($field in @('authority-version','target-version','asset-path')) {
+          $wrongPatch = $mir43Manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+          $oldVersion = "4.4.$($targetCodes[$i])00"
+          switch ($field) {
+            'authority-version' { $wrongPatch.target_authority[$i].distribution_version = $oldVersion }
+            'target-version' { $wrongPatch.targets[$i].distribution_version = $oldVersion }
+            'asset-path' { $wrongPatch.targets[$i].asset.path = "assets/$($descriptors[$i].target)/more-infinite-research_$oldVersion.zip" }
+          }
+          $wrongPatch.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $wrongPatch
+          $wrongPatchRejected = $false
+          try { $wrongPatch | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop | Out-Null }
+          catch { $wrongPatchRejected = $true }
+          Assert-MIR42CandidateBuildTest $wrongPatchRejected "$($sourceVersion.Replace('.',''))-schema-refuses-patch00-$($descriptors[$i].target)-$field"
+        }
+      }
+    }
   }
   $performanceContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $performanceManifest
   $performanceEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $performanceRoot 'candidate-manifest.json')
@@ -1267,7 +1297,7 @@ function New-MIR42NineTargetCriterionEvidence {
     $maintenanceCriterionAssertions++
   }
   if ($IdentityContractsOnly) {
-    [pscustomobject][ordered]@{ status='MIR-4.3-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=@('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0'); current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; mir43_source_versions=@('4.3.0','4.3.1','4.4.0'); mir43_target_identities=27; mir43_manifest_contracts=3; metadata_idempotence_checks=9; invalid_version_refusals=2; invalid_manifest_refusals=16; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
+    [pscustomobject][ordered]@{ status='MIR-4.3-CANDIDATE-IDENTITY-CONTRACTS-PASSED'; source_versions=$admittedCandidateSources; current_maintenance_contract_assertions=$script:mir422ConstructionAssertions; target_identities=9; mir43_source_versions=@($mir43Contracts.source_version); mir43_target_identities=9*$mir43Contracts.Count; mir43_manifest_contracts=$mir43Contracts.Count; metadata_idempotence_checks=9; invalid_version_refusals=2; invalid_manifest_refusals=16; patch00_opposing_checks=27; engine_envelope_assertions=$engineEnvelopeAssertions; engine_destination_assertions=$engineDestinationAssertions; maintenance_custody_assertions=$maintenanceCustodyAssertions; maintenance_evidence_assertions=$maintenanceEvidenceAssertions; maintenance_independent_assertions=$maintenanceIndependentAssertions; seal_candidate_contract_assertions=$sealCandidateContractAssertions; maintenance_binder_assertions=$maintenanceBinderAssertions; maintenance_criterion_assertions=$maintenanceCriterionAssertions; maintenance_campaign_assertions=$maintenanceCampaignAssertions; maintenance_readiness_assertions=$maintenanceReadinessAssertions; maintenance_seal_assertions=$maintenanceSealAssertions; controlled_predecessor_archives=9; engine_runs=0; actual_candidate_zip_builds=0 }
     return
   }
 

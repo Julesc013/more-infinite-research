@@ -54,8 +54,11 @@ for _, size in ipairs({0, 32, 64}) do
     world(size, reversed)
     Context.with_active(Context.new(), function()
       local rows = bindings.snapshot()
+      local internal = bindings.view()
       check(#rows == 2 and rows[1].name == "ordinary-lab" and rows[2].name == "specialist-lab",
         "Laboratory bindings are sorted by actual prototype name")
+      check(internal == bindings.view() and internal ~= rows,
+        "Context-owned laboratory bindings have a stable internal view and a distinct public snapshot")
       local ordinary = find(rows, "ordinary-lab")
       local specialist = find(rows, "specialist-lab")
       check(has(ordinary.inputs, "automation-science-pack") and has(ordinary.inputs, "chemical-science-pack"),

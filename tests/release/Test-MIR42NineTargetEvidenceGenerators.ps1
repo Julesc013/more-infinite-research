@@ -242,7 +242,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
         }
       }
     )
-    foreach ($sourceVersion in @('4.2.3','4.3.0','4.3.1')) {
+    foreach ($sourceVersion in @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')) {
       $individualObservation = [ordered]@{
         schema=1;kind='MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
         status=("MIR-$sourceVersion-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED")
@@ -358,6 +358,52 @@ function Test-MIR431NormalPerformanceTelemetryBinding {
   }
 }
 
+function Test-MIR442MaintenanceEvidenceAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  foreach($criterion in @('fresh-exact-loads','target-omissions','performance-telemetry')) {
+    $contract = Get-MIR42CriterionObservationContract -Criterion $criterion -PublishedMaintenance -SourceVersion '4.4.2'
+    Assert-MIR42NineGeneratorTest -Condition ($criterion -ceq 'performance-telemetry' -or [string]$contract.status -like 'MIR-4.4.2-*') -Code ('442-criterion-admission-'+$criterion)
+  }
+  $rejected=$false
+  try { Get-MIR42CriterionObservationContract -Criterion 'performance-telemetry' -PublishedMaintenance -SourceVersion '4.4.3' | Out-Null }
+  catch { $rejected = $_.Exception -is [Management.Automation.ParameterBindingException] }
+  Assert-MIR42NineGeneratorTest -Condition $rejected -Code '443-criterion-refused'
+  $root=Join-Path $RepoRoot ('build/tmp/mir442-evidence-admission-'+[guid]::NewGuid().ToString('N'))
+  [IO.Directory]::CreateDirectory($root)|Out-Null
+  try {
+    $source=[pscustomobject][ordered]@{commit=('a'*40);tree=('b'*40);package_source_sha256=('C'*64)}
+    foreach($kind in @('MIR42FourTargetDeterministicCandidateManifestV9','MIR42FourTargetDeterministicCandidateManifestV8','MIR42FourTargetDeterministicCandidateManifestV7')) {
+      $schema=if($kind.EndsWith('V8')){8}else{9}
+      $record=[pscustomobject][ordered]@{schema=$schema;kind=$kind;source=$source;package_source_sha256=$source.package_source_sha256;build_complete=$true;record_sha256=''}
+      $path=Join-Path $root ($kind+'.json')
+      Write-MIR4BootstrapRecord -Record $record -Path $path|Out-Null
+      $reference=[pscustomobject][ordered]@{sha256=(Get-MIR4Sha256File -Path $path);record_sha256=$record.record_sha256}
+      $candidate=[pscustomobject][ordered]@{source=$source;candidate_manifest=$reference}
+      if($kind.EndsWith('V9')) {
+        $observed=Get-MIR42CriterionEvidenceObservation -Path $path -Criterion 'package-exclusion' -Candidate $candidate -SourceVersion '4.4.2' -Code 'mir442-admission-control'
+        Assert-MIR42NineGeneratorTest -Condition ($observed.sha256 -ceq $reference.sha256) -Code '442-v9-construction-consumed'
+        $reformatted=Join-Path $root 'reformatted.json'
+        [IO.File]::WriteAllText($reformatted,([IO.File]::ReadAllText($path)+"`n"),[Text.UTF8Encoding]::new($false))
+        $rejected=$false
+        try { Get-MIR42CriterionEvidenceObservation -Path $reformatted -Criterion 'package-exclusion' -Candidate $candidate -SourceVersion '4.4.2' -Code 'mir442-admission-control'|Out-Null }
+        catch { $rejected=$_.Exception.Message -ceq '[mir442-admission-control-binding] package-exclusion' }
+        Assert-MIR42NineGeneratorTest -Condition $rejected -Code '442-v9-changed-raw-bytes-refused'
+      } else {
+        $rejected=$false
+        try { Get-MIR42CriterionEvidenceObservation -Path $path -Criterion 'package-exclusion' -Candidate $candidate -SourceVersion '4.4.2' -Code 'mir442-admission-control'|Out-Null }
+        catch { $rejected=$_.Exception.Message -in @('[mir442-admission-control-binding] package-exclusion','[mir42-candidate-construction-version-contract]') }
+        Assert-MIR42NineGeneratorTest -Condition $rejected -Code ('442-wrong-construction-refused-'+$kind)
+      }
+    }
+  } finally {
+    $null=Assert-MIR4DescendantPath -Root (Join-Path $RepoRoot 'build') -Path $root
+    $null=Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $root
+    Remove-Item -LiteralPath $root -Recurse -Force
+  }
+  Write-Output 'MIR442-MAINTENANCE-EVIDENCE-ADMISSION-PASSED assertions=8 engines=0 controlled_evidence_only=true'
+}
+
+Test-MIR442MaintenanceEvidenceAdmission -RepoRoot $repo
 if ($Normal431TelemetryOnly) {
   Test-MIR431NormalPerformanceTelemetryBinding -RepoRoot $repo
   Write-Output 'MIR431-NORMAL-PERFORMANCE-TELEMETRY-PASSED assertions=6 engines=0 controlled_evidence_only=true'

@@ -49,7 +49,7 @@ function Assert-MIR421NativeEngineIdentity {
 function Get-MIR42ReleaseTargetIdentity {
   param([Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion = '4.2.0')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$SourceVersion = '4.2.0')
   if ($Target -in @('f210','f200','f110','f100')) {
     return Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   }
@@ -89,6 +89,7 @@ function Get-MIR42CandidateConstructionVersionContract {
     6 { '4.3.1' }
     7 { '4.4.0' }
     8 { '4.4.1' }
+    9 { '4.4.2' }
     default { throw '[mir42-candidate-construction-version-contract]' }
   }
   $kind = "MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"
@@ -105,7 +106,7 @@ function Get-MIR42CandidateConstructionVersionContract {
 }
 
 function Get-MIR42PublishedMaintenancePredecessorContract {
-  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
+  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$CandidateSourceVersion='4.2.1')
   # Select a recorded publication explicitly, never by the supplied filename or
   # by transferring a predecessor's exceptional acceptance to this candidate.
   if ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) {
@@ -114,6 +115,22 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
       commit='0e2703d7b545b97a2bdb308a02d84857288b6dc1';tree='bb6c3df2bc76cbd9da000432e4a0ecf6dd6a585e'
       manifest_name='mir-4.3.0.manifest.json';manifest_bytes=6436
       manifest_sha256='38B3FE01F1001802F3714C1E5ED6EF959DA131F22B1A8B6D2DF19B64F93F68B7'
+    }
+  }
+  if ($CandidateSourceVersion -ceq '4.4.2') {
+    return [pscustomobject][ordered]@{
+      source_version='4.4.1';source_patch=1;source_tag='v4.4.1';release_id=413691909;asset_count=17;target_commitish='2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6'
+      commit='2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6';tree='3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825'
+      manifest_name='mir-4.4.1.manifest.json';manifest_bytes=5448
+      manifest_sha256='490380F8733643F1692644A4915F97AC6ECC99A8302E95F743B3E2B95F60B004'
+    }
+  }
+  if ($CandidateSourceVersion -ceq '4.4.1') {
+    return [pscustomobject][ordered]@{
+      source_version='4.4.0';source_patch=0;source_tag='v4.4.0';release_id=413564113;asset_count=17;target_commitish='main'
+      commit='72b5c72eab810baf74c9a785ac4ebbc0d438c94a';tree='fe63974c649ddba389da5979ba94a59bffdd5e72'
+      manifest_name='mir-4.4.0.manifest.json';manifest_bytes=26167
+      manifest_sha256='48E78F4859B88B048E77337A3E0068C0177B62CDB23642A88A1EF9F7F6760307'
     }
   }
   if ($CandidateSourceVersion -cin @('4.2.3','4.3.0')) {
@@ -142,7 +159,7 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
 
 function Read-MIR42PublishedMaintenancePredecessorManifest {
   param([Parameter(Mandatory)][string]$ManifestPath,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $path = [IO.Path]::GetFullPath($ManifestPath)
   $expectedSha = $contract.manifest_sha256
@@ -162,11 +179,11 @@ function Read-MIR42PublishedMaintenancePredecessorManifest {
 
 function Assert-MIR42PublishedMaintenancePredecessorMetadata {
   param([Parameter(Mandatory)]$PinnedManifest,[Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $manifest = $PinnedManifest.manifest
-  $published430 = $contract.source_version -ceq '4.3.0'
-  $manifestIdentity = if ($published430) {
+  $publishedFinalManifest = $contract.source_version -cin @('4.3.0','4.4.0','4.4.1')
+  $manifestIdentity = if ($publishedFinalManifest) {
     [int]$manifest.schema -eq 1 -and [string]$manifest.kind -ceq 'MIR42FinalReleaseManifestV1' -and
     [string]$manifest.source_version -ceq $contract.source_version -and [string]$manifest.source_tag -ceq $contract.source_tag -and
     [string]$manifest.source.commit -ceq $contract.commit -and [string]$manifest.source.tree -ceq $contract.tree
@@ -176,7 +193,7 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
   if ([string]$PinnedManifest.sha256 -cne $contract.manifest_sha256 -or [int64]$PinnedManifest.bytes -ne $contract.manifest_bytes -or
       [int64]$ReleaseMetadata.id -ne $contract.release_id -or
       [string]$ReleaseMetadata.tag_name -cne $contract.source_tag -or
-      ($published430 -and [string]$ReleaseMetadata.target_commitish -cne $contract.target_commitish) -or
+      ($publishedFinalManifest -and [string]$ReleaseMetadata.target_commitish -cne $contract.target_commitish) -or
       [bool]$ReleaseMetadata.draft -or [bool]$ReleaseMetadata.prerelease -or [bool]$ReleaseMetadata.immutable -or
       @($ReleaseMetadata.assets).Count -ne $contract.asset_count -or
       @($ReleaseMetadata.assets | Group-Object name | Where-Object Count -ne 1).Count -ne 0 -or
@@ -216,7 +233,7 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
 function Get-MIR42PublishedMaintenancePredecessorInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$CandidateSourceVersion='4.2.1',
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$CandidateSourceVersion='4.2.1',
     [AllowEmptyString()][string]$SelectedTarget='',
     [AllowEmptyString()][string]$SelectedArchivePath='',
     [System.Collections.IDictionary]$ArchiveBindings=$null)
@@ -338,7 +355,7 @@ function Get-MIR42FourTargetArchiveInput {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
     [Parameter(Mandatory)][string]$Path,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion='4.2.0'
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$SourceVersion='4.2.0'
   )
 
   if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "[mir42-preflight-archive-missing] $Target" }

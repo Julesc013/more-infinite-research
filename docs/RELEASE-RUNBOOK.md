@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-15
+last_reviewed: 2026-10-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -62,7 +62,11 @@ The maintainer cancelled 4.3.1 publication and consolidated its retained repairs
 
 The 4.4.0 acceptance was current-candidate-specific, unsigned and partially qualified. The normal technical seal and protected-main promotion were not performed; `main` remains at the published 4.3.0 state. The release does not inherit the 4.3.0 emergency exception. Its manifest retains the exact completed F200, F110 and F210 scopes, focused observations and every unfinished qualification scope. Portal uploads remain maintainer-managed and are not claimed by the GitHub readback.
 
-4.4.1 must use a new exact candidate and normal candidate-bound admissions. It cannot relabel 4.4.0 evidence, signatures or readiness. Its initial queue is the remaining target/fresh/save/Library/client qualification, the unresolved Secretas reporter-save and F210 1.0.37 scopes, the mining-yield and Space Exploration distinction, ordinary-menu and broader-profile performance work, and restoration of an operational protected signing path.
+[v4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1) was published at 2026-10-15T10:50:21Z as GitHub release `413691909`, at commit `2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6` and tree `3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825`. Its nine `CCC01` packages and eight supporting assets were anonymously downloaded and hash-verified. The matching local delivery is `dist/release-4.4.1/`; its publication receipt preserves the original manifest and archive identities.
+
+The 4.4.1 emergency repair removed the load-only `on_tick` registration. Its unsigned, essential-check acceptance was explicitly limited to that candidate and did not establish a successful native multiplayer connection or complete the inherited qualification. It supplies neither a normal signing exception nor candidate-bound acceptance for 4.4.2. Portal availability remains separate from GitHub publication.
+
+The 4.4.2 improvement release targets 16 October 2026, 20:00 AEDT / 09:00 UTC, with feature freeze aimed at 16:00 AEDT or earlier when observed acceptance durations require it. Verify released 4.4.1 independently, then qualify the actual changed candidate: immediate 4.4.1 upgrades, direct 4.4.0 upgrades and affected older paths selected by the existing verification plan. A hosted server without a completed separate-client join is incomplete multiplayer evidence. Preserve the outstanding target, save, Library/client, reporter-specific and ordinary-menu obligations; source checks, construction receipts and earlier releases do not satisfy them.
 
 ## Readiness order
 

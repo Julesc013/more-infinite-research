@@ -8,11 +8,11 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
-## Published 4.3.0 and 4.4.0 development
+## Published 4.4.1 and 4.4.2 development
 
-**[MIR 4.3.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0)** is the current published release. Its original packages and disclosed qualification limits remain unchanged. The separate 4.3.1 publication was cancelled; its retained repairs are being consolidated into 4.4.0.
+**[MIR 4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1)** is published with the emergency correction for a load-only `on_tick` registration that prevented multiplayer joins. Its original packages and disclosed qualification limits remain unchanged; publication did not establish a completed native multiplayer test. The separate 4.3.1 publication was cancelled and its retained repairs were incorporated into 4.4.0.
 
-MIR 4.4.0 is under qualification. It uses the existing research catalogue and one emitter, with approved static and parameterized bindings replacing startup factory-acquisition discovery. Old Full and Classic setting values are retained as compatibility inputs to the same generator. Development packages are not yet qualified releases: current-package research, upgrade/reload, runtime/client and performance checks remain required. See the [active campaign and 4.4.x sequence](docs/releases/mir4-post-4.0-roadmap.md#active-campaign-mir-440-unified-research-generation). The 4.2 material below retains its historical release and recovery context.
+MIR 4.4.2 development continues performance and maintenance work in that single research-generation path. It uses the existing research catalogue and one emitter, with approved static and parameterized bindings replacing startup factory-acquisition discovery. Old Full and Classic setting values are retained as compatibility inputs to the same generator. Development packages are not yet qualified releases: current-package research, upgrade/reload, runtime/client and performance checks remain required. See the [active campaign and 4.4.x sequence](docs/releases/mir4-post-4.0-roadmap.md#active-campaign-mir-440-unified-research-generation). The 4.2 material below retains its historical release and recovery context.
 
 ## MIR 4.0 Whole-Platform Genesis
 
