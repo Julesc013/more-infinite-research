@@ -4499,9 +4499,9 @@
     {
       "path": "tools/lib/validation/NativeProbeResources.ps1",
       "classification": "canonical-internal",
-      "sha256": "9C0904E5871B714D42E040F5AAB315E237E6A322F54EDFE2B1B6BDFCE1925235",
+      "sha256": "8A5B5D7CD926CE8312CC3ED37E402030CBDFC62CF61E66A0F72F309C7DF15E38",
       "hash_mode": "canonical-text-v1",
-      "lines": 304,
+      "lines": 309,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ee41648f96be212ce2632a6a47a34e6746aa0649394777c41e5740e1e5c0371c"
+  "digest": "sha256:f840d7efb757815dd2c4510db9ff0b4e13a7d7fd0abae9137b2b0c20684ca225"
 }
