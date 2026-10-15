@@ -65,11 +65,13 @@ local function lab_acceptance_view()
 end
 
 local function lab_accepts_all(entry, packs, diagnostic_observer)
-  for _ = 1, entry.input_count do
-    if not diagnostic_visit(diagnostic_observer) then return false end
+  if diagnostic_observer then
+    for _ = 1, entry.input_count do
+      if not diagnostic_visit(diagnostic_observer) then return false end
+    end
   end
   for _, pack in ipairs(packs or {}) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
     if not entry.accepted_inputs[pack] then return false end
   end
   return true
@@ -78,7 +80,7 @@ end
 -- Laboratory admission consumes the common declared-reference graph.
 -- There is no witness-producing fallback or per-item acquisition query.
 local function lab_acquisition_available(lab_name, diagnostic_observer)
-  if not diagnostic_visit(diagnostic_observer) then return false end
+  if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
   local service = compiler_context.current():service("science.lab_binding_available")
   if not service then error("MIR approved lab-binding service is not registered in CompilerContext.", 2) end
   return service(lab_name)
@@ -98,7 +100,7 @@ local function accepting_lab(packs, diagnostic_observer, reachability_context)
   if not packs or #packs == 0 then return false end
   local unresolved
   for _, entry in ipairs(lab_acceptance_view()) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
     if lab_accepts_all(entry, packs, diagnostic_observer) then
       local available, reason = lab_acquisition_available(entry.name, diagnostic_observer, reachability_context)
       if available == true then return true end
@@ -117,7 +119,7 @@ end
 local function accepting_ingredients(ingredients, diagnostic_observer, reachability_context)
   local packs = {}
   for _, ingredient in ipairs(ingredients or {}) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
     local name = M.ingredient_name(ingredient)
     if name then table.insert(packs, name) end
   end

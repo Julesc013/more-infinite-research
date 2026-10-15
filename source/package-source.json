@@ -2943,10 +2943,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/lab_compatibility.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10696,
-      "source_sha256": "BE0E9F297E74439C0E4B32D66E63DBF117549E13EB9A89904A4C710FC8F022E3",
-      "output_bytes": 10696,
-      "output_sha256": "BE0E9F297E74439C0E4B32D66E63DBF117549E13EB9A89904A4C710FC8F022E3"
+      "source_bytes": 10834,
+      "source_sha256": "5B168D71CBA8F1359981AC6A1744EF01A558C4104705153F9E8A6D0B505A0088",
+      "output_bytes": 10834,
+      "output_sha256": "5B168D71CBA8F1359981AC6A1744EF01A558C4104705153F9E8A6D0B505A0088"
     },
     {
       "layer": "capability",
@@ -7690,5 +7690,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "EE7C4E1A4BA64F4C646217124C7D5603DD1685E9FFF995388D55C5C02460BDDD"
+  "record_sha256": "35A88E3658F0A735992ECE4472ED177BB3BC82B1E2E0B9877B6E8F0EB5FABE26"
 }

@@ -335,6 +335,42 @@ do
   end)
 end
 
+-- Diagnostic limits still count duplicate physical inputs and stop before a
+-- lab binding is consulted. Normal research admission has no such work budget.
+do
+  local raw = world(0, false)
+  raw.lab = {ordinary = {name = "ordinary", inputs = {roles[1], roles[2], roles[1]}}}
+  local owner, binding_queries = Context.new(), 0
+  owner:set_service("science.lab_binding_available", function()
+    binding_queries = binding_queries + 1
+    return true
+  end)
+  owner:freeze_services()
+  Context.with_active(owner, function()
+    for _, limit in ipairs({6, 7}) do
+      local visits, before = 0, binding_queries
+      local observer = {reserve_visit = function()
+        visits = visits + 1
+        return visits <= limit
+      end}
+      local accepted = lab_compatibility.any_lab_accepts_all({roles[1], roles[2]}, observer)
+      check(accepted == (limit == 7) and visits == 7,
+        "Diagnostic lab work retains its exact boundary including duplicate inputs")
+      check(binding_queries - before == (limit == 7 and 1 or 0),
+        "An exhausted diagnostic cannot consult the lab binding beyond its budget")
+    end
+    local before = binding_queries
+    local accepted = lab_compatibility.any_lab_accepts_all({roles[1]}, {
+      is_stopped = function() return true end,
+      reserve_visit = function() error("A stopped diagnostic must not reserve more work") end
+    })
+    check(not accepted and binding_queries == before,
+      "An already stopped diagnostic does not query a lab or reserve more work")
+    check(lab_compatibility.any_lab_accepts_all({roles[1], roles[2]}),
+      "Ordinary admission remains independent of private diagnostic exhaustion")
+  end)
+end
+
 -- Exercise the actual production facade and its actual lab-source projection;
 -- former solver modules remain poisoned by the host throughout this fixture.
 world(128, false)
