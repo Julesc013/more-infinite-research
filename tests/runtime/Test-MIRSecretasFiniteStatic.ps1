@@ -17,9 +17,13 @@ $fixtureCases=@(
   [ordered]@{target='f210';source='4.2.2';mir='4.2.21002';fixture='0.1.2';factorio='2.1';retained=$true;deps='base = 2.1.21|space-age = 2.1.21|secretas = 1.0.37|pretty-frozeta = 1.0.1|more-infinite-research = 4.2.21002'},
   [ordered]@{target='f200';source='4.2.2';mir='4.2.20002';fixture='0.1.3';factorio='2.0';retained=$false;deps='base = 2.0.77|space-age = 2.0.77|secretas = 1.0.33|pretty-frozeta = 0.1.0|more-infinite-research = 4.2.20002'},
   [ordered]@{target='f210';source='4.4.0';mir='4.4.21000';fixture='0.1.4';factorio='2.1';retained=$false;deps='base = 2.1.21|space-age = 2.1.21|secretas = 1.0.37|pretty-frozeta = 1.0.1|more-infinite-research = 4.4.21000'},
-  [ordered]@{target='f200';source='4.4.0';mir='4.4.20000';fixture='0.1.5';factorio='2.0';retained=$false;deps='base = 2.0.77|space-age = 2.0.77|secretas = 1.0.33|pretty-frozeta = 0.1.0|more-infinite-research = 4.4.20000'}
+  [ordered]@{target='f200';source='4.4.0';mir='4.4.20000';fixture='0.1.5';factorio='2.0';retained=$false;deps='base = 2.0.77|space-age = 2.0.77|secretas = 1.0.33|pretty-frozeta = 0.1.0|more-infinite-research = 4.4.20000'},
+  [ordered]@{target='f210';source='4.4.2';mir='4.4.21002';fixture='0.1.8';factorio='2.1';retained=$false;deps='base = 2.1.21|space-age = 2.1.21|secretas = 1.0.37|pretty-frozeta = 1.0.1|more-infinite-research = 4.4.21002'},
+  [ordered]@{target='f200';source='4.4.2';mir='4.4.20002';fixture='0.1.9';factorio='2.0';retained=$false;deps='base = 2.0.77|space-age = 2.0.77|secretas = 1.0.33|pretty-frozeta = 0.1.0|more-infinite-research = 4.4.20002'}
 )
 $fixtureChecks=0
+Assert-Secretas (@($fixtureCases | ForEach-Object { [string]$_.fixture } | Sort-Object -Unique).Count-eq$fixtureCases.Count) 'source/target fixture identities collide'
+$fixtureChecks++
 foreach($case in $fixtureCases){
   $selected=New-SecretasSelectedFixture -Source $source -Run (Join-Path $scratch ($case.target+'-'+$case.source)) -SelectedTarget $case.target -SelectedSourceVersion $case.source -SelectedMIRVersion $case.mir
   Assert-Secretas (($selected-ceq$source)-eq[bool]$case.retained) ('retained fixture selection '+$case.target+'/'+$case.source)
@@ -31,7 +35,11 @@ foreach($case in $fixtureCases){
 }
 foreach($wrong in @(
   @{target='f210';source='4.4.0';mir='4.4.20000'},
-  @{target='f200';source='4.4.0';mir='4.4.21000'}
+  @{target='f200';source='4.4.0';mir='4.4.21000'},
+  @{target='f210';source='4.4.2';mir='4.4.20002'},
+  @{target='f200';source='4.4.2';mir='4.4.21002'},
+  @{target='f200';source='4.4.2';mir='4.4.20000'},
+  @{target='f200';source='4.4.2';mir='4.4.20001'}
 )){
   $refused=$false
   try{New-SecretasSelectedFixture -Source $source -Run $scratch -SelectedTarget $wrong.target -SelectedSourceVersion $wrong.source -SelectedMIRVersion $wrong.mir|Out-Null}catch{$refused=$_.Exception.Message-ceq'[mir422-secretas] selected fixture candidate version differs'}

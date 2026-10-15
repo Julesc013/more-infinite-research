@@ -215,7 +215,9 @@ function Invoke-MIR431ReleaseUpgradeControls {
 
 function Invoke-MIR442ReleaseUpgradeControls {
   param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
-  return Invoke-MIR430ReleaseUpgradeControls -Root $Root -PackageAssets $PackageAssets -CandidateSourceVersion '4.4.2'
+  $controls = Invoke-MIR430ReleaseUpgradeControls -Root $Root -PackageAssets $PackageAssets -CandidateSourceVersion '4.4.2'
+  $f016 = Invoke-MIR442F016RestorationControls -Root (Join-Path $Root 'f016-prerequisite-restorations')
+  return [pscustomobject]@{path=$controls.path;checks=([int]$controls.checks + [int]$f016.checks);native_runs=0}
 }
 
 function Invoke-MIR440ReleaseUpgradeControls {

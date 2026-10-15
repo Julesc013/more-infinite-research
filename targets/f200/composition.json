@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6030,
-      "expected_sha256": "B64C4310E33C51FB7DE99417D7F440E5C7D930BC23D961C835E512500A804C1B",
+      "expected_bytes": 6300,
+      "expected_sha256": "4DD512409652282179AE7E89DD9FBDF87EBA2C9EC6A6FC6D19B725D3A44F915A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2584,12 +2584,12 @@
       "path": "prototypes/mir/planner/base_continuations/plan.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua",
+      "source_path": "source/prototypes/mir/planner/base_continuations/plan.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed base-continuations plan responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16955,
-      "expected_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758",
+      "expected_bytes": 16665,
+      "expected_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3692,8 +3692,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2612,
-      "expected_sha256": "B552E455707FC0802932E6FA9B5C91C2E860B817232B02DE228F670C4A48A978",
+      "expected_bytes": 5728,
+      "expected_sha256": "450D80EF46C1DBF12B596CCE9FF491CEFBBFCC23CDBE81E34532A9A6F928D0E8",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "0224E7BBA83C9B70EB01C1A501D0DE96DDEA01D3CA0A213B0A92D0898512AC28"
+  "record_sha256": "1AD98F65E37109FC86B0ADE4927C75B4A51FD4AFB6BF484F4F2FB29B8907B04B"
 }

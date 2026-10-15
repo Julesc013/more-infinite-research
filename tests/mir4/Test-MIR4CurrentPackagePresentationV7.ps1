@@ -28,29 +28,40 @@ $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.int
 $retiredPredecessorSources=@(
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
-  'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
+  'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua',
+  'targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua'
 )
 $retiredCurrentSources=@(
   'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
   'source/prototypes/mir/runtime/compiler_profile_notice.lua',
   'source/prototypes/mir/pipeline/classic_compiler.lua',
   'source/prototypes/mir/domain/compiler/classic_declarations.lua',
-  'source/prototypes/mir/planner/classic/plan.lua'
+  'source/prototypes/mir/planner/classic/plan.lua',
+  'source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'
 )
 $predecessorPaths=@($predecessorManifest.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
 $currentPaths=@($manifest.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
 $missingPredecessors=@($predecessorPaths|Where-Object{$_-cnotin@($migrated.provenance.predecessor_source_path)}|Sort-Object -Unique)
+$sharedPlan=@($manifest.bindings|Where-Object{
+  [string]$_.source_path-ceq'source/prototypes/mir/planner/base_continuations/plan.lua'-and
+  [string]$_.output_path-ceq'prototypes/mir/planner/base_continuations/plan.lua'
+})
+$sharedPlanShape=($sharedPlan.Count-eq1-and[string]$sharedPlan[0].layer-ceq'capability'-and
+  [string]$sharedPlan[0].semantic_class-ceq'target-replacement'-and
+  [string]$sharedPlan[0].transform-ceq'copy-exact-bytes'-and
+  (@($sharedPlan[0].target_scope)-join'|')-ceq'f210|f200|f110|f100')
 $successionChecks=@(
   ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
   ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
-  (@($manifest.bindings).Count-eq376),($currentPaths.Count-eq376),
-  ($migrated.Count-eq356),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq356),
+  (@($manifest.bindings).Count-eq375),($currentPaths.Count-eq375),
+  ($migrated.Count-eq355),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq355),
   ($introduced.Count-eq20),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),
   ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
   (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
   (($missingPredecessors-join'|')-ceq(($retiredPredecessorSources|Sort-Object -Unique)-join'|')),
   (@($retiredPredecessorSources|Where-Object{$_-cnotin$predecessorPaths}).Count-eq0),
   (@($retiredCurrentSources|Where-Object{$_-cin$currentPaths}).Count-eq0),
+  $sharedPlanShape,
   ([string]$progressionIntroduced[0].source_path-ceq'source/prototypes/mir/families/material_progression.lua'),
   ([string]$progressionIntroduced[0].output_path-ceq'prototypes/mir/families/material_progression.lua'),
   ((@($progressionIntroduced[0].target_scope)-join'|')-ceq'f210|f200|f110|f100'),
@@ -93,7 +104,10 @@ foreach($forgery in @(
   @{id='retired-classic-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/settings/compiler_profile.lua');$row[0].source_path='source/prototypes/mir/domain/compiler/classic_declarations.lua';$row[0].output_path='prototypes/mir/domain/compiler/classic_declarations.lua'}},
   @{id='retired-runtime-notice-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/runtime/state.lua');$row[0].source_path='source/prototypes/mir/runtime/compiler_profile_notice.lua';$row[0].output_path='prototypes/mir/runtime/compiler_profile_notice.lua'}},
   @{id='retired-science-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].output_path='prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].provenance.introduction_id='MIR42-SCIENCE-ROUTE-FEASIBILITY'}},
-  @{id='approved-binding-substitution';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/forged.lua'}}
+  @{id='approved-binding-substitution';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/forged.lua'}},
+  @{id='retired-f200-plan-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'}},
+  @{id='shared-f200-plan-missing';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/prototypes/mir/planner/base_continuations/forged-plan.lua'}},
+  @{id='shared-f200-plan-scope';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].target_scope=@('f210','f110','f100')}}
 )){
   $copy=$manifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
   &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy

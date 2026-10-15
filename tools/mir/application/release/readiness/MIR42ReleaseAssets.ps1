@@ -41,6 +41,62 @@ function Test-MIR422SavedScalarEqual {
   return $false
 }
 
+function Get-MIR442F016PrerequisiteRestorations {
+  param([Collections.IDictionary]$Before,[Collections.IDictionary]$After)
+  # Exact published 4.4.0/4.4.1 -> 4.4.2 correction, restoring the independently
+  # captured 4.2.2 science frontier. Neither direct 4.2.2 upgrades nor future
+  # destinations inherit this allowance. Raw source capture SHA256 identities:
+  # 4.4.0: 615C303A5C53DCE72AD0E1FA36FA38935264E3FBCBC55E79E009D355B071F973
+  # 4.4.1: 62C93B83C4FE6A0F9D9A1F731A246299629DA1CE2BFF377054A9F5A0165211F5
+  # 4.2.2: 72FA8A950D39C09C16CE15A7ACED8E9CBF11CF7C712326EB409E6F9D65E95FFB
+  foreach($snapshot in @($Before,$After)){
+    if(-not$snapshot.Contains('engine_line')-or$snapshot.engine_line-cne'0.16'-or
+      -not$snapshot.Contains('from_version')-or$snapshot.from_version-cnotin@('4.4.01600','4.4.01601')-or
+      -not$snapshot.Contains('to_version')-or$snapshot.to_version-cne'4.4.01602'){return $null}
+  }
+  if($Before.from_version-cne$After.from_version){return $null}
+  $rows=@(
+    @('braking-force-8','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,braking-force-6,braking-force-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,braking-force-6,braking-force-7,electric-engine,engine,speed-module'),
+    @('inserter-capacity-bonus-8','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,inserter-capacity-bonus-6,inserter-capacity-bonus-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,inserter-capacity-bonus-6,inserter-capacity-bonus-7,speed-module'),
+    @('recipe-prod-research_character_crafting_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_mining_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_reach-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_walking_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_electric_shooting_speed-1','advanced-electronics,advanced-material-processing-2,discharge-defense-equipment,military-2','advanced-electronics,advanced-material-processing-2,discharge-defense-equipment,electric-engine,engine,military-2,turrets'),
+    @('recipe-prod-research_flamethrower_shooting_speed-1','advanced-electronics,advanced-material-processing-2,flamethrower,military-2','advanced-electronics,advanced-material-processing-2,electric-engine,engine,flamethrower,military-2,turrets'),
+    @('recipe-prod-research_inventory_capacity-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_lab_productivity-1','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,military-2','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,military-2,speed-module,turrets'),
+    @('recipe-prod-research_robot_battery-1','advanced-electronics,advanced-material-processing-2','advanced-electronics,advanced-material-processing-2,electric-engine,engine'),
+    @('recipe-prod-research_rocket_shooting_speed-1','advanced-electronics,advanced-material-processing-2,military-2,rocketry','advanced-electronics,advanced-material-processing-2,electric-engine,engine,military-2,rocketry,turrets'),
+    @('research-speed-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,military-2,research-speed-5,research-speed-6','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,military-2,research-speed-5,research-speed-6,speed-module,turrets'),
+    @('worker-robots-storage-4','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,worker-robots-storage-2,worker-robots-storage-3','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,speed-module,worker-robots-storage-2,worker-robots-storage-3')
+  )
+  $result=[Collections.Hashtable]::new([StringComparer]::Ordinal)
+  foreach($row in $rows){
+    $vectors=@{}
+    foreach($field in @('before','after')){
+      $names=$row[$(if($field-ceq'before'){1}else{2})].Split(',')
+      $vector=@{}
+      for($index=0;$index-lt$names.Count;$index++){$vector[($index+1).ToString([Globalization.CultureInfo]::InvariantCulture)]=$names[$index]}
+      $vectors[$field]=$vector
+    }
+    $result[$row[0]]=$vectors
+  }
+  return $result
+}
+
+function Test-MIR442F016PrerequisiteRestoration {
+  param([string]$Name,[Collections.IDictionary]$BeforeDefinition,[Collections.IDictionary]$AfterDefinition,[Collections.IDictionary]$Restorations)
+  if($null-eq$Restorations-or-not$Restorations.Contains($Name)-or
+    -not$BeforeDefinition.Contains('prerequisites')-or-not$AfterDefinition.Contains('prerequisites')){return $false}
+  $expected=$Restorations[$Name]
+  if(-not(Test-MIR422SavedScalarEqual $BeforeDefinition.prerequisites $expected.before)-or
+    -not(Test-MIR422SavedScalarEqual $AfterDefinition.prerequisites $expected.after)){return $false}
+  $old=$BeforeDefinition.Clone();$new=$AfterDefinition.Clone()
+  $null=$old.Remove('prerequisites');$null=$new.Remove('prerequisites')
+  return (Test-MIR422SavedScalarEqual $old $new)
+}
+
 function Assert-MIR422CompleteSavedState {
   param(
     [Collections.IDictionary]$Before,
@@ -48,6 +104,7 @@ function Assert-MIR422CompleteSavedState {
     [switch]$RequireExactResearchDefinitions,
     [switch]$AllowMIR430FullCompilerProfileDefault
   )
+  $restorations=Get-MIR442F016PrerequisiteRestorations $Before $After
   if($Before.forces-isnot[Collections.IDictionary]-or$After.forces-isnot[Collections.IDictionary]-or$Before.forces.Count-lt1-or$Before.forces.Count-ne$After.forces.Count){throw '[mir422-upgrade-forces]'}
   foreach($force in $Before.forces.Keys){
     if(-not$After.forces.Contains($force)){throw '[mir422-upgrade-force-missing]'}
@@ -71,8 +128,9 @@ function Assert-MIR422CompleteSavedState {
         $definitions=@($definitionFields|Where-Object {$a.Contains($_)})
         if($definitions.Count-lt1){throw '[mir423-upgrade-definition-missing]'}
         foreach($definition in $definitions){
-          if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]-or
-            -not(Test-MIR422SavedScalarEqual $a[$definition] $b[$definition])){throw "[mir423-upgrade-research-definition] $force/$name"}
+          if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]){throw "[mir423-upgrade-research-definition] $force/$name"}
+          if(-not(Test-MIR422SavedScalarEqual $a[$definition] $b[$definition])-and
+            -not(Test-MIR442F016PrerequisiteRestoration $name $a[$definition] $b[$definition] $restorations)){throw "[mir423-upgrade-research-definition] $force/$name"}
         }
       }
       # The native oracle compares complete definitions with its exact reviewed

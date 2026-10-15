@@ -194,6 +194,11 @@ function Write-MIR4PrivatePatchPackageIdentity {
       $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
     } elseif ($SourceVersion -ceq '4.4.2') {
       $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
+      if ($targetCode -ceq '015') {
+        $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+      } elseif ($targetCode -ceq '016') {
+        $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
+      }
     }
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
@@ -431,9 +436,66 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
   return $report
 }
 
+function Resolve-MIR4AdapterFallbackRetirements {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Manifest,
+    [hashtable]$AdapterFallbackRetirements=@{}
+  )
+  if($AdapterFallbackRetirements.Count-eq0){return @()}
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $targetOrder=@('f210','f200','f110','f100')
+  $entries=[Collections.Generic.List[object]]::new()
+  foreach($mapping in @($AdapterFallbackRetirements.GetEnumerator()|Sort-Object {[string]$_.Key})){
+    $sourcePath=[string]$mapping.Key;$fallbackPath=[string]$mapping.Value
+    Assert-MIR4PortableArchivePath -Path $sourcePath
+    Assert-MIR4PortableArchivePath -Path $fallbackPath
+    if($sourcePath-cnotmatch'^source/adapters/'-or$fallbackPath-cnotmatch'^source/'-or$fallbackPath-cmatch'^source/adapters/'-or$sourcePath-ceq$fallbackPath){throw "[mir4-source-adapter-fallback-path] $sourcePath"}
+    $sourceRows=@($Manifest.bindings|Where-Object {[string]$_.source_path-ceq$sourcePath})
+    if($sourceRows.Count-ne1-or[string]$sourceRows[0].transform-cne'copy-exact-bytes'){throw "[mir4-source-adapter-fallback-binding] $sourcePath"}
+    if(Test-Path -LiteralPath (Join-Path $repo $sourcePath)){throw "[mir4-source-adapter-fallback-source-present] $sourcePath"}
+    $fallbackRows=@($Manifest.bindings|Where-Object {[string]$_.source_path-ceq$fallbackPath})
+    if($fallbackRows.Count-ne1-or[string]$fallbackRows[0].transform-cne'copy-exact-bytes'){throw "[mir4-source-adapter-fallback-binding] $fallbackPath"}
+    if(-not(Test-Path -LiteralPath (Join-Path $repo $fallbackPath) -PathType Leaf)){throw "[mir4-source-adapter-fallback-source-missing] $fallbackPath"}
+    if([string]$sourceRows[0].output_path-cne[string]$fallbackRows[0].output_path){throw "[mir4-source-adapter-fallback-output] $sourcePath"}
+    if([string]$sourceRows[0].semantic_class-cne[string]$fallbackRows[0].semantic_class){throw "[mir4-source-adapter-fallback-semantic-class] $sourcePath"}
+    $sourceScope=@($sourceRows[0].target_scope|ForEach-Object {[string]$_})
+    $fallbackScope=@($fallbackRows[0].target_scope|ForEach-Object {[string]$_})
+    if($sourceScope.Count-eq0-or$fallbackScope.Count-eq0-or@($sourceScope|Sort-Object -Unique).Count-ne$sourceScope.Count-or@($fallbackScope|Sort-Object -Unique).Count-ne$fallbackScope.Count-or
+       @(($sourceScope+$fallbackScope)|Where-Object {$_-notin$targetOrder}).Count-ne0-or@($sourceScope|Where-Object {$_-in$fallbackScope}).Count-ne0){throw "[mir4-source-adapter-fallback-scope] $sourcePath"}
+    $entries.Add([pscustomobject]@{source_path=$sourcePath;source_binding=$sourceRows[0];fallback_path=$fallbackPath;fallback_binding=$fallbackRows[0];source_scope=$sourceScope;fallback_scope=$fallbackScope})
+  }
+  if(@($entries.source_path|Sort-Object -Unique).Count-ne$entries.Count-or@($entries.fallback_path|Sort-Object -Unique).Count-ne$entries.Count){throw '[mir4-source-adapter-fallback-duplicate]'}
+  foreach($entry in $entries){
+    $entry.fallback_binding.target_scope=@($targetOrder|Where-Object {$_-in@($entry.source_scope+$entry.fallback_scope)})
+  }
+  $retiredPaths=@($entries|ForEach-Object {[string]$_.source_path})
+  $Manifest.bindings=@($Manifest.bindings|Where-Object {[string]$_.source_path-cnotin$retiredPaths})
+  return @($entries)
+}
+
+function Update-MIR4AdapterFallbackRetirementOverlay {
+  param(
+    [Parameter(Mandatory)]$Composition,
+    [Parameter(Mandatory)][string]$Target,
+    [Parameter(Mandatory)][object[]]$Entries
+  )
+  foreach($entry in $Entries){
+    $operations=@($Composition.operations|Where-Object {[string]$_.path-ceq[string]$entry.source_binding.output_path})
+    if($Target-in@($entry.source_scope)){
+      if($operations.Count-ne1-or[string]$operations[0].operation-cne'add'-or[string]$operations[0].source_path-cne[string]$entry.source_path-or
+         [string]$operations[0].transform-cne[string]$entry.source_binding.transform-or[string]$operations[0].semantic_class-cne[string]$entry.source_binding.semantic_class){throw "[mir4-source-adapter-fallback-overlay] $Target/$($entry.source_binding.output_path)"}
+      $operations[0].source_path=[string]$entry.fallback_path
+    }elseif($Target-in@($entry.fallback_scope)){
+      if($operations.Count-ne1-or[string]$operations[0].operation-cne'add'-or[string]$operations[0].source_path-cne[string]$entry.fallback_path-or
+         [string]$operations[0].transform-cne[string]$entry.fallback_binding.transform-or[string]$operations[0].semantic_class-cne[string]$entry.fallback_binding.semantic_class){throw "[mir4-source-adapter-fallback-overlay] $Target/$($entry.source_binding.output_path)"}
+    }elseif($operations.Count){throw "[mir4-source-adapter-fallback-target-scope] $Target/$($entry.source_binding.output_path)"}
+  }
+}
+
 function Update-MIR4CurrentSourceBindings {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[scriptblock]$HistoricalAdapterProjector,[string[]]$RetiredSourcePaths=@())
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[scriptblock]$HistoricalAdapterProjector,[string[]]$RetiredSourcePaths=@(),[hashtable]$AdapterFallbackRetirements=@{})
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
   # Ordinarily refresh only existing admitted paths. An explicit retirement
   # removes only the binding of an already deleted source and its matching
@@ -444,6 +506,8 @@ function Update-MIR4CurrentSourceBindings {
   $identities=@{}
   $changed=[Collections.Generic.List[string]]::new()
   $retired=[ordered]@{}
+  if(@($RetiredSourcePaths|Where-Object {$AdapterFallbackRetirements.ContainsKey([string]$_)}).Count){throw '[mir4-source-retirement-adapter-duplicate]'}
+  $adapterFallbackRetired=@(Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $manifest -AdapterFallbackRetirements $AdapterFallbackRetirements)
   foreach($relative in $RetiredSourcePaths) {
     Assert-MIR4PortableArchivePath -Path $relative
     if($relative -cnotmatch '^source/' -or $retired.Contains($relative)) { throw '[mir4-source-retirement-path]' }
@@ -482,6 +546,7 @@ function Update-MIR4CurrentSourceBindings {
   foreach($target in @('f210','f200','f110','f100')) {
     $path="targets/$target/composition.json"
     $composition=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $path -Kind 'MIR4TargetCompositionV2'
+    if($adapterFallbackRetired.Count){Update-MIR4AdapterFallbackRetirementOverlay -Composition $composition -Target $target -Entries $adapterFallbackRetired}
     if($retired.Count) {
       foreach($entry in $retired.GetEnumerator()) {
         $operations=@($composition.operations | Where-Object { [string]$_.path -ceq [string]$entry.Value.output_path })
@@ -580,5 +645,5 @@ function Update-MIR4CurrentSourceBindings {
       [IO.File]::Move($temporary,$path,$true)
     }
   }
-  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);retired_sources=@($retired.Keys);projections=@($writes.Keys);membership_changed=($retired.Count -gt 0);publication_authorized=$false}
+  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);retired_sources=@($retired.Keys)+@($adapterFallbackRetired|ForEach-Object {[string]$_.source_path});projections=@($writes.Keys);membership_changed=($retired.Count -gt 0-or$adapterFallbackRetired.Count -gt 0);publication_authorized=$false}
 }

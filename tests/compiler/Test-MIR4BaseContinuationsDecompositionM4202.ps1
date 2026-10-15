@@ -98,7 +98,7 @@ $targetModuleSources=@{
   }
   f200=@{
     qualify='source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua'
-    plan='source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'
+    plan='source/prototypes/mir/planner/base_continuations/plan.lua'
   }
 }
 foreach($target in @('f210','f200')){
@@ -116,6 +116,7 @@ foreach($target in @('f210','f200')){
   $targetRows=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-in$outputs})
   Assert-MIR4M4202BaseContinuations ($targetRows.Count-eq5) "target-binding-count-$target"
 }
+Assert-MIR4M4202BaseContinuations (-not(Test-Path -LiteralPath (Join-Path $repo 'source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua') -PathType Leaf)) 'f200-retired-plan-absent'
 
 $f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f210.qualify))
 $f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f200.qualify))

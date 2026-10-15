@@ -108,6 +108,11 @@ function New-MIRNativeProbeResourceContext {
   $policy=[pscustomobject]@{minimum_free_ram_gib=4}
   $peak=[int64]$ExpectedPeakMemoryMiB*1MB
   $writes=[int64]$MaxNewOutputMiB*1MB
+  # Candidate authentication prepares temporary source/archive inventories.
+  # Release completed host allocations before the initial admission, as the
+  # direct-library actor already does before each child. Keep all live inputs,
+  # declared child peaks and machine reserves in the admission calculation.
+  [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
   $null=Assert-MIR441ResourceAdmission -Policy $policy -WorkRoot $output -EstimatedPeakBytes $writes -ExpectedPeakMemoryBytes $peak
   [pscustomobject]@{
     root=$(if($UseExactOutputRoot){$output}else{Join-Path $output ([guid]::NewGuid().ToString('N'))})
