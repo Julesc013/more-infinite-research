@@ -6320,10 +6320,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/streams/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 4409,
-      "source_sha256": "56054309A514D53D1873BFB61D5206838283BC70F4E83C93DE35A2D90AB6F7E4",
-      "output_bytes": 4409,
-      "output_sha256": "56054309A514D53D1873BFB61D5206838283BC70F4E83C93DE35A2D90AB6F7E4"
+      "source_bytes": 5728,
+      "source_sha256": "450D80EF46C1DBF12B596CCE9FF491CEFBBFCC23CDBE81E34532A9A6F928D0E8",
+      "output_bytes": 5728,
+      "output_sha256": "450D80EF46C1DBF12B596CCE9FF491CEFBBFCC23CDBE81E34532A9A6F928D0E8"
     },
     {
       "layer": "capability",
@@ -7655,10 +7655,10 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 30749,
-      "source_sha256": "2F4E307FE033E33527EA0D1A003017D49AFD00C230A5FA0A48C6614DA84FDD74",
-      "output_bytes": 30749,
-      "output_sha256": "2F4E307FE033E33527EA0D1A003017D49AFD00C230A5FA0A48C6614DA84FDD74"
+      "source_bytes": 30755,
+      "source_sha256": "450A86841A4D3A4A72F2C1C778DAC31CD2763C2CC4FEDF24A485A0E3B47E7C70",
+      "output_bytes": 30755,
+      "output_sha256": "450A86841A4D3A4A72F2C1C778DAC31CD2763C2CC4FEDF24A485A0E3B47E7C70"
     },
     {
       "layer": "shared",
@@ -7690,5 +7690,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "0A375B038376F0646313C13518BB1333655794F4C077B9ED3C9875746AB2ED34"
+  "record_sha256": "A62B3DA2E151E8E4AA36DDD7CA3B04846D2B87E5A0E81136048BCA8B4D3A584A"
 }

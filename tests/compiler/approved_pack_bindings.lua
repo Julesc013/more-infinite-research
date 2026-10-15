@@ -835,12 +835,90 @@ Context.with_active(Context.new(), function()
     "A different F015 direct recipe unlocker cannot inherit the retained progression declaration")
 end)
 
-target_profiles.current_factorio_version = "0.16"
+target_profiles.current_factorio_version = "0.17"
 raw = f015_progression_world()
 Context.with_active(Context.new(), function()
   local science = require("prototypes.mir.capabilities.science_integration.science_packs")
   check(equal_names(science.prereq_techs_for_science_pack("high-tech-science-pack"), {"advanced-electronics-2"}),
     "The F015 retained progression declaration cannot apply on a different target line")
+end)
+
+-- Captured 4.2.01602 definitions, independently observed before the R22
+-- upgrade failure, retain these science gates. The 0.16 production recipe
+-- has two ingredients; it must not inherit the 0.15 recipe shape.
+local function f016_progression_world()
+  local value = f015_progression_world()
+  value.recipe["production-science-pack"].ingredients = {{"electric-engine-unit", 1}, {"electric-furnace", 1}}
+  value.tool["science-pack-3"] = {type = "tool", name = "science-pack-3"}
+  value.lab.lab.inputs[#value.lab.lab.inputs + 1] = "science-pack-3"
+  value.recipe["science-pack-3"] = {type = "recipe", name = "science-pack-3", enabled = false,
+    ingredients = {{"advanced-circuit", 1}, {"engine-unit", 1}, {"electric-mining-drill", 1}},
+    results = {{type = "item", name = "science-pack-3", amount = 1}}}
+  value.technology["advanced-electronics"] = {type = "technology", name = "advanced-electronics",
+    research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+    effects = {{type = "unlock-recipe", recipe = "science-pack-3"}}}
+  return value
+end
+
+target_profiles.current_factorio_version = "0.16"
+raw = f016_progression_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local groups = {
+    {names = {"braking-force-8", "inserter-capacity-bonus-8", "worker-robots-storage-4"},
+      packs = {"science-pack-3", "high-tech-science-pack", "production-science-pack"},
+      gates = {"advanced-electronics", "advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "speed-module"}},
+    {names = {"research-speed-7", "recipe-prod-research_lab_productivity-1"},
+      packs = {"science-pack-3", "high-tech-science-pack", "production-science-pack", "military-science-pack"},
+      gates = {"advanced-electronics", "advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "military-2", "speed-module", "turrets"}},
+    {names = {"recipe-prod-research_character_crafting_speed-1", "recipe-prod-research_character_mining_speed-1",
+        "recipe-prod-research_character_reach-1", "recipe-prod-research_character_walking_speed-1", "recipe-prod-research_inventory_capacity-1"},
+      packs = {"high-tech-science-pack", "military-science-pack"},
+      gates = {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    {names = {"recipe-prod-research_electric_shooting_speed-1", "recipe-prod-research_flamethrower_shooting_speed-1", "recipe-prod-research_rocket_shooting_speed-1"},
+      packs = {"science-pack-3", "production-science-pack", "military-science-pack"},
+      gates = {"advanced-electronics", "advanced-material-processing-2", "electric-engine", "engine", "military-2", "turrets"}},
+    {names = {"recipe-prod-research_robot_battery-1"}, packs = {"science-pack-3", "production-science-pack"},
+      gates = {"advanced-electronics", "advanced-material-processing-2", "electric-engine", "engine"}}
+  }
+  for _, group in ipairs(groups) do
+    local actual = f015_vector_gates(science, group.packs)
+    for _, name in ipairs(group.names) do
+      check(equal_names(actual, group.gates),
+        "F016 retained science gates match the independent published definition for " .. name)
+    end
+  end
+  check(equal_names(science.prereq_techs_for_science_pack("science-pack-3"), {"advanced-electronics", "engine"}),
+    "F016 chemical science retains its declared engine-unit progression gate")
+  check(science.production_route_for_pack("science-pack-3").acquisition_proof == false,
+    "F016 retained progression is a declared reference contract, not a factory proof")
+end)
+
+raw = f016_progression_world()
+raw.recipe["production-science-pack"].ingredients[#raw.recipe["production-science-pack"].ingredients + 1] = {"assembling-machine-1", 1}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["production-science-pack"] == nil
+      and string.find(index.issues["production-science-pack"], "retained-progression-recipe-ingredients-mismatch", 1, true),
+    "F016 cannot inherit the different F015 production recipe declaration")
+end)
+
+raw = f016_progression_world()
+raw.recipe["science-pack-3"].ingredients[2] = {"iron-plate", 1}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["science-pack-3"] == nil
+      and string.find(index.issues["science-pack-3"], "retained-progression-recipe-ingredients-mismatch", 1, true),
+    "A changed F016 chemical recipe cannot receive a stale engine progression gate")
+end)
+
+raw = f016_progression_world()
+raw.technology.engine.enabled = false
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["science-pack-3"] == nil
+      and string.find(index.issues["science-pack-3"], "retained-progression-prerequisite-disabled-technology:engine", 1, true),
+    "A disabled F016 engine technology refuses its retained chemical declaration")
 end)
 target_profiles.current_factorio_version = "2.0"
 

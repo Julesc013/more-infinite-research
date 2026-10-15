@@ -165,7 +165,7 @@ local function retained_initial_machine_reason(policy)
   return nil
 end
 
--- The F015 declarations retain a published progression boundary without
+-- The historical declarations retain a published progression boundary without
 -- restoring a production solver. A changed recipe, source unlocker, category
 -- or prerequisite technology is an explicit reference failure, never a
 -- reason to impose historical gates on new input.

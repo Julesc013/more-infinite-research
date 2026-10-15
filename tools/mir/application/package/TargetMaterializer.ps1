@@ -196,6 +196,8 @@ function Write-MIR4PrivatePatchPackageIdentity {
       $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
       if ($targetCode -ceq '015') {
         $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+      } elseif ($targetCode -ceq '016') {
+        $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
       }
     }
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
