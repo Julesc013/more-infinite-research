@@ -134,6 +134,20 @@ try {
     [string]$programme440.published_maintenance_predecessor.source_version -ceq '4.3.0') '440-maintenance-programme-contract'
   $programme440Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme440Path -AllowPendingTransition
   Assert-NineAuthority ([string]$programme440Read.record.release_line -ceq '4.4') '440-maintenance-programme-reader'
+  $programme442Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-442.json'
+  $programme442 = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programme442Path -SourceVersion '4.4.2'
+  $expected442 = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.4.2'
+  Assert-NineAuthority ([string]$programme442.release_line -ceq '4.4' -and [string]$programme442.candidate.version_line -ceq '4.4' -and
+    [string]$programme442.published_maintenance_predecessor.source_version -ceq '4.4.1' -and
+    [string]$programme442.published_maintenance_predecessor.source_tag -ceq 'v4.4.1' -and
+    [string]$programme442.published_maintenance_predecessor.manifest_sha256 -ceq [string]$expected442.manifest_sha256) '442-maintenance-programme-binds-published-441'
+  $programme442Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme442Path -AllowPendingTransition
+  Assert-NineAuthority ([string]$programme442Read.record.published_maintenance_predecessor.source_version -ceq '4.4.1') '442-maintenance-programme-reader-resolves-published-441'
+  $wrong442 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme442 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong442.published_maintenance_predecessor.manifest_sha256 = '0' * 64
+  Write-MIR42NormalizedRecord -Record $wrong442 -OutputPath $programme442Path -Code 'mir42-nine-test-442-wrong-maintenance' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme442Path -AllowPendingTransition } 'mir42-seal-current-programme-maintenance-binding' '442-wrong-published-441-binding-rejected'
+  Assert-NineAuthorityReject { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.4.1'}) | Out-Null } 'mir42-nine-target-release-line-candidate-version' 'published-441-is-not-normal-programme-candidate'
   $wrong440 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme440 | ConvertFrom-Json -Depth 100 -DateKind String
   $wrong440.candidate.version_line = '4.2'
   Write-MIR42NormalizedRecord -Record $wrong440 -OutputPath $programme440Path -Code 'mir42-nine-test-440-wrong-line' | Out-Null

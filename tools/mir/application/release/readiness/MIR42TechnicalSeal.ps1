@@ -132,7 +132,7 @@ function Get-MIR42SealCandidateScope {
 }
 
 function Get-MIR42NineTargetReleaseLineContract {
-  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0')][string]$SourceVersion)
+  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0','4.4.2')][string]$SourceVersion)
   $releaseLine = ([version]$SourceVersion).ToString(2)
   return [pscustomobject][ordered]@{
     source_version = $SourceVersion
@@ -154,12 +154,12 @@ function Get-MIR42NineTargetCandidateReleaseLineContract {
             $Candidate.identity.PSObject.Properties.Name -contains 'record' -and $null -ne $Candidate.identity.record) {
     $sourceVersion = [string](Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record).source_version
   }
-  if ($sourceVersion -cnotin @('4.2.0','4.4.0')) { throw '[mir42-nine-target-release-line-candidate-version]' }
+  if ($sourceVersion -cnotin @('4.2.0','4.4.0','4.4.2')) { throw '[mir42-nine-target-release-line-candidate-version]' }
   return Get-MIR42NineTargetReleaseLineContract -SourceVersion $sourceVersion
 }
 
 function Get-MIR42NineTargetPromotionPlanStatusContract {
-  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0')][string]$SourceVersion)
+  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0','4.4.2')][string]$SourceVersion)
   return Get-MIR42NineTargetReleaseLineContract -SourceVersion $SourceVersion
 }
 
@@ -170,6 +170,27 @@ function Get-MIR42NineTargetPromotionPlanStatusReleaseLineContract {
     if ($Status -ceq [string]$contract.promotion_plan_status) { return $contract }
   }
   throw '[mir42-nine-target-promotion-plan-status]'
+}
+
+function Resolve-MIR42NineTargetProgrammeSourceVersion {
+  param([Parameter(Mandatory)]$Programme)
+  $releaseLine = [string]$Programme.release_line
+  if ($releaseLine -ceq '4.2') { return '4.2.0' }
+  if ($releaseLine -cne '4.4' -or $Programme.PSObject.Properties.Name -notcontains 'published_maintenance_predecessor') {
+    throw '[mir42-seal-current-programme-state]'
+  }
+  $fields = @('source_version','source_tag','release_id','commit','tree','manifest_name','manifest_bytes','manifest_sha256')
+  $matches = [Collections.Generic.List[string]]::new()
+  foreach ($candidateSourceVersion in @('4.4.0','4.4.2')) {
+    $expected = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $candidateSourceVersion
+    $bound = $true
+    foreach ($field in $fields) {
+      if ([string]$Programme.published_maintenance_predecessor.$field -cne [string]$expected.$field) { $bound = $false; break }
+    }
+    if ($bound) { $matches.Add($candidateSourceVersion) }
+  }
+  if ($matches.Count -ne 1) { throw '[mir42-seal-current-programme-maintenance-binding]' }
+  return [string]$matches[0]
 }
 
 function Get-MIR42SealScopeContract {
@@ -233,7 +254,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -249,7 +270,7 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
   if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
-  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1','4.4.0')) {
+  if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')) {
     throw '[mir42-individual-engine-run-source-version]'
   }
   $contract.engine_run_kind = 'MIR42NineTargetMaintenanceIndividualEngineRunV1'
@@ -1062,7 +1083,7 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
-      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0')) {
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2')) {
         $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
       }
     }
@@ -1725,7 +1746,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
   # The seal is release evidence, so it always binds the complete Full
   # preservation oracle. Classic remains available for private
   # characterization but cannot select a reduced snapshot field here.
-  if ($candidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0') -and $receipt.Contains('upgrade_policy')) {
+  if ($candidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2') -and $receipt.Contains('upgrade_policy')) {
     $prefix = 'mir' + $candidateSourceVersion.Replace('.', '') + '-upgrade'
     throw "[$prefix-classic-reduced-policy-not-release-preservation]"
   }
@@ -1733,7 +1754,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target
-    predecessor_source_version = if ($candidateSourceVersion -cin @('4.3.1','4.4.0')) { '4.3.0' } else { '4.2.2' }
+    predecessor_source_version = if ($candidateSourceVersion -ceq '4.4.2') { '4.4.1' } elseif ($candidateSourceVersion -cin @('4.3.1','4.4.0')) { '4.3.0' } else { '4.2.2' }
     receipt = [pscustomobject]@{path=$receiptPath;sha256=[string]$ReceiptReference.sha256}
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
@@ -2025,7 +2046,7 @@ function Assert-MIR431SealPerformanceCriterionEvidence {
   )
 
   $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-  if ([string]$version.source_version -cnotin @('4.3.1','4.4.0')) { return }
+  if ([string]$version.source_version -cnotin @('4.3.1','4.4.0','4.4.2')) { return }
   $evidence = @($Record.evidence)
   if ($evidence.Count -ne 1) { throw '[mir431-seal-performance-evidence-count]' }
   $path = Resolve-MIR42SealImmutableFile -Path ([string]$evidence[0].path) -Sha256 ([string]$evidence[0].sha256) -Code 'mir431-seal-performance-observation'
@@ -2063,7 +2084,7 @@ function Get-MIR42NineTargetCriterionEvidenceRecord {
   if ([string]$record.criterion -ceq 'performance-telemetry') {
     Assert-MIR430SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cin @('4.3.1','4.4.0')) {
+    if ([string]$version.source_version -cin @('4.3.1','4.4.0','4.4.2')) {
       if ($null -eq $PublishedMaintenanceInputs) { throw '[mir431-seal-performance-maintenance-custody-required]' }
       Assert-MIR431SealPerformanceCriterionEvidence -Record $record -Candidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
     }
@@ -2377,7 +2398,7 @@ function New-MIR42NineTargetReleaseCutProgramme {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputPath,
-    [ValidateSet('4.2.0','4.4.0')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.4.0','4.4.2')][string]$SourceVersion = '4.2.0',
     [switch]$RefreshPendingAuthority,
     [string]$CheckpointRoot = ''
   )
@@ -2491,7 +2512,7 @@ function Test-MIR42NineTargetPendingAuthorityRefresh {
   # records after their canonical inputs changed.  Every other pending
   # authority field, including all gates and predecessor bindings, must
   # already be byte-for-byte equivalent to the current construction.
-  $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion (([string]$Existing.release_line) + '.0')
+  $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion (Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $Existing)
   if ($Existing.PSObject.Properties.Name -contains 'written_transition_authorization' -or
       [string]$Existing.status -cne [string]$release.programme_pending_status -or
       [string]$Existing.candidate.version_line -cne [string]$release.release_line -or
@@ -2770,11 +2791,7 @@ function Get-MIR42LiveProgrammeTransition {
   $programmeReceipt = Read-MIR42SealRecord -Path $path -Code 'mir42-seal-current-programme'
   $programme = $programmeReceipt.record
   $sourceVersion = if ($Scope -ceq 'nine-target') {
-    switch ([string]$programme.release_line) {
-      '4.2' { '4.2.0' }
-      '4.4' { '4.4.0' }
-      default { throw '[mir42-seal-current-programme-state]' }
-    }
+    Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme
   } else { '4.2.0' }
   $release = Get-MIR42NineTargetReleaseLineContract -SourceVersion $sourceVersion
   $usesPublishedMaintenance = ($Scope -ceq 'nine-target' -and [string]$release.release_line -ceq '4.4')
