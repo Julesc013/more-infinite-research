@@ -94,9 +94,8 @@ function Start-Stage([string]$stage,[string]$save,[int]$port,[string]$serverConf
  $server=Start-Owned $stage 'server' 3 @('--start-server',$save,'--bind',"127.0.0.1:$port",'--server-settings',(Join-Path $dir 'server-settings.json'),'--config',$serverConfig,'--mod-directory',$mods,'--no-log-rotation','--disable-audio');Wait-NewServerReady $sl $server
  # Scripted interaction checks the same rendered views and server state without
  # depending on sprite resolution. Bound texture-loading memory for two clients.
- $graphicsQuality=if($InputMode -ceq 'ScriptedFixture'){'very-low'}else{'medium'}
- $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--graphics-quality',$graphicsQuality,'--video-memory-usage','low')
- if($InputMode -ceq 'ScriptedFixture'){$common+=@('--max-threads','1')}
+ $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--video-memory-usage','low')
+ if($InputMode -ceq 'ScriptedFixture'){$common+=@('--force-graphics-preset','very-low','--single-thread-loading','--low-vram')}else{$common+=@('--graphics-quality','medium')}
  $a=Start-Owned $stage 'client-a' 1 (@('--config',$aConfig)+$common);$b=Start-Owned $stage 'client-b' 2 (@('--config',$bConfig)+$common)
  return [pscustomobject]@{server=$server;client_a=$a;client_b=$b;server_log=$sl;client_a_log=$al;client_b_log=$bl}
 }
