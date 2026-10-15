@@ -15,7 +15,7 @@ function Get-MIR43HistoricalCandidateAuthenticationProjection {
   param(
     [Parameter(Mandatory)][string]$Repository,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion
   )
 
   $repo = (Resolve-Path -LiteralPath $Repository).Path
@@ -245,7 +245,7 @@ function Read-MIR43HistoricalCurrentCandidate {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion,
     $ExpectedReceiptDescriptor = $null
   )
 
@@ -373,7 +373,7 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$WorkRoot
   )
 

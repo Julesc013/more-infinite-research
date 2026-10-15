@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Resolve-MIR4CurrentPackageMetadataSourceVersion {
   param([Parameter(Mandatory)][string]$SourceVersion)
 
-  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')
   if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
     throw '[mir4-current-package-metadata-source-version]'
   }
@@ -190,6 +190,9 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
   if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
+    if ($SourceVersion -ceq '4.4.1') {
+      $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+    }
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
   if ($null -ne $readme) {
@@ -256,7 +259,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
