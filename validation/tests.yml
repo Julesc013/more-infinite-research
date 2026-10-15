@@ -127,6 +127,10 @@
       "requires_factorio": false,
       "inputs": [
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v4.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v5.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v6.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v7.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v8.schema.json",
         "tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
         "fixtures/release-inputs/mir421-published-420-manifest.json",
         "fixtures/release-inputs/mir422-published-421-manifest.json",
