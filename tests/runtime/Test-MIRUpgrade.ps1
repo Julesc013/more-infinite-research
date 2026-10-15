@@ -425,6 +425,10 @@ $upgradePeakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
 $upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
 # Refuse before source resolution, staging, evidence allocation or any engine.
 if (-not $PrepareInputsOnly) {
+  # This early guard precedes New-MIRNativeProbeResourceContext. Release only
+  # completed setup allocations here as well, retaining live inputs and the
+  # unchanged child forecast, reserve and watchdog policy.
+  [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
   $null=Assert-MIR441ResourceAdmission -Policy $upgradeResourcePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
 } elseif ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($resolvedUpgradeRoot)).AvailableFreeSpace -lt 544MB) {
   throw '[mir-upgrade-preparation-capacity] Small fixture preparation requires 32 MiB output allowance plus 512 MiB headroom; this does not admit a native run.'
