@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-15
+last_reviewed: 2026-10-16
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,22 +14,29 @@ source_of_truth_for:
 
 # MIR 4.x operating programme
 
-## Published 4.4.0 and active 4.4.1 qualification follow-up
+<a id="active-campaign-mir-440-unified-research-generation"></a>
+
+## Published 4.4.1 and active 4.4.2 improvements and qualification
 
 The maintainer's 14 October direction superseded the separate 4.3.1 publication attempt and rolled its verified repairs into 4.4.0. The fixed **15 October 2026, 15:36 AEDT / 04:36 UTC** request is historical; it did not replace acceptance evidence or create a reusable waiver.
 
 [v4.4.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.0) is published. GitHub release `413564113` was published at 2026-10-15T08:16:05Z from tag `v4.4.0`, commit `72b5c72eab810baf74c9a785ac4ebbc0d438c94a`, and tree `fe63974c649ddba389da5979ba94a59bffdd5e72`. All seventeen public assets were anonymously downloaded and hash-verified; `dist/release-4.4.0/PUBLICATION-RECEIPT.json` is the delivery readback. The release is explicitly unsigned and partially qualified, with no normal technical seal or protected-main promotion. `main` remains at the published 4.3.0 state, and Portal upload is still a separate maintainer-managed action.
 
-Published 4.3.0 remains the immediate predecessor, while direct 4.2.2 coverage remains necessary for players skipping 4.3.0. Unpublished 4.3.1 candidates remain preserved experiments, not released predecessors. Their observations can be reused only for exact applicable inputs; they do not qualify 4.4.0 or a future 4.4.1 candidate.
+[v4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1) was published at 2026-10-15T10:50:21Z as release `413691909`, at commit `2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6` and tree `3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825`. All seventeen public assets were anonymously downloaded and hash-verified; the matching delivery is `dist/release-4.4.1/`. Its unsigned, essential-check emergency acceptance was candidate-specific and did not establish a completed native multiplayer connection.
 
-### 4.4.1 qualification queue
+Published 4.4.1 is the immediate predecessor for 4.4.2. Retain direct 4.4.0 and affected 4.2.2 upgrades under the existing verification plan. Published 4.3.0 remains an independent historical reference; unpublished 4.3.1 candidates remain preserved experiments. Reuse observations only for their actual applicable inputs, without relabelling them as a new destination pass.
 
-- Build a new exact 4.4.1 candidate; do not rebind 4.4.0 package, signature, seal, or qualification receipts.
+### 4.4.2 improvement and qualification queue
+
+- Verify published 4.4.1 with a separate graphical client over localhost: join, same-host rejoin, save/restart/rejoin and relevant Library states. A reproduced MIR-breaking defect takes priority for an immediate 4.4.2; a resource-blocked attempt remains inconclusive.
+- Build a new exact 4.4.2 candidate with completed, verified performance and maintenance improvements. Substantial refactoring is eligible when its benefit, preservation and integration checks are complete; retain unfinished work outside the release.
 - Complete the unrun or incomplete target, fresh-load, save, Library first-open/settings/reload, genuine client and multiplayer scenarios selected by the next verification plan.
 - Reproduce or close the reporter-specific Secretas save and F210 Secretas 1.0.37 scopes; the focused F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 continuation pass does not cover either.
 - Keep mining-yield and Space Exploration claims separate from the focused F200 drill-manufacturing observation; qualify only a reproduced player-facing defect.
 - Repeat performance work on named ordinary-menu and broader profiles, with the same exact candidate and controls. The released F200 Galore headless `--create` diagnostic improved over 4.3.0 but did not meet the ten-percent destination and is not a menu/client result.
-- Restore and verify an operational protected signing path before making a normal signed/sealed release claim; the 4.4.0 emergency authorization is not inherited.
+- Restore and verify an operational protected signing path before making a normal signed/sealed release claim; neither earlier emergency authorization is inherited.
+
+The scheduled publication target is **16 October 2026, 20:00 AEDT / 09:00 UTC**, with feature freeze aimed at 16:00 AEDT or earlier when measured acceptance durations require it. If an emergency 4.4.2 is published first, the next release is 4.4.3; never reuse published identities or replace their bytes.
 
 ### Product outcome
 
@@ -43,7 +50,7 @@ Transfer the complete established catalogue, including Base, Space Age and exist
 
 ### 4.4.0 repair evidence and limits
 
-- The Library parsing-time dependency fixes and conditional idle maintenance were released; actual first opening, settings, reload and genuine client behavior remain 4.4.1 qualification work.
+- The Library parsing-time dependency fixes and conditional idle maintenance were released; outstanding first-opening, settings, reload and genuine-client checks remain in the current qualification queue.
 - Keep the preservation-capable handling of saved Full/Classic values while replacing both execution alternatives with the approved generation path.
 - Keep published drill-manufacturing research and clarify its presentation. The proposed new drill permission grant was removed. A focused candidate-bound F200 observation recorded 24 burner drills and 22 electric drills from 20 module-free crafts after one level; it does not test ore mining yield, Space Exploration or client behavior.
 - The F200 Galore headless `--create` diagnostic is preserved as a bounded observation. It is not a passing ordinary-menu, reporter-profile or client qualification.
@@ -64,13 +71,13 @@ Work proceeds in the primary checkout with non-overlapping ownership. Native run
 
 The hour-four checkpoint is an implementation and native-measurement decision, not another general architecture review. The hour-eight checkpoint must expose any remaining catalogue, semantic or resource gap before the final qualification window. A release cannot satisfy the plan by keeping the old discovery path as a hidden fallback or by reducing established research.
 
-### 4.4.1 performance and release acceptance
+### 4.4.2 performance and release acceptance
 
-Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.4.0 from cumulative comparisons against 4.3.0 and 4.2.2. The destination is added startup time below both ten seconds and ten percent of the no-MIR baseline where achievable, reported per named profile. Include the available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
+Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.4.1, comparisons with 4.4.0 and cumulative gains against 4.3.0/4.2.2. Work toward added startup time no greater than `min(0.10 * without-MIR startup, 30 seconds)`, preferably below ten seconds, per named profile. This destination does not withhold useful qualified interim repairs. Include available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
 
 Validate complete research definitions and saved investment, not only names or counts. Include applicable Base/Space Age and modded cases, finite-tail ownership, required historical destinations, Library cold use/reload/settings and genuine client/multiplayer behavior. A scripted remote open is not a physical shortcut test; several forces are not several clients. No catalogue suppression or freeze moved to first use is accepted as a speedup.
 
-The codec remains `100 * integer(CCC) + SOURCE_PATCH`: 4.4.1 will use the registered `CCC01` identities for its new source patch. Required checks, actual candidate review, protected signing and publication readback remain normal gates. The 4.4.0 emergency publication does not authorize a 4.4.1 exception. Restore existing approved signing capability without requesting secrets in chat or treating ordinary release permission as missing.
+The codec remains `100 * integer(CCC) + SOURCE_PATCH`: 4.4.2 uses the registered `CCC02` identities. Required checks, actual candidate review, protected signing and publication readback remain normal gates. Earlier emergency publications do not authorize a new exception. Restore existing approved signing capability without requesting secrets in chat or treating ordinary release permission as missing.
 
 GitHub publication, local delivery, affected-player Portal availability and completion of all nine maintainer-managed Portal uploads remain separate states. The retained six-hour upload spacing requires at least 48 hours from first to ninth Portal upload; this plan does not claim all-nine Portal completion within sixteen hours.
 
@@ -79,17 +86,17 @@ GitHub publication, local delivery, affected-player Portal availability and comp
 | Release | Scope and admission |
 | --- | --- |
 | 4.4.0 | Published unsigned, partially qualified emergency release with preserved published bytes, exact disclosed native scopes, and separate delivery readback. It does not claim a normal seal, protected-main promotion, complete native matrix, ordinary-menu performance pass, Portal upload, or reporter-wide incident closure. GitHub release immutability remains disabled. |
-| 4.4.1 | First normal corrective qualification batch: remaining incident-specific binding, migration, target/fresh/save/Library/client/multiplayer and performance evidence, plus a new signing/seal/promotion decision. No hidden catalogue implementation is deferred from 4.4.0. |
-| 4.4.2 | Further measured startup, memory and Library improvements within the same binder, with stronger scaling and repeatability toward the performance target. |
+| 4.4.1 | Published emergency repair for the load-only tick registration, with original bytes and disclosed limited acceptance preserved. It does not complete native multiplayer, save or signing obligations for the next candidate. |
+| 4.4.2 | Verify multiplayer independently and include completed, verified startup, memory, runtime and maintainability improvements in the single implementation. Resolve or explicitly retain incomplete qualification and incident scopes. |
 | 4.4.3 | Additional approved community/mod coverage through reusable declarations and the existing science/ownership rules, with exact compatibility and migration evidence. |
 | 4.4.4 onward | Useful developer-time discovery/contributor tools, historical refinements and remaining admitted requests. MEP work requires a ready, useful production contract. |
-| Further 4.4.x | Continue the preserved request queue in useful, independently qualified batches. No empty releases, new compiler modes or parallel catalogues. |
+| Further 4.4.x / admitted 4.5.x | Continue the preserved request queue in useful, independently qualified batches. Themes do not defer a ready improvement or override an urgent defect. No empty releases, new compiler modes or parallel catalogues. |
 
 Patch suffixes are source patches: 4.4.1 uses `CCC01` and 4.4.2 uses `CCC02`; packaging retries never change them. Published assets remain unchanged. Each follow-on patch preserves the established 4.4.0 baseline except for independently justified and tested corrections.
 
 ## Historical 4.0–4.1 programme and custody context
 
-The remaining sections retain the earlier operating programme and accepted historical observations. They do not reinstate the skipped 4.3.1 release, obsolete emergency deadlines or a different active 4.4.1 scope.
+The remaining sections retain the earlier operating programme and accepted historical observations. They do not reinstate the skipped 4.3.1 release, obsolete emergency deadlines or a different active 4.4.2 scope.
 
 MIR 4.0.0 proved that the project can produce a multi-target, proof-governed product line. MIR 4.x now has two simultaneous duties: keep the released 4.0 line repairable and make future development physically coherent. The programme therefore runs a stable patch lane and one development lane under shared findings, shared semantic intent, independently qualified target packages, and immutable published bytes.
 

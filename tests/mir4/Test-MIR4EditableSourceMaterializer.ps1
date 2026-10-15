@@ -69,21 +69,21 @@ $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.in
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
 $retiredCurrentSources=@(
   'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+  'source/prototypes/mir/runtime/compiler_profile_notice.lua',
   'source/prototypes/mir/pipeline/classic_compiler.lua',
   'source/prototypes/mir/domain/compiler/classic_declarations.lua',
   'source/prototypes/mir/planner/classic/plan.lua'
 )
 $compilerTransitionSources=@(
-  'source/prototypes/mir/settings/compiler_profile.lua',
-  'source/prototypes/mir/runtime/compiler_profile_notice.lua'
+  'source/prototypes/mir/settings/compiler_profile.lua'
 )
 $approvedScienceSources=@(
   'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
   'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
 )
-if(@($manifest.bindings).Count-ne377-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne377-or
+if(@($manifest.bindings).Count-ne376-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne376-or
    $migratedBindings.Count-ne356-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne356-or
-   $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne2-or$approvedScienceBindings.Count-ne2-or
+   $introducedBindings.Count-ne20-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or
    @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{Test-Path -LiteralPath (Join-Path $repo $_)}).Count-ne0-or
@@ -158,6 +158,19 @@ function Assert-MIR4EditableSourceRejected([scriptblock]$Action,[string]$Code){
 Assert-MIR4EditableSourceRejected {
   New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId HISTORICAL-REJECT -SourceVersion '4.1.0' -OutputRoot 'build/packages/test-historical-rejection' | Out-Null
 } '[mir4-target-materializer-historical-source-version-requires-pinned-checkout]'
+
+$sourceManifestPath=Join-Path $repo 'source/package-source.json'
+$sourceManifestBefore=(Get-FileHash -LiteralPath $sourceManifestPath -Algorithm SHA256).Hash
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('source/prototypes/mir/settings/compiler_profile.lua') -Check | Out-Null
+} '[mir4-source-retirement-source-present]'
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('source/prototypes/mir/runtime/not-a-declared-source.lua') -Check | Out-Null
+} '[mir4-source-retirement-binding]'
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('../outside.lua') -Check | Out-Null
+} 'Unsafe or non-portable MIR 4 archive path'
+if((Get-FileHash -LiteralPath $sourceManifestPath -Algorithm SHA256).Hash-cne$sourceManifestBefore){throw '[mir4-editable-source-retirement-check-mutated-manifest]'}
 $omissionState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f200')
 $omission=@($omissionState.composition.operations|Where-Object{[string]$_.operation-ceq'omit'}|Select-Object -First 1)
 if($omission.Count-ne1){throw '[mir4-editable-source-omission-fixture]'}
@@ -194,7 +207,7 @@ foreach($target in @('f210','f200','f110','f100')){
   # The current source removes the retired discovery and Classic implementations
   # while adding the approved lab/pack reference bindings.  The frozen baseline
   # identities remain exact; current semantic changes are not historical byte parity.
-  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
+  $expectedDelta=if($target-in@('f210','f200')){37}else{106}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

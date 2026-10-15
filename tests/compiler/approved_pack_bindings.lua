@@ -5,9 +5,13 @@ local function check(condition, message)
 end
 
 local Context = require("prototypes.mir.pipeline.compiler_context")
+local lab_compatibility = require("prototypes.mir.capabilities.science_integration.lab_compatibility")
 local bindings = require("prototypes.mir.capabilities.science_integration.pack_bindings")
 local catalogue = require("prototypes.mir.streams.registry")
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local lab_bindings = require("prototypes.mir.capabilities.science_integration.lab_bindings")
+local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local roles = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
 
 local function world(alternatives, reversed)
@@ -43,6 +47,56 @@ local function world(alternatives, reversed)
   data.raw = raw
   return raw
 end
+
+world(0, false)
+Context.with_active(Context.new(), function()
+  local internal_labs = lab_bindings.view()
+  local copied_labs = lab_bindings.snapshot()
+  local before = fingerprint.of(internal_labs)
+  local copied_index = bindings.compile_references(catalogue.shared, copied_labs)
+  local internal_index = science_packs.binding_snapshot()
+  check(fingerprint.of(copied_index) == fingerprint.of(internal_index),
+    "The Context-owned laboratory view produces the same approved reference bindings as the copied public snapshot")
+  check(fingerprint.of(lab_bindings.view()) == before,
+    "Approved reference construction never mutates Context-owned laboratory bindings")
+  local input_before = internal_index.labs[1].inputs[1]
+  local recipe_before = internal_index.labs[1].sources[1].recipe_name
+  internal_index.labs[1].inputs[1] = "caller-mutation"
+  internal_index.labs[1].sources[1].recipe_name = "caller-mutation"
+  local fresh_index = science_packs.binding_snapshot()
+  check(fresh_index.labs[1].inputs[1] == input_before
+      and fresh_index.labs[1].sources[1].recipe_name == recipe_before,
+    "Public approved-reference snapshots cannot mutate the shared laboratory view")
+  local exposed_index = Context.current():service("science.approved_binding_index")()
+  exposed_index.labs[1].inputs[1] = "caller-mutation"
+  exposed_index.labs[1].sources[1].recipe_name = "caller-mutation"
+  local lab_snapshot = lab_bindings.snapshot()
+  check(lab_snapshot[1].inputs[1] == input_before and lab_snapshot[1].sources[1].recipe_name == recipe_before,
+    "The exposed approved-binding service cannot mutate the shared laboratory view")
+  local service_snapshot = science_packs.binding_snapshot()
+  check(service_snapshot.labs[1].inputs[1] == input_before
+      and service_snapshot.labs[1].sources[1].recipe_name == recipe_before,
+    "The exposed approved-binding service cannot mutate later public binding snapshots")
+end)
+
+local first_context, second_context = Context.new(), Context.new()
+world(0, false)
+local first_labs
+Context.with_active(first_context, function()
+  first_labs = lab_bindings.view()
+  science_packs.binding_snapshot()
+end)
+world(0, false)
+data.raw.lab.lab.inputs = {roles[1]}
+local second_labs
+Context.with_active(second_context, function()
+  second_labs = lab_bindings.view()
+  science_packs.binding_snapshot()
+  check(second_labs ~= first_labs and #second_labs[1].inputs == 1,
+    "A fresh CompilerContext builds its own laboratory bindings from its active prototype world")
+end)
+check(#first_labs[1].inputs == #roles,
+  "A later Context cannot replace the earlier Context-owned laboratory binding view")
 
 local function bind_all()
   local result = {}
@@ -207,6 +261,79 @@ Context.with_active(Context.new(), function()
     "Completion of a closed research/science cycle proves no approved reference seed")
   check(bindings.bound_technology_reason(index, roles[4]) ~= nil, "Unestablished research retains an explicit reason")
 end)
+
+-- Accepted input sets and canonical order are private Context state.  Repeated
+-- Boolean/reduction queries must reuse them, while a new Context sees the
+-- current data-stage records.  The aliased raw row remains a separate named
+-- candidate, matching the former raw-table traversal rather than collapsing it.
+do
+  local raw = world(0, false)
+  raw.lab["lab-alias"] = raw.lab.lab
+  local owner = Context.new()
+  owner:set_service("science.pack_production_status", function() return "research" end)
+  owner:set_service("science.lab_binding_available", function() return true end)
+  owner:freeze_services()
+  Context.with_active(owner, function()
+    for _ = 1, 8 do
+      check(lab_compatibility.valid_research_ingredients({{roles[1], 1}, {roles[2], 1}}),
+        "Repeated declared lab checks retain the former Boolean result")
+    end
+    local first_view = owner:state_view("approved_lab_acceptance_view")
+    check(first_view == owner:state_view("approved_lab_acceptance_view") and #first_view == 2
+        and first_view[1].name == "lab" and first_view[2].name == "lab-alias"
+        and first_view[1].accepted_inputs[roles[1]] and first_view[2].accepted_inputs[roles[2]],
+      "Accepted input sets and canonical lab order are prepared once without collapsing aliases")
+  end)
+  raw.lab["lab-alias"] = nil
+  raw.lab.lab.inputs = {roles[1]}
+  local fresh = Context.new()
+  fresh:set_service("science.pack_production_status", function() return "research" end)
+  fresh:set_service("science.lab_binding_available", function() return true end)
+  fresh:freeze_services()
+  Context.with_active(fresh, function()
+    check(not lab_compatibility.valid_research_ingredients({{roles[1], 1}, {roles[2], 1}}),
+      "A fresh Context rebuilds accepted inputs after a data-stage input change")
+  end)
+end
+
+do
+  local raw = world(0, false)
+  raw.lab = {}
+  local owner = Context.new()
+  owner:set_service("science.pack_production_status", function() return "research" end)
+  owner:set_service("science.lab_binding_available", function() return true end)
+  owner:freeze_services()
+  Context.with_active(owner, function()
+    check(not lab_compatibility.valid_research_ingredients({{roles[1], 1}}),
+      "An empty physical laboratory set remains a known negative")
+    local selected, status = lab_compatibility.best_lab_compatible_ingredients({{roles[1], 1}}, "zero-labs", {})
+    check(selected == nil and status == "invalid", "An empty lab set cannot justify a reduced science vector")
+  end)
+end
+
+do
+  local raw = world(0, false)
+  raw.lab = {
+    zeta = {name = "zeta", inputs = {roles[1], roles[2]}},
+    alpha = {name = "alpha", inputs = {roles[1]}}
+  }
+  local owner = Context.new()
+  owner:set_service("science.pack_production_status", function() return "research" end)
+  owner:set_service("science.lab_binding_available", function() return true end)
+  owner:freeze_services()
+  Context.with_active(owner, function()
+    for _ = 1, 8 do
+      local chosen, status = lab_compatibility.best_lab_compatible_ingredients(
+        {{roles[1], 1}, {roles[2], 1}, {"excluded-pack", 1}}, "canonical-reduction", {})
+      check(chosen and status == "reduced" and #chosen == 2
+          and chosen[1][1] == roles[1] and chosen[2][1] == roles[2],
+        "Repeated reduction preserves the best accepted science vector")
+    end
+    local view = owner:state_view("approved_lab_acceptance_view")
+    check(#view == 2 and view[1].name == "alpha" and view[2].name == "zeta",
+      "Reduction consumes the one canonical Context-owned lab order")
+  end)
+end
 
 -- Exercise the actual production facade and its actual lab-source projection;
 -- former solver modules remain poisoned by the host throughout this fixture.

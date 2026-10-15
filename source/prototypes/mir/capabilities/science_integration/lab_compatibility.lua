@@ -42,15 +42,35 @@ local function diagnostic_visit(observer)
   return true
 end
 
-local function lab_accepts_all(lab, packs, diagnostic_observer)
-  local accepted = {}
-  for _, input in ipairs((lab and lab.inputs) or {}) do
+-- The lab acceptance vector is immutable for one compiler Context.  Keep it
+-- private: public binding snapshots still cross their defensive-copy boundary.
+-- `input_count` retains the diagnostic observer's former visit budget even
+-- when a physical lab repeats an input name.
+local function build_lab_acceptance_view()
+  local labs = {}
+  for name, lab in pairs(data_raw.prototypes("lab")) do
+    local accepted, input_count = {}, 0
+    for _, input in ipairs((lab and lab.inputs) or {}) do
+      accepted[input] = true
+      input_count = input_count + 1
+    end
+    labs[#labs + 1] = {name = name, accepted_inputs = accepted, input_count = input_count}
+  end
+  table.sort(labs, function(left, right) return left.name < right.name end)
+  return labs
+end
+
+local function lab_acceptance_view()
+  return compiler_context.current():state_view("approved_lab_acceptance_view", build_lab_acceptance_view)
+end
+
+local function lab_accepts_all(entry, packs, diagnostic_observer)
+  for _ = 1, entry.input_count do
     if not diagnostic_visit(diagnostic_observer) then return false end
-    accepted[input] = true
   end
   for _, pack in ipairs(packs or {}) do
     if not diagnostic_visit(diagnostic_observer) then return false end
-    if not accepted[pack] then return false end
+    if not entry.accepted_inputs[pack] then return false end
   end
   return true
 end
@@ -77,12 +97,12 @@ end
 local function accepting_lab(packs, diagnostic_observer, reachability_context)
   if not packs or #packs == 0 then return false end
   local unresolved
-  for name, lab in pairs(data_raw.prototypes("lab")) do
+  for _, entry in ipairs(lab_acceptance_view()) do
     if not diagnostic_visit(diagnostic_observer) then return false end
-    if lab_accepts_all(lab, packs, diagnostic_observer) then
-      local available, reason = lab_acquisition_available(name, diagnostic_observer, reachability_context)
+    if lab_accepts_all(entry, packs, diagnostic_observer) then
+      local available, reason = lab_acquisition_available(entry.name, diagnostic_observer, reachability_context)
       if available == true then return true end
-      if available == nil then unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. name)) end
+      if available == nil then unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. entry.name)) end
     end
   end
   return false, unresolved
@@ -193,17 +213,12 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
     return nil, "invalid"
   end
 
-  local labs = {}
-  for name, lab in pairs(data_raw.prototypes("lab")) do table.insert(labs, {name = name, lab = lab}) end
-  table.sort(labs, function(a, b) return a.name < b.name end)
-
   local best, best_lab = nil, nil
-  for _, entry in ipairs(labs) do
-    local candidate, accepted = {}, {}
-    for _, input in ipairs(entry.lab.inputs or {}) do accepted[input] = true end
+  for _, entry in ipairs(lab_acceptance_view()) do
+    local candidate = {}
     for _, ingredient in ipairs(source) do
       local name = M.ingredient_name(ingredient)
-      if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
+      if name and entry.accepted_inputs[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
     end
     local candidate_has_required = contains_required(candidate, required)
     if candidate_has_required and contains_phase_trigger(candidate, required_any_packs) and #candidate > 0 then

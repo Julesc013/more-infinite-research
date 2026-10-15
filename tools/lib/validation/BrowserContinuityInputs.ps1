@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot '../compatibility/FactorioRunner.ps1')
 
 function Get-MIRBrowserContinuityReadmeSha256 {
-  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion,[string]$ReadmePath)
+  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')][string]$SourceVersion,[string]$ReadmePath)
   . (Join-Path $RepositoryRoot 'tools/mir/application/package/TargetMaterializer.ps1')
   $Target=$Target.ToLowerInvariant()
   $state=Get-MIR4TargetMaterializerState -RepoRoot $RepositoryRoot -Target $Target

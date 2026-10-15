@@ -85,7 +85,11 @@ function Assert-MIR42EngineSharedInputs {
       @{candidate='4.3.1';requested='4.2.2';source='4.2.2';reader='4.2.3'},
       @{candidate='4.4.0';requested='';source='4.3.0';reader='4.4.0'},
       @{candidate='4.4.0';requested='4.3.0';source='4.3.0';reader='4.4.0'},
-      @{candidate='4.4.0';requested='4.2.2';source='4.2.2';reader='4.2.3'}
+      @{candidate='4.4.0';requested='4.2.2';source='4.2.2';reader='4.2.3'},
+      @{candidate='4.4.2';requested='';source='4.4.1';reader='4.4.2'},
+      @{candidate='4.4.2';requested='4.4.1';source='4.4.1';reader='4.4.2'},
+      @{candidate='4.4.2';requested='4.4.0';source='4.4.0';reader='4.4.1'},
+      @{candidate='4.4.2';requested='4.2.2';source='4.2.2';reader='4.2.3'}
     )){
       $selection=Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $case.candidate -RequestedPredecessorSourceVersion $case.requested
       Check ($selection.source_version-ceq$case.source-and$selection.reader_version-ceq$case.reader) ('frozen predecessor reader selection '+$case.candidate+'/'+$case.requested)
@@ -97,6 +101,9 @@ function Assert-MIR42EngineSharedInputs {
     }
     foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.3','4.3.1','4.3.2','4.4.0')){
       Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.4.0' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
+    }
+    foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.3','4.3.0','4.3.1','4.3.2','4.4.2')){
+      Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.4.2' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
     }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.2.2' -RequestedPredecessorSourceVersion '4.2.0'} 'mir42-engine-maintenance-predecessor-selection'
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.0' -RequestedPredecessorSourceVersion '4.3.0'} 'mir42-engine-maintenance-predecessor-selection'
@@ -264,7 +271,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $builtArguments=@($built.arguments)
     Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') '423 historical upgrade changed its legacy candidate or retention binding.'
     Assert-MIR42ControlledArgumentAbsent $builtArguments '-SourceMaterializationPath'
-    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0')){
+    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2')){
       foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
         $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget $currentTarget -RequestedSourceVersion $currentSourceVersion -WithMaintenance $true
         $builtArguments=@($built.arguments);$historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
@@ -307,7 +314,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
           Refuses {Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion "4.2.$patch" -EnginePath $badPath} "mir421-$historicalTarget-local-engine-binding-required"
         }
       }
-      foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
+      foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2')){
         $source=[version]$sourceVersion
         $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion $sourceVersion -EnginePath $boundEngine
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $historicalTarget.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build

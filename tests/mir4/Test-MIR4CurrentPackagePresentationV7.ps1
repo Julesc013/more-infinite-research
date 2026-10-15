@@ -32,6 +32,7 @@ $retiredPredecessorSources=@(
 )
 $retiredCurrentSources=@(
   'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+  'source/prototypes/mir/runtime/compiler_profile_notice.lua',
   'source/prototypes/mir/pipeline/classic_compiler.lua',
   'source/prototypes/mir/domain/compiler/classic_declarations.lua',
   'source/prototypes/mir/planner/classic/plan.lua'
@@ -42,9 +43,9 @@ $missingPredecessors=@($predecessorPaths|Where-Object{$_-cnotin@($migrated.prove
 $successionChecks=@(
   ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
   ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
-  (@($manifest.bindings).Count-eq377),($currentPaths.Count-eq377),
+  (@($manifest.bindings).Count-eq376),($currentPaths.Count-eq376),
   ($migrated.Count-eq356),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq356),
-  ($introduced.Count-eq21),($compilerTransitionIntroduced.Count-eq2),($approvedBindingsIntroduced.Count-eq2),
+  ($introduced.Count-eq20),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),
   ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
   (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
   (($missingPredecessors-join'|')-ceq(($retiredPredecessorSources|Sort-Object -Unique)-join'|')),
@@ -65,7 +66,7 @@ $successionChecks=@(
   ((@($historicalIntroduced.target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-ceq'f013|f014|f015|f016|f017')
 )
 if($successionChecks-contains$false){throw '[mir4-package-presentation-v7-source-succession]'}
-foreach($source in @('source/prototypes/mir/settings/compiler_profile.lua','source/prototypes/mir/runtime/compiler_profile_notice.lua')){
+foreach($source in @('source/prototypes/mir/settings/compiler_profile.lua')){
   $row=@($compilerTransitionIntroduced|Where-Object{[string]$_.source_path-ceq$source})
   if($row.Count-ne1-or[string]$row[0].layer-cne'capability'-or[string]$row[0].semantic_class-cne'target-overlay'-or
     [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
@@ -90,6 +91,7 @@ foreach($forgery in @(
   @{id='browser-transform';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').transform='forged-transform'}},
   @{id='browser-identity';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/adapters/runtime-capabilities/game-browser-host.lua').provenance.introduction_id='undeclared-introduction'}},
   @{id='retired-classic-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/settings/compiler_profile.lua');$row[0].source_path='source/prototypes/mir/domain/compiler/classic_declarations.lua';$row[0].output_path='prototypes/mir/domain/compiler/classic_declarations.lua'}},
+  @{id='retired-runtime-notice-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/runtime/state.lua');$row[0].source_path='source/prototypes/mir/runtime/compiler_profile_notice.lua';$row[0].output_path='prototypes/mir/runtime/compiler_profile_notice.lua'}},
   @{id='retired-science-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].output_path='prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua';$row[0].provenance.introduction_id='MIR42-SCIENCE-ROUTE-FEASIBILITY'}},
   @{id='approved-binding-substitution';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/forged.lua'}}
 )){

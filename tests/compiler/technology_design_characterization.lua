@@ -868,11 +868,26 @@ do
       "owned recipe domain reports exact canonical bytes")
     check(recipe_facts.snapshot_recipe_domain_fingerprint(deepcopy(index)) == nil,
       "copied recipe index cannot claim owned digest authority")
+    local capture_metrics_before = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
     local captured = snapshot_adapter.capture()
+    local capture_metrics_after = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
     check(captured.domain_fingerprints.recipes == component.fingerprint,
       "adapter reuses only the owned recipes-domain digest")
     check(captured.metrics.reused_recipe_canonical_bytes == component.canonical_bytes,
       "adapter reports exact reused recipe canonical bytes")
+    check(capture_metrics_after.explicit_snapshots == capture_metrics_before.explicit_snapshots
+        and capture_metrics_after.full_copies == capture_metrics_before.full_copies,
+      "adapter byte telemetry does not request an observable snapshot copy")
+    local public_captured_snapshot = compilation_snapshot.snapshot(captured)
+    local captured_snapshot_bytes = public_captured_snapshot.metrics.snapshot_bytes
+    public_captured_snapshot.metrics.snapshot_bytes = nil
+    public_captured_snapshot.metrics.canonicalization_passes = public_captured_snapshot.metrics.canonicalization_passes - 1
+    local expected_captured_snapshot_bytes = #fingerprint.canonical(public_captured_snapshot)
+    check(captured_snapshot_bytes == expected_captured_snapshot_bytes,
+      "adapter byte telemetry preserves the pre-metric public projection length")
+    public_captured_snapshot.metrics.snapshot_bytes = -1
+    check(captured.metrics.snapshot_bytes == expected_captured_snapshot_bytes,
+      "public snapshot mutation cannot alter adapter byte telemetry")
     return {full = full, domain = component.fingerprint,
       index_epoch = context_a:state_epoch("recipe_index"),
       material_epoch = context_a:state_epoch("recipe_index_fingerprint_material"),

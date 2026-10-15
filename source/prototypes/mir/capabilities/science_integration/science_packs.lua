@@ -16,7 +16,7 @@ local S = {pack_registry = pack_registry, lab_compatibility = lab_compatibility,
 
 local function index()
   return compiler_context.current():state_view("approved_research_bindings", function()
-    return pack_bindings.compile_references(catalogue.shared, lab_bindings.snapshot())
+    return pack_bindings.compile_references(catalogue.shared, lab_bindings.view())
   end)
 end
 
@@ -72,7 +72,7 @@ function S.ensure_services(context)
   for name, callback in pairs(services) do
     if not context:has_service(name) then context:set_service(name, callback) end
   end
-  context:set_service("science.approved_binding_index", index)
+  context:set_service("science.approved_binding_index", function() return deepcopy(index()) end)
   return context
 end
 

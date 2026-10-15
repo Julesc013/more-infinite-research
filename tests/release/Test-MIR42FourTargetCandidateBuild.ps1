@@ -303,7 +303,7 @@ function Test-MIR42IndependentConstructionInput {
 }
 
 $commit = (& git -C $repo rev-parse HEAD).Trim()
-$admittedCandidateSources = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')
+$admittedCandidateSources = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
 foreach ($entryPoint in @(
   'tools/commands/release/New-MIR42FourTargetCandidate.ps1',
   'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
@@ -341,10 +341,14 @@ $current441 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.
 Assert-MIR42CandidateBuildTest (
   [string]$current441.source_version -ceq '4.4.1' -and [int]$current441.source_minor -eq 4 -and [int]$current441.source_patch -eq 1
 ) 'current-package-metadata-admits-4-4-1-identity'
-$current440Rejected = $false
-try { Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.2' | Out-Null }
-catch { $current440Rejected = $_.Exception.Message -ceq '[mir4-current-package-metadata-source-version]' }
-Assert-MIR42CandidateBuildTest $current440Rejected 'current-package-metadata-refuses-unapproved-4-4-patch'
+$current442 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.2'
+Assert-MIR42CandidateBuildTest (
+  [string]$current442.source_version -ceq '4.4.2' -and [int]$current442.source_minor -eq 4 -and [int]$current442.source_patch -eq 2
+) 'current-package-metadata-admits-4-4-2-identity'
+$current443Rejected = $false
+try { Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.4.3' | Out-Null }
+catch { $current443Rejected = $_.Exception.Message -ceq '[mir4-current-package-metadata-source-version]' }
+Assert-MIR42CandidateBuildTest $current443Rejected 'current-package-metadata-refuses-unapproved-4-4-patch'
 
 $root = Join-Path $repo ('build/test-results/mir42-four-target-candidate-' + [guid]::NewGuid().ToString('N'))
 $partialRoot = $root + '-partial'
@@ -415,7 +419,8 @@ try {
     [pscustomobject][ordered]@{ source_version='4.3.0'; schema=5; source_patch='00' },
     [pscustomobject][ordered]@{ source_version='4.3.1'; schema=6; source_patch='01' },
     [pscustomobject][ordered]@{ source_version='4.4.0'; schema=7; source_patch='00' },
-    [pscustomobject][ordered]@{ source_version='4.4.1'; schema=8; source_patch='01' }
+    [pscustomobject][ordered]@{ source_version='4.4.1'; schema=8; source_patch='01' },
+    [pscustomobject][ordered]@{ source_version='4.4.2'; schema=9; source_patch='02' }
   )
   $mir43DescriptorSets = [ordered]@{}
   $targetCodes = @('210','200','110','100','017','016','015','014','013')
@@ -445,13 +450,13 @@ try {
       ) "$sourceVersion-release-target-identity-$i"
     }
   }
-  foreach ($schemaVersion in @(1,2,3,4,5,6,7,8)) {
+  foreach ($schemaVersion in @(1,2,3,4,5,6,7,8,9)) {
     $versionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $repo -Manifest ([pscustomobject]@{schema=$schemaVersion;kind="MIR42FourTargetDeterministicCandidateManifestV$schemaVersion"})
-    $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')[$schemaVersion-1]
+    $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')[$schemaVersion-1]
     Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
   foreach ($badContract in @(
-    [pscustomobject]@{schema=9;kind='MIR42FourTargetDeterministicCandidateManifestV9'},
+    [pscustomobject]@{schema=10;kind='MIR42FourTargetDeterministicCandidateManifestV10'},
     [pscustomobject]@{schema=2;kind='MIR42FourTargetDeterministicCandidateManifestV1'}
   )) {
     $rejected = $false
@@ -623,7 +628,7 @@ try {
     Assert-MIR42CandidateBuildTest $crossVersionRejected "$sourceVersion-schema-refuses-cross-source-authority"
     # Exercise the complete writer output, including historical leading-zero
     # codes. A schema accepting patch 00 in any one of these fields must fail.
-    if ($sourceVersion -ceq '4.4.1') {
+    if ($sourceVersion -cin @('4.4.1','4.4.2')) {
       for ($i = 0; $i -lt $descriptors.Count; $i++) {
         foreach ($field in @('authority-version','target-version','asset-path')) {
           $wrongPatch = $mir43Manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
@@ -637,7 +642,7 @@ try {
           $wrongPatchRejected = $false
           try { $wrongPatch | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop | Out-Null }
           catch { $wrongPatchRejected = $true }
-          Assert-MIR42CandidateBuildTest $wrongPatchRejected "441-schema-refuses-patch00-$($descriptors[$i].target)-$field"
+          Assert-MIR42CandidateBuildTest $wrongPatchRejected "$($sourceVersion.Replace('.',''))-schema-refuses-patch00-$($descriptors[$i].target)-$field"
         }
       }
     }

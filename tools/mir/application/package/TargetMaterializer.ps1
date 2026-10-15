@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Resolve-MIR4CurrentPackageMetadataSourceVersion {
   param([Parameter(Mandatory)][string]$SourceVersion)
 
-  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
   if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
     throw '[mir4-current-package-metadata-source-version]'
   }
@@ -192,6 +192,8 @@ function Write-MIR4PrivatePatchPackageIdentity {
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
     if ($SourceVersion -ceq '4.4.1') {
       $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+    } elseif ($SourceVersion -ceq '4.4.2') {
+      $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
     }
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }
@@ -259,7 +261,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
@@ -431,15 +433,29 @@ function Invoke-MIR4CurrentSourceMaterializerProof {
 
 function Update-MIR4CurrentSourceBindings {
   [CmdletBinding()]
-  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[scriptblock]$HistoricalAdapterProjector)
+  param([Parameter(Mandatory)][string]$RepoRoot,[switch]$Check,[scriptblock]$HistoricalAdapterProjector,[string[]]$RetiredSourcePaths=@())
   $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-  # Refresh only existing, admitted paths. Membership, target scope, transforms,
-  # versioning and support remain separately reviewed authorities.
+  # Ordinarily refresh only existing admitted paths. An explicit retirement
+  # removes only the binding of an already deleted source and its matching
+  # overlay operations; never infer retirement from a missing file.
   $manifest=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'source/package-source.json' -Kind 'MIR4ComposablePackageSourceV3'
   $authority=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath 'targets/package-authority.json' -Kind 'MIR4CanonicalPackageAuthorityV2'
   $records=[ordered]@{}
   $identities=@{}
   $changed=[Collections.Generic.List[string]]::new()
+  $retired=[ordered]@{}
+  foreach($relative in $RetiredSourcePaths) {
+    Assert-MIR4PortableArchivePath -Path $relative
+    if($relative -cnotmatch '^source/' -or $retired.Contains($relative)) { throw '[mir4-source-retirement-path]' }
+    $rows=@($manifest.bindings | Where-Object { [string]$_.source_path -ceq $relative })
+    if($rows.Count -ne 1 -or [string]$rows[0].transform -cne 'copy-exact-bytes') { throw "[mir4-source-retirement-binding] $relative" }
+    if(Test-Path -LiteralPath (Join-Path $repo $relative)) { throw "[mir4-source-retirement-source-present] $relative" }
+    if(@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$rows[0].output_path }).Count -ne 1) { throw "[mir4-source-retirement-shared-output] $relative" }
+    $retired[$relative]=$rows[0]
+  }
+  if($retired.Count) {
+    $manifest.bindings=@($manifest.bindings | Where-Object { -not $retired.Contains([string]$_.source_path) })
+  }
   foreach($binding in @($manifest.bindings)) {
     $relative=[string]$binding.source_path
     Assert-MIR4PortableArchivePath -Path $relative
@@ -466,6 +482,17 @@ function Update-MIR4CurrentSourceBindings {
   foreach($target in @('f210','f200','f110','f100')) {
     $path="targets/$target/composition.json"
     $composition=Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath $path -Kind 'MIR4TargetCompositionV2'
+    if($retired.Count) {
+      foreach($entry in $retired.GetEnumerator()) {
+        $operations=@($composition.operations | Where-Object { [string]$_.path -ceq [string]$entry.Value.output_path })
+        if($target -in @($entry.Value.target_scope)) {
+          if($operations.Count -ne 1 -or [string]$operations[0].operation -cne 'add' -or [string]$operations[0].source_path -cne $entry.Key) {
+            throw "[mir4-source-retirement-overlay] $target/$($entry.Value.output_path)"
+          }
+        }elseif($operations.Count) { throw "[mir4-source-retirement-target-scope] $target/$($entry.Value.output_path)" }
+      }
+      $composition.operations=@($composition.operations | Where-Object { [string]$_.path -cnotin @($retired.Values.output_path) })
+    }
     foreach($operation in @($composition.operations)) {
       if([string]$operation.operation -ceq 'omit') { continue }
       $rows=@($manifest.bindings | Where-Object { [string]$_.output_path -ceq [string]$operation.path -and [string]$_.source_path -ceq [string]$operation.source_path -and $target -in @($_.target_scope) })
@@ -553,5 +580,5 @@ function Update-MIR4CurrentSourceBindings {
       [IO.File]::Move($temporary,$path,$true)
     }
   }
-  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);projections=@($writes.Keys);membership_changed=$false;publication_authorized=$false}
+  [pscustomobject][ordered]@{status='current';changed_sources=@($changed.ToArray() | Sort-Object -Unique);retired_sources=@($retired.Keys);projections=@($writes.Keys);membership_changed=($retired.Count -gt 0);publication_authorized=$false}
 }

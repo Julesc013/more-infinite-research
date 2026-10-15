@@ -892,8 +892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 10087,
-      "expected_sha256": "67291AF6132E0FD9D77BC2FDA1047A6F3A6CC970C7F7F573B3E930461C69A840",
+      "expected_bytes": 10696,
+      "expected_sha256": "BE0E9F297E74439C0E4B32D66E63DBF117549E13EB9A89904A4C710FC8F022E3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -940,8 +940,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6000,
-      "expected_sha256": "647B632C5101EF9D3D2B197DDA94F9DB51BA645B7DE412582B5F6FDFCF8FA085",
+      "expected_bytes": 6030,
+      "expected_sha256": "B64C4310E33C51FB7DE99417D7F440E5C7D930BC23D961C835E512500A804C1B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2348,8 +2348,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7442,
-      "expected_sha256": "E8514B9A82A231E8265903BBE683BA26229DF1AA0E38A2C0B5972809FCE82BA0",
+      "expected_bytes": 7434,
+      "expected_sha256": "29BF1D28397393FAA447DEC2F0F19AF82CA2F2B90DC1182A8F4700FA3605B4CB",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3827,22 +3827,6 @@
         "canonical-package-authority-established-after-replay",
         "fresh-runtime-replay-complete-before-cutover"
       ]
-    },
-    {
-      "path": "prototypes/mir/runtime/compiler_profile_notice.lua",
-      "operation": "add",
-      "semantic_class": "target-overlay",
-      "source_path": "source/prototypes/mir/runtime/compiler_profile_notice.lua",
-      "transform": "copy-exact-bytes",
-      "reason": "Compose the canonical reduced compiler into f110 without another emitter.",
-      "capability_disposition": "included-for-target",
-      "expected_bytes": 2200,
-      "expected_sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46",
-      "proof_obligations": [
-        "exact-path-and-byte-identity",
-        "canonical-package-authority-established-after-replay",
-        "fresh-runtime-replay-complete-before-cutover"
-      ]
     }
   ],
   "invariants": {
@@ -3851,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "A7CC4CAFEE86FA8BBE30DFA3E92691087A695A05BC972F43523F2534AEE53D1C"
+  "record_sha256": "0F9108DB3A44E0FCB8C491FED29EF0EE20D432DA1AB352B89B295D54E2A07D40"
 }

@@ -381,6 +381,25 @@ try {
   $bobAngelSnapshot.active_mods.angelsbioprocessinggraphics='2.0.1'
   $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
   if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
+  foreach($binding in @(
+    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.68'},
+    [pscustomobject]@{from='4.4.20000';fixture_version='0.1.66'},
+    [pscustomobject]@{from='4.4.20001';fixture_version='0.1.67'}
+  )){
+    if(Test-Path -LiteralPath $bobAngelFixture){Remove-Item -LiteralPath $bobAngelFixture -Recurse -Force}
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $bobAngelFixture -Recurse
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $bobAngelFixture -Target f200 -SourceVersion '4.4.2' -FromVersion $binding.from
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $bobAngelFixture -FromVersion $binding.from -ToVersion '4.4.20002'
+    Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $bobAngelFixture -FromVersion $binding.from -ToVersion '4.4.20002'
+    $info=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'info.json') -Raw|ConvertFrom-Json
+    $control=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'control.lua') -Raw
+    if($info.version-cne$binding.fixture_version-or-not$control.Contains('complete_catalogue_upgrade = true')-or-not$control.Contains('["f200-bob-angel"]={technology="mining-productivity-4",level=5}')){
+      throw 'Bob/Angel 4.4.2 full-state fixture identity or complete-state oracle differs'
+    }
+    $f200BobAngelAssertions++
+  }
+  $rejected=$false;try{Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $bobAngelFixture -FromVersion '4.3.20000' -ToVersion '4.4.20002'}catch{$rejected=$_.Exception.Message-ceq'[mir423-f200-bob-angel-oracle-transition]'}
+  if(-not$rejected){throw 'Bob/Angel 4.4.2 oracle accepted an unpinned predecessor'};$f200BobAngelAssertions++
   $bobAngelFixtureSucceeded=$true
 } catch {
   if(-not(Test-Path -LiteralPath $bobAngelFixture -PathType Container)){New-Item -ItemType Directory -Force -Path $bobAngelFixture|Out-Null}
@@ -421,11 +440,15 @@ $galoreFixtureSucceeded=$false
 try {
   foreach($binding in @(
     [pscustomobject]@{from='4.2.20002';to='4.3.20001';fixture_version='0.1.51'},
-    [pscustomobject]@{from='4.3.20000';to='4.3.20001';fixture_version='0.1.50'}
+    [pscustomobject]@{from='4.3.20000';to='4.3.20001';fixture_version='0.1.50'},
+    [pscustomobject]@{from='4.2.20002';to='4.4.20002';fixture_version='0.1.68';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20000';to='4.4.20002';fixture_version='0.1.66';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20001';to='4.4.20002';fixture_version='0.1.67';source='4.4.2'}
   )){
     if(Test-Path -LiteralPath $galoreFixture){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $galoreFixture -Recurse
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $galoreFixture -Target f200 -SourceVersion '4.3.1' -FromVersion $binding.from -F200GaloreSpaceAge
+    $sourceVersion=if($binding.PSObject.Properties['source']){[string]$binding.source}else{'4.3.1'}
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $galoreFixture -Target f200 -SourceVersion $sourceVersion -FromVersion $binding.from -F200GaloreSpaceAge
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $galoreFixture -FromVersion $binding.from -ToVersion $binding.to
     Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $galoreFixture -FromVersion $binding.from -ToVersion $binding.to
     $info=Get-Content -LiteralPath (Join-Path $galoreFixture 'info.json') -Raw|ConvertFrom-Json
@@ -446,6 +469,8 @@ try {
   if(-not$rejected){throw 'Galore fixture identity accepted a non-F200 target'};$f200GaloreSpaceAgeAssertions++
   $rejected=$false;try{Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $galoreFixture -FromVersion '4.2.20001' -ToVersion '4.3.20001'}catch{$rejected=$_.Exception.Message-ceq'[mir431-f200-galore-oracle-transition]'}
   if(-not$rejected){throw 'Galore complete-state oracle accepted an unpublished predecessor'};$f200GaloreSpaceAgeAssertions++
+  $rejected=$false;try{Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $galoreFixture -FromVersion '4.3.20000' -ToVersion '4.4.20002'}catch{$rejected=$_.Exception.Message-ceq'[mir431-f200-galore-oracle-transition]'}
+  if(-not$rejected){throw 'Galore 4.4.2 complete-state oracle accepted an unpinned predecessor'};$f200GaloreSpaceAgeAssertions++
   $galoreFixtureSucceeded=$true
 } catch {
   if(-not(Test-Path -LiteralPath $galoreFixture -PathType Container)){New-Item -ItemType Directory -Force -Path $galoreFixture|Out-Null}
@@ -1003,6 +1028,50 @@ $currentGalore440Immediate=$currentGalore440.Clone();$currentGalore440Immediate.
 Assert-MIR421CurrentUpgradeInputMode @currentGalore440Immediate
 $mir43Assertions+=6
 
+# 4.4.2 preserves three independently authenticated predecessor lanes: direct
+# published 4.2.2, retained 4.4.0 custody, and immediate published 4.4.1.
+foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  $fixtureName=if($target-cin@('f017','f016','f015','f014','f013')){'assert-upgrade-historical-terminal-to-mir42'}else{'assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'}
+  $selected=if($target-cin@('f017','f016','f015','f014','f013')){$combinedCustody}else{''}
+  $direct442=@{Target=$target;FromVersion=('4.2.'+$code+'02');ToVersion=('4.4.'+$code+'02');FixtureName=$fixtureName;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$selected;PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';SourceVersion='4.4.2'}
+  Assert-MIR421CurrentUpgradeInputMode @direct442
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $direct442.FromVersion -SourceVersion '4.4.2')-cne'4.2.3'){throw "4.4.2 direct reader mismatch: $target"}
+  $retained440=$direct442.Clone();$retained440.FromVersion=('4.4.'+$code+'00');$retained440.PublishedPredecessorManifest='published-430.json'
+  Assert-MIR421CurrentUpgradeInputMode @retained440
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $retained440.FromVersion -SourceVersion '4.4.2')-cne'4.4.1'){throw "4.4.2 retained 4.4.0 reader mismatch: $target"}
+  $immediate441=$direct442.Clone();$immediate441.FromVersion=('4.4.'+$code+'01');$immediate441.PublishedPredecessorManifest='published-441.json'
+  Assert-MIR421CurrentUpgradeInputMode @immediate441
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $immediate441.FromVersion -SourceVersion '4.4.2')-cne'4.4.2'){throw "4.4.2 immediate reader mismatch: $target"}
+  foreach($badFrom in @(('4.2.'+$code+'01'),('4.3.'+$code+'00'),('4.4.'+$code+'02'))){
+    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $target -FromVersion $badFrom -SourceVersion '4.4.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
+    if(-not$rejected){throw "4.4.2 reader admitted an unpinned predecessor: $target/$badFrom"}
+  }
+  $wrong=$immediate441.Clone();$wrong.ToVersion=('4.4.'+$code+'01')
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+  if(-not$rejected){throw "4.4.2 mode admitted a wrong destination: $target"}
+  $mir43Assertions+=8
+}
+$currentSpaceAge442=$currentSpaceAge440.Clone();$currentSpaceAge442.SourceVersion='4.4.2';$currentSpaceAge442.ToVersion='4.4.21002'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge442
+$currentSpaceAge442Retained=$currentSpaceAge442.Clone();$currentSpaceAge442Retained.FromVersion='4.4.21000';$currentSpaceAge442Retained.PublishedPredecessorManifest='published-430.json'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge442Retained
+$currentSpaceAge442Immediate=$currentSpaceAge442.Clone();$currentSpaceAge442Immediate.FromVersion='4.4.21001';$currentSpaceAge442Immediate.PublishedPredecessorManifest='published-441.json'
+Assert-MIR421CurrentUpgradeInputMode @currentSpaceAge442Immediate
+$currentBobAngel442=$currentBobAngel440.Clone();$currentBobAngel442.SourceVersion='4.4.2';$currentBobAngel442.ToVersion='4.4.20002'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel442
+$currentBobAngel442Retained=$currentBobAngel442.Clone();$currentBobAngel442Retained.FromVersion='4.4.20000';$currentBobAngel442Retained.PublishedPredecessorManifest='published-430.json'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel442Retained
+$currentBobAngel442Immediate=$currentBobAngel442.Clone();$currentBobAngel442Immediate.FromVersion='4.4.20001';$currentBobAngel442Immediate.PublishedPredecessorManifest='published-441.json'
+Assert-MIR421CurrentUpgradeInputMode @currentBobAngel442Immediate
+$currentGalore442=$currentGalore440.Clone();$currentGalore442.SourceVersion='4.4.2';$currentGalore442.ToVersion='4.4.20002'
+Assert-MIR421CurrentUpgradeInputMode @currentGalore442
+$currentGalore442Retained=$currentGalore442.Clone();$currentGalore442Retained.FromVersion='4.4.20000';$currentGalore442Retained.PublishedPredecessorManifest='published-430.json'
+Assert-MIR421CurrentUpgradeInputMode @currentGalore442Retained
+$currentGalore442Immediate=$currentGalore442.Clone();$currentGalore442Immediate.FromVersion='4.4.20001';$currentGalore442Immediate.PublishedPredecessorManifest='published-441.json'
+Assert-MIR421CurrentUpgradeInputMode @currentGalore442Immediate
+$mir43Assertions+=9
+
 $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target 'f999' -FromVersion '4.3.99900' -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
 if(-not$rejected){throw '4.3.1 predecessor reader accepted an unselected target'}
 $mir43Assertions++
@@ -1032,6 +1101,98 @@ if($published430Rows.Count-ne9-or(@($published430Rows.target)-join'|')-cne'f210|
    @($published430Rows|Where-Object {$_.version-cne('4.3.'+$_.target.Substring(1)+'00')}).Count){
   throw '4.3.1 published 4.3.0 predecessor target binding differs'
 }
+$mir43Assertions+=2
+# The direct 4.4.0 lane has its own published final-manifest contract.  It is
+# not parsed through the 4.4.1 receipt reader, even though 4.4.1 is the
+# candidate-version selector that owns the exact 4.4.0 predecessor contract.
+$published440Path=Join-Path $RepoRoot 'fixtures/release-inputs/mir442-published-440-manifest.json'
+$published440=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published440Path -CandidateSourceVersion '4.4.1'
+$published440Contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.4.1'
+if($published440Contract.source_version-cne'4.4.0'-or$published440Contract.source_tag-cne'v4.4.0'-or
+   $published440Contract.release_id-ne413564113-or$published440Contract.asset_count-ne17-or
+   $published440.sha256-cne$published440Contract.manifest_sha256-or$published440.bytes-ne$published440Contract.manifest_bytes-or
+   [string]$published440.manifest.kind-cne'MIR42FinalReleaseManifestV1'-or
+   [string]$published440.manifest.status-cne'emergency-accepted-unsigned-partially-qualified'){
+  throw '4.4.2 published 4.4.0 predecessor contract differs'
+}
+$published440TargetAssetIds=@(643184887,643184818,643184721,643184693,643184662,643184653,643184595,643184561,643184536)
+$published440Assets=@(for($i=0;$i-lt@($published440.manifest.targets).Count;$i++){
+  $row=$published440.manifest.targets[$i]
+  [pscustomobject]@{id=$published440TargetAssetIds[$i];name=[string]$row.filename;size=[int64]$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+})
+$published440Assets+=,[pscustomobject]@{id=643184535;name='mir-4.4.0.manifest.json';size=[int64]$published440.bytes;digest=('sha256:'+[string]$published440.sha256).ToLowerInvariant();state='uploaded'}
+foreach($i in 1..7){$published440Assets+=,[pscustomobject]@{id=(600000000+$i);name=('controlled-440-supporting-asset-'+$i);size=1;digest=('sha256:'+('a'*64));state='uploaded'}}
+$published440Metadata=[pscustomobject]@{id=413564113;tag_name='v4.4.0';target_commitish='72b5c72eab810baf74c9a785ac4ebbc0d438c94a';draft=$false;prerelease=$false;immutable=$false;assets=$published440Assets}
+$published440Rows=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published440 -ReleaseMetadata $published440Metadata -CandidateSourceVersion '4.4.1')
+if($published440Rows.Count-ne9-or(@($published440Rows.target)-join'|')-cne'f210|f200|f110|f100|f017|f016|f015|f014|f013' -or
+   @($published440Rows|Where-Object {$_.version-cne('4.4.'+$_.target.Substring(1)+'00')}).Count){
+  throw '4.4.2 published 4.4.0 predecessor target binding differs'
+}
+$mir43Assertions+=2
+foreach($mutation in @(
+  @{name='target-commitish';apply={param($m)$m.target_commitish='other'};code='[mir42-maintenance-predecessor-release-metadata]'},
+  @{name='manifest-digest';apply={param($m)($m.assets|Where-Object name -ceq 'mir-4.4.0.manifest.json')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-manifest]'},
+  @{name='selected-target-digest';apply={param($m)($m.assets|Where-Object name -ceq 'more-infinite-research_4.4.21000.zip')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-asset]'}
+)){
+  $invalid=$published440Metadata|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  & $mutation.apply $invalid
+  $rejected=$false;try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published440 -ReleaseMetadata $invalid -CandidateSourceVersion '4.4.1'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($mutation.code)}
+  if(-not$rejected){throw "4.4.2 direct reader accepted invalid 4.4.0 $($mutation.name)"}
+  $mir43Assertions++
+}
+$changed440=Join-Path $testRoot 'changed-published-440-manifest.json'
+$changed440Bytes=[IO.File]::ReadAllBytes($published440Path);$changed440Bytes[100]=$changed440Bytes[100]-bxor1
+[IO.File]::WriteAllBytes($changed440,$changed440Bytes)
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed440 -CandidateSourceVersion '4.4.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.4.2 direct reader accepted changed 4.4.0 manifest bytes'}
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot 'fixtures/release-inputs/mir442-published-441-manifest.json') -CandidateSourceVersion '4.4.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.4.2 direct reader accepted the 4.4.1 manifest'}
+$mir43Assertions+=2
+# The published 4.4.1 release has its own exact emergency publication shape.
+# The frozen raw manifest remains custody evidence only; it does not convey a
+# completed seal or qualification state to 4.4.2.
+$published441Path=Join-Path $RepoRoot 'fixtures/release-inputs/mir442-published-441-manifest.json'
+$published441=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published441Path -CandidateSourceVersion '4.4.2'
+$published441Contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.4.2'
+if($published441Contract.source_version-cne'4.4.1'-or$published441Contract.source_tag-cne'v4.4.1'-or
+   $published441Contract.release_id-ne413691909-or$published441Contract.asset_count-ne17-or
+   $published441.sha256-cne$published441Contract.manifest_sha256-or$published441.bytes-ne$published441Contract.manifest_bytes-or
+   [string]$published441.manifest.kind-cne'MIR42FinalReleaseManifestV1'-or
+   [string]$published441.manifest.status-cne'emergency-accepted-unsigned-essential-only'){
+  throw '4.4.2 published 4.4.1 predecessor contract differs'
+}
+$published441TargetAssetIds=@(643548913,643548906,643548894,643548889,643548847,643548827,643548825,643548820,643548796)
+$published441Assets=@(for($i=0;$i-lt@($published441.manifest.targets).Count;$i++){
+  $row=$published441.manifest.targets[$i]
+  [pscustomobject]@{id=$published441TargetAssetIds[$i];name=[string]$row.filename;size=[int64]$row.bytes;digest=('sha256:'+[string]$row.sha256).ToLowerInvariant();state='uploaded'}
+})
+$published441Assets+=,[pscustomobject]@{id=643548800;name='mir-4.4.1.manifest.json';size=[int64]$published441.bytes;digest=('sha256:'+[string]$published441.sha256).ToLowerInvariant();state='uploaded'}
+foreach($i in 1..7){$published441Assets+=,[pscustomobject]@{id=(700000000+$i);name=('controlled-441-supporting-asset-'+$i);size=1;digest=('sha256:'+('a'*64));state='uploaded'}}
+$published441Metadata=[pscustomobject]@{id=413691909;tag_name='v4.4.1';target_commitish='2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6';draft=$false;prerelease=$false;immutable=$false;assets=$published441Assets}
+$published441Rows=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published441 -ReleaseMetadata $published441Metadata -CandidateSourceVersion '4.4.2')
+if($published441Rows.Count-ne9-or(@($published441Rows.target)-join'|')-cne'f210|f200|f110|f100|f017|f016|f015|f014|f013' -or
+   @($published441Rows|Where-Object {$_.version-cne('4.4.'+$_.target.Substring(1)+'01')}).Count){
+  throw '4.4.2 published 4.4.1 predecessor target binding differs'
+}
+$mir43Assertions+=2
+foreach($mutation in @(
+  @{name='target-commitish';apply={param($m)$m.target_commitish='other'};code='[mir42-maintenance-predecessor-release-metadata]'},
+  @{name='manifest-digest';apply={param($m)($m.assets|Where-Object name -ceq 'mir-4.4.1.manifest.json')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-manifest]'},
+  @{name='selected-target-digest';apply={param($m)($m.assets|Where-Object name -ceq 'more-infinite-research_4.4.21001.zip')[0].digest='sha256:'+('0'*64)};code='[mir42-maintenance-predecessor-published-asset]'}
+)){
+  $invalid=$published441Metadata|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100
+  & $mutation.apply $invalid
+  $rejected=$false;try{Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published441 -ReleaseMetadata $invalid -CandidateSourceVersion '4.4.2'|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith($mutation.code)}
+  if(-not$rejected){throw "4.4.2 published reader accepted invalid $($mutation.name)"}
+  $mir43Assertions++
+}
+$changed441=Join-Path $testRoot 'changed-published-441-manifest.json'
+$changed441Bytes=[IO.File]::ReadAllBytes($published441Path);$changed441Bytes[100]=$changed441Bytes[100]-bxor1
+[IO.File]::WriteAllBytes($changed441,$changed441Bytes)
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $changed441 -CandidateSourceVersion '4.4.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.4.2 published reader accepted changed 4.4.1 manifest bytes'}
+$rejected=$false;try{Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published430Path -CandidateSourceVersion '4.4.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-maintenance-predecessor-frozen-manifest]'}
+if(-not$rejected){throw '4.4.2 published reader accepted the 4.3.0 manifest'}
 $mir43Assertions+=2
 foreach($mutation in @(
   @{name='target-commitish';apply={param($m)$m.target_commitish='other'};code='[mir42-maintenance-predecessor-release-metadata]'},
