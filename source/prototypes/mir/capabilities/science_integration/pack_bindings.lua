@@ -131,12 +131,28 @@ end
 -- Factorio cannot supply the pack. In particular, do not silently correct the
 -- old rocket inventory guard and thereby change existing research science.
 -- Positive/unfamiliar native cases remain explicit until separately approved.
+local function legacy_015_launch_result(pack_name, payload_name)
+  -- Factorio 0.15 records the satellite launch output on rocket-silo-rocket
+  -- result_items, with the qualifying payload in tuple position three. This is
+  -- only a retained negative admission policy shape; it never supplies a
+  -- positive pack route or recognizes arbitrary result_items on other lines.
+  if target_profiles.current_factorio_version ~= "0.15"
+    or not prototype_lookup.item_prototype(payload_name) then return false end
+  for _, rocket in pairs(data_raw.prototypes("rocket-silo-rocket")) do
+    for _, result in ipairs(rocket.result_items or {}) do
+      if type(result) == "table" and result[3] == payload_name
+        and has_item_output({result}, pack_name) then return true end
+    end
+  end
+  return false
+end
+
 local function retained_launch_exclusion(pack_name, policy)
   if not policy or pack_name ~= pack_registry.native_pack_name(policy.pack) then return nil end
   local payload = prototype_lookup.item_prototype(policy.payload)
   local products = payload and (payload.rocket_launch_products
     or (payload.rocket_launch_product and {payload.rocket_launch_product}))
-  if not has_item_output(products, pack_name) then return nil end
+  if not has_item_output(products, pack_name) and not legacy_015_launch_result(pack_name, policy.payload) then return nil end
   -- A non-launch native producer is relevant new input. Do not pretend the
   -- old launch exclusion proves that producer unavailable.
   for kind, prototypes in pairs(data_raw.raw()) do

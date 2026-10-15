@@ -538,6 +538,88 @@ Context.with_active(Context.new(), function()
   check(science.pack_production_status("space-science-pack") == "initial",
     "An actual approved direct recipe takes precedence over retained launch policy")
 end)
+-- Factorio 0.15 stores its satellite-qualified space-science result on the
+-- rocket entity, rather than on the satellite item. It is a retained policy
+-- exclusion only: exact output and payload tuple are required, while all
+-- unrecognized or potentially positive shapes stay unresolved.
+local function legacy_015_launch_world(result)
+  local value = world(0, false)
+  value.tool["space-science-pack"] = {type = "tool", name = "space-science-pack"}
+  value.lab.lab.inputs[#value.lab.lab.inputs + 1] = "space-science-pack"
+  value.item.satellite = {type = "item", name = "satellite"}
+  value["rocket-silo-rocket"] = {legacy_rocket = {name = "legacy-rocket", result_items = result and {result} or {}}}
+  value.technology["bullet-damage-6"] = {type = "technology", name = "bullet-damage-6", prerequisites = {},
+    unit = {count = 1, ingredients = {{roles[4], 1}}}}
+  value.technology["bullet-damage-7"] = {type = "technology", name = "bullet-damage-7",
+    prerequisites = {"bullet-damage-6"}, max_level = "infinite", effects = {{type = "ammo-damage", ammo_category = "bullet", modifier = 0.4}},
+    unit = {count = 1000, ingredients = {{roles[1], 1}, {roles[2], 1}, {roles[3], 1}, {roles[4], 1}, {"space-science-pack", 1}}}}
+  return value
+end
+local target_profiles = package.loaded["prototypes.mir.platform.factorio.target_profiles"]
+target_profiles.current_factorio_version = "0.15"
+raw = legacy_015_launch_world({"space-science-pack", 1000, "satellite"})
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(science.pack_production_status("space-science-pack") == "unreachable",
+    "The exact F015 rocket result shape remains a retained negative policy, not an acquisition route")
+  local source = science.production_route_for_pack("space-science-pack")
+  check(source.status == "not-admitted" and source.acquisition_proof == false
+      and source.source_kind == "retained-published-native-launch-policy"
+      and source.policy_reason == "published-native-launch-contract-not-supported-on-target",
+    "The F015 result-item policy keeps the existing detailed negative record")
+  check(science.technology_researchability_reason("bullet-damage-7") == "science-excluded-by-published-policy:space-science-pack",
+    "A real F015-shaped late technology receives the retained exclusion rather than an unresolved binding")
+end)
+raw = legacy_015_launch_world(nil)
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "A missing F015 rocket result cannot inherit the retained policy")
+end)
+raw = legacy_015_launch_world({"space-science-pack", 1000, "wrong-payload"})
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "A wrong F015 launch payload cannot inherit the retained policy")
+end)
+raw = legacy_015_launch_world({"space-science-pack", 0, "satellite"})
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "A zero-result F015 launch tuple cannot inherit the retained policy")
+end)
+raw = legacy_015_launch_world({"space-science-pack", 1000, "satellite"})
+raw.item.satellite = nil
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "An F015 result tuple without its actual payload item cannot inherit the retained policy")
+end)
+target_profiles.current_factorio_version = "0.16"
+raw = legacy_015_launch_world({"space-science-pack", 1000, "satellite"})
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "Legacy rocket result tuples cannot become a policy adapter for a different target line")
+end)
+target_profiles.current_factorio_version = "0.15"
+raw = legacy_015_launch_world({"space-science-pack", 1000, "satellite"})
+raw.resource = {ore = {name = "ore", minable = {result = "space-science-pack"}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(not pcall(science.pack_production_status, "space-science-pack"),
+    "A non-launch native producer prevents the F015 policy answer")
+end)
+raw = legacy_015_launch_world({"space-science-pack", 1000, "satellite"})
+raw.recipe["space-science-pack"] = {type = "recipe", name = "space-science-pack", enabled = true,
+  results = {{type = "item", name = "space-science-pack", amount = 1}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(science.pack_production_status("space-science-pack") == "initial",
+    "An actual direct recipe retains precedence over the F015 negative policy")
+end)
+target_profiles.current_factorio_version = "2.0"
+
 local function self_cycle_world()
   local cycle = world(0, false)
   cycle.tool["closed-cycle-pack"] = {type = "tool", name = "closed-cycle-pack"}
