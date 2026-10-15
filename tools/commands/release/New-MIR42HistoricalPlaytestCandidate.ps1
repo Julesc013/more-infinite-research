@@ -296,6 +296,8 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
       $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
       if ($SourceVersion -ceq '4.4.1') {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+      } elseif ($SourceVersion -ceq '4.4.2') {
+        $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
       }
       $changelog = $entry + $changelog
     }

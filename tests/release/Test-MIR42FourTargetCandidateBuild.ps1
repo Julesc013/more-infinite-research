@@ -46,7 +46,7 @@ function Test-MIR43HistoricalBaselineProjection {
   $utf8 = [Text.UTF8Encoding]::new($false)
   foreach ($target in @('f017','f016','f015','f014','f013')) {
     $record = Get-Content -Raw -LiteralPath (Join-Path $repo "targets/historical/$target/target.json") | ConvertFrom-Json -Depth 100 -DateKind String
-    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1','4.4.0')) {
+    foreach ($sourceVersion in @('4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
       $tree = Join-Path $OutputRoot "$target/$sourceVersion"
       [IO.Directory]::CreateDirectory($tree) | Out-Null
       $template = Join-Path $repo "source/presentation/historical/$target/info.json.template"
@@ -93,7 +93,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
 
   . (Join-Path $repo 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
   $projectionChecks = 0
-  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0')) {
+  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
     foreach ($target in @('f017','f016','f015','f014','f013')) {
       $projection = Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target $target -SourceVersion $sourceVersion
       Assert-MIR42CandidateBuildTest (
@@ -110,7 +110,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
   }
 
   $writer = Join-Path $repo 'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
-  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.3.0' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
+  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.4.2' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
   Assert-MIR42CandidateBuildTest ($manifestRows.Count -eq 1) 'historical-authentication-fixture-manifest-count'
   $manifest = $manifestRows[0]
   $manifestPath = Join-Path $OutputRoot 'manifests/f017.json'
@@ -119,10 +119,10 @@ function Test-MIR43HistoricalCandidateAuthentication {
     (Test-Path -LiteralPath $manifestPath -PathType Leaf) -and
     (Test-Path -LiteralPath $archive -PathType Leaf) -and
     [string]$manifest.target -ceq 'f017' -and
-    [string]$manifest.candidate_row.source_version -ceq '4.3.0'
+    [string]$manifest.candidate_row.source_version -ceq '4.4.2'
   ) 'historical-authentication-fixture-identity'
   $controls = Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls -Repository $repo -Archive $archive -ManifestPath $manifestPath `
-    -Target f017 -SourceVersion '4.3.0' -WorkRoot (Join-Path $OutputRoot 'opposing')
+    -Target f017 -SourceVersion '4.4.2' -WorkRoot (Join-Path $OutputRoot 'opposing')
   Assert-MIR42CandidateBuildTest (
     [string]$controls.status -ceq 'passed' -and
     [int]$controls.assertions -eq 4 -and
@@ -365,7 +365,7 @@ foreach ($target in @('f017','f016','f015','f014','f013')) {
 try {
   $historicalIdentityChecks = Test-MIR43HistoricalBaselineProjection -OutputRoot (Join-Path $identityRoot 'historical-baseline')
   if ($HistoricalIdentityProjectionOnly) {
-    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1','4.4.0');engine_runs=0;actual_candidate_zip_builds=0}
+    [pscustomobject]@{status='MIR-4.3-HISTORICAL-IDENTITY-PROJECTION-CONTROLS-PASSED';checks=$historicalIdentityChecks;targets=5;source_versions=@('4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2');engine_runs=0;actual_candidate_zip_builds=0}
     return
   }
   if ($HistoricalAuthenticationOnly) {
@@ -373,7 +373,7 @@ try {
     [pscustomobject][ordered]@{
       status = 'MIR-4.3-HISTORICAL-CANDIDATE-AUTHENTICATION-CONTROLS-PASSED'
       targets = 5
-      source_versions = @('4.3.0','4.3.1','4.4.0')
+      source_versions = @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
       authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
       authentication_assertions = [int]$historicalAuthentication.authentication_assertions
       authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions
