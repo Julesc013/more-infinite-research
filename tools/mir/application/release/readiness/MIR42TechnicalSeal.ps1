@@ -1466,6 +1466,36 @@ function Get-MIR42HistoricalTerminalAuthority {
   return [pscustomobject][ordered]@{identity=$identity;target_record=$targetRecord;terminal_seal=$seal;predecessor_path=$predecessorPath}
 }
 
+# Factorio 0.13's Windows executable has no PE version resource. A completed
+# historical run leaves those PE-derived receipt fields blank; the reader then
+# binds the exact binary to the independently sealed semantic version. Keep
+# this exception deliberately narrow: modern targets, present/forged receipt
+# versions, and any identity other than the sealed F013 engine retain the
+# ordinary PE-version requirement.
+function Test-MIR42F013BlankPEVersionReceiptFallback {
+  param(
+    [Parameter(Mandatory)][bool]$ReceiptVersionPresent,
+    [Parameter(Mandatory)][bool]$ReceiptVersionTokenIsBlank,
+    [Parameter(Mandatory)][AllowEmptyString()][string]$FileVersion,
+    [Parameter(Mandatory)][AllowEmptyString()][string]$ProductVersion,
+    [Parameter(Mandatory)][string]$EnginePath,
+    [Parameter(Mandatory)][string]$EngineSha256,
+    [Parameter(Mandatory)][string]$EngineVersion
+  )
+  if (-not $ReceiptVersionPresent -or -not $ReceiptVersionTokenIsBlank -or
+      $FileVersion -cne '' -or $ProductVersion -cne '') {
+    return $false
+  }
+  $historical = Get-MIR42HistoricalTerminalAuthority -RepoRoot $mir42SealRepoRoot -Target 'f013' -PredecessorIdentityOnly
+  $targetEngine = $historical.target_record.record.engine
+  $sealedEngine = $historical.terminal_seal.record.engine
+  return ([IO.Path]::GetFullPath($EnginePath).Equals([IO.Path]::GetFullPath([string]$targetEngine.path),[StringComparison]::OrdinalIgnoreCase) -and
+    [string]$EngineSha256 -ceq [string]$targetEngine.sha256 -and
+    [string]$EngineSha256 -ceq [string]$sealedEngine.binary_sha256 -and
+    [string]$EngineVersion -ceq [string]$targetEngine.version -and
+    [string]$EngineVersion -ceq [string]$sealedEngine.version)
+}
+
 function Assert-MIR42HistoricalTerminalExecution {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
@@ -1722,8 +1752,22 @@ function Assert-MIR42IndividualUpgradeReceipt {
     . (Join-Path $mir42SealRepoRoot 'tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1')
   }
   $receiptPath = Resolve-MIR42SealImmutableFile -Path ([string]$ReceiptReference.path) -Sha256 ([string]$ReceiptReference.sha256) -Code 'mir42-individual-engine-run-receipt'
-  try { $receipt = Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -AsHashtable -Depth 100 -DateKind String }
+  $receiptVersionDocument = $null
+  try {
+    $receiptJson = Get-Content -Raw -LiteralPath $receiptPath
+    $receipt = $receiptJson | ConvertFrom-Json -AsHashtable -Depth 100 -DateKind String
+    $receiptVersionOptions = [Text.Json.JsonDocumentOptions]::new()
+    $receiptVersionOptions.MaxDepth = 100
+    $receiptVersionDocument = [Text.Json.JsonDocument]::Parse($receiptJson, $receiptVersionOptions)
+    $receiptVersionToken = [Text.Json.JsonElement]::new()
+    $receiptVersionPresent = $receiptVersionDocument.RootElement.TryGetProperty('factorio_binary_version', [ref]$receiptVersionToken)
+    $receiptVersionIsString = $receiptVersionPresent -and $receiptVersionToken.ValueKind -eq [Text.Json.JsonValueKind]::String
+    $receiptVersionTokenIsBlank = $receiptVersionPresent -and ($receiptVersionToken.ValueKind -eq [Text.Json.JsonValueKind]::Null -or
+      ($receiptVersionIsString -and $receiptVersionToken.GetString() -ceq ''))
+    $receiptVersion = if ($receiptVersionIsString) { [string]$receipt['factorio_binary_version'] } else { '' }
+  }
   catch { throw '[mir42-individual-engine-run-receipt-json]' }
+  finally { if ($null -ne $receiptVersionDocument) { $receiptVersionDocument.Dispose() } }
   if ([int]$receipt.schema -ne 3 -or [string]$receipt.status -cne 'passed' -or
       [string]$receipt.git_commit -cne [string]$Candidate.source.commit -or
       [string]$receipt.factorio_binary_sha256 -cne [string]$Engine.sha256 -or
@@ -1734,12 +1778,15 @@ function Assert-MIR42IndividualUpgradeReceipt {
   $productVersion = [string](Get-Item -LiteralPath $enginePath).VersionInfo.ProductVersion
   if ($productVersion -match '^([0-9]+[.][0-9]+[.][0-9]+)') { $productVersion = [string]$Matches[1] }
   $fileVersion = [string](Get-Item -LiteralPath $enginePath).VersionInfo.FileVersion
-  $receiptVersion = [string]$receipt.factorio_binary_version
   $receiptProductVersion = [regex]::Match($receiptVersion, '^[0-9]+[.][0-9]+[.][0-9]+').Value
   $engineProductVersion = [regex]::Match([string]$Engine.version, '^[0-9]+[.][0-9]+[.][0-9]+').Value
-  if ([string]::IsNullOrWhiteSpace($receiptProductVersion) -or [string]::IsNullOrWhiteSpace($engineProductVersion) -or
+  $strictVersionMatch = -not ([string]::IsNullOrWhiteSpace($receiptProductVersion) -or [string]::IsNullOrWhiteSpace($engineProductVersion) -or
       $receiptVersion -cne [string]$Engine.version -or $fileVersion -cne [string]$Engine.version -or
-      $productVersion -cne $engineProductVersion -or $receiptProductVersion -cne $productVersion) {
+      $productVersion -cne $engineProductVersion -or $receiptProductVersion -cne $productVersion)
+  $historicalBlankPEFallback = -not $strictVersionMatch -and [string]$CandidateTarget.target -ceq 'f013' -and
+    (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $receiptVersionPresent -ReceiptVersionTokenIsBlank $receiptVersionTokenIsBlank -FileVersion $fileVersion -ProductVersion $productVersion `
+      -EnginePath $enginePath -EngineSha256 ([string]$Engine.sha256) -EngineVersion ([string]$Engine.version))
+  if (-not $strictVersionMatch -and -not $historicalBlankPEFallback) {
     throw '[mir42-individual-engine-run-engine-version]'
   }
   $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
