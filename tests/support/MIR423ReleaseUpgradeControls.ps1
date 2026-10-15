@@ -129,3 +129,112 @@ function Invoke-MIR423ReleaseUpgradeControls {
   }
   return [pscustomobject]@{path=$path;checks=$checks;native_runs=0}
 }
+
+function Invoke-MIR442F016RestorationControls {
+  param([Parameter(Mandatory)][string]$Root)
+
+  # Host-only reader controls. These vectors are independently transcribed from
+  # the captured published 4.2.2 F016 definitions, rather than consulting the
+  # release-reader allowance. They contain only the reviewed prerequisite field.
+  [IO.Directory]::CreateDirectory($Root) | Out-Null
+  $vectors = @(
+    @{name='braking-force-8';before=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','braking-force-6','braking-force-7');after=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','automation-2','battery','braking-force-6','braking-force-7','electric-engine','engine','speed-module')},
+    @{name='inserter-capacity-bonus-8';before=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','inserter-capacity-bonus-6','inserter-capacity-bonus-7');after=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','automation-2','battery','electric-engine','engine','inserter-capacity-bonus-6','inserter-capacity-bonus-7','speed-module')},
+    @{name='recipe-prod-research_character_crafting_speed-1';before=@('advanced-electronics-2','military-2');after=@('advanced-electronics-2','automation-2','battery','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_character_mining_speed-1';before=@('advanced-electronics-2','military-2');after=@('advanced-electronics-2','automation-2','battery','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_character_reach-1';before=@('advanced-electronics-2','military-2');after=@('advanced-electronics-2','automation-2','battery','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_character_walking_speed-1';before=@('advanced-electronics-2','military-2');after=@('advanced-electronics-2','automation-2','battery','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_electric_shooting_speed-1';before=@('advanced-electronics','advanced-material-processing-2','discharge-defense-equipment','military-2');after=@('advanced-electronics','advanced-material-processing-2','discharge-defense-equipment','electric-engine','engine','military-2','turrets')},
+    @{name='recipe-prod-research_flamethrower_shooting_speed-1';before=@('advanced-electronics','advanced-material-processing-2','flamethrower','military-2');after=@('advanced-electronics','advanced-material-processing-2','electric-engine','engine','flamethrower','military-2','turrets')},
+    @{name='recipe-prod-research_inventory_capacity-1';before=@('advanced-electronics-2','military-2');after=@('advanced-electronics-2','automation-2','battery','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_lab_productivity-1';before=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','military-2');after=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','automation-2','battery','electric-engine','engine','military-2','speed-module','turrets')},
+    @{name='recipe-prod-research_robot_battery-1';before=@('advanced-electronics','advanced-material-processing-2');after=@('advanced-electronics','advanced-material-processing-2','electric-engine','engine')},
+    @{name='recipe-prod-research_rocket_shooting_speed-1';before=@('advanced-electronics','advanced-material-processing-2','military-2','rocketry');after=@('advanced-electronics','advanced-material-processing-2','electric-engine','engine','military-2','rocketry','turrets')},
+    @{name='research-speed-7';before=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','military-2','research-speed-5','research-speed-6');after=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','automation-2','battery','electric-engine','engine','military-2','research-speed-5','research-speed-6','speed-module','turrets')},
+    @{name='worker-robots-storage-4';before=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','worker-robots-storage-2','worker-robots-storage-3');after=@('advanced-electronics','advanced-electronics-2','advanced-material-processing-2','automation-2','battery','electric-engine','engine','speed-module','worker-robots-storage-2','worker-robots-storage-3')}
+  )
+
+  function New-MIR442F016PrerequisiteVector([object[]]$Names) {
+    $value = [ordered]@{}
+    for ($index = 0; $index -lt $Names.Count; $index++) {
+      $value[($index + 1).ToString([Globalization.CultureInfo]::InvariantCulture)] = [string]$Names[$index]
+    }
+    return $value
+  }
+  function New-MIR442F016Snapshot([string]$FromVersion,[string]$EngineLine,[switch]$Restored) {
+    $forces = [ordered]@{}
+    foreach ($forceName in @('enemy','neutral','player')) {
+      $technologies = [ordered]@{}
+      foreach ($row in $vectors) {
+        $prerequisites = New-MIR442F016PrerequisiteVector $(if ($Restored) { @($row.after) } else { @($row.before) })
+        $technologies[[string]$row.name] = [ordered]@{
+          researched=$false;level=1
+          definition=[ordered]@{
+            effects=@(@{type='laboratory-speed';modifier=0.1})
+            ingredients=@(@{name='automation-science-pack';amount=1})
+            prerequisites=$prerequisites
+            max_level='infinite';order='a';unit_count=100;unit_count_formula='100*L';unit_energy=30
+          }
+        }
+      }
+      $forces[$forceName] = [ordered]@{
+        technologies=$technologies;bonuses=@{};recipes=@{};settings=@{};effects=@{};ammo=@{};gun_speed=@{};turret=@{}
+        queue=@();research_queue_enabled=$true;current_research=$null;research_progress=0
+      }
+    }
+    # Native evaluator snapshots are JSON records read with -AsHashtable. Keep
+    # the control representation identical so IDictionary.Clone behavior and
+    # numeric-string prerequisite dictionaries use the real reader shape.
+    return ([ordered]@{engine_line=$EngineLine;from_version=$FromVersion;to_version='4.4.01602';forces=$forces} |
+      ConvertTo-Json -Depth 100 | ConvertFrom-Json -AsHashtable -Depth 100)
+  }
+  function Assert-MIR442F016ReaderRefusal([string]$Description,$Before,$After) {
+    $refused = $false
+    try { Assert-MIR422CompleteSavedState -Before $Before -After $After -RequireExactResearchDefinitions }
+    catch { $refused = $_.Exception.Message.StartsWith('[mir423-upgrade-research-definition]',[StringComparison]::Ordinal) }
+    if (-not $refused) { throw "442 F016 restoration controls accepted $Description" }
+  }
+
+  $checks = 0
+  foreach ($fromVersion in @('4.4.01600','4.4.01601')) {
+    $before = New-MIR442F016Snapshot -FromVersion $fromVersion -EngineLine '0.16'
+    $after = New-MIR442F016Snapshot -FromVersion $fromVersion -EngineLine '0.16' -Restored
+    Assert-MIR422CompleteSavedState -Before $before -After $after -RequireExactResearchDefinitions
+    $checks++
+  }
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16'
+  $after = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16' -Restored
+  $after.forces.player.technologies['braking-force-8'].definition.prerequisites['99'] = 'forged-prerequisite'
+  Assert-MIR442F016ReaderRefusal 'an unreviewed F016 prerequisite' $before $after; $checks++
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16'
+  $after = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16' -Restored
+  $after.forces.neutral.technologies['recipe-prod-research_lab_productivity-1'].definition.unit_count = 101
+  Assert-MIR442F016ReaderRefusal 'a non-prerequisite change on a reviewed technology' $before $after; $checks++
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.2.01602' -EngineLine '0.16'
+  $after = New-MIR442F016Snapshot -FromVersion '4.2.01602' -EngineLine '0.16' -Restored
+  Assert-MIR442F016ReaderRefusal 'a direct published 4.2.2 predecessor' $before $after; $checks++
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.15'
+  $after = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.15' -Restored
+  Assert-MIR442F016ReaderRefusal 'a non-F016 engine line' $before $after; $checks++
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16'
+  $after = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16' -Restored
+  $after.to_version = '4.4.01603'
+  Assert-MIR442F016ReaderRefusal 'a non-4.4.01602 destination' $before $after; $checks++
+
+  $before = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16'
+  $after = New-MIR442F016Snapshot -FromVersion '4.4.01600' -EngineLine '0.16' -Restored
+  $beforeTechnology = $before.forces.player.technologies['braking-force-8']
+  $afterTechnology = $after.forces.player.technologies['braking-force-8']
+  $null = $before.forces.player.technologies.Remove('braking-force-8')
+  $null = $after.forces.player.technologies.Remove('braking-force-8')
+  $before.forces.player.technologies['Braking-force-8'] = $beforeTechnology
+  $after.forces.player.technologies['Braking-force-8'] = $afterTechnology
+  Assert-MIR442F016ReaderRefusal 'a case-altered reviewed technology name' $before $after; $checks++
+
+  return [pscustomobject]@{checks=$checks;native_runs=0}
+}

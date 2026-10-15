@@ -6576,24 +6576,6 @@
       "target_scope": [
         "f200"
       ],
-      "output_path": "prototypes/mir/planner/base_continuations/plan.lua",
-      "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua",
-      "provenance": {
-        "kind": "migrated-predecessor",
-        "predecessor_source_path": "targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua"
-      },
-      "transform": "copy-exact-bytes",
-      "source_bytes": 16955,
-      "source_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758",
-      "output_bytes": 16955,
-      "output_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758"
-    },
-    {
-      "layer": "adapter",
-      "target_scope": [
-        "f200"
-      ],
       "output_path": "prototypes/mir/planner/native_owner_binding.lua",
       "semantic_class": "target-replacement",
       "source_path": "source/adapters/f200/prototypes/mir/planner/native_owner_binding.lua",
@@ -6917,6 +6899,7 @@
       "layer": "capability",
       "target_scope": [
         "f210",
+        "f200",
         "f110",
         "f100"
       ],
@@ -7690,5 +7673,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "A62B3DA2E151E8E4AA36DDD7CA3B04846D2B87E5A0E81136048BCA8B4D3A584A"
+  "record_sha256": "C64B9960CEC8F577095490241BEEC41A07FAFB6FD44E56726E1EB453DFAF8FEA"
 }

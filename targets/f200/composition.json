@@ -2584,12 +2584,12 @@
       "path": "prototypes/mir/planner/base_continuations/plan.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua",
+      "source_path": "source/prototypes/mir/planner/base_continuations/plan.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed base-continuations plan responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16955,
-      "expected_sha256": "661DC5E0D8E80CD5AA8A7CBDDF06288E96A9A9B5F01A3D500D0B1F714FCEB758",
+      "expected_bytes": 16665,
+      "expected_sha256": "BE724348A09C6F6E81F87340320513C5D01A6BBBA7936763C8C4F08B81AF6ED9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "73C1168FF07F41A243608017E49486D6CBC7B0CF6F58EFA7B1E572621FBE66D6"
+  "record_sha256": "1AD98F65E37109FC86B0ADE4927C75B4A51FD4AFB6BF484F4F2FB29B8907B04B"
 }

@@ -10,12 +10,13 @@ param(
   [string]$EvidenceRoot,
   [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'OnFailure',
   [ValidateSet('f210','f200','f110','f100')][string]$Target='f210',
-  [string[]]$RetiredSourcePaths=@()
+  [string[]]$RetiredSourcePaths=@(),
+  [hashtable]$AdapterFallbackRetirements=@{}
 )
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-if($RetiredSourcePaths.Count -and $Command -notin @('refresh','refresh-check')) { throw '[mir4-source-retirement-command]' }
+if(($RetiredSourcePaths.Count-or$AdapterFallbackRetirements.Count) -and $Command -notin @('refresh','refresh-check')) { throw '[mir4-source-retirement-command]' }
 if ($Command -in @('refresh','refresh-check')) {
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   # Reuse the historical constructor's exact pure transforms without running
@@ -29,7 +30,7 @@ if ($Command -in @('refresh','refresh-check')) {
     if($functions.Count -ne 1) { throw "[mir4-source-refresh-historical-renderer-function] $name" }
     . ([scriptblock]::Create($functions[0].Extent.Text))
   }
-  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') -RetiredSourcePaths $RetiredSourcePaths -HistoricalAdapterProjector {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -Check:($Command -ceq 'refresh-check') -RetiredSourcePaths $RetiredSourcePaths -AdapterFallbackRetirements $AdapterFallbackRetirements -HistoricalAdapterProjector {
     param($adapter,$record,$manifest)
     ConvertTo-MIR42HistoricalAdapterBytes -Adapter $adapter -Record $record -SourceManifest $manifest
   } | ConvertTo-Json -Depth 6

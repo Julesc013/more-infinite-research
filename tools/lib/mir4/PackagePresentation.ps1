@@ -961,19 +961,21 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $retiredPredecessorSources=@(
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
-    'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua'
+    'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua',
+    'targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua'
   )
   $retiredCurrentSources=@(
     'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
     'source/prototypes/mir/runtime/compiler_profile_notice.lua',
     'source/prototypes/mir/pipeline/classic_compiler.lua',
     'source/prototypes/mir/domain/compiler/classic_declarations.lua',
-    'source/prototypes/mir/planner/classic/plan.lua'
+    'source/prototypes/mir/planner/classic/plan.lua',
+    'source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'
   )
   $predecessorPaths=@($Predecessor.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
   $currentPaths=@($Current.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
-  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne376-or$currentPaths.Count-ne376-or
-     $migrated.Count-ne356-or$introduced.Count-ne20-or$compilerTransitionIntroduced.Count-ne1-or
+  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne375-or$currentPaths.Count-ne375-or
+     $migrated.Count-ne355-or$introduced.Count-ne20-or$compilerTransitionIntroduced.Count-ne1-or
      $approvedBindingsIntroduced.Count-ne2-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
      $progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or$browserIntroduced.Count-ne2-or
      @($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0){
@@ -981,6 +983,16 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   }
   foreach($source in $retiredPredecessorSources){if($source-cnotin$predecessorPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
   foreach($source in $retiredCurrentSources){if($source-cin$currentPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
+  $sharedPlan=@($Current.bindings|Where-Object{
+    [string]$_.source_path-ceq'source/prototypes/mir/planner/base_continuations/plan.lua'-and
+    [string]$_.output_path-ceq'prototypes/mir/planner/base_continuations/plan.lua'
+  })
+  if($sharedPlan.Count-ne1-or[string]$sharedPlan[0].layer-cne'capability'-or
+     [string]$sharedPlan[0].semantic_class-cne'target-replacement'-or
+     [string]$sharedPlan[0].transform-cne'copy-exact-bytes'-or
+     (@($sharedPlan[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+    throw '[mir4-package-presentation-v7-source-succession]'
+  }
   $compilerTransitionSources=@(
     'source/prototypes/mir/settings/compiler_profile.lua'
   )
@@ -1056,6 +1068,14 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
     $currentProjection=[pscustomobject][ordered]@{layer=[string]$current.layer;target_scope=@($current.target_scope);output_path=[string]$current.output_path;semantic_class=[string]$current.semantic_class;source_path=[string]$current.source_path;predecessor_source_path=[string]$current.provenance.predecessor_source_path;transform=[string]$current.transform}
     if([string]$current.source_path-ceq'source/presentation/f100/README.md.template'){
       if((@($prior.target_scope)-join'|')-cne'f100'-or(@($current.target_scope)-join'|')-cne'f100|f017|f016|f015|f014|f013'){throw '[mir4-package-presentation-v7-source-succession]'}
+      $currentProjection.target_scope=@($prior.target_scope)
+    }elseif([string]$current.source_path-ceq'source/prototypes/mir/planner/base_continuations/plan.lua'-and
+      [string]$prior.predecessor_source_path-ceq'targets/f210/files/prototypes/mir/planner/base_continuations/plan.lua'){
+      if((@($prior.target_scope)-join'|')-cne'f210|f110|f100'-or(@($current.target_scope)-join'|')-cne'f210|f200|f110|f100'){
+        throw '[mir4-package-presentation-v7-source-succession]'
+      }
+      # The independently retired f200 adapter is an exact declared fallback
+      # to this shared plan; compare the preserved f210 predecessor projection.
       $currentProjection.target_scope=@($prior.target_scope)
     }
     if((ConvertTo-MIR4BootstrapCanonicalJson -Value $currentProjection)-cne(ConvertTo-MIR4BootstrapCanonicalJson -Value $priorProjection)){throw '[mir4-package-presentation-v7-source-succession]'}
