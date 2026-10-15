@@ -194,6 +194,9 @@ function Write-MIR4PrivatePatchPackageIdentity {
       $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
     } elseif ($SourceVersion -ceq '4.4.2') {
       $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
+      if ($targetCode -ceq '015') {
+        $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+      }
     }
     [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
   }

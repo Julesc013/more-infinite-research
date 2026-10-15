@@ -618,6 +618,230 @@ Context.with_active(Context.new(), function()
   check(science.pack_production_status("space-science-pack") == "initial",
     "An actual direct recipe retains precedence over the F015 negative policy")
 end)
+
+-- F015 keeps a small, explicit progression frontier for the three actual
+-- late science recipes. It is independent of their direct unlockers and
+-- applies only after every declared recipe shape still matches the engine.
+local function f015_progression_world()
+  local value = world(0, false)
+  -- The ordinary fixture creates a modern same-named production unlock. The
+  -- F015 source instead owns the native advanced-material-processing-2 gate.
+  value.technology["production-science-pack"] = nil
+  value.item["assembling-machine-1"] = {type = "item", name = "assembling-machine-1"}
+  value.item["assembling-machine-2"] = {type = "item", name = "assembling-machine-2"}
+  value["assembling-machine"] = {
+    ["assembling-machine-1"] = {type = "assembling-machine", name = "assembling-machine-1",
+      minable = {result = "assembling-machine-1"}, crafting_categories = {"crafting"}, ingredient_count = 2},
+    ["assembling-machine-2"] = {type = "assembling-machine", name = "assembling-machine-2",
+      minable = {result = "assembling-machine-2"}, crafting_categories = {"crafting"}, ingredient_count = 4}
+  }
+  value.recipe["assembling-machine-1"] = {type = "recipe", name = "assembling-machine-1", enabled = false,
+    results = {{type = "item", name = "assembling-machine-1", amount = 1}}}
+  value.recipe["assembling-machine-2"] = {type = "recipe", name = "assembling-machine-2", enabled = false,
+    results = {{type = "item", name = "assembling-machine-2", amount = 1}}}
+  value.technology.automation = {type = "technology", name = "automation",
+    research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+    effects = {{type = "unlock-recipe", recipe = "assembling-machine-1"}}}
+  local sources = {
+    ["high-tech-science-pack"] = {
+      unlocker = "advanced-electronics-2",
+      ingredients = {{"battery", 1}, {"processing-unit", 1}, {"speed-module", 1}, {"copper-cable", 1}}
+    },
+    ["production-science-pack"] = {
+      unlocker = "advanced-material-processing-2",
+      ingredients = {{"electric-engine-unit", 1}, {"assembling-machine-1", 1}, {"electric-furnace", 1}}
+    },
+    ["military-science-pack"] = {
+      unlocker = "military-2",
+      ingredients = {{"piercing-rounds-magazine", 1}, {"grenade", 1}, {"gun-turret", 1}}
+    }
+  }
+  for pack, source in pairs(sources) do
+    value.tool[pack] = {type = "tool", name = pack}
+    value.lab.lab.inputs[#value.lab.lab.inputs + 1] = pack
+    value.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+      ingredients = deepcopy(source.ingredients), results = {{type = "item", name = pack, amount = 1}}}
+    value.technology[source.unlocker] = {type = "technology", name = source.unlocker,
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+      effects = {{type = "unlock-recipe", recipe = pack}}}
+  end
+  for _, name in ipairs({"automation-2", "battery", "speed-module", "electric-engine", "engine", "turrets"}) do
+    value.technology[name] = {type = "technology", name = name,
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1}}
+  end
+  value.technology["automation-2"].effects = {{type = "unlock-recipe", recipe = "assembling-machine-2"}}
+  return value
+end
+
+local function equal_names(actual, expected)
+  if #actual ~= #expected then return false end
+  for index, name in ipairs(expected) do if actual[index] ~= name then return false end end
+  return true
+end
+
+local function f015_vector_gates(science, packs)
+  local gates, seen = {}, {}
+  for _, pack in ipairs(packs) do
+    for _, gate in ipairs(science.prereq_techs_for_science_pack(pack)) do
+      if not seen[gate] then seen[gate] = true; gates[#gates + 1] = gate end
+    end
+  end
+  table.sort(gates)
+  return gates
+end
+
+target_profiles.current_factorio_version = "0.15"
+raw = f015_progression_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local expected = {
+    ["high-tech-science-pack"] = {"advanced-electronics-2", "automation-2", "battery", "speed-module"},
+    ["production-science-pack"] = {"advanced-material-processing-2", "electric-engine", "engine"},
+    ["military-science-pack"] = {"military-2", "turrets"}
+  }
+  for pack, gates in pairs(expected) do
+    check(equal_names(science.prereq_techs_for_science_pack(pack), gates),
+      "F015 declared progression preserves the exact published gate union for " .. pack)
+    local source = science.production_route_for_pack(pack)
+    check(#source.unlockers == 1 and source.unlockers[1] == gates[1]
+        and #source.progression_prerequisites == #gates - 1 and source.acquisition_proof == false,
+      "F015 progression gates remain separate from the direct source unlocker for " .. pack)
+  end
+  local actual_422_vectors = {
+    ["braking-force-8"] = {{"high-tech-science-pack", "production-science-pack"},
+      {"advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "speed-module"}},
+    ["inserter-capacity-bonus-8"] = {{"high-tech-science-pack", "production-science-pack"},
+      {"advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "speed-module"}},
+    ["research-speed-7"] = {{"high-tech-science-pack", "production-science-pack"},
+      {"advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "speed-module"}},
+    ["worker-robots-storage-4"] = {{"high-tech-science-pack", "production-science-pack"},
+      {"advanced-electronics-2", "advanced-material-processing-2", "automation-2", "battery", "electric-engine", "engine", "speed-module"}},
+    ["recipe-prod-research_character_crafting_speed-1"] = {{"high-tech-science-pack", "military-science-pack"},
+      {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    ["recipe-prod-research_character_mining_speed-1"] = {{"high-tech-science-pack", "military-science-pack"},
+      {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    ["recipe-prod-research_character_reach-1"] = {{"high-tech-science-pack", "military-science-pack"},
+      {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    ["recipe-prod-research_character_walking_speed-1"] = {{"high-tech-science-pack", "military-science-pack"},
+      {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    ["recipe-prod-research_inventory_capacity-1"] = {{"high-tech-science-pack", "military-science-pack"},
+      {"advanced-electronics-2", "automation-2", "battery", "military-2", "speed-module", "turrets"}},
+    ["recipe-prod-research_electric_shooting_speed-1"] = {{"military-science-pack", "production-science-pack"},
+      {"advanced-material-processing-2", "electric-engine", "engine", "military-2", "turrets"}},
+    ["recipe-prod-research_flamethrower_shooting_speed-1"] = {{"military-science-pack", "production-science-pack"},
+      {"advanced-material-processing-2", "electric-engine", "engine", "military-2", "turrets"}},
+    ["recipe-prod-research_rocket_shooting_speed-1"] = {{"military-science-pack", "production-science-pack"},
+      {"advanced-material-processing-2", "electric-engine", "engine", "military-2", "turrets"}},
+    ["recipe-prod-research_robot_battery-1"] = {{"production-science-pack"},
+      {"advanced-material-processing-2", "electric-engine", "engine"}}
+  }
+  for name, row in pairs(actual_422_vectors) do
+    check(equal_names(f015_vector_gates(science, row[1]), row[2]),
+      "F015 retained declaration matches the captured 4.2.2 prerequisite union for " .. name)
+  end
+  check(equal_names(science.prereq_techs_for_science_pack("logistic-science-pack"), {"logistic-science-pack"}),
+    "The F015 declaration does not add progression gates to a non-selected pack")
+  local changed = science.production_route_for_pack("high-tech-science-pack")
+  changed.progression_prerequisites[1] = "caller-mutation"
+  check(science.production_route_for_pack("high-tech-science-pack").progression_prerequisites[1] == "automation-2",
+    "Public F015 progression records remain copy-isolated")
+end)
+
+raw = f015_progression_world()
+raw.recipe["high-tech-science-pack"].ingredients[1] = {"iron-plate", 1}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-recipe-ingredients-mismatch", 1, true),
+    "A changed F015 pack recipe refuses the retained progression declaration")
+end)
+
+raw = f015_progression_world()
+raw.recipe["military-science-pack"].category = "chemistry"
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["military-science-pack"] == nil
+      and string.find(index.issues["military-science-pack"], "retained-progression-recipe-category-mismatch", 1, true),
+    "A changed F015 recipe machine category refuses the retained progression declaration")
+end)
+
+raw = f015_progression_world()
+raw["assembling-machine"]["assembling-machine-1"].ingredient_count = 4
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-initial-machine-mismatch:assembling-machine-1", 1, true),
+    "A raised F015 initial assembler ingredient limit refuses the automation-2 declaration")
+end)
+
+raw = f015_progression_world()
+raw.item["initial-wide-assembler"] = {type = "item", name = "initial-wide-assembler"}
+raw["assembling-machine"]["initial-wide-assembler"] = {type = "assembling-machine", name = "initial-wide-assembler",
+  minable = {result = "initial-wide-assembler"}, crafting_categories = {"crafting"}, ingredient_count = 4}
+raw.recipe["initial-wide-assembler"] = {type = "recipe", name = "initial-wide-assembler", enabled = false,
+  results = {{type = "item", name = "initial-wide-assembler", amount = 1}}}
+raw.technology.automation.effects[#raw.technology.automation.effects + 1] =
+  {type = "unlock-recipe", recipe = "initial-wide-assembler"}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-initial-machine-capability-changed:initial-wide-assembler", 1, true),
+    "An additional initial wide crafting machine refuses the automation-2 declaration")
+end)
+
+raw = f015_progression_world()
+raw.item["late-wide-assembler"] = {type = "item", name = "late-wide-assembler"}
+raw["assembling-machine"]["late-wide-assembler"] = {type = "assembling-machine", name = "late-wide-assembler",
+  minable = {result = "late-wide-assembler"}, crafting_categories = {"crafting"}, ingredient_count = 4}
+raw.recipe["late-wide-assembler"] = {type = "recipe", name = "late-wide-assembler", enabled = false,
+  results = {{type = "item", name = "late-wide-assembler", amount = 1}}}
+raw.technology["automation-3"] = {type = "technology", name = "automation-3",
+  research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+  effects = {{type = "unlock-recipe", recipe = "late-wide-assembler"}}}
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(equal_names(science.prereq_techs_for_science_pack("high-tech-science-pack"),
+      {"advanced-electronics-2", "automation-2", "battery", "speed-module"}),
+    "An unrelated non-initial wide machine cannot veto the F015 retained declaration")
+end)
+
+raw = f015_progression_world()
+raw.technology["speed-module"] = nil
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-prerequisite-missing-technology:speed-module", 1, true),
+    "A missing F015 retained progression technology refuses the declaration")
+end)
+
+raw = f015_progression_world()
+raw.technology["battery"].enabled = false
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-prerequisite-disabled-technology:battery", 1, true),
+    "A disabled F015 retained progression technology refuses the declaration")
+end)
+
+raw = f015_progression_world()
+raw.technology["advanced-electronics-2"].effects = {}
+raw.technology["other-high-tech-unlock"] = {type = "technology", name = "other-high-tech-unlock",
+  research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+  effects = {{type = "unlock-recipe", recipe = "high-tech-science-pack"}}}
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+  check(index.packs["high-tech-science-pack"] == nil
+      and string.find(index.issues["high-tech-science-pack"], "retained-progression-source-mismatch", 1, true),
+    "A different F015 direct recipe unlocker cannot inherit the retained progression declaration")
+end)
+
+target_profiles.current_factorio_version = "0.16"
+raw = f015_progression_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  check(equal_names(science.prereq_techs_for_science_pack("high-tech-science-pack"), {"advanced-electronics-2"}),
+    "The F015 retained progression declaration cannot apply on a different target line")
+end)
 target_profiles.current_factorio_version = "2.0"
 
 local function self_cycle_world()

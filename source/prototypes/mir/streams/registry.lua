@@ -16,7 +16,43 @@ M.shared = {
     unique_direct_unlock = true,
     -- Preserve the published launch-source admission contract. Correcting
     -- that historical policy is a separate semantic/migration change.
-    retained_launch_source = {pack = "space-science-pack", payload = "satellite"}
+    retained_launch_source = {pack = "space-science-pack", payload = "satellite"},
+    -- Factorio 0.15's approved pack recipes have a published prerequisite
+    -- frontier that is not represented by their direct recipe unlock alone.
+    -- These are negative-safe, target-specific declarations: every row must
+    -- match the actual recipe, direct unlocker, category and item inputs
+    -- before its progression gates are used. They do not discover factories
+    -- or prove acquisition.
+    retained_progression_prerequisites = {
+      ["0.15"] = {
+        ["high-tech-science-pack"] = {
+          recipe = "high-tech-science-pack",
+          unlocker = "advanced-electronics-2",
+          categories = {"crafting"},
+          ingredients = {"battery", "copper-cable", "processing-unit", "speed-module"},
+          initial_machine = {
+            name = "assembling-machine-1", category = "crafting", ingredient_count = 2, unlocker = "automation",
+            capability_machine = {name = "assembling-machine-2", category = "crafting", ingredient_count = 4, unlocker = "automation-2"},
+            early_unlockers = {"automation", "electronics"}
+          },
+          prerequisites = {"automation-2", "battery", "speed-module"}
+        },
+        ["production-science-pack"] = {
+          recipe = "production-science-pack",
+          unlocker = "advanced-material-processing-2",
+          categories = {"crafting"},
+          ingredients = {"assembling-machine-1", "electric-engine-unit", "electric-furnace"},
+          prerequisites = {"electric-engine", "engine"}
+        },
+        ["military-science-pack"] = {
+          recipe = "military-science-pack",
+          unlocker = "military-2",
+          categories = {"crafting"},
+          ingredients = {"grenade", "gun-turret", "piercing-rounds-magazine"},
+          prerequisites = {"turrets"}
+        }
+      }
+    }
   },
   -- Shared source declarations for the ordinary productivity-family science
   -- vector. These are authored progression bindings, not cached discoveries.

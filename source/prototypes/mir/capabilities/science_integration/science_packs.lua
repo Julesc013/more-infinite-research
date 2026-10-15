@@ -41,7 +41,15 @@ local function production_status(pack_name)
 end
 
 local function prerequisites(pack_name)
-  return deepcopy(source_for(pack_name).unlockers)
+  local source = source_for(pack_name)
+  local result, seen = {}, {}
+  for _, field in ipairs({"unlockers", "progression_prerequisites"}) do
+    for _, name in ipairs(source[field] or {}) do
+      if not seen[name] then seen[name] = true; result[#result + 1] = name end
+    end
+  end
+  table.sort(result)
+  return result
 end
 
 local function researchability_reason(technology_name)

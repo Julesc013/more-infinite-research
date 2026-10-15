@@ -60,6 +60,7 @@ local function binding(pack_name, declaration, reference_only)
     binding_id = "approved-pack/" .. pack_name,
     source_kind = "declared-recipe",
     unlockers = {},
+    progression_prerequisites = {},
     ingredient_packs = {},
     -- This record validates the approved source references. It is not an
     -- acquisition proof and must never be published as one.
@@ -89,6 +90,123 @@ local function binding(pack_name, declaration, reference_only)
   out.status, out.initial, out.unlocker = "research", false, gate
   out.unlockers[1] = gate
   return out
+end
+
+local function same_names(actual, expected)
+  if type(expected) ~= "table" or #actual ~= #expected then return false end
+  for index, name in ipairs(expected) do
+    if actual[index] ~= name then return false end
+  end
+  return true
+end
+
+local function variant_item_ingredients(variant)
+  local names = {}
+  for _, ingredient in ipairs(variant.ingredients or {}) do
+    if ingredient.type ~= "item" then return nil end
+    names[#names + 1] = ingredient.name
+  end
+  table.sort(names)
+  return names
+end
+
+local function has_category(machine, category)
+  for _, value in ipairs(machine.crafting_categories or {}) do
+    if value == category then return true end
+  end
+  return false
+end
+
+local function outputs_item(fact, item_name)
+  for _, variant in ipairs((fact or {}).variants or {}) do
+    local matches = false
+    for _, result in ipairs(variant.results or {}) do
+      if result.type == "item" and result.name == item_name and recipe_semantics.possible_item_result(result) then
+        matches = true; break
+      end
+    end
+    if not matches then return false end
+  end
+  return fact ~= nil and #(fact.variants or {}) > 0
+end
+
+local function machine_matches(machine, expected)
+  if not machine or machine.name ~= expected.name or machine.ingredient_count ~= expected.ingredient_count
+    or not has_category(machine, expected.category) or (machine.minable or {}).result ~= expected.name then
+    return false
+  end
+  local fact = recipe_facts.view(expected.name)
+  local unlockers = recipe_unlocks.for_recipe(expected.name)
+  return outputs_item(fact, expected.name) and #unlockers == 1 and unlockers[1] == expected.unlocker
+end
+
+local function retained_initial_machine_reason(policy)
+  local expected = policy.initial_machine
+  if not expected then return nil end
+  local machines = data_raw.prototypes("assembling-machine")
+  local primary = machines[expected.name]
+  if not machine_matches(primary, expected) or not machine_matches(machines[(expected.capability_machine or {}).name], expected.capability_machine or {}) then
+    return "retained-progression-initial-machine-mismatch:" .. expected.name
+  end
+  local early_unlockers = {}
+  for _, name in ipairs(expected.early_unlockers or {}) do early_unlockers[name] = true end
+  local threshold = #(policy.ingredients or {})
+  for name, machine in pairs(machines) do
+    if name ~= expected.name and has_category(machine, expected.category)
+      and name ~= (expected.capability_machine or {}).name
+      and type(machine.ingredient_count) == "number" and machine.ingredient_count >= threshold then
+      local fact = recipe_facts.view(name)
+      local unlockers = recipe_unlocks.for_recipe(name)
+      if outputs_item(fact, name) and #unlockers == 1 and early_unlockers[unlockers[1]] then
+        return "retained-progression-initial-machine-capability-changed:" .. name
+      end
+    end
+  end
+  return nil
+end
+
+-- The F015 declarations retain a published progression boundary without
+-- restoring a production solver. A changed recipe, source unlocker, category
+-- or prerequisite technology is an explicit reference failure, never a
+-- reason to impose historical gates on new input.
+local function retained_progression_prerequisites(shared, source)
+  local policies = ((shared.science_binding_policy or {}).retained_progression_prerequisites or {})
+  local policy = (policies[target_profiles.current_factorio_version] or {})[source.pack_name]
+  if not policy then return {} end
+  if source.recipe_name ~= policy.recipe or source.unlocker ~= policy.unlocker then
+    return nil, "retained-progression-source-mismatch:" .. source.pack_name
+  end
+  local fact = recipe_facts.view(source.recipe_name)
+  if not fact or not same_names(fact.categories or {}, policy.categories) then
+    return nil, "retained-progression-recipe-category-mismatch:" .. source.recipe_name
+  end
+  if #(fact.variants or {}) == 0 then
+    return nil, "retained-progression-recipe-ingredients-mismatch:" .. source.recipe_name
+  end
+  for _, variant in ipairs(fact.variants) do
+    local ingredients = variant_item_ingredients(variant)
+    if not ingredients or not same_names(ingredients, policy.ingredients) then
+      return nil, "retained-progression-recipe-ingredients-mismatch:" .. source.recipe_name
+    end
+  end
+  local machine_reason = retained_initial_machine_reason(policy)
+  if machine_reason then return nil, machine_reason end
+  local prerequisites = {}
+  for _, name in ipairs(policy.prerequisites or {}) do
+    local reason = technology_reason(name)
+    if reason then return nil, "retained-progression-prerequisite-" .. reason end
+    prerequisites[#prerequisites + 1] = name
+  end
+  table.sort(prerequisites)
+  return prerequisites
+end
+
+local function with_retained_progression(shared, source)
+  if source.status ~= "research" then return source end
+  local prerequisites, reason = retained_progression_prerequisites(shared, source)
+  if not prerequisites then return nil, reason end
+  source.progression_prerequisites = prerequisites
+  return source
 end
 
 -- Bind exactly the approved source. Later alternative producers neither
@@ -203,7 +321,7 @@ local function declared_source(pack_name, shared)
     local declaration = M.declaration_for_role(role, declarations)
     if declaration and declaration.pack == pack_name then
       local result, reason = binding(pack_name, declaration, true)
-      if result then return result end
+      if result then return with_retained_progression(shared, result) end
       -- A different actual unlock may be admitted only by the separately
       -- authored unique-owner rule below, never by production exploration.
       if not (shared.science_binding_policy or {}).unique_direct_unlock then return nil, reason end
@@ -242,7 +360,10 @@ local function declared_source(pack_name, shared)
     end
     if #gates ~= 1 then return nil, "ambiguous-approved-pack-unlock:" .. pack_name end
   end
-  return binding(pack_name, {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
+  local result, reason = binding(pack_name,
+    {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
+  if not result then return nil, reason end
+  return with_retained_progression(shared, result)
 end
 
 -- Positive reference rules validate only declared pack sources, direct lab
@@ -398,6 +519,9 @@ local function build_reference_bindings(shared, labs)
       end
       local required = {}
       for _, gate in ipairs(source.unlockers) do required[#required + 1] = node("technology", gate) end
+      for _, gate in ipairs(source.progression_prerequisites or {}) do
+        required[#required + 1] = node("technology", gate)
+      end
       for _, ingredient in ipairs(source.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
       add("pack", pack, required)
     end

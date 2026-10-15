@@ -298,6 +298,9 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
       } elseif ($SourceVersion -ceq '4.4.2') {
         $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
+        if ([string]$Record.factorio_line -ceq '0.15') {
+          $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+        }
       }
       $changelog = $entry + $changelog
     }
