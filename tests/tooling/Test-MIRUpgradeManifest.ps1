@@ -382,13 +382,13 @@ try {
   $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
   if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
   foreach($binding in @(
-    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.68'},
-    [pscustomobject]@{from='4.4.20000';fixture_version='0.1.66'},
-    [pscustomobject]@{from='4.4.20001';fixture_version='0.1.67'}
+    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.88'},
+    [pscustomobject]@{from='4.4.20000';fixture_version='0.1.86'},
+    [pscustomobject]@{from='4.4.20001';fixture_version='0.1.87'}
   )){
     if(Test-Path -LiteralPath $bobAngelFixture){Remove-Item -LiteralPath $bobAngelFixture -Recurse -Force}
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $bobAngelFixture -Recurse
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $bobAngelFixture -Target f200 -SourceVersion '4.4.2' -FromVersion $binding.from
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $bobAngelFixture -Target f200 -SourceVersion '4.4.2' -FromVersion $binding.from -F200BobAngel
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $bobAngelFixture -FromVersion $binding.from -ToVersion '4.4.20002'
     Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $bobAngelFixture -FromVersion $binding.from -ToVersion '4.4.20002'
     $info=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'info.json') -Raw|ConvertFrom-Json
@@ -441,9 +441,9 @@ try {
   foreach($binding in @(
     [pscustomobject]@{from='4.2.20002';to='4.3.20001';fixture_version='0.1.51'},
     [pscustomobject]@{from='4.3.20000';to='4.3.20001';fixture_version='0.1.50'},
-    [pscustomobject]@{from='4.2.20002';to='4.4.20002';fixture_version='0.1.68';source='4.4.2'},
-    [pscustomobject]@{from='4.4.20000';to='4.4.20002';fixture_version='0.1.66';source='4.4.2'},
-    [pscustomobject]@{from='4.4.20001';to='4.4.20002';fixture_version='0.1.67';source='4.4.2'}
+    [pscustomobject]@{from='4.2.20002';to='4.4.20002';fixture_version='0.1.78';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20000';to='4.4.20002';fixture_version='0.1.76';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20001';to='4.4.20002';fixture_version='0.1.77';source='4.4.2'}
   )){
     if(Test-Path -LiteralPath $galoreFixture){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $galoreFixture -Recurse
@@ -480,6 +480,67 @@ try {
   if($galoreFixtureSucceeded-and(Test-Path -LiteralPath $galoreFixture)){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
 }
 if(Test-Path -LiteralPath $galoreFixture){throw 'Galore staged fixture was not cleaned after a successful host control'}
+$mir442IdentityRoot=Join-Path $RepoRoot ('build/tmp/mir442-fixture-identities-'+[Guid]::NewGuid().ToString('N'))
+$mir442IdentitySucceeded=$false
+try {
+  New-Item -ItemType Directory -Force -Path $mir442IdentityRoot|Out-Null
+  $mir442IdentityCases=@(
+    # The fixture mod name is target-scoped.  Version therefore must isolate
+    # every distinct F200 oracle under the same Factorio 2.0 library.
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$false;expected='0.1.68'},
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$false;expected='0.1.66'},
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$false;expected='0.1.67'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.2.20002';space_age=$false;galore=$true;bob=$false;expected='0.1.78'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20000';space_age=$false;galore=$true;bob=$false;expected='0.1.76'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20001';space_age=$false;galore=$true;bob=$false;expected='0.1.77'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$true;expected='0.1.88'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$true;expected='0.1.86'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$true;expected='0.1.87'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.2.21002';space_age=$false;galore=$false;bob=$false;expected='0.1.68'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21000';space_age=$false;galore=$false;bob=$false;expected='0.1.66'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21001';space_age=$false;galore=$false;bob=$false;expected='0.1.67'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.2.21002';space_age=$true;galore=$false;bob=$false;expected='0.1.98'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21000';space_age=$true;galore=$false;bob=$false;expected='0.1.96'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21001';space_age=$true;galore=$false;bob=$false;expected='0.1.97'}
+  )
+  $mir442Identities=@()
+  foreach($case in $mir442IdentityCases){
+    $fixture=Join-Path $mir442IdentityRoot ($case.scenario+'-'+$case.from.Replace('.','-'))
+    Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/assert-upgrade-4-0-'+$case.target.Substring(1)+'00-to-4-1-'+$case.target.Substring(1)+'00')) -Destination $fixture -Recurse
+    $identityArgs=@{FixtureDirectory=$fixture;Target=$case.target;SourceVersion='4.4.2';FromVersion=$case.from;SpaceAge=[bool]$case.space_age;F200GaloreSpaceAge=[bool]$case.galore;F200BobAngel=[bool]$case.bob}
+    Set-MIR421ModernBaseUpgradeFixtureIdentity @identityArgs
+    $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
+    if($info.version-cne$case.expected){throw "4.4.2 fixture identity differs for $($case.scenario)/$($case.from)"}
+    $mir442Identities+=,[pscustomobject]@{scenario=$case.scenario;name=[string]$info.name;factorio_version=[string]$info.factorio_version;predecessor=$case.from;version=[string]$info.version}
+  }
+  foreach($scenario in @($mir442Identities|Group-Object scenario)){
+    if($scenario.Count-ne3-or@($scenario.Group.version|Sort-Object -Unique).Count-ne3){throw "4.4.2 fixture predecessor versions collided within $($scenario.Name)"}
+  }
+  foreach($engineName in @($mir442Identities|Group-Object {$_.factorio_version+'|'+$_.name})){
+    if(@($engineName.Group.version|Sort-Object -Unique).Count-ne$engineName.Count){throw "4.4.2 fixture identity collided within $($engineName.Name)"}
+  }
+  $wrongScenarioFixture=Join-Path $mir442IdentityRoot 'wrong-bob-scenario'
+  $rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $wrongScenarioFixture -Target f200 -SourceVersion '4.4.2' -FromVersion '4.2.20002' -F200BobAngel -F200GaloreSpaceAge}catch{$rejected=$_.Exception.Message-ceq'[mir423-f200-bob-angel-fixture-target]'}
+  if(-not$rejected){throw 'Fixture identity admitted mutually exclusive Bob/Angel and Galore scenarios'}
+  $rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $wrongScenarioFixture -Target f210 -SourceVersion '4.4.2' -FromVersion '4.2.21002' -F200BobAngel}catch{$rejected=$_.Exception.Message-ceq'[mir423-f200-bob-angel-fixture-target]'}
+  if(-not$rejected){throw 'Bob/Angel fixture identity accepted a non-F200 scenario'}
+  $f200BobAngelAssertions+=2;$f200GaloreSpaceAgeAssertions+=3;$currentAssertions+=10
+  $mir442IdentitySucceeded=$true
+} catch {
+  if(-not(Test-Path -LiteralPath $mir442IdentityRoot -PathType Container)){New-Item -ItemType Directory -Force -Path $mir442IdentityRoot|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $mir442IdentityRoot 'TEST-FAILURE-RETAINED.txt'),("4.4.2 staged-fixture identity host control failed and was retained for inspection.`n" + $_.Exception.Message + "`n"),[Text.UTF8Encoding]::new($false))
+  throw
+} finally {
+  if($mir442IdentitySucceeded-and(Test-Path -LiteralPath $mir442IdentityRoot)){Remove-Item -LiteralPath $mir442IdentityRoot -Recurse -Force}
+}
+if(Test-Path -LiteralPath $mir442IdentityRoot){throw '4.4.2 staged fixture identity control was not cleaned after success'}
+$modernIdentityCalls=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Set-MIR421ModernBaseUpgradeFixtureIdentity'
+},$true))
+if($modernIdentityCalls.Count-ne1-or$modernIdentityCalls[0].Extent.Text-cnotmatch '(?s)-F200BobAngel:\$f200BobAngelScenario'){
+  throw 'Upgrade runner does not forward the Bob/Angel fixture identity specialization'
+}
+$currentAssertions++
 $galoreSelection=@(
   [pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='elevated-rails';version='2.0.77'},[pscustomobject]@{name='quality';version='2.0.77'},[pscustomobject]@{name='space-age';version='2.0.77'},
   [pscustomobject]@{name='galore_lib';version='2.2.0'},[pscustomobject]@{name='vanilla_galore_continued';version='1.4.2'},[pscustomobject]@{name='space_age_galore';version='1.6.3'},

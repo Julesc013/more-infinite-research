@@ -780,7 +780,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if ($targetCode -cin @('210','200','110','100') -and $fixtureIdentityTransition -and
       ($SpaceIsFake -or $Archetype -cin @('','base-default','f200-bob-angel','f200-galore-space-age') -or ($targetCode-ceq'210' -and $Archetype-ceq'space-age-native-owner'))) {
     $f210HistoricalSettingOracle=$targetCode-ceq'210'-and$SourceVersion-ceq'4.2.3'-and$FromVersion-ceq'4.2.21000'-and$ToVersion-ceq'4.2.21003'-and-not$SpaceIsFake-and$Archetype-ceq'space-age-native-owner'
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner') -F200GaloreSpaceAge:$f200GaloreSpaceAgeScenario -HistoricalSettingsOracle:$f210HistoricalSettingOracle
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -SourceVersion $SourceVersion -FromVersion $FromVersion -SpaceIsFake:$SpaceIsFake -SpaceAge:($Archetype-ceq'space-age-native-owner') -F200GaloreSpaceAge:$f200GaloreSpaceAgeScenario -F200BobAngel:$f200BobAngelScenario -HistoricalSettingsOracle:$f210HistoricalSettingOracle
     if($f210HistoricalSettingOracle){
       Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
     }
