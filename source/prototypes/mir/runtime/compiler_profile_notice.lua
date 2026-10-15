@@ -1,18 +1,11 @@
--- Classic deliberately trades broad automatic inference for bounded startup
--- work.  This module makes that selected contract visible before a player
--- re-saves an older factory under the reduced profile.
---
--- `on_load` cannot access LuaGameScript or persistent state.  It only
--- installs this module's one-shot first-tick callback; that callback reads
--- the current startup selection, notifies connected players, and removes
--- itself before doing any player work.
+-- The saved `classic` value is a compatibility alias for the one Full
+-- compiler.  Keep this lifecycle participant for coordinator compatibility,
+-- but never subscribe an event that was not already active in the saved game.
 local compiler_profile = require("prototypes.mir.settings.compiler_profile")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {}
 M.requires_features = {"scripted_techs"}
-
-local load_notice_scheduled = false
 
 local function classic_selected()
   return compiler_profile.get(target_line.factorio_version) == "classic"
@@ -55,34 +48,17 @@ local function notify_connected_players(caption)
   return delivered
 end
 
-local function clear_load_notice_subscription()
-  if load_notice_scheduled then
-    script.on_event(defines.events.on_tick, nil)
-    load_notice_scheduled = false
-  end
-end
-
-local function deliver_deferred_load_notice()
-  clear_load_notice_subscription()
-  if classic_selected() then notify_connected_players(caption_for_existing_classic()) end
-end
-
 function M.on_init()
   if classic_selected() then notify_connected_players(caption_for_initial_classic()) end
 end
 
 function M.on_load()
-  -- Factorio allows conditional event registration here, but not access to
-  -- game/settings or writes to storage/global.  Do not move profile choice
-  -- into this callback.
-  if not load_notice_scheduled then
-    load_notice_scheduled = true
-    script.on_event(defines.events.on_tick, deliver_deferred_load_notice)
-  end
+  -- on_load cannot read game/settings or write persistent state.  The former
+  -- deferred on_tick notice is retired: Full is the only active compiler, so
+  -- loading a client must preserve the saved server's handler set exactly.
 end
 
 function M.on_configuration_changed(event)
-  clear_load_notice_subscription()
   if classic_selected() then notify_connected_players(caption_for_upgrade(event)) end
 end
 

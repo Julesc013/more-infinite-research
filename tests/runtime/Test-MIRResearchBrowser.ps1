@@ -42,6 +42,12 @@ $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
 $sourceVersionParts=@($SourceVersion.Split('.'))
 if($sourceVersionParts.Count -ne 3){throw '[mir-browser-source-version]'}
 $expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor ([int]$sourceVersionParts[1]) -SourcePatch ([int]$sourceVersionParts[2])
+function Get-MIRBrowserFixtureIdentity([string]$SourceVersion) {
+ if($SourceVersion -ceq '4.4.0') {
+  return [pscustomobject]@{name='mir-browser-test';version='1.0.1'}
+ }
+ return [pscustomobject]@{name='mir-browser-test';version='1.0.0'}
+}
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }
@@ -132,9 +138,10 @@ New-Item -ItemType Directory -Path $run | Out-Null
 try {
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$fixture=Join-Path $run 'fixture-source/mir-browser-test_1.0.0'
+$fixtureIdentity=Get-MIRBrowserFixtureIdentity -SourceVersion $SourceVersion
+$fixture=Join-Path $run ('fixture-source/{0}_{1}' -f $fixtureIdentity.name,$fixtureIdentity.version)
 New-Item -ItemType Directory -Force $fixture | Out-Null
-[ordered]@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
+[ordered]@{name=$fixtureIdentity.name;version=$fixtureIdentity.version;title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
@@ -263,7 +270,7 @@ $coreChecks='check_omissions(check); check_browser_core_regressions(browser_core
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {
  $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
- $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
+ $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureIdentity.name -Version $fixtureIdentity.version -ModsDir $preparedRoot
  Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
  Write-Output "Browser fixture prepared without native execution or library writes: $run"
  return

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run source-bound Classic saved-investment notice controls under Lua 5.2."""
+"""Run source-bound compiler-profile notice controls under Lua 5.2."""
 from __future__ import annotations
 
 import argparse
@@ -14,7 +14,6 @@ SOURCES = (
     Path("source/prototypes/mir/settings/compiler_profile.lua"),
     Path("source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua"),
     Path("source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua"),
-    Path("source/locale/en/more-infinite-research.cfg"),
 )
 
 
@@ -45,37 +44,28 @@ def main() -> int:
     from lupa import lua52
 
     notice_source = (repo / SOURCES[0]).read_text(encoding="utf-8")
-    locale_source = (repo / SOURCES[-1]).read_text(encoding="utf-8")
-    required_locale = (
-        "[mir-message]",
-        "classic-profile-initial-scope=",
-        "classic-profile-existing-save-scope=",
-        "classic-profile-upgrade-warning=",
-        "MIR 4.2 generated research, levels, effects, and current research progress",
-        "untouched backup",
-        "Full before loading",
-    )
-    if not all(value in locale_source for value in required_locale):
-        raise RuntimeError("Classic saved-investment warning localisation is incomplete")
-    if "function M.on_load()" not in notice_source or "script.on_event(defines.events.on_tick" not in notice_source:
-        raise RuntimeError("Classic notice lacks the reviewed conditional one-shot load path")
+    profile_source = (repo / SOURCES[1]).read_text(encoding="utf-8")
+    if "function M.on_load()" not in notice_source or "script.on_event" in notice_source:
+        raise RuntimeError("Compiler profile notice retains the retired deferred load subscription")
+    if "return \"full\"" not in profile_source:
+        raise RuntimeError("Compiler profile no longer provides the unified Full compatibility alias")
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
     fixture = runtime.execute((repo / FIXTURE).read_text(encoding="utf-8"))
     adapters = runtime.table_from({
         "f200": (repo / SOURCES[2]).read_text(encoding="utf-8"),
         "f210": (repo / SOURCES[3]).read_text(encoding="utf-8"),
     })
-    result = fixture(notice_source, adapters)
+    result = fixture(notice_source, profile_source, adapters)
     record = {
-        "status": "MIR-CLASSIC-PROFILE-NOTICE-CONTROLS-PASSED",
+        "status": "MIR-COMPILER-PROFILE-NOTICE-CONTROLS-PASSED",
         "assertions": int(result["assertions"]),
         "source_sha256": digest(repo),
         "fixture_sha256": hashlib.sha256((repo / FIXTURE).read_bytes()).hexdigest(),
         "runtime": "lupa.lua52",
         "factorio_processes": 0,
     }
-    if record["assertions"] < 13:
-        raise RuntimeError(f"Incomplete Classic notice controls: {record}")
+    if record["assertions"] < 24:
+        raise RuntimeError(f"Incomplete compiler profile notice controls: {record}")
     print(json.dumps(record, sort_keys=True))
     return 0
 
