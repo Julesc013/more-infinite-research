@@ -8,6 +8,9 @@ local Context = require("prototypes.mir.pipeline.compiler_context")
 local bindings = require("prototypes.mir.capabilities.science_integration.pack_bindings")
 local catalogue = require("prototypes.mir.streams.registry")
 local deepcopy = require("prototypes.mir.core.deepcopy")
+local fingerprint = require("prototypes.mir.core.fingerprint")
+local lab_bindings = require("prototypes.mir.capabilities.science_integration.lab_bindings")
+local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
 local roles = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
 
 local function world(alternatives, reversed)
@@ -43,6 +46,56 @@ local function world(alternatives, reversed)
   data.raw = raw
   return raw
 end
+
+world(0, false)
+Context.with_active(Context.new(), function()
+  local internal_labs = lab_bindings.view()
+  local copied_labs = lab_bindings.snapshot()
+  local before = fingerprint.of(internal_labs)
+  local copied_index = bindings.compile_references(catalogue.shared, copied_labs)
+  local internal_index = science_packs.binding_snapshot()
+  check(fingerprint.of(copied_index) == fingerprint.of(internal_index),
+    "The Context-owned laboratory view produces the same approved reference bindings as the copied public snapshot")
+  check(fingerprint.of(lab_bindings.view()) == before,
+    "Approved reference construction never mutates Context-owned laboratory bindings")
+  local input_before = internal_index.labs[1].inputs[1]
+  local recipe_before = internal_index.labs[1].sources[1].recipe_name
+  internal_index.labs[1].inputs[1] = "caller-mutation"
+  internal_index.labs[1].sources[1].recipe_name = "caller-mutation"
+  local fresh_index = science_packs.binding_snapshot()
+  check(fresh_index.labs[1].inputs[1] == input_before
+      and fresh_index.labs[1].sources[1].recipe_name == recipe_before,
+    "Public approved-reference snapshots cannot mutate the shared laboratory view")
+  local exposed_index = Context.current():service("science.approved_binding_index")()
+  exposed_index.labs[1].inputs[1] = "caller-mutation"
+  exposed_index.labs[1].sources[1].recipe_name = "caller-mutation"
+  local lab_snapshot = lab_bindings.snapshot()
+  check(lab_snapshot[1].inputs[1] == input_before and lab_snapshot[1].sources[1].recipe_name == recipe_before,
+    "The exposed approved-binding service cannot mutate the shared laboratory view")
+  local service_snapshot = science_packs.binding_snapshot()
+  check(service_snapshot.labs[1].inputs[1] == input_before
+      and service_snapshot.labs[1].sources[1].recipe_name == recipe_before,
+    "The exposed approved-binding service cannot mutate later public binding snapshots")
+end)
+
+local first_context, second_context = Context.new(), Context.new()
+world(0, false)
+local first_labs
+Context.with_active(first_context, function()
+  first_labs = lab_bindings.view()
+  science_packs.binding_snapshot()
+end)
+world(0, false)
+data.raw.lab.lab.inputs = {roles[1]}
+local second_labs
+Context.with_active(second_context, function()
+  second_labs = lab_bindings.view()
+  science_packs.binding_snapshot()
+  check(second_labs ~= first_labs and #second_labs[1].inputs == 1,
+    "A fresh CompilerContext builds its own laboratory bindings from its active prototype world")
+end)
+check(#first_labs[1].inputs == #roles,
+  "A later Context cannot replace the earlier Context-owned laboratory binding view")
 
 local function bind_all()
   local result = {}

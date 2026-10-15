@@ -138,12 +138,17 @@ local function build_snapshot()
   return records
 end
 
--- Snapshot rows are copied at the public boundary.  The Context keeps the
--- internal projection only for the exact data-stage input lifetime.
-function M.snapshot()
+-- Internal compiler consumers may share this Context-owned projection for the
+-- exact data-stage input lifetime.  They must treat every row as read-only.
+function M.view()
   local context = compiler_context.current()
-  local records = context:state_view("approved_lab_bindings", build_snapshot)
-  return deepcopy(records)
+  return context:state_view("approved_lab_bindings", build_snapshot)
+end
+
+-- Snapshot rows are copied at the public boundary.  Reports, fixtures, and
+-- other callers must never retain the Context-owned projection.
+function M.snapshot()
+  return deepcopy(M.view())
 end
 
 return M
