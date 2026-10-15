@@ -1398,9 +1398,30 @@ foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
       $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
       $sourceIdentity=[version]$sourceVersion
       $expected=if($sourceIdentity.Minor-eq4){'1.0.'+(40+$predecessor.identity_patch)}else{'1.0.'+(20+3*$sourceIdentity.Build+$predecessor.identity_patch)}
-      if($info.version-cne$expected){throw "4.3 historical fixture identity collision: $target/$sourceVersion/$($predecessor.label)"}
+      if($info.version-cne$expected){throw "historical fixture identity collision: $target/$sourceVersion/$($predecessor.label)"}
       $mir43Assertions++
     }
+  }
+}
+$mir442HistoricalPredecessors=@(
+  [pscustomobject]@{label='direct-422';identity_patch=2},
+  [pscustomobject]@{label='published-440';identity_patch=0},
+  [pscustomobject]@{label='published-441';identity_patch=1}
+)
+foreach($target in @('f017','f016','f015','f014','f013')){
+  $code=$target.Substring(1)
+  foreach($predecessor in $mir442HistoricalPredecessors){
+    $from=if($predecessor.label-ceq'direct-422'){('4.2.'+$code+'02')}elseif($predecessor.label-ceq'published-440'){('4.4.'+$code+'00')}else{('4.4.'+$code+'01')}
+    $fixtureRoot=Join-Path $mir43FixtureRoot ('mir442-historical-'+$target+'-'+$predecessor.label)
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $fixtureRoot -Recurse
+    $infoPath=Join-Path $fixtureRoot 'info.json'
+    $infoText=Get-Content -LiteralPath $infoPath -Raw
+    [IO.File]::WriteAllText($infoPath,$infoText.Replace('@@FACTORIO_LINE@@',('0.'+[int]$code)).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$from),[Text.UTF8Encoding]::new($false))
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $target -SourceVersion '4.4.2' -FromVersion $from
+    $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+    $expected='1.1.'+(46+$predecessor.identity_patch)
+    if($info.version-cne$expected){throw "4.4.2 historical fixture oracle revision collision: $target/$($predecessor.label)"}
+    $mir43Assertions++
   }
 }
 $f200Mir43Oracle=Join-Path $mir43FixtureRoot 'mir43-f200-full-state-oracle'
