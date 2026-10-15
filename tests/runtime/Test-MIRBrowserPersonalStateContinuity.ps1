@@ -92,7 +92,11 @@ function Wait-SuccessorSave([string]$p,[string]$log,[int]$offset,[object[]]$i){W
 function Start-Stage([string]$stage,[string]$save,[int]$port,[string]$serverConfig,[string]$aConfig,[string]$bConfig,[string]$mods,[string]$serverData,[string]$clientAData,[string]$clientBData,[string]$dir){
  $sl=Join-Path $serverData 'factorio-current.log';$al=Join-Path $clientAData 'factorio-current.log';$bl=Join-Path $clientBData 'factorio-current.log';foreach($p in @($sl,$al,$bl)){if(Test-Path -LiteralPath $p -PathType Leaf){Remove-Item -LiteralPath $p -Force}}
  $server=Start-Owned $stage 'server' 3 @('--start-server',$save,'--bind',"127.0.0.1:$port",'--server-settings',(Join-Path $dir 'server-settings.json'),'--config',$serverConfig,'--mod-directory',$mods,'--no-log-rotation','--disable-audio');Wait-NewServerReady $sl $server
- $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--graphics-quality','medium','--video-memory-usage','low')
+ # Scripted interaction checks the same rendered views and server state without
+ # depending on sprite resolution. Bound texture-loading memory for two clients.
+ $graphicsQuality=if($InputMode -ceq 'ScriptedFixture'){'very-low'}else{'medium'}
+ $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--graphics-quality',$graphicsQuality,'--video-memory-usage','low')
+ if($InputMode -ceq 'ScriptedFixture'){$common+=@('--max-threads','1')}
  $a=Start-Owned $stage 'client-a' 1 (@('--config',$aConfig)+$common);$b=Start-Owned $stage 'client-b' 2 (@('--config',$bConfig)+$common)
  return [pscustomobject]@{server=$server;client_a=$a;client_b=$b;server_log=$sl;client_a_log=$al;client_b_log=$bl}
 }
