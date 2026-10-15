@@ -127,7 +127,7 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
   }
   if ($CandidateSourceVersion -ceq '4.4.1') {
     return [pscustomobject][ordered]@{
-      source_version='4.4.0';source_patch=0;source_tag='v4.4.0';release_id=413564113;asset_count=17;target_commitish='72b5c72eab810baf74c9a785ac4ebbc0d438c94a'
+      source_version='4.4.0';source_patch=0;source_tag='v4.4.0';release_id=413564113;asset_count=17;target_commitish='main'
       commit='72b5c72eab810baf74c9a785ac4ebbc0d438c94a';tree='fe63974c649ddba389da5979ba94a59bffdd5e72'
       manifest_name='mir-4.4.0.manifest.json';manifest_bytes=26167
       manifest_sha256='48E78F4859B88B048E77337A3E0068C0177B62CDB23642A88A1EF9F7F6760307'

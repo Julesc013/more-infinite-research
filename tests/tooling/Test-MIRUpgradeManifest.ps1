@@ -1183,7 +1183,7 @@ $published440Assets=@(for($i=0;$i-lt@($published440.manifest.targets).Count;$i++
 })
 $published440Assets+=,[pscustomobject]@{id=643184535;name='mir-4.4.0.manifest.json';size=[int64]$published440.bytes;digest=('sha256:'+[string]$published440.sha256).ToLowerInvariant();state='uploaded'}
 foreach($i in 1..7){$published440Assets+=,[pscustomobject]@{id=(600000000+$i);name=('controlled-440-supporting-asset-'+$i);size=1;digest=('sha256:'+('a'*64));state='uploaded'}}
-$published440Metadata=[pscustomobject]@{id=413564113;tag_name='v4.4.0';target_commitish='72b5c72eab810baf74c9a785ac4ebbc0d438c94a';draft=$false;prerelease=$false;immutable=$false;assets=$published440Assets}
+$published440Metadata=[pscustomobject]@{id=413564113;tag_name='v4.4.0';target_commitish='main';draft=$false;prerelease=$false;immutable=$false;assets=$published440Assets}
 $published440Rows=@(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published440 -ReleaseMetadata $published440Metadata -CandidateSourceVersion '4.4.1')
 if($published440Rows.Count-ne9-or(@($published440Rows.target)-join'|')-cne'f210|f200|f110|f100|f017|f016|f015|f014|f013' -or
    @($published440Rows|Where-Object {$_.version-cne('4.4.'+$_.target.Substring(1)+'00')}).Count){
