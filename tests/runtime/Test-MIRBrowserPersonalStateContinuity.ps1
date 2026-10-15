@@ -96,7 +96,11 @@ function Start-Stage([string]$stage,[string]$save,[int]$port,[string]$serverConf
  # depending on sprite resolution. Bound texture-loading memory for two clients.
  $common=@('--mp-connect',"127.0.0.1:$port",'--mod-directory',$mods,'--no-log-rotation','--disable-audio','--window-size','1024x768','--video-memory-usage','low')
  if($InputMode -ceq 'ScriptedFixture'){$common+=@('--force-graphics-preset','very-low','--single-thread-loading','--low-vram')}else{$common+=@('--graphics-quality','medium')}
- $a=Start-Owned $stage 'client-a' 1 (@('--config',$aConfig)+$common);$b=Start-Owned $stage 'client-b' 2 (@('--config',$bConfig)+$common)
+ $a=Start-Owned $stage 'client-a' 1 (@('--config',$aConfig)+$common)
+ # Keep both clients connected for the proof, but avoid overlapping their
+ # temporary sprite-loading allocations in the scripted fixture.
+ if($InputMode -ceq 'ScriptedFixture'){Wait-Until{(Get-LogText $al) -match '(?m)Factorio initialised'} 'client A graphics initialization before client B startup' @($server,$a)}
+ $b=Start-Owned $stage 'client-b' 2 (@('--config',$bConfig)+$common)
  return [pscustomobject]@{server=$server;client_a=$a;client_b=$b;server_log=$sl;client_a_log=$al;client_b_log=$bl}
 }
 function Assert-FixtureNames($v,[string]$p){Assert-PropertyNames $v @('finite','infinite','queued')$p;Assert-Equal $v.finite 'mir-browser-personal-finite'"$p finite technology";Assert-Equal $v.infinite 'mir-browser-personal-infinite'"$p infinite technology";Assert-Equal $v.queued 'mir-browser-personal-infinite'"$p queued technology"}
