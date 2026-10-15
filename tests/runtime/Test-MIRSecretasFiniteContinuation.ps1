@@ -4,7 +4,7 @@ param(
   [Parameter(Mandatory)][string]$CandidateZip,
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
   [ValidateSet('f210','f200')][string]$Target='f210',
-  [ValidateSet('4.2.2','4.4.0')][string]$SourceVersion='4.2.2',
+  [ValidateSet('4.2.2','4.4.0','4.4.2')][string]$SourceVersion='4.2.2',
   [string]$FactorioExe='',
   [string]$LibraryDirectory='',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
@@ -25,7 +25,7 @@ function Assert-Secretas([bool]$Condition,[string]$Message){if(-not$Condition){t
 function Get-SecretasArtifact([string]$Path){$f=Get-Item -LiteralPath $Path;[ordered]@{path=$f.FullName;sha256=(Get-FileHash -LiteralPath $Path).Hash;bytes=$f.Length}}
 function New-SecretasSelectedFixture(
   [string]$Source,[string]$Run,[ValidateSet('f210','f200')][string]$SelectedTarget,
-  [ValidateSet('4.2.2','4.4.0')][string]$SelectedSourceVersion,
+  [ValidateSet('4.2.2','4.4.0','4.4.2')][string]$SelectedSourceVersion,
   [Parameter(Mandatory)][string]$SelectedMIRVersion
 ){
   # Historical fixture bytes remain selected only for their exact 4.2.2 F210
@@ -35,6 +35,8 @@ function New-SecretasSelectedFixture(
     'f200/4.2.2'=[ordered]@{fixture_version='0.1.3';factorio_version='2.0';mir='4.2.20002';retained=$false;dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.2.20002');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.2.20002"'},[pscustomobject]@{from='"1.0.37"';to='"1.0.33"'},[pscustomobject]@{from='"1.0.1"';to='"0.1.0"'},[pscustomobject]@{from='"2.1.21"';to='"2.0.77"'})}
     'f210/4.4.0'=[ordered]@{fixture_version='0.1.4';factorio_version='2.1';mir='4.4.21000';retained=$false;dependencies=@('base = 2.1.21','space-age = 2.1.21','secretas = 1.0.37','pretty-frozeta = 1.0.1','more-infinite-research = 4.4.21000');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.21000"'})}
     'f200/4.4.0'=[ordered]@{fixture_version='0.1.5';factorio_version='2.0';mir='4.4.20000';retained=$false;dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.4.20000');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.20000"'},[pscustomobject]@{from='"1.0.37"';to='"1.0.33"'},[pscustomobject]@{from='"1.0.1"';to='"0.1.0"'},[pscustomobject]@{from='"2.1.21"';to='"2.0.77"'})}
+    'f210/4.4.2'=[ordered]@{fixture_version='0.1.8';factorio_version='2.1';mir='4.4.21002';retained=$false;dependencies=@('base = 2.1.21','space-age = 2.1.21','secretas = 1.0.37','pretty-frozeta = 1.0.1','more-infinite-research = 4.4.21002');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.21002"'})}
+    'f200/4.4.2'=[ordered]@{fixture_version='0.1.9';factorio_version='2.0';mir='4.4.20002';retained=$false;dependencies=@('base = 2.0.77','space-age = 2.0.77','secretas = 1.0.33','pretty-frozeta = 0.1.0','more-infinite-research = 4.4.20002');replacements=@([pscustomobject]@{from='"4.2.21002"';to='"4.4.20002"'},[pscustomobject]@{from='"1.0.37"';to='"1.0.33"'},[pscustomobject]@{from='"1.0.1"';to='"0.1.0"'},[pscustomobject]@{from='"2.1.21"';to='"2.0.77"'})}
   }
   $key=$SelectedTarget+'/'+$SelectedSourceVersion
   Assert-Secretas ($profiles.ContainsKey($key)) 'selected fixture source/target tuple is not admitted'
@@ -78,7 +80,7 @@ $fixture=Join-Path $repo 'fixtures/assert-secretas-finite-continuation-hotfix'
 $scenarioPath=Join-Path $fixture $(if($Target-ceq'f200'){'scenario-f200.json'}else{'scenario.json'})
 $scenario=Get-Content -LiteralPath $scenarioPath -Raw|ConvertFrom-Json
 $info=Get-Content -LiteralPath (Join-Path $fixture 'info.json') -Raw|ConvertFrom-Json
-Assert-Secretas (($SourceVersion-ceq[string]$scenario.source_version)-or$SourceVersion-ceq'4.4.0') 'selected candidate source version is not admitted by this exact scenario'
+Assert-Secretas (($SourceVersion-ceq[string]$scenario.source_version)-or$SourceVersion-cin@('4.4.0','4.4.2')) 'selected candidate source version is not admitted by this exact scenario'
 $candidateIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $scenario.target -SourceVersion $SourceVersion
 $candidate=Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -Target $scenario.target -SourceVersion $SourceVersion
 Assert-Secretas ([string]$candidate.receipt.distribution_version-ceq[string]$candidateIdentity.distribution_version) 'candidate canonical distribution identity differs'
