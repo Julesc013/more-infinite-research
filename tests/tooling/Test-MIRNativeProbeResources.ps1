@@ -1248,6 +1248,18 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   Assert-Probe ($profile.mods-ceq$browserLibrary-and-not(Test-Path -LiteralPath (Join-Path $browserJob 'profiles'))) 'browser lifecycle recreated a populated profile.'
   Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $profile.mods 'mod-settings.dat'))) 'browser inherited previous library settings.'
   Assert-Probe (-not(@($profile.activation.selected.name)-contains'unrequested')) 'browser enabled an unrelated archive.'
+  $createData=Join-Path $browserJob 'create-log-controls';[IO.Directory]::CreateDirectory($createData)|Out-Null
+  $nativeCreateLog=Join-Path $createData 'factorio-current.log';$capturedCreateLog=Join-Path $browserJob 'create-current.log'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog} 'create-log-missing'
+  $loadingLines=@($profile.activation.selected|ForEach-Object {'   0.010 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})-join "`n"
+  [IO.File]::WriteAllText($nativeCreateLog,$loadingLines+"`n   1.000 Goodbye`n")
+  $captured=Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog
+  Assert-Probe ($captured-ceq$capturedCreateLog-and(Get-MIRImmutableInputSha256 $captured)-ceq(Get-MIRImmutableInputSha256 $nativeCreateLog)) 'browser did not preserve the configured native create log exactly.'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog} 'create-log-preserved'
+  [IO.File]::WriteAllText($nativeCreateLog,$loadingLines.Replace('more-infinite-research 4.2.20001','more-infinite-research 4.2.20002'))
+  $wrongCapture=Join-Path $browserJob 'wrong-selection-create.log'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $wrongCapture} 'loaded-selection'
+  Assert-Probe (-not(Test-Path -LiteralPath $wrongCapture)) 'browser copied a native log with the wrong selection.'
   [IO.File]::WriteAllText((Join-Path $profile.mods 'mod-settings.dat'),'private settings')
   Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase configured -Inputs $profileInputs @libraryArguments -PreviousProfile $profile} 'previous-profile-active'
   $terminal=Complete-MIRBrowserContinuityProfile -Profile $profile

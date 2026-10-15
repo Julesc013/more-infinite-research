@@ -113,6 +113,20 @@ function Invoke-MIRBrowserContinuityGovernedRun {
   Write-Output "MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=$(Join-Path $context.root 'result.json')"
 }
 
+function Save-MIRBrowserContinuityCreateLog {
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$WriteDataDirectory,[Parameter(Mandatory)][string]$Destination)
+  # Windows GUI builds always write this configured native log, but need not
+  # create a separate --console-log file. Preserve the actual completed launch.
+  $source=Join-Path $WriteDataDirectory 'factorio-current.log'
+  if(Test-Path -LiteralPath $Destination){throw '[mir-browser-continuity-create-log-preserved]'}
+  if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw '[mir-browser-continuity-create-log-missing]'}
+  $null=Assert-MIRLibraryLoadedSelection -Activation $Activation -LogPath $source
+  $before=Get-MIRImmutableInputSha256 $source
+  Copy-Item -LiteralPath $source -Destination $Destination
+  if((Get-MIRImmutableInputSha256 $source)-cne$before-or(Get-MIRImmutableInputSha256 $Destination)-cne$before){throw '[mir-browser-continuity-create-log-custody]'}
+  return $Destination
+}
+
 function New-MIRBrowserContinuityProfile {
   param([string]$JobRoot,[string]$Phase,[object[]]$Inputs,[string]$LibraryDirectory,[string]$EngineDataDirectory,[string]$EngineVersion,$PreviousProfile=$null)
   $root=Resolve-MIR441RecoveryScratchPath -Path $JobRoot
