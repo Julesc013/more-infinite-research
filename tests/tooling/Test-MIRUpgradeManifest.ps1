@@ -825,7 +825,9 @@ try {
     [pscustomobject]@{source='4.2.2';from='4.2.21001';to='4.2.21002'},
     [pscustomobject]@{source='4.2.3';from='4.2.21002';to='4.2.21003'},
     [pscustomobject]@{source='4.3.1';from='4.2.21002';to='4.3.21001'},
-    [pscustomobject]@{source='4.3.1';from='4.3.21000';to='4.3.21001'}
+    [pscustomobject]@{source='4.3.1';from='4.3.21000';to='4.3.21001'},
+    [pscustomobject]@{source='4.4.0';from='4.2.21002';to='4.4.21000'},
+    [pscustomobject]@{source='4.4.0';from='4.3.21000';to='4.4.21000'}
   )
   foreach($currentMode in $currentModes){
     $SourceVersion=$currentMode.source
@@ -1243,6 +1245,35 @@ foreach($needle in @(
   if(-not$f210BaseFullControl.Contains($needle)){throw "F210 Base Full fixture lost complete-state hook: $needle"}
 }
 $mir43Assertions++
+$f210BaseStateArguments=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.CommandParameterAst]-and$node.ParameterName-ceq'BaseDefaultCompleteState'
+},$true))
+if($f210BaseStateArguments.Count-ne1-or$null-eq$f210BaseStateArguments[0].Argument){throw 'F210 Base complete-state caller argument missing or ambiguous'}
+$f210BaseStateEvaluator=[scriptblock]::Create($f210BaseStateArguments[0].Argument.Extent.Text)
+foreach($predecessor in @('4.2.21002','4.3.21000')){
+  $Archetype='base-default';$FromVersion=$predecessor;$ToVersion='4.4.21000'
+  $selectedBaseState=[bool](& $f210BaseStateEvaluator)
+  if(-not$selectedBaseState){throw "F210 Base caller omitted complete snapshots for $predecessor -> 4.4.21000"}
+  $fixturePath=Join-Path $mir43FixtureRoot ('mir440-f210-base-complete-'+$predecessor.Replace('.','-'))
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $fixturePath -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixturePath -Target f210 -SourceVersion '4.4.0' -FromVersion $predecessor
+  Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixturePath -FromVersion $predecessor -ToVersion '4.4.21000' -BaseDefaultCompleteState:$selectedBaseState
+  $control=Get-Content -LiteralPath (Join-Path $fixturePath 'control.lua') -Raw
+  foreach($needle in @('(archetype == "space-age-native-owner" or archetype == "base-default")','to_version == "4.4.21000"','export_state("source")','export_state("upgrade")','export_state("reload")')){
+    if(-not$control.Contains($needle)){throw "F210 4.4 Base fixture lost complete-state hook: $needle"}
+  }
+  $mir43Assertions++
+}
+foreach($binding in @(
+  @{archetype='base-default';from='4.2.21001';to='4.4.21000'},
+  @{archetype='base-default';from='4.3.21001';to='4.4.21000'},
+  @{archetype='base-default';from='4.3.21000';to='4.4.21001'},
+  @{archetype='space-age-native-owner';from='4.3.21000';to='4.4.21000'}
+)){
+  $Archetype=$binding.archetype;$FromVersion=$binding.from;$ToVersion=$binding.to
+  if([bool](& $f210BaseStateEvaluator)){throw 'F210 Base caller admitted an unbound or different-archetype snapshot transition'}
+  $mir43Assertions++
+}
 $f210WrongBaseBindingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-wrong-snapshot-binding'
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210WrongBaseBindingFixture -Recurse
 Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210WrongBaseBindingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21001'

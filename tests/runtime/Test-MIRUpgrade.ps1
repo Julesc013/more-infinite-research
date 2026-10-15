@@ -776,7 +776,8 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
         -BaseDefaultCompleteState:($Archetype-ceq'base-default'-and(
           ($FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000') -or
           ($FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21001') -or
-          ($FromVersion-ceq'4.3.21000'-and$ToVersion-ceq'4.3.21001')))
+          ($FromVersion-ceq'4.3.21000'-and$ToVersion-ceq'4.3.21001') -or
+          ($FromVersion-cin@('4.2.21002','4.3.21000')-and$ToVersion-ceq'4.4.21000')))
     }
   }
   if($targetCode-ceq'200'-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','f200-bob-angel','f200-galore-space-age')){
