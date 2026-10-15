@@ -947,7 +947,7 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "69BD1F869F68CE276FCE7C0249F29A2E3AF64D10BAF64E9658EC9A4E24A5F966",
+      "sha256": "BE738606846C5CB938AC928DACC749958107B6FB8440EFCEBDBD5C15155E7BCA",
       "hash_mode": "canonical-text-v1",
       "lines": 899,
       "package_visible": false
@@ -3267,7 +3267,7 @@
     {
       "path": "tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme.ps1",
       "classification": "canonical-internal",
-      "sha256": "E122F5DA7FBB31610B71101989F583F9E4BB922CB8D5FAE52B5F4DCED62532F6",
+      "sha256": "818E8C0F4407EA3A0183C38CC9FE1E3F094B66E431647810D48AFB26CD728491",
       "hash_mode": "canonical-text-v1",
       "lines": 35,
       "package_visible": false
@@ -4459,7 +4459,7 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "944C88E7F217E4A8FA9B407976C70E2273895122D8A0526BD335887F5FABCC50",
+      "sha256": "75F4989DF8D32443C0F6481A3A8AF121E4FBF3C40CE569939A9496883514415B",
       "hash_mode": "canonical-text-v1",
       "lines": 715,
       "package_visible": false
@@ -4499,7 +4499,7 @@
     {
       "path": "tools/lib/validation/NativeProbeResources.ps1",
       "classification": "canonical-internal",
-      "sha256": "5FC12DC864E8412E159997358C2283A4BBE3622CBD316EF523E7659453C59124",
+      "sha256": "9C0904E5871B714D42E040F5AAB315E237E6A322F54EDFE2B1B6BDFCE1925235",
       "hash_mode": "canonical-text-v1",
       "lines": 304,
       "package_visible": false
@@ -5339,7 +5339,7 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42EvidenceReconciliation.ps1",
       "classification": "canonical-internal",
-      "sha256": "0FD816E1004A8E0309F237C77D5F2971006D3B2DDF830602C2B0CA0CFC27C9CA",
+      "sha256": "FD4356F37C0904857F8760439A7053E6D4D70C05D45100912629D424A1C73C23",
       "hash_mode": "canonical-text-v1",
       "lines": 1900,
       "package_visible": false
@@ -5347,7 +5347,7 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
       "classification": "canonical-internal",
-      "sha256": "832ADDFC183A36A205EDF339045FD913CC753824A7ECCD444D539F45A11C8DE6",
+      "sha256": "1AE0BFD5A7A8ECCE51306DA209E314F23D816207E794507A4F95BE057E1B3AA0",
       "hash_mode": "canonical-text-v1",
       "lines": 539,
       "package_visible": false
@@ -5371,7 +5371,7 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42ProtectedMainPromotion.ps1",
       "classification": "canonical-internal",
-      "sha256": "31524548988044FE5E1AA7E5A23A13E3BE342C7B43C27AC6A4A572A20175978F",
+      "sha256": "DED1DDC3E2A06329C6BCDDD1E3E2CEE6BE8C42229BCF4FC14269773D6284DC45",
       "hash_mode": "canonical-text-v1",
       "lines": 810,
       "package_visible": false
@@ -5379,9 +5379,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42ReleaseAssets.ps1",
       "classification": "canonical-internal",
-      "sha256": "4DA3C953363C1EBF4CFEF0B4CA78FBC32C13E8236AB03B823A242D8CE51B60C9",
+      "sha256": "31BC194E034B17050275E38954DACB7FFBA6D34AA0C9E64839880F1570DD95E4",
       "hash_mode": "canonical-text-v1",
-      "lines": 1582,
+      "lines": 1591,
       "package_visible": false
     },
     {
@@ -5395,9 +5395,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
       "classification": "canonical-internal",
-      "sha256": "EF656C90E2680DB7F51A628254E88F2E01CE70F26FE35DB44B55AAC3733EB234",
+      "sha256": "FCDC3B8FB4B198D8E3277C6F59B1E9339E383D140CD91390E842C8AEDDEC1FEC",
       "hash_mode": "canonical-text-v1",
-      "lines": 3354,
+      "lines": 3371,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:92d8712855b20ecafd538d92107e4d65c7829b08181bb3b2febbaf8c883453bd"
+  "digest": "sha256:25d3f0d46d1f6113517f6a28f5a0e2ebc03b6c50cf7173d38b13fc13099bf2da"
 }
