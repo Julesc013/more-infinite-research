@@ -7655,10 +7655,10 @@
         "reason": "Explicitly reduced classic compiler selected before full proof analysis, using the existing emitter."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2961,
-      "source_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
-      "output_bytes": 2961,
-      "output_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D"
+      "source_bytes": 2200,
+      "source_sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46",
+      "output_bytes": 2200,
+      "output_sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46"
     },
     {
       "layer": "shared",
@@ -7712,5 +7712,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "ECABEC1355398238A1773F6068178CE14920EE7F17AE8EEE1D926FEEA1B92B26"
+  "record_sha256": "3549594ECD38C7E41E33E8251F8960C2D5E2CB141D701E1DDCFC942AD1CD1D68"
 }

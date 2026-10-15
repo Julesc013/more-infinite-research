@@ -3900,8 +3900,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f210 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2961,
-      "expected_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
+      "expected_bytes": 2200,
+      "expected_sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3915,5 +3915,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "C2BF99CD3EAED08C9421A11D1C6ACD8C7DF2E755E3AA8003A8359693CB887A06"
+  "record_sha256": "1ED31535159921E36A557BED2B9FB8FF095EAD5EEBB4A7AABA16DE7659E32BA7"
 }

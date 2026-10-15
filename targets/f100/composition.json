@@ -3836,8 +3836,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Compose the canonical reduced compiler into f100 without another emitter.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 2961,
-      "expected_sha256": "35F9B6C4E003D5E3F771AE319C5682F5C122E07DBB8E7183D22D236B4C0C503D",
+      "expected_bytes": 2200,
+      "expected_sha256": "8CF1227C0591C0E51E4F29617F9B55DC1F886A46C62CBB5DEAD875986980AB46",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3851,5 +3851,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "4EA9C3325E94499311CE16270AF7A869DA9766F5403DDB40E0908323E45D0EF7"
+  "record_sha256": "87322ECCC662357DAC6D4C042EE22A3B0BFFCE945742282136309B820F302B35"
 }
