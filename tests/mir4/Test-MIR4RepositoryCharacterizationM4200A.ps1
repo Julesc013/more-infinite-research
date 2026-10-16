@@ -14,6 +14,11 @@ $expectedPackage=Get-MIRPackageSourceFingerprint -RepoRoot $repo
 $expectedReadme=Get-MIRFileContentSha256 -Path (Join-Path $repo 'README.md') -RelativePath 'README.md'
 $output='build/reports/repository-characterization'
 
+Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path '.vscode/settings.json') -ceq 'normative-authority') 'mir4-characterization-editor-settings'
+foreach ($unknown in @('.vscode/unreviewed.json','.vscode/settings.json.backup')) {
+  Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path $unknown) -ceq 'unknown') 'mir4-characterization-unreviewed-editor-path' $unknown
+}
+
 $authority=Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo
 Assert-MIR4CharacterizationV1 (@($authority.writers).Count -eq 1) 'mir4-characterization-single-writer'
 Assert-MIR4CharacterizationV1 (@($authority.report_files).Count -eq 8) 'mir4-characterization-report-contract'

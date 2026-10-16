@@ -662,6 +662,145 @@ function Test-MIR42IndividualNativeInputReader {
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
 
+    # Factorio 0.13 has no Windows PE version metadata.  The fallback is
+    # admissible only for its exact sealed binary and semantic version; a
+    # populated receipt value, or either version/hash drift, remains a refusal.
+    $f013Authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target 'f013' -PredecessorIdentityOnly
+    $f013Engine = $f013Authority.target_record.record.engine
+    $f013FallbackAccepted = Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version)
+    $f013MissingReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $false -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013WhitespaceReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ArrayReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedFileVersionRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion ([string]$f013Engine.version) -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedPEFieldRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion ([string]$f013Engine.version) `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedVersionRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion '0.13.999')
+    $f013ForgedHashRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ('0' * 64) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedPathRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath (Join-Path (Split-Path -Parent ([string]$f013Engine.path)) 'factorio-other.exe') -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    Assert-MIR42NineSealTest -Condition ($f013FallbackAccepted -and $f013MissingReceiptRejected -and $f013WhitespaceReceiptRejected -and $f013ArrayReceiptRejected -and $f013ForgedReceiptRejected -and $f013ForgedFileVersionRejected -and $f013ForgedPEFieldRejected -and $f013ForgedVersionRejected -and $f013ForgedHashRejected -and $f013ForgedPathRejected) -Code 'individual-f013-blank-pe-version-requires-sealed-engine'
+    $checks++
+
+    # The integrated reader case needs a real local file so it can verify the
+    # exact immutable-file binding.  This deliberately plain-text .exe has no
+    # Windows PE version resources; it is a host-only structural fixture, not
+    # a substitute for the sealed 0.13 engine or native qualification.
+    $f013ReaderEngineRoot = Join-Path $root 'f013-blank-pe-version-engine'
+    New-Item -ItemType Directory -Force -Path $f013ReaderEngineRoot | Out-Null
+    $f013ReaderEngineFile = Write-HostText (Join-Path $f013ReaderEngineRoot 'factorio.exe') 'host-only f013 blank-pe-version fixture'
+    $f013ReaderEngineInfo = Get-Item -LiteralPath $f013ReaderEngineFile.path
+    $f013ReaderFileVersion = [string]$f013ReaderEngineInfo.VersionInfo.FileVersion
+    $f013ReaderProductVersion = [string]$f013ReaderEngineInfo.VersionInfo.ProductVersion
+    Assert-MIR42NineSealTest -Condition ($f013ReaderFileVersion -ceq '' -and $f013ReaderProductVersion -ceq '') -Code 'individual-f013-host-fixture-has-blank-pe-version'
+    $checks++
+    $f013ReaderEngine = [pscustomobject][ordered]@{
+      path = [string]$f013ReaderEngineFile.path
+      sha256 = [string]$f013ReaderEngineFile.sha256
+      version = [string]$f013Engine.version
+    }
+    # The production reader always loads the sealed historical authority.  The
+    # host-only integrated case replaces only that read with equivalent sealed
+    # fixture metadata, so hosted CI never requires D:\Programs\Factorio\0.13.
+    $f013ReaderAuthority = [pscustomobject][ordered]@{
+      target_record = [pscustomobject][ordered]@{
+        record = [pscustomobject][ordered]@{
+          engine = [pscustomobject][ordered]@{
+            path = [string]$f013ReaderEngine.path
+            sha256 = [string]$f013ReaderEngine.sha256
+            version = [string]$f013ReaderEngine.version
+          }
+        }
+      }
+      terminal_seal = [pscustomobject][ordered]@{
+        record = [pscustomobject][ordered]@{
+          engine = [pscustomobject][ordered]@{
+            binary_sha256 = [string]$f013ReaderEngine.sha256
+            version = [string]$f013ReaderEngine.version
+          }
+        }
+      }
+    }
+    function New-F013BlankPEVersionReaderRecord {
+      $record = Copy-HostValue $baseRecord
+      $f013EnginePath = Resolve-MIR42SealImmutableFile -Path ([string]$f013ReaderEngine.path) -Sha256 ([string]$f013ReaderEngine.sha256) -Code 'mir42-individual-f013-reader-engine'
+      $receiptIndex = @($record.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      Assert-MIR42NineSealTest -Condition ($receiptIndex -ge 0) -Code 'individual-f013-reader-row'
+      $receipt = Get-Content -LiteralPath $record.individual_upgrade_receipts[$receiptIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $receipt.factorio_binary_sha256 = [string]$f013ReaderEngine.sha256
+      $receipt.factorio_binary_version = $null
+      Set-HostReceiptField $record $receiptIndex $receipt
+      $record.individual_upgrade_receipts[$receiptIndex].engine = [ordered]@{path=$f013EnginePath;sha256=[string]$f013ReaderEngine.sha256;version=[string]$f013ReaderEngine.version}
+      foreach ($freshIndex in 0..($record.fresh_loads.Count - 1)) {
+        if ([string]$record.fresh_loads[$freshIndex].target -cne 'f013') { continue }
+        $summary = Get-Content -LiteralPath $record.fresh_loads[$freshIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+        $summary.engine = [ordered]@{path=$f013EnginePath;sha256=[string]$f013ReaderEngine.sha256}
+        $reference = Write-HostBootstrap (Join-Path $root ('f013-fresh-reader-' + [guid]::NewGuid().ToString('N') + '.json')) $summary
+        $record.fresh_loads[$freshIndex].receipt = [ordered]@{path=$reference.path;sha256=$reference.sha256}
+      }
+      return $record
+    }
+    $f013AuthorityReader = (Get-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority).ScriptBlock
+    try {
+      $script:mir42F013ReaderFixtureAuthority = $f013ReaderAuthority
+      $script:mir42F013ReaderAuthorityReader = $f013AuthorityReader
+      Set-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority -Value {
+        param($RepoRoot,$Target,[switch]$PredecessorIdentityOnly)
+        if ([string]$Target -ceq 'f013') { return $script:mir42F013ReaderFixtureAuthority }
+        return & $script:mir42F013ReaderAuthorityReader -RepoRoot $RepoRoot -Target $Target -PredecessorIdentityOnly:$PredecessorIdentityOnly
+      }
+      $f013NullVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013NullVersionReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'f013-null-pe-version.json') $f013NullVersionRecord)
+      $f013NullVersionBound = Get-MIR42BoundEngineRun -Reference $f013NullVersionReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
+      Assert-MIR42NineSealTest -Condition ((@($f013NullVersionBound.record.targets | Where-Object target -CEQ 'f013').engine_execution.executable_sha256) -ceq [string]$f013ReaderEngine.sha256) -Code 'individual-f013-null-pe-version-reader'
+      $checks++
+      $f013MissingVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013MissingVersionIndex = @($f013MissingVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013MissingVersionReceipt = Get-Content -LiteralPath $f013MissingVersionRecord.individual_upgrade_receipts[$f013MissingVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $null = $f013MissingVersionReceipt.Remove('factorio_binary_version');Set-HostReceiptField $f013MissingVersionRecord $f013MissingVersionIndex $f013MissingVersionReceipt
+      Assert-HostReaderRefusal 'f013-missing-pe-version' $f013MissingVersionRecord '[mir42-individual-engine-run-engine-version]'
+      $f013WhitespaceVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013WhitespaceVersionIndex = @($f013WhitespaceVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013WhitespaceVersionReceipt = Get-Content -LiteralPath $f013WhitespaceVersionRecord.individual_upgrade_receipts[$f013WhitespaceVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $f013WhitespaceVersionReceipt.factorio_binary_version = ' ';Set-HostReceiptField $f013WhitespaceVersionRecord $f013WhitespaceVersionIndex $f013WhitespaceVersionReceipt
+      Assert-HostReaderRefusal 'f013-whitespace-pe-version' $f013WhitespaceVersionRecord '[mir42-individual-engine-run-engine-version]'
+      $f013ArrayVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013ArrayVersionIndex = @($f013ArrayVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013ArrayVersionReceipt = Get-Content -LiteralPath $f013ArrayVersionRecord.individual_upgrade_receipts[$f013ArrayVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $f013ArrayVersionReceipt.factorio_binary_version = @();Set-HostReceiptField $f013ArrayVersionRecord $f013ArrayVersionIndex $f013ArrayVersionReceipt
+      Assert-HostReaderRefusal 'f013-array-pe-version' $f013ArrayVersionRecord '[mir42-individual-engine-run-engine-version]'
+      foreach ($arrayCase in @(
+        [pscustomobject]@{name='null-array';value=@($null)},
+        [pscustomobject]@{name='empty-string-array';value=@('')}
+      )) {
+        $arrayRecord = New-F013BlankPEVersionReaderRecord
+        $arrayIndex = @($arrayRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+        $arrayReceipt = Get-Content -LiteralPath $arrayRecord.individual_upgrade_receipts[$arrayIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+        $arrayReceipt.factorio_binary_version = $arrayCase.value;Set-HostReceiptField $arrayRecord $arrayIndex $arrayReceipt
+        Assert-HostReaderRefusal ('f013-' + $arrayCase.name + '-pe-version') $arrayRecord '[mir42-individual-engine-run-engine-version]'
+      }
+    } finally {
+      Set-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority -Value $f013AuthorityReader
+      Remove-Variable -Name mir42F013ReaderFixtureAuthority -Scope Script -ErrorAction SilentlyContinue
+      Remove-Variable -Name mir42F013ReaderAuthorityReader -Scope Script -ErrorAction SilentlyContinue
+    }
+
+    # The normal reader still refuses an empty version on a modern executable;
+    # the F013 target guard cannot relax its PE-version contract.
+    $modernBlankVersion = Copy-HostValue $baseRecord
+    $modernBlankReceipt = Get-Content -LiteralPath $modernBlankVersion.individual_upgrade_receipts[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $modernBlankReceipt.factorio_binary_version = ''
+    Set-HostReceiptField $modernBlankVersion 0 $modernBlankReceipt
+    Assert-HostReaderRefusal 'modern-blank-pe-version' $modernBlankVersion '[mir42-individual-engine-run-engine-version]'
+
     $wrongRunner = Copy-HostValue $baseRecord;$wrongRunner.runner = Write-HostText (Join-Path $root 'runner-no-upgrade-invocation.ps1') 'upgraded-save-second-reload-passed'
     Assert-HostReaderRefusal 'runner-without-upgrade-invocation' $wrongRunner '[mir42-individual-engine-run-runner-content]'
     $wrongHarness = Copy-HostValue $baseRecord;$wrongHarness.harness = Write-HostText (Join-Path $root 'harness-without-reload-marker.ps1') 'Test-MIRUpgrade.ps1'

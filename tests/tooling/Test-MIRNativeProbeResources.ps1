@@ -473,9 +473,10 @@ try {
   $continuityAst=[Management.Automation.Language.Parser]::ParseFile((Join-Path $repo 'tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1'),[ref]$browserTokens,[ref]$browserErrors)
   Assert-Probe ($browserErrors.Count-eq 0) 'continuity harness syntax differs.'
   $continuityBinding=[scriptblock]::Create($continuityAst.ParamBlock.Extent.Text+'; return $SourceVersion')
-  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')){
+  foreach($version in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')){
     Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion $version)-ceq$version) 'continuity caller rejected a retained source version.'
   }
+  Refuses-Probe {& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion '4.4.3'} 'Cannot validate argument'
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   foreach($name in @('Fail','Assert-True','Assert-Equal','Get-Sha256','Get-ZipEntry','Get-ZipEntrySha256','Get-ZipEntryText','Normalize-ZipMember','Test-Candidate')){
@@ -487,7 +488,7 @@ try {
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
-    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1')){
+    foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')){
       $sourceParts=@($sourceVersion.Split('.'))
       $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
       $ExpectedDistributionVersion=$identity.distribution_version;$ExpectedPackageRoot='more-infinite-research_'+$ExpectedDistributionVersion
@@ -514,8 +515,14 @@ try {
         $invalid=New-ControlledBrowserArchive -Line $line -Identity $identity -Variant patch-two
         Refuses-Probe {Test-Candidate $invalid $hostPath $locale $readmePath} 'candidate distribution version'
       }
+      if($sourceVersion-ceq'4.4.2'){
+        $wrongSuffixIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor 4 -SourcePatch 1
+        $wrongSuffix=New-ControlledBrowserArchive -Line $line -Identity $wrongSuffixIdentity
+        Refuses-Probe {Test-Candidate $wrongSuffix $hostPath $locale $readmePath} 'candidate filename'
+      }
     }
     Refuses-Probe {Get-MIRBrowserContinuityReadmeSha256 -RepositoryRoot $repo -Target $target -SourceVersion '4.2.1' -ReadmePath $hostPath} 'readme-authority'
+    Refuses-Probe {Get-MIRBrowserContinuityReadmeSha256 -RepositoryRoot $repo -Target $target -SourceVersion '4.4.3' -ReadmePath $readmePath} 'Cannot validate argument'
   }
   Refuses-Probe {Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([byte[]]@(65)) -DistributionVersion '4.2.21002'} 'source-identity'
   $source=Join-Path $fixture 'dependency.zip'
@@ -1241,6 +1248,18 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   Assert-Probe ($profile.mods-ceq$browserLibrary-and-not(Test-Path -LiteralPath (Join-Path $browserJob 'profiles'))) 'browser lifecycle recreated a populated profile.'
   Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $profile.mods 'mod-settings.dat'))) 'browser inherited previous library settings.'
   Assert-Probe (-not(@($profile.activation.selected.name)-contains'unrequested')) 'browser enabled an unrelated archive.'
+  $createData=Join-Path $browserJob 'create-log-controls';[IO.Directory]::CreateDirectory($createData)|Out-Null
+  $nativeCreateLog=Join-Path $createData 'factorio-current.log';$capturedCreateLog=Join-Path $browserJob 'create-current.log'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog} 'create-log-missing'
+  $loadingLines=@($profile.activation.selected|ForEach-Object {'   0.010 Loading mod '+$_.name+' '+$_.version+' (data.lua)'})-join "`n"
+  [IO.File]::WriteAllText($nativeCreateLog,$loadingLines+"`n   1.000 Goodbye`n")
+  $captured=Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog
+  Assert-Probe ($captured-ceq$capturedCreateLog-and(Get-MIRImmutableInputSha256 $captured)-ceq(Get-MIRImmutableInputSha256 $nativeCreateLog)) 'browser did not preserve the configured native create log exactly.'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $capturedCreateLog} 'create-log-preserved'
+  [IO.File]::WriteAllText($nativeCreateLog,$loadingLines.Replace('more-infinite-research 4.2.20001','more-infinite-research 4.2.20002'))
+  $wrongCapture=Join-Path $browserJob 'wrong-selection-create.log'
+  Refuses-Probe {Save-MIRBrowserContinuityCreateLog -Activation $profile.activation -WriteDataDirectory $createData -Destination $wrongCapture} 'loaded-selection'
+  Assert-Probe (-not(Test-Path -LiteralPath $wrongCapture)) 'browser copied a native log with the wrong selection.'
   [IO.File]::WriteAllText((Join-Path $profile.mods 'mod-settings.dat'),'private settings')
   Refuses-Probe {New-MIRBrowserContinuityProfile -JobRoot $browserJob -Phase configured -Inputs $profileInputs @libraryArguments -PreviousProfile $profile} 'previous-profile-active'
   $terminal=Complete-MIRBrowserContinuityProfile -Profile $profile
@@ -1298,7 +1317,9 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     $candidate430Input=New-BrowserInput 'more-infinite-research' '4.3.20000' 'mir-candidate'
     $candidate431Input=New-BrowserInput 'more-infinite-research' '4.3.20001' 'mir-candidate'
     $candidate440Input=New-BrowserInput 'more-infinite-research' '4.4.20000' 'mir-candidate'
-    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')){
+    $candidate441Input=New-BrowserInput 'more-infinite-research' '4.4.20001' 'mir-candidate'
+    $candidate442Input=New-BrowserInput 'more-infinite-research' '4.4.20002' 'mir-candidate'
+    foreach($sourceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')){
     $parameters=[ordered]@{CandidateArchive=$mirInput.source_path;RepositoryRoot=$repo;Target='F200';FactorioExe=$pwsh;TimeoutSeconds=30;StageLimit='Initial';InputMode='ScriptedFixture';SourceVersion='4.2.1';LibraryDirectory=$browserLibrary;Operation='Run'}
     $parameters.SourceVersion=$sourceVersion
     if($sourceVersion-ceq'4.2.2'){$parameters.CandidateArchive=$currentMirInput.source_path}
@@ -1306,6 +1327,8 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     if($sourceVersion-ceq'4.3.0'){$parameters.CandidateArchive=$candidate430Input.source_path}
     if($sourceVersion-ceq'4.3.1'){$parameters.CandidateArchive=$candidate431Input.source_path}
     if($sourceVersion-ceq'4.4.0'){$parameters.CandidateArchive=$candidate440Input.source_path}
+    if($sourceVersion-ceq'4.4.1'){$parameters.CandidateArchive=$candidate441Input.source_path}
+    if($sourceVersion-ceq'4.4.2'){$parameters.CandidateArchive=$candidate442Input.source_path}
     $output=@(Invoke-MIRBrowserContinuityGovernedRun -RepositoryRoot $repo -ScriptPath $worker -Parameters $parameters -OutputRoot $fixture -ExpectedPeakMemoryMiB 512 -MaxNewOutputMiB 8)
     $resultPath=($output|Where-Object{$_-like'MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=*'}).Substring('MIR_BROWSER_CONTINUITY_GOVERNED_RESULT='.Length)
     $result=Get-Content -LiteralPath $resultPath -Raw|ConvertFrom-Json -Depth 40 -DateKind String
@@ -1320,7 +1343,7 @@ $record=[ordered]@{schema=1;status='checkpointed';scope='synthetic actor protoco
     Assert-MIRBrowserContinuityTerminalReceipt -Receipt $fallback.library_input_receipts[0] -JobRoot (Join-Path (Split-Path -Parent $resultPath) 'worker')
     Assert-Probe ($fallback.library_input_receipts[0].status-ceq'restored-direct-library-controls') 'browser fallback reader lost its direct-library receipt.'
     Assert-Probe ($fallback.source_version-ceq$sourceVersion-and$fallback.candidate.archive_sha256-ceq(Get-FileHash $parameters.CandidateArchive).Hash) 'browser owned worker lost the selected maintenance version or bytes.'
-    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'};'4.4.0'{'4.4.20000'}}
+    $expectedVersion=switch($sourceVersion){'4.2.1'{'4.2.20001'};'4.2.2'{'4.2.20002'};'4.2.3'{'4.2.20003'};'4.3.0'{'4.3.20000'};'4.3.1'{'4.3.20001'};'4.4.0'{'4.4.20000'};'4.4.1'{'4.4.20001'};'4.4.2'{'4.4.20002'}}
     Assert-Probe ((@($fallback.library_input_receipts[0].selected|Where-Object name -CEQ 'more-infinite-research').version)-ceq$expectedVersion) 'browser worker selected a different installed maintenance version.'
     }
   }
