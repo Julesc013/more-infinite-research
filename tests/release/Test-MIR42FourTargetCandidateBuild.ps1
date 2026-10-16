@@ -576,7 +576,14 @@ try {
     $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
-    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and $authoredVersion.Groups[1].Value -ceq $currentVersions[$i]) "422-authored-current-changelog-version-$i"
+    # The V3 fixture remains bound to 4.2.2.  Authored changelog heads are
+    # target-local history: f210/f200 advanced to the admitted 4.4.2 identity,
+    # while the other retained target heads remain at 4.2.2.
+    $admittedAuthoredVersions = @(
+      [string]$currentIdentity.distribution_version
+      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.4.2').distribution_version
+    )
+    Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and ($admittedAuthoredVersions -ccontains [string]$authoredVersion.Groups[1].Value)) "422-authored-current-changelog-version-$i"
   }
   $rejected=$false
   try{Get-MIR42CandidateTargetDescriptors -RepoRoot $repo -SourceVersion '4.2.2' -SelectedTargets @('f210','f200','f110','f100')|Out-Null}catch{$rejected=$_.Exception.Message-match'mir42-candidate-target-selection-unsupported'}
