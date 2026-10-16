@@ -25,7 +25,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
   if($F200GaloreSpaceAge-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$HistoricalSettingsOracle)){throw '[mir431-f200-galore-fixture-target]'}
   if($F200BobAngel-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){throw '[mir423-f200-bob-angel-fixture-target]'}
-  if($SourceVersion-ceq'4.5.0'-and$Target-cne'f210'){throw '[mir450-f210-fixture-transition]'}
+  if($SourceVersion-ceq'4.5.0'-and$Target-cnotin@('f210','f200')){throw '[mir450-f210-fixture-transition]'}
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
   $sourcePatch=$source.Build
@@ -62,6 +62,9 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   $fixtureVersion=if($Target-ceq'f210'-and$SourceVersion-ceq'4.5.0'){
     if($FromVersion-cne'4.4.21002'){throw '[mir450-f210-fixture-transition]'}
     if($SpaceAge){'0.1.1101'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1100'}else{throw '[mir450-f210-fixture-transition]'}
+  }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-cne'4.4.20002'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f200-fixture-transition]'}
+    '0.1.1102'
   }elseif($F200BobAngel-and$SourceVersion-ceq'4.4.2'){
     if($FromVersion-ceq'4.4.20000'){'0.1.1086'}elseif($FromVersion-ceq'4.4.20001'){'0.1.1087'}elseif($FromVersion-ceq'4.2.20002'){'0.1.1089'}else{throw '[mir423-f200-bob-angel-fixture-transition]'}
   }elseif($F200GaloreSpaceAge){
@@ -158,8 +161,9 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $direct422To442=$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002'
   $retained440To442=$FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002'
   $published441To442=$FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002'
+  $published442To450=$FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20000'
   $published410Transition=$ToVersion-ceq'4.3.20000'-and$FromVersion-ceq'4.1.20000'
-  if(-not($legacyTransition-or$crossMinorTransition-or$published430Maintenance-or$direct422To440-or$published430To440-or$direct422To442-or$retained440To442-or$published441To442-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
+  if(-not($legacyTransition-or$crossMinorTransition-or$published430Maintenance-or$direct422To440-or$published430To440-or$direct422To442-or$retained440To442-or$published441To442-or$published442To450-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
   # Reuse the complete canonical oracle. Only its private native test copy is
   # adapted to F200 base research; Space Age-only expected rows do not exist in
   # that environment. Every observed technology, recipe and force still compares.
@@ -178,13 +182,13 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "'+$ToVersion+'" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
   $control=$control.Replace('mir-4121000-upgraded',('mir-'+$ToVersion.Replace('.','')+'-upgraded'))
-  if($ToVersion -match '^4[.](?:3[.]200(?:00|01)|4[.]200(?:00|02))$') {
+  if($ToVersion -match '^4[.](?:3[.]200(?:00|01)|4[.]200(?:00|02)|5[.]20000)$') {
     # Only the newly introduced, preservation-capable selector is admitted.
     # Source snapshots stay unchanged; all old settings and all research
     # definitions/investment still pass through the complete equality oracle.
     $settingAnchor='local added_422_setting_defaults = {}'
     if(-not $control.Contains($settingAnchor)){throw '[mir430-full-upgrade-setting-anchor]'}
-    $settingDefaults=if($ToVersion-ceq'4.4.20002'){
+    $settingDefaults=if($ToVersion-cin@('4.4.20002','4.5.20000')){
       'local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}'
     }else{
       'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}'

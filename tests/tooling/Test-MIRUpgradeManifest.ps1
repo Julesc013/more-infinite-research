@@ -1153,9 +1153,9 @@ $currentGalore442Immediate=$currentGalore442.Clone();$currentGalore442Immediate.
 Assert-MIR421CurrentUpgradeInputMode @currentGalore442Immediate
 $mir43Assertions+=9
 
-# 4.5.0 admits only the corrected R24 F210 predecessor.  Base and Space Age
+# 4.5.0 admits only corrected R24 predecessors. F210 Base and Space Age
 # receive distinct disposable fixture identities and the same Full preservation
-# gate; no direct 4.2.2, F200, or historical lane is implied here.
+# gate; F200 adds only Base. No direct 4.2.2 or historical lane is implied here.
 $specializationPatterns=@($ast.FindAll({param($node)
   $node-is[Management.Automation.Language.BinaryExpressionAst]-and
   $node.Operator-eq[Management.Automation.Language.TokenKind]::Imatch-and
@@ -1190,13 +1190,48 @@ foreach($badFrom in @('4.2.21002','4.4.21000','4.4.21001')){
   if(-not$rejected){throw "4.5.0 reader admitted an unpinned predecessor: $badFrom"}
   $mir43Assertions++
 }
-$wrongTarget450=@{Target='f200';FromVersion='4.4.20002';ToVersion='4.5.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+$currentF200Base450=@{Target='f200';FromVersion='4.4.20002';ToVersion='4.5.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+Assert-MIR421CurrentUpgradeInputMode @currentF200Base450
+if((Resolve-MIR42UpgradePredecessorReaderVersion -Target f200 -FromVersion '4.4.20002' -SourceVersion '4.5.0')-cne'4.5.0'){throw '4.5.0 F200 Base did not select exact R24 custody'}
+$f200Fixture450=Join-Path $mir450IdentityRoot 'f200-base-default'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $f200Fixture450 -Recurse
+Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f200Fixture450 -Target f200 -SourceVersion '4.5.0' -FromVersion '4.4.20002'
+$f200Info450=Get-Content -LiteralPath (Join-Path $f200Fixture450 'info.json') -Raw|ConvertFrom-Json
+if($f200Info450.version-cne'0.1.1102'){throw '4.5.0 F200 Base fixture is not distinct from F210 fixtures'}
+Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $f200Fixture450 -FromVersion '4.4.20002' -ToVersion '4.5.20000'
+$f200Control450=Get-Content -LiteralPath (Join-Path $f200Fixture450 'control.lua') -Raw
+foreach($needle in @('local complete_catalogue_upgrade = true','["mir-max-level-worker-robots-speed"] = 0','export_state("source")','export_state("upgrade")','export_state("reload")','mir-4520000-upgraded')){
+  if(-not$f200Control450.Contains($needle)){throw "4.5.0 F200 fixture lost the complete preservation hook: $needle"}
+}
+$mir43Assertions+=4
+$fullSpecialization=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$fullPreservationSpecialization'
+},$true))
+if($fullSpecialization.Count-ne1){throw 'Complete-preservation selection is missing or ambiguous'}
+$fullSpecializationCode=[scriptblock]::Create($fullSpecialization[0].Right.Extent.Text)
+$evaluateF200450={param($code,[string]$from,[string]$to,[string]$scenario)
+  $SelectedTarget='f200';$SourceVersion='4.5.0';$FromVersion=$from;$ToVersion=$to
+  $FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';$Archetype=$scenario;$SpaceIsFake=$false
+  $f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
+  & $code
+}
+if(-not(& $evaluateF200450 $fullSpecializationCode '4.4.20002' '4.5.20000' 'base-default')){throw 'Live preservation selection skips F200 R24 -> 4.5 Base'}
+foreach($bad in @(@('4.4.20001','4.5.20000','base-default'),@('4.4.20002','4.5.20001','base-default'),@('4.4.20002','4.5.20000','f200-bob-angel'))){
+  if(& $evaluateF200450 $fullSpecializationCode $bad[0] $bad[1] $bad[2]){throw 'Live F200 4.5 preservation selection admits an unselected path'}
+}
+$mir43Assertions+=4
+foreach($badFrom in @('4.2.20002','4.4.20000','4.4.20001')){
+  $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f200 -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
+  if(-not$rejected){throw "4.5.0 F200 admitted an unpinned predecessor: $badFrom"}
+  $mir43Assertions++
+}
+$wrongTarget450=$currentF200Base450.Clone();$wrongTarget450.Target='f110';$wrongTarget450.FromVersion='4.4.11002';$wrongTarget450.ToVersion='4.5.11000'
 $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongTarget450}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
-if(-not$rejected){throw '4.5.0 mode admitted an unsupported F200 target'}
-$rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f200 -FromVersion '4.4.20002' -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
-if(-not$rejected){throw '4.5.0 reader admitted an unsupported F200 target'}
-$rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $mir450IdentityRoot -Target f200 -SourceVersion '4.5.0' -FromVersion '4.4.20002'}catch{$rejected=$_.Exception.Message-ceq'[mir450-f210-fixture-transition]'}
-if(-not$rejected){throw '4.5.0 fixture identity admitted an unsupported F200 target'}
+if(-not$rejected){throw '4.5.0 mode admitted an unsupported F110 target'}
+$rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f110 -FromVersion '4.4.11002' -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
+if(-not$rejected){throw '4.5.0 reader admitted an unsupported F110 target'}
+$rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $mir450IdentityRoot -Target f110 -SourceVersion '4.5.0' -FromVersion '4.4.11002'}catch{$rejected=$_.Exception.Message-ceq'[mir450-f210-fixture-transition]'}
+if(-not$rejected){throw '4.5.0 fixture identity admitted an unsupported F110 target'}
 $wrong450=@{Target='f210';FromVersion='4.4.21002';ToVersion='4.5.21001';FixtureName='assert-upgrade-4-0-21000-to-4-1-21000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
 $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong450}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
 if(-not$rejected){throw '4.5.0 mode admitted a wrong destination'}
