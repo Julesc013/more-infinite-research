@@ -350,6 +350,38 @@ try {
   $freshCandidate = [pscustomobject][ordered]@{source=[pscustomobject][ordered]@{commit=$freshSource}}
   $freshExecution = [pscustomobject][ordered]@{executable_path=$freshEnginePath;executable_sha256=$freshEngine;version='0.17.79';fresh_loads=@($freshRefs)}
   Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution
+  $writeFreshVersionFixture = {
+    param([string]$DistributionVersion,[string]$LoggedVersion)
+    $freshTarget.distribution_version = $DistributionVersion
+    $freshRecord.candidate.version = $DistributionVersion
+    [IO.File]::WriteAllText($freshLog,"Loading mod more-infinite-research $LoggedVersion (data.lua)`nFactorio initialised`nCreating new map",[Text.UTF8Encoding]::new($false))
+    $freshRecord.log.sha256 = (Get-FileHash -LiteralPath $freshLog -Algorithm SHA256).Hash.ToUpperInvariant()
+    $freshRefs.log.sha256 = $freshRecord.log.sha256
+    $freshRecord.record_sha256 = ''
+    Write-MIR4BootstrapRecord -Record $freshRecord -Path $freshReceipt | Out-Null
+    $freshRefs.receipt.sha256 = (Get-FileHash -LiteralPath $freshReceipt -Algorithm SHA256).Hash.ToUpperInvariant()
+  }
+  foreach ($versionCase in @(
+    @{distribution='4.3.01700';logged='4.3.1700'},
+    @{distribution='4.4.01700';logged='4.4.1700'},
+    @{distribution='4.4.01702';logged='4.4.1702'}
+  )) {
+    & $writeFreshVersionFixture $versionCase.distribution $versionCase.logged
+    Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution
+  }
+  # Hash-valid observations must still reject an unadmitted minor and a
+  # different loaded patch; expanding 4.4 support must not loosen either guard.
+  & $writeFreshVersionFixture '4.5.01700' '4.5.1700'
+  $futureMinorRejected = $false
+  try { Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution }
+  catch { $futureMinorRejected = $_.Exception.Message -ceq '[mir42-seal-historical-distribution-version] f017' }
+  Assert-MIR42NineSealTest -Condition $futureMinorRejected -Code 'historical-fresh-unadmitted-minor-rejected'
+  & $writeFreshVersionFixture '4.4.01702' '4.4.1701'
+  $wrongLoadedPatchRejected = $false
+  try { Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution }
+  catch { $wrongLoadedPatchRejected = $_.Exception.Message -ceq '[mir42-seal-real-engine-fresh-load-log-marker] f017/package-zip-base' }
+  Assert-MIR42NineSealTest -Condition $wrongLoadedPatchRejected -Code 'historical-fresh-wrong-loaded-patch-rejected'
+  & $writeFreshVersionFixture '4.4.01702' '4.4.1702'
   $freshRecord.source_commit = 'b' * 40
   $freshRecord.record_sha256 = ''
   $wrongFreshReceipt = Join-Path $readerFixtureRoot 'historical-fresh-wrong-source.json'

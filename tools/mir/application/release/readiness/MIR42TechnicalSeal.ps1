@@ -1277,7 +1277,7 @@ function Assert-MIR42FreshEngineLoads {
     $logText = Get-Content -Raw -LiteralPath ([string]$fresh.log.path)
     $logModVersion = [string]$Target.distribution_version
     if ($targetId -in $script:MIR42SealHistoricalTargets) {
-      if ($logModVersion -notmatch '^4[.](2|3)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
+      if ($logModVersion -notmatch '^4[.](2|3|4)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
       $logModVersion = '4.' + $Matches[1] + '.' + [int]$Matches[2]
     }
     if (-not $logText.Contains("Loading mod more-infinite-research $logModVersion ") -or
