@@ -81,7 +81,7 @@ function Invoke-MIR4LocalDelivery {
     $intent=[ordered]@{schema=1;release_id=$ReleaseId;files=$plan;build_authorized=$false;publication_authorized=$false}
     if ($null -ne $ReceiptMetadata) {
       foreach ($name in $ReceiptMetadata.Keys) {
-        if ($name -cnotin @('frozen_inventory','source_version','release_tag','direct_root_package_count','versioned_bundle','mod_portal_upload_performed')) { throw '[mir4-delivery-receipt-metadata]' }
+        if ($name -cnotin @('frozen_inventory','source_version','release_tag','direct_root_package_count','versioned_bundle','versioned_bundle_sha256','versioned_bundle_bytes','mod_portal_upload_performed')) { throw '[mir4-delivery-receipt-metadata]' }
       }
       # Inventory identity is part of the resumable intent, even when a new
       # inventory happens to name the same files. Refuse a changed authority
@@ -149,7 +149,7 @@ function Invoke-MIR4LocalDelivery {
     $receipt=[ordered]@{schema=1;kind='MIR4LocalDeliveryV1';status='delivered-and-verified';release_id=$ReleaseId;files=$plan;source_and_remote_sync='separate-required-postcondition';build_performed=$false;publication_performed=$false}
     if ($null -ne $ReceiptMetadata) {
       foreach ($name in $ReceiptMetadata.Keys) {
-        if ($name -cnotin @('frozen_inventory','source_version','release_tag','direct_root_package_count','versioned_bundle','mod_portal_upload_performed') -or $receipt.Contains($name)) { throw '[mir4-delivery-receipt-metadata]' }
+        if ($name -cnotin @('frozen_inventory','source_version','release_tag','direct_root_package_count','versioned_bundle','versioned_bundle_sha256','versioned_bundle_bytes','mod_portal_upload_performed') -or $receipt.Contains($name)) { throw '[mir4-delivery-receipt-metadata]' }
         $receipt[$name] = $ReceiptMetadata[$name]
       }
     }
@@ -326,6 +326,77 @@ function Get-MIR42NineTargetLocalDeliveryReplayPointerReplacement {
   }
 }
 
+function New-MIR42NineTargetLocalDeliveryBundle {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$SourceRoot,
+    [Parameter(Mandatory)][string]$BundleName,
+    [Parameter(Mandatory)][object[]]$Packages
+  )
+  if ([IO.Path]::IsPathRooted($BundleName) -or $BundleName -match '(^|[/\\])[.][.]?([/\\]|$)|[:\x00-\x1f]' -or
+      [IO.Path]::GetFileName($BundleName) -cne $BundleName -or $BundleName -notmatch '^MIR_[0-9]+_[0-9]+_[0-9]+_DISTRIBUTIONS\.zip$') {
+    throw '[mir42-delivery-bundle-name]'
+  }
+  if (@($Packages).Count -ne 9) { throw '[mir42-delivery-bundle-package-count]' }
+  $root = (Resolve-Path -LiteralPath $SourceRoot).Path
+  $output = [IO.Path]::GetFullPath((Join-Path $root $BundleName))
+  if (-not $output.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+    throw '[mir42-delivery-bundle-boundary]'
+  }
+  $payloadsByName = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+  $orderedNames = [Collections.Generic.List[string]]::new()
+  foreach ($package in @($Packages)) {
+    $name = [string]$package.public_name
+    if ([string]::IsNullOrWhiteSpace($name) -or [IO.Path]::GetFileName($name) -cne $name -or $name -match '[/\\:\x00-\x1f]') {
+      throw '[mir42-delivery-bundle-package-name]'
+    }
+    $path = Assert-MIR42NineTargetLocalDeliveryFile -SourceRoot $root -SourcePath ([string]$package.path) -Sha256 ([string]$package.sha256) -Bytes ([int64]$package.bytes)
+    $payload = [pscustomobject][ordered]@{name=$name;path=$path;sha256=([string]$package.sha256).ToUpperInvariant();bytes=[int64]$package.bytes}
+    if (-not $payloadsByName.TryAdd($name, $payload)) { throw '[mir42-delivery-bundle-package-name]' }
+    $orderedNames.Add($name)
+  }
+  $orderedNames.Sort([StringComparer]::Ordinal)
+  if (Test-Path -LiteralPath $output) {
+    if (-not (Test-Path -LiteralPath $output -PathType Leaf)) { throw '[mir42-delivery-bundle-output-conflict]' }
+    Assert-MIR42NineTargetLocalDeliveryBundle -Path $output -Packages $Packages
+    $item = Get-Item -LiteralPath $output -Force
+    return [pscustomobject][ordered]@{name=$BundleName;sha256=(Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64]$item.Length;created=$false}
+  }
+  Add-Type -AssemblyName System.IO.Compression -ErrorAction Stop
+  $temporary = Join-Path $root ('.mir42-delivery-bundle-' + [guid]::NewGuid().ToString('N') + '.zip')
+  try {
+    $stream = [IO.File]::Open($temporary, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+    try {
+      $archive = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create, $true)
+      try {
+        foreach ($name in $orderedNames) {
+          $payload = $payloadsByName[$name]
+          $entry = $archive.CreateEntry([string]$payload.name, [IO.Compression.CompressionLevel]::Optimal)
+          $entry.LastWriteTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+          $entry.ExternalAttributes = 0
+          $input = $null
+          $entryStream = $null
+          try {
+            $input = [IO.File]::OpenRead([string]$payload.path)
+            $entryStream = $entry.Open()
+            $input.CopyTo($entryStream)
+          } finally {
+            if ($null -ne $entryStream) { $entryStream.Dispose() }
+            if ($null -ne $input) { $input.Dispose() }
+          }
+        }
+      } finally { $archive.Dispose() }
+    } finally { $stream.Dispose() }
+    Assert-MIR42NineTargetLocalDeliveryBundle -Path $temporary -Packages $Packages
+    [IO.File]::Move($temporary, $output)
+    Assert-MIR42NineTargetLocalDeliveryBundle -Path $output -Packages $Packages
+    $item = Get-Item -LiteralPath $output -Force
+    return [pscustomobject][ordered]@{name=$BundleName;sha256=(Get-FileHash -LiteralPath $output -Algorithm SHA256).Hash.ToUpperInvariant();bytes=[int64]$item.Length;created=$true}
+  } finally {
+    if ([IO.File]::Exists($temporary)) { [IO.File]::Delete($temporary) }
+  }
+}
+
 function Get-MIR42NineTargetLocalDeliveryPlan {
   [CmdletBinding()]
   param(
@@ -403,11 +474,10 @@ function Get-MIR42NineTargetLocalDeliveryPlan {
   }
 
   $bundleName = 'MIR_' + $sourceVersion.Replace('.', '_') + '_DISTRIBUTIONS.zip'
-  $bundleSource = Join-Path $SourceRoot $bundleName
-  if (-not (Test-Path -LiteralPath $bundleSource -PathType Leaf)) { throw "[mir42-delivery-source-identity] $bundleName" }
-  $bundlePath = Assert-MIR42NineTargetLocalDeliveryFile -SourceRoot $SourceRoot -SourcePath $bundleName -Sha256 ((Get-FileHash -LiteralPath $bundleSource -Algorithm SHA256).Hash) -Bytes ((Get-Item -LiteralPath $bundleSource -Force).Length)
-  Assert-MIR42NineTargetLocalDeliveryBundle -Path $bundlePath -Packages $packages
-  Add-MIR42NineTargetLocalDeliveryPlanFile -SourcePath $bundleName -DestinationPath ($sourceVersion + '/' + $bundleName) -Sha256 ((Get-FileHash -LiteralPath $bundlePath -Algorithm SHA256).Hash) -Bytes ((Get-Item -LiteralPath $bundlePath -Force).Length)
+  # Build only after the authoritative inventory reader has bound every package.
+  # The returned identity is then frozen into the plan, intent and receipt.
+  $bundle = New-MIR42NineTargetLocalDeliveryBundle -SourceRoot $SourceRoot -BundleName $bundleName -Packages $packages
+  Add-MIR42NineTargetLocalDeliveryPlanFile -SourcePath $bundleName -DestinationPath ($sourceVersion + '/' + $bundleName) -Sha256 ([string]$bundle.sha256) -Bytes ([int64]$bundle.bytes)
 
   $dist = Join-Path ((Resolve-Path -LiteralPath $RepoRoot).Path) 'dist'
   foreach ($pointerName in @('LATEST-MIR42-PUBLISHED.txt','LATEST-MIR42-FINAL-CANDIDATE.txt',('UPLOAD-' + $sourceVersion + '.txt'))) {
@@ -435,6 +505,7 @@ function Get-MIR42NineTargetLocalDeliveryPlan {
     source_version = $sourceVersion
     release_tag = $releaseTag
     bundle_name = $bundleName
+    bundle = [pscustomobject][ordered]@{name=[string]$bundle.name;sha256=[string]$bundle.sha256;bytes=[int64]$bundle.bytes}
     packages = @($packages | ForEach-Object { [pscustomobject][ordered]@{public_name=[string]$_.public_name;sha256=[string]$_.sha256;bytes=[int64]$_.bytes} })
     files = @($files)
   }
@@ -472,6 +543,8 @@ function Invoke-MIR42NineTargetLocalDelivery {
     release_tag = $plan.release_tag
     direct_root_package_count = 9
     versioned_bundle = ($plan.source_version + '/' + $plan.bundle_name)
+    versioned_bundle_sha256 = [string]$plan.bundle.sha256
+    versioned_bundle_bytes = [int64]$plan.bundle.bytes
     mod_portal_upload_performed = $false
   }
   $delivery = Invoke-MIR4LocalDelivery -RepoRoot $RepoRoot -SourceRoot $SourceRoot -Files @($plan.files) -ReleaseId $ReleaseId -AfterCopy $AfterCopy -ReceiptMetadata $receiptMetadata

@@ -5259,9 +5259,9 @@
     {
       "path": "tools/mir/application/release/LocalDelivery.ps1",
       "classification": "canonical-internal",
-      "sha256": "2C9742857F65DD25D743ED4F77D9CAB3EA21730154FED7B648C7C5B4C28D08F4",
+      "sha256": "07CCD1251366680AA52E99209EBFB7ADF797B8A126A058257CB3D8187149101C",
       "hash_mode": "canonical-text-v1",
-      "lines": 481,
+      "lines": 554,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4d1b1c8a578dcfe8786f8d5be920cb0c028e963a651d6202c19af4f1213a4bb2"
+  "digest": "sha256:23005e5ea2760e05b6787013adcb9a7a0a1e203641cdafd431832cee568890a1"
 }
