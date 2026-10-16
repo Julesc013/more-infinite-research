@@ -107,6 +107,7 @@ function Assert-MIR42EngineSharedInputs {
     }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.2.2' -RequestedPredecessorSourceVersion '4.2.0'} 'mir42-engine-maintenance-predecessor-selection'
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.0' -RequestedPredecessorSourceVersion '4.3.0'} 'mir42-engine-maintenance-predecessor-selection'
+    Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.5.0'} 'mir42-engine-maintenance-predecessor-candidate-scope'
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.2'} 'mir42-engine-maintenance-predecessor-candidate-scope'
     # A fresh PowerShell scope must preserve failures before any output allocation.
     $earlyFailure=Join-Path $scratch 'early-failure.ps1'

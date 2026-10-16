@@ -1225,6 +1225,65 @@ foreach($badFrom in @('4.2.20002','4.4.20000','4.4.20001')){
   if(-not$rejected){throw "4.5.0 F200 admitted an unpinned predecessor: $badFrom"}
   $mir43Assertions++
 }
+# F015 retains the historical full-state oracle on exactly the corrected R24
+# predecessor. This is a one-target admission, not an all-historical grant.
+$currentF015450=@{Target='f015';FromVersion='4.4.01502';ToVersion='4.5.01500';FixtureName='assert-upgrade-historical-terminal-to-mir42';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='combined-r24-candidate.json';PublishedPredecessorManifest='published-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+Assert-MIR421CurrentUpgradeInputMode @currentF015450
+if((Resolve-MIR42UpgradePredecessorReaderVersion -Target f015 -FromVersion '4.4.01502' -SourceVersion '4.5.0')-cne'4.5.0'){throw '4.5.0 F015 did not select exact R24 custody'}
+$mir450F015Fixture=Join-Path $mir450IdentityRoot 'f015-historical-r24'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-historical-terminal-to-mir42') -Destination $mir450F015Fixture -Recurse
+$mir450F015InfoPath=Join-Path $mir450F015Fixture 'info.json'
+$mir450F015Info=[IO.File]::ReadAllText($mir450F015InfoPath).Replace('@@FACTORIO_LINE@@','0.15').Replace('@@MIR_UPGRADE_FROM_VERSION@@','4.4.01502')
+[IO.File]::WriteAllText($mir450F015InfoPath,$mir450F015Info,[Text.UTF8Encoding]::new($false))
+Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $mir450F015Fixture -Target f015 -SourceVersion '4.5.0' -FromVersion '4.4.01502'
+$mir450F015Info=Get-Content -LiteralPath $mir450F015InfoPath -Raw|ConvertFrom-Json
+if($mir450F015Info.version-cne'1.2.1102'){throw '4.5.0 F015 fixture identity is not the distinct R24 transition identity'}
+$mir450F015ControlPath=Join-Path $mir450F015Fixture 'control.lua'
+$mir450F015Control=[IO.File]::ReadAllText($mir450F015ControlPath).Replace('__MIR_UPGRADE_FROM_VERSION__','4.4.01502').Replace('__MIR_UPGRADE_TO_VERSION__','4.5.01500').Replace('__MIR_FACTORIO_LINE__','0.15').Replace('__MIR_INFINITE_TECHNOLOGY__','mining-productivity-16').Replace('__MIR_UPGRADE_SAVE_NAME__','mir-4501500-upgraded')
+[IO.File]::WriteAllText($mir450F015ControlPath,$mir450F015Control,[Text.UTF8Encoding]::new($false))
+Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $mir450F015Fixture -Target f015 -FromVersion '4.4.01502' -ToVersion '4.5.01500'
+$mir450F015Control=Get-Content -LiteralPath $mir450F015ControlPath -Raw
+foreach($needle in @('complete_state_oracle.capture()','complete_state_oracle.verify(phase == "reload" and "reload" or "upgrade")','4.4.01502','4.5.01500')){
+  if(-not$mir450F015Control.Contains($needle)){throw "4.5.0 F015 fixture lost complete preservation hook: $needle"}
+}
+$evaluateF015450={param($code,[string]$from,[string]$to,[string]$archetype)
+  $SelectedTarget='f015';$SourceVersion='4.5.0';$FromVersion=$from;$ToVersion=$to
+  $FixtureName='assert-upgrade-historical-terminal-to-mir42';$Archetype=$archetype;$SpaceIsFake=$false
+  & $code
+}
+if(-not(& $evaluateF015450 $fullSpecializationCode '4.4.01502' '4.5.01500' 'base-default')){throw 'Live preservation selection skips F015 R24 -> 4.5'}
+$SourceVersion='4.5.0';$SpaceIsFake=$false;$k2Scenario=$false;$classicReducedPolicy=$false;$mir42UpgradeSpecialized=$false;$isHistoricalTerminalFixture=$true;$Archetype='base-default'
+if(-not(& $completeCatalogueEvaluator)){throw '4.5.0 F015 R24 route does not retain the full catalogue gate'}
+$mir43Assertions++
+foreach($bad in @(@('4.4.01501','4.5.01500','base-default'),@('4.4.01502','4.5.01501','base-default'),@('4.4.01502','4.5.01500','wrong-archetype'))){
+  if(& $evaluateF015450 $fullSpecializationCode $bad[0] $bad[1] $bad[2]){throw 'Live F015 4.5 preservation selection admits an unselected path'}
+}
+foreach($badFrom in @('4.2.01502','4.4.01500','4.4.01501')){
+  $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f015 -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
+  if(-not$rejected){throw "4.5.0 F015 admitted an unpinned predecessor: $badFrom"}
+}
+$wrongF015=$currentF015450.Clone();$wrongF015.ToVersion='4.5.01501'
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongF015}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+if(-not$rejected){throw '4.5.0 mode admitted F015 wrong destination'}
+$wrongF015=$currentF015450.Clone();$wrongF015.SelectedReleaseManifest=''
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongF015}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+if(-not$rejected){throw '4.5.0 F015 mode admitted missing historical candidate custody'}
+$wrongF015=$currentF015450.Clone();$wrongF015.Target='f014';$wrongF015.FromVersion='4.4.01402';$wrongF015.ToVersion='4.5.01400'
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongF015}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
+if(-not$rejected){throw '4.5.0 mode admitted unqualified F014 historical target'}
+$resolved450F015=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion '4.4.01502' -ToVersion '4.5.01500'
+if($resolved450F015.target-cne'4.5.01500'-or$resolved450F015.predecessor_kind-cne'same-target-maintenance'){throw '4.5.0 F015 historical transition lost exact same-target binding'}
+foreach($invalidHistorical450 in @(
+  @{from='4.4.01402';to='4.5.01400'},
+  @{from='1.5.9';to='4.5.01500'},
+  @{from='4.4.01501';to='4.5.01500'},
+  @{from='4.4.01502';to='4.5.01501'}
+)){
+  $rejected=$false;try{Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $invalidHistorical450.from -ToVersion $invalidHistorical450.to|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('MIR historical upgrade specialization requires an exact terminal predecessor')}
+  if(-not$rejected){throw "Historical 4.5 resolver admitted $($invalidHistorical450.from) to $($invalidHistorical450.to)"}
+}
+$mir43Assertions+=4
+$mir43Assertions+=17
 $wrongTarget450=$currentF200Base450.Clone();$wrongTarget450.Target='f110';$wrongTarget450.FromVersion='4.4.11002';$wrongTarget450.ToVersion='4.5.11000'
 $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongTarget450}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
 if(-not$rejected){throw '4.5.0 mode admitted an unsupported F110 target'}
