@@ -395,9 +395,9 @@ try {
   $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
   if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
   foreach($binding in @(
-    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.89'},
-    [pscustomobject]@{from='4.4.20000';fixture_version='0.1.86'},
-    [pscustomobject]@{from='4.4.20001';fixture_version='0.1.87'}
+    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.1089'},
+    [pscustomobject]@{from='4.4.20000';fixture_version='0.1.1086'},
+    [pscustomobject]@{from='4.4.20001';fixture_version='0.1.1087'}
   )){
     if(Test-Path -LiteralPath $bobAngelFixture){Remove-Item -LiteralPath $bobAngelFixture -Recurse -Force}
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $bobAngelFixture -Recurse
@@ -461,9 +461,9 @@ try {
   foreach($binding in @(
     [pscustomobject]@{from='4.2.20002';to='4.3.20001';fixture_version='0.1.51'},
     [pscustomobject]@{from='4.3.20000';to='4.3.20001';fixture_version='0.1.50'},
-    [pscustomobject]@{from='4.2.20002';to='4.4.20002';fixture_version='0.1.78';source='4.4.2'},
-    [pscustomobject]@{from='4.4.20000';to='4.4.20002';fixture_version='0.1.76';source='4.4.2'},
-    [pscustomobject]@{from='4.4.20001';to='4.4.20002';fixture_version='0.1.77';source='4.4.2'}
+    [pscustomobject]@{from='4.2.20002';to='4.4.20002';fixture_version='0.1.1078';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20000';to='4.4.20002';fixture_version='0.1.1076';source='4.4.2'},
+    [pscustomobject]@{from='4.4.20001';to='4.4.20002';fixture_version='0.1.1077';source='4.4.2'}
   )){
     if(Test-Path -LiteralPath $galoreFixture){Remove-Item -LiteralPath $galoreFixture -Recurse -Force}
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000') -Destination $galoreFixture -Recurse
@@ -507,21 +507,21 @@ try {
   $mir442IdentityCases=@(
     # The fixture mod name is target-scoped.  Version therefore must isolate
     # every distinct F200 oracle under the same Factorio 2.0 library.
-    [pscustomobject]@{scenario='f200-base';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$false;expected='0.1.68'},
-    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$false;expected='0.1.66'},
-    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$false;expected='0.1.67'},
-    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.2.20002';space_age=$false;galore=$true;bob=$false;expected='0.1.78'},
-    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20000';space_age=$false;galore=$true;bob=$false;expected='0.1.76'},
-    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20001';space_age=$false;galore=$true;bob=$false;expected='0.1.77'},
-    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$true;expected='0.1.89'},
-    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$true;expected='0.1.86'},
-    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$true;expected='0.1.87'},
-    [pscustomobject]@{scenario='f210-base';target='f210';from='4.2.21002';space_age=$false;galore=$false;bob=$false;expected='0.1.68'},
-    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21000';space_age=$false;galore=$false;bob=$false;expected='0.1.66'},
-    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21001';space_age=$false;galore=$false;bob=$false;expected='0.1.67'},
-    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.2.21002';space_age=$true;galore=$false;bob=$false;expected='0.1.98'},
-    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21000';space_age=$true;galore=$false;bob=$false;expected='0.1.96'},
-    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21001';space_age=$true;galore=$false;bob=$false;expected='0.1.97'}
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$false;expected='0.1.1068'},
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$false;expected='0.1.1066'},
+    [pscustomobject]@{scenario='f200-base';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$false;expected='0.1.1067'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.2.20002';space_age=$false;galore=$true;bob=$false;expected='0.1.1078'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20000';space_age=$false;galore=$true;bob=$false;expected='0.1.1076'},
+    [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20001';space_age=$false;galore=$true;bob=$false;expected='0.1.1077'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$true;expected='0.1.1089'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$true;expected='0.1.1086'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$true;expected='0.1.1087'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.2.21002';space_age=$false;galore=$false;bob=$false;expected='0.1.1068'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21000';space_age=$false;galore=$false;bob=$false;expected='0.1.1066'},
+    [pscustomobject]@{scenario='f210-base';target='f210';from='4.4.21001';space_age=$false;galore=$false;bob=$false;expected='0.1.1067'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.2.21002';space_age=$true;galore=$false;bob=$false;expected='0.1.1098'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21000';space_age=$true;galore=$false;bob=$false;expected='0.1.1096'},
+    [pscustomobject]@{scenario='f210-space-age';target='f210';from='4.4.21001';space_age=$true;galore=$false;bob=$false;expected='0.1.1097'}
   )
   $mir442Identities=@()
   foreach($case in $mir442IdentityCases){

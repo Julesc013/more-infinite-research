@@ -7,6 +7,7 @@ local stream_registry = require("prototypes.mir.streams.registry")
 local setting_defaults = require("prototypes.mir.settings.defaults")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
 
 local POLICY_DATA_NAME = "more-infinite-research-maximum-level-policy"
 local POLICY_VERSION = 3
@@ -172,9 +173,30 @@ local function add_base_continuation_runtime_bindings(managed, runtime_settings_
   end
 end
 
+local function add_native_worker_robot_speed_runtime_binding(managed,
+    runtime_settings_bindings)
+  local setting_name = "mir-max-level-worker-robots-speed"
+  local selected = selected_maximum(setting_name)
+  if type(selected) ~= "number" then return end
+  local input = maximum_level_binding.native_worker_robot_speed_cap_input(selected,
+    function(name)
+      return prototypes and prototypes.technology and prototypes.technology[name] or nil
+    end)
+  if not input then return end
+  add_runtime_binding(
+    managed,
+    runtime_settings_bindings,
+    input.technology_id,
+    input.stream_id,
+    input.setting_name,
+    input.source,
+    input.operation)
+end
+
 local function add_runtime_settings_policy(managed, runtime_settings_bindings)
   add_generated_runtime_bindings(managed, runtime_settings_bindings)
   add_base_continuation_runtime_bindings(managed, runtime_settings_bindings)
+  add_native_worker_robot_speed_runtime_binding(managed, runtime_settings_bindings)
 end
 
 local function v3_binding_admission_error(binding)

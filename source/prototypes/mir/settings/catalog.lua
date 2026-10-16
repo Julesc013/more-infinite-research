@@ -177,6 +177,18 @@ function M.global_setting_prototypes()
       localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
     },
     {
+      type = "int-setting",
+      name = "mir-max-level-worker-robots-speed",
+      setting_type = "startup",
+      default_value = 0,
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = setting_order.global("compatibility", 15),
+      targets = {requires_features = {"scripted_techs"}, required_effect_types = {}},
+      localised_name = {"mod-setting-name.mir-max-level-worker-robots-speed"},
+      localised_description = {"mod-setting-description.mir-max-level-worker-robots-speed"}
+    },
+    {
       type = "bool-setting",
       name = "mir-use-installed-space-age-icons",
       setting_type = "startup",

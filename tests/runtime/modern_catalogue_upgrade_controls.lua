@@ -2,13 +2,26 @@
 -- prove oracle activation and refusal; they are not native save evidence.
 local checks = 0
 local function check(value, message) checks = checks + 1; assert(value, message) end
-local function fixture(from, to, persisted_damage)
+local function replace_exact(value, needle, replacement)
+  local start = assert(value:find(needle, 1, true), "fixture transformation anchor")
+  return value:sub(1, start - 1) .. replacement .. value:sub(start + #needle)
+end
+local function fixture(from, to, persisted_damage, worker_speed_cap_allowance)
   local file = assert(io.open(REPO_ROOT .. "/fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua", "rb"))
   local source = file:read("*a"); file:close()
   -- Use the same collision-free version substitutions as the native runner.
   source = source:gsub("4%.0%.21000", "__FROM__"):gsub("4%.1%.21000", "__TO__")
   source = source:gsub("__FROM__", from):gsub("__TO__", to)
   if persisted_damage then source=source:gsub("local persisted_damage_probe = false", "local persisted_damage_probe = true") end
+  if worker_speed_cap_allowance and to == "4.4.21002" then
+    source = replace_exact(source, 'local added_422_setting_defaults = {}',
+      'local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}')
+    source = replace_exact(source,
+      '  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$"))',
+      '  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$") or from_version == "4.4.21001")')
+    source = replace_exact(source, '  and to_version:match("^4%.2%.210%d%d$")',
+      '  and (to_version:match("^4%.2%.210%d%d$") or to_version == "4.4.21002")')
+  end
   local callbacks, logs = {}, {}
   local function technology_record(name)
     return {name=name,level=3,researched=false,enabled=true,visible_when_disabled=true,
@@ -82,6 +95,31 @@ for _, case in ipairs(mutations) do
 end
 local f=fixture("4.2.21001","4.2.21002")
 check(table.concat(f.logs,"\n"):find("external snapshot mir-upgrade-full-state-source.json=source",1,true)~=nil,"independent source output required")
+local worker_speed_default=fixture("4.4.21001","4.4.21002",false,true)
+worker_speed_default.env.settings.startup["mir-compiler-profile"]={value="full"}
+worker_speed_default.env.settings.startup["mir-max-level-worker-robots-speed"]={value=0}
+local worker_speed_allowed,worker_speed_reason=pcall(worker_speed_default.callbacks.upgrade)
+check(worker_speed_allowed,"the exact 4.4.2 worker-speed default must be admitted: "..tostring(worker_speed_reason))
+for _, value in ipairs({1, -1}) do
+  local worker_speed_rejected=fixture("4.4.21001","4.4.21002",false,true)
+  worker_speed_rejected.env.settings.startup["mir-compiler-profile"]={value="full"}
+  worker_speed_rejected.env.settings.startup["mir-max-level-worker-robots-speed"]={value=value}
+  local accepted,reason=pcall(worker_speed_rejected.callbacks.upgrade)
+  check(not accepted and tostring(reason):find("startup/imported settings changed",1,true),
+    "nondefault worker-speed settings must remain rejected")
+end
+local worker_speed_unknown=fixture("4.4.21001","4.4.21002",false,true)
+worker_speed_unknown.env.settings.startup["mir-compiler-profile"]={value="full"}
+worker_speed_unknown.env.settings.startup["mir-max-level-worker-robots-speed"]={value=0}
+worker_speed_unknown.env.settings.startup["mir-worker-speed-unknown"]={value=0}
+local unknown_accepted,unknown_reason=pcall(worker_speed_unknown.callbacks.upgrade)
+check(not unknown_accepted and tostring(unknown_reason):find("startup/imported settings changed",1,true),
+  "worker-speed allowance must not admit an unrelated setting")
+local worker_speed_past_destination=fixture("4.2.21001","4.2.21002")
+worker_speed_past_destination.env.settings.startup["mir-max-level-worker-robots-speed"]={value=0}
+local past_accepted,past_reason=pcall(worker_speed_past_destination.callbacks.upgrade)
+check(not past_accepted and tostring(past_reason):find("startup/imported settings changed",1,true),
+  "worker-speed default must not be admitted before the 4.4.2 destination")
 local added=fixture("4.2.21000","4.2.21002")
 added.env.settings.startup["ips-enable-research_material_glycerol"]={value=true}
 added.env.settings.startup["ips-cost-linear-increment-research_material_py_wood"]={value=0}
