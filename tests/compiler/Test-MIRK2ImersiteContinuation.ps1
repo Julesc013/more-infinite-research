@@ -41,6 +41,7 @@ $modules=[ordered]@{
   'prototypes.mir.platform.factorio.target_line'='source/prototypes/mir/platform/factorio/target_line.lua'
   'fixtures.material_progression.target_profiles'='source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua'
   'prototypes.mir.domain.technology.maximum_level_binding'='source/prototypes/mir/domain/technology/maximum_level_binding.lua'
+  'prototypes.mir.runtime.maximum_level_control'='source/prototypes/mir/runtime/maximum_level_control.lua'
   'prototypes.mir.planner.stream_compiler.material_continuation'='source/prototypes/mir/planner/stream_compiler/material_continuation.lua'
   'prototypes.mir.policy.max_level'='source/prototypes/mir/policy/max_level.lua'
   'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
@@ -48,6 +49,7 @@ $modules=[ordered]@{
 $tests=[ordered]@{
   progression='tests/compiler/material_progression.lua'
   continuation='tests/compiler/material_continuation.lua'
+  worker_robot_speed_cap='tests/runtime/worker_robot_speed_cap.lua'
 }
 
 $lua=[Text.StringBuilder]::new()
@@ -98,13 +100,14 @@ $log=Get-Content -Raw -LiteralPath $nativeLog
 [IO.File]::WriteAllText((Join-Path $run 'stdout.txt'),$log,[Text.UTF8Encoding]::new($false))
 $progressionMatch=[regex]::Match($log,'MIR-MATERIAL-PROGRESSION-PASS ([0-9]+)')
 $continuationMatch=[regex]::Match($log,'MIR-MATERIAL-CONTINUATION-PASS ([0-9]+)')
-if($exitCode -ne 0 -or -not $progressionMatch.Success -or -not $continuationMatch.Success) {
+$workerRobotSpeedCapMatch=[regex]::Match($log,'MIR-WORKER-ROBOT-SPEED-CAP-PASS')
+if($exitCode -ne 0 -or -not $progressionMatch.Success -or -not $continuationMatch.Success -or -not $workerRobotSpeedCapMatch.Success) {
   throw "K2 Imersite continuation compiler regression failed: $nativeLog"
 }
 $receipt=[ordered]@{
   status='passed'
   scope='controlled-material-declarations-and-continuation-planner-not-K2-profile-qualification'
-  assertions=[ordered]@{progression=[int]$progressionMatch.Groups[1].Value;continuation=[int]$continuationMatch.Groups[1].Value}
+  assertions=[ordered]@{progression=[int]$progressionMatch.Groups[1].Value;continuation=[int]$continuationMatch.Groups[1].Value;worker_robot_speed_cap=$true}
   engine_version=$version.Trim()
   engine_sha256=$engineSha256
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash

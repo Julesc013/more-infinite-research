@@ -268,8 +268,8 @@ if ($source.MaximumLevelContext -notmatch 'maximum_level_binding\.from_plan\(lat
     $source.MaximumLevelPresentation -notmatch 'context:replace_epoch\(' -or
     $source.ModData -notmatch 'more-infinite-research\.maximum-level-policy-v3' -or
     $source.RuntimeMaximum -notmatch 'POLICY_VERSION = 3' -or
-    $source.RuntimeMaximum -notmatch 'if target_line\.mod_data_supported\(\) then return \{\}, true end' -or
-    $source.RuntimeMaximum -notmatch 'if not managed then\s+managed = \{\}\s+add_runtime_settings_policy\(managed\)' -or
+    $source.RuntimeMaximum -notmatch 'if target_line\.mod_data_supported\(\) then return \{\}, true, \{\} end' -or
+    $source.RuntimeMaximum -notmatch 'if not managed then\s+managed = \{\}\s+runtime_settings_bindings = \{\}\s+add_runtime_settings_policy\(managed, runtime_settings_bindings\)' -or
     $source.RuntimeMaximum -notmatch 'legacy-v2-read-only' -or
     $source.RuntimeMaximum -notmatch 'selected_maximum\(setting_name\)') {
   throw "Current maximum-level policy must publish V3, fail closed on missing modern transport, retain read-only V2 migration, and limit settings reconstruction to targets without mod-data."
