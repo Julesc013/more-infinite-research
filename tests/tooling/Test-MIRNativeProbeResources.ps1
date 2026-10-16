@@ -479,13 +479,23 @@ try {
   Refuses-Probe {& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo -SourceVersion '4.4.3'} 'Cannot validate argument'
   Assert-Probe ((& $continuityBinding -CandidateArchive 'controlled' -RepositoryRoot $repo)-ceq'4.2.1') 'continuity default changed.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-  foreach($name in @('Fail','Assert-True','Assert-Equal','Get-Sha256','Get-ZipEntry','Get-ZipEntrySha256','Get-ZipEntryText','Normalize-ZipMember','Test-Candidate')){
+  foreach($name in @('Fail','Assert-True','Assert-Equal','Assert-PropertyNames','Assert-FixtureInfo','New-FixtureArchive','Get-Sha256','Get-ZipEntry','Get-ZipEntrySha256','Get-ZipEntryText','Normalize-ZipMember','Test-Candidate')){
     $definitions=@($continuityAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
     Assert-Probe ($definitions.Count-eq 1) "expected one continuity admission function: $name"
     . ([scriptblock]::Create($definitions[0].Extent.Text))
   }
   foreach($target in @('f210','f200')){
     $Target=$target.ToUpperInvariant();$line=if($target-ceq'f210'){'2.1'}else{'2.0'};$TargetContract=@{factorio_line=$line}
+    $fixtureSource=Join-Path $repo 'fixtures/assert-browser-personal-state-continuity'
+    $infoName=if($target-ceq'f210'){'info.json'}else{'info-f200.json'}
+    $mainInfo=Join-Path $fixtureSource $infoName;$markerSource=Join-Path $fixtureSource 'configuration-marker';$markerInfo=Join-Path $markerSource $infoName
+    Assert-FixtureInfo $mainInfo 'mir-fixture-assert-browser-personal-state-continuity' '0.1.0'
+    Assert-FixtureInfo $markerInfo 'mir-fixture-browser-personal-continuity-config-marker' '0.1.1'
+    Refuses-Probe {Assert-FixtureInfo $markerInfo 'mir-fixture-browser-personal-continuity-config-marker' '0.1.0'} 'fixture info version'
+    Refuses-Probe {Assert-FixtureInfo $mainInfo 'mir-fixture-assert-browser-personal-state-continuity' '0.1.1'} 'fixture info version'
+    $markerArchive=New-FixtureArchive $markerSource 'mir-fixture-browser-personal-continuity-config-marker' '0.1.1' (Join-Path $fixture ('marker-'+$target)) $markerInfo @('data.lua','control.lua')
+    $markerData=Get-ZipEntry $markerArchive '/data.lua'
+    Assert-Probe ((Get-ZipEntrySha256 $markerArchive $markerData)-ceq(Get-FileHash (Join-Path $markerSource 'data.lua')).Hash) 'configuration marker omitted its exact inert native loading entry.'
     $hostPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser.lua';$locale=Join-Path $repo 'source/locale/en/more-infinite-research.cfg'
     $readmePath=Join-Path $repo "source/presentation/$target/README.md.template"
     foreach($sourceVersion in @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')){
