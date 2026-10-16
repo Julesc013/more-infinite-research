@@ -1153,9 +1153,10 @@ $currentGalore442Immediate=$currentGalore442.Clone();$currentGalore442Immediate.
 Assert-MIR421CurrentUpgradeInputMode @currentGalore442Immediate
 $mir43Assertions+=9
 
-# 4.5.0 admits only corrected R24 predecessors. Each target keeps a distinct
-# prepared fixture identity, the existing Full preservation oracle, and exact
-# target-specific custody; the joined all-nine runner remains separately refused.
+# 4.5.0 retains corrected R24 as its immediate release predecessor and has a
+# separately pinned direct published 4.2.2 compatibility lane. Each route
+# keeps a distinct prepared fixture identity and exact target custody; the
+# joined all-nine runner remains separately refused.
 $specializationPatterns=@($ast.FindAll({param($node)
   $node-is[Management.Automation.Language.BinaryExpressionAst]-and
   $node.Operator-eq[Management.Automation.Language.TokenKind]::Imatch-and
@@ -1219,7 +1220,7 @@ foreach($case in $mir450Cases){
   if((Resolve-MIR42UpgradePredecessorReaderVersion -Target f210 -FromVersion $mode.FromVersion -SourceVersion '4.5.0')-cne'4.5.0'){throw "4.5.0 immediate R24 reader mismatch for $($case.archetype)"}
   $mir43Assertions+=2
 }
-foreach($badFrom in @('4.2.21002','4.4.21000','4.4.21001')){
+foreach($badFrom in @('4.2.21001','4.4.21000','4.4.21001')){
   $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f210 -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
   if(-not$rejected){throw "4.5.0 reader admitted an unpinned predecessor: $badFrom"}
   $mir43Assertions++
@@ -1254,7 +1255,7 @@ foreach($bad in @(@('4.4.20001','4.5.20000','base-default'),@('4.4.20002','4.5.2
   if(& $evaluateF200450 $fullSpecializationCode $bad[0] $bad[1] $bad[2]){throw 'Live F200 4.5 preservation selection admits an unselected path'}
 }
 $mir43Assertions+=4
-foreach($badFrom in @('4.2.20002','4.4.20000','4.4.20001')){
+foreach($badFrom in @('4.2.20001','4.4.20000','4.4.20001')){
   $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f200 -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
   if(-not$rejected){throw "4.5.0 F200 admitted an unpinned predecessor: $badFrom"}
   $mir43Assertions++
@@ -1292,7 +1293,7 @@ $mir43Assertions++
 foreach($bad in @(@('4.4.01501','4.5.01500','base-default'),@('4.4.01502','4.5.01501','base-default'),@('4.4.01502','4.5.01500','wrong-archetype'))){
   if(& $evaluateF015450 $fullSpecializationCode $bad[0] $bad[1] $bad[2]){throw 'Live F015 4.5 preservation selection admits an unselected path'}
 }
-foreach($badFrom in @('4.2.01502','4.4.01500','4.4.01501')){
+foreach($badFrom in @('4.2.01501','4.4.01500','4.4.01501')){
   $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target f015 -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
   if(-not$rejected){throw "4.5.0 F015 admitted an unpinned predecessor: $badFrom"}
 }
@@ -1425,6 +1426,103 @@ function Test-MIR450CapDefaultAllowance {param([hashtable]$Before,[hashtable]$Af
 if(-not(Test-MIR450CapDefaultAllowance -Before @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=0} -After @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=0})){throw '4.5.0 cap default allowance rejected R24 default zero'}
 if(Test-MIR450CapDefaultAllowance -Before @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=0} -After @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=1}){throw '4.5.0 cap default allowance admitted nonzero worker speed'}
 $mir43Assertions+=15
+
+# Direct published 4.2.2 -> 4.5.0 compatibility is an additional Full-only
+# preservation route. It authenticates through the retained 4.2.3 custody
+# reader; it never changes 4.5's immediate R24 release predecessor contract.
+$direct422ManifestPath=Join-Path $RepoRoot 'fixtures/release-inputs/mir423-published-422-manifest.json'
+$direct422Manifest=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $direct422ManifestPath -CandidateSourceVersion '4.2.3'
+$direct422Contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.2.3'
+if($direct422Contract.source_version-cne'4.2.2'-or$direct422Contract.source_tag-cne'v4.2.2'-or
+   $direct422Manifest.sha256-cne$direct422Contract.manifest_sha256-or$direct422Manifest.bytes-ne$direct422Contract.manifest_bytes-or
+   @($direct422Manifest.manifest.targets).Count-ne9){throw 'Direct 4.2.2 custody differs from its pinned published manifest'}
+foreach($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+  $row=@($direct422Manifest.manifest.targets|Where-Object { $_.target -ceq $target })
+  if($row.Count-ne1-or[string]$row[0].distribution_version-cne('4.2.'+$target.Substring(1)+'02')-or[string]$row[0].sha256-notmatch'^[A-F0-9]{64}$'){
+    throw "Direct 4.2.2 custody target differs: $target"
+  }
+}
+$mir43Assertions+=11
+
+$mir450Direct422Root=Join-Path $testRoot 'mir450-direct-422-identities'
+New-Item -ItemType Directory -Force -Path $mir450Direct422Root|Out-Null
+$mir450Direct422Routes=@(
+  [ordered]@{target='f210';from='4.2.21002';to='4.5.21000';fixture='assert-upgrade-4-0-21000-to-4-1-21000';archetype='base-default';space_age=$false;historical=$false;fixture_version='0.1.1110';cap=$true},
+  [ordered]@{target='f210';from='4.2.21002';to='4.5.21000';fixture='assert-upgrade-4-0-21000-to-4-1-21000';archetype='space-age-native-owner';space_age=$true;historical=$false;fixture_version='0.1.1111';cap=$true},
+  [ordered]@{target='f200';from='4.2.20002';to='4.5.20000';fixture='assert-upgrade-4-0-20000-to-4-1-20000';archetype='base-default';space_age=$false;historical=$false;fixture_version='0.1.1112';cap=$true},
+  [ordered]@{target='f110';from='4.2.11002';to='4.5.11000';fixture='assert-upgrade-4-0-11000-to-4-1-11000';archetype='base-default';space_age=$false;historical=$false;fixture_version='0.1.1113';cap=$false},
+  [ordered]@{target='f100';from='4.2.10002';to='4.5.10000';fixture='assert-upgrade-4-0-10000-to-4-1-10000';archetype='base-default';space_age=$false;historical=$false;fixture_version='0.1.1114';cap=$false},
+  [ordered]@{target='f017';from='4.2.01702';to='4.5.01700';fixture='assert-upgrade-historical-terminal-to-mir42';archetype='base-default';space_age=$false;historical=$true;fixture_version='1.2.1113';cap=$false},
+  [ordered]@{target='f016';from='4.2.01602';to='4.5.01600';fixture='assert-upgrade-historical-terminal-to-mir42';archetype='base-default';space_age=$false;historical=$true;fixture_version='1.2.1114';cap=$false},
+  [ordered]@{target='f015';from='4.2.01502';to='4.5.01500';fixture='assert-upgrade-historical-terminal-to-mir42';archetype='base-default';space_age=$false;historical=$true;fixture_version='1.2.1112';cap=$false},
+  [ordered]@{target='f014';from='4.2.01402';to='4.5.01400';fixture='assert-upgrade-historical-terminal-to-mir42';archetype='base-default';space_age=$false;historical=$true;fixture_version='1.2.1115';cap=$false},
+  [ordered]@{target='f013';from='4.2.01302';to='4.5.01300';fixture='assert-upgrade-historical-terminal-to-mir42';archetype='base-default';space_age=$false;historical=$true;fixture_version='1.2.1116';cap=$false}
+)
+$mir450Direct422FixtureVersions=@()
+foreach($route in $mir450Direct422Routes){
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$route.fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($route.historical){'combined-current-candidate.json'}else{''});PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+  Assert-MIR421CurrentUpgradeInputMode @mode
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.5.0')-cne'4.2.3'){
+    throw "Direct 4.2.2 reader did not select the retained custody contract: $($route.target)"
+  }
+  $fixtureRoot=Join-Path $mir450Direct422Root ($route.target+'-'+$route.archetype)
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$route.fixture)) -Destination $fixtureRoot -Recurse
+  if($route.historical){
+    $line='0.'+[int]$route.target.Substring(1)
+    $infoPath=Join-Path $fixtureRoot 'info.json'
+    [IO.File]::WriteAllText($infoPath,([IO.File]::ReadAllText($infoPath).Replace('@@FACTORIO_LINE@@',$line).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$route.from)),[Text.UTF8Encoding]::new($false))
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.0' -FromVersion $route.from
+    $controlPath=Join-Path $fixtureRoot 'control.lua'
+    $infinite=if($route.target-ceq'f017'){'mining-productivity-4'}elseif($route.target-cin@('f016','f015')){'mining-productivity-16'}else{''}
+    $control=[IO.File]::ReadAllText($controlPath).Replace('__MIR_UPGRADE_FROM_VERSION__',$route.from).Replace('__MIR_UPGRADE_TO_VERSION__',$route.to).Replace('__MIR_FACTORIO_LINE__',$line).Replace('__MIR_INFINITE_TECHNOLOGY__',$infinite).Replace('__MIR_UPGRADE_SAVE_NAME__',('mir-'+$route.to.Replace('.','')+'-upgraded'))
+    [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
+    Set-MIR430FullCompilerProfileUpgradeAllowance -Target $route.target -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+    $allowance=Get-Content -LiteralPath (Join-Path $fixtureRoot 'mir422_complete_state.lua') -Raw
+    if(-not$allowance.Contains('expected_settings["mir-compiler-profile"] = "full"')){throw "Direct 4.2.2 historical Full allowance missing: $($route.target)"}
+  }elseif($route.target-ceq'f200'){
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target f200 -SourceVersion '4.5.0' -FromVersion $route.from
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+    $allowance=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
+    if(-not$allowance.Contains('local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}')){throw 'Direct 4.2.2 F200 cap/default allowance missing'}
+  }elseif($route.target-ceq'f210'){
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target f210 -SourceVersion '4.5.0' -FromVersion $route.from -SpaceAge:([bool]$route.space_age)
+    Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
+    $allowance=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
+    if(-not$allowance.Contains('local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}')){throw "Direct 4.2.2 F210 cap/default allowance missing: $($route.archetype)"}
+  }else{
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.0' -FromVersion $route.from
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
+    Set-MIR430FullCompilerProfileUpgradeAllowance -Target $route.target -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+    $allowance=Get-Content -LiteralPath (Join-Path $fixtureRoot 'mir422_complete_state.lua') -Raw
+    if(-not$allowance.Contains('expected_settings["mir-compiler-profile"] = "full"')){throw "Direct 4.2.2 modern Full allowance missing: $($route.target)"}
+  }
+  $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+  if($info.version-cne$route.fixture_version){throw "Direct 4.2.2 fixture identity mismatch: $($route.target)/$($route.archetype)"}
+  $mir450Direct422FixtureVersions += [string]$info.version
+  $SelectedTarget=$route.target;$SourceVersion='4.5.0';$FromVersion=$route.from;$ToVersion=$route.to
+  $FixtureName=$route.fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
+  if(-not(& $fullSpecializationCode)){throw "Direct 4.2.2 route skipped the Full preservation guard: $($route.target)/$($route.archetype)"}
+  $mir42UpgradeSpecialized=(-not[bool]$route.historical);$isHistoricalTerminalFixture=[bool]$route.historical;$k2Scenario=$false;$classicReducedPolicy=$false
+  if(-not(& $completeCatalogueEvaluator)){throw "Direct 4.2.2 route skipped the complete catalogue evaluator: $($route.target)/$($route.archetype)"}
+  $badFrom='4.2.'+$route.target.Substring(1)+'01'
+  $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $badFrom -SourceVersion '4.5.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
+  if(-not$rejected){throw "Direct 4.2.2 reader admitted an unpinned predecessor: $($route.target)/$badFrom"}
+  $wrong=$mode.Clone();$wrong.FromVersion=$badFrom
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+  if(-not$rejected){throw "Direct 4.2.2 input mode admitted an unpinned predecessor: $($route.target)/$badFrom"}
+  $mir43Assertions+=5
+}
+if(@($mir450Direct422FixtureVersions|Sort-Object -Unique).Count-ne$mir450Direct422Routes.Count){throw 'Direct 4.2.2 fixture identities collide'}
+if(-not(Test-MIR450CapDefaultAllowance -Before @{existing='retained'} -After @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=0})){throw 'Direct 4.2.2 cap/default allowance rejected exact additions'}
+if(Test-MIR450CapDefaultAllowance -Before @{existing='retained'} -After @{existing='retained';'mir-compiler-profile'='full';'mir-max-level-worker-robots-speed'=1}){throw 'Direct 4.2.2 cap/default allowance admitted a nonzero cap'}
+$wrongTarget450=@{Target='f200';FromVersion='4.2.21002';ToVersion='4.5.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongTarget450}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]'}
+if(-not$rejected){throw 'Direct 4.2.2 input mode admitted cross-target custody'}
+$wrongProfile450=@{Target='f200';FromVersion='4.2.20002';ToVersion='4.5.20000';FixtureName='assert-upgrade-4-0-20000-to-4-1-20000';Archetype='f200-bob-angel';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-422.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.0'}
+$rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongProfile450}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+if(-not$rejected){throw 'Direct 4.2.2 input mode admitted an unqualified F200 mod profile'}
+$mir43Assertions+=4
 
 $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target 'f999' -FromVersion '4.3.99900' -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
 if(-not$rejected){throw '4.3.1 predecessor reader accepted an unselected target'}
@@ -1810,7 +1908,25 @@ foreach($binding in @(
   if([bool](& $f210BaseStateEvaluator)){throw 'F210 Base caller admitted an unbound or different-archetype snapshot transition'}
   $mir43Assertions++
 }
-$f210WrongBaseBindingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-wrong-snapshot-binding'
+# The runner's actual F210 call controls whether the Full oracle captures
+# source, upgrade and both reload states.  R24 and direct published 4.2.2 are
+# the only 4.5 Base predecessors entitled to that stronger snapshot; the
+# Space Age route and every adjacent pair must leave it off.
+$f210450BaseStateCases=@(
+  @{label='r24-base';archetype='base-default';from='4.4.21002';to='4.5.21000';expected=$true},
+  @{label='published422-base';archetype='base-default';from='4.2.21002';to='4.5.21000';expected=$true},
+  @{label='r24-space-age';archetype='space-age-native-owner';from='4.4.21002';to='4.5.21000';expected=$false},
+  @{label='published422-space-age';archetype='space-age-native-owner';from='4.2.21002';to='4.5.21000';expected=$false},
+  @{label='wrong-r24-patch';archetype='base-default';from='4.4.21001';to='4.5.21000';expected=$false},
+  @{label='wrong-published422-patch';archetype='base-default';from='4.2.21001';to='4.5.21000';expected=$false},
+  @{label='wrong-450-destination';archetype='base-default';from='4.2.21002';to='4.5.21001';expected=$false}
+)
+foreach($binding in $f210450BaseStateCases){
+  $Archetype=$binding.archetype;$FromVersion=$binding.from;$ToVersion=$binding.to
+  $selected=[bool](& $f210BaseStateEvaluator)
+  if($selected-ne[bool]$binding.expected){throw "F210 4.5 Base complete-state caller binding differs: $($binding.label)"}
+  $mir43Assertions++
+}$f210WrongBaseBindingFixture=Join-Path $mir43FixtureRoot 'mir43-f210-base-wrong-snapshot-binding'
 Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Destination $f210WrongBaseBindingFixture -Recurse
 Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $f210WrongBaseBindingFixture -Target f210 -SourceVersion '4.3.0' -FromVersion '4.2.21001'
 $rejected=$false;try{Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $f210WrongBaseBindingFixture -FromVersion '4.2.21001' -ToVersion '4.3.21000' -BaseDefaultCompleteState}catch{$rejected=$_.Exception.Message-ceq'[mir430-full-upgrade-base-snapshot-transition]'}
