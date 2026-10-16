@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-16
+last_reviewed: 2026-10-17
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 <a id="active-campaign-mir-440-unified-research-generation"></a>
 
-## Published 4.4.1 and active 4.4.2 improvements and qualification
+## Published 4.4.2 and active 4.4.x continuation
 
 The maintainer's 14 October direction superseded the separate 4.3.1 publication attempt and rolled its verified repairs into 4.4.0. The fixed **15 October 2026, 15:36 AEDT / 04:36 UTC** request is historical; it did not replace acceptance evidence or create a reusable waiver.
 
@@ -24,19 +24,16 @@ The maintainer's 14 October direction superseded the separate 4.3.1 publication 
 
 [v4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1) was published at 2026-10-15T10:50:21Z as release `413691909`, at commit `2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6` and tree `3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825`. All seventeen public assets were anonymously downloaded and hash-verified; the matching delivery is `dist/release-4.4.1/`. Its unsigned, essential-check emergency acceptance was candidate-specific and did not establish a completed native multiplayer connection.
 
-Published 4.4.1 is the immediate predecessor for 4.4.2. Retain direct 4.4.0 and affected 4.2.2 upgrades under the existing verification plan. Published 4.3.0 remains an independent historical reference; unpublished 4.3.1 candidates remain preserved experiments. Reuse observations only for their actual applicable inputs, without relabelling them as a new destination pass.
+Published [v4.4.2](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.2), GitHub release `415194452`, was published at 2026-10-16T17:10:35Z from source commit `fe385332f778e1c79a0ad930140fe6e4defdb17a` and tree `95bb20196cc4195375acefeacc727e6a5370af21`. The nine `CCC02` player packages and nine supporting assets were anonymously downloaded and SHA-256 verified. `dist/4.4.2/PUBLICATION-RECEIPT.json` records the public readback; `dist/4.4.2/`, the nine top-level ZIPs and `LATEST` are the matching primary delivery. Portal availability remains a separate maintainer-managed state.
 
-### 4.4.2 improvement and qualification queue
+### 4.4.2 boundary and follow-up
 
-- Verify published 4.4.1 with a separate graphical client over localhost: join, same-host rejoin, save/restart/rejoin and relevant Library states. A reproduced MIR-breaking defect takes priority for an immediate 4.4.2; a resource-blocked attempt remains inconclusive.
-- Build a new exact 4.4.2 candidate with completed, verified performance and maintenance improvements. Substantial refactoring is eligible when its benefit, preservation and integration checks are complete; retain unfinished work outside the release.
-- Complete the unrun or incomplete target, fresh-load, save, Library first-open/settings/reload, genuine client and multiplayer scenarios selected by the next verification plan.
-- Reproduce or close the reporter-specific Secretas save and F210 Secretas 1.0.37 scopes; the focused F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 continuation pass does not cover either.
-- Keep mining-yield and Space Exploration claims separate from the focused F200 drill-manufacturing observation; qualify only a reproduced player-facing defect.
-- Repeat performance work on named ordinary-menu and broader profiles, with the same exact candidate and controls. The released F200 Galore headless `--create` diagnostic improved over 4.3.0 but did not meet the ten-percent destination and is not a menu/client result.
-- Restore and verify an operational protected signing path before making a normal signed/sealed release claim; neither earlier emergency authorization is inherited.
-
-The scheduled publication target is **16 October 2026, 20:00 AEDT / 09:00 UTC**, with feature freeze aimed at 16:00 AEDT or earlier when measured acceptance durations require it. If an emergency 4.4.2 is published first, the next release is 4.4.3; never reuse published identities or replace their bytes.
+- 4.4.2 fixes the reproduced Dark Matter Replicators Reborn 3.7.1 startup crash and introduces the native Base/Space Age **Infinite worker robot speed — max level** setting. Its default is `0` (unlimited); cap `10` admits level 10 and blocks level 11 through the existing controller while preserving earned levels, speed bonuses and the established technology/effect/science/cost identities.
+- Exact F200 Base 4.4.1-to-4.4.2 and F210 Space Age 4.2.2-to-4.4.2 upgrades passed complete state and definition comparisons with both cold reloads. The retained Base state contained 250 technologies/217 recipes and the Space Age state 348 technologies/662 recipes. F200 Base and F210 Space Age `0`-to-`10`-to-`0` native cap transitions preserved earned bonuses and fractional progress.
+- True Nukes Continued 0.3.36 with Warheads Continued 0.0.21 passed the available Base and combined Space Age/Dark Matter Replicators startup reproductions. The original unspecified nuclear-test crash and the full reporter modpack remain unreplicated; no speculative fix is claimed.
+- 4.4.2 makes no fresh general performance claim. Its startup smoke observations are completion evidence, while the ten-percent and preferably-sub-ten-second destination remains open.
+- Follow-on 4.4.x work must still cover genuine client join/rejoin and pending-work states, physical shortcut/menu paths, broader engine and historical upgrades, the original reporter profiles, Secretas/F210 continuation scope, and matched ordinary-menu performance. A reproduced urgent defect may pre-empt feature work; a blocked or missing profile remains inconclusive.
+- A later normal signed/sealed release needs its own accepted evidence and protected signing path. The 4.4.2 essential-check publication is unsigned and candidate-specific; hosted CI was still in progress at publication and is not represented as passed.
 
 ### Product outcome
 
@@ -71,13 +68,13 @@ Work proceeds in the primary checkout with non-overlapping ownership. Native run
 
 The hour-four checkpoint is an implementation and native-measurement decision, not another general architecture review. The hour-eight checkpoint must expose any remaining catalogue, semantic or resource gap before the final qualification window. A release cannot satisfy the plan by keeping the old discovery path as a hidden fallback or by reducing established research.
 
-### 4.4.2 performance and release acceptance
+### 4.4.x performance and release acceptance
 
-Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.4.1, comparisons with 4.4.0 and cumulative gains against 4.3.0/4.2.2. Work toward added startup time no greater than `min(0.10 * without-MIR startup, 30 seconds)`, preferably below ten seconds, per named profile. This destination does not withhold useful qualified interim repairs. Include available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
+Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.4.2, comparisons with earlier 4.4.x releases and cumulative gains against 4.3.0/4.2.2. Work toward added startup time no greater than `min(0.10 * without-MIR startup, 30 seconds)`, preferably below ten seconds, per named profile. This destination does not withhold useful qualified interim repairs. Include available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
 
 Validate complete research definitions and saved investment, not only names or counts. Include applicable Base/Space Age and modded cases, finite-tail ownership, required historical destinations, Library cold use/reload/settings and genuine client/multiplayer behavior. A scripted remote open is not a physical shortcut test; several forces are not several clients. No catalogue suppression or freeze moved to first use is accepted as a speedup.
 
-The codec remains `100 * integer(CCC) + SOURCE_PATCH`: 4.4.2 uses the registered `CCC02` identities. Required checks, actual candidate review, protected signing and publication readback remain normal gates. Earlier emergency publications do not authorize a new exception. Restore existing approved signing capability without requesting secrets in chat or treating ordinary release permission as missing.
+The codec remains `100 * integer(CCC) + SOURCE_PATCH`: 4.4.2 uses the registered `CCC02` identities. Future releases require their own checks, actual candidate review, protected signing and publication readback; earlier emergency publications do not authorize a new exception. Restore existing approved signing capability without requesting secrets in chat or treating ordinary release permission as missing.
 
 GitHub publication, local delivery, affected-player Portal availability and completion of all nine maintainer-managed Portal uploads remain separate states. The retained six-hour upload spacing requires at least 48 hours from first to ninth Portal upload; this plan does not claim all-nine Portal completion within sixteen hours.
 
@@ -87,8 +84,8 @@ GitHub publication, local delivery, affected-player Portal availability and comp
 | --- | --- |
 | 4.4.0 | Published unsigned, partially qualified emergency release with preserved published bytes, exact disclosed native scopes, and separate delivery readback. It does not claim a normal seal, protected-main promotion, complete native matrix, ordinary-menu performance pass, Portal upload, or reporter-wide incident closure. GitHub release immutability remains disabled. |
 | 4.4.1 | Published emergency repair for the load-only tick registration, with original bytes and disclosed limited acceptance preserved. It does not complete native multiplayer, save or signing obligations for the next candidate. |
-| 4.4.2 | Verify multiplayer independently and include completed, verified startup, memory, runtime and maintainability improvements in the single implementation. Resolve or explicitly retain incomplete qualification and incident scopes. |
-| 4.4.3 | Additional approved community/mod coverage through reusable declarations and the existing science/ownership rules, with exact compatibility and migration evidence. |
+| 4.4.2 | Published unsigned essential-check release. It fixes the reproduced Dark Matter Replicators Reborn startup crash, adds the native Base/Space Age worker-robot-speed cap, and retains the stated package, upgrade and cap-transition evidence. It does not claim a normal seal, complete client/multiplayer coverage, reporter-wide incident closure, Portal upload or the performance destination. |
+| 4.4.3 | Immediate regressions and remaining client, migration, performance and reporter-profile repairs, followed by additional approved community/mod coverage through reusable declarations and the existing science/ownership rules with exact compatibility and migration evidence. |
 | 4.4.4 onward | Useful developer-time discovery/contributor tools, historical refinements and remaining admitted requests. MEP work requires a ready, useful production contract. |
 | Further 4.4.x / admitted 4.5.x | Continue the preserved request queue in useful, independently qualified batches. Themes do not defer a ready improvement or override an urgent defect. No empty releases, new compiler modes or parallel catalogues. |
 
