@@ -7,6 +7,7 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
+local family_resolver = require("prototypes.mir.families.resolver")
 local research_cost_compatibility = require("prototypes.mir.domain.research_cost.compatibility_slice")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 
@@ -76,7 +77,6 @@ function M.publish(context)
     mutation_journal = context:state_view("mutation_journal"):snapshot(),
     technology_catalog_fingerprint = plan.technology_catalog_fingerprint,
     technology_graph_parity = context:artifact("technology_graph_parity"),
-    provider_resolution = deepcopy(context:state_view("family_resolution") or {}),
     input_sanitation_ledger = deepcopy(plan.input_sanitation_ledger),
     output_sanitation_ledger = context:artifact("output_sanitation_ledger")
   }
@@ -130,8 +130,13 @@ function M.publish(context)
       + evidence_bytes)
   end
   context_construction.record_work_volume()
-  local internal_evidence = include_internal and publishes_mod_data
-    and compiler_evidence.build(evidence_input) or nil
+  local internal_evidence = nil
+  if include_internal and publishes_mod_data then
+    -- Developer evidence keeps the complete measured ProviderMetrics view;
+    -- ordinary publication does not build or serialize diagnostic metrics.
+    evidence_input.provider_resolution = family_resolver.inspection_snapshot()
+    internal_evidence = compiler_evidence.build(evidence_input)
+  end
   if research_cost_support then
     require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)
   end

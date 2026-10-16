@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 237,
+  "test_count": 238,
   "tests": [
     {
       "id": "docs.check",
@@ -8426,6 +8426,31 @@
       "matrix": null
     },
     {
+      "id": "static.provider-metrics-lazy",
+      "proposition": "The governed test 'static.provider-metrics-lazy' passes for its exact selected inputs.",
+      "cohort": "compiler-static",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRProviderMetricsLazy.ps1",
+      "canonical_implementation": "tests/compiler/Test-MIRProviderMetricsLazy.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/**",
+        "tests/compiler/Test-MIRProviderMetricsLazy.ps1",
+        "tests/compiler/run_provider_metrics_lazy_controls.py",
+        "tests/compiler/provider_metrics_lazy.lua",
+        ".github/workflows/validate.yml",
+        "validation/tests.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.recipe-productivity-permissions",
       "proposition": "The governed test 'static.recipe-productivity-permissions' passes for its exact selected inputs.",
       "cohort": "compiler-static",
@@ -8651,10 +8676,10 @@
       "package-repository": 69,
       "tooling-release": 70,
       "runtime-upgrade": 61,
-      "compiler-static": 22,
+      "compiler-static": 23,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 224,
+    "canonical_test_commands": 225,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8667,5 +8692,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bc967226c2a3da8227b77ce137cb4586bb3fc0eebc4257d493f6cecb9e4909bb"
+  "digest": "sha256:0e69356cc099dd23fed462b647a0c3625a9dfa64975d2bf86bd9df2901edd20a"
 }

@@ -734,6 +734,21 @@
       ]
     },
     {
+      "id": "static.provider-metrics-lazy",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/compiler/Test-MIRProviderMetricsLazy.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source:source/**",
+        "tests/compiler/Test-MIRProviderMetricsLazy.ps1",
+        "tests/compiler/run_provider_metrics_lazy_controls.py",
+        "tests/compiler/provider_metrics_lazy.lua",
+        ".github/workflows/validate.yml",
+        "validation/tests.yml"
+      ]
+    },
+    {
       "id": "static.approved-lab-bindings",
       "kind": "static",
       "layer": "F0",

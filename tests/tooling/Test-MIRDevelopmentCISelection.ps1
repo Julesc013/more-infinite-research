@@ -110,21 +110,23 @@ $developmentLuaConsumers=@(
   'static.recipe-productivity-permissions',
   'static.approved-pack-bindings',
   'static.approved-lab-bindings',
+  'static.provider-metrics-lazy',
   'static.settings-catalogue-lifecycle'
 )
 $developmentProfileIds=@($actualAssurance.profiles.'mir4-development'|ForEach-Object {[string]$_})
-Assert-MIRDevelopmentCISelection -Condition ($developmentProfileIds.Count -eq 48 -and
-  @($developmentProfileIds|Sort-Object -Unique).Count -eq 48) -Message 'Development profile must retain exactly forty-eight distinct hosted static controls.'
+Assert-MIRDevelopmentCISelection -Condition ($developmentProfileIds.Count -eq 49 -and
+  @($developmentProfileIds|Sort-Object -Unique).Count -eq 49) -Message 'Development profile must retain exactly forty-nine distinct hosted static controls.'
 foreach($consumerId in $developmentLuaConsumers) {
   Assert-MIRDevelopmentCISelection -Condition (@($developmentProfileIds|Where-Object {$_ -ceq $consumerId}).Count -eq 1) -Message "Development profile omitted its demonstrated Lua consumer: $consumerId"
 }
 Assert-MIRDevelopmentCISelection -Condition ((@($actualAssurance.profiles.'mir440-approved-bindings'|ForEach-Object {[string]$_}) -join ',') -ceq
   'static.approved-pack-bindings,static.approved-lab-bindings') -Message 'The focused approved-bindings profile must not be broadened by development CI admission.'
 $actualLuaSelectionExpectations=[ordered]@{
-  'source/prototypes/mir/pipeline/recipe_productivity_permissions.lua'=@('static.recipe-productivity-permissions','static.approved-pack-bindings')
-  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'=@('static.approved-pack-bindings')
-  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua'=@('static.approved-pack-bindings','static.approved-lab-bindings')
-  'source/prototypes/mir/settings/catalog.lua'=@('static.approved-pack-bindings','static.settings-catalogue-lifecycle')
+  'source/prototypes/mir/pipeline/recipe_productivity_permissions.lua'=@('static.recipe-productivity-permissions','static.approved-pack-bindings','static.provider-metrics-lazy')
+  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'=@('static.approved-pack-bindings','static.provider-metrics-lazy')
+  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua'=@('static.approved-pack-bindings','static.approved-lab-bindings','static.provider-metrics-lazy')
+  'source/prototypes/mir/families/resolver.lua'=@('static.approved-pack-bindings','static.provider-metrics-lazy')
+  'source/prototypes/mir/settings/catalog.lua'=@('static.approved-pack-bindings','static.settings-catalogue-lifecycle','static.provider-metrics-lazy')
 }
 foreach($entry in $actualLuaSelectionExpectations.GetEnumerator()) {
   $luaClassification=Get-MIRAssuranceClassification -Paths @([string]$entry.Key) -Config $actualAssurance
