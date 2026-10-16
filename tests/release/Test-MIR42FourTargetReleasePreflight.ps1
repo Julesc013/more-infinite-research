@@ -69,6 +69,65 @@ try {
   try { Invoke-MIR42FourTargetReleasePreflight -RepoRoot $repo -FinalSourceCommit $head -F210Zip $zips.f210 -F200Zip $zips.f200 -F110Zip $zips.f110 -F100Zip $bad -OutputRoot (Join-Path $root 'bad-result') | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-preflight-package-excluded-entry' }
   Assert-MIR42PreflightTest $rejected 'mir42-preflight-package-excluded-rejected'
 
+  # 4.4.2 published its exact V9 construction record, retaining its original
+  # unqualified fields. Synthetic API metadata exercises that distinct input
+  # format without promoting it to a final manifest or transferring a waiver.
+  $published442 = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $repo 'fixtures/release-inputs/mir450-published-442-r24-construction.json') -CandidateSourceVersion '4.5.0'
+  $published442Contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.0'
+  $published442Assets = [Collections.Generic.List[object]]::new()
+  $published442Assets.Add([pscustomobject]@{id=1;name=$published442Contract.manifest_name;size=$published442.bytes;digest=('sha256:'+$published442.sha256.ToLowerInvariant());state='uploaded'})
+  foreach ($target in $published442.manifest.targets) {
+    $published442Assets.Add([pscustomobject]@{id=($published442Assets.Count+1);name=('more-infinite-research_'+$target.distribution_version+'.zip');size=$target.asset.bytes;digest=('sha256:'+$target.asset.sha256.ToLowerInvariant());state='uploaded'})
+  }
+  while ($published442Assets.Count -lt 18) {
+    $published442Assets.Add([pscustomobject]@{id=($published442Assets.Count+1);name=('synthetic-support-'+$published442Assets.Count);size=1;digest=('sha256:'+('a'*64));state='uploaded'})
+  }
+  $published442Metadata = [pscustomobject]@{
+    id=415194452;tag_name='v4.4.2';target_commitish='fe385332f778e1c79a0ad930140fe6e4defdb17a'
+    draft=$false;prerelease=$false;immutable=$false;assets=@($published442Assets)
+  }
+  $published442Rows = @(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published442 -ReleaseMetadata $published442Metadata -CandidateSourceVersion '4.5.0')
+  Assert-MIR42PreflightTest ($published442Rows.Count -eq 9 -and
+    $published442Rows[1].target -ceq 'f200' -and $published442Rows[1].version -ceq '4.4.20002' -and
+    $published442Rows[1].sha256 -ceq '9467A82FC0DE73CB520C987A54A778B7278F0ADFD0315100D539FDAB843B5B58' -and
+    $published442Rows[1].content_sha256 -ceq '8E83FB18BEECFCA8F6DC58B318D93522BE2501D9E12C4538679ECCFD2D0442B6' -and
+    $published442Rows[1].entry_count -eq 340) 'mir45-published442-exact-construction-inventory'
+  Assert-MIR42PreflightTest ($published442.manifest.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV9' -and
+    $published442.manifest.qualification -ceq 'not-performed' -and
+    $published442.manifest.tagging -ceq 'not-performed' -and -not $published442.manifest.publication_authorized) 'mir45-published442-no-inherited-acceptance'
+  # Independently exercise the parsed-record acceptance boundary. Recompute the
+  # inner record hash so each refusal depends on the forbidden inherited claim,
+  # rather than merely detecting a stale self-hash. The frozen fixture is untouched.
+  foreach ($claim in @('qualification','technical_seal','signing','tagging','publication_authorized')) {
+    $badPinned = $published442 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+    $badPinned.manifest.$claim = if ($claim -ceq 'publication_authorized') { $true } else { 'performed' }
+    $badPinned.manifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $badPinned.manifest
+    $rejected = $false
+    try { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $badPinned -ReleaseMetadata $published442Metadata -CandidateSourceVersion '4.5.0' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-release-metadata' }
+    Assert-MIR42PreflightTest $rejected ('mir45-published442-inherited-claim-rejected-'+$claim)
+  }
+  foreach ($mutation in @('release-id','source-commit','draft','immutable','manifest-digest','package-digest','superseded-release','superseded-source')) {
+    $badMetadata = $published442Metadata | ConvertTo-Json -Depth 30 | ConvertFrom-Json
+    switch ($mutation) {
+      'release-id' { $badMetadata.id++ }
+      'source-commit' { $badMetadata.target_commitish = '0'*40 }
+      'draft' { $badMetadata.draft = $true }
+      'immutable' { $badMetadata.immutable = $true }
+      'manifest-digest' { $badMetadata.assets[0].digest = 'sha256:'+('0'*64) }
+      'package-digest' { $badMetadata.assets[2].digest = 'sha256:'+('0'*64) }
+      'superseded-release' { $badMetadata.id = 414958467 }
+      'superseded-source' { $badMetadata.target_commitish = '69b39bb1f933341af95b9fbee4139ca88885d5f4' }
+    }
+    $rejected = $false
+    try { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published442 -ReleaseMetadata $badMetadata -CandidateSourceVersion '4.5.0' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor' }
+    Assert-MIR42PreflightTest $rejected ('mir45-published442-rejected-'+$mutation)
+  }
+  $tampered442 = Join-Path $root 'tampered-published442-construction.json'
+  [IO.File]::WriteAllBytes($tampered442, [IO.File]::ReadAllBytes($published442.path) + [byte[]]@(32))
+  $rejected = $false
+  try { Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $tampered442 -CandidateSourceVersion '4.5.0' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-frozen-manifest' }
+  Assert-MIR42PreflightTest $rejected 'mir45-published442-raw-manifest-rejected'
+
   # Exercise the published-reader custody switch without a release API call.
   # Archive identities remain checked by the real reader; these controlled
   # inputs prove it accepts only an exact complete direct-library map and keeps
