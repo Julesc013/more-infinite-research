@@ -55,7 +55,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   }
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
   $fixtureVersion=if($F200BobAngel-and$SourceVersion-ceq'4.4.2'){
-    if($FromVersion-ceq'4.4.20000'){'0.1.86'}elseif($FromVersion-ceq'4.4.20001'){'0.1.87'}elseif($FromVersion-ceq'4.2.20002'){'0.1.88'}else{throw '[mir423-f200-bob-angel-fixture-transition]'}
+    if($FromVersion-ceq'4.4.20000'){'0.1.86'}elseif($FromVersion-ceq'4.4.20001'){'0.1.87'}elseif($FromVersion-ceq'4.2.20002'){'0.1.89'}else{throw '[mir423-f200-bob-angel-fixture-transition]'}
   }elseif($F200GaloreSpaceAge){
     if($SourceVersion-ceq'4.3.1'){
       if($FromVersion-ceq'4.3.20000'){'0.1.50'}elseif($FromVersion-ceq'4.2.20002'){'0.1.51'}else{throw '[mir431-f200-galore-fixture-transition]'}
@@ -791,19 +791,166 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
   $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
   # This is deliberately narrower than the retained generic complete-state
-  # oracle. Both the 4.2 performance lane and the exact 4.3 Full lane reject
-  # even an unresearched extra technology for this fixed Bob/Angel input.
+  # oracle. The direct 4.2.2 lane permits only the source-reviewed additions
+  # below. Each record is constructed from a finite source terminal or a
+  # declared stream/staged material contract, never from the candidate state.
   # Earlier predecessor lanes retain their reviewed feature allowances.
   $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
   $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
   if($technologySetGuard.Matches($control).Count-ne1){throw '[mir423-f200-bob-angel-performance-only-anchor]'}
-  $strictTechnologySetGuard=@'
+  $strictTechnologySetGuard=if($full442Direct){@'
+  local function sorted_names_with(prerequisites, additions, context)
+    local out, seen = {}, {}
+    for _, value in ipairs(prerequisites or {}) do
+      if seen[value] then fail("source terminal duplicates prerequisite: " .. context) end
+      seen[value] = true; out[#out + 1] = value
+    end
+    for _, value in ipairs(additions or {}) do
+      if seen[value] then fail("reviewed continuation duplicates prerequisite: " .. context) end
+      seen[value] = true; out[#out + 1] = value
+    end
+    table.sort(out)
+    return out
+  end
+  local function equal_names(left, right)
+    if #left ~= #right then return false end
+    for index, value in ipairs(left) do if value ~= right[index] then return false end end
+    return true
+  end
+  local function exact_addition_state(name, after, level)
+    if after.level ~= level or after.researched ~= false or after.enabled ~= true
+      or after.visible_when_disabled ~= false or math.abs((after.saved_progress or 0)) > epsilon then
+      fail("reviewed added technology state differs: " .. name)
+    end
+  end
+  local function exact_prototype_fields(name, prototype, contract)
+    if prototype.hidden ~= false or prototype.hidden_in_factoriopedia ~= false
+      or prototype.max_level ~= contract.max_level
+      or (contract.order ~= nil and prototype.order ~= contract.order)
+      or not equal_names(prototype.prerequisites, contract.prerequisites)
+      or not equal_state(prototype.ingredients, contract.ingredients)
+      or not equal_state(prototype.effects, contract.effects)
+      or prototype.unit_count ~= contract.unit_count
+      or prototype.unit_count_formula ~= contract.count_formula
+      or prototype.unit_energy ~= contract.unit_energy then
+      fail("reviewed added technology definition differs: " .. name)
+    end
+  end
+  local function terminal_contract(expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy)
+    local tail = expected.technologies[tail_name]
+    if not tail or tail.level ~= level - 1 or tail.prototype.max_level ~= level - 1 then
+      fail("reviewed finite terminal differs: " .. tail_name)
+    end
+    local additions = {tail_name}
+    for _, ingredient in ipairs(ingredients) do additions[#additions + 1] = ingredient.name end
+    return {
+      max_level = 4294967295,
+      order = tail.prototype.order,
+      prerequisites = sorted_names_with(tail.prototype.prerequisites, additions, tail_name),
+      ingredients = ingredients,
+      effects = effects,
+      unit_count = unit_count,
+      count_formula = count_formula,
+      unit_energy = unit_energy
+    }
+  end
+  local function verify_terminal_addition(name, after, expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy)
+    exact_addition_state(name, after, level)
+    exact_prototype_fields(name, after.prototype,
+      terminal_contract(expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy))
+  end
+  -- These constants are the reviewed F200 Defaults contracts. They retain the
+  -- six finite native tails, two declared direct streams, and the approved
+  -- copper/tungsten material stages. They are not candidate observations.
+  local reviewed_added_names = {
+    ["braking-force-8"] = true,
+    ["inserter-capacity-bonus-8"] = true,
+    ["laser-shooting-speed-8"] = true,
+    ["research-speed-7"] = true,
+    ["weapon-shooting-speed-7"] = true,
+    ["worker-robots-storage-4"] = true,
+    ["recipe-prod-research_cannon_shooting_speed-1"] = true,
+    ["recipe-prod-research_electric_shooting_speed-1"] = true,
+    ["recipe-prod-research_material_copper_tungsten-1"] = true,
+    ["recipe-prod-research_material_copper_tungsten-4"] = true
+  }
+  local function verify_reviewed_addition(name, after)
+    local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
+    local A_L_M = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}}
+    if name == "braking-force-8" then
+      return verify_terminal_addition(name, after, expected, "braking-force-7", 8, A_L,
+        {{type="train-braking-force-bonus",modifier=0.15}}, 861, "861.51212960553*1.33333^(L-8)", 3600)
+    elseif name == "inserter-capacity-bonus-8" then
+      return verify_terminal_addition(name, after, expected, "inserter-capacity-bonus-7", 8, A_L,
+        {{type="inserter-stack-size-bonus",modifier=2},{type="bulk-inserter-capacity-bonus",modifier=4}}, 914488, "914488.340211249*3.33333^(L-8)", 3600)
+    elseif name == "laser-shooting-speed-8" then
+      return verify_terminal_addition(name, after, expected, "laser-shooting-speed-7", 8, A_L_M,
+        {{type="gun-speed",ammo_category="laser",modifier=0.5}}, 1025, "1025.15625*1.5^(L-8)", 7200)
+    elseif name == "research-speed-7" then
+      return verify_terminal_addition(name, after, expected, "research-speed-6", 7, A_L_M,
+        {{type="laboratory-speed",modifier=0.6}}, 683, "683.4375*1.5^(L-7)", 7200)
+    elseif name == "weapon-shooting-speed-7" then
+      return verify_terminal_addition(name, after, expected, "weapon-shooting-speed-6", 7, A_L_M,
+        {{type="gun-speed",ammo_category="bullet",modifier=0.4},{type="gun-speed",ammo_category="shotgun-shell",modifier=0.4}}, 683, "683.4375*1.5^(L-7)", 7200)
+    elseif name == "worker-robots-storage-4" then
+      return verify_terminal_addition(name, after, expected, "worker-robots-storage-3", 4, A_L,
+        {{type="worker-robot-storage",modifier=1}}, 675, "675*1.5^(L-4)", 3600)
+    end
+    local direct = {
+      ["recipe-prod-research_cannon_shooting_speed-1"] = {
+        prerequisites={"automation-science-pack","logistic-science-pack","military-science-pack","tank","weapon-shooting-speed-5"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}},
+        effects={{type="gun-speed",ammo_category="cannon-shell",modifier=0.1}}, order="p[research_cannon_shooting_speed]"
+      },
+      ["recipe-prod-research_electric_shooting_speed-1"] = {
+        prerequisites={"automation-science-pack","discharge-defense-equipment","logistic-science-pack","military-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}},
+        effects={{type="gun-speed",ammo_category="electric",modifier=0.1}}, order="p[research_electric_shooting_speed]"
+      }
+    }
+    local row = direct[name]
+    if row then
+      exact_addition_state(name, after, 1)
+      row.max_level, row.unit_count, row.count_formula, row.unit_energy = 4294967295, 60, "60*1.5^(L-1)", 3600
+      return exact_prototype_fields(name, after.prototype, row)
+    end
+    local material = {
+      ["recipe-prod-research_material_copper_tungsten-1"] = {
+        level=1,max_level=3,order="p[research_material_copper_tungsten]",
+        prerequisites={"angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}},
+        effects={{type="change-recipe-productivity",recipe="bob-copper-tungsten-alloy",change=0.02}},
+        unit_count=200,count_formula="200*2^(L-1)",unit_energy=1800
+      },
+      ["recipe-prod-research_material_copper_tungsten-4"] = {
+        level=4,max_level=150,order="p[research_material_copper_tungsten__continuation]",
+        prerequisites={"angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_copper_tungsten-1","utility-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}},
+        effects={{type="change-recipe-productivity",recipe="bob-copper-tungsten-alloy",change=0.02}},
+        unit_count=1600,count_formula="1600+200*(L-4)",unit_energy=1800
+      }
+    }
+    row = material[name]
+    if not row then fail("unreviewed added technology: " .. name) end
+    exact_addition_state(name, after, row.level)
+    return exact_prototype_fields(name, after.prototype, row)
+  end
+  for name, after in pairs(observed.technologies) do
+    if not expected.technologies[name] then
+      if not reviewed_added_names[name] then fail("new technology added in performance-only upgrade: " .. name) end
+      verify_reviewed_addition(name, after)
+    end
+  end
+  for name in pairs(reviewed_added_names) do
+    if not observed.technologies[name] then fail("reviewed added technology missing: " .. name) end
+  end
+'@.TrimEnd()}else{@'
   for name in pairs(observed.technologies) do
     if not expected.technologies[name] then
       fail("new technology added in performance-only upgrade: " .. name)
     end
   end
-'@.TrimEnd()
+'@.TrimEnd()}
   $control=$technologySetGuard.Replace($control,$strictTechnologySetGuard,1)
   [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
   $settings=Get-Content -LiteralPath $settingsPath -Raw
@@ -815,8 +962,8 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   # Fixture identity remains unique across the two 4.3.1 predecessor lanes.
   # The direct published 4.2.2 lane has source patch 1 plus predecessor patch
   # 2 (0.1.45); the immediate 4.3.0 lane is 0.1.43.
-  $expectedVersion=if($full442Direct){'0.1.88'}elseif($full442Retained){'0.1.86'}elseif($full442Immediate){'0.1.87'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
-  $nextVersion=if($full442Direct){'0.1.88'}elseif($full442Retained){'0.1.86'}elseif($full442Immediate){'0.1.87'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
+  $expectedVersion=if($full442Direct){'0.1.89'}elseif($full442Retained){'0.1.86'}elseif($full442Immediate){'0.1.87'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full442Direct){'0.1.89'}elseif($full442Retained){'0.1.86'}elseif($full442Immediate){'0.1.87'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
   if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
   $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))
