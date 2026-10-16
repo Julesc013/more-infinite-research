@@ -18,6 +18,7 @@ local family_resolver = require("prototypes.mir.families.resolver")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local technology_catalog_contract = require("prototypes.mir.planner.technology_catalog")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local maximum_level_binding = target_line.feature_enabled("scripted_techs")
   and require("prototypes.mir.domain.technology." .. "maximum_level_binding") or nil
 
@@ -145,11 +146,14 @@ local function compile_active(context)
   latest.transformation_plan_fingerprint = pure_compilation.transformation_plan.plan_fingerprint
   local maximum_level_policy
   if maximum_level_binding then
+    local native_worker_robot_speed_input = maximum_level_binding.native_worker_robot_speed_cap_input(
+      policy_snapshot.effective_settings.values["mir-max-level-worker-robots-speed"], data_raw.technology)
     maximum_level_policy = maximum_level_binding.from_plan(latest, {
       plan_fingerprint = latest.compilation_fingerprint,
       target_profile = target_line.factorio_version,
       scripted_techs_supported = true,
-      mod_data_supported = target_line.mod_data_supported()
+      mod_data_supported = target_line.mod_data_supported(),
+      native_worker_robot_speed_input = native_worker_robot_speed_input
     })
   end
   context:set_state("compiler_input", input)
