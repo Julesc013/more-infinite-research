@@ -25,7 +25,6 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
   if($F200GaloreSpaceAge-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$HistoricalSettingsOracle)){throw '[mir431-f200-galore-fixture-target]'}
   if($F200BobAngel-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){throw '[mir423-f200-bob-angel-fixture-target]'}
-  if($SourceVersion-ceq'4.5.0'-and$Target-cnotin@('f210','f200')){throw '[mir450-f210-fixture-transition]'}
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
   $sourcePatch=$source.Build
@@ -65,6 +64,12 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.5.0'){
     if($FromVersion-cne'4.4.20002'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f200-fixture-transition]'}
     '0.1.1102'
+  }elseif($Target-ceq'f110'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-cne'4.4.11002'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f110-fixture-transition]'}
+    '0.1.1103'
+  }elseif($Target-ceq'f100'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-cne'4.4.10002'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f100-fixture-transition]'}
+    '0.1.1104'
   }elseif($F200BobAngel-and$SourceVersion-ceq'4.4.2'){
     if($FromVersion-ceq'4.4.20000'){'0.1.1086'}elseif($FromVersion-ceq'4.4.20001'){'0.1.1087'}elseif($FromVersion-ceq'4.2.20002'){'0.1.1089'}else{throw '[mir423-f200-bob-angel-fixture-transition]'}
   }elseif($F200GaloreSpaceAge){
@@ -313,13 +318,13 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
     ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq3-and$fromPatch-eq0)))
   $published442Predecessor=[bool]($SourceVersion-ceq'4.4.2'-and(
     ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq4-and$fromPatch-in@(0,1))))
-  $published450F015Predecessor=[bool]($SourceVersion-ceq'4.5.0'-and$Target-ceq'f015'-and$fromMinor-eq4-and$fromPatch-eq2)
+  $published450HistoricalPredecessor=[bool]($SourceVersion-ceq'4.5.0'-and$Target-cin@('f017','f016','f015','f014','f013')-and$fromMinor-eq4-and$fromPatch-eq2)
   if(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
      ($SourceVersion-ceq'4.3.0'-and($fromMinor-ne2-or$fromPatch-gt2)) -or
      ($SourceVersion-ceq'4.3.1'-and-not$published431Predecessor) -or
      ($SourceVersion-ceq'4.4.0'-and-not$published440Predecessor)-or
      ($SourceVersion-ceq'4.4.2'-and-not$published442Predecessor)-or
-     ($SourceVersion-ceq'4.5.0'-and-not$published450F015Predecessor)){throw '[mir42-upgrade-fixture-predecessor]'}
+     ($SourceVersion-ceq'4.5.0'-and-not$published450HistoricalPredecessor)){throw '[mir42-upgrade-fixture-predecessor]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -328,7 +333,7 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   # 4.4.2 F016 predecessor corrections change those fixture bytes. Keep the
   # immutable 1.0.46/.47/.48 archives and use the independent 1.1.46/.47/.48
   # oracle-content revision, avoiding the future 1.0 patch-version series.
-  $fixtureVersion=if($source.Minor-eq3){'1.0.'+(20+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.4.2'){'1.1.'+(46+$fromPatch)}elseif($SourceVersion-ceq'4.5.0'){'1.2.1102'}elseif($source.Minor-eq4){'1.0.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
+  $fixtureVersion=if($source.Minor-eq3){'1.0.'+(20+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.4.2'){'1.1.'+(46+$fromPatch)}elseif($SourceVersion-ceq'4.5.0'){switch($Target){'f017'{'1.2.1103'}'f016'{'1.2.1104'}'f015'{'1.2.1102'}'f014'{'1.2.1105'}'f013'{'1.2.1106'}default{throw '[mir450-historical-fixture-transition]'}}}elseif($source.Minor-eq4){'1.0.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){
