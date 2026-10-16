@@ -2988,8 +2988,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed technology-catalog validate responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 14914,
-      "expected_sha256": "400C23ECEBFD90D2A3A0F16B8C214B35ABEEC924F03C6C722C00003AB574FB1F",
+      "expected_bytes": 14622,
+      "expected_sha256": "B6637DE60C0E6DE25CEF7EE72A43FE96448233A1CD8C865087E2BFA4E712C83C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "ECBF7F6B6AF74F0CDF79C8F752E6EB5C4D66B57C97CC73C1866E3AD5A991CDE4"
+  "record_sha256": "525E4DAF7D0E2777816EBAF5DF6D4923E98DC141BD0363B6240230C435F0CAA3"
 }

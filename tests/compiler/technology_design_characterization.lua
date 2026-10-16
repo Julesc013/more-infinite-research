@@ -966,4 +966,77 @@ do
   for _, name in ipairs(loaded_names) do package.loaded[name] = saved[name] end
 end
 
+
+-- Private constructor-boundary control: final catalog validation accepts only
+-- constructor-owned child records on its cheap path. This preserves the
+-- complete catalog shape and fingerprints while rejecting forged lookalikes.
+do
+  local catalog_validate = require("prototypes.mir.planner.technology_catalog.validate")
+  local normal_fingerprints = {
+    candidate = catalog_deferred.candidate_catalog_fingerprint,
+    qualification = catalog_deferred.qualification_catalog_fingerprint,
+    preselection = catalog_deferred.preselection_catalog_fingerprint,
+    selection = catalog_deferred.selection_fingerprint,
+    catalog = catalog_deferred.catalog_fingerprint
+  }
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "constructor-owned final catalog remains accepted by the cheap ownership guard")
+  check(catalog_deferred.candidate_catalog_fingerprint == normal_fingerprints.candidate
+      and catalog_deferred.qualification_catalog_fingerprint == normal_fingerprints.qualification
+      and catalog_deferred.preselection_catalog_fingerprint == normal_fingerprints.preselection
+      and catalog_deferred.selection_fingerprint == normal_fingerprints.selection
+      and catalog_deferred.catalog_fingerprint == normal_fingerprints.catalog,
+    "cheap ownership guard preserves normal catalog fingerprint semantics")
+
+  local function shallow_catalog(source)
+    local out = {}
+    for key, value in pairs(source) do out[key] = value end
+    return out
+  end
+
+  -- Full-looking candidate data copied out of the catalog has no registered
+  -- identity. It must not be admitted by a caller-provided fast-path flag.
+  local unowned = shallow_catalog(catalog_deferred)
+  unowned.candidates = {deepcopy(catalog_deferred.candidates[1])}
+  expect_error(function() catalog_validate.assert_newly_constructed(unowned) end,
+    "Trusted TechnologyCandidate record is required")
+
+  -- This is the compact schema-invalid selection record from the independent
+  -- anchor experiment: sufficient for selection fields but not a Candidate.
+  local original_candidate = catalog_deferred.candidates[1]
+  local compact = shallow_catalog(catalog_deferred)
+  compact.candidates = {{
+    candidate_id = original_candidate.candidate_id,
+    selection_key = original_candidate.selection_key,
+    alternatives = original_candidate.alternatives,
+    diagnostic_evaluation = original_candidate.diagnostic_evaluation
+  }}
+  expect_error(function() catalog_validate.assert_newly_constructed(compact) end,
+    "Trusted TechnologyCandidate record is required")
+
+  -- A registered candidate whose authority identity changes after construction
+  -- also fails without entering a full fingerprint pass.
+  local identity_mutated = shallow_catalog(catalog_deferred)
+  local candidate = catalog_deferred.candidates[1]
+  local candidate_id = candidate.candidate_id
+  candidate.candidate_id = candidate_id .. "/forged"
+  expect_error(function() catalog_validate.assert_newly_constructed(identity_mutated) end,
+    "Trusted TechnologyCandidate record is required")
+  candidate.candidate_id = candidate_id
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "restored constructor-owned candidate remains valid after opposing identity control")
+
+  -- A hard gate participates in final-resolution policy and must be owned too.
+  -- Replacing only that registered child keeps its qualification otherwise valid.
+  local qualification = catalog_deferred.qualifications[1]
+  local gate_name = hard_gate_authority.order()[1]
+  local original_gate = qualification.hard_gates[gate_name]
+  qualification.hard_gates[gate_name] = deepcopy(original_gate)
+  expect_error(function() catalog_validate.assert_newly_constructed(catalog_deferred) end,
+    "Trusted TechnologyGate record is required")
+  qualification.hard_gates[gate_name] = original_gate
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "restored constructor-owned hard gate remains valid after opposing identity control")
+end
+
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)
