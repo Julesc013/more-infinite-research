@@ -1168,6 +1168,40 @@ foreach($version in @('4.2.21001','4.3.21000','4.4.21002','4.5.21000')){
 }
 if('4.6.21000'-cmatch$specializationPatterns[0].Right.Value){throw 'Upgrade fixture specialization gate admits an unselected source minor'}
 $mir43Assertions+=5
+# Exercise the actual runner selectors, not only the helper functions. A
+# helper can pass its unit controls while the runner never calls it.
+$identityAssignments=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+  $node.Left.Extent.Text-ceq'$fixtureIdentityTransition'
+},$true))
+if($identityAssignments.Count-ne1){throw 'Modern fixture identity selector missing or ambiguous'}
+$identitySelector=[scriptblock]::Create($identityAssignments[0].Right.Extent.Text)
+$modernCompleteGuards=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.IfStatementAst]-and
+  $node.Clauses[0].Item1.Extent.Text.Contains('$targetCode')-and
+  $node.Clauses[0].Item1.Extent.Text.Contains("'110','100'")-and
+  $node.Clauses[0].Item2.Extent.Text.Contains('Set-MIR422HistoricalCompleteStateUpgradeOracle')
+},$true))
+if($modernCompleteGuards.Count-ne1){throw 'Modern historical full-state oracle caller missing or ambiguous'}
+$modernCompleteSelector=[scriptblock]::Create($modernCompleteGuards[0].Clauses[0].Item1.Extent.Text)
+foreach($targetCode in @('210','200','110','100')){
+  $SourceVersion='4.5.0';$FromVersion='4.4.'+$targetCode+'02';$ToVersion='4.5.'+$targetCode+'00'
+  if(-not(& $identitySelector)){throw "Actual runner skips the 4.5 fixture identity for f$targetCode"}
+  $FromVersion='4.4.'+$targetCode+'01'
+  if(& $identitySelector){throw "Actual runner admits an unselected 4.5 fixture predecessor for f$targetCode"}
+  $FromVersion='4.4.'+$targetCode+'02';$ToVersion='4.5.'+$targetCode+'01'
+  if(& $identitySelector){throw "Actual runner admits an unselected 4.5 fixture destination for f$targetCode"}
+  $mir43Assertions+=3
+}
+foreach($targetCode in @('110','100')){
+  $SourceVersion='4.5.0';$classicReducedPolicy=$false;$Archetype='base-default'
+  if(-not(& $modernCompleteSelector)){throw "Actual runner skips the full-state oracle for 4.5 f$targetCode"}
+  $classicReducedPolicy=$true
+  if(& $modernCompleteSelector){throw "Actual runner assigns a Full oracle to Classic f$targetCode"}
+  $classicReducedPolicy=$false;$Archetype='automatic-family-creation'
+  if(& $modernCompleteSelector){throw "Actual runner assigns the Base oracle to a different f$targetCode scenario"}
+  $mir43Assertions+=3
+}
 $mir450IdentityRoot=Join-Path $testRoot 'mir450-immediate-r24-identities'
 New-Item -ItemType Directory -Force -Path $mir450IdentityRoot|Out-Null
 $mir450Cases=@(

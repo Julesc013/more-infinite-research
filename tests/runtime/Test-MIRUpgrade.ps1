@@ -782,7 +782,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     ($SourceVersion -ceq'4.3.1' -and $FromVersion -cin @(('4.2.'+$targetCode+'02'),('4.3.'+$targetCode+'00')) -and $ToVersion -ceq ('4.3.'+$targetCode+'01')) -or
     ($SourceVersion -ceq'4.4.0' -and $FromVersion -cin @(('4.2.'+$targetCode+'02'),('4.3.'+$targetCode+'00')) -and $ToVersion -ceq ('4.4.'+$targetCode+'00')) -or
     ($SourceVersion -ceq'4.4.2' -and $FromVersion -cin @(('4.2.'+$targetCode+'02'),('4.4.'+$targetCode+'00'),('4.4.'+$targetCode+'01')) -and $ToVersion -ceq ('4.4.'+$targetCode+'02')) -or
-    ($targetCode-cin@('210','200')-and$SourceVersion-ceq'4.5.0'-and$FromVersion-ceq("4.4.${targetCode}02")-and$ToVersion-ceq("4.5.${targetCode}00")) -or
+    ($targetCode-cin@('210','200','110','100')-and$SourceVersion-ceq'4.5.0'-and$FromVersion-ceq("4.4.${targetCode}02")-and$ToVersion-ceq("4.5.${targetCode}00")) -or
     ($targetCode-ceq'200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and$ToVersion-ceq'4.3.20000')
   )
   $mir42UpgradeSpecialized=$true
@@ -831,7 +831,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   if($f200BobAngelScenario){
     Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
   }
-  if($targetCode-cin@('110','100')-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')-and-not$classicReducedPolicy-and$Archetype-ceq'base-default'){
+  if($targetCode-cin@('110','100')-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')-and-not$classicReducedPolicy-and$Archetype-ceq'base-default'){
     Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -Target ('f'+$targetCode) -FromVersion $FromVersion -ToVersion $ToVersion
     if($SourceVersion-cin@('4.3.0','4.3.1','4.4.0','4.4.2')){
       Set-MIR430FullCompilerProfileUpgradeAllowance -Target ('f'+$targetCode) -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
