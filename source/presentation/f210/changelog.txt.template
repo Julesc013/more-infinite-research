@@ -10,6 +10,8 @@ Version: 4.4.21002
     - Avoid copying the public compiler snapshot solely to measure its serialized size.
 
   Changes:
+    - Add an explicit maximum-level setting for native infinite worker robot speed research,
+      using the existing cap controller without changing earned bonuses, science or costs.
     - Use the shared native-continuation planner and remove the obsolete Classic notice.
 
 ---------------------------------------------------------------------------------------------------
