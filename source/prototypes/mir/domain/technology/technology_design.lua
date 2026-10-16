@@ -5,6 +5,15 @@ local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
+local qualification_provenance = setmetatable({}, {__mode = "k"})
+-- Constructor-owned provenance is immutable in the two graph-qualification
+-- callers that opt into share_immutable. Keep only its exact canonical text,
+-- never a validation result or a cached answer for caller-owned tables.
+-- These lifetime totals cap retained text even if collection is delayed.
+local provenance_bytes, provenance_entries = 0, 0
+local MAXIMUM_PROVENANCE_BYTES = 2 * 1024 * 1024
+local MAXIMUM_PROVENANCE_ENTRIES = 512
+
 local authority = trusted_record.new("TechnologyDesign")
 
 local SCHEMA = {
@@ -604,6 +613,7 @@ local function validate(design, verify_fingerprints, options)
 end
 
 function M.verify_untrusted(design)
+  if type(design) == "table" then qualification_provenance[design] = nil end
   authority.verify_untrusted(design, function(record) validate(record, true) end, trust_identity(design or {}))
   return true
 end
@@ -625,8 +635,22 @@ function M.refresh_fingerprints(design, options)
   design.subject_fingerprint = fingerprint.of(subject_material(design))
   design.design_fingerprint = fingerprint.of(design_material(design))
   design.prototype_fingerprint = fingerprint.of(prototype_projection_unvalidated(design))
-  design.qualification_fingerprint = fingerprint.of(
-    qualification_material(design, options.trusted_gates == true))
+  qualification_provenance[design] = nil
+  if options.trusted_gates == true and options.retain_qualification_provenance == true
+    and provenance_entries < MAXIMUM_PROVENANCE_ENTRIES
+    and provenance_bytes < MAXIMUM_PROVENANCE_BYTES then
+    local encoded
+    design.qualification_fingerprint, encoded = fingerprint.of_owned_string_map_with_fragment(
+      qualification_material(design, true), "provenance")
+    if encoded and provenance_bytes + #encoded <= MAXIMUM_PROVENANCE_BYTES then
+      qualification_provenance[design] = {source = design.provenance, encoded = encoded}
+      provenance_entries = provenance_entries + 1
+      provenance_bytes = provenance_bytes + #encoded
+    end
+  else
+    design.qualification_fingerprint = fingerprint.of(
+      qualification_material(design, options.trusted_gates == true))
+  end
   design.semantic_fingerprint = design.qualification_fingerprint
   return design
 end
@@ -668,7 +692,16 @@ function M.with_qualification(design, row, options)
   result.gates = trusted_gate_map(row.gates)
   result.context.action_reason = row.reason
   result.context.target_profile_fingerprint = row.target_profile_fingerprint
-  result.qualification_fingerprint = fingerprint.of(qualification_material(result, true))
+  local retained = options and options.validated and options.share_immutable
+    and qualification_provenance[design] or nil
+  if retained and rawequal(retained.source, result.provenance) then
+    local encoded
+    result.qualification_fingerprint, encoded = fingerprint.of_owned_string_map_with_fragment(
+      qualification_material(result, true), "provenance", retained.encoded)
+    if encoded then qualification_provenance[result] = retained end
+  else
+    result.qualification_fingerprint = fingerprint.of(qualification_material(result, true))
+  end
   result.semantic_fingerprint = result.qualification_fingerprint
   return trust(result)
 end
@@ -834,7 +867,10 @@ function M.from_generation_row(row)
   -- Construction owns every field in this new record. Prove the structural
   -- and cross-field invariants once, then compute the fingerprints once.
   validate(result, false, {trusted_children = true, trusted_children_verified = true})
-  M.refresh_fingerprints(result, {trusted_gates = true})
+  M.refresh_fingerprints(result, {
+    trusted_gates = true,
+    retain_qualification_provenance = row.action == "emit" or row.action == "adopt"
+  })
   return trust(result)
 end
 

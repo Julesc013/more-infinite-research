@@ -341,6 +341,62 @@ function M.of(value)
   return hash_canonical(text)
 end
 
+
+local function contains_metatable(value, seen)
+  if type(value) ~= "table" then return false end
+  if getmetatable(value) ~= nil then return true end
+  if seen[value] then return false end
+  seen[value] = true
+  -- Raw iteration must not execute a hook before the ordinary traversal.
+  for key, child in next, value do
+    if contains_metatable(key, seen) or contains_metatable(child, seen) then return true end
+  end
+  return false
+end
+
+-- Trusted composition, like of_canonical(text): capture an exact field during
+-- its first serialization, or splice those immutable bytes into the map.
+-- Supplied bytes are NOT a validation of the current selected value. The
+-- caller owns that field's immutable lifetime and its trust boundary.
+-- Dynamic tables cannot establish this lifetime; their ordinary traversal is
+-- performed once without retaining a fragment. Other fields are always read.
+function M.of_owned_string_map_with_fragment(value, selected_key, encoded_field)
+  if type(value) ~= "table" or getmetatable(value) ~= nil or type(selected_key) ~= "string"
+    or rawget(value, selected_key) == nil
+    or (encoded_field ~= nil and type(encoded_field) ~= "string") then
+    error("Exact field fingerprint requires an owned string map and canonical text.", 2)
+  end
+  local keys = string_map_keys(value)
+  if not keys then error("Exact field fingerprint requires an owned string map.", 2) end
+  local seen = {}
+  for key, child in next, value do
+    if (encoded_field == nil or key ~= selected_key) and contains_metatable(child, seen) then
+      -- No hook has run during this eligibility check. Fall back to exactly
+      -- the original traversal once, without retaining a dynamic fragment.
+      return M.of(value), nil
+    end
+  end
+  table.sort(keys)
+  local out, count = {"{"}, 1
+  for index, key in ipairs(keys) do
+    if index > 1 then count = count + 1; out[count] = "," end
+    out[count + 1], out[count + 2] = quoted_string(key), ":"
+    count = count + 2
+    if key == selected_key and encoded_field ~= nil then
+      count = count + 1; out[count] = encoded_field
+    else
+      local first = count + 1
+      count = encode(value[key], {[value] = true}, "$", false, value, out, count)
+      if key == selected_key then encoded_field = table.concat(out, "", first, count) end
+    end
+  end
+  out[count + 1] = "}"
+  local text = table.concat(out)
+  record_canonical_metrics(#text)
+  metrics.fingerprint_calls = metrics.fingerprint_calls + 1
+  return hash_canonical(text), encoded_field
+end
+
 function M.of_canonical(text)
   if type(text) ~= "string" then error("Canonical fingerprint text is required.", 2) end
   metrics.fingerprint_calls = metrics.fingerprint_calls + 1

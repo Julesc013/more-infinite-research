@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -20,7 +20,7 @@ function Set-MIR42HistoricalBaselinePackageIdentity {
   # The verified adapter remains a pinned 4.2 baseline. Project its identity
   # only in this private build tree before the normal patch writer validates
   # the requested minor. Never broaden that writer's accepted input versions.
-  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3|4)[.]0$') {
+  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5)[.]0$') {
     throw '[mir42-historical-baseline-projection]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -205,7 +205,7 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     [Parameter(Mandatory)][string]$TargetRecordPath
   )
 
-  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3|4)[.](?<patch>[0-9]{1,2})$') {
+  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5)[.](?<patch>[0-9]{1,2})$') {
     throw '[mir42-historical-authentication-source-version]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -433,7 +433,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
