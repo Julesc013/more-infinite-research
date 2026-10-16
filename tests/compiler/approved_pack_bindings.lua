@@ -1091,6 +1091,13 @@ Context.with_active(Context.new(), function()
   check(science_packs.pack_production_status("dmrsa-tenemut") == "initial", "Positive typed mining results bind natively")
 end)
 raw = mined_science_world()
+raw.recipe["later-tenemut-replication"] = {type = "recipe", name = "later-tenemut-replication", enabled = false,
+  results = {{type = "item", name = "dmrsa-tenemut", amount = 1}}}
+Context.with_active(Context.new(), function()
+  check(science_packs.pack_production_status("dmrsa-tenemut") == "initial", "Later replication recipes cannot hide the approved mined seed")
+  check(science_packs.pack_production_status("dmrsa-dark-matter-scoop") == "research", "The scoop still resolves when tenemut has later producers")
+end)
+raw = mined_science_world()
 raw.tool["unapproved-mined-pack"] = {type = "tool", name = "unapproved-mined-pack"}
 raw.lab["replication-lab"].inputs[#raw.lab["replication-lab"].inputs + 1] = "unapproved-mined-pack"
 raw.resource.other = {type = "resource", name = "other", autoplace = {}, minable = {result = "unapproved-mined-pack"}}

@@ -330,6 +330,10 @@ local function direct_resource_source(pack_name, shared)
 end
 
 local function declared_source(pack_name, shared)
+  -- The approved mined seed precedes later replication/recycling recipes.
+  -- Their existence does not make the original resource research-locked.
+  local native = direct_resource_source(pack_name, shared)
+  if native then return native end
   local declarations = shared.science_bindings or {}
   local declared_roles = {}
   for role in pairs(declarations) do declared_roles[#declared_roles + 1] = role end
@@ -359,8 +363,6 @@ local function declared_source(pack_name, shared)
     -- route search or chooses an alternative by traversal order.
     local producers = recipe_facts.recipes_by_output_identity_view("item", pack_name)
     if #producers == 0 then
-      local native = direct_resource_source(pack_name, shared)
-      if native then return native end
       local excluded = retained_launch_exclusion(pack_name, (shared.science_binding_policy or {}).retained_launch_source)
       if excluded then return excluded end
       return nil, "missing-approved-pack-source:" .. pack_name
