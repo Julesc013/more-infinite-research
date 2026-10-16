@@ -102,6 +102,12 @@ M.shared = {
     },
     ["production-science-pack"] = {
       recipe = "production-science-pack", technology = "production-science-pack", allow_initial = true
+    },
+    -- Angel's Biology token has several producers.  This is the reviewed
+    -- early producer, with its explicit direct unlock owner; it is not a
+    -- traversal-selected alternative or a material-acquisition proof.
+    ["angels-token-bio"] = {
+      recipe = "angels-temperate-garden-a", technology = "angels-gardens", allow_initial = true
     }
   }
 }
