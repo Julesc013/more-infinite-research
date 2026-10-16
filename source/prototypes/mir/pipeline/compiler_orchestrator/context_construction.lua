@@ -80,7 +80,7 @@ local function compile_active(context)
   telemetry.start_phase("planning")
   local stream_plan = stream_compiler.compile_view(context)
   local base_plan, base_candidates = base_continuations.plan_all()
-  local provider_inputs = family_resolver.view()
+  local provider_inputs = family_resolver.compilation_projection()
   local policy_snapshot = policy_snapshot_adapter.capture(context)
   local input_snapshot = compilation_snapshot_adapter.capture({
     stream_inputs = {plan = stream_plan},
