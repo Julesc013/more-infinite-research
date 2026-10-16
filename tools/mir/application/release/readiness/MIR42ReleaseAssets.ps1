@@ -97,12 +97,96 @@ function Test-MIR442F016PrerequisiteRestoration {
   return (Test-MIR422SavedScalarEqual $old $new)
 }
 
+function Get-MIR442F200BobAngelReviewedAdditionContracts {
+  # Source-derived exact contract for the direct F200 Bob/Angel 4.2.2 lane.
+  # It is not projected from a candidate snapshot and is never a generic new-ID allowance.
+  $json = @'
+{
+  "braking-force-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","braking-force-6","braking-force-7","logistic-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"train-braking-force-bonus","modifier":0.15}],"unit_count":861,"unit_count_formula":"861.51212960553*1.33333^(L-8)","unit_energy":3600}},
+  "inserter-capacity-bonus-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","inserter-capacity-bonus-6","inserter-capacity-bonus-7","logistic-science-pack","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"inserter-stack-size-bonus","modifier":2},{"type":"bulk-inserter-capacity-bonus","modifier":4}],"unit_count":914488,"unit_count_formula":"914488.340211249*3.33333^(L-8)","unit_energy":3600}},
+  "laser-shooting-speed-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","laser-shooting-speed-6","laser-shooting-speed-7","logistic-science-pack","military-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"laser","modifier":0.5}],"unit_count":1025,"unit_count_formula":"1025.15625*1.5^(L-8)","unit_energy":7200}},
+  "research-speed-7": {"level":7,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","research-speed-5","research-speed-6","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"laboratory-speed","modifier":0.6}],"unit_count":683,"unit_count_formula":"683.4375*1.5^(L-7)","unit_energy":7200}},
+  "weapon-shooting-speed-7": {"level":7,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","utility-science-pack","weapon-shooting-speed-5","weapon-shooting-speed-6"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"bullet","modifier":0.4},{"type":"gun-speed","ammo_category":"shotgun-shell","modifier":0.4}],"unit_count":683,"unit_count_formula":"683.4375*1.5^(L-7)","unit_energy":7200}},
+  "worker-robots-storage-4": {"level":4,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","utility-science-pack","worker-robots-storage-2","worker-robots-storage-3"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"worker-robot-storage","modifier":1}],"unit_count":675,"unit_count_formula":"675*1.5^(L-4)","unit_energy":3600}},
+  "recipe-prod-research_cannon_shooting_speed-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_cannon_shooting_speed]","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","tank","weapon-shooting-speed-5"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"cannon-shell","modifier":0.1}],"unit_count":60,"unit_count_formula":"60*1.5^(L-1)","unit_energy":3600}},
+  "recipe-prod-research_electric_shooting_speed-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_electric_shooting_speed]","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","discharge-defense-equipment","logistic-science-pack","military-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"electric","modifier":0.1}],"unit_count":60,"unit_count_formula":"60*1.5^(L-1)","unit_energy":3600}},
+  "recipe-prod-research_material_copper_tungsten-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_material_copper_tungsten]","hidden":false,"hidden_in_factoriopedia":false,"max_level":3,"prerequisites":["angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"change-recipe-productivity","recipe":"bob-copper-tungsten-alloy","change":0.02}],"unit_count":200,"unit_count_formula":"200*2^(L-1)","unit_energy":1800}},
+  "recipe-prod-research_material_copper_tungsten-4": {"level":4,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_material_copper_tungsten__continuation]","hidden":false,"hidden_in_factoriopedia":false,"max_level":150,"prerequisites":["angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_copper_tungsten-1","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"utility-science-pack","amount":1}],"effects":[{"type":"change-recipe-productivity","recipe":"bob-copper-tungsten-alloy","change":0.02}],"unit_count":1600,"unit_count_formula":"1600+200*(L-4)","unit_energy":1800}}
+}
+'@
+  return ($json | ConvertFrom-Json -AsHashtable -Depth 100)
+}
+
+function Test-MIR442F200BobAngelActiveMods {
+  param([Collections.IDictionary]$Snapshot,[string]$MIRVersion)
+  if($Snapshot-isnot[Collections.IDictionary]-or-not$Snapshot.Contains('active_mods')-or$Snapshot.active_mods-isnot[Collections.IDictionary]){return $false}
+  $expected=[Collections.Hashtable]::new([StringComparer]::Ordinal)
+  foreach($identity in @(
+      'angelsbioprocessing@2.0.3','angelsbioprocessinggraphics@2.0.0',
+      'angelspetrochem@2.0.3','angelspetrochemgraphics@2.0.1',
+      'angelsrefining@2.0.4','angelsrefininggraphics@2.0.0',
+      'angelssmelting@2.0.5','angelssmeltinggraphics@2.0.0',
+      'base@2.0.77','bobelectronics@2.1.1','boblibrary@2.1.0',
+      'bobores@2.1.2','bobplates@2.1.1','bobrevamp@2.1.1',
+      'mir-fixture-assert-upgrade-4-0-20000-to-4-1-20000@0.1.89',
+      'mir423-startup-observer@1.0.0',('more-infinite-research@'+$MIRVersion))){
+    $name,$version=$identity -split '@',2;$expected[$name]=$version
+  }
+  return (Test-MIR422SavedScalarEqual $expected $Snapshot.active_mods)
+}
+
+function Get-MIR442F200BobAngelScopeField {
+  param($Value,[Parameter(Mandatory)][string]$Name)
+  if($Value-is[Collections.IDictionary]){
+    if($Value.Contains($Name)){return [pscustomobject]@{present=$true;value=$Value[$Name]}}
+    return [pscustomobject]@{present=$false;value=$null}
+  }
+  if($null-eq$Value){return [pscustomobject]@{present=$false;value=$null}}
+  $property=$Value.PSObject.Properties[$Name]
+  if($null-eq$property){return [pscustomobject]@{present=$false;value=$null}}
+  return [pscustomobject]@{present=$true;value=$property.Value}
+}
+
+function Get-MIR442F200BobAngelReviewedAdditions {
+  param($Record,$Row,$Package,[string]$CandidateSourceVersion,[Collections.IDictionary]$States)
+  # A source/profile/asset-scoped contract, never a generic new-ID allowance.
+  $rowTarget=Get-MIR442F200BobAngelScopeField $Row 'target'
+  $rowPredecessor=Get-MIR442F200BobAngelScopeField $Row 'predecessor_source_version'
+  $packageSha256=Get-MIR442F200BobAngelScopeField $Package 'sha256'
+  if($Record-isnot[Collections.IDictionary]-or$States-isnot[Collections.IDictionary]-or
+    -not$rowTarget.present-or-not$rowPredecessor.present-or-not$packageSha256.present-or
+    -not$Record.Contains('archetype')-or-not$Record.Contains('factorio_binary_version')-or
+    -not$Record.Contains('from')-or-not$Record.Contains('to')-or
+    $Record.from-isnot[Collections.IDictionary]-or$Record.to-isnot[Collections.IDictionary]-or
+    -not$Record.from.Contains('version')-or-not$Record.to.Contains('version')-or
+    $CandidateSourceVersion-cne'4.4.2'-or[string]$rowTarget.value-cne'f200'-or
+    [string]$rowPredecessor.value-cne'4.2.2'-or[string]$Record.archetype-cne'f200-bob-angel'-or
+    [string]$Record.factorio_binary_version-cne'2.0.77.84539'-or
+    [string]$Record.from.version-cne'4.2.20002'-or[string]$Record.to.version-cne'4.4.20002'-or
+    [string]$packageSha256.value-cne'E0DEB9E1A9E3CE83903B9CD3DADB13A51D9DD0BF2E480845554BBCC67CCDC0D2'-or
+    -not$Record.Contains('f200_bob_angel_input_profile')){return $null}
+  $profile=$Record.f200_bob_angel_input_profile
+  if($profile-isnot[Collections.IDictionary]-or[string]$profile.sha256-cne'306F4D61739054AD63395B80D5C1884A8B1BEAEF222D70640EA446661BB6B0FA'-or
+    $profile.source_lock-isnot[Collections.IDictionary]-or[string]$profile.source_lock.sha256-cne'00193B07816DBB0043FDDC0BC801A67BCE47041EC60C171D6837F2141CBF9FED'-or
+    [string]$profile.source_lock.identity_sha256-cne'AF1B932BF627053685FEC050FF97CC71F50A682B89A64FDACA3223F81771BF22'){return $null}
+  if(-not$States.Contains('source')-or-not$States.Contains('upgrade')-or-not$States.Contains('reload')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.source '4.2.20002')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.upgrade '4.4.20002')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.reload '4.4.20002')){return $null}
+  return Get-MIR442F200BobAngelReviewedAdditionContracts
+}
+function Test-MIR442F200BobAngelReviewedAddition {
+  param([string]$Name,[Collections.IDictionary]$Technology,[Collections.IDictionary]$Contracts)
+  return $Technology-is[Collections.IDictionary]-and$Contracts-is[Collections.IDictionary]-and
+    $Contracts.Contains($Name)-and(Test-MIR422SavedScalarEqual $Technology $Contracts[$Name])
+}
 function Assert-MIR422CompleteSavedState {
   param(
     [Collections.IDictionary]$Before,
     [Collections.IDictionary]$After,
     [switch]$RequireExactResearchDefinitions,
-    [switch]$AllowMIR430FullCompilerProfileDefault
+    [switch]$AllowMIR430FullCompilerProfileDefault,
+    [Collections.IDictionary]$ReviewedAddedTechnologyContracts
   )
   $restorations=Get-MIR442F016PrerequisiteRestorations $Before $After
   if($Before.forces-isnot[Collections.IDictionary]-or$After.forces-isnot[Collections.IDictionary]-or$Before.forces.Count-lt1-or$Before.forces.Count-ne$After.forces.Count){throw '[mir422-upgrade-forces]'}
@@ -115,7 +199,22 @@ function Assert-MIR422CompleteSavedState {
     # A direct 4.2.2 -> performance-only 4.2.3 transition must preserve the
     # complete catalogue, including unresearched technologies and definitions.
     # Older predecessors keep their reviewed feature/definition allowances.
-    if($RequireExactResearchDefinitions-and$old.technologies.Count-ne$new.technologies.Count){throw '[mir423-upgrade-technology-set]'}
+    if($RequireExactResearchDefinitions){
+      if($null-eq$ReviewedAddedTechnologyContracts){
+        if($old.technologies.Count-ne$new.technologies.Count){throw '[mir423-upgrade-technology-set]'}
+      }else{
+        $addedNames=@($new.technologies.Keys|Where-Object {-not$old.technologies.Contains($_)})
+        foreach($name in $ReviewedAddedTechnologyContracts.Keys){
+          if($old.technologies.Contains($name)-or-not$new.technologies.Contains($name)){throw '[mir442-f200-bob-angel-added-technology-set]'}
+        }
+        if($addedNames.Count-ne$ReviewedAddedTechnologyContracts.Count){throw '[mir442-f200-bob-angel-added-technology-set]'}
+        foreach($name in $addedNames){
+          if(-not(Test-MIR442F200BobAngelReviewedAddition $name $new.technologies[$name] $ReviewedAddedTechnologyContracts)){
+            throw '[mir442-f200-bob-angel-added-technology-definition]'
+          }
+        }
+      }
+    }
     foreach($name in $old.technologies.Keys){
       if(-not$new.technologies.Contains($name)){throw "[mir422-upgrade-technology-missing] $force/$name"}
       if($old.technologies[$name]-isnot[Collections.IDictionary]-or$new.technologies[$name]-isnot[Collections.IDictionary]){throw '[mir422-upgrade-technology-shape]'}
@@ -657,10 +756,12 @@ function Assert-MIR423NativeUpgradeProof {
     $states[$snapshot.stage]=$s
   }
   if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw "[$errorPrefix-snapshot-set]"}
+  $reviewedAddedTechnologyContracts=Get-MIR442F200BobAngelReviewedAdditions -Record $r -Row $Row -Package $Package -CandidateSourceVersion $CandidateSourceVersion -States $states
   foreach($phase in @('upgrade','reload')){
     Assert-MIR422CompleteSavedState $states.source $states[$phase] `
       -RequireExactResearchDefinitions:($candidate.Minor -gt 2 -or $predecessor.Build-eq2) `
-      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2'))
+      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2')) `
+      -ReviewedAddedTechnologyContracts $reviewedAddedTechnologyContracts
   }
   return $proof
 }
