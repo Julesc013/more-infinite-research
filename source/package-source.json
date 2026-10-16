@@ -3048,10 +3048,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/science_integration/science_selector.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 13559,
-      "source_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB",
-      "output_bytes": 13559,
-      "output_sha256": "83358DC6B9095BD0DDF3654CAEF8587C7666DC1111C2D3DB166B11B39333E0FB"
+      "source_bytes": 18441,
+      "source_sha256": "8425E1E6FA44EFB99084BFB951558647F6D4736FFB44E877C5A6C58ED6B264E4",
+      "output_bytes": 18441,
+      "output_sha256": "8425E1E6FA44EFB99084BFB951558647F6D4736FFB44E877C5A6C58ED6B264E4"
     },
     {
       "layer": "capability",
@@ -3111,10 +3111,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/compatibility/policy_authority.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 2861,
-      "source_sha256": "7B7A77ED7775D42AD8FD9D7F5772F3BAD5AD6A2455B946B87CF51497A65F7191",
-      "output_bytes": 2861,
-      "output_sha256": "7B7A77ED7775D42AD8FD9D7F5772F3BAD5AD6A2455B946B87CF51497A65F7191"
+      "source_bytes": 5216,
+      "source_sha256": "EE78A3AD8EC6F05A99FECECDC819CCCF0B9F54781036AD993C0BBB2B1CB6C5B9",
+      "output_bytes": 5216,
+      "output_sha256": "EE78A3AD8EC6F05A99FECECDC819CCCF0B9F54781036AD993C0BBB2B1CB6C5B9"
     },
     {
       "layer": "capability",
@@ -5379,10 +5379,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/prerequisites.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 3203,
-      "source_sha256": "704E5B3A6D4C26ACAA59B463DD358197C007A6511B2BA94EC763C14C330EB3FC",
-      "output_bytes": 3203,
-      "output_sha256": "704E5B3A6D4C26ACAA59B463DD358197C007A6511B2BA94EC763C14C330EB3FC"
+      "source_bytes": 3324,
+      "source_sha256": "87B7FC420FAA3DDD70325A05E5386AF8182CC8CBEBD69714D029772996C10102",
+      "output_bytes": 3324,
+      "output_sha256": "87B7FC420FAA3DDD70325A05E5386AF8182CC8CBEBD69714D029772996C10102"
     },
     {
       "layer": "capability",
@@ -7673,5 +7673,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "E401D4C5C4841B9CBAF81FC51DDB8CAF15D2859129CDC05CEEAEC644635B0796"
+  "record_sha256": "66F56DBDB85BE6273709FC81E9CC8FABCF2AF415A48EB4C87154724289BD5879"
 }
