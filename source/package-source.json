@@ -3321,10 +3321,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/domain/compiler/mutation_journal.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 7727,
-      "source_sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F",
-      "output_bytes": 7727,
-      "output_sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F"
+      "source_bytes": 8752,
+      "source_sha256": "A0FBB1EECEF58245900F5059F2F59C9B92000C2FBF42F7FAC6161F0636D2A8BF",
+      "output_bytes": 8752,
+      "output_sha256": "A0FBB1EECEF58245900F5059F2F59C9B92000C2FBF42F7FAC6161F0636D2A8BF"
     },
     {
       "layer": "capability",
@@ -4919,10 +4919,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/publication.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 8071,
-      "source_sha256": "571802390F1A22C933DD922E77AC03BE6A8467803B03D9973A2B0E56647BC2D9",
-      "output_bytes": 8071,
-      "output_sha256": "571802390F1A22C933DD922E77AC03BE6A8467803B03D9973A2B0E56647BC2D9"
+      "source_bytes": 9530,
+      "source_sha256": "35A3B4BCD5129C2DBC735F9E883E54F98339EFC6B0D62D46D77D0A0FF17E8A65",
+      "output_bytes": 9530,
+      "output_sha256": "35A3B4BCD5129C2DBC735F9E883E54F98339EFC6B0D62D46D77D0A0FF17E8A65"
     },
     {
       "layer": "capability",
@@ -7673,5 +7673,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "FB0966E578963B0813248EA0569086404C012B7EB90D7E55601E133C51C6A63D"
+  "record_sha256": "76EC1ECB5EC29B0A274448F435C3B637197F8F11DFDFB7E1B2E1AACA08593361"
 }

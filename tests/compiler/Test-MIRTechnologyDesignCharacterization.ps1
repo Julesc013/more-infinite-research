@@ -65,6 +65,10 @@ $modules=[ordered]@{
   'prototypes.mir.planner.technology_catalog.build'='source/prototypes/mir/planner/technology_catalog/build.lua'
   'prototypes.mir.planner.technology_catalog.query'='source/prototypes/mir/planner/technology_catalog/query.lua'
   'prototypes.mir.domain.compiler.public_artifact_budget'='source/prototypes/mir/domain/compiler/public_artifact_budget.lua'
+  'prototypes.mir.domain.compiler.transformation_operation'='source/prototypes/mir/domain/compiler/transformation_operation.lua'
+  'prototypes.mir.domain.compiler.transformation_plan'='source/prototypes/mir/domain/compiler/transformation_plan.lua'
+  'prototypes.mir.domain.compiler.mutation_journal'='source/prototypes/mir/domain/compiler/mutation_journal.lua'
+  'prototypes.mir.domain.evidence.compiler_evidence'='source/prototypes/mir/domain/evidence/compiler_evidence.lua'
   'prototypes.mir.report.public_compiler_artifacts'='source/prototypes/mir/report/public_compiler_artifacts.lua'
 }
 $lua=[Text.StringBuilder]::new()
@@ -113,15 +117,15 @@ try{
     throw "TechnologyDesign characterization failed: $nativeLog"
   }
   $assertionCount=[int]$Matches[1]
-  if($assertionCount-ne4939) {
-    throw "TechnologyDesign characterization expected 4939 assertions, observed $assertionCount`: $nativeLog"
+  if($assertionCount-ne4947) {
+    throw "TechnologyDesign characterization expected 4947 assertions, observed $assertionCount`: $nativeLog"
   }
   if($log-notmatch'MIR-PUBLICATION-MEASUREMENT-PASS ([0-9]+)') {
     throw "Publication measurement characterization failed: $nativeLog"
   }
   $publicationAssertionCount=[int]$Matches[1]
-  if($publicationAssertionCount-ne11) {
-    throw "Publication measurement characterization expected 11 assertions, observed $publicationAssertionCount`: $nativeLog"
+  if($publicationAssertionCount-ne27) {
+    throw "Publication measurement characterization expected 27 assertions, observed $publicationAssertionCount`: $nativeLog"
   }
   $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $nativeLog -LatestInvocation
 }finally{

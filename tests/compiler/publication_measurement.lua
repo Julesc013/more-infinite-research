@@ -13,8 +13,138 @@ local function copy(value)
   return out
 end
 
+-- Load actual public projection and journal contracts before this controlled
+-- publication fixture substitutes its bounded module doubles below.
+local actual_deepcopy = require("prototypes.mir.core.deepcopy")
+local actual_fingerprint = require("prototypes.mir.core.fingerprint")
+local actual_public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
+local actual_compiler_evidence = require("prototypes.mir.domain.evidence.compiler_evidence")
+local actual_transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
+local actual_mutation_journal = require("prototypes.mir.domain.compiler.mutation_journal")
+
 local state = {}
 local telemetry = {}
+
+-- The publication module must not make an ordinary full copy of final-result
+-- or selected diagnostic records. The wrapper is installed before it loads.
+package.loaded["prototypes.mir.core.deepcopy"] = function(value)
+  if type(value) == "table" and value._publication_copy_probe then
+    state.probe_deepcopy_calls = (state.probe_deepcopy_calls or 0) + 1
+  end
+  return actual_deepcopy(value)
+end
+
+local function canonical(value)
+  return actual_fingerprint.canonical(value)
+end
+
+local function actual_evidence_input()
+  return {
+    compilation_plan_schema = 2,
+    compilation_fingerprint = "mir32-compilation",
+    qualification_fingerprint = "mir32-qualification",
+    telemetry = {schema = 1, counters = {public_bytes = 17}, phases = {}, witnesses = {}},
+    compiler_result = {
+      schema = 3,
+      result_phase = "final",
+      result_fingerprint = "mir32-result",
+      planned_result_fingerprint = "mir32-planned",
+      status = "PASS",
+      dimensions = {execution = "APPLIED", safety = "QUALIFIED", release = "ELIGIBLE"},
+      execution_evidence = {journal_fingerprint = "mir32-journal", applied = 1},
+      ignored_full_result_material = {payload = {"large", "unexported", "projection"}}
+    },
+    mutation_journal = {
+      schema = 2,
+      plan_fingerprint = "mir32-plan",
+      journal_fingerprint = "mir32-journal",
+      required_operation_count = 1,
+      terminal_counts = {applied = 1, failed = 0},
+      missing_operation_count = 0,
+      duplicate_operation_count = 0,
+      undeclared_operation_count = 0,
+      out_of_plan_operation_count = 0,
+      complete = true,
+      entries = {{before_snapshot = {unexported = true}, after_projection = {unexported = true}}}
+    },
+    input_sanitation_ledger = {
+      schema = 1, pass = "input", scanned_technology_count = 2,
+      scanned_effect_count = 3, pruned_effect_count = 1, affected_technology_count = 1,
+      generated_technology_count = 1, external_technology_count = 1,
+      emptied_technology_count = 0, sanitized_target_inventory_fingerprint = "mir32-target",
+      technologies = {{original_technology = "ignored-ledger-row", retained_effects = {"x"}}}
+    },
+    output_sanitation_ledger = {
+      schema = 1, pass = "output", scanned_technology_count = 2,
+      scanned_effect_count = 3, pruned_effect_count = 1, affected_technology_count = 1,
+      generated_technology_count = 1, external_technology_count = 1,
+      emptied_technology_count = 0, sanitized_target_inventory_fingerprint = "mir32-target",
+      technologies = {{original_technology = "ignored-ledger-row", retained_effects = {"x"}}}
+    }
+  }
+end
+
+local publication_plan = actual_transformation_plan.new({
+  phase = "publication", execution_mode = "SAFE",
+  compilation_snapshot_fingerprint = "mir32-snapshot", policy_fingerprint = "mir32-policy",
+  operations = {}
+})
+local publication_journal = actual_mutation_journal.new(publication_plan)
+local prefinal_ok, prefinal_message = pcall(function() return publication_journal:publication_summary() end)
+check(not prefinal_ok and string.find(tostring(prefinal_message), "requires finalization", 1, true),
+  "journal rejects a public summary before finalization")
+publication_journal:finalize()
+local isolated_summary = publication_journal:publication_summary()
+check(isolated_summary.entries == nil and isolated_summary.violations == nil
+  and isolated_summary.terminal_counts.applied == 0,
+  "journal public summary excludes operation material")
+isolated_summary.terminal_counts.applied = 99
+check(publication_journal:publication_summary().terminal_counts.applied == 0,
+  "journal public summary is copy-isolated")
+
+local actual_input = actual_evidence_input()
+local actual_public_full = actual_public_artifacts.compiler_evidence(actual_input)
+local actual_public_full_bytes = canonical(actual_public_full)
+local actual_summary_input = copy(actual_input)
+actual_summary_input.mutation_journal.entries = nil
+local actual_public_summary = actual_public_artifacts.compiler_evidence(actual_summary_input)
+check(canonical(actual_public_summary) == actual_public_full_bytes,
+  "actual public evidence ignores complete journal operation rows")
+local actual_ignored_result = copy(actual_summary_input)
+actual_ignored_result.compiler_result.ignored_full_result_material.payload[1] = "changed-unexported"
+check(canonical(actual_public_artifacts.compiler_evidence(actual_ignored_result)) == actual_public_full_bytes,
+  "actual public evidence ignores complete result-only projection material")
+local function actual_evidence_changes(mutator)
+  local changed = copy(actual_summary_input)
+  mutator(changed)
+  return canonical(actual_public_artifacts.compiler_evidence(changed)) ~= actual_public_full_bytes
+end
+check(actual_evidence_changes(function(value) value.compiler_result.dimensions.release = "BLOCKED" end),
+  "actual public evidence binds result dimensions")
+check(actual_evidence_changes(function(value) value.compiler_result.execution_evidence.applied = 2 end),
+  "actual public evidence binds execution evidence")
+check(actual_evidence_changes(function(value) value.mutation_journal.terminal_counts.applied = 2 end),
+  "actual public evidence binds journal terminal counts")
+check(actual_evidence_changes(function(value) value.input_sanitation_ledger.technologies[1].retained_effects[1] = "changed" end),
+  "actual public evidence binds complete sanitation ledgers")
+actual_summary_input.compiler_result.dimensions.release = "MUTATED_AFTER_BUILD"
+actual_summary_input.mutation_journal.terminal_counts.applied = 44
+check(canonical(actual_public_summary) == actual_public_full_bytes,
+  "actual public evidence defensively isolates returned result and journal rows")
+
+local actual_internal_input = actual_evidence_input()
+actual_internal_input.compiler_input_fingerprint = "mir32-input"
+actual_internal_input.compiler_result_fingerprint = "mir32-result"
+actual_internal_input.technology_catalog_fingerprint = "mir32-catalog"
+actual_internal_input.technology_graph_parity = {valid = true, rows = {{technology = "mir32-tech"}}}
+actual_internal_input.provider_resolution = {rows = {{provider = "mir32-provider"}}}
+actual_internal_input.provider_decision_diagnostics = {
+  {kind = "decision", reason = "canonical_provider_decision_projection", payload = {complete = true}}
+}
+local internal_copied_input = copy(actual_internal_input)
+local actual_internal_bytes = canonical(actual_compiler_evidence.build(internal_copied_input))
+check(canonical(actual_compiler_evidence.build(actual_internal_input)) == actual_internal_bytes,
+  "actual internal evidence retains complete journal, parity, and decision rows from owned inputs")
 
 local function reset(mod_data_supported, factorio_version, reject_evidence_budget, diagnostics_enabled)
   state = {
@@ -37,7 +167,12 @@ local function reset(mod_data_supported, factorio_version, reject_evidence_budge
     adapter_calls = {},
     generation_plan_constructions = 0,
     catalog_constructions = 0,
-    coverage_publications = 0
+    coverage_publications = 0,
+    probe_deepcopy_calls = 0,
+    journal_summary_calls = 0,
+    journal_snapshot_calls = 0,
+    diagnostics_accesses = 0,
+    artifact_calls = {}
   }
 end
 
@@ -63,7 +198,14 @@ package.loaded["prototypes.mir.pipeline.compiler_context"] = {current = function
 package.loaded["prototypes.mir.domain.evidence.compiler_evidence"] = {
   build = function(input)
     state.internal_constructions = state.internal_constructions + 1
+    state.internal_input = input
     return {kind = "internal-evidence", compilation_fingerprint = input.compilation_fingerprint}
+  end
+}
+package.loaded["prototypes.mir.families.resolver"] = {
+  inspection_snapshot = function()
+    state.provider_inspection_calls = (state.provider_inspection_calls or 0) + 1
+    return {providers = {{provider_id = "mir32-provider", full_metrics = {unexported = true}}}}
   end
 }
 package.loaded["prototypes.mir.report.compiler_telemetry"] = telemetry
@@ -79,6 +221,7 @@ package.loaded["prototypes.mir.report.public_compiler_artifacts"] = {
   end,
   compiler_evidence = function(input)
     state.evidence_constructions = state.evidence_constructions + 1
+    state.public_input = input
     state.evidence_telemetry = copy(input.telemetry)
     return {
       kind = "compiler-evidence", bytes = 17,
@@ -131,7 +274,31 @@ local target_line = package.loaded["prototypes.mir.platform.factorio.target_line
 local publication = require("prototypes.mir.pipeline.compiler_orchestrator.publication")
 
 local function context()
-  local final_result = {schema = 1, result_fingerprint = "mir32-result"}
+  local final_result = {
+    schema = 1, result_fingerprint = "mir32-result", _publication_copy_probe = "final-result",
+    dimensions = {execution = "APPLIED"}, execution_evidence = {journal_fingerprint = "mir32-journal"},
+    ignored_full_result_material = {unexported = {"large", "row"}}
+  }
+  local journal = {
+    publication_summary = function()
+      state.journal_summary_calls = state.journal_summary_calls + 1
+      return {
+        schema = 2, plan_fingerprint = "mir32-plan", journal_fingerprint = "mir32-journal",
+        required_operation_count = 1, terminal_counts = {applied = 1, failed = 0},
+        missing_operation_count = 0, duplicate_operation_count = 0,
+        undeclared_operation_count = 0, out_of_plan_operation_count = 0, complete = true
+      }
+    end,
+    snapshot = function()
+      state.journal_snapshot_calls = state.journal_snapshot_calls + 1
+      return {
+        schema = 2, plan_fingerprint = "mir32-plan", journal_fingerprint = "mir32-journal",
+        entries = {{before_snapshot = {unexported = true}, after_projection = {unexported = true}}},
+        terminal_counts = {applied = 1, failed = 0}, complete = true,
+        _publication_copy_probe = "journal-snapshot"
+      }
+    end
+  }
   return {
     plan = {
       schema = 2,
@@ -140,18 +307,37 @@ local function context()
       compiler_input = {input_fingerprint = "mir32-input"},
       stream_plan = {rows = {}},
       technology_catalog = {schema = 4, catalog_fingerprint = "mir32-catalog"},
-      input_sanitation_ledger = {},
+      technology_catalog_fingerprint = "mir32-catalog-fingerprint",
+      input_sanitation_ledger = {
+        schema = 1, pass = "input", scanned_technology_count = 1,
+        sanitized_target_inventory_fingerprint = "mir32-target", _publication_copy_probe = "input-ledger",
+        technologies = {{ignored = true}}
+      },
       base_extension_operations = {},
       pure_compilation = {execution_mode = "SAFE"}
     },
     state_view = function(_, key)
       if key == "final_compiler_result" then return final_result end
       if key == "family_resolution" then return {} end
-      if key == "diagnostics" then return {rows = {}} end
-      if key == "mutation_journal" then return {snapshot = function() return {schema = 1} end} end
+      if key == "diagnostics" then
+        state.diagnostics_accesses = state.diagnostics_accesses + 1
+        return {rows = {{kind = "decision", reason = "canonical_provider_decision_projection",
+          _publication_copy_probe = "provider-decision", payload = {unexported = true}}}}
+      end
+      if key == "mutation_journal" then return journal end
       return nil
     end,
-    artifact = function() return {} end,
+    artifact = function(_, name)
+      state.artifact_calls[name] = (state.artifact_calls[name] or 0) + 1
+      if name == "output_sanitation_ledger" then
+        return {schema = 1, pass = "output", scanned_technology_count = 1,
+          sanitized_target_inventory_fingerprint = "mir32-target", technologies = {{ignored = true}}}
+      end
+      if name == "technology_graph_parity" then
+        return {valid = true, full_parity_rows = {{unexported = true}}}
+      end
+      return {}
+    end,
     state_key_count = function() return 7 end,
     execution_mode = function() return "SAFE" end
   }
@@ -173,6 +359,16 @@ check(state.evidence_telemetry.counters.compiler_evidence_public_bytes == 0
 check(state.counters.compiler_evidence_public_bytes == 17
   and state.counters.public_artifact_total_bytes == 83,
   "live telemetry records exact public artifact bytes after publication")
+check(state.journal_summary_calls == 1 and state.journal_snapshot_calls == 0
+  and state.probe_deepcopy_calls == 0,
+  "ordinary publication avoids full result and journal copies")
+check(state.diagnostics_accesses == 0 and (state.artifact_calls.technology_graph_parity or 0) == 0
+  and (state.artifact_calls.output_sanitation_ledger or 0) == 1,
+  "ordinary publication does not construct internal diagnostics or graph parity")
+check(state.public_input.compiler_input_fingerprint == nil
+  and state.public_input.technology_graph_parity == nil
+  and state.public_input.provider_decision_diagnostics == nil,
+  "ordinary public evidence receives only its declared projection")
 
 reset(true, "2.1", true, false)
 target_line.factorio_version = state.factorio_version
@@ -194,5 +390,13 @@ target_line.factorio_version = state.factorio_version
 check(publication.publish(context()) == true and state.internal_constructions == 1
   and state.adapter_calls[1].internal.kind == "internal-evidence",
   "diagnostics retain one paired internal evidence projection")
+check(state.journal_summary_calls == 1 and state.journal_snapshot_calls == 1
+  and state.diagnostics_accesses == 1 and state.provider_inspection_calls == 1
+  and (state.artifact_calls.technology_graph_parity or 0) == 1,
+  "internal publication constructs the complete diagnostic inputs only on request")
+check(state.internal_input.mutation_journal.entries[1].before_snapshot.unexported
+  and state.internal_input.technology_graph_parity.full_parity_rows[1].unexported
+  and state.internal_input.provider_decision_diagnostics[1].payload.unexported,
+  "internal evidence retains complete journal, parity, and decision rows")
 
 print("MIR-PUBLICATION-MEASUREMENT-PASS " .. assertions)
