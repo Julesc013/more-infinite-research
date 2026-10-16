@@ -72,6 +72,83 @@ check(schema.schema == 2 and #schema.dimensions == 7, "schema-2 authority")
 schema.dimensions[1] = "forged"
 check(technology_design.schema_authority().dimensions[1] == "identity", "schema authority defensive copy")
 
+do
+  local material = {schema = 2, context = {reason = "before"}, provenance = {fields = {cost = {value = 30}}}}
+  local before = fingerprint.canonical(material)
+  local initial, fragment = fingerprint.of_owned_string_map_with_fragment(material, "provenance")
+  check(initial == fingerprint.of(material), "owned field capture preserves the full MIR32 wire")
+  check(fragment == fingerprint.canonical(material.provenance), "captured fragment is exact canonical text")
+  material.context = {reason = "after", optional = false}
+  local updated = fingerprint.of_owned_string_map_with_fragment(material, "provenance", fragment)
+  check(updated == fingerprint.of(material), "trusted splice still reads changed non-fragment fields")
+  material.context = {reason = "before"}
+  check(fingerprint.canonical(material) == before, "field capture does not change its input")
+
+  local function dynamic_material()
+    local calls = {pairs = 0, index = 0}
+    local dynamic = setmetatable({seed = true}, {
+      __pairs = function()
+        calls.pairs = calls.pairs + 1
+        return next, {observed = true}, nil
+      end,
+      __index = function()
+        calls.index = calls.index + 1
+        return 17
+      end
+    })
+    return {provenance = dynamic, context = {reason = "dynamic"}}, calls
+  end
+  local baseline, old_calls = dynamic_material()
+  local expected = fingerprint.of(baseline)
+  local dynamic, new_calls = dynamic_material()
+  local observed, retained = fingerprint.of_owned_string_map_with_fragment(dynamic, "provenance")
+  check(observed == expected and retained == nil, "dynamic source uses ordinary traversal without retention")
+  check(new_calls.pairs == old_calls.pairs and new_calls.index == old_calls.index,
+    "eligibility scan never executes metatable hooks")
+  local baseline_other, old_other_calls = dynamic_material()
+  baseline_other.provenance, baseline_other.context = baseline_other.context, baseline_other.provenance
+  local expected_other = fingerprint.of(baseline_other)
+  local dynamic_other, new_other_calls = dynamic_material()
+  dynamic_other.provenance, dynamic_other.context = dynamic_other.context, dynamic_other.provenance
+  local observed_other, retained_other = fingerprint.of_owned_string_map_with_fragment(
+    dynamic_other, "provenance", fingerprint.canonical(dynamic_other.provenance))
+  check(observed_other == expected_other and retained_other == nil,
+    "new dynamic non-fragment input uses ordinary traversal once")
+  check(new_other_calls.pairs == old_other_calls.pairs and new_other_calls.index == old_other_calls.index,
+    "fallback neither duplicates nor suppresses new-field hooks")
+  local cyclic = {provenance = {}}; cyclic.context = cyclic
+  expect_error(function() fingerprint.of_owned_string_map_with_fragment(cyclic, "provenance") end,
+    "Cannot fingerprint cyclic table")
+  expect_error(function() fingerprint.of_owned_string_map_with_fragment({[1] = true, provenance = {}}, "provenance") end,
+    "owned string map")
+
+  local original = fingerprint.of_owned_string_map_with_fragment
+  local captures, reuses = 0, 0
+  fingerprint.of_owned_string_map_with_fragment = function(value, key, encoded)
+    if encoded then reuses = reuses + 1 else captures = captures + 1 end
+    return original(value, key, encoded)
+  end
+  local source = row()
+  local owned = technology_design.from_generation_row(source)
+  check(captures == 1, "owned constructor captures during its existing qualification pass")
+  local qualified = technology_design.with_qualification(owned, source, {validated = true, share_immutable = true})
+  check(reuses == 1 and rawequal(qualified.provenance, owned.provenance),
+    "only explicit immutable qualification reuses owned provenance")
+  check(technology_design.verify_untrusted(qualified), "reused result passes independent full verification")
+  technology_design.verify_untrusted(owned)
+  technology_design.with_qualification(owned, source, {validated = true, share_immutable = true})
+  check(reuses == 1, "untrusted verification clears fragment eligibility")
+  local refreshed = technology_design.from_generation_row(row())
+  technology_design.refresh_fingerprints(refreshed)
+  technology_design.with_qualification(refreshed, row(), {validated = true, share_immutable = true})
+  check(reuses == 1, "public fingerprint refresh clears fragment eligibility")
+  local mutated = technology_design.from_generation_row(row())
+  mutated.provenance.fields["cost.research_time"].value = 31
+  expect_error(function() technology_design.with_qualification(mutated, row()) end,
+    "TechnologyDesign dimension differs from leaf provenance")
+  fingerprint.of_owned_string_map_with_fragment = original
+end
+
 local source_row = row()
 local design = technology_design.from_generation_row(source_row)
 check(technology_design.is_trusted(design), "constructor registers trusted record")
@@ -964,6 +1041,19 @@ do
   end, "CompilationSnapshot fact-domain fingerprint differs: recipes")
 
   for _, name in ipairs(loaded_names) do package.loaded[name] = saved[name] end
+end
+
+do
+  -- Exceed both the entry allowance and the usual text allowance. Exhaustion
+  -- must use the full fingerprint path, without losing or changing research.
+  local last
+  for index = 1, 620 do
+    local source = row({stream_key = "quota-" .. index})
+    local owned = technology_design.from_generation_row(source)
+    last = technology_design.with_qualification(owned, source, {validated = true, share_immutable = true})
+  end
+  check(last.technology_id == "mir-fixture-productivity" and technology_design.verify_untrusted(last),
+    "fragment allowance exhaustion preserves useful complete research")
 end
 
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)
