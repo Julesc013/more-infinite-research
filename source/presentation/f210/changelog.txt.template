@@ -1,4 +1,18 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.4.21002
+
+  Bugfixes:
+    - Bind Dark Matter Replicators Reborn's mined tenemut lab input to its actual resource,
+      preventing unresolved scoop science dependencies without restarting factory discovery.
+
+  Performance:
+    - Reuse lab acceptance data and approved bindings within each compilation.
+    - Avoid copying the public compiler snapshot solely to measure its serialized size.
+
+  Changes:
+    - Use the shared native-continuation planner and remove the obsolete Classic notice.
+
+---------------------------------------------------------------------------------------------------
 Version: 4.2.21002
 
   Bugfixes:
