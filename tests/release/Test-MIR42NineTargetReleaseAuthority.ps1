@@ -143,6 +143,43 @@ try {
     [string]$programme442.published_maintenance_predecessor.manifest_sha256 -ceq [string]$expected442.manifest_sha256) '442-maintenance-programme-binds-published-441'
   $programme442Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme442Path -AllowPendingTransition
   Assert-NineAuthority ([string]$programme442Read.record.published_maintenance_predecessor.source_version -ceq '4.4.1') '442-maintenance-programme-reader-resolves-published-441'
+  $programme450Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-450.json'
+  $programme450 = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programme450Path -SourceVersion '4.5.0'
+  $expected450 = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.0'
+  Assert-NineAuthority ([string]$programme450.release_line -ceq '4.5' -and [string]$programme450.candidate.version_line -ceq '4.5' -and
+    [string]$programme450.status -ceq 'active-current-4.5-release-cut-pre-freeze-no-transition-authority' -and
+    [string]$programme450.published_maintenance_predecessor.source_version -ceq '4.4.2' -and
+    [string]$programme450.published_maintenance_predecessor.source_tag -ceq 'v4.4.2' -and
+    [string]$programme450.published_maintenance_predecessor.manifest_sha256 -ceq [string]$expected450.manifest_sha256 -and
+    $programme450.PSObject.Properties.Name -cnotcontains 'direct_predecessors') '450-maintenance-programme-binds-exact-r24'
+  $programme450Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme450Path -AllowPendingTransition
+  Assert-NineAuthority ([string]$programme450Read.record.release_line -ceq '4.5' -and [string]$programme450Read.record.published_maintenance_predecessor.source_version -ceq '4.4.2') '450-maintenance-programme-reader-resolves-exact-r24'
+  $wrong450 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme450 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong450.published_maintenance_predecessor.source_version = '4.4.1'
+  $wrong450.published_maintenance_predecessor.source_tag = 'v4.4.1'
+  Write-MIR42NormalizedRecord -Record $wrong450 -OutputPath $programme450Path -Code 'mir42-nine-test-450-wrong-maintenance' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme450Path -AllowPendingTransition } 'mir42-seal-current-programme-schema' '450-schema-rejects-published-441-predecessor'
+  $lineMixed450 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme450 | ConvertFrom-Json -Depth 100 -DateKind String
+  $lineMixed450.published_maintenance_predecessor = $expected442
+  Assert-NineAuthorityReject { Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $lineMixed450 } 'mir42-seal-current-programme-maintenance-binding' '450-resolver-rejects-442-predecessor-on-450-line'
+  $lineMixed442 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme442 | ConvertFrom-Json -Depth 100 -DateKind String
+  $lineMixed442.published_maintenance_predecessor = $expected450
+  Assert-NineAuthorityReject { Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $lineMixed442 } 'mir42-seal-current-programme-maintenance-binding' '442-resolver-rejects-r24-predecessor-on-44-line'
+  $wrong442R24 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme442 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong442R24.published_maintenance_predecessor = $expected450
+  $wrong442R24Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-442-r24.json'
+  Write-MIR42NormalizedRecord -Record $wrong442R24 -OutputPath $wrong442R24Path -Code 'mir42-nine-test-442-r24-maintenance' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $wrong442R24Path -AllowPendingTransition } 'mir42-seal-current-programme-schema' '442-schema-rejects-r24-predecessor'
+  $wrong440Status = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme440 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong440Status.status = 'active-current-4.5-release-cut-pre-freeze-no-transition-authority'
+  $wrong440StatusPath = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-440-wrong-status.json'
+  Write-MIR42NormalizedRecord -Record $wrong440Status -OutputPath $wrong440StatusPath -Code 'mir42-nine-test-440-wrong-status' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $wrong440StatusPath -AllowPendingTransition } 'mir42-seal-current-programme-schema' '440-schema-rejects-450-status'
+  $wrong450Status = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme450 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong450Status.status = 'active-current-4.4-release-cut-pre-freeze-no-transition-authority'
+  $wrong450StatusPath = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-450-wrong-status.json'
+  Write-MIR42NormalizedRecord -Record $wrong450Status -OutputPath $wrong450StatusPath -Code 'mir42-nine-test-450-wrong-status' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $wrong450StatusPath -AllowPendingTransition } 'mir42-seal-current-programme-schema' '450-schema-rejects-440-status'
   $wrong442 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme442 | ConvertFrom-Json -Depth 100 -DateKind String
   $wrong442.published_maintenance_predecessor.manifest_sha256 = '0' * 64
   Write-MIR42NormalizedRecord -Record $wrong442 -OutputPath $programme442Path -Code 'mir42-nine-test-442-wrong-maintenance' | Out-Null

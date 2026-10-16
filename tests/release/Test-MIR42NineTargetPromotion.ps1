@@ -223,6 +223,37 @@ try {
     $script:mir42PromotionSealUnderTest = $seal442
     $plan442 = Get-MIR42NineTargetProtectedMainPromotionPlan -RepoRoot $repo -TechnicalSealPath $seal442.path -CandidateManifestPath 'synthetic-candidate-442.json' -QualificationPath 'synthetic-qualification.json' -RealEngineCampaignPath 'synthetic-campaign.json' -IndependentVerificationPath 'synthetic-independent.json' -SigningCeremonyPath 'synthetic-signing.json' -SourceFreezeAuthorityPath 'synthetic-freeze.json' -ReviewerAttestationPath 'synthetic-reviewer.json' -SshKeygenPath 'synthetic' -OfflineRestoreDrillPath 'synthetic-restore.json'
     Assert-MIR42NinePromotionTest -Condition ([string]$plan442.status -ceq 'MIR-4.4-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -and [string]$plan442.candidate.ref -ceq $script:mir42PromotionExpectedCandidateRef -and @($plan442.direct_predecessors).Count -eq 9 -and (ConvertTo-MIR4BootstrapCanonicalJson -Value $plan442.published_maintenance_predecessor) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $maintenance442)) -Code '442-plan-binds-published-441-maintenance-custody-and-release-line'
+    $candidate450 = $candidate442 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $candidate450.source_version = '4.5.0'
+    $maintenance450 = $maintenance442 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $maintenance450.targets = @($targets | ForEach-Object { [pscustomobject][ordered]@{target=[string]$_.target;version='4.4.2';sha256=('7' * 64)} })
+    $state450 = $state442 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $state450.candidate = $candidate450
+    $state450.maintenance_inputs = $maintenance450
+    $programme450 = $state442.programme | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $programme450.record.release_line = '4.5'
+    $programme450.record.candidate.version_line = '4.5'
+    $state450.programme = $programme450
+    $readiness450 = $readiness442 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $readiness450._state = $state450
+    $input450 = Get-MIR42SealScopeContract -Scope 'nine-target'
+    $input450.seal_kind = 'MIR42NineTargetMaintenanceTechnicalSealV1'
+    $input450.seal_status = 'MIR-4.5.0-NINE-TARGET-MAINTENANCE-TECHNICALLY-SEALED-AWAITING-PROTECTED-MAIN-PR'
+    $script:mir42PromotionTechnicalContractUnderTest = $input450
+    Set-Item Function:Get-MIR42TechnicalSealInputContract -Value { param($Candidate,[switch]$PublishedMaintenance) if ([string]$Candidate.source_version -cne '4.5.0') { throw '[mir42-nine-promotion-450-contract-fixture]' }; if (-not $PublishedMaintenance) { return Get-MIR42SealScopeContract -Scope 'nine-target' }; return $script:mir42PromotionTechnicalContractUnderTest }
+    $seal450Record = $seal442Record | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
+    $seal450Record.status = [string]$input450.seal_status
+    $seal450Record.source = $candidate450.source
+    $seal450Record.candidate_manifest = [ordered]@{sha256=[string]$candidate450.identity.sha256;record_sha256=[string]$candidate450.identity.record.record_sha256}
+    $seal450Record.targets = @($candidate450.targets)
+    $seal450Record.published_maintenance_predecessor = $maintenance450
+    $seal450Record.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $seal450Record
+    $seal450 = [pscustomobject][ordered]@{path=(Join-Path $root 'synthetic-nine-450-maintenance-seal.json');sha256=('0' * 64);record=$seal450Record}
+    $script:mir42PromotionReadinessUnderTest = $readiness450
+    $script:mir42PromotionSealUnderTest = $seal450
+    $script:mir42PromotionExpectedCandidateRef = 'refs/heads/release/mir-4.5-candidate-' + $devCommit.Substring(0,12)
+    $plan450 = Get-MIR42NineTargetProtectedMainPromotionPlan -RepoRoot $repo -TechnicalSealPath $seal450.path -CandidateManifestPath 'synthetic-candidate-450.json' -QualificationPath 'synthetic-qualification.json' -RealEngineCampaignPath 'synthetic-campaign.json' -IndependentVerificationPath 'synthetic-independent.json' -SigningCeremonyPath 'synthetic-signing.json' -SourceFreezeAuthorityPath 'synthetic-freeze.json' -ReviewerAttestationPath 'synthetic-reviewer.json' -SshKeygenPath 'synthetic' -OfflineRestoreDrillPath 'synthetic-restore.json'
+    Assert-MIR42NinePromotionTest -Condition ([string]$plan450.status -ceq 'MIR-4.5-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -and [string]$plan450.candidate.ref -ceq $script:mir42PromotionExpectedCandidateRef -and @($plan450.direct_predecessors).Count -eq 9 -and (ConvertTo-MIR4BootstrapCanonicalJson -Value $plan450.published_maintenance_predecessor) -ceq (ConvertTo-MIR4BootstrapCanonicalJson -Value $maintenance450)) -Code '450-plan-binds-exact-r24-maintenance-custody-and-release-line'
     $script:mir42PromotionTechnicalContractUnderTest = $input440
     Set-Item Function:Get-MIR42TechnicalSealInputContract -Value { param($Candidate,[switch]$PublishedMaintenance) if ([string]$Candidate.source_version -cne '4.4.0') { throw '[mir42-nine-promotion-440-contract-fixture]' }; if (-not $PublishedMaintenance) { return Get-MIR42SealScopeContract -Scope 'nine-target' }; return $script:mir42PromotionTechnicalContractUnderTest }
     $wrongLineReadiness = $readiness440 | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String

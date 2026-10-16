@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 function New-MIR421ReleaseAssetCustodyFixture {
-  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]$CandidateSourceVersion='4.2.1')
+  param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')][string]$CandidateSourceVersion='4.2.1')
   # Structural fixtures only: IDs and paths are synthetic. No network, native
   # campaign, signature or actual release qualification is claimed here.
   $contract=Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
@@ -13,6 +13,7 @@ function New-MIR421ReleaseAssetCustodyFixture {
     '4.3.1' {'fixtures/release-inputs/mir431-published-430-manifest.json'}
     '4.4.0' {'fixtures/release-inputs/mir431-published-430-manifest.json'}
     '4.4.2' {'fixtures/release-inputs/mir442-published-441-manifest.json'}
+    '4.5.0' {'fixtures/release-inputs/mir450-published-442-r24-construction.json'}
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $RepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   return [pscustomobject][ordered]@{
@@ -22,13 +23,17 @@ function New-MIR421ReleaseAssetCustodyFixture {
     signed=$false
     targets=@(foreach ($index in 0..8) {
       $row=$pin.manifest.targets[$index]
-      [pscustomobject][ordered]@{target=$row.target;version=$row.distribution_version;path='structural-fixture-only';sha256=$row.sha256;bytes=$row.bytes;content_sha256=$row.content_sha256;entry_count=$row.entry_count;github_asset_id=($index + 1);github_digest=('sha256:' + $row.sha256.ToLowerInvariant())}
+      $asset = if ($row.PSObject.Properties.Name -contains 'asset') { $row.asset } else { $row }
+      if ($null -eq $asset -or $asset.PSObject.Properties.Name -notcontains 'sha256' -or $asset.PSObject.Properties.Name -notcontains 'bytes') {
+        throw "[mir421-release-assets-custody-target-shape] $($row.target)"
+      }
+      [pscustomobject][ordered]@{target=$row.target;version=$row.distribution_version;path='structural-fixture-only';sha256=$asset.sha256;bytes=$asset.bytes;content_sha256=$(if ($row.PSObject.Properties.Name -contains 'content_sha256') { $row.content_sha256 } else { $asset.content_sha256 });entry_count=$(if ($row.PSObject.Properties.Name -contains 'entry_count') { $row.entry_count } else { $asset.entry_count });github_asset_id=($index + 1);github_digest=('sha256:' + ([string]$asset.sha256).ToLowerInvariant())}
     })
     native_qualification='not-performed';release_qualification='not-performed'
   }
 }
 function Invoke-MIR430FullReleaseUpgradeControls {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2')][string]$CandidateSourceVersion='4.3.0')
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')][string]$CandidateSourceVersion='4.3.0')
 
   # Host-only structural controls. 4.3.0 proves all direct 4.2.x inputs; 4.3.1
   # and 4.4.0 use direct published 4.2.2 plus published 4.3.0, while 4.4.2
@@ -63,7 +68,7 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   }
 
   $script:mir430UpgradeControlChecks = 0
-  $predecessorVersions = if ($CandidateSourceVersion -ceq '4.4.2') { @('4.2.2','4.4.0','4.4.1') } elseif ($CandidateSourceVersion -cin @('4.3.1','4.4.0','4.4.2')) { @('4.2.2','4.3.0') } else { @('4.2.0','4.2.1','4.2.2') }
+  $predecessorVersions = if ($CandidateSourceVersion -ceq '4.5.0') { @('4.4.2') } elseif ($CandidateSourceVersion -ceq '4.4.2') { @('4.2.2','4.4.0','4.4.1') } elseif ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) { @('4.2.2','4.3.0') } else { @('4.2.0','4.2.1','4.2.2') }
   $rows = @()
   foreach ($package in $PackageAssets) {
     foreach ($sourceVersion in $predecessorVersions) {
@@ -129,7 +134,7 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   $duplicatePath = Join-Path $Root 'duplicate.json'
   $null = Write-MIR430UpgradeJson $duplicatePath $duplicate
   Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $duplicatePath -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-matrix-identity]') 'a duplicate predecessor row'
-  if ($CandidateSourceVersion -cin @('4.3.1','4.4.0','4.4.2')) {
+  if ($CandidateSourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0')) {
     $wrongPredecessor = Copy-MIR430UpgradeValue $rows[0]
     $wrongPredecessor.predecessor_source_version = '4.2.1'
     Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongPredecessor -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } '[mir423-upgrade-predecessor-version]' 'an obsolete 4.2.1 predecessor for a dual-predecessor release'
@@ -182,13 +187,15 @@ function Invoke-MIR430FullReleaseUpgradeControls {
 }
 
 function Invoke-MIR430ReleaseUpgradeControls {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2')][string]$CandidateSourceVersion='4.3.0')
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')][string]$CandidateSourceVersion='4.3.0')
 
   # The release matrix is Full-only. Build its complete-state controls first,
   # then prove that a Classic omission receipt cannot be admitted in place of
   # them. Classic compiler behavior is characterized by compiler fixtures; it
   # is not release-preservation evidence.
   $full = Invoke-MIR430FullReleaseUpgradeControls -Root (Join-Path $Root 'full') -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion
+  # 4.5.0 has only its exact R24 predecessor. The complete-state helper above already includes a Classic-profile refusal; the historical f200/4.2.2 receipt mutation below has no row to inspect and must not fabricate one.
+  if ($CandidateSourceVersion -ceq '4.5.0') { return $full }
   $bundle = Get-Content -LiteralPath $full.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
   $row = @($bundle.rows | Where-Object { [string]$_.target -ceq 'f200' -and [string]$_.predecessor_source_version -ceq '4.2.2' })
   if ($row.Count -ne 1) { throw '430 release controls could not locate the Full f200 4.2.2 row' }
@@ -352,4 +359,11 @@ function Invoke-MIR430ClassicCharacterizationControls {
     Assert-MIR430ClassicNativeUpgradeProof -Record $record -States $states
   }
   return [pscustomobject]@{checks=$classicRows.Count;native_runs=0;release_evidence=$false}
+}
+
+function Invoke-MIR450ReleaseUpgradeControls {
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets)
+  # Synthetic host controls exercise the normal 4.5 evidence reader only.
+  # They do not claim all-nine native/full-state qualification.
+  return Invoke-MIR430ReleaseUpgradeControls -Root $Root -PackageAssets $PackageAssets -CandidateSourceVersion '4.5.0'
 }

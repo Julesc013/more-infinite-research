@@ -295,10 +295,9 @@ local function candidate_rows(plan, options)
       operation = operation.operation
     }, options))
   end
-  local effective_settings = require("prototypes.mir.settings.effective")
-  local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-  local native_worker_speed = M.native_worker_robot_speed_cap_input(
-    effective_settings.get(NATIVE_WORKER_ROBOT_SPEED_CAP.setting_name), data_raw.technology)
+  -- The pipeline owns live settings and prototype access. This domain module
+  -- consumes only the normalized, exact native-owner input it supplies.
+  local native_worker_speed = options.native_worker_robot_speed_input
   if native_worker_speed then table.insert(rows, new_binding(native_worker_speed, options)) end
   table.sort(rows, function(left, right)
     if left.technology_id ~= right.technology_id then

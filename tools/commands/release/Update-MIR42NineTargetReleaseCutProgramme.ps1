@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [ValidateSet('Prepare','RefreshPendingAuthority','AdvanceWrittenGo')][string]$Mode = 'Prepare',
-  [ValidateSet('4.2.0','4.4.0','4.4.2')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.4.0','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0',
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path,
   [string]$OutputPath = '',
   [string]$MaintainerAuthorizationPath = '',
