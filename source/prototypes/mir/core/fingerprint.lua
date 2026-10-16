@@ -252,12 +252,43 @@ local function hash_canonical(text)
   local hash = 2166136261
   local index = 1
   local length = #text
-  -- Expand sixteen applications of h' = (h * 65599 + byte) mod p into
-  -- one polynomial reduction. Split the incoming 32-bit hash at 16 bits:
-  -- both products and the entire sum then stay below 2^50, hence remain
-  -- exact integers even on hosts whose Lua numbers are IEEE doubles.
-  -- Coefficients are 65599^k mod p, with p = 4294967291; the high-word
-  -- coefficient is (65536 * 65599^16) mod p. Public MIR32 bytes stay exact.
+  -- Expand sixty-four applications of h' = (h * 65599 + byte) mod p into
+  -- one polynomial reduction. Coefficients are 65599^(64-i) mod p, with
+  -- p = 4294967291; the high-word coefficient is
+  -- (65536 * 65599^64) mod p. Splitting the incoming hash at sixteen bits
+  -- keeps the 64-byte block's maximum sum (309575477997975) below 2^50,
+  -- so its modular reduction is exact on hosts with IEEE doubles.
+  while index + 63 <= length do
+    local b1, b2, b3, b4, b5, b6, b7, b8,
+      b9, b10, b11, b12, b13, b14, b15, b16,
+      b17, b18, b19, b20, b21, b22, b23, b24,
+      b25, b26, b27, b28, b29, b30, b31, b32,
+      b33, b34, b35, b36, b37, b38, b39, b40,
+      b41, b42, b43, b44, b45, b46, b47, b48,
+      b49, b50, b51, b52, b53, b54, b55, b56,
+      b57, b58, b59, b60, b61, b62, b63, b64 = string.byte(text, index, index + 63)
+    hash = ((hash % 65536) * 146797196
+      + math.floor(hash / 65536) * 4069272507
+      + b1 * 1215902443 + b2 * 2476471573 + b3 * 3938897067 + b4 * 2899403580
+      + b5 * 1999198626 + b6 * 509214467 + b7 * 340729569 + b8 * 859077220
+      + b9 * 2674194776 + b10 * 3838006095 + b11 * 608892496 + b12 * 1527692201
+      + b13 * 1095060224 + b14 * 3951250417 + b15 * 3616333780 + b16 * 2470550117
+      + b17 * 3217580270 + b18 * 2631607767 + b19 * 3875063198 + b20 * 2754314305
+      + b21 * 2565603860 + b22 * 1731015882 + b23 * 1120532344 + b24 * 1991969472
+      + b25 * 2282028414 + b26 * 2616076390 + b27 * 379456265 + b28 * 3192537684
+      + b29 * 1231465988 + b30 * 2903094272 + b31 * 1894900097 + b32 * 898122856
+      + b33 * 2475681052 + b34 * 3931367653 + b35 * 1990113602 + b36 * 3866410975
+      + b37 * 378100391 + b38 * 1188800122 + b39 * 2977209126 + b40 * 3407656288
+      + b41 * 2086023652 + b42 * 1976728967 + b43 * 2929229384 + b44 * 1532572579
+      + b45 * 2108779693 + b46 * 1248734355 + b47 * 1834508716 + b48 * 995218484
+      + b49 * 412560925 + b50 * 1384565098 + b51 * 3943398063 + b52 * 2768719420
+      + b53 * 647177936 + b54 * 990682743 + b55 * 3942737328 + b56 * 3220614473
+      + b57 * 3002971012 + b58 * 3426381976 + b59 * 506879193 + b60 * 1222258819
+      + b61 * 780915824 + b62 * 8261510 + b63 * 65599 + b64 * 1
+      ) % 4294967291
+    index = index + 64
+  end
+  -- Keep the current 16-byte and short remainder paths for tails and short text.
   while index + 15 <= length do
     local b1, b2, b3, b4, b5, b6, b7, b8,
       b9, b10, b11, b12, b13, b14, b15, b16 = string.byte(text, index, index + 15)
