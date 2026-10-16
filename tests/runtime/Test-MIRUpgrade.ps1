@@ -752,7 +752,7 @@ Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
 if ($SpaceIsFake) { Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Destination (Join-Path $stagedFixture 'mir421_space_fake_upgrade.lua') }
 $mir42UpgradeSpecialized=$false
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
-    $ToVersion -match '^4[.](?<minor>2|3|4)[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
+    $ToVersion -match '^4[.](?<minor>2|3|4|5)[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
   $toMinor=[int]$Matches.minor
   $targetCode=[string]$Matches.target
   $toPatch=[int]$Matches.patch

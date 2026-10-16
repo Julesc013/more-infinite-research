@@ -1156,6 +1156,18 @@ $mir43Assertions+=9
 # 4.5.0 admits only the corrected R24 F210 predecessor.  Base and Space Age
 # receive distinct disposable fixture identities and the same Full preservation
 # gate; no direct 4.2.2, F200, or historical lane is implied here.
+$specializationPatterns=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.BinaryExpressionAst]-and
+  $node.Operator-eq[Management.Automation.Language.TokenKind]::Imatch-and
+  $node.Left.Extent.Text-ceq'$ToVersion'-and$node.Right-is[Management.Automation.Language.StringConstantExpressionAst]-and
+  $node.Right.Value.Contains('(?<minor>')-and$node.Right.Value.Contains('(?<target>')
+},$true))
+if($specializationPatterns.Count-ne1){throw 'Upgrade fixture specialization gate missing or ambiguous'}
+foreach($version in @('4.2.21001','4.3.21000','4.4.21002','4.5.21000')){
+  if($version-cnotmatch$specializationPatterns[0].Right.Value){throw "Upgrade fixture specialization gate skips $version"}
+}
+if('4.6.21000'-cmatch$specializationPatterns[0].Right.Value){throw 'Upgrade fixture specialization gate admits an unselected source minor'}
+$mir43Assertions+=5
 $mir450IdentityRoot=Join-Path $testRoot 'mir450-immediate-r24-identities'
 New-Item -ItemType Directory -Force -Path $mir450IdentityRoot|Out-Null
 $mir450Cases=@(
