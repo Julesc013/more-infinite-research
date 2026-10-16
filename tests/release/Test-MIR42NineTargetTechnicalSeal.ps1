@@ -219,6 +219,13 @@ Assert-MIR42NineSealTest -Condition ([string]$nineContract.evidence_kind -ceq 'M
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.engine_run_kind -ceq 'MIR42NineTargetEngineRunV1') -Code 'nine-engine-contract'
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.binder_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED') -Code 'nine-binder-contract'
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.campaign_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED') -Code 'nine-campaign-contract'
+$release450 = Get-MIR42NineTargetReleaseLineContract -SourceVersion '4.5.0'
+Assert-MIR42NineSealTest -Condition ([string]$release450.release_line -ceq '4.5' -and
+  [string]$release450.programme_pending_status -ceq 'active-current-4.5-release-cut-pre-freeze-no-transition-authority' -and
+  [string]$release450.promotion_plan_status -ceq 'MIR-4.5-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -and
+  [string]$release450.candidate_ref_prefix -ceq 'refs/heads/release/mir-4.5-candidate-') -Code '450-release-line-contract-is-exact'
+$candidateRelease450 = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.0'})
+Assert-MIR42NineSealTest -Condition ([string]$candidateRelease450.release_line -ceq '4.5') -Code '450-candidate-release-line-is-explicit'
 
 function Test-MIR42NineCriterionEvidenceReader {
   param([Parameter(Mandatory)][string]$RepoRoot)
