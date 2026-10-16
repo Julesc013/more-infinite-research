@@ -576,13 +576,13 @@ try {
     $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
-    # The V3 fixture remains bound to 4.2.2.  Authored changelog heads are
-    # target-local history: f210/f200 advanced to the admitted 4.4.2 identity,
-    # while the other retained target heads remain at 4.2.2.
-    $admittedAuthoredVersions = @(
-      [string]$currentIdentity.distribution_version
-      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.4.2').distribution_version
-    )
+    # The V3 fixture remains bound to 4.2.2.  Only f210/f200 advanced their
+    # authored changelog heads to the admitted 4.4.2 identity; every other
+    # retained target must keep its exact 4.2.2 head.
+    $admittedAuthoredVersions = @([string]$currentIdentity.distribution_version)
+    if ($target -in @('f210','f200')) {
+      $admittedAuthoredVersions += [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.4.2').distribution_version
+    }
     Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and ($admittedAuthoredVersions -ccontains [string]$authoredVersion.Groups[1].Value)) "422-authored-current-changelog-version-$i"
   }
   $rejected=$false
