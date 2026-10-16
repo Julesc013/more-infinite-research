@@ -547,6 +547,27 @@ do
     check(fingerprint.of_canonical(text) == scalar_digest(text), "fused uncached scalar parity")
   end
 end
+-- Fixed independent MIR32 vectors cross the 64-byte front block exactly.
+-- They deliberately include NUL and binary bytes; the literals remain stable
+-- even if the polynomial block implementation is accidentally corrupted.
+do
+  local seed = string.char(0, 255, 1, 128, 13, 10, 34, 92)
+  local vectors = {
+    {length = 63, digest = "mir32-733948da"},
+    {length = 64, digest = "mir32-a3f52eab"},
+    {length = 65, digest = "mir32-8804b0a6"},
+    {length = 127, digest = "mir32-1a5c4038"},
+    {length = 128, digest = "mir32-bcec520e"},
+    {length = 129, digest = "mir32-d039e2f4"}
+  }
+  for _, vector in ipairs(vectors) do
+    local text = string.sub(string.rep(seed, math.ceil(vector.length / #seed)), 1, vector.length)
+    check(fingerprint.of_canonical(text) == vector.digest,
+      "64-byte fixed binary MIR32 cold vector " .. vector.length)
+    check(fingerprint.of_canonical(text) == vector.digest,
+      "64-byte fixed binary MIR32 warm vector " .. vector.length)
+  end
+end
 for index = 1, 4100 do fingerprint.of_canonical("fifo-eviction-" .. index) end
 local cache_metrics = fingerprint.metrics()
 check(cache_metrics.hash_cache_entries <= 4096 and cache_metrics.hash_cache_bytes <= 2 * 1024 * 1024,
