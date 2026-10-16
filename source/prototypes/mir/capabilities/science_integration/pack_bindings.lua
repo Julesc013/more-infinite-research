@@ -312,7 +312,28 @@ local function retained_launch_exclusion(pack_name, policy)
     source_kind = "retained-published-native-launch-policy", policy_reason = reason, acquisition_proof = false}
 end
 
+local function direct_resource_source(pack_name, shared)
+  local name = ((shared.science_binding_policy or {}).resource_pack_sources or {})[pack_name]
+  if type(name) ~= "string" then return nil end
+  local resource = data_raw.prototype("resource", name)
+  local mined = resource and resource.minable
+  if not resource or type(resource.autoplace) ~= "table" or type(mined) ~= "table"
+    or mined.required_fluid ~= nil then return nil end
+  local positive_output = mined.result == pack_name
+    and (mined.count == nil or positive(mined.count))
+    and (mined.result_count == nil or positive(mined.result_count))
+  if not positive_output and not has_item_output(mined.results, pack_name) then return nil end
+  return {pack_name = pack_name, binding_id = "approved-resource/" .. pack_name,
+    source_kind = "declared-autoplaced-resource", resource_names = {name},
+    status = "initial", initial = true, unlockers = {},
+    progression_prerequisites = {}, ingredient_packs = {}, acquisition_proof = false}
+end
+
 local function declared_source(pack_name, shared)
+  -- The approved mined seed precedes later replication/recycling recipes.
+  -- Their existence does not make the original resource research-locked.
+  local native = direct_resource_source(pack_name, shared)
+  if native then return native end
   local declarations = shared.science_bindings or {}
   local declared_roles = {}
   for role in pairs(declarations) do declared_roles[#declared_roles + 1] = role end

@@ -20,6 +20,9 @@ M.shared = {
     named_pack_recipe = true,
     unique_direct_recipe = true,
     unique_direct_unlock = true,
+    -- DMR Reborn's specialist lab consumes this mined tool directly. Validate
+    -- its actual resource instead of searching for a nonexistent recipe.
+    resource_pack_sources = { ["dmrsa-tenemut"] = "dmrsa-tenemut" },
     -- Preserve the published launch-source admission contract. Correcting
     -- that historical policy is a separate semantic/migration change.
     retained_launch_source = {pack = "space-science-pack", payload = "satellite"},

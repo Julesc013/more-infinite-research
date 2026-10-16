@@ -1038,4 +1038,107 @@ Context.with_active(Context.new(), function()
   check(not pcall(science.pack_production_status, "closed-cycle-pack"),
     "A possible native seed prevents a recipe-only closed-cycle negative conclusion")
 end)
+-- DMR Reborn 3.7.1 consumes its mined tenemut tool in a specialist lab and
+-- in scoop recipes. A native mining source must seed the finite references;
+-- it is not a recipe and must not start factory acquisition.
+local function mined_science_world()
+  local result = world(0, false)
+  result.tool["dmrsa-tenemut"] = {type = "tool", name = "dmrsa-tenemut"}
+  result.tool["dmrsa-dark-matter-scoop"] = {type = "tool", name = "dmrsa-dark-matter-scoop"}
+  result.resource = {["dmrsa-tenemut"] = {type = "resource", name = "dmrsa-tenemut", autoplace = {},
+    minable = {result = "dmrsa-tenemut"}}}
+  result.lab["replication-lab"] = {name = "replication-lab", inputs = {"dmrsa-tenemut", "dmrsa-dark-matter-scoop"}}
+  result.recipe["dmrsa-dark-matter-scoop"] = {type = "recipe", name = "dmrsa-dark-matter-scoop", enabled = false,
+    ingredients = {{"dmrsa-tenemut", 4}, {"iron-plate", 1}},
+    results = {{type = "item", name = "dmrsa-dark-matter-scoop", amount = 1}}}
+  result.technology["replication-1"] = {type = "technology", name = "replication-1", prerequisites = {},
+    unit = {count = 50, time = 30, ingredients = {{roles[1], 1}, {roles[2], 1}}},
+    effects = {{type = "unlock-recipe", recipe = "dmrsa-dark-matter-scoop"}}}
+  return result
+end
+raw = mined_science_world()
+Context.with_active(Context.new(), function()
+  check(science_packs.pack_production_status("dmrsa-tenemut") == "initial", "Autoplaced mined lab consumable is an approved seed")
+  check(science_packs.pack_production_status("dmrsa-dark-matter-scoop") == "research", "Mined seed resolves the reported scoop dependency")
+  local source = science_packs.production_route_for_pack("dmrsa-tenemut")
+  check(source.source_kind == "declared-autoplaced-resource" and source.acquisition_proof == false,
+    "Native mining is an explicit reference declaration, never an acquisition proof")
+  check(#source.resource_names == 1 and source.resource_names[1] == "dmrsa-tenemut", "Native source identifies its actual resource")
+  source.resource_names[1] = "caller mutation"
+  check(science_packs.production_route_for_pack("dmrsa-tenemut").resource_names[1] == "dmrsa-tenemut", "Native source copy remains isolated")
+  check(science_packs.any_lab_accepts_all({roles[1], roles[2]}), "A specialist lab does not veto ordinary labs")
+end)
+for _, mutation in ipairs({
+  function(r) r.resource["dmrsa-tenemut"].autoplace = nil end,
+  function(r) r.resource["dmrsa-tenemut"].minable.required_fluid = "sulfuric-acid" end,
+  function(r) r.resource["dmrsa-tenemut"].minable.count = 0 end,
+  function(r) r.resource["dmrsa-tenemut"].minable.result = "different-item" end,
+  function(r) r.resource.unapproved = r.resource["dmrsa-tenemut"]; r.resource["dmrsa-tenemut"] = nil end
+}) do
+  raw = mined_science_world(); mutation(raw)
+  Context.with_active(Context.new(), function()
+    check(not pcall(science_packs.pack_production_status, "dmrsa-tenemut"), "Invalid native reference must not manufacture a seed")
+  end)
+end
+raw = mined_science_world()
+raw.resource["dmrsa-tenemut"].minable = {results = {{type = "item", name = "dmrsa-tenemut", amount = 1, probability = 0}}}
+Context.with_active(Context.new(), function()
+  check(not pcall(science_packs.pack_production_status, "dmrsa-tenemut"), "Zero-probability mining is not a native seed")
+end)
+raw = mined_science_world()
+raw.resource["dmrsa-tenemut"].minable = {results = {{type = "item", name = "dmrsa-tenemut", amount = 1}}}
+Context.with_active(Context.new(), function()
+  check(science_packs.pack_production_status("dmrsa-tenemut") == "initial", "Positive typed mining results bind natively")
+end)
+raw = mined_science_world()
+raw.recipe["later-tenemut-replication"] = {type = "recipe", name = "later-tenemut-replication", enabled = false,
+  results = {{type = "item", name = "dmrsa-tenemut", amount = 1}}}
+Context.with_active(Context.new(), function()
+  check(science_packs.pack_production_status("dmrsa-tenemut") == "initial", "Later replication recipes cannot hide the approved mined seed")
+  check(science_packs.pack_production_status("dmrsa-dark-matter-scoop") == "research", "The scoop still resolves when tenemut has later producers")
+end)
+raw = mined_science_world()
+raw.tool["unapproved-mined-pack"] = {type = "tool", name = "unapproved-mined-pack"}
+raw.lab["replication-lab"].inputs[#raw.lab["replication-lab"].inputs + 1] = "unapproved-mined-pack"
+raw.resource.other = {type = "resource", name = "other", autoplace = {}, minable = {result = "unapproved-mined-pack"}}
+Context.with_active(Context.new(), function()
+  check(not pcall(science_packs.pack_production_status, "unapproved-mined-pack"), "The tenemut declaration cannot admit unrelated mined lab inputs")
+end)
+
+-- True Nukes Continued 0.3.36 uses crafted tools as research triggers for
+-- atomic-bomb and full-fission-atomics.  They are prerequisite gates, not
+-- lab science ingredients, even while their inherited unit retains an
+-- otherwise unknown science vector.
+local function true_nukes_trigger_world()
+  local result = world(0, false)
+  result.tool["test-pack-atomic-20t-1"] = {type = "tool", name = "test-pack-atomic-20t-1"}
+  result.tool["test-pack-atomic-500t-1"] = {type = "tool", name = "test-pack-atomic-500t-1"}
+  for _, row in ipairs({
+    {name = "atomic-bomb", item = "test-pack-atomic-20t-1"},
+    {name = "full-fission-atomics", item = "test-pack-atomic-500t-1"}
+  }) do
+    result.technology[row.name] = {
+      type = "technology", name = row.name, prerequisites = {},
+      research_trigger = {type = "craft-item", item = row.item, count = 1},
+      unit = {count = 1, time = 60, ingredients = {{"unbound-nuclear-science", 1}}}
+    }
+  end
+  return result
+end
+raw = true_nukes_trigger_world()
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, lab_bindings.view())
+  check(bindings.bound_technology_reason(index, "atomic-bomb") == nil
+      and bindings.bound_technology_reason(index, "full-fission-atomics") == nil,
+    "Craft-item nuclear test triggers remain prerequisite gates despite inherited unit ingredients")
+  check(index.packs["test-pack-atomic-20t-1"] == nil and index.packs["test-pack-atomic-500t-1"] == nil,
+    "Nuclear test tools outside lab inputs never become approved science packs")
+end)
+raw = true_nukes_trigger_world()
+raw.technology["atomic-bomb"].research_trigger = nil
+Context.with_active(Context.new(), function()
+  local index = bindings.compile_references(catalogue.shared, lab_bindings.view())
+  check(bindings.bound_technology_reason(index, "atomic-bomb") == "no-accepting-lab",
+    "The trigger field, rather than an unchecked unit, admits the nuclear test technology")
+end)
 return checks
