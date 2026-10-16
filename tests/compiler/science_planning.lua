@@ -23,11 +23,23 @@ local known = {'automation-science-pack','logistic-science-pack','military-scien
   'cryogenic-science-pack','kr-basic-tech-card','kr-matter-tech-card',
   'wood-science-pack','steam-science-pack'}
 local exists = {}; for _, n in ipairs(known) do exists[n]=true end
+exists['angels-token-bio'] = true
 _G.log = function(_) end
 _G.data = {raw={lab={},technology={}}, extend=function() error('Unexpected prototype mutation') end}
 local function stub(name, value) package.loaded[name] = value end
 stub('prototypes.mir.settings.effective', {get=function(n) return values[n] end})
+local context_state = {}
 stub('prototypes.mir.pipeline.compiler_context', {current=function() return {
+ state_view=function(_, name, build)
+  -- This fixture mutates lab prototypes across isolated cases.  Cache only
+  -- the new retention decision; production Contexts retain their normal
+  -- immutable-input views.
+  if name ~= 'retained_bob_angel_422_science_selection' then
+   return build and build() or nil
+  end
+  if context_state[name] == nil and build then context_state[name] = build() end
+  return context_state[name]
+ end,
  service=function(_, name)
   if name == 'science.lab_binding_available' then
    return function(lab_name) return fixture_lab_bindings[lab_name] == true end
@@ -44,9 +56,10 @@ stub('prototypes.mir.index.item_prototype_facts', {placeable_items_for_entity=fu
  return data.raw.lab[name] and {name} or {}
 end})
 local registry = {science_pack_exists=function(n) return exists[n]==true end,
- native_pack_name=function(n) return n end,extra_official_progression=function() return {} end}
+ native_pack_name=function(n) return n end,extra_official_progression=function() return {} end,
+ get=function(_) return {} end}
 stub('prototypes.mir.capabilities.science_integration.pack_registry',registry)
-stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1}})
+stub('prototypes.mir.streams.registry',{shared={per_level_default=0.1},get=function(_) return {} end})
 stub('prototypes.mir.capabilities.recipe_productivity.recipe_matching',{buckets_view=function(key) return derived_buckets[key] or {} end})
 stub('prototypes.mir.capabilities.science_integration.recipe_unlock_facts',{
  recipe_enabled_without_research=function(recipe_name) return initially_available_recipes[recipe_name] == true end
@@ -67,11 +80,14 @@ local science = {
  is_official_science_pack=function(n) return not n:match('^kr%-') end,
  researchable_unlockers_for_recipe=function(recipe_name) return derived_unlockers[recipe_name] or {} end,
  technology_researchability_reason=function(technology_name) return native_owner_rejections[technology_name] end,
+  technology_is_researchable=function(technology_name) return native_owner_rejections[technology_name] == nil end,
+  prereq_techs_for_science_pack=function(name) return {name} end,
  best_lab_compatible_ingredients=lab.best_lab_compatible_ingredients,
- valid_research_ingredients=lab.valid_research_ingredients
+  valid_research_ingredients=lab.valid_research_ingredients
 }
 stub('prototypes.mir.capabilities.science_integration.science_packs',science)
 local selector = require('prototypes.mir.capabilities.science_integration.science_selector')
+local prerequisites = require('prototypes.mir.planner.prerequisites')
 local k2 = require('prototypes.mir.compatibility.policies.k2_science_phase')
 local planner = require('prototypes.mir.planner.science')
 local checks=0
@@ -85,6 +101,12 @@ local function names(xs)
 end
 local function has(xs,n)
  for _,v in ipairs(xs or {}) do if (v.name or v[1])==n then return true end end; return false
+end
+local function has_name(xs,n)
+ for _,v in ipairs(xs or {}) do
+  if v==n or (type(v)=='table' and (v.name or v[1])==n) then return true end
+ end
+ return false
 end
 check('K01', k2.applies(active_mods), 'V1 admits exactly K2 2.1.2 plus K2SO 2.0.13')
 check('K02', not k2.applies({Krastorio2='2.1.2',['Krastorio2-spaced-out']='2.0.17'}), 'V1 does not admit K2SO 2.0.17')
@@ -153,6 +175,86 @@ values['mir-science-pack-ingredient-policy']='configured'
 selected=selector.pick_science_for_stream({science_packs={'space-science-pack'}},'research_ice')
 check('S04',has(selected,'cryogenic-science-pack'),'Declared hard-required cryogenic pack defeats exclusion')
 roles={}
+-- A retained configured selection is not a claim that the omitted packs are
+-- unreachable.  It applies only after the current declared sources/direct
+-- unlockers and a complete accepting lab vector have been checked; player
+-- selected expansion policies keep their requested packs.
+local retained_routes = {}
+for _, name in ipairs({'automation-science-pack','logistic-science-pack','chemical-science-pack',
+  'production-science-pack','military-science-pack','utility-science-pack'}) do
+  retained_routes[name] = {recipe_name=name, unlocker=name, unlockers={name}}
+end
+retained_routes['angels-token-bio'] = {
+  recipe_name='angels-temperate-garden-a', unlocker='angels-gardens', unlockers={'angels-gardens'}
+}
+local retained_lab_ok = true
+science.production_route_for_pack = function(name) return retained_routes[name] end
+science.any_lab_accepts_all = function(packs)
+  local wanted = {}
+  for _, name in ipairs(packs or {}) do wanted[name] = true end
+  return retained_lab_ok and wanted['automation-science-pack'] and wanted['logistic-science-pack']
+    and wanted['chemical-science-pack'] and wanted['production-science-pack']
+    and wanted['military-science-pack'] and wanted['utility-science-pack'] and wanted['angels-token-bio']
+end
+roles={
+  {role='exclude',pack='chemical-science-pack',configured_only=true,retained_selection='bob-angel-422'},
+  {role='exclude',pack='production-science-pack',configured_only=true,retained_selection='bob-angel-422'},
+  {role='exclude',pack='utility-science-pack',configured_only=true,retained_selection='bob-angel-422'},
+  {role='exclude',pack='angels-token-bio',configured_only=true,retained_selection='bob-angel-422'}
+}
+values['mir-science-pack-ingredient-policy']='configured'
+context_state={}
+local retained_spec={science_packs={'automation-science-pack','logistic-science-pack','chemical-science-pack',
+  'production-science-pack','military-science-pack','utility-science-pack','angels-token-bio'}}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA01',names(selected)=='automation-science-pack,logistic-science-pack,military-science-pack',
+  'Validated configured retention keeps the published Bob/Angel science vector')
+local retained_prereqs, retained_reason=prerequisites.build_for('research_bullets',selected)
+check('BA02',not retained_reason and has_name(retained_prereqs,'angels-water-treatment'),
+  'Validated retained military route contributes its published progression gate through the planner')
+check('BA03',#selector.retained_prerequisites_for_stream('research_advanced_circuit',selected)==0,
+  'An A/L family does not inherit the retained military-route gate')
+values['mir-science-pack-ingredient-policy']='all'
+context_state={}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA04',has(selected,'chemical-science-pack') and has(selected,'production-science-pack')
+  and has(selected,'utility-science-pack') and has(selected,'angels-token-bio')
+  and #selector.retained_prerequisites_for_stream('research_bullets',selected)==0,
+  'A player-selected expansion does not inherit configured-only retention')
+values['mir-science-pack-ingredient-policy']='configured'
+retained_lab_ok=false
+context_state={}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA05',has(selected,'chemical-science-pack') and has(selected,'production-science-pack')
+  and has(selected,'utility-science-pack') and has(selected,'angels-token-bio')
+  and #selector.retained_prerequisites_for_stream('research_bullets',selected)==0,
+  'A changed accepting laboratory refuses the retained selection rather than claiming pack absence')
+retained_lab_ok=true
+retained_routes['production-science-pack'].unlocker='wrong-production-owner'
+retained_routes['production-science-pack'].unlockers={'wrong-production-owner'}
+context_state={}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA06',has(selected,'chemical-science-pack') and has(selected,'production-science-pack')
+  and has(selected,'utility-science-pack') and has(selected,'angels-token-bio'),
+  'A changed declared direct unlock refuses the retained selection')
+retained_routes['production-science-pack']={recipe_name='production-science-pack',unlocker='production-science-pack',unlockers={'production-science-pack'}}
+exists['utility-science-pack']=false
+context_state={}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA07',has(selected,'chemical-science-pack') and has(selected,'production-science-pack')
+  and has(selected,'angels-token-bio'),
+  'A missing named pack refuses retention without querying an unresolved source')
+exists['utility-science-pack']=true
+native_owner_rejections['angels-water-treatment']='unreachable'
+context_state={}
+selected=selector.pick_science_for_stream(retained_spec,'research_bullets')
+check('BA08',has(selected,'chemical-science-pack') and has(selected,'production-science-pack')
+  and has(selected,'utility-science-pack') and has(selected,'angels-token-bio')
+  and #selector.retained_prerequisites_for_stream('research_bullets',selected)==0,
+  'An unavailable retained military gate refuses the policy without changing pack facts')
+native_owner_rejections['angels-water-treatment']=nil
+roles={}
+context_state={}
 -- Derivation must not recast a research-locked external recipe with no
 -- researchable unlocker as an early base-science technology. This is a
 -- controlled provenance law for dense overhauls, not a claim about any one
