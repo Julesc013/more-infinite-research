@@ -366,11 +366,24 @@ try {
     foreach($name in $Expected.Keys){if(-not$Observed.ContainsKey($name)){throw "missing technology: $name"}}
     foreach($name in $Observed.Keys){if(-not$Expected.ContainsKey($name)){throw "unexpected technology: $name"}}
   }
+  $reviewedAdditions=@(
+    'braking-force-8','inserter-capacity-bonus-8','laser-shooting-speed-8','research-speed-7',
+    'weapon-shooting-speed-7','worker-robots-storage-4',
+    'recipe-prod-research_cannon_shooting_speed-1','recipe-prod-research_electric_shooting_speed-1',
+    'recipe-prod-research_material_copper_tungsten-1','recipe-prod-research_material_copper_tungsten-4'
+  )
+  if($reviewedAdditions.Count-ne10-or@($reviewedAdditions|Sort-Object -Unique).Count-ne10){throw 'Bob/Angel reviewed addition set is not exact'}
   $expectedTechnologies=@{established=[pscustomobject]@{researched=$true}}
-  & $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true}}
+  $observedTechnologies=@{established=[pscustomobject]@{researched=$true}}
+  foreach($name in $reviewedAdditions){
+    $expectedTechnologies[$name]=[pscustomobject]@{researched=$false}
+    $observedTechnologies[$name]=[pscustomobject]@{researched=$false}
+  }
+  & $assertExactTechnologySet $expectedTechnologies $observedTechnologies
   $f200BobAngelAssertions++
   $rejected=$false
-  try{& $assertExactTechnologySet $expectedTechnologies @{established=[pscustomobject]@{researched=$true};unearned=[pscustomobject]@{researched=$false}}}catch{$rejected=$_.Exception.Message-ceq'unexpected technology: unearned'}
+  $observedTechnologies.unearned=[pscustomobject]@{researched=$false}
+  try{& $assertExactTechnologySet $expectedTechnologies $observedTechnologies}catch{$rejected=$_.Exception.Message-ceq'unexpected technology: unearned'}
   if(-not$rejected){throw 'Bob/Angel performance-only technology-set control accepted an unresearched addition'}
   $f200BobAngelAssertions++
   $bobAngelSelection=@([pscustomobject]@{name='base';version='2.0.77'},[pscustomobject]@{name='angelsbioprocessinggraphics';version='2.0.0'},[pscustomobject]@{name='mir423-startup-observer';version='1.0.0'},[pscustomobject]@{name='more-infinite-research';version='4.2.20003'})
@@ -382,7 +395,7 @@ try {
   $rejected=$false;try{Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $bobAngelSnapshot -ExpectedSelection $bobAngelSelection -Stage upgrade|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('[mir423-f200-bob-angel-active-mods]')}
   if(-not$rejected){throw 'Bob/Angel full-state active-mod comparison accepted a graphics version mismatch'};$f200BobAngelAssertions++
   foreach($binding in @(
-    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.88'},
+    [pscustomobject]@{from='4.2.20002';fixture_version='0.1.89'},
     [pscustomobject]@{from='4.4.20000';fixture_version='0.1.86'},
     [pscustomobject]@{from='4.4.20001';fixture_version='0.1.87'}
   )){
@@ -395,6 +408,13 @@ try {
     $control=Get-Content -LiteralPath (Join-Path $bobAngelFixture 'control.lua') -Raw
     if($info.version-cne$binding.fixture_version-or-not$control.Contains('complete_catalogue_upgrade = true')-or-not$control.Contains('["f200-bob-angel"]={technology="mining-productivity-4",level=5}')){
       throw 'Bob/Angel 4.4.2 full-state fixture identity or complete-state oracle differs'
+    }
+    $hasReviewedAdditions=$control.Contains('local reviewed_added_names = {')
+    if(($binding.from-ceq'4.2.20002'-and-not$hasReviewedAdditions)-or($binding.from-cne'4.2.20002'-and$hasReviewedAdditions)){
+      throw 'Bob/Angel reviewed additions escaped their direct 4.2.2 oracle lane'
+    }
+    if($binding.from-ceq'4.2.20002'){
+      foreach($name in $reviewedAdditions){if(-not$control.Contains('['+'"'+$name+'"'+'] = true')){throw "Bob/Angel reviewed addition omitted: $name"}}
     }
     $f200BobAngelAssertions++
   }
@@ -493,7 +513,7 @@ try {
     [pscustomobject]@{scenario='f200-galore';target='f200';from='4.2.20002';space_age=$false;galore=$true;bob=$false;expected='0.1.78'},
     [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20000';space_age=$false;galore=$true;bob=$false;expected='0.1.76'},
     [pscustomobject]@{scenario='f200-galore';target='f200';from='4.4.20001';space_age=$false;galore=$true;bob=$false;expected='0.1.77'},
-    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$true;expected='0.1.88'},
+    [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.2.20002';space_age=$false;galore=$false;bob=$true;expected='0.1.89'},
     [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20000';space_age=$false;galore=$false;bob=$true;expected='0.1.86'},
     [pscustomobject]@{scenario='f200-bob-angel';target='f200';from='4.4.20001';space_age=$false;galore=$false;bob=$true;expected='0.1.87'},
     [pscustomobject]@{scenario='f210-base';target='f210';from='4.2.21002';space_age=$false;galore=$false;bob=$false;expected='0.1.68'},
