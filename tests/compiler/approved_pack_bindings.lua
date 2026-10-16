@@ -335,6 +335,58 @@ do
   end)
 end
 
+-- A declared external science input may have other raw producers.  The
+-- approved source stays the named recipe and direct unlock owner; alternatives
+-- neither choose a route by traversal order nor veto the proven declaration.
+do
+  local raw = world(0, false)
+  local token = "angels-token-bio"
+  local source = "angels-temperate-garden-a"
+  local alternative = "unapproved-garden-token-producer"
+  local unlocker = "angels-gardens"
+  local dependent = "token-dependent-prerequisite"
+  raw.tool[token] = {type = "tool", name = token}
+  raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = token
+  raw.recipe[source] = {type = "recipe", name = source, enabled = false,
+    ingredients = {{"iron-plate", 1}}, results = {{type = "item", name = token, amount = 1}}}
+  raw.recipe[alternative] = {type = "recipe", name = alternative, enabled = false,
+    ingredients = {{"iron-plate", 1}}, results = {{type = "item", name = token, amount = 1}}}
+  raw.technology[unlocker] = {type = "technology", name = unlocker, prerequisites = {roles[2]},
+    unit = {count = 1, ingredients = {{roles[1], 1}, {roles[2], 1}}},
+    effects = {{type = "unlock-recipe", recipe = source}}}
+  raw.technology[dependent] = {type = "technology", name = dependent, prerequisites = {unlocker},
+    unit = {count = 1, ingredients = {{roles[1], 1}, {roles[2], 1}, {token, 1}}}}
+  raw.technology[roles[4]].prerequisites[#raw.technology[roles[4]].prerequisites + 1] = dependent
+  local without_declaration = deepcopy(catalogue.shared)
+  without_declaration.science_bindings[token] = nil
+  Context.with_active(Context.new(), function()
+    local index = bindings.compile_references(without_declaration,
+      {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+    check(index.packs[token] == nil
+        and string.find(index.issues[token], "ambiguous-approved-pack-source", 1, true),
+      "Removing the authored Angel token declaration reproduces the ambiguous-source refusal")
+  end)
+  Context.with_active(Context.new(), function()
+    local index = bindings.compile_references(catalogue.shared,
+      {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+    local status, gate = bindings.bound_pack_status(index, token)
+    check(status == "research" and gate == unlocker and index.packs[token].recipe_name == source,
+      "An approved named token source remains bound despite an unapproved alternative producer")
+    check(bindings.bound_technology_reason(index, roles[4]) == nil
+        and bindings.bound_pack_status(index, roles[4]) == "research",
+      "A declared token seed resolves its dependent established science chain")
+  end)
+  local wrong_owner = deepcopy(catalogue.shared)
+  wrong_owner.science_bindings[token].technology = roles[1]
+  Context.with_active(Context.new(), function()
+    local index = bindings.compile_references(wrong_owner,
+      {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+    check(index.packs[token] == nil
+        and string.find(index.issues[token], "ambiguous-approved-pack-source", 1, true),
+      "A named token source with a wrong owner cannot fall through to choose an ambiguous producer")
+  end)
+end
+
 -- Diagnostic limits still count duplicate physical inputs and stop before a
 -- lab binding is consulted. Normal research admission has no such work budget.
 do
