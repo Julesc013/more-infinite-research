@@ -10,7 +10,6 @@ local recipe_risk_facts = require("prototypes.mir.index.recipe_risk_facts")
 local target_profiles = require("prototypes.mir.platform.factorio.target_profiles")
 local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
-local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local discover = require("prototypes.mir.planner.stream_compiler.discover")
 local ownership = require("prototypes.mir.planner.stream_compiler.ownership")
@@ -18,14 +17,20 @@ local qualify = require("prototypes.mir.planner.stream_compiler.qualify")
 local material_continuation = require("prototypes.mir.planner.stream_compiler.material_continuation")
 
 local M = {}
+local pregraph_drafts = setmetatable({}, {__mode = "k"})
+
+local function exported_artifact(artifact)
+  return generation_plan.is_draft(artifact)
+    and generation_plan.materialize_draft(artifact) or deepcopy(artifact)
+end
 
 local function compile_active(context, return_view)
   discover.ensure_services(context)
-  local cached = context:state_view("generation_plan")
-  if cached then return return_view and cached or deepcopy(cached) end
+  local cached = context:state_view("generation_plan") or pregraph_drafts[context]
+  if cached then return return_view and cached or exported_artifact(cached) end
   local streams, native_owner_inputs, shared_rules = discover.source_snapshot()
   telemetry.start_phase("stream_compiler")
-  local plan = generation_plan.new({
+  local metadata = {
     source_fingerprints = {
       facts = recipe_facts.fingerprint(),
       risks = recipe_risk_facts.fingerprint(),
@@ -37,7 +42,7 @@ local function compile_active(context, return_view)
       native_owners = fingerprint.of(native_owner_inputs),
       provider_decisions = family_resolver.decision_set_fingerprint()
     }
-  })
+  }
   local rows = {}
   for _, key in ipairs(table_utils.sorted_keys(streams)) do
     table.insert(rows, qualify.plan(key, streams[key]))
@@ -52,16 +57,11 @@ local function compile_active(context, return_view)
     if continuation then table.insert(staged_rows, continuation) end
   end
   rows = staged_rows
-  for _, row in ipairs(rows) do
-    row.technology_design = technology_design.from_generation_row(row)
-    plan:add_owned_derived(row)
-  end
-  local finalized = plan:finalize()
-  local artifact = finalized:artifact_view()
+  local artifact = generation_plan.prepare(rows, metadata)
   telemetry.count("stream_rows", #artifact.rows)
   telemetry.finish_phase("stream_compiler")
-  context:set_state("generation_plan", artifact)
-  return return_view and artifact or deepcopy(artifact)
+  pregraph_drafts[context] = artifact
+  return return_view and artifact or exported_artifact(artifact)
 end
 
 local function compile(context, return_view)
@@ -79,7 +79,9 @@ end
 
 function M.accept(plan, context)
   context = context or compiler_context.current()
-  local artifact = type(plan.artifact) == "function" and plan:artifact() or deepcopy(plan)
+  local artifact = generation_plan.is_draft(plan) and generation_plan.materialize_draft(plan)
+    or (type(plan.artifact) == "function" and plan:artifact() or deepcopy(plan))
+  pregraph_drafts[context] = nil
   if context:has_state("generation_plan") then
     context:replace_epoch("generation_plan", artifact, context:state_epoch("generation_plan"))
   else
@@ -89,12 +91,17 @@ end
 
 function M.latest_artifact(context)
   context = context or compiler_context.current()
-  return context:state_snapshot("generation_plan")
+  local artifact = context:state_view("generation_plan") or pregraph_drafts[context]
+  return artifact and exported_artifact(artifact) or nil
 end
 
 function M.accept_artifact(artifact, context, options)
   context = context or compiler_context.current()
   local accepted = options and options.trusted and artifact or deepcopy(artifact)
+  if generation_plan.is_draft(accepted) then
+    error("A private GenerationDraft cannot become the public GenerationPlan.", 2)
+  end
+  pregraph_drafts[context] = nil
   if context:has_state("generation_plan") then
     context:replace_epoch("generation_plan", accepted, context:state_epoch("generation_plan"))
   else

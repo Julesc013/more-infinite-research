@@ -73,19 +73,69 @@ local function assert_preserved()
     prerequisites = prerequisites, effects = actual.effects}
   assert(fingerprint.of(projection) == fingerprint.of(expected), "Established iron definition changed")
 end
-local counts, emitted_plan, emitted_journal
+local counts, emitted_plan, emitted_journal, emitted_context, draft_fixture_row
 Context.with_active(Context.new(), function()
   local context = Context.current()
   local effect_safety = require("prototypes.mir.emit.effect_safety")
   local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
   context:set_service("effect_target_inventory", target_inventory)
   context:record_artifact("input_sanitation_ledger", input_ledger)
+  local stream_compiler = require("prototypes.mir.planner.stream_compiler")
+  local generation_plan = require("prototypes.mir.planner.generation_plan")
+  local technology_design = require("prototypes.mir.domain.technology.technology_design")
+  local draft = stream_compiler.compile_view(context)
+  check(generation_plan.is_draft(draft) and context:state_view("generation_plan") == nil,
+    "Pre-graph handoff remains private rather than publishing an incomplete GenerationPlan")
+  local draft_iron
+  for _, row in ipairs(draft.rows) do
+    if row.stream_key == "research_iron" then draft_iron = row end
+  end
+  check(draft_iron and draft_iron.technology_design == nil,
+    "Ordinary authored iron does not construct its discarded pre-graph TechnologyDesign")
+  draft_fixture_row = deepcopy(draft_iron)
+  check(not pcall(generation_plan.assert_trusted_artifact, draft)
+    and not pcall(generation_plan.assert_trusted_draft, deepcopy(draft)),
+    "Drafts cannot masquerade as final plans and copied drafts do not retain private authority")
+  local public_plan = stream_compiler.latest_artifact(context)
+  local pregraph_iron
+  for _, row in ipairs(public_plan.rows) do
+    if row.stream_key == "research_iron" then pregraph_iron = row.technology_design end
+  end
+  check(public_plan.schema == 3 and pregraph_iron ~= nil
+    and public_plan.record_type == nil and context:state_view("generation_plan") == nil,
+    "Explicit inspection materializes the complete existing public pre-graph plan contract")
+  check(fingerprint.canonical(stream_compiler.compile(context)) == fingerprint.canonical(public_plan),
+    "Explicit compile and latest-artifact inspection retain the same complete public plan")
+  check(not pcall(require("prototypes.mir.planner.compilation_plan").finalize,
+    deepcopy(draft), {}, {effect_target_inventory = target_inventory}),
+    "The final compiler refuses a copied draft before consuming private preparations")
+  local preparations = generation_plan.assert_trusted_draft(draft)
+  local isolated_projection = technology_design.prepared_graph_projection(preparations[draft_iron], draft_iron)
+  isolated_projection.effects[1].change = 123
+  check(technology_design.prepared_graph_projection(preparations[draft_iron], draft_iron).effects[1].change == 0.1,
+    "Graph projection exports cannot mutate the private preparation")
+  local forged_row = {}
+  for key, value in pairs(draft_iron) do forged_row[key] = value end
+  forged_row.fields = deepcopy(draft_iron.fields)
+  forged_row.fields.effects[1].change = 123
+  check(not pcall(technology_design.prepared_graph_projection, preparations[draft_iron], forged_row),
+    "A preparation refuses changed raw effect semantics before graph qualification")
+  local malformed_row = deepcopy(draft_iron)
+  malformed_row.spec.automatic_family = {creation_maturity = "not-a-valid-maturity"}
+  check(not pcall(technology_design.prepare_generation_row, malformed_row),
+    "Preparation retains the constructor's malformed-maturity validation")
   local plan = compiler.compile(context)
   local iron
   for _, row in ipairs(plan.stream_plan.rows) do
     if row.stream_key == "research_iron" then iron = row end
   end
   check(iron and iron.action == "emit", "Existing authored iron family must be admitted")
+  local expected_final_design = technology_design.with_qualification(pregraph_iron, iron)
+  check(fingerprint.canonical(iron.technology_design) == fingerprint.canonical(expected_final_design),
+    "Single final binding equals the independently materialized pre-graph plus qualification path")
+  check(context:state_view("generation_plan").schema == 3
+    and stream_compiler.latest_artifact(context).record_type == nil,
+    "Only the complete final GenerationPlan is installed before publication and emission")
   check(#plan.stream_plan.rows > 100, "Use the actual catalogue, not a replacement five-family catalogue")
   compiler.apply_streams(context)
   compiler.apply_base_extensions(context)
@@ -125,6 +175,48 @@ Context.with_active(Context.new(), function()
     "Actual contract-check summary preserves the full journal evidence projection")
   counts = {rows = #plan.stream_plan.rows, operations = #plan.transformation_plan.operations}
   emitted_plan, emitted_journal = plan.transformation_plan, journal
+  emitted_context = context
+end)
+
+Context.with_active(emitted_context, function()
+  local generation_plan = require("prototypes.mir.planner.generation_plan")
+  local technology_design = require("prototypes.mir.domain.technology.technology_design")
+  local compilation_plan = require("prototypes.mir.planner.compilation_plan")
+  local function compare_draft_case(change)
+    local input = deepcopy(draft_fixture_row)
+    change(input)
+    local ordinary_row = deepcopy(input)
+    ordinary_row.technology_design = technology_design.from_generation_row(ordinary_row)
+    local ordinary = generation_plan.new()
+    ordinary:add_owned_derived(ordinary_row)
+    local draft = generation_plan.prepare({input})
+    local options = {effect_target_inventory = emitted_context:service("effect_target_inventory")}
+    local expected = compilation_plan.finalize(ordinary:finalize():artifact_view(), {}, options)
+    local actual = compilation_plan.finalize(draft, {}, options)
+    check(fingerprint.canonical(actual.stream_plan.rows) == fingerprint.canonical(expected.stream_plan.rows),
+      "Draft sanitation/graph decision preserves the complete full-path final rows")
+    return actual.stream_plan.rows[1], actual
+  end
+  local sanitized = compare_draft_case(function(row)
+    row.fields.effects[#row.fields.effects + 1] = {type = "unlock-recipe", recipe = "missing-draft-control-recipe"}
+  end)
+  check(sanitized.action == "emit" and #sanitized.fields.effects == 1
+    and #sanitized.effect_integrity.removed == 1
+    and #sanitized.technology_design.design.effects.value == 1,
+    "Sanitation re-prepares retained effect semantics before graph and final binding")
+  local rejected_row, rejected_plan = compare_draft_case(function(row)
+    row.fields.prerequisites = {"missing-draft-control-prerequisite"}
+  end)
+  check(rejected_row.action == "skip" and rejected_row.reason == "prerequisite_missing"
+    and rejected_row.technology_design.materialization.kind == "diagnose"
+    and #rejected_plan.technology_catalog.candidates[1].alternatives == 2,
+    "Graph rejection retains a complete final skip design and explicit safe diagnostic")
+  local erased = compare_draft_case(function(row)
+    row.fields.effects = {{type = "unlock-recipe", recipe = "missing-draft-control-recipe"}}
+  end)
+  check(erased.action == "skip" and erased.reason == "no_valid_effect_targets"
+    and erased.technology_design.materialization.kind == "diagnose",
+    "Zero retained effects preserve the full rejection contract rather than binding stale preparation")
 end)
 
 local mutation_journal = require("prototypes.mir.domain.compiler.mutation_journal")
