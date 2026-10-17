@@ -427,7 +427,10 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   for _, operation in ipairs(normalized_base) do
     local normalized, covered_by_native = apply_weapon_overlap_policy(
       operation, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
-    normalized = model.normalized_base_operation(normalized)
+    -- Preserve the existing post-policy copy boundary without eagerly binding
+    -- a TechnologyDesign.  Only a terminal native-coverage, ownership, or graph
+    -- decision may require the final design below.
+    normalized = model.owned_base_operation(normalized)
     if covered_by_native then
       local reason = "covered_by_existing_infinite_native_modifier"
       normalized.gates.effect_valid = gate_contract.failed(
