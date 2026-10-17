@@ -675,6 +675,49 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check (-not(Test-Path (Join-Path $invalidRelease43.FreshRoot 'summary.json'))) 'invalid 4.3 modern identity produced evidence.'
     }
     Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
+    # Execute the actual runner's FreshLeaf admission AST.  This intentionally
+    # stops before candidate/release I/O and native launch; later runner code
+    # continues through the maintained published-predecessor reader.
+    $runnerTokens=$null;$runnerErrors=$null
+    $runnerAst=[Management.Automation.Language.Parser]::ParseFile($runnerPath,[ref]$runnerTokens,[ref]$runnerErrors)
+    Check (@($runnerErrors).Count-eq0) 'FreshLeaf runner did not parse.'
+    $freshLeafAdmissionAst=@($runnerAst.EndBlock.Statements|Where-Object {
+      $_ -is [Management.Automation.Language.IfStatementAst] -and $_.Extent.Text.TrimStart().StartsWith('if ($freshLeafMode)')
+    })
+    Check ($freshLeafAdmissionAst.Count-eq1) 'FreshLeaf runner admission AST was not unique.'
+    $freshLeafAdmission=[scriptblock]::Create($freshLeafAdmissionAst[0].Extent.Text)
+    function Invoke-MIR42ActualFreshLeafAdmission {
+      param([Parameter(Mandatory)][string]$CandidateSourceVersion,[Parameter(Mandatory)][string]$PredecessorSourceVersion)
+      $freshLeafMode=$true
+      $sourceVersion=$CandidateSourceVersion
+      $PublishedMaintenancePredecessorSourceVersion=$PredecessorSourceVersion
+      $SelectedFreshScenario='package-zip-base'
+      $SelectedFreshTarget='f200'
+      $SelectedFreshLibraryDirectory=$sourceRoot
+      . $freshLeafAdmission
+      return [pscustomobject]@{targets=@($targets);library=[string]$libraryBindings.f200}
+    }
+    try {
+      foreach($pair in @(
+        @{candidate='4.5.0';predecessor='4.4.2'},
+        @{candidate='4.5.2';predecessor='4.5.1'},
+        @{candidate='4.5.2';predecessor='4.4.2'}
+      )){
+        $admission=Invoke-MIR42ActualFreshLeafAdmission -CandidateSourceVersion $pair.candidate -PredecessorSourceVersion $pair.predecessor
+        Check ((@($admission.targets)-join'|')-ceq'f200' -and $admission.library-ceq(Resolve-Path -LiteralPath $sourceRoot).Path) ('FreshLeaf actual entry did not retain its admitted single-target library for '+$pair.candidate+'/'+$pair.predecessor)
+      }
+      foreach($pair in @(
+        @{candidate='4.5.0';predecessor='4.5.1'},
+        @{candidate='4.5.2';predecessor='4.5.0'},
+        @{candidate='4.5.2';predecessor='4.2.2'},
+        @{candidate='4.4.2';predecessor='4.4.2'},
+        @{candidate='4.5.3';predecessor='4.5.2'}
+      )){
+        Refuses {Invoke-MIR42ActualFreshLeafAdmission -CandidateSourceVersion $pair.candidate -PredecessorSourceVersion $pair.predecessor} 'mir42-engine-fresh-leaf-maintenance-selection'
+      }
+    } finally {
+      Remove-Item -LiteralPath function:Invoke-MIR42ActualFreshLeafAdmission -ErrorAction SilentlyContinue
+    }
     # FreshLeaf must dispatch exactly one already-admitted direct loader. These
     # are host controls: stubs preserve the public leaf result shape and do not
     # synthesize an engine receipt or invoke Factorio.
