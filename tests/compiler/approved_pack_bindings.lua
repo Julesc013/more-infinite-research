@@ -1141,4 +1141,62 @@ Context.with_active(Context.new(), function()
   check(bindings.bound_technology_reason(index, "atomic-bomb") == "no-accepting-lab",
     "The trigger field, rather than an unchecked unit, admits the nuclear test technology")
 end)
+-- Angel's Smelting can disable its unused silver chain. A stale upstream
+-- modules edge must be repaired before approved science references are built;
+-- unrelated disabled prerequisites must remain fatal.
+local repair_registry = require("prototypes.mir.compatibility.repairs.registry")
+local saved_mods = mods
+local function angels_silver_world(active, disabled, missing)
+  local result = world(0, false)
+  mods = deepcopy(saved_mods)
+  if active then mods.angelssmelting = "2.1.1" end
+  result.technology.modules = {type = "technology", name = "modules",
+    prerequisites = {roles[2], "angels-silver-smelting-1"},
+    unit = {count = 10, time = 10, ingredients = {{roles[2], 1}}}}
+  if not missing then
+    result.technology["angels-silver-smelting-1"] = {
+      type = "technology", name = "angels-silver-smelting-1", enabled = not disabled,
+      prerequisites = {}, research_trigger = {type = "craft-item", item = "iron-plate", count = 1}}
+  end
+  result.technology[roles[4]].prerequisites = {roles[3], "modules"}
+  return result
+end
+
+local silver_world = angels_silver_world(true, true, false)
+local expected_silver_world = deepcopy(silver_world)
+expected_silver_world.technology.modules.prerequisites = {roles[2]}
+Context.with_active(Context.new(), function()
+  repair_registry.apply()
+  check(fingerprint.of(silver_world) == fingerprint.of(expected_silver_world),
+    "The Angel silver repair changes only the reported disabled prerequisite edge")
+  local index = bindings.compile_references(catalogue.shared, lab_bindings.view())
+  check(bindings.bound_pack_status(index, roles[4]) == "research",
+    "A stale disabled Angel silver edge cannot abort downstream approved science")
+  local after = fingerprint.of(silver_world)
+  repair_registry.apply()
+  check(fingerprint.of(silver_world) == after, "The exact Angel silver repair is idempotent")
+end)
+for _, case in ipairs({
+  {active = false, disabled = true},
+  {active = true, disabled = false},
+  {active = true, disabled = true, missing = true}
+}) do
+  local unqualified = angels_silver_world(case.active, case.disabled, case.missing)
+  local before = fingerprint.of(unqualified)
+  Context.with_active(Context.new(), function()
+    repair_registry.apply()
+    check(fingerprint.of(unqualified) == before,
+      "Absent Angel, enabled silver and missing silver never authorize prerequisite removal")
+  end)
+end
+local other_disabled = angels_silver_world(true, true, false)
+other_disabled.technology["unrelated-disabled"] = {type = "technology", name = "unrelated-disabled", enabled = false}
+other_disabled.technology.modules.prerequisites[#other_disabled.technology.modules.prerequisites + 1] = "unrelated-disabled"
+Context.with_active(Context.new(), function()
+  repair_registry.apply()
+  local index = bindings.compile_references(catalogue.shared, lab_bindings.view())
+  check(bindings.bound_pack_status(index, roles[4]) == nil,
+    "The exact Angel repair never waives another disabled prerequisite")
+end)
+mods = saved_mods
 return checks

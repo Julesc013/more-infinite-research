@@ -157,6 +157,7 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
     $requiredDeps = @(
       "base >= 2.1.18",
       "(?) elevated-rails",
+      "(?) angelssmelting",
       "? recycler >= 2.1.18",
       "(?) quality",
       "(?) Krastorio2",

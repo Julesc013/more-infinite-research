@@ -25,6 +25,7 @@ $progressionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduc
 $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
 $compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
 $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+$angelsRepairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
 $retiredPredecessorSources=@(
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
@@ -53,9 +54,9 @@ $sharedPlanShape=($sharedPlan.Count-eq1-and[string]$sharedPlan[0].layer-ceq'capa
 $successionChecks=@(
   ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
   ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
-  (@($manifest.bindings).Count-eq375),($currentPaths.Count-eq375),
+  (@($manifest.bindings).Count-eq376),($currentPaths.Count-eq376),
   ($migrated.Count-eq355),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq355),
-  ($introduced.Count-eq20),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),
+  ($introduced.Count-eq21),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),($angelsRepairIntroduced.Count-eq1),
   ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
   (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
   (($missingPredecessors-join'|')-ceq(($retiredPredecessorSources|Sort-Object -Unique)-join'|')),
@@ -107,7 +108,13 @@ foreach($forgery in @(
   @{id='approved-binding-substitution';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua');$row[0].source_path='source/prototypes/mir/capabilities/science_integration/forged.lua'}},
   @{id='retired-f200-plan-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'}},
   @{id='shared-f200-plan-missing';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/prototypes/mir/planner/base_continuations/forged-plan.lua'}},
-  @{id='shared-f200-plan-scope';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].target_scope=@('f210','f110','f100')}}
+  @{id='shared-f200-plan-scope';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].target_scope=@('f210','f110','f100')}},
+  @{id='angels-repair-missing';mutate={param($r)$r.bindings=@($r.bindings|Where-Object source_path -CNE 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua')}},
+  @{id='angels-repair-substitution';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').source_path='source/prototypes/mir/compatibility/repairs/forged.lua'}},
+  @{id='angels-repair-scope';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').target_scope=@('f210','f200')}},
+  @{id='angels-repair-output';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').output_path='prototypes/mir/compatibility/repairs/forged.lua'}},
+  @{id='angels-repair-identity';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').provenance.introduction_id='undeclared-introduction'}},
+  @{id='angels-repair-transform';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').transform='forged-transform'}}
 )){
   $copy=$manifest|ConvertTo-Json -Depth 100|ConvertFrom-Json -Depth 100 -DateKind String
   &$forgery.mutate $copy;$copy.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $copy

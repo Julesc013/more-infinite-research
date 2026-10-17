@@ -20,7 +20,7 @@ $expectedBindingTargets = @('f013','f014','f015','f016','f017','f100','f110','f2
 $actualBindingTargets = @($model.bindings | ForEach-Object { @($_.target_scope) } | ForEach-Object { [string]$_ } | Sort-Object -Unique -CaseSensitive)
 $expectedModelTargets = @('f100','f110','f200','f210')
 $actualModelTargets = @($model.targets | ForEach-Object { [string]$_.target } | Sort-Object -CaseSensitive)
-Assert-MIR4ComposableSourceModel (@($model.bindings).Count -eq 375 -and @($model.targets).Count -eq 4) 'mir4-composable-source-model-cardinality'
+Assert-MIR4ComposableSourceModel (@($model.bindings).Count -eq 376 -and @($model.targets).Count -eq 4) 'mir4-composable-source-model-cardinality'
 Assert-MIR4ComposableSourceModel (($actualBindingTargets -join '|') -ceq ($expectedBindingTargets -join '|')) 'mir4-composable-source-model-binding-target-scopes'
 Assert-MIR4ComposableSourceModel (($actualModelTargets -join '|') -ceq ($expectedModelTargets -join '|')) 'mir4-composable-source-model-target-authority'
 
@@ -41,6 +41,6 @@ Assert-MIR4ComposableSourceModel ($raw -notmatch 'src/mod|families[.](?:modern|l
 
 $cliRaw = & (Join-Path $repo 'tools/mir/cli/Invoke-MIR4PackageSource.ps1') -Command model -RepoRoot $repo -OutputPath 'build/reports/package-source/tests/mir4-composable-source-model-cli-v2.json'
 $cli = $cliRaw | ConvertFrom-Json -Depth 20 -DateKind String
-Assert-MIR4ComposableSourceModel ([string]$cli.status -ceq 'passed-canonical-composable-source-model' -and [int]$cli.bindings -eq 375 -and [int]$cli.targets -eq 4) 'mir4-composable-source-model-cli'
+Assert-MIR4ComposableSourceModel ([string]$cli.status -ceq 'passed-canonical-composable-source-model' -and [int]$cli.bindings -eq 376 -and [int]$cli.targets -eq 4) 'mir4-composable-source-model-cli'
 
 [pscustomobject][ordered]@{status='passed';test_id='static.mir4-composable-source-model-m42-02';bindings=@($model.bindings).Count;targets=@($model.targets).Count;release_authority=$false;record_sha256=[string]$model.record_sha256} | ConvertTo-Json -Depth 10

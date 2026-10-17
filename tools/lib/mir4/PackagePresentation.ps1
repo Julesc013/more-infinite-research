@@ -958,6 +958,7 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $browserIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0146'})
   $compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
   $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+  $angelsRepairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
   $retiredPredecessorSources=@(
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
@@ -974,8 +975,8 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   )
   $predecessorPaths=@($Predecessor.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
   $currentPaths=@($Current.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
-  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne375-or$currentPaths.Count-ne375-or
-     $migrated.Count-ne355-or$introduced.Count-ne20-or$compilerTransitionIntroduced.Count-ne1-or
+  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne376-or$currentPaths.Count-ne376-or
+     $migrated.Count-ne355-or$introduced.Count-ne21-or$compilerTransitionIntroduced.Count-ne1-or$angelsRepairIntroduced.Count-ne1-or
      $approvedBindingsIntroduced.Count-ne2-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
      $progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or$browserIntroduced.Count-ne2-or
      @($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0){
@@ -983,6 +984,14 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   }
   foreach($source in $retiredPredecessorSources){if($source-cnotin$predecessorPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
   foreach($source in $retiredCurrentSources){if($source-cin$currentPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
+  if([string]$angelsRepairIntroduced[0].source_path-cne'source/prototypes/mir/compatibility/repairs/angels_smelting.lua'-or
+     [string]$angelsRepairIntroduced[0].output_path-cne'prototypes/mir/compatibility/repairs/angels_smelting.lua'-or
+     [string]$angelsRepairIntroduced[0].layer-cne'shared'-or
+     [string]$angelsRepairIntroduced[0].semantic_class-cne'common-semantic-source'-or
+     [string]$angelsRepairIntroduced[0].transform-cne'copy-exact-bytes'-or
+     (@($angelsRepairIntroduced[0].target_scope)-join'|')-cne'f210|f200|f110|f100'){
+    throw '[mir4-package-presentation-v7-source-succession]'
+  }
   $sharedPlan=@($Current.bindings|Where-Object{
     [string]$_.source_path-ceq'source/prototypes/mir/planner/base_continuations/plan.lua'-and
     [string]$_.output_path-ceq'prototypes/mir/planner/base_continuations/plan.lua'

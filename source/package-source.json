@@ -423,10 +423,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/compatibility/repairs/registry.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 488,
-      "source_sha256": "DCED275D96102E0589373F600437EC935CD51B2C7C3600FF1E2B57A66E4534C5",
-      "output_bytes": 488,
-      "output_sha256": "DCED275D96102E0589373F600437EC935CD51B2C7C3600FF1E2B57A66E4534C5"
+      "source_bytes": 690,
+      "source_sha256": "287E7E483101AEA2A200701112696825A5E216A86EC75B22BFF12B53B488B2DA",
+      "output_bytes": 690,
+      "output_sha256": "287E7E483101AEA2A200701112696825A5E216A86EC75B22BFF12B53B488B2DA"
     },
     {
       "layer": "shared",
@@ -6767,10 +6767,10 @@
         "predecessor_source_path": "targets/f210/generation/info.json.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 616,
-      "source_sha256": "BE8D890CECFE14908F9196578F961E267D395CA37FF311A6C61DC3D91C1222D3",
-      "output_bytes": 616,
-      "output_sha256": "BE8D890CECFE14908F9196578F961E267D395CA37FF311A6C61DC3D91C1222D3"
+      "source_bytes": 642,
+      "source_sha256": "D94A926E76BBFE7830150097D45689DAE5834B3C84013C7419506FF95BA3DFE6",
+      "output_bytes": 642,
+      "output_sha256": "D94A926E76BBFE7830150097D45689DAE5834B3C84013C7419506FF95BA3DFE6"
     },
     {
       "layer": "capability",
@@ -7664,6 +7664,28 @@
       "source_sha256": "C62C10AC07D52A231FF72470E75F48F97F3BF4FB5E59198B9DD4C4025FCE64DA",
       "output_bytes": 5800,
       "output_sha256": "C62C10AC07D52A231FF72470E75F48F97F3BF4FB5E59198B9DD4C4025FCE64DA"
+    },
+    {
+      "layer": "shared",
+      "target_scope": [
+        "f210",
+        "f200",
+        "f110",
+        "f100"
+      ],
+      "output_path": "prototypes/mir/compatibility/repairs/angels_smelting.lua",
+      "semantic_class": "common-semantic-source",
+      "source_path": "source/prototypes/mir/compatibility/repairs/angels_smelting.lua",
+      "provenance": {
+        "kind": "current-introduction",
+        "introduction_id": "MIR450-ANGELS-DISABLED-SILVER",
+        "reason": "Narrow admitted repair of the reported modules prerequisite on disabled Angel silver research"
+      },
+      "transform": "copy-exact-bytes",
+      "source_bytes": 1594,
+      "source_sha256": "C14487B32AF423594BE7B80251596862651B06C2F496E28EF92CCDE57122B9B2",
+      "output_bytes": 1594,
+      "output_sha256": "C14487B32AF423594BE7B80251596862651B06C2F496E28EF92CCDE57122B9B2"
     }
   ],
   "invariants": {
@@ -7673,5 +7695,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "BF489AE70EA2225A9E9456BA82C95B6941ECE0F902982949D80D18CDE5ED46D5"
+  "record_sha256": "28DD0765D9B596047EF8819E3952FBA95CE49B8AA8D766F2F426D6327BCDE340"
 }

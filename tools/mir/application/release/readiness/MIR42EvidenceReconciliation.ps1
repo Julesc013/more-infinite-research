@@ -1752,7 +1752,7 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4','MIR42FourTargetDeterministicCandidateManifestV5','MIR42FourTargetDeterministicCandidateManifestV6','MIR42FourTargetDeterministicCandidateManifestV7','MIR42FourTargetDeterministicCandidateManifestV9') -and
+  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4','MIR42FourTargetDeterministicCandidateManifestV5','MIR42FourTargetDeterministicCandidateManifestV6','MIR42FourTargetDeterministicCandidateManifestV7','MIR42FourTargetDeterministicCandidateManifestV9','MIR42FourTargetDeterministicCandidateManifestV10') -and
     [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
     (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
   if ($candidateConstruction) {

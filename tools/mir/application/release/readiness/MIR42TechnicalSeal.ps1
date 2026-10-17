@@ -1222,8 +1222,8 @@ function Get-MIR42ExactQualificationReceipt {
 function Assert-MIR42FreshEngineLoads {
   param([Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Execution)
   $targetId = [string]$Target.target
-  $expectedFactorioVersion = [regex]::Match([string]$Execution.version, '^[0-9]+[.][0-9]+[.][0-9]+').Value
-  if ([string]::IsNullOrWhiteSpace($expectedFactorioVersion)) { throw "[mir42-seal-real-engine-version-shape] $targetId" }
+  $expectedFactorioVersion = [string]$Execution.version
+  if ($expectedFactorioVersion -cnotmatch '^[0-9]+[.][0-9]+[.][0-9]+(?:[.][0-9]+)?$') { throw "[mir42-seal-real-engine-version-shape] $targetId" }
   [string[]]$expectedScenarios = if ($targetId -ceq 'f210') { @('package-zip-base','package-zip-space-age') } else { @('package-zip-base') }
   $freshLoads = @($Execution.fresh_loads)
   if ($freshLoads.Count -ne $expectedScenarios.Count -or
@@ -1278,7 +1278,7 @@ function Assert-MIR42FreshEngineLoads {
     $logText = Get-Content -Raw -LiteralPath ([string]$fresh.log.path)
     $logModVersion = [string]$Target.distribution_version
     if ($targetId -in $script:MIR42SealHistoricalTargets) {
-      if ($logModVersion -notmatch '^4[.](2|3|4)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
+      if ($logModVersion -notmatch '^4[.](2|3|4|5)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
       $logModVersion = '4.' + $Matches[1] + '.' + [int]$Matches[2]
     }
     if (-not $logText.Contains("Loading mod more-infinite-research $logModVersion ") -or
