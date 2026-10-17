@@ -296,6 +296,8 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
       $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
       if ($SourceVersion -ceq '4.4.1') {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+      } elseif ($SourceVersion -ceq '4.5.0') {
+        $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
       } elseif ($SourceVersion -ceq '4.4.2') {
         $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
         if ([string]$Record.factorio_line -ceq '0.15') {
