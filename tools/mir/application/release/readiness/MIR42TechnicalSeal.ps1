@@ -2464,7 +2464,9 @@ function New-MIR42NineTargetReleaseCutProgramme {
   Assert-MIR42SealTargetSet -Rows @($previous.record.selected_targets | ForEach-Object { [pscustomobject]@{target=[string]$_} }) -Code 'mir42-nine-programme-superseded'
   $historical = [Collections.Generic.List[object]]::new()
   foreach ($target in $script:MIR42SealHistoricalTargets) {
-    $authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target
+    # A pending programme records committed identities, not archive execution
+    # evidence. Execution and seal admission retain their archive verification.
+    $authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $repo -Target $target -PredecessorIdentityOnly
     $record = $authority.target_record.record
     $historical.Add([pscustomobject][ordered]@{
       target=$target

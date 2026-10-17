@@ -5395,9 +5395,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1",
       "classification": "canonical-internal",
-      "sha256": "953CF3DAE672810B08BF3650F5EA93DDFA6E92B0897022A1E693D186D17135F2",
+      "sha256": "23327ECB248FC3421BE105F4B31AF0F46DBA47D7784708800F09064EC5D7DD4A",
       "hash_mode": "canonical-text-v1",
-      "lines": 3422,
+      "lines": 3424,
       "package_visible": false
     },
     {
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:b282b128632c9de072d948c75b4752cd5bf213976fc44d3d41ffdf064383b5ab"
+  "digest": "sha256:4caa8809bede37a73c8ff448437ccb35dda86afee41ab7e65dbbce34d041c415"
 }
