@@ -821,7 +821,12 @@ function Test-MIR42IndividualNativeInputReader {
       $f013BlankSemanticVersion = New-F013BlankPEVersionReaderRecord
       $f013BlankSemanticIndex = @($f013BlankSemanticVersion.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
       $f013BlankSemanticVersion.individual_upgrade_receipts[$f013BlankSemanticIndex].engine.version = ''
-      Assert-HostReaderRefusal 'f013-blank-sealed-semantic-version' $f013BlankSemanticVersion '[mir42-individual-engine-run-engine-version]'
+      $f013BlankSemanticReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'f013-blank-sealed-semantic-version.json') $f013BlankSemanticVersion)
+      $f013BlankSemanticRefused = $false
+      try { $null = Get-MIR42BoundEngineRun -Reference $f013BlankSemanticReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+      catch { $f013BlankSemanticRefused = $true }
+      Assert-MIR42NineSealTest -Condition $f013BlankSemanticRefused -Code 'individual-f013-blank-sealed-semantic-version-rejected'
+      $checks++;$script:mir42IndividualReaderChecks++
       $f013MissingVersionRecord = New-F013BlankPEVersionReaderRecord
       $f013MissingVersionIndex = @($f013MissingVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
       $f013MissingVersionReceipt = Get-Content -LiteralPath $f013MissingVersionRecord.individual_upgrade_receipts[$f013MissingVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
