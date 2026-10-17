@@ -42,7 +42,7 @@ function Resolve-MIR42IndependentChild {
 
 function Get-MIR42IndependentScopeContract {
   param([Parameter(Mandatory)][ValidateSet('four-target','nine-target')][string]$Scope,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')][string]$SourceVersion='4.2.1')
   if ($PublishedMaintenance) {
     Assert-MIR42IndependentMaintenanceScope -Scope $Scope -SourceVersion $SourceVersion
     return [pscustomobject][ordered]@{
@@ -134,7 +134,7 @@ function Get-MIR42IndependentEngine {
 
 function Assert-MIR42IndependentMaintenanceScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][string]$SourceVersion)
-  if ($Scope -cne 'nine-target' -or $SourceVersion -cnotin @('4.2.1','4.2.2','4.2.3')) {
+  if ($Scope -cne 'nine-target' -or $SourceVersion -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')) {
     throw '[mir42-independent-maintenance-candidate-scope]'
   }
 }
