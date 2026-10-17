@@ -1199,4 +1199,83 @@ Context.with_active(Context.new(), function()
     "The exact Angel repair never waives another disabled prerequisite")
 end)
 mods = saved_mods
+
+local function alternate_space_world(change)
+  local raw = world(0, false)
+  for _, name in ipairs({"space-science-pack", "unknown-upstream-pack"}) do
+    raw.tool[name] = {type = "tool", name = name}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = name
+  end
+  raw.recipe["space-science-pack"] = {type = "recipe", name = "space-science-pack", enabled = false,
+    results = {{type = "item", name = "space-science-pack", amount = 1}}}
+  raw.technology["space-science-pack"] = {type = "technology", name = "space-science-pack",
+    unit = {count = 1, ingredients = {{"unknown-upstream-pack", 1}}},
+    effects = {{type = "unlock-recipe", recipe = "space-science-pack"}}}
+  raw.recipe["alternate-space-source"] = {type = "recipe", name = "alternate-space-source", enabled = true,
+    ingredients = {{"iron-plate", 1}}, results = {{type = "item", name = "space-science-pack", amount = 1}}}
+  if change then change(raw) end
+  return raw
+end
+alternate_space_world()
+Context.with_active(Context.new(), function()
+  check(science_packs.pack_production_status("space-science-pack") == "initial",
+    "A proven direct alternate resolves space science despite an unresolved named source")
+  check(science_packs.production_route_for_pack("space-science-pack").recipe_name == "alternate-space-source",
+    "The selected binding is the proven alternate, never the unresolved named source")
+  local selected = science_packs.best_lab_compatible_ingredients(
+    {{roles[1], 1}, {"space-science-pack", 1}}, "alternate-space-regression", {"space-science-pack"})
+  check(selected and #selected == 2, "The repaired binding retains required space science")
+  check(science_packs.binding_snapshot().work.factory_acquisition_calls == 0,
+    "Direct-source alternatives never enter factory acquisition")
+end)
+alternate_space_world(function(raw)
+  raw.technology["space-science-pack"].unit.ingredients = {{roles[1], 1}}
+end)
+Context.with_active(Context.new(), function()
+  local status, gate = science_packs.pack_production_status("space-science-pack")
+  check(status == "research" and gate == "space-science-pack"
+      and science_packs.production_route_for_pack("space-science-pack").recipe_name == "space-science-pack",
+    "A proven named source retains its existing progression ahead of alternatives")
+end)
+for _, change in ipairs({
+  function(raw) raw.recipe["alternate-space-source"] = nil end,
+  function(raw) raw.recipe["alternate-space-source"].results[1].amount = 0 end,
+  function(raw) raw.recipe["alternate-space-source"].results[1].type = "fluid" end,
+  function(raw) raw.recipe["alternate-space-source"].ingredients = {{"space-science-pack", 1}} end,
+  function(raw)
+    raw.recipe["alternate-space-source"].enabled = false
+    raw.technology["alternate-space-gate"] = {type = "technology", name = "alternate-space-gate",
+      unit = {count = 1, ingredients = {{"unknown-upstream-pack", 1}}},
+      effects = {{type = "unlock-recipe", recipe = "alternate-space-source"}}}
+  end
+}) do
+  alternate_space_world(change)
+  Context.with_active(Context.new(), function()
+    local ok, reason = pcall(science_packs.pack_production_status, "space-science-pack")
+    check(not ok and tostring(reason):find("unresolved-approved-pack-dependencies:space-science-pack", 1, true),
+      "Missing, zero, fluid, circular or unresolved alternatives never fabricate a space-science binding")
+  end)
+end
+for _, reversed in ipairs({false, true}) do
+  local raw = world(0, false)
+  local pack = "promethium-science-pack"
+  raw.tool[pack] = {type = "tool", name = pack}
+  raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+  raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+    results = {{type = "item", name = pack, amount = 1}}}
+  local owners = reversed and {"extra-promethium-unlock", pack} or {pack, "extra-promethium-unlock"}
+  for _, name in ipairs(owners) do
+    raw.technology[name] = {type = "technology", name = name,
+      unit = {count = 1, ingredients = {{roles[1], 1}}},
+      effects = {{type = "unlock-recipe", recipe = pack}}}
+  end
+  Context.with_active(Context.new(), function()
+    local status, gate = science_packs.pack_production_status(pack)
+    check(status == "research" and gate == pack,
+      "An additional recipe unlock cannot veto the validated authored Promethium source")
+    local source = science_packs.production_route_for_pack(pack)
+    check(source.recipe_name == pack and #source.unlockers == 1 and source.unlockers[1] == pack,
+      "Promethium preserves its actual native prerequisite rather than requiring every alternate owner")
+  end)
+end
 return checks

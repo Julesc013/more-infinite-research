@@ -15,8 +15,8 @@ M.shared = {
   growth_factor = 2,
   research_time = 60,
   science_binding_policy = {
-    -- Parameterized sources bind an actual same-named pack recipe and its
-    -- unique direct unlock owner. They never explore ingredient factories.
+    -- Parameterized sources prefer the named recipe, with finite direct
+    -- alternatives and unique unlock owners; they never explore factories.
     named_pack_recipe = true,
     unique_direct_recipe = true,
     unique_direct_unlock = true,
@@ -105,6 +105,9 @@ M.shared = {
     },
     ["production-science-pack"] = {
       recipe = "production-science-pack", technology = "production-science-pack", allow_initial = true
+    },
+    ["promethium-science-pack"] = {
+      recipe = "promethium-science-pack", technology = "promethium-science-pack", allow_initial = true
     },
     -- Angel's Biology token has several producers.  This is the reviewed
     -- early producer, with its explicit direct unlock owner; it is not a
