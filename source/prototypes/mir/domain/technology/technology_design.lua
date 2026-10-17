@@ -848,6 +848,20 @@ function M.from_generation_row(row)
   return trust(result)
 end
 
+local function preparation_material(row)
+  -- The GenerationDraft fingerprint binds the remaining row authority itself.
+  -- Retain only the authored inputs that this pre-graph construction consumes
+  -- but that the final plan row does not serialize independently.
+  return {
+    fields = row.fields,
+    spec = row.spec,
+    materialization = row.materialization,
+    identity_authority = row.identity_authority,
+    direct_effects = row.direct_effects,
+    adoption = row.adoption
+  }
+end
+
 function M.prepare_generation_row(row)
   if row.action ~= "emit" or row.stage_kind == "material-continuation"
     or row.technology_design ~= nil then
@@ -857,9 +871,9 @@ function M.prepare_generation_row(row)
   local handle = {}
   preparations[handle] = {
     design = design,
-    -- Bind the complete authored input, including fields not represented in a
-    -- graph projection. No mutable table identity substitutes for this digest.
-    input_fingerprint = fingerprint.of(row),
+    -- At preparation capture, this digest binds the authored inputs below;
+    -- the GenerationDraft fingerprint binds the remaining row authority.
+    input_fingerprint = fingerprint.of(preparation_material(row)),
     source = row.source, spec = row.spec, materialization = row.materialization,
     provider_ids = row.provider_ids, family_ids = row.family_ids,
     identity_authority = row.identity_authority

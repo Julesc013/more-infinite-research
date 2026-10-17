@@ -3878,10 +3878,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/domain/technology/technology_design.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 55482,
-      "source_sha256": "C5A2F0F57A3B3B95E8B61BC4F8DD18E1326C95DBE0C834BC4AB9538A7524D3BA",
-      "output_bytes": 55482,
-      "output_sha256": "C5A2F0F57A3B3B95E8B61BC4F8DD18E1326C95DBE0C834BC4AB9538A7524D3BA"
+      "source_bytes": 55988,
+      "source_sha256": "C81EEDAAD44B8FDB7B14E5F9D8B3934ED84D967883AE7A511BD6844527DBAE9C",
+      "output_bytes": 55988,
+      "output_sha256": "C81EEDAAD44B8FDB7B14E5F9D8B3934ED84D967883AE7A511BD6844527DBAE9C"
     },
     {
       "layer": "capability",
@@ -7695,5 +7695,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "B44896224AABB889F198DD0725159D58CB6F8E8F139D637A1A2F8EE1E3A47417"
+  "record_sha256": "D21B4CA446708BD13434899F02BEBB5BC13ED986D91B405C0C3AF63B25C938DC"
 }

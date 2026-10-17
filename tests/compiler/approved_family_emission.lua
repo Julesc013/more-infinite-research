@@ -124,6 +124,69 @@ Context.with_active(Context.new(), function()
   malformed_row.spec.automatic_family = {creation_maturity = "not-a-valid-maturity"}
   check(not pcall(technology_design.prepare_generation_row, malformed_row),
     "Preparation retains the constructor's malformed-maturity validation")
+
+  local function draft_fingerprints(change)
+    local input = deepcopy(draft_fixture_row)
+    change(input)
+    local draft = generation_plan.prepare({input}, {source_fingerprints = {}})
+    local preparations = generation_plan.assert_trusted_draft(draft)
+    return technology_design.preparation_fingerprint(preparations[draft.rows[1]], draft.rows[1]),
+      draft.plan_fingerprint, draft
+  end
+
+  local baseline_preparation, baseline_plan, baseline_draft = draft_fingerprints(function() end)
+  check(next(baseline_draft.source_fingerprints) == nil,
+    "Compact preparation controls do not rely on global source fingerprints")
+  local compact_preparation_cases = {
+    {"fields", function(row) row.fields.effects[1].change = 0.2 end},
+    {"spec", function(row) row.spec.migration_policy = "draft-material-control" end},
+    {"materialization", function(row)
+      row.materialization = {kind = "continuation", base_technology = "research-speed-1",
+        chain_key = "draft-material-control"}
+    end},
+    {"identity authority", function(row) row.identity_authority = "draft-material-control" end},
+    {"direct effects", function(row) row.direct_effects = not row.direct_effects end}
+  }
+  for _, case in ipairs(compact_preparation_cases) do
+    local preparation, plan_fingerprint, draft = draft_fingerprints(case[2])
+    check(preparation ~= baseline_preparation and plan_fingerprint ~= baseline_plan
+      and next(draft.source_fingerprints) == nil,
+      "Compact preparation material binds authored " .. case[1] .. " semantics")
+  end
+
+  local function adoption_fingerprints(expected_count)
+    return draft_fingerprints(function(row)
+      row.fields.count = nil
+      row.adoption = {expected_snapshot = {unit = {count = expected_count}}}
+    end)
+  end
+  local adoption_preparation, adoption_plan, adoption_draft = adoption_fingerprints(101)
+  local changed_adoption_preparation, changed_adoption_plan, changed_adoption_draft = adoption_fingerprints(102)
+  check(adoption_preparation ~= changed_adoption_preparation and adoption_plan ~= changed_adoption_plan
+    and next(adoption_draft.source_fingerprints) == nil
+    and next(changed_adoption_draft.source_fingerprints) == nil,
+    "Compact preparation material binds adopted expected count when authored fields omit it")
+
+  local gate_contract = require("prototypes.mir.domain.technology.gate")
+  local inherited_plan_cases = {
+    {"source", function(row) row.source = "draft-material-source" end},
+    {"provider ids", function(row) row.provider_ids = {"draft-material-provider"} end},
+    {"family ids", function(row) row.family_ids = {"draft-material-family"} end},
+    {"reason", function(row) row.reason = "draft-material-reason" end},
+    {"target profile", function(row) row.target_profile_fingerprint = "draft-material-target" end},
+    {"technology risk", function(row) row.technology_risk = {kind = "draft-material-risk"} end},
+    {"diagnostics", function(row) row.diagnostics = {draft_material = true} end},
+    {"gates", function(row)
+      row.gates.effect_valid = gate_contract.passed("draft-material-gate", {changed = true})
+    end}
+  }
+  for _, case in ipairs(inherited_plan_cases) do
+    local preparation, plan_fingerprint, draft = draft_fingerprints(case[2])
+    check(preparation == baseline_preparation and plan_fingerprint ~= baseline_plan
+      and next(draft.source_fingerprints) == nil,
+      "GenerationDraft row authority binds inherited " .. case[1] .. " semantics")
+  end
+
   local plan = compiler.compile(context)
   local iron
   for _, row in ipairs(plan.stream_plan.rows) do
