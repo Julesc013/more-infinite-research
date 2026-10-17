@@ -90,6 +90,8 @@ function Assert-MIR42EngineSharedInputs {
       @{candidate='4.4.2';requested='4.4.1';source='4.4.1';reader='4.4.2'},
       @{candidate='4.4.2';requested='4.4.0';source='4.4.0';reader='4.4.1'},
       @{candidate='4.4.2';requested='4.2.2';source='4.2.2';reader='4.2.3'}
+      @{candidate='4.5.0';requested='';source='4.4.2';reader='4.5.0'}
+      @{candidate='4.5.0';requested='4.2.2';source='4.2.2';reader='4.2.3'}
     )){
       $selection=Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $case.candidate -RequestedPredecessorSourceVersion $case.requested
       Check ($selection.source_version-ceq$case.source-and$selection.reader_version-ceq$case.reader) ('frozen predecessor reader selection '+$case.candidate+'/'+$case.requested)
@@ -107,7 +109,9 @@ function Assert-MIR42EngineSharedInputs {
     }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.2.2' -RequestedPredecessorSourceVersion '4.2.0'} 'mir42-engine-maintenance-predecessor-selection'
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.0' -RequestedPredecessorSourceVersion '4.3.0'} 'mir42-engine-maintenance-predecessor-selection'
-    Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.5.0'} 'mir42-engine-maintenance-predecessor-candidate-scope'
+    foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.3','4.3.0','4.3.1','4.3.2','4.4.0','4.4.1','4.5.0')){
+      Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.5.0' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
+    }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.2'} 'mir42-engine-maintenance-predecessor-candidate-scope'
     # A fresh PowerShell scope must preserve failures before any output allocation.
     $earlyFailure=Join-Path $scratch 'early-failure.ps1'
@@ -272,11 +276,12 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $builtArguments=@($built.arguments)
     Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') '423 historical upgrade changed its legacy candidate or retention binding.'
     Assert-MIR42ControlledArgumentAbsent $builtArguments '-SourceMaterializationPath'
-    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2')){
+    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')){
       foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
         $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget $currentTarget -RequestedSourceVersion $currentSourceVersion -WithMaintenance $true
         $builtArguments=@($built.arguments);$historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
         $expectedReceipt=Join-Path $built.candidate_root ('materializations/'+$currentTarget+'.json')
+        $fromVersion=if($currentSourceVersion -ceq '4.5.0'){'4.4.'+$currentTarget.Substring(1)+'02'}else{'4.2.'+$currentTarget.Substring(1)+'02'}
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedTarget') -ceq $currentTarget) "$currentTarget/$currentSourceVersion lost its target binding."
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath') -ceq 'controlled-published.json') "$currentTarget/$currentSourceVersion lost its published predecessor binding."
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SourceMaterializationPath') -ceq $expectedReceipt) "$currentTarget/$currentSourceVersion lost its exact materialization receipt binding."
@@ -287,7 +292,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
           Assert-MIR42ControlledArgumentAbsent $builtArguments '-SelectedReleaseManifest'
         }
         $code=$currentTarget.Substring(1);$toVersion='4.'+([version]$currentSourceVersion).Minor+'.'+$code+([version]$currentSourceVersion).Build.ToString('00')
-        $mode=@{Target=$currentTarget;FromVersion=('4.2.'+$code+'02');ToVersion=$toVersion;FixtureName=$(if($historical){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"});Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($historical){Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest'}else{''});PublishedPredecessorManifest=(Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath');Retention=(Get-MIR42ControlledArgumentValue $builtArguments '-Retention');SourceVersion=$currentSourceVersion}
+        $mode=@{Target=$currentTarget;FromVersion=$fromVersion;ToVersion=$toVersion;FixtureName=$(if($historical){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"});Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($historical){Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest'}else{''});PublishedPredecessorManifest=(Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath');Retention=(Get-MIR42ControlledArgumentValue $builtArguments '-Retention');SourceVersion=$currentSourceVersion}
         Assert-MIR421CurrentUpgradeInputMode @mode
         Check $true "$currentTarget/$currentSourceVersion actual callee rejected the runner's current input mode."
         $wrongManifest=$mode.Clone();$wrongManifest.SelectedReleaseManifest=if($historical){''}else{'wrong-candidate-manifest.json'}
@@ -298,7 +303,17 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         Refuses {Assert-MIR421CurrentUpgradeInputMode @wrongRetention} 'mir421-current-upgrade-input-mode'
       }
     }
-    Refuses {Get-MIR42EngineMaintenanceHarnessArguments -Target 'f210' -SourceVersion '4.3.1' -CandidateManifestPath 'controlled-candidate-manifest.json' -PublishedPredecessorManifestPath 'controlled-published.json'} 'mir42-engine-maintenance-materialization-required'
+    # Direct published 4.2.2 skips remain supported for every current 4.5 target.
+    # This is a callee contract check; R24 remains the default maintenance route.
+    foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
+      $historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
+      $code=$currentTarget.Substring(1)
+      $mode=@{Target=$currentTarget;FromVersion=('4.2.'+$code+'02');ToVersion=('4.5.'+$code+'00');FixtureName=$(if($historical){'assert-upgrade-historical-terminal-to-mir42'}else{"assert-upgrade-4-0-${code}00-to-4-1-${code}00"});Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if($historical){'controlled-candidate-manifest.json'}else{''});PublishedPredecessorManifest='controlled-published.json';Retention='Always';SourceVersion='4.5.0'}
+      Assert-MIR421CurrentUpgradeInputMode @mode
+      Check $true "$currentTarget direct422/4.5.0 actual Full callee rejected an admitted skipper input."
+      $wrongProfile=$mode.Clone();$wrongProfile.Retention='OnFailure'
+      Refuses {Assert-MIR421CurrentUpgradeInputMode @wrongProfile} 'mir421-current-upgrade-input-mode'
+    }    Refuses {Get-MIR42EngineMaintenanceHarnessArguments -Target 'f210' -SourceVersion '4.3.1' -CandidateManifestPath 'controlled-candidate-manifest.json' -PublishedPredecessorManifestPath 'controlled-published.json'} 'mir42-engine-maintenance-materialization-required'
     Refuses {Get-MIR42EngineMaintenanceHarnessArguments -Target 'f017' -SourceVersion '4.3.1' -CandidateManifestPath 'controlled-candidate-manifest.json' -PublishedPredecessorManifestPath 'controlled-published.json'} 'mir42-engine-maintenance-materialization-required'
     $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget 'f200' -RequestedSourceVersion '4.2.0' -WithMaintenance $false
     Check ((Get-MIR42ControlledArgumentValue @($built.arguments) '-SourceVersion') -ceq '4.2.1') 'original base-upgrade invocation lost the harness historical default.'
@@ -315,7 +330,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
           Refuses {Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion "4.2.$patch" -EnginePath $badPath} "mir421-$historicalTarget-local-engine-binding-required"
         }
       }
-      foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2')){
+      foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')){
         $source=[version]$sourceVersion
         $descriptor=Get-MIR42HistoricalEngineDescriptor -RepoRoot $RepoRoot -Target $historicalTarget -SourceVersion $sourceVersion -EnginePath $boundEngine
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $historicalTarget.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build
@@ -335,12 +350,17 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $script:observedCustodySource=$CandidateSourceVersion
       Check ($ManifestPath-ceq'controlled-published.json') 'joined runner dropped the supplied manifest.'
       Check ($ArchiveBindings -is [Collections.IDictionary] -and $ArchiveBindings.Count -eq $targets.Count) 'joined runner omitted complete explicit direct-library custody.'
+      $publishedSource=[version]$requestedPredecessorSourceVersion
       foreach($id in $targets){
-        $version='4.2.'+$id.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1)
+        $version=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $id.Substring(1) -SourceMinor $publishedSource.Minor -SourcePatch $publishedSource.Build).distribution_version
         $expected=[IO.Path]::GetFullPath((Join-Path $sourceRoot ('more-infinite-research_'+$version+'.zip')))
         Check ([IO.Path]::GetFullPath([string]$ArchiveBindings[$id])-ceq$expected) "$id did not bind the expected published archive in its explicit library."
       }
-      return [pscustomobject]@{targets=@($selected.Keys|ForEach-Object {[pscustomobject]@{target=$_;path=$selected[$_].predecessor;version=('4.2.'+$_.Substring(1)+'0'+(([version]$CandidateSourceVersion).Build-1))}})}
+      return [pscustomobject]@{targets=@($selected.Keys|ForEach-Object {
+        $id=[string]$_
+        $version=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $id.Substring(1) -SourceMinor $publishedSource.Minor -SourcePatch $publishedSource.Build).distribution_version
+        [pscustomobject]@{target=$id;path=$selected[$id].predecessor;version=$version}
+      })}
     }
     try{
       $PublishedMaintenancePredecessorManifestPath='controlled-published.json';$isNineTargetCandidate=$true
@@ -366,6 +386,21 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         $tag=switch($readerVersion){'4.2.1'{'v4.2.0-stable'};'4.2.2'{'v4.2.1'};'4.2.3'{'v4.2.2'}}
         Check ($script:observedReleaseRoute-ceq('repos/Julesc013/more-infinite-research/releases/tags/'+$tag)-and$script:observedCustodySource-ceq$readerVersion) '423 did not select the exact predecessor publication or custody reader.'
         foreach($id in $selected.Keys){Check ($selected[$id].from-ceq('4.2.'+$id.Substring(1)+'0'+(([version]$predecessorSourceVersion).Build)) -and $selected[$id].maintenance_predecessor.target-ceq$id) "$id lost the selected 423 predecessor identity."}
+      }
+      foreach($predecessorSourceVersion in @('','4.2.2')){
+        $sourceVersion='4.5.0';$PublishedMaintenancePredecessorSourceVersion=$predecessorSourceVersion
+        $selected=[ordered]@{}
+        foreach($id in $rows.Keys){$selected[$id]=[ordered]@{predecessor=$rows[$id].predecessor;from='unselected'}}
+        . ([scriptblock]::Create($maintenanceNode[0].Extent.Text))
+        $expectedSource=if([string]::IsNullOrWhiteSpace($predecessorSourceVersion)){'4.4.2'}else{'4.2.2'}
+        $expectedReader=if($expectedSource-ceq'4.4.2'){'4.5.0'}else{'4.2.3'}
+        $expectedTag=if($expectedSource-ceq'4.4.2'){'v4.4.2'}else{'v4.2.2'}
+        Check ($script:observedReleaseRoute-ceq('repos/Julesc013/more-infinite-research/releases/tags/'+$expectedTag)-and$script:observedCustodySource-ceq$expectedReader) '4.5 did not select the exact R24 or direct422 custody reader.'
+        $published=[version]$expectedSource
+        foreach($id in $selected.Keys){
+          $expectedVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $id.Substring(1) -SourceMinor $published.Minor -SourcePatch $published.Build).distribution_version
+          Check ($selected[$id].from-ceq$expectedVersion-and$selected[$id].maintenance_predecessor.target-ceq$id) "$id lost the selected 4.5 predecessor identity."
+        }
       }
       $sourceVersion='4.2.0'
       $PublishedMaintenancePredecessorSourceVersion=''
@@ -441,7 +476,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     }}
     Check (@($freshRoots|ForEach-Object {Get-MIRImmutableInputFileIdentity (Join-Path $_ 'selection.json')}|Sort-Object -Unique).Count -eq 20) 'fresh definitions share identities.'
     $release43HistoricalRoots=[Collections.Generic.List[string]]::new()
-    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
+    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.5.0')){
       $source=[version]$sourceVersion;$target='f013';$freshLine='0.13'
       $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -452,7 +487,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $receipt=Get-Content -Raw -LiteralPath $result.receipt.path|ConvertFrom-Json -Depth 100
       Check ($receipt.candidate.version-ceq$freshVersion-and(Test-MIR4BootstrapRecordHash $receipt)-and$receipt.library_input_receipt.status-ceq'restored-direct-library-controls') "$sourceVersion historical fresh load did not retain its exact identity or restore controls."
     }
-    Check ($release43HistoricalRoots.Count-eq3) '4.3/4.4 historical fresh-load controls omitted an admitted source version.'
+    Check ($release43HistoricalRoots.Count-eq4) 'current historical fresh-load controls omitted an admitted source version.'
     $freshVersion='4.2.01301';$freshParams.SourceVersion='4.2.1'
     $freshParams.Candidate=Join-Path $sourceRoot 'more-infinite-research_4.2.01301.zip'
     $freshParams.CandidateSha256=Get-MIRImmutableInputSha256 $freshParams.Candidate
@@ -572,7 +607,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
     }
     $release43ModernRoots=[Collections.Generic.List[string]]::new();$release431ModernCandidate='';$release431ModernInventory=$null
-    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0')){
+    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.5.0')){
       $source=[version]$sourceVersion;$target='f200';$freshLine='2.0';$freshIsModern=$true;$freshEnableSpaceAge=$false;$freshFailure=''
       $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -584,7 +619,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($summary.status-ceq'passed'-and$summary.mir_version-ceq$freshVersion-and$summary.validation_package_sha256-ceq$release43ModernParams.CandidateSha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$sourceVersion modern fresh load did not retain exact source/target identity."
       if($sourceVersion-ceq'4.3.1'){$release431ModernCandidate=$candidate;$release431ModernInventory=$inventory}
     }
-    Check ($release43ModernRoots.Count-eq3-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) '4.3/4.4 modern fresh-load controls omitted an admitted source version.'
+    Check ($release43ModernRoots.Count-eq4-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) 'current modern fresh-load controls omitted an admitted source version.'
     $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
     [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
     $modernFailureParams=@{
