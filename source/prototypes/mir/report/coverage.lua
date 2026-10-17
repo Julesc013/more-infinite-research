@@ -11,9 +11,12 @@ local adoption = require("prototypes.mir.emit.transactions.productivity_family_a
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
+local artifact_budget = require("prototypes.mir.domain.compiler.public_artifact_budget")
 
 local M = {}
 
+-- This publisher consumes only the scalar count paired with its fresh public
+-- projection. External records continue through assert_byte_budget.
 local CATEGORIES = {
   "auto_attached",
   "generated_family_covered",
@@ -231,8 +234,8 @@ function M.publish(context, options)
   local include_internal = options.include_internal == true
   local artifact = context:state_snapshot("coverage_report")
     or M.build(context, {include_rows = include_internal})
-  local public = public_artifacts.coverage(artifact)
-  telemetry.count("coverage_public_bytes", public_artifacts.assert_byte_budget(public))
+  local public, public_bytes = public_artifacts.coverage(artifact)
+  telemetry.count("coverage_public_bytes", artifact_budget.assert_byte_count_within_limit(public.kind, public_bytes))
   mod_data.emit_coverage(public)
   if include_internal then
     telemetry.count("coverage_internal_bytes", #fingerprint.canonical(artifact))
