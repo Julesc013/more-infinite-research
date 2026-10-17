@@ -3692,8 +3692,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6301,
-      "expected_sha256": "F2BE5B35286918EC2E6B1EF9CCC91074F21D9DE60A1C80AA3AC3C1049337C84B",
+      "expected_bytes": 6445,
+      "expected_sha256": "FD9C8619101CC1E4E7B076059FD23405849F81438FD6E849A923A7510DA722A3",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "D0FB8EBBADE1A2A6A209B8CE048100A02EA035C69354DB81DE5EEBC36B85F5F7"
+  "record_sha256": "64BB87E9DDEBDE3559A2180176227C040E8BA48FC7DADCE561D1E3B9A605E512"
 }
