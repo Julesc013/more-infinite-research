@@ -76,9 +76,9 @@ local function build_snapshot(journal)
   }
 end
 
--- The ordinary snapshot/finalize API exposes a full defensive copy.  The
--- internal execution path only needs these scalar results and the realized
--- fingerprint rows, so it must never copy operation before/after projections.
+-- The ordinary snapshot/finalize API exposes a full defensive copy. Optional
+-- summary consumers receive only scalar results and fresh realized-fingerprint
+-- rows, without copying operation before/after projections.
 local function finalization_summary(snapshot)
   local realized_operations = {}
   for index, entry in ipairs(snapshot.entries or {}) do
@@ -216,15 +216,15 @@ function Journal:finalize(options)
     if options.return_snapshot == false then return finalization_summary(self.final_snapshot) end
     return deepcopy(self.final_snapshot)
   end
-  local result = build_snapshot(self)
-  local complete = result.missing_operation_count == 0
-    and result.duplicate_operation_count == 0
-    and result.undeclared_operation_count == 0
-    and result.out_of_plan_operation_count == 0
-    and result.terminal_counts.failed == 0
-    and #result.entries == self.required_operation_count
+  local preview = build_snapshot(self)
+  local complete = preview.missing_operation_count == 0
+    and preview.duplicate_operation_count == 0
+    and preview.undeclared_operation_count == 0
+    and preview.out_of_plan_operation_count == 0
+    and preview.terminal_counts.failed == 0
+    and #preview.entries == self.required_operation_count
   self.finalized = true
-  result.finalized = true
+  local result = build_snapshot(self)
   result.complete = complete
   result.journal_fingerprint = fingerprint.of(journal_fingerprint_material(result))
   self.final_snapshot = deepcopy(result)
