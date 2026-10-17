@@ -1524,6 +1524,85 @@ $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongProfile450}catch
 if(-not$rejected){throw 'Direct 4.2.2 input mode admitted an unqualified F200 mod profile'}
 $mir43Assertions+=4
 
+# 4.5.2 preserves exactly the latest 4.5.1 and corrected R24 modern routes.
+# It deliberately does not reactivate the direct 4.2.2 or historical lanes.
+$maintenanceMatcher=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$maintenanceMatch'
+},$true))
+$earlierPatchGate=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$earlierPatch'
+},$true))
+if($maintenanceMatcher.Count-ne1-or$earlierPatchGate.Count-ne1){throw 'Live maintenance predecessor gate missing or ambiguous'}
+$mir43Assertions += & {
+  param($Matcher,$Gate)
+  $cases=@(
+    @{target='200';from='4.5.20001';expected=$true},
+    @{target='210';from='4.5.21001';expected=$true},
+    @{target='200';from='4.4.20002';expected=$true},
+    @{target='200';from='4.5.20002';expected=$false},
+    @{target='200';from='4.5.20003';expected=$false},
+    @{target='200';from='4.6.20000';expected=$false}
+  )
+  foreach($case in $cases){
+    $targetCode=$case.target;$FromVersion=$case.from;$toMinor=5;$toPatch=2
+    $maintenanceMatch=& $Matcher
+    if([bool](& $Gate)-ne$case.expected){throw "Live maintenance gate misclassified $FromVersion -> 4.5.${targetCode}02"}
+  }
+  return $cases.Count
+} ([scriptblock]::Create($maintenanceMatcher[0].Right.Extent.Text)) ([scriptblock]::Create($earlierPatchGate[0].Right.Extent.Text))
+$mir452IdentityRoot=Join-Path $testRoot 'mir452-modern-identities'
+New-Item -ItemType Directory -Force -Path $mir452IdentityRoot|Out-Null
+$mir452Routes=@(
+  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1120'},
+  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.0';fixture_version='0.1.1121'},
+  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1122'},
+  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.1';fixture_version='0.1.1123'},
+  [ordered]@{target='f200';from='4.4.20002';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1124'},
+  [ordered]@{target='f200';from='4.5.20001';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1125'}
+)
+$mir452FixtureVersions=@()
+foreach($route in $mir452Routes){
+  $fixture='assert-upgrade-4-0-'+$route.target.Substring(1)+'00-to-4-1-'+$route.target.Substring(1)+'00'
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
+  Assert-MIR421CurrentUpgradeInputMode @mode
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.5.2')-cne$route.reader){throw "4.5.2 selected wrong predecessor reader: $($route.target)/$($route.from)"}
+  $fixtureRoot=Join-Path $mir452IdentityRoot ($route.target+'-'+$route.archetype+'-'+$route.from.Replace('.','-'))
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixture)) -Destination $fixtureRoot -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from -SpaceAge:([bool]$route.space_age)
+  if($route.target-ceq'f210'){
+    Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
+  }else{
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+  }
+  $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+  if($info.version-cne$route.fixture_version){throw "4.5.2 fixture identity mismatch: $($route.target)/$($route.archetype)/$($route.from)"}
+  $mir452FixtureVersions += [string]$info.version
+  $SelectedTarget=$route.target;$SourceVersion='4.5.2';$FromVersion=$route.from;$ToVersion=$route.to
+  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
+  if(-not(& $fullSpecializationCode)){throw "4.5.2 route skipped the Full preservation guard: $($route.target)/$($route.archetype)"}
+  $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$k2Scenario=$false;$classicReducedPolicy=$false
+  if(-not(& $completeCatalogueEvaluator)){throw "4.5.2 route skipped the complete catalogue evaluator: $($route.target)/$($route.archetype)"}
+  $mir43Assertions+=5
+}
+if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne6){throw '4.5.2 fixture identities collide across the admitted routes'}
+foreach($bad in @(
+  @{target='f210';from='4.5.21002';to='4.5.21002';archetype='base-default'},
+  @{target='f200';from='4.4.20001';to='4.5.20002';archetype='base-default'},
+  @{target='f110';from='4.5.11001';to='4.5.11002';archetype='base-default';reader_rejected=$true},
+  @{target='f200';from='4.5.20001';to='4.5.20002';archetype='space-age-native-owner';reader_rejected=$false}
+)){
+  $fixture='assert-upgrade-4-0-'+$bad.target.Substring(1)+'00-to-4-1-'+$bad.target.Substring(1)+'00'
+  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  if(-not$rejected){throw "4.5.2 input mode admitted an unbound route: $($bad.target)/$($bad.from)/$($bad.archetype)"}
+  if(-not($bad.ContainsKey('reader_rejected') -and -not [bool]$bad['reader_rejected'])){
+    $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $bad.target -FromVersion $bad.from -SourceVersion '4.5.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
+    if(-not$rejected){throw "4.5.2 reader admitted an unbound route: $($bad.target)/$($bad.from)"}
+    $mir43Assertions++
+  }
+  $mir43Assertions++
+}
+
 $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target 'f999' -FromVersion '4.3.99900' -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
 if(-not$rejected){throw '4.3.1 predecessor reader accepted an unselected target'}
 $mir43Assertions++
@@ -1919,7 +1998,12 @@ $f210450BaseStateCases=@(
   @{label='published422-space-age';archetype='space-age-native-owner';from='4.2.21002';to='4.5.21000';expected=$false},
   @{label='wrong-r24-patch';archetype='base-default';from='4.4.21001';to='4.5.21000';expected=$false},
   @{label='wrong-published422-patch';archetype='base-default';from='4.2.21001';to='4.5.21000';expected=$false},
-  @{label='wrong-450-destination';archetype='base-default';from='4.2.21002';to='4.5.21001';expected=$false}
+  @{label='wrong-450-destination';archetype='base-default';from='4.2.21002';to='4.5.21001';expected=$false},
+  @{label='452-r24-base';archetype='base-default';from='4.4.21002';to='4.5.21002';expected=$true},
+  @{label='452-published451-base';archetype='base-default';from='4.5.21001';to='4.5.21002';expected=$true},
+  @{label='452-r24-space-age';archetype='space-age-native-owner';from='4.4.21002';to='4.5.21002';expected=$false},
+  @{label='452-published451-space-age';archetype='space-age-native-owner';from='4.5.21001';to='4.5.21002';expected=$false},
+  @{label='452-wrong-predecessor';archetype='base-default';from='4.5.21000';to='4.5.21002';expected=$false}
 )
 foreach($binding in $f210450BaseStateCases){
   $Archetype=$binding.archetype;$FromVersion=$binding.from;$ToVersion=$binding.to
