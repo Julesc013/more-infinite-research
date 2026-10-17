@@ -701,6 +701,21 @@ function Test-MIR42IndividualNativeInputReader {
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
 
+    # Historical engines print the numeric distribution component without
+    # padding. Exercise current 4.5 logs through the same fresh-load reader.
+    $historicalFreshPackage = @($packages | Where-Object target -CEQ 'f017')[0]
+    $historicalFreshExecution = Copy-HostValue (@($bound.record.targets | Where-Object target -CEQ 'f017')[0].engine_execution)
+    $historicalFreshSummary = Get-Content -LiteralPath $historicalFreshExecution.fresh_loads[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $historicalFreshLog = Write-HostText (Join-Path $root 'f017-current-450.log') "Loading mod more-infinite-research 4.5.1700 (data.lua)`nFactorio initialised`nCreating new map"
+    $historicalFreshSummary.candidate.version = '4.5.01700'
+    $historicalFreshSummary.log = $historicalFreshLog
+    $historicalFreshReference = Write-HostBootstrap (Join-Path $root 'f017-current-450.json') $historicalFreshSummary
+    $historicalFreshExecution.fresh_loads[0].receipt = [ordered]@{path=$historicalFreshReference.path;sha256=$historicalFreshReference.sha256}
+    $historicalFreshExecution.fresh_loads[0].log = $historicalFreshLog
+    $historicalFreshTarget = [pscustomobject]@{target='f017';target_id='factorio-0.17';distribution_version='4.5.01700';archive=[pscustomobject]@{sha256=$historicalFreshPackage.archive_sha256;content_sha256=$historicalFreshPackage.content_sha256}}
+    Assert-MIR42FreshEngineLoads -Target $historicalFreshTarget -CandidateTarget ([pscustomobject]@{source=$source}) -Execution $historicalFreshExecution
+    $checks++;$script:mir42IndividualReaderChecks++
+
     # Fresh-load producers record the full executable FileVersion, just like
     # the upgrade runner. A different build or a truncated product version
     # must not bind to the same exact engine observation.
