@@ -4583,10 +4583,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/graph/snapshot.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 8269,
-      "source_sha256": "3E28449D827D7439CF4EF280E69DDF08A6EEE2457BB8FE1200E7932682CB304C",
-      "output_bytes": 8269,
-      "output_sha256": "3E28449D827D7439CF4EF280E69DDF08A6EEE2457BB8FE1200E7932682CB304C"
+      "source_bytes": 8486,
+      "source_sha256": "070F021CF3DB25AD3D83AFA78E82498C27EAB14091E444F0EA46AC96C0FF7087",
+      "output_bytes": 8486,
+      "output_sha256": "070F021CF3DB25AD3D83AFA78E82498C27EAB14091E444F0EA46AC96C0FF7087"
     },
     {
       "layer": "capability",
@@ -7673,5 +7673,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "40C543854A05A0AA9E79F82147558994489A3B6F54BC4C92FD5B498EA89723D0"
+  "record_sha256": "BF489AE70EA2225A9E9456BA82C95B6941ECE0F902982949D80D18CDE5ED46D5"
 }

@@ -94,6 +94,10 @@ function M.new(technologies, options)
     for _, name in ipairs(options.sorted_names) do append(name, technologies[name]) end
   else
     for name, technology in pairs(technologies or {}) do append(name, technology) end
+    -- A custom __pairs may emit duplicate names; retain its historical pre-sort.
+    if getmetatable(technologies) ~= nil then
+      table.sort(nodes, function(left, right) return left.name < right.name end)
+    end
   end
   local snapshot = snapshot_from_nodes(nodes, technology_view)
   return snapshot
