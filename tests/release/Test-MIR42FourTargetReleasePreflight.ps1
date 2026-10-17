@@ -7,10 +7,10 @@ $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
 
 function Assert-MIR42PreflightTest([bool]$Condition,[string]$Code) { if (-not $Condition) { throw "[$Code]" } }
 function New-MIR42PreflightTestZip {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Target,[switch]$IncludeForbidden)
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Target,[switch]$IncludeForbidden,[string]$SourceVersion='4.2.0')
   $lines = [ordered]@{f210='2.1';f200='2.0';f110='1.1';f100='1.0';f017='0.17';f016='0.16';f015='0.15';f014='0.14';f013='0.13'}
   $codes = [ordered]@{f210='210';f200='200';f110='110';f100='100';f017='017';f016='016';f015='015';f014='014';f013='013'}
-  $version = "4.2.$($codes[$Target])00"
+  $version = [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $Target -SourceVersion $SourceVersion).distribution_version
   $package = Join-Path $Root "stage/more-infinite-research_$version"
   New-Item -ItemType Directory -Force -Path $package | Out-Null
   $info = [ordered]@{name='more-infinite-research';version=$version;factorio_version=$lines[$Target];title='Test'}
@@ -68,6 +68,15 @@ try {
   $rejected = $false
   try { Invoke-MIR42FourTargetReleasePreflight -RepoRoot $repo -FinalSourceCommit $head -F210Zip $zips.f210 -F200Zip $zips.f200 -F110Zip $zips.f110 -F100Zip $bad -OutputRoot (Join-Path $root 'bad-result') | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-preflight-package-excluded-entry' }
   Assert-MIR42PreflightTest $rejected 'mir42-preflight-package-excluded-rejected'
+
+  foreach ($target in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')) {
+    $currentZip = New-MIR42PreflightTestZip -Root (Join-Path $root ('450-'+$target)) -Target $target -SourceVersion '4.5.0'
+    $currentArchive = Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $target -Path $currentZip -SourceVersion '4.5.0'
+    Assert-MIR42PreflightTest ($currentArchive.distribution_version -ceq ('4.5.'+$target.Substring(1)+'00') -and $currentArchive.package_excluded_entries_absent) "mir45-preflight-current-archive-$target"
+    $wrongVersionRejected = $false
+    try { Get-MIR42FourTargetArchiveInput -RepoRoot $repo -Target $target -Path $currentZip -SourceVersion '4.4.2' | Out-Null } catch { $wrongVersionRejected = $_.Exception.Message -match 'mir42-preflight-package-root' }
+    Assert-MIR42PreflightTest $wrongVersionRejected "mir45-preflight-refuses-cross-version-archive-$target"
+  }
 
   # 4.4.2 published its exact V9 construction record, retaining its original
   # unqualified fields. Synthetic API metadata exercises that distinct input

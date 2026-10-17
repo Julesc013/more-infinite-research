@@ -646,6 +646,17 @@ try {
       (Test-MIR4BootstrapRecordHash -Record $mir43Manifest) -and
       (Get-Content -Raw -LiteralPath (Join-Path $mir43Root 'candidate-manifest.json') | Test-Json -SchemaFile $mir43VersionContract.schema_path)
     ) "$sourceVersion-writer-selects-current-nine-target-schema"
+    # Exercise the production historical and independent readers as well as
+    # the schema. Their old 4.2-only parameter sets blocked real 4.5 receipts.
+    foreach ($historicalTarget in @('f017','f016','f015','f014','f013')) {
+      $historical = Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target $historicalTarget -SourceVersion $sourceVersion -PredecessorIdentityOnly
+      Assert-MIR42CandidateBuildTest ($historical.identity.source_version -ceq $sourceVersion -and $historical.record.distribution_version -ceq ('4.2.'+$historicalTarget.Substring(1)+'00')) "$sourceVersion-historical-reader-keeps-pinned-baseline-$historicalTarget"
+    }
+    $independent = Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion $sourceVersion
+    Assert-MIR42CandidateBuildTest ($independent.reconciliation_status -ceq "MIR-$sourceVersion-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED" -and $independent.rehash_status -ceq "MIR-$sourceVersion-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED") "$sourceVersion-independent-reader-keeps-current-version"
+    $wrongScope = ''
+    try { Get-MIR42IndependentScopeContract -Scope 'four-target' -PublishedMaintenance -SourceVersion $sourceVersion | Out-Null } catch { $wrongScope = $_.Exception.Message }
+    Assert-MIR42CandidateBuildTest ($wrongScope -ceq '[mir42-independent-maintenance-candidate-scope]') "$sourceVersion-independent-reader-refuses-four-target-maintenance"
     $crossVersion = $mir43Manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
     $crossVersion.target_authority[0].source_version = '4.2.3'
     $crossVersion.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $crossVersion
@@ -676,6 +687,12 @@ try {
     }
   }
   $performanceContract=Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $repo -Manifest $performanceManifest
+  $futureHistoricalRefused = $false
+  try { Get-MIR42QualificationHistoricalAuthority -RepoRoot $repo -Target f017 -SourceVersion '4.6.0' -PredecessorIdentityOnly | Out-Null } catch { $futureHistoricalRefused = $_.FullyQualifiedErrorId -match 'ParameterArgumentValidationError' }
+  Assert-MIR42CandidateBuildTest $futureHistoricalRefused 'historical-reader-refuses-unadmitted-source-version'
+  $futureIndependentRefused = $false
+  try { Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.6.0' | Out-Null } catch { $futureIndependentRefused = $_.FullyQualifiedErrorId -match 'ParameterArgumentValidationError' }
+  Assert-MIR42CandidateBuildTest $futureIndependentRefused 'independent-reader-refuses-unadmitted-source-version'
   $performanceEnvelope=Get-MIR42EngineCandidateVersionContract -RepoRoot $repo -ManifestPath (Join-Path $performanceRoot 'candidate-manifest.json')
   Assert-MIR42CandidateBuildTest ($performanceContract.source_version-ceq'4.2.3'-and$performanceEnvelope.source_version-ceq'4.2.3'-and$performanceEnvelope.nine_targets-and-not$performanceManifest.publication_authorized-and$performanceManifest.qualification-ceq'not-performed') '423-writer-and-consumed-readers-preserve-private-boundary'
   $performanceEvidenceCandidate=[pscustomobject]@{scope='nine-target';targets=$performanceManifest.targets;identity=[pscustomobject]@{record=$performanceManifest}}

@@ -122,7 +122,7 @@ function Resolve-MIR42QualificationChildPath {
 
 function Get-MIR42QualificationHistoricalAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0',
     [switch]$PredecessorIdentityOnly)
   $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   $baselineIdentity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 0
