@@ -1524,8 +1524,10 @@ $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @wrongProfile450}catch
 if(-not$rejected){throw 'Direct 4.2.2 input mode admitted an unqualified F200 mod profile'}
 $mir43Assertions+=4
 
-# 4.5.2 preserves exactly the latest 4.5.1 and corrected R24 modern routes.
-# It deliberately does not reactivate the direct 4.2.2 or historical lanes.
+# 4.5.2 admits exactly the public V451 and corrected R24 predecessor for
+# every bound target.  Each route has a fresh fixture identity; the existing
+# Full preservation, two-cold-reload and direct-library contracts remain in
+# the native harness and are selected below, never inferred from a fixture.
 $maintenanceMatcher=@($ast.FindAll({param($node)
   $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$maintenanceMatch'
 },$true))
@@ -1550,29 +1552,59 @@ $mir43Assertions += & {
   }
   return $cases.Count
 } ([scriptblock]::Create($maintenanceMatcher[0].Right.Extent.Text)) ([scriptblock]::Create($earlierPatchGate[0].Right.Extent.Text))
-$mir452IdentityRoot=Join-Path $testRoot 'mir452-modern-identities'
+$mir452IdentityRoot=Join-Path $testRoot 'mir452-allnine-identities'
 New-Item -ItemType Directory -Force -Path $mir452IdentityRoot|Out-Null
+# The upgrade reader retains its 4.5.1 key for the published V11 predecessor.
+# The engine maintenance selector separately uses the 4.5.2 destination key.
 $mir452Routes=@(
-  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1120'},
-  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.0';fixture_version='0.1.1121'},
-  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1122'},
-  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.1';fixture_version='0.1.1123'},
-  [ordered]@{target='f200';from='4.4.20002';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1124'},
-  [ordered]@{target='f200';from='4.5.20001';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1125'}
+  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1120';historical=$false},
+  [ordered]@{target='f210';from='4.4.21002';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.0';fixture_version='0.1.1121';historical=$false},
+  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1122';historical=$false},
+  [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.1';fixture_version='0.1.1123';historical=$false},
+  [ordered]@{target='f200';from='4.4.20002';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1124';historical=$false},
+  [ordered]@{target='f200';from='4.5.20001';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1125';historical=$false},
+  [ordered]@{target='f110';from='4.4.11002';to='4.5.11002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1126';historical=$false},
+  [ordered]@{target='f110';from='4.5.11001';to='4.5.11002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1127';historical=$false},
+  [ordered]@{target='f100';from='4.4.10002';to='4.5.10002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1128';historical=$false},
+  [ordered]@{target='f100';from='4.5.10001';to='4.5.10002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1129';historical=$false},
+  [ordered]@{target='f017';from='4.4.01702';to='4.5.01702';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1130';historical=$true},
+  [ordered]@{target='f017';from='4.5.01701';to='4.5.01702';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1131';historical=$true},
+  [ordered]@{target='f016';from='4.4.01602';to='4.5.01602';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1132';historical=$true},
+  [ordered]@{target='f016';from='4.5.01601';to='4.5.01602';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1133';historical=$true},
+  [ordered]@{target='f015';from='4.4.01502';to='4.5.01502';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1134';historical=$true},
+  [ordered]@{target='f015';from='4.5.01501';to='4.5.01502';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1135';historical=$true},
+  [ordered]@{target='f014';from='4.4.01402';to='4.5.01402';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1136';historical=$true},
+  [ordered]@{target='f014';from='4.5.01401';to='4.5.01402';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1137';historical=$true},
+  [ordered]@{target='f013';from='4.4.01302';to='4.5.01302';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1138';historical=$true},
+  [ordered]@{target='f013';from='4.5.01301';to='4.5.01302';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1139';historical=$true}
 )
 $mir452FixtureVersions=@()
 foreach($route in $mir452Routes){
-  $fixture='assert-upgrade-4-0-'+$route.target.Substring(1)+'00-to-4-1-'+$route.target.Substring(1)+'00'
-  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
+  $fixture=if([bool]$route.historical){'assert-upgrade-historical-terminal-to-mir42'}else{'assert-upgrade-4-0-'+$route.target.Substring(1)+'00-to-4-1-'+$route.target.Substring(1)+'00'}
+  $selectedManifest=if([bool]$route.historical){'combined-v452-candidate.json'}else{''}
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$selectedManifest;PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
   Assert-MIR421CurrentUpgradeInputMode @mode
   if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.5.2')-cne$route.reader){throw "4.5.2 selected wrong predecessor reader: $($route.target)/$($route.from)"}
   $fixtureRoot=Join-Path $mir452IdentityRoot ($route.target+'-'+$route.archetype+'-'+$route.from.Replace('.','-'))
   Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixture)) -Destination $fixtureRoot -Recurse
-  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from -SpaceAge:([bool]$route.space_age)
+  if([bool]$route.historical){
+    $infoPath=Join-Path $fixtureRoot 'info.json'
+    $line='0.'+[int]$route.target.Substring(1)
+    $infoText=[IO.File]::ReadAllText($infoPath).Replace('@@FACTORIO_LINE@@',$line).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$route.from)
+    [IO.File]::WriteAllText($infoPath,$infoText,[Text.UTF8Encoding]::new($false))
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from
+    $controlPath=Join-Path $fixtureRoot 'control.lua'
+    $control=[IO.File]::ReadAllText($controlPath).Replace('__MIR_UPGRADE_FROM_VERSION__',$route.from).Replace('__MIR_UPGRADE_TO_VERSION__',$route.to).Replace('__MIR_FACTORIO_LINE__',$line).Replace('__MIR_INFINITE_TECHNOLOGY__',$(if($route.target-ceq'f017'){'mining-productivity-4'}elseif($route.target-cin@('f016','f015')){'mining-productivity-16'}else{''})).Replace('__MIR_UPGRADE_SAVE_NAME__',('mir-'+$route.to.Replace('.','')+'-upgraded'))
+    [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+  }else{
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from -SpaceAge:([bool]$route.space_age)
+  }
   if($route.target-ceq'f210'){
     Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
-  }else{
+  }elseif($route.target-ceq'f200'){
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+  }else{
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
   }
   $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
   if($info.version-cne$route.fixture_version){throw "4.5.2 fixture identity mismatch: $($route.target)/$($route.archetype)/$($route.from)"}
@@ -1580,29 +1612,33 @@ foreach($route in $mir452Routes){
   $SelectedTarget=$route.target;$SourceVersion='4.5.2';$FromVersion=$route.from;$ToVersion=$route.to
   $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
   if(-not(& $fullSpecializationCode)){throw "4.5.2 route skipped the Full preservation guard: $($route.target)/$($route.archetype)"}
-  $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$k2Scenario=$false;$classicReducedPolicy=$false
+  $mir42UpgradeSpecialized=(-not[bool]$route.historical);$isHistoricalTerminalFixture=[bool]$route.historical;$k2Scenario=$false;$classicReducedPolicy=$false
   if(-not(& $completeCatalogueEvaluator)){throw "4.5.2 route skipped the complete catalogue evaluator: $($route.target)/$($route.archetype)"}
   $mir43Assertions+=5
 }
-if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne6){throw '4.5.2 fixture identities collide across the admitted routes'}
+if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne20){throw '4.5.2 fixture identities collide across all admitted routes'}
 foreach($bad in @(
-  @{target='f210';from='4.5.21002';to='4.5.21002';archetype='base-default'},
-  @{target='f200';from='4.4.20001';to='4.5.20002';archetype='base-default'},
-  @{target='f110';from='4.5.11001';to='4.5.11002';archetype='base-default';reader_rejected=$true},
-  @{target='f200';from='4.5.20001';to='4.5.20002';archetype='space-age-native-owner';reader_rejected=$false}
+  @{target='f210';from='4.5.21002';to='4.5.21002';archetype='base-default';historical=$false},
+  @{target='f200';from='4.4.20001';to='4.5.20002';archetype='base-default';historical=$false},
+  @{target='f110';from='4.5.11000';to='4.5.11002';archetype='base-default';historical=$false},
+  @{target='f017';from='4.5.01701';to='4.5.01702';archetype='base-default';historical=$true;missing_combined=$true;resolver_rejected=$false},
+  @{target='f200';from='4.5.20001';to='4.5.20002';archetype='space-age-native-owner';historical=$false;resolver_rejected=$false},
+  @{target='f013';from='4.6.01300';to='4.5.01302';archetype='base-default';historical=$true}
 )){
-  $fixture='assert-upgrade-4-0-'+$bad.target.Substring(1)+'00-to-4-1-'+$bad.target.Substring(1)+'00'
-  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
-  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  $fixture=if([bool]$bad.historical){'assert-upgrade-historical-terminal-to-mir42'}else{'assert-upgrade-4-0-'+$bad.target.Substring(1)+'00-to-4-1-'+$bad.target.Substring(1)+'00'}
+  $selectedManifest=if(([bool]$bad.historical) -and -not ($bad.ContainsKey('missing_combined') -and [bool]$bad['missing_combined'])){'combined-v452-candidate.json'}else{''}
+  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$selectedManifest;PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-input-mode]'}
   if(-not$rejected){throw "4.5.2 input mode admitted an unbound route: $($bad.target)/$($bad.from)/$($bad.archetype)"}
-  if(-not($bad.ContainsKey('reader_rejected') -and -not [bool]$bad['reader_rejected'])){
+  # Input-mode-only failures cannot be rejected by a reader that receives
+  # neither the archetype nor combined-manifest selection.
+  if(-not($bad.ContainsKey('resolver_rejected') -and -not [bool]$bad['resolver_rejected'])){
     $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target $bad.target -FromVersion $bad.from -SourceVersion '4.5.2'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-version]'}
     if(-not$rejected){throw "4.5.2 reader admitted an unbound route: $($bad.target)/$($bad.from)"}
     $mir43Assertions++
   }
   $mir43Assertions++
 }
-
 $rejected=$false;try{Resolve-MIR42UpgradePredecessorReaderVersion -Target 'f999' -FromVersion '4.3.99900' -SourceVersion '4.3.1'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir42-upgrade-predecessor-target]'}
 if(-not$rejected){throw '4.3.1 predecessor reader accepted an unselected target'}
 $mir43Assertions++

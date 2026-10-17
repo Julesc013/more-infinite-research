@@ -13,7 +13,9 @@ if (-not (Get-Command Get-MIR4CanonicalPackageSourceFingerprint -ErrorAction Sil
 if (-not (Get-Command Test-MIR4OpenSshSignatureV1 -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42SealRepoRoot 'tools/mir/application/custody/OfflineCandidateCustody.ps1')
 }
-if (-not (Get-Command Assert-MIR42FourTargetPackageExcludedSurface -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command Assert-MIR42FourTargetPackageExcludedSurface -ErrorAction SilentlyContinue) -or
+    -not (Get-Variable MIR42FourTargetLines -Scope Script -ErrorAction SilentlyContinue)) {
+  # A nested command can inherit the functions without this script's constants.
   . (Join-Path $mir42SealRepoRoot 'tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1')
 }
 if (-not (Get-Command Test-MIR4FixedFactorioEngineIdentity -ErrorAction SilentlyContinue)) {
@@ -159,7 +161,7 @@ function Get-MIR42NineTargetCandidateReleaseLineContract {
 }
 
 function Get-MIR42NineTargetPromotionPlanStatusContract {
-  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0','4.4.2','4.5.0')][string]$SourceVersion)
+  param([Parameter(Mandatory)][ValidateSet('4.2.0','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion)
   return Get-MIR42NineTargetReleaseLineContract -SourceVersion $SourceVersion
 }
 
@@ -2446,7 +2448,7 @@ function New-MIR42NineTargetReleaseCutProgramme {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$OutputPath,
-    [ValidateSet('4.2.0','4.4.0','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion = '4.2.0',
     [switch]$RefreshPendingAuthority,
     [string]$CheckpointRoot = ''
   )
@@ -2699,7 +2701,8 @@ function Assert-MIR42NineTargetProgrammeCandidateBinding {
   param([Parameter(Mandatory)]$Programme,[Parameter(Mandatory)]$Candidate)
   if ($Programme.record.PSObject.Properties.Name -notcontains 'written_transition_authorization') { throw '[mir42-nine-programme-transition-reference-missing]' }
   $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $Candidate
-  if ([string]$Programme.record.release_line -cne [string]$candidateRelease.release_line -or
+  if (([string]$candidateRelease.release_line -ceq '4.5' -and [string](Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $Programme.record) -cne [string]$candidateRelease.source_version) -or
+      [string]$Programme.record.release_line -cne [string]$candidateRelease.release_line -or
       [string]$Programme.record.candidate.version_line -cne [string]$candidateRelease.release_line) {
     throw '[mir42-nine-programme-transition-readiness-candidate-binding]'
   }
