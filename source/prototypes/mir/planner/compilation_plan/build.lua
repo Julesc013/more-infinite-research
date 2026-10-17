@@ -21,8 +21,41 @@ local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.finger
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
 
-local function sanitize_stream_artifact(stream_artifact, target_inventory)
+local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled)
+  local allowances = {}
+  if enabled ~= true then return allowances end
+  for _, row in ipairs(stream_artifact.rows or {}) do
+    if row.action == "skip" and type(row.reason) == "string" and row.reason ~= ""
+      and type(row.technology_design) == "table" then
+      local resolved = true
+      for _, gate_name in ipairs(REQUIRED_GATES) do
+        if not gate_contract.is_authoritatively_resolved((row.gates or {})[gate_name]) then
+          resolved = false
+          break
+        end
+      end
+      if resolved then
+        local selection_key = tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)
+        if allowances[selection_key] then
+          error("CompilationPlan initial skip diagnostic allowance is duplicated: " .. selection_key, 2)
+        end
+        allowances[selection_key] = {
+          selection_key = selection_key,
+          reason = row.reason,
+          candidate_id = row.technology_design.candidate_id,
+          design_fingerprint = row.technology_design.design_fingerprint,
+          hard_gates_resolved = true,
+          gates_fingerprint = fingerprint.of(row.gates)
+        }
+      end
+    end
+  end
+  return allowances
+end
+
+local function sanitize_stream_artifact(stream_artifact, target_inventory, preparations)
   local rows, removed_count, skipped_count = {}, 0, 0
+  local sanitized_preparations = {}
   for _, source_row in ipairs(stream_artifact.rows or {}) do
     local row = model.derive_stream_row(source_row)
     if row.action == "emit" then
@@ -60,7 +93,12 @@ local function sanitize_stream_artifact(stream_artifact, target_inventory)
       -- Rebuild only when sanitation changed prototype semantics, ensuring the
       -- preliminary graph and final operation both consume the retained set.
       -- Zero-removal rows need only one qualification refresh after graph proof.
-      if #removed > 0 then
+      if preparations and preparations[source_row] then
+        if row.action == "emit" then
+          sanitized_preparations[row] = #removed > 0
+            and technology_design.prepare_generation_row(row) or preparations[source_row]
+        end
+      elseif #removed > 0 then
         row.technology_design = technology_design.from_generation_row(row)
       end
     end
@@ -73,10 +111,10 @@ local function sanitize_stream_artifact(stream_artifact, target_inventory)
   }, {
     removed_effect_count = removed_count,
     skipped_stream_count = skipped_count
-  }
+  }, sanitized_preparations
 end
 
-local function apply_graph_decisions(stream_artifact, graph_summary)
+local function apply_graph_decisions(stream_artifact, graph_summary, preparations)
   -- Sanitation already produced a transient row projection with independently
   -- owned top-level, gate, and fields tables. Complete immutable child values
   -- may remain shared while graph decisions mutate that projection in place.
@@ -123,11 +161,13 @@ local function apply_graph_decisions(stream_artifact, graph_summary)
           "unique-output-identity",
           "generation-plan",
           {"generation-plan:unique-output-identity"})
-        row.technology_design = technology_design.with_qualification(
-          row.technology_design,
-          row,
-          {validated = true, share_immutable = true}
-        )
+        if preparations and preparations[row] then
+          row.technology_design = technology_design.finalize_prepared_generation_row(
+            preparations[row], row)
+        else
+          row.technology_design = technology_design.with_qualification(
+            row.technology_design, row, {validated = true, share_immutable = true})
+        end
       end
     elseif row.action == "adopt" then
       row.gates.effect_valid = gate_contract.passed(
@@ -200,12 +240,13 @@ local function apply_base_graph_decisions(base_operations, graph_summary)
   return accepted, rejected
 end
 
-local function materialized_stream_operations(artifact, options)
+local function materialized_stream_operations(artifact, options, preparations)
   options = options or {}
   local out = {}
   for _, row in ipairs(artifact.rows or {}) do
     if row.action == "emit" then
-      if not row.technology_design then
+      local preparation = preparations and preparations[row]
+      if not row.technology_design and not (preparation and options.virtual_projection) then
         error("CompilationPlan emitted row lacks TechnologyDesign schema 2: " .. tostring(row.stream_key), 2)
       end
       local design = row.technology_design
@@ -214,7 +255,9 @@ local function materialized_stream_operations(artifact, options)
         -- Graph input is an ephemeral projection of an already finalized
         -- GenerationPlan. Admit its trusted children and allow only pending
         -- graph gates without constructing a discarded qualification record.
-        virtual_technology = technology_design.trusted_prototype_projection_view(design)
+        virtual_technology = preparation
+          and technology_design.prepared_graph_projection(preparation, row)
+          or technology_design.trusted_prototype_projection_view(design)
         hard_gate_authority.assert_total(row.gates)
         for _, gate_name in ipairs(REQUIRED_GATES) do
           local gate = row.gates[gate_name]
@@ -346,9 +389,14 @@ end
 
 function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_artifact
+  local preparations
   local trusted_stream_artifact = false
   local planned_base_candidates = deepcopy((compiler_inputs and compiler_inputs.base_candidates) or {})
-  if type(stream_plan.artifact) == "function" then
+  if generation_plan.is_draft(stream_plan) then
+    preparations = generation_plan.assert_trusted_draft(stream_plan)
+    stream_artifact = stream_plan
+    trusted_stream_artifact = true
+  elseif type(stream_plan.artifact) == "function" then
     stream_artifact = stream_plan:artifact()
   elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
     stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
@@ -356,8 +404,12 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   else
     stream_artifact = deepcopy(stream_plan)
   end
-  if not stream_artifact or stream_artifact.schema ~= 3 then error("CompilationPlan requires GenerationPlan schema 3", 2) end
+  if not stream_artifact or (not preparations and stream_artifact.schema ~= 3) then
+    error("CompilationPlan requires GenerationPlan schema 3 or its exact private draft", 2)
+  end
   if not trusted_stream_artifact then validation.admit_stream_artifact(stream_artifact) end
+  local initial_skip_diagnostic_allowances = capture_initial_skip_diagnostic_allowances(
+    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
@@ -365,11 +417,12 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local stream_effect_integrity
   local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
     or effect_target_inventory.capture()
-  stream_artifact, stream_effect_integrity = sanitize_stream_artifact(stream_artifact, target_inventory)
+  stream_artifact, stream_effect_integrity, preparations = sanitize_stream_artifact(
+    stream_artifact, target_inventory, preparations)
   -- This projection is input to the authoritative graph evaluator, not an
   -- emission authorization. Pending graph gates remain explicit proposals.
   local operations = materialized_stream_operations(
-    stream_artifact, {include_design = false, virtual_projection = true})
+    stream_artifact, {include_design = false, virtual_projection = true}, preparations)
   local normalized_base, base_effect_integrity = model.sanitize_base_operations(base_plan, target_inventory)
   for _, operation in ipairs(normalized_base) do
     local normalized, covered_by_native = apply_weapon_overlap_policy(
@@ -435,7 +488,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end
   validation.operations(operations)
   local graph_summary = technology_graph.validate_operations(operations)
-  stream_artifact = apply_graph_decisions(stream_artifact, graph_summary)
+  stream_artifact = apply_graph_decisions(stream_artifact, graph_summary, preparations)
   local graph_rejected_base
   normalized_base, graph_rejected_base = apply_base_graph_decisions(normalized_base, graph_summary)
   operations = materialized_stream_operations(stream_artifact)
@@ -509,6 +562,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       compilation_plan_fingerprint = artifact.compilation_fingerprint,
       trusted_designs = true,
       defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
+      initial_skip_diagnostic_allowances = initial_skip_diagnostic_allowances,
       base_candidates = final_base_candidates
     }
   )
@@ -541,7 +595,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end
   local accepted_candidates = {}
   for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
-    if selection.action ~= "diagnose" then table.insert(accepted_candidates, deepcopy(selection)) end
+    if selection.action == "emit" or selection.action == "adopt" then
+      table.insert(accepted_candidates, deepcopy(selection))
+    end
   end
   for _, candidate in ipairs(final_base_candidates) do
     if candidate.action == "create" then table.insert(accepted_candidates, {
@@ -596,7 +652,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local quality_dispositions, promotion_dispositions = {}, {}
   local promotion_blocked = false
   for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
-    if selection.action ~= "diagnose" then
+    if selection.action == "emit" or selection.action == "adopt" then
       local design = design_by_candidate[selection.candidate_id .. "/" .. selection.alternative_id] or {}
       local identity = design.identity or {}
       local released = identity.identity_state == "released"

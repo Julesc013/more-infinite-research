@@ -50,7 +50,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   # numeric neighbourhood.
   $published450Predecessor=[bool]($SourceVersion-ceq'4.5.0'-and(
     ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq2-and$fromPatch-eq2)))
-  $published452Predecessor=[bool]($SourceVersion-ceq'4.5.2'-and$Target-cin@('f210','f200')-and(
+  $published452Predecessor=[bool]($SourceVersion-ceq'4.5.2'-and$Target-cin@('f210','f200','f110','f100')-and(
     ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq5-and$fromPatch-eq1)))
   if(-not$published410F200-and(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
      ($SourceVersion-ceq'4.3.0'-and($fromMinor-ne2-or$fromPatch-gt2)) -or
@@ -77,6 +77,15 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
       if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-f200-fixture-transition]'}
       '0.1.1125'
     }else{throw '[mir452-f200-fixture-transition]'}
+  }elseif($Target-cin@('f110','f100')-and$SourceVersion-ceq'4.5.2'){
+    if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-historical-modern-fixture-transition]'}
+    switch($Target+'/'+$FromVersion){
+      'f110/4.4.11002'{'0.1.1126'}
+      'f110/4.5.11001'{'0.1.1127'}
+      'f100/4.4.10002'{'0.1.1128'}
+      'f100/4.5.10001'{'0.1.1129'}
+      default{throw '[mir452-historical-modern-fixture-transition]'}
+    }
   }elseif($Target-ceq'f210'-and$SourceVersion-ceq'4.5.0'){
     if($FromVersion-ceq'4.4.21002'){
       if($SpaceAge){'0.1.1101'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1100'}else{throw '[mir450-f210-fixture-transition]'}
@@ -340,7 +349,7 @@ function Read-MIR430Published410F200ReleaseInput {
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion,
     [AllowEmptyString()][string]$FromVersion='')
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
@@ -348,7 +357,7 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   if([string]::IsNullOrWhiteSpace($FromVersion)){
     $FromVersion=if($source.Minor-ge3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
   }
-  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4)[.]'+$code+'(?<patch>00|01|02)$'))
+  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5)[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$fromMatch.Success){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromMinor=[int]$fromMatch.Groups['minor'].Value
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
@@ -360,12 +369,15 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
     ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq4-and$fromPatch-in@(0,1))))
   $published450HistoricalPredecessor=[bool]($SourceVersion-ceq'4.5.0'-and$Target-cin@('f017','f016','f015','f014','f013')-and(
     ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq2-and$fromPatch-eq2)))
+  $published452HistoricalPredecessor=[bool]($SourceVersion-ceq'4.5.2'-and$Target-cin@('f017','f016','f015','f014','f013')-and(
+    ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq5-and$fromPatch-eq1)))
   if(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
      ($SourceVersion-ceq'4.3.0'-and($fromMinor-ne2-or$fromPatch-gt2)) -or
      ($SourceVersion-ceq'4.3.1'-and-not$published431Predecessor) -or
      ($SourceVersion-ceq'4.4.0'-and-not$published440Predecessor)-or
      ($SourceVersion-ceq'4.4.2'-and-not$published442Predecessor)-or
-     ($SourceVersion-ceq'4.5.0'-and-not$published450HistoricalPredecessor)){throw '[mir42-upgrade-fixture-predecessor]'}
+     ($SourceVersion-ceq'4.5.0'-and-not$published450HistoricalPredecessor)-or
+     ($SourceVersion-ceq'4.5.2'-and-not$published452HistoricalPredecessor)){throw '[mir42-upgrade-fixture-predecessor]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
@@ -378,6 +390,20 @@ function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
     if($fromMinor-eq4){switch($Target){'f017'{'1.2.1103'}'f016'{'1.2.1104'}'f015'{'1.2.1102'}'f014'{'1.2.1105'}'f013'{'1.2.1106'}default{throw '[mir450-historical-fixture-transition]'}}
     }elseif($fromMinor-eq2){switch($Target){'f017'{'1.2.1113'}'f016'{'1.2.1114'}'f015'{'1.2.1112'}'f014'{'1.2.1115'}'f013'{'1.2.1116'}default{throw '[mir450-historical-fixture-transition]'}}
     }else{throw '[mir450-historical-fixture-transition]'}
+  }elseif($SourceVersion-ceq'4.5.2'){
+    switch($Target+'/'+$FromVersion){
+      'f017/4.4.01702'{'1.2.1130'}
+      'f017/4.5.01701'{'1.2.1131'}
+      'f016/4.4.01602'{'1.2.1132'}
+      'f016/4.5.01601'{'1.2.1133'}
+      'f015/4.4.01502'{'1.2.1134'}
+      'f015/4.5.01501'{'1.2.1135'}
+      'f014/4.4.01402'{'1.2.1136'}
+      'f014/4.5.01401'{'1.2.1137'}
+      'f013/4.4.01302'{'1.2.1138'}
+      'f013/4.5.01301'{'1.2.1139'}
+      default{throw '[mir452-historical-fixture-transition]'}
+    }
   }elseif($source.Minor-eq4){'1.0.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or

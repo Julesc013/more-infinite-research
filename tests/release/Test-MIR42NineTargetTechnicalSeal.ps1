@@ -227,6 +227,53 @@ Assert-MIR42NineSealTest -Condition ([string]$release450.release_line -ceq '4.5'
 $candidateRelease450 = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.0'})
 Assert-MIR42NineSealTest -Condition ([string]$candidateRelease450.release_line -ceq '4.5') -Code '450-candidate-release-line-is-explicit'
 
+
+function Test-MIR452SealAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  # The central construction reader owns schema/hash validation. This compact
+  # unit verifies only this module's V12 admission and keeps V11 predecessor
+  # bytes out of normal candidate evidence.
+  $targets = @($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject]@{target=$_} })
+  $candidate = [pscustomobject]@{targets=$targets;identity=[pscustomobject]@{record=[pscustomobject]@{fixture_source_version='4.5.2'}}}
+  $reader = (Get-Command Get-MIR42SealCandidateConstructionVersionContract -CommandType Function -ErrorAction Stop).ScriptBlock
+  try {
+    Set-Item -LiteralPath Function:Get-MIR42SealCandidateConstructionVersionContract -Value {
+      param($RepoRoot,$Manifest)
+      [pscustomobject]@{source_version=[string]$Manifest.fixture_source_version}
+    }
+    $contract = Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance
+    Assert-MIR42NineSealTest -Condition ([string]$contract.maintenance_source_version -ceq '4.5.2' -and
+      [string]$contract.engine_run_kind -ceq 'MIR42NineTargetMaintenanceIndividualEngineRunV1') -Code '452-individual-maintenance-contract'
+    $candidate.identity.record.fixture_source_version='4.5.1'
+    $rejected=$false
+    # The outer maintenance source gate rejects this predecessor before the
+    # individual-receipt contract can be selected.
+    try { Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    Assert-MIR42NineSealTest -Condition $rejected -Code '451-remains-predecessor-not-normal-individual-candidate'
+  } finally {
+    Set-Item -LiteralPath Function:Get-MIR42SealCandidateConstructionVersionContract -Value $reader
+  }
+
+  $release452 = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.2'})
+  Assert-MIR42NineSealTest -Condition ([string]$release452.release_line -ceq '4.5') -Code '452-candidate-release-line-is-explicit'
+  $futureRejected=$false
+  try { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.3'}) | Out-Null } catch { $futureRejected=$_.Exception.Message -ceq '[mir42-nine-target-release-line-candidate-version]' }
+  Assert-MIR42NineSealTest -Condition $futureRejected -Code '453-candidate-release-line-rejected'
+
+  $published = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.2'
+  $programme = [pscustomobject]@{release_line='4.5';published_maintenance_predecessor=$published}
+  Assert-MIR42NineSealTest -Condition ((Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme) -ceq '4.5.2') -Code '452-programme-binds-published-451-custody'
+  $programme.published_maintenance_predecessor.tree=('0' * 40)
+  $custodyRejected=$false
+  try { Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme | Out-Null } catch { $custodyRejected=$_.Exception.Message -ceq '[mir42-seal-current-programme-maintenance-binding]' }
+  Assert-MIR42NineSealTest -Condition $custodyRejected -Code '452-programme-rejects-wrong-published-451-custody'
+}
+
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR452SealAdmission -RepoRoot $repo
+}
+
 function Test-MIR42NineCriterionEvidenceReader {
   param([Parameter(Mandatory)][string]$RepoRoot)
 

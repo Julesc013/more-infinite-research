@@ -2,7 +2,7 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0'
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion = '4.2.0'
 )
 
 Set-StrictMode -Version Latest
@@ -15,7 +15,7 @@ if (-not (Test-Path -LiteralPath $module -PathType Leaf)) { throw "[mir42-releas
 . (Join-Path $repo 'tests/support/MIR421ReleaseAssetControls.ps1')
 . (Join-Path $repo 'tests/support/MIR422ReleaseUpgradeControls.ps1')
 . (Join-Path $repo 'tests/support/MIR423ReleaseUpgradeControls.ps1')
-$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')
+$maintenance=$SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')
 $releaseTag='v' + $SourceVersion
 $sourceMinor=([version]$SourceVersion).Minor
 $patchSuffix=([version]$SourceVersion).Build.ToString('D2')
@@ -41,12 +41,37 @@ $known442=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.4.2' -ReleaseTa
 Assert-MIR42ReleaseAssetsTest -Condition ($known442.maintenance -and $known442.source_minor-eq4 -and $known442.source_patch-eq2) -Code '442-release-contract-admits-current-maintenance-only'
 $known450=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.5.0' -ReleaseTag 'v4.5.0'
 Assert-MIR42ReleaseAssetsTest -Condition ($known450.maintenance -and $known450.source_minor-eq5 -and $known450.source_patch-eq0 -and $known450.tag-ceq'v4.5.0') -Code '450-release-contract-admits-exact-normal-maintenance-only'
+$known452=Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.5.2' -ReleaseTag 'v4.5.2'
+Assert-MIR42ReleaseAssetsTest -Condition ($known452.maintenance -and $known452.source_minor-eq5 -and $known452.source_patch-eq2 -and $known452.tag-ceq'v4.5.2') -Code '452-release-contract-retains-source-patch02'
+$futureAssetVersionRejected=$false
+try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.5.3' -ReleaseTag 'v4.5.3' | Out-Null } catch { $futureAssetVersionRejected=$_.Exception.Message -ceq '[mir42-release-assets-version-contract]' }
+Assert-MIR42ReleaseAssetsTest $futureAssetVersionRejected '452-does-not-admit-future-source-version'
+
 $predecessorOnlyRejected=$false
 try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.4.1' -ReleaseTag 'v4.4.1' | Out-Null } catch { $predecessorOnlyRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
 Assert-MIR42ReleaseAssetsTest -Condition $predecessorOnlyRejected -Code 'published-441-cannot-borrow-normal-release-assets'
 $futureVersionRejected=$false
 try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.2' -ReleaseTag 'v4.3.2' | Out-Null } catch { $futureVersionRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
 Assert-MIR42ReleaseAssetsTest -Condition $futureVersionRejected -Code 'unknown-432-cannot-borrow-431-custody'
+
+
+function Test-MIR452NativeUpgradeProofReader {
+  $patch = Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.1' -CandidateSourceVersion '4.5.2'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$patch.source_version -ceq '4.5.1' -and [string]$patch.source_tag -ceq 'v4.5.1' -and
+    [string]$patch.manifest.manifest.source.commit -ceq '69c297f9bca974f4280158781aa97a9678d0fcd4' -and
+    [string]$patch.manifest.manifest.source.tree -ceq '0e4723efd3d720942ef42935a62a2676c6860b6c' -and
+    [string]$patch.target.distribution_version -ceq '4.5.20001' -and [string]$patch.target.sha256 -ceq '6AF50F62B56580BBED277C0A943F356970598A38D3007C0F7F98EC3F07A14EDE') -Code '452-proof-reader-binds-exact-published-451'
+  $minor = Get-MIR423PublishedUpgradePredecessor -Target 'f210' -PredecessorSourceVersion '4.4.2' -CandidateSourceVersion '4.5.2'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$minor.source_version -ceq '4.4.2' -and [string]$minor.source_tag -ceq 'v4.4.2' -and
+    [string]$minor.target.distribution_version -ceq '4.4.21002' -and [string]$minor.target.sha256 -ceq '12FBB1D1B71CD27B87C734A0B7F34F3B996EC4899C7A2F27C5A0C9C7A5BE972F') -Code '452-proof-reader-binds-corrected-r24'
+  $wrongPairRejected=$false
+  try { Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.0' -CandidateSourceVersion '4.5.2' | Out-Null } catch { $wrongPairRejected=$_.Exception.Message -ceq '[mir423-upgrade-predecessor-version]' }
+  Assert-MIR42ReleaseAssetsTest -Condition $wrongPairRejected -Code '452-proof-reader-rejects-unbound-predecessor'
+  $futureRejected=$false
+  try { Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.1' -CandidateSourceVersion '4.5.3' | Out-Null } catch { $futureRejected=$true }
+  Assert-MIR42ReleaseAssetsTest -Condition $futureRejected -Code '453-proof-reader-rejected'
+}
+Test-MIR452NativeUpgradeProofReader
 
 function New-MIR42ReleaseAssetsFixtureZip {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$Line)
@@ -175,7 +200,7 @@ try {
   Write-MIR4BootstrapRecord -Record $sealRecord -Path $sealPath | Out-Null
   $sealIdentity = Read-MIR42SealRecord -Path $sealPath -Code 'mir42-release-assets-test-seal'
   $promotionPlan = [pscustomobject][ordered]@{
-    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status=([string](Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -cin @('4.4.0','4.4.2','4.5.0')) { $SourceVersion } else { '4.2.0' })).promotion_plan_status);scope='nine-target';source=$source
+    schema=1;kind='MIR42NineTargetProtectedMainPromotionPlanV1';status=([string](Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) { $SourceVersion } else { '4.2.0' })).promotion_plan_status);scope='nine-target';source=$source
     technical_seal=[ordered]@{sha256=[string]$sealIdentity.sha256;record_sha256=[string]$sealIdentity.record.record_sha256}
     candidate_manifest=[ordered]@{sha256=('D' * 64);record_sha256=('E' * 64)};target_assets=@($targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
     main_before=('f' * 40);remote_mutation_performed=$false;protected_main_promotion_authorized=$false;human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false
@@ -270,6 +295,13 @@ try {
     $upgradeControls=Invoke-MIR450ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
     $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
     Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '450-exact-r24-upgrade-evidence-opposing-controls'
+  }
+  if ($SourceVersion -ceq '4.5.2') {
+    $upgradeControls=Invoke-MIR452ReleaseUpgradeControls -Root (Join-Path $root 'upgrade-controls') -PackageAssets @($fixturePackages)
+    $PSDefaultParameterValues['Get-MIR42NineTargetReleaseAssetInventory:MaintenanceUpgradeEvidencePath']=$upgradeControls.path
+    Assert-MIR42ReleaseAssetsTest ($upgradeControls.checks -ge 9 -and $upgradeControls.native_runs -eq 0) '452-full-prior-patch-and-corrected-minor-upgrade-opponents'
+    $upgradeRows=Get-Content -LiteralPath $upgradeControls.path -Raw | ConvertFrom-Json -Depth 100 -DateKind String
+    Assert-MIR42ReleaseAssetsTest (@($upgradeRows.rows).Count -eq 18 -and @($upgradeRows.rows | Where-Object predecessor_source_version -ceq '4.5.1').Count -eq 9 -and @($upgradeRows.rows | Where-Object predecessor_source_version -ceq '4.4.2').Count -eq 9) '452-exact-eighteen-predecessor-rows'
   }
   $inventoryPath = Join-Path $root 'frozen-inventory.json'
   $inventory = Get-MIR42NineTargetReleaseAssetInventory -RepoRoot $repo -CandidateManifestPath 'synthetic-candidate.json' -TechnicalSealPath $sealPath -PromotionPlan $promotionPlan -SourceVersion $SourceVersion -ReleaseTag $releaseTag -AssetRoot $assetRoot -OutputPath $inventoryPath
@@ -484,7 +516,7 @@ if (-not $maintenance) {
   # Use a fresh script scope after the legacy fixtures have been retired. The
   # module's dot-source guards must not reuse parent functions without their
   # script-scoped constants. This remains one serial test process tree.
-  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0')) {
+  foreach ($maintenanceVersion in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
     & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
     if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
   }

@@ -1644,8 +1644,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 52269,
-      "expected_sha256": "2FE7AD2F150F1EB90004C35161F96AC6B8747F76CB132B763DFF68AE99574A01",
+      "expected_bytes": 55988,
+      "expected_sha256": "C81EEDAAD44B8FDB7B14E5F9D8B3934ED84D967883AE7A511BD6844527DBAE9C",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2636,8 +2636,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compilation-plan build responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 32401,
-      "expected_sha256": "D68006FA7BCD8F29B4B49950078AD89CE3FEA653B66F13C00F37C97760301607",
+      "expected_bytes": 35070,
+      "expected_sha256": "B27F1D9B2A9E19C764666C4058E58EC8D6243B122303E7983246F6A0468BEC19",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2796,8 +2796,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 13397,
-      "expected_sha256": "C8DC0BD0072253E64EDDC644110CB057126AFE0BBE5745AC4FA60953046C71A6",
+      "expected_bytes": 16239,
+      "expected_sha256": "682ADE3FEFB4F11F5DA77D3B1862BA491C29C954BB95266F15FDF807515EA48A",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2860,8 +2860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f210 adapter source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3055,
-      "expected_sha256": "034A196CFA4CBA3CC2049BA81121B8EB08AFED347C83A0129F4AE6652C0967E7",
+      "expected_bytes": 3600,
+      "expected_sha256": "299136D32C9435B464B7DF741A25C84910CD96F676093679A241BF0F1952FC49",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2892,8 +2892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed stream-compiler qualify responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 13431,
-      "expected_sha256": "A0339F701705825F756FB06E4A87D1603746CCC6BCACD96F97DFFAD76E1BF430",
+      "expected_bytes": 12589,
+      "expected_sha256": "2D7C9C8FE0B5278AB5C601B621BAB42E9BA8BC2EF19547A2C259F229DDBC1969",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2924,8 +2924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed technology-catalog model responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6289,
-      "expected_sha256": "8A9C9170D79BC092285C53A24B78AEE6B1A27A8AF98CCFFA74C85BDC7AC1F10F",
+      "expected_bytes": 6947,
+      "expected_sha256": "B87209B539D4B6F456E79A75ED635EAF7C4F617C02B2462A501FB7AE7DD52EC7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2972,8 +2972,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed technology-catalog build responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8696,
-      "expected_sha256": "CA27B3BFC2F74E32CCFFE44DEC3459B06BA139C0AB506F6DF1C7FB625B2A07E5",
+      "expected_bytes": 10529,
+      "expected_sha256": "3151A95056BA2668CC061AF69D6DC5827AE57DE227D8E648D86C4DF61C2CADA0",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2988,8 +2988,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed technology-catalog validate responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 14622,
-      "expected_sha256": "B6637DE60C0E6DE25CEF7EE72A43FE96448233A1CD8C865087E2BFA4E712C83C",
+      "expected_bytes": 20062,
+      "expected_sha256": "F460421F503C2B8FCA1B61C5C8A2453D3509F1B40EA7C74F0B3FF99B8DB20A23",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3020,8 +3020,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5017,
-      "expected_sha256": "E101524BC57622E8DA1B0743379A14F5F0DA1BE9C2875EA7DE00449B9618FDF2",
+      "expected_bytes": 6911,
+      "expected_sha256": "7F30AAB047984D8249F7A0F0A5A5ACD72064723E02C68404C6D7C78E1DA529D1",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3420,8 +3420,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 14040,
-      "expected_sha256": "CFB4CB2BC030FC31BD969903CA6ABF1F9660270308BD20902744D9A2EB049C2C",
+      "expected_bytes": 14691,
+      "expected_sha256": "FA878B54E340E946CB012764ECE05AFE035B49ABFEFD69832DB9108F50D8BA09",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "8C9615839CDAA6DD70F45C159A62E374FCC4A78D7B2AA0DC5A0FF17DE875506F"
+  "record_sha256": "366FD08E637C77F78D3D97D576615662A1BCADA4A64E574FA189378B2A0213CF"
 }

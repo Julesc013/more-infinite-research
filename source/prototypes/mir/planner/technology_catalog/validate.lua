@@ -26,12 +26,15 @@ local function verify_evaluation_shape(evaluation)
     or not model.ALTERNATIVE_EVALUATION_MODES[evaluation.mode]
     or type(evaluation.complete) ~= "boolean"
     or not nonnegative_integer(evaluation.evaluated_alternatives)
-    or not nonnegative_integer(evaluation.deferred_diagnostic_alternatives) then
+    or not nonnegative_integer(evaluation.deferred_diagnostic_alternatives)
+    or not nonnegative_integer(evaluation.deferred_rejected_diagnostic_alternatives)
+    or evaluation.deferred_rejected_diagnostic_alternatives > evaluation.deferred_diagnostic_alternatives then
     error("TechnologyCatalog alternative evaluation state is invalid.", 3)
   end
   verify_exact_fields(evaluation, {
     mode = true, complete = true,
-    evaluated_alternatives = true, deferred_diagnostic_alternatives = true
+    evaluated_alternatives = true, deferred_diagnostic_alternatives = true,
+    deferred_rejected_diagnostic_alternatives = true
   }, "alternative evaluation state")
 end
 
@@ -64,6 +67,39 @@ local function verify_diagnostic_evaluation(catalog, indexes, candidate)
     end
     return false
   end
+  if evaluation.state == "deferred-initial-skip-rejected-primary" then
+    verify_exact_fields(evaluation, {
+      state = true, selection_key = true, reason = true, primary_alternative_id = true,
+      primary_design_fingerprint = true, primary_qualification_fingerprint = true
+    }, "deferred rejected diagnostic evaluation")
+    if catalog.phase ~= "final"
+      or catalog.alternative_evaluation.mode ~= "player-selected-primary-plus-required-fallbacks"
+      or not nonempty_string(evaluation.selection_key)
+      or not nonempty_string(evaluation.reason)
+      or not nonempty_string(evaluation.primary_alternative_id)
+      or not nonempty_string(evaluation.primary_design_fingerprint)
+      or not nonempty_string(evaluation.primary_qualification_fingerprint)
+      or candidate.selection_key ~= evaluation.selection_key then
+      error("TechnologyCatalog deferred rejected diagnostic is outside its player final-mode contract.", 3)
+    end
+    local primary = indexer.alternative(indexes, candidate.candidate_id, evaluation.primary_alternative_id)
+    local qualification = primary and indexer.qualification(indexes, primary.qualification_fingerprint)
+    if not primary or primary.action ~= "reject" or primary.disposition ~= "rejected"
+      or primary.qualification_decision ~= "rejected"
+      or primary.design_fingerprint ~= evaluation.primary_design_fingerprint
+      or primary.qualification_fingerprint ~= evaluation.primary_qualification_fingerprint
+      or not qualification or qualification.candidate_id ~= candidate.candidate_id
+      or qualification.design_fingerprint ~= primary.design_fingerprint
+      or qualification.decision ~= "rejected" then
+      error("TechnologyCatalog deferred rejected diagnostic primary proof is invalid: "
+        .. tostring(candidate.candidate_id), 3)
+    end
+    if #candidate.alternatives ~= 1 then
+      error("TechnologyCatalog deferred rejected diagnostic retained an unevaluated alternative: "
+        .. tostring(candidate.candidate_id), 3)
+    end
+    return "rejected", primary
+  end
   if evaluation.state ~= "deferred-primary-qualified" then
     error("TechnologyCatalog diagnostic evaluation state is unknown: "
       .. tostring(evaluation.state), 3)
@@ -95,7 +131,7 @@ local function verify_diagnostic_evaluation(catalog, indexes, candidate)
     error("TechnologyCatalog deferred diagnostic retained an unevaluated alternative: "
       .. tostring(candidate.candidate_id), 3)
   end
-  return primary
+  return "qualified", primary
 end
 
 local function verify(catalog, options)
@@ -127,7 +163,7 @@ local function verify(catalog, options)
     end
     indexer.add_qualification(indexes, qualification)
   end
-  local alternative_count, deferred_count = 0, 0
+  local alternative_count = 0
   local qualification_use = {}
   for _, candidate in ipairs(catalog.candidates) do
     if options.trusted_children then technology_candidate.assert_trusted(candidate)
@@ -170,17 +206,24 @@ local function verify(catalog, options)
         .. qualification_fingerprint, 2)
     end
   end
-  local deferred_primaries = {}
+  local deferred_primaries, deferred_rejected_primaries, deferred_rejected_evaluations = {}, {}, {}
+  local deferred_count, deferred_rejected_count = 0, 0
   for _, candidate in ipairs(catalog.candidates) do
-    local primary = verify_diagnostic_evaluation(catalog, indexes, candidate)
-    if primary then
+    local deferred_kind, primary = verify_diagnostic_evaluation(catalog, indexes, candidate)
+    if deferred_kind == "qualified" then
       deferred_count = deferred_count + 1
       deferred_primaries[candidate.candidate_id] = primary
+    elseif deferred_kind == "rejected" then
+      deferred_count = deferred_count + 1
+      deferred_rejected_count = deferred_rejected_count + 1
+      deferred_rejected_primaries[candidate.candidate_id] = primary
+      deferred_rejected_evaluations[candidate.candidate_id] = candidate.diagnostic_evaluation
     end
   end
   local evaluation = catalog.alternative_evaluation
   if evaluation.evaluated_alternatives ~= alternative_count
     or evaluation.deferred_diagnostic_alternatives ~= deferred_count
+    or evaluation.deferred_rejected_diagnostic_alternatives ~= deferred_rejected_count
     or evaluation.complete ~= (deferred_count == 0)
     or (evaluation.mode == "full-diagnostics" and deferred_count ~= 0)
     or (evaluation.mode == "player-selected-primary-plus-required-fallbacks" and deferred_count == 0) then
@@ -226,7 +269,35 @@ local function verify(catalog, options)
     local alternative = indexer.alternative(indexes, selection.candidate_id, selection.alternative_id)
     local acceptable = alternative and (alternative.qualification_decision == "qualified"
       or (catalog.phase ~= "final" and alternative.qualification_decision == "proposal"))
-    if not acceptable
+    local deferred_rejected = deferred_rejected_primaries[selection.candidate_id]
+    local deferred_evaluation = deferred_rejected_evaluations[selection.candidate_id]
+    local special_rejection = deferred_rejected
+      and selection.action == "reject"
+      and alternative == deferred_rejected
+      and selection.alternative_id == deferred_rejected.alternative_id
+      and selection.design_fingerprint == deferred_rejected.design_fingerprint
+      and selection.qualification_fingerprint == deferred_rejected.qualification_fingerprint
+      and selection.policy == "stable-owner-promoted-diagnostic-v1"
+      and type(selection.deferred_rejection) == "table"
+      and selection.deferred_rejection.state == "deferred-initial-skip-rejected-primary"
+      and selection.selection_key == deferred_evaluation.selection_key
+      and selection.reason == deferred_evaluation.reason
+      and selection.deferred_rejection.selection_key == deferred_evaluation.selection_key
+      and selection.deferred_rejection.reason == deferred_evaluation.reason
+      and selection.deferred_rejection.primary_alternative_id == deferred_rejected.alternative_id
+      and selection.deferred_rejection.primary_design_fingerprint == deferred_rejected.design_fingerprint
+      and selection.deferred_rejection.primary_qualification_fingerprint == deferred_rejected.qualification_fingerprint
+    if special_rejection then
+      verify_exact_fields(selection, {
+        selection_key = true, candidate_id = true, alternative_id = true, action = true,
+        reason = true, design_fingerprint = true, qualification_fingerprint = true,
+        policy = true, deferred_rejection = true
+      }, "deferred rejected current selection")
+      verify_exact_fields(selection.deferred_rejection, {
+        state = true, selection_key = true, reason = true, primary_alternative_id = true,
+        primary_design_fingerprint = true, primary_qualification_fingerprint = true
+      }, "deferred rejected selection provenance")
+    elseif not acceptable
       or alternative.action ~= selection.action
       or alternative.design_fingerprint ~= selection.design_fingerprint
       or alternative.qualification_fingerprint ~= selection.qualification_fingerprint then
@@ -245,6 +316,16 @@ local function verify(catalog, options)
       or selection.design_fingerprint ~= primary.design_fingerprint
       or selection.qualification_fingerprint ~= primary.qualification_fingerprint then
       error("TechnologyCatalog deferred diagnostic primary selection is invalid: " .. candidate_id, 2)
+    end
+  end
+  for candidate_id, primary in pairs(deferred_rejected_primaries) do
+    local selection = (selections_by_candidate[candidate_id] or {})[1]
+    if #(selections_by_candidate[candidate_id] or {}) ~= 1 or not selection
+      or selection.alternative_id ~= primary.alternative_id
+      or selection.action ~= "reject"
+      or selection.design_fingerprint ~= primary.design_fingerprint
+      or selection.qualification_fingerprint ~= primary.qualification_fingerprint then
+      error("TechnologyCatalog deferred rejected diagnostic primary selection is invalid: " .. candidate_id, 2)
     end
   end
   if options.verify_fingerprints ~= false then

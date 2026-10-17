@@ -9,6 +9,7 @@ local M = {}
 local Plan = {}
 Plan.__index = Plan
 local trusted_artifacts = setmetatable({}, {__mode = "k"})
+local trusted_drafts = setmetatable({}, {__mode = "k"})
 
 local ACTIONS = {
   adopt = true,
@@ -64,14 +65,17 @@ local function validate_row(row, options)
   end
   if row.action == "emit" then
     required(row, "technology_name")
-    required(row, "technology_design")
-    if options.design_derived then
+    if options.preparation then
+      technology_design.preparation_fingerprint(options.preparation, row)
+    elseif options.design_derived then
+      required(row, "technology_design")
       if technology_design.is_trusted(row.technology_design) then
         technology_design.assert_trusted(row.technology_design)
       else
         technology_design.verify_untrusted(row.technology_design)
       end
     else
+      required(row, "technology_design")
       technology_design.assert_generation_row(row)
     end
     required(row, "fields")
@@ -130,7 +134,7 @@ function Plan:add(row)
   table.insert(self.rows, deepcopy(row))
 end
 
-local function row_fingerprint_material(row)
+local function row_fingerprint_material(row, preparation)
   local design = row.technology_design or {}
   local adoption = row.adoption
   return {
@@ -165,6 +169,10 @@ local function row_fingerprint_material(row)
     staged_parent_technology = row.staged_parent_technology,
     staged_parent_stream_key = row.staged_parent_stream_key,
     configured_stream_key = row.configured_stream_key,
+    generation_preparation = preparation and {
+      schema = 1,
+      input_fingerprint = technology_design.preparation_fingerprint(preparation, row)
+    } or nil,
     technology_design = row.technology_design and {
       schema = design.schema,
       candidate_id = design.candidate_id,
@@ -178,9 +186,11 @@ local function row_fingerprint_material(row)
   }
 end
 
-local function rows_fingerprint_material(rows)
+local function rows_fingerprint_material(rows, preparations)
   local out = {}
-  for index, row in ipairs(rows) do out[index] = row_fingerprint_material(row) end
+  for index, row in ipairs(rows) do
+    out[index] = row_fingerprint_material(row, preparations and preparations[row])
+  end
   return out
 end
 
@@ -227,7 +237,8 @@ function Plan:finalize()
   for _, row in ipairs(self.rows) do
     -- Recheck the inexpensive row and gate invariants at the ownership
     -- boundary without repeating complete TechnologyDesign fingerprints.
-    validate_row(row, {design_derived = true})
+    validate_row(row, {design_derived = true,
+      preparation = self.preparations and self.preparations[row]})
     if stream_keys[row.stream_key] then
       error("GenerationPlan contains duplicate stream key: " .. row.stream_key, 2)
     end
@@ -294,9 +305,10 @@ function Plan:finalize()
     effect_ownership_conflict_count = ownership_conflict_count
   }
   self.plan_fingerprint = fingerprint.of({
-    schema = 3,
+    schema = self.preparations and 1 or 3,
+    record_type = self.preparations and "GenerationDraft" or nil,
     source_fingerprints = self.source_fingerprints,
-    rows = rows_fingerprint_material(self.rows),
+    rows = rows_fingerprint_material(self.rows, self.preparations),
     validation_summary = self.validation_summary
   })
   return self
@@ -355,6 +367,62 @@ function M.assert_trusted_artifact(artifact)
     error("GenerationPlan artifact is not the exact trusted finalized view", 2)
   end
   return artifact
+end
+
+-- The private pre-graph handoff is deliberately not a schema-3 GenerationPlan.
+-- Its opaque preparations never occur in serialized rows or context state.
+function M.prepare(rows, metadata)
+  local plan = M.new(metadata)
+  plan.preparations = {}
+  for _, row in ipairs(rows) do
+    if row.action == "emit" and row.stage_kind ~= "material-continuation" then
+      plan.preparations[row] = technology_design.prepare_generation_row(row)
+    else
+      row.technology_design = technology_design.from_generation_row(row)
+    end
+    plan:add_owned_derived(row)
+  end
+  plan:finalize()
+  local draft = {
+    schema = 1, record_type = "GenerationDraft", phase = "pregraph",
+    plan_fingerprint = plan.plan_fingerprint,
+    source_fingerprints = plan.source_fingerprints,
+    rows = plan.rows, validation_summary = plan.validation_summary
+  }
+  trusted_drafts[draft] = {plan = plan, plan_fingerprint = draft.plan_fingerprint,
+    rows = draft.rows, source_fingerprints = draft.source_fingerprints,
+    validation_summary = draft.validation_summary}
+  return draft
+end
+
+function M.is_draft(artifact)
+  return type(artifact) == "table" and artifact.record_type == "GenerationDraft"
+end
+
+function M.assert_trusted_draft(draft)
+  local owned = trusted_drafts[draft]
+  if not owned or draft.schema ~= 1 or draft.record_type ~= "GenerationDraft" or draft.phase ~= "pregraph"
+    or draft.plan_fingerprint ~= owned.plan_fingerprint or draft.rows ~= owned.rows
+    or draft.source_fingerprints ~= owned.source_fingerprints
+    or draft.validation_summary ~= owned.validation_summary then
+    error("GenerationDraft must be the exact private pre-graph handoff.", 2)
+  end
+  return owned.plan.preparations
+end
+
+function M.materialize_draft(draft)
+  local preparations = M.assert_trusted_draft(draft)
+  local plan = M.new({source_fingerprints = draft.source_fingerprints})
+  for _, row in ipairs(draft.rows) do
+    local exported = {}
+    for key, value in pairs(row) do exported[key] = value end
+    if preparations[row] then
+      exported.technology_design = technology_design.finalize_prepared_generation_row(
+        preparations[row], row)
+    end
+    plan:add_owned_derived(exported)
+  end
+  return plan:finalize():artifact()
 end
 
 function M.effect_identity(effect)

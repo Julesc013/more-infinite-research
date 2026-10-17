@@ -106,6 +106,12 @@ $nineIndependentContract = Get-MIR42IndependentScopeContract -Scope (Get-MIR42In
 Assert-MIR42NineGeneratorTest -Condition ([string]$modernContract.kind -ceq 'MIR42FourTargetEvidenceReconciliationV1' -and [string]$modernContract.target_requirement -ceq 'all_four_targets_required') -Code 'modern-contract'
 Assert-MIR42NineGeneratorTest -Condition ([string]$nineContract.kind -ceq 'MIR42NineTargetEvidenceReconciliationV1' -and [string]$nineContract.target_requirement -ceq 'all_nine_targets_required') -Code 'nine-reconciliation-contract'
 Assert-MIR42NineGeneratorTest -Condition ([string]$nineIndependentContract.rehash_kind -ceq 'MIR42NineTargetIndependentEvidenceRehashV1' -and [string]$nineIndependentContract.target_requirement -ceq 'all_nine_targets_required') -Code 'nine-independent-contract'
+$v12IndependentContract = Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.5.2'
+Assert-MIR42NineGeneratorTest -Condition ([string]$v12IndependentContract.reconciliation_status -ceq 'MIR-4.5.2-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED' -and [string]$v12IndependentContract.rehash_status -ceq 'MIR-4.5.2-NINE-TARGET-MAINTENANCE-INDEPENDENT-EVIDENCE-REHASH-PASSED-PRIVATE-UNQUALIFIED') -Code '452-independent-contract'
+$rejected = $false
+try { Get-MIR42IndependentScopeContract -Scope 'nine-target' -PublishedMaintenance -SourceVersion '4.5.1' | Out-Null }
+catch { $rejected = $_.Exception -is [Management.Automation.ParameterBindingException] }
+Assert-MIR42NineGeneratorTest -Condition $rejected -Code '451-independent-current-candidate-refused'
 
 function Test-MIR42NineCriterionEvidenceWriter {
   param([Parameter(Mandatory)][string]$RepoRoot,[ValidateSet(1,2,3,4,5,6)][int]$SchemaVersion=1)
@@ -242,7 +248,7 @@ function Test-MIR42NineCriterionEvidenceWriter {
         }
       }
     )
-    foreach ($sourceVersion in @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')) {
+    foreach ($sourceVersion in @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.2')) {
       $individualObservation = [ordered]@{
         schema=1;kind='MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
         status=("MIR-$sourceVersion-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED")
@@ -443,8 +449,151 @@ function Test-MIR450ConstructionCriterionAdmission {
   Write-Output 'MIR450-CONSTRUCTION-CRITERION-ADMISSION-PASSED assertions=10 engines=0 controlled_evidence_only=true'
 }
 
+function Test-MIR452CurrentEvidenceAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $root = Join-Path $RepoRoot ('build/tmp/mir452-current-evidence-' + [guid]::NewGuid().ToString('N'))
+  [IO.Directory]::CreateDirectory($root) | Out-Null
+  $originalBound = Get-Item Function:Get-MIR42BoundEngineRun -ErrorAction SilentlyContinue
+  try {
+    $source = [pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+    $construction = [pscustomobject][ordered]@{
+      schema=12;kind='MIR42FourTargetDeterministicCandidateManifestV12';source=$source
+      package_source_sha256=$source.package_source_sha256;build_complete=$true;record_sha256=''
+    }
+    $constructionPath = Join-Path $root 'candidate-v12.json'
+    Write-MIR4BootstrapRecord -Record $construction -Path $constructionPath | Out-Null
+    $constructionReference = [pscustomobject][ordered]@{sha256=(Get-MIR4Sha256File -Path $constructionPath);record_sha256=$construction.record_sha256}
+    $candidate = [pscustomobject][ordered]@{source=$source;candidate_manifest=$constructionReference}
+    foreach ($criterion in @('package-exclusion','deterministic-reconstruction')) {
+      $observed = Get-MIR42CriterionEvidenceObservation -Path $constructionPath -Criterion $criterion -Candidate $candidate -SourceVersion '4.5.2' -Code 'mir452-current-evidence'
+      Assert-MIR42NineGeneratorTest -Condition ($observed.sha256 -ceq $constructionReference.sha256) -Code ('452-v12-construction-accepted-' + $criterion)
+    }
+
+    $v11 = $construction | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+    $v11.schema = 11; $v11.kind = 'MIR42FourTargetDeterministicCandidateManifestV11'
+    $v11Path = Join-Path $root 'candidate-v11.json'
+    Write-MIR4BootstrapRecord -Record $v11 -Path $v11Path | Out-Null
+    $v11Candidate = [pscustomobject][ordered]@{source=$source;candidate_manifest=[pscustomobject][ordered]@{sha256=(Get-MIR4Sha256File -Path $v11Path);record_sha256=$v11.record_sha256}}
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $v11Path -Criterion 'package-exclusion' -Candidate $v11Candidate -SourceVersion '4.5.2' -Code 'mir452-current-evidence' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir452-current-evidence-binding] package-exclusion' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v11-predecessor-not-current-candidate'
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $constructionPath -Criterion 'package-exclusion' -Candidate $candidate -SourceVersion '4.5.0' -Code 'mir452-current-evidence' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir452-current-evidence-binding] package-exclusion' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v12-cross-source-construction-refused'
+    foreach ($criterion in @('package-exclusion','deterministic-reconstruction')) {
+      foreach ($mutation in @('tree','package-source')) {
+        $mismatchSource = $source | ConvertTo-Json -Depth 20 | ConvertFrom-Json -Depth 20
+        if ($mutation -ceq 'tree') { $mismatchSource.tree = ('0' * 40) } else { $mismatchSource.package_source_sha256 = ('0' * 64) }
+        $mismatchCandidate = [pscustomobject][ordered]@{source=$mismatchSource;candidate_manifest=$constructionReference}
+        $rejected = $false
+        try { Get-MIR42CriterionEvidenceObservation -Path $constructionPath -Criterion $criterion -Candidate $mismatchCandidate -SourceVersion '4.5.2' -Code 'mir452-current-evidence' | Out-Null }
+        catch { $rejected = $_.Exception.Message -ceq ('[mir452-current-evidence-binding] ' + $criterion) }
+        Assert-MIR42NineGeneratorTest -Condition $rejected -Code ('452-v12-construction-' + $mutation + '-source-refused-' + $criterion)
+      }
+    }
+
+    $futureRejected = $false
+    try { Get-MIR42CriterionObservationContract -Criterion 'performance-telemetry' -PublishedMaintenance -SourceVersion '4.5.3' | Out-Null }
+    catch { $futureRejected = $_.Exception -is [Management.Automation.ParameterBindingException] }
+    Assert-MIR42NineGeneratorTest -Condition $futureRejected -Code '453-current-evidence-source-refused'
+
+    $published = [pscustomobject][ordered]@{targets=@(
+      foreach ($target in $script:MIR42QualificationNineTargets) {
+        [pscustomobject][ordered]@{target=$target;path=('published-' + $target + '.zip');version=('4.5.1-' + $target);sha256=($target.Substring(1,1) * 64)}
+      }
+    )}
+    $individualTargets = @(
+      foreach ($publishedTarget in @($published.targets)) {
+        [pscustomobject][ordered]@{
+          target=[string]$publishedTarget.target
+          engine_execution=[pscustomobject][ordered]@{
+            published_maintenance_predecessor=$publishedTarget
+            predecessor=[pscustomobject][ordered]@{path=[string]$publishedTarget.path;version=[string]$publishedTarget.version;sha256=[string]$publishedTarget.sha256}
+          }
+        }
+      }
+    )
+    $fresh = [pscustomobject][ordered]@{
+      schema=1;kind='MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
+      status='MIR-4.5.2-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+      source=$source;candidate_manifest=$constructionReference;published_maintenance_predecessor=$published;targets=$individualTargets
+      engine_input_kind='individual-upgrade-receipts-and-fresh-loads';release_qualification='not-performed';release_acceptance='not-performed';record_sha256=''
+    }
+    $freshPath = Join-Path $root 'fresh-v12.json'
+    Write-MIR4BootstrapRecord -Record $fresh -Path $freshPath | Out-Null
+    $freshObserved = Get-MIR42CriterionEvidenceObservation -Path $freshPath -Criterion 'fresh-exact-loads' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -SourceVersion '4.5.2'
+    Assert-MIR42NineGeneratorTest -Condition ([string]$freshObserved.record_sha256 -ceq [string]$fresh.record_sha256) -Code '452-v12-individual-fresh-accepted'
+
+    $wrongStatus = $fresh | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+    $wrongStatus.status = 'MIR-4.5.1-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+    $wrongStatusPath = Join-Path $root 'fresh-wrong-status.json'
+    Write-MIR4BootstrapRecord -Record $wrongStatus -Path $wrongStatusPath | Out-Null
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $wrongStatusPath -Criterion 'fresh-exact-loads' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -SourceVersion '4.5.2' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir452-current-evidence-binding] fresh-exact-loads' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v12-individual-wrong-status-refused'
+
+    $partial = $fresh | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+    $partial.targets = @($partial.targets | Select-Object -First 8)
+    $partialPath = Join-Path $root 'fresh-partial.json'
+    Write-MIR4BootstrapRecord -Record $partial -Path $partialPath | Out-Null
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $partialPath -Criterion 'fresh-exact-loads' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -SourceVersion '4.5.2' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir42-maintenance-criterion-custody-binding]' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v12-individual-partial-targets-refused'
+
+    $crossSource = $fresh | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+    $crossSource.source.tree = ('0' * 40)
+    $crossSourcePath = Join-Path $root 'fresh-cross-source.json'
+    Write-MIR4BootstrapRecord -Record $crossSource -Path $crossSourcePath | Out-Null
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $crossSourcePath -Criterion 'fresh-exact-loads' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -SourceVersion '4.5.2' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir452-current-evidence-binding] fresh-exact-loads' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v12-individual-cross-source-refused'
+
+    $performance = [pscustomobject][ordered]@{
+      schema=1;kind='MIR42NineTargetCriterionObservationV1';status='passed';criterion='performance-telemetry'
+      telemetry_scope='bounded-candidate-load-and-upgrade-resource-observation';compiler_profile='full'
+      source=$source;candidate_manifest=$constructionReference
+      individual_engine_run=[pscustomobject][ordered]@{path='individual-engine-run.json';sha256=('F' * 64);record_sha256=('1' * 64)};record_sha256=''
+    }
+    $performancePath = Join-Path $root 'performance-v12.json'
+    Write-MIR4BootstrapRecord -Record $performance -Path $performancePath | Out-Null
+    $engineCandidate = [pscustomobject][ordered]@{
+      source=$source;identity=[pscustomobject][ordered]@{sha256=$constructionReference.sha256;record=[pscustomobject][ordered]@{record_sha256=$constructionReference.record_sha256}}
+      scope='nine-target';targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})
+    }
+    Set-Item Function:Get-MIR42BoundEngineRun -Value {
+      param($Reference,$Candidate,$PublishedMaintenanceInputs)
+      [pscustomobject][ordered]@{
+        path='individual-engine-run.json';sha256=('F' * 64);input_kind='individual-upgrade-receipts-and-fresh-loads'
+        record=[pscustomobject][ordered]@{record_sha256=('1' * 64);targets=@($script:MIR42QualificationNineTargets | ForEach-Object {[pscustomobject][ordered]@{target=$_}})}
+      }
+    }
+    $performanceObserved = Get-MIR42CriterionEvidenceObservation -Path $performancePath -Criterion 'performance-telemetry' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -IndividualEngineCandidate $engineCandidate -SourceVersion '4.5.2'
+    Assert-MIR42NineGeneratorTest -Condition ([string]$performanceObserved.record_sha256 -ceq [string]$performance.record_sha256) -Code '452-v12-individual-performance-accepted'
+    $performanceWrong = $performance | ConvertTo-Json -Depth 30 | ConvertFrom-Json -Depth 30
+    $performanceWrong.status = 'completed'
+    $performanceWrongPath = Join-Path $root 'performance-wrong-status.json'
+    Write-MIR4BootstrapRecord -Record $performanceWrong -Path $performanceWrongPath | Out-Null
+    $rejected = $false
+    try { Get-MIR42CriterionEvidenceObservation -Path $performanceWrongPath -Criterion 'performance-telemetry' -Candidate $candidate -Code 'mir452-current-evidence' -PublishedMaintenanceInputs $published -IndividualEngineCandidate $engineCandidate -SourceVersion '4.5.2' | Out-Null }
+    catch { $rejected = $_.Exception.Message -ceq '[mir452-current-evidence-binding] performance-telemetry' }
+    Assert-MIR42NineGeneratorTest -Condition $rejected -Code '452-v12-individual-performance-status-refused'
+  } finally {
+    if ($null -eq $originalBound) { Remove-Item Function:Get-MIR42BoundEngineRun -ErrorAction SilentlyContinue } else { Set-Item Function:Get-MIR42BoundEngineRun -Value $originalBound.ScriptBlock }
+    $null = Assert-MIR4DescendantPath -Root (Join-Path $RepoRoot 'build') -Path $root
+    $null = Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $root
+    if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  }
+  Write-Output 'MIR452-CURRENT-EVIDENCE-ADMISSION-PREPARED assertions=15 engines=0 controlled_evidence_only=true'
+}
+
 Test-MIR442MaintenanceEvidenceAdmission -RepoRoot $repo
 Test-MIR450ConstructionCriterionAdmission -RepoRoot $repo
+Test-MIR452CurrentEvidenceAdmission -RepoRoot $repo
 if ($Normal431TelemetryOnly) {
   Test-MIR431NormalPerformanceTelemetryBinding -RepoRoot $repo
   Write-Output 'MIR431-NORMAL-PERFORMANCE-TELEMETRY-PASSED assertions=6 engines=0 controlled_evidence_only=true'

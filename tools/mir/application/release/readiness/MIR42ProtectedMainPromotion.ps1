@@ -369,7 +369,7 @@ function Assert-MIR42PromotionReadinessScope {
   if ($RequiredScope -ceq 'nine-target') {
     $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $state.candidate
     if ([string]$state.programme.record.release_line -cne [string]$candidateRelease.release_line) { throw '[mir42-promotion-current-programme-release-line]' }
-    $predecessorRows = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0')) {
+    $predecessorRows = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) {
       $maintenanceInputs = if ($state.PSObject.Properties.Name -ccontains 'maintenance_inputs') { $state.maintenance_inputs } else { $null }
       if ($null -eq $maintenanceInputs -or $null -eq $maintenanceInputs.targets) { throw '[mir42-promotion-maintenance-predecessor-required]' }
       @($maintenanceInputs.targets)
@@ -566,7 +566,7 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     $plan.scope = 'nine-target'
     $plan.candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
     $plan.current_programme = [ordered]@{path=[string]$readiness._state.programme.path;sha256=[string]$readiness._state.programme.sha256;record_sha256=[string]$readiness._state.programme.record.record_sha256}
-    $plan.direct_predecessors = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0')) {
+    $plan.direct_predecessors = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) {
       @($readiness._state.maintenance_inputs.targets)
     } else { @($readiness._state.programme.record.direct_predecessors) }
     $plan.target_assets = @($candidate.targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })

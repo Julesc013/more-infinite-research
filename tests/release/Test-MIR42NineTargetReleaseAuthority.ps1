@@ -154,6 +154,57 @@ try {
     $programme450.PSObject.Properties.Name -cnotcontains 'direct_predecessors') '450-maintenance-programme-binds-exact-r24'
   $programme450Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme450Path -AllowPendingTransition
   Assert-NineAuthority ([string]$programme450Read.record.release_line -ceq '4.5' -and [string]$programme450Read.record.published_maintenance_predecessor.source_version -ceq '4.4.2') '450-maintenance-programme-reader-resolves-exact-r24'
+  # 4.5.2 is the current V12 candidate. Its immediate maintenance custody is
+  # the exact published V11 4.5.1 construction record; its older 4.4.2
+  # predecessor remains separate historical/upgrade evidence.
+  $programme452Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-452.json'
+  $programme452 = New-MIR42NineTargetReleaseCutProgramme -RepoRoot $repo -OutputPath $programme452Path -SourceVersion '4.5.2'
+  $expected452 = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.2'
+  Assert-NineAuthority ([string]$programme452.release_line -ceq '4.5' -and [string]$programme452.candidate.version_line -ceq '4.5' -and
+    [string]$programme452.status -ceq 'active-current-4.5-release-cut-pre-freeze-no-transition-authority' -and
+    [string]$programme452.published_maintenance_predecessor.source_version -ceq '4.5.1' -and
+    [string]$programme452.published_maintenance_predecessor.source_tag -ceq 'v4.5.1' -and
+    [string]$programme452.published_maintenance_predecessor.manifest_sha256 -ceq [string]$expected452.manifest_sha256) '452-maintenance-programme-binds-exact-published-451'
+  $programme452Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $programme452Path -AllowPendingTransition
+  Assert-NineAuthority ([string](Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme452Read.record) -ceq '4.5.2' -and
+    [string]$programme452Read.record.published_maintenance_predecessor.source_version -ceq '4.5.1') '452-maintenance-programme-reader-resolves-exact-published-451'
+  $programmeCommand = Join-Path $repo 'tools/commands/release/Update-MIR42NineTargetReleaseCutProgramme.ps1'
+  $programme452CommandPath = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-452-command.json'
+  $programme452Command = @(& $programmeCommand -Mode Prepare -RepoRoot $repo -OutputPath $programme452CommandPath -SourceVersion '4.5.2') -join [Environment]::NewLine | ConvertFrom-Json -Depth 100 -DateKind String
+  Assert-NineAuthority ([string]$programme452Command.published_maintenance_predecessor.source_version -ceq '4.5.1' -and
+    -not [bool]$programme452Command.release_transition_authority -and -not [bool]$programme452Command.publication_authorized) '452-programme-command-preserves-pending-gates'
+  $wrong452 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme452 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong452.published_maintenance_predecessor = $programme450.published_maintenance_predecessor
+  $wrong452Path = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-452-r24.json'
+  Write-MIR42NormalizedRecord -Record $wrong452 -OutputPath $wrong452Path -Code 'mir42-nine-test-452-r24-maintenance' | Out-Null
+  $wrong452Read = Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $wrong452Path -AllowPendingTransition
+  Assert-NineAuthority ([string](Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $wrong452Read.record) -ceq '4.5.0') '452-r24-custody-resolves-only-as-450'
+  $wrong452Exact = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme452 | ConvertFrom-Json -Depth 100 -DateKind String
+  $wrong452Exact.published_maintenance_predecessor.manifest_sha256 = ('F' * 64)
+  $wrong452ExactPath = Join-Path $scratch 'build/release-programme-transitions/MIR42-Nine-Target-Release-Cut-ProgrammeV1-452-wrong-v11-hash.json'
+  Write-MIR42NormalizedRecord -Record $wrong452Exact -OutputPath $wrong452ExactPath -Code 'mir42-nine-test-452-wrong-v11-hash' | Out-Null
+  Assert-NineAuthorityReject { Get-MIR42LiveProgrammeTransition -RepoRoot $scratch -Scope 'nine-target' -ProgrammePath $wrong452ExactPath -AllowPendingTransition } 'mir42-seal-current-programme-maintenance-binding' '452-resolver-rejects-mutated-v11-custody'
+  $candidate452Binding = [pscustomobject][ordered]@{
+    scope='nine-target';source_version='4.5.2';identity=[pscustomobject][ordered]@{sha256=('A' * 64);record=[pscustomobject][ordered]@{record_sha256=('B' * 64)}}
+    source=[pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  }
+  $programme452Binding = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme452Read.record | ConvertFrom-Json -Depth 100 -DateKind String
+  $programme452Binding | Add-Member -NotePropertyName written_transition_authorization -NotePropertyValue ([pscustomobject][ordered]@{
+    candidate_manifest=[pscustomobject][ordered]@{sha256=('A' * 64);record_sha256=('B' * 64)}
+    source=[pscustomobject][ordered]@{commit=('a' * 40);tree=('b' * 40);package_source_sha256=('C' * 64)}
+  })
+  Assert-MIR42NineTargetProgrammeCandidateBinding -Programme ([pscustomobject]@{record=$programme452Binding}) -Candidate $candidate452Binding
+  $r24ProgrammeBinding = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme452Binding | ConvertFrom-Json -Depth 100 -DateKind String
+  $r24ProgrammeBinding.published_maintenance_predecessor = $programme450.published_maintenance_predecessor
+  Assert-NineAuthorityReject { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme ([pscustomobject]@{record=$r24ProgrammeBinding}) -Candidate $candidate452Binding } 'mir42-nine-programme-transition-readiness-candidate-binding' '452-candidate-rejects-old-450-programme'
+  $candidate450Binding = ConvertTo-MIR4BootstrapCanonicalJson -Value $candidate452Binding | ConvertFrom-Json -Depth 100 -DateKind String
+  $candidate450Binding.source_version = '4.5.0'
+  Assert-NineAuthorityReject { Assert-MIR42NineTargetProgrammeCandidateBinding -Programme ([pscustomobject]@{record=$programme452Binding}) -Candidate $candidate450Binding } 'mir42-nine-programme-transition-readiness-candidate-binding' '452-v11-programme-rejects-old-450-candidate'
+  Assert-NineAuthorityReject { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.1'}) | Out-Null } 'mir42-nine-target-release-line-candidate-version' 'published-451-is-not-normal-programme-candidate'
+  Assert-NineAuthorityReject { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.3'}) | Out-Null } 'mir42-nine-target-release-line-candidate-version' 'future-453-is-not-normal-programme-candidate'
+  $futureProgrammeRejected = $false
+  try { Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion '4.5.3' | Out-Null } catch [System.Management.Automation.ParameterBindingException] { $futureProgrammeRejected = $true }
+  Assert-NineAuthority $futureProgrammeRejected 'future-453-programme-status-contract-rejected'
   $wrong450 = ConvertTo-MIR4BootstrapCanonicalJson -Value $programme450 | ConvertFrom-Json -Depth 100 -DateKind String
   $wrong450.published_maintenance_predecessor.source_version = '4.4.1'
   $wrong450.published_maintenance_predecessor.source_tag = 'v4.4.1'

@@ -93,7 +93,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
 
   . (Join-Path $repo 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
   $projectionChecks = 0
-  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')) {
+  foreach ($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')) {
     foreach ($target in @('f017','f016','f015','f014','f013')) {
       $projection = Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target $target -SourceVersion $sourceVersion
       Assert-MIR42CandidateBuildTest (
@@ -116,36 +116,64 @@ function Test-MIR43HistoricalCandidateAuthentication {
   }
   Assert-MIR42CandidateBuildTest $unsupported450Patch 'historical-authentication-keeps-emergency-4-5-1-out-of-normal-evidence-route'
   $projectionChecks++
+  $unsupportedFuturePatch = $false
+  try {
+    Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target f017 -SourceVersion '4.5.3' | Out-Null
+  } catch [System.Management.Automation.ParameterBindingException] {
+    $unsupportedFuturePatch = $true
+  }
+  Assert-MIR42CandidateBuildTest $unsupportedFuturePatch 'historical-authentication-refuses-future-4-5-3-normal-evidence-route'
+  $projectionChecks++
 
   $writer = Join-Path $repo 'tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1'
-  $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion '4.4.2' -CandidateId 'AUTHENTICATION-CONTROL' -OutputRoot $OutputRoot -Repetitions 2 -Check)
-  Assert-MIR42CandidateBuildTest ($manifestRows.Count -eq 1) 'historical-authentication-fixture-manifest-count'
-  $manifest = $manifestRows[0]
-  $manifestPath = Join-Path $OutputRoot 'manifests/f017.json'
-  $archive = Join-Path $repo ([string]$manifest.distribution.path)
+  $auth442Root = Join-Path $OutputRoot 'authentication-442'
+  $auth452Root = Join-Path $OutputRoot 'authentication-452'
   Assert-MIR42CandidateBuildTest (
-    (Test-Path -LiteralPath $manifestPath -PathType Leaf) -and
-    (Test-Path -LiteralPath $archive -PathType Leaf) -and
-    [string]$manifest.target -ceq 'f017' -and
-    [string]$manifest.candidate_row.source_version -ceq '4.4.2'
-  ) 'historical-authentication-fixture-identity'
-  $controls = Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls -Repository $repo -Archive $archive -ManifestPath $manifestPath `
-    -Target f017 -SourceVersion '4.4.2' -WorkRoot (Join-Path $OutputRoot 'opposing')
-  Assert-MIR42CandidateBuildTest (
-    [string]$controls.status -ceq 'passed' -and
-    [int]$controls.assertions -eq 4 -and
-    [int]$controls.authority_input_assertions -eq 5 -and
-    [int]$controls.receipt_custody_assertions -eq 6 -and
-    -not [bool]$controls.native_factorio -and
-    -not [bool]$controls.package_materialization -and
-    -not (Test-Path -LiteralPath (Join-Path $OutputRoot 'opposing'))
-  ) 'historical-authentication-opposing-controls'
+    [System.IO.Path]::GetFullPath($auth442Root) -cne [System.IO.Path]::GetFullPath($auth452Root)
+  ) 'historical-authentication-fixture-output-roots-are-distinct'
+  $authenticationCases = @(
+    [pscustomobject][ordered]@{ label = '442'; source_version = '4.4.2'; candidate_id = 'AUTHENTICATION-CONTROL-442'; output_root = $auth442Root },
+    [pscustomobject][ordered]@{ label = '452'; source_version = '4.5.2'; candidate_id = 'AUTHENTICATION-CONTROL-452'; output_root = $auth452Root }
+  )
+  $authenticationAssertions = 0
+  $authorityInputAssertions = 0
+  $receiptCustodyAssertions = 0
+  $authenticCandidateZipBuilds = 0
+  foreach ($case in $authenticationCases) {
+    $manifestRows = @(& $writer -RepoRoot $repo -Target f017 -SourceVersion ([string]$case.source_version) -CandidateId ([string]$case.candidate_id) -OutputRoot ([string]$case.output_root) -Repetitions 2 -Check)
+    Assert-MIR42CandidateBuildTest ($manifestRows.Count -eq 1) "historical-authentication-fixture-manifest-count-$($case.label)"
+    $manifest = $manifestRows[0]
+    $manifestPath = Join-Path ([string]$case.output_root) 'manifests/f017.json'
+    $archive = Join-Path $repo ([string]$manifest.distribution.path)
+    Assert-MIR42CandidateBuildTest (
+      (Test-Path -LiteralPath $manifestPath -PathType Leaf) -and
+      (Test-Path -LiteralPath $archive -PathType Leaf) -and
+      [string]$manifest.target -ceq 'f017' -and
+      [string]$manifest.candidate_row.source_version -ceq [string]$case.source_version
+    ) "historical-authentication-fixture-identity-$($case.label)"
+    $opposingRoot = Join-Path ([string]$case.output_root) 'opposing'
+    $controls = Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls -Repository $repo -Archive $archive -ManifestPath $manifestPath `
+      -Target f017 -SourceVersion ([string]$case.source_version) -WorkRoot $opposingRoot
+    Assert-MIR42CandidateBuildTest (
+      [string]$controls.status -ceq 'passed' -and
+      [int]$controls.assertions -eq 4 -and
+      [int]$controls.authority_input_assertions -eq 5 -and
+      [int]$controls.receipt_custody_assertions -eq 6 -and
+      -not [bool]$controls.native_factorio -and
+      -not [bool]$controls.package_materialization -and
+      -not (Test-Path -LiteralPath $opposingRoot)
+    ) "historical-authentication-opposing-controls-$($case.label)"
+    $authenticationAssertions += [int]$controls.assertions
+    $authorityInputAssertions += [int]$controls.authority_input_assertions
+    $receiptCustodyAssertions += [int]$controls.receipt_custody_assertions
+    $authenticCandidateZipBuilds += 2
+  }
   return [pscustomobject][ordered]@{
     authority_projection_checks = $projectionChecks
-    authentication_assertions = [int]$controls.assertions
-    authority_input_assertions = [int]$controls.authority_input_assertions
-    receipt_custody_assertions = [int]$controls.receipt_custody_assertions
-    authentic_candidate_zip_builds = 2
+    authentication_assertions = $authenticationAssertions
+    authority_input_assertions = $authorityInputAssertions
+    receipt_custody_assertions = $receiptCustodyAssertions
+    authentic_candidate_zip_builds = $authenticCandidateZipBuilds
     factorio_processes = 0
   }
 }
@@ -397,7 +425,7 @@ try {
     [pscustomobject][ordered]@{
       status = 'MIR-4.3-HISTORICAL-CANDIDATE-AUTHENTICATION-CONTROLS-PASSED'
       targets = 5
-      source_versions = @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')
+      source_versions = @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')
       authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
       authentication_assertions = [int]$historicalAuthentication.authentication_assertions
       authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions

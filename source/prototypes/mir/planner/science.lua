@@ -70,6 +70,19 @@ function M.ingredients_for_selected(key, selected)
   return ingredients, lab_status or "full", decision
 end
 
+function M.phase_diagnostic_fields(decision)
+  if type(decision) ~= "table" then
+    error("Science phase decision is required for phase diagnostics.", 2)
+  end
+  return {
+    science_phase_policy_id = decision.policy_id,
+    science_phase_policy_status = decision.status,
+    science_phase_removed_packs = table.concat(decision.removed_packs or {}, ","),
+    science_phase_requested_packs = table.concat(decision.requested_packs or {}, ","),
+    science_phase_required_packs = table.concat(decision.retained_required_packs or {}, ",")
+  }
+end
+
 function M.ingredients_for_stream(key, spec)
   return M.ingredients_for_selected(key, science_selector.pick_science_for_stream(spec, key))
 end

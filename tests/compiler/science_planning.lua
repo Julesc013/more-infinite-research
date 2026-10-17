@@ -502,7 +502,12 @@ do
    'prototypes.mir.settings.automatic_compiler_policy'}) do stub(name,{}) end
  stub('prototypes.mir.planner.requirements',{missing_reason=function() end})
  stub('prototypes.mir.planner.prerequisites',{build_for=function() return {} end})
- stub('prototypes.mir.planner.science',{ingredients_for_stream=function() return {{'automation-science-pack',1}},'full' end})
+ -- This isolated continuation/cap probe retains the F200 no-phase contract;
+ -- phase normalization is exercised through the real common module above.
+ stub('prototypes.mir.planner.science',{
+  ingredients_for_stream=function() return {{'automation-science-pack',1}},'full' end,
+  phase_diagnostic_fields=function() return nil end
+ })
  stub('prototypes.mir.platform.factorio.target_line',{feature_enabled=function(name) return name~='productivity_family_adoption' end})
  stub('prototypes.mir.settings.effect_scaling',{scale_stream_effects=function(_,_,effects) return effects end})
  stub('prototypes.mir.domain.research_cost.classification',{anchor_level=function() return 1 end})
