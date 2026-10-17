@@ -403,7 +403,48 @@ function Test-MIR442MaintenanceEvidenceAdmission {
   Write-Output 'MIR442-MAINTENANCE-EVIDENCE-ADMISSION-PASSED assertions=8 engines=0 controlled_evidence_only=true'
 }
 
+function Test-MIR450ConstructionCriterionAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $root=Join-Path $RepoRoot ('build/tmp/mir450-construction-criterion-'+[guid]::NewGuid().ToString('N'))
+  [IO.Directory]::CreateDirectory($root)|Out-Null
+  try {
+    $source=[pscustomobject][ordered]@{commit=('a'*40);tree=('b'*40);package_source_sha256=('C'*64)}
+    $record=[pscustomobject][ordered]@{schema=10;kind='MIR42FourTargetDeterministicCandidateManifestV10';source=$source;package_source_sha256=$source.package_source_sha256;build_complete=$true;record_sha256=''}
+    $path=Join-Path $root 'candidate.json'
+    Write-MIR4BootstrapRecord -Record $record -Path $path|Out-Null
+    $reference=[pscustomobject][ordered]@{sha256=(Get-MIR4Sha256File -Path $path);record_sha256=$record.record_sha256}
+    $candidate=[pscustomobject][ordered]@{source=$source;candidate_manifest=$reference}
+    foreach($criterion in @('package-exclusion','deterministic-reconstruction')) {
+      $observed=Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $criterion -Candidate $candidate -SourceVersion '4.5.0' -Code 'mir450-construction-criterion'
+      Assert-MIR42NineGeneratorTest -Condition ($observed.sha256 -ceq $reference.sha256) -Code ('450-v10-construction-consumed-'+$criterion)
+      $reformatted=Join-Path $root ($criterion+'-reformatted.json')
+      [IO.File]::WriteAllText($reformatted,([IO.File]::ReadAllText($path)+"`n"),[Text.UTF8Encoding]::new($false))
+      $rejected=$false
+      try { Get-MIR42CriterionEvidenceObservation -Path $reformatted -Criterion $criterion -Candidate $candidate -SourceVersion '4.5.0' -Code 'mir450-construction-criterion'|Out-Null }
+      catch { $rejected=$_.Exception.Message -ceq ('[mir450-construction-criterion-binding] '+$criterion) }
+      Assert-MIR42NineGeneratorTest -Condition $rejected -Code ('450-v10-raw-bytes-refused-'+$criterion)
+      foreach($mutation in @('wrong-schema','incomplete-build','future-kind')) {
+        $bad=$record|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+        switch($mutation){'wrong-schema'{$bad.schema=9};'incomplete-build'{$bad.build_complete=$false};'future-kind'{$bad.schema=11;$bad.kind='MIR42FourTargetDeterministicCandidateManifestV11'}}
+        $badPath=Join-Path $root ($criterion+'-'+$mutation+'.json')
+        Write-MIR4BootstrapRecord -Record $bad -Path $badPath|Out-Null
+        $badCandidate=[pscustomobject][ordered]@{source=$source;candidate_manifest=[pscustomobject][ordered]@{sha256=(Get-MIR4Sha256File -Path $badPath);record_sha256=$bad.record_sha256}}
+        $rejected=$false
+        try { Get-MIR42CriterionEvidenceObservation -Path $badPath -Criterion $criterion -Candidate $badCandidate -SourceVersion '4.5.0' -Code 'mir450-construction-criterion'|Out-Null }
+        catch { $rejected=$_.Exception.Message -in @('[mir42-candidate-construction-version-contract]',('[mir450-construction-criterion-binding] '+$criterion)) }
+        Assert-MIR42NineGeneratorTest -Condition $rejected -Code ('450-v10-'+$mutation+'-refused-'+$criterion)
+      }
+    }
+  } finally {
+    $null=Assert-MIR4DescendantPath -Root (Join-Path $RepoRoot 'build') -Path $root
+    $null=Assert-MIR4NoReparseAncestors -Root $RepoRoot -Path $root
+    Remove-Item -LiteralPath $root -Recurse -Force
+  }
+  Write-Output 'MIR450-CONSTRUCTION-CRITERION-ADMISSION-PASSED assertions=10 engines=0 controlled_evidence_only=true'
+}
+
 Test-MIR442MaintenanceEvidenceAdmission -RepoRoot $repo
+Test-MIR450ConstructionCriterionAdmission -RepoRoot $repo
 if ($Normal431TelemetryOnly) {
   Test-MIR431NormalPerformanceTelemetryBinding -RepoRoot $repo
   Write-Output 'MIR431-NORMAL-PERFORMANCE-TELEMETRY-PASSED assertions=6 engines=0 controlled_evidence_only=true'
