@@ -73,7 +73,8 @@ $retiredCurrentSources=@(
   'source/prototypes/mir/runtime/compiler_profile_notice.lua',
   'source/prototypes/mir/pipeline/classic_compiler.lua',
   'source/prototypes/mir/domain/compiler/classic_declarations.lua',
-  'source/prototypes/mir/planner/classic/plan.lua'
+  'source/prototypes/mir/planner/classic/plan.lua',
+  'source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
 )
 $compilerTransitionSources=@(
   'source/prototypes/mir/settings/compiler_profile.lua'
@@ -82,8 +83,8 @@ $approvedScienceSources=@(
   'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
   'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
 )
-if(@($manifest.bindings).Count-ne376-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne376-or
-   $migratedBindings.Count-ne355-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne355-or
+if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+   $migratedBindings.Count-ne354-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne354-or
    $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or$angelsRepairBindings.Count-ne1-or
    @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or

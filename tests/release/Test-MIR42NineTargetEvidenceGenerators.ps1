@@ -131,14 +131,34 @@ function Test-MIR42NineCriterionEvidenceWriter {
   $candidateReference = [pscustomobject][ordered]@{
     sha256=(Get-MIR4Sha256File -Path $candidatePath);record_sha256=[string]$candidateRecord.record_sha256
   }
+  # Independent historical fixture identities, rather than one modern version
+  # attached to every older construction schema.
+  $fixtureSourceVersion = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')[$SchemaVersion-1]
+  $fixtureVersion = [version]$fixtureSourceVersion
+  $fixtureTargets = if($SchemaVersion-eq1){$script:MIR42QualificationTargets}else{$script:MIR42QualificationNineTargets}
+  $fixtureScope = if($SchemaVersion-eq1){'four-target'}else{'nine-target'}
   $candidateRows = @(
-    foreach ($target in $script:MIR42QualificationNineTargets) {
-      [pscustomobject][ordered]@{target=$target;scope='nine-target';identity=[pscustomobject][ordered]@{source_version='4.2.1';distribution_version=('4.2.' + $target.Substring(1) + '00')};source=$constructionSource;package_source_sha256=$source.package_source_sha256;candidate_manifest=$candidateReference}
+    foreach ($target in $fixtureTargets) {
+      $distributionVersion = '{0}.{1}.{2:00000}' -f $fixtureVersion.Major,$fixtureVersion.Minor,(100*[int]$target.Substring(1)+$fixtureVersion.Build)
+      [pscustomobject][ordered]@{target=$target;scope=$fixtureScope;identity=[pscustomobject][ordered]@{source_version=$fixtureSourceVersion;distribution_version=$distributionVersion};source=$constructionSource;package_source_sha256=$source.package_source_sha256;candidate_manifest=$candidateReference}
     }
   )
   $originalCandidateRows = (Get-Item Function:Get-MIR42QualificationCandidateRows).ScriptBlock
   try {
     Set-Item Function:Get-MIR42QualificationCandidateRows -Value { param($RepoRoot,$CandidateManifestPath) return @($candidateRows) }
+    if($SchemaVersion-eq1){
+      # V1 predates the nine-target programme. Retain it as an opposing scope
+      # case instead of inventing nine-target 4.2.1 rows for a 4.2.0 manifest.
+      $legacyOutput=Join-Path $root 'legacy-four-target-criterion.json'
+      $rejected=$false
+      try {
+        $null=New-MIR42NineTargetCriterionEvidence -RepoRoot $RepoRoot -CandidateManifestPath $candidatePath -Criterion 'package-exclusion' `
+          -ObservationPaths @($candidatePath) -ObservedTargets @($script:MIR42QualificationNineTargets) -Claim 'invalid legacy fixture' `
+          -KnownLimitations 'four-target construction cannot qualify a nine-target release' -OutputPath $legacyOutput
+      }catch{$rejected=$_.Exception.Message-ceq'[mir42-criterion-evidence-candidate-scope]'}
+      Assert-MIR42NineGeneratorTest -Condition ($rejected-and-not(Test-Path -LiteralPath $legacyOutput)) -Code 'criterion-v1-four-target-refused-without-output'
+      return
+    }
     $criterionRecords = @{}
     foreach ($criterion in $script:MIR42ReleaseAcceptanceCriteria) {
       $observationPath = $candidatePath
@@ -164,6 +184,21 @@ function Test-MIR42NineCriterionEvidenceWriter {
         Write-MIR4BootstrapRecord -Record ([pscustomobject]$observation) -Path $observationPath | Out-Null
       }
       $output = Join-Path $root ('criterion-' + $criterion + '.json')
+      if($criterion-ceq'performance-telemetry'-and$SchemaVersion-ge5){
+        # These metadata fixtures contain neither 4.3.0 stress measurements
+        # nor 4.3.1 authenticated engine evidence. They must not qualify as
+        # performance evidence. The dedicated normal-performance controls
+        # below exercise the latter's positive and opposing cases.
+        $expectedFailure=if($SchemaVersion-eq5){'[mir42-criterion-evidence-observation-binding] performance-telemetry'}else{'[mir42-criterion-evidence-observation-normal-performance-engine-input]'}
+        $rejected=$false
+        try {
+          $null=Get-MIR42CriterionEvidenceObservation -Path $observationPath -Criterion $criterion `
+            -Candidate ([pscustomobject]@{source=$source;candidate_manifest=$candidateReference}) `
+            -Code 'mir42-criterion-evidence-observation' -SourceVersion $fixtureSourceVersion
+        }catch{$rejected=$_.Exception.Message-ceq$expectedFailure}
+        Assert-MIR42NineGeneratorTest -Condition ($rejected-and-not(Test-Path -LiteralPath $output)) -Code ('criterion-metadata-not-native-performance-v'+$SchemaVersion)
+        continue
+      }
       $criterionRecords[$criterion] = New-MIR42NineTargetCriterionEvidence -RepoRoot $RepoRoot -CandidateManifestPath $candidatePath -Criterion $criterion `
         -ObservationPaths @($observationPath) -ObservedTargets @($script:MIR42QualificationNineTargets) -Claim ('fixture ' + $criterion) `
         -KnownLimitations 'structural writer fixture only; no release qualification claimed' -OutputPath $output
@@ -180,9 +215,9 @@ function Test-MIR42NineCriterionEvidenceWriter {
     Write-MIR4BootstrapRecord -Record $badObservation -Path $badPath | Out-Null
     $rejected = $false
     try {
-      New-MIR42NineTargetCriterionEvidence -RepoRoot $RepoRoot -CandidateManifestPath $candidatePath -Criterion 'performance-telemetry' `
-        -ObservationPaths @($badPath) -ObservedTargets @($script:MIR42QualificationNineTargets) -Claim 'bad fixture' `
-        -KnownLimitations 'bad fixture' -OutputPath (Join-Path $root 'bad-performance-criterion.json') | Out-Null
+      Get-MIR42CriterionEvidenceObservation -Path $badPath -Criterion 'performance-telemetry' `
+        -Candidate ([pscustomobject]@{source=$source;candidate_manifest=$candidateReference}) `
+        -Code 'mir42-criterion-evidence-observation' -SourceVersion $fixtureSourceVersion | Out-Null
     } catch { $rejected = $_.Exception.Message -match '^\[mir42-criterion-evidence-observation-binding\] performance-telemetry$' }
     Assert-MIR42NineGeneratorTest -Condition $rejected -Code 'criterion-performance-general-fps-rejected'
     $reformattedPath = Join-Path $root 'reformatted-construction.json'
