@@ -270,6 +270,7 @@
       "inputs": [
         "spec/schemas/mir423-maintainer-written-release-authorization-v1.schema.json",
         "spec/schemas/mir430-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir452-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
