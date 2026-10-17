@@ -1544,6 +1544,10 @@
         "source:source/prototypes/mir/core/fingerprint.lua",
         "source:source/prototypes/mir/core/trusted_record.lua",
         "source:source/prototypes/mir/domain/compiler/compilation_snapshot.lua",
+        "source:source/prototypes/mir/domain/compiler/public_artifact_budget.lua",
+        "source:source/prototypes/mir/platform/factorio/data_raw.lua",
+        "source:source/prototypes/mir/report/coverage.lua",
+        "source:source/prototypes/mir/report/public_compiler_artifacts.lua",
         "source:source/prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
         "source:source/prototypes/mir/domain/effects/metadata.lua",
         "source:source/prototypes/mir/domain/effects/generated_target_contracts.lua",
@@ -8214,6 +8218,7 @@
       "inputs": [
         "spec/schemas/mir423-maintainer-written-release-authorization-v1.schema.json",
         "spec/schemas/mir430-maintainer-written-release-authorization-v1.schema.json",
+        "spec/schemas/mir452-maintainer-written-release-authorization-v1.schema.json",
         "tests/release/Test-MIR42NineTargetWrittenGoAuthorization.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
         "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
@@ -8695,5 +8700,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:fb8382d5bf771b7ebed379e21a4a81a5b7bfc02cce56b330a72719e938797cbd"
+  "digest": "sha256:95b5baef34fc85f83004514737036e180a922fd6f73feadf236bf4bb05225f6c"
 }

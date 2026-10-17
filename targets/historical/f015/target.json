@@ -63,12 +63,12 @@
   "patches": [
     {
       "output_path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
-      "base_sha256": "35A3B4BCD5129C2DBC735F9E883E54F98339EFC6B0D62D46D77D0A0FF17E8A65",
+      "base_sha256": "CB3A2E2339EBCDA9AD904732830BAAAF3F2CD3E6B632F7361C839BE8F8612F62",
       "find": "  [\"1.0\"] = \"omit-unqualified\"",
       "replace": "  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.15\"] = \"omit-unqualified\""
     }
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "82AC5DA3ADACA1116635D2FC347ECFBDD9CAD99D6D561FE5144E6FFF1BAD0494"
+  "record_sha256": "BDCB06FA8E4F457FBA283314576F1492E65678E1EEB795C1B5D9EE888E066B4C"
 }

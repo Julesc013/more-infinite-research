@@ -72,6 +72,8 @@ $modules=[ordered]@{
   'prototypes.mir.domain.compiler.mutation_journal'='source/prototypes/mir/domain/compiler/mutation_journal.lua'
   'prototypes.mir.domain.evidence.compiler_evidence'='source/prototypes/mir/domain/evidence/compiler_evidence.lua'
   'prototypes.mir.report.public_compiler_artifacts'='source/prototypes/mir/report/public_compiler_artifacts.lua'
+  'prototypes.mir.report.coverage'='source/prototypes/mir/report/coverage.lua'
+  'prototypes.mir.platform.factorio.data_raw'='source/prototypes/mir/platform/factorio/data_raw.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')
@@ -84,12 +86,13 @@ foreach($entry in $modules.GetEnumerator()) {
   [void]$lua.AppendLine('end')
   $identities+=@{path=$entry.Value;sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash}
 }
-[void]$lua.AppendLine('local function run(_ENV)')
+[void]$lua.AppendLine('local function run(_ENV); do')
 $testPath=Join-Path $repo 'tests/compiler/technology_design_characterization.lua'
 [void]$lua.AppendLine([IO.File]::ReadAllText($testPath))
+[void]$lua.AppendLine('end; do')
 $publicationTestPath=Join-Path $repo 'tests/compiler/publication_measurement.lua'
 [void]$lua.AppendLine([IO.File]::ReadAllText($publicationTestPath))
-[void]$lua.AppendLine('end; run(env)')
+[void]$lua.AppendLine('end; end; run(env)')
 $fixtureName='mir-technology-design-characterization'
 $fixtureVersion='1.0.0'
 [IO.File]::WriteAllText((Join-Path $fixtureSource 'data.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
@@ -126,8 +129,8 @@ try{
     throw "Publication measurement characterization failed: $nativeLog"
   }
   $publicationAssertionCount=[int]$Matches[1]
-  if($publicationAssertionCount-ne27) {
-    throw "Publication measurement characterization expected 27 assertions, observed $publicationAssertionCount`: $nativeLog"
+  if($publicationAssertionCount-ne92) {
+    throw "Publication measurement characterization expected 92 assertions, observed $publicationAssertionCount`: $nativeLog"
   }
   $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $nativeLog -LatestInvocation
 }finally{

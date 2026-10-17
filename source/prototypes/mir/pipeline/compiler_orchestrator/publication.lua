@@ -10,9 +10,12 @@ local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
 local family_resolver = require("prototypes.mir.families.resolver")
 local research_cost_compatibility = require("prototypes.mir.domain.research_cost.compatibility_slice")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local artifact_budget = require("prototypes.mir.domain.compiler.public_artifact_budget")
 
 local M = {}
 
+-- Owned builders return a scalar count while this publication boundary still
+-- owns the fresh record. Arbitrary records continue through assert_byte_budget.
 -- The bounded research-cost support artifact has admitted exact dispositions
 -- only for Factorio 2.0 and 2.1.  Factorio-1 packages retain their reduced
 -- research surface but do not emit a proof whose target contract they cannot
@@ -37,11 +40,11 @@ function M.publish(context)
   -- Older engines retain the exact compiler-evidence log below, but have no
   -- mod-data consumer. Do not construct unused public or internal projections.
   if publishes_mod_data then
-    local public_plan = public_artifacts.generation_plan(plan.stream_plan)
-    local public_catalog = public_artifacts.technology_catalog(
+    local public_plan, plan_public_bytes = public_artifacts.generation_plan(plan.stream_plan)
+    plan_public_bytes = artifact_budget.assert_byte_count_within_limit(public_plan.kind, plan_public_bytes)
+    local public_catalog, catalog_public_bytes = public_artifacts.technology_catalog(
       plan.technology_catalog, context:state_view("family_resolution") or {})
-    local plan_public_bytes = public_artifacts.assert_byte_budget(public_plan)
-    local catalog_public_bytes = public_artifacts.assert_byte_budget(public_catalog)
+    catalog_public_bytes = artifact_budget.assert_byte_count_within_limit(public_catalog.kind, catalog_public_bytes)
     telemetry.count("generation_plan_public_bytes", plan_public_bytes)
     telemetry.count("technology_catalog_public_bytes", catalog_public_bytes)
     mod_data.emit_generation_plan(public_plan)
@@ -142,8 +145,8 @@ function M.publish(context)
   -- work and makes the payload's telemetry depend on that reconstruction.
   context_construction.record_work_volume()
   evidence_input.telemetry = telemetry.snapshot()
-  local public_evidence = public_artifacts.compiler_evidence(evidence_input)
-  local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)
+  local public_evidence, evidence_bytes = public_artifacts.compiler_evidence(evidence_input)
+  evidence_bytes = artifact_budget.assert_byte_count_within_limit(public_evidence.kind, evidence_bytes)
   if publishes_mod_data then
     telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)
     local counters = telemetry.snapshot().counters
