@@ -41,6 +41,13 @@ for i, name in ipairs(roles) do
     data.raw.technology[name].unit = {count = 10, time = 10, ingredients = {{roles[i - 1], 1}}}
   end
 end
+-- Real base-continuation input: this finite upstream research-speed chain is
+-- admitted by the same planner that supplies production base operations.
+data.raw.technology["research-speed-1"] = {
+  type = "technology", name = "research-speed-1", prerequisites = {"production-science-pack"},
+  effects = {{type = "laboratory-speed", modifier = 0.1}},
+  unit = {count = 200, time = 60, ingredients = {{"automation-science-pack", 1}, {"production-science-pack", 1}}}
+}
 local Context = require("prototypes.mir.pipeline.compiler_context")
 local compiler = require("prototypes.mir.pipeline.compiler_orchestrator")
 local deepcopy = require("prototypes.mir.core.deepcopy")
@@ -142,6 +149,148 @@ local function rejected(action, fragment)
   local ok, message = pcall(action)
   check(not ok and tostring(message):find(fragment, 1, true), "reject " .. fragment)
 end
+
+-- Base continuation effects are pruned before their final TechnologyDesign is
+-- bound.  Keep the former two-bind sequence as a local oracle so the focused
+-- structural/binding split cannot change a public operation or rejection.
+local compilation_model = require("prototypes.mir.planner.compilation_plan.model")
+local base_classify = require("prototypes.mir.planner.base_continuations.classify")
+local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local technology_effects = require("prototypes.mir.integrity.technology_effects")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory").capture()
+local function legacy_sanitize_base_operations(base_plan, inventory)
+  local operations, removed_count, skipped_count, rejected_candidates = {}, 0, 0, {}
+  for _, source_operation in ipairs(base_plan or {}) do
+    local operation = compilation_model.normalized_base_operation(source_operation)
+    local kept, removed = technology_effects.sanitize_effects(
+      (operation.technology and operation.technology.effects) or {},
+      "CompilationPlan " .. tostring(operation.technology_name), "generated", inventory)
+    removed_count = removed_count + #removed
+    operation.technology.effects = kept
+    if #kept > 0 and technology_effects.has_possible_research_effects(kept) then
+      operation.gates.effect_valid = gate_contract.passed(
+        "effect-contracts",
+        {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"})
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      table.insert(operations, operation)
+    else
+      skipped_count = skipped_count + 1
+      local reason = #removed > 0 and "no_valid_effect_targets" or "no_base_extension_effects"
+      local evidence = #removed > 0 and "effect-contracts:all-targets-missing"
+        or "effect-contracts:no-base-effects"
+      if #kept > 0 then
+        reason = "zero_base_extension_effects"
+        evidence = "effect-contracts:zero-base-effect-changes"
+      end
+      operation.gates.effect_valid = gate_contract.failed("effect-contracts", reason, {evidence})
+      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      table.insert(rejected_candidates, {
+        candidate_id = "base-continuation/" .. tostring(operation.key),
+        key = operation.key,
+        action = "reject",
+        reason = reason,
+        gates = operation.gates,
+        technology_design = operation.technology_design,
+        candidate_fingerprint = fingerprint.of({key = operation.key, reason = reason, gates = operation.gates})
+      })
+    end
+  end
+  return operations, {
+    removed_effect_count = removed_count,
+    skipped_base_extension_count = skipped_count,
+    rejected_candidates = rejected_candidates
+  }
+end
+local function base_binding_source(effects)
+  return {
+    schema = 1,
+    operation = "emit_base_extension",
+    key = "approved-family-binding-control",
+    manifest_id = "base-continuation/approved-family-binding-control",
+    base_technology_name = "production-science-pack",
+    technology_name = "approved-family-binding-control-infinite",
+    technology = {
+      type = "technology",
+      name = "approved-family-binding-control-infinite",
+      localised_name = {"technology-name.approved-family-binding-control"},
+      localised_description = {"technology-description.approved-family-binding-control"},
+      prerequisites = {"production-science-pack"},
+      effects = deepcopy(effects),
+      unit = {count_formula = "1000*2^(L-1)", ingredients = {{"automation-science-pack", 1}}, time = 60},
+      max_level = "infinite",
+      upgrade = true,
+      level = 1
+    },
+    gates = base_classify.accepted_gate_vector(
+      "approved-family-binding-control", "approved-family-binding-control-infinite")
+  }
+end
+local retained_and_missing_effects = {
+  {type = "change-recipe-productivity", recipe = "iron-plate", change = 0.1},
+  {type = "unlock-recipe", recipe = "missing-approved-family-binding-control"}
+}
+local original_from_base = technology_design.from_base_extension_operation
+local original_fingerprint_of = fingerprint.of
+local binding_counts = {base_design_constructions = 0, fingerprint_calls = 0}
+technology_design.from_base_extension_operation = function(...)
+  binding_counts.base_design_constructions = binding_counts.base_design_constructions + 1
+  return original_from_base(...)
+end
+fingerprint.of = function(...)
+  binding_counts.fingerprint_calls = binding_counts.fingerprint_calls + 1
+  return original_fingerprint_of(...)
+end
+local legacy_operations, legacy_integrity = legacy_sanitize_base_operations(
+  {base_binding_source(retained_and_missing_effects)}, target_inventory)
+local legacy_counts = deepcopy(binding_counts)
+binding_counts.base_design_constructions, binding_counts.fingerprint_calls = 0, 0
+local candidate_source = base_binding_source(retained_and_missing_effects)
+local candidate_source_fingerprint = original_fingerprint_of(candidate_source)
+local candidate_operations, candidate_integrity = compilation_model.sanitize_base_operations(
+  {candidate_source}, target_inventory)
+local candidate_counts = deepcopy(binding_counts)
+technology_design.from_base_extension_operation = original_from_base
+fingerprint.of = original_fingerprint_of
+check(fingerprint.canonical(candidate_operations) == fingerprint.canonical(legacy_operations)
+  and fingerprint.canonical(candidate_integrity) == fingerprint.canonical(legacy_integrity),
+  "Base sanitation binds the same accepted operation and integrity evidence after effect pruning")
+check(candidate_counts.base_design_constructions == legacy_counts.base_design_constructions - 1
+  and candidate_counts.fingerprint_calls < legacy_counts.fingerprint_calls,
+  "Base sanitation avoids the discarded pre-sanitization TechnologyDesign and its fingerprints")
+check(candidate_source_fingerprint == fingerprint.of(candidate_source)
+  and candidate_operations[1].technology.type == "technology"
+  and #candidate_operations[1].technology.effects == 1
+  and candidate_integrity.removed_effect_count == 1,
+  "Base sanitation retains the copied canonical projection while leaving source effects unchanged")
+candidate_operations[1].technology.effects[1].change = 99
+check(candidate_source.technology.effects[1].change == 0.1
+  and technology_design.prototype_projection(candidate_operations[1].technology_design, {validated = true}).effects[1].change == 0.1,
+  "Base sanitation does not share its returned projection with source or trusted design ownership")
+local rejected_effects = {{type = "unlock-recipe", recipe = "missing-approved-family-binding-control"}}
+local legacy_rejected, legacy_rejected_integrity = legacy_sanitize_base_operations(
+  {base_binding_source(rejected_effects)}, target_inventory)
+local candidate_rejected, candidate_rejected_integrity = compilation_model.sanitize_base_operations(
+  {base_binding_source(rejected_effects)}, target_inventory)
+check(fingerprint.canonical(candidate_rejected) == fingerprint.canonical(legacy_rejected)
+  and fingerprint.canonical(candidate_rejected_integrity) == fingerprint.canonical(legacy_rejected_integrity)
+  and #candidate_rejected == 0 and candidate_rejected_integrity.rejected_candidates[1].reason == "no_valid_effect_targets",
+  "Base sanitation preserves rejected-candidate design and evidence after all targets are removed")
+local incomplete_gates = base_binding_source(retained_and_missing_effects)
+incomplete_gates.gates.effect_valid = nil
+rejected(function() compilation_model.sanitize_base_operations({incomplete_gates}, target_inventory) end,
+  "Technology hard-gate vector is missing")
+local malformed_effects = base_binding_source(retained_and_missing_effects)
+malformed_effects.technology.effects = "not-a-table"
+check(not pcall(function() compilation_model.sanitize_base_operations({malformed_effects}, target_inventory) end),
+  "Base sanitation refuses malformed non-table effects")
+rejected(function() compilation_model.sanitize_base_operations(
+  {base_binding_source(retained_and_missing_effects)}, nil) end,
+  "Effect target validation requires an explicit target inventory")
+local missing_technology = base_binding_source(retained_and_missing_effects)
+missing_technology.technology = nil
+rejected(function() compilation_model.sanitize_base_operations({missing_technology}, target_inventory) end,
+  "TechnologyDesign base continuation operation is required.")
 stable_finalization(emitted_journal, emitted_journal:finalize(), true, "actual emitted catalogue")
 local function plan_for(operations)
   return transformation_plan.new({phase = "journal-finalization-control", execution_mode = "SAFE",

@@ -2620,8 +2620,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compilation-plan model responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7804,
-      "expected_sha256": "6EBCBE188F7AD69FA7491597BA298EE2ECEB8CB39FC6DF862F69D299BBDDBCE2",
+      "expected_bytes": 8555,
+      "expected_sha256": "A69A7BA221C11D0714073A49F84E089E41F72937FB6277DDAF6E6DB657D2763B",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "A352F298828A7D0D27D71DE3CE3E3AF2FE23FF3A569AB1C3ED37922265D31BF9"
+  "record_sha256": "8C9615839CDAA6DD70F45C159A62E374FCC4A78D7B2AA0DC5A0FF17DE875506F"
 }
