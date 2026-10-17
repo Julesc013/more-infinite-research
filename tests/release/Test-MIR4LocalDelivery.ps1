@@ -151,6 +151,8 @@ if ($nineTargetResult.status -cne 'delivered-and-verified' -or $nineTargetResult
 $nineTargetReceipt = [IO.File]::ReadAllText((Join-Path $nineTarget.repo 'build/delivery/nine-target/receipt.json')) | ConvertFrom-Json
 if ([string]$nineTargetReceipt.source_version -cne '4.4.2' -or [string]$nineTargetReceipt.release_tag -cne 'v4.4.2' -or
     [int]$nineTargetReceipt.direct_root_package_count -ne 9 -or [string]$nineTargetReceipt.versioned_bundle -cne '4.4.2/MIR_4_4_2_DISTRIBUTIONS.zip' -or
+    [string]$nineTargetReceipt.versioned_bundle_sha256 -cne (Get-FileHash -LiteralPath (Join-Path $nineTarget.source $nineTarget.bundle_name) -Algorithm SHA256).Hash -or
+    [int64]$nineTargetReceipt.versioned_bundle_bytes -ne (Get-Item -LiteralPath (Join-Path $nineTarget.source $nineTarget.bundle_name) -Force).Length -or
     [string]$nineTargetReceipt.frozen_inventory.record_sha256 -cne ('C' * 64) -or [bool]$nineTargetReceipt.mod_portal_upload_performed) {
   throw 'Nine-target delivery did not persist the enriched accepted-inventory receipt facts.'
 }
@@ -161,12 +163,79 @@ foreach ($package in $nineTarget.packages) {
   }
 }
 if (-not (Test-Path -LiteralPath (Join-Path $nineTarget.repo ('dist/4.4.2/' + $nineTarget.bundle_name)) -PathType Leaf)) { throw 'Nine-target delivery omitted the validated bundle.' }
+$nineTargetSourceBundleHash = (Get-FileHash -LiteralPath (Join-Path $nineTarget.source $nineTarget.bundle_name) -Algorithm SHA256).Hash
+$nineTargetSourceBundleBytes = (Get-Item -LiteralPath (Join-Path $nineTarget.source $nineTarget.bundle_name) -Force).Length
 [void](Invoke-MIR42NineTargetLocalDelivery -RepoRoot $nineTarget.repo -SourceRoot $nineTarget.source -FrozenInventoryPath $nineTarget.inventory_path -ReleaseId 'nine-target')
 $global:MIR4LocalDeliveryFixtureInventory.record_sha256 = 'E' * 64
 Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $nineTarget.repo -SourceRoot $nineTarget.source -FrozenInventoryPath $nineTarget.inventory_path -ReleaseId 'nine-target' } 'intent-conflict'
 $global:MIR4LocalDeliveryFixtureInventory.record_sha256 = 'C' * 64
 $boundReceipt = [IO.File]::ReadAllText((Join-Path $nineTarget.repo 'build/delivery/nine-target/receipt.json')) | ConvertFrom-Json
 if ([string]$boundReceipt.frozen_inventory.record_sha256 -cne ('C' * 64)) { throw 'Changed inventory authority rewrote an existing delivery receipt.' }
+if ((Get-FileHash -LiteralPath (Join-Path $nineTarget.source $nineTarget.bundle_name) -Algorithm SHA256).Hash -cne $nineTargetSourceBundleHash) {
+  throw 'A valid existing source bundle was rewritten.'
+}
+$nineTargetIntent = [IO.File]::ReadAllText((Join-Path $nineTarget.repo 'build/delivery/nine-target/intent.json')) | ConvertFrom-Json
+$nineTargetBundleIntent = @($nineTargetIntent.files | Where-Object destination_path -ceq ('4.4.2/' + $nineTarget.bundle_name))
+$nineTargetBundleReceipt = @($boundReceipt.files | Where-Object destination_path -ceq ('4.4.2/' + $nineTarget.bundle_name))
+if ($nineTargetBundleIntent.Count -ne 1 -or $nineTargetBundleReceipt.Count -ne 1 -or
+    [string]$nineTargetBundleIntent[0].sha256 -cne $nineTargetSourceBundleHash -or
+    [string]$nineTargetBundleReceipt[0].sha256 -cne $nineTargetSourceBundleHash -or
+    [string]$nineTargetIntent.receipt_metadata.versioned_bundle_sha256 -cne $nineTargetSourceBundleHash -or
+    [int64]$nineTargetIntent.receipt_metadata.versioned_bundle_bytes -ne $nineTargetSourceBundleBytes) {
+  throw 'Delivery intent or receipt omitted the exact versioned bundle identity.'
+}
+
+# A missing bundle is built only after the authoritative inventory has already
+# bound all nine package bytes. Planning alone must not create delivery output.
+$generatedA = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'generated-bundle-a'
+$global:MIR4LocalDeliveryFixtureInventory = $generatedA.record
+$generatedABundlePath = Join-Path $generatedA.source $generatedA.bundle_name
+Remove-Item -LiteralPath $generatedABundlePath -Force
+$generatedAPlan = Get-MIR42NineTargetLocalDeliveryPlan -RepoRoot $generatedA.repo -SourceRoot $generatedA.source -FrozenInventoryPath $generatedA.inventory_path -ReleaseId 'generated-bundle-a'
+if (-not (Test-Path -LiteralPath $generatedABundlePath -PathType Leaf) -or
+    (Test-Path -LiteralPath (Join-Path $generatedA.repo 'dist')) -or
+    (Test-Path -LiteralPath (Join-Path $generatedA.repo 'build/delivery/generated-bundle-a/receipt.json'))) {
+  throw 'Accepted-inventory bundle preparation either failed or performed delivery.'
+}
+$generatedAHash = (Get-FileHash -LiteralPath $generatedABundlePath -Algorithm SHA256).Hash
+$generatedABytes = (Get-Item -LiteralPath $generatedABundlePath -Force).Length
+$generatedAPlanBundle = @($generatedAPlan.files | Where-Object destination_path -ceq ('4.4.2/' + $generatedA.bundle_name))
+if ($generatedAPlanBundle.Count -ne 1 -or [string]$generatedAPlan.bundle.sha256 -cne $generatedAHash -or
+    [int64]$generatedAPlan.bundle.bytes -ne $generatedABytes -or [string]$generatedAPlanBundle[0].sha256 -cne $generatedAHash) {
+  throw 'Accepted-inventory plan did not freeze the generated bundle identity.'
+}
+$generatedAResult = Invoke-MIR42NineTargetLocalDelivery -RepoRoot $generatedA.repo -SourceRoot $generatedA.source -FrozenInventoryPath $generatedA.inventory_path -ReleaseId 'generated-bundle-a'
+$generatedAReceipt = [IO.File]::ReadAllText((Join-Path $generatedA.repo 'build/delivery/generated-bundle-a/receipt.json')) | ConvertFrom-Json
+$generatedAIntent = [IO.File]::ReadAllText((Join-Path $generatedA.repo 'build/delivery/generated-bundle-a/intent.json')) | ConvertFrom-Json
+foreach ($record in @($generatedAIntent,$generatedAReceipt)) {
+  $bundleEntry = @($record.files | Where-Object destination_path -ceq ('4.4.2/' + $generatedA.bundle_name))
+  if ($bundleEntry.Count -ne 1 -or [string]$bundleEntry[0].sha256 -cne $generatedAHash) {
+    throw 'Generated bundle byte identity was not retained through delivery.'
+  }
+}
+if ([string]$generatedAIntent.receipt_metadata.versioned_bundle_sha256 -cne $generatedAHash -or
+    [int64]$generatedAIntent.receipt_metadata.versioned_bundle_bytes -ne $generatedABytes -or
+    [string]$generatedAReceipt.versioned_bundle_sha256 -cne $generatedAHash -or
+    [int64]$generatedAReceipt.versioned_bundle_bytes -ne $generatedABytes) {
+  throw 'Generated bundle byte identity was not retained in the delivery intent and receipt metadata.'
+}
+
+# Deterministic archive layout: independent identical frozen inputs create the
+# same bundle bytes; a later plan preserves the first valid generated bundle.
+$generatedB = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'generated-bundle-b'
+$global:MIR4LocalDeliveryFixtureInventory = $generatedB.record
+$generatedBBundlePath = Join-Path $generatedB.source $generatedB.bundle_name
+Remove-Item -LiteralPath $generatedBBundlePath -Force
+$generatedBPlan = Get-MIR42NineTargetLocalDeliveryPlan -RepoRoot $generatedB.repo -SourceRoot $generatedB.source -FrozenInventoryPath $generatedB.inventory_path -ReleaseId 'generated-bundle-b'
+if ((Get-FileHash -LiteralPath $generatedBBundlePath -Algorithm SHA256).Hash -cne $generatedAHash -or
+    (Get-Item -LiteralPath $generatedBBundlePath -Force).Length -ne $generatedABytes) {
+  throw 'Identical nine-package inputs did not produce stable bundle bytes.'
+}
+$generatedBHash = (Get-FileHash -LiteralPath $generatedBBundlePath -Algorithm SHA256).Hash
+[void](Get-MIR42NineTargetLocalDeliveryPlan -RepoRoot $generatedB.repo -SourceRoot $generatedB.source -FrozenInventoryPath $generatedB.inventory_path -ReleaseId 'generated-bundle-b')
+if ((Get-FileHash -LiteralPath $generatedBBundlePath -Algorithm SHA256).Hash -cne $generatedBHash) {
+  throw 'A valid generated source bundle was rewritten.'
+}
 
 $wrongDirect = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-direct'
 $global:MIR4LocalDeliveryFixtureInventory = $wrongDirect.record
@@ -197,7 +266,44 @@ Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $missingVersioned
 $wrongBundle = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-bundle'
 $global:MIR4LocalDeliveryFixtureInventory = $wrongBundle.record
 Write-MIR4LocalDeliveryFixtureBundle -SourceRoot $wrongBundle.source -BundleName $wrongBundle.bundle_name -Packages @($wrongBundle.packages[0..7])
+$wrongBundlePath = Join-Path $wrongBundle.source $wrongBundle.bundle_name
+$wrongBundleHash = (Get-FileHash -LiteralPath $wrongBundlePath -Algorithm SHA256).Hash
 Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $wrongBundle.repo -SourceRoot $wrongBundle.source -FrozenInventoryPath $wrongBundle.inventory_path -ReleaseId 'wrong-bundle' } 'bundle-member-set'
+if ((Get-FileHash -LiteralPath $wrongBundlePath -Algorithm SHA256).Hash -cne $wrongBundleHash) { throw 'Wrong-member source bundle was overwritten.' }
+
+# A stale-version archive can have the required count but not current names.
+$wrongVersionBundle = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-version-bundle'
+$wrongVersionSource = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-version-source' -SourceVersion '4.4.1'
+$global:MIR4LocalDeliveryFixtureInventory = $wrongVersionBundle.record
+$wrongVersionPath = Join-Path $wrongVersionBundle.source $wrongVersionBundle.bundle_name
+Copy-Item -LiteralPath (Join-Path $wrongVersionSource.source $wrongVersionSource.bundle_name) -Destination $wrongVersionPath -Force
+$wrongVersionHash = (Get-FileHash -LiteralPath $wrongVersionPath -Algorithm SHA256).Hash
+Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $wrongVersionBundle.repo -SourceRoot $wrongVersionBundle.source -FrozenInventoryPath $wrongVersionBundle.inventory_path -ReleaseId 'wrong-version-bundle' } 'bundle-package'
+if ((Get-FileHash -LiteralPath $wrongVersionPath -Algorithm SHA256).Hash -cne $wrongVersionHash) { throw 'Stale-version source bundle was overwritten.' }
+
+# A correct member name with stale entry bytes is also refused, while a source
+# package that no longer matches the inventory fails before bundle creation.
+$wrongHashBundle = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-hash-bundle'
+$global:MIR4LocalDeliveryFixtureInventory = $wrongHashBundle.record
+$wrongHashPackage = $wrongHashBundle.packages[0]
+$wrongHashPackagePath = Join-Path $wrongHashBundle.source $wrongHashPackage.path
+$originalWrongHashPackageBytes = [IO.File]::ReadAllBytes($wrongHashPackagePath)
+[IO.File]::WriteAllText($wrongHashPackagePath, 'forged package bytes', [Text.UTF8Encoding]::new($false))
+Write-MIR4LocalDeliveryFixtureBundle -SourceRoot $wrongHashBundle.source -BundleName $wrongHashBundle.bundle_name -Packages $wrongHashBundle.packages
+[IO.File]::WriteAllBytes($wrongHashPackagePath, $originalWrongHashPackageBytes)
+$wrongHashBundlePath = Join-Path $wrongHashBundle.source $wrongHashBundle.bundle_name
+$wrongHashBundleHash = (Get-FileHash -LiteralPath $wrongHashBundlePath -Algorithm SHA256).Hash
+Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $wrongHashBundle.repo -SourceRoot $wrongHashBundle.source -FrozenInventoryPath $wrongHashBundle.inventory_path -ReleaseId 'wrong-hash-bundle' } 'bundle-package'
+if ((Get-FileHash -LiteralPath $wrongHashBundlePath -Algorithm SHA256).Hash -cne $wrongHashBundleHash) { throw 'Wrong-hash source bundle was overwritten.' }
+
+$wrongPackageInput = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'wrong-package-input'
+$global:MIR4LocalDeliveryFixtureInventory = $wrongPackageInput.record
+$wrongPackagePath = Join-Path $wrongPackageInput.source $wrongPackageInput.packages[0].path
+$wrongPackageBundlePath = Join-Path $wrongPackageInput.source $wrongPackageInput.bundle_name
+$wrongPackageBundleHash = (Get-FileHash -LiteralPath $wrongPackageBundlePath -Algorithm SHA256).Hash
+[IO.File]::WriteAllText($wrongPackagePath, 'source package no longer matches inventory', [Text.UTF8Encoding]::new($false))
+Expect-Blocked { Get-MIR42NineTargetLocalDeliveryPlan -RepoRoot $wrongPackageInput.repo -SourceRoot $wrongPackageInput.source -FrozenInventoryPath $wrongPackageInput.inventory_path -ReleaseId 'wrong-package-input' } 'source-identity'
+if ((Get-FileHash -LiteralPath $wrongPackageBundlePath -Algorithm SHA256).Hash -cne $wrongPackageBundleHash) { throw 'Bad package input triggered a bundle rewrite.' }
 
 $firstRelease = New-MIR4NineTargetLocalDeliveryFixture -Root $root -Name 'sequential-first' -SourceVersion '4.4.2'
 $global:MIR4LocalDeliveryFixtureInventory = $firstRelease.record
@@ -256,4 +362,4 @@ New-Item -ItemType Directory -Force -Path (Split-Path -Parent $unknownPointerPat
 Expect-Blocked { Invoke-MIR42NineTargetLocalDelivery -RepoRoot $unknownPointer.repo -SourceRoot $unknownPointer.source -FrozenInventoryPath $unknownPointer.inventory_path -ReleaseId 'unknown-pointer' } 'pointer-selector'
 if ([IO.File]::ReadAllText($unknownPointerPath) -cne 'maintainer-owned manual pointer') { throw 'Unknown pointer was overwritten.' }
 
-Write-Output 'Local delivery passed generic interruption/identity controls and exact nine-target inventory delivery controls for direct ZIPs, versioned assets, bundle content, strict current pointers, and sequential recognised-pointer handoff.'
+Write-Output 'Local delivery passed generic interruption/identity controls and exact nine-target inventory delivery controls for direct ZIPs, generated/preserved deterministic bundles, versioned assets, strict current pointers, and sequential recognised-pointer handoff.'

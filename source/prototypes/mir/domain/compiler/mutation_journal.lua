@@ -156,6 +156,28 @@ function Journal:record(operation, before, after, status, failure_code, options)
   return deepcopy(entry)
 end
 
+function Journal:publication_summary()
+  local snapshot = self.final_snapshot
+  if not self.finalized or type(snapshot) ~= "table" then
+    error("MutationJournal publication summary requires finalization.", 2)
+  end
+  -- Public compiler evidence deliberately excludes mutable operation rows and
+  -- their before/after snapshots. Return a new, minimal record so publication
+  -- cannot retain or mutate the journal-owned final snapshot.
+  return {
+    schema = snapshot.schema,
+    plan_fingerprint = snapshot.plan_fingerprint,
+    journal_fingerprint = snapshot.journal_fingerprint,
+    required_operation_count = snapshot.required_operation_count,
+    terminal_counts = deepcopy(snapshot.terminal_counts),
+    missing_operation_count = snapshot.missing_operation_count,
+    duplicate_operation_count = snapshot.duplicate_operation_count,
+    undeclared_operation_count = snapshot.undeclared_operation_count,
+    out_of_plan_operation_count = snapshot.out_of_plan_operation_count,
+    complete = snapshot.complete
+  }
+end
+
 function Journal:snapshot()
   if self.final_snapshot then return deepcopy(self.final_snapshot) end
   local out = build_snapshot(self)

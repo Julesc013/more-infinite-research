@@ -1212,8 +1212,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 7727,
-      "expected_sha256": "FD5AEA19C87EDB244485C5DDC4383E63E032F1A0D9D01F8B206E66EDB299762F",
+      "expected_bytes": 8752,
+      "expected_sha256": "A0FBB1EECEF58245900F5059F2F59C9B92000C2FBF42F7FAC6161F0636D2A8BF",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2188,8 +2188,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8317,
-      "expected_sha256": "95321E7261485B681CF673D0BBA7151EE3CFEF6AD3F569B0F87F9C72C9D3C5ED",
+      "expected_bytes": 8486,
+      "expected_sha256": "070F021CF3DB25AD3D83AFA78E82498C27EAB14091E444F0EA46AC96C0FF7087",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2444,8 +2444,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8071,
-      "expected_sha256": "571802390F1A22C933DD922E77AC03BE6A8467803B03D9973A2B0E56647BC2D9",
+      "expected_bytes": 9530,
+      "expected_sha256": "35A3B4BCD5129C2DBC735F9E883E54F98339EFC6B0D62D46D77D0A0FF17E8A65",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2988,8 +2988,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 14914,
-      "expected_sha256": "400C23ECEBFD90D2A3A0F16B8C214B35ABEEC924F03C6C722C00003AB574FB1F",
+      "expected_bytes": 14622,
+      "expected_sha256": "B6637DE60C0E6DE25CEF7EE72A43FE96448233A1CD8C865087E2BFA4E712C83C",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "DD1A07552D40FB1C3301A262F6D84B1A872150449EB8FC94B1247A2D48CD95E0"
+  "record_sha256": "027E8685E8DABE557585CBB3E66555C04EFD33FF08EC7B6B3C7AA87330FDD48C"
 }

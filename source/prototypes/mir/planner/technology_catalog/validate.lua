@@ -119,10 +119,8 @@ local function verify(catalog, options)
   end
   local indexes = indexer.new()
   for _, qualification in ipairs(catalog.qualifications) do
-    if not options.trusted_children_verified then
-      if options.trusted_children then technology_qualification.assert_trusted(qualification)
-      else technology_qualification.verify_untrusted(qualification) end
-    end
+    if options.trusted_children then technology_qualification.assert_trusted(qualification)
+    else technology_qualification.verify_untrusted(qualification) end
     if indexer.qualification(indexes, qualification.qualification_fingerprint) then
       error("TechnologyCatalog qualification fingerprint is duplicated: "
         .. tostring(qualification.qualification_fingerprint), 2)
@@ -132,10 +130,8 @@ local function verify(catalog, options)
   local alternative_count, deferred_count = 0, 0
   local qualification_use = {}
   for _, candidate in ipairs(catalog.candidates) do
-    if not options.trusted_children_verified then
-      if options.trusted_children then technology_candidate.assert_trusted(candidate)
-      else technology_candidate.verify_untrusted(candidate) end
-    end
+    if options.trusted_children then technology_candidate.assert_trusted(candidate)
+    else technology_candidate.verify_untrusted(candidate) end
     if type(candidate.selection_key) ~= "string" or type(candidate.alternatives) ~= "table" then
       error("TechnologyCatalog candidate alternatives are invalid.", 2)
     end
@@ -160,10 +156,8 @@ local function verify(catalog, options)
         or alternative.technology_design.design_fingerprint ~= alternative.design_fingerprint then
         error("TechnologyCatalog alternative lacks its exact preserved TechnologyDesign: " .. key, 2)
       end
-      if not options.trusted_children_verified then
-        if options.trusted_children then technology_design.assert_trusted(alternative.technology_design)
-        else technology_design.verify_untrusted(alternative.technology_design) end
-      end
+      if options.trusted_children then technology_design.assert_trusted(alternative.technology_design)
+      else technology_design.verify_untrusted(alternative.technology_design) end
       indexer.add_alternative(indexes, candidate.candidate_id, alternative)
     end
   end
@@ -196,9 +190,7 @@ local function verify(catalog, options)
     for _, qualification in ipairs(catalog.qualifications) do
       for _, gate_name in ipairs(safety_qualification.schema_authority().gate_order) do
         local gate = qualification.hard_gates[gate_name]
-        local resolved = gate and (options.trusted_children_verified
-          and (gate.status == "passed" or gate.status == "failed" or gate.status == "not-applicable")
-          or gate_contract.is_authoritatively_resolved(gate))
+        local resolved = gate and gate_contract.is_authoritatively_resolved(gate)
         if not resolved then
           error("TechnologyCatalog final qualification has an unresolved hard gate: "
             .. qualification.candidate_id .. "/" .. gate_name, 2)
@@ -281,11 +273,9 @@ function M.assert_owned(catalog)
 end
 
 function M.assert_newly_constructed(catalog)
-  return verify(catalog, {
-    trusted_children = true,
-    trusted_children_verified = true,
-    verify_fingerprints = false
-  })
+  -- Constructor output must still be authority-owned. assert_owned performs
+  -- those cheap identity checks without recanonicalizing each child.
+  return M.assert_owned(catalog)
 end
 
 function M.assert_trusted(catalog)

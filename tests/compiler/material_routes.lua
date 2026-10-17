@@ -1306,15 +1306,25 @@ end)()
       end
     end
   end
-  -- A high scoped cap is optional material inference. Classic must neither
-  -- build that graph nor replace its guard with an unchecked cap override.
+  -- A retired internal Classic option cannot select another production
+  -- transformation or bypass the ordinary material guard.
+  profile_module.current=function() return assert(profiles.profiles["2.1"]) end
   local previous_build=scope.build
-  scope.build=function() error("Classic invoked excluded cap-scope inference") end
+  local scope_builds=0
+  scope.build=function(...)
+    scope_builds=scope_builds+1
+    return previous_build(...)
+  end
   recipes={manufacture={name="manufacture",ingredients={{"ore",1}},results={{"component",1}},maximum_productivity=2}}
-  local classic_changed=limits.apply({allow_material_analysis=false})
-  check(classic_changed.productivity==0,"Classic leaves the excluded scoped cap unapplied")
-  check(classic_changed.productivity_status=="not-evaluated-classic-material-scope","Classic reports the scoped cap uncomputed")
-  check(recipes.manufacture.maximum_productivity==2,"Classic preserves the actual cap rather than emitting an unchecked override")
+  local expected_changed=limits.apply()
+  local expected_cap=recipes.manufacture.maximum_productivity
+  check(expected_changed.productivity>0 and expected_cap~=2,"normal scoped cap applies its checked transformation")
+  recipes.manufacture.maximum_productivity=2
+  local retired_option_changed=limits.apply({allow_material_analysis=false})
+  check(scope_builds==2,"retired Classic option still executes the ordinary scoped cap guard")
+  check(retired_option_changed.productivity==expected_changed.productivity,"retired option preserves ordinary scoped mutation count")
+  check(retired_option_changed.productivity_status==expected_changed.productivity_status,"retired option cannot publish an uncomputed Classic status")
+  check(recipes.manufacture.maximum_productivity==expected_cap,"retired option preserves the guarded cap")
   scope.build=previous_build
   data_module.prototypes=previous_prototypes
   profile_module.current=previous_current

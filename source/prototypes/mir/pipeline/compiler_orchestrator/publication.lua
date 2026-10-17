@@ -67,24 +67,49 @@ function M.publish(context)
   end
   telemetry.count("technology_design_count", design_count)
   telemetry.count("technology_design_canonical_bytes", design_bytes)
+  local journal = context:state_view("mutation_journal")
+  if not journal then error("Compiler artifacts cannot publish without a MutationJournal.", 2) end
+  -- Public evidence reads a fixed projection of the finalized result and
+  -- journal. Avoid copying operation snapshots, parity proofs, and developer
+  -- decision rows unless the explicitly requested internal evidence consumes
+  -- them below. The output sanitation ledger remains an exported report input,
+  -- so it retains the Context defensive-copy boundary.
+  local output_sanitation_ledger = context:artifact("output_sanitation_ledger")
   local evidence_input = {
     compilation_plan_schema = plan.schema,
     compilation_fingerprint = plan.compilation_fingerprint,
     qualification_fingerprint = plan.qualification_fingerprint,
-    compiler_input_fingerprint = plan.compiler_input.input_fingerprint,
-    compiler_result = deepcopy(final_result),
-    compiler_result_fingerprint = final_result.result_fingerprint,
-    mutation_journal = context:state_view("mutation_journal"):snapshot(),
-    technology_catalog_fingerprint = plan.technology_catalog_fingerprint,
-    technology_graph_parity = context:artifact("technology_graph_parity"),
-    input_sanitation_ledger = deepcopy(plan.input_sanitation_ledger),
-    output_sanitation_ledger = context:artifact("output_sanitation_ledger")
+    compiler_result = final_result,
+    mutation_journal = journal:publication_summary(),
+    input_sanitation_ledger = plan.input_sanitation_ledger,
+    output_sanitation_ledger = output_sanitation_ledger
   }
-  evidence_input.provider_decision_diagnostics = {}
-  for _, row in ipairs((context:state_view("diagnostics") or {}).rows or {}) do
-    if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
-      table.insert(evidence_input.provider_decision_diagnostics, deepcopy(row))
+  -- Keep the complete developer evidence input at the original publication
+  -- boundary. Subsequent report publishers add diagnostic rows, so capturing
+  -- it later would silently change the explicit internal artifact. Ordinary
+  -- publication never enters this branch.
+  local internal_evidence_input = nil
+  if include_internal and publishes_mod_data then
+    local provider_decision_diagnostics = {}
+    for _, row in ipairs((context:state_view("diagnostics") or {}).rows or {}) do
+      if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
+        table.insert(provider_decision_diagnostics, deepcopy(row))
+      end
     end
+    internal_evidence_input = {
+      compilation_plan_schema = plan.schema,
+      compilation_fingerprint = plan.compilation_fingerprint,
+      qualification_fingerprint = plan.qualification_fingerprint,
+      compiler_input_fingerprint = plan.compiler_input.input_fingerprint,
+      compiler_result = final_result,
+      compiler_result_fingerprint = final_result.result_fingerprint,
+      mutation_journal = journal:snapshot(),
+      technology_catalog_fingerprint = plan.technology_catalog_fingerprint,
+      technology_graph_parity = context:artifact("technology_graph_parity"),
+      input_sanitation_ledger = plan.input_sanitation_ledger,
+      output_sanitation_ledger = output_sanitation_ledger,
+      provider_decision_diagnostics = provider_decision_diagnostics
+    }
   end
   if target_line.feature_enabled("productivity_family_adoption") then
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
@@ -131,11 +156,12 @@ function M.publish(context)
   end
   context_construction.record_work_volume()
   local internal_evidence = nil
-  if include_internal and publishes_mod_data then
-    -- Developer evidence keeps the complete measured ProviderMetrics view;
-    -- ordinary publication does not build or serialize diagnostic metrics.
-    evidence_input.provider_resolution = family_resolver.inspection_snapshot()
-    internal_evidence = compiler_evidence.build(evidence_input)
+  if internal_evidence_input then
+    -- Preserve the established timing of the resolver inspection: report
+    -- publishers have completed before the explicit internal artifact reads it.
+    internal_evidence_input.provider_resolution = family_resolver.inspection_snapshot()
+    internal_evidence_input.telemetry = evidence_input.telemetry
+    internal_evidence = compiler_evidence.build(internal_evidence_input)
   end
   if research_cost_support then
     require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)

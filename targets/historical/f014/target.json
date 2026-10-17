@@ -63,7 +63,7 @@
   "patches": [
     {
       "output_path": "prototypes/mir/pipeline/compiler_orchestrator/publication.lua",
-      "base_sha256": "571802390F1A22C933DD922E77AC03BE6A8467803B03D9973A2B0E56647BC2D9",
+      "base_sha256": "35A3B4BCD5129C2DBC735F9E883E54F98339EFC6B0D62D46D77D0A0FF17E8A65",
       "find": "  [\"1.0\"] = \"omit-unqualified\"",
       "replace": "  [\"1.0\"] = \"omit-unqualified\",\n  [\"0.14\"] = \"omit-unqualified\""
     },
@@ -82,5 +82,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "65B869D29AF53C0FE39D2D56BDF7D799D29D21B42028E6125AC00C47BEE155C8"
+  "record_sha256": "6ACBFB508E7AE8D5ABF7B49E19E63DF030F51D8C3BBE14CD8CF69B095633BFD7"
 }
