@@ -6767,10 +6767,10 @@
         "predecessor_source_path": "targets/f210/generation/info.json.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 616,
-      "source_sha256": "BE8D890CECFE14908F9196578F961E267D395CA37FF311A6C61DC3D91C1222D3",
-      "output_bytes": 616,
-      "output_sha256": "BE8D890CECFE14908F9196578F961E267D395CA37FF311A6C61DC3D91C1222D3"
+      "source_bytes": 642,
+      "source_sha256": "D94A926E76BBFE7830150097D45689DAE5834B3C84013C7419506FF95BA3DFE6",
+      "output_bytes": 642,
+      "output_sha256": "D94A926E76BBFE7830150097D45689DAE5834B3C84013C7419506FF95BA3DFE6"
     },
     {
       "layer": "capability",
@@ -7695,5 +7695,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "A40B158065A99F8F95892922969D6BEF4A5BC678F60B9CC19886B20106B62E33"
+  "record_sha256": "28DD0765D9B596047EF8819E3952FBA95CE49B8AA8D766F2F426D6327BCDE340"
 }
