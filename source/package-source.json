@@ -5106,10 +5106,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/model.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 7804,
-      "source_sha256": "6EBCBE188F7AD69FA7491597BA298EE2ECEB8CB39FC6DF862F69D299BBDDBCE2",
-      "output_bytes": 7804,
-      "output_sha256": "6EBCBE188F7AD69FA7491597BA298EE2ECEB8CB39FC6DF862F69D299BBDDBCE2"
+      "source_bytes": 8555,
+      "source_sha256": "A69A7BA221C11D0714073A49F84E089E41F72937FB6277DDAF6E6DB657D2763B",
+      "output_bytes": 8555,
+      "output_sha256": "A69A7BA221C11D0714073A49F84E089E41F72937FB6277DDAF6E6DB657D2763B"
     },
     {
       "layer": "capability",
@@ -7695,5 +7695,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "B74F552FC8991E321CD9BDFE3A227B4BA8B3FEE783622EF7548C97B6488BFC8D"
+  "record_sha256": "17F267CCE76DD0AEEFE5D175EE3FDB0D7086CAD44BDAFFE1227D80E1F9E1EEDF"
 }
