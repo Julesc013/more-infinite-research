@@ -655,7 +655,7 @@ $fullPreservationSpecialization=[bool](
     ($SelectedTarget-ceq'f210'-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@('4.4.21002','4.5.21001')-and$ToVersion-ceq'4.5.21002'-and
       $FixtureName-ceq'assert-upgrade-4-0-21000-to-4-1-21000'-and$Archetype-cin@('base-default','space-age-native-owner')-and-not$SpaceIsFake) -or
     ($SelectedTarget-ceq'f200'-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@('4.4.20002','4.5.20001')-and$ToVersion-ceq'4.5.20002'-and
-      $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-ceq'base-default'-and-not$SpaceIsFake) -or
+      $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-cin@('base-default','f200-galore-space-age')-and-not$SpaceIsFake-and(($Archetype-cne'f200-galore-space-age')-or$f200GaloreSpaceAgeScenario)) -or
     ($SelectedTarget-cin@('f110','f100')-and$SourceVersion-ceq'4.5.0'-and$FromVersion-cin@(('4.2.'+$SelectedTarget.Substring(1)+'02'),('4.4.'+$SelectedTarget.Substring(1)+'02'))-and$ToVersion-ceq('4.5.'+$SelectedTarget.Substring(1)+'00')-and
       $FixtureName-ceq('assert-upgrade-4-0-'+$SelectedTarget.Substring(1)+'00-to-4-1-'+$SelectedTarget.Substring(1)+'00')-and$Archetype-ceq'base-default'-and-not$SpaceIsFake) -or
     ($SelectedTarget-cin@('f110','f100')-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@(('4.4.'+$SelectedTarget.Substring(1)+'02'),('4.5.'+$SelectedTarget.Substring(1)+'01'))-and$ToVersion-ceq('4.5.'+$SelectedTarget.Substring(1)+'02')-and
