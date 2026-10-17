@@ -71,11 +71,13 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     }else{throw '[mir452-f210-fixture-transition]'}
   }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.5.2'){
     if($FromVersion-ceq'4.4.20002'){
-      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-f200-fixture-transition]'}
-      '0.1.1124'
+      if($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1140'}
+      elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1124'}
+      else{throw '[mir452-f200-fixture-transition]'}
     }elseif($FromVersion-ceq'4.5.20001'){
-      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-f200-fixture-transition]'}
-      '0.1.1125'
+      if($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1141'}
+      elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1125'}
+      else{throw '[mir452-f200-fixture-transition]'}
     }else{throw '[mir452-f200-fixture-transition]'}
   }elseif($Target-cin@('f110','f100')-and$SourceVersion-ceq'4.5.2'){
     if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-historical-modern-fixture-transition]'}
@@ -747,11 +749,13 @@ function Read-MIR431F200GaloreSpaceAgeUpgradeProfile {
 
 function Assert-MIR431F200GaloreSpaceAgeUpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]$SourceVersion='4.3.1')
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.2')][string]$SourceVersion='4.3.1')
   $full431=[bool]($SourceVersion-ceq'4.3.1'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.3.20001')
   $full440=[bool]($SourceVersion-ceq'4.4.0'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.4.20000')
   $full442=[bool]($SourceVersion-ceq'4.4.2'-and$FromVersion-cin@('4.2.20002','4.4.20000','4.4.20001')-and$ToVersion-ceq'4.4.20002')
-  if($Target-cne'f200'-or-not($full431-or$full440-or$full442)-or
+  $full452R24=[bool]($SourceVersion-ceq'4.5.2'-and$FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20002')
+  $full452Published451=[bool]($SourceVersion-ceq'4.5.2'-and$FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002')
+  if($Target-cne'f200'-or-not($full431-or$full440-or$full442-or$full452R24-or$full452Published451)-or
      $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-galore-space-age'-or
      $SpaceIsFake-or$SourceOnlyFixtureNames.Count){throw '[mir431-f200-galore-transition]'}
 }
@@ -765,7 +769,9 @@ function Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle {
   $full442Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002')
   $full442Retained=[bool]($FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002')
   $full442Immediate=[bool]($FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002')
-  if(-not($full431Direct-or$full431Immediate-or$full440Direct-or$full440Immediate-or$full442Direct-or$full442Retained-or$full442Immediate)){throw '[mir431-f200-galore-oracle-transition]'}
+  $full452R24=[bool]($FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20002')
+  $full452Published451=[bool]($FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002')
+  if(-not($full431Direct-or$full431Immediate-or$full440Direct-or$full440Immediate-or$full442Direct-or$full442Retained-or$full442Immediate-or$full452R24-or$full452Published451)){throw '[mir431-f200-galore-oracle-transition]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
@@ -786,7 +792,7 @@ function Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle {
   $settings=$settings.Replace($settingsAnchor,'default_value="f200-galore-space-age",allowed_values={"base-default","f200-galore-space-age"}')
   [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
   $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
-  $expectedVersion=if($full442Direct){'0.1.1078'}elseif($full442Retained){'0.1.1076'}elseif($full442Immediate){'0.1.1077'}elseif($full431Direct){'0.1.51'}elseif($full431Immediate){'0.1.50'}elseif($full440Direct){'0.1.53'}else{'0.1.52'}
+  $expectedVersion=if($full452R24){'0.1.1140'}elseif($full452Published451){'0.1.1141'}elseif($full442Direct){'0.1.1078'}elseif($full442Retained){'0.1.1076'}elseif($full442Immediate){'0.1.1077'}elseif($full431Direct){'0.1.51'}elseif($full431Immediate){'0.1.50'}elseif($full440Direct){'0.1.53'}else{'0.1.52'}
   if($info.version-cne$expectedVersion){throw '[mir431-f200-galore-fixture-identity]'}
 }
 

@@ -3187,7 +3187,7 @@
     {
       "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
       "classification": "historical",
-      "sha256": "BB53F8EF2B72B21811019FAABE98321D9CAEC39EE616DCB3F6959237850CA707",
+      "sha256": "86EAEE1B6597C2592F68C824467F3FEFF3A7B9D4659A52C557DE06AE922A4C36",
       "hash_mode": "canonical-text-v1",
       "lines": 551,
       "package_visible": false
@@ -5187,7 +5187,7 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "1A34F95DDB1C5E8F6AAA38926E1D5F6C9DC3D1203A328E5552800215EB900586",
+      "sha256": "20F15292726EFF72429A4B59DD52F15B3B9EB3FD2861717312F1028C2D22CE47",
       "hash_mode": "canonical-text-v1",
       "lines": 656,
       "package_visible": false
@@ -6058,5 +6058,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4caa8809bede37a73c8ff448437ccb35dda86afee41ab7e65dbbce34d041c415"
+  "digest": "sha256:d552cc5a3076256d0a463495a6ee20d8d1984b36909467811be27050427a8f18"
 }

@@ -1563,6 +1563,8 @@ $mir452Routes=@(
   [ordered]@{target='f210';from='4.5.21001';to='4.5.21002';archetype='space-age-native-owner';space_age=$true;reader='4.5.1';fixture_version='0.1.1123';historical=$false},
   [ordered]@{target='f200';from='4.4.20002';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1124';historical=$false},
   [ordered]@{target='f200';from='4.5.20001';to='4.5.20002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1125';historical=$false},
+  [ordered]@{target='f200';from='4.4.20002';to='4.5.20002';archetype='f200-galore-space-age';space_age=$false;galore=$true;reader='4.5.0';fixture_version='0.1.1140';historical=$false},
+  [ordered]@{target='f200';from='4.5.20001';to='4.5.20002';archetype='f200-galore-space-age';space_age=$false;galore=$true;reader='4.5.1';fixture_version='0.1.1141';historical=$false},
   [ordered]@{target='f110';from='4.4.11002';to='4.5.11002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1126';historical=$false},
   [ordered]@{target='f110';from='4.5.11001';to='4.5.11002';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='0.1.1127';historical=$false},
   [ordered]@{target='f100';from='4.4.10002';to='4.5.10002';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='0.1.1128';historical=$false},
@@ -1578,11 +1580,13 @@ $mir452Routes=@(
   [ordered]@{target='f013';from='4.4.01302';to='4.5.01302';archetype='base-default';space_age=$false;reader='4.5.0';fixture_version='1.2.1138';historical=$true},
   [ordered]@{target='f013';from='4.5.01301';to='4.5.01302';archetype='base-default';space_age=$false;reader='4.5.1';fixture_version='1.2.1139';historical=$true}
 )
+$galoreProfilePath=Join-Path $RepoRoot 'fixtures/run-profiles/mir430-startup-galore-space-age-f200.json'
 $mir452FixtureVersions=@()
 foreach($route in $mir452Routes){
   $fixture=if([bool]$route.historical){'assert-upgrade-historical-terminal-to-mir42'}else{'assert-upgrade-4-0-'+$route.target.Substring(1)+'00-to-4-1-'+$route.target.Substring(1)+'00'}
   $selectedManifest=if([bool]$route.historical){'combined-v452-candidate.json'}else{''}
-  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$selectedManifest;PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.5.2'}
+  $galore=[bool]($route.Contains('galore') -and $route.galore)
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$selectedManifest;PublishedPredecessorManifest='published-451-or-r24.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile=$(if($galore){$galoreProfilePath}else{''});SourceVersion='4.5.2'}
   Assert-MIR421CurrentUpgradeInputMode @mode
   if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.5.2')-cne$route.reader){throw "4.5.2 selected wrong predecessor reader: $($route.target)/$($route.from)"}
   $fixtureRoot=Join-Path $mir452IdentityRoot ($route.target+'-'+$route.archetype+'-'+$route.from.Replace('.','-'))
@@ -1597,12 +1601,13 @@ foreach($route in $mir452Routes){
     $control=[IO.File]::ReadAllText($controlPath).Replace('__MIR_UPGRADE_FROM_VERSION__',$route.from).Replace('__MIR_UPGRADE_TO_VERSION__',$route.to).Replace('__MIR_FACTORIO_LINE__',$line).Replace('__MIR_INFINITE_TECHNOLOGY__',$(if($route.target-ceq'f017'){'mining-productivity-4'}elseif($route.target-cin@('f016','f015')){'mining-productivity-16'}else{''})).Replace('__MIR_UPGRADE_SAVE_NAME__',('mir-'+$route.to.Replace('.','')+'-upgraded'))
     [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
   }else{
-    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from -SpaceAge:([bool]$route.space_age)
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.5.2' -FromVersion $route.from -SpaceAge:([bool]$route.space_age) -F200GaloreSpaceAge:$galore
   }
   if($route.target-ceq'f210'){
     Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
   }elseif($route.target-ceq'f200'){
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+    if($galore){Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to}
   }else{
     Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
   }
@@ -1610,13 +1615,13 @@ foreach($route in $mir452Routes){
   if($info.version-cne$route.fixture_version){throw "4.5.2 fixture identity mismatch: $($route.target)/$($route.archetype)/$($route.from)"}
   $mir452FixtureVersions += [string]$info.version
   $SelectedTarget=$route.target;$SourceVersion='4.5.2';$FromVersion=$route.from;$ToVersion=$route.to
-  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
+  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$galore
   if(-not(& $fullSpecializationCode)){throw "4.5.2 route skipped the Full preservation guard: $($route.target)/$($route.archetype)"}
   $mir42UpgradeSpecialized=(-not[bool]$route.historical);$isHistoricalTerminalFixture=[bool]$route.historical;$k2Scenario=$false;$classicReducedPolicy=$false
   if(-not(& $completeCatalogueEvaluator)){throw "4.5.2 route skipped the complete catalogue evaluator: $($route.target)/$($route.archetype)"}
   $mir43Assertions+=5
 }
-if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne20){throw '4.5.2 fixture identities collide across all admitted routes'}
+if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne22){throw '4.5.2 fixture identities collide across all admitted routes'}
 foreach($bad in @(
   @{target='f210';from='4.5.21002';to='4.5.21002';archetype='base-default';historical=$false},
   @{target='f200';from='4.4.20001';to='4.5.20002';archetype='base-default';historical=$false},
