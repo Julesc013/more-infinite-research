@@ -148,6 +148,10 @@ function M.technology_catalog(catalog, provider_resolution)
     or type(evaluation.deferred_diagnostic_alternatives) ~= "number"
     or evaluation.deferred_diagnostic_alternatives < 0
     or evaluation.deferred_diagnostic_alternatives ~= math.floor(evaluation.deferred_diagnostic_alternatives)
+    or type(evaluation.deferred_rejected_diagnostic_alternatives) ~= "number"
+    or evaluation.deferred_rejected_diagnostic_alternatives < 0
+    or evaluation.deferred_rejected_diagnostic_alternatives ~= math.floor(evaluation.deferred_rejected_diagnostic_alternatives)
+    or evaluation.deferred_rejected_diagnostic_alternatives > evaluation.deferred_diagnostic_alternatives
     or evaluation.complete ~= (evaluation.deferred_diagnostic_alternatives == 0)
     or (evaluation.mode == "full-diagnostics" and evaluation.deferred_diagnostic_alternatives ~= 0)
     or (evaluation.mode == "player-selected-primary-plus-required-fallbacks"
@@ -165,7 +169,8 @@ function M.technology_catalog(catalog, provider_resolution)
       alternative_id = selection.alternative_id,
       action = selection.action,
       design_fingerprint = selection.design_fingerprint,
-      qualification_fingerprint = selection.qualification_fingerprint
+      qualification_fingerprint = selection.qualification_fingerprint,
+      deferred_rejection = deepcopy(selection.deferred_rejection)
     })
   end
   for _, candidate in ipairs(catalog.candidates or {}) do
@@ -216,12 +221,14 @@ function M.technology_catalog(catalog, provider_resolution)
       mode = evaluation.mode,
       complete = evaluation.complete,
       evaluated_alternatives = evaluation.evaluated_alternatives,
-      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives
+      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives,
+      deferred_rejected_diagnostic_alternatives = evaluation.deferred_rejected_diagnostic_alternatives
     },
     counts = {
       candidates = #(catalog.candidates or {}),
       evaluated_alternatives = alternative_count,
       deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives,
+      deferred_rejected_diagnostic_alternatives = evaluation.deferred_rejected_diagnostic_alternatives,
       selected = #selected,
       rejected = rejected_count,
       review_required = review_count

@@ -21,6 +21,38 @@ local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.finger
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
 
+local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled)
+  local allowances = {}
+  if enabled ~= true then return allowances end
+  for _, row in ipairs(stream_artifact.rows or {}) do
+    if row.action == "skip" and type(row.reason) == "string" and row.reason ~= ""
+      and type(row.technology_design) == "table" then
+      local resolved = true
+      for _, gate_name in ipairs(REQUIRED_GATES) do
+        if not gate_contract.is_authoritatively_resolved((row.gates or {})[gate_name]) then
+          resolved = false
+          break
+        end
+      end
+      if resolved then
+        local selection_key = tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)
+        if allowances[selection_key] then
+          error("CompilationPlan initial skip diagnostic allowance is duplicated: " .. selection_key, 2)
+        end
+        allowances[selection_key] = {
+          selection_key = selection_key,
+          reason = row.reason,
+          candidate_id = row.technology_design.candidate_id,
+          design_fingerprint = row.technology_design.design_fingerprint,
+          hard_gates_resolved = true,
+          gates_fingerprint = fingerprint.of(row.gates)
+        }
+      end
+    end
+  end
+  return allowances
+end
+
 local function sanitize_stream_artifact(stream_artifact, target_inventory, preparations)
   local rows, removed_count, skipped_count = {}, 0, 0
   local sanitized_preparations = {}
@@ -376,6 +408,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     error("CompilationPlan requires GenerationPlan schema 3 or its exact private draft", 2)
   end
   if not trusted_stream_artifact then validation.admit_stream_artifact(stream_artifact) end
+  local initial_skip_diagnostic_allowances = capture_initial_skip_diagnostic_allowances(
+    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
@@ -528,6 +562,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       compilation_plan_fingerprint = artifact.compilation_fingerprint,
       trusted_designs = true,
       defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
+      initial_skip_diagnostic_allowances = initial_skip_diagnostic_allowances,
       base_candidates = final_base_candidates
     }
   )
@@ -560,7 +595,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end
   local accepted_candidates = {}
   for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
-    if selection.action ~= "diagnose" then table.insert(accepted_candidates, deepcopy(selection)) end
+    if selection.action == "emit" or selection.action == "adopt" then
+      table.insert(accepted_candidates, deepcopy(selection))
+    end
   end
   for _, candidate in ipairs(final_base_candidates) do
     if candidate.action == "create" then table.insert(accepted_candidates, {
@@ -615,7 +652,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local quality_dispositions, promotion_dispositions = {}, {}
   local promotion_blocked = false
   for _, selection in ipairs(artifact.technology_catalog.current_selections or {}) do
-    if selection.action ~= "diagnose" then
+    if selection.action == "emit" or selection.action == "adopt" then
       local design = design_by_candidate[selection.candidate_id .. "/" .. selection.alternative_id] or {}
       local identity = design.identity or {}
       local released = identity.identity_state == "released"

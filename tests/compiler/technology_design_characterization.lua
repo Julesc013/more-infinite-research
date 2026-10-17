@@ -312,14 +312,35 @@ local function catalog_operation(row_value)
   return {stream_key = row_value.stream_key, technology_design = row_value.technology_design}
 end
 
-local function finalize_catalog(row_value, defer)
+local function initial_skip_allowance(row_value)
+  local selection_key = tostring(row_value.stream_key) .. ":" .. tostring(row_value.manifest_id or row_value.stream_key)
+  local resolved = true
+  for _, gate_name in ipairs(hard_gate_authority.order()) do
+    if not gate.is_authoritatively_resolved(row_value.gates[gate_name]) then resolved = false end
+  end
+  return {
+    [selection_key] = {
+      selection_key = selection_key,
+      reason = row_value.reason,
+      candidate_id = row_value.technology_design.candidate_id,
+      design_fingerprint = row_value.technology_design.design_fingerprint,
+      hard_gates_resolved = resolved,
+      gates_fingerprint = fingerprint.of(row_value.gates)
+    }
+  }
+end
+
+local function finalize_catalog(row_value, defer, allowances)
   local operations = (row_value.action == "emit" or row_value.action == "adopt")
     and {catalog_operation(row_value)} or {}
   return technology_catalog.finalize(
     {row_value},
     {fixture = "catalog-deferred-diagnostics"},
     operations,
-    {defer_diagnostic_alternatives = defer == true}
+    {
+      defer_diagnostic_alternatives = defer == true,
+      initial_skip_diagnostic_allowances = allowances
+    }
   )
 end
 
@@ -367,6 +388,103 @@ check(catalog_skip_final.alternative_evaluation.mode == "full-diagnostics"
   and catalog_skip_final.candidates[1].diagnostic_evaluation.state == "constructed"
   and catalog_skip_final.current_selections[1].action == "diagnose",
   "skip retains the full required diagnostic fallback")
+
+-- An initial skip with an exact, owned allowance has already constructed the
+-- rejected primary. Player compilation can retain that primary and select its
+-- rejection directly; it never invents a qualified safe-diagnostic identity.
+local catalog_initial_skip = catalog_emit_row("initial-skip", "skip")
+local original_as_diagnostic_alternative = technology_design.as_diagnostic_alternative
+technology_design.as_diagnostic_alternative = function()
+  error("initial skip must not construct a safe diagnostic alternative")
+end
+local catalog_initial_skip_deferred = finalize_catalog(
+  catalog_initial_skip, true, initial_skip_allowance(catalog_initial_skip))
+technology_design.as_diagnostic_alternative = original_as_diagnostic_alternative
+local catalog_initial_skip_primary = catalog_initial_skip_deferred.candidates[1].alternatives[1]
+local catalog_initial_skip_selection = catalog_initial_skip_deferred.current_selections[1]
+check(catalog_initial_skip_deferred.alternative_evaluation.mode
+    == "player-selected-primary-plus-required-fallbacks"
+  and not catalog_initial_skip_deferred.alternative_evaluation.complete
+  and catalog_initial_skip_deferred.alternative_evaluation.evaluated_alternatives == 1
+  and catalog_initial_skip_deferred.alternative_evaluation.deferred_diagnostic_alternatives == 1
+  and catalog_initial_skip_deferred.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 1
+  and #catalog_initial_skip_deferred.candidates[1].alternatives == 1
+  and catalog_initial_skip_deferred.candidates[1].diagnostic_evaluation.state
+    == "deferred-initial-skip-rejected-primary"
+  and catalog_initial_skip_primary.action == "reject"
+  and catalog_initial_skip_primary.qualification_decision == "rejected"
+  and catalog_initial_skip_selection.action == "reject"
+  and catalog_initial_skip_selection.deferred_rejection.reason == catalog_initial_skip.reason,
+  "initial skip defers only the losing safe diagnostic and retains its real rejected primary")
+expect_error(function() technology_catalog.require_full_diagnostics(catalog_initial_skip_deferred) end,
+  "full diagnostics are required")
+local catalog_initial_skip_full = finalize_catalog(catalog_initial_skip, true)
+local catalog_initial_skip_full_primary
+for _, alternative in ipairs(catalog_initial_skip_full.candidates[1].alternatives) do
+  if alternative.action == "reject" then catalog_initial_skip_full_primary = alternative end
+end
+check(catalog_initial_skip_full_primary.design_fingerprint == catalog_initial_skip_primary.design_fingerprint
+  and catalog_initial_skip_full_primary.qualification_fingerprint
+    == catalog_initial_skip_primary.qualification_fingerprint
+  and catalog_initial_skip_full.current_selections[1].action == "diagnose",
+  "initial skip deferral preserves the full rejected primary while full diagnostics retain diagnose")
+local forged_initial_skip_allowance = initial_skip_allowance(catalog_initial_skip)
+forged_initial_skip_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].design_fingerprint = "mir32-forged"
+local catalog_forged_allowance = finalize_catalog(catalog_initial_skip, true, forged_initial_skip_allowance)
+check(catalog_forged_allowance.alternative_evaluation.complete
+  and #catalog_forged_allowance.candidates[1].alternatives == 2,
+  "forged initial skip allowance cannot defer diagnostics")
+local catalog_forged_candidate_allowance = initial_skip_allowance(catalog_initial_skip)
+catalog_forged_candidate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].candidate_id
+  = "mir-candidate/forged"
+local catalog_forged_candidate = finalize_catalog(
+  catalog_initial_skip, true, catalog_forged_candidate_allowance)
+check(catalog_forged_candidate.alternative_evaluation.complete
+  and #catalog_forged_candidate.candidates[1].alternatives == 2,
+  "forged initial skip candidate identity cannot defer diagnostics")
+local catalog_forged_gate_allowance = initial_skip_allowance(catalog_initial_skip)
+catalog_forged_gate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].gates_fingerprint
+  = "mir32-forged"
+local catalog_forged_gate = finalize_catalog(catalog_initial_skip, true, catalog_forged_gate_allowance)
+check(catalog_forged_gate.alternative_evaluation.complete
+  and #catalog_forged_gate.candidates[1].alternatives == 2,
+  "forged initial skip hard-gate binding cannot defer diagnostics")
+for _, mutation in ipairs({
+  {field = "reason", value = "different-rejection", label = "reason"},
+  {field = "selection_key", value = "different:selection", label = "selection key"},
+  {field = "hard_gates_resolved", value = false, label = "resolved-gate assertion"}
+}) do
+  local allowance = initial_skip_allowance(catalog_initial_skip)
+  allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"][mutation.field] = mutation.value
+  local fallback = finalize_catalog(catalog_initial_skip, true, allowance)
+  check(fallback.alternative_evaluation.complete and #fallback.candidates[1].alternatives == 2,
+    "forged initial skip " .. mutation.label .. " retains full diagnostics")
+end
+local catalog_initial_skip_unresolved = catalog_emit_row("initial-skip-unresolved", "skip", "pending")
+local catalog_initial_skip_unresolved_full = finalize_catalog(
+  catalog_initial_skip_unresolved, true, initial_skip_allowance(catalog_initial_skip_unresolved))
+check(catalog_initial_skip_unresolved_full.alternative_evaluation.complete
+  and #catalog_initial_skip_unresolved_full.candidates[1].alternatives == 2,
+  "unresolved initial skip retains full diagnostics")
+local catalog_initial_skip_preselection = technology_catalog.from_generation_rows(
+  {catalog_initial_skip}, {fixture = "catalog-initial-skip-preselection"}, {
+    defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_initial_skip)
+  })
+check(catalog_initial_skip_preselection.phase == "preselection"
+  and catalog_initial_skip_preselection.alternative_evaluation.complete
+  and #catalog_initial_skip_preselection.candidates[1].alternatives == 2,
+  "preselection proposal inventory never defers initial skip diagnostics")
+local catalog_converted_failed_emit = catalog_emit_row("converted-failed-emit", "emit", "failed")
+local catalog_converted_failed_emit_full = technology_catalog.from_preselection_rows(
+  {catalog_converted_failed_emit}, {fixture = "catalog-converted-failed-emit"}, {
+    phase = "final", defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_converted_failed_emit),
+    defer_validation = true, children_admitted = true
+  })
+check(catalog_converted_failed_emit_full.alternative_evaluation.complete
+  and #catalog_converted_failed_emit_full.candidates[1].alternatives == 2,
+  "non-initial rejected emit retains full diagnostics")
 
 local catalog_failed = technology_catalog.from_preselection_rows(
   {catalog_emit_row("failed", "emit", "failed")},
@@ -421,6 +539,23 @@ check(fingerprint.of(permutation_forward.current_selections) == fingerprint.of(p
   and permutation_reverse.alternative_evaluation.deferred_diagnostic_alternatives == 2,
   "deferred primary selection remains permutation independent")
 
+local deferred_skip_left = catalog_emit_row("deferred-skip-left", "skip")
+local deferred_skip_right = catalog_emit_row("deferred-skip-right", "skip")
+local deferred_skip_allowances = initial_skip_allowance(deferred_skip_left)
+for key, value in pairs(initial_skip_allowance(deferred_skip_right)) do deferred_skip_allowances[key] = value end
+local function finalize_deferred_skips(rows)
+  return technology_catalog.finalize(rows, {fixture = "catalog-deferred-skip-permutation"}, {}, {
+    defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = deferred_skip_allowances
+  })
+end
+local deferred_skip_forward = finalize_deferred_skips({deferred_skip_left, deferred_skip_right})
+local deferred_skip_reverse = finalize_deferred_skips({deferred_skip_right, deferred_skip_left})
+check(fingerprint.of(deferred_skip_forward.current_selections) == fingerprint.of(deferred_skip_reverse.current_selections)
+  and deferred_skip_forward.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 2
+  and deferred_skip_reverse.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 2,
+  "deferred initial skip selection remains permutation independent")
+
 local forged_deferred_binding = technology_catalog.snapshot(catalog_deferred)
 forged_deferred_binding.candidates[1].diagnostic_evaluation.primary_design_fingerprint = "mir32-forged"
 expect_error(function() technology_catalog.verify_untrusted(forged_deferred_binding) end,
@@ -471,6 +606,27 @@ table.remove(missing_deferred_selection.current_selections, 1)
 expect_error(function() technology_catalog.verify_untrusted(missing_deferred_selection) end,
   "deferred diagnostic primary selection is invalid")
 
+local forged_rejected_state = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_state.candidates[1].diagnostic_evaluation.state = "constructed"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_state) end,
+  "constructed diagnostic evaluation")
+local forged_rejected_selection = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_selection.current_selections[1].action = "diagnose"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_selection) end,
+  "current selection is invalid or rejected")
+local forged_rejected_primary = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_primary.candidates[1].diagnostic_evaluation.primary_design_fingerprint = "mir32-forged"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_primary) end,
+  "deferred rejected diagnostic primary proof is invalid")
+local forged_rejected_count = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_count.alternative_evaluation.deferred_rejected_diagnostic_alternatives = 0
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_count) end,
+  "alternative evaluation counts are invalid")
+local forged_rejected_provenance = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_provenance.current_selections[1].deferred_rejection.reason = "forged"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_provenance) end,
+  "current selection is invalid or rejected")
+
 local caller_snapshot = technology_catalog.snapshot(catalog_deferred)
 caller_snapshot.candidates[1].diagnostic_evaluation.state = "forged"
 caller_snapshot.alternative_evaluation.evaluated_alternatives = 99
@@ -478,6 +634,11 @@ local caller_snapshot_again = technology_catalog.snapshot(catalog_deferred)
 check(caller_snapshot_again.candidates[1].diagnostic_evaluation.state == "deferred-primary-qualified"
   and caller_snapshot_again.alternative_evaluation.evaluated_alternatives == 1,
   "catalog query snapshots isolate deferred-evaluation metadata")
+local deferred_skip_snapshot = technology_catalog.snapshot(catalog_initial_skip_deferred)
+deferred_skip_snapshot.current_selections[1].deferred_rejection.reason = "mutated"
+check(technology_catalog.snapshot(catalog_initial_skip_deferred).current_selections[1].deferred_rejection.reason
+    == catalog_initial_skip.reason,
+  "deferred rejected selection provenance is copy isolated")
 
 local public_full_catalog = public_compiler_artifacts.technology_catalog(catalog_full, {})
 local public_deferred_catalog = public_compiler_artifacts.technology_catalog(catalog_deferred, {})
@@ -489,6 +650,16 @@ check(public_deferred_catalog.schema == 2 and not public_deferred_catalog.altern
   and public_deferred_catalog.counts.evaluated_alternatives == 1
   and public_deferred_catalog.counts.deferred_diagnostic_alternatives == 1,
   "public partial catalog reports evaluated and deferred counts honestly")
+local public_deferred_skip_catalog = public_compiler_artifacts.technology_catalog(catalog_initial_skip_deferred, {})
+check(public_deferred_skip_catalog.counts.deferred_rejected_diagnostic_alternatives == 1
+  and public_deferred_skip_catalog.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 1
+  and public_deferred_skip_catalog.selected[1].action == "reject"
+  and public_deferred_skip_catalog.selected[1].deferred_rejection.reason == catalog_initial_skip.reason,
+  "public partial catalog reports deferred rejected-primary provenance honestly")
+public_deferred_skip_catalog.selected[1].deferred_rejection.reason = "mutated"
+check(public_compiler_artifacts.technology_catalog(catalog_initial_skip_deferred, {}).selected[1]
+    .deferred_rejection.reason == catalog_initial_skip.reason,
+  "public deferred rejection provenance is copy isolated")
 local forged_public_catalog = technology_catalog.snapshot(catalog_deferred)
 forged_public_catalog.alternative_evaluation.evaluated_alternatives = 2
 expect_error(function() public_compiler_artifacts.technology_catalog(forged_public_catalog, {}) end,
