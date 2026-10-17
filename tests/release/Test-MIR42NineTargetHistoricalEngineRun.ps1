@@ -1,5 +1,6 @@
 param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,
+  [string]$EngineRunnerPath = '',
   [switch]$SharedInputsOnly
 )
 
@@ -44,7 +45,8 @@ function Import-MIR42EngineRunnerFunction {
   Set-Item -LiteralPath ("function:script:$Name") -Value $implementation
 }
 
-$runnerPath = Join-Path $RepoRoot 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'
+$runnerPath = if ([string]::IsNullOrWhiteSpace($EngineRunnerPath)) { Join-Path $RepoRoot 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1' } else { [IO.Path]::GetFullPath($EngineRunnerPath) }
+if (-not (Test-Path -LiteralPath $runnerPath -PathType Leaf)) { throw 'engine-runner-path' }
 $runner = Get-Content -Raw -LiteralPath $runnerPath
 function Assert-MIR42EngineSharedInputs {
   . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
@@ -67,7 +69,7 @@ function Assert-MIR42EngineSharedInputs {
   function Refuses([scriptblock]$Action,[string]$Expected){$failure='';try{& $Action|Out-Null}catch{$failure=$_.Exception.Message};Check ($failure.Contains($Expected)) "expected $Expected; got $failure"}
   $script:engineSharedAssertions=0
   $scratch=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $RepoRoot ('build/tmp/engine-link-controls-'+[guid]::NewGuid().ToString('N')))
-  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42EngineMaintenanceSelection','Get-MIR42EngineMaintenanceHarnessArguments','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives')){
+  foreach($name in @('Assert-MIR42EngineRunFile','Get-MIR42EngineRunArchiveVersion','Get-MIR42EngineMaintenanceSelection','Get-MIR42EngineMaintenanceHarnessArguments','Get-MIR42HistoricalEngineDescriptor','Get-MIR42EngineRunSha','Get-MIR42EngineLibraryBindings','Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Invoke-MIR42SelectedFreshLeaf','Assert-MIR42EngineLibraryArchives')){
     Import-MIR42EngineRunnerFunction -Path $runnerPath -Name $name
   }
   Import-MIR42EngineRunnerFunction -Path (Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1') -Name 'Assert-MIR421CurrentUpgradeInputMode'
@@ -255,7 +257,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       $row.engine='controlled';$row.fixture='controlled';$row.candidate_authority_path=Join-Path $scratch ('exact-construction-'+$RequestedTarget+'.zip');$receiptPath=Join-Path $rowRoot 'upgrade.json';$ExpectedPeakMemoryMiB=256
       $target=$RequestedTarget;$sourceVersion=$RequestedSourceVersion;$libraryBindings=@{};foreach($id in $rows.Keys){$libraryBindings[$id]=$sourceRoot}
       $candidateRoot=Join-Path $scratch 'controlled-candidate';$manifestPath='controlled-candidate-manifest.json';$PublishedMaintenancePredecessorManifestPath='controlled-published.json'
-      $maintenanceInputs=if($WithMaintenance){[pscustomobject]@{targets=@()}}else{$null}
+      $maintenanceInputs=if($WithMaintenance){[pscustomobject]@{targets=@()}}else{$null};$freshLeafMode=$false
       . ([scriptblock]::Create($argumentNode[0].Extent.Text+"`n"+$maintenanceArgumentNode[0].Extent.Text+"`n"+'$builtArguments=@($args)'))
       return [pscustomobject]@{arguments=@($builtArguments);candidate_root=$candidateRoot;target=$target;source_version=$sourceVersion}
     }
@@ -365,7 +367,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     try{
       $PublishedMaintenancePredecessorManifestPath='controlled-published.json';$isNineTargetCandidate=$true
       $script:MIR42ModernEngineTargets=@('f210','f200','f110','f100')
-      $targets=@($rows.Keys);$libraryBindings=@{};foreach($id in $targets){$libraryBindings[$id]=$sourceRoot}
+      $targets=@($rows.Keys);$libraryBindings=@{};foreach($id in $targets){$libraryBindings[$id]=$sourceRoot};$freshLeafMode=$false
       # Legacy maintenance candidates keep their immediate predecessor.  A
       # 423 candidate must also select each retained 420/421/422 publication.
       foreach($sourceVersion in @('4.2.1','4.2.2')){
@@ -652,10 +654,63 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check (-not(Test-Path (Join-Path $invalidRelease43.FreshRoot 'summary.json'))) 'invalid 4.3 modern identity produced evidence.'
     }
     Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
+    # FreshLeaf must dispatch exactly one already-admitted direct loader. These
+    # are host controls: stubs preserve the public leaf result shape and do not
+    # synthesize an engine receipt or invoke Factorio.
+    $script:MIR42ModernEngineTargets=@('f210','f200','f110','f100');$script:MIR42HistoricalEngineTargets=@('f017','f016','f015','f014','f013')
+    $leafRoot=Join-Path $exactRoot 'fresh-leaf-dispatch';$null=New-Item -ItemType Directory -Path $leafRoot
+    $script:leafDispatch=[Collections.Generic.List[string]]::new();$script:leafUpgradeCalls=0
+    $savedModern=(Get-Item -LiteralPath 'function:Invoke-MIR42ModernFreshLoad').ScriptBlock
+    $savedHistorical=(Get-Item -LiteralPath 'function:Invoke-MIR42HistoricalFreshLoad').ScriptBlock
+    $savedBounded=(Get-Item -LiteralPath 'function:Invoke-MIR42BoundedUpgrade').ScriptBlock
+    try {
+      Set-Item -LiteralPath 'function:script:Invoke-MIR42BoundedUpgrade' -Value { $script:leafUpgradeCalls++; throw 'fresh-leaf-must-not-call-upgrade-worker' }
+      Set-Item -LiteralPath 'function:script:Invoke-MIR42ModernFreshLoad' -Value {
+        param($Target,$Scenario,$FactorioLine,$FactorioBinaryVersion,$Engine,$EngineSha256,$Candidate,$CandidateSha256,$CandidateContentSha256,$PackageSourceSha256,$LibraryDirectory,$Version,$FreshRoot,$SourceCommit,$DirectLoaderSha256,$RuntimeScenarioRegistryPath,$DeadlineSeconds)
+        $script:leafDispatch.Add("modern/$Target/$Scenario")
+        $null=New-Item -ItemType Directory -Force -Path $FreshRoot
+        $summaryPath=Join-Path $FreshRoot 'summary.json';$logPath=Join-Path $FreshRoot 'factorio-current.log';$stdoutPath=Join-Path $FreshRoot 'stdout.txt';$stderrPath=Join-Path $FreshRoot 'stderr.txt'
+        $summary=[ordered]@{status='passed';git_commit=$SourceCommit;validation_package_sha256=$CandidateSha256;validation_package_content_sha256=$CandidateContentSha256;expected_scenarios=@($Scenario);scenarios=@([ordered]@{status='passed';assertions_executed=1})}
+        [IO.File]::WriteAllText($summaryPath,($summary|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false));[IO.File]::WriteAllText($logPath,"Loading mod more-infinite-research $Version`nFactorio initialised`nCreating new map",[Text.UTF8Encoding]::new($false));[IO.File]::WriteAllText($stdoutPath,'',[Text.UTF8Encoding]::new($false));[IO.File]::WriteAllText($stderrPath,'',[Text.UTF8Encoding]::new($false))
+        [pscustomobject][ordered]@{scenario=$Scenario;receipt=[pscustomobject]@{path=$summaryPath;sha256=(Get-MIR42EngineRunSha $summaryPath)};log=[pscustomobject]@{path=$logPath;sha256=(Get-MIR42EngineRunSha $logPath)};stdout=[pscustomobject]@{path=$stdoutPath;sha256=(Get-MIR42EngineRunSha $stdoutPath)};stderr=[pscustomobject]@{path=$stderrPath;sha256=(Get-MIR42EngineRunSha $stderrPath)}}
+      }
+      Set-Item -LiteralPath 'function:script:Invoke-MIR42HistoricalFreshLoad' -Value {
+        param($Target,$FactorioLine,$Engine,$EngineSha256,$Candidate,$CandidateSha256,$LibraryDirectory,$Version,$SourceVersion,$FreshRoot,$SourceCommit,$DeadlineSeconds)
+        $script:leafDispatch.Add("historical/$Target/package-zip-base");$null=New-Item -ItemType Directory -Force -Path $FreshRoot
+        $marker=Join-Path $FreshRoot 'historical-leaf.txt';[IO.File]::WriteAllText($marker,'controlled',[Text.UTF8Encoding]::new($false))
+        [pscustomobject][ordered]@{scenario='package-zip-base';receipt=[pscustomobject]@{path=$marker;sha256=(Get-MIR42EngineRunSha $marker)};log=[pscustomobject]@{path=$marker;sha256=(Get-MIR42EngineRunSha $marker)};stdout=[pscustomobject]@{path=$marker;sha256=(Get-MIR42EngineRunSha $marker)};stderr=[pscustomobject]@{path=$marker;sha256=(Get-MIR42EngineRunSha $marker)}}
+      }
+      $leafTargets=@('f210','f200','f015')
+      $leafManifest=[pscustomobject]@{targets=@(foreach($id in @('f210','f200')){[pscustomobject]@{target=$id;asset=[pscustomobject]@{sha256=[string]$rows[$id].candidate_sha256};content_sha256=[string](Get-MIR4ArchiveInventory -Path $rows[$id].candidate).content_sha256}})}
+      function New-MIR42LeafRow([string]$Target){
+        $row=[ordered]@{engine='controlled-engine';engine_sha256=('E'*64);engine_major=$(if($Target -eq'f210'){'2.1'}elseif($Target -eq'f200'){'2.0'}else{'0.15'});engine_version=$(if($Target -eq'f210'){'2.1.1'}elseif($Target -eq'f200'){'2.0.1'}else{'0.15.1'});candidate=$rows[$Target].candidate;candidate_sha256=$rows[$Target].candidate_sha256;to=$rows[$Target].to;source_version='4.5.0'}
+        if($Target -eq'f015'){$row.historical=[ordered]@{terminal_seal=[ordered]@{target='0.15'}}}
+        return $row
+      }
+      $leafCommon=@{Manifest=$leafManifest;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot;SourceCommit=('A'*40);RunnerPath=$runnerPath;RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60}
+      $f200=Invoke-MIR42SelectedFreshLeaf -Target f200 -Scenario package-zip-base -Row (New-MIR42LeafRow f200) -FreshRoot (Join-Path $leafRoot 'f200') @leafCommon
+      $f210=Invoke-MIR42SelectedFreshLeaf -Target f210 -Scenario package-zip-space-age -Row (New-MIR42LeafRow f210) -FreshRoot (Join-Path $leafRoot 'f210') @leafCommon
+      $f015=Invoke-MIR42SelectedFreshLeaf -Target f015 -Scenario package-zip-base -Row (New-MIR42LeafRow f015) -FreshRoot (Join-Path $leafRoot 'f015') @leafCommon
+      Check ((@($script:leafDispatch) -join '|') -ceq 'modern/f200/package-zip-base|modern/f210/package-zip-space-age|historical/f015/package-zip-base') 'FreshLeaf did not select the exact existing modern/historical leaf functions.'
+      Check ($f200.scenario-ceq'package-zip-base'-and$f210.scenario-ceq'package-zip-space-age'-and$f015.scenario-ceq'package-zip-base'-and$script:leafUpgradeCalls-eq0) 'FreshLeaf changed the public fresh result shape or reached the upgrade worker.'
+      Check ((@(Get-ChildItem -LiteralPath $leafRoot -Directory|ForEach-Object Name|Sort-Object) -join '|') -ceq 'f015|f200|f210') 'FreshLeaf allocated an unrelated target stage.'
+      Refuses {Invoke-MIR42SelectedFreshLeaf -Target f200 -Scenario package-zip-space-age -Row (New-MIR42LeafRow f200) -FreshRoot (Join-Path $leafRoot 'rejected-f200-space-age') @leafCommon} 'f200-package-zip-space-age-fresh-target-binding'
+      Refuses {Invoke-MIR42SelectedFreshLeaf -Target f015 -Scenario package-zip-space-age -Row (New-MIR42LeafRow f015) -FreshRoot (Join-Path $leafRoot 'rejected-f015-space-age') @leafCommon} 'f015-package-zip-space-age-fresh-target-binding'
+      $missingManifest=[pscustomobject]@{targets=@($leafManifest.targets|Where-Object target -ne 'f200')}
+      Refuses {Invoke-MIR42SelectedFreshLeaf -Target f200 -Scenario package-zip-base -Row (New-MIR42LeafRow f200) -Manifest $missingManifest -PackageSourceSha256 ('B'*64) -LibraryDirectory $sourceRoot -SourceCommit ('A'*40) -RunnerPath $runnerPath -RuntimeScenarioRegistryPath $runtimeScenarioRegistry -FreshRoot (Join-Path $leafRoot 'rejected-missing') -DeadlineSeconds 60} 'f200-fresh-candidate-row'
+    } finally {
+      Set-Item -LiteralPath 'function:script:Invoke-MIR42ModernFreshLoad' -Value $savedModern;Set-Item -LiteralPath 'function:script:Invoke-MIR42HistoricalFreshLoad' -Value $savedHistorical;Set-Item -LiteralPath 'function:script:Invoke-MIR42BoundedUpgrade' -Value $savedBounded
+      Remove-Item -LiteralPath function:New-MIR42LeafRow -ErrorAction SilentlyContinue
+      Remove-Variable -Name leafDispatch,leafUpgradeCalls -Scope Script -ErrorAction SilentlyContinue
+    }
+    $freshLeafStart=$runner.IndexOf('$freshLeafMode = $PSCmdlet.ParameterSetName',[StringComparison]::Ordinal);$freshLeafTarget=$runner.IndexOf('$targets = @($SelectedFreshTarget)',[StringComparison]::Ordinal);$freshLeafCustody=$runner.IndexOf('-SelectedTarget $SelectedFreshTarget -SelectedArchivePath $SelectedFreshPredecessor',[StringComparison]::Ordinal);$freshLeafCall=$runner.IndexOf('Invoke-MIR42SelectedFreshLeaf -Target $target',[StringComparison]::Ordinal);$freshLeafReturn=$runner.IndexOf('$freshLoads[0] | ConvertTo-Json -Depth 30',[StringComparison]::Ordinal);$upgradeStart=$runner.IndexOf('$receiptPath = Join-Path $rowRoot ''upgrade.json''',[StringComparison]::Ordinal)
+    Check ($freshLeafStart-ge0-and$freshLeafTarget-gt$freshLeafStart-and$freshLeafCustody-gt$freshLeafTarget-and$freshLeafCall-gt$freshLeafCustody-and$freshLeafReturn-gt$freshLeafCall-and$upgradeStart-gt$freshLeafReturn) 'FreshLeaf runner ordering no longer retains one target, selected R24 custody, then a leaf-only return before upgrade.'
+    $freshLeafSegment=$runner.Substring($freshLeafCall,$upgradeStart-$freshLeafCall)
+    Check ($freshLeafSegment.Contains('$freshLoads[0] | ConvertTo-Json -Depth 30')-and-not$freshLeafSegment.Contains('-File,$harness')-and-not$freshLeafSegment.Contains('upgrade.json')) 'FreshLeaf branch could start an upgrade or construct an aggregate receipt.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
     Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=22 fresh_version_controls=24 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {
-    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
+    foreach($name in @('Invoke-MIR42BoundedUpgrade','Invoke-MIR42DirectFreshLoad','Invoke-MIR42HistoricalFreshLoad','Invoke-MIR42ModernFreshLoad','Invoke-MIR42SelectedFreshLeaf','Assert-MIR42EngineLibraryArchives','Invoke-PackageZipSmokeScenario','Get-MIR42EngineLibraryBindings')){Remove-Item -LiteralPath "function:script:$name" -ErrorAction SilentlyContinue}
     if(Test-Path -LiteralPath $scratch){$null=Assert-MIRImmutableInputPathWithin -Path $scratch -Root (Join-Path $RepoRoot 'build/tmp') -Context 'owned tiny engine controls';Remove-Item -LiteralPath $scratch -Recurse -Force}
   }
 }
@@ -926,23 +981,17 @@ if (-not $harness.Contains("`$serverReload = `$isHistoricalTerminalFixture -and 
     -not $harness.Contains('$secondReloadExitCode = if ($serverReload)')) {
   throw 'historical-013-through-016-reloads-must-use-server-path'
 }
-$historicalFreshCall = $runner.IndexOf('$freshLoads = @(Invoke-MIR42HistoricalFreshLoad -Target $target',[StringComparison]::Ordinal)
-$historicalFreshBranch = if ($historicalFreshCall -ge 0) { $runner.LastIndexOf('if ($isHistoricalTarget) {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
-$modernFreshCall = $runner.IndexOf('$fresh = Invoke-MIR42ModernFreshLoad -Target $target',[StringComparison]::Ordinal)
-$modernFreshElse = if ($historicalFreshCall -ge 0) { $runner.IndexOf('} else {',$historicalFreshCall,[StringComparison]::Ordinal) } else { -1 }
-if ($historicalFreshBranch -lt 0 -or $historicalFreshCall -le $historicalFreshBranch -or
-    $modernFreshElse -le $historicalFreshCall -or $modernFreshCall -le $modernFreshElse -or
-    -not $runner.Contains('-ErrorPrefix "mir42-$Target-historical-fresh"') -or
-    -not $runner.Contains('throw "[$ErrorPrefix-log-content] $log"') -or
-    -not $runner.Contains('function Invoke-MIR42DirectFreshLoad {') -or
+if (-not $runner.Contains('function Invoke-MIR42SelectedFreshLeaf {') -or
+    -not $runner.Contains('Invoke-MIR42HistoricalFreshLoad -Target $Target') -or
+    -not $runner.Contains('Invoke-MIR42ModernFreshLoad -Target $Target') -or
     -not $runner.Contains('Invoke-MIR42BoundedUpgrade -PowerShell $Engine') -or
     -not $runner.Contains('-NativeActor -FactorioActor') -or
     -not $runner.Contains('-HideDisabledOwnedFixtureArchives:($Target -ceq ''f013'')') -or
     -not $runner.Contains('-EnableSpaceAge:$EnableSpaceAge -HideDisabledOwnedFixtureArchives:$HideDisabledOwnedFixtureArchives') -or
+    -not $runner.Contains('-SelectedTarget $SelectedFreshTarget -SelectedArchivePath $SelectedFreshPredecessor') -or
     $runner.Contains('-ScenarioWorker')) {
   throw 'historical-and-modern-fresh-loads-must-use-direct-native-actors'
-}
-foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','kind=$runKind','status=$runStatus')) {
+}foreach ($needle in @('$isHistoricalTerminalFixture = $FixtureName -eq ''assert-upgrade-historical-terminal-to-mir42''','$isLegacyFactorio = $isHistoricalTerminalFixture -or','MIR historical upgrade specialization requires an exact terminal predecessor','historical-terminal-source-state-retained','historical-terminal-infinite-bonus-retained-where-supported','$historicalHarness = Assert-MIR42HistoricalUpgradeHarness -RepoRoot $repo','$historical = Get-MIR42HistoricalEngineDescriptor -RepoRoot $repo -Target $target','kind=$runKind','status=$runStatus')) {
   if (-not ($runner.Contains($needle) -or $harness.Contains($needle))) { throw "historical-runtime-contract $needle" }
 }
 $tokens=$null;$errors=$null
