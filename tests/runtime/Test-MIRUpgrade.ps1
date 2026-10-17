@@ -789,7 +789,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
   $toPatch=[int]$Matches.patch
   $code = $targetCode+'00'
   $expectedFrom = "4.1.$code"
-  $maintenanceMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4)[.]'+$targetCode+'(?<patch>[0-9]{2})$'))
+  $maintenanceMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5)[.]'+$targetCode+'(?<patch>[0-9]{2})$'))
   $earlierPatch=$maintenanceMatch.Success -and (([int]$maintenanceMatch.Groups['minor'].Value -lt $toMinor) -or
     (([int]$maintenanceMatch.Groups['minor'].Value -eq $toMinor) -and ([int]$maintenanceMatch.Groups['patch'].Value -lt $toPatch)))
   if ($FromVersion -cne $expectedFrom -and -not $earlierPatch) { throw 'MIR 4 upgrade specialization requires its exact baseline or an earlier same-target maintenance version.' }

@@ -1526,6 +1526,30 @@ $mir43Assertions+=4
 
 # 4.5.2 preserves exactly the latest 4.5.1 and corrected R24 modern routes.
 # It deliberately does not reactivate the direct 4.2.2 or historical lanes.
+$maintenanceMatcher=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$maintenanceMatch'
+},$true))
+$earlierPatchGate=@($ast.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and$node.Left.Extent.Text-ceq'$earlierPatch'
+},$true))
+if($maintenanceMatcher.Count-ne1-or$earlierPatchGate.Count-ne1){throw 'Live maintenance predecessor gate missing or ambiguous'}
+$mir43Assertions += & {
+  param($Matcher,$Gate)
+  $cases=@(
+    @{target='200';from='4.5.20001';expected=$true},
+    @{target='210';from='4.5.21001';expected=$true},
+    @{target='200';from='4.4.20002';expected=$true},
+    @{target='200';from='4.5.20002';expected=$false},
+    @{target='200';from='4.5.20003';expected=$false},
+    @{target='200';from='4.6.20000';expected=$false}
+  )
+  foreach($case in $cases){
+    $targetCode=$case.target;$FromVersion=$case.from;$toMinor=5;$toPatch=2
+    $maintenanceMatch=& $Matcher
+    if([bool](& $Gate)-ne$case.expected){throw "Live maintenance gate misclassified $FromVersion -> 4.5.${targetCode}02"}
+  }
+  return $cases.Count
+} ([scriptblock]::Create($maintenanceMatcher[0].Right.Extent.Text)) ([scriptblock]::Create($earlierPatchGate[0].Right.Extent.Text))
 $mir452IdentityRoot=Join-Path $testRoot 'mir452-modern-identities'
 New-Item -ItemType Directory -Force -Path $mir452IdentityRoot|Out-Null
 $mir452Routes=@(
