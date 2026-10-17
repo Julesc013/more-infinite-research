@@ -1212,8 +1212,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8752,
-      "expected_sha256": "A0FBB1EECEF58245900F5059F2F59C9B92000C2FBF42F7FAC6161F0636D2A8BF",
+      "expected_bytes": 10040,
+      "expected_sha256": "D5D865306D3233AF9112641261DE00FFFDF6F7B3D2D106CD73FDC6F02FB19B38",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -1948,8 +1948,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 3074,
-      "expected_sha256": "F15C57DFF132DDBB059BD4D9BFAD1ADC8DA764D7B8FA037BC251F918190B9DEB",
+      "expected_bytes": 3118,
+      "expected_sha256": "8D443BC95ADF2EA18BD24DEC1FB3DEE346FB4AD6C31864EACF39191C466E61D6",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2412,8 +2412,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 4997,
-      "expected_sha256": "3D1B64E9FAEF3A4566740982CDD9C743CA2EBB30B865FD127140142CFA0EB740",
+      "expected_bytes": 5091,
+      "expected_sha256": "27FBF854808EA30C361312A5791ED70977D7CF0D97BB476557EA536323A14E3F",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2700,8 +2700,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9538,
-      "expected_sha256": "E5BFE1E50AF63CCEB2E19098691C53E06D851B71B58857C09E69B12EACD8B3E2",
+      "expected_bytes": 9667,
+      "expected_sha256": "1827F45D5F33279DC849FBD1DA3EFE1B4A17845E07C8E7F016172DE1D7082CC7",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "A0E306AFBB029596EB2E7F62EC35E9E91C6ECCF2E74EFB0F1974326515C4A938"
+  "record_sha256": "49529C20F9C56DD949681D00D886F887F074E6EEB0AAB1BA60A285151AA8ED5D"
 }

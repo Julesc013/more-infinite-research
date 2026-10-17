@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -125,7 +125,7 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
     # The shared README is authored for the current F100 maintenance package.
     # Resolve that identity from its guarded heading instead of pinning an old
     # source patch in the historical projection.
-    $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.(?<minor>[234])\.100[0-9]{2})(?:\r?\n|$)')
+    $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.(?<minor>[2345])\.100[0-9]{2})(?:\r?\n|$)')
     if (-not $readmeIdentity.Success) { throw '[mir42-historical-readme-source-identity]' }
     $replacements = @(
       @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
@@ -296,6 +296,8 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
       $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
       if ($SourceVersion -ceq '4.4.1') {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+      } elseif ($SourceVersion -ceq '4.5.2') {
+        $entry += "  Performance:`n    - Reuse final journal preparation without changing generated research.`n"
       } elseif ($SourceVersion -ceq '4.5.1') {
         $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
       } elseif ($SourceVersion -ceq '4.5.0') {
@@ -437,7 +439,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
