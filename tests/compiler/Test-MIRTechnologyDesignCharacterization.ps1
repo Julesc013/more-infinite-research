@@ -67,6 +67,8 @@ $modules=[ordered]@{
   'prototypes.mir.domain.compiler.public_artifact_budget'='source/prototypes/mir/domain/compiler/public_artifact_budget.lua'
   'prototypes.mir.domain.compiler.transformation_operation'='source/prototypes/mir/domain/compiler/transformation_operation.lua'
   'prototypes.mir.domain.compiler.transformation_plan'='source/prototypes/mir/domain/compiler/transformation_plan.lua'
+  'prototypes.mir.domain.compiler.policy_snapshot'='source/prototypes/mir/domain/compiler/policy_snapshot.lua'
+  'prototypes.mir.planner.compiler'='source/prototypes/mir/planner/compiler.lua'
   'prototypes.mir.domain.compiler.mutation_journal'='source/prototypes/mir/domain/compiler/mutation_journal.lua'
   'prototypes.mir.domain.evidence.compiler_evidence'='source/prototypes/mir/domain/evidence/compiler_evidence.lua'
   'prototypes.mir.report.public_compiler_artifacts'='source/prototypes/mir/report/public_compiler_artifacts.lua'
@@ -117,8 +119,8 @@ try{
     throw "TechnologyDesign characterization failed: $nativeLog"
   }
   $assertionCount=[int]$Matches[1]
-  if($assertionCount-ne4947) {
-    throw "TechnologyDesign characterization expected 4947 assertions, observed $assertionCount`: $nativeLog"
+  if($assertionCount-ne4955) {
+    throw "TechnologyDesign characterization expected 4955 assertions, observed $assertionCount`: $nativeLog"
   }
   if($log-notmatch'MIR-PUBLICATION-MEASUREMENT-PASS ([0-9]+)') {
     throw "Publication measurement characterization failed: $nativeLog"

@@ -53,26 +53,22 @@ function M.assert_output(context)
   )
   local journal = context:state_view("mutation_journal")
   if not journal then error("CompilerResult finalization requires a MutationJournal.", 2) end
-  local finalized_journal = journal:finalize({allow_failed = true})
+  local finalized_journal = journal:finalize({allow_failed = true, return_snapshot = false})
   local graph_parity = context:artifact("technology_graph_parity")
   local input_sanitation = plan.input_sanitation_ledger or {}
   local output_sanitation = context:artifact("output_sanitation_ledger") or {}
   local sanitation_passed = type(input_sanitation.sanitized_target_inventory_fingerprint) == "string"
     and input_sanitation.sanitized_target_inventory_fingerprint
       == output_sanitation.sanitized_target_inventory_fingerprint
-  local realized = {}
-  for _, entry in ipairs(finalized_journal.entries or {}) do
-    table.insert(realized, {
-      operation_id = entry.operation_id,
-      status = entry.status,
-      after_fingerprint = entry.after_fingerprint
-    })
-  end
+  -- finalization_summary() is created for this internal call and contains only
+  -- fresh fingerprint rows. This caller fingerprints the rows immediately and
+  -- does not store or return them, so a second local row copy has no ownership purpose.
+  local realized = finalized_journal.realized_operations or {}
   local evidence = {
     journal_fingerprint = finalized_journal.journal_fingerprint,
-    executed_operation_count = #(finalized_journal.entries or {}),
+    executed_operation_count = finalized_journal.executed_operation_count,
     skipped_operation_count = 0,
-    failed_operation_count = finalized_journal.terminal_counts.failed or 0,
+    failed_operation_count = finalized_journal.failed_operation_count,
     missing_operation_count = finalized_journal.missing_operation_count,
     duplicate_operation_count = finalized_journal.duplicate_operation_count,
     undeclared_operation_count = finalized_journal.undeclared_operation_count,

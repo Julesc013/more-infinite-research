@@ -1039,4 +1039,69 @@ do
     "restored constructor-owned hard gate remains valid after opposing identity control")
 end
 
+-- The operation constructor is the ownership boundary for adopted native
+-- research. Planner inputs may be reused without a second preparatory copy,
+-- but neither those inputs nor an exported plan may mutate admitted output.
+do
+  local planner = require("prototypes.mir.planner.compiler")
+  local operation_contract = require("prototypes.mir.domain.compiler.transformation_operation")
+  local plan_contract = require("prototypes.mir.domain.compiler.transformation_plan")
+  local policy = require("prototypes.mir.domain.compiler.policy_snapshot").new({})
+  local adopted = catalog_adopt_row("ownership-boundary")
+  adopted.adoption.input_snapshot = deepcopy(adopted.adoption.expected_snapshot)
+  adopted.adoption.input_snapshot.unit.count_formula = "50*L"
+  adopted.adoption.input_fingerprint = fingerprint.of(adopted.adoption.input_snapshot)
+  adopted.adoption.configured_fields = {"effects", "unit"}
+  adopted.technology_design = technology_design.from_generation_row(adopted)
+  local created = catalog_emit_row("ownership-create")
+  local snapshot = compilation_snapshot.new({
+    stream_inputs = {rows = {adopted, created}}, base_continuation_inputs = {operations = {}}
+  })
+  local expected_adoption = fingerprint.canonical(adopted.adoption)
+  local expected_before = fingerprint.canonical(adopted.adoption.input_snapshot)
+  local expected_after = fingerprint.canonical(adopted.adoption.expected_snapshot)
+  local compiled = planner.compile(snapshot, policy)
+  local plan = compiled.transformation_plan
+  check(#plan.operations == 2 and plan.operation_counts.patch == 1 and plan.operation_counts.create == 1,
+    "actual planner preserves both adopted and newly generated operations")
+  local operation
+  for _, candidate in ipairs(plan.operations) do
+    if candidate.action == "patch" then operation = candidate end
+  end
+  check(operation and fingerprint.canonical(operation.expected_before_snapshot) == expected_before
+      and fingerprint.canonical(operation.expected_after_projection) == expected_after
+      and fingerprint.canonical(operation.payload.adoption) == expected_adoption,
+    "adoption constructor preserves complete snapshots and payload")
+  check(operation.expected_before_snapshot ~= adopted.adoption.input_snapshot
+      and operation.expected_after_projection ~= adopted.adoption.expected_snapshot
+      and operation.payload.adoption ~= adopted.adoption,
+    "constructor owns independent adoption tables")
+  local original_plan = fingerprint.canonical(plan_contract.snapshot(plan))
+  local original_operation_fingerprint = operation.operation_fingerprint
+  local original_plan_fingerprint = plan.plan_fingerprint
+  adopted.adoption.input_snapshot.unit.ingredients[1][2] = 999
+  adopted.adoption.expected_snapshot.effects[1].change = 999
+  adopted.adoption.configured_fields[1] = "forged-field"
+  check(fingerprint.canonical(operation.expected_before_snapshot) == expected_before
+      and fingerprint.canonical(operation.expected_after_projection) == expected_after
+      and fingerprint.canonical(operation.payload.adoption) == expected_adoption,
+    "nested source mutation cannot alter admitted adoption")
+  check(operation_contract.verify_untrusted(operation) and operation_contract.assert_trusted(operation)
+      and operation.operation_fingerprint == original_operation_fingerprint,
+    "source mutation preserves valid operation fingerprint and trust")
+  check(fingerprint.canonical(plan_contract.snapshot(plan)) == original_plan
+      and plan.plan_fingerprint == original_plan_fingerprint,
+    "source mutation preserves complete plan bytes and fingerprint")
+  local exported = plan_contract.snapshot(plan)
+  for _, candidate in ipairs(exported.operations) do
+    if candidate.action == "patch" then
+      candidate.expected_before_snapshot.unit.ingredients[1][2] = 1000
+      candidate.expected_after_projection.effects[1].change = 1000
+      candidate.payload.adoption.configured_fields[1] = "forged-export"
+    end
+  end
+  check(fingerprint.canonical(plan_contract.snapshot(plan)) == original_plan,
+    "nested exported-plan mutation cannot alter owned adoption")
+end
+
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

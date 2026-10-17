@@ -51,9 +51,11 @@ local function stream_operation(row, policy)
   local design = row.technology_design
   if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
   else technology_design.verify_untrusted(design) end
-  local expected_before = row.action == "adopt" and deepcopy(row.adoption.input_snapshot)
+  -- TransformationOperation owns the snapshots and payload after construction.
+  -- Pass row-owned adoption data through that single defensive-copy boundary.
+  local expected_before = row.action == "adopt" and row.adoption.input_snapshot
     or {presence = "absent", prototype_type = "technology", id = tostring(subject_id)}
-  local expected_after = row.action == "adopt" and deepcopy(row.adoption.expected_snapshot)
+  local expected_after = row.action == "adopt" and row.adoption.expected_snapshot
     or technology_design.trusted_prototype_projection_view(design)
   if action == "create" then expected_after.type = "technology" end
   return operation_contract.new({
@@ -77,7 +79,7 @@ local function stream_operation(row, policy)
       stream_key = row.stream_key,
       manifest_id = row.manifest_id,
       technology_design = design,
-      adoption = deepcopy(row.adoption)
+      adoption = row.adoption
     },
     evidence = {gates = row.gates}
   })

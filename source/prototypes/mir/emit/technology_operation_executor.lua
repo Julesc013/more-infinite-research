@@ -55,9 +55,9 @@ function M.apply_plan(plan, journal, options)
       local ok, result = xpcall(function() return apply_operation(operation) end, debug.traceback)
       local after = capture(operation)
       if not ok then
-        journal:record(operation, before, after, "failed", "mutation-error", {skip_precheck = true})
+        journal:record(operation, before, after, "failed", "mutation-error", {skip_precheck = true, return_entry = false})
       end
-      journal:record(operation, before, after, "applied", nil, {skip_precheck = true})
+      journal:record(operation, before, after, "applied", nil, {skip_precheck = true, return_entry = false})
       table.insert(realized, {
         operation_id = operation.operation_id,
         subject = deepcopy(operation.subject),

@@ -76,6 +76,30 @@ local function build_snapshot(journal)
   }
 end
 
+-- The ordinary snapshot/finalize API exposes a full defensive copy.  The
+-- internal execution path only needs these scalar results and the realized
+-- fingerprint rows, so it must never copy operation before/after projections.
+local function finalization_summary(snapshot)
+  local realized_operations = {}
+  for index, entry in ipairs(snapshot.entries or {}) do
+    realized_operations[index] = {
+      operation_id = entry.operation_id,
+      status = entry.status,
+      after_fingerprint = entry.after_fingerprint
+    }
+  end
+  return {
+    journal_fingerprint = snapshot.journal_fingerprint,
+    executed_operation_count = #(snapshot.entries or {}),
+    failed_operation_count = snapshot.terminal_counts.failed or 0,
+    missing_operation_count = snapshot.missing_operation_count,
+    duplicate_operation_count = snapshot.duplicate_operation_count,
+    undeclared_operation_count = snapshot.undeclared_operation_count,
+    out_of_plan_operation_count = snapshot.out_of_plan_operation_count,
+    realized_operations = realized_operations
+  }
+end
+
 function M.new(plan)
   if plan_contract.is_trusted(plan) then plan_contract.assert_trusted(plan)
   else plan_contract.verify_untrusted(plan) end
@@ -153,6 +177,7 @@ function Journal:record(operation, before, after, status, failure_code, options)
     error("Transformation execution failed for " .. operation.operation_id
       .. ": " .. tostring(entry.failure_code), 2)
   end
+  if options.return_entry == false then return nil end
   return deepcopy(entry)
 end
 
@@ -187,7 +212,10 @@ end
 
 function Journal:finalize(options)
   options = options or {}
-  if self.final_snapshot then return deepcopy(self.final_snapshot) end
+  if self.final_snapshot then
+    if options.return_snapshot == false then return finalization_summary(self.final_snapshot) end
+    return deepcopy(self.final_snapshot)
+  end
   local result = build_snapshot(self)
   local complete = result.missing_operation_count == 0
     and result.duplicate_operation_count == 0
@@ -207,6 +235,7 @@ function Journal:finalize(options)
       .. " out-of-plan=" .. result.out_of_plan_operation_count
       .. " failed=" .. result.terminal_counts.failed, 2)
   end
+  if options.return_snapshot == false then return finalization_summary(self.final_snapshot) end
   return deepcopy(result)
 end
 
