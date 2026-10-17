@@ -674,7 +674,7 @@ function Test-MIR42IndividualNativeInputReader {
         } else {
           $summary = [pscustomobject][ordered]@{
             schema=2;status='passed';git_commit=$source.commit;validation_package_sha256=$candidateTarget.archive_sha256
-            validation_package_content_sha256=$candidateTarget.content_sha256;factorio_binary_version=$engineProductVersion
+            validation_package_content_sha256=$candidateTarget.content_sha256;factorio_binary_version=$engineVersion
             expected_scenarios=@($scenario);scenarios=@([pscustomobject][ordered]@{name=$scenario;status='passed';assertions_executed=1})
           }
           $summaryReference = Write-HostJson (Join-Path $root ($prefix + '.json')) $summary
@@ -700,6 +700,23 @@ function Test-MIR42IndividualNativeInputReader {
     $bound = Get-MIR42BoundEngineRun -Reference $baseReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
+
+    # Fresh-load producers record the full executable FileVersion, just like
+    # the upgrade runner. A different build or a truncated product version
+    # must not bind to the same exact engine observation.
+    $differentBuild = $engineProductVersion + '.999999'
+    foreach ($versionCase in @(
+      [pscustomobject]@{name='different-build';version=$differentBuild},
+      [pscustomobject]@{name='truncated-version';version=$engineProductVersion}
+    )) {
+      if ([string]$versionCase.version -ceq $engineVersion) { continue }
+      $wrongFreshVersion = Copy-HostValue $baseRecord
+      $freshVersionSummary = Get-Content -LiteralPath $wrongFreshVersion.fresh_loads[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $freshVersionSummary.factorio_binary_version = [string]$versionCase.version
+      $freshVersionReference = Write-HostJson (Join-Path $root ('fresh-' + $versionCase.name + '.json')) $freshVersionSummary
+      $wrongFreshVersion.fresh_loads[0].receipt = [ordered]@{path=$freshVersionReference.path;sha256=$freshVersionReference.sha256}
+      Assert-HostReaderRefusal ('fresh-engine-' + $versionCase.name) $wrongFreshVersion '[mir42-seal-real-engine-fresh-load-binding]'
+    }
 
     # Factorio 0.13 has no Windows PE version metadata.  The fallback is
     # admissible only for its exact sealed binary and semantic version; a
@@ -801,6 +818,10 @@ function Test-MIR42IndividualNativeInputReader {
       $f013NullVersionBound = Get-MIR42BoundEngineRun -Reference $f013NullVersionReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
       Assert-MIR42NineSealTest -Condition ((@($f013NullVersionBound.record.targets | Where-Object target -CEQ 'f013').engine_execution.executable_sha256) -ceq [string]$f013ReaderEngine.sha256) -Code 'individual-f013-null-pe-version-reader'
       $checks++
+      $f013BlankSemanticVersion = New-F013BlankPEVersionReaderRecord
+      $f013BlankSemanticIndex = @($f013BlankSemanticVersion.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013BlankSemanticVersion.individual_upgrade_receipts[$f013BlankSemanticIndex].engine.version = ''
+      Assert-HostReaderRefusal 'f013-blank-sealed-semantic-version' $f013BlankSemanticVersion '[mir42-individual-engine-run-engine-version]'
       $f013MissingVersionRecord = New-F013BlankPEVersionReaderRecord
       $f013MissingVersionIndex = @($f013MissingVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
       $f013MissingVersionReceipt = Get-Content -LiteralPath $f013MissingVersionRecord.individual_upgrade_receipts[$f013MissingVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100

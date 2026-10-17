@@ -1222,8 +1222,8 @@ function Get-MIR42ExactQualificationReceipt {
 function Assert-MIR42FreshEngineLoads {
   param([Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Execution)
   $targetId = [string]$Target.target
-  $expectedFactorioVersion = [regex]::Match([string]$Execution.version, '^[0-9]+[.][0-9]+[.][0-9]+').Value
-  if ([string]::IsNullOrWhiteSpace($expectedFactorioVersion)) { throw "[mir42-seal-real-engine-version-shape] $targetId" }
+  $expectedFactorioVersion = [string]$Execution.version
+  if ($expectedFactorioVersion -cnotmatch '^[0-9]+[.][0-9]+[.][0-9]+(?:[.][0-9]+)?$') { throw "[mir42-seal-real-engine-version-shape] $targetId" }
   [string[]]$expectedScenarios = if ($targetId -ceq 'f210') { @('package-zip-base','package-zip-space-age') } else { @('package-zip-base') }
   $freshLoads = @($Execution.fresh_loads)
   if ($freshLoads.Count -ne $expectedScenarios.Count -or
