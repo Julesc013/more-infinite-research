@@ -64,6 +64,7 @@ $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
 $compilerTransitionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
 $approvedScienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+$angelsRepairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
@@ -81,9 +82,9 @@ $approvedScienceSources=@(
   'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
   'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
 )
-if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+if(@($manifest.bindings).Count-ne376-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne376-or
    $migratedBindings.Count-ne355-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne355-or
-   $introducedBindings.Count-ne20-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or
+   $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or$angelsRepairBindings.Count-ne1-or
    @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{Test-Path -LiteralPath (Join-Path $repo $_)}).Count-ne0-or
@@ -269,9 +270,11 @@ foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
   # The current source removes the retired discovery and Classic implementations
-  # while adding the approved lab/pack reference bindings.  The frozen baseline
-  # identities remain exact; current semantic changes are not historical byte parity.
-  $expectedDelta=if($target-in@('f210','f200')){37}else{106}
+  # while adding the approved lab/pack reference bindings and the single declared
+  # Angel repair. The frozen baseline identities remain exact; current semantic
+  # changes are not historical byte parity. The succession guard above authenticates
+  # the repair's exact binding rather than accepting an arbitrary extra file.
+  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

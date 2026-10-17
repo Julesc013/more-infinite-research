@@ -23,19 +23,28 @@ foreach ($target in @('f210','f200','f110','f100')) {
   }
 }
 
-# Angel Smelting performs supported F200 Bob/Angel recipe rewrites in its
-# data-final-fixes stage. The hidden optional edge is therefore a package-load
-# ordering contract, not a user-facing required/recommended dependency. Keep
-# the edge target-specific until an independent F210 case establishes it.
+# Angel Smelting finalizes recipes and disabled technologies in data-final-fixes.
+# The reported disabled-silver repair must see that state on both modern engines.
+# This is a hidden optional ordering edge; it must not force installation.
 $f200Context = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f200'
 $f200Info = Get-MIR4CurrentTargetPackageOutputText -Context $f200Context -RelativePath 'info.json' | ConvertFrom-Json
 $f210Context = New-MIR4CurrentTargetPackageContext -RepoRoot $repo -Target 'f210'
 $f210Info = Get-MIR4CurrentTargetPackageOutputText -Context $f210Context -RelativePath 'info.json' | ConvertFrom-Json
-if (@($f200Info.dependencies | Where-Object { [string]$_ -ceq '(?) angelssmelting' }).Count -ne 1) {
-  throw '[mir4-current-target-package-f200-angelssmelting-ordering]'
+function Assert-MIR4AngelsOptionalOrdering($Info,[string]$Target) {
+  $edges=@($Info.dependencies | Where-Object { [string]$_ -match '(^|\s)angelssmelting(\s|$)' })
+  if ($edges.Count -ne 1 -or [string]$edges[0] -cne '(?) angelssmelting') {
+    throw "[mir4-current-target-package-$Target-angelssmelting-ordering]"
+  }
 }
-if (@($f210Info.dependencies | Where-Object { [string]$_ -ceq '(?) angelssmelting' }).Count -ne 0) {
-  throw '[mir4-current-target-package-f210-unsupported-angelssmelting-ordering]'
+foreach($row in @(@{target='f200';info=$f200Info},@{target='f210';info=$f210Info})) {
+  Assert-MIR4AngelsOptionalOrdering $row.info $row.target
+  foreach($badEdges in @(@{name='missing';edges=@()},@{name='required';edges=@('angelssmelting')},@{name='duplicate';edges=@('(?) angelssmelting','(?) angelssmelting')})) {
+    $bad=$row.info|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+    $bad.dependencies=@($bad.dependencies|Where-Object {[string]$_ -notmatch '(^|\s)angelssmelting(\s|$)'})+@($badEdges.edges)
+    $rejected=$false
+    try {Assert-MIR4AngelsOptionalOrdering $bad $row.target} catch {$rejected=$_.Exception.Message -ceq "[mir4-current-target-package-$($row.target)-angelssmelting-ordering]"}
+    if(-not$rejected){throw "[mir4-current-target-package-angels-opposer-$($row.target)-$($badEdges.name)]"}
+  }
 }
 
 # The former repository-root player projection has no current source or test
