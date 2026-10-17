@@ -109,7 +109,7 @@ function Get-MIR42CandidateConstructionVersionContract {
 }
 
 function Get-MIR42PublishedMaintenancePredecessorContract {
-  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$CandidateSourceVersion='4.2.1')
+  param([ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2')][string]$CandidateSourceVersion='4.2.1')
   # Select a recorded publication explicitly, never by the supplied filename or
   # by transferring a predecessor's exceptional acceptance to this candidate.
   if ($CandidateSourceVersion -ceq '4.5.0') {
@@ -123,9 +123,10 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
       manifest_sha256='BF965294AD2338C7CAD02A0323A6BDB2535378D152A63D41A70AD94098631F9C'
     }
   }
-  if ($CandidateSourceVersion -ceq '4.5.1') {
+  if ($CandidateSourceVersion -cin @('4.5.1','4.5.2')) {
     # This is the published V11 construction record for the immediate 4.5.1
-    # predecessor. Its unqualified state is verified, never inherited.
+    # predecessor of 4.5.2. Keep 4.5.1 as the existing upgrade-reader key.
+    # Its unqualified state is verified, never inherited.
     return [pscustomobject][ordered]@{
       source_version='4.5.1';source_patch=1;source_tag='v4.5.1';release_id=415853821;asset_count=18;target_commitish='69c297f9bca974f4280158781aa97a9678d0fcd4'
       commit='69c297f9bca974f4280158781aa97a9678d0fcd4';tree='0e4723efd3d720942ef42935a62a2676c6860b6c'
@@ -184,7 +185,7 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
 
 function Read-MIR42PublishedMaintenancePredecessorManifest {
   param([Parameter(Mandatory)][string]$ManifestPath,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$CandidateSourceVersion='4.2.1')
+    [string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $path = [IO.Path]::GetFullPath($ManifestPath)
   $expectedSha = $contract.manifest_sha256
@@ -204,7 +205,7 @@ function Read-MIR42PublishedMaintenancePredecessorManifest {
 
 function Assert-MIR42PublishedMaintenancePredecessorMetadata {
   param([Parameter(Mandatory)]$PinnedManifest,[Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$CandidateSourceVersion='4.2.1')
+    [string]$CandidateSourceVersion='4.2.1')
   $contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
   $manifest = $PinnedManifest.manifest
   $publishedFinalManifest = $contract.source_version -cin @('4.3.0','4.4.0','4.4.1')
@@ -284,7 +285,7 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
 function Get-MIR42PublishedMaintenancePredecessorInputs {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)]$ReleaseMetadata,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$CandidateSourceVersion='4.2.1',
+    [string]$CandidateSourceVersion='4.2.1',
     [AllowEmptyString()][string]$SelectedTarget='',
     [AllowEmptyString()][string]$SelectedArchivePath='',
     [System.Collections.IDictionary]$ArchiveBindings=$null)

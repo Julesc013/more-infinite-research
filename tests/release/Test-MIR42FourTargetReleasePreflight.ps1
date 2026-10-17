@@ -179,6 +179,45 @@ try {
   try { Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $tampered451 -CandidateSourceVersion '4.5.1' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-frozen-manifest' }
   Assert-MIR42PreflightTest $rejected 'mir452-published451-raw-manifest-rejected'
 
+  # Normal 4.5.2 custody uses the same exact public predecessor as the selected
+  # upgrade lane. Its identity contract does not grant candidate qualification.
+  $published452Contract = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.2'
+  $published452Predecessor = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published451Path -CandidateSourceVersion '4.5.2'
+  $published452Rows = @(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published452Predecessor -ReleaseMetadata $published451Metadata -CandidateSourceVersion '4.5.2')
+  Assert-MIR42PreflightTest ($published452Contract.source_version -ceq '4.5.1' -and
+    $published452Contract.release_id -eq 415853821 -and $published452Contract.source_tag -ceq 'v4.5.1' -and
+    $published452Predecessor.sha256 -ceq $published451.sha256 -and $published452Rows.Count -eq 9 -and
+    $published452Predecessor.manifest.qualification -ceq 'not-performed' -and
+    -not $published452Predecessor.manifest.publication_authorized) 'mir452-normal-predecessor-exact-public451'
+  foreach ($badPath in @($tampered451, $published442.path)) {
+    $rejected = $false
+    try { Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $badPath -CandidateSourceVersion '4.5.2' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-frozen-manifest' }
+    Assert-MIR42PreflightTest $rejected 'mir452-normal-predecessor-wrong-or-changed-manifest-rejected'
+  }
+  foreach ($claim in @('qualification','technical_seal','signing','tagging','publication_authorized')) {
+    $badPinned = $published452Predecessor | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+    $badPinned.manifest.$claim = if ($claim -ceq 'publication_authorized') { $true } else { 'performed' }
+    $badPinned.manifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $badPinned.manifest
+    $rejected = $false
+    try { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $badPinned -ReleaseMetadata $published451Metadata -CandidateSourceVersion '4.5.2' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor-release-metadata' }
+    Assert-MIR42PreflightTest $rejected ('mir452-normal-predecessor-inherited-claim-rejected-'+$claim)
+  }
+  $selfPredecessor = $published451Metadata | ConvertTo-Json -Depth 30 | ConvertFrom-Json
+  $selfPredecessor.tag_name = 'v4.5.2'
+  $rejected = $false
+  try { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published452Predecessor -ReleaseMetadata $selfPredecessor -CandidateSourceVersion '4.5.2' | Out-Null } catch { $rejected = $_.Exception.Message -match 'mir42-maintenance-predecessor' }
+  Assert-MIR42PreflightTest $rejected 'mir452-normal-self-predecessor-rejected'
+  foreach ($reader in @(
+    { Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.3' },
+    { Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath $published451Path -CandidateSourceVersion '4.5.3' },
+    { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $published451 -ReleaseMetadata $published451Metadata -CandidateSourceVersion '4.5.3' },
+    { Get-MIR42PublishedMaintenancePredecessorInputs -RepoRoot $repo -ManifestPath $published451Path -ReleaseMetadata $published451Metadata -CandidateSourceVersion '4.5.3' }
+  )) {
+    $rejected = $false
+    try { & $reader | Out-Null } catch { $rejected = $_.Exception.Message -match '4[.]5[.]3' }
+    Assert-MIR42PreflightTest $rejected 'mir452-normal-predecessor-future-version-rejected-by-contract'
+  }
+
   # Exercise the published-reader custody switch without a release API call.
   # Archive identities remain checked by the real reader; these controlled
   # inputs prove it accepts only an exact complete direct-library map and keeps
