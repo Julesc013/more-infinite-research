@@ -252,6 +252,25 @@ Context.with_active(Context.new(), function()
     and stream_compiler.latest_artifact(context).record_type == nil,
     "Only the complete final GenerationPlan is installed before publication and emission")
   check(#plan.stream_plan.rows > 100, "Use the actual catalogue, not a replacement five-family catalogue")
+  local initial_base = ((plan.compiler_input or {}).compilation_snapshot or {}).base_continuation_inputs or {}
+  local initial_operations = initial_base.operations or {}
+  local final_operations = plan.base_extension_operations or {}
+  check(#initial_operations > 0 and #final_operations > 0
+    and initial_operations[1].technology_design ~= nil and final_operations[1].technology_design ~= nil,
+    "The input snapshot retains its bound base design while the final graph result is fully bound")
+  for _, operation in ipairs(final_operations) do
+    local expected_design = technology_design.from_base_extension_operation(operation)
+    local prototype = technology_design.prototype_projection(operation.technology_design, {validated = true})
+    local expected_prototype = deepcopy(prototype)
+    expected_prototype.type = "technology"
+    check(fingerprint.canonical(operation.technology_design) == fingerprint.canonical(expected_design)
+      and fingerprint.canonical(expected_prototype) == fingerprint.canonical(operation.technology),
+      "Final accepted base operation binds exact post-graph design and prototype semantics")
+    local initial_before = fingerprint.canonical(initial_operations[1].technology_design)
+    if #prototype.effects > 0 then prototype.effects[1].modifier = 99; prototype.effects[1].change = 99 end
+    check(fingerprint.canonical(initial_operations[1].technology_design) == initial_before,
+      "Final base prototype projection cannot mutate the preserved input-snapshot design")
+  end
   compiler.apply_streams(context)
   compiler.apply_base_extensions(context)
   local output_ledger = effect_safety.sanitize_all_technology_effects({
@@ -433,6 +452,139 @@ local function base_binding_source(effects)
       "approved-family-binding-control", "approved-family-binding-control-infinite")
   }
 end
+Context.with_active(emitted_context, function()
+  local compilation_plan = require("prototypes.mir.planner.compilation_plan")
+  -- Accepted sanitizer output is structural only.  These opponents prove every
+  -- terminal base decision rebinds a complete design before it becomes a public
+  -- candidate or operation.
+  local target_inventory = emitted_context:service("effect_target_inventory")
+  local function final_base_candidate(artifact, key)
+    for _, candidate in ipairs((artifact.technology_catalog or {}).base_candidates or {}) do
+      if candidate.key == key then return candidate end
+    end
+  end
+  local collision_operation = base_binding_source({
+    {type = "change-recipe-productivity", recipe = "iron-plate", change = 0.1}
+  })
+  local collision = compilation_plan.finalize(emitted_context:state_view("compilation_plan").stream_plan,
+    {collision_operation}, {effect_target_inventory = target_inventory})
+  local collision_candidate = final_base_candidate(collision, collision_operation.key)
+  check(collision_candidate and collision_candidate.reason == "covered_by_planned_operation"
+    and collision_candidate.technology_design ~= nil
+    and technology_design.verify_untrusted(collision_candidate.technology_design),
+    "Combined ownership omission binds the complete rejected base candidate after its terminal decision")
+  local graph_operation = base_binding_source({
+    {type = "laboratory-speed", modifier = 0.2}
+  })
+  graph_operation.key = "graph-deferred-base-control"
+  graph_operation.manifest_id = "base-continuation/graph-deferred-base-control"
+  graph_operation.technology_name = "graph-deferred-base-control-infinite"
+  graph_operation.technology.name = graph_operation.technology_name
+  graph_operation.technology.prerequisites = {"missing-base-graph-control"}
+  local graph_rejected = compilation_plan.finalize(emitted_context:state_view("compilation_plan").stream_plan,
+    {graph_operation}, {effect_target_inventory = target_inventory})
+  local graph_candidate = final_base_candidate(graph_rejected, graph_operation.key)
+  check(graph_candidate and graph_candidate.reason == "prerequisite_missing"
+    and graph_candidate.technology_design ~= nil
+    and technology_design.verify_untrusted(graph_candidate.technology_design)
+    and graph_candidate.technology_design.gates.prerequisites_acyclic.passed == false,
+    "Graph rejection binds the complete failed base candidate only after the graph decision")
+  local policy_row
+  for _, source_row in ipairs(emitted_context:state_view("compilation_plan").stream_plan.rows) do
+    if type(source_row.fields) == "table" then policy_row = deepcopy(source_row); break end
+  end
+  check(policy_row ~= nil, "Policy opponent requires an existing emitted stream row")
+  policy_row.action = "skip"
+  policy_row.reason = "covered_by_existing_infinite_native_modifier"
+  policy_row.stream_key = "weapon-policy-deferred-base-control"
+  policy_row.manifest_id = "weapon-policy-deferred-base-control"
+  policy_row.technology_name = "weapon-policy-deferred-base-control"
+  policy_row.fields.effects = {{type = "gun-speed", ammo_category = "bullet", modifier = 0.1}}
+  policy_row.spec.direct_effects = deepcopy(policy_row.fields.effects)
+  policy_row.diagnostics = {
+    owners = "external-native-owner",
+    native_effect_covered_categories = "bullet"
+  }
+  policy_row.technology_design = technology_design.from_generation_row(policy_row)
+  local policy_stream = deepcopy(emitted_context:state_view("compilation_plan").stream_plan)
+  table.insert(policy_stream.rows, policy_row)
+  local policy_operation = base_binding_source({
+    {type = "gun-speed", ammo_category = "bullet", modifier = 0.1}
+  })
+  policy_operation.key = "weapon-shooting-speed"
+  policy_operation.manifest_id = "base-continuation/weapon-policy-deferred-base-control"
+  policy_operation.technology_name = "weapon-policy-deferred-base-control-infinite"
+  policy_operation.technology.name = policy_operation.technology_name
+  local prior_ammo_categories = data.raw["ammo-category"]
+  data.raw["ammo-category"] = {bullet = {type = "ammo-category", name = "bullet"}}
+  local policy_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory").capture()
+  local policy_rejected = compilation_plan.finalize(policy_stream,
+    {policy_operation}, {effect_target_inventory = policy_inventory})
+  data.raw["ammo-category"] = prior_ammo_categories
+  local policy_candidate = final_base_candidate(policy_rejected, policy_operation.key)
+  check(policy_candidate and policy_candidate.reason == "covered_by_existing_infinite_native_modifier"
+    and policy_candidate.technology_design ~= nil
+    and technology_design.verify_untrusted(policy_candidate.technology_design)
+    and policy_candidate.technology_design.gates.effect_valid.passed == false,
+    "Native weapon policy binds the complete failed base candidate after its terminal coverage decision")
+
+  -- A partial native overlap must retain the unowned category, then bind its
+  -- final TechnologyDesign only after policy, ownership and graph decisions.
+  local partial_operation = base_binding_source({
+    {type = "gun-speed", ammo_category = "bullet", modifier = 0.1},
+    {type = "gun-speed", ammo_category = "rocket", modifier = 0.2}
+  })
+  partial_operation.key = "weapon-shooting-speed"
+  partial_operation.manifest_id = "base-continuation/weapon-policy-partial-base-control"
+  partial_operation.technology_name = "weapon-policy-partial-base-control-infinite"
+  partial_operation.technology.name = partial_operation.technology_name
+  partial_operation.technology_design = technology_design.from_base_extension_operation(partial_operation)
+  partial_operation.technology = technology_design.prototype_projection(
+    partial_operation.technology_design, {validated = true})
+  partial_operation.technology.type = "technology"
+  local partial_source_fingerprint = fingerprint.canonical(partial_operation)
+  local partial_stream = deepcopy(emitted_context:state_view("compilation_plan").stream_plan)
+  table.insert(partial_stream.rows, deepcopy(policy_row))
+  local prior_partial_ammo_categories = data.raw["ammo-category"]
+  data.raw["ammo-category"] = {
+    bullet = {type = "ammo-category", name = "bullet"},
+    rocket = {type = "ammo-category", name = "rocket"}
+  }
+  local partial_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory").capture()
+  local partial = compilation_plan.finalize(partial_stream, {partial_operation},
+    {effect_target_inventory = partial_inventory})
+  data.raw["ammo-category"] = prior_partial_ammo_categories
+  local partial_final
+  for _, operation in ipairs(partial.base_extension_operations or {}) do
+    if operation.key == partial_operation.key then partial_final = operation end
+  end
+  local partial_candidate = final_base_candidate(partial, partial_operation.key)
+  local partial_input = (((partial.compiler_input or {}).compilation_snapshot or {})
+    .base_continuation_inputs or {}).operations[1]
+  local partial_input_projection = partial_input and partial_input.technology_design
+    and technology_design.prototype_projection(partial_input.technology_design, {validated = true})
+  local partial_expected = partial_final and technology_design.from_base_extension_operation(partial_final)
+  local partial_projection = partial_final and technology_design.prototype_projection(
+    partial_final.technology_design, {validated = true})
+  if partial_projection then partial_projection.type = "technology" end
+  check(partial_final and partial_candidate and partial_candidate.action == "create"
+    and #partial_final.technology.effects == 1
+    and partial_final.technology.effects[1].ammo_category == "rocket"
+    and partial_final.planned_policy == "weapon-speed-overlap-resolved"
+    and fingerprint.canonical(partial_final.technology_design) == fingerprint.canonical(partial_expected)
+    and fingerprint.canonical(partial_final.technology) == fingerprint.canonical(partial_projection)
+    and partial_candidate.design_fingerprint == partial_final.technology_design.design_fingerprint,
+    "Partial native weapon coverage retains the unowned category and binds the exact accepted terminal design")
+  check(partial_final and fingerprint.canonical(partial_operation) == partial_source_fingerprint
+    and partial_input_projection and #partial_input_projection.effects == 2
+    and partial_input_projection.effects[1].ammo_category == "bullet"
+    and partial_input_projection.effects[2].ammo_category == "rocket"
+    and partial_final.technology_design.design_fingerprint
+      ~= partial_operation.technology_design.design_fingerprint,
+    "Partial native weapon filtering preserves the full source/input design without aliasing its final design")
+
+end)
+
 local retained_and_missing_effects = {
   {type = "change-recipe-productivity", recipe = "iron-plate", change = 0.1},
   {type = "unlock-recipe", recipe = "missing-approved-family-binding-control"}
@@ -459,21 +611,24 @@ local candidate_operations, candidate_integrity = compilation_model.sanitize_bas
 local candidate_counts = deepcopy(binding_counts)
 technology_design.from_base_extension_operation = original_from_base
 fingerprint.of = original_fingerprint_of
-check(fingerprint.canonical(candidate_operations) == fingerprint.canonical(legacy_operations)
-  and fingerprint.canonical(candidate_integrity) == fingerprint.canonical(legacy_integrity),
-  "Base sanitation binds the same accepted operation and integrity evidence after effect pruning")
-check(candidate_counts.base_design_constructions == legacy_counts.base_design_constructions - 1
+local legacy_structural = deepcopy(legacy_operations)
+legacy_structural[1].technology_design = nil
+check(fingerprint.canonical(candidate_operations) == fingerprint.canonical(legacy_structural)
+  and fingerprint.canonical(candidate_integrity) == fingerprint.canonical(legacy_integrity)
+  and candidate_operations[1].technology_design == nil,
+  "Base sanitation preserves the accepted structural operation and integrity evidence while deferring final design binding")
+check(candidate_counts.base_design_constructions == 0
+  and candidate_counts.base_design_constructions == legacy_counts.base_design_constructions - 2
   and candidate_counts.fingerprint_calls < legacy_counts.fingerprint_calls,
-  "Base sanitation avoids the discarded pre-sanitization TechnologyDesign and its fingerprints")
+  "Base sanitation avoids both discarded pre-graph TechnologyDesign bindings and their fingerprints")
 check(candidate_source_fingerprint == fingerprint.of(candidate_source)
   and candidate_operations[1].technology.type == "technology"
   and #candidate_operations[1].technology.effects == 1
   and candidate_integrity.removed_effect_count == 1,
-  "Base sanitation retains the copied canonical projection while leaving source effects unchanged")
+  "Base sanitation retains the copied structural projection while leaving source effects unchanged")
 candidate_operations[1].technology.effects[1].change = 99
-check(candidate_source.technology.effects[1].change == 0.1
-  and technology_design.prototype_projection(candidate_operations[1].technology_design, {validated = true}).effects[1].change == 0.1,
-  "Base sanitation does not share its returned projection with source or trusted design ownership")
+check(candidate_source.technology.effects[1].change == 0.1,
+  "Base sanitation does not share its deferred structural projection with the source operation")
 local rejected_effects = {{type = "unlock-recipe", recipe = "missing-approved-family-binding-control"}}
 local legacy_rejected, legacy_rejected_integrity = legacy_sanitize_base_operations(
   {base_binding_source(rejected_effects)}, target_inventory)

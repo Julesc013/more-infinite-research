@@ -105,6 +105,10 @@ end
 -- would construct a design that no later consumer can use.
 local function normalized_base_operation_structure(operation)
   local out = M.copy_operation_with_design_view(operation)
+  -- An input-plan design describes the pre-sanitization candidate.  Never carry
+  -- it into the mutable compilation view: final binding happens only after all
+  -- remaining base decisions are known.
+  out.technology_design = nil
   out.gates = {}
   for gate_name, gate in pairs(operation.gates or {}) do out.gates[gate_name] = gate end
   out.schema = 2
@@ -125,8 +129,17 @@ local function bind_base_operation_design(operation)
   return operation
 end
 
+-- Private compilation-stage view.  It owns the mutable operation structure but
+-- deliberately has no TechnologyDesign until a terminal base decision needs one.
+-- The source plan remains fully bound for the input snapshot and planned-candidate
+-- record; this view is only used after sanitation while policy, ownership, and
+-- graph decisions can still change effects or gates.
+function M.owned_base_operation(operation)
+  return normalized_base_operation_structure(operation)
+end
+
 function M.normalized_base_operation(operation)
-  local out = normalized_base_operation_structure(operation)
+  local out = M.owned_base_operation(operation)
   return bind_base_operation_design(out)
 end
 
@@ -149,7 +162,9 @@ function M.sanitize_base_operations(base_plan, target_inventory)
         "effect-contracts",
         {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
       )
-      bind_base_operation_design(operation)
+      -- The virtual graph and combined ownership resolver consume this owned
+      -- structure and its gates/effects only.  Bind the complete design after
+      -- their terminal decision, where the public operation is formed.
       table.insert(operations, operation)
     else
       skipped_count = skipped_count + 1
