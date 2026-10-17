@@ -48,6 +48,25 @@ $futureVersionRejected=$false
 try { Get-MIR42ReleaseAssetVersionContract -SourceVersion '4.3.2' -ReleaseTag 'v4.3.2' | Out-Null } catch { $futureVersionRejected=$_.Exception.Message-ceq'[mir42-release-assets-version-contract]' }
 Assert-MIR42ReleaseAssetsTest -Condition $futureVersionRejected -Code 'unknown-432-cannot-borrow-431-custody'
 
+
+function Test-MIR452NativeUpgradeProofReader {
+  $patch = Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.1' -CandidateSourceVersion '4.5.2'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$patch.source_version -ceq '4.5.1' -and [string]$patch.source_tag -ceq 'v4.5.1' -and
+    [string]$patch.manifest.manifest.source.commit -ceq '69c297f9bca974f4280158781aa97a9678d0fcd4' -and
+    [string]$patch.manifest.manifest.source.tree -ceq '0e4723efd3d720942ef42935a62a2676c6860b6c' -and
+    [string]$patch.target.distribution_version -ceq '4.5.20001' -and [string]$patch.target.sha256 -ceq '6AF50F62B56580BBED277C0A943F356970598A38D3007C0F7F98EC3F07A14EDE') -Code '452-proof-reader-binds-exact-published-451'
+  $minor = Get-MIR423PublishedUpgradePredecessor -Target 'f210' -PredecessorSourceVersion '4.4.2' -CandidateSourceVersion '4.5.2'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$minor.source_version -ceq '4.4.2' -and [string]$minor.source_tag -ceq 'v4.4.2' -and
+    [string]$minor.target.distribution_version -ceq '4.4.21002' -and [string]$minor.target.sha256 -ceq '12FBB1D1B71CD27B87C734A0B7F34F3B996EC4899C7A2F27C5A0C9C7A5BE972F') -Code '452-proof-reader-binds-corrected-r24'
+  $wrongPairRejected=$false
+  try { Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.0' -CandidateSourceVersion '4.5.2' | Out-Null } catch { $wrongPairRejected=$_.Exception.Message -ceq '[mir423-upgrade-predecessor-version]' }
+  Assert-MIR42ReleaseAssetsTest -Condition $wrongPairRejected -Code '452-proof-reader-rejects-unbound-predecessor'
+  $futureRejected=$false
+  try { Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.1' -CandidateSourceVersion '4.5.3' | Out-Null } catch { $futureRejected=$true }
+  Assert-MIR42ReleaseAssetsTest -Condition $futureRejected -Code '453-proof-reader-rejected'
+}
+Test-MIR452NativeUpgradeProofReader
+
 function New-MIR42ReleaseAssetsFixtureZip {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$Line)
 
