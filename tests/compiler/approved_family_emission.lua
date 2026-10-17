@@ -52,6 +52,58 @@ local Context = require("prototypes.mir.pipeline.compiler_context")
 local compiler = require("prototypes.mir.pipeline.compiler_orchestrator")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+-- Target adapters own phase reporting; the common qualifier owns the decision.
+local f200_science = require("prototypes.mir.planner.science")
+check(f200_science.phase_diagnostic_fields(nil) == nil,
+  "F200 explicitly has no science-phase reporting fields")
+local f210_science = assert(loadfile(source_root .. "/prototypes/mir/planner/science.lua"))()
+local phase_fields = f210_science.phase_diagnostic_fields({
+  policy_id = "phase-policy", status = "normalized", removed_packs = {"old-pack"},
+  requested_packs = {"request-pack"}, retained_required_packs = {"required-pack"}
+})
+check(fingerprint.canonical(phase_fields) == fingerprint.canonical({
+  science_phase_policy_id = "phase-policy", science_phase_policy_status = "normalized",
+  science_phase_removed_packs = "old-pack", science_phase_requested_packs = "request-pack",
+  science_phase_required_packs = "required-pack"
+}), "Common phase reporting preserves all five exact F210 fields")
+check(not pcall(f210_science.phase_diagnostic_fields, nil),
+  "F210 phase reporting refuses a missing science decision")
+
+-- Exercise merge_fields(nil, nonempty_native_fields) through the actual common
+-- qualifier. Keep the synthetic owner out of the ordinary catalogue context.
+local native_owner = "mir452-fixture-native-laboratory-speed-1"
+data.raw.technology[native_owner] = {
+  type = "technology", name = native_owner, enabled = true, max_level = "infinite",
+  prerequisites = {"production-science-pack"},
+  effects = {{type = "laboratory-speed", modifier = 0.1}},
+  unit = {count = 100, time = 30, ingredients = {{"automation-science-pack", 1}}}
+}
+Context.with_active(Context.new(), function()
+  local qualifier = require("prototypes.mir.planner.stream_compiler.qualify")
+  local descriptor = require("prototypes.mir.domain.streams.descriptor")
+  local row = qualifier.plan("mir452_native_phase_probe", descriptor.normalize("mir452_native_phase_probe", {
+    icon_item = "iron-plate", science_packs = roles, adopt_exact_native_effect_owner = true,
+    direct_effects = {
+      {type = "laboratory-speed", modifier = 0.1},
+      {type = "worker-robot-battery", modifier = 0.1}
+    }
+  }))
+  check(row.action == "emit" and row.reason == "direct_effect"
+    and #row.fields.effects == 1 and row.fields.effects[1].type == "worker-robot-battery",
+    "Mixed native coverage retains exactly the unowned direct effect")
+  local details = row.diagnostics
+  check(details.native_effect_owners == native_owner and details.owners == native_owner
+    and type(details.native_effect_policy) == "string"
+    and details.native_effect_covered_identities ~= ""
+    and details.native_effect_emitted_identities ~= "",
+    "F200 nil phase fields do not suppress following native-owner diagnostics")
+  check(row.science_phase_policy == nil and details.science_phase_policy_id == nil
+    and details.science_phase_policy_status == nil and details.science_phase_removed_packs == nil
+    and details.science_phase_requested_packs == nil and details.science_phase_required_packs == nil,
+    "The common qualifier preserves F200's absent phase metadata")
+end)
+data.raw.technology[native_owner] = nil
+
 local name = "recipe-prod-research_iron-1"
 local expected = {
   name = name, max_level = "infinite", time = 60, count_formula = "8000*2^(L-1)",

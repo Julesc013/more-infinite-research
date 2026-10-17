@@ -91,7 +91,7 @@ $targetModuleSources=@{
     qualify='source/prototypes/mir/planner/stream_compiler/qualify.lua'
   }
   f200=@{
-    qualify='source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
+    qualify='source/prototypes/mir/planner/stream_compiler/qualify.lua'
   }
 }
 foreach($target in @('f210','f200')){
@@ -102,15 +102,18 @@ foreach($target in @('f210','f200')){
   $qualify=Get-Content -Raw -LiteralPath (Join-Path $repo $sourcePath)
   foreach($owner in @('discover','ownership','diagnostics')){Assert-MIR4M4202StreamCompiler ($qualify-match"stream_compiler[.]$owner") "qualify-import-$target-$owner"}
   Assert-MIR4M4202StreamCompiler ($qualify-notmatch'compile_active|generation_plan[.]new|context:set_state') "qualify-boundary-$target"
-  $maxQualifyLines=if($target-ceq'f210'){260}else{250}
+  $maxQualifyLines=260 # Both targets now select the same shared module.
   Assert-MIR4M4202StreamCompiler (@(Get-Content -LiteralPath (Join-Path $repo $sourcePath)).Count-le$maxQualifyLines) "qualify-size-$target"
   $targetRows=@($manifest.bindings|Where-Object{$target-in@($_.target_scope)-and[string]$_.output_path-in$outputs})
   Assert-MIR4M4202StreamCompiler ($targetRows.Count-eq6) "target-binding-count-$target"
 }
 
 $f210Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f210.qualify))
-$f200Qualify=Get-Content -Raw -LiteralPath (Join-Path $repo ([string]$targetModuleSources.f200.qualify))
-Assert-MIR4M4202StreamCompiler ($f210Qualify-match'science_phase_decision'-and$f200Qualify-notmatch'science_phase_decision') 'target-science-policy-preserved'
+Assert-MIR4M4202StreamCompiler ($f210Qualify-match'planner_science[.]phase_diagnostic_fields') 'shared-qualifier-science-adapter'
+Assert-MIR4M4202StreamCompiler (-not(Test-Path -LiteralPath (Join-Path $repo 'source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'))) 'retired-f200-qualifier'
+$f210Science=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/prototypes/mir/planner/science.lua')
+$f200Science=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/adapters/f200/prototypes/mir/planner/science.lua')
+Assert-MIR4M4202StreamCompiler ($f210Science-match'function M[.]phase_diagnostic_fields'-and$f210Science-match'science_phase_policy_id'-and$f200Science-match'function M[.]phase_diagnostic_fields\(_\)\s+return nil') 'target-science-policy-preserved'
 foreach($shared in @('compile.lua','diagnostics.lua','discover.lua','ownership.lua')){
   $sharedOutput="prototypes/mir/planner/stream_compiler/$shared"
   $f210Source=[string]@($manifest.bindings|Where-Object{'f210'-in@($_.target_scope)-and[string]$_.output_path-ceq$sharedOutput})[0].source_path

@@ -30,7 +30,8 @@ $retiredPredecessorSources=@(
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/technology_researchability.lua',
-  'targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua'
+  'targets/f200/files/prototypes/mir/planner/base_continuations/plan.lua',
+  'targets/f200/files/prototypes/mir/planner/stream_compiler/qualify.lua'
 )
 $retiredCurrentSources=@(
   'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
@@ -38,7 +39,8 @@ $retiredCurrentSources=@(
   'source/prototypes/mir/pipeline/classic_compiler.lua',
   'source/prototypes/mir/domain/compiler/classic_declarations.lua',
   'source/prototypes/mir/planner/classic/plan.lua',
-  'source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'
+  'source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua',
+  'source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
 )
 $predecessorPaths=@($predecessorManifest.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
 $currentPaths=@($manifest.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
@@ -54,8 +56,8 @@ $sharedPlanShape=($sharedPlan.Count-eq1-and[string]$sharedPlan[0].layer-ceq'capa
 $successionChecks=@(
   ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
   ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
-  (@($manifest.bindings).Count-eq376),($currentPaths.Count-eq376),
-  ($migrated.Count-eq355),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq355),
+  (@($manifest.bindings).Count-eq375),($currentPaths.Count-eq375),
+  ($migrated.Count-eq354),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq354),
   ($introduced.Count-eq21),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),($angelsRepairIntroduced.Count-eq1),
   ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
   (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
@@ -109,6 +111,9 @@ foreach($forgery in @(
   @{id='retired-f200-plan-reintroduced';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/adapters/f200/prototypes/mir/planner/base_continuations/plan.lua'}},
   @{id='shared-f200-plan-missing';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].source_path='source/prototypes/mir/planner/base_continuations/forged-plan.lua'}},
   @{id='shared-f200-plan-scope';mutate={param($r)$row=@($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/base_continuations/plan.lua');$row[0].target_scope=@('f210','f110','f100')}},
+  @{id='retired-f200-qualifier-reintroduced';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/stream_compiler/qualify.lua').source_path='source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'}},
+  @{id='shared-f200-qualifier-missing';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/stream_compiler/qualify.lua').source_path='source/prototypes/mir/planner/stream_compiler/forged.lua'}},
+  @{id='shared-f200-qualifier-scope';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/stream_compiler/qualify.lua').target_scope=@('f210','f110','f100')}},
   @{id='angels-repair-missing';mutate={param($r)$r.bindings=@($r.bindings|Where-Object source_path -CNE 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua')}},
   @{id='angels-repair-substitution';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').source_path='source/prototypes/mir/compatibility/repairs/forged.lua'}},
   @{id='angels-repair-scope';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/compatibility/repairs/angels_smelting.lua').target_scope=@('f210','f200')}},

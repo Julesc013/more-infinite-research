@@ -2860,8 +2860,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed f200 adapter source for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 635,
-      "expected_sha256": "9999355BFF92D11628494179E162AF7762B6AC99E29FAF6502CA90303B9669C0",
+      "expected_bytes": 691,
+      "expected_sha256": "1DB95D35784C982FA0ECE8790EEF3EEECDB442B17989B1F062B4402C86202154",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2888,12 +2888,12 @@
       "path": "prototypes/mir/planner/stream_compiler/qualify.lua",
       "operation": "add",
       "semantic_class": "target-replacement",
-      "source_path": "source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "source_path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed stream-compiler qualify responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11652,
-      "expected_sha256": "A3F251B9B1858538C6CA34F6923D6D630F33E4E954CC7C7A8655DB44050064F3",
+      "expected_bytes": 12589,
+      "expected_sha256": "2D7C9C8FE0B5278AB5C601B621BAB42E9BA8BC2EF19547A2C259F229DDBC1969",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "A03B2447A1B1FB420F0A18E0B48A3899FC1CE96CD1559A16DEAC36D0048EE7FF"
+  "record_sha256": "3224335E968C5C54F08BB7B0831B6AA24AB62FD24BB5396C424F3D281C800DED"
 }

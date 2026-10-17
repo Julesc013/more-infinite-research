@@ -29,7 +29,7 @@ $modules=[ordered]@{
  'prototypes.mir.planner.science'='source/prototypes/mir/planner/science.lua'
  'prototypes.mir.planner.prerequisites'='source/prototypes/mir/planner/prerequisites.lua'
  'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
- 'prototypes.mir.planner.stream_compiler.qualify'='source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
+ 'prototypes.mir.planner.stream_compiler.qualify'='source/prototypes/mir/planner/stream_compiler/qualify.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')

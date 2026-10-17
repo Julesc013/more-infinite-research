@@ -1,9 +1,5 @@
 local D = require("prototypes.mir.report.diagnostics_sink")
-local deepcopy = require("prototypes.mir.core.deepcopy")
-local data_raw = require("prototypes.mir.platform.factorio.data_raw")
 local material_progression = require("prototypes.mir.families.material_progression")
-local science_packs = require("prototypes.mir.capabilities.science_integration.science_packs")
-local research_cost_model = require("prototypes.mir.domain.research_cost.model")
 local native_owner_binding = require("prototypes.mir.planner.native_owner_binding")
 local costs = require("prototypes.mir.planner.costs")
 local icon_builder = require("prototypes.mir.presentation.icon_builder")
@@ -35,7 +31,10 @@ local attach_family_recipes = ownership.attach_family_recipes
 
 local function merge_fields(...)
   local out = {}
-  for _, fields in ipairs({...}) do
+  -- F200 has no phase diagnostic record.  Do not use ipairs({ ... }): a
+  -- leading nil would stop before the following native-owner diagnostics.
+  for index = 1, select("#", ...) do
+    local fields = select(index, ...)
     for field, value in pairs(fields or {}) do out[field] = value end
   end
   return out
@@ -122,13 +121,8 @@ local function plan_stream(key, raw_spec)
   end
 
   local ingredients, lab_status, science_phase_decision = planner_science.ingredients_for_stream(key, spec)
-  local science_phase_fields = {
-    science_phase_policy_id = science_phase_decision.policy_id,
-    science_phase_policy_status = science_phase_decision.status,
-    science_phase_removed_packs = table.concat(science_phase_decision.removed_packs or {}, ","),
-    science_phase_requested_packs = table.concat(science_phase_decision.requested_packs or {}, ","),
-    science_phase_required_packs = table.concat(science_phase_decision.retained_required_packs or {}, ",")
-  }
+  local science_phase_fields = planner_science.phase_diagnostic_fields(science_phase_decision)
+  local science_phase_row = science_phase_fields and {science_phase_policy = science_phase_decision} or nil
   if not ingredients or #ingredients == 0 then
     return skip_row(key, spec, "no_lab_compatible_science", ingredients, direct_effects, lab_status,
       merge_fields(science_phase_fields, native_effect_fields), {
@@ -163,14 +157,13 @@ local function plan_stream(key, raw_spec)
     }
     return plan_row(key, spec, "emit", "direct_effect",
       D.stream_fields(key, spec, "generated", "direct_effect", ingredients, prerequisites, emitted_effects,
-        lab_status, merge_fields(science_phase_fields, native_effect_fields)), {
+        lab_status, merge_fields(science_phase_fields, native_effect_fields)), merge_fields({
         technology_name = technology_name,
         fields = fields,
         planned_max_level = max_level,
         direct_effects = true,
-        overlap_effects = direct_effects,
-        science_phase_policy = science_phase_decision
-      })
+        overlap_effects = direct_effects
+      }, science_phase_row))
   end
 
   if not target_line.feature_enabled("recipe_productivity") then
@@ -189,18 +182,13 @@ local function plan_stream(key, raw_spec)
   buckets, adopted_effects, family_blocked, adoption_owner_name, adoption = native_owner_binding.plan(key, spec, buckets)
   if adoption then
     return plan_row(key, spec, "adopt", adoption.operation,
-      D.stream_fields(key, spec, "adopted", adoption.operation, ingredients, nil, adopted_effects, lab_status, {
-        owners = adoption_owner_name,
-        recipes = owner_policy.recipe_names_from_effects(adopted_effects),
-          science_phase_policy_id = science_phase_fields.science_phase_policy_id,
-          science_phase_policy_status = science_phase_fields.science_phase_policy_status,
-          science_phase_removed_packs = science_phase_fields.science_phase_removed_packs,
-          science_phase_requested_packs = science_phase_fields.science_phase_requested_packs,
-          science_phase_required_packs = science_phase_fields.science_phase_required_packs
-      }), {
-        adoption = adoption,
-        science_phase_policy = science_phase_decision
-      })
+      D.stream_fields(key, spec, "adopted", adoption.operation, ingredients, nil, adopted_effects, lab_status,
+        merge_fields({
+          owners = adoption_owner_name,
+          recipes = owner_policy.recipe_names_from_effects(adopted_effects)
+        }, science_phase_fields)), merge_fields({
+          adoption = adoption
+        }, science_phase_row))
   end
   if retained_buckets then buckets = retained_buckets end
   local effects = recipe_productivity_planner.effects_from_buckets(key, buckets)
@@ -249,13 +237,12 @@ local function plan_stream(key, raw_spec)
   }
   local row = plan_row(key, spec, "emit", "recipe_productivity",
     D.stream_fields(key, spec, "generated", "recipe_productivity", ingredients, prerequisites, emitted_effects,
-      lab_status, science_phase_fields), {
+      lab_status, science_phase_fields), merge_fields({
       technology_name = technology_name,
       fields = fields,
       planned_max_level = max_level,
-      direct_effects = false,
-      science_phase_policy = science_phase_decision
-    })
+      direct_effects = false
+    }, science_phase_row))
   return retained_buckets and diagnostics.retain_earned_effects(row) or row
 end
 
