@@ -67,12 +67,15 @@ local function replacement_prerequisites(prerequisites, old_name, replacements)
   return out
 end
 
-local function snapshot_from_nodes(nodes)
+local function snapshot_from_nodes(nodes, known_view)
   table.sort(nodes, function(left, right) return left.name < right.name end)
   local snapshot = {schema = 1, nodes = nodes}
   snapshot.graph_fingerprint = fingerprint.of({schema = snapshot.schema, nodes = snapshot.nodes})
-  local view = {}
-  for _, node in ipairs(nodes) do view[node.name] = node end
+  local view = known_view
+  if not view then
+    view = {}
+    for _, node in ipairs(nodes) do view[node.name] = node end
+  end
   technology_views[snapshot] = view
   return snapshot
 end
@@ -91,10 +94,8 @@ function M.new(technologies, options)
     for _, name in ipairs(options.sorted_names) do append(name, technologies[name]) end
   else
     for name, technology in pairs(technologies or {}) do append(name, technology) end
-    table.sort(nodes, function(left, right) return left.name < right.name end)
   end
-  local snapshot = snapshot_from_nodes(nodes)
-  technology_views[snapshot] = technology_view
+  local snapshot = snapshot_from_nodes(nodes, technology_view)
   return snapshot
 end
 
