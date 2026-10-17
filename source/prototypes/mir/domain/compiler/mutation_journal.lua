@@ -188,15 +188,15 @@ end
 function Journal:finalize(options)
   options = options or {}
   if self.final_snapshot then return deepcopy(self.final_snapshot) end
-  local preview = build_snapshot(self)
-  local complete = preview.missing_operation_count == 0
-    and preview.duplicate_operation_count == 0
-    and preview.undeclared_operation_count == 0
-    and preview.out_of_plan_operation_count == 0
-    and preview.terminal_counts.failed == 0
-    and #preview.entries == self.required_operation_count
-  self.finalized = true
   local result = build_snapshot(self)
+  local complete = result.missing_operation_count == 0
+    and result.duplicate_operation_count == 0
+    and result.undeclared_operation_count == 0
+    and result.out_of_plan_operation_count == 0
+    and result.terminal_counts.failed == 0
+    and #result.entries == self.required_operation_count
+  self.finalized = true
+  result.finalized = true
   result.complete = complete
   result.journal_fingerprint = fingerprint.of(journal_fingerprint_material(result))
   self.final_snapshot = deepcopy(result)

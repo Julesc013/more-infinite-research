@@ -66,7 +66,7 @@ local function assert_preserved()
     prerequisites = prerequisites, effects = actual.effects}
   assert(fingerprint.of(projection) == fingerprint.of(expected), "Established iron definition changed")
 end
-local counts
+local counts, emitted_plan, emitted_journal
 Context.with_active(Context.new(), function()
   local context = Context.current()
   local plan = compiler.compile(context)
@@ -84,7 +84,83 @@ Context.with_active(Context.new(), function()
   check(journal and journal.plan_fingerprint == plan.transformation_plan.plan_fingerprint,
     "The actual emission journal is bound to the actual common plan")
   counts = {rows = #plan.stream_plan.rows, operations = #plan.transformation_plan.operations}
+  emitted_plan, emitted_journal = plan.transformation_plan, journal
 end)
+
+local mutation_journal = require("prototypes.mir.domain.compiler.mutation_journal")
+local transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
+local transformation_operation = require("prototypes.mir.domain.compiler.transformation_operation")
+local function stable_finalization(journal, result, complete, label)
+  check(result.finalized == true and result.complete == complete, label .. " finalization state")
+  local bytes = fingerprint.canonical(result)
+  check(bytes == fingerprint.canonical(journal:snapshot())
+    and bytes == fingerprint.canonical(journal:finalize()), label .. " stable frozen bytes")
+  local another = journal:finalize()
+  another.terminal_counts.applied = 999
+  another.missing_operations[1] = "changed-returned-copy"
+  another.violations.duplicate[1] = "changed-returned-copy"
+  if another.entries[1] then another.entries[1].before_snapshot.changed_returned_copy = true end
+  result.terminal_counts.failed = 999
+  if result.entries[1] then result.entries[1].after_projection.changed_returned_copy = true end
+  check(bytes == fingerprint.canonical(journal:snapshot())
+    and bytes == fingerprint.canonical(journal:finalize()), label .. " defensive copies")
+end
+local function rejected(action, fragment)
+  local ok, message = pcall(action)
+  check(not ok and tostring(message):find(fragment, 1, true), "reject " .. fragment)
+end
+stable_finalization(emitted_journal, emitted_journal:finalize(), true, "actual emitted catalogue")
+local function plan_for(operations)
+  return transformation_plan.new({phase = "journal-finalization-control", execution_mode = "SAFE",
+    compilation_snapshot_fingerprint = emitted_plan.compilation_snapshot_fingerprint,
+    policy_fingerprint = emitted_plan.policy_fingerprint, operations = operations})
+end
+local empty = mutation_journal.new(plan_for({}))
+local empty_result = empty:finalize()
+check(empty_result.required_operation_count == 0 and #empty_result.entries == 0
+  and empty_result.terminal_counts.applied == 0 and empty_result.terminal_counts.failed == 0,
+  "empty plan retains exact terminal counts")
+stable_finalization(empty, empty_result, true, "empty plan")
+local operation = emitted_plan.operations[1]
+local one_plan = plan_for({operation})
+local before, after = operation.expected_before_snapshot, operation.expected_after_projection
+local missing = mutation_journal.new(one_plan)
+rejected(function() missing:finalize() end, "MutationJournal is incomplete or failed: missing=1")
+local missing_result = missing:snapshot()
+check(missing_result.missing_operation_count == 1 and missing_result.missing_operations[1] == operation.operation_id,
+  "failed finalization freezes the exact missing operation before raising")
+stable_finalization(missing, missing_result, false, "missing operation")
+local failed = mutation_journal.new(one_plan)
+rejected(function() failed:record(operation, before, {}, "applied") end, "postcondition-mismatch")
+local failed_result = failed:finalize({allow_failed = true})
+check(failed_result.terminal_counts.failed == 1 and failed_result.missing_operation_count == 0,
+  "failed execution remains recorded instead of missing")
+stable_finalization(failed, failed_result, false, "failed operation")
+local duplicate = mutation_journal.new(one_plan)
+duplicate:record(operation, before, after, "applied")
+rejected(function() duplicate:record(operation, before, after, "applied") end, "more than once")
+local duplicate_result = duplicate:finalize({allow_failed = true})
+check(duplicate_result.duplicate_operation_count == 1 and #duplicate_result.entries == 1,
+  "duplicate rejection retains the original applied operation")
+stable_finalization(duplicate, duplicate_result, false, "duplicate operation")
+local other = deepcopy(operation)
+other.operation_id = operation.operation_id .. "/undeclared"
+other = transformation_operation.new(other)
+local undeclared = mutation_journal.new(one_plan)
+rejected(function() undeclared:assert_operation(other) end, "undeclared operation")
+local undeclared_result = undeclared:finalize({allow_failed = true})
+check(undeclared_result.undeclared_operation_count == 1 and undeclared_result.missing_operation_count == 1,
+  "undeclared rejection retains the planned missing operation")
+stable_finalization(undeclared, undeclared_result, false, "undeclared operation")
+local changed = deepcopy(operation)
+changed.allowed_delta = {changed = true}
+changed = transformation_operation.new(changed)
+local out_of_plan = mutation_journal.new(one_plan)
+rejected(function() out_of_plan:assert_operation(changed) end, "differs from its bound plan")
+local out_of_plan_result = out_of_plan:finalize({allow_failed = true})
+check(out_of_plan_result.out_of_plan_operation_count == 1 and out_of_plan_result.missing_operation_count == 1,
+  "changed operation retains its bound-plan violation")
+stable_finalization(out_of_plan, out_of_plan_result, false, "out-of-plan operation")
 local emitted = data.raw.technology[name]
 data.raw.technology[name] = nil
 check(not pcall(assert_preserved), "The preservation oracle rejects deletion of non-core research")
