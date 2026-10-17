@@ -384,7 +384,32 @@ local function declared_source(pack_name, shared)
   local result, reason = binding(pack_name,
     {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
   if not result then return nil, reason end
-  return with_retained_progression(shared, result)
+  local retained, retained_reason = with_retained_progression(shared, result)
+  return retained, retained_reason, retained ~= nil
+end
+
+local function direct_alternatives(pack_name, primary, shared)
+  local sources = {primary}
+  for _, recipe_name in ipairs(recipe_facts.recipes_by_output_identity_view("item", pack_name)) do
+    if recipe_name ~= primary.recipe_name then
+      local fact = recipe_facts.view(recipe_name)
+      if outputs_pack(fact, pack_name) then
+        local gates = {}
+        if fact.enabled_without_research ~= true then
+          for _, name in ipairs(recipe_unlocks.for_recipe(recipe_name)) do
+            if not technology_reason(name) then gates[#gates + 1] = name end
+          end
+        end
+        if fact.enabled_without_research == true or #gates == 1 then
+          local source = binding(pack_name,
+            {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
+          if source then source = with_retained_progression(shared, source) end
+          if source then sources[#sources + 1] = source end
+        end
+      end
+    end
+  end
+  return sources
 end
 
 -- Positive reference rules validate only declared pack sources, direct lab
@@ -522,13 +547,13 @@ end
 local function build_reference_bindings(shared, labs)
   local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, unavailable_labs = {},
     technologies = {}, rules = {}}
-  local unknown_sources = {}
+  local unknown_sources, route_choices = {}, {}
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
   end
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
-    local source, reason = declared_source(pack, shared)
+    local source, reason, parameterized = declared_source(pack, shared)
     result.packs[pack], result.issues[pack] = source, reason
     if not source then unknown_sources[node("pack", pack)] = true end
     if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
@@ -538,13 +563,25 @@ local function build_reference_bindings(shared, labs)
       if #recipe_facts.recipes_by_output_identity_view("item", pack) > 1 then
         unknown_sources[node("pack", pack)] = true
       end
-      local required = {}
-      for _, gate in ipairs(source.unlockers) do required[#required + 1] = node("technology", gate) end
-      for _, gate in ipairs(source.progression_prerequisites or {}) do
-        required[#required + 1] = node("technology", gate)
+      local sources = parameterized and (shared.science_binding_policy or {}).unique_direct_recipe
+        and direct_alternatives(pack, source, shared) or {source}
+      for index, candidate in ipairs(sources) do
+        local required = {}
+        for _, gate in ipairs(candidate.unlockers) do required[#required + 1] = node("technology", gate) end
+        for _, gate in ipairs(candidate.progression_prerequisites or {}) do
+          required[#required + 1] = node("technology", gate)
+        end
+        for _, ingredient in ipairs(candidate.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
+        if #sources == 1 then
+          add("pack", pack, required)
+        else
+          local route = pack .. "\0" .. index
+          add("pack-source", route, required)
+          add("pack", pack, {node("pack-source", route)})
+          route_choices[pack] = route_choices[pack] or {}
+          route_choices[pack][#route_choices[pack] + 1] = {node = node("pack-source", route), source = candidate}
+        end
       end
-      for _, ingredient in ipairs(source.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
-      add("pack", pack, required)
     end
   end
   for _, lab in ipairs(labs) do
@@ -620,6 +657,13 @@ local function build_reference_bindings(shared, labs)
     for pack in pairs(native) do guarded[node("pack", pack)] = true end
     return guarded, visits
   end)
+  -- A pack is an OR of direct sources, while every source keeps its own AND
+  -- requirements. Keep the named source only when that source was established.
+  for pack, choices in pairs(route_choices) do
+    for _, choice in ipairs(choices) do
+      if result.facts[choice.node] then result.packs[pack] = choice.source; break end
+    end
+  end
   -- Retain the separately declared published launch exclusion. Completed
   -- reference cycles are classified below; unsupported sources stay unknown.
   if result.has_policy_exclusions then

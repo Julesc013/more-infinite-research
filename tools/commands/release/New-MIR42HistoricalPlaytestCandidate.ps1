@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -296,6 +296,10 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
       $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
       if ($SourceVersion -ceq '4.4.1') {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+      } elseif ($SourceVersion -ceq '4.5.1') {
+        $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
+      } elseif ($SourceVersion -ceq '4.5.0') {
+        $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
       } elseif ($SourceVersion -ceq '4.4.2') {
         $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
         if ([string]$Record.factorio_line -ceq '0.15') {
@@ -433,7 +437,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'
