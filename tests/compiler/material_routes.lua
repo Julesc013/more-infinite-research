@@ -951,7 +951,7 @@ check(exact_f200_streams.research_material_silicon.reviewed_forward_routes["kr-s
 local changed_f200_mods=clone_map(exact_f200_mods)
 changed_f200_mods.angelssmelting="2.0.6"
 local changed_f200_streams=material_streams_for({factorio_version="2.0"},changed_f200_mods,f200_items)
-check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$","changed F200 closure leaves Aluminium on Bob declaration")
+check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$" and changed_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==2,"changed F200 provider retains Aluminium only behind a schema-2 structural certificate")
 check(recipe_patterns(changed_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$" and changed_f200_streams.research_material_nickel.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel nickel routes and certificate")
 check(recipe_patterns(changed_f200_streams.research_material_silver)=="^bob%-silver%-plate$" and changed_f200_streams.research_material_silver.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel silver routes and certificate")
 check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$","changed F200 closure withdraws unproven Angel gold and platinum finals")
@@ -1961,5 +1961,190 @@ end)()
   package.loaded["prototypes.mir.index.recipe_risk_facts"] = previous_risks
   provider.current = previous_current
 end)()
+
+
+-- An approved complete structural boundary does not depend on an entire
+-- provider-version tuple. Each negative still passes through the real matcher.
+do
+  local original_mods = graph_mods
+  local function unpinned_certificate(world, bindings)
+    local value = graph_certificate_for(world, bindings)
+    value.profiles[1].mod_locks = {}
+    return value
+  end
+  local value = unpinned_certificate(graph_world())
+  graph_mods = {different_provider="99.0.0", unrelated="1.2.3"}
+  check(table.concat(graph_routes(graph_world(), value), ",") == "smelting",
+    "structural schema2 admits unchanged approved boundary without provider tuple")
+  graph_mods = {}
+  check(#graph_routes(graph_world(), value) == 1, "structural boundary does not invent a required provider")
+  graph_mods = {another_unrelated="3.0.0"}
+  local disconnected = graph_world()
+  disconnected.unrelated = canonical_route("unrelated", "coal", "ash")
+  check(#graph_routes(disconnected, value) == 1, "disconnected content preserves complete structural approval")
+
+  for _, scope in ipairs({"closed", "named-relevant-providers"}) do
+    local closed = unpinned_certificate(graph_world())
+    closed.profiles[1].mod_lock_scope = scope
+    check(#graph_routes(graph_world(), closed) == 0, "empty provider pins remain forbidden for " .. scope)
+  end
+  local schema1 = unpinned_certificate(graph_world())
+  schema1.relevant_return_graph_contract.schema = 1
+  check(#graph_routes(graph_world(), schema1) == 0, "schema1 cannot claim complete structural approval")
+  for _, field in ipairs({"return_graph_fingerprint", "bindings_fingerprint",
+      "reachable_identity_count", "relevant_recipe_count", "direct_output_producer_count"}) do
+    local missing = unpinned_certificate(graph_world())
+    missing.relevant_return_graph_contract[field] = nil
+    check(#graph_routes(graph_world(), missing) == 0, "structural approval requires " .. field)
+  end
+  local absent_pins = unpinned_certificate(graph_world())
+  absent_pins.profiles[1].mod_locks = nil
+  check(#graph_routes(graph_world(), absent_pins) == 0, "missing profile pins are not an explicit structural declaration")
+  local pinned = unpinned_certificate(graph_world())
+  pinned.profiles[1].mod_locks = {named_provider="1.0.0"}
+  check(#graph_routes(graph_world(), pinned) == 0, "authored nonempty provider pins remain mandatory")
+
+  local changed = graph_world()
+  changed.downstream.variants[1].ingredients[1].amount = 2
+  check(#graph_routes(changed, value) == 0, "changed cone recipe rejects structural approval")
+  local extra_producer = graph_world()
+  extra_producer.other = canonical_route("other", "scrap", "plate")
+  check(#graph_routes(extra_producer, value) == 0, "new output producer rejects structural approval")
+  local cycle = graph_world()
+  cycle.cycle = canonical_route("cycle", "gear", "ore")
+  check(#graph_routes(cycle, value) == 0, "return cycle remains rejected")
+  local owned = {owners={smelting={"foreign-owner"}}, technologies={
+    ["foreign-owner"]={effects={{type="change-recipe-productivity",recipe="smelting",change=0.1}}}}}
+  check(#graph_routes(graph_world(), value, owned) == 0, "new foreign owner rejects structural approval")
+  local unlocked = {unlocks={smelting={"changed-unlock"}}, technologies={
+    ["changed-unlock"]={unit={ingredients={{"chemical-science-pack",1}}},prerequisites={}}}}
+  check(#graph_routes(graph_world(), value, unlocked) == 0, "changed unlock science rejects structural approval")
+  local cap_changed = graph_world()
+  cap_changed.smelting.effective_maximum_productivity = 4
+  check(#graph_routes(cap_changed, value) == 0, "productivity cap remains bounded")
+  graph_mods = original_mods
+end
+
+-- A selected empty-pin schema-2 profile validates the complete graph once
+-- within this synchronous admission call. A wrong-risk structural profile
+-- performs no structural traversal and cannot hide a later pinned profile.
+do
+  local original_mods = graph_mods
+  local original_observation_enabled = observation_enabled
+  observation_enabled = false
+  graph_mods = {different_provider="99.0.0", unrelated="1.2.3"}
+  local value = graph_certificate_for(graph_world())
+  value.profiles[1].mod_locks = {}
+  local original_fingerprints = matcher.relevant_route_fingerprints
+  local calls = 0
+  matcher.relevant_route_fingerprints = function(...)
+    calls = calls + 1
+    return original_fingerprints(...)
+  end
+  check(table.concat(graph_routes(graph_world(), value), ",") == "smelting" and calls == 1,
+    "selected empty-pin schema2 profile validates its full graph exactly once")
+  matcher.relevant_route_fingerprints = original_fingerprints
+
+  local risk = value.profiles[1].canonical_risk_fingerprint
+  local wrong = {id="wrong-risk-empty", canonical_risk_fingerprint="mir32-deadbeef",
+    mod_lock_scope="relevant-return-graph", mod_locks={}}
+  local pinned = {id="valid-pinned", canonical_risk_fingerprint=risk,
+    mod_lock_scope="closed", mod_locks={}}
+  for name, version in pairs(graph_mods) do pinned.mod_locks[name] = version end
+  value.profiles = {wrong, pinned}
+  calls = 0
+  matcher.relevant_route_fingerprints = function(...)
+    calls = calls + 1
+    return original_fingerprints(...)
+  end
+  check(table.concat(graph_routes(graph_world(), value), ",") == "smelting" and calls == 0,
+    "wrong-risk empty profile makes zero structural queries before later pinned validation")
+  matcher.relevant_route_fingerprints = original_fingerprints
+
+  value.profiles = {wrong}
+  calls = 0
+  matcher.relevant_route_fingerprints = function(...)
+    calls = calls + 1
+    return original_fingerprints(...)
+  end
+  check(#graph_routes(graph_world(), value) == 0 and calls == 0,
+    "wrong-risk empty profile alone is rejected without structural traversal")
+  matcher.relevant_route_fingerprints = original_fingerprints
+  graph_mods = original_mods
+  observation_enabled = original_observation_enabled
+end
+
+-- A malformed new profile cannot hide an existing valid pinned alternative.
+do
+  local original_mods = graph_mods
+  graph_mods = {Krastorio2="2.1.2", ["Krastorio2-spaced-out"]="2.0.13", qol="1.0.0"}
+  local value = graph_certificate_for(graph_world())
+  local structural = value.profiles[1]
+  structural.mod_locks = {}
+  value.relevant_return_graph_contract.bindings_fingerprint = nil
+  local pinned = {id="valid-pinned", canonical_risk_fingerprint=structural.canonical_risk_fingerprint,
+    mod_lock_scope="closed", mod_locks={}}
+  for name, version in pairs(graph_mods) do pinned.mod_locks[name] = version end
+  value.profiles = {structural, pinned}
+  check(#graph_routes(graph_world(), value) == 1,
+    "malformed unpinned profile cannot mask a later valid pinned profile")
+  value.profiles = {pinned, structural}
+  check(#graph_routes(graph_world(), value) == 1,
+    "valid pinned profile remains admitted before a malformed unpinned profile")
+  graph_mods = original_mods
+end
+
+-- The R07 F200 Bob/Angel input has no BobTech lock.  These two routes are
+-- declared under one family/emitter but only schema-2 full graph contracts;
+-- altered actual inputs still fail in the shared matcher above.
+do
+  local r07_mods = clone_map(exact_f200_mods)
+  r07_mods.bobtech = nil
+  local r07_streams = material_streams_for({factorio_version="2.0"}, r07_mods, f200_items)
+  local r07_family = r07_streams.research_material_aluminium
+  local casting = assert(r07_family.reviewed_forward_routes["angels-plate-aluminium"])
+  local rolling = assert(r07_family.reviewed_forward_routes["angels-plate-aluminium-2"])
+  check(recipe_patterns(r07_family)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$",
+    "R07 F200 Aluminium keeps one family with Bob and two ordinary Angel finals")
+  for _, certificate in ipairs({casting, rolling}) do
+    local profile = certificate.profiles[1]
+    local contract = certificate.relevant_return_graph_contract
+    check(certificate.require_exact_route_certificate and certificate.maximum_productivity==3
+      and profile.mod_lock_scope=="relevant-return-graph" and next(profile.mod_locks)==nil
+      and profile.observer_mod_locks==nil and contract.schema==2
+      and contract.reachable_identity_count==90 and contract.relevant_recipe_count==92
+      and contract.direct_output_producer_count==3,
+      "R07 Aluminium admits only an explicit empty-pin full schema-2 boundary")
+  end
+  check(casting.profiles[1].canonical_risk_fingerprint=="mir32-28583fe9"
+      and casting.relevant_return_graph_contract.return_graph_fingerprint=="mir32-34df6bfc"
+      and casting.relevant_return_graph_contract.bindings_fingerprint=="mir32-1793ad3e"
+      and casting.ingredients[1].type=="fluid"
+      and casting.ingredients[1].name=="angels-liquid-molten-aluminium"
+      and casting.ingredients[1].amount==40
+      and casting.results[1].type=="item" and casting.results[1].name=="bob-aluminium-plate"
+      and casting.results[1].amount==4,
+    "R07 casting binds its recorded typed IO and full risk/graph/ownership/science evidence")
+  check(rolling.profiles[1].canonical_risk_fingerprint=="mir32-6ae1add6"
+      and rolling.relevant_return_graph_contract.return_graph_fingerprint=="mir32-555427be"
+      and rolling.relevant_return_graph_contract.bindings_fingerprint=="mir32-d5f1b456"
+      and rolling.ingredients[1].type=="item" and rolling.ingredients[1].name=="angels-roll-aluminium"
+      and rolling.ingredients[1].amount==1
+      and rolling.results[1].type=="item" and rolling.results[1].name=="bob-aluminium-plate"
+      and rolling.results[1].amount==4,
+    "R07 rolling binds its distinct typed IO and full risk/graph/ownership/science evidence")
+  local exact = exact_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"]
+  check(exact.relevant_return_graph_contract.schema==1 and next(exact.profiles[1].mod_locks)~=nil,
+    "retained exact F200 profile retains its pinned schema-1 Aluminium certificate")
+  local unrelated = clone_map(r07_mods)
+  unrelated.qol = "1.0.0"
+  local unrelated_streams = material_streams_for({factorio_version="2.0"}, unrelated, f200_items)
+  check(unrelated_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==2,
+    "unrelated provider remains outside the schema-2 affected graph declaration")
+  local f210_streams = material_streams_for({factorio_version="2.1"}, r07_mods, f200_items)
+  check(recipe_patterns(f210_streams.research_material_aluminium)=="^bob%-aluminium%-plate$"
+      and f210_streams.research_material_aluminium.reviewed_forward_routes==nil,
+    "R07 F200 structural declaration cannot cross the engine phase boundary")
+end
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
