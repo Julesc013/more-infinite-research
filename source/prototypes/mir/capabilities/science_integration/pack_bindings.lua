@@ -392,21 +392,21 @@ local function declared_source(pack_name, shared)
 end
 
 local function direct_alternatives(pack_name, primary, shared, primary_gates)
-  local sources = {primary}
+  local sources = primary and {primary} or {}
   local competing_recipes = {}
   local function append(recipe_name, gate)
-    if recipe_name == primary.recipe_name and gate == primary.unlocker then return end
+    if primary and recipe_name == primary.recipe_name and gate == primary.unlocker then return end
     local source = binding(pack_name,
       {pack = pack_name, recipe = recipe_name, technology = gate, allow_initial = true}, true)
     if source then source = with_retained_progression(shared, source) end
     if source then sources[#sources + 1] = source end
   end
-  if (shared.science_binding_policy or {}).direct_unlock_alternatives and #(primary_gates or {}) > 1 then
+  if primary and (shared.science_binding_policy or {}).direct_unlock_alternatives and #(primary_gates or {}) > 1 then
     competing_recipes[primary.recipe_name] = true
     for _, gate in ipairs(primary_gates) do append(primary.recipe_name, gate) end
   end
   for _, recipe_name in ipairs(recipe_facts.recipes_by_output_identity_view("item", pack_name)) do
-    if recipe_name ~= primary.recipe_name then
+    if not primary or recipe_name ~= primary.recipe_name then
       local fact = recipe_facts.view(recipe_name)
       if outputs_pack(fact, pack_name) then
         local gates = {}
@@ -577,6 +577,17 @@ local function build_reference_bindings(shared, labs)
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
     local source, reason, parameterized, primary_gates = declared_source(pack, shared)
+    local sources, competing_recipes
+    local policy = shared.science_binding_policy or {}
+    if policy.unique_direct_recipe and (parameterized
+      or (not source and reason == "ambiguous-approved-pack-unlock:" .. pack
+        and policy.named_pack_recipe and policy.unique_direct_unlock and policy.direct_unlock_alternatives)) then
+      -- A named recipe with no usable owner is a failed source, not proof
+      -- that every direct producer is unavailable. Reuse the same finite
+      -- alternatives and AND/OR rules, including each owner's actual science.
+      sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
+      if not source and #sources > 0 then source, reason = sources[1], nil end
+    end
     result.packs[pack], result.issues[pack] = source, reason
     if not source then unknown_sources[node("pack", pack)] = true end
     if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
@@ -586,10 +597,7 @@ local function build_reference_bindings(shared, labs)
       if #recipe_facts.recipes_by_output_identity_view("item", pack) > 1 then
         unknown_sources[node("pack", pack)] = true
       end
-      local sources, competing_recipes = {source}, {}
-      if parameterized and (shared.science_binding_policy or {}).unique_direct_recipe then
-        sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
-      end
+      sources, competing_recipes = sources or {source}, competing_recipes or {}
       for index, candidate in ipairs(sources) do
         local required = {}
         for _, gate in ipairs(candidate.unlockers) do required[#required + 1] = node("technology", gate) end
