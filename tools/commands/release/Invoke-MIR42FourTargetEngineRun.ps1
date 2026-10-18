@@ -714,7 +714,17 @@ $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 if($running.Count){throw '[mir42-engine-factorio-already-running]'}
 $freshLeafMode = $PSCmdlet.ParameterSetName -ceq 'FreshLeaf'
 if ($freshLeafMode) {
-  if ($sourceVersion -cne '4.5.0' -or $PublishedMaintenancePredecessorSourceVersion -cne '4.4.2') {
+  # Fresh leaves are individual current-package observations.  Keep this
+  # narrower than the aggregate maintenance selector: only the retained
+  # 4.5.0/4.4.2 pair and the current 4.5.2 predecessor pairs have an
+  # individual-fresh contract.  The existing reader below still authenticates
+  # the selected publication, manifest, release metadata and archive bytes.
+  $freshLeafPredecessors = switch -CaseSensitive ($sourceVersion) {
+    '4.5.0' { @('4.4.2') }
+    '4.5.2' { @('4.5.1','4.4.2') }
+    default { @() }
+  }
+  if ($PublishedMaintenancePredecessorSourceVersion -cnotin $freshLeafPredecessors) {
     throw '[mir42-engine-fresh-leaf-maintenance-selection]'
   }
   if ($SelectedFreshScenario -ceq 'package-zip-space-age' -and $SelectedFreshTarget -cne 'f210') {
