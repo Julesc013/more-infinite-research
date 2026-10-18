@@ -343,8 +343,8 @@ local function declared_source(pack_name, shared)
     if declaration and declaration.pack == pack_name then
       local result, reason = binding(pack_name, declaration, true)
       if result then return with_retained_progression(shared, result) end
-      -- A different actual unlock may be admitted only by the separately
-      -- authored unique-owner rule below, never by production exploration.
+      -- Different actual unlocks require the separately authored direct-owner
+      -- policy below, never production exploration.
       if not (shared.science_binding_policy or {}).unique_direct_unlock then return nil, reason end
       break
     end
@@ -379,17 +379,32 @@ local function declared_source(pack_name, shared)
     for _, name in ipairs(recipe_unlocks.for_recipe(recipe_name)) do
       if not technology_reason(name) then gates[#gates + 1] = name end
     end
-    if #gates ~= 1 then return nil, "ambiguous-approved-pack-unlock:" .. pack_name end
+    if #gates == 0 or (#gates > 1
+      and not (shared.science_binding_policy or {}).direct_unlock_alternatives) then
+      return nil, "ambiguous-approved-pack-unlock:" .. pack_name
+    end
   end
   local result, reason = binding(pack_name,
     {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
   if not result then return nil, reason end
   local retained, retained_reason = with_retained_progression(shared, result)
-  return retained, retained_reason, retained ~= nil
+  return retained, retained_reason, retained ~= nil, gates
 end
 
-local function direct_alternatives(pack_name, primary, shared)
+local function direct_alternatives(pack_name, primary, shared, primary_gates)
   local sources = {primary}
+  local competing_recipes = {}
+  local function append(recipe_name, gate)
+    if recipe_name == primary.recipe_name and gate == primary.unlocker then return end
+    local source = binding(pack_name,
+      {pack = pack_name, recipe = recipe_name, technology = gate, allow_initial = true}, true)
+    if source then source = with_retained_progression(shared, source) end
+    if source then sources[#sources + 1] = source end
+  end
+  if (shared.science_binding_policy or {}).direct_unlock_alternatives and #(primary_gates or {}) > 1 then
+    competing_recipes[primary.recipe_name] = true
+    for _, gate in ipairs(primary_gates) do append(primary.recipe_name, gate) end
+  end
   for _, recipe_name in ipairs(recipe_facts.recipes_by_output_identity_view("item", pack_name)) do
     if recipe_name ~= primary.recipe_name then
       local fact = recipe_facts.view(recipe_name)
@@ -400,26 +415,33 @@ local function direct_alternatives(pack_name, primary, shared)
             if not technology_reason(name) then gates[#gates + 1] = name end
           end
         end
-        if fact.enabled_without_research == true or #gates == 1 then
-          local source = binding(pack_name,
-            {pack = pack_name, recipe = recipe_name, technology = gates[1], allow_initial = true}, true)
-          if source then source = with_retained_progression(shared, source) end
-          if source then sources[#sources + 1] = source end
+        if fact.enabled_without_research == true then
+          append(recipe_name, nil)
+        elseif #gates == 1 or (shared.science_binding_policy or {}).direct_unlock_alternatives then
+          -- Each owner is one OR alternative with its own complete science
+          -- dependencies. The existing bounded propagation must establish it;
+          -- neither name order nor the existence of an unlock proves access.
+          if #gates > 1 then competing_recipes[recipe_name] = true end
+          for _, gate in ipairs(gates) do append(recipe_name, gate) end
         end
       end
     end
   end
-  return sources
+  return sources, competing_recipes
 end
 
 -- Positive reference rules validate only declared pack sources, direct lab
 -- placement sources and research units/prerequisites. Each established fact
 -- is propagated once. No rule recursively acquires a material, machine,
 -- power source or surface, and no complete production proof is constructed.
-local function propagate(rules, unknown_sources, native_source_guard)
+local function propagate(rules, unknown_sources, native_source_guard, tracked_sources)
   local facts, watchers, queue, edge_count = {}, {}, {}, 0
+  local source_order = {}
   local function establish(name)
-    if not facts[name] then facts[name] = true; queue[#queue + 1] = name end
+    if not facts[name] then
+      facts[name] = true; queue[#queue + 1] = name
+      if tracked_sources and tracked_sources[name] then source_order[name] = #queue end
+    end
   end
   for _, rule in ipairs(rules) do
     local seen = {}
@@ -479,7 +501,7 @@ local function propagate(rules, unknown_sources, native_source_guard)
   return facts, {rules = #rules, dependency_edges = edge_count, facts = #queue,
     dependency_notifications = notifications, unknown_facts = #unknown_queue,
     unknown_dependency_notifications = unknown_notifications, native_source_prototype_visits = native_visits,
-    factory_acquisition_calls = 0}, unknown
+    factory_acquisition_calls = 0}, unknown, source_order
 end
 
 local function node(kind, name)
@@ -548,12 +570,13 @@ local function build_reference_bindings(shared, labs)
   local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, unavailable_labs = {},
     technologies = {}, rules = {}}
   local unknown_sources, route_choices = {}, {}
+  local tracked_sources
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
   end
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
-    local source, reason, parameterized = declared_source(pack, shared)
+    local source, reason, parameterized, primary_gates = declared_source(pack, shared)
     result.packs[pack], result.issues[pack] = source, reason
     if not source then unknown_sources[node("pack", pack)] = true end
     if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
@@ -563,8 +586,10 @@ local function build_reference_bindings(shared, labs)
       if #recipe_facts.recipes_by_output_identity_view("item", pack) > 1 then
         unknown_sources[node("pack", pack)] = true
       end
-      local sources = parameterized and (shared.science_binding_policy or {}).unique_direct_recipe
-        and direct_alternatives(pack, source, shared) or {source}
+      local sources, competing_recipes = {source}, {}
+      if parameterized and (shared.science_binding_policy or {}).unique_direct_recipe then
+        sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
+      end
       for index, candidate in ipairs(sources) do
         local required = {}
         for _, gate in ipairs(candidate.unlockers) do required[#required + 1] = node("technology", gate) end
@@ -580,6 +605,10 @@ local function build_reference_bindings(shared, labs)
           add("pack", pack, {node("pack-source", route)})
           route_choices[pack] = route_choices[pack] or {}
           route_choices[pack][#route_choices[pack] + 1] = {node = node("pack-source", route), source = candidate}
+          if competing_recipes[candidate.recipe_name] then
+            tracked_sources = tracked_sources or {}
+            tracked_sources[node("pack-source", route)] = true
+          end
         end
       end
     end
@@ -642,8 +671,8 @@ local function build_reference_bindings(shared, labs)
       end
     end
   end
-  local unknown
-  result.facts, result.work, unknown = propagate(result.rules, unknown_sources, function(facts, unresolved)
+  local unknown, source_order
+  result.facts, result.work, unknown, source_order = propagate(result.rules, unknown_sources, function(facts, unresolved)
     local candidates = {}
     for pack, source in pairs(result.packs) do
       local key = node("pack", pack)
@@ -656,13 +685,22 @@ local function build_reference_bindings(shared, labs)
     local guarded = {}
     for pack in pairs(native) do guarded[node("pack", pack)] = true end
     return guarded, visits
-  end)
+  end, tracked_sources)
   -- A pack is an OR of direct sources, while every source keeps its own AND
   -- requirements. Keep the named source only when that source was established.
   for pack, choices in pairs(route_choices) do
+    local selected
     for _, choice in ipairs(choices) do
-      if result.facts[choice.node] then result.packs[pack] = choice.source; break end
+      if result.facts[choice.node] then
+        if not selected then selected = choice
+        elseif choice.source.recipe_name == selected.source.recipe_name
+          and source_order[choice.node] < source_order[selected.node] then selected = choice end
+      end
     end
+    -- Keep the established recipe preference. Within that recipe, retain the
+    -- first independently established owner: a circular owner becoming true
+    -- after another owner supplied the pack cannot replace its own seed.
+    if selected then result.packs[pack] = selected.source end
   end
   -- Retain the separately declared published launch exclusion. Completed
   -- reference cycles are classified below; unsupported sources stay unknown.
