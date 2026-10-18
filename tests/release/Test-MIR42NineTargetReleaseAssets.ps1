@@ -73,6 +73,13 @@ function Test-MIR452NativeUpgradeProofReader {
 }
 Test-MIR452NativeUpgradeProofReader
 
+function Test-MIR460NativeUpgradePredecessorReader {
+  $patch = Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion '4.5.2' -CandidateSourceVersion '4.6.0'
+  Assert-MIR42ReleaseAssetsTest -Condition ([string]$patch.source_version -ceq '4.5.2' -and [string]$patch.source_tag -ceq 'v4.5.2' -and [string]$patch.manifest.manifest.source.commit -ceq '8e4de4be0f24a3da514ad39179d5ce254459788d' -and [string]$patch.manifest.manifest.source.tree -ceq '46e1787363671e1209b819dcc0b5360fc9433fc1' -and [string]$patch.target.distribution_version -ceq '4.5.20002' -and [string]$patch.target.sha256 -ceq 'BACA8E34001F5569F367FCFEC28C118653269EC29FACB811E5B75B49C3C082DD') -Code '460-proof-reader-binds-exact-published-452'
+  foreach ($wrong in @('4.4.2','4.5.0','4.5.1','4.5.3','4.6.0')) {$rejected=$false;try {Get-MIR423PublishedUpgradePredecessor -Target 'f200' -PredecessorSourceVersion $wrong -CandidateSourceVersion '4.6.0'|Out-Null}catch{$rejected=$_.Exception.Message -ceq '[mir423-upgrade-predecessor-version]'};Assert-MIR42ReleaseAssetsTest -Condition $rejected -Code ('460-proof-reader-rejects-unbound-predecessor-'+$wrong)}
+}
+Test-MIR460NativeUpgradePredecessorReader
+
 function New-MIR42ReleaseAssetsFixtureZip {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][string]$Version,[Parameter(Mandatory)][string]$Line)
 

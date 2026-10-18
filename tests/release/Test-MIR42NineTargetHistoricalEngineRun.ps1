@@ -97,6 +97,8 @@ function Assert-MIR42EngineSharedInputs {
       @{candidate='4.5.2';requested='';source='4.5.1';reader='4.5.2'}
       @{candidate='4.5.2';requested='4.5.1';source='4.5.1';reader='4.5.2'}
       @{candidate='4.5.2';requested='4.4.2';source='4.4.2';reader='4.5.0'}
+      @{candidate='4.6.0';requested='';source='4.5.2';reader='4.6.0'}
+      @{candidate='4.6.0';requested='4.5.2';source='4.5.2';reader='4.6.0'}
     )){
       $selection=Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion $case.candidate -RequestedPredecessorSourceVersion $case.requested
       Check ($selection.source_version-ceq$case.source-and$selection.reader_version-ceq$case.reader) ('frozen predecessor reader selection '+$case.candidate+'/'+$case.requested)
@@ -119,6 +121,9 @@ function Assert-MIR42EngineSharedInputs {
     }
     foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.3.2','4.4.0','4.4.1','4.5.0','4.5.2','4.5.3')){
       Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.5.2' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
+    }
+    foreach($invalid in @('4.1.0','4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.3.2','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.3','4.6.0')){
+      Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.6.0' -RequestedPredecessorSourceVersion $invalid} 'mir42-engine-maintenance-predecessor-selection'
     }
     Refuses {Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.3.2'} 'mir42-engine-maintenance-predecessor-candidate-scope'
     # A fresh PowerShell scope must preserve failures before any output allocation.

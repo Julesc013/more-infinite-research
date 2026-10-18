@@ -123,6 +123,7 @@ function Get-MIR42EngineMaintenanceSelection {
     '4.4.2' { @('4.2.2','4.4.0','4.4.1') }
     '4.5.0' { @('4.2.2',[string]$direct.source_version) }
     '4.5.2' { @('4.5.1','4.4.2') }
+    '4.6.0' { @('4.5.2') }
     default { @([string]$direct.source_version) }
   }
   if ($requested -cnotin $permitted) { throw '[mir42-engine-maintenance-predecessor-selection]' }
@@ -136,6 +137,7 @@ function Get-MIR42EngineMaintenanceSelection {
     '4.4.0' { if ($CandidateSourceVersion -ceq '4.4.2') { '4.4.1' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.4.2' { if ($CandidateSourceVersion -cin @('4.5.0','4.5.2')) { '4.5.0' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.5.1' { if ($CandidateSourceVersion -ceq '4.5.2') { '4.5.2' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
+    '4.5.2' { if ($CandidateSourceVersion -ceq '4.6.0') { '4.6.0' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.4.1' { if ($CandidateSourceVersion -ceq '4.4.2') { '4.4.2' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     default { throw '[mir42-engine-maintenance-predecessor-selection]' }
   }
