@@ -77,7 +77,12 @@ function Read-MIR42SealRecord {
 }
 
 function Assert-MIR42SealSource {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Source,[Parameter(Mandatory)][string]$Code)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Source,
+    [Parameter(Mandatory)][string]$Code,
+    [switch]$AllowPackageEquivalentToolingDescendant
+  )
   foreach ($field in @('commit','tree','package_source_sha256')) {
     if ($Source.PSObject.Properties.Name -notcontains $field -or [string]::IsNullOrWhiteSpace([string]$Source.$field)) {
       throw "[$Code-source-field] $field"
@@ -87,12 +92,23 @@ function Assert-MIR42SealSource {
   if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) { throw "[$Code-source-dirty]" }
   $commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
   $tree = (& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
-  if ($LASTEXITCODE -ne 0 -or $commit -cne [string]$Source.commit -or $tree -cne [string]$Source.tree) {
-    throw "[$Code-source-tree-drift]"
+  if ($LASTEXITCODE -ne 0) { throw "[$Code-source-tree-drift]" }
+  $exactSource = ($commit -ceq [string]$Source.commit -and $tree -ceq [string]$Source.tree)
+  if (-not $exactSource) {
+    if (-not $AllowPackageEquivalentToolingDescendant) { throw "[$Code-source-tree-drift]" }
+    $resolvedCommit = (& git -C $RepoRoot rev-parse "$([string]$Source.commit)^{commit}").Trim()
+    if ($LASTEXITCODE -ne 0 -or $resolvedCommit -cne [string]$Source.commit) { throw "[$Code-source-tree-drift]" }
+    $sourceTree = (& git -C $RepoRoot rev-parse "$([string]$Source.commit)^{tree}").Trim()
+    if ($LASTEXITCODE -ne 0 -or $sourceTree -cne [string]$Source.tree) { throw "[$Code-source-tree-drift]" }
+    & git -C $RepoRoot merge-base --is-ancestor ([string]$Source.commit) HEAD
+    if ($LASTEXITCODE -ne 0) { throw "[$Code-source-tree-drift]" }
+    $packageRoots = @(Get-MIR4CanonicalPackageSourceRoots)
+    $packageInputChanges = @(& git -C $RepoRoot diff --name-status --find-renames "$([string]$Source.commit)..HEAD" -- @packageRoots)
+    if ($LASTEXITCODE -ne 0 -or $packageInputChanges.Count -ne 0) { throw "[$Code-package-source-drift]" }
   }
   $packageSource = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $RepoRoot
   if ($packageSource -cne [string]$Source.package_source_sha256) { throw "[$Code-package-source-drift]" }
-  return [pscustomobject][ordered]@{commit=$commit;tree=$tree;package_source_sha256=$packageSource}
+  return [pscustomobject][ordered]@{commit=[string]$Source.commit;tree=[string]$Source.tree;package_source_sha256=$packageSource}
 }
 
 function Assert-MIR42SealExternalPathSeparatedFromRepository {
@@ -973,10 +989,17 @@ function Get-MIR42HistoricalMaterializerReceiptCustody {
 }
 
 function Get-MIR42ExactFourTargetCandidate {
-  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$CandidateManifestPath)
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [switch]$AllowPackageEquivalentToolingDescendant
+  )
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
   $candidate = $candidateInput.record
   $versionContract = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $candidate
+  if ($AllowPackageEquivalentToolingDescendant -and [string]$versionContract.source_version -cne '4.6.0') {
+    throw '[mir42-seal-candidate-tooling-equivalence-version]'
+  }
   if ($candidate.PSObject.Properties.Name -notcontains 'target_authority') { throw '[mir42-seal-candidate-target-authority-missing]' }
   $targetScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.targets) -Code 'mir42-seal-candidate-targets'
   $authorityScope = Get-MIR42SealCandidateTargetScope -Rows @($candidate.target_authority) -Code 'mir42-seal-candidate-target-authority'
@@ -997,7 +1020,7 @@ function Get-MIR42ExactFourTargetCandidate {
     tree = [string]$candidate.source.tree
     package_source_sha256 = [string]$candidate.package_source_sha256
   }
-  $source = Assert-MIR42SealSource -RepoRoot $RepoRoot -Source $candidateSource -Code 'mir42-seal-candidate'
+  $source = Assert-MIR42SealSource -RepoRoot $RepoRoot -Source $candidateSource -Code 'mir42-seal-candidate' -AllowPackageEquivalentToolingDescendant:$AllowPackageEquivalentToolingDescendant
   $root = Split-Path -Parent $candidateInput.path
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($target in @($candidate.targets)) {
@@ -1086,7 +1109,7 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
-      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) {
         $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
       }
     }

@@ -529,12 +529,15 @@ try {
     $expectedSource = @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')[$schemaVersion-1]
     Assert-MIR42CandidateBuildTest ($versionContract.source_version -ceq $expectedSource -and $versionContract.requires_nine_targets -eq ($schemaVersion -ge 2) -and (Test-Path -LiteralPath $versionContract.schema_path -PathType Leaf)) "construction-version-contract-$schemaVersion"
   }
-  $v13PredecessorUnavailable = $false
-  try { Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.6.0' | Out-Null } catch { $v13PredecessorUnavailable = $_.Exception.Message -ceq '[mir42-maintenance-predecessor-publication-unavailable] 4.6.0' }
-  Assert-MIR42CandidateBuildTest $v13PredecessorUnavailable 'v13-construction-refuses-unpublished-452-predecessor'
-  $v13ExplicitOldPredecessorRejected = $false
-  try { Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.6.0' -RequestedPredecessorSourceVersion '4.5.2' | Out-Null } catch { $v13ExplicitOldPredecessorRejected = $_.Exception.Message -ceq '[mir42-maintenance-predecessor-publication-unavailable] 4.6.0' }
-  Assert-MIR42CandidateBuildTest $v13ExplicitOldPredecessorRejected 'v13-engine-selection-refuses-unpublished-452-predecessor'
+  $v13Predecessor = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.6.0'
+  Assert-MIR42CandidateBuildTest ($v13Predecessor.source_version -ceq '4.5.2' -and $v13Predecessor.source_tag -ceq 'v4.5.2' -and $v13Predecessor.release_id -eq 416333929 -and $v13Predecessor.commit -ceq '8e4de4be0f24a3da514ad39179d5ce254459788d' -and $v13Predecessor.tree -ceq '46e1787363671e1209b819dcc0b5360fc9433fc1' -and $v13Predecessor.manifest_sha256 -ceq 'BD8AE26FE457334C6856591BB09D286F32A7D1D7DB6C596CB6CB7D463F1A8493') 'v13-construction-binds-published-452-predecessor'
+  $v13Selection = Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.6.0' -RequestedPredecessorSourceVersion '4.5.2'
+  Assert-MIR42CandidateBuildTest ($v13Selection.source_version -ceq '4.5.2' -and $v13Selection.reader_version -ceq '4.6.0') 'v13-engine-selection-binds-published-452-predecessor'
+  foreach ($wrongPredecessor in @('4.4.2','4.5.0','4.5.1','4.5.3','4.6.0')) {
+    $rejected = $false
+    try { Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.6.0' -RequestedPredecessorSourceVersion $wrongPredecessor | Out-Null } catch { $rejected = $_.Exception.Message -ceq '[mir42-engine-maintenance-predecessor-selection]' }
+    Assert-MIR42CandidateBuildTest $rejected ('v13-engine-selection-rejects-non-immediate-predecessor-'+$wrongPredecessor)
+  }
 
   foreach ($badContract in @(
     [pscustomobject]@{schema=14;kind='MIR42FourTargetDeterministicCandidateManifestV14'},

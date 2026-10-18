@@ -12,6 +12,63 @@ function Assert-MIR42SealTest {
   if (-not $Condition) { throw "[mir42-seal-test] $Code" }
 }
 
+function Test-MIR42SealProductEquivalentSource {
+  param([Parameter(Mandatory)][string]$WorkingRoot)
+  [IO.Directory]::CreateDirectory((Join-Path $WorkingRoot 'source')) | Out-Null
+  [IO.Directory]::CreateDirectory((Join-Path $WorkingRoot 'targets')) | Out-Null
+  $runGit = {
+    param([string[]]$Arguments)
+    $output = @(& git -C $WorkingRoot -c user.name=MirTest -c user.email=mir-test@example.invalid -c commit.gpgsign=false -c core.hooksPath= @Arguments 2>&1)
+    if ($LASTEXITCODE -ne 0) { throw "[mir42-seal-source-control-git] $($output -join ' ')" }
+    $output
+  }
+  & $runGit -Arguments @('init','--quiet') | Out-Null
+  [IO.File]::WriteAllText((Join-Path $WorkingRoot 'source/control.lua'), 'return {}')
+  [IO.File]::WriteAllText((Join-Path $WorkingRoot 'targets/control.json'), '{}')
+  & $runGit -Arguments @('add','.') | Out-Null
+  & $runGit -Arguments @('commit','--quiet','-m','product') | Out-Null
+  $original = [pscustomobject]@{
+    commit = ([string](& $runGit -Arguments @('rev-parse','HEAD'))).Trim()
+    tree = ([string](& $runGit -Arguments @('rev-parse','HEAD^{tree}'))).Trim()
+    package_source_sha256 = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $WorkingRoot
+  }
+  [IO.File]::WriteAllText((Join-Path $WorkingRoot 'tooling.note'), 'tooling only')
+  & $runGit -Arguments @('add','.') | Out-Null
+  & $runGit -Arguments @('commit','--quiet','-m','tooling') | Out-Null
+  $reject = {
+    param($Source,[string]$Needle,[bool]$OptIn=$true)
+    $failure = ''
+    try { Assert-MIR42SealSource -RepoRoot $WorkingRoot -Source $Source -Code 'source-control' -AllowPackageEquivalentToolingDescendant:$OptIn | Out-Null }
+    catch { $failure = $_.Exception.Message }
+    Assert-MIR42SealTest ($failure.Contains($Needle,[StringComparison]::Ordinal)) ('source-control-expected-'+$Needle)
+  }
+  & $reject -Source $original -Needle 'source-tree-drift' -OptIn $false
+  $accepted = Assert-MIR42SealSource -RepoRoot $WorkingRoot -Source $original -Code 'source-control' -AllowPackageEquivalentToolingDescendant
+  Assert-MIR42SealTest ($accepted.commit -ceq $original.commit -and $accepted.tree -ceq $original.tree) 'source-control-retains-original-identity'
+  & $reject -Source ([pscustomobject]@{commit=$original.commit;tree=('0'*40);package_source_sha256=$original.package_source_sha256}) -Needle 'source-tree-drift'
+  & $reject -Source ([pscustomobject]@{commit=$original.commit;tree=$original.tree;package_source_sha256=('0'*64)}) -Needle 'package-source-drift'
+  $unrelatedTree = ([string](& $runGit -Arguments @('rev-parse','HEAD^{tree}'))).Trim()
+  $unrelatedCommit = ([string](& $runGit -Arguments @('commit-tree',$unrelatedTree,'-m','unrelated source'))).Trim()
+  & $reject -Source ([pscustomobject]@{commit=$unrelatedCommit;tree=$unrelatedTree;package_source_sha256=$original.package_source_sha256}) -Needle 'source-tree-drift'
+  [IO.File]::WriteAllText((Join-Path $WorkingRoot 'tooling.note'), 'dirty tooling')
+  & $reject -Source $original -Needle 'source-dirty'
+  & $runGit -Arguments @('restore','--worktree','--','tooling.note') | Out-Null
+  & $runGit -Arguments @('mv','source/control.lua','source/renamed.lua') | Out-Null
+  & $runGit -Arguments @('commit','--quiet','-m','changed product') | Out-Null
+  $forged = [pscustomobject]@{commit=$original.commit;tree=$original.tree;package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $WorkingRoot)}
+  & $reject -Source $forged -Needle 'package-source-drift'
+  $beforeTargetChange = [pscustomobject]@{
+    commit = ([string](& $runGit -Arguments @('rev-parse','HEAD'))).Trim()
+    tree = ([string](& $runGit -Arguments @('rev-parse','HEAD^{tree}'))).Trim()
+  }
+  [IO.File]::WriteAllText((Join-Path $WorkingRoot 'targets/control.json'), '{"changed":true}')
+  & $runGit -Arguments @('add','.') | Out-Null
+  & $runGit -Arguments @('commit','--quiet','-m','changed target') | Out-Null
+  $forgedTarget = [pscustomobject]@{commit=$beforeTargetChange.commit;tree=$beforeTargetChange.tree;package_source_sha256=(Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $WorkingRoot)}
+  & $reject -Source $forgedTarget -Needle 'package-source-drift'
+  return 8
+}
+
 function Set-MIR42SealTestExactAcl {
   param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$OwnerSid)
   $security = if (Test-Path -LiteralPath $Path -PathType Container) { [Security.AccessControl.DirectorySecurity]::new() } else { [Security.AccessControl.FileSecurity]::new() }
@@ -28,6 +85,7 @@ try {
   $assets = Join-Path $root 'assets'
   $rows = Join-Path $root 'target-rows'
   New-Item -ItemType Directory -Force -Path $assets,$rows | Out-Null
+  $sourceEquivalenceAssertions = Test-MIR42SealProductEquivalentSource -WorkingRoot (Join-Path $root 'source-equivalence')
   $source = [ordered]@{
     commit = (& git -C $RepoRoot rev-parse HEAD).Trim()
     tree = (& git -C $RepoRoot rev-parse 'HEAD^{tree}').Trim()
@@ -39,8 +97,9 @@ try {
   foreach ($target in @('f210','f200','f110','f100')) {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.0'
     $targetAuthority.Add([pscustomobject][ordered]@{target=[string]$identity.target;target_id=[string]$identity.target_id;source_version=[string]$identity.source_version;distribution_version=[string]$identity.distribution_version})
-    $assetRelative = "assets/$([string]$identity.package_name)"
+    $assetRelative = "assets/$target/$([string]$identity.package_name)"
     $assetPath = Join-Path $root $assetRelative
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $assetPath)) | Out-Null
     $stage = Join-Path $root "staging/$target/$([string]$identity.distribution_root)"
     New-Item -ItemType Directory -Force -Path $stage | Out-Null
     [IO.File]::WriteAllText((Join-Path $stage 'info.json'), (([ordered]@{name='more-infinite-research';version=[string]$identity.distribution_version;factorio_version=([string]$identity.target_id -replace '^factorio-','')} | ConvertTo-Json -Compress)), [Text.UTF8Encoding]::new($false))
@@ -49,7 +108,7 @@ try {
     $inventory = Get-MIR4ArchiveInventory -Path $assetPath
     $asset = [ordered]@{path=$assetRelative;bytes=[int64]$inventory.bytes;sha256=[string]$inventory.archive_sha256}
     $row = [pscustomobject][ordered]@{
-      schema=1;kind='MIR42FourTargetCandidateRowV1';target=$target;distribution_version=[string]$identity.distribution_version
+      schema=1;kind='MIR42FourTargetCandidateRowV1';target=$target;source_version=[string]$identity.source_version;distribution_version=[string]$identity.distribution_version
       source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource
       asset=$asset;content_sha256=[string]$inventory.content_sha256;entry_count=[int]$inventory.entry_count;build_a_sha256=$asset.sha256;build_b_sha256=$asset.sha256
       deterministic_archive_bytes=$true;package_excluded_surface=$true;record_sha256=''
@@ -61,12 +120,17 @@ try {
   }
   $manifest = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetDeterministicCandidateManifestV1';status='private-deterministic-four-target-candidate-built-unqualified';build_complete=$true
-    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@($targetAuthority);resource_admission=@{}
+    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@($targetAuthority)
+    resource_admission=@{admitted=$true;minimum_free_memory_bytes=1;minimum_free_work_bytes=1}
     targets=@($targets);failures=@();qualification='not-performed';technical_seal='not-performed';signing='not-performed';tagging='not-performed';publication_authorized=$false;record_sha256=''
   }
   $manifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $manifest
   $manifestPath = Join-Path $root 'candidate-manifest.json'
   Write-MIR4BootstrapRecord -Record $manifest -Path $manifestPath | Out-Null
+  $oldVersionEquivalenceRejected = $false
+  try { Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $manifestPath -AllowPackageEquivalentToolingDescendant | Out-Null }
+  catch { $oldVersionEquivalenceRejected = $_.Exception.Message.Contains('mir42-seal-candidate-tooling-equivalence-version',[StringComparison]::Ordinal) }
+  Assert-MIR42SealTest $oldVersionEquivalenceRejected 'old-construction-version-cannot-opt-in-to-tooling-equivalence'
 
   Assert-MIR42SealTest ((Get-MIR42SealCandidateTargetScope -Rows @($targets) -Code 'mir42-seal-test-four-scope') -ceq 'four-target') 'candidate-reader-four-target-scope'
   $nineScopeRows = @($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject]@{target=[string]$_} })

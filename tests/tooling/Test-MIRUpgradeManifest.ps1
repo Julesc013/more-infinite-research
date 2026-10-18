@@ -1164,11 +1164,11 @@ $specializationPatterns=@($ast.FindAll({param($node)
   $node.Right.Value.Contains('(?<minor>')-and$node.Right.Value.Contains('(?<target>')
 },$true))
 if($specializationPatterns.Count-ne1){throw 'Upgrade fixture specialization gate missing or ambiguous'}
-foreach($version in @('4.2.21001','4.3.21000','4.4.21002','4.5.21000')){
+foreach($version in @('4.2.21001','4.3.21000','4.4.21002','4.5.21000','4.6.21000')){
   if($version-cnotmatch$specializationPatterns[0].Right.Value){throw "Upgrade fixture specialization gate skips $version"}
 }
-if('4.6.21000'-cmatch$specializationPatterns[0].Right.Value){throw 'Upgrade fixture specialization gate admits an unselected source minor'}
-$mir43Assertions+=5
+if('4.7.21000'-cmatch$specializationPatterns[0].Right.Value){throw 'Upgrade fixture specialization gate admits an unselected source minor'}
+$mir43Assertions+=6
 # Exercise the actual runner selectors, not only the helper functions. A
 # helper can pass its unit controls while the runner never calls it.
 $identityAssignments=@($ast.FindAll({param($node)
@@ -2133,6 +2133,140 @@ foreach($case in @(
   if(Test-MIR431HistoricalFullSettingAllowance -Before $case.before -After $case.after){throw 'Historical Full selector setting allowance accepted a changed existing, Classic, or unrelated setting'}
   $mir43Assertions++
 }
+# V13 has one published V12 predecessor. Exercise all currently selected F210/F200
+# Full fixture specializations without constructing a native process or library archive.
+$mir460Routes=@(
+  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='base-default';space_age=$false;galore=$false;bob=$false;fixture_version='0.1.1130'},
+  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='space-age-native-owner';space_age=$true;galore=$false;bob=$false;fixture_version='0.1.1131'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='base-default';space_age=$false;galore=$false;bob=$false;fixture_version='0.1.1132'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';space_age=$false;galore=$true;bob=$false;fixture_version='0.1.1133'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';space_age=$false;galore=$false;bob=$true;fixture_version='0.1.1136'}
+)
+$mir460FixtureVersions=@()
+foreach($route in $mir460Routes){
+  $code=$route.target.Substring(1)
+  $fixture='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$(if($route.bob){$bobAngelProfilePath}else{''});F200GaloreSpaceAgeInputProfile=$(if($route.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
+  Assert-MIR421CurrentUpgradeInputMode @mode
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.6.0')-cne'4.6.0'){throw "4.6 reader identity mismatch: $($route.target)/$($route.archetype)"}
+  $fixtureRoot=Join-Path $mir43FixtureRoot ('mir460-'+$route.target+'-'+$route.archetype)
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixture)) -Destination $fixtureRoot -Recurse
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.6.0' -FromVersion $route.from -SpaceAge:([bool]$route.space_age) -F200GaloreSpaceAge:([bool]$route.galore) -F200BobAngel:([bool]$route.bob)
+  if($route.target-ceq'f210'){
+    Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
+  }else{
+    Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+    if($route.galore){Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to}
+    if($route.bob){
+      Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+      $bobOracle=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
+      foreach($needle in @('["recipe-prod-research_material_aluminium-1"] = true','["recipe-prod-research_material_aluminium-4"] = true','angels-plate-aluminium-2','angels-aluminium-casting-2','1600+200*(L-4)','reviewed Aluminium addition state differs','recipe="angels-plate-aluminium",change=0.02','recipe="angels-plate-aluminium-2",change=0.02')){
+        if(-not$bobOracle.Contains($needle)){throw "4.6 Bob/Angel strict oracle omitted reviewed Aluminium contract: $needle"}
+      }
+      foreach($forbidden in @('recipe-prod-research_material_copper_tungsten-1','reviewed finite terminal differs','recipe="angels-plate-aluminium",modifier=','recipe="angels-plate-aluminium-2",modifier=')){
+        if($bobOracle.Contains($forbidden)){throw "4.6 Bob/Angel strict oracle inherited unrelated 4.4.2 allowance: $forbidden"}
+      }
+      $mir43Assertions+=12
+    }
+  }
+  $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+  if($info.version-cne$route.fixture_version){throw "4.6 fixture identity mismatch: $($route.target)/$($route.archetype)"}
+  $mir460FixtureVersions += [string]$info.version
+  $SelectedTarget=$route.target;$SourceVersion='4.6.0';$FromVersion=$route.from;$ToVersion=$route.to
+  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=[bool]$route.bob;$f200GaloreSpaceAgeScenario=[bool]$route.galore
+  if(-not(& $fullSpecializationCode)){throw "4.6 Full specialization missing: $($route.target)/$($route.archetype)"}
+  $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$k2Scenario=$false;$classicReducedPolicy=$false
+  if(-not(& $completeCatalogueEvaluator)){throw "4.6 complete catalogue missing: $($route.target)/$($route.archetype)"}
+  $mir43Assertions+=5
+}
+if(@($mir460FixtureVersions|Sort-Object -Unique).Count-ne5){throw '4.6 fixture identities collide'}
+foreach($bad in @(
+  @{target='f210';from='4.5.21001';to='4.6.21000';archetype='base-default';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20001';archetype='base-default';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20001';to='4.6.20000';archetype='f200-bob-angel';galore=$false;bob=$true}
+)){
+  $code=$bad.target.Substring(1);$fixture='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
+  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$(if($bad.bob){$bobAngelProfilePath}else{''});F200GaloreSpaceAgeInputProfile=$(if($bad.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  if(-not$rejected){throw "4.6 input mode admitted invalid route: $($bad.target)/$($bad.from)/$($bad.to)/$($bad.archetype)"}
+  $mir43Assertions++
+}
+
+# V13 remaining target lanes retain the single actual published V12 predecessor.
+# These are fixture/input controls only; normal archive custody and native Full
+# state/two-reload evidence stay in the canonical runner.
+$mir460RemainingRoutes=@(
+  [ordered]@{target='f110';from='4.5.11002';to='4.6.11000';archetype='base-default';historical=$false;fixture_version='0.1.1134'},
+  [ordered]@{target='f100';from='4.5.10002';to='4.6.10000';archetype='base-default';historical=$false;fixture_version='0.1.1135'},
+  [ordered]@{target='f017';from='4.5.01702';to='4.6.01700';archetype='base-default';historical=$true;fixture_version='1.2.1140'},
+  [ordered]@{target='f016';from='4.5.01602';to='4.6.01600';archetype='base-default';historical=$true;fixture_version='1.2.1141'},
+  [ordered]@{target='f015';from='4.5.01502';to='4.6.01500';archetype='base-default';historical=$true;fixture_version='1.2.1142'},
+  [ordered]@{target='f014';from='4.5.01402';to='4.6.01400';archetype='base-default';historical=$true;fixture_version='1.2.1143'},
+  [ordered]@{target='f013';from='4.5.01302';to='4.6.01300';archetype='base-default';historical=$true;fixture_version='1.2.1144'}
+)
+$mir460RemainingVersions=@()
+foreach($route in $mir460RemainingRoutes){
+  $code=$route.target.Substring(1)
+  $fixture=if([bool]$route.historical){'assert-upgrade-historical-terminal-to-mir42'}else{'assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'}
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if([bool]$route.historical){'combined-v460-candidate.json'}else{''});PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.6.0'}
+  Assert-MIR421CurrentUpgradeInputMode @mode
+  if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.6.0')-cne'4.6.0'){throw "4.6 reader identity mismatch: $($route.target)"}
+  $fixtureRoot=Join-Path $mir43FixtureRoot ('mir460-'+$route.target+'-remaining')
+  Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixture)) -Destination $fixtureRoot -Recurse
+  if([bool]$route.historical){
+    $line='0.'+[int]$code
+    $infoPath=Join-Path $fixtureRoot 'info.json'
+    $infoText=[IO.File]::ReadAllText($infoPath).Replace('@@FACTORIO_LINE@@',$line).Replace('@@MIR_UPGRADE_FROM_VERSION@@',$route.from)
+    [IO.File]::WriteAllText($infoPath,$infoText,[Text.UTF8Encoding]::new($false))
+    Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.6.0' -FromVersion $route.from
+    $controlPath=Join-Path $fixtureRoot 'control.lua'
+    $control=[IO.File]::ReadAllText($controlPath).Replace('__MIR_UPGRADE_FROM_VERSION__',$route.from).Replace('__MIR_UPGRADE_TO_VERSION__',$route.to).Replace('__MIR_FACTORIO_LINE__',$line).Replace('__MIR_INFINITE_TECHNOLOGY__',$(if($route.target-ceq'f017'){'mining-productivity-4'}elseif($route.target-cin@('f016','f015')){'mining-productivity-16'}else{''})).Replace('__MIR_UPGRADE_SAVE_NAME__',('mir-'+$route.to.Replace('.','')+'-upgraded'))
+    [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
+  }else{
+    Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.6.0' -FromVersion $route.from
+    Set-MIR422HistoricalCompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -Target $route.target -FromVersion $route.from -ToVersion $route.to
+  }
+  $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
+  if($info.version-cne$route.fixture_version){throw "4.6 fixture identity mismatch: $($route.target)"}
+  $mir460RemainingVersions += [string]$info.version
+  $SelectedTarget=$route.target;$SourceVersion='4.6.0';$FromVersion=$route.from;$ToVersion=$route.to
+  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
+  if(-not(& $fullSpecializationCode)){throw "4.6 Full specialization missing: $($route.target)"}
+  $mir42UpgradeSpecialized=(-not[bool]$route.historical);$isHistoricalTerminalFixture=[bool]$route.historical;$k2Scenario=$false;$classicReducedPolicy=$false
+  if(-not(& $completeCatalogueEvaluator)){throw "4.6 complete catalogue missing: $($route.target)"}
+  if([bool]$route.historical){
+    $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $route.from -ToVersion $route.to
+    if($resolved.target-cne$route.to-or$resolved.predecessor_kind-cne'same-target-maintenance'-or$resolved.line-cne('0.'+[int]$code)){throw "4.6 historical resolver mismatch: $($route.target)"}
+    $mir43Assertions++
+  }
+  $mir43Assertions+=5
+}
+if(@($mir460RemainingVersions|Sort-Object -Unique).Count-ne$mir460RemainingRoutes.Count){throw '4.6 remaining fixture identities collide'}
+foreach($bad in @(
+  @{target='f110';from='4.5.11001';to='4.6.11000';historical=$false},
+  @{target='f100';from='4.5.10002';to='4.6.10001';historical=$false},
+  @{target='f017';from='4.5.01701';to='4.6.01700';historical=$true},
+  @{target='f016';from='4.5.01502';to='4.6.01600';historical=$true},
+  @{target='f013';from='4.5.01302';to='4.6.01300';historical=$true;wrong_fixture=$true}
+)){
+  $code=$bad.target.Substring(1)
+  $fixture=if([bool]$bad.historical){if($bad.ContainsKey('wrong_fixture') -and [bool]$bad.wrong_fixture){'assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'}else{'assert-upgrade-historical-terminal-to-mir42'}}else{'assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'}
+  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype='base-default';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest=$(if([bool]$bad.historical){'combined-v460-candidate.json'}else{''});PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.6.0'}
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
+  if(-not$rejected){throw "4.6 input mode admitted invalid remaining route: $($bad.target)/$($bad.from)/$($bad.to)"}
+  $mir43Assertions++
+}
+# The identity writers themselves retain exact source/target binding, not just
+# the runner's input-mode gate.
+$remainingIdentityFixture=Join-Path $mir43FixtureRoot 'mir460-remaining-identity-negative'
+Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-11000-to-4-1-11000') -Destination $remainingIdentityFixture -Recurse
+$rejected=$false;try{Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $remainingIdentityFixture -Target f110 -SourceVersion '4.6.0' -FromVersion '4.5.11002' -SpaceAge}catch{$rejected=$_.Exception.Message-ceq'[mir422-space-age-fixture-target]'}
+if(-not$rejected){throw '4.6 F110 fixture identity admitted an F210-only Space Age flag'}
+$mir43Assertions++
+
 Remove-Item -LiteralPath $mir43FixtureRoot -Recurse -Force
 # The matrix has a single current-destination route with exact argument
 # propagation and demands both reload receipts for it.

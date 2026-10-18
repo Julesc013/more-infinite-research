@@ -15,7 +15,7 @@ function Get-MIR43HistoricalCandidateAuthenticationProjection {
   param(
     [Parameter(Mandatory)][string]$Repository,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')][string]$SourceVersion
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion
   )
 
   $repo = (Resolve-Path -LiteralPath $Repository).Path
@@ -32,7 +32,7 @@ function Get-MIR43HistoricalCandidateAuthenticationProjection {
     [string]$value.kind -ceq 'MIR42HistoricalCandidateAuthenticationProjectionV1' -and
     [string]$value.target -ceq $Target -and
     [string]$value.source_version -ceq $SourceVersion -and
-    [string]$value.distribution_root -match '^more-infinite-research_4[.](?:3|4|5)[.][0-9]{5}$' -and
+    [string]$value.distribution_root -match '^more-infinite-research_4[.](?:3|4|5|6)[.][0-9]{5}$' -and
     [string]$value.member_projection_sha256 -match '^[0-9A-F]{64}$' -and
     @($value.members).Count -gt 0
   ) 'authentication projection contract differs'
@@ -245,8 +245,10 @@ function Read-MIR43HistoricalCurrentCandidate {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')][string]$SourceVersion,
-    $ExpectedReceiptDescriptor = $null
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion,
+    $ExpectedReceiptDescriptor = $null,
+    [switch]$AllowPackageEquivalentToolingDescendant,
+    $ExpectedCandidateSource = $null
   )
 
   $repo = (Resolve-Path -LiteralPath $Repository).Path
@@ -284,12 +286,29 @@ function Read-MIR43HistoricalCurrentCandidate {
   $projection = Get-MIR43HistoricalCandidateAuthenticationProjection -Repository $repo -Target $Target -SourceVersion $SourceVersion
   $head = (& git -C $repo rev-parse HEAD).Trim()
   $tree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-  Assert-MIR43HistoricalCandidateAuthentication ($LASTEXITCODE -eq 0 -and
-    [string]$manifest.source.commit -ceq $head -and [string]$manifest.source.tree -ceq $tree -and
-    [string]$manifest.source.commit -ceq [string]$projection.source.commit -and
-    [string]$manifest.source.tree -ceq [string]$projection.source.tree -and
-    [string]$manifest.candidate_row.source.commit -ceq [string]$projection.source.commit -and
-    [string]$manifest.candidate_row.source.tree -ceq [string]$projection.source.tree -and
+  $equivalentToolingDescendant = [bool]$AllowPackageEquivalentToolingDescendant
+  if ($equivalentToolingDescendant) {
+    Assert-MIR43HistoricalCandidateAuthentication ($SourceVersion -ceq '4.6.0' -and $null -ne $ExpectedCandidateSource) 'candidate source or distribution identity differs'
+    if (-not (Get-Command Assert-MIR42SealSource -ErrorAction SilentlyContinue)) {
+      . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+    }
+    $sealedSource = Assert-MIR42SealSource -RepoRoot $repo -Source $ExpectedCandidateSource -Code 'mir43-historical-current-candidate' -AllowPackageEquivalentToolingDescendant
+    Assert-MIR43HistoricalCandidateAuthentication (
+      [string]$manifest.source.commit -ceq [string]$sealedSource.commit -and
+      [string]$manifest.source.tree -ceq [string]$sealedSource.tree -and
+      [string]$manifest.candidate_row.source.commit -ceq [string]$sealedSource.commit -and
+      [string]$manifest.candidate_row.source.tree -ceq [string]$sealedSource.tree
+    ) 'candidate source or distribution identity differs'
+  } else {
+    Assert-MIR43HistoricalCandidateAuthentication ($LASTEXITCODE -eq 0 -and
+      [string]$manifest.source.commit -ceq $head -and [string]$manifest.source.tree -ceq $tree -and
+      [string]$manifest.source.commit -ceq [string]$projection.source.commit -and
+      [string]$manifest.source.tree -ceq [string]$projection.source.tree -and
+      [string]$manifest.candidate_row.source.commit -ceq [string]$projection.source.commit -and
+      [string]$manifest.candidate_row.source.tree -ceq [string]$projection.source.tree
+    ) 'candidate source or distribution identity differs'
+  }
+  Assert-MIR43HistoricalCandidateAuthentication (
     [string]$manifest.factorio_line -ceq [string]$projection.factorio_line -and
     [string]$manifest.distribution_version -ceq [string]$projection.distribution_version -and
     [string]$manifest.candidate_row.distribution_version -ceq [string]$projection.distribution_version
@@ -373,7 +392,7 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
     [Parameter(Mandatory)][string]$Archive,
     [Parameter(Mandatory)][string]$ManifestPath,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$WorkRoot
   )
 
