@@ -522,7 +522,8 @@ $to = Resolve-MIRUpgradePath -Path $ToZip
 $currentMaterialization=$null
 $historicalCombinedCandidate=$null
 $historicalCombinedTarget=$null
-$isHistoricalCurrentCandidate=[bool]($SourceMaterializationPath -and $SourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') -and $SelectedTarget -cin @('f017','f016','f015','f014','f013'))
+$isHistoricalCurrentCandidate=[bool]($SourceMaterializationPath -and $SourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0') -and $SelectedTarget -cin @('f017','f016','f015','f014','f013'))
+$allowHistoricalPackageEquivalentToolingDescendant=[bool]($isHistoricalCurrentCandidate-and$SourceVersion-ceq'4.6.0')
 if($SourceMaterializationPath){
   # Modern packages are authenticated by the canonical materializer receipt.
   # Historical targets have no canonical materializer surface: their input is
@@ -530,7 +531,7 @@ if($SourceMaterializationPath){
   if($isHistoricalCurrentCandidate){
     if(-not$SelectedReleaseManifest){throw '[mir-upgrade-historical-candidate-manifest-required]'}
     . (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
-    $historicalCombinedCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath (Resolve-MIRUpgradePath $SelectedReleaseManifest)
+    $historicalCombinedCandidate=Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath (Resolve-MIRUpgradePath $SelectedReleaseManifest) -AllowPackageEquivalentToolingDescendant:$allowHistoricalPackageEquivalentToolingDescendant
     $historicalRows=@($historicalCombinedCandidate.targets|Where-Object {[string]$_.target-ceq$SelectedTarget})
     if($historicalRows.Count-ne1){throw '[mir-upgrade-historical-candidate-target]'}
     $historicalCombinedTarget=$historicalRows[0]
@@ -539,7 +540,7 @@ if($SourceMaterializationPath){
     $suppliedReceipt=Resolve-MIRUpgradePath $SourceMaterializationPath
     if([IO.Path]::GetFullPath($suppliedReceipt)-cne[IO.Path]::GetFullPath([string]$historicalCombinedTarget.historical_materializer_manifest_path)){throw '[mir-upgrade-historical-candidate-receipt-path]'}
     . (Join-Path $RepoRoot 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
-    $currentMaterialization=Read-MIR43HistoricalCurrentCandidate -Repository $RepoRoot -Archive $to -ManifestPath $suppliedReceipt -Target $SelectedTarget -SourceVersion $SourceVersion -ExpectedReceiptDescriptor $historicalCombinedTarget.historical_materializer_manifest
+    $currentMaterialization=Read-MIR43HistoricalCurrentCandidate -Repository $RepoRoot -Archive $to -ManifestPath $suppliedReceipt -Target $SelectedTarget -SourceVersion $SourceVersion -ExpectedReceiptDescriptor $historicalCombinedTarget.historical_materializer_manifest -AllowPackageEquivalentToolingDescendant:$allowHistoricalPackageEquivalentToolingDescendant -ExpectedCandidateSource $historicalCombinedCandidate.source
     if([string]$currentMaterialization.receipt_custody-cne'combined-candidate-bound'){throw '[mir-upgrade-historical-candidate-receipt-custody]'}
   }else{
     . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
