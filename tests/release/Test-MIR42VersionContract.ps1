@@ -76,7 +76,7 @@ try {
     $before = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
     $rejected = $false
     try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.2.${code}02" | Out-Null }
-    catch { $rejected = $_.Exception.Message -match 'source-patch' }
+    catch { $rejected = $_.Exception.Message -match 'source-identity' }
     $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
     if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir422-implicit-patch-change]' }
     $assertions++
@@ -95,7 +95,7 @@ try {
     $assertions++
     $rejected = $false
     try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.2.${code}01" -SourceVersion '4.2.2' | Out-Null }
-    catch { $rejected = $_.Exception.Message -match 'source-patch' }
+    catch { $rejected = $_.Exception.Message -match 'source-identity' }
     $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
     if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir422-wrong-patch-mutated-input]' }
     $assertions++
@@ -112,6 +112,39 @@ try {
         -not $writtenHistory.Contains("Version: 4.2.${code}03`n") -or -not $writtenHistory.Contains('source 4.2.3.') -or
         [IO.File]::ReadAllText($readmePath) -cne "MIR 4.2.${code}03, source 4.2.3.`n`n$readme") { throw '[mir423-package-metadata]' }
     $assertions++
+    # Source 4.5.0 starts a new minor baseline.  The same authoritative writer
+    # must update all public package-identity surfaces while refusing an
+    # incompatible source-patch component before it can mutate the tree.
+    $source450Baseline = "4.5.${code}00"
+    $source450Version = "4.5.${code}00"
+    $source450WrongPatch = "4.5.${code}01"
+    $source450PriorVersion = "4.4.${code}02"
+    $source450History = "---------------------------------------------------------------------------------------------------`nVersion: $source450PriorVersion`n  Changes:`n    - Preserved source-4.4 maintenance entry.`n"
+    $info.version = $source450Baseline
+    [IO.File]::WriteAllText($infoPath, ($info | ConvertTo-Json), $utf8)
+    [IO.File]::WriteAllText($historyPath, $source450History, $utf8)
+    [IO.File]::WriteAllText($readmePath, $readme, $utf8)
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $source450Version -SourceVersion '4.5.0'
+    $written = Get-Content -Raw -LiteralPath $infoPath | ConvertFrom-Json
+    $writtenHistory = [IO.File]::ReadAllText($historyPath)
+    if ($written.version -cne $source450Version -or $written.title -cne $info.title -or
+        -not $writtenHistory.Contains("Version: $source450Version`n") -or -not $writtenHistory.Contains('source 4.5.0.') -or
+        -not $writtenHistory.EndsWith($source450History, [StringComparison]::Ordinal) -or
+        [IO.File]::ReadAllText($readmePath) -cne "MIR $source450Version, source 4.5.0.`n`n$readme") { throw '[mir450-package-metadata]' }
+    $assertions++
+    $before = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
+    $rejected = $false
+    try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $source450WrongPatch -SourceVersion '4.5.0' | Out-Null }
+    catch { $rejected = $_.Exception.Message -match 'source-identity' }
+    $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
+    if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir450-wrong-source-patch-mutated-input]' }
+    $assertions++
+    $rejected = $false
+    try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $source450Version -SourceVersion '4.5.1' | Out-Null }
+    catch { $rejected = $_.Exception.Message -match 'source-version' }
+    $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
+    if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir451-unapproved-source-mutated-input]' }
+    $assertions++
   }
 } finally {
   if (Test-Path -LiteralPath $root) {
@@ -121,4 +154,4 @@ try {
     Remove-Item -LiteralPath $resolved -Recurse -Force
   }
 }
-[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';source_4_2_2_suffix='02';source_4_2_3_suffix='03';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true;one_time_source_tag_bound=$true;factorio_processes=0;candidate_qualification='not-performed'} | ConvertTo-Json
+[pscustomobject]@{status='passed';targets=9;assertions=$assertions;source_4_2_0_suffix='00';source_4_2_1_suffix='01';source_4_2_2_suffix='02';source_4_2_3_suffix='03';source_4_5_0_suffix='00';mismatched_source_patch_rejected=$true;historical_leading_zero_retained=$true;one_time_source_tag_bound=$true;factorio_processes=0;candidate_qualification='not-performed'} | ConvertTo-Json

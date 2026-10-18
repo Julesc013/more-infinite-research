@@ -6,7 +6,7 @@ param(
  [string]$LibraryDirectory='',
  [switch]$PrepareInputsOnly,
  [ValidateSet('2.0','2.1')][string]$Target='2.1',
- [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1',
+ [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0')][string]$SourceVersion='4.2.1',
  [switch]$Graphics,
  [ValidateSet('low','very-low')][string]$GraphicsPreset='low',
  [ValidateSet('None','Defaults','RawOptIn','ImportedOptIn','RawOptInImportedOff')][string]$DlcIconCase='None',
@@ -42,6 +42,12 @@ $targetKey=if($Target -ceq '2.0'){'f200'}else{'f210'}
 $sourceVersionParts=@($SourceVersion.Split('.'))
 if($sourceVersionParts.Count -ne 3){throw '[mir-browser-source-version]'}
 $expectedIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $targetKey.Substring(1) -SourceMinor ([int]$sourceVersionParts[1]) -SourcePatch ([int]$sourceVersionParts[2])
+function Get-MIRBrowserFixtureIdentity([string]$SourceVersion) {
+ if($SourceVersion -ceq '4.4.0') {
+  return [pscustomobject]@{name='mir-browser-test';version='1.0.1'}
+ }
+ return [pscustomobject]@{name='mir-browser-test';version='1.0.0'}
+}
 function Get-MIRBrowserIconCase([string]$Case) {
  switch -CaseSensitive ($Case) {
   'None' { return $null }
@@ -98,6 +104,8 @@ try {
  foreach($stage in @('data','control')){$bindings["prototypes/mir/stage/$stage.lua"]="source/prototypes/mir/stage/$stage.lua"}
  $adapter=if($Target -ceq '2.1'){'f210'}else{'f200'}
  $bindings['prototypes/mir/runtime/scripted_techs.lua']="source/adapters/$adapter/prototypes/mir/runtime/scripted_techs.lua"
+ $bindings['prototypes/mir/settings/compiler_profile.lua']='source/prototypes/mir/settings/compiler_profile.lua'
+ $bindings['prototypes/mir/platform/factorio/target_line.lua']='source/prototypes/mir/platform/factorio/target_line.lua'
  $bindings['prototypes/mir/platform/factorio/target_profiles.lua']="source/adapters/$adapter/prototypes/mir/platform/factorio/target_profiles.lua"
  $bindings['prototypes/mir/platform/factorio/browser_host.lua']='source/prototypes/mir/platform/factorio/browser_host.lua'
  foreach($name in $bindings.Keys) {
@@ -130,9 +138,10 @@ New-Item -ItemType Directory -Path $run | Out-Null
 try {
 $sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
 $sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-$fixture=Join-Path $run 'fixture-source/mir-browser-test_1.0.0'
+$fixtureIdentity=Get-MIRBrowserFixtureIdentity -SourceVersion $SourceVersion
+$fixture=Join-Path $run ('fixture-source/{0}_{1}' -f $fixtureIdentity.name,$fixtureIdentity.version)
 New-Item -ItemType Directory -Force $fixture | Out-Null
-[ordered]@{name='mir-browser-test';version='1.0.0';title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
+[ordered]@{name=$fixtureIdentity.name;version=$fixtureIdentity.version;title='MIR browser acceptance';author='MIR';factorio_version=$Target;dependencies=@('base','more-infinite-research')} | ConvertTo-Json | Set-Content (Join-Path $fixture 'info.json')
 Copy-Item -LiteralPath (Join-Path $repo 'tests/runtime/browser_fixture_data.lua') -Destination (Join-Path $fixture 'data.lua')
 Initialize-MIRBrowserIconFixture -Fixture $fixture -Repository $repo -Case $DlcIconCase
 $lua=[Text.StringBuilder]::new()
@@ -147,11 +156,25 @@ foreach($module in @(@{name='browser_core';path='research_browser_core.lua'},@{n
 [void]$lua.AppendLine('local browser_omission_prototypes={mod_data={},mod_setting={}}')
 [void]$lua.AppendLine('local browser_omission_controller_bindings={}')
 [void]$lua.AppendLine('local browser_omission_controller={runtime_settings_bindings=function() return browser_omission_controller_bindings end}')
-[void]$lua.AppendLine('local browser_omission_runtime_settings={startup={}}')
+[void]$lua.AppendLine('local browser_omission_runtime_settings={startup={["mir-compiler-profile"]={value="full"}}}')
 [void]$lua.AppendLine('local browser_omission_registered_settings={["ips-max-level-bridge"]={name="ips-max-level-bridge",type="int-setting"}}')
 [void]$lua.AppendLine('local browser_omission_fingerprint=(function()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/core/fingerprint.lua')))
 [void]$lua.AppendLine('end)()')
+$browserOmissionProviderPath=Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua'
+$browserOmissionProviderSource=[IO.File]::ReadAllText($browserOmissionProviderPath)
+$browserOmissionRequiredModules=@([regex]::Matches($browserOmissionProviderSource,'require\(\s*["'']([^"'']+)["'']\s*\)')|ForEach-Object{$_.Groups[1].Value}|Sort-Object -Unique)
+$browserOmissionAdmittedModules=@(
+  'prototypes.mir.core.fingerprint',
+  'prototypes.mir.platform.factorio.browser_host',
+  'prototypes.mir.runtime.maximum_level_control',
+  'prototypes.mir.runtime.startup_settings',
+  'prototypes.mir.settings.catalog',
+  'prototypes.mir.settings.profile_codec'
+)|Sort-Object
+if(($browserOmissionRequiredModules -join "`n") -cne ($browserOmissionAdmittedModules -join "`n")) {
+  throw '[mir-browser-omission-provider-dependencies] Controlled provider dependencies changed; admit each dependency explicitly before a native Browser run.'
+}
 [void]$lua.AppendLine(@'
 local browser_omission_provider=(function()
   local prototypes=browser_omission_prototypes
@@ -178,10 +201,10 @@ local browser_omission_provider=(function()
       import_setting_name="mir-profile-import",decode=function() return nil end
     }
     end
-    return {}
+    error("[mir-browser-omission-provider-dependency] "..tostring(name),2)
   end
 '@)
-[void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'source/prototypes/mir/runtime/research_browser_mir_provider.lua')))
+[void]$lua.AppendLine($browserOmissionProviderSource)
 [void]$lua.AppendLine('end)()')
 [void]$lua.AppendLine([IO.File]::ReadAllText((Join-Path $repo 'tests/runtime/research_browser_omissions.lua')))
 [void]$lua.AppendLine('local check_browser_core_regressions=(function()')
@@ -247,7 +270,7 @@ $coreChecks='check_omissions(check); check_browser_core_regressions(browser_core
 [IO.File]::WriteAllText((Join-Path $fixture 'control.lua'),$lua.ToString(),[Text.UTF8Encoding]::new($false))
 if($PrepareInputsOnly) {
  $preparedRoot=Join-Path $run 'prepared-fixtures';[IO.Directory]::CreateDirectory($preparedRoot)|Out-Null
- $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $preparedRoot
+ $archive=Publish-MIRModDirectoryArchive -Source $fixture -Name $fixtureIdentity.name -Version $fixtureIdentity.version -ModsDir $preparedRoot
  Write-MIRNativeProbeResult -Context $resources -Record ([ordered]@{kind='MIRBrowserPreparedInputsV1';status='prepared-not-native-tested';target=$Target;source_version=$SourceVersion;distribution_version=$expectedIdentity.distribution_version;source_commit=$sourceCommit;dlc_icon_case=$DlcIconCase;fixture=@{path=$archive;sha256=(Get-MIRImmutableInputSha256 $archive)};factorio_processes=0})
  Write-Output "Browser fixture prepared without native execution or library writes: $run"
  return

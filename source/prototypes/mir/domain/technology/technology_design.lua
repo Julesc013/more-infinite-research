@@ -6,6 +6,11 @@ local gate_contract = require("prototypes.mir.domain.technology.gate")
 
 local M = {}
 local authority = trusted_record.new("TechnologyDesign")
+-- Preparations are private compiler handoffs, never trusted designs. Keeping
+-- their records behind opaque handles prevents an incomplete design escaping
+-- through a plan snapshot or reaching the emitter.
+local preparations = setmetatable({}, {__mode = "k"})
+local assert_emit_projection
 
 local SCHEMA = {
   schema = 2,
@@ -673,7 +678,7 @@ function M.with_qualification(design, row, options)
   return trust(result)
 end
 
-function M.from_generation_row(row)
+local function prepare_generation_row(row)
   if type(row) ~= "table" then error("TechnologyDesign requires a GenerationPlan row.", 2) end
   local source, evidence_class, fixed = source_profile(row)
   local fields = row.fields or {}
@@ -833,6 +838,87 @@ function M.from_generation_row(row)
   }
   -- Construction owns every field in this new record. Prove the structural
   -- and cross-field invariants once, then compute the fingerprints once.
+  validate(result, false, {trusted_children = true, trusted_children_verified = true})
+  return result
+end
+
+function M.from_generation_row(row)
+  local result = prepare_generation_row(row)
+  M.refresh_fingerprints(result, {trusted_gates = true})
+  return trust(result)
+end
+
+local function preparation_material(row)
+  -- The GenerationDraft fingerprint binds the remaining row authority itself.
+  -- Retain only the authored inputs that this pre-graph construction consumes
+  -- but that the final plan row does not serialize independently.
+  return {
+    fields = row.fields,
+    spec = row.spec,
+    materialization = row.materialization,
+    identity_authority = row.identity_authority,
+    direct_effects = row.direct_effects,
+    adoption = row.adoption
+  }
+end
+
+function M.prepare_generation_row(row)
+  if row.action ~= "emit" or row.stage_kind == "material-continuation"
+    or row.technology_design ~= nil then
+    error("Generation preparation requires an ordinary emitted row.", 2)
+  end
+  local design = prepare_generation_row(row)
+  local handle = {}
+  preparations[handle] = {
+    design = design,
+    -- At preparation capture, this digest binds the authored inputs below;
+    -- the GenerationDraft fingerprint binds the remaining row authority.
+    input_fingerprint = fingerprint.of(preparation_material(row)),
+    source = row.source, spec = row.spec, materialization = row.materialization,
+    provider_ids = row.provider_ids, family_ids = row.family_ids,
+    identity_authority = row.identity_authority
+  }
+  return handle
+end
+
+local function preparation_for(handle, row)
+  local preparation = preparations[handle]
+  local design = preparation and preparation.design
+  local identity = design and design.design.identity.value
+  if not design or row.action ~= "emit"
+    or identity.stream_key ~= row.stream_key or identity.manifest_id ~= row.manifest_id
+    or design.technology_id ~= row.technology_name
+    or preparation.source ~= row.source or preparation.spec ~= row.spec
+    or preparation.materialization ~= row.materialization
+    or preparation.provider_ids ~= row.provider_ids or preparation.family_ids ~= row.family_ids
+    or preparation.identity_authority ~= row.identity_authority then
+    error("Generation preparation does not match its authored row.", 3)
+  end
+  return preparation
+end
+
+function M.preparation_fingerprint(handle, row)
+  return preparation_for(handle, row).input_fingerprint
+end
+
+function M.prepared_graph_projection(handle, row)
+  local preparation = preparation_for(handle, row)
+  -- Ownership reconciliation receives its own projection; neither it nor an
+  -- explicit reader can mutate the structurally validated preparation.
+  local projection = prototype_projection_unvalidated(preparation.design)
+  assert_emit_projection(row, projection)
+  return deepcopy(projection)
+end
+
+function M.finalize_prepared_generation_row(handle, row)
+  local preparation = preparation_for(handle, row)
+  local result = {}
+  for key, value in pairs(preparation.design) do result[key] = value end
+  result.gates = trusted_gate_map(row.gates)
+  result.context = deepcopy(result.context)
+  result.context.action_reason = row.reason
+  result.context.target_profile_fingerprint = row.target_profile_fingerprint
+  assert_emit_projection(row, prototype_projection_unvalidated(result))
   validate(result, false, {trusted_children = true, trusted_children_verified = true})
   M.refresh_fingerprints(result, {trusted_gates = true})
   return trust(result)
@@ -1138,6 +1224,10 @@ function M.assert_generation_row(row)
     end
     return true
   end
+  return assert_emit_projection(row, projection)
+end
+
+assert_emit_projection = function(row, projection)
   local legacy = row.fields or {}
   local mismatches = {}
   local function compare(path, left, right)

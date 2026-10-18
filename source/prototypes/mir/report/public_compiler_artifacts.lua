@@ -10,14 +10,37 @@ local function append_sample(out, value)
   if #out < SAMPLE_LIMIT then table.insert(out, value) end
 end
 
-function M.assert_byte_budget(artifact)
-  local budget = artifact_budget.limit(artifact and artifact.kind)
-  local bytes = #fingerprint.canonical(artifact)
-  if bytes > budget then
-    error("MIR public artifact exceeds its hard byte budget: " .. artifact.kind
-      .. " bytes=" .. bytes .. " budget=" .. budget, 2)
+-- These four public records are freshly allocated string-keyed maps. Capture
+-- the exact pre-field bytes while producing their established self-digest;
+-- publication consumes the derived final count before the record leaves its
+-- owned local boundary. Generic budget checks intentionally remain separate.
+local function self_fingerprinted_public(public, field)
+  if type(public) ~= "table" or getmetatable(public) ~= nil
+    or type(field) ~= "string" or field == "" or rawget(public, field) ~= nil
+    or next(public) == nil then
+    error("Owned public artifact finalization requires a fresh nonempty map.", 2)
   end
-  return bytes, budget
+  for key in pairs(public) do
+    if type(key) ~= "string" then
+      error("Owned public artifact finalization requires string map keys.", 2)
+    end
+  end
+  local pre_fingerprint_text = fingerprint.canonical(public)
+  local digest = fingerprint.of_canonical(pre_fingerprint_text)
+  public[field] = digest
+  -- Map order cannot change this delta: one separator, one quoted key, a
+  -- colon, and one quoted MIR32 digest are appended logically to the map.
+  local final_bytes = #pre_fingerprint_text
+    + 1 + #string.format("%q", field) + 1 + #string.format("%q", digest)
+  return public, final_bytes
+end
+
+function M.assert_byte_budget(artifact)
+  -- Preserve unknown-kind refusal before traversing arbitrary caller data.
+  -- The second O(1) lookup belongs to the shared scalar boundary below.
+  artifact_budget.limit(artifact and artifact.kind)
+  local bytes = #fingerprint.canonical(artifact)
+  return artifact_budget.assert_byte_count_within_limit(artifact.kind, bytes)
 end
 
 local function sorted_effect_identities(effects)
@@ -113,8 +136,7 @@ function M.generation_plan(artifact)
     validation_summary = deepcopy(artifact.validation_summary or {}),
     rows = rows
   }
-  public.public_fingerprint = fingerprint.of(public)
-  return public
+  return self_fingerprinted_public(public, "public_fingerprint")
 end
 
 function M.coverage(artifact)
@@ -131,8 +153,7 @@ function M.coverage(artifact)
       summary = artifact.summary
     })
   }
-  public.public_fingerprint = fingerprint.of(public)
-  return public
+  return self_fingerprinted_public(public, "public_fingerprint")
 end
 
 function M.technology_catalog(catalog, provider_resolution)
@@ -148,6 +169,10 @@ function M.technology_catalog(catalog, provider_resolution)
     or type(evaluation.deferred_diagnostic_alternatives) ~= "number"
     or evaluation.deferred_diagnostic_alternatives < 0
     or evaluation.deferred_diagnostic_alternatives ~= math.floor(evaluation.deferred_diagnostic_alternatives)
+    or type(evaluation.deferred_rejected_diagnostic_alternatives) ~= "number"
+    or evaluation.deferred_rejected_diagnostic_alternatives < 0
+    or evaluation.deferred_rejected_diagnostic_alternatives ~= math.floor(evaluation.deferred_rejected_diagnostic_alternatives)
+    or evaluation.deferred_rejected_diagnostic_alternatives > evaluation.deferred_diagnostic_alternatives
     or evaluation.complete ~= (evaluation.deferred_diagnostic_alternatives == 0)
     or (evaluation.mode == "full-diagnostics" and evaluation.deferred_diagnostic_alternatives ~= 0)
     or (evaluation.mode == "player-selected-primary-plus-required-fallbacks"
@@ -165,7 +190,8 @@ function M.technology_catalog(catalog, provider_resolution)
       alternative_id = selection.alternative_id,
       action = selection.action,
       design_fingerprint = selection.design_fingerprint,
-      qualification_fingerprint = selection.qualification_fingerprint
+      qualification_fingerprint = selection.qualification_fingerprint,
+      deferred_rejection = deepcopy(selection.deferred_rejection)
     })
   end
   for _, candidate in ipairs(catalog.candidates or {}) do
@@ -216,12 +242,14 @@ function M.technology_catalog(catalog, provider_resolution)
       mode = evaluation.mode,
       complete = evaluation.complete,
       evaluated_alternatives = evaluation.evaluated_alternatives,
-      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives
+      deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives,
+      deferred_rejected_diagnostic_alternatives = evaluation.deferred_rejected_diagnostic_alternatives
     },
     counts = {
       candidates = #(catalog.candidates or {}),
       evaluated_alternatives = alternative_count,
       deferred_diagnostic_alternatives = evaluation.deferred_diagnostic_alternatives,
+      deferred_rejected_diagnostic_alternatives = evaluation.deferred_rejected_diagnostic_alternatives,
       selected = #selected,
       rejected = rejected_count,
       review_required = review_count
@@ -236,8 +264,7 @@ function M.technology_catalog(catalog, provider_resolution)
       review_required = review_count > #samples.review_required
     }
   }
-  public.public_fingerprint = fingerprint.of(public)
-  return public
+  return self_fingerprinted_public(public, "public_fingerprint")
 end
 
 local function sanitation_summary(ledger)
@@ -309,8 +336,7 @@ function M.compiler_evidence(input)
       complete = input.mutation_journal.complete
     } or nil
   }
-  public.evidence_fingerprint = fingerprint.of(public)
-  return public
+  return self_fingerprinted_public(public, "evidence_fingerprint")
 end
 
 function M.research_cost_compatibility(artifact)

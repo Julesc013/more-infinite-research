@@ -1000,16 +1000,27 @@ local function data_stage_item_prototype(name)
   return lookup.item_prototype(name)
 end
 
+-- The R07 capture has no BobTech package.  Keep the retained exact
+-- provider-pinned F200 closure unchanged, but declare its two Aluminium
+-- finals here so the shared matcher can decide from their complete schema-2
+-- graph/ownership/science boundary below.  This is F200-only.
+local function f200_bob_angel_aluminium_structural_declaration()
+  return target_profiles.current().factorio_version == "2.0"
+    and aluminium_mod_active("bobplates")
+    and aluminium_mod_active("angelssmelting")
+end
+
 local function aluminium_material_family()
   if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
-    if not f200_bob_angel_relevant_return_graph_routes then
-      return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
+    if f200_bob_angel_relevant_return_graph_routes
+      or f200_bob_angel_aluminium_structural_declaration() then
+      return material_family("bob-aluminium-plate", {
+        "bob-aluminium-plate",
+        "angels-plate-aluminium",
+        "angels-plate-aluminium-2"
+      }, {"bobplates", "angelssmelting"})
     end
-    return material_family("bob-aluminium-plate", {
-      "bob-aluminium-plate",
-      "angels-plate-aluminium",
-      "angels-plate-aluminium-2"
-    }, {"bobplates", "angelssmelting"})
+    return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
   end
   if aluminium_mod_active("angelssmelting") then
     return material_family("angels-plate-aluminium", {
@@ -1234,6 +1245,54 @@ local F200_BOB_ANGEL_RETURN_GRAPH_ROUTES = {
   ["angels-wire-silver-2"]={id="F200-BA-silver-wire-final-v1",risk="mir32-ce67b188",graph="mir32-99c58542",bindings="mir32-53f936f8",identities=130,recipes=134,producers=2,ingredients={f200_entry("item","angels-wire-coil-silver",4)},results={f200_entry("item","angels-wire-silver",16)}}
 }
 
+-- This is the distinct F200 Bob/Angel-no-BobTech shape recorded by R07.
+-- Empty provider pins are intentional only because the schema-2 return-graph
+-- contract below binds the whole affected graph, typed IO, owners, and
+-- unlock/science boundary through its recorded bindings fingerprint.
+local F200_BOB_ANGEL_ALUMINIUM_STRUCTURAL_ROUTES = {
+  ["angels-plate-aluminium"] = {
+    id="F200-BA-aluminium-casting-structural-r07-v1",
+    risk="mir32-28583fe9", graph="mir32-34df6bfc", bindings="mir32-1793ad3e",
+    identities=90, recipes=92, producers=3,
+    ingredients={f200_entry("fluid","angels-liquid-molten-aluminium",40)},
+    results={f200_entry("item","bob-aluminium-plate",4)}
+  },
+  ["angels-plate-aluminium-2"] = {
+    id="F200-BA-aluminium-roll-structural-r07-v1",
+    risk="mir32-6ae1add6", graph="mir32-555427be", bindings="mir32-d5f1b456",
+    identities=90, recipes=92, producers=3,
+    ingredients={f200_entry("item","angels-roll-aluminium",1)},
+    results={f200_entry("item","bob-aluminium-plate",4)}
+  }
+}
+
+local function f200_bob_angel_aluminium_structural_route(recipe_name)
+  local observed = F200_BOB_ANGEL_ALUMINIUM_STRUCTURAL_ROUTES[recipe_name]
+  if not observed then error("MIR F200 missing Aluminium structural observation " .. recipe_name) end
+  return {
+    id=observed.id,
+    evidence_id="F200-BobAngel-Aluminium-schema2-input-2.0.77-r07",
+    require_exact_route_certificate=true,
+    maximum_productivity=3.0,
+    profiles={{
+      id=observed.id .. "-profile",
+      mod_locks={},
+      mod_lock_scope="relevant-return-graph",
+      canonical_risk_fingerprint=observed.risk
+    }},
+    ingredients=observed.ingredients,
+    results=observed.results,
+    relevant_return_graph_contract={
+      schema=2,
+      return_graph_fingerprint=observed.graph,
+      bindings_fingerprint=observed.bindings,
+      reachable_identity_count=observed.identities,
+      relevant_recipe_count=observed.recipes,
+      direct_output_producer_count=observed.producers
+    }
+  }
+end
+
 local function f200_bob_angel_return_graph_route(recipe_name, relevant_input_contract)
   local observed = F200_BOB_ANGEL_RETURN_GRAPH_ROUTES[recipe_name]
   if not observed then error("MIR F200 missing return-graph observation " .. recipe_name) end
@@ -1297,6 +1356,17 @@ if f200_bob_angel_relevant_return_graph_routes then
     ["angels-plate-silver"] = f200_bob_angel_return_graph_route("angels-plate-silver", f200_nickel_silver_input_contract("angels-liquid-molten-silver", "angels-silver-smelting-1", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}, {"angels-ore-floatation","angels-metallurgy-2"})),
     ["angels-plate-silver-2"] = f200_bob_angel_return_graph_route("angels-plate-silver-2", f200_nickel_silver_input_contract("angels-roll-silver", "angels-silver-casting-2", {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1}}, {"angels-strand-casting-2","angels-silver-smelting-1","angels-copper-casting-2"})),
     ["angels-wire-silver-2"] = f200_bob_angel_return_graph_route("angels-wire-silver-2")
+  }
+end
+
+-- Preserve the retained exact schema-1 profile when present.  The R07
+-- BobTech-absent profile is separately admitted only by the exact schema-2
+-- structural contract above; declaration does not itself authorize emission.
+if f200_bob_angel_aluminium_structural_declaration()
+  and not f200_bob_angel_relevant_return_graph_routes then
+  streams.research_material_aluminium.reviewed_forward_routes = {
+    ["angels-plate-aluminium"] = f200_bob_angel_aluminium_structural_route("angels-plate-aluminium"),
+    ["angels-plate-aluminium-2"] = f200_bob_angel_aluminium_structural_route("angels-plate-aluminium-2")
   }
 end
 

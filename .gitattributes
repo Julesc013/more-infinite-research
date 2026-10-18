@@ -7,6 +7,17 @@ fixtures/release-inputs/mir421-published-420-manifest.json -text -eol whitespace
 fixtures/release-inputs/mir422-published-421-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 # Preserve the exact published 4.2.2 receipt bytes for 4.2.3 predecessor custody.
 fixtures/release-inputs/mir423-published-422-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact published 4.3.0 receipt bytes for 4.3.1 immediate-predecessor custody.
+fixtures/release-inputs/mir431-published-430-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve both actual published predecessors for the 4.4.2 upgrade paths.
+fixtures/release-inputs/mir442-published-440-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+fixtures/release-inputs/mir442-published-441-manifest.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the actually published 4.4.2 construction asset for 4.5.0 predecessor custody.
+fixtures/release-inputs/mir450-published-442-r24-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact published 4.5.1 construction bytes for 4.5.2 custody.
+fixtures/release-inputs/mir452-published-451-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# Preserve the exact published 4.5.2 construction bytes for 4.6.0 custody.
+fixtures/release-inputs/mir460-published-452-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 
 # Emergency startup-profile inputs and their observation schema are raw-hash
 # pinned. Retain their CRLF bytes while still checking actual whitespace.

@@ -142,10 +142,11 @@ Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirect
 Assert-LibraryRefusal {Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000') -Target f210} 'mir441-resource-output-root'
 function Test-MaintenanceFixtureCallSites {
   $PersistedDamageZip=''
-  # The real runner initializes this from its optional F200 Bob/Angel input
-  # profile before specializing fixture contents.  This AST-only caller test
-  # exercises the ordinary lanes, so keep that optional lane explicitly off.
-  $f200BobAngelScenario=$false
+  # The real runner initializes these from optional F200 named-profile inputs
+  # before specializing fixture contents. This AST-only caller test exercises
+  # ordinary lanes, so both named-profile paths must stay explicitly inactive.
+  $f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false;$classicReducedPolicy=$false
+  Assert-LibraryTest (-not $f200BobAngelScenario -and -not $f200GaloreSpaceAgeScenario -and -not $classicReducedPolicy) 'ordinary fixture caller disables named and reduced-profile inputs'
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
   Assert-LibraryTest (-not$errors.Count) 'upgrade fixture caller parses'
@@ -535,7 +536,26 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $harness=Join-Path $RepoRoot 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
   $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count -eq 0) 'K2 direct-library consumer parses'
-  foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213DirectLibraryInputs')){
+  # Execute the actual initial binding expression before a selected current
+  # fixture has been built. Preflight exits before this native-only path.
+  $archiveBindings=@(foreach($assignment in @($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -ceq '$inputBinding'
+  },$true))){
+    foreach($table in @($assignment.Right.FindAll({param($node)$node -is [Management.Automation.Language.HashtableAst]},$true))){
+      if(@($table.KeyValuePairs|ForEach-Object{$_.Item1.Extent.Text}) -ccontains 'fixture'){continue} # earlier current-preflight binding
+      foreach($pair in $table.KeyValuePairs){if($pair.Item1.Extent.Text -ceq 'archive_hashes'){$pair.Item2}}
+    }
+  })
+  Assert-LibraryTest ($archiveBindings.Count -eq 1) 'K2 initial archive binding has one actual owner'
+  $bindingExpression=[scriptblock]::Create($archiveBindings[0].Extent.Text)
+  $baseInputs=[pscustomobject]@{archive_hashes=@{'base-input.zip'='BASE'}}
+  $directInputs=$null
+  $initialHashes=& $bindingExpression
+  Assert-LibraryTest ($initialHashes.Count -eq 1 -and $initialHashes['base-input.zip'] -ceq 'BASE') 'K2 native setup retains base hashes before current fixture preparation'
+  $directInputs=[pscustomobject]@{archive_hashes=@{'base-input.zip'='BASE';'selected-fixture.zip'='FIXTURE'}}
+  $completeHashes=& $bindingExpression
+  Assert-LibraryTest ($completeHashes.Count -eq 2 -and $completeHashes['selected-fixture.zip'] -ceq 'FIXTURE') 'K2 prepared and retained paths bind the complete direct-library hashes'
+  foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213BaseLibraryInputs','Read-K2213DirectLibraryInputs')){
     $nodes=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
     if($nodes.Count -ne 1){throw "K2 input function is absent or duplicated: $name"}
     . ([scriptblock]::Create($nodes[0].Extent.Text))
@@ -653,14 +673,14 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
       . ([scriptblock]::Create($function[0].Extent.Text))
       $script:upgradeActivation=$activation;$script:upgradeProcessIndex=0;$script:upgradeResourceRuns=@()
       # This controlled actor represents the ordinary base upgrade. The actual
-       # adapter also supports K2 and F200 Bob/Angel observers; initialize
-       # both optional scenarios explicitly.
-       $k2Scenario=$false;$f200BobAngelScenario=$false
+       # adapter also supports K2 and named F200 profile observers; initialize
+       # all optional scenarios explicitly for this ordinary base actor.
+       $k2Scenario=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=$false
       $suiteRoot=$root;$root=Join-Path $suiteRoot 'upgrade-actor-run'
       [IO.Directory]::CreateDirectory($root)|Out-Null
       $script:upgradeResourceContext=[pscustomobject]@{root=$root;aliases=@();shared_alias_bytes=0L;max_new_output_bytes=2MB;result_reserve_bytes=64KB}
       Add-MIRNativeProbeLibraryActivation -Context $script:upgradeResourceContext -Activation $activation
-      $upgradePolicy=@{};$upgradePeakBytes=1MB
+      $upgradeResourcePolicy=@{};$upgradePeakBytes=1MB
       [IO.Directory]::CreateDirectory((Join-Path $root 'userdata'))|Out-Null
       $upgradeConfig=Join-Path $root 'upgrade-config.ini'
       [IO.File]::WriteAllLines($upgradeConfig,@('[path]',('read-data='+$data),('write-data='+(Join-Path $root 'userdata')),'[other]','enable-new-mods=false'))
@@ -696,12 +716,18 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $browserPath=Join-Path $RepoRoot 'tests/runtime/Test-MIRResearchBrowser.ps1'
   $browserAst=[Management.Automation.Language.Parser]::ParseFile($browserPath,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count-eq0) 'direct browser harness parses'
-  foreach($name in @('Get-MIRBrowserLibrarySelection','Get-MIRBrowserIconCase','Initialize-MIRBrowserIconFixture','Invoke-BrowserEngine')){
+  foreach($name in @('Get-MIRBrowserLibrarySelection','Get-MIRBrowserFixtureIdentity','Get-MIRBrowserIconCase','Initialize-MIRBrowserIconFixture','Invoke-BrowserEngine')){
     $function=@($browserAst.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$true))
     Assert-LibraryTest ($function.Count-eq1) ('browser adapter exists: '+$name)
     . ([scriptblock]::Create($function[0].Extent.Text))
   }
   Assert-LibraryRefusal {& $browserPath -RepoRoot $RepoRoot} 'mir-browser-direct-inputs-required'
+  $fixtureIdentityCalls=@($browserAst.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'Get-MIRBrowserFixtureIdentity'},$true))
+  Assert-LibraryTest ($fixtureIdentityCalls.Count-eq1) 'browser harness derives its fixture identity through one source-version helper'
+  $historicalBrowserFixtureIdentity=Get-MIRBrowserFixtureIdentity -SourceVersion '4.3.1'
+  $currentBrowserFixtureIdentity=Get-MIRBrowserFixtureIdentity -SourceVersion '4.4.0'
+  Assert-LibraryTest ($historicalBrowserFixtureIdentity.name-ceq'mir-browser-test'-and$historicalBrowserFixtureIdentity.version-ceq'1.0.0') 'historical browser source lines retain the trusted fixture identity'
+  Assert-LibraryTest ($currentBrowserFixtureIdentity.name-ceq'mir-browser-test'-and$currentBrowserFixtureIdentity.version-ceq'1.0.1') 'current browser source line receives a distinct fixture identity'
   Assert-LibraryTest ($null-eq(Get-MIRBrowserIconCase 'None')) 'ordinary browser fixture has no icon-setting override'
   foreach($row in @(@('Defaults',$false,$null),@('RawOptIn',$true,$null),@('ImportedOptIn',$false,$true),@('RawOptInImportedOff',$true,$false))){
     $selected=Get-MIRBrowserIconCase $row[0]
@@ -733,12 +759,12 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
     }
     Assert-LibraryTest (@($digests|Sort-Object -Unique).Count-eq1) ('prepared/executed icon fixture bytes are deterministic: '+$case)
   }
-  $browserFixture=Join-Path $root 'browser-assertions';[IO.Directory]::CreateDirectory($browserFixture)|Out-Null
-  Write-TestJson (Join-Path $browserFixture 'info.json') @{name='mir-browser-test';version='1.0.0';factorio_version='2.1';dependencies=@('base','more-infinite-research')}
+  $browserFixture=Join-Path $root ('browser-assertions-'+$historicalBrowserFixtureIdentity.version);[IO.Directory]::CreateDirectory($browserFixture)|Out-Null
+  Write-TestJson (Join-Path $browserFixture 'info.json') @{name=$historicalBrowserFixtureIdentity.name;version=$historicalBrowserFixtureIdentity.version;factorio_version='2.1';dependencies=@('base','more-infinite-research')}
   [IO.File]::WriteAllText((Join-Path $browserFixture 'control.lua'),'-- controlled browser assertions')
   $browserArgs=@{Library=$library;EngineVersion='2.1.20';Candidate=$badArchive;Version='4.2.21001';ExpectedSha256=(Get-MIRImmutableInputSha256 $badArchive);FixtureDirectory=$browserFixture}
   Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-library-fixture-missing'
-  $null=Publish-MIRModDirectoryArchive -Source $browserFixture -Name 'mir-browser-test' -Version '1.0.0' -ModsDir $library
+  $null=Publish-MIRModDirectoryArchive -Source $browserFixture -Name $historicalBrowserFixtureIdentity.name -Version $historicalBrowserFixtureIdentity.version -ModsDir $library
   $selection=Get-MIRBrowserLibrarySelection @browserArgs
   $profile=Join-Path $profiles 'browser.json';Write-TestJson $profile $selection.mod_list
   $activation=Start-MIRLibraryActivation $library $data $profile $selection.archive_hashes -SettingsMode Defaults
@@ -789,6 +815,24 @@ Initialize-MIRBrowserIconFixture -Fixture $Fixture -Repository $Repository -Case
   $terminal=Complete-MIRLibraryActivation $activation;$activation=$null
   Assert-LibraryTest ($terminal.archive_links_created-eq0-and$terminal.dependency_payload_bytes_copied-eq0-and$terminal.archive_extractions-eq0-and-not(Test-Path -LiteralPath (Join-Path $run 'mods'))) 'browser switches controls without a populated mod directory'
   Assert-LibraryTest ([Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $library 'mod-list.json')))-ceq[Convert]::ToBase64String($oldList)) 'browser restores previous selection'
+  $currentBrowserFixture=Join-Path $root ('browser-assertions-'+$currentBrowserFixtureIdentity.version);[IO.Directory]::CreateDirectory($currentBrowserFixture)|Out-Null
+  Write-TestJson (Join-Path $currentBrowserFixture 'info.json') @{name=$currentBrowserFixtureIdentity.name;version=$currentBrowserFixtureIdentity.version;factorio_version='2.1';dependencies=@('base','more-infinite-research')}
+  [IO.File]::WriteAllText((Join-Path $currentBrowserFixture 'control.lua'),'-- controlled current browser assertions')
+  $currentBrowserArgs=@{Library=$library;EngineVersion='2.1.20';Candidate=$badArchive;Version='4.2.21001';ExpectedSha256=(Get-MIRImmutableInputSha256 $badArchive);FixtureDirectory=$currentBrowserFixture}
+  Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @currentBrowserArgs} 'mir-library-fixture-missing'
+  $null=Publish-MIRModDirectoryArchive -Source $currentBrowserFixture -Name $currentBrowserFixtureIdentity.name -Version $currentBrowserFixtureIdentity.version -ModsDir $library
+  $currentSelection=Get-MIRBrowserLibrarySelection @currentBrowserArgs
+  $historicalSelection=Get-MIRBrowserLibrarySelection @browserArgs
+  $currentFixtureArchiveName=$currentBrowserFixtureIdentity.name+'_'+$currentBrowserFixtureIdentity.version+'.zip'
+  $historicalFixtureArchiveName=$historicalBrowserFixtureIdentity.name+'_'+$historicalBrowserFixtureIdentity.version+'.zip'
+  Assert-LibraryTest ((@($currentSelection.mod_list.mods|Where-Object {$_.name-ceq$currentBrowserFixtureIdentity.name})[0].version)-ceq$currentBrowserFixtureIdentity.version) 'current browser selection chooses its distinct fixture version with the historical archive resident'
+  Assert-LibraryTest (($currentSelection.archive_hashes.Keys -contains $currentFixtureArchiveName)-and-not($currentSelection.archive_hashes.Keys -contains $historicalFixtureArchiveName)) 'current browser selection pins only its current fixture archive'
+  Assert-LibraryTest (($historicalSelection.archive_hashes.Keys -contains $historicalFixtureArchiveName)-and-not($historicalSelection.archive_hashes.Keys -contains $currentFixtureArchiveName)) 'historical browser selection remains pinned to its trusted fixture archive'
+  $currentProfile=Join-Path $profiles 'browser-current.json';Write-TestJson $currentProfile $currentSelection.mod_list
+  $activation=Start-MIRLibraryActivation $library $data $currentProfile $currentSelection.archive_hashes -SettingsMode Defaults
+  $currentActive=Get-Content -LiteralPath (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
+  Assert-LibraryTest ((@($currentActive.mods|Where-Object {$_.name-ceq$currentBrowserFixtureIdentity.name})[0].version)-ceq$currentBrowserFixtureIdentity.version) 'activation selects current browser fixture while both fixture versions coexist'
+  $null=Complete-MIRLibraryActivation $activation;$activation=$null
   $browserArgs.ExpectedSha256='0'*64
   Assert-LibraryRefusal {Get-MIRBrowserLibrarySelection @browserArgs} 'mir-browser-library-input-hash'
   $browserArgs.ExpectedSha256=Get-MIRImmutableInputSha256 $badArchive

@@ -199,7 +199,7 @@
         "maximum_dependency_failures": 0,
         "required_log_fragments": [
           "[mir-fixture-assert-f200-science-researchability-diagnostic] final-route pack=logistic-science-pack status=research",
-          "[mir-fixture-assert-f200-science-researchability-diagnostic] projection=bounded-indeterminate pack=logistic-science-pack visits=1024 reason=diagnostic-work-budget-exhausted",
+          "[mir-fixture-assert-f200-science-researchability-diagnostic] final-route pack=logistic-science-pack status=research prerequisite=logistic-science-pack recipe=logistic-science-pack unlocker=logistic-science-pack acquisition_proof=false steam_witness=boiler-conversion",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=1",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=2",
           "[mir-fixture-assert-f200-science-researchability-diagnostic] emission=3",
@@ -371,7 +371,7 @@
         "required_result": "passed",
         "maximum_dependency_failures": 0,
         "required_log_fragments": [
-          "[mir-fixture-assert-recycler-progression-routes-f200] PASS recycler-1-routes-rejected=true"
+          "[mir-fixture-assert-recycler-progression-routes-f200] PASS recycler-1-routes-excluded-from-bindings=true"
         ],
         "forbidden_log_fragments": [
           "MIR Factorio 2.0 Recycler Progression route assertion failed"
@@ -379,7 +379,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Recycler Progression 1.0.0 Factorio 2.0 target-local route characterization. The reported science-pack recycling unlock surface is allowed to be absent; any present route must remain non-authoritative and recycler-1 must never enter generated prerequisites."
+      "notes": "Exact Recycler Progression 1.0.0 Factorio 2.0 target-local binding characterization. The reported science-pack recycling unlock surface is allowed to be absent; current declared bindings exclude recycler recipes and recycler-1 never enters generated prerequisites."
     },
     {
       "name": "local-2-0-krastorio-spaced-out",

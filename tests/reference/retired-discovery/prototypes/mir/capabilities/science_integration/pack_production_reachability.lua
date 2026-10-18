@@ -1004,13 +1004,41 @@ local function positive_witness_memo_key(identity, visiting_packs, visiting_tech
   }, "\0")
 end
 
-local function negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+local function plain_active_name_set(values)
+  if values == nil then return true end
+  if type(values) ~= "table" or getmetatable(values) ~= nil then return false end
+  for name, active in pairs(values) do
+    -- Even a plain container can hold a key with an observable __tostring.
+    -- Compiler-owned active sets contain string names; other keys retain the
+    -- historical second projection rather than suppress that observation.
+    if active and type(name) ~= "string" then return false end
+  end
+  return true
+end
+
+local function can_reuse_positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+  -- A caller can supply tables with metamethods.  The historical negative-key
+  -- path evaluated the positive projection again, so retain that observation
+  -- count and order for opaque inputs rather than assuming a repeated read is
+  -- inert.  Compiler-owned route state uses ordinary plain tables.
+  return type(identity) == "table" and getmetatable(identity) == nil
+    and plain_active_name_set(visiting_packs)
+    and plain_active_name_set(visiting_technologies)
+end
+
+local function negative_witness_memo_key(
+  identity, context, state, visiting_packs, visiting_technologies, positive_key
+)
   -- A failed route is conditional on every active cycle boundary. Unlike a
   -- positive witness, it cannot be reused across sibling contexts merely
   -- because the queried output matches. This key belongs to one immutable
   -- production-route query and includes the source epoch and all active sets.
+  if positive_key == nil
+    or not can_reuse_positive_witness_memo_key(identity, visiting_packs, visiting_technologies) then
+    positive_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
+  end
   return table.concat({
-    positive_witness_memo_key(identity, visiting_packs, visiting_technologies),
+    positive_key,
     tostring(state.recipe_source_epoch),
     active_set_key(state.visiting),
     active_set_key(context.pairs),
@@ -1111,9 +1139,9 @@ local function research_unlocked_output_witness(identity, options, state, visiti
     memo_key = positive_witness_memo_key(identity, visiting_packs, visiting_technologies)
     for _, entry in ipairs(positive_memo[memo_key] or {}) do
       if positive_witness_reusable(entry, context, state, identity_key(identity)) then
-        -- This memo owns a copied, immutable witness for this route query.
-        -- Callers only inspect it or attach it to another immutable witness;
-        -- cloning its full ingredient tree on every hit repeats proved work.
+        -- This memo owns the completed witness for this route query. Internal
+        -- consumers only read it or attach it to another immutable witness.
+        -- Public returns copy data; diagnostics bypass this private memo.
         return entry.witness
       end
     end
@@ -1122,7 +1150,8 @@ local function research_unlocked_output_witness(identity, options, state, visiti
       negative_memo = {}
       options.research_unlock_negative_memo = negative_memo
     end
-    negative_key = negative_witness_memo_key(identity, context, state, visiting_packs, visiting_technologies)
+    negative_key = negative_witness_memo_key(
+      identity, context, state, visiting_packs, visiting_technologies, memo_key)
     if negative_memo[negative_key] then return nil end
   end
   local witness_checkpoint = diagnostic_checkpoint(options)
@@ -1147,7 +1176,7 @@ local function research_unlocked_output_witness(identity, options, state, visiti
               < RESEARCH_UNLOCK_POSITIVE_MEMO_TOTAL_LIMIT then
             local dependencies = {pairs = {}, required_technologies = {}}
             witness_unlock_dependencies(result, context.technologies, dependencies)
-            local owned_witness = deepcopy(result)
+            local owned_witness = result
             table.insert(entries, {
               witness = owned_witness,
               output_identities = memo_witness_identity_summary(owned_witness),
@@ -2233,9 +2262,9 @@ local function canonical_boolean_acquisition_services_match(context)
 end
 
 local function contextual_boolean_acquisition_generation(context, owner, state)
-  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state
-    or not canonical_boolean_acquisition_services_match(context)
-    or not route_feasibility.state_context_matches(state, context) then return nil end
+  if type(owner) ~= "table" or type(state) ~= "table" or owner.route_witness_state ~= state then return nil end
+  if not canonical_boolean_acquisition_services_match(context) then return nil, "service_identity" end
+  if not route_feasibility.state_context_matches(state, context) then return nil end
   local source_epoch = canonical_recipe_facts.source_epoch()
   local recipe_index = context:state_view("recipe_index")
   local research_index = context:state_view("technology_researchability_index")
@@ -2286,12 +2315,15 @@ local function contextual_boolean_acquisition_memo_owner(state, observer)
   local context = compiler_context.current()
   local owner = context:state_view("science_pack_production")
   if type(owner) ~= "table" or owner.route_witness_state ~= state then return nil end
-  if not canonical_boolean_acquisition_services_match(context) then
+  -- The generation reader validates the live services once. A second
+  -- identical lookup immediately before it cannot establish another fact.
+  -- Retention after the proof still invokes that reader independently.
+  local generation, refusal = contextual_boolean_acquisition_generation(context, owner, state)
+  if refusal == "service_identity" then
     reset_contextual_boolean_acquisition_memo(owner, "service_identity")
     telemetry.count("science_contextual_boolean_acquisition_service_bypasses")
     return nil
   end
-  local generation = contextual_boolean_acquisition_generation(context, owner, state)
   if not generation then return nil end
   if not contextual_boolean_acquisition_memo_is_current(owner, generation) then
     reset_contextual_boolean_acquisition_memo(owner, "generation")

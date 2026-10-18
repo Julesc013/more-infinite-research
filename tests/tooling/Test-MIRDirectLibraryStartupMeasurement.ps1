@@ -244,15 +244,15 @@ loading-multithreading=true
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   $runner=(Get-Command Invoke-MIRDirectLibraryStartupMeasurement)
   $runnerVersions=@($runner.Parameters['StartupCandidateSourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
-  Assert-DirectStartup ((@($runnerVersions|Sort-Object)-join'|')-ceq'4.2.3|4.3.0|4.3.1') 'startup runner does not admit exactly the current candidate source versions.'
-  foreach($case in @(@{source='4.2.3';distribution='4.2.20003'},@{source='4.3.0';distribution='4.3.20000'},@{source='4.3.1';distribution='4.3.20001'})){
+  Assert-DirectStartup ((@($runnerVersions|Sort-Object)-join'|')-ceq'4.2.3|4.3.0|4.3.1|4.4.0|4.4.2') 'startup runner does not admit exactly the current candidate source versions.'
+  foreach($case in @(@{source='4.2.3';distribution='4.2.20003'},@{source='4.3.0';distribution='4.3.20000'},@{source='4.3.1';distribution='4.3.20001'},@{source='4.4.0';distribution='4.4.20000'},@{source='4.4.2';distribution='4.4.20002'})){
     $identity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f200 -SourceVersion $case.source
     Assert-DirectStartup ($identity.source_version-ceq$case.source-and$identity.distribution_version-ceq$case.distribution) "startup runner cannot project $($case.source) to its f200 candidate identity."
   }
   Assert-DirectStartup ($source.Contains(". (Join-Path `$repo 'tools/mir/application/package/PackageAuthority.ps1')")-and$source.Contains(". (Join-Path `$repo 'tools/mir/application/package/TargetMaterializer.ps1')")-and$source.Contains('$candidateIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $Target -SourceVersion $StartupCandidateSourceVersion')-and$source.Contains('Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateMaterializationArchive -ReceiptPath $CandidateMaterializationReceiptPath -Target $Target -SourceVersion $StartupCandidateSourceVersion')-and$source.Contains("label=('candidate-'+`$StartupCandidateSourceVersion)")-and$source.Contains('candidate=$(if($hasCandidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate')) 'startup runner does not load its canonical identity authority or bind the selected candidate source identity through archive validation, receipt validation, label, and report input.'
   $entry=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1')
   Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('GraphicalPlayerReady')-and$entry.Contains('PlayerReadyObserverArchive')-and$entry.Contains('PlayerReadyBenchmarkTicks')-and$entry.Contains('OrdinaryMenu')-and$entry.Contains('OrdinaryPlayerConfigPath')-and$entry.Contains('AdmissionWaitSeconds')-and$entry.Contains('endpoint-mode-conflict')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve direct-library admission-wait forwarding around its selected endpoint mode.'
-  Assert-DirectStartup ($entry.Contains("[ValidateSet('4.2.3','4.3.0','4.3.1')][string]`$StartupCandidateSourceVersion='4.2.3'")-and$entry.Contains('StartupCandidateSourceVersion=$StartupCandidateSourceVersion')) 'performance entrypoint does not preserve the default or selected startup candidate source version.'
+  Assert-DirectStartup ($entry.Contains("[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]`$StartupCandidateSourceVersion='4.2.3'")-and$entry.Contains('StartupCandidateSourceVersion=$StartupCandidateSourceVersion')) 'performance entrypoint does not preserve the default or selected startup candidate source version.'
   $entryPath=Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1'
   $startupCliInputs=@{RepoRoot=$repo;ObserveStartup=$true;FactorioBin='fixture-factorio.exe';LocalModZipDir='fixture-library';StartupProfileTemplatePath='fixture-profile.json';Published422Archive='fixture-published.zip';Published422ManifestPath='fixture-manifest.json';Published422ManifestSha256=('0'*64);StartupOutputRoot='fixture-output';ExpectedSourceCommit=('0'*40)}
   $conflictingEndpointRejected=$false;try{& $entryPath @startupCliInputs -GraphicalPlayerReady -OrdinaryMenu|Out-Null}catch{$conflictingEndpointRejected=$_.Exception.Message-ceq'[mir-direct-startup-endpoint-mode-conflict]'}
@@ -262,6 +262,7 @@ loading-multithreading=true
   $accepted=@((Get-Command Read-MIRNativeProbeCurrentCandidate).Parameters['SourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
   Assert-DirectStartup ('4.2.3'-in$accepted) 'native candidate reader rejects the 4.2.3 materialization identity.'
   Assert-DirectStartup ('4.3.0'-in$accepted-and'4.3.1'-in$accepted) 'native candidate reader rejects current 4.3 materialization identities.'
+  Assert-DirectStartup ('4.4.0'-in$accepted-and'4.4.2'-in$accepted) 'native candidate reader rejects admitted current 4.4 materialization identities.'
   $privateReadme=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([Text.UTF8Encoding]::new($false).GetBytes('MIR package')) -DistributionVersion '4.2.20003' -SourceVersion '4.2.3'
   Assert-DirectStartup (([Text.UTF8Encoding]::new($false).GetString($privateReadme)).StartsWith("MIR 4.2.20003, source 4.2.3.`n`n",[StringComparison]::Ordinal)) 'materializer does not support private 4.2.3 package identity presentation.'
   foreach($case in @(@{source='4.3.0';distribution='4.3.20000'},@{source='4.3.1';distribution='4.3.20001'})){
@@ -285,7 +286,7 @@ loading-multithreading=true
   function Get-MIRNativeProbeRemainingOutputBytes {param($Context);[int64]1MB}
   function Read-MIRNativeProbeCurrentCandidate {
     param($Repository,$Archive,$ReceiptPath,$Target,$SourceVersion)
-    [pscustomobject]@{path=$Archive;receipt=[pscustomobject]@{archive_sha256=$stressCandidateSha;source_version=$SourceVersion;package_source_sha256=('0'*64);source_manifest_sha256=('0'*64)}}
+    [pscustomobject]@{path=$Archive;receipt=[pscustomobject]@{archive_sha256=(Get-MIRImmutableInputSha256 -Path $Archive);source_version=$SourceVersion;package_source_sha256=('0'*64);source_manifest_sha256=('0'*64)}}
   }
   function Assert-MIRDirectLibraryPublished422Manifest {throw 'Controlled predecessor must never execute in candidate-only mode.'}
   function Invoke-MIRDirectLibraryStartupSample {
@@ -300,6 +301,25 @@ loading-multithreading=true
   Assert-DirectStartup ($script:stressCalls.Count-eq2-and@($script:stressCalls|Where-Object {$_.label-cne'candidate-4.3.0'-or$_.archive.sha256-cne$stressCandidateSha}).Count-eq0) 'candidate-only orchestration called a baseline or a different candidate.'
   Assert-DirectStartup ($stressResult.samples[0].cache_state-ceq'initial-selection'-and$stressResult.samples[1].cache_state-ceq'warm-repeat'-and$stressResult.samples[0].sample-eq1-and$stressResult.samples[1].sample-eq2) 'candidate-only sample sequencing is not explicit.'
   Assert-DirectStartup (@($stressResult.measurement_notes|Where-Object {$_-match'no relative speedup'}).Count-eq1) 'candidate-only result lacks its comparison limitation.'
+  $candidate440=Write-TestArchive -Library $library -Version '4.4.20000'
+  $args440=$stressArgs.Clone();$args440.StartupCandidateSourceVersion='4.4.0';$args440.CandidateArchive=$candidate440;$args440.CandidateMaterializationArchive=$candidate440;$args440.OutputRoot=Join-Path $root 'candidate-only-440-run'
+  $script:stressCalls.Clear()
+  $result440=Invoke-MIRDirectLibraryStartupMeasurement @args440
+  Assert-DirectStartup ($result440.inputs.candidate.source_version-ceq'4.4.0'-and$result440.inputs.candidate.materialization.source_version-ceq'4.4.0'-and$result440.samples.Count-eq2-and$script:stressCalls.Count-eq2-and@($script:stressCalls|Where-Object {$_.label-cne'candidate-4.4.0'-or$_.archive.sha256-cne(Get-MIRImmutableInputSha256 -Path $candidate440)}).Count-eq0) '4.4 orchestration lost the selected package, source identity or sample labels.'
+  $wrong440=$args440.Clone();$wrong440.CandidateArchive=$stressCandidate;$wrong440.OutputRoot=Join-Path $root 'reject-440-wrong-source'
+  $wrong440Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @wrong440|Out-Null}catch{$wrong440Rejected=$_.Exception.Message-ceq'[mir-direct-startup-candidate-identity]'}
+  Assert-DirectStartup $wrong440Rejected '4.4 measurement accepted a 4.3 candidate archive.'
+  $candidate442=Write-TestArchive -Library $library -Version '4.4.20002'
+  $args442=$stressArgs.Clone();$args442.StartupCandidateSourceVersion='4.4.2';$args442.CandidateArchive=$candidate442;$args442.CandidateMaterializationArchive=$candidate442;$args442.OutputRoot=Join-Path $root 'candidate-only-442-run'
+  $script:stressCalls.Clear()
+  $result442=Invoke-MIRDirectLibraryStartupMeasurement @args442
+  Assert-DirectStartup ($result442.inputs.candidate.source_version-ceq'4.4.2'-and$result442.inputs.candidate.materialization.source_version-ceq'4.4.2'-and$result442.samples.Count-eq2-and$script:stressCalls.Count-eq2-and@($script:stressCalls|Where-Object {$_.label-cne'candidate-4.4.2'-or$_.archive.sha256-cne(Get-MIRImmutableInputSha256 -Path $candidate442)}).Count-eq0) '4.4.2 orchestration lost its exact CCC02 package, source identity, or sample labels.'
+  $wrong442=$args442.Clone();$wrong442.CandidateArchive=$candidate440;$wrong442.OutputRoot=Join-Path $root 'reject-442-wrong-source'
+  $wrong442Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @wrong442|Out-Null}catch{$wrong442Rejected=$_.Exception.Message-ceq'[mir-direct-startup-candidate-identity]'}
+  Assert-DirectStartup $wrong442Rejected '4.4.2 measurement accepted a non-CCC02 candidate archive.'
+  $unadmitted443=$args442.Clone();$unadmitted443.StartupCandidateSourceVersion='4.4.3'
+  $unadmitted443Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @unadmitted443|Out-Null}catch{$unadmitted443Rejected=$_.FullyQualifiedErrorId-match'^ParameterArgumentValidationError'}
+  Assert-DirectStartup $unadmitted443Rejected 'startup runner admitted unregistered 4.4.3.'
   foreach($case in @('missing-comparison','preliminary','supplied-comparison','graphical')){
     $argsCopy=$stressArgs.Clone();$argsCopy.OutputRoot=Join-Path $root ('reject-'+$case)
     $code=switch($case){

@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.0+"
 audience: release-manager
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-12
+last_reviewed: 2026-10-17
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -51,6 +51,28 @@ This later maintainer acceptance superseded the earlier conditional publication 
 For 4.2.2, the same asset command takes `-SourceVersion 4.2.2 -ReleaseTag v4.2.2 -PublishedMaintenancePredecessorManifestPath <published-421-manifest>`. The inventory, support records, main readback and publication authorization must retain that exact predecessor custody and all nine `CCC02` identities. The [4.2.2 conditional authorization schema](../spec/schemas/mir422-maintainer-written-release-authorization-v1.schema.json) preserves both published predecessors and rejects inherited testing waivers. A 4.2.1 authorization cannot authorize or be relabelled for 4.2.2. This contract records the current execution authority only; actual qualification, signatures, review, restore, protected-main readback and final-byte binding remain required.
 
 For the emergency 4.2.2 cut, Inventory additionally requires `-MaintenanceUpgradeEvidencePath <bundle>`. The bundle contains all eighteen target/predecessor results (published CCC00 and CCC01 to the same CCC02 bytes), complete supported saved-state snapshots and full-state phase logs, plus the separately persisted damaged-save case. The frozen inventory binds its hash; inventory readback and publication authorization revalidate every referenced input. Missing, skipped, mismatched or changed evidence prevents publication. A successful ordinary 4.2.1 upgrade does not prove recovery from a save already persisted after technology removal.
+
+## Published 4.3.0, 4.4.0, 4.4.1 and 4.4.2
+
+Published [v4.3.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0) identifies commit `0e2703d7b545b97a2bdb308a02d84857288b6dc1` and release `411700807`. Its nine player ZIPs and fifteen public assets were anonymously downloaded and verified. Keep those bytes and original receipts intact. The unsigned, partially qualified emergency publication was explicitly limited to that candidate; it does not supply signing, review, qualification or acceptance for a later release.
+
+The maintainer cancelled 4.3.1 publication and consolidated its retained repairs into 4.4.0. The fixed 15 October 2026, 15:36 AEDT / 04:36 UTC request was a historical delivery cutoff, not a reusable waiver. Unpublished 4.3.1 assets and observations remain preserved under their original identities; they are not a released predecessor or 4.4.0 qualification.
+
+[v4.4.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.0) was published at 2026-10-15T08:16:05Z as GitHub release `413564113`, tagged directly at commit `72b5c72eab810baf74c9a785ac4ebbc0d438c94a` and tree `fe63974c649ddba389da5979ba94a59bffdd5e72`. Its nine `CCC00` packages and eight supporting assets were anonymously downloaded and hash-verified: seventeen public assets in total. `dist/release-4.4.0/PUBLICATION-RECEIPT.json` binds that delivery without rewriting the frozen manifest or ZIPs.
+
+The 4.4.0 acceptance was current-candidate-specific, unsigned and partially qualified. The normal technical seal and protected-main promotion were not performed; `main` remains at the published 4.3.0 state. The release does not inherit the 4.3.0 emergency exception. Its manifest retains the exact completed F200, F110 and F210 scopes, focused observations and every unfinished qualification scope. Portal uploads remain maintainer-managed and are not claimed by the GitHub readback.
+
+[v4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1) was published at 2026-10-15T10:50:21Z as GitHub release `413691909`, at commit `2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6` and tree `3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825`. Its nine `CCC01` packages and eight supporting assets were anonymously downloaded and hash-verified. The matching local delivery is `dist/release-4.4.1/`; its publication receipt preserves the original manifest and archive identities.
+
+The 4.4.1 emergency repair removed the load-only `on_tick` registration. Its unsigned, essential-check acceptance was explicitly limited to that candidate and did not establish a successful native multiplayer connection or complete the inherited qualification. It supplies neither a normal signing exception nor candidate-bound acceptance for 4.4.2. Portal availability remains separate from GitHub publication.
+
+Published [v4.4.2](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.2), GitHub release `415194452`, was published at 2026-10-16T17:10:35Z from source commit `fe385332f778e1c79a0ad930140fe6e4defdb17a` and tree `95bb20196cc4195375acefeacc727e6a5370af21`. Its nine `CCC02` player packages and nine supporting assets were anonymously downloaded and SHA-256 verified: eighteen public assets in total. `dist/4.4.2/PUBLICATION-RECEIPT.json` records the 2026-10-16T17:10:56.7721891Z readback, and the matching primary delivery contains `dist/4.4.2/`, the nine top-level ZIPs and `LATEST`.
+
+The release fixes the reproduced Dark Matter Replicators Reborn 3.7.1 startup crash by binding the native tenemut resource before later replication recipes. It also adds the explicit **Infinite worker robot speed — max level** startup setting for the native Base and Space Age chains: its default `0` is unlimited, while `10` admits level 10 and blocks level 11 through the existing cap controller. The setting preserves earned levels and speed bonuses and does not change technology IDs, science, costs or effects. Exact F200 Base 4.4.1-to-4.4.2 and F210 Space Age 4.2.2-to-4.4.2 upgrades passed complete definitions, state, effects, queues and two cold reloads; they retained 250 technologies/217 recipes and 348 technologies/662 recipes respectively. F200 Base and F210 Space Age also passed the native `0`-to-`10`-to-`0` cap transition with earned bonus and fractional-progress preservation.
+
+True Nukes Continued 0.3.36 with Warheads Continued 0.0.21 passed the available Base and combined Space Age/Dark Matter Replicators startup reproductions. The original unspecified nuclear-test crash and the full reporter modpack remain unreplicated; no invented fix or bypass is claimed. Current science controls passed 329 assertions, the common-emitter controls passed seven assertions, the upgrade oracle passed 57 opposing controls, and independent archive checks passed for all nine targets.
+
+This is an unsigned essential-check emergency publication with no normal technical seal, protected-main promotion, complete all-engine client qualification or hardware-independent loading guarantee. Hosted CI remained in progress at publication and is not represented as passed. The performance target, genuine client/multiplayer, physical shortcut/menu, original reporter-modpack and broader historical acceptance remain open. Portal uploads are maintainer-managed and separate from GitHub publication. Prior receipts retain their exact original package/source identities; this candidate supplies no reusable signing or acceptance exception.
 
 ## Readiness order
 

@@ -15,8 +15,8 @@ import sys
 from pathlib import Path
 
 
-SOURCE_PATH = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
-POLICY_PATH = Path("source/prototypes/mir/capabilities/science_integration/production_route_policy.lua")
+SOURCE_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+POLICY_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/production_route_policy.lua")
 FIXTURE_PATH = Path("tests/compiler/route_construction_sieve.lua")
 RETURN_MARKER = "\nreturn M"
 
@@ -158,6 +158,7 @@ end
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-ROUTE-CONSTRUCTION-SIEVE-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "assertions": int(result["assertions"]),
         "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
         "policy_sha256": hashlib.sha256(policy.encode("utf-8")).hexdigest(),

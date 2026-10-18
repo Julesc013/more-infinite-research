@@ -7,11 +7,15 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
+local family_resolver = require("prototypes.mir.families.resolver")
 local research_cost_compatibility = require("prototypes.mir.domain.research_cost.compatibility_slice")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local artifact_budget = require("prototypes.mir.domain.compiler.public_artifact_budget")
 
 local M = {}
 
+-- Owned builders return a scalar count while this publication boundary still
+-- owns the fresh record. Arbitrary records continue through assert_byte_budget.
 -- The bounded research-cost support artifact has admitted exact dispositions
 -- only for Factorio 2.0 and 2.1.  Factorio-1 packages retain their reduced
 -- research surface but do not emit a proof whose target contract they cannot
@@ -36,11 +40,11 @@ function M.publish(context)
   -- Older engines retain the exact compiler-evidence log below, but have no
   -- mod-data consumer. Do not construct unused public or internal projections.
   if publishes_mod_data then
-    local public_plan = public_artifacts.generation_plan(plan.stream_plan)
-    local public_catalog = public_artifacts.technology_catalog(
+    local public_plan, plan_public_bytes = public_artifacts.generation_plan(plan.stream_plan)
+    plan_public_bytes = artifact_budget.assert_byte_count_within_limit(public_plan.kind, plan_public_bytes)
+    local public_catalog, catalog_public_bytes = public_artifacts.technology_catalog(
       plan.technology_catalog, context:state_view("family_resolution") or {})
-    local plan_public_bytes = public_artifacts.assert_byte_budget(public_plan)
-    local catalog_public_bytes = public_artifacts.assert_byte_budget(public_catalog)
+    catalog_public_bytes = artifact_budget.assert_byte_count_within_limit(public_catalog.kind, catalog_public_bytes)
     telemetry.count("generation_plan_public_bytes", plan_public_bytes)
     telemetry.count("technology_catalog_public_bytes", catalog_public_bytes)
     mod_data.emit_generation_plan(public_plan)
@@ -66,25 +70,49 @@ function M.publish(context)
   end
   telemetry.count("technology_design_count", design_count)
   telemetry.count("technology_design_canonical_bytes", design_bytes)
+  local journal = context:state_view("mutation_journal")
+  if not journal then error("Compiler artifacts cannot publish without a MutationJournal.", 2) end
+  -- Public evidence reads a fixed projection of the finalized result and
+  -- journal. Avoid copying operation snapshots, parity proofs, and developer
+  -- decision rows unless the explicitly requested internal evidence consumes
+  -- them below. The output sanitation ledger remains an exported report input,
+  -- so it retains the Context defensive-copy boundary.
+  local output_sanitation_ledger = context:artifact("output_sanitation_ledger")
   local evidence_input = {
     compilation_plan_schema = plan.schema,
     compilation_fingerprint = plan.compilation_fingerprint,
     qualification_fingerprint = plan.qualification_fingerprint,
-    compiler_input_fingerprint = plan.compiler_input.input_fingerprint,
-    compiler_result = deepcopy(final_result),
-    compiler_result_fingerprint = final_result.result_fingerprint,
-    mutation_journal = context:state_view("mutation_journal"):snapshot(),
-    technology_catalog_fingerprint = plan.technology_catalog_fingerprint,
-    technology_graph_parity = context:artifact("technology_graph_parity"),
-    provider_resolution = deepcopy(context:state_view("family_resolution") or {}),
-    input_sanitation_ledger = deepcopy(plan.input_sanitation_ledger),
-    output_sanitation_ledger = context:artifact("output_sanitation_ledger")
+    compiler_result = final_result,
+    mutation_journal = journal:publication_summary(),
+    input_sanitation_ledger = plan.input_sanitation_ledger,
+    output_sanitation_ledger = output_sanitation_ledger
   }
-  evidence_input.provider_decision_diagnostics = {}
-  for _, row in ipairs((context:state_view("diagnostics") or {}).rows or {}) do
-    if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
-      table.insert(evidence_input.provider_decision_diagnostics, deepcopy(row))
+  -- Keep the complete developer evidence input at the original publication
+  -- boundary. Subsequent report publishers add diagnostic rows, so capturing
+  -- it later would silently change the explicit internal artifact. Ordinary
+  -- publication never enters this branch.
+  local internal_evidence_input = nil
+  if include_internal and publishes_mod_data then
+    local provider_decision_diagnostics = {}
+    for _, row in ipairs((context:state_view("diagnostics") or {}).rows or {}) do
+      if row.kind == "decision" and row.reason == "canonical_provider_decision_projection" then
+        table.insert(provider_decision_diagnostics, deepcopy(row))
+      end
     end
+    internal_evidence_input = {
+      compilation_plan_schema = plan.schema,
+      compilation_fingerprint = plan.compilation_fingerprint,
+      qualification_fingerprint = plan.qualification_fingerprint,
+      compiler_input_fingerprint = plan.compiler_input.input_fingerprint,
+      compiler_result = final_result,
+      compiler_result_fingerprint = final_result.result_fingerprint,
+      mutation_journal = journal:snapshot(),
+      technology_catalog_fingerprint = plan.technology_catalog_fingerprint,
+      technology_graph_parity = context:artifact("technology_graph_parity"),
+      input_sanitation_ledger = plan.input_sanitation_ledger,
+      output_sanitation_ledger = output_sanitation_ledger,
+      provider_decision_diagnostics = provider_decision_diagnostics
+    }
   end
   if target_line.feature_enabled("productivity_family_adoption") then
     require("prototypes.mir.emit.transactions.productivity_family_adoption").emit_mod_data()
@@ -117,8 +145,8 @@ function M.publish(context)
   -- work and makes the payload's telemetry depend on that reconstruction.
   context_construction.record_work_volume()
   evidence_input.telemetry = telemetry.snapshot()
-  local public_evidence = public_artifacts.compiler_evidence(evidence_input)
-  local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)
+  local public_evidence, evidence_bytes = public_artifacts.compiler_evidence(evidence_input)
+  evidence_bytes = artifact_budget.assert_byte_count_within_limit(public_evidence.kind, evidence_bytes)
   if publishes_mod_data then
     telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)
     local counters = telemetry.snapshot().counters
@@ -130,8 +158,14 @@ function M.publish(context)
       + evidence_bytes)
   end
   context_construction.record_work_volume()
-  local internal_evidence = include_internal and publishes_mod_data
-    and compiler_evidence.build(evidence_input) or nil
+  local internal_evidence = nil
+  if internal_evidence_input then
+    -- Preserve the established timing of the resolver inspection: report
+    -- publishers have completed before the explicit internal artifact reads it.
+    internal_evidence_input.provider_resolution = family_resolver.inspection_snapshot()
+    internal_evidence_input.telemetry = evidence_input.telemetry
+    internal_evidence = compiler_evidence.build(internal_evidence_input)
+  end
   if research_cost_support then
     require("prototypes.mir.emit.research_cost_compatibility_adapter").publish(research_cost_support)
   end

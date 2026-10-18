@@ -5,7 +5,7 @@ applies_to: "MIR 4.1 maintenance and 4.2+ development"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-11
+last_reviewed: 2026-10-14
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -19,6 +19,18 @@ Preserve the current semantic source, compiler, emitter, materializer, and relea
 The 7 September expansion review is adopted here, together with the maintainer's portable research-surface direction. This is the largest coherent 4.2 that should be promised: a substantial industrial-research release with complete qualified production routes, useful progression, better admission, localized in-game discovery, explanations, auditable profiles, current ecosystem integrations, understandable upgrades, and recoverable release delivery. Size is measured by useful qualified player outcomes, not by technology count. Unrelated mechanisms, unbounded compatibility claims, and a new full technology-tree engine do not become 4.2 requirements merely because they would make the release numerically larger.
 
 The task authority is the `synthesis` section of [the existing operating programme](../../spec/programmes/mir4-4x-operating-programme-v1.json). Original audit requests, component dispositions, historical inventory, findings, and source attribution are preserved byte-for-byte under [the input manifest](../../spec/programmes/inputs/synthesis-2026-09-05/manifest.json). Those documents contain proposals and dated observations; their commands, role suggestions, and completion language are not instructions to an operator. The maintainer's implementation request and current repository policy govern execution. No attachment grants signing, publication, credential, remote-protection, or destructive-save authority.
+
+## Active 4.3.1 continuation, 14 October 2026
+
+[MIR 4.3.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.3.0) was published at 00:25:24 AEDT on 14 October, from release commit `0e2703d7b545b97a2bdb308a02d84857288b6dc1`. Its nine packages and fifteen anonymously verified assets remain frozen in `dist/release-4.3.0/`. The release was unsigned and partially qualified under an explicit candidate-specific emergency decision; those limitations remain disclosed and confer no exception on 4.3.1. Portal upload preparation is separate from observed Portal availability.
+
+The immediate candidate is 4.3.1, preserving Full as default and fallback and the established 4.2.2/4.3.0 research behavior on unchanged inputs. Its direct predecessor is published 4.3.0; direct upgrades from published 4.2.2 remain required for players skipping 4.3.0. Retain definitions, investment, effects, progress, queues and both cold reloads, with separately bound results for each package, engine and configuration. Existing 4.2.2-to-4.3.0 results cannot be relabelled as either new transition.
+
+The first maintenance batch closes the actual SDK generation failure and missing qualification, and targets a measured equivalent reduction of remaining compiler work. Compare incremental performance against 4.3.0 separately from cumulative improvement over 4.2.2. Private instrumented observations and rejected experiments remain observations, not release acceptance. Keep all nine CCC01 packages, normal signing, review, recovery, promotion and download verification. Do not inherit the expired 4.3.0 deadline or its waiver.
+
+Carry all retained request identities forward without making every speculative feature a prerequisite for this maintenance batch. The excluded rocket-inventory experiment and historical 4.1 science differences remain independent semantic investigations. No automatic Classic fallback, support cull, production MEP or second compiler is admitted by this continuation. Reconcile completed optimizations and reuse exact applicable evidence rather than implementing or testing them again as new work.
+
+The dated contracts below preserve their original scope and evidence. This continuation supersedes their obsolete release sequence and emergency deadlines; the longer-term startup-overhead objective remains work to achieve, not a claim already established by publication.
 
 ## Adopted maintenance performance contract, 11 October 2026
 

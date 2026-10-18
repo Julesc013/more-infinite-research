@@ -1,0 +1,132 @@
+{
+  "schema": 1,
+  "kind": "MIR42FinalReleaseManifestV1",
+  "source_version": "4.4.1",
+  "source_tag": "v4.4.1",
+  "status": "emergency-accepted-unsigned-essential-only",
+  "source": {
+    "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+    "tree": "3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825"
+  },
+  "package_source_sha256": "DE4B73F78C2105145791C5C13297F2D7181D3A81CF28CD223C31C418DE6DB227",
+  "candidate_manifest_sha256": "4FF1E1466CAB186EC56EBFF9CB8388F13E3E5C46B69ABA4278428233BD708990",
+  "targets": [
+    {
+      "target": "f210",
+      "distribution_version": "4.4.21001",
+      "filename": "more-infinite-research_4.4.21001.zip",
+      "factorio_version": "2.1",
+      "bytes": 1407589,
+      "sha256": "981B0C2322D51DAF72B84DE02CFE7607CEF6A6612269EC9DCBC6ABBB58137092",
+      "content_sha256": "560BE9BC51EA02231FC3E56051765EB0724811081A78BDB1603D9DF7036367E0",
+      "entry_count": 343
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.4.20001",
+      "filename": "more-infinite-research_4.4.20001.zip",
+      "factorio_version": "2.0",
+      "bytes": 1403717,
+      "sha256": "FD3D83C36275EA6C5A5F7AB9BE1D5C8CE17893865E2151A8781E643054DECB3F",
+      "content_sha256": "14CB30F01A4AF55F422613EA0D41F0D560C233E6933509843B86A8BECA5691E4",
+      "entry_count": 341
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.4.11001",
+      "filename": "more-infinite-research_4.4.11001.zip",
+      "factorio_version": "1.1",
+      "bytes": 665245,
+      "sha256": "02728A1555E9E8C6F4CE2708A0A49C2B49691E9E78DBA47ECB3B47107A5F06D7",
+      "content_sha256": "E6A98788F1AE79C30B11A4606E17F5A71DF389B18C61BFB6F23BD51666EE359D",
+      "entry_count": 281
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.4.10001",
+      "filename": "more-infinite-research_4.4.10001.zip",
+      "factorio_version": "1.0",
+      "bytes": 665220,
+      "sha256": "B513066C1BE6C5906AAC775A9AFD1546B831C249EE9301F9B7C04507126057DF",
+      "content_sha256": "415356E86722D0647787C596F446590C2E4426B2236AB860D755CCC3DAF0BB6A",
+      "entry_count": 281
+    },
+    {
+      "target": "f017",
+      "distribution_version": "4.4.01701",
+      "filename": "more-infinite-research_4.4.01701.zip",
+      "factorio_version": "0.17",
+      "bytes": 650830,
+      "sha256": "719BEB6FD62E7CCF08A978FF49B3600F7FF22596A85FC32B18B191E101B0EE09",
+      "content_sha256": "2FD3A5FA4851C0F7EB614FFB1CE1754D852C73DC1CCB86D3AB4BAC003D65DCD7",
+      "entry_count": 281
+    },
+    {
+      "target": "f016",
+      "distribution_version": "4.4.01601",
+      "filename": "more-infinite-research_4.4.01601.zip",
+      "factorio_version": "0.16",
+      "bytes": 651085,
+      "sha256": "8AB617DE9A2F08657344A1E00FF4444EBEACF9EF61BAF29921CACC8B860938E1",
+      "content_sha256": "302A37775B517971A689D63AC081C3E64F44528A5D8771C2CF9A6D8A6A2C5D6B",
+      "entry_count": 281
+    },
+    {
+      "target": "f015",
+      "distribution_version": "4.4.01501",
+      "filename": "more-infinite-research_4.4.01501.zip",
+      "factorio_version": "0.15",
+      "bytes": 651073,
+      "sha256": "9B976D2C7D00F3880D4E63EF32C607FA01F827F231CFE2598011BCD2BB1E2082",
+      "content_sha256": "40D3382A54783026434E0479A7E30A07D385D9DD80AA30160A254435EABA793A",
+      "entry_count": 281
+    },
+    {
+      "target": "f014",
+      "distribution_version": "4.4.01401",
+      "filename": "more-infinite-research_4.4.01401.zip",
+      "factorio_version": "0.14",
+      "bytes": 651325,
+      "sha256": "1F0534D25B254EF0739F0D6CF22181A2EC64D1D0EF7A3E86B6D0274EB649D83C",
+      "content_sha256": "0D2901BA82A9A10C4896A7B9FC5089AB4E6DFBB40553A7D1B17D536C36610B51",
+      "entry_count": 281
+    },
+    {
+      "target": "f013",
+      "distribution_version": "4.4.01301",
+      "filename": "more-infinite-research_4.4.01301.zip",
+      "factorio_version": "0.13",
+      "bytes": 651326,
+      "sha256": "EDA57648186AF494266602AE09704E8CBCF6E46B89125CB1386B0352932EF26B",
+      "content_sha256": "0241A0A977090D753145B54BED3F493157D3795021A7A87969DD688BF533A907",
+      "entry_count": 281
+    }
+  ],
+  "signing": {
+    "status": "unsigned",
+    "signature_present": false
+  },
+  "technical_seal": "not-performed",
+  "qualification": {
+    "real_client": "not-run-capacity-unavailable",
+    "performance": "no-speed-gain-claim",
+    "broad_validation": "deferred-4.4.2",
+    "construction_manifest_schema": "failed; independent essential archive checks passed; original failure retained"
+  },
+  "evidence": {
+    "notice_control_sha256": "87BF3E1D57E8323B917307BA1D1EEF8717229F3B8CB2405C94E23DD3AFCEB86A",
+    "published440_opposing_sha256": "1D8BD985C39A98F2AB86B5AF3933A44721C4E82CBD5800F87B6B43714A233ECD",
+    "administration_preflight_sha256": "D66EDB4B866A764E8F33F7547164B72A78F4CDF2E97CA1610EC24D65BEDCCF7F",
+    "immutability_probe_sha256": "E3EC8530EC17E43D07B727267E960BA41214137DA4A3FBE14CAB1FF71BA40EF4",
+    "inventory_sha256": "9B38C49464CE25AD377B16397BA25E256ECAC3BC6B451E7A7DA044CE0FBBFB89",
+    "frozen_construction_inventory": {
+      "kind": "MIR441FrozenConstructionInventoryV1",
+      "status": "nine-deterministically-built-archives-bound; finalV8schemawrapperfailed; independentessentialarchiveauditrequired",
+      "source": {
+        "commit": "2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6",
+        "tree": "3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825"
+      }
+    },
+    "package_parity": "mir-4.4.1.evidence.zip:evidence/package-parity.json"
+  }
+}

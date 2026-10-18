@@ -41,13 +41,154 @@ function Test-MIR422SavedScalarEqual {
   return $false
 }
 
+function Get-MIR442F016PrerequisiteRestorations {
+  param([Collections.IDictionary]$Before,[Collections.IDictionary]$After)
+  # Exact published 4.4.0/4.4.1 -> 4.4.2 correction, restoring the independently
+  # captured 4.2.2 science frontier. Neither direct 4.2.2 upgrades nor future
+  # destinations inherit this allowance. Raw source capture SHA256 identities:
+  # 4.4.0: 615C303A5C53DCE72AD0E1FA36FA38935264E3FBCBC55E79E009D355B071F973
+  # 4.4.1: 62C93B83C4FE6A0F9D9A1F731A246299629DA1CE2BFF377054A9F5A0165211F5
+  # 4.2.2: 72FA8A950D39C09C16CE15A7ACED8E9CBF11CF7C712326EB409E6F9D65E95FFB
+  foreach($snapshot in @($Before,$After)){
+    if(-not$snapshot.Contains('engine_line')-or$snapshot.engine_line-cne'0.16'-or
+      -not$snapshot.Contains('from_version')-or$snapshot.from_version-cnotin@('4.4.01600','4.4.01601')-or
+      -not$snapshot.Contains('to_version')-or$snapshot.to_version-cne'4.4.01602'){return $null}
+  }
+  if($Before.from_version-cne$After.from_version){return $null}
+  $rows=@(
+    @('braking-force-8','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,braking-force-6,braking-force-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,braking-force-6,braking-force-7,electric-engine,engine,speed-module'),
+    @('inserter-capacity-bonus-8','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,inserter-capacity-bonus-6,inserter-capacity-bonus-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,inserter-capacity-bonus-6,inserter-capacity-bonus-7,speed-module'),
+    @('recipe-prod-research_character_crafting_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_mining_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_reach-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_character_walking_speed-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_electric_shooting_speed-1','advanced-electronics,advanced-material-processing-2,discharge-defense-equipment,military-2','advanced-electronics,advanced-material-processing-2,discharge-defense-equipment,electric-engine,engine,military-2,turrets'),
+    @('recipe-prod-research_flamethrower_shooting_speed-1','advanced-electronics,advanced-material-processing-2,flamethrower,military-2','advanced-electronics,advanced-material-processing-2,electric-engine,engine,flamethrower,military-2,turrets'),
+    @('recipe-prod-research_inventory_capacity-1','advanced-electronics-2,military-2','advanced-electronics-2,automation-2,battery,military-2,speed-module,turrets'),
+    @('recipe-prod-research_lab_productivity-1','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,military-2','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,military-2,speed-module,turrets'),
+    @('recipe-prod-research_robot_battery-1','advanced-electronics,advanced-material-processing-2','advanced-electronics,advanced-material-processing-2,electric-engine,engine'),
+    @('recipe-prod-research_rocket_shooting_speed-1','advanced-electronics,advanced-material-processing-2,military-2,rocketry','advanced-electronics,advanced-material-processing-2,electric-engine,engine,military-2,rocketry,turrets'),
+    @('research-speed-7','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,military-2,research-speed-5,research-speed-6','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,military-2,research-speed-5,research-speed-6,speed-module,turrets'),
+    @('worker-robots-storage-4','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,worker-robots-storage-2,worker-robots-storage-3','advanced-electronics,advanced-electronics-2,advanced-material-processing-2,automation-2,battery,electric-engine,engine,speed-module,worker-robots-storage-2,worker-robots-storage-3')
+  )
+  $result=[Collections.Hashtable]::new([StringComparer]::Ordinal)
+  foreach($row in $rows){
+    $vectors=@{}
+    foreach($field in @('before','after')){
+      $names=$row[$(if($field-ceq'before'){1}else{2})].Split(',')
+      $vector=@{}
+      for($index=0;$index-lt$names.Count;$index++){$vector[($index+1).ToString([Globalization.CultureInfo]::InvariantCulture)]=$names[$index]}
+      $vectors[$field]=$vector
+    }
+    $result[$row[0]]=$vectors
+  }
+  return $result
+}
+
+function Test-MIR442F016PrerequisiteRestoration {
+  param([string]$Name,[Collections.IDictionary]$BeforeDefinition,[Collections.IDictionary]$AfterDefinition,[Collections.IDictionary]$Restorations)
+  if($null-eq$Restorations-or-not$Restorations.Contains($Name)-or
+    -not$BeforeDefinition.Contains('prerequisites')-or-not$AfterDefinition.Contains('prerequisites')){return $false}
+  $expected=$Restorations[$Name]
+  if(-not(Test-MIR422SavedScalarEqual $BeforeDefinition.prerequisites $expected.before)-or
+    -not(Test-MIR422SavedScalarEqual $AfterDefinition.prerequisites $expected.after)){return $false}
+  $old=$BeforeDefinition.Clone();$new=$AfterDefinition.Clone()
+  $null=$old.Remove('prerequisites');$null=$new.Remove('prerequisites')
+  return (Test-MIR422SavedScalarEqual $old $new)
+}
+
+function Get-MIR442F200BobAngelReviewedAdditionContracts {
+  # Source-derived exact contract for the direct F200 Bob/Angel 4.2.2 lane.
+  # It is not projected from a candidate snapshot and is never a generic new-ID allowance.
+  $json = @'
+{
+  "braking-force-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","braking-force-6","braking-force-7","logistic-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"train-braking-force-bonus","modifier":0.15}],"unit_count":861,"unit_count_formula":"861.51212960553*1.33333^(L-8)","unit_energy":3600}},
+  "inserter-capacity-bonus-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","inserter-capacity-bonus-6","inserter-capacity-bonus-7","logistic-science-pack","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"inserter-stack-size-bonus","modifier":2},{"type":"bulk-inserter-capacity-bonus","modifier":4}],"unit_count":914488,"unit_count_formula":"914488.340211249*3.33333^(L-8)","unit_energy":3600}},
+  "laser-shooting-speed-8": {"level":8,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","laser-shooting-speed-6","laser-shooting-speed-7","logistic-science-pack","military-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"laser","modifier":0.5}],"unit_count":1025,"unit_count_formula":"1025.15625*1.5^(L-8)","unit_energy":7200}},
+  "research-speed-7": {"level":7,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","research-speed-5","research-speed-6","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"laboratory-speed","modifier":0.6}],"unit_count":683,"unit_count_formula":"683.4375*1.5^(L-7)","unit_energy":7200}},
+  "weapon-shooting-speed-7": {"level":7,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","utility-science-pack","weapon-shooting-speed-5","weapon-shooting-speed-6"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"bullet","modifier":0.4},{"type":"gun-speed","ammo_category":"shotgun-shell","modifier":0.4}],"unit_count":683,"unit_count_formula":"683.4375*1.5^(L-7)","unit_energy":7200}},
+  "worker-robots-storage-4": {"level":4,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","utility-science-pack","worker-robots-storage-2","worker-robots-storage-3"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"worker-robot-storage","modifier":1}],"unit_count":675,"unit_count_formula":"675*1.5^(L-4)","unit_energy":3600}},
+  "recipe-prod-research_cannon_shooting_speed-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_cannon_shooting_speed]","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","logistic-science-pack","military-science-pack","tank","weapon-shooting-speed-5"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"cannon-shell","modifier":0.1}],"unit_count":60,"unit_count_formula":"60*1.5^(L-1)","unit_energy":3600}},
+  "recipe-prod-research_electric_shooting_speed-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_electric_shooting_speed]","hidden":false,"hidden_in_factoriopedia":false,"max_level":4294967295,"prerequisites":["automation-science-pack","discharge-defense-equipment","logistic-science-pack","military-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"military-science-pack","amount":1}],"effects":[{"type":"gun-speed","ammo_category":"electric","modifier":0.1}],"unit_count":60,"unit_count_formula":"60*1.5^(L-1)","unit_energy":3600}},
+  "recipe-prod-research_material_copper_tungsten-1": {"level":1,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_material_copper_tungsten]","hidden":false,"hidden_in_factoriopedia":false,"max_level":3,"prerequisites":["angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1}],"effects":[{"type":"change-recipe-productivity","recipe":"bob-copper-tungsten-alloy","change":0.02}],"unit_count":200,"unit_count_formula":"200*2^(L-1)","unit_energy":1800}},
+  "recipe-prod-research_material_copper_tungsten-4": {"level":4,"researched":false,"enabled":true,"visible_when_disabled":false,"saved_progress":0,"prototype":{"order":"p[research_material_copper_tungsten__continuation]","hidden":false,"hidden_in_factoriopedia":false,"max_level":150,"prerequisites":["angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_copper_tungsten-1","utility-science-pack"],"ingredients":[{"name":"automation-science-pack","amount":1},{"name":"logistic-science-pack","amount":1},{"name":"utility-science-pack","amount":1}],"effects":[{"type":"change-recipe-productivity","recipe":"bob-copper-tungsten-alloy","change":0.02}],"unit_count":1600,"unit_count_formula":"1600+200*(L-4)","unit_energy":1800}}
+}
+'@
+  return ($json | ConvertFrom-Json -AsHashtable -Depth 100)
+}
+
+function Test-MIR442F200BobAngelActiveMods {
+  param([Collections.IDictionary]$Snapshot,[string]$MIRVersion)
+  if($Snapshot-isnot[Collections.IDictionary]-or-not$Snapshot.Contains('active_mods')-or$Snapshot.active_mods-isnot[Collections.IDictionary]){return $false}
+  $expected=[Collections.Hashtable]::new([StringComparer]::Ordinal)
+  foreach($identity in @(
+      'angelsbioprocessing@2.0.3','angelsbioprocessinggraphics@2.0.0',
+      'angelspetrochem@2.0.3','angelspetrochemgraphics@2.0.1',
+      'angelsrefining@2.0.4','angelsrefininggraphics@2.0.0',
+      'angelssmelting@2.0.5','angelssmeltinggraphics@2.0.0',
+      'base@2.0.77','bobelectronics@2.1.1','boblibrary@2.1.0',
+      'bobores@2.1.2','bobplates@2.1.1','bobrevamp@2.1.1',
+      'mir-fixture-assert-upgrade-4-0-20000-to-4-1-20000@0.1.89',
+      'mir423-startup-observer@1.0.0',('more-infinite-research@'+$MIRVersion))){
+    $name,$version=$identity -split '@',2;$expected[$name]=$version
+  }
+  return (Test-MIR422SavedScalarEqual $expected $Snapshot.active_mods)
+}
+
+function Get-MIR442F200BobAngelScopeField {
+  param($Value,[Parameter(Mandatory)][string]$Name)
+  if($Value-is[Collections.IDictionary]){
+    if($Value.Contains($Name)){return [pscustomobject]@{present=$true;value=$Value[$Name]}}
+    return [pscustomobject]@{present=$false;value=$null}
+  }
+  if($null-eq$Value){return [pscustomobject]@{present=$false;value=$null}}
+  $property=$Value.PSObject.Properties[$Name]
+  if($null-eq$property){return [pscustomobject]@{present=$false;value=$null}}
+  return [pscustomobject]@{present=$true;value=$property.Value}
+}
+
+function Get-MIR442F200BobAngelReviewedAdditions {
+  param($Record,$Row,$Package,[string]$CandidateSourceVersion,[Collections.IDictionary]$States)
+  # A source/profile/asset-scoped contract, never a generic new-ID allowance.
+  $rowTarget=Get-MIR442F200BobAngelScopeField $Row 'target'
+  $rowPredecessor=Get-MIR442F200BobAngelScopeField $Row 'predecessor_source_version'
+  $packageSha256=Get-MIR442F200BobAngelScopeField $Package 'sha256'
+  if($Record-isnot[Collections.IDictionary]-or$States-isnot[Collections.IDictionary]-or
+    -not$rowTarget.present-or-not$rowPredecessor.present-or-not$packageSha256.present-or
+    -not$Record.Contains('archetype')-or-not$Record.Contains('factorio_binary_version')-or
+    -not$Record.Contains('from')-or-not$Record.Contains('to')-or
+    $Record.from-isnot[Collections.IDictionary]-or$Record.to-isnot[Collections.IDictionary]-or
+    -not$Record.from.Contains('version')-or-not$Record.to.Contains('version')-or
+    $CandidateSourceVersion-cne'4.4.2'-or[string]$rowTarget.value-cne'f200'-or
+    [string]$rowPredecessor.value-cne'4.2.2'-or[string]$Record.archetype-cne'f200-bob-angel'-or
+    [string]$Record.factorio_binary_version-cne'2.0.77.84539'-or
+    [string]$Record.from.version-cne'4.2.20002'-or[string]$Record.to.version-cne'4.4.20002'-or
+    [string]$packageSha256.value-cne'E0DEB9E1A9E3CE83903B9CD3DADB13A51D9DD0BF2E480845554BBCC67CCDC0D2'-or
+    -not$Record.Contains('f200_bob_angel_input_profile')){return $null}
+  $profile=$Record.f200_bob_angel_input_profile
+  if($profile-isnot[Collections.IDictionary]-or[string]$profile.sha256-cne'306F4D61739054AD63395B80D5C1884A8B1BEAEF222D70640EA446661BB6B0FA'-or
+    $profile.source_lock-isnot[Collections.IDictionary]-or[string]$profile.source_lock.sha256-cne'00193B07816DBB0043FDDC0BC801A67BCE47041EC60C171D6837F2141CBF9FED'-or
+    [string]$profile.source_lock.identity_sha256-cne'AF1B932BF627053685FEC050FF97CC71F50A682B89A64FDACA3223F81771BF22'){return $null}
+  if(-not$States.Contains('source')-or-not$States.Contains('upgrade')-or-not$States.Contains('reload')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.source '4.2.20002')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.upgrade '4.4.20002')-or
+    -not(Test-MIR442F200BobAngelActiveMods $States.reload '4.4.20002')){return $null}
+  return Get-MIR442F200BobAngelReviewedAdditionContracts
+}
+function Test-MIR442F200BobAngelReviewedAddition {
+  param([string]$Name,[Collections.IDictionary]$Technology,[Collections.IDictionary]$Contracts)
+  return $Technology-is[Collections.IDictionary]-and$Contracts-is[Collections.IDictionary]-and
+    $Contracts.Contains($Name)-and(Test-MIR422SavedScalarEqual $Technology $Contracts[$Name])
+}
 function Assert-MIR422CompleteSavedState {
   param(
     [Collections.IDictionary]$Before,
     [Collections.IDictionary]$After,
     [switch]$RequireExactResearchDefinitions,
-    [switch]$AllowMIR430FullCompilerProfileDefault
+    [switch]$AllowMIR430FullCompilerProfileDefault,
+    [Collections.IDictionary]$ReviewedAddedTechnologyContracts
   )
+  $restorations=Get-MIR442F016PrerequisiteRestorations $Before $After
   if($Before.forces-isnot[Collections.IDictionary]-or$After.forces-isnot[Collections.IDictionary]-or$Before.forces.Count-lt1-or$Before.forces.Count-ne$After.forces.Count){throw '[mir422-upgrade-forces]'}
   foreach($force in $Before.forces.Keys){
     if(-not$After.forces.Contains($force)){throw '[mir422-upgrade-force-missing]'}
@@ -58,7 +199,22 @@ function Assert-MIR422CompleteSavedState {
     # A direct 4.2.2 -> performance-only 4.2.3 transition must preserve the
     # complete catalogue, including unresearched technologies and definitions.
     # Older predecessors keep their reviewed feature/definition allowances.
-    if($RequireExactResearchDefinitions-and$old.technologies.Count-ne$new.technologies.Count){throw '[mir423-upgrade-technology-set]'}
+    if($RequireExactResearchDefinitions){
+      if($null-eq$ReviewedAddedTechnologyContracts){
+        if($old.technologies.Count-ne$new.technologies.Count){throw '[mir423-upgrade-technology-set]'}
+      }else{
+        $addedNames=@($new.technologies.Keys|Where-Object {-not$old.technologies.Contains($_)})
+        foreach($name in $ReviewedAddedTechnologyContracts.Keys){
+          if($old.technologies.Contains($name)-or-not$new.technologies.Contains($name)){throw '[mir442-f200-bob-angel-added-technology-set]'}
+        }
+        if($addedNames.Count-ne$ReviewedAddedTechnologyContracts.Count){throw '[mir442-f200-bob-angel-added-technology-set]'}
+        foreach($name in $addedNames){
+          if(-not(Test-MIR442F200BobAngelReviewedAddition $name $new.technologies[$name] $ReviewedAddedTechnologyContracts)){
+            throw '[mir442-f200-bob-angel-added-technology-definition]'
+          }
+        }
+      }
+    }
     foreach($name in $old.technologies.Keys){
       if(-not$new.technologies.Contains($name)){throw "[mir422-upgrade-technology-missing] $force/$name"}
       if($old.technologies[$name]-isnot[Collections.IDictionary]-or$new.technologies[$name]-isnot[Collections.IDictionary]){throw '[mir422-upgrade-technology-shape]'}
@@ -71,8 +227,9 @@ function Assert-MIR422CompleteSavedState {
         $definitions=@($definitionFields|Where-Object {$a.Contains($_)})
         if($definitions.Count-lt1){throw '[mir423-upgrade-definition-missing]'}
         foreach($definition in $definitions){
-          if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]-or
-            -not(Test-MIR422SavedScalarEqual $a[$definition] $b[$definition])){throw "[mir423-upgrade-research-definition] $force/$name"}
+          if($a[$definition]-isnot[Collections.IDictionary]-or-not$b.Contains($definition)-or$b[$definition]-isnot[Collections.IDictionary]){throw "[mir423-upgrade-research-definition] $force/$name"}
+          if(-not(Test-MIR422SavedScalarEqual $a[$definition] $b[$definition])-and
+            -not(Test-MIR442F016PrerequisiteRestoration $name $a[$definition] $b[$definition] $restorations)){throw "[mir423-upgrade-research-definition] $force/$name"}
         }
       }
       # The native oracle compares complete definitions with its exact reviewed
@@ -224,23 +381,68 @@ function Read-MIR423UpgradeProofReference {
 
 function Get-MIR423PublishedUpgradePredecessor {
   param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$PredecessorSourceVersion,
-    [ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
-  $sourcePatch=([version]$PredecessorSourceVersion).Build
-  $contractVersion=switch($sourcePatch){
-    0 {'4.2.1'}
-    1 {'4.2.2'}
-    2 {'4.2.3'}
-    default {throw '[mir423-upgrade-predecessor-version]'}
+    [ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
+
+  # 4.6.0 selects only the published final 4.5.2 immediate predecessor.
+  # 4.5.2 retains its published 4.5.1 patch predecessor and corrected 4.4.2
+  # minor predecessor. Earlier pairs retain exact public custody.
+  $allowedPredecessors = if ($CandidateSourceVersion -ceq '4.6.0') {
+    @('4.5.2')
+  } elseif ($CandidateSourceVersion -ceq '4.5.2') {
+    @('4.5.1','4.4.2')
+  } elseif ($CandidateSourceVersion -ceq '4.5.0') {
+    @('4.4.2')
+  } elseif ($CandidateSourceVersion -ceq '4.4.2') {
+    @('4.2.2','4.4.0','4.4.1')
+  } elseif ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) {
+    @('4.2.2','4.3.0')
+  } else {
+    @('4.2.0','4.2.1','4.2.2')
   }
-  $manifestRelative=switch($sourcePatch){
-    0 {'fixtures/release-inputs/mir421-published-420-manifest.json'}
-    1 {'fixtures/release-inputs/mir422-published-421-manifest.json'}
-    2 {'fixtures/release-inputs/mir423-published-422-manifest.json'}
+  if ($PredecessorSourceVersion -cnotin $allowedPredecessors) { throw '[mir423-upgrade-predecessor-version]' }
+  $contractVersion = switch -CaseSensitive ($PredecessorSourceVersion) {
+    '4.2.0' { '4.2.1' }
+    '4.2.1' { '4.2.2' }
+    '4.2.2' { '4.2.3' }
+    '4.3.0' { if ($CandidateSourceVersion -ceq '4.4.0') { '4.4.0' } else { '4.3.1' } }
+    '4.4.0' { if ($CandidateSourceVersion -ceq '4.4.2') { '4.4.1' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    '4.4.1' { if ($CandidateSourceVersion -ceq '4.4.2') { '4.4.2' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    '4.4.2' { if ($CandidateSourceVersion -cin @('4.5.0','4.5.2')) { '4.5.0' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    '4.5.1' { if ($CandidateSourceVersion -ceq '4.5.2') { '4.5.2' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    '4.5.2' { if ($CandidateSourceVersion -ceq '4.6.0') { '4.6.0' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    default { throw '[mir423-upgrade-predecessor-version]' }
+  }
+  $manifestRelative = switch -CaseSensitive ($PredecessorSourceVersion) {
+    '4.2.0' { 'fixtures/release-inputs/mir421-published-420-manifest.json' }
+    '4.2.1' { 'fixtures/release-inputs/mir422-published-421-manifest.json' }
+    '4.2.2' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
+    '4.3.0' { 'fixtures/release-inputs/mir431-published-430-manifest.json' }
+    '4.4.0' { 'fixtures/release-inputs/mir442-published-440-manifest.json' }
+    '4.4.1' { 'fixtures/release-inputs/mir442-published-441-manifest.json' }
+    '4.4.2' { 'fixtures/release-inputs/mir450-published-442-r24-construction.json' }
+    '4.5.1' { 'fixtures/release-inputs/mir452-published-451-construction.json' }
+    '4.5.2' { 'fixtures/release-inputs/mir460-published-452-construction.json' }
+    default { throw '[mir423-upgrade-predecessor-version]' }
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $manifestRelative) -CandidateSourceVersion $contractVersion
   $published=@($pin.manifest.targets|Where-Object target -CEQ $Target)
   if($published.Count-ne1){throw '[mir423-upgrade-predecessor-target]'}
-  return [pscustomobject]@{source_patch=$sourcePatch;source_tag=(Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contractVersion).source_tag;manifest=$pin;target=$published[0]}
+  # Published V9/V11/V12 construction records keep archive identity under asset.
+  # Normalize only this reader result so the established full-state proof
+  # contract keeps one target shape; authenticated predecessor bytes remain untouched.
+  $publishedTarget=$published[0]
+  if($PredecessorSourceVersion -cin @('4.4.2','4.5.1','4.5.2')) {
+    if($publishedTarget.PSObject.Properties.Name -cnotcontains 'asset' -or $null -eq $publishedTarget.asset -or
+      $publishedTarget.asset.PSObject.Properties.Name -cnotcontains 'sha256' -or $publishedTarget.asset.PSObject.Properties.Name -cnotcontains 'bytes') {
+      throw '[mir423-upgrade-predecessor-target]'
+    }
+    $publishedTarget=[pscustomobject][ordered]@{
+      target=[string]$publishedTarget.target;distribution_version=[string]$publishedTarget.distribution_version
+      sha256=[string]$publishedTarget.asset.sha256;bytes=[int64]$publishedTarget.asset.bytes
+      content_sha256=[string]$publishedTarget.content_sha256;entry_count=[int]$publishedTarget.entry_count
+    }
+  }
+  return [pscustomobject]@{source_version=$PredecessorSourceVersion;source_patch=([version]$PredecessorSourceVersion).Build;source_tag=(Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $contractVersion).source_tag;manifest=$pin;target=$publishedTarget}
 }
 
 function Get-MIR430ClassicSealSnapshotValue {
@@ -527,15 +729,17 @@ function Assert-MIR430ClassicNativeUpgradeProof {
 }
 
 function Assert-MIR423NativeUpgradeProof {
-  param($Row,$Package,[ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
+  param($Row,$Package,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
   $proof=Read-MIR423UpgradeProofReference $Row.receipt
   $r=$proof.record;$dir=Split-Path $proof.path
-  $code=$Row.target.Substring(1);$patch=([version]$Row.predecessor_source_version).Build
+  $code=$Row.target.Substring(1);$predecessor=[version]$Row.predecessor_source_version
   $candidate=[version]$CandidateSourceVersion
-  $from='4.2.'+$code+$patch.ToString('00')
+  $allowedPredecessors = if($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')}
+  if([string]$Row.predecessor_source_version -cnotin $allowedPredecessors){throw '[mir423-upgrade-predecessor-version]'}
+  $from=('4.'+$predecessor.Minor+'.'+$code+$predecessor.Build.ToString('00'))
   $to=(New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $candidate.Minor -SourcePatch $candidate.Build).distribution_version
   $errorPrefix='mir'+$CandidateSourceVersion.Replace('.','')+'-upgrade'
-  if($patch-notin @(0,1,2)-or$r.schema-ne3-or$r.status-cne'passed'-or$r.factorio_processes-lt4-or$r.from.version-cne$from-or$r.to.version-cne$to-or$r.to.sha256-cne$Package.sha256){throw "[$errorPrefix-native-binding]"}
+  if($r.schema-ne3-or$r.status-cne'passed'-or$r.factorio_processes-lt4-or$r.from.version-cne$from-or$r.to.version-cne$to-or$r.to.sha256-cne$Package.sha256){throw "[$errorPrefix-native-binding]"}
   $published=Get-MIR423PublishedUpgradePredecessor -Target $Row.target -PredecessorSourceVersion $Row.predecessor_source_version -CandidateSourceVersion $CandidateSourceVersion
   if($r.from.sha256-cne$published.target.sha256-or$r.published_maintenance_predecessor.source_tag-cne$published.source_tag-or$r.published_maintenance_predecessor.manifest.sha256-cne$published.manifest.sha256){throw "[$errorPrefix-published-predecessor]"}
   foreach($a in @('exact-candidate-normal-mod-directory-load','upgraded-save-reload-passed','upgraded-save-second-reload-passed')){if($a-cnotin$r.assertions){throw "[$errorPrefix-phase-skipped]"}}
@@ -545,11 +749,10 @@ function Assert-MIR423NativeUpgradeProof {
     $null=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $ledger.filename) -Sha256 $ledger.sha256 -Code ($errorPrefix+'-resource-ledger')
     if($ledger.exit_code-ne0-and$ledger.completion_predicate_observed-cne$true){throw "[$errorPrefix-process-failed]"}
   }
-  # A release-bound 4.3.0 upgrade must prove complete retained state under the
-  # Full profile. A reduced Classic policy is useful only as a private
-  # characterization; it cannot supply release-preservation evidence.
-  if($CandidateSourceVersion-ceq'4.3.0'-and$r.Contains('upgrade_policy')){throw '[mir430-upgrade-classic-reduced-policy-not-release-preservation]'}
-  if($CandidateSourceVersion-cne'4.3.0'-and$r.Contains('upgrade_policy')){throw "[$errorPrefix-upgrade-policy]"}
+  # Release evidence is Full-only. Reduced Classic behavior remains private
+  # characterization and may never stand in for retained catalogue/state proof.
+  if($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0') -and $r.Contains('upgrade_policy')){throw "[$errorPrefix-classic-reduced-policy-not-release-preservation]"}
+  if($CandidateSourceVersion -cnotin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') -and $r.Contains('upgrade_policy')){throw "[$errorPrefix-upgrade-policy]"}
   foreach($stage in @('create','load','reload','second_reload')){
     $name=$r[$stage+'_log'];if([IO.Path]::GetFileName($name)-cne$name){throw "[$errorPrefix-log-path]"}
     $log=Resolve-MIR42SealImmutableFile -Path (Join-Path $dir $name) -Sha256 $r[$stage+'_log_sha256'] -Code ($errorPrefix+'-log')
@@ -578,31 +781,35 @@ function Assert-MIR423NativeUpgradeProof {
     $states[$snapshot.stage]=$s
   }
   if((($states.Keys|Sort-Object)-join'|')-cne'reload|source|upgrade'){throw "[$errorPrefix-snapshot-set]"}
+  $reviewedAddedTechnologyContracts=Get-MIR442F200BobAngelReviewedAdditions -Record $r -Row $Row -Package $Package -CandidateSourceVersion $CandidateSourceVersion -States $states
   foreach($phase in @('upgrade','reload')){
     Assert-MIR422CompleteSavedState $states.source $states[$phase] `
-      -RequireExactResearchDefinitions:($candidate.Minor -gt 2 -or $patch-eq2) `
-      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -ceq '4.3.0')
+      -RequireExactResearchDefinitions:($candidate.Minor -gt 2 -or $predecessor.Build-eq2) `
+      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) `
+      -ReviewedAddedTechnologyContracts $reviewedAddedTechnologyContracts
   }
   return $proof
 }
 
 function Assert-MIR423MaintenanceUpgradeEvidence {
-  param([string]$Path,[object[]]$PackageAssets,[ValidateSet('4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.3')
+  param([string]$Path,[object[]]$PackageAssets,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
   $errorPrefix='mir'+$CandidateSourceVersion.Replace('.','')+'-upgrade'
   if([string]::IsNullOrWhiteSpace($Path)){throw "[$errorPrefix-evidence-required]"}
   $bundle=Read-MIR423UpgradeProofReference ([pscustomobject]@{path=[IO.Path]::GetFullPath($Path);sha256=(Get-FileHash $Path).Hash}) -MaximumBytes 256KB
   $r=$bundle.record
   $kind='MIR'+$CandidateSourceVersion.Replace('.','')+'MaintenanceUpgradeEvidenceV1'
-  if($r.schema-ne1-or$r.kind-cne$kind-or$r.source_version-cne$CandidateSourceVersion-or$r.rows.Count-ne27){throw "[$errorPrefix-matrix-cardinality]"}
+  $predecessors=@(if($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')})
+  $expectedCount=$script:MIR42ReleaseAssetTargets.Count*$predecessors.Count
+  if($r.schema-ne1-or$r.kind-cne$kind-or$r.source_version-cne$CandidateSourceVersion-or$r.rows.Count-ne$expectedCount){throw "[$errorPrefix-matrix-cardinality]"}
   $seen=@{}
   foreach($row in $r.rows){
     $key=$row.target+'|'+$row.predecessor_source_version
-    if($seen.Contains($key)-or$row.target-cnotin$script:MIR42ReleaseAssetTargets-or$row.predecessor_source_version-cnotin@('4.2.0','4.2.1','4.2.2')){throw "[$errorPrefix-matrix-identity]"}
+    if($seen.Contains($key)-or$row.target-cnotin$script:MIR42ReleaseAssetTargets-or$row.predecessor_source_version-cnotin$predecessors){throw "[$errorPrefix-matrix-identity]"}
     $seen[$key]=$true;$package=@($PackageAssets|Where-Object target -CEQ $row.target)
     if($package.Count-ne1){throw "[$errorPrefix-package-cardinality]"}
     $null=Assert-MIR423NativeUpgradeProof $row $package[0] -CandidateSourceVersion $CandidateSourceVersion
   }
-  foreach($target in $script:MIR42ReleaseAssetTargets){foreach($predecessor in @('4.2.0','4.2.1','4.2.2')){if(-not$seen.Contains($target+'|'+$predecessor)){throw "[$errorPrefix-matrix-coverage]"}}}
+  foreach($target in $script:MIR42ReleaseAssetTargets){foreach($predecessor in $predecessors){if(-not$seen.Contains($target+'|'+$predecessor)){throw "[$errorPrefix-matrix-coverage]"}}}
   return [pscustomobject]@{path=$bundle.path;sha256=(Get-FileHash $bundle.path).Hash}
 }
 
@@ -610,10 +817,10 @@ function Assert-MIR423MaintenanceUpgradeEvidence {
 function Get-MIR42ReleaseAssetVersionContract {
   param([Parameter(Mandatory)][string]$SourceVersion,[Parameter(Mandatory)][string]$ReleaseTag)
 
-  if ($SourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0') -or $ReleaseTag -cne ('v' + $SourceVersion)) {
+  if ($SourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') -or $ReleaseTag -cne ('v' + $SourceVersion)) {
     throw '[mir42-release-assets-version-contract]'
   }
-  $maintenance = $SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0')
+  $maintenance = $SourceVersion -cin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')
   $prefix = if ($maintenance) { 'MIR42NineTargetMaintenance' } else { 'MIR42NineTarget' }
   $statusPrefix = if ($maintenance) { "MIR-$SourceVersion-NINE-TARGET-MAINTENANCE" } else { 'MIR-4.2-NINE-TARGET' }
   return [pscustomobject][ordered]@{
@@ -627,7 +834,7 @@ function Get-MIR42ReleaseAssetVersionContract {
 }
 
 function Assert-MIR42ReleaseAssetMaintenancePredecessor {
-  param([Parameter(Mandatory)]$Inputs,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0')][string]$CandidateSourceVersion='4.2.1')
+  param([Parameter(Mandatory)]$Inputs,[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$CandidateSourceVersion='4.2.1')
 
   # This validates carried custody, not a native pass. The public CLI obtains
   # these inputs through the existing complete promotion/readiness reader.
@@ -649,13 +856,33 @@ function Assert-MIR42ReleaseAssetMaintenancePredecessor {
     '4.2.2' { 'fixtures/release-inputs/mir422-published-421-manifest.json' }
     '4.2.3' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
     '4.3.0' { 'fixtures/release-inputs/mir423-published-422-manifest.json' }
+    '4.3.1' { 'fixtures/release-inputs/mir431-published-430-manifest.json' }
+    '4.4.0' { 'fixtures/release-inputs/mir431-published-430-manifest.json' }
+    '4.4.2' { 'fixtures/release-inputs/mir442-published-441-manifest.json' }
+    '4.5.0' { 'fixtures/release-inputs/mir450-published-442-r24-construction.json' }
+    '4.5.2' { 'fixtures/release-inputs/mir452-published-451-construction.json' }
   }
   $pin = Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $pinPath) -CandidateSourceVersion $CandidateSourceVersion
   for ($index=0; $index -lt $script:MIR42ReleaseAssetTargets.Count; $index++) {
     $actual=$Inputs.targets[$index];$expected=$pin.manifest.targets[$index]
+    # R24/V9 records keep the archive identity in `asset` while content and
+    # entry metadata remain target-level. Normalize this reader view only;
+    # never rewrite the authenticated predecessor record.
+    $expectedAsset = if ($expected.PSObject.Properties.Name -contains 'asset') { $expected.asset } else { $expected }
+    if ($null -eq $expectedAsset -or $expectedAsset.PSObject.Properties.Name -notcontains 'sha256' -or $expectedAsset.PSObject.Properties.Name -notcontains 'bytes') {
+      throw "[mir42-release-assets-maintenance-predecessor-target] $index/asset"
+    }
+    $expectedContentSha = if ($expected.PSObject.Properties.Name -contains 'content_sha256') { [string]$expected.content_sha256 } else { [string]$expectedAsset.content_sha256 }
+    $expectedEntryCount = if ($expected.PSObject.Properties.Name -contains 'entry_count') { [string]$expected.entry_count } else { [string]$expectedAsset.entry_count }
     if ([string]$actual.version -cne [string]$expected.distribution_version) { throw "[mir42-release-assets-maintenance-predecessor-target] $index/version" }
-    foreach ($field in @('target','sha256','bytes','content_sha256','entry_count')) {
-      if ([string]$actual.$field -cne [string]$expected.$field) { throw "[mir42-release-assets-maintenance-predecessor-target] $index/$field" }
+    foreach ($expectedField in @(
+      [pscustomobject]@{name='target';value=[string]$expected.target},
+      [pscustomobject]@{name='sha256';value=[string]$expectedAsset.sha256},
+      [pscustomobject]@{name='bytes';value=[string]$expectedAsset.bytes},
+      [pscustomobject]@{name='content_sha256';value=$expectedContentSha},
+      [pscustomobject]@{name='entry_count';value=$expectedEntryCount}
+    )) {
+      if ([string]$actual.($expectedField.name) -cne [string]$expectedField.value) { throw "[mir42-release-assets-maintenance-predecessor-target] $index/$($expectedField.name)" }
     }
     if ([int64]$actual.github_asset_id -le 0 -or [string]$actual.github_digest -cne ('sha256:' + [string]$actual.sha256.ToLowerInvariant())) {
       throw "[mir42-release-assets-maintenance-predecessor-asset] $index"
@@ -790,8 +1017,9 @@ function Assert-MIR42NineTargetReleaseAssetPromotionPlan {
     if ($PromotionPlan.PSObject.Properties.Name -notcontains $field) { throw "[mir42-release-assets-promotion-field] $field" }
   }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $PromotionPlan -Fields @('remote_mutation_performed','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized') -Code 'mir42-release-assets-promotion'
+  $release = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ([string]$VersionContract.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) { [string]$VersionContract.source_version } else { '4.2.0' })
   if ([int]$PromotionPlan.schema -ne 1 -or [string]$PromotionPlan.kind -cne 'MIR42NineTargetProtectedMainPromotionPlanV1' -or
-      [string]$PromotionPlan.status -cne 'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -or
+      [string]$PromotionPlan.status -cne [string]$release.promotion_plan_status -or
       [string]$PromotionPlan.scope -cne 'nine-target' -or [bool]$PromotionPlan.remote_mutation_performed -or
       [bool]$PromotionPlan.protected_main_promotion_authorized -or -not [bool]$PromotionPlan.human_go_required_after_main_readback -or
       [bool]$PromotionPlan.tagging_authorized -or [bool]$PromotionPlan.publication_authorized) {
@@ -946,7 +1174,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     [Parameter(Mandatory)][string]$CandidateManifestPath,
     [Parameter(Mandatory)][string]$TechnicalSealPath,
     [Parameter(Mandatory)]$PromotionPlan,
-    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$ReleaseTag,
     [string]$MaintenanceUpgradeEvidencePath = "",
     [Parameter(Mandatory)][string]$AssetRoot,
@@ -1006,6 +1234,11 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     '4.2.2' { Assert-MIR422MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) }
     '4.2.3' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) }
     '4.3.0' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.3.0' }
+    '4.3.1' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.3.1' }
+    '4.4.0' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.4.0' }
+    '4.4.2' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.4.2' }
+    '4.5.0' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.5.0' }
+    '4.5.2' { Assert-MIR423MaintenanceUpgradeEvidence -Path $MaintenanceUpgradeEvidencePath -PackageAssets @($packageAssets) -CandidateSourceVersion '4.5.2' }
     default { $null }
   }
   foreach ($path in $versionContract.support_paths) { $expectedPaths.Add($path) }
@@ -1096,7 +1329,7 @@ function Get-MIR42NineTargetReleaseAssetInventory {
     record_sha256 = ''
   }
   if ($versionContract.maintenance) { $inventory | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $maintenanceInputs }
-  if ($SourceVersion -cin @('4.2.2','4.2.3','4.3.0')) { $inventory | Add-Member -NotePropertyName maintenance_upgrade_evidence -NotePropertyValue $upgradeEvidence }
+  if ($SourceVersion -cin @('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) { $inventory | Add-Member -NotePropertyName maintenance_upgrade_evidence -NotePropertyValue $upgradeEvidence }
   return Write-MIR42ReleaseAssetInventoryRecord -Record $inventory -OutputPath $output
 }
 
@@ -1106,7 +1339,7 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   $versionContract = Get-MIR42ReleaseAssetVersionContract -SourceVersion ([string]$Record.release.source_version) -ReleaseTag ([string]$Record.release.tag)
   $expectedProperties=@('schema','kind','status','release','source','candidate_manifest','technical_seal','promotion_plan','package_assets','github_assets','checksum','signature','qualification','provenance','components','release_manifest','release_notes','mod_portal_upload_texts','asset_root_file_set_sha256','protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified','record_sha256')
   if ($versionContract.maintenance) { $expectedProperties += 'published_maintenance_predecessor' }
-  if ($versionContract.source_version -cin @('4.2.2','4.2.3','4.3.0')) { $expectedProperties += 'maintenance_upgrade_evidence' }
+  if ($versionContract.source_version -cin @('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) { $expectedProperties += 'maintenance_upgrade_evidence' }
   Assert-MIR42ReleaseAssetProperties -Value $Record -Expected $expectedProperties -Code 'mir42-release-assets-inventory'
   if ($versionContract.maintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $Record.published_maintenance_predecessor -CandidateSourceVersion $versionContract.source_version }
   Assert-MIR42ReleaseAssetBooleanFlags -Value $Record -Fields @('protected_main_promotion_authorized','human_go_required_after_main_readback','tagging_authorized','publication_authorized','public_readback_verified') -Code 'mir42-release-assets-inventory'
@@ -1127,8 +1360,9 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
     if ($hash -notmatch '^[A-F0-9]{64}$') { throw '[mir42-release-assets-inventory-binding]' }
   }
   Assert-MIR42ReleaseAssetProperties -Value $Record.promotion_plan -Expected @('kind','status','main_before','source_commit','source_tree','candidate_manifest_sha256','technical_seal_sha256') -Code 'mir42-release-assets-inventory-promotion'
+  $promotionRelease = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ([string]$versionContract.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) { [string]$versionContract.source_version } else { '4.2.0' })
   if ([string]$Record.promotion_plan.kind -cne 'MIR42NineTargetProtectedMainPromotionPlanV1' -or
-      [string]$Record.promotion_plan.status -cne 'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -or
+      [string]$Record.promotion_plan.status -cne [string]$promotionRelease.promotion_plan_status -or
       [string]$Record.promotion_plan.source_commit -cne [string]$Record.source.commit -or [string]$Record.promotion_plan.source_tree -cne [string]$Record.source.tree -or
       [string]$Record.promotion_plan.candidate_manifest_sha256 -cne [string]$Record.candidate_manifest.sha256 -or
       [string]$Record.promotion_plan.technical_seal_sha256 -cne [string]$Record.technical_seal.sha256) {
@@ -1142,9 +1376,9 @@ function Assert-MIR42NineTargetFrozenReleaseAssetInventory {
   } elseif ($versionContract.source_version -ceq '4.2.3') {
     $evidence=Read-MIR423UpgradeProofReference $Record.maintenance_upgrade_evidence -MaximumBytes 256KB
     $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $evidence.path -PackageAssets @($Record.package_assets)
-  } elseif ($versionContract.source_version -ceq '4.3.0') {
+  } elseif ($versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
     $evidence=Read-MIR423UpgradeProofReference $Record.maintenance_upgrade_evidence -MaximumBytes 256KB
-    $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $evidence.path -PackageAssets @($Record.package_assets) -CandidateSourceVersion '4.3.0'
+    $null=Assert-MIR423MaintenanceUpgradeEvidence -Path $evidence.path -PackageAssets @($Record.package_assets) -CandidateSourceVersion $versionContract.source_version
   }
   $public = @($Record.github_assets)
   if ($public.Count -ne 16) { throw '[mir42-release-assets-inventory-github-count]' }
@@ -1218,12 +1452,13 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
 
   $authorizationPath = (Resolve-Path -LiteralPath $Path).Path
   $inputRecord = Get-Content -Raw -LiteralPath $authorizationPath | ConvertFrom-Json -Depth 100 -DateKind String
-  $maintenance = [string]$inputRecord.kind -cin @('MIR421MaintainerWrittenReleaseAuthorizationV1','MIR422MaintainerWrittenReleaseAuthorizationV1','MIR423MaintainerWrittenReleaseAuthorizationV1','MIR430MaintainerWrittenReleaseAuthorizationV1')
+  $maintenance = [string]$inputRecord.kind -cin @('MIR421MaintainerWrittenReleaseAuthorizationV1','MIR422MaintainerWrittenReleaseAuthorizationV1','MIR423MaintainerWrittenReleaseAuthorizationV1','MIR430MaintainerWrittenReleaseAuthorizationV1','MIR452MaintainerWrittenReleaseAuthorizationV1')
   $schemaName = switch -CaseSensitive ([string]$inputRecord.kind) {
     'MIR421MaintainerWrittenReleaseAuthorizationV1' { 'mir421-maintainer-written-release-authorization-v1.schema.json' }
     'MIR422MaintainerWrittenReleaseAuthorizationV1' { 'mir422-maintainer-written-release-authorization-v1.schema.json' }
     'MIR423MaintainerWrittenReleaseAuthorizationV1' { 'mir423-maintainer-written-release-authorization-v1.schema.json' }
     'MIR430MaintainerWrittenReleaseAuthorizationV1' { 'mir430-maintainer-written-release-authorization-v1.schema.json' }
+    'MIR452MaintainerWrittenReleaseAuthorizationV1' { 'mir452-maintainer-written-release-authorization-v1.schema.json' }
     default { 'mir42-maintainer-written-release-authorization-v1.schema.json' }
   }
   $schemaPath = Join-Path $mir42ReleaseAssetsRepoRoot ('spec/schemas/' + $schemaName)
@@ -1303,7 +1538,7 @@ function Read-MIR42NineTargetWrittenReleaseAuthorization {
 function Read-MIR42NineTargetProtectedMainReadbackForPublication {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$Path,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion='4.2.1')
 
   $identity = Read-MIR42SealRecord -Path $Path -Code 'mir42-release-go-main-readback'
   $record = $identity.record
@@ -1316,8 +1551,9 @@ function Read-MIR42NineTargetProtectedMainReadbackForPublication {
   if ($PublishedMaintenance) { $expectedProperties += 'published_maintenance_predecessor' }
   Assert-MIR42ReleaseAssetProperties -Value $record -Expected $expectedProperties -Code 'mir42-release-go-main-readback-shape'
   if ($PublishedMaintenance) { Assert-MIR42ReleaseAssetMaintenancePredecessor -Inputs $record.published_maintenance_predecessor -CandidateSourceVersion $SourceVersion }
+  $release = Get-MIR42NineTargetPromotionPlanStatusContract -SourceVersion $(if ($SourceVersion -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) { $SourceVersion } else { '4.2.0' })
   if ([int]$record.schema -ne 1 -or [string]$record.kind -cne 'MIR42NineTargetProtectedMainReadbackV1' -or
-      [string]$record.status -cne 'MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST' -or [string]$record.scope -cne 'nine-target' -or
+      [string]$record.status -cne [string]$release.main_readback_status -or [string]$record.scope -cne 'nine-target' -or
       $record.main_readback_verified -isnot [bool] -or -not [bool]$record.main_readback_verified -or
       $record.remote_mutation_performed -isnot [bool] -or [bool]$record.remote_mutation_performed -or
       $record.protected_main_promotion_authorized -isnot [bool] -or [bool]$record.protected_main_promotion_authorized -or

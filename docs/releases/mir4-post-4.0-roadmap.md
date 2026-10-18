@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-09-07
+last_reviewed: 2026-10-17
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -13,6 +13,87 @@ source_of_truth_for:
 ---
 
 # MIR 4.x operating programme
+
+<a id="active-campaign-mir-440-unified-research-generation"></a>
+
+## Published 4.4.2 and active 4.4.x continuation
+
+The maintainer's 14 October direction superseded the separate 4.3.1 publication attempt and rolled its verified repairs into 4.4.0. The fixed **15 October 2026, 15:36 AEDT / 04:36 UTC** request is historical; it did not replace acceptance evidence or create a reusable waiver.
+
+[v4.4.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.0) is published. GitHub release `413564113` was published at 2026-10-15T08:16:05Z from tag `v4.4.0`, commit `72b5c72eab810baf74c9a785ac4ebbc0d438c94a`, and tree `fe63974c649ddba389da5979ba94a59bffdd5e72`. All seventeen public assets were anonymously downloaded and hash-verified; `dist/release-4.4.0/PUBLICATION-RECEIPT.json` is the delivery readback. The release is explicitly unsigned and partially qualified, with no normal technical seal or protected-main promotion. `main` remains at the published 4.3.0 state, and Portal upload is still a separate maintainer-managed action.
+
+[v4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1) was published at 2026-10-15T10:50:21Z as release `413691909`, at commit `2a41ffaf2756b6ef6b250a3cfed5903e6a5085c6` and tree `3ffbf5fbb6cbe4639de3b0146ff9b29b360ef825`. All seventeen public assets were anonymously downloaded and hash-verified; the matching delivery is `dist/release-4.4.1/`. Its unsigned, essential-check emergency acceptance was candidate-specific and did not establish a completed native multiplayer connection.
+
+Published [v4.4.2](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.2), GitHub release `415194452`, was published at 2026-10-16T17:10:35Z from source commit `fe385332f778e1c79a0ad930140fe6e4defdb17a` and tree `95bb20196cc4195375acefeacc727e6a5370af21`. The nine `CCC02` player packages and nine supporting assets were anonymously downloaded and SHA-256 verified. `dist/4.4.2/PUBLICATION-RECEIPT.json` records the public readback; `dist/4.4.2/`, the nine top-level ZIPs and `LATEST` are the matching primary delivery. Portal availability remains a separate maintainer-managed state.
+
+### 4.4.2 boundary and follow-up
+
+- 4.4.2 fixes the reproduced Dark Matter Replicators Reborn 3.7.1 startup crash and introduces the native Base/Space Age **Infinite worker robot speed — max level** setting. Its default is `0` (unlimited); cap `10` admits level 10 and blocks level 11 through the existing controller while preserving earned levels, speed bonuses and the established technology/effect/science/cost identities.
+- Exact F200 Base 4.4.1-to-4.4.2 and F210 Space Age 4.2.2-to-4.4.2 upgrades passed complete state and definition comparisons with both cold reloads. The retained Base state contained 250 technologies/217 recipes and the Space Age state 348 technologies/662 recipes. F200 Base and F210 Space Age `0`-to-`10`-to-`0` native cap transitions preserved earned bonuses and fractional progress.
+- True Nukes Continued 0.3.36 with Warheads Continued 0.0.21 passed the available Base and combined Space Age/Dark Matter Replicators startup reproductions. The original unspecified nuclear-test crash and the full reporter modpack remain unreplicated; no speculative fix is claimed.
+- 4.4.2 makes no fresh general performance claim. Its startup smoke observations are completion evidence, while the ten-percent and preferably-sub-ten-second destination remains open.
+- Follow-on 4.4.x work must still cover genuine client join/rejoin and pending-work states, physical shortcut/menu paths, broader engine and historical upgrades, the original reporter profiles, Secretas/F210 continuation scope, and matched ordinary-menu performance. A reproduced urgent defect may pre-empt feature work; a blocked or missing profile remains inconclusive.
+- A later normal signed/sealed release needs its own accepted evidence and protected signing path. The 4.4.2 essential-check publication is unsigned and candidate-specific; hosted CI was still in progress at publication and is not represented as passed.
+
+### Product outcome
+
+Approve research during development and instantiate it during Factorio loading. Reuse the existing authored stream catalogue, contribution model and emitter. Ship one production generation path with narrow platform adapters; Full and Classic are retired as execution choices. Preserve old serialized selector values through a tested compatibility transition without adding another public compiler mode.
+
+Approved static and parameterized families declare identities, effects, matching rules, science, progression, ownership, finite-tail continuation, costs, caps and settings behavior. Startup builds shared indexes, binds actual prototypes and settings, validates the relevant assumptions and final prerequisite graph, and emits the approved result. New names can match a supported parameterized family; new semantics require an approved declaration.
+
+Open-ended acquisition proofs, competing production-route exploration and exhaustive diagnostic explanations leave the installed startup path. A binding miss cannot re-enter the old discovery solver. Whole-compilation work is bounded deterministically; wall-clock expiry cannot choose technologies. Unsupported relevant input receives a precise diagnosis, not a fabricated proof, silent catalogue reduction or empty compatibility placeholder. Such a failure remains a compatibility failure, not a performance success.
+
+Transfer the complete established catalogue, including Base, Space Age and existing mod integrations. Preserve 4.2.2/4.3.0 behavior on unchanged supported inputs: technology IDs and useful effects, science and prerequisites, ownership, costs and formulas, availability, caps, settings, earned bonuses, queues and fractional progress. Independently specified bug fixes require explicit expected differences. Historical 4.1 definitions are not restored merely to satisfy obsolete equality tests.
+
+### 4.4.0 repair evidence and limits
+
+- The Library parsing-time dependency fixes and conditional idle maintenance were released; outstanding first-opening, settings, reload and genuine-client checks remain in the current qualification queue.
+- Keep the preservation-capable handling of saved Full/Classic values while replacing both execution alternatives with the approved generation path.
+- Keep published drill-manufacturing research and clarify its presentation. The proposed new drill permission grant was removed. A focused candidate-bound F200 observation recorded 24 burner drills and 22 electric drills from 20 module-free crafts after one level; it does not test ore mining yield, Space Exploration or client behavior.
+- The F200 Galore headless `--create` diagnostic is preserved as a bounded observation. It is not a passing ordinary-menu, reporter-profile or client qualification.
+- The focused F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 finite-level continuation passed with two reloads. The reporter save and F210 Secretas 1.0.37 remain open, as do mining-yield, Space Exploration and client limits.
+
+### Historical 4.4.0 execution sequence
+
+Work proceeds in the primary checkout with non-overlapping ownership. Native runs remain serial under the existing resource governor. Qualification and release preparation proceed alongside implementation; there are no new worktrees, dependency-copy farms or release frameworks.
+
+| Time from instruction | Required outcome |
+| --- | --- |
+| 0–1 hour | Preserve and commit ready repairs; inventory established families and exact acceptance obligations; reconcile 4.4.0 version admission, existing signing capability and resource gaps. |
+| 1–4 hours | Transfer one real existing family end to end through the shared emitter. Compare its complete output against the accepted baseline and measure a relevant native profile. Prove its old acquisition/discovery calls are absent. |
+| 4–8 hours | Transfer remaining established families, ownership/finite continuations and science policies; integrate early; remove replaced production discovery imports and the Full/Classic dispatch. Run opposing checks and representative native comparisons during transfer. |
+| 8–10 hours | Finish catalogue, package-closure and incident checks. Freeze player bytes by 09:36 AEDT or earlier if observed remaining serial qualification requires it. Unfinished optional features move to a later 4.4.x patch. |
+| 10–15 hours | Complete required destination-specific native, saved-state, first-use and client acceptance on frozen actual packages. Compare published 4.3.0 and direct 4.2.2 upgrades with both cold reloads. Reevaluate retained observations when sufficient; rerun changed, missing or incomplete cases. |
+| 15–16 hours | Complete applicable review/signing/promotion, stage all nine assets, publish canonical v4.4.0, verify anonymous downloads and hashes, and deliver matching primary-checkout dist and release materials. Report exact unmet obligations if acceptance is incomplete. |
+
+The hour-four checkpoint is an implementation and native-measurement decision, not another general architecture review. The hour-eight checkpoint must expose any remaining catalogue, semantic or resource gap before the final qualification window. A release cannot satisfy the plan by keeping the old discovery path as a hidden fallback or by reducing established research.
+
+### 4.4.x performance and release acceptance
+
+Measure ordinary menu startup, headless creation, save loading and first Library opening separately. Use matched enabled versions, startup settings, engine, package bytes and invocation; distinguish incremental improvement over 4.4.2, comparisons with earlier 4.4.x releases and cumulative gains against 4.3.0/4.2.2. Work toward added startup time no greater than `min(0.10 * without-MIR startup, 30 seconds)`, preferably below ten seconds, per named profile. This destination does not withhold useful qualified interim repairs. Include available large/recipe-heavy stress environments and the dependency-valid Galore closure; preserve missing reporter inputs as a limitation.
+
+Validate complete research definitions and saved investment, not only names or counts. Include applicable Base/Space Age and modded cases, finite-tail ownership, required historical destinations, Library cold use/reload/settings and genuine client/multiplayer behavior. A scripted remote open is not a physical shortcut test; several forces are not several clients. No catalogue suppression or freeze moved to first use is accepted as a speedup.
+
+The codec remains `100 * integer(CCC) + SOURCE_PATCH`: 4.4.2 uses the registered `CCC02` identities. Future releases require their own checks, actual candidate review, protected signing and publication readback; earlier emergency publications do not authorize a new exception. Restore existing approved signing capability without requesting secrets in chat or treating ordinary release permission as missing.
+
+GitHub publication, local delivery, affected-player Portal availability and completion of all nine maintainer-managed Portal uploads remain separate states. The retained six-hour upload spacing requires at least 48 hours from first to ninth Portal upload; this plan does not claim all-nine Portal completion within sixteen hours.
+
+### Follow-on 4.4.x releases
+
+| Release | Scope and admission |
+| --- | --- |
+| 4.4.0 | Published unsigned, partially qualified emergency release with preserved published bytes, exact disclosed native scopes, and separate delivery readback. It does not claim a normal seal, protected-main promotion, complete native matrix, ordinary-menu performance pass, Portal upload, or reporter-wide incident closure. GitHub release immutability remains disabled. |
+| 4.4.1 | Published emergency repair for the load-only tick registration, with original bytes and disclosed limited acceptance preserved. It does not complete native multiplayer, save or signing obligations for the next candidate. |
+| 4.4.2 | Published unsigned essential-check release. It fixes the reproduced Dark Matter Replicators Reborn startup crash, adds the native Base/Space Age worker-robot-speed cap, and retains the stated package, upgrade and cap-transition evidence. It does not claim a normal seal, complete client/multiplayer coverage, reporter-wide incident closure, Portal upload or the performance destination. |
+| 4.4.3 | Immediate regressions and remaining client, migration, performance and reporter-profile repairs, followed by additional approved community/mod coverage through reusable declarations and the existing science/ownership rules with exact compatibility and migration evidence. |
+| 4.4.4 onward | Useful developer-time discovery/contributor tools, historical refinements and remaining admitted requests. MEP work requires a ready, useful production contract. |
+| Further 4.4.x / admitted 4.5.x | Continue the preserved request queue in useful, independently qualified batches. Themes do not defer a ready improvement or override an urgent defect. No empty releases, new compiler modes or parallel catalogues. |
+
+Patch suffixes are source patches: 4.4.1 uses `CCC01` and 4.4.2 uses `CCC02`; packaging retries never change them. Published assets remain unchanged. Each follow-on patch preserves the established 4.4.0 baseline except for independently justified and tested corrections.
+
+## Historical 4.0–4.1 programme and custody context
+
+The remaining sections retain the earlier operating programme and accepted historical observations. They do not reinstate the skipped 4.3.1 release, obsolete emergency deadlines or a different active 4.4.2 scope.
 
 MIR 4.0.0 proved that the project can produce a multi-target, proof-governed product line. MIR 4.x now has two simultaneous duties: keep the released 4.0 line repairable and make future development physically coherent. The programme therefore runs a stable patch lane and one development lane under shared findings, shared semantic intent, independently qualified target packages, and immutable published bytes.
 

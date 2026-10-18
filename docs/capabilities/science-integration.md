@@ -5,7 +5,7 @@ applies_to: "3.0.0+"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-10
+last_reviewed: 2026-10-15
 supersedes: []
 superseded_by: []
 ---
@@ -16,7 +16,23 @@ Science integration decides when active science packs participate in generated r
 
 The dynamic science-pack manufacturing stream binds its base and discovered lab inputs to productive item outputs and rejects explicit upstream productivity bans. A same-named fluid cannot receive the item's manufacturing bonus, and a fully productivity-excluded science item cannot qualify through an unrelated coproduct. Explicit caller output constraints retain their authority. A modded sample used by a lab belongs to this existing science stream when its final recipe passes admission; adding a separate sample owner would duplicate that coverage. This rule does not qualify garden, seed or tree production, upstream finalizers, native output or save upgrades.
 
-The 3.1 implementation separates six authorities behind the stable `science_packs.lua` facade:
+## 4.4 implementation under qualification
+
+The current source uses the existing approved stream catalogue with one science facade and one emitter. `pack_bindings.lua` binds named or uniquely identified typed science recipes and their direct research gates; `lab_bindings.lua` binds actual lab inputs and placement-item sources. A finite positive reference graph propagates established science, lab and technology facts once. It preserves AND requirements, alternative sources and unseeded-cycle distinctions without constructing factory acquisition proofs or comparing production-route frontiers.
+
+The declared source policy gives an authored source precedence over a unique structural source. Ambiguous or unknown relevant bindings produce an explicit unresolved diagnosis; they do not invoke the retired solver or silently remove established research. The narrow retained launch-source policy records a published admission exclusion separately from physical impossibility. Required packs cannot be dropped to make a lab accept the remaining vector. One actual lab must accept the complete selected vector; combining incompatible specialist labs does not create a valid laboratory.
+
+After the finite reference graph completes, a closed component with no seed receives an explicit approved-reference exclusion. Unknown source dependencies, unexamined alternative producers and possible native seeds prevent that conclusion; they remain unresolved. This distinguishes a completed reference-policy result from pending recursion or a claim about factory feasibility. Native source inspection runs only for proposed closed exclusions. Lab placement dependencies include science consumed by their recipes even when a different lab accepts that science; each lab retains its own acceptance vector.
+
+Source epochs protect the shared binding snapshots, public records remain defensive copies, and saved Full/Classic values select the same generation path. The former recursive modules and route selector are retained only under `tests/reference/retired-discovery/` for developer characterization and are excluded from player packages. The old setting identity and historical recovery notice do not select another compiler.
+
+Controlled graph, common-emitter and captured-prototype observations establish only their stated source/input bindings. They do not establish native startup, saved-state preservation, actual client interaction or resolution of the reporter's complete Galore installation. Those remain destination-package qualification obligations.
+
+## Historical acquisition model through 4.3.0
+
+The remaining acquisition details describe the published predecessor and its retained developer reference, not the installed 4.4 execution path. They remain useful for identifying expected output and explicit compatibility differences; their former module names below resolve under `tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/`.
+
+The 3.1 implementation separated six authorities behind the stable `science_packs.lua` facade:
 
 - `pack_registry.lua` admits physical lab inputs as research packs and owns official ordering;
 - `lab_compatibility.lua` validates or deterministically reduces ingredient sets;

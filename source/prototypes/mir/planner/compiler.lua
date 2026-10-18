@@ -51,9 +51,11 @@ local function stream_operation(row, policy)
   local design = row.technology_design
   if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
   else technology_design.verify_untrusted(design) end
-  local expected_before = row.action == "adopt" and deepcopy(row.adoption.input_snapshot)
+  -- TransformationOperation owns the snapshots and payload after construction.
+  -- Pass row-owned adoption data through that single defensive-copy boundary.
+  local expected_before = row.action == "adopt" and row.adoption.input_snapshot
     or {presence = "absent", prototype_type = "technology", id = tostring(subject_id)}
-  local expected_after = row.action == "adopt" and deepcopy(row.adoption.expected_snapshot)
+  local expected_after = row.action == "adopt" and row.adoption.expected_snapshot
     or technology_design.trusted_prototype_projection_view(design)
   if action == "create" then expected_after.type = "technology" end
   return operation_contract.new({
@@ -77,7 +79,7 @@ local function stream_operation(row, policy)
       stream_key = row.stream_key,
       manifest_id = row.manifest_id,
       technology_design = design,
-      adoption = deepcopy(row.adoption)
+      adoption = row.adoption
     },
     evidence = {gates = row.gates}
   })
@@ -112,41 +114,6 @@ local function base_operation(operation, policy)
       technology_design = design
     },
     evidence = {gates = operation.gates or design.gates or {}}
-  })
-end
-
--- The finite declared profile supplies already checked rows. It deliberately
--- does not request world snapshots, provider inference or catalogue expansion.
--- Both profiles use these same operation constructors and the same emitter.
-function M.compile_declared_plan(stream_plan, base_plan, identity)
-  assert(type(identity) == "table" and type(identity.profile_fingerprint) == "string"
-    and type(identity.source_fingerprint) == "string", "Declared compiler identity is required.")
-  local policy = {policy_fingerprint = identity.profile_fingerprint}
-  local operations, subjects = {}, {}
-  local function append(record, kind)
-    local unresolved, failed = gate_disposition(record)
-    if #unresolved > 0 or #failed > 0 then
-      error("Declared compiler cannot emit an unresolved or failed design: "
-        .. tostring(record.technology_name), 2)
-    end
-    if subjects[record.technology_name] then
-      error("Declared compiler output identity is duplicated: " .. tostring(record.technology_name), 2)
-    end
-    subjects[record.technology_name] = true
-    table.insert(operations, kind == "stream" and stream_operation(record, policy)
-      or base_operation(record, policy))
-  end
-  for _, row in ipairs(stream_plan.rows or {}) do
-    if row.action == "emit" then append(row, "stream")
-    elseif row.action ~= "skip" then error("Declared compiler accepts create/skip rows only.", 2) end
-  end
-  for _, row in ipairs(base_plan or {}) do append(row, "base-continuation") end
-  return transformation_plan.new({
-    phase = "declared-classic-core",
-    execution_mode = "SAFE",
-    compilation_snapshot_fingerprint = identity.source_fingerprint,
-    policy_fingerprint = identity.profile_fingerprint,
-    operations = operations
   })
 end
 

@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "kind": "MIR42FinalReleaseManifestV1",
+  "source_version": "4.3.0",
+  "source_tag": "v4.3.0",
+  "status": "emergency-accepted-with-disclosed-qualification-gaps",
+  "acceptance_record_kind": "MIR430FreshEmergencyAcceptanceV1",
+  "source": {
+    "commit": "0e2703d7b545b97a2bdb308a02d84857288b6dc1",
+    "tree": "bb6c3df2bc76cbd9da000432e4a0ecf6dd6a585e"
+  },
+  "built_from_dev_commit": "27c2d4b857ad5031dfd7178f988bec6ac9c7deaf",
+  "promotion_pull_request": "https://github.com/Julesc013/more-infinite-research/pull/640",
+  "package_source_sha256": "CF42E93FE79E39749C23C23877CD3C12C452EE73700C398BB09FA95AB9A53E2B",
+  "candidate_manifest_sha256": "C2CF68AEF1F29EB2662D4825CE706DA37F4C8A0798D3F6FBCA3DB8C31913E8A3",
+  "targets": [
+    {
+      "target": "f210",
+      "distribution_version": "4.3.21000",
+      "filename": "more-infinite-research_4.3.21000.zip",
+      "factorio_version": "2.1",
+      "bytes": 1460639,
+      "sha256": "9CB1B6466FC767072E0D11BFC02A139DABD8286CCF5F669C2E2500047B012F7F",
+      "content_sha256": "03F381B574E293ACAB05298D05D596345EE919AA77852CA815FD51EC2A9B8C4A",
+      "entry_count": 348
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.3.20000",
+      "filename": "more-infinite-research_4.3.20000.zip",
+      "factorio_version": "2.0",
+      "bytes": 1456776,
+      "sha256": "856D81ACD0B25F24EB1DCC8B0FA4BCD68FE1A66DAFC8011A8807EF1F77F05C65",
+      "content_sha256": "4C0C46C066D591645D5F8AB6D3897082E95851706F3F3C6DF2BACBAEB277364B",
+      "entry_count": 346
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.3.11000",
+      "filename": "more-infinite-research_4.3.11000.zip",
+      "factorio_version": "1.1",
+      "bytes": 717417,
+      "sha256": "C9DBE1920BF581CAFFEA5DE0D4FB5351714568D0BF330BC30F9E77EB6DC13358",
+      "content_sha256": "02D210D8A22424474C1230EADFFDAE4B1E3A0A934AF27F6121EF7C887031DC05",
+      "entry_count": 286
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.3.10000",
+      "filename": "more-infinite-research_4.3.10000.zip",
+      "factorio_version": "1.0",
+      "bytes": 717414,
+      "sha256": "834F9E1154890AEA2794458DC17A08355DE7A76DE063E9ACDA4BABC06B187BC6",
+      "content_sha256": "5BC4F500F8F9962F5C9632985DC8B41C5AC81211742ADCF9DD72A5275C26A164",
+      "entry_count": 286
+    },
+    {
+      "target": "f017",
+      "distribution_version": "4.3.01700",
+      "filename": "more-infinite-research_4.3.01700.zip",
+      "factorio_version": "0.17",
+      "bytes": 703025,
+      "sha256": "71732DECD981028744041548CF3F86E47864FADACEB0633B5B6ADA53216B227B",
+      "content_sha256": "19344B1F491C0ACC52AC6429D1BBEA5686E97459E085497940C8C3FF759ED215",
+      "entry_count": 286
+    },
+    {
+      "target": "f016",
+      "distribution_version": "4.3.01600",
+      "filename": "more-infinite-research_4.3.01600.zip",
+      "factorio_version": "0.16",
+      "bytes": 703287,
+      "sha256": "BBF4E3334D1E4C182CDA7448501555C1A8617B8DDA056316C33710B7A872575C",
+      "content_sha256": "31A8C6ECD3E046CD297594B784868BAC7E4A50C6F595DF3420AC5487E2C1DD06",
+      "entry_count": 286
+    },
+    {
+      "target": "f015",
+      "distribution_version": "4.3.01500",
+      "filename": "more-infinite-research_4.3.01500.zip",
+      "factorio_version": "0.15",
+      "bytes": 703273,
+      "sha256": "4FF7254F718CADE2CD0B68104D6DB753BE9942516A945A6E10CCA7DD7AA4916A",
+      "content_sha256": "F10F4B59D0B568A65B6E1B31920451A7A15E9C6FD2D9EC3D884B311D264E5E2E",
+      "entry_count": 286
+    },
+    {
+      "target": "f014",
+      "distribution_version": "4.3.01400",
+      "filename": "more-infinite-research_4.3.01400.zip",
+      "factorio_version": "0.14",
+      "bytes": 703527,
+      "sha256": "A42B1685E1E5FE98E24D21162727BC7CEB3630B13DBFB9650B9C6C5968E21FAA",
+      "content_sha256": "A54548814108160549135E06F212947AA70667377FC2A0711C2540A81B20CAAC",
+      "entry_count": 286
+    },
+    {
+      "target": "f013",
+      "distribution_version": "4.3.01300",
+      "filename": "more-infinite-research_4.3.01300.zip",
+      "factorio_version": "0.13",
+      "bytes": 703526,
+      "sha256": "256921DE23ABAEE7344D534BA081D0A7616B2C04595DDCF98337EA3972E249C8",
+      "content_sha256": "1A5AF234BEC22CB8D0EA82E09E09EDD6E4DCB3AB9C838B5A2DE7EBD3CB3A038A",
+      "entry_count": 286
+    }
+  ],
+  "signing": {
+    "status": "unsigned",
+    "signature_present": false
+  },
+  "technical_seal": "not-performed",
+  "completed_native_evidence": [
+    {
+      "path": "build/tmp/mir430-modern-p2-native-full_d05_f200_p2_r06/upgrade-result.json",
+      "sha256": "B1DA6B0B5AABC5589A26F97A46EF8C3E34FE0ACF2C11B6F612303CC940C0F5EC",
+      "status": "passed",
+      "factorio_processes": 4
+    },
+    {
+      "path": "build/tmp/mir430-modern-p2-native-full_q07_f210_sa_p2_r02/upgrade-result.json",
+      "sha256": "A22C13333C78EA4DC6E846713442BF546D0C5EF9D9C17AABA3119EFABBEF4583",
+      "status": "passed",
+      "factorio_processes": 4
+    },
+    {
+      "path": "build/tmp/mir430-modern-p2-native-full_q07_f210_base_delivery_r03/upgrade-result.json",
+      "sha256": "571AB8824F80847A5CDD654537C49ECD7515EE77359ABF19E4390DC766F69274",
+      "status": "passed",
+      "factorio_processes": 4
+    }
+  ],
+  "completed_performance_profiles": [
+    "F200 Galore/Space Age",
+    "F200 Bob/Angel"
+  ],
+  "catalogue_baseline": "published 4.2.2",
+  "compiler_profile": "full",
+  "maintainer_authorization": {
+    "statement": "okay after this lets immediately tag and release now its too late for anythig else we have 10 minutes",
+    "disclosed_before_authorization": [
+      "partial native/client acceptance",
+      "missing signing/sealing",
+      "SDK check failure"
+    ],
+    "new_candidate_specific_decision": true,
+    "prior_release_waiver_reused": false
+  },
+  "qualification_gaps": [
+    "remaining historical/destination/native/client/feature cases",
+    "modded-save migrations",
+    "ordinary-menu and actual reporter-installation timing",
+    "first Library use",
+    "complete green CI",
+    "protected signing/sealing/review"
+  ],
+  "release_immutable": false,
+  "prepared_utc": "2026-10-13T13:22:31.827810+00:00",
+  "publication": {
+    "status": "prepared-not-yet-published",
+    "anonymous_readback": "pending",
+    "portal": "not-uploaded"
+  }
+}

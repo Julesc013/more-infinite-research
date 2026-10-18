@@ -1,39 +1,9 @@
 -- Failure-only observation of this exact finalized environment. These facts
 -- are post-MIR inputs, not a pre-compiler capture or a gameplay acceptance.
 local function observe_missing_tin()
-  local prefix = "__more-infinite-research__.prototypes.mir."
-  local compiler_context = require(prefix .. "pipeline.compiler_context")
-  local science = require(prefix .. "capabilities.science_integration.science_packs")
-  local production = science.pack_production_reachability
-  local recipe_facts = require(prefix .. "index.recipe_facts")
   for _, name in ipairs({"bob-burner-lab", "lab", "bob-glass", "bob-quartz", "stone-furnace", "wood", "iron-plate"}) do
-    compiler_context.with_active(compiler_context.new({execution_mode="SAFE"}), function()
-      science.ensure_services()
-      recipe_facts.index_view()
-      local normal = production.item_acquisition_witness(name, {}, {})
-      local routes = require(prefix .. "capabilities.science_integration.recipe_route_feasibility")
-      local initial = data.raw.recipe[name] and routes.initial_recipe_witness(name, name)
-      local observer = {visits=0, failures={}, stopped=false}
-      function observer:is_stopped() return self.stopped end
-      function observer:reserve_visit(depth)
-        self.visits = self.visits + 1
-        if self.visits > 200000 or depth > 96 then self.stopped = true end
-        return not self.stopped
-      end
-      function observer:record(failure, depth)
-        if #self.failures < 30 then self.failures[#self.failures+1] = {depth=depth, failure=failure} end
-      end
-      function observer:checkpoint() return #self.failures end
-      function observer:rollback(count)
-        while #self.failures > count do self.failures[#self.failures] = nil end
-      end
-      local witness = production.item_acquisition_witness(name, {}, {}, observer)
-      log("[mir-tin-acquisition-diagnostic] " .. serpent.line({item=name,
-        witness_kind=witness and witness.kind, normal_witness_kind=normal and normal.kind,
-        initial_witness_kind=initial and initial.kind, visits=observer.visits,
-        indeterminate=observer.stopped, failures=observer.failures,
-        recipe=data.raw.recipe[name]}, {comment=false}))
-    end)
+    log("[mir-tin-acquisition-diagnostic] " .. serpent.line({item=name,
+      item_prototype=data.raw.item[name], recipe=data.raw.recipe[name]}, {comment=false}))
   end
   for _, prototype_type in ipairs({"furnace", "assembling-machine"}) do
     local machine = data.raw[prototype_type]["stone-furnace"]

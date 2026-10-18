@@ -312,14 +312,35 @@ local function catalog_operation(row_value)
   return {stream_key = row_value.stream_key, technology_design = row_value.technology_design}
 end
 
-local function finalize_catalog(row_value, defer)
+local function initial_skip_allowance(row_value)
+  local selection_key = tostring(row_value.stream_key) .. ":" .. tostring(row_value.manifest_id or row_value.stream_key)
+  local resolved = true
+  for _, gate_name in ipairs(hard_gate_authority.order()) do
+    if not gate.is_authoritatively_resolved(row_value.gates[gate_name]) then resolved = false end
+  end
+  return {
+    [selection_key] = {
+      selection_key = selection_key,
+      reason = row_value.reason,
+      candidate_id = row_value.technology_design.candidate_id,
+      design_fingerprint = row_value.technology_design.design_fingerprint,
+      hard_gates_resolved = resolved,
+      gates_fingerprint = fingerprint.of(row_value.gates)
+    }
+  }
+end
+
+local function finalize_catalog(row_value, defer, allowances)
   local operations = (row_value.action == "emit" or row_value.action == "adopt")
     and {catalog_operation(row_value)} or {}
   return technology_catalog.finalize(
     {row_value},
     {fixture = "catalog-deferred-diagnostics"},
     operations,
-    {defer_diagnostic_alternatives = defer == true}
+    {
+      defer_diagnostic_alternatives = defer == true,
+      initial_skip_diagnostic_allowances = allowances
+    }
   )
 end
 
@@ -367,6 +388,103 @@ check(catalog_skip_final.alternative_evaluation.mode == "full-diagnostics"
   and catalog_skip_final.candidates[1].diagnostic_evaluation.state == "constructed"
   and catalog_skip_final.current_selections[1].action == "diagnose",
   "skip retains the full required diagnostic fallback")
+
+-- An initial skip with an exact, owned allowance has already constructed the
+-- rejected primary. Player compilation can retain that primary and select its
+-- rejection directly; it never invents a qualified safe-diagnostic identity.
+local catalog_initial_skip = catalog_emit_row("initial-skip", "skip")
+local original_as_diagnostic_alternative = technology_design.as_diagnostic_alternative
+technology_design.as_diagnostic_alternative = function()
+  error("initial skip must not construct a safe diagnostic alternative")
+end
+local catalog_initial_skip_deferred = finalize_catalog(
+  catalog_initial_skip, true, initial_skip_allowance(catalog_initial_skip))
+technology_design.as_diagnostic_alternative = original_as_diagnostic_alternative
+local catalog_initial_skip_primary = catalog_initial_skip_deferred.candidates[1].alternatives[1]
+local catalog_initial_skip_selection = catalog_initial_skip_deferred.current_selections[1]
+check(catalog_initial_skip_deferred.alternative_evaluation.mode
+    == "player-selected-primary-plus-required-fallbacks"
+  and not catalog_initial_skip_deferred.alternative_evaluation.complete
+  and catalog_initial_skip_deferred.alternative_evaluation.evaluated_alternatives == 1
+  and catalog_initial_skip_deferred.alternative_evaluation.deferred_diagnostic_alternatives == 1
+  and catalog_initial_skip_deferred.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 1
+  and #catalog_initial_skip_deferred.candidates[1].alternatives == 1
+  and catalog_initial_skip_deferred.candidates[1].diagnostic_evaluation.state
+    == "deferred-initial-skip-rejected-primary"
+  and catalog_initial_skip_primary.action == "reject"
+  and catalog_initial_skip_primary.qualification_decision == "rejected"
+  and catalog_initial_skip_selection.action == "reject"
+  and catalog_initial_skip_selection.deferred_rejection.reason == catalog_initial_skip.reason,
+  "initial skip defers only the losing safe diagnostic and retains its real rejected primary")
+expect_error(function() technology_catalog.require_full_diagnostics(catalog_initial_skip_deferred) end,
+  "full diagnostics are required")
+local catalog_initial_skip_full = finalize_catalog(catalog_initial_skip, true)
+local catalog_initial_skip_full_primary
+for _, alternative in ipairs(catalog_initial_skip_full.candidates[1].alternatives) do
+  if alternative.action == "reject" then catalog_initial_skip_full_primary = alternative end
+end
+check(catalog_initial_skip_full_primary.design_fingerprint == catalog_initial_skip_primary.design_fingerprint
+  and catalog_initial_skip_full_primary.qualification_fingerprint
+    == catalog_initial_skip_primary.qualification_fingerprint
+  and catalog_initial_skip_full.current_selections[1].action == "diagnose",
+  "initial skip deferral preserves the full rejected primary while full diagnostics retain diagnose")
+local forged_initial_skip_allowance = initial_skip_allowance(catalog_initial_skip)
+forged_initial_skip_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].design_fingerprint = "mir32-forged"
+local catalog_forged_allowance = finalize_catalog(catalog_initial_skip, true, forged_initial_skip_allowance)
+check(catalog_forged_allowance.alternative_evaluation.complete
+  and #catalog_forged_allowance.candidates[1].alternatives == 2,
+  "forged initial skip allowance cannot defer diagnostics")
+local catalog_forged_candidate_allowance = initial_skip_allowance(catalog_initial_skip)
+catalog_forged_candidate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].candidate_id
+  = "mir-candidate/forged"
+local catalog_forged_candidate = finalize_catalog(
+  catalog_initial_skip, true, catalog_forged_candidate_allowance)
+check(catalog_forged_candidate.alternative_evaluation.complete
+  and #catalog_forged_candidate.candidates[1].alternatives == 2,
+  "forged initial skip candidate identity cannot defer diagnostics")
+local catalog_forged_gate_allowance = initial_skip_allowance(catalog_initial_skip)
+catalog_forged_gate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].gates_fingerprint
+  = "mir32-forged"
+local catalog_forged_gate = finalize_catalog(catalog_initial_skip, true, catalog_forged_gate_allowance)
+check(catalog_forged_gate.alternative_evaluation.complete
+  and #catalog_forged_gate.candidates[1].alternatives == 2,
+  "forged initial skip hard-gate binding cannot defer diagnostics")
+for _, mutation in ipairs({
+  {field = "reason", value = "different-rejection", label = "reason"},
+  {field = "selection_key", value = "different:selection", label = "selection key"},
+  {field = "hard_gates_resolved", value = false, label = "resolved-gate assertion"}
+}) do
+  local allowance = initial_skip_allowance(catalog_initial_skip)
+  allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"][mutation.field] = mutation.value
+  local fallback = finalize_catalog(catalog_initial_skip, true, allowance)
+  check(fallback.alternative_evaluation.complete and #fallback.candidates[1].alternatives == 2,
+    "forged initial skip " .. mutation.label .. " retains full diagnostics")
+end
+local catalog_initial_skip_unresolved = catalog_emit_row("initial-skip-unresolved", "skip", "pending")
+local catalog_initial_skip_unresolved_full = finalize_catalog(
+  catalog_initial_skip_unresolved, true, initial_skip_allowance(catalog_initial_skip_unresolved))
+check(catalog_initial_skip_unresolved_full.alternative_evaluation.complete
+  and #catalog_initial_skip_unresolved_full.candidates[1].alternatives == 2,
+  "unresolved initial skip retains full diagnostics")
+local catalog_initial_skip_preselection = technology_catalog.from_generation_rows(
+  {catalog_initial_skip}, {fixture = "catalog-initial-skip-preselection"}, {
+    defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_initial_skip)
+  })
+check(catalog_initial_skip_preselection.phase == "preselection"
+  and catalog_initial_skip_preselection.alternative_evaluation.complete
+  and #catalog_initial_skip_preselection.candidates[1].alternatives == 2,
+  "preselection proposal inventory never defers initial skip diagnostics")
+local catalog_converted_failed_emit = catalog_emit_row("converted-failed-emit", "emit", "failed")
+local catalog_converted_failed_emit_full = technology_catalog.from_preselection_rows(
+  {catalog_converted_failed_emit}, {fixture = "catalog-converted-failed-emit"}, {
+    phase = "final", defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_converted_failed_emit),
+    defer_validation = true, children_admitted = true
+  })
+check(catalog_converted_failed_emit_full.alternative_evaluation.complete
+  and #catalog_converted_failed_emit_full.candidates[1].alternatives == 2,
+  "non-initial rejected emit retains full diagnostics")
 
 local catalog_failed = technology_catalog.from_preselection_rows(
   {catalog_emit_row("failed", "emit", "failed")},
@@ -421,6 +539,23 @@ check(fingerprint.of(permutation_forward.current_selections) == fingerprint.of(p
   and permutation_reverse.alternative_evaluation.deferred_diagnostic_alternatives == 2,
   "deferred primary selection remains permutation independent")
 
+local deferred_skip_left = catalog_emit_row("deferred-skip-left", "skip")
+local deferred_skip_right = catalog_emit_row("deferred-skip-right", "skip")
+local deferred_skip_allowances = initial_skip_allowance(deferred_skip_left)
+for key, value in pairs(initial_skip_allowance(deferred_skip_right)) do deferred_skip_allowances[key] = value end
+local function finalize_deferred_skips(rows)
+  return technology_catalog.finalize(rows, {fixture = "catalog-deferred-skip-permutation"}, {}, {
+    defer_diagnostic_alternatives = true,
+    initial_skip_diagnostic_allowances = deferred_skip_allowances
+  })
+end
+local deferred_skip_forward = finalize_deferred_skips({deferred_skip_left, deferred_skip_right})
+local deferred_skip_reverse = finalize_deferred_skips({deferred_skip_right, deferred_skip_left})
+check(fingerprint.of(deferred_skip_forward.current_selections) == fingerprint.of(deferred_skip_reverse.current_selections)
+  and deferred_skip_forward.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 2
+  and deferred_skip_reverse.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 2,
+  "deferred initial skip selection remains permutation independent")
+
 local forged_deferred_binding = technology_catalog.snapshot(catalog_deferred)
 forged_deferred_binding.candidates[1].diagnostic_evaluation.primary_design_fingerprint = "mir32-forged"
 expect_error(function() technology_catalog.verify_untrusted(forged_deferred_binding) end,
@@ -471,6 +606,27 @@ table.remove(missing_deferred_selection.current_selections, 1)
 expect_error(function() technology_catalog.verify_untrusted(missing_deferred_selection) end,
   "deferred diagnostic primary selection is invalid")
 
+local forged_rejected_state = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_state.candidates[1].diagnostic_evaluation.state = "constructed"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_state) end,
+  "constructed diagnostic evaluation")
+local forged_rejected_selection = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_selection.current_selections[1].action = "diagnose"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_selection) end,
+  "current selection is invalid or rejected")
+local forged_rejected_primary = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_primary.candidates[1].diagnostic_evaluation.primary_design_fingerprint = "mir32-forged"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_primary) end,
+  "deferred rejected diagnostic primary proof is invalid")
+local forged_rejected_count = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_count.alternative_evaluation.deferred_rejected_diagnostic_alternatives = 0
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_count) end,
+  "alternative evaluation counts are invalid")
+local forged_rejected_provenance = technology_catalog.snapshot(catalog_initial_skip_deferred)
+forged_rejected_provenance.current_selections[1].deferred_rejection.reason = "forged"
+expect_error(function() technology_catalog.verify_untrusted(forged_rejected_provenance) end,
+  "current selection is invalid or rejected")
+
 local caller_snapshot = technology_catalog.snapshot(catalog_deferred)
 caller_snapshot.candidates[1].diagnostic_evaluation.state = "forged"
 caller_snapshot.alternative_evaluation.evaluated_alternatives = 99
@@ -478,6 +634,11 @@ local caller_snapshot_again = technology_catalog.snapshot(catalog_deferred)
 check(caller_snapshot_again.candidates[1].diagnostic_evaluation.state == "deferred-primary-qualified"
   and caller_snapshot_again.alternative_evaluation.evaluated_alternatives == 1,
   "catalog query snapshots isolate deferred-evaluation metadata")
+local deferred_skip_snapshot = technology_catalog.snapshot(catalog_initial_skip_deferred)
+deferred_skip_snapshot.current_selections[1].deferred_rejection.reason = "mutated"
+check(technology_catalog.snapshot(catalog_initial_skip_deferred).current_selections[1].deferred_rejection.reason
+    == catalog_initial_skip.reason,
+  "deferred rejected selection provenance is copy isolated")
 
 local public_full_catalog = public_compiler_artifacts.technology_catalog(catalog_full, {})
 local public_deferred_catalog = public_compiler_artifacts.technology_catalog(catalog_deferred, {})
@@ -489,6 +650,16 @@ check(public_deferred_catalog.schema == 2 and not public_deferred_catalog.altern
   and public_deferred_catalog.counts.evaluated_alternatives == 1
   and public_deferred_catalog.counts.deferred_diagnostic_alternatives == 1,
   "public partial catalog reports evaluated and deferred counts honestly")
+local public_deferred_skip_catalog = public_compiler_artifacts.technology_catalog(catalog_initial_skip_deferred, {})
+check(public_deferred_skip_catalog.counts.deferred_rejected_diagnostic_alternatives == 1
+  and public_deferred_skip_catalog.alternative_evaluation.deferred_rejected_diagnostic_alternatives == 1
+  and public_deferred_skip_catalog.selected[1].action == "reject"
+  and public_deferred_skip_catalog.selected[1].deferred_rejection.reason == catalog_initial_skip.reason,
+  "public partial catalog reports deferred rejected-primary provenance honestly")
+public_deferred_skip_catalog.selected[1].deferred_rejection.reason = "mutated"
+check(public_compiler_artifacts.technology_catalog(catalog_initial_skip_deferred, {}).selected[1]
+    .deferred_rejection.reason == catalog_initial_skip.reason,
+  "public deferred rejection provenance is copy isolated")
 local forged_public_catalog = technology_catalog.snapshot(catalog_deferred)
 forged_public_catalog.alternative_evaluation.evaluated_alternatives = 2
 expect_error(function() public_compiler_artifacts.technology_catalog(forged_public_catalog, {}) end,
@@ -547,6 +718,27 @@ do
     check(fingerprint.of_canonical(text) == scalar_digest(text), "fused uncached scalar parity")
   end
 end
+-- Fixed independent MIR32 vectors cross the 64-byte front block exactly.
+-- They deliberately include NUL and binary bytes; the literals remain stable
+-- even if the polynomial block implementation is accidentally corrupted.
+do
+  local seed = string.char(0, 255, 1, 128, 13, 10, 34, 92)
+  local vectors = {
+    {length = 63, digest = "mir32-733948da"},
+    {length = 64, digest = "mir32-a3f52eab"},
+    {length = 65, digest = "mir32-8804b0a6"},
+    {length = 127, digest = "mir32-1a5c4038"},
+    {length = 128, digest = "mir32-bcec520e"},
+    {length = 129, digest = "mir32-d039e2f4"}
+  }
+  for _, vector in ipairs(vectors) do
+    local text = string.sub(string.rep(seed, math.ceil(vector.length / #seed)), 1, vector.length)
+    check(fingerprint.of_canonical(text) == vector.digest,
+      "64-byte fixed binary MIR32 cold vector " .. vector.length)
+    check(fingerprint.of_canonical(text) == vector.digest,
+      "64-byte fixed binary MIR32 warm vector " .. vector.length)
+  end
+end
 for index = 1, 4100 do fingerprint.of_canonical("fifo-eviction-" .. index) end
 local cache_metrics = fingerprint.metrics()
 check(cache_metrics.hash_cache_entries <= 4096 and cache_metrics.hash_cache_bytes <= 2 * 1024 * 1024,
@@ -579,6 +771,60 @@ expect_error(function() fingerprint.canonical(mixed_cycle) end,
   "cyclic table at $[0].back")
 check(fingerprint.canonical({true, {}, false}) == '[true,[],false]',
   "a diagnostic failure cannot retain another call's buffer cursor")
+
+-- Cached numeric text must preserve the engine's exact formatting, including
+-- signed zero and NaN, without retaining any containing mutable record.
+do
+  local values = {0, -1 / math.huge, 1, -1, 0.1, -0.1, 1 / 3, -1 / 3,
+    2 ^ 53, -2 ^ 53, 1e-308, -1e-308, 1e308, -1e308, math.huge, -math.huge, 0 / 0}
+  for index, value in ipairs(values) do
+    local expected = string.format("%.17g", value)
+    check(fingerprint.canonical(value) == expected, "numeric canonical bytes " .. index)
+    check(fingerprint.of(value) == scalar_digest(expected), "numeric scalar digest " .. index)
+    check(fingerprint.canonical_length(value) == #expected, "numeric canonical length " .. index)
+  end
+  local map = {[-3.25] = math.huge, [2.5] = -1 / math.huge, tag = {1 / 3}}
+  local expected_map = '{[-3.25]:' .. string.format("%.17g", math.huge)
+    .. ',[2.5]:' .. string.format("%.17g", -1 / math.huge)
+    .. ',"tag":[' .. string.format("%.17g", 1 / 3) .. ']}'
+  check(fingerprint.canonical(map) == expected_map, "cached numeric mixed-map bytes and ordering")
+  check(fingerprint.of(map) == scalar_digest(expected_map), "cached numeric mixed-map digest")
+
+  fingerprint.canonical(12345.625)
+  local warm_before = fingerprint.metrics()
+  fingerprint.canonical(12345.625)
+  fingerprint.canonical(12345.625)
+  local warm_after = fingerprint.metrics()
+  check(warm_after.numeric_text_computations == warm_before.numeric_text_computations,
+    "warm numeric values do not repeat formatting")
+  check(warm_after.numeric_text_cache_hits == warm_before.numeric_text_cache_hits + 2,
+    "numeric cache reports actual scalar reuse")
+  local record = {nested = {amount = 1 / 3}}
+  local old_text, old_digest = fingerprint.canonical(record), fingerprint.of(record)
+  record.nested.amount = -1 / 3
+  check(fingerprint.canonical(record) ~= old_text and fingerprint.of(record) ~= old_digest,
+    "numeric reuse does not hide mutations in containing records")
+
+  for index = 1, 4200 do
+    local value = 987000 + index + 0.375
+    local expected = string.format("%.17g", value)
+    check(fingerprint.canonical(value) == expected and fingerprint.of(value) == scalar_digest(expected),
+      "numeric cache capacity preserves bytes and digest " .. index)
+  end
+  local full = fingerprint.metrics()
+  check(full.numeric_text_cache_entries == 4096, "numeric text residency stops at its fixed capacity")
+  local uncached = 7777777.25
+  local expected_uncached = string.format("%.17g", uncached)
+  local first, second = fingerprint.canonical(uncached), fingerprint.canonical(uncached)
+  check(first == expected_uncached and second == expected_uncached
+    and fingerprint.metrics().numeric_text_computations == full.numeric_text_computations + 2,
+    "full numeric cache falls back to exact formatting without changing admission")
+  fingerprint.reset_metrics()
+  local reset = fingerprint.metrics()
+  check(reset.numeric_text_computations == 0 and reset.numeric_text_cache_hits == 0
+    and reset.numeric_text_cache_entries == full.numeric_text_cache_entries,
+    "metric reset preserves bounded scalar residency")
+end
 
 -- Projection composition must equal two ordinary complete serializations,
 -- including empty selections, sparse/mixed children, aliases and long fields.
@@ -814,11 +1060,26 @@ do
       "owned recipe domain reports exact canonical bytes")
     check(recipe_facts.snapshot_recipe_domain_fingerprint(deepcopy(index)) == nil,
       "copied recipe index cannot claim owned digest authority")
+    local capture_metrics_before = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
     local captured = snapshot_adapter.capture()
+    local capture_metrics_after = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
     check(captured.domain_fingerprints.recipes == component.fingerprint,
       "adapter reuses only the owned recipes-domain digest")
     check(captured.metrics.reused_recipe_canonical_bytes == component.canonical_bytes,
       "adapter reports exact reused recipe canonical bytes")
+    check(capture_metrics_after.explicit_snapshots == capture_metrics_before.explicit_snapshots
+        and capture_metrics_after.full_copies == capture_metrics_before.full_copies,
+      "adapter byte telemetry does not request an observable snapshot copy")
+    local public_captured_snapshot = compilation_snapshot.snapshot(captured)
+    local captured_snapshot_bytes = public_captured_snapshot.metrics.snapshot_bytes
+    public_captured_snapshot.metrics.snapshot_bytes = nil
+    public_captured_snapshot.metrics.canonicalization_passes = public_captured_snapshot.metrics.canonicalization_passes - 1
+    local expected_captured_snapshot_bytes = #fingerprint.canonical(public_captured_snapshot)
+    check(captured_snapshot_bytes == expected_captured_snapshot_bytes,
+      "adapter byte telemetry preserves the pre-metric public projection length")
+    public_captured_snapshot.metrics.snapshot_bytes = -1
+    check(captured.metrics.snapshot_bytes == expected_captured_snapshot_bytes,
+      "public snapshot mutation cannot alter adapter byte telemetry")
     return {full = full, domain = component.fingerprint,
       index_epoch = context_a:state_epoch("recipe_index"),
       material_epoch = context_a:state_epoch("recipe_index_fingerprint_material"),
@@ -874,6 +1135,209 @@ do
   end, "CompilationSnapshot fact-domain fingerprint differs: recipes")
 
   for _, name in ipairs(loaded_names) do package.loaded[name] = saved[name] end
+end
+
+
+-- Private constructor-boundary control: final catalog validation accepts only
+-- constructor-owned child records on its cheap path. This preserves the
+-- complete catalog shape and fingerprints while rejecting forged lookalikes.
+do
+  local catalog_validate = require("prototypes.mir.planner.technology_catalog.validate")
+  local normal_fingerprints = {
+    candidate = catalog_deferred.candidate_catalog_fingerprint,
+    qualification = catalog_deferred.qualification_catalog_fingerprint,
+    preselection = catalog_deferred.preselection_catalog_fingerprint,
+    selection = catalog_deferred.selection_fingerprint,
+    catalog = catalog_deferred.catalog_fingerprint
+  }
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "constructor-owned final catalog remains accepted by the cheap ownership guard")
+  check(catalog_deferred.candidate_catalog_fingerprint == normal_fingerprints.candidate
+      and catalog_deferred.qualification_catalog_fingerprint == normal_fingerprints.qualification
+      and catalog_deferred.preselection_catalog_fingerprint == normal_fingerprints.preselection
+      and catalog_deferred.selection_fingerprint == normal_fingerprints.selection
+      and catalog_deferred.catalog_fingerprint == normal_fingerprints.catalog,
+    "cheap ownership guard preserves normal catalog fingerprint semantics")
+
+  local function shallow_catalog(source)
+    local out = {}
+    for key, value in pairs(source) do out[key] = value end
+    return out
+  end
+
+  -- Full-looking candidate data copied out of the catalog has no registered
+  -- identity. It must not be admitted by a caller-provided fast-path flag.
+  local unowned = shallow_catalog(catalog_deferred)
+  unowned.candidates = {deepcopy(catalog_deferred.candidates[1])}
+  expect_error(function() catalog_validate.assert_newly_constructed(unowned) end,
+    "Trusted TechnologyCandidate record is required")
+
+  -- This is the compact schema-invalid selection record from the independent
+  -- anchor experiment: sufficient for selection fields but not a Candidate.
+  local original_candidate = catalog_deferred.candidates[1]
+  local compact = shallow_catalog(catalog_deferred)
+  compact.candidates = {{
+    candidate_id = original_candidate.candidate_id,
+    selection_key = original_candidate.selection_key,
+    alternatives = original_candidate.alternatives,
+    diagnostic_evaluation = original_candidate.diagnostic_evaluation
+  }}
+  expect_error(function() catalog_validate.assert_newly_constructed(compact) end,
+    "Trusted TechnologyCandidate record is required")
+
+  -- A registered candidate whose authority identity changes after construction
+  -- also fails without entering a full fingerprint pass.
+  local identity_mutated = shallow_catalog(catalog_deferred)
+  local candidate = catalog_deferred.candidates[1]
+  local candidate_id = candidate.candidate_id
+  candidate.candidate_id = candidate_id .. "/forged"
+  expect_error(function() catalog_validate.assert_newly_constructed(identity_mutated) end,
+    "Trusted TechnologyCandidate record is required")
+  candidate.candidate_id = candidate_id
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "restored constructor-owned candidate remains valid after opposing identity control")
+
+  -- A hard gate participates in final-resolution policy and must be owned too.
+  -- Replacing only that registered child keeps its qualification otherwise valid.
+  local qualification = catalog_deferred.qualifications[1]
+  local gate_name = hard_gate_authority.order()[1]
+  local original_gate = qualification.hard_gates[gate_name]
+  qualification.hard_gates[gate_name] = deepcopy(original_gate)
+  expect_error(function() catalog_validate.assert_newly_constructed(catalog_deferred) end,
+    "Trusted TechnologyGate record is required")
+  qualification.hard_gates[gate_name] = original_gate
+  check(catalog_validate.assert_newly_constructed(catalog_deferred),
+    "restored constructor-owned hard gate remains valid after opposing identity control")
+end
+
+-- The operation constructor is the ownership boundary for adopted native
+-- research. Planner inputs may be reused without a second preparatory copy,
+-- but neither those inputs nor an exported plan may mutate admitted output.
+do
+  local planner = require("prototypes.mir.planner.compiler")
+  local operation_contract = require("prototypes.mir.domain.compiler.transformation_operation")
+  local plan_contract = require("prototypes.mir.domain.compiler.transformation_plan")
+  local policy = require("prototypes.mir.domain.compiler.policy_snapshot").new({})
+  local adopted = catalog_adopt_row("ownership-boundary")
+  adopted.adoption.input_snapshot = deepcopy(adopted.adoption.expected_snapshot)
+  adopted.adoption.input_snapshot.unit.count_formula = "50*L"
+  adopted.adoption.input_fingerprint = fingerprint.of(adopted.adoption.input_snapshot)
+  adopted.adoption.configured_fields = {"effects", "unit"}
+  adopted.technology_design = technology_design.from_generation_row(adopted)
+  local created = catalog_emit_row("ownership-create")
+  local snapshot = compilation_snapshot.new({
+    stream_inputs = {rows = {adopted, created}}, base_continuation_inputs = {operations = {}}
+  })
+  local expected_adoption = fingerprint.canonical(adopted.adoption)
+  local expected_before = fingerprint.canonical(adopted.adoption.input_snapshot)
+  local expected_after = fingerprint.canonical(adopted.adoption.expected_snapshot)
+  local compiled = planner.compile(snapshot, policy)
+  local plan = compiled.transformation_plan
+  check(#plan.operations == 2 and plan.operation_counts.patch == 1 and plan.operation_counts.create == 1,
+    "actual planner preserves both adopted and newly generated operations")
+  local operation
+  for _, candidate in ipairs(plan.operations) do
+    if candidate.action == "patch" then operation = candidate end
+  end
+  check(operation and fingerprint.canonical(operation.expected_before_snapshot) == expected_before
+      and fingerprint.canonical(operation.expected_after_projection) == expected_after
+      and fingerprint.canonical(operation.payload.adoption) == expected_adoption,
+    "adoption constructor preserves complete snapshots and payload")
+  check(operation.expected_before_snapshot ~= adopted.adoption.input_snapshot
+      and operation.expected_after_projection ~= adopted.adoption.expected_snapshot
+      and operation.payload.adoption ~= adopted.adoption,
+    "constructor owns independent adoption tables")
+  local original_plan = fingerprint.canonical(plan_contract.snapshot(plan))
+  local original_operation_fingerprint = operation.operation_fingerprint
+  local original_plan_fingerprint = plan.plan_fingerprint
+  adopted.adoption.input_snapshot.unit.ingredients[1][2] = 999
+  adopted.adoption.expected_snapshot.effects[1].change = 999
+  adopted.adoption.configured_fields[1] = "forged-field"
+  check(fingerprint.canonical(operation.expected_before_snapshot) == expected_before
+      and fingerprint.canonical(operation.expected_after_projection) == expected_after
+      and fingerprint.canonical(operation.payload.adoption) == expected_adoption,
+    "nested source mutation cannot alter admitted adoption")
+  check(operation_contract.verify_untrusted(operation) and operation_contract.assert_trusted(operation)
+      and operation.operation_fingerprint == original_operation_fingerprint,
+    "source mutation preserves valid operation fingerprint and trust")
+  check(fingerprint.canonical(plan_contract.snapshot(plan)) == original_plan
+      and plan.plan_fingerprint == original_plan_fingerprint,
+    "source mutation preserves complete plan bytes and fingerprint")
+  local exported = plan_contract.snapshot(plan)
+  for _, candidate in ipairs(exported.operations) do
+    if candidate.action == "patch" then
+      candidate.expected_before_snapshot.unit.ingredients[1][2] = 1000
+      candidate.expected_after_projection.effects[1].change = 1000
+      candidate.payload.adoption.configured_fields[1] = "forged-export"
+    end
+  end
+  check(fingerprint.canonical(plan_contract.snapshot(plan)) == original_plan,
+    "nested exported-plan mutation cannot alter owned adoption")
+end
+
+
+-- The selection policy owns its local vector and already computes its exact
+-- canonical digest.  The catalog may reuse that digest only for scalar
+-- selection reasons; all exported selections remain defensive copies and a
+-- non-scalar reason follows the existing returned-copy fingerprint path.
+do
+  local selection_policy = require("prototypes.mir.planner.technology_selection_policy")
+  local final_direct, final_fingerprint, final_reusable = selection_policy.select_final(catalog_full, {catalog_emit})
+  local final_facade, final_facade_fingerprint, final_facade_reusable = selection_policy.select(
+    catalog_full, {catalog_emit})
+  check(fingerprint.canonical(final_facade) == fingerprint.canonical(final_direct),
+    "final selection facade preserves its established first return")
+  check(final_facade_fingerprint == final_fingerprint
+      and final_facade_fingerprint == fingerprint.of(final_facade),
+    "final selection facade forwards the exact producer digest")
+  check(final_facade_reusable == true,
+    "ordinary scalar final selection declares its owned digest reusable")
+
+  local pre_row = catalog_emit_row("preselection")
+  local pre_direct, pre_fingerprint, pre_reusable = selection_policy.select_prequalification(
+    catalog_preselection, {pre_row})
+  local pre_facade, pre_facade_fingerprint, pre_facade_reusable = selection_policy.select(
+    catalog_preselection, {pre_row})
+  check(fingerprint.canonical(pre_facade) == fingerprint.canonical(pre_direct),
+    "prequalification selection facade preserves its established first return")
+  check(pre_facade_fingerprint == pre_fingerprint
+      and pre_facade_fingerprint == fingerprint.of(pre_facade),
+    "prequalification selection facade forwards the exact producer digest")
+  check(pre_reusable == true and pre_facade_reusable == true,
+    "ordinary scalar prequalification selection declares its owned digest reusable")
+
+  final_facade[1].reason = "forged-exported-selection"
+  local final_again = selection_policy.select(catalog_full, {catalog_emit})
+  check(final_again[1].reason == catalog_emit.reason,
+    "mutating a returned selection cannot alter a later policy selection")
+
+  local scalar_seed = finalize_catalog(catalog_emit, false)
+  fingerprint.reset_metrics()
+  local scalar_bound = technology_catalog.bind_selections(
+    scalar_seed, {catalog_emit}, {trusted_owned = true, defer_validation = true})
+  local scalar_metrics = fingerprint.metrics()
+  check(scalar_bound.selection_fingerprint == final_fingerprint
+      and scalar_metrics.fingerprint_calls == 2,
+    "catalog binds the scalar producer digest without recanonicalizing its returned selection")
+
+  local fallback_row = {}
+  for key, value in pairs(catalog_emit) do fallback_row[key] = value end
+  fallback_row.reason = {kind = "non-scalar-selection-reason"}
+  local fallback_direct, fallback_fingerprint, fallback_reusable = selection_policy.select(
+    scalar_seed, {fallback_row})
+  check(fallback_reusable == false,
+    "non-scalar selection reason refuses producer-digest reuse")
+  check(fallback_fingerprint == fingerprint.of(fallback_direct),
+    "non-scalar selection retains the exact returned-copy digest")
+
+  local fallback_seed = finalize_catalog(catalog_emit, false)
+  fingerprint.reset_metrics()
+  local fallback_bound = technology_catalog.bind_selections(
+    fallback_seed, {fallback_row}, {trusted_owned = true, defer_validation = true})
+  local fallback_metrics = fingerprint.metrics()
+  check(fallback_bound.selection_fingerprint == fallback_fingerprint
+      and fallback_metrics.fingerprint_calls == scalar_metrics.fingerprint_calls + 1,
+    "catalog rehashes the returned selection when scalar compatibility is absent")
 end
 
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

@@ -62,13 +62,33 @@ try {
 $migratedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'migrated-predecessor'})
 $introducedBindings=@($manifest.bindings|Where-Object{[string]$_.provenance.kind-ceq'current-introduction'})
 $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-HISTORICAL-PRIVATE-TARGET-ADAPTERS'})
-$scienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'})
+$compilerTransitionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
+$approvedScienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
+$angelsRepairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
-if(@($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne382-or
-   $migratedBindings.Count-ne359-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne359-or
-   $introducedBindings.Count-ne23-or$historicalBindings.Count-ne12-or$scienceBindings.Count-ne1-or$repairBindings.Count-ne1-or$progressionBindings.Count-ne1-or$progressionPlannerBindings.Count-ne1-or
+$retiredCurrentSources=@(
+  'source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua',
+  'source/prototypes/mir/runtime/compiler_profile_notice.lua',
+  'source/prototypes/mir/pipeline/classic_compiler.lua',
+  'source/prototypes/mir/domain/compiler/classic_declarations.lua',
+  'source/prototypes/mir/planner/classic/plan.lua',
+  'source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
+)
+$compilerTransitionSources=@(
+  'source/prototypes/mir/settings/compiler_profile.lua'
+)
+$approvedScienceSources=@(
+  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
+  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
+)
+if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+   $migratedBindings.Count-ne354-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne354-or
+   $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or$angelsRepairBindings.Count-ne1-or
+   @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
+   @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or
+   @($retiredCurrentSources|Where-Object{Test-Path -LiteralPath (Join-Path $repo $_)}).Count-ne0-or
    [string]$progressionBindings[0].source_path-cne'source/prototypes/mir/families/material_progression.lua'-or
    [string]$progressionBindings[0].output_path-cne'prototypes/mir/families/material_progression.lua'-or
    (@($progressionBindings[0].target_scope)-join'|')-cne'f210|f200|f110|f100'-or
@@ -83,6 +103,18 @@ if(@($manifest.bindings).Count-ne382-or@($manifest.bindings.source_path|Sort-Obj
    (@($repairBindings[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
    [string]$repairBindings[0].provenance.kind-cne'current-introduction'){
   throw '[mir4-editable-source-binding-uniqueness]'
+}
+foreach($source in $compilerTransitionSources){
+  $row=@($compilerTransitionBindings|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'capability'-or[string]$row[0].semantic_class-cne'target-overlay'-or
+     [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+     ((@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100')){throw '[mir4-editable-source-binding-uniqueness]'}
+}
+foreach($source in $approvedScienceSources){
+  $row=@($approvedScienceBindings|Where-Object{[string]$_.source_path-ceq$source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne'shared'-or[string]$row[0].semantic_class-cne'common-semantic-source'-or
+     [string]$row[0].output_path-cne$source.Substring('source/'.Length)-or[string]$row[0].transform-cne'copy-exact-bytes'-or
+     ((@($row[0].target_scope)-join'|')-cne'f210|f200|f110|f100')){throw '[mir4-editable-source-binding-uniqueness]'}
 }
 Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor (Get-MIR4ComposablePackageSourceV2Predecessor -RepoRoot $repo)|Out-Null
 $targetOutputs=@(foreach($binding in @($manifest.bindings)){foreach($target in @($binding.target_scope)){"$target|$([string]$binding.output_path)"}})
@@ -128,6 +160,83 @@ function Assert-MIR4EditableSourceRejected([scriptblock]$Action,[string]$Code){
 Assert-MIR4EditableSourceRejected {
   New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId HISTORICAL-REJECT -SourceVersion '4.1.0' -OutputRoot 'build/packages/test-historical-rejection' | Out-Null
 } '[mir4-target-materializer-historical-source-version-requires-pinned-checkout]'
+
+$sourceManifestPath=Join-Path $repo 'source/package-source.json'
+$sourceManifestBefore=(Get-FileHash -LiteralPath $sourceManifestPath -Algorithm SHA256).Hash
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('source/prototypes/mir/settings/compiler_profile.lua') -Check | Out-Null
+} '[mir4-source-retirement-source-present]'
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('source/prototypes/mir/runtime/not-a-declared-source.lua') -Check | Out-Null
+} '[mir4-source-retirement-binding]'
+Assert-MIR4EditableSourceRejected {
+  Update-MIR4CurrentSourceBindings -RepoRoot $repo -RetiredSourcePaths @('../outside.lua') -Check | Out-Null
+} 'Unsafe or non-portable MIR 4 archive path'
+if((Get-FileHash -LiteralPath $sourceManifestPath -Algorithm SHA256).Hash-cne$sourceManifestBefore){throw '[mir4-editable-source-retirement-check-mutated-manifest]'}
+
+# A retired target adapter may fall back only to the already admitted shared
+# source for the exact same output.  Exercise the writer's in-memory
+# retirement transform so this control never deletes or refreshes live source.
+$sharedPlanPath='source/prototypes/mir/planner/base_continuations/plan.lua'
+$syntheticRetiredAdapterPath='source/adapters/f200/prototypes/mir/planner/base_continuations/retired-plan.lua'
+$presentAdapterPath='source/adapters/f200/prototypes/mir/planner/base_continuations/qualify.lua'
+$fallbackFixtureManifest=Copy-MIR4EditableSourceState $manifest
+$fallbackShared=@($fallbackFixtureManifest.bindings|Where-Object{[string]$_.source_path-ceq$sharedPlanPath})
+if($fallbackShared.Count-ne1){throw '[mir4-editable-source-adapter-fallback-fixture]'}
+# Model the pre-retirement manifest in memory.  The current source has already
+# removed the f200 plan adapter, so no live binding can serve as this fixture.
+$syntheticFallbackAdapter=Copy-MIR4EditableSourceState $fallbackShared[0]
+$syntheticFallbackAdapter.layer='adapter'
+$syntheticFallbackAdapter.target_scope=@('f200')
+$syntheticFallbackAdapter.source_path=$syntheticRetiredAdapterPath
+$syntheticFallbackAdapter.provenance=[pscustomobject][ordered]@{kind='test-only-retired-adapter'}
+$fallbackShared[0].target_scope=@('f210','f110','f100')
+$fallbackFixtureManifest.bindings=@($fallbackFixtureManifest.bindings)+@($syntheticFallbackAdapter)
+$fallbackManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+$fallbackCompositions=[ordered]@{}
+foreach($target in @('f210','f200','f110','f100')){
+  $fallbackCompositions[$target]=Copy-MIR4EditableSourceState (Read-MIR4TargetMaterializerRecord -RepoRoot $repo -RelativePath "targets/$target/composition.json" -Kind 'MIR4TargetCompositionV2')
+}
+$fallbackF200Operation=@($fallbackCompositions.f200.operations|Where-Object{[string]$_.path-ceq[string]$syntheticFallbackAdapter.output_path})
+if($fallbackF200Operation.Count-ne1-or[string]$fallbackF200Operation[0].source_path-cne$sharedPlanPath){throw '[mir4-editable-source-adapter-fallback-overlay-fixture]'}
+$fallbackF200Operation[0].source_path=$syntheticRetiredAdapterPath
+$unrelatedCompositions=[ordered]@{}
+foreach($target in @('f210','f110','f100')){$unrelatedCompositions[$target]=$fallbackCompositions[$target]|ConvertTo-Json -Depth 100}
+$fallbackEntries=@(Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $fallbackManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath})
+if($fallbackEntries.Count-ne1-or@($fallbackManifest.bindings|Where-Object{[string]$_.source_path-ceq$syntheticRetiredAdapterPath}).Count-ne0-or
+   (@($fallbackEntries[0].fallback_binding.target_scope)-join'|')-cne'f210|f200|f110|f100') {throw '[mir4-editable-source-adapter-fallback-selection]'}
+foreach($target in @('f210','f200','f110','f100')){Update-MIR4AdapterFallbackRetirementOverlay -Composition $fallbackCompositions[$target] -Target $target -Entries $fallbackEntries}
+$fallbackF200Operation=@($fallbackCompositions.f200.operations|Where-Object{[string]$_.path-ceq'prototypes/mir/planner/base_continuations/plan.lua'})
+if($fallbackF200Operation.Count-ne1-or[string]$fallbackF200Operation[0].source_path-cne$sharedPlanPath){throw '[mir4-editable-source-adapter-fallback-overlay]'}
+foreach($target in @('f210','f110','f100')){if(($fallbackCompositions[$target]|ConvertTo-Json -Depth 100)-cne$unrelatedCompositions[$target]){throw "[mir4-editable-source-adapter-fallback-unrelated-target] $target"}}
+
+$missingFallbackManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $missingFallbackManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath='source/prototypes/mir/planner/base_continuations/not-a-plan.lua'}|Out-Null} '[mir4-source-adapter-fallback-binding]'
+$duplicateFallbackManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+$duplicateFallbackManifest.bindings=@($duplicateFallbackManifest.bindings)+@(Copy-MIR4EditableSourceState (@($duplicateFallbackManifest.bindings|Where-Object{[string]$_.source_path-ceq$sharedPlanPath})[0]))
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $duplicateFallbackManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-binding]'
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest (Copy-MIR4EditableSourceState $manifest) -AdapterFallbackRetirements @{$presentAdapterPath=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-source-present]'
+$wrongOutputManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+@($wrongOutputManifest.bindings|Where-Object{[string]$_.source_path-ceq$sharedPlanPath})[0].output_path='prototypes/mir/planner/base_continuations/not-plan.lua'
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $wrongOutputManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-output]'
+$wrongTransformManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+@($wrongTransformManifest.bindings|Where-Object{[string]$_.source_path-ceq$sharedPlanPath})[0].transform='exact-template-v1'
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $wrongTransformManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-binding]'
+$overlappingScopeManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+@($overlappingScopeManifest.bindings|Where-Object{[string]$_.source_path-ceq$sharedPlanPath})[0].target_scope=@('f210','f200','f110','f100')
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $overlappingScopeManifest -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-scope]'
+$nonAdapterRetirementManifest=Copy-MIR4EditableSourceState $fallbackFixtureManifest
+@($nonAdapterRetirementManifest.bindings|Where-Object{[string]$_.source_path-ceq$syntheticRetiredAdapterPath})[0].source_path='source/prototypes/mir/planner/base_continuations/retired-plan.lua'
+Assert-MIR4EditableSourceRejected {Resolve-MIR4AdapterFallbackRetirements -RepoRoot $repo -Manifest $nonAdapterRetirementManifest -AdapterFallbackRetirements @{'source/prototypes/mir/planner/base_continuations/retired-plan.lua'=$sharedPlanPath}|Out-Null} '[mir4-source-adapter-fallback-path]'
+$badOverlay=Copy-MIR4EditableSourceState $fallbackCompositions.f200
+@($badOverlay.operations|Where-Object{[string]$_.path-ceq'prototypes/mir/planner/base_continuations/plan.lua'})[0].source_path=$sharedPlanPath
+Assert-MIR4EditableSourceRejected {Update-MIR4AdapterFallbackRetirementOverlay -Composition $badOverlay -Target 'f200' -Entries $fallbackEntries} '[mir4-source-adapter-fallback-overlay]'
+
+$cliPath=Join-Path $repo 'tools/mir/cli/Invoke-MIR4PackageSource.ps1'
+$cliTokens=$null;$cliErrors=$null;$cliAst=[Management.Automation.Language.Parser]::ParseFile($cliPath,[ref]$cliTokens,[ref]$cliErrors)
+if($cliErrors.Count-or@($cliAst.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ceq'AdapterFallbackRetirements'}).Count-ne1-or
+   -not([IO.File]::ReadAllText($cliPath).Contains('-AdapterFallbackRetirements $AdapterFallbackRetirements'))){throw '[mir4-editable-source-adapter-fallback-cli]'}
+Assert-MIR4EditableSourceRejected {& $cliPath -RepoRoot $repo -Command 'baseline' -AdapterFallbackRetirements @{$syntheticRetiredAdapterPath=$sharedPlanPath}} '[mir4-source-retirement-command]'
 $omissionState=Copy-MIR4EditableSourceState (Get-MIR4TargetMaterializerState -RepoRoot $repo -Target 'f200')
 $omission=@($omissionState.composition.operations|Where-Object{[string]$_.operation-ceq'omit'}|Select-Object -First 1)
 if($omission.Count-ne1){throw '[mir4-editable-source-omission-fixture]'}
@@ -161,10 +270,12 @@ $baseline=Get-MIR4ShadowBaseline -RepoRoot $repo
 foreach($target in @('f210','f200','f110','f100')){
   $expected=@($baseline.targets|Where-Object{[string]$_.target-ceq$target})
   $actualRow=@($proof.targets|Where-Object{[string]$_.target-ceq$target})
-  # The five named Classic modules extend the earlier admitted composition;
-  # the frozen baseline identities above remain exact and adapter scopes do
-  # not overlap. Current semantic changes are not historical byte parity.
-  $expectedDelta=if($target-in@('f210','f200')){43}else{112}
+  # The current source removes the retired discovery and Classic implementations
+  # while adding the approved lab/pack reference bindings and the single declared
+  # Angel repair. The frozen baseline identities remain exact; current semantic
+  # changes are not historical byte parity. The succession guard above authenticates
+  # the repair's exact binding rather than accepting an arbitrary extra file.
+  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or

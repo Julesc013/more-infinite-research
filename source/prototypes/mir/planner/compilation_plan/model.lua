@@ -99,8 +99,16 @@ function M.rebuild_stream_artifact(stream_artifact, rows, rebuild_design_by_inde
   return plan:finalize():artifact_view()
 end
 
-function M.normalized_base_operation(operation)
+-- Prepare a private base-continuation record for policy work.  Binding it to a
+-- TechnologyDesign is deliberately separate: effect sanitation changes both
+-- the technology projection and the effect gate, so binding before sanitation
+-- would construct a design that no later consumer can use.
+local function normalized_base_operation_structure(operation)
   local out = M.copy_operation_with_design_view(operation)
+  -- An input-plan design describes the pre-sanitization candidate.  Never carry
+  -- it into the mutable compilation view: final binding happens only after all
+  -- remaining base decisions are known.
+  out.technology_design = nil
   out.gates = {}
   for gate_name, gate in pairs(operation.gates or {}) do out.gates[gate_name] = gate end
   out.schema = 2
@@ -108,16 +116,39 @@ function M.normalized_base_operation(operation)
   out.registry = {kind = "base_extension", key = out.key}
   if type(out.gates) ~= "table" or next(out.gates) == nil then out.gates = default_base_gates(out) end
   hard_gate_authority.assert_total(out.gates)
-  out.technology_design = technology_design.from_base_extension_operation(out)
-  out.technology = technology_design.prototype_projection(out.technology_design, {validated = true})
-  out.technology.type = "technology"
+  if type(out.technology) ~= "table" then
+    error("TechnologyDesign base continuation operation is required.", 2)
+  end
   return out
+end
+
+local function bind_base_operation_design(operation)
+  operation.technology_design = technology_design.from_base_extension_operation(operation)
+  operation.technology = technology_design.prototype_projection(operation.technology_design, {validated = true})
+  operation.technology.type = "technology"
+  return operation
+end
+
+-- Private compilation-stage view.  It owns the mutable operation structure but
+-- deliberately has no TechnologyDesign until a terminal base decision needs one.
+-- The source plan remains fully bound for the input snapshot and planned-candidate
+-- record; this view is only used after sanitation while policy, ownership, and
+-- graph decisions can still change effects or gates.
+function M.owned_base_operation(operation)
+  return normalized_base_operation_structure(operation)
+end
+
+function M.normalized_base_operation(operation)
+  local out = M.owned_base_operation(operation)
+  return bind_base_operation_design(out)
 end
 
 function M.sanitize_base_operations(base_plan, target_inventory)
   local operations, removed_count, skipped_count, rejected_candidates = {}, 0, 0, {}
   for _, source_operation in ipairs(base_plan or {}) do
-    local operation = M.normalized_base_operation(source_operation)
+    -- Sanitize the owned structural copy first, then bind exactly the final
+    -- design.  The source plan's validated projection remains untouched.
+    local operation = normalized_base_operation_structure(source_operation)
     local kept, removed = technology_effects.sanitize_effects(
       (operation.technology and operation.technology.effects) or {},
       "CompilationPlan " .. tostring(operation.technology_name),
@@ -131,7 +162,9 @@ function M.sanitize_base_operations(base_plan, target_inventory)
         "effect-contracts",
         {#removed > 0 and "effect-contracts:sanitized" or "effect-contracts:all-targets-exist"}
       )
-      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      -- The virtual graph and combined ownership resolver consume this owned
+      -- structure and its gates/effects only.  Bind the complete design after
+      -- their terminal decision, where the public operation is formed.
       table.insert(operations, operation)
     else
       skipped_count = skipped_count + 1
@@ -144,7 +177,7 @@ function M.sanitize_base_operations(base_plan, target_inventory)
       end
       operation.gates.effect_valid = gate_contract.failed(
         "effect-contracts", reason, {evidence})
-      operation.technology_design = technology_design.from_base_extension_operation(operation)
+      bind_base_operation_design(operation)
       table.insert(rejected_candidates, {
         candidate_id = "base-continuation/" .. tostring(operation.key),
         key = operation.key,

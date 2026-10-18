@@ -10,7 +10,7 @@ local function decision_fingerprint(row)
   return fingerprint.of(material)
 end
 
-function M.build(rule, stream, candidate, classification, pack_decision, change, action)
+function M.build(rule, stream, candidate, classification, pack_decision, change, action, unlock_depth)
   local risk_fact = classification.risk_fact
   local promotion_class = pack_decision.kind == "exact-reviewed" and "exact-reviewed"
     or candidate.source == "compatibility-pack-seed" and "promoted"
@@ -46,7 +46,8 @@ function M.build(rule, stream, candidate, classification, pack_decision, change,
     risk_fingerprint = risk_fact and risk_fact.risk_fingerprint or "missing",
     risk_hard_flags = deepcopy((risk_fact and risk_fact.hard_flags) or {"recipe_fact_missing"}),
     risk_review_flags = deepcopy((risk_fact and risk_fact.review_flags) or {}),
-    risk_disposition = classification.risk_disposition
+    risk_disposition = classification.risk_disposition,
+    unlock_depth = unlock_depth
   }
   provider_claim.bind(row)
   row.decision_fingerprint = decision_fingerprint(row)

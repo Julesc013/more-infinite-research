@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 
-SOURCE_PATH = Path("source/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua")
+SOURCE_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/recipe_route_feasibility.lua")
 FIXTURE_PATH = Path("tests/compiler/enabled_producer_sieve.lua")
 RETURN_MARKER = "\nreturn M"
 
@@ -125,6 +125,7 @@ end
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-ENABLED-PRODUCER-SIEVE-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "assertions": int(result["assertions"]),
         "cold_sieved": int(result["cold_sieved"]),
         "filtered": int(result["filtered"]),

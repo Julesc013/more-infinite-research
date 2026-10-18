@@ -122,7 +122,7 @@ function Resolve-MIR42QualificationChildPath {
 
 function Get-MIR42QualificationHistoricalAuthority {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')][string]$SourceVersion = '4.2.0',
     [switch]$PredecessorIdentityOnly)
   $identity = Get-MIR42ReleaseTargetIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
   $baselineIdentity = New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor 2 -SourcePatch 0
@@ -506,7 +506,7 @@ function Get-MIR42QualificationUpgradeReceipt {
 function Assert-MIR42MaintenanceReconciliationScope {
   param([Parameter(Mandatory)][string]$Scope,[Parameter(Mandatory)][object[]]$Candidates)
   if ($Scope -cne 'nine-target' -or $Candidates.Count -ne 9 -or
-      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2','4.2.3') }).Count -ne 0 -or
+      @($Candidates | Where-Object { [string]$_.identity.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') }).Count -ne 0 -or
       @($Candidates | ForEach-Object { [string]$_.identity.source_version } | Sort-Object -Unique).Count -ne 1) {
     throw '[mir42-reconciliation-maintenance-candidate-scope]'
   }
@@ -1581,9 +1581,10 @@ function Resolve-MIR42CriterionEvidenceOutputPath {
 
 function Get-MIR42CriterionObservationContract {
   param([Parameter(Mandatory)][string]$Criterion,[switch]$PublishedMaintenance,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1')
-  $emergencyClassic = $SourceVersion -cin @('4.3.0','4.3.1')
-  if ($PublishedMaintenance -and -not $emergencyClassic -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion='4.2.1')
+  $emergency430 = $SourceVersion -ceq '4.3.0'
+  $normal431 = $SourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')
+  if ($PublishedMaintenance -and -not ($emergency430 -or $normal431) -and $Criterion -cnotin @('fresh-exact-loads','target-omissions')) {
     throw '[mir42-maintenance-criterion-input-scope]'
   }
   if ($Criterion -ceq 'fresh-exact-loads') {
@@ -1640,6 +1641,90 @@ function Assert-MIR42MaintenanceCriterionObservation {
   }
 }
 
+function Assert-MIR431NormalPerformanceTelemetryObservation {
+  param(
+    [Parameter(Mandatory)]$Record,
+    [Parameter(Mandatory)]$Candidate,
+    [Parameter(Mandatory)]$IndividualEngineCandidate,
+    [Parameter(Mandatory)]$PublishedMaintenanceInputs,
+    [Parameter(Mandatory)][string]$Code
+  )
+
+  # 4.3.1 returns to the ordinary nine-target performance criterion. Its
+  # observation remains bound to the authenticated individual engine run, so
+  # a self-reported result cannot replace archive, upgrade, reload, or
+  # resource-ledger evidence.
+  Assert-MIR430PerformancePropertyNames -Value $Record -Expected @(
+    'schema','kind','status','criterion','telemetry_scope','compiler_profile',
+    'source','candidate_manifest','individual_engine_run','record_sha256'
+  ) -Code "$Code-shape"
+  if ([int]$Record.schema -ne 1 -or
+      [string]$Record.kind -cne 'MIR42NineTargetCriterionObservationV1' -or
+      [string]$Record.status -cne 'passed' -or
+      [string]$Record.criterion -cne 'performance-telemetry' -or
+      [string]$Record.telemetry_scope -cne 'bounded-candidate-load-and-upgrade-resource-observation' -or
+      [string]$Record.compiler_profile -cne 'full' -or
+      [string]$Record.source.commit -cne [string]$Candidate.source.commit -or
+      [string]$Record.source.tree -cne [string]$Candidate.source.tree -or
+      [string]$Record.source.package_source_sha256 -cne [string]$Candidate.source.package_source_sha256 -or
+      [string]$Record.candidate_manifest.sha256 -cne [string]$Candidate.candidate_manifest.sha256 -or
+      [string]$Record.candidate_manifest.record_sha256 -cne [string]$Candidate.candidate_manifest.record_sha256) {
+    throw "[$Code-binding]"
+  }
+  Assert-MIR430PerformancePropertyNames -Value $Record.individual_engine_run -Expected @('path','sha256','record_sha256') -Code "$Code-engine-run-shape"
+
+  # Technical Seal normally imports this module. For standalone criterion
+  # production, load its existing authenticated run reader only after this
+  # module has completed loading, avoiding a circular dot-source.
+  if (-not (Get-Command Get-MIR42BoundEngineRun -ErrorAction SilentlyContinue)) {
+    . (Join-Path $mir42QualificationRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
+  }
+  $bound = Get-MIR42BoundEngineRun -Reference $Record.individual_engine_run -Candidate $IndividualEngineCandidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
+  $expectedTargets = @($script:MIR42QualificationNineTargets)
+  $actualTargets = @($bound.record.targets | ForEach-Object { [string]$_.target })
+  if ([string]$bound.input_kind -cne 'individual-upgrade-receipts-and-fresh-loads' -or
+      [string]$bound.sha256 -cne [string]$Record.individual_engine_run.sha256 -or
+      [string]$bound.record.record_sha256 -cne [string]$Record.individual_engine_run.record_sha256 -or
+      $actualTargets.Count -ne $expectedTargets.Count -or ($actualTargets -join '|') -cne ($expectedTargets -join '|')) {
+    throw "[$Code-engine-run-binding]"
+  }
+  return $bound
+}
+
+function New-MIR431NormalPerformanceEngineCandidate {
+  param(
+    [Parameter(Mandatory)][string]$CandidateManifestPath,
+    [Parameter(Mandatory)]$Candidate
+  )
+
+  if ($Candidate.PSObject.Properties.Name -notcontains 'target_rows' -or @($Candidate.target_rows).Count -ne $script:MIR42QualificationNineTargets.Count) {
+    throw '[mir431-normal-performance-candidate-shape]'
+  }
+  $root = Split-Path -Parent (Resolve-Path -LiteralPath $CandidateManifestPath).Path
+  $targets = @(
+    foreach ($row in @($Candidate.target_rows)) {
+      $archivePath = Resolve-MIR42QualificationChildPath -Root $root -RelativePath ([string]$row.archive.path) -Code 'mir431-normal-performance-candidate-archive'
+      [pscustomobject][ordered]@{
+        target = [string]$row.target
+        distribution_version = [string]$row.identity.distribution_version
+        archive_sha256 = [string]$row.archive.sha256
+        content_sha256 = [string]$row.archive.content_sha256
+        entry_count = [int]$row.archive.entry_count
+        archive_path = $archivePath
+      }
+    }
+  )
+  return [pscustomobject][ordered]@{
+    identity = [pscustomobject][ordered]@{
+      sha256 = [string]$Candidate.candidate_manifest.sha256
+      record = [pscustomobject][ordered]@{record_sha256=[string]$Candidate.candidate_manifest.record_sha256}
+    }
+    source = $Candidate.source
+    scope = 'nine-target'
+    targets = $targets
+  }
+}
+
 function Get-MIR42CriterionEvidenceObservation {
   param(
     [Parameter(Mandatory)][string]$Path,
@@ -1647,10 +1732,16 @@ function Get-MIR42CriterionEvidenceObservation {
     [Parameter(Mandatory)]$Candidate,
     [Parameter(Mandatory)][string]$Code,
     $PublishedMaintenanceInputs = $null,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1'
+    $IndividualEngineCandidate = $null,
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$SourceVersion='4.2.1'
   )
   $contract = Get-MIR42CriterionObservationContract -Criterion $Criterion -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -SourceVersion $SourceVersion
-  $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -ceq '4.2.3'
+  # Individual native receipts contain the direct predecessor upgrades and
+  # fresh-load evidence in one authenticated input.  The Technical Seal
+  # admits this representation for these maintenance releases; criterion
+  # consumption must retain the same bounded version contract.
+  $individualFreshInput = $null -ne $PublishedMaintenanceInputs -and $SourceVersion -cin @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')
+  $individualFreshStatus = "MIR-$SourceVersion-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED"
   $record = Read-MIR42QualificationBootstrapRecord -Path $Path -Code $Code
   $candidateManifest = $Candidate.candidate_manifest
   $source = $Candidate.source
@@ -1661,18 +1752,36 @@ function Get-MIR42CriterionEvidenceObservation {
     [string]$record.source.package_source_sha256 -ceq [string]$source.package_source_sha256 -and
     [string]$record.candidate_manifest.sha256 -ceq [string]$candidateManifest.sha256 -and
     [string]$record.candidate_manifest.record_sha256 -ceq [string]$candidateManifest.record_sha256
-  $candidateConstruction = [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4') -and
+  # Construction evidence has the package source at the manifest root, while
+  # commit/tree remain under source. Bind both locations before either
+  # construction-only criterion can consume the record.
+  $candidateConstructionSourceBound =
+    $record.PSObject.Properties.Name -contains 'source' -and
+    $record.PSObject.Properties.Name -contains 'package_source_sha256' -and
+    $Candidate.PSObject.Properties.Name -contains 'source' -and
+    $record.source -is [object] -and $source -is [object] -and
+    $record.source.PSObject.Properties.Name -contains 'commit' -and
+    $record.source.PSObject.Properties.Name -contains 'tree' -and
+    $source.PSObject.Properties.Name -contains 'commit' -and
+    $source.PSObject.Properties.Name -contains 'tree' -and
+    $source.PSObject.Properties.Name -contains 'package_source_sha256' -and
+    [string]$record.source.commit -ceq [string]$source.commit -and
+    [string]$record.source.tree -ceq [string]$source.tree -and
+    [string]$record.package_source_sha256 -ceq [string]$source.package_source_sha256
+  $candidateConstruction = $candidateConstructionSourceBound -and
+    [string]$record.kind -cin @('MIR42FourTargetDeterministicCandidateManifestV1','MIR42FourTargetDeterministicCandidateManifestV2','MIR42FourTargetDeterministicCandidateManifestV3','MIR42FourTargetDeterministicCandidateManifestV4','MIR42FourTargetDeterministicCandidateManifestV5','MIR42FourTargetDeterministicCandidateManifestV6','MIR42FourTargetDeterministicCandidateManifestV7','MIR42FourTargetDeterministicCandidateManifestV9','MIR42FourTargetDeterministicCandidateManifestV10','MIR42FourTargetDeterministicCandidateManifestV12') -and
     [string]$record.record_sha256 -ceq [string]$candidateManifest.record_sha256 -and
     (Get-MIR4Sha256File -Path $Path) -ceq [string]$candidateManifest.sha256
   if ($candidateConstruction) {
-    $null = Get-MIR42CandidateConstructionVersionContract -RepoRoot $mir42QualificationRoot -Manifest $record
+    $constructionContract = Get-MIR42CandidateConstructionVersionContract -RepoRoot $mir42QualificationRoot -Manifest $record
+    $candidateConstruction = [string]$constructionContract.source_version -ceq $SourceVersion
   }
   $kindAndStateValid = switch ($Criterion) {
     'fresh-exact-loads' {
       $candidateBound -and (
         ([string]$record.kind -ceq [string]$contract.kind -and [string]$record.status -ceq [string]$contract.status) -or
         ($individualFreshInput -and [string]$record.kind -ceq 'MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1' -and
-          [string]$record.status -ceq 'MIR-4.2.3-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED' -and
+          [string]$record.status -ceq $individualFreshStatus -and
           $record.PSObject.Properties.Name -contains 'engine_input_kind' -and [string]$record.engine_input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads')
       ) -and
         [string]$record.release_qualification -ceq 'not-performed' -and [string]$record.release_acceptance -ceq 'not-performed'
@@ -1685,7 +1794,7 @@ function Get-MIR42CriterionEvidenceObservation {
     'package-exclusion' { $candidateConstruction -and [bool]$record.build_complete }
     'deterministic-reconstruction' { $candidateConstruction -and [bool]$record.build_complete }
     'performance-telemetry' {
-      if ($SourceVersion -cin @('4.3.0','4.3.1')) {
+      if ($SourceVersion -ceq '4.3.0') {
         $candidateBound -and [string]$record.kind -ceq 'MIR430FullStartupStressObservationV1' -and
           [string]$record.status -ceq 'completed' -and [string]$record.compiler_profile -ceq 'full'
       } else {
@@ -1700,11 +1809,14 @@ function Get-MIR42CriterionEvidenceObservation {
     }
   }
   if (-not $kindAndStateValid) { throw "[$Code-binding] $Criterion" }
-  if ($null -ne $PublishedMaintenanceInputs -and $SourceVersion -cnotin @('4.3.0','4.3.1')) {
+  if ($null -ne $PublishedMaintenanceInputs -and $SourceVersion -cne '4.3.0' -and -not ($SourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') -and $Criterion -ceq 'performance-telemetry')) {
     Assert-MIR42MaintenanceCriterionObservation -Record $record -Criterion $Criterion -PublishedInputs $PublishedMaintenanceInputs
   }
-  if ($Criterion -ceq 'performance-telemetry' -and $SourceVersion -cin @('4.3.0','4.3.1')) {
+  if ($Criterion -ceq 'performance-telemetry' -and $SourceVersion -ceq '4.3.0') {
     $null = Assert-MIR430FullStartupStressObservation -RepoRoot $mir42QualificationRoot -Path $Path -Candidate $Candidate -Code $Code
+  } elseif ($Criterion -ceq 'performance-telemetry' -and $SourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
+    if ($null -eq $IndividualEngineCandidate -or $null -eq $PublishedMaintenanceInputs) { throw "[$Code-normal-performance-engine-input]" }
+    $null = Assert-MIR431NormalPerformanceTelemetryObservation -Record $record -Candidate $Candidate -IndividualEngineCandidate $IndividualEngineCandidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs -Code $Code
   }
   return [pscustomobject][ordered]@{
     path = (Resolve-Path -LiteralPath $Path).Path
@@ -1773,16 +1885,19 @@ function New-MIR42NineTargetCriterionEvidence {
       @($notApplicable | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.reason) }).Count -ne 0) {
     throw '[mir42-criterion-evidence-target-coverage]'
   }
-  if ($Criterion -ceq 'performance-telemetry' -and $maintenanceSourceVersion -cin @('4.3.0','4.3.1')) {
+  if ($Criterion -ceq 'performance-telemetry' -and $maintenanceSourceVersion -ceq '4.3.0') {
     $expectedUnobserved = @($candidate.targets | Where-Object { $_ -cne 'f200' })
     if (($observed -join '|') -cne 'f200' -or ($notApplicableTargets -join '|') -cne ($expectedUnobserved -join '|')) {
       throw '[mir430-performance-criterion-target-scope]'
     }
   }
   if ($ObservationPaths.Count -eq 0) { throw '[mir42-criterion-evidence-observations-required]' }
+  $individualEngineCandidate = if ($Criterion -ceq 'performance-telemetry' -and $maintenanceSourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
+    New-MIR431NormalPerformanceEngineCandidate -CandidateManifestPath $CandidateManifestPath -Candidate $candidate
+  } else { $null }
   $evidence = @(
     foreach ($path in $ObservationPaths) {
-      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation' -PublishedMaintenanceInputs $maintenanceInputs -SourceVersion $maintenanceSourceVersion
+      Get-MIR42CriterionEvidenceObservation -Path $path -Criterion $Criterion -Candidate $candidate -Code 'mir42-criterion-evidence-observation' -PublishedMaintenanceInputs $maintenanceInputs -IndividualEngineCandidate $individualEngineCandidate -SourceVersion $maintenanceSourceVersion
     }
   )
   if (@($evidence.path | Sort-Object -Unique).Count -ne $evidence.Count -or [string]::IsNullOrWhiteSpace($Claim) -or [string]::IsNullOrWhiteSpace($KnownLimitations)) {

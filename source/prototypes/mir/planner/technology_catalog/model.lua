@@ -43,13 +43,27 @@ function M.deferred_diagnostic_evaluation(primary)
   }
 end
 
-function M.alternative_evaluation(mode, evaluated_alternatives, deferred_diagnostic_alternatives)
-  local deferred = deferred_diagnostic_alternatives or 0
+function M.deferred_rejected_diagnostic_evaluation(primary, selection_key, reason)
+  return {
+    state = "deferred-initial-skip-rejected-primary",
+    selection_key = selection_key,
+    reason = reason,
+    primary_alternative_id = primary.alternative_id,
+    primary_design_fingerprint = primary.design_fingerprint,
+    primary_qualification_fingerprint = primary.qualification_fingerprint
+  }
+end
+
+function M.alternative_evaluation(mode, evaluated_alternatives, deferred_diagnostic_alternatives,
+  deferred_rejected_diagnostic_alternatives)
+  local deferred_qualified = deferred_diagnostic_alternatives or 0
+  local deferred_rejected = deferred_rejected_diagnostic_alternatives or 0
   return {
     mode = mode,
-    complete = deferred == 0,
+    complete = deferred_qualified + deferred_rejected == 0,
     evaluated_alternatives = evaluated_alternatives or 0,
-    deferred_diagnostic_alternatives = deferred
+    deferred_diagnostic_alternatives = deferred_qualified + deferred_rejected,
+    deferred_rejected_diagnostic_alternatives = deferred_rejected
   }
 end
 

@@ -3,7 +3,6 @@ local agricultural_growth = require("prototypes.mir.runtime.effects.agricultural
 local passive_repair = require("prototypes.mir.runtime.effects.passive_repair")
 local productivity_family_adoption = require("prototypes.mir.runtime.productivity_family_adoption")
 local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
-local compiler_profile_notice = require("prototypes.mir.runtime.compiler_profile_notice")
 local planet_discovery_recovery = require("prototypes.mir.runtime.planet_discovery_recovery")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local runtime_state = require("prototypes.mir.runtime.state")
@@ -21,7 +20,6 @@ local features = {
   passive_repair,
   productivity_family_adoption,
   maximum_level_control,
-  compiler_profile_notice,
   planet_discovery_recovery
 }
 if research_browser then features[#features + 1] = research_browser end
@@ -84,7 +82,6 @@ function M.register()
   script.on_load(function()
     passive_repair.on_load()
     if research_browser then research_browser.on_load() end
-    compiler_profile_notice.on_load()
   end)
   script.on_init(function(event)
     run_all("on_init", event)

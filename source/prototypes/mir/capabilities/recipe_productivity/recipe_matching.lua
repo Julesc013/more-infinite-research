@@ -664,7 +664,7 @@ local function exact_entries(entries, expected)
   return true
 end
 
-local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope)
+local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope, complete_structural_binding)
   if type(mod_locks) ~= "table" or type(runtime_mods) ~= "table" then return false end
   scope = scope or "closed"
   if scope ~= "closed" and scope ~= "named-relevant-providers" and scope ~= "relevant-return-graph" then return false end
@@ -673,7 +673,9 @@ local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope
     count = count + 1
     if type(name) ~= "string" or name == "" or type(expected) ~= "string" or expected == "" or runtime_mods[name] ~= expected then return false end
   end
-  if count == 0 then return false end
+  -- Only a schema-2 cone contract can replace provider-version pins.
+  -- Closed profiles and schema-1 direct-route records retain their locks.
+  if count == 0 and not (scope == "relevant-return-graph" and complete_structural_binding) then return false end
   observer_mod_locks = observer_mod_locks or {}
   if type(observer_mod_locks) ~= "table" then return false end
   for name, expected in pairs(observer_mod_locks) do
@@ -872,16 +874,36 @@ local function relevant_return_graph_contract_matches(recipe, contract)
   return true, "accepted"
 end
 
-local function matching_profile(profiles, runtime_mods)
+local function matching_profile(profiles, runtime_mods, graph_contract, fact, risk)
   if type(profiles) ~= "table" or #profiles == 0 then return nil, "profile-missing" end
+  local structural_binding_matches
   for _, profile in ipairs(profiles) do
+    local complete_structural_binding = false
+    local structural_contract_validated = false
+    if type(profile) == "table" and profile.mod_lock_scope == "relevant-return-graph"
+      and type(profile.mod_locks) == "table" and next(profile.mod_locks) == nil
+      and type(graph_contract) == "table" and graph_contract.schema == 2 then
+      -- An empty-pin replacement must agree with the already validated
+      -- canonical risk before paying for its complete graph traversal. This
+      -- keeps a wrong-risk structural profile from masking a later pinned one.
+      if profile.canonical_risk_fingerprint == risk.risk_fingerprint then
+        -- Validate the replacement boundary before choosing an unpinned
+        -- profile. A malformed structural profile must not mask a later valid
+        -- pinned one. Existing pinned-only profiles do not query this path.
+        if structural_binding_matches == nil then
+          structural_binding_matches = relevant_return_graph_contract_matches(fact, graph_contract)
+        end
+        complete_structural_binding = structural_binding_matches == true
+        structural_contract_validated = complete_structural_binding
+      end
+    end
     if type(profile) == "table" and type(profile.id) == "string" and profile.id ~= ""
       and valid_mir32_fingerprint(profile.canonical_risk_fingerprint)
-      and exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks, profile.mod_lock_scope) then
-      return profile, "matched"
+      and exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks, profile.mod_lock_scope, complete_structural_binding) then
+      return profile, "matched", structural_contract_validated
     end
   end
-  return nil, "mod-lock"
+  return nil, "mod-lock", false
 end
 
 local reviewed_forward_routes = {}
@@ -907,7 +929,7 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
     or not valid_mir32_fingerprint(risk.risk_fingerprint) then
     return false, "canonical-risk"
   end
-  local profile, profile_reason = matching_profile(certificate.profiles, runtime_mods)
+  local profile, profile_reason, structural_contract_validated = matching_profile(certificate.profiles, runtime_mods, certificate.relevant_return_graph_contract, fact, risk)
   if not profile then return false, profile_reason end
   if profile.canonical_risk_fingerprint ~= risk.risk_fingerprint then
     return false, "canonical-risk"
@@ -927,7 +949,15 @@ function reviewed_forward_routes.admits(recipe_name, fact, risk, certificate, ru
       and not exact_mod_lock(profile.mod_locks, runtime_mods, profile.observer_mod_locks, "named-relevant-providers") then
       return false, "return-graph-bindings-upgrade-required"
     end
-    local relevant, relevant_reason = relevant_return_graph_contract_matches(fact, certificate.relevant_return_graph_contract)
+    local relevant, relevant_reason
+    if structural_contract_validated then
+      -- The selected empty-pin schema-2 profile was fully checked synchronously
+      -- above. Reuse only this call-local result; later phase and return checks
+      -- still execute below and no mutable route object escapes this function.
+      relevant, relevant_reason = true, "accepted"
+    else
+      relevant, relevant_reason = relevant_return_graph_contract_matches(fact, certificate.relevant_return_graph_contract)
+    end
     if not relevant then return false, "relevant-" .. relevant_reason end
     if certificate.relevant_input_contract then
       local input_matches, input_reason = relevant_input_contract_matches(recipe_name, certificate.relevant_input_contract)

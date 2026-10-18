@@ -186,7 +186,7 @@ function M.capture(options)
     trusted_components = recipe_domain ~= nil
   })
   result.metrics.peak_memory_bytes = math.max(result.metrics.memory_before_bytes, result.metrics.memory_after_bytes)
-  result.metrics.snapshot_bytes = #fingerprint.canonical(snapshot_contract.snapshot(result))
+  result.metrics.snapshot_bytes = snapshot_contract.snapshot_canonical_bytes(result)
   result.metrics.canonicalization_passes = result.metrics.canonicalization_passes + 1
   return result
 end

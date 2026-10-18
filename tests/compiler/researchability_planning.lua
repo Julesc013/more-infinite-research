@@ -1929,6 +1929,35 @@ canonical_recipe_facts.recipes_by_output_identity_view = normal_shared_output_lo
 check("U05B", memo_status == "research" and shared_inner_output_lookups == 1,
   "A complete inner unlock witness is reused across sibling routes with unrelated active unlockers")
 
+-- U05B has already exercised the real local witness memo through 12 sibling
+-- candidates. Keep the additional assertion in a nested function so this
+-- large controlled Lua fixture does not enlarge its outer local-variable frame.
+;(function()
+  local memo_route_first = production.production_route_for_pack("memo-pack")
+  local memo_first_pairs = memo_route_first and memo_route_first.provenance
+    and memo_route_first.provenance.selected_research_unlock_pairs or {}
+  local memo_first_signature = {}
+  for _, pair in ipairs(memo_first_pairs) do
+    memo_first_signature[#memo_first_signature + 1] = pair.recipe .. "\0" .. pair.unlocker
+  end
+  if memo_first_pairs[1] then memo_first_pairs[1].recipe = "caller-mutated-memo-route" end
+  local memo_route_second = production.production_route_for_pack("memo-pack")
+  local memo_second_pairs = memo_route_second and memo_route_second.provenance
+    and memo_route_second.provenance.selected_research_unlock_pairs or {}
+  local memo_second_signature = {}
+  for _, pair in ipairs(memo_second_pairs) do
+    memo_second_signature[#memo_second_signature + 1] = pair.recipe .. "\0" .. pair.unlocker
+  end
+  check("U05C", memo_route_first and memo_route_second
+    and memo_route_first ~= memo_route_second
+    and memo_route_first.recipe == "memo-pack-01"
+    and table.concat(memo_first_signature, ",")
+      == "memo-outer-01-recipe\0OuterUnlock1,memo-pack-01\0RootUnlock,shared-inner-recipe\0SharedInnerUnlock"
+    and table.concat(memo_second_signature, ",")
+      == "memo-outer-01-recipe\0OuterUnlock1,memo-pack-01\0RootUnlock,shared-inner-recipe\0SharedInnerUnlock",
+    "The normal same-options memo route retains its selected gates and the public route boundary isolates caller mutation")
+end)()
+
 -- Locked typed-output alternatives use the same normal producer ordering.
 -- Count real technology service evaluations, rather than pre-cache entries.
 local locked_order_world = {
@@ -3994,6 +4023,106 @@ end)()
 end)()
 
 
+
+do
+(function()
+reset({
+  item_prototypes = {P = {type = "item"}, Primer = {type = "item"}},
+  labs = {lab = {inputs = {"P", "Primer"}}},
+  techs = {EligibilityUnlock = {enabled = true,
+    unit = {count = 1, ingredients = {{"P", 1}}}}},
+  recipe_prototypes = {ordinary = {name = "ordinary"}, seed_P = {name = "seed_P"}},
+  recipe_facts = {ordinary = route_fact("ordinary-item"), seed_P = route_fact("P")},
+  producers = {P = {"seed_P"}}, unlockers = {},
+  resources = {
+    Primer = {minable = {result = "Primer", count = 1}},
+    P = {minable = {result = "P", count = 1}}
+  }
+})
+production.pack_production_status("Primer", {})
+local owner = context:state_view("science_pack_production")
+local memo = owner.technology_mechanism_memo
+local graph = require("prototypes.mir.graph.researchability_index")
+local original_reachable, closure_calls = graph.reachable_names, 0
+graph.reachable_names = function(...)
+  closure_calls = closure_calls + 1
+  return original_reachable(...)
+end
+local pack_calls, status = 0, "initial"
+context.services["science.pack_production_status"] = function()
+  pack_calls = pack_calls + 1
+  return status
+end
+local function query(selected_memo)
+  local visiting = {}
+  local answer = researchability.reason_with_context("EligibilityUnlock", {
+    unlock_recipe_name = "ordinary", visiting_packs = {},
+    visiting_technologies = visiting, mechanism_memo = selected_memo or memo
+  })
+  check("QE-CYCLE-CLEAN", next(visiting) == nil,
+    "Eligibility reuse leaves the active technology traversal empty")
+  return answer
+end
+local answers_current = true
+for index = 1, 16 do
+  status = index % 2 == 0 and "unreachable" or "initial"
+  local answer = query()
+  answers_current = answers_current
+    and (index % 2 == 0 and answer == "unreachable-science-P" or index % 2 == 1 and answer == nil)
+end
+check("QE-ACTUAL-RESEARCH", answers_current and pack_calls == 16,
+  "A memo-eligibility refusal never caches the research answer or skips the changing acquisition service")
+check("QE-CLOSURE-PREPARATION", closure_calls == 17,
+  "Sixteen unresolved-root queries perform one eligibility walk and sixteen actual research walks")
+
+local previous_calls = closure_calls
+owner.root_entry_generation = owner.root_entry_generation + 1
+query()
+check("QE-GENERATION", closure_calls - previous_calls == 2,
+  "A root-generation change invalidates the preparation refusal before the next query")
+
+local old_index = context:state_view("technology_researchability_index")
+context:replace_epoch("technology_researchability_index",
+  require("prototypes.mir.core.deepcopy")(old_index),
+  context:state_epoch("technology_researchability_index"))
+previous_calls = closure_calls
+query()
+check("QE-INDEX", closure_calls - previous_calls == 2,
+  "Replacing the research index invalidates a refusal even when the scalar source epoch is unchanged")
+
+local custom_memo = {}
+previous_calls = closure_calls
+query(custom_memo); query(custom_memo)
+check("QE-CUSTOM", closure_calls - previous_calls == 4,
+  "A caller-owned mechanism memo retains both historical eligibility walks")
+
+local previous_generation = owner.root_entry_generation
+owner.root_entry_generation = nil
+previous_calls = closure_calls
+query(); query()
+check("QE-MISSING-GENERATION", closure_calls - previous_calls == 4,
+  "An owner without an explicit root generation cannot retain a preparation refusal")
+owner.root_entry_generation = previous_generation
+
+-- Use the real writer, rather than only changing the test generation. This
+-- creates the science root that was missing during every query above.
+context.services["science.pack_production_status"] = production.pack_production_status
+local before_root_write = owner.root_entry_generation
+production.pack_production_status("P", {})
+local root_written = owner.entries.P ~= nil and owner.root_entry_generation > before_root_write
+local qualified_answer = query()
+local after_qualification = closure_calls
+local repeated_answer = query()
+check("QE-REAL-ROOT-WRITE", root_written and qualified_answer == nil
+  and repeated_answer == nil and memo.root_qualified.EligibilityUnlock == true
+  and closure_calls == after_qualification,
+  "A real completed science root retires the refusal and enables the original exact answer memo: "
+    .. tostring(root_written) .. ", " .. tostring(qualified_answer) .. ", " .. tostring(repeated_answer)
+    .. ", " .. tostring(memo.root_qualified.EligibilityUnlock) .. ", "
+    .. tostring(after_qualification) .. "/" .. tostring(closure_calls))
+graph.reachable_names = original_reachable
+end)()
+end
 
 if #failures > 0 then error(table.concat(failures, "\n")) end
 print("MIR-RESEARCHABILITY-PLANNING-PASS " .. checks)

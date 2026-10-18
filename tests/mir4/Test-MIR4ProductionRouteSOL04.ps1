@@ -4,9 +4,15 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-. (Join-Path $RepoRoot 'tools/lib/validation/CurrentTargetPackage.ps1')
-$targetPackage = New-MIR4CurrentTargetPackageContext -RepoRoot $RepoRoot -Target 'f210'
-function Resolve-MIRCurrentProductionRoutePath { param([string]$RelativePath) Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $RelativePath }
+# The SOL-04 receipt was committed with this implementation. Its retired solver
+# is historical evidence, not a required surface of today's player package.
+$historicalSourceCommit = 'ea5b37983e4f682c841eba662a87276f082d4afd'
+function Read-MIRSol04HistoricalSource {
+  param([Parameter(Mandatory)][string]$RelativePath)
+  $lines = & git -C $RepoRoot show ($historicalSourceCommit + ':' + $RelativePath) 2>$null
+  if ($LASTEXITCODE -ne 0) { throw "[mir4-sol04-historical-authority] $RelativePath" }
+  return $lines -join "`n"
+}
 $path = Join-Path $RepoRoot ".mir/releases/waves/mir4-r0/MIR4-Production-Route-SOL04V1.json"
 $record = Get-Content -Raw -LiteralPath $path | ConvertFrom-Json -Depth 100
 $shaPattern = '^[A-F0-9]{64}$'
@@ -108,13 +114,12 @@ foreach ($relative in $requiredAuthorities) {
     throw "SOL-04 historical implementation authority is missing from its receipt: $relative"
   }
 }
-$policySource = Get-Content -Raw -LiteralPath (Resolve-MIRCurrentProductionRoutePath 'prototypes/mir/capabilities/science_integration/production_route_policy.lua')
-$reachabilitySource = Get-Content -Raw -LiteralPath (Resolve-MIRCurrentProductionRoutePath 'prototypes/mir/capabilities/science_integration/pack_production_reachability.lua')
-# SOL-04 is frozen qualification evidence. Current route semantics are checked
-# by the source-composed static/current suite rather than by requiring today's
-# policy adapter to remain byte-identical to the historical V2 artifact.
+$policySource = Read-MIRSol04HistoricalSource 'prototypes/mir/capabilities/science_integration/production_route_policy.lua'
+$reachabilitySource = Read-MIRSol04HistoricalSource 'prototypes/mir/capabilities/science_integration/pack_production_reachability.lua'
+# Current declared science bindings have their own checks. Do not restore the
+# old discovery engine merely to validate this frozen historical receipt.
 if ($policySource -notmatch 'policy_id' -or $reachabilitySource -notmatch 'function') {
-  throw "SOL-04 current source-composed successor surface is incomplete."
+  throw "SOL-04 pinned historical implementation surface is incomplete."
 }
 if (-not $record.exit_gate.generic_route_policy_proven -or
     -not $record.exit_gate.ordinary_primary_preference_proven -or
@@ -128,4 +133,4 @@ if (-not $record.exit_gate.generic_route_policy_proven -or
   throw "SOL-04 exit gate is incomplete, overclaims Factorio 2.0, or grants publication authority."
 }
 
-Write-Host "MIR 4 SOL-04 production-route policy and exact Factorio 2.1 evidence passed."
+Write-Host "MIR 4 SOL-04 historical production-route policy and exact Factorio 2.1 evidence passed."

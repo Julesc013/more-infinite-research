@@ -2,13 +2,11 @@
 -- runtime state, then exposes only bounded, copied scalar DTOs to the core.
 -- A malformed public projection is omitted rather than guessed from names.
 local profile_codec = require("prototypes.mir.settings.profile_codec")
-local compiler_profile = require("prototypes.mir.settings.compiler_profile")
 local settings_catalog = require("prototypes.mir.settings.catalog")
 local startup_settings = require("prototypes.mir.runtime.startup_settings")
 local maximum_level_control = require("prototypes.mir.runtime.maximum_level_control")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local browser_host = require("prototypes.mir.platform.factorio.browser_host")
-local target_line = require("prototypes.mir.platform.factorio.target_line")
 
 local M = {schema = 2, catalogue_limit = 30000}
 
@@ -79,15 +77,6 @@ local function same_array(left, right)
   for index, value in ipairs(left) do if right[index] ~= value then return false end end
   return true
 end
-
-local CLASSIC_UNSUPPORTED_CLASSES = {
-  "automatic-families",
-  "competing-owner-replacements",
-  "generic-mod-inference",
-  "material-progression",
-  "recipe-productivity",
-  "weapon-speed-redistribution"
-}
 
 local function scalar_equal(left, right)
   return type(left) == type(right) and left == right
@@ -479,12 +468,11 @@ end
 -- row cannot become a research/queue action or imply removal from a save.
 -- The public candidate cache also holds copied immutable facts only; force and
 -- prototype observations remain live in snapshot().
-local omission_rows, validated_public_candidates, validated_compiler_profile
+local omission_rows, validated_public_candidates
 
 function M.invalidate_omissions()
   omission_rows = nil
   validated_public_candidates = nil
-  validated_compiler_profile = nil
   validated_policy_caps = nil
   validated_runtime_settings_bindings = nil
 end
@@ -543,22 +531,6 @@ local function copy_string_array(values)
   local copy = {}
   for index, value in ipairs(values) do copy[index] = value end
   return copy
-end
-
-local function copy_compiler_scope(scope)
-  if not scope then return nil end
-  local out = {
-    schema = 1,
-    state = scope.state,
-    profile = "classic",
-    full_catalog_status = "not-evaluated"
-  }
-  if scope.state == "available" then
-    out.supported_manifest_ids = copy_string_array(scope.supported_manifest_ids)
-    out.unsupported_classes = copy_string_array(scope.unsupported_classes)
-    out.omitted_research_not_preserved = true
-  end
-  return out
 end
 
 local function detail_for_row(row, recipes, disposition, caps, force)
@@ -728,79 +700,13 @@ local function current_public_candidates()
   return candidates
 end
 
-local function classic_profile_selected()
-  return compiler_profile.get(target_line.factorio_version) == "classic"
-end
-
-local function sealed_classic_profile()
-  if validated_compiler_profile ~= nil then
-    return validated_compiler_profile ~= false and validated_compiler_profile or nil
-  end
-  local artifact = mod_data("more-infinite-research-compiler-profile")
-  if type(artifact) ~= "table" or not only_fields(artifact, {
-      schema = true, kind = true, profile = true, full_catalog_status = true,
-      supported_manifest_ids = true, unsupported_classes = true,
-      omitted_research_not_preserved = true, profile_fingerprint = true
-    }) or artifact.schema ~= 1 or artifact.kind ~= "mir-classic-profile-public"
-      or artifact.profile ~= "classic" or artifact.full_catalog_status ~= "not-evaluated"
-      or artifact.omitted_research_not_preserved ~= true
-      or not fingerprint_matches(artifact, "profile_fingerprint") then
-    validated_compiler_profile = false
-    return nil
-  end
-  local ids = sorted_unique_strings(artifact.supported_manifest_ids)
-  local unsupported = sorted_unique_strings(artifact.unsupported_classes)
-  if not ids or #ids > M.catalogue_limit or not unsupported
-      or not same_array(unsupported, CLASSIC_UNSUPPORTED_CLASSES) then
-    validated_compiler_profile = false
-    return nil
-  end
-  validated_compiler_profile = {
-    state = "available",
-    supported_manifest_ids = ids,
-    unsupported_classes = unsupported
-  }
-  return validated_compiler_profile
-end
-
--- Factorio 2.0 has no mod-data transport.  It can still establish the
--- declared direct identities that actually exist in the live force.  Native
--- continuation identities depend on the observed tail, so they are omitted
--- here rather than guessed from a declaration list.
-local function f200_classic_profile(force)
-  local declarations = require("prototypes.mir.domain.compiler.classic_declarations")
-  local ids = {}
-  for _, declaration in pairs(declarations.direct_streams or {}) do
-    local technology = force and force.technologies and force.technologies[declaration.technology_name]
-    if technology and technology.valid then table.insert(ids, declaration.manifest_id) end
-  end
-  table.sort(ids)
-  return {
-    state = "available",
-    supported_manifest_ids = ids,
-    unsupported_classes = copy_string_array(CLASSIC_UNSUPPORTED_CLASSES)
-  }
-end
-
-local function compiler_scope(force)
-  if not classic_profile_selected() then return nil end
-  if target_line.mod_data_supported() then
-    -- A modern classic selection without a sealed data-stage profile must be
-    -- made visible as unavailable.  It is never treated as an ordinary full
-    -- catalogue simply because its generation-plan artifact is absent.
-    return sealed_classic_profile() or {state = "unavailable"}
-  end
-  return f200_classic_profile(force)
-end
-
 function M.snapshot(force)
   local caps, families, details = {}, {}, {}
   local runtime_settings_bindings = live_runtime_settings_bindings(force)
   local candidates = current_public_candidates()
-  local scope = copy_compiler_scope(compiler_scope(force))
   if not candidates then
     return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families,
-      details = details, runtime_settings_bindings = runtime_settings_bindings, compiler_scope = scope}
+      details = details, runtime_settings_bindings = runtime_settings_bindings}
   end
   local policies = current_policy_caps()
   local count = 0
@@ -816,7 +722,7 @@ function M.snapshot(force)
     end
   end
   return {schema = M.schema, kind = "portable-research-enrichment", caps = caps, families = families,
-    details = details, runtime_settings_bindings = runtime_settings_bindings, compiler_scope = scope}
+    details = details, runtime_settings_bindings = runtime_settings_bindings}
 end
 
 -- A refresh of the research list never traverses live Force recipe bonuses.
@@ -842,8 +748,7 @@ function M.list_snapshot(force)
   end
   return {schema = M.schema, kind = "portable-research-enrichment", caps = caps,
     families = families, recipe_ids = recipe_ids_by_technology, details = {},
-    runtime_settings_bindings = runtime_settings_bindings,
-    compiler_scope = copy_compiler_scope(compiler_scope(force))}
+    runtime_settings_bindings = runtime_settings_bindings}
 end
 
 function M.selected_detail(force, technology_id)

@@ -1,10 +1,10 @@
 # More Infinite Research
 
-**MIR 4.3 compiler profiles — modern targets (1.0 and newer):** **Full** is the default and retains broad automatic research support with the performance optimizations in this update. **Classic** is an explicit reduced-support option. It offers five direct character bonuses and up to six validated native continuations, omitting broad automatic mod inference, material progression and recipe-productivity research. If you select Classic, previously generated research, levels, effects and progress outside this core are **not preserved**.
+**MIR 4.4.0 research generation:** approved research families use one generation path within the selected engine target's capabilities. Saved Full and Classic values no longer select different compilers; the reduced Classic implementation is retired.
 
-Before opening an existing factory that needs MIR 4.2 research, choose **Full** in the `mir-compiler-profile` startup setting, restart Factorio and load an untouched backup. Full may still load slowly. If Classic has already loaded the factory, quit without saving; selecting Full after a Classic resave cannot restore lost investment. Historical Factorio 0.x packages retain their existing reduced path.
+Keep an untouched backup before upgrading. Restoring applicable definitions cannot reconstruct levels, bonuses or progress already erased by saving with omitted technologies in 4.3.0 Classic. Use a pre-update backup where available. Loading time depends on the active mods. Historical Factorio 0.x packages retain their existing target capabilities.
 
-The catalogue and older release descriptions below document Full or earlier release behavior. They do not expand Classic's supported core. The matching release notes and exact package evidence identify the tested upgrade dispositions.
+The catalogue and older release descriptions below document earlier release behavior. The matching release notes and exact package evidence identify tested configurations and upgrade outcomes.
 
 [![Factorio Mod Portal downloads](https://img.shields.io/factorio-mod-portal/dt/more-infinite-research?style=flat-square&label=downloads)](https://mods.factorio.com/mod/more-infinite-research) [![Factorio Mod Portal version](https://img.shields.io/factorio-mod-portal/v/more-infinite-research?style=flat-square&label=mod%20version)](https://mods.factorio.com/mod/more-infinite-research) [![Factorio version](https://img.shields.io/factorio-mod-portal/factorio-version/more-infinite-research?style=flat-square&label=Factorio)](https://mods.factorio.com/mod/more-infinite-research) [![Last updated](https://img.shields.io/factorio-mod-portal/last-updated/more-infinite-research?style=flat-square)](https://mods.factorio.com/mod/more-infinite-research) [![Issues](https://img.shields.io/github/issues/Julesc013/more-infinite-research?style=flat-square)](https://github.com/Julesc013/more-infinite-research/issues) [![Validate](https://img.shields.io/github/actions/workflow/status/Julesc013/more-infinite-research/validate.yml?branch=main&style=flat-square&label=validate)](https://github.com/Julesc013/more-infinite-research/actions/workflows/validate.yml)
 
@@ -12,9 +12,9 @@ The catalogue and older release descriptions below document Full or earlier rele
 
 More Infinite Research adds **configurable infinite productivity** and **bonus research** for intermediate items, logistics chains, combat bonuses, player bonuses, and Space Age gaps that vanilla Factorio does not cover on supported modern target lines.
 
-**This MIR `4.2.x` package** targets **Factorio `2.0`** and requires `base >= 2.0.77`.
+**This MIR `4.4.0` package** targets **Factorio `2.0`** and requires `base >= 2.0.77`.
 
-### MIR 4.2.1 maintenance update
+### Historical MIR 4.2.1 maintenance update
 
 This update corrects Space Is Fake's Weapon shooting speed 7 and Lab research speed 7 ingredients, native braking-force scaling, zero-effect continuations, and acquisition checks for science and production. The Research Library adds localized recipe/material discovery and fixes view ownership and force-merge cache cleanup. It retains the accepted layout.
 
@@ -24,7 +24,7 @@ With Space Is Fake 1.0.60, this target retains earned low-density-structure, pla
 
 New material and Angel/Py declarations still require safe routes, available science, laboratories and compatible owners. A declaration is not a general compatibility guarantee. The matching release evidence defines the tested packages and environments; broader integrations and historical Library ports remain separate work.
 
-### Upgrading from published 4.2.0
+### Historical upgrade from published 4.2.0
 
 Source `v4.2.0-stable` uses target packages ending `00`; canonical `v4.2.1` uses `01`. Install the `01` package for the same Factorio target. Preserve original saves, keep startup values unchanged for the first load, and retain the package checksum for support. A private or previously withdrawn ZIP may share the new numeric version: replace those bytes explicitly with the matching published package and verify its checksum. A same-version file replacement does not itself rerun version-gated migrations or reset earned research.
 
