@@ -1,0 +1,103 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0164",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Instantiate approved research through one science binding path and retire installed acquisition and Classic alternatives.",
+  "details": [
+    "Bind source-owned and parameterized science declarations to actual typed recipes, unlocks and laboratory inputs; propagate finite research references without constructing factory-acquisition proofs.",
+    "Keep the existing catalogue, target adapters and authoritative emitter. Saved Full/Classic setting values share the same generation path; the former Classic generator and four science-discovery modules are excluded from player packages.",
+    "Unknown or ambiguous relevant bindings remain explicit. They neither invoke the retired solver nor silently remove established research; retained launch-policy exclusions are distinguished from physical impossibility.",
+    "Controlled graph, common-emitter and captured-prototype checks are source evidence. Actual destination upgrades, native performance and client behavior remain required before release."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "performance",
+    "science",
+    "settings"
+  ],
+  "audiences": [
+    "players",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Shared approved binding path and inert legacy compiler selector replace installed discovery alternatives; destination native acceptance remains required."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Shared approved binding path and inert legacy compiler selector replace installed discovery alternatives; destination native acceptance remains required."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Shared approved binding path and inert legacy compiler selector replace installed discovery alternatives; destination native acceptance remains required."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Shared approved binding path and inert legacy compiler selector replace installed discovery alternatives; destination native acceptance remains required."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapters retain their target-native research path; destination package and upgrade evidence remain required."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapters retain their target-native research path; destination package and upgrade evidence remain required."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapters retain their target-native research path; destination package and upgrade evidence remain required."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapters retain their target-native research path; destination package and upgrade evidence remain required."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapters retain their target-native research path; destination package and upgrade evidence remain required."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "unknown",
+    "settings": "compatible",
+    "migration": "unknown",
+    "compatibility": "unknown",
+    "public_contract": "changed",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tests/compiler/approved_pack_bindings.lua: finite graph and opposing source controls"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/approved_family_emission.lua: actual catalogue/common-emitter preservation"
+    },
+    {
+      "kind": "document",
+      "value": "docs/capabilities/science-integration.md"
+    }
+  ]
+}

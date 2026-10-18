@@ -16,6 +16,8 @@ local RECIPE_DOMAIN_FIELDS = {"facts", "names", "schema"}
 -- snapshots have broader recipe-derived closure and cannot be soundly
 -- rewritten by replacing one recipe map in place.
 local RECIPE_SNAPSHOT_STATE_NAMES = {
+  "approved_lab_bindings",
+  "approved_research_bindings",
   "relationship_indexes",
   "recipe_risk_index",
   "mod_progression_cache",

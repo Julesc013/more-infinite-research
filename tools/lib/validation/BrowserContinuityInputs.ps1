@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot '../compatibility/FactorioRunner.ps1')
 
 function Get-MIRBrowserContinuityReadmeSha256 {
-  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion,[string]$ReadmePath)
+  param([string]$RepositoryRoot,[ValidateSet('f210','f200')][string]$Target,[ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')][string]$SourceVersion,[string]$ReadmePath)
   . (Join-Path $RepositoryRoot 'tools/mir/application/package/TargetMaterializer.ps1')
   $Target=$Target.ToLowerInvariant()
   $state=Get-MIR4TargetMaterializerState -RepoRoot $RepositoryRoot -Target $Target
@@ -111,6 +111,20 @@ function Invoke-MIRBrowserContinuityGovernedRun {
   Write-MIRNativeProbeResult -Context $context -Record $result
   Write-Output "MIR_BROWSER_PERSONAL_STATE_CONTINUITY_RECEIPT=$receipt"
   Write-Output "MIR_BROWSER_CONTINUITY_GOVERNED_RESULT=$(Join-Path $context.root 'result.json')"
+}
+
+function Save-MIRBrowserContinuityCreateLog {
+  param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$WriteDataDirectory,[Parameter(Mandatory)][string]$Destination)
+  # Windows GUI builds always write this configured native log, but need not
+  # create a separate --console-log file. Preserve the actual completed launch.
+  $source=Join-Path $WriteDataDirectory 'factorio-current.log'
+  if(Test-Path -LiteralPath $Destination){throw '[mir-browser-continuity-create-log-preserved]'}
+  if(-not(Test-Path -LiteralPath $source -PathType Leaf)){throw '[mir-browser-continuity-create-log-missing]'}
+  $null=Assert-MIRLibraryLoadedSelection -Activation $Activation -LogPath $source
+  $before=Get-MIRImmutableInputSha256 $source
+  Copy-Item -LiteralPath $source -Destination $Destination
+  if((Get-MIRImmutableInputSha256 $source)-cne$before-or(Get-MIRImmutableInputSha256 $Destination)-cne$before){throw '[mir-browser-continuity-create-log-custody]'}
+  return $Destination
 }
 
 function New-MIRBrowserContinuityProfile {

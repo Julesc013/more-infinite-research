@@ -49,6 +49,17 @@ function Assert-MIRKnownStagingImpactRouting {
     $requiredCheck=if($path -match 'Test-MIR42F200SettingsCapTransition'){ 'static.f200-base-only-settings-cap-transition-harness' }elseif($path -match 'Test-MIR42V2V3CapMigration'){ 'static.f210-v2-v3-migration-inputs' }elseif($path -match 'Test-MIR4HistoricalPrivateRuntime'){ 'static.mir4-historical-runtime-inputs' }else{ 'static.immutable-input-staging' }
     if($classification.escalated-or$requiredCheck-notin$classification.tests){throw "Known staging path lost its consumed staging check: $path"}
   }
+  foreach($profile in @('k2-213-imersite-f210.json','k2-213-imersite-f210-422.json','k2-213-imersite-f210-440.json','k2-213-imersite-f210-460.json')){
+    $classification=Get-MIRAssuranceClassification -Paths @('fixtures/run-profiles/'+$profile) -Config $policy
+    foreach($required in @('static.upgrade-manifest-inputs','static.direct-library-activation')){
+      if($required-notin$classification.tests){throw "K2 exact input profile lost its consumed check: $profile / $required"}
+    }
+  }
+  $futureProfile=Get-MIRAssuranceClassification -Paths @('fixtures/run-profiles/k2-213-imersite-f210-461.json') -Config $policy
+  if('static.upgrade-manifest-inputs'-in$futureProfile.tests-or'static.direct-library-activation'-in$futureProfile.tests){
+    throw 'K2 exact input-profile routing silently admitted an unreviewed future source.'
+  }
+  Write-Host '[ok] retained and explicit 4.4 K2 profiles select upgrade/library checks; future versions are not silently admitted.'
   $browserFixtures=@(
     'tests/runtime/browser_fixture_data.lua',
     'tests/runtime/research_browser.lua',

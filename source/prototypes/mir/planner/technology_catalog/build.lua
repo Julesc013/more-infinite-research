@@ -3,11 +3,41 @@ local fingerprint = require("prototypes.mir.core.fingerprint")
 local technology_candidate = require("prototypes.mir.domain.technology.technology_candidate")
 local technology_qualification = require("prototypes.mir.domain.technology.technology_qualification")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local gate_contract = require("prototypes.mir.domain.technology.gate")
+local safety_qualification = require("prototypes.mir.domain.technology.safety_qualification")
 local selection_policy = require("prototypes.mir.planner.technology_selection_policy")
 local model = require("prototypes.mir.planner.technology_catalog.model")
 local validate = require("prototypes.mir.planner.technology_catalog.validate")
 
 local M = {}
+
+local function resolved_hard_gates(gates)
+  for _, gate_name in ipairs(safety_qualification.schema_authority().gate_order) do
+    if not gate_contract.is_authoritatively_resolved((gates or {})[gate_name]) then return false end
+  end
+  return true
+end
+
+local function initial_skip_deferment(row, candidate, primary, allowances)
+  if row.action ~= "skip" or primary.disposition ~= "rejected"
+    or primary.qualification_decision ~= "rejected"
+    or not resolved_hard_gates(row.gates)
+    or type(allowances) ~= "table" then
+    return nil
+  end
+  local selection_key = model.selection_key(row)
+  local allowance = allowances[selection_key]
+  if type(allowance) ~= "table"
+    or allowance.selection_key ~= selection_key
+    or allowance.reason ~= row.reason
+    or allowance.candidate_id ~= candidate.candidate_id
+    or allowance.design_fingerprint ~= primary.design_fingerprint
+    or allowance.hard_gates_resolved ~= true
+    or allowance.gates_fingerprint ~= fingerprint.of(row.gates) then
+    return nil
+  end
+  return allowance
+end
 
 local function append_qualified_alternative(candidate, qualifications, alternative_qualifications,
   design, row, action, disposition, options)
@@ -41,6 +71,7 @@ function M.from_preselection_rows(rows, context_material, options)
   local defer_diagnostic_alternatives = options.phase == "final"
     and options.defer_diagnostic_alternatives == true
   local deferred_diagnostic_alternatives = 0
+  local deferred_rejected_diagnostic_alternatives = 0
   for _, row in ipairs(rows or {}) do
     if options.phase == "final" then row = model.final_qualification_row(row) end
     local primary_design = row.technology_design or technology_design.from_generation_row(row)
@@ -76,9 +107,15 @@ function M.from_preselection_rows(rows, context_material, options)
     local defer_diagnostic = defer_diagnostic_alternatives
       and primary_disposition == "materialize"
       and primary.qualification_decision == "qualified"
+    local initial_skip_allowance = defer_diagnostic_alternatives
+      and initial_skip_deferment(row, candidate, primary, options.initial_skip_diagnostic_allowances)
     if defer_diagnostic then
       candidate.diagnostic_evaluation = model.deferred_diagnostic_evaluation(primary)
       deferred_diagnostic_alternatives = deferred_diagnostic_alternatives + 1
+    elseif initial_skip_allowance then
+      candidate.diagnostic_evaluation = model.deferred_rejected_diagnostic_evaluation(
+        primary, initial_skip_allowance.selection_key, initial_skip_allowance.reason)
+      deferred_rejected_diagnostic_alternatives = deferred_rejected_diagnostic_alternatives + 1
     else
       local diagnostic_design = technology_design.as_diagnostic_alternative(
         primary_design,
@@ -112,9 +149,10 @@ function M.from_preselection_rows(rows, context_material, options)
     qualifications = qualifications,
     alternative_qualifications = alternative_qualifications,
     alternative_evaluation = model.alternative_evaluation(
-      deferred_diagnostic_alternatives > 0
+      (deferred_diagnostic_alternatives > 0 or deferred_rejected_diagnostic_alternatives > 0)
           and "player-selected-primary-plus-required-fallbacks" or "full-diagnostics",
-      #alternative_qualifications, deferred_diagnostic_alternatives),
+      #alternative_qualifications, deferred_diagnostic_alternatives,
+      deferred_rejected_diagnostic_alternatives),
     current_selections = {},
     context_fingerprint = fingerprint.of(context_material or {}),
     mutation_authority = false,
@@ -140,9 +178,14 @@ function M.bind_selections(catalog, rows, options)
   if not options.trusted_owned then validate.verify_untrusted(catalog) end
   if not options.trusted_owned then model.authority.count_full_copy() end
   local result = options.trusted_owned and catalog or deepcopy(catalog)
-  local selections = selection_policy.select(result, rows)
+  local selections, selection_fingerprint, returned_copy_equivalent = selection_policy.select(result, rows)
   result.current_selections = selections
-  result.selection_fingerprint = fingerprint.of(selections)
+  -- The policy fingerprints its transient, locally constructed selection list
+  -- before returning the defensive copy. For scalar row reasons that copy has
+  -- identical canonical bytes. A non-scalar reason keeps the established
+  -- returned-copy traversal and its original mutation/error behavior.
+  result.selection_fingerprint = returned_copy_equivalent and selection_fingerprint
+    or fingerprint.of(selections)
   result.catalog_fingerprint = fingerprint.of(model.catalog_material(result))
   if not options.defer_validation then
     if options.trusted_owned then validate.assert_owned(result)

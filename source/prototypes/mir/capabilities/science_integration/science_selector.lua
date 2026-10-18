@@ -6,6 +6,7 @@ local recipes = require("prototypes.mir.capabilities.recipe_productivity.recipe_
 local recipe_unlock_facts = require("prototypes.mir.capabilities.science_integration.recipe_unlock_facts")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compatibility_policy = require("prototypes.mir.compatibility.policy_authority")
+local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 
 local M = {}
 
@@ -79,8 +80,84 @@ local STREAM_REQUIRED_PACKS = {
   research_platform = {"cryogenic-science-pack"}
 }
 
+-- The published Bob/Angel predecessor supplied the retained military-route
+-- gate for these semantic families. This is a family policy rather than a
+-- list of generated technology snapshots: each family still uses its ordinary
+-- declaration, emitter and selected science vector.
+local RETAINED_BOB_ANGEL_MILITARY_STREAMS = {
+  research_bullets = true,
+  research_grenades = true,
+  research_heavy_ammo = true,
+  research_rockets = true,
+  research_walls = true,
+  research_flamethrower_shooting_speed = true,
+  research_rocket_shooting_speed = true,
+  research_lab_productivity = true,
+  research_science_pack_productivity = true,
+  research_character_crafting_speed = true,
+  research_character_mining_speed = true,
+  research_character_reach = true,
+  research_character_walking_speed = true,
+  research_inventory_capacity = true
+}
+
 local function startup_setting(name)
   return effective_settings.get(name)
+end
+
+local function same_names(left, right)
+  if #left ~= #right then return false end
+  for index, name in ipairs(right) do
+    if left[index] ~= name then return false end
+  end
+  return true
+end
+
+-- This validates the narrow published-selection disposition against the
+-- current immutable input.  It uses the unified declared-reference facade,
+-- never an acquisition/proof solver: each route has an actual source recipe
+-- and direct unlock owner, and one actual bound laboratory accepts the whole
+-- relevant vector.  The result says nothing about whether excluded packs are
+-- physically producible.
+local function retained_bob_angel_422_selection_valid()
+  return compiler_context.current():state_view("retained_bob_angel_422_science_selection", function()
+    local expected = {
+      {pack = "automation-science-pack", recipe = "automation-science-pack", unlocker = "automation-science-pack"},
+      {pack = "logistic-science-pack", recipe = "logistic-science-pack", unlocker = "logistic-science-pack"},
+      {pack = "chemical-science-pack", recipe = "chemical-science-pack", unlocker = "chemical-science-pack"},
+      {pack = "production-science-pack", recipe = "production-science-pack", unlocker = "production-science-pack"},
+      {pack = "military-science-pack", recipe = "military-science-pack", unlocker = "military-science-pack"},
+      {pack = "utility-science-pack", recipe = "utility-science-pack", unlocker = "utility-science-pack"},
+      {pack = "angels-token-bio", recipe = "angels-temperate-garden-a", unlocker = "angels-gardens"}
+    }
+    local accepting_vector = {}
+    for _, source in ipairs(expected) do
+      if not science.science_pack_exists(source.pack) then return false end
+      accepting_vector[#accepting_vector + 1] = source.pack
+      local route = science.production_route_for_pack(source.pack)
+      if not route or route.recipe_name ~= source.recipe or route.unlocker ~= source.unlocker
+        or not same_names(route.unlockers or {}, {source.unlocker}) then return false end
+    end
+    return science.any_lab_accepts_all(accepting_vector)
+      and science.technology_is_researchable("angels-water-treatment")
+      and science.technology_is_researchable("angels-gardens")
+  end)
+end
+
+local function retained_role_is_valid(role)
+  if role.retained_selection == nil then return true end
+  if role.retained_selection == "bob-angel-422" then return retained_bob_angel_422_selection_valid() end
+  return false
+end
+
+local function excludes_for_policy(role, key, policy)
+  if role.role ~= "exclude" then return false end
+  if role.configured_only == true and policy ~= "configured" then return false end
+  return retained_role_is_valid(role)
+end
+
+local function policy_roles_for_stream(key)
+  return compatibility_policy.science_roles_for_stream(key)
 end
 
 local function add_if_science_pack_exists(list, name)
@@ -144,12 +221,13 @@ local function science_from_unlocks(key, spec)
   return out
 end
 
-local function apply_science_exclusions(ingredients, key)
+local function apply_science_exclusions(ingredients, key, policy)
   if not key then return ingredients end
+  policy = policy or startup_setting("mir-science-pack-ingredient-policy") or "configured"
   local required, denied = {}, {}
   for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
-  for _, role in ipairs(compatibility_policy.science_roles_for_stream(key)) do
-    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
+  for _, role in ipairs(policy_roles_for_stream(key)) do
+    if excludes_for_policy(role, key, policy) and not required[role.pack] then denied[role.pack] = true end
   end
   local out = {}
   for _, ingredient in ipairs(ingredients or {}) do
@@ -163,7 +241,7 @@ function M.apply_science_pack_ingredient_policy(ingredients, key)
   if policy == "configured" then
     -- Preserve configured ingredients inside the compatibility contract,
     -- without loading optional ingredient expansion policies.
-    return apply_science_exclusions(deepcopy(ingredients or {}), key)
+    return apply_science_exclusions(deepcopy(ingredients or {}), key, policy)
   end
 
   local out, seen = {}, {}
@@ -205,7 +283,7 @@ function M.apply_science_pack_ingredient_policy(ingredients, key)
     end
   end
 
-  return apply_science_exclusions(out, key)
+  return apply_science_exclusions(out, key, policy)
 end
 
 function M.pick_science_for_stream(spec, key)
@@ -242,9 +320,10 @@ function M.pick_science_for_stream(spec, key)
   local denied = {}
   local required = {}
   for _, pack in ipairs(STREAM_REQUIRED_PACKS[key] or {}) do required[pack] = true end
-  local policy_roles = compatibility_policy.science_roles_for_stream(key)
+  local policy = startup_setting("mir-science-pack-ingredient-policy") or "configured"
+  local policy_roles = policy_roles_for_stream(key)
   for _, role in ipairs(policy_roles) do
-    if role.role == "exclude" and not required[role.pack] then denied[role.pack] = true end
+    if excludes_for_policy(role, key, policy) and not required[role.pack] then denied[role.pack] = true end
   end
   for _, role in ipairs(policy_roles) do
     if role.role ~= "exclude" and not denied[role.pack] then add_if_science_pack_exists(packs, role.pack) end
@@ -284,6 +363,28 @@ end
 
 function M.required_science_packs_for_stream(key)
   return deepcopy(STREAM_REQUIRED_PACKS[key] or {})
+end
+
+-- The predecessor's selected military route supplied this progression gate.
+-- Keep it only when the validated configured retention policy selected
+-- military science; this is distinct from asserting that any other pack is
+-- unreachable or changing a player-selected ingredient policy.
+function M.retained_prerequisites_for_stream(key, selected)
+  if (startup_setting("mir-science-pack-ingredient-policy") or "configured") ~= "configured" then return {} end
+  if not RETAINED_BOB_ANGEL_MILITARY_STREAMS[key] then return {} end
+  local applies = false
+  for _, role in ipairs(policy_roles_for_stream(key)) do
+    if role.retained_selection == "bob-angel-422"
+      and excludes_for_policy(role, key, "configured") then
+      applies = true
+      break
+    end
+  end
+  if not applies then return {} end
+  for _, ingredient in ipairs(selected or {}) do
+    if ingredient_name(ingredient) == "military-science-pack" then return {"angels-water-treatment"} end
+  end
+  return {}
 end
 
 -- Science-pack productivity is meaningful only at the currently selected

@@ -5,6 +5,26 @@ local M = {}
 
 local ACTION_RANK = {adopt = 10, emit = 20, diagnose = 90}
 
+local function deferred_rejected_primary(candidate, row)
+  local evaluation = candidate.diagnostic_evaluation or {}
+  if row.action ~= "skip" or evaluation.state ~= "deferred-initial-skip-rejected-primary"
+    or evaluation.selection_key ~= candidate.selection_key
+    or evaluation.reason ~= row.reason then
+    return nil
+  end
+  for _, alternative in ipairs(candidate.alternatives or {}) do
+    if alternative.alternative_id == evaluation.primary_alternative_id
+      and alternative.action == "reject"
+      and alternative.disposition == "rejected"
+      and alternative.qualification_decision == "rejected"
+      and alternative.design_fingerprint == evaluation.primary_design_fingerprint
+      and alternative.qualification_fingerprint == evaluation.primary_qualification_fingerprint then
+      return alternative, evaluation
+    end
+  end
+  return nil
+end
+
 local function selected_alternative(candidate, requested_action, allow_proposals)
   local qualified = {}
   for _, alternative in ipairs(candidate.alternatives or {}) do
@@ -30,25 +50,47 @@ local function select(catalog, rows, allow_proposals)
     rows_by_key[tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)] = row
   end
   local selections = {}
+  -- Selection records are constructed locally. The only value copied from a
+  -- planning row is reason; record whether it is scalar so the catalog can
+  -- safely reuse the fingerprint captured before this function's defensive
+  -- selection copy. Non-scalar reasons retain the existing returned-copy hash.
+  local returned_copy_equivalent = true
   for _, candidate in ipairs(catalog.candidates or {}) do
     local row = rows_by_key[candidate.selection_key]
     if not row then error("SelectionPolicy candidate lacks a planning row: " .. candidate.selection_key, 2) end
     local requested = (row.action == "emit" or row.action == "adopt") and row.action or "diagnose"
     local selected = selected_alternative(candidate, requested, allow_proposals)
+    local deferred_rejection
+    if not selected then selected, deferred_rejection = deferred_rejected_primary(candidate, row) end
     if not selected then error("SelectionPolicy candidate has no qualified alternative: " .. candidate.candidate_id, 2) end
-    table.insert(selections, {
+    -- Read once at the original selection-construction boundary. A foreign row
+    -- may have a metatable, so do not add a second __index observation.
+    local reason = row.reason
+    if reason ~= nil and type(reason) ~= "string" then returned_copy_equivalent = false end
+    local selection = {
       selection_key = candidate.selection_key,
       candidate_id = candidate.candidate_id,
       alternative_id = selected.alternative_id,
       action = selected.action,
-      reason = row.reason,
+      reason = reason,
       design_fingerprint = selected.design_fingerprint,
       qualification_fingerprint = selected.qualification_fingerprint,
       policy = "stable-owner-promoted-diagnostic-v1"
-    })
+    }
+    if deferred_rejection then
+      selection.deferred_rejection = {
+        state = deferred_rejection.state,
+        selection_key = deferred_rejection.selection_key,
+        reason = deferred_rejection.reason,
+        primary_alternative_id = deferred_rejection.primary_alternative_id,
+        primary_design_fingerprint = deferred_rejection.primary_design_fingerprint,
+        primary_qualification_fingerprint = deferred_rejection.primary_qualification_fingerprint
+      }
+    end
+    table.insert(selections, selection)
   end
   table.sort(selections, function(left, right) return left.candidate_id < right.candidate_id end)
-  return deepcopy(selections), fingerprint.of(selections)
+  return deepcopy(selections), fingerprint.of(selections), returned_copy_equivalent
 end
 
 function M.select_prequalification(catalog, rows)
@@ -60,8 +102,10 @@ function M.select_final(catalog, rows)
 end
 
 function M.select(catalog, rows)
-  return catalog.phase == "final" and M.select_final(catalog, rows)
-    or M.select_prequalification(catalog, rows)
+  -- Preserve all results from the chosen producer: the catalog consumes the
+  -- first defensive copy and, when safe, its companion fingerprint.
+  if catalog.phase == "final" then return M.select_final(catalog, rows) end
+  return M.select_prequalification(catalog, rows)
 end
 
 function M.assert_generation_projection(selections, rows)
@@ -71,7 +115,8 @@ function M.assert_generation_projection(selections, rows)
     local key = tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)
     local selection = by_key[key]
     if not selection then error("SelectionPolicy projection lacks a selection: " .. key, 2) end
-    local projected = selection.action == "diagnose" and "skip" or selection.action
+    local projected = (selection.action == "diagnose" or selection.action == "reject")
+      and "skip" or selection.action
     if projected ~= row.action then
       error("SelectionPolicy projection differs from GenerationPlan: " .. key
         .. " selected=" .. tostring(selection.action) .. " row=" .. tostring(row.action), 2)
@@ -79,6 +124,12 @@ function M.assert_generation_projection(selections, rows)
     if row.technology_design and selection.design_fingerprint ~= row.technology_design.design_fingerprint
       and row.action ~= "skip" then
       error("SelectionPolicy design differs from GenerationPlan: " .. key, 2)
+    end
+    if selection.action == "reject" and (row.action ~= "skip"
+      or type(selection.deferred_rejection) ~= "table"
+      or selection.deferred_rejection.selection_key ~= key
+      or selection.deferred_rejection.reason ~= row.reason) then
+      error("SelectionPolicy deferred rejection differs from GenerationPlan: " .. key, 2)
     end
   end
   local row_count = #(rows or {})

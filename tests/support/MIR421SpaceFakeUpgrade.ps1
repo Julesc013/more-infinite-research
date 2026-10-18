@@ -10,10 +10,12 @@ function Assert-MIR42CompleteCatalogueUpgradeMarker {
 function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100')][string]$Target,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.1',
+    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion='4.2.1',
     [AllowEmptyString()][string]$FromVersion='',
     [switch]$SpaceIsFake,
     [switch]$SpaceAge,
+    [switch]$F200GaloreSpaceAge,
+    [switch]$F200BobAngel,
     [switch]$HistoricalSettingsOracle)
   # Only the disposable prepared fixture changes. Identity includes the
   # predecessor when 4.2.2 tests both CCC00 -> CCC02 and CCC01 -> CCC02:
@@ -21,27 +23,133 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
   # archive name/version.
   if($SpaceIsFake -and $Target -cnotin @('f210','f200')){throw '[mir421-sif-target]'}
   if($SpaceAge -and ($SpaceIsFake -or $Target-cne'f210')){throw '[mir422-space-age-fixture-target]'}
+  if($F200GaloreSpaceAge-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$HistoricalSettingsOracle)){throw '[mir431-f200-galore-fixture-target]'}
+  if($F200BobAngel-and($Target-cne'f200'-or$SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){throw '[mir423-f200-bob-angel-fixture-target]'}
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
   $sourcePatch=$source.Build
   if([string]::IsNullOrWhiteSpace($FromVersion)){
-    $FromVersion=if($source.Minor-eq3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
+    $FromVersion=if($source.Minor-ge3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
   }
   # Published 4.1.20000 is a deliberately narrow, independently authenticated
   # F200 predecessor for the 4.3.0 Full preservation fixture. It receives a
   # distinct disposable fixture version and is never a 4.2 maintenance row.
   $published410F200=[bool]($Target-ceq'f200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and-not$SpaceIsFake-and-not$SpaceAge-and-not$HistoricalSettingsOracle)
-  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3)[.]'+$code+'(?<patch>00|01|02)$'))
+  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5|6)[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$published410F200-and-not$fromMatch.Success){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromMinor=if($fromMatch.Success){[int]$fromMatch.Groups['minor'].Value}else{1}
   $fromPatch=if($fromMatch.Success){[int]$fromMatch.Groups['patch'].Value}else{0}
+  $published431Predecessor=[bool]($SourceVersion-ceq'4.3.1'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq3-and$fromPatch-eq0)))
+  $published440Predecessor=[bool]($SourceVersion-ceq'4.4.0'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq3-and$fromPatch-eq0)))
+  $published442Predecessor=[bool]($SourceVersion-ceq'4.4.2'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq4-and$fromPatch-in@(0,1))))
+  # 4.5.0 has two separately pinned published predecessor lanes: corrected
+  # R24 and direct published 4.2.2.  Do not infer a retained lane from their
+  # numeric neighbourhood.
+  $published450Predecessor=[bool]($SourceVersion-ceq'4.5.0'-and(
+    ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq2-and$fromPatch-eq2)))
+  $published452Predecessor=[bool]($SourceVersion-ceq'4.5.2'-and$Target-cin@('f210','f200','f110','f100')-and(
+    ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq5-and$fromPatch-eq1)))
+  # V13 admits exactly the published final V12 same-target predecessor.
+  $published460Predecessor=[bool]($SourceVersion-ceq'4.6.0'-and$Target-cin@('f210','f200','f110','f100')-and$fromMinor-eq5-and$fromPatch-eq2)
   if(-not$published410F200-and(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
-     ($source.Minor-eq3-and($fromMinor-ne2-or$fromPatch-gt2)))){throw '[mir42-upgrade-fixture-predecessor]'}
+     ($SourceVersion-ceq'4.3.0'-and($fromMinor-ne2-or$fromPatch-gt2)) -or
+     ($SourceVersion-ceq'4.3.1'-and-not$published431Predecessor) -or
+     ($SourceVersion-ceq'4.4.0'-and-not$published440Predecessor)-or
+     ($SourceVersion-ceq'4.4.2'-and-not$published442Predecessor)-or
+     ($SourceVersion-ceq'4.5.0'-and-not$published450Predecessor)-or
+     ($SourceVersion-ceq'4.5.2'-and-not$published452Predecessor)-or
+     ($SourceVersion-ceq'4.6.0'-and-not$published460Predecessor))){throw '[mir42-upgrade-fixture-predecessor]'}
   if($HistoricalSettingsOracle-and($Target-cne'f210'-or$SourceVersion-cne'4.2.3'-or$FromVersion-cne'4.2.21000'-or-not$SpaceAge-or$SpaceIsFake)){
     throw '[mir423-f210-settings-oracle-transition]'
   }
   $direct420To422=$SourceVersion-ceq'4.2.2'-and$fromPatch-eq0
-  $fixtureVersion=if($published410F200){'0.1.49'}elseif($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
+  $fixtureVersion=if($Target-ceq'f210'-and$SourceVersion-ceq'4.6.0'){
+    if($FromVersion-cne'4.5.21002'){throw '[mir460-f210-fixture-transition]'}
+    if($SpaceAge){'0.1.1131'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1130'}else{throw '[mir460-f210-fixture-transition]'}
+  }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.6.0'){
+    if($FromVersion-cne'4.5.20002'){throw '[mir460-f200-fixture-transition]'}
+    if($F200BobAngel-and-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){'0.1.1136'}
+    elseif($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1133'}
+    elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1132'}
+    else{throw '[mir460-f200-fixture-transition]'}
+  }elseif($Target-cin@('f110','f100')-and$SourceVersion-ceq'4.6.0'){
+    if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir460-historical-modern-fixture-transition]'}
+    switch($Target+'/'+$FromVersion){
+      'f110/4.5.11002'{'0.1.1134'}
+      'f100/4.5.10002'{'0.1.1135'}
+      default{throw '[mir460-historical-modern-fixture-transition]'}
+    }
+  }elseif($Target-ceq'f210'-and$SourceVersion-ceq'4.5.2'){
+    if($FromVersion-ceq'4.4.21002'){
+      if($SpaceAge){'0.1.1121'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1120'}else{throw '[mir452-f210-fixture-transition]'}
+    }elseif($FromVersion-ceq'4.5.21001'){
+      if($SpaceAge){'0.1.1123'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1122'}else{throw '[mir452-f210-fixture-transition]'}
+    }else{throw '[mir452-f210-fixture-transition]'}
+  }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.5.2'){
+    if($FromVersion-ceq'4.4.20002'){
+      if($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1140'}
+      elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1124'}
+      else{throw '[mir452-f200-fixture-transition]'}
+    }elseif($FromVersion-ceq'4.5.20001'){
+      if($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1141'}
+      elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1125'}
+      else{throw '[mir452-f200-fixture-transition]'}
+    }else{throw '[mir452-f200-fixture-transition]'}
+  }elseif($Target-cin@('f110','f100')-and$SourceVersion-ceq'4.5.2'){
+    if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir452-historical-modern-fixture-transition]'}
+    switch($Target+'/'+$FromVersion){
+      'f110/4.4.11002'{'0.1.1126'}
+      'f110/4.5.11001'{'0.1.1127'}
+      'f100/4.4.10002'{'0.1.1128'}
+      'f100/4.5.10001'{'0.1.1129'}
+      default{throw '[mir452-historical-modern-fixture-transition]'}
+    }
+  }elseif($Target-ceq'f210'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-ceq'4.4.21002'){
+      if($SpaceAge){'0.1.1101'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1100'}else{throw '[mir450-f210-fixture-transition]'}
+    }elseif($FromVersion-ceq'4.2.21002'){
+      if($SpaceAge){'0.1.1111'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1110'}else{throw '[mir450-f210-fixture-transition]'}
+    }else{throw '[mir450-f210-fixture-transition]'}
+  }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-ceq'4.4.20002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f200-fixture-transition]'}
+      '0.1.1102'
+    }elseif($FromVersion-ceq'4.2.20002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f200-fixture-transition]'}
+      '0.1.1112'
+    }else{throw '[mir450-f200-fixture-transition]'}
+  }elseif($Target-ceq'f110'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-ceq'4.4.11002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f110-fixture-transition]'}
+      '0.1.1103'
+    }elseif($FromVersion-ceq'4.2.11002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f110-fixture-transition]'}
+      '0.1.1113'
+    }else{throw '[mir450-f110-fixture-transition]'}
+  }elseif($Target-ceq'f100'-and$SourceVersion-ceq'4.5.0'){
+    if($FromVersion-ceq'4.4.10002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f100-fixture-transition]'}
+      '0.1.1104'
+    }elseif($FromVersion-ceq'4.2.10002'){
+      if($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle){throw '[mir450-f100-fixture-transition]'}
+      '0.1.1114'
+    }else{throw '[mir450-f100-fixture-transition]'}
+  }elseif($F200BobAngel-and$SourceVersion-ceq'4.4.2'){
+    if($FromVersion-ceq'4.4.20000'){'0.1.1086'}elseif($FromVersion-ceq'4.4.20001'){'0.1.1087'}elseif($FromVersion-ceq'4.2.20002'){'0.1.1089'}else{throw '[mir423-f200-bob-angel-fixture-transition]'}
+  }elseif($F200GaloreSpaceAge){
+    if($SourceVersion-ceq'4.3.1'){
+      if($FromVersion-ceq'4.3.20000'){'0.1.50'}elseif($FromVersion-ceq'4.2.20002'){'0.1.51'}else{throw '[mir431-f200-galore-fixture-transition]'}
+    }elseif($SourceVersion-ceq'4.4.0'){
+      if($FromVersion-ceq'4.3.20000'){'0.1.52'}elseif($FromVersion-ceq'4.2.20002'){'0.1.53'}else{throw '[mir431-f200-galore-fixture-transition]'}
+    }elseif($SourceVersion-ceq'4.4.2'){
+      if($FromVersion-ceq'4.4.20000'){'0.1.1076'}elseif($FromVersion-ceq'4.4.20001'){'0.1.1077'}elseif($FromVersion-ceq'4.2.20002'){'0.1.1078'}else{throw '[mir431-f200-galore-fixture-transition]'}
+    }else{throw '[mir431-f200-galore-fixture-transition]'}
+  }elseif($Target-ceq'f210'-and$SpaceAge-and$SourceVersion-ceq'4.4.2'){
+    if($FromVersion-ceq'4.4.21000'){'0.1.1096'}elseif($FromVersion-ceq'4.4.21001'){'0.1.1097'}elseif($FromVersion-ceq'4.2.21002'){'0.1.1098'}else{throw '[mir422-space-age-fixture-transition]'}
+  }elseif($published410F200){'0.1.49'}elseif($source.Minor-eq3){'0.1.'+(40+3*$sourcePatch+$fromPatch)}elseif($Target-cin@('f210','f200')-and$SourceVersion-ceq'4.4.2'){'0.1.'+(1060+3*$sourcePatch+$fromPatch)}elseif($source.Minor-eq4){'0.1.'+(60+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'0.1.'+(30+$fromPatch)}elseif($direct420To422){if($SpaceIsFake){'0.1.7'}elseif($SpaceAge){'0.1.17'}else{'0.1.6'}}elseif($SpaceIsFake){if($SourceVersion-ceq'4.2.2'){'0.1.3'}else{'0.1.0'}}elseif($SpaceAge){if($SourceVersion-ceq'4.2.2'){'0.1.16'}else{'0.1.4'}}elseif($SourceVersion-ceq'4.2.2'){'0.1.2'}else{'0.1.1'}
   if($HistoricalSettingsOracle){$fixtureVersion='0.1.33'}
   if($Target-ceq'f210'-and$SourceVersion-ceq'4.2.2'-and-not$SpaceAge){
     $fixtureVersion=if($direct420To422){if($SpaceIsFake){'0.1.20'}else{'0.1.18'}}else{if($SpaceIsFake){'0.1.21'}else{'0.1.19'}}
@@ -119,8 +227,19 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $fromMatch=[regex]::Match($FromVersion,'^4[.]2[.]200(?<patch>00|01|02)$')
   $legacyTransition=$toMatch.Success-and$fromMatch.Success-and([int]$fromMatch.Groups['patch'].Value-lt[int]$toMatch.Groups['patch'].Value)
   $crossMinorTransition=[regex]::IsMatch($ToVersion,'^4[.]3[.]200(?:00|01)$')-and[regex]::IsMatch($FromVersion,'^4[.]2[.]200(?:00|01|02)$')
+  $published430Maintenance=$FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.3.20001'
+  $direct422To440=$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20000'
+  $published430To440=$FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.4.20000'
+  $direct422To442=$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002'
+  $retained440To442=$FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002'
+  $published441To442=$FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002'
+  $published442To450=$FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20000'
+  $direct422To450=$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.5.20000'
+  $published442To452=$FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20002'
+  $published451To452=$FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002'
+  $published452To460=$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000'
   $published410Transition=$ToVersion-ceq'4.3.20000'-and$FromVersion-ceq'4.1.20000'
-  if(-not($legacyTransition-or$crossMinorTransition-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
+  if(-not($legacyTransition-or$crossMinorTransition-or$published430Maintenance-or$direct422To440-or$published430To440-or$direct422To442-or$retained440To442-or$published441To442-or$published442To450-or$direct422To450-or$published442To452-or$published451To452-or$published452To460-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
   # Reuse the complete canonical oracle. Only its private native test copy is
   # adapted to F200 base research; Space Age-only expected rows do not exist in
   # that environment. Every observed technology, recipe and force still compares.
@@ -139,13 +258,18 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $control=$control.Replace('if to_version == "4.2.21002" then','if to_version == "'+$ToVersion+'" then')
   $control=$control.Replace('complete Space Age state retained','complete research state retained')
   $control=$control.Replace('mir-4121000-upgraded',('mir-'+$ToVersion.Replace('.','')+'-upgraded'))
-  if($ToVersion -match '^4[.]3[.]200(?:00|01)$') {
+  if($ToVersion -match '^4[.](?:3[.]200(?:00|01)|4[.]200(?:00|02)|5[.]200(?:00|02)|6[.]20000)$') {
     # Only the newly introduced, preservation-capable selector is admitted.
     # Source snapshots stay unchanged; all old settings and all research
     # definitions/investment still pass through the complete equality oracle.
     $settingAnchor='local added_422_setting_defaults = {}'
     if(-not $control.Contains($settingAnchor)){throw '[mir430-full-upgrade-setting-anchor]'}
-    $control=$control.Replace($settingAnchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+    $settingDefaults=if($ToVersion-cin@('4.4.20002','4.5.20000','4.5.20002','4.6.20000')){
+      'local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}'
+    }else{
+      'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}'
+    }
+    $control=$control.Replace($settingAnchor,$settingDefaults)
   }
   if($ToVersion -match '^4[.]2[.]') {
   $reviewed=@'
@@ -247,25 +371,74 @@ function Read-MIR430Published410F200ReleaseInput {
 function Set-MIR42HistoricalMaintenanceUpgradeFixtureIdentity {
   param([Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion,
     [AllowEmptyString()][string]$FromVersion='')
   $code=$Target.Substring(1)
   $source=[version]$SourceVersion
   $sourcePatch=$source.Build
   if([string]::IsNullOrWhiteSpace($FromVersion)){
-    $FromVersion=if($source.Minor-eq3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
+    $FromVersion=if($source.Minor-ge3){'4.2.'+$code+'02'}else{'4.2.'+$code+($sourcePatch-1).ToString('00')}
   }
-  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3)[.]'+$code+'(?<patch>00|01|02)$'))
+  $fromMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5|6)[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$fromMatch.Success){throw '[mir42-upgrade-fixture-predecessor]'}
   $fromMinor=[int]$fromMatch.Groups['minor'].Value
   $fromPatch=[int]$fromMatch.Groups['patch'].Value
+  $published431Predecessor=[bool]($SourceVersion-ceq'4.3.1'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq3-and$fromPatch-eq0)))
+  $published440Predecessor=[bool]($SourceVersion-ceq'4.4.0'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq3-and$fromPatch-eq0)))
+  $published442Predecessor=[bool]($SourceVersion-ceq'4.4.2'-and(
+    ($fromMinor-eq2-and$fromPatch-eq2)-or($fromMinor-eq4-and$fromPatch-in@(0,1))))
+  $published450HistoricalPredecessor=[bool]($SourceVersion-ceq'4.5.0'-and$Target-cin@('f017','f016','f015','f014','f013')-and(
+    ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq2-and$fromPatch-eq2)))
+  $published452HistoricalPredecessor=[bool]($SourceVersion-ceq'4.5.2'-and$Target-cin@('f017','f016','f015','f014','f013')-and(
+    ($fromMinor-eq4-and$fromPatch-eq2)-or($fromMinor-eq5-and$fromPatch-eq1)))
+  # V13 binds only its same-target public V12 predecessor.
+  $published460HistoricalPredecessor=[bool]($SourceVersion-ceq'4.6.0'-and$Target-cin@('f017','f016','f015','f014','f013')-and$fromMinor-eq5-and$fromPatch-eq2)
   if(($source.Minor-eq2-and($fromMinor-ne2-or$fromPatch-ge$sourcePatch)) -or
-     ($source.Minor-eq3-and($fromMinor-ne2-or$fromPatch-gt2))){throw '[mir42-upgrade-fixture-predecessor]'}
+     ($SourceVersion-ceq'4.3.0'-and($fromMinor-ne2-or$fromPatch-gt2)) -or
+     ($SourceVersion-ceq'4.3.1'-and-not$published431Predecessor) -or
+     ($SourceVersion-ceq'4.4.0'-and-not$published440Predecessor)-or
+     ($SourceVersion-ceq'4.4.2'-and-not$published442Predecessor)-or
+     ($SourceVersion-ceq'4.5.0'-and-not$published450HistoricalPredecessor)-or
+     ($SourceVersion-ceq'4.5.2'-and-not$published452HistoricalPredecessor)-or
+     ($SourceVersion-ceq'4.6.0'-and-not$published460HistoricalPredecessor)){throw '[mir42-upgrade-fixture-predecessor]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $path=Join-Path $directory 'info.json'
   Assert-MIRLibraryPath $path
   $info=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -DateKind String
-  $fixtureVersion=if($source.Minor-eq3){'1.0.'+(20+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
+  # The complete-state oracle is packaged inside every historical fixture. Its
+  # 4.4.2 F016 predecessor corrections change those fixture bytes. Keep the
+  # immutable 1.0.46/.47/.48 archives and use the independent 1.1.46/.47/.48
+  # oracle-content revision, avoiding the future 1.0 patch-version series.
+  $fixtureVersion=if($source.Minor-eq3){'1.0.'+(20+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.4.2'){'1.1.'+(46+$fromPatch)}elseif($SourceVersion-ceq'4.5.0'){
+    if($fromMinor-eq4){switch($Target){'f017'{'1.2.1103'}'f016'{'1.2.1104'}'f015'{'1.2.1102'}'f014'{'1.2.1105'}'f013'{'1.2.1106'}default{throw '[mir450-historical-fixture-transition]'}}
+    }elseif($fromMinor-eq2){switch($Target){'f017'{'1.2.1113'}'f016'{'1.2.1114'}'f015'{'1.2.1112'}'f014'{'1.2.1115'}'f013'{'1.2.1116'}default{throw '[mir450-historical-fixture-transition]'}}
+    }else{throw '[mir450-historical-fixture-transition]'}
+  }elseif($SourceVersion-ceq'4.6.0'){
+    switch($Target+'/'+$FromVersion){
+      'f017/4.5.01702'{'1.2.1140'}
+      'f016/4.5.01602'{'1.2.1141'}
+      'f015/4.5.01502'{'1.2.1142'}
+      'f014/4.5.01402'{'1.2.1143'}
+      'f013/4.5.01302'{'1.2.1144'}
+      default{throw '[mir460-historical-fixture-transition]'}
+    }
+  }elseif($SourceVersion-ceq'4.5.2'){
+    switch($Target+'/'+$FromVersion){
+      'f017/4.4.01702'{'1.2.1130'}
+      'f017/4.5.01701'{'1.2.1131'}
+      'f016/4.4.01602'{'1.2.1132'}
+      'f016/4.5.01601'{'1.2.1133'}
+      'f015/4.4.01502'{'1.2.1134'}
+      'f015/4.5.01501'{'1.2.1135'}
+      'f014/4.4.01402'{'1.2.1136'}
+      'f014/4.5.01401'{'1.2.1137'}
+      'f013/4.4.01302'{'1.2.1138'}
+      'f013/4.5.01301'{'1.2.1139'}
+      default{throw '[mir452-historical-fixture-transition]'}
+    }
+  }elseif($source.Minor-eq4){'1.0.'+(40+3*$sourcePatch+$fromPatch)}elseif($SourceVersion-ceq'4.2.3'){'1.0.'+(8+$fromPatch)}elseif($SourceVersion-ceq'4.2.2'){if($fromPatch-eq0){'1.0.6'}else{'1.0.7'}}else{'1.0.'+$sourcePatch}
   $line='0.'+[int]$Target.Substring(1)
   if($info.name-cne'mir-fixture-assert-upgrade-historical-terminal-to-mir42'-or
     $info.factorio_version-cne$line-or$info.version-cnotin@('1.0.0',$fixtureVersion)){
@@ -308,17 +481,42 @@ function Set-MIR422HistoricalCompleteStateUpgradeOracle {
 
 function Set-MIR430FullCompilerProfileUpgradeAllowance {
   param(
-    [Parameter(Mandatory)][ValidateSet('f210','f110','f100')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('f210','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
     [Parameter(Mandatory)][string]$FixtureDirectory,
     [Parameter(Mandatory)][string]$FromVersion,
     [Parameter(Mandatory)][string]$ToVersion,
     [switch]$BaseDefaultCompleteState
   )
   $code=$Target.Substring(1)
-  if($FromVersion-cnotin@("4.2.${code}00","4.2.${code}01","4.2.${code}02")-or$ToVersion-cnotin@("4.3.${code}00","4.3.${code}01")){
+  $crossMinorTransition=$FromVersion-cin@("4.2.${code}00","4.2.${code}01","4.2.${code}02")-and$ToVersion-cin@("4.3.${code}00","4.3.${code}01")
+  $published430Maintenance=$FromVersion-ceq("4.3.${code}00")-and$ToVersion-ceq("4.3.${code}01")
+  $published430To440=$FromVersion-ceq("4.3.${code}00")-and$ToVersion-ceq("4.4.${code}00")
+  $direct422To440=$FromVersion-ceq("4.2.${code}02")-and$ToVersion-ceq("4.4.${code}00")
+  $direct422To442=$FromVersion-ceq("4.2.${code}02")-and$ToVersion-ceq("4.4.${code}02")
+  $retained440To442=$FromVersion-ceq("4.4.${code}00")-and$ToVersion-ceq("4.4.${code}02")
+  $published441To442=$FromVersion-ceq("4.4.${code}01")-and$ToVersion-ceq("4.4.${code}02")
+  # R24 and direct published 4.2.2 have distinct pinned 4.5 Full settings
+  # transitions. No retained or alternate patch is inferred.
+  $published442To450=$Target-ceq'f210'-and$FromVersion-ceq'4.4.21002'-and$ToVersion-ceq'4.5.21000'
+  $direct422To450=$FromVersion-ceq("4.2.${code}02")-and$ToVersion-ceq("4.5.${code}00")
+  $published442To452=$Target-ceq'f210'-and$FromVersion-ceq'4.4.21002'-and$ToVersion-ceq'4.5.21002'
+  $published451To452=$Target-ceq'f210'-and$FromVersion-ceq'4.5.21001'-and$ToVersion-ceq'4.5.21002'
+  $published452To460=$Target-ceq'f210'-and$FromVersion-ceq'4.5.21002'-and$ToVersion-ceq'4.6.21000'
+  if(-not($crossMinorTransition-or$published430Maintenance-or$published430To440-or$direct422To440-or$direct422To442-or$retained440To442-or$published441To442-or$published442To450-or$direct422To450-or$published442To452-or$published451To452-or$published452To460)){
     throw '[mir430-full-upgrade-setting-transition]'
   }
-  if($BaseDefaultCompleteState-and($Target-cne'f210'-or$FromVersion-cne'4.2.21002'-or$ToVersion-cne'4.3.21000')){
+  if($Target-cin@('f017','f016','f015','f014','f013')-and-not($crossMinorTransition-or$published430To440-or$direct422To440-or$direct422To442-or$retained440To442-or$published441To442-or$direct422To450)){
+    throw '[mir430-full-upgrade-setting-transition]'
+  }
+  $baseCompleteStateTransition=$Target-ceq'f210'-and(
+    ($FromVersion-ceq'4.2.21002'-and$ToVersion-cin@('4.3.21000','4.3.21001')) -or
+    ($FromVersion-ceq'4.3.21000'-and$ToVersion-ceq'4.3.21001') -or
+    ($FromVersion-cin@('4.2.21002','4.3.21000')-and$ToVersion-ceq'4.4.21000') -or
+    ($FromVersion-cin@('4.2.21002','4.4.21000','4.4.21001')-and$ToVersion-ceq'4.4.21002') -or
+    ($FromVersion-cin@('4.2.21002','4.4.21002')-and$ToVersion-ceq'4.5.21000') -or
+    ($FromVersion-cin@('4.4.21002','4.5.21001')-and$ToVersion-ceq'4.5.21002') -or
+    ($FromVersion-ceq'4.5.21002'-and$ToVersion-ceq'4.6.21000'))
+  if($BaseDefaultCompleteState-and-not$baseCompleteStateTransition){
     throw '[mir430-full-upgrade-base-snapshot-transition]'
   }
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
@@ -327,6 +525,7 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
     $text=Get-Content -LiteralPath $path -Raw
     $anchor='local added_422_setting_defaults = {}'
     $completeStateGate='  and to_version:match("^4%.2%.210%d%d$")'
+    $completeStateSourceGate='  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$"))'
     $completeStateArchetype='archetype == "space-age-native-owner"'
     $completeStateReportedRows='  for _, name in ipairs({"recipe-prod-research_cargo_bay_unloading_distance-1", "recipe-prod-research_ice-1", "recipe-prod-research_science_pack_productivity-1"}) do'
     $completeStateHooks=@('    export_state("source")','    export_state("upgrade")','      export_state("reload")')
@@ -335,18 +534,29 @@ function Set-MIR430FullCompilerProfileUpgradeAllowance {
        @($completeStateHooks|Where-Object {-not$text.Contains($_)}).Count){
       throw '[mir430-full-upgrade-complete-state-anchor]'
     }
+    if(($published430Maintenance-or$published430To440-or$retained440To442-or$published441To442-or$published442To450-or$direct422To450-or$published442To452-or$published451To452-or$published452To460)-and[regex]::Matches($text,[regex]::Escape($completeStateSourceGate)).Count-ne1){
+      throw '[mir430-full-upgrade-complete-state-anchor]'
+    }
     $baseFullSnapshot=[bool]$BaseDefaultCompleteState
     if($baseFullSnapshot-and(
         [regex]::Matches($text,[regex]::Escape($completeStateArchetype)).Count-ne1-or
         [regex]::Matches($text,[regex]::Escape($completeStateReportedRows)).Count-ne1)){
       throw '[mir430-full-upgrade-base-snapshot-anchor]'
     }
-    $text=$text.Replace($anchor,'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}')
+    $settingDefaults=if($ToVersion-cin@('4.4.21002','4.5.21000','4.5.21002','4.6.21000')){
+      'local added_422_setting_defaults = {["mir-compiler-profile"] = "full", ["mir-max-level-worker-robots-speed"] = 0}'
+    }else{
+      'local added_422_setting_defaults = {["mir-compiler-profile"] = "full"}'
+    }
+    $text=$text.Replace($anchor,$settingDefaults)
     # The same Full fixture that authorizes the newly added selector must retain
     # the complete-state path on the exact cross-minor F210 destination. The
     # source, upgrade and reload hooks above remain mandatory and are checked
     # before this private fixture transformation.
     $text=$text.Replace($completeStateGate,('  and (to_version:match("^4%.2%.210%d%d$") or to_version == "'+$ToVersion+'")'))
+    if($published430Maintenance-or$published430To440-or$retained440To442-or$published441To442-or$published442To450-or$direct422To450-or$published442To452-or$published451To452-or$published452To460){
+      $text=$text.Replace($completeStateSourceGate,('  and (from_version:match("^4%.1%.21000$") or from_version:match("^4%.2%.210%d%d$") or from_version == "'+$FromVersion+'")'))
+    }
     if($baseFullSnapshot){
       # The exact published F210 Base predecessor needs the same source,
       # upgrade and reload proof as the Space Age lane.  Do not admit Base
@@ -519,6 +729,121 @@ function Add-MIR421SpaceFakeUpgradeOracle {
   return 'local sif = require("mir421_space_fake_upgrade")' + "`n" + $ControlText
 }
 
+function Read-MIR431F200GaloreSpaceAgeUpgradeProfile {
+  param([Parameter(Mandatory)][string]$Path)
+  $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
+  if($profile.schema-ne1-or$profile.kind-cne'MIR430NamedStartupStressProfileV1'-or
+     $profile.id-cne'f200-galore-space-age'-or$profile.target-cne'f200'-or
+     $profile.status-cne'acquired-exact-selection-not-native-qualified'-or
+     $profile.claim_scope-cne'specified-available-inputs-not-reporter-313-mod-environment'-or
+     $null-eq$profile.engine-or$profile.engine.version-cne'2.0.77'-or
+     [string]$profile.engine.sha256-cne'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B'){
+    throw '[mir431-f200-galore-profile]'
+  }
+  $expectedMods=[ordered]@{
+    base='2.0.77';'elevated-rails'='2.0.77';quality='2.0.77';'space-age'='2.0.77';
+    galore_lib='2.2.0';vanilla_galore_continued='1.4.2';space_age_galore='1.6.3'
+  }
+  $expectedArchives=[ordered]@{
+    'galore_lib_2.2.0.zip'=[ordered]@{name='galore_lib';version='2.2.0';bytes=77415;sha256='D473E10294091F45D77F181907FC777CEE181B18EB57B8B914D02E0D2C1C3FE2'}
+    'vanilla_galore_continued_1.4.2.zip'=[ordered]@{name='vanilla_galore_continued';version='1.4.2';bytes=113591;sha256='18ECF427C4671B7036C2AE278C19FF4E7853E68428D515F7A52095CB6D5DCF0C'}
+    'space_age_galore_1.6.3.zip'=[ordered]@{name='space_age_galore';version='1.6.3';bytes=149753;sha256='0C758F793E783082258F62705A17F40E917B9BBFC3B1D77ABF2A32E954CDE3B4'}
+  }
+  $expectedBuiltins=[ordered]@{
+    base=[ordered]@{version='2.0.77';info_sha256='FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786'}
+    'elevated-rails'=[ordered]@{version='2.0.77';info_sha256='310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089'}
+    quality=[ordered]@{version='2.0.77';info_sha256='2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD'}
+    'space-age'=[ordered]@{version='2.0.77';info_sha256='F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A'}
+  }
+  $mods=@($profile.mods)
+  if($mods.Count-ne$expectedMods.Count-or@($mods|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-selection]'}
+  foreach($name in $expectedMods.Keys){
+    $row=@($mods|Where-Object name -CEQ $name)
+    if($row.Count-ne1-or$row[0].enabled-isnot[bool]-or-not$row[0].enabled-or$row[0].version-cne$expectedMods[$name]){throw "[mir431-f200-galore-selection] $name"}
+  }
+  $archives=@($profile.archive_pins)
+  if($archives.Count-ne$expectedArchives.Count-or@($archives|Group-Object filename|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-archive-count]'}
+  $inputs=@()
+  foreach($filename in $expectedArchives.Keys){
+    $expected=$expectedArchives[$filename];$row=@($archives|Where-Object filename -CEQ $filename)
+    if($row.Count-ne1-or$row[0].name-cne$expected.name-or$row[0].version-cne$expected.version-or
+       [int64]$row[0].bytes-ne[int64]$expected.bytes-or[string]$row[0].sha256-cne$expected.sha256){throw "[mir431-f200-galore-archive] $filename"}
+    $inputs+=,[pscustomobject]@{file_name=$filename;expected_sha256=$expected.sha256;identity=[ordered]@{name=$expected.name;version=$expected.version};role='acquired-galore-space-age-upstream'}
+  }
+  $builtins=@($profile.builtin_pins)
+  if($builtins.Count-ne$expectedBuiltins.Count-or@($builtins|Group-Object name|Where-Object Count -GT 1).Count){throw '[mir431-f200-galore-builtin-count]'}
+  $builtinPins=@()
+  foreach($name in $expectedBuiltins.Keys){
+    $expected=$expectedBuiltins[$name];$row=@($builtins|Where-Object name -CEQ $name)
+    if($row.Count-ne1-or$row[0].version-cne$expected.version-or[string]$row[0].info_sha256-cne$expected.info_sha256){throw "[mir431-f200-galore-builtin] $name"}
+    $builtinPins+=,[pscustomobject]@{name=$name;version=$expected.version;info_sha256=$expected.info_sha256}
+  }
+  return [pscustomobject]@{profile=$profile;inputs=$inputs;builtin_pins=$builtinPins;sha256=(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+}
+
+function Assert-MIR431F200GaloreSpaceAgeUpgradeTransition {
+  param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.2','4.6.0')][string]$SourceVersion='4.3.1')
+  $full431=[bool]($SourceVersion-ceq'4.3.1'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.3.20001')
+  $full440=[bool]($SourceVersion-ceq'4.4.0'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.4.20000')
+  $full442=[bool]($SourceVersion-ceq'4.4.2'-and$FromVersion-cin@('4.2.20002','4.4.20000','4.4.20001')-and$ToVersion-ceq'4.4.20002')
+  $full452R24=[bool]($SourceVersion-ceq'4.5.2'-and$FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20002')
+  $full452Published451=[bool]($SourceVersion-ceq'4.5.2'-and$FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002')
+  $full460=[bool]($SourceVersion-ceq'4.6.0'-and$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
+  if($Target-cne'f200'-or-not($full431-or$full440-or$full442-or$full452R24-or$full452Published451-or$full460)-or
+     $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-galore-space-age'-or
+     $SpaceIsFake-or$SourceOnlyFixtureNames.Count){throw '[mir431-f200-galore-transition]'}
+}
+
+function Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle {
+  param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
+  $full431Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20001')
+  $full431Immediate=[bool]($FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.3.20001')
+  $full440Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20000')
+  $full440Immediate=[bool]($FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.4.20000')
+  $full442Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002')
+  $full442Retained=[bool]($FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002')
+  $full442Immediate=[bool]($FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002')
+  $full452R24=[bool]($FromVersion-ceq'4.4.20002'-and$ToVersion-ceq'4.5.20002')
+  $full452Published451=[bool]($FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002')
+  $full460=[bool]($FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
+  if(-not($full431Direct-or$full431Immediate-or$full440Direct-or$full440Immediate-or$full442Direct-or$full442Retained-or$full442Immediate-or$full452R24-or$full452Published451-or$full460)){throw '[mir431-f200-galore-oracle-transition]'}
+  $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
+  $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
+  foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
+  $control=Get-Content -LiteralPath $controlPath -Raw
+  $profileAnchor='["base-default"]={technology="mining-productivity-4",level=5}'
+  $galoreProfile='["f200-galore-space-age"]={technology="mining-productivity-3",level=5,requires_space_age=true}'
+  $obsoleteGaloreProfile='["f200-galore-space-age"]={technology="mining-productivity-4",level=5,requires_space_age=true}'
+  if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1-or$control.Contains($galoreProfile)-or$control.Contains($obsoleteGaloreProfile)){throw '[mir431-f200-galore-oracle-anchor]'}
+  # The exact pinned Galore+Space Age input retires mining-productivity-4 and
+  # makes mining-productivity-3 the infinite native continuation.  Seed the
+  # same existing owner so source creation exercises an earned level and queue.
+  $control=$control.Replace($profileAnchor,$profileAnchor+', '+$galoreProfile)
+  if([regex]::Matches($control,[regex]::Escape($galoreProfile)).Count-ne1-or$control.Contains($obsoleteGaloreProfile)){throw '[mir431-f200-galore-oracle-seed]'}
+  [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
+  $settings=Get-Content -LiteralPath $settingsPath -Raw
+  $settingsAnchor='default_value="base-default",allowed_values={"base-default"}'
+  if([regex]::Matches($settings,[regex]::Escape($settingsAnchor)).Count-ne1){throw '[mir431-f200-galore-settings-anchor]'}
+  $settings=$settings.Replace($settingsAnchor,'default_value="f200-galore-space-age",allowed_values={"base-default","f200-galore-space-age"}')
+  [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
+  $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  $expectedVersion=if($full460){'0.1.1133'}elseif($full452R24){'0.1.1140'}elseif($full452Published451){'0.1.1141'}elseif($full442Direct){'0.1.1078'}elseif($full442Retained){'0.1.1076'}elseif($full442Immediate){'0.1.1077'}elseif($full431Direct){'0.1.51'}elseif($full431Immediate){'0.1.50'}elseif($full440Direct){'0.1.53'}else{'0.1.52'}
+  if($info.version-cne$expectedVersion){throw '[mir431-f200-galore-fixture-identity]'}
+}
+
+function Assert-MIR431F200GaloreSpaceAgeFullStateActiveMods {
+  param([Parameter(Mandatory)]$Snapshot,[Parameter(Mandatory)][object[]]$ExpectedSelection,[Parameter(Mandatory)][ValidateSet('source','upgrade','reload')][string]$Stage)
+  if($null-eq$Snapshot.active_mods){throw "[mir431-f200-galore-active-mods] $Stage"}
+  $expected=[ordered]@{}
+  foreach($row in $ExpectedSelection){$name=[string]$row.name;$version=[string]$row.version;if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$expected.Contains($name)){throw "[mir431-f200-galore-selection] $Stage"};$expected[$name]=$version}
+  $actual=[ordered]@{}
+  foreach($property in @($Snapshot.active_mods.PSObject.Properties)){$name=[string]$property.Name;$version=[string]$property.Value;if([string]::IsNullOrWhiteSpace($name)-or$version-cnotmatch'^\d+[.]\d+[.]\d+$'-or$actual.Contains($name)){throw "[mir431-f200-galore-active-mods] $Stage"};$actual[$name]=$version}
+  if($actual.Count-ne$expected.Count){throw "[mir431-f200-galore-active-mods] $Stage"}
+  foreach($name in $expected.Keys){if(-not$actual.Contains($name)-or$actual[$name]-cne$expected[$name]){throw "[mir431-f200-galore-active-mods] $Stage"}}
+  return [pscustomobject]@{stage=$Stage;active_mods=@($actual.Keys|Sort-Object|ForEach-Object {[ordered]@{name=$_;version=$actual[$_]}})}
+}
+
 function Read-MIR423F200BobAngelUpgradeProfile {
   param([Parameter(Mandatory)][string]$Path)
   $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
@@ -580,10 +905,16 @@ function Read-MIR423F200BobAngelUpgradeProfile {
 
 function Assert-MIR423F200BobAngelUpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1')][string]$SourceVersion='4.2.3')
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.6.0')][string]$SourceVersion='4.2.3')
   $maintenance=[bool]($SourceVersion-ceq'4.2.3'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
   $full430=[bool]($SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
-  if($Target-cne'f200'-or-not($maintenance-or$full430)-or
+  $full431=[bool]($SourceVersion-ceq'4.3.1'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.3.20001')
+  $full440=[bool]($SourceVersion-ceq'4.4.0'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.4.20000')
+  $full442=[bool]($SourceVersion-ceq'4.4.2'-and$FromVersion-cin@('4.2.20002','4.4.20000','4.4.20001')-and$ToVersion-ceq'4.4.20002')
+  # The affected Bob/Angel lane has one reviewed published predecessor and
+  # one Full destination. Do not admit adjacent 4.5/4.6 versions here.
+  $full460=[bool]($SourceVersion-ceq'4.6.0'-and$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
+  if($Target-cne'f200'-or-not($maintenance-or$full430-or$full431-or$full440-or$full442-or$full460)-or
      $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-bob-angel'-or
      $SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir423-f200-bob-angel-transition]'
@@ -594,7 +925,20 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   param([Parameter(Mandatory)][string]$FixtureDirectory,[Parameter(Mandatory)][string]$FromVersion,[Parameter(Mandatory)][string]$ToVersion)
   $maintenance=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
   $full430=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
-  if(-not($maintenance-or$full430)){throw '[mir423-f200-bob-angel-oracle-transition]'}
+  $full431Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20001')
+  $full431Immediate=[bool]($FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.3.20001')
+  $full440Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20000')
+  $full440Immediate=[bool]($FromVersion-ceq'4.3.20000'-and$ToVersion-ceq'4.4.20000')
+  $full442Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002')
+  $full442Retained=[bool]($FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002')
+  $full442Immediate=[bool]($FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002')
+  # Fixed against the independently reviewed R05 Aluminium contract. This is
+  # deliberately not derived from the candidate's observed technology table.
+  $full460=[bool]($FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
+  $full431=[bool]($full431Direct-or$full431Immediate)
+  $full440=[bool]($full440Direct-or$full440Immediate)
+  $full442=[bool]($full442Direct-or$full442Retained-or$full442Immediate)
+  if(-not($maintenance-or$full430-or$full431-or$full440-or$full442-or$full460)){throw '[mir423-f200-bob-angel-oracle-transition]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
@@ -603,19 +947,225 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   if([regex]::Matches($control,[regex]::Escape($profileAnchor)).Count-ne1){throw '[mir423-f200-bob-angel-oracle-anchor]'}
   $control=$control.Replace($profileAnchor,$profileAnchor+', ["f200-bob-angel"]={technology="mining-productivity-4",level=5}')
   # This is deliberately narrower than the retained generic complete-state
-  # oracle. Both the 4.2 performance lane and the exact 4.3 Full lane reject
-  # even an unresearched extra technology for this fixed Bob/Angel input.
+  # oracle. The direct 4.2.2 lane permits only the source-reviewed additions
+  # below. Each record is constructed from a finite source terminal or a
+  # declared stream/staged material contract, never from the candidate state.
   # Earlier predecessor lanes retain their reviewed feature allowances.
   $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
   $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
   if($technologySetGuard.Matches($control).Count-ne1){throw '[mir423-f200-bob-angel-performance-only-anchor]'}
-  $strictTechnologySetGuard=@'
+  $strictTechnologySetGuard=if($full460){@'
+  local function equal_names(left, right)
+    if #left ~= #right then return false end
+    for index, value in ipairs(left) do if value ~= right[index] then return false end end
+    return true
+  end
+  local function exact_addition_state(name, after, level)
+    if after.level ~= level or after.researched ~= false or after.enabled ~= true
+      or after.visible_when_disabled ~= false or math.abs((after.saved_progress or 0)) > epsilon then
+      fail("reviewed Aluminium addition state differs: " .. name)
+    end
+  end
+  local function exact_prototype_fields(name, prototype, contract)
+    if prototype.hidden ~= false or prototype.hidden_in_factoriopedia ~= false
+      or prototype.max_level ~= contract.max_level or prototype.order ~= contract.order
+      or not equal_names(prototype.prerequisites, contract.prerequisites)
+      or not equal_state(prototype.ingredients, contract.ingredients)
+      or not equal_state(prototype.effects, contract.effects)
+      or prototype.unit_count ~= contract.unit_count
+      or prototype.unit_count_formula ~= contract.count_formula
+      or prototype.unit_energy ~= contract.unit_energy then
+      fail("reviewed Aluminium definition differs: " .. name)
+    end
+  end
+  -- These two records are the independently reviewed R05 BOB_ANGEL_422_MODS
+  -- contract for the published 4.5.2 -> 4.6.0 Full upgrade. They are fixed
+  -- policy facts, never values learned from the upgraded candidate snapshot.
+  local reviewed_added_names = {
+    ["recipe-prod-research_material_aluminium-1"] = true,
+    ["recipe-prod-research_material_aluminium-4"] = true
+  }
+  local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
+  local A_L_U = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}}
+  -- LuaTechnologyPrototype exposes recipe-productivity magnitude as change.
+  -- Compare that runtime snapshot schema, retaining the reviewed 2% policy.
+  local AL_EFFECTS = {{type="change-recipe-productivity",recipe="angels-plate-aluminium",change=0.02},{type="change-recipe-productivity",recipe="angels-plate-aluminium-2",change=0.02}}
+  local contracts = {
+    ["recipe-prod-research_material_aluminium-1"] = {
+      level=1,max_level=3,order="p[research_material_aluminium]",
+      prerequisites={"angels-aluminium-casting-2","angels-aluminium-smelting-1","automation-science-pack","logistic-science-pack"},
+      ingredients=A_L,effects=AL_EFFECTS,unit_count=200,count_formula="200*2^(L-1)",unit_energy=1800
+    },
+    ["recipe-prod-research_material_aluminium-4"] = {
+      level=4,max_level=150,order="p[research_material_aluminium__continuation]",
+      prerequisites={"angels-aluminium-casting-2","angels-aluminium-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_aluminium-1","utility-science-pack"},
+      ingredients=A_L_U,effects=AL_EFFECTS,unit_count=1600,count_formula="1600+200*(L-4)",unit_energy=1800
+    }
+  }
+  for name, after in pairs(observed.technologies) do
+    if not expected.technologies[name] then
+      local contract = contracts[name]
+      if not reviewed_added_names[name] or not contract then fail("new technology added in reviewed Bob/Angel upgrade: " .. name) end
+      exact_addition_state(name, after, contract.level)
+      exact_prototype_fields(name, after.prototype, contract)
+    end
+  end
+  for name in pairs(reviewed_added_names) do
+    if not observed.technologies[name] then fail("reviewed Aluminium technology missing: " .. name) end
+  end
+'@.TrimEnd()}elseif($full442Direct){@'
+  local function sorted_names_with(prerequisites, additions, context)
+    local out, seen = {}, {}
+    for _, value in ipairs(prerequisites or {}) do
+      if seen[value] then fail("source terminal duplicates prerequisite: " .. context) end
+      seen[value] = true; out[#out + 1] = value
+    end
+    for _, value in ipairs(additions or {}) do
+      if seen[value] then fail("reviewed continuation duplicates prerequisite: " .. context) end
+      seen[value] = true; out[#out + 1] = value
+    end
+    table.sort(out)
+    return out
+  end
+  local function equal_names(left, right)
+    if #left ~= #right then return false end
+    for index, value in ipairs(left) do if value ~= right[index] then return false end end
+    return true
+  end
+  local function exact_addition_state(name, after, level)
+    if after.level ~= level or after.researched ~= false or after.enabled ~= true
+      or after.visible_when_disabled ~= false or math.abs((after.saved_progress or 0)) > epsilon then
+      fail("reviewed added technology state differs: " .. name)
+    end
+  end
+  local function exact_prototype_fields(name, prototype, contract)
+    if prototype.hidden ~= false or prototype.hidden_in_factoriopedia ~= false
+      or prototype.max_level ~= contract.max_level
+      or (contract.order ~= nil and prototype.order ~= contract.order)
+      or not equal_names(prototype.prerequisites, contract.prerequisites)
+      or not equal_state(prototype.ingredients, contract.ingredients)
+      or not equal_state(prototype.effects, contract.effects)
+      or prototype.unit_count ~= contract.unit_count
+      or prototype.unit_count_formula ~= contract.count_formula
+      or prototype.unit_energy ~= contract.unit_energy then
+      fail("reviewed added technology definition differs: " .. name)
+    end
+  end
+  local function terminal_contract(expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy)
+    local tail = expected.technologies[tail_name]
+    if not tail or tail.level ~= level - 1 or tail.prototype.max_level ~= level - 1 then
+      fail("reviewed finite terminal differs: " .. tail_name)
+    end
+    local additions = {tail_name}
+    for _, ingredient in ipairs(ingredients) do additions[#additions + 1] = ingredient.name end
+    return {
+      max_level = 4294967295,
+      order = tail.prototype.order,
+      prerequisites = sorted_names_with(tail.prototype.prerequisites, additions, tail_name),
+      ingredients = ingredients,
+      effects = effects,
+      unit_count = unit_count,
+      count_formula = count_formula,
+      unit_energy = unit_energy
+    }
+  end
+  local function verify_terminal_addition(name, after, expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy)
+    exact_addition_state(name, after, level)
+    exact_prototype_fields(name, after.prototype,
+      terminal_contract(expected, tail_name, level, ingredients, effects, unit_count, count_formula, unit_energy))
+  end
+  -- These constants are the reviewed F200 Defaults contracts. They retain the
+  -- six finite native tails, two declared direct streams, and the approved
+  -- copper/tungsten material stages. They are not candidate observations.
+  local reviewed_added_names = {
+    ["braking-force-8"] = true,
+    ["inserter-capacity-bonus-8"] = true,
+    ["laser-shooting-speed-8"] = true,
+    ["research-speed-7"] = true,
+    ["weapon-shooting-speed-7"] = true,
+    ["worker-robots-storage-4"] = true,
+    ["recipe-prod-research_cannon_shooting_speed-1"] = true,
+    ["recipe-prod-research_electric_shooting_speed-1"] = true,
+    ["recipe-prod-research_material_copper_tungsten-1"] = true,
+    ["recipe-prod-research_material_copper_tungsten-4"] = true
+  }
+  local function verify_reviewed_addition(name, after)
+    local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
+    local A_L_M = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}}
+    if name == "braking-force-8" then
+      return verify_terminal_addition(name, after, expected, "braking-force-7", 8, A_L,
+        {{type="train-braking-force-bonus",modifier=0.15}}, 861, "861.51212960553*1.33333^(L-8)", 3600)
+    elseif name == "inserter-capacity-bonus-8" then
+      return verify_terminal_addition(name, after, expected, "inserter-capacity-bonus-7", 8, A_L,
+        {{type="inserter-stack-size-bonus",modifier=2},{type="bulk-inserter-capacity-bonus",modifier=4}}, 914488, "914488.340211249*3.33333^(L-8)", 3600)
+    elseif name == "laser-shooting-speed-8" then
+      return verify_terminal_addition(name, after, expected, "laser-shooting-speed-7", 8, A_L_M,
+        {{type="gun-speed",ammo_category="laser",modifier=0.5}}, 1025, "1025.15625*1.5^(L-8)", 7200)
+    elseif name == "research-speed-7" then
+      return verify_terminal_addition(name, after, expected, "research-speed-6", 7, A_L_M,
+        {{type="laboratory-speed",modifier=0.6}}, 683, "683.4375*1.5^(L-7)", 7200)
+    elseif name == "weapon-shooting-speed-7" then
+      return verify_terminal_addition(name, after, expected, "weapon-shooting-speed-6", 7, A_L_M,
+        {{type="gun-speed",ammo_category="bullet",modifier=0.4},{type="gun-speed",ammo_category="shotgun-shell",modifier=0.4}}, 683, "683.4375*1.5^(L-7)", 7200)
+    elseif name == "worker-robots-storage-4" then
+      return verify_terminal_addition(name, after, expected, "worker-robots-storage-3", 4, A_L,
+        {{type="worker-robot-storage",modifier=1}}, 675, "675*1.5^(L-4)", 3600)
+    end
+    local direct = {
+      ["recipe-prod-research_cannon_shooting_speed-1"] = {
+        prerequisites={"automation-science-pack","logistic-science-pack","military-science-pack","tank","weapon-shooting-speed-5"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}},
+        effects={{type="gun-speed",ammo_category="cannon-shell",modifier=0.1}}, order="p[research_cannon_shooting_speed]"
+      },
+      ["recipe-prod-research_electric_shooting_speed-1"] = {
+        prerequisites={"automation-science-pack","discharge-defense-equipment","logistic-science-pack","military-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="military-science-pack",amount=1}},
+        effects={{type="gun-speed",ammo_category="electric",modifier=0.1}}, order="p[research_electric_shooting_speed]"
+      }
+    }
+    local row = direct[name]
+    if row then
+      exact_addition_state(name, after, 1)
+      row.max_level, row.unit_count, row.count_formula, row.unit_energy = 4294967295, 60, "60*1.5^(L-1)", 3600
+      return exact_prototype_fields(name, after.prototype, row)
+    end
+    local material = {
+      ["recipe-prod-research_material_copper_tungsten-1"] = {
+        level=1,max_level=3,order="p[research_material_copper_tungsten]",
+        prerequisites={"angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}},
+        effects={{type="change-recipe-productivity",recipe="bob-copper-tungsten-alloy",change=0.02}},
+        unit_count=200,count_formula="200*2^(L-1)",unit_energy=1800
+      },
+      ["recipe-prod-research_material_copper_tungsten-4"] = {
+        level=4,max_level=150,order="p[research_material_copper_tungsten__continuation]",
+        prerequisites={"angels-tungsten-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_copper_tungsten-1","utility-science-pack"},
+        ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}},
+        effects={{type="change-recipe-productivity",recipe="bob-copper-tungsten-alloy",change=0.02}},
+        unit_count=1600,count_formula="1600+200*(L-4)",unit_energy=1800
+      }
+    }
+    row = material[name]
+    if not row then fail("unreviewed added technology: " .. name) end
+    exact_addition_state(name, after, row.level)
+    return exact_prototype_fields(name, after.prototype, row)
+  end
+  for name, after in pairs(observed.technologies) do
+    if not expected.technologies[name] then
+      if not reviewed_added_names[name] then fail("new technology added in performance-only upgrade: " .. name) end
+      verify_reviewed_addition(name, after)
+    end
+  end
+  for name in pairs(reviewed_added_names) do
+    if not observed.technologies[name] then fail("reviewed added technology missing: " .. name) end
+  end
+'@.TrimEnd()}else{@'
   for name in pairs(observed.technologies) do
     if not expected.technologies[name] then
       fail("new technology added in performance-only upgrade: " .. name)
     end
   end
-'@.TrimEnd()
+'@.TrimEnd()}
   $control=$technologySetGuard.Replace($control,$strictTechnologySetGuard,1)
   [IO.File]::WriteAllText($controlPath,$control,[Text.UTF8Encoding]::new($false))
   $settings=Get-Content -LiteralPath $settingsPath -Raw
@@ -624,8 +1174,11 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $settings=$settings.Replace($settingsAnchor,'default_value="f200-bob-angel",allowed_values={"base-default","f200-bob-angel"}')
   [IO.File]::WriteAllText($settingsPath,$settings,[Text.UTF8Encoding]::new($false))
   $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
-  $expectedVersion=if($full430){'0.1.42'}else{'0.1.32'}
-  $nextVersion=if($full430){'0.1.42'}else{'0.1.33'}
+  # Fixture identity remains unique across the two 4.3.1 predecessor lanes.
+  # The direct published 4.2.2 lane has source patch 1 plus predecessor patch
+  # 2 (0.1.45); the immediate 4.3.0 lane is 0.1.43.
+  $expectedVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
   if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
   $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))

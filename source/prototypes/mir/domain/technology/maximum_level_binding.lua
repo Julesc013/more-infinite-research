@@ -6,6 +6,20 @@ local M = {}
 local SCHEMA = 3
 local KIND = "MIRMaximumLevelPolicyV3"
 local KNOWN_FINALIZER_ADAPTER = "factorio-data-final-fixes-v1"
+local NATIVE_WORKER_ROBOT_SPEED_CAP = {
+  setting_name = "mir-max-level-worker-robots-speed",
+  stream_id = "native-owner:worker-robots-speed",
+  family_id = "worker-robot-speed",
+  manifest_id = "native-worker-robots-speed-cap",
+  source = "native-owner",
+  scope = "exact-native-owner",
+  operation = "native-owner-cap",
+  proof = "exact-native-worker-robot-speed-infinite-tail",
+  tails = {
+    {technology_id = "worker-robots-speed-7", predecessor = "worker-robots-speed-6"},
+    {technology_id = "worker-robots-speed-6", predecessor = "worker-robots-speed-5"}
+  }
+}
 local PRECEDENCE = {
   ["exact-technology"] = 1,
   ["exact-native-owner"] = 2,
@@ -37,6 +51,85 @@ end
 local function finite_cap(value)
   local cap = effective_cap(value)
   return type(cap) == "number" and cap or nil
+end
+
+local function bounded_name(value)
+  if type(value) == "string" and value ~= "" and #value <= 1024 then return value end
+  if value == nil then return nil end
+  local ok, name = pcall(function() return value.name end)
+  return ok and type(name) == "string" and name ~= "" and #name <= 1024 and name or nil
+end
+
+local function infinite_max_level(value)
+  return value == "infinite"
+    or (type(value) == "number" and value == value and value >= 4294967295)
+end
+
+local function has_exact_worker_robot_speed_effect(technology)
+  local effects = technology and technology.effects
+  if effects == nil then return false end
+  local count, only = 0, nil
+  local ok = pcall(function()
+    for _, effect in pairs(effects) do
+      count = count + 1
+      only = effect
+    end
+  end)
+  if not ok or count ~= 1 or only == nil then return false end
+  local read_ok, effect_type, modifier = pcall(function()
+    return only.type, only.modifier
+  end)
+  return read_ok and effect_type == "worker-robot-speed" and modifier == 0.65
+end
+
+local function has_prerequisite(technology, expected)
+  local prerequisites = technology and technology.prerequisites
+  if prerequisites == nil then return false end
+  local found = false
+  local ok = pcall(function()
+    for _, prerequisite in pairs(prerequisites) do
+      if bounded_name(prerequisite) == expected then found = true; return end
+    end
+  end)
+  return ok and found
+end
+
+-- This is deliberately a narrow native-owner admission, shared by the data
+-- policy and F200's settings-derived V3 fallback. It recognizes only the
+-- documented infinite tail, its immediate native predecessor, and its sole
+-- native worker-speed effect; similarly named external continuations do not
+-- gain cap ownership.
+function M.approved_native_worker_robot_speed_tail(lookup)
+  if type(lookup) ~= "function" then return nil end
+  for _, candidate in ipairs(NATIVE_WORKER_ROBOT_SPEED_CAP.tails) do
+    local ok, technology = pcall(lookup, candidate.technology_id)
+    if ok and technology and bounded_name(technology) == candidate.technology_id
+        and infinite_max_level(technology.max_level)
+        and has_exact_worker_robot_speed_effect(technology)
+        and has_prerequisite(technology, candidate.predecessor) then
+      return candidate.technology_id
+    end
+  end
+  return nil
+end
+
+function M.native_worker_robot_speed_cap_input(requested_cap, lookup)
+  local ok, cap = pcall(finite_cap, requested_cap)
+  if not ok or cap == nil then return nil end
+  local technology_id = M.approved_native_worker_robot_speed_tail(lookup)
+  if not technology_id then return nil end
+  return {
+    technology_id = technology_id,
+    stream_id = NATIVE_WORKER_ROBOT_SPEED_CAP.stream_id,
+    family_id = NATIVE_WORKER_ROBOT_SPEED_CAP.family_id,
+    manifest_id = NATIVE_WORKER_ROBOT_SPEED_CAP.manifest_id,
+    setting_name = NATIVE_WORKER_ROBOT_SPEED_CAP.setting_name,
+    requested_cap = cap,
+    source = NATIVE_WORKER_ROBOT_SPEED_CAP.source,
+    scope = NATIVE_WORKER_ROBOT_SPEED_CAP.scope,
+    operation = NATIVE_WORKER_ROBOT_SPEED_CAP.operation,
+    proof = NATIVE_WORKER_ROBOT_SPEED_CAP.proof
+  }
 end
 
 local function stable_fingerprint(record, field)
@@ -202,6 +295,10 @@ local function candidate_rows(plan, options)
       operation = operation.operation
     }, options))
   end
+  -- The pipeline owns live settings and prototype access. This domain module
+  -- consumes only the normalized, exact native-owner input it supplies.
+  local native_worker_speed = options.native_worker_robot_speed_input
+  if native_worker_speed then table.insert(rows, new_binding(native_worker_speed, options)) end
   table.sort(rows, function(left, right)
     if left.technology_id ~= right.technology_id then
       return left.technology_id < right.technology_id

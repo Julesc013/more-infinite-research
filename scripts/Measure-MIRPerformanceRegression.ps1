@@ -26,7 +26,7 @@ param(
   [string]$StartupCandidateArchive='',
   [string]$CandidateMaterializationArchive='',
   [string]$CandidateMaterializationReceiptPath='',
-  [ValidateSet('4.2.3','4.3.0','4.3.1')][string]$StartupCandidateSourceVersion='4.2.3',
+  [ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]$StartupCandidateSourceVersion='4.2.3',
   [switch]$PreliminaryStartup,
   [switch]$StartupCandidateOnly,
   [string]$StartupOutputRoot='',

@@ -19,11 +19,13 @@ if($LASTEXITCODE -ne 0){throw "Witness memo isolation controls failed: $($output
 $recordLine=$output | Where-Object {$_ -match '^\{.*"status": "MIR-WITNESS-MEMO-ISOLATION-CONTROLS-PASSED".*\}$'} | Select-Object -Last 1
 if(-not $recordLine){throw "Witness memo isolation controls produced no success record: $($output -join [Environment]::NewLine)"}
 $record=$recordLine | ConvertFrom-Json
+  if([string]$record.scope -cne 'retired-discovery-characterization-not-current-package-certification'){throw 'Retired discovery controls must remain package-excluded characterizations.'}
 if([int]$record.private_hits -ne 3 -or [int]$record.isolated_hits -ne 2 -or [int]$record.graph_clone_calls -ne 2){
   throw 'Witness memo isolation controls did not retain their expected cold/warm operation counts.'
 }
 [pscustomobject]@{
   status=[string]$record.status
+  scope=[string]$record.scope
   assertions=[int]$record.assertions
   private_hits=[int]$record.private_hits
   isolated_hits=[int]$record.isolated_hits

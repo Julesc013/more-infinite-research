@@ -14,8 +14,9 @@ import sys
 from pathlib import Path
 
 
-PACK_MODULE = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+PACK_MODULE = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
 FIXTURE = Path("tests/compiler/contextual_boolean_route_policy.lua")
+PACK_MODULE_NAME = "prototypes.mir.capabilities.science_integration.pack_production_reachability"
 
 
 def arguments() -> argparse.Namespace:
@@ -28,6 +29,38 @@ def arguments() -> argparse.Namespace:
 
 def escaped_lua_path(path: Path) -> str:
     return str(path.resolve()).replace("\\", "/").replace('"', '\\"')
+
+
+def instrument_pack_module(source: str) -> str:
+    """Expose exact private key helpers only inside this controlled Lua VM."""
+    positive = "local function positive_witness_memo_key(identity, visiting_packs, visiting_technologies)\n"
+    if source.count(positive) != 1:
+        raise RuntimeError("Could not locate the positive research-unlock key helper")
+    source = source.replace(
+        positive,
+        "local contextual_boolean_route_policy_positive_key_calls = 0\n"
+        + positive
+        + "  contextual_boolean_route_policy_positive_key_calls = "
+        "contextual_boolean_route_policy_positive_key_calls + 1\n",
+        1,
+    )
+    terminal = "\nreturn M\n"
+    if source.count(terminal) != 1:
+        raise RuntimeError("Could not locate the pack-production module return")
+    hooks = r'''
+M.__mir_contextual_boolean_route_policy_test_hooks = {
+  positive_witness_memo_key = positive_witness_memo_key,
+  negative_witness_memo_key = negative_witness_memo_key,
+  research_unlocked_output_witness = research_unlocked_output_witness,
+  positive_key_call_count = function()
+    return contextual_boolean_route_policy_positive_key_calls
+  end,
+  reset_positive_key_call_count = function()
+    contextual_boolean_route_policy_positive_key_calls = 0
+  end
+}
+'''
+    return source.replace(terminal, "\n" + hooks + "return M\n", 1)
 
 
 def bootstrap(target: str) -> str:
@@ -148,31 +181,51 @@ def main() -> int:
     from lupa import lua52
 
     source = (repo / PACK_MODULE).read_text(encoding="utf-8")
+    reference_root = repo / "tests/reference/retired-discovery"
+    if not reference_root.is_dir():
+        raise RuntimeError(f"Missing retired discovery reference root: {reference_root}")
+    instrumented_source = instrument_pack_module(source)
     fixture = (repo / FIXTURE).read_text(encoding="utf-8")
     adapter_root = repo / "source" / "adapters" / args.target
     if not adapter_root.is_dir():
         raise RuntimeError(f"Missing target adapter: {adapter_root}")
     runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
     runtime.execute(
-        'package.path = "' + escaped_lua_path(repo / "source" / "?.lua") + ';'
+        'package.path = "' + escaped_lua_path(reference_root / "?.lua") + ';'
+        + escaped_lua_path(repo / "source" / "?.lua") + ';'
         + escaped_lua_path(adapter_root / "?.lua") + ';" .. package.path'
     )
     runtime.execute(bootstrap(args.target))
+    runtime.execute(
+        "package.preload[" + json.dumps(PACK_MODULE_NAME) + "] = function()\n"
+        "  local chunk, load_error = load(" + json.dumps(instrumented_source, ensure_ascii=False)
+        + ", '@contextual-boolean-route-policy-pack-module')\n"
+        "  if not chunk then error(load_error, 0) end\n"
+        "  return chunk()\n"
+        "end\n"
+    )
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-CONTEXTUAL-BOOLEAN-ROUTE-POLICY-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "target": args.target,
         "assertions": int(result["assertions"]),
         "cold_available": bool(result["cold_available"]),
         "warm_available": bool(result["warm_available"]),
         "boolean_hits": int(result["boolean_hits"]),
+        "r29_key_reuse": bool(result["r29_key_reuse"]),
+        "r29_opaque_fallback": bool(result["r29_opaque_fallback"]),
+        "r29_opaque_key_fallback": bool(result["r29_opaque_key_fallback"]),
+        "r29_negative_hit": bool(result["r29_negative_hit"]),
         "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
         "fixture_sha256": hashlib.sha256(fixture.encode("utf-8")).hexdigest(),
         "runtime": "lupa.lua52",
         "factorio_processes": 0,
     }
-    if (record["assertions"] < 11 or not record["cold_available"] or not record["warm_available"]
-            or record["boolean_hits"] < 1):
+    if (record["assertions"] < 14 or not record["cold_available"] or not record["warm_available"]
+            or record["boolean_hits"] < 1 or not record["r29_key_reuse"]
+            or not record["r29_opaque_fallback"] or not record["r29_opaque_key_fallback"]
+            or not record["r29_negative_hit"]):
         raise RuntimeError(f"Unexpected Boolean route-policy result: {record}")
     print(json.dumps(record, sort_keys=True))
     return 0

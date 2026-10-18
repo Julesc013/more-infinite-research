@@ -9,6 +9,7 @@ local setting_order = require("prototypes.mir.settings.order")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local test_overrides = require("prototypes.mir.settings.test_overrides")
+local compiler_profile = require("prototypes.mir.settings.compiler_profile")
 
 local M = {}
 local spec_by_name_cache = nil
@@ -126,7 +127,7 @@ end
 
 function M.global_setting_prototypes()
   local out = {
-    require("prototypes.mir.settings.compiler_profile").prototype(),
+    compiler_profile.prototype(),
     {
       type = "bool-setting",
       name = "ips-require-space-gate",
@@ -174,6 +175,18 @@ function M.global_setting_prototypes()
       order = setting_order.global("compatibility", 10),
       localised_name = {"mod-setting-name.mir-adjust-vanilla-weapon-speed-techs"},
       localised_description = {"mod-setting-description.mir-adjust-vanilla-weapon-speed-techs"}
+    },
+    {
+      type = "int-setting",
+      name = "mir-max-level-worker-robots-speed",
+      setting_type = "startup",
+      default_value = 0,
+      minimum_value = 0,
+      maximum_value = 2147483647,
+      order = setting_order.global("compatibility", 15),
+      targets = {requires_features = {"scripted_techs"}, required_effect_types = {}},
+      localised_name = {"mod-setting-name.mir-max-level-worker-robots-speed"},
+      localised_description = {"mod-setting-description.mir-max-level-worker-robots-speed"}
     },
     {
       type = "bool-setting",

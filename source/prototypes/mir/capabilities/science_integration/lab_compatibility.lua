@@ -1,32 +1,18 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local data_raw = require("prototypes.mir.platform.factorio.data_raw")
-local prototype_lookup = require("prototypes.mir.platform.factorio.prototype_lookup")
 local effective_settings = require("prototypes.mir.settings.effective")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
-local item_facts = require("prototypes.mir.index.item_prototype_facts")
 
 local M = {}
--- Companion service records are mutable Context tables. Retain the canonical
--- pairing in this module-private weak-key registry so Lab admission never
--- trusts fields supplied or later replaced by an external record. Values
--- deliberately retain only functions, never the record key itself.
-local known_item_acquisition_companions = setmetatable({}, {__mode = "k"})
-
-function M.install_item_acquisition_companion(context, witness, available)
-  if type(context) ~= "table" or type(context.set_service) ~= "function"
-    or type(witness) ~= "function" or type(available) ~= "function" then
-    error("MIR canonical item-acquisition companion requires Context and function services.", 2)
-  end
-  local companion = {witness = witness, available = available}
-  context:set_service("science.item_acquisition_available", companion)
-  known_item_acquisition_companions[companion] = {witness = witness, available = available}
-  return companion
-end
-
 local function pack_production_status(...)
   local service = compiler_context.current():service("science.pack_production_status")
   if not service then error("MIR science pack-production service is not registered in CompilerContext.", 2) end
   return service(...)
+end
+
+local function pack_is_admitted(name)
+  local status = pack_production_status(name)
+  return status ~= "unreachable" and status ~= "not-admitted"
 end
 
 function M.ingredient_name(ingredient)
@@ -56,87 +42,94 @@ local function diagnostic_visit(observer)
   return true
 end
 
-local function lab_accepts_all(lab, packs, diagnostic_observer)
-  local accepted = {}
-  for _, input in ipairs((lab and lab.inputs) or {}) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
-    accepted[input] = true
+-- The lab acceptance vector is immutable for one compiler Context.  Keep it
+-- private: public binding snapshots still cross their defensive-copy boundary.
+-- `input_count` retains the diagnostic observer's former visit budget even
+-- when a physical lab repeats an input name.
+local function build_lab_acceptance_view()
+  local labs = {}
+  for name, lab in pairs(data_raw.prototypes("lab")) do
+    local accepted, input_count = {}, 0
+    for _, input in ipairs((lab and lab.inputs) or {}) do
+      accepted[input] = true
+      input_count = input_count + 1
+    end
+    labs[#labs + 1] = {name = name, accepted_inputs = accepted, input_count = input_count}
+  end
+  table.sort(labs, function(left, right) return left.name < right.name end)
+  return labs
+end
+
+local function lab_acceptance_view()
+  return compiler_context.current():state_view("approved_lab_acceptance_view", build_lab_acceptance_view)
+end
+
+local function lab_accepts_all(entry, packs, diagnostic_observer)
+  if diagnostic_observer then
+    for _ = 1, entry.input_count do
+      if not diagnostic_visit(diagnostic_observer) then return false end
+    end
   end
   for _, pack in ipairs(packs or {}) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
-    if not accepted[pack] then return false end
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
+    if not entry.accepted_inputs[pack] then return false end
   end
   return true
 end
 
--- The ordinary compiler needs only a yes/no answer for lab placement.  A
--- paired Boolean companion can therefore avoid copying a complete private
--- witness graph that this module never exposes.  An observer, unknown
--- companion, or replaced witness service always retains the public witness
--- path: its result and callback behavior are externally observable.
-local function item_acquisition_available(item_name, service, context, diagnostic_observer)
-  if not diagnostic_observer then
-    local companion = compiler_context.current():service("science.item_acquisition_available")
-    local registered = type(companion) == "table" and known_item_acquisition_companions[companion] or nil
-    if registered and companion.witness == registered.witness
-      and companion.available == registered.available and registered.witness == service then
-      local available, paired = registered.available(item_name,
-        context.visiting_packs or {}, context.visiting_technologies or {})
-      if paired == true then return available and true or false end
-    end
-  end
-  local witness = service(item_name, context.visiting_packs or {},
-    context.visiting_technologies or {}, diagnostic_observer)
-  return witness and true or false
+-- Laboratory admission consumes the common declared-reference graph.
+-- There is no witness-producing fallback or per-item acquisition query.
+local function lab_acquisition_available(lab_name, diagnostic_observer)
+  if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
+  local service = compiler_context.current():service("science.lab_binding_available")
+  if not service then error("MIR approved lab-binding service is not registered in CompilerContext.", 2) end
+  return service(lab_name)
 end
 
-local function lab_acquisition_available(lab_name, diagnostic_observer, reachability_context)
-  local context = reachability_context or {}
-  local service = compiler_context.current():service("science.item_acquisition_witness")
-  if not service then error("MIR item-acquisition service is not registered in CompilerContext.", 2) end
-  local items = {}
-  if diagnostic_observer then
-    -- A cold diagnostic must reserve each raw visit rather than construct the
-    -- normal comprehensive item index outside its work budget.
-    for _, item_type in ipairs(prototype_lookup.item_types()) do
-      if not diagnostic_visit(diagnostic_observer) then return nil end
-      for name, item in pairs(data_raw.prototypes(item_type)) do
-        if not diagnostic_visit(diagnostic_observer) then return nil end
-        if item.place_result == lab_name then items[#items + 1] = name end
-      end
-    end
-    table.sort(items)
-  else
-    for _, name in ipairs(item_facts.placeable_items_for_entity(lab_name)) do
-      local item = prototype_lookup.item_prototype(name)
-      if item and item.place_result == lab_name then items[#items + 1] = name end
+local function unresolved_lab(reason)
+  error("MIR approved laboratory binding is unresolved: " .. tostring(reason)
+    .. ". Refusing to discard established research or invoke production discovery.", 3)
+end
+
+local function first_reason(current, reason)
+  if reason and (not current or reason < current) then return reason end
+  return current
+end
+
+local function accepting_lab(packs, diagnostic_observer, reachability_context)
+  if not packs or #packs == 0 then return false end
+  local unresolved
+  for _, entry in ipairs(lab_acceptance_view()) do
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
+    if lab_accepts_all(entry, packs, diagnostic_observer) then
+      local available, reason = lab_acquisition_available(entry.name, diagnostic_observer, reachability_context)
+      if available == true then return true end
+      if available == nil then unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. entry.name)) end
     end
   end
-  for _, name in ipairs(items) do
-    if not diagnostic_visit(diagnostic_observer) then return nil end
-    if item_acquisition_available(name, service, context, diagnostic_observer) then return true end
-  end
-  return false
+  return false, unresolved
 end
 
 function M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
-  if not packs or #packs == 0 then return false end
-  for name, lab in pairs(data_raw.prototypes("lab")) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
-    if lab_accepts_all(lab, packs, diagnostic_observer)
-      and lab_acquisition_available(name, diagnostic_observer, reachability_context) then return true end
-  end
-  return false
+  local accepted, reason = accepting_lab(packs, diagnostic_observer, reachability_context)
+  if not accepted and reason and not diagnostic_observer then unresolved_lab(reason) end
+  return accepted
 end
 
-function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
+local function accepting_ingredients(ingredients, diagnostic_observer, reachability_context)
   local packs = {}
   for _, ingredient in ipairs(ingredients or {}) do
-    if not diagnostic_visit(diagnostic_observer) then return false end
+    if diagnostic_observer and not diagnostic_visit(diagnostic_observer) then return false end
     local name = M.ingredient_name(ingredient)
     if name then table.insert(packs, name) end
   end
-  return M.any_lab_accepts_all(packs, diagnostic_observer, reachability_context)
+  return accepting_lab(packs, diagnostic_observer, reachability_context)
+end
+
+function M.valid_research_ingredients(ingredients, diagnostic_observer, reachability_context)
+  local accepted, reason = accepting_ingredients(ingredients, diagnostic_observer, reachability_context)
+  if not accepted and reason and not diagnostic_observer then unresolved_lab(reason) end
+  return accepted
 end
 
 local function required_set(required_packs)
@@ -179,12 +172,16 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
     local reachable = #unchanged > 0
     for _, ingredient in ipairs(unchanged) do
       local pack_name = M.ingredient_name(ingredient)
-      if not pack_name or pack_production_status(pack_name) == "unreachable" then
+      if not pack_name or not pack_is_admitted(pack_name) then
         reachable = false
         break
       end
     end
-    if reachable and M.valid_research_ingredients(unchanged) then return unchanged, "unchanged" end
+    if reachable then
+      local accepted, reason = accepting_ingredients(unchanged)
+      if accepted then return unchanged, "unchanged" end
+      if reason then unresolved_lab(reason) end
+    end
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
       .. " because engine-default lab policy forbids ingredient rewriting and the selected set is not safely researchable.")
     return nil, "invalid"
@@ -193,12 +190,12 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
   local source = {}
   for _, ingredient in ipairs(deepcopy(ingredients or {})) do
     local pack_name = M.ingredient_name(ingredient)
-    if pack_name and pack_production_status(pack_name) ~= "unreachable" then
+    if pack_name and pack_is_admitted(pack_name) then
       table.insert(source, ingredient)
     else
       log("[more-infinite-research] Excluding science pack " .. tostring(pack_name)
         .. " from " .. tostring(context or "unknown technology")
-        .. " because it has no initially available recipe or enabled reachable unlock technology.")
+        .. " because it is not admitted by the approved science source policy.")
     end
   end
   if #source == 0 then return nil, "empty" end
@@ -209,33 +206,37 @@ function M.best_lab_compatible_ingredients(ingredients, context, required_packs,
       .. " because required science pack " .. tostring(unreachable_required) .. " is unreachable.")
     return nil, "required-unreachable"
   end
-  if M.valid_research_ingredients(source) then return source, "full" end
+  local accepted, unresolved = accepting_ingredients(source)
+  if accepted then return source, "full" end
   if policy() == "skip" then
+    if unresolved then unresolved_lab(unresolved) end
     log("[more-infinite-research] Skipping " .. tostring(context or "unknown technology")
       .. " because no lab accepts the full selected science-pack set and the lab incompatibility policy is skip.")
     return nil, "invalid"
   end
 
-  local labs = {}
-  for name, lab in pairs(data_raw.prototypes("lab")) do table.insert(labs, {name = name, lab = lab}) end
-  table.sort(labs, function(a, b) return a.name < b.name end)
-
   local best, best_lab = nil, nil
-  for _, entry in ipairs(labs) do
-    local candidate, accepted = {}, {}
-    for _, input in ipairs(entry.lab.inputs or {}) do accepted[input] = true end
+  for _, entry in ipairs(lab_acceptance_view()) do
+    local candidate = {}
     for _, ingredient in ipairs(source) do
       local name = M.ingredient_name(ingredient)
-      if name and accepted[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
+      if name and entry.accepted_inputs[name] then table.insert(candidate, {name, M.ingredient_amount(ingredient)}) end
     end
     local candidate_has_required = contains_required(candidate, required)
-    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs)
-      and #candidate > 0 and lab_acquisition_available(entry.name)
-      and (not best or #candidate > #best) then
-      best, best_lab = candidate, entry.name
+    if candidate_has_required and contains_phase_trigger(candidate, required_any_packs) and #candidate > 0 then
+      local available, reason = lab_acquisition_available(entry.name)
+      if available == true and (not best or #candidate > #best) then
+        best, best_lab = candidate, entry.name
+      elseif available == nil then
+        unresolved = first_reason(unresolved, reason or ("unresolved-lab:" .. entry.name))
+      end
     end
   end
 
+  -- An unresolved accepting source cannot be treated as a disproved route to
+  -- justify rewriting the requested science. A valid complete vector above
+  -- already returns without letting a specialist lab veto it.
+  if unresolved then unresolved_lab(unresolved) end
   if best then
     log("[more-infinite-research] Reduced science packs for " .. tostring(context or "unknown technology")
       .. " to a lab-compatible subset accepted by " .. best_lab .. ".")

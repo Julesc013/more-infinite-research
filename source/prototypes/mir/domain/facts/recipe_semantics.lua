@@ -61,6 +61,33 @@ function M.maximum_base_result_amount(entry)
   return math.max(minimum, maximum)
 end
 
+local function finite_nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0 and value < math.huge
+end
+
+-- One shared structural rule for direct source bindings.  It says only that
+-- the declared product can occur; it does not establish a recipe route,
+-- factory feasibility, or expected yield.  A fixed amount remains
+-- authoritative over ranges through maximum_base_result_amount().
+function M.possible_item_result(entry)
+  if type(entry) == "string" then return entry ~= "" end
+  if type(entry) ~= "table" then return false end
+  local base = M.maximum_base_result_amount(entry)
+  local extra = entry.extra_count_fraction
+  if extra == nil then extra = 0 end
+  if not finite_nonnegative(base) or not finite_nonnegative(extra) or base + extra <= 0 then return false end
+  local probability = entry.independent_probability
+  if probability == nil then probability = entry.probability end
+  if probability == nil then probability = 1 end
+  if type(probability) ~= "number" or probability ~= probability or probability <= 0 or probability > 1 then return false end
+  local shared = entry.shared_probability
+  if shared ~= nil then
+    if type(shared) ~= "table" or not finite_nonnegative(shared.min) or not finite_nonnegative(shared.max)
+      or shared.max > 1 or shared.min >= shared.max then return false end
+  end
+  return true
+end
+
 -- Baseline production, before bonus exclusions. Return true only for a
 -- supported, unambiguous product that cannot occur. Unknown fields/shapes
 -- retain their possible process edge; this is not a profitable-loop proof.

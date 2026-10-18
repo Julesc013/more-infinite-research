@@ -617,7 +617,8 @@ fixtures:
     shipped: false
     external_mod_identity: bobplates
     qualification_status: unqualified
-    candidate_versions: ["4.2.21001", "4.2.21002"]
+    candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000"]
+    current_candidate_version: "4.4.21000"
     exact_version_envelope:
       base: "2.1.21"
       boblibrary: "3.0.1"
@@ -643,7 +644,13 @@ fixtures:
     planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
     input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
     maintenance_input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
-    candidate_versions: ["4.2.21001", "4.2.21002"]
+    current_input_profile: fixtures/run-profiles/k2-213-imersite-f210-460.json
+    current_fixture_version: "0.1.6"
+    current_candidate_version: "4.6.21000"
+    input_profiles:
+      - fixtures/run-profiles/k2-213-imersite-f210-440.json
+      - fixtures/run-profiles/k2-213-imersite-f210-460.json
+    candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000", "4.6.21000"]
     exact_version_envelope:
       base: "2.1.21"
       Krastorio2: "2.1.3"

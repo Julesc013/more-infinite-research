@@ -55,6 +55,7 @@ package.loaded["prototypes.mir.planner.costs"] = {
   max_level_for = function() return configured_maximum end,
   base_cost_for = function() return 100 end
 }
+local native_worker_robot_speed_cap = 0
 package.loaded["prototypes.mir.planner.prerequisites"] = {
   build_for = function() return {"automation"}, nil end
 }
@@ -69,13 +70,19 @@ package.loaded["prototypes.mir.planner.science"] = {
 }
 local scripted = true
 local mod_data_supported = true
+local legacy_numeric_research_cost = false
 package.loaded["prototypes.mir.platform.factorio.target_line"] = {
-  feature_enabled = function(name) return name == "scripted_techs" and scripted end,
+  feature_enabled = function(name)
+    return (name == "scripted_techs" and scripted)
+      or (name == "legacy_numeric_research_cost" and legacy_numeric_research_cost)
+  end,
   mod_data_supported = function() return mod_data_supported end
 }
 package.loaded["prototypes.mir.domain.research_cost.model"] = {
   evaluate = function() return 400 end,
-  new = function(input) return {count_formula = "400+100*(L-4)", input = input} end
+  new = function(input)
+    return {count_formula = "400+100*(L-4)", base_cost = input.base_cost, input = input}
+  end
 }
 package.loaded["prototypes.mir.planner.stream_compiler.diagnostics"] = {
   plan_row = function(key, spec, action, reason, diagnostics, extra)
@@ -132,6 +139,16 @@ check(stage.fields.cost_model.input.anchor_level == 4
 check(stage.fields.effects[1].recipe == legacy.fields.effects[1].recipe
     and stage.fields.effects[1].change == legacy.fields.effects[1].change,
   "the continuation retains the exact qualified effect")
+check(stage.fields.count == nil and stage.fields.count_formula == "400+100*(L-4)",
+  "the normal continuation retains its formula-only research cost")
+legacy_numeric_research_cost = true
+local numeric_stage = continuation.plan(legacy)
+check(numeric_stage.fields.count == 400 and numeric_stage.fields.count_formula == nil,
+  "a legacy numeric continuation has exactly one integer research cost")
+legacy_numeric_research_cost = false
+local restored_formula_stage = continuation.plan(legacy)
+check(restored_formula_stage.fields.count == nil and restored_formula_stage.fields.count_formula == "400+100*(L-4)",
+  "leaving the legacy target restores formula-only continuation cost")
 
 -- An already required later pack must not turn a lower ordinary pack into
 -- a new frontier. These cases exercise the real shared planner, retaining
@@ -332,6 +349,79 @@ late_available = true
 local adopted = {action = "adopt", spec = spec}
 check(continuation.plan(adopted) == nil,
   "a native owner cannot be extended as an MIR generated family")
+
+-- Native worker-robot speed remains Factorio-owned. The cap policy may bind
+-- only the exact documented infinite tail and must not make a default-zero
+-- setting observable in the compiler output.
+local maximum_level_binding = require("prototypes.mir.domain.technology.maximum_level_binding")
+local function worker_speed_cap_input()
+  return maximum_level_binding.native_worker_robot_speed_cap_input(native_worker_robot_speed_cap,
+    function(name) return science_technologies[name] end)
+end
+local worker_speed_plan = {stream_plan = {rows = {}}, fingerprint = "worker-speed-cap"}
+science_technologies["worker-robots-speed-6"] = {
+  name = "worker-robots-speed-6",
+  max_level = "infinite",
+  effects = {{type = "worker-robot-speed", modifier = 0.65}},
+  prerequisites = {"worker-robots-speed-5", "space-science-pack"}
+}
+science_technologies["worker-robots-speed-7"] = nil
+native_worker_robot_speed_cap = 0
+local worker_speed_default = maximum_level_binding.from_plan(worker_speed_plan,
+  {scripted_techs_supported = true, mod_data_supported = true, native_worker_robot_speed_input = worker_speed_cap_input()})
+check(#worker_speed_default.bindings == 0,
+  "worker speed default zero must not add a native cap binding")
+
+native_worker_robot_speed_cap = 10
+local worker_speed_base = maximum_level_binding.from_plan(worker_speed_plan,
+  {scripted_techs_supported = true, mod_data_supported = true, native_worker_robot_speed_input = worker_speed_cap_input()})
+check(#worker_speed_base.bindings == 1
+    and worker_speed_base.bindings[1].technology_id == "worker-robots-speed-6"
+    and worker_speed_base.bindings[1].setting.name == "mir-max-level-worker-robots-speed"
+    and worker_speed_base.bindings[1].cap.effective == 10
+    and worker_speed_base.bindings[1].binding.source == "native-owner"
+    and worker_speed_base.bindings[1].binding.scope == "exact-native-owner"
+    and worker_speed_base.bindings[1].runtime_strategy.mode == "absolute-cap-controller",
+  "base worker speed cap must bind only the native infinite tail to V3 control")
+local worker_speed_base_observed = maximum_level_binding.observe_finalizers(worker_speed_base, {
+  ["worker-robots-speed-6"] = {
+    adapter = "factorio-data-final-fixes-v1",
+    observed_prototype_max_level = "infinite"
+  }
+})
+check(worker_speed_base_observed.finalizer_status == "accepted"
+    and worker_speed_base_observed.bindings[1].diagnostics.status == "accepted",
+  "base worker speed cap requires the unmodified native infinite prototype")
+
+science_technologies["worker-robots-speed-6"].max_level = 6
+science_technologies["worker-robots-speed-7"] = {
+  name = "worker-robots-speed-7",
+  max_level = "infinite",
+  effects = {{type = "worker-robot-speed", modifier = 0.65}},
+  prerequisites = {"worker-robots-speed-6", "electromagnetic-science-pack"}
+}
+local worker_speed_space_age = maximum_level_binding.from_plan(worker_speed_plan,
+  {scripted_techs_supported = true, mod_data_supported = true, native_worker_robot_speed_input = worker_speed_cap_input()})
+check(#worker_speed_space_age.bindings == 1
+    and worker_speed_space_age.bindings[1].technology_id == "worker-robots-speed-7",
+  "Space Age worker speed cap must select its distinct native infinite tail")
+
+table.insert(science_technologies["worker-robots-speed-7"].effects,
+  {type = "worker-robot-storage", modifier = 1})
+local worker_speed_malformed = maximum_level_binding.from_plan(worker_speed_plan,
+  {scripted_techs_supported = true, mod_data_supported = true, native_worker_robot_speed_input = worker_speed_cap_input()})
+check(#worker_speed_malformed.bindings == 0,
+  "an ambiguous worker speed effect list must not gain cap ownership")
+science_technologies["worker-robots-speed-7"] = nil
+science_technologies["worker-robots-speed-6"].max_level = "infinite"
+native_worker_robot_speed_cap = 10
+local worker_speed_f200 = maximum_level_binding.from_plan(worker_speed_plan,
+  {scripted_techs_supported = true, mod_data_supported = false, native_worker_robot_speed_input = worker_speed_cap_input()})
+check(#worker_speed_f200.bindings == 1
+    and worker_speed_f200.bindings[1].target_requirements.mod_data_transport_supported == false
+    and worker_speed_f200.bindings[1].runtime_strategy.mode == "absolute-cap-controller",
+  "F200 retains the same strict worker speed V3 binding for settings-derived control")
+native_worker_robot_speed_cap = 0
 
 -- These subjects are the retained requested outcomes, independent of the
 -- production key accessor. An emitted early row represents an already

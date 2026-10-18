@@ -184,10 +184,22 @@ return function(core, adapter, check, host_source)
     "actual host transport refusal fails to raw IDs without opening an untracked window")
 
   player.locale, player.gui = cache.locale, {screen = {}}
+  local callback_translations = {[player.index] = cache}
+  local maintenance_subscriptions = {}
+  local translations_need_maintenance = actual_function("translations_need_maintenance", {
+    type = type, pairs = pairs, next = next})
+  local refresh_translation_maintenance_subscription = actual_function(
+    "refresh_translation_maintenance_subscription", {
+      translation_state = function() return callback_translations, {} end,
+      translations_need_maintenance = translations_need_maintenance,
+      set_translation_maintenance_subscription = function(active)
+        maintenance_subscriptions[#maintenance_subscriptions + 1] = active
+      end})
   local callback = actual_function("translated", {
     core = core, type = type, string = string, translation_queue = queue, ROOT = "mir_research_browser",
     event_player = function() return player end,
-    translation_state = function() return {[player.index] = cache}, {} end})
+    translation_state = function() return callback_translations, {} end,
+    refresh_translation_maintenance_subscription = refresh_translation_maintenance_subscription})
   queue.reset_catalogue(cache, {key}, "actual-composed-callback")
   queue.dispatch(cache, key, 0, function() return 202 end, subjects, false)
   local long_result = names[key] .. "\31" .. string.rep("r", 600) .. "\31"
@@ -196,6 +208,18 @@ return function(core, adapter, check, host_source)
   check(cache.values[key] == names[key] and type(cache.search_values[key]) == "string"
       and #cache.search_values[key] > 1024 and not cache.discovery_limited,
     "the actual callback retains a valid composed result larger than one caption")
+  check(#maintenance_subscriptions == 1 and maintenance_subscriptions[1] == false,
+    "actual callback removes maintenance after the final retained translation")
+  callback_translations[2] = {pending_by_id = {[777] = true}}
+  queue.reset_catalogue(cache, {key}, "peer-pending-callback")
+  queue.dispatch(cache, key, 0, function() return 203 end, subjects, false)
+  callback{player_index = player.index, id = 203, translated = true, result = translated(payload)}
+  check(maintenance_subscriptions[#maintenance_subscriptions] == true,
+    "actual callback retains maintenance while another issued translation remains")
+  callback_translations[2] = nil
+  refresh_translation_maintenance_subscription()
+  check(maintenance_subscriptions[#maintenance_subscriptions] == false,
+    "actual maintenance refresh unregisters after the last issued translation completes")
 
   local pending, view_state, clock = {[2] = 4}, {tab = "research", search = "plaque doree"}, {tick = 10}
   local results, subscribed = {valid = true}, 0

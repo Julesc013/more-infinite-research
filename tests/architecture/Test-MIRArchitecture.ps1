@@ -534,10 +534,8 @@ if ($LASTEXITCODE -ne 0) {
 
 $dataFinalFixesStageText = Read-MIRFile -RelativePath "prototypes/mir/stage/data_final_fixes.lua"
 Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'return require("prototypes.mir.pipeline.commands").run_all({return_snapshot = false})'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'if compiler_profile.get(target_line.factorio_version) == "classic" then'
-Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Text $dataFinalFixesStageText -Needle 'return require("prototypes.mir.pipeline.classic_compiler").run()'
-if ($dataFinalFixesStageText -match '(?m)^local\s+\w+\s*=\s*require\("prototypes[.]mir[.]pipeline[.]commands"\)') {
-  throw 'The full command DAG must be imported only after the Classic profile returns.'
+if ($dataFinalFixesStageText -match 'classic_compiler|compiler_profile[.]get') {
+  throw 'The public data-final-fixes stage must execute the single preservation-capable command DAG without profile dispatch.'
 }
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
 if ($dataFinalFixesStageText -match 'commands\.run\("') {

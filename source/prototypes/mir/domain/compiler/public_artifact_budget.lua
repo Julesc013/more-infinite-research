@@ -18,6 +18,21 @@ function M.limit(kind)
   return limit
 end
 
+-- Enforces a scalar count against the registered kind limit. It does not
+-- inspect or serialize an artifact; callers that hold arbitrary records must
+-- canonicalize them independently before invoking this boundary.
+function M.assert_byte_count_within_limit(kind, bytes)
+  local limit = M.limit(kind)
+  if type(bytes) ~= "number" or bytes < 0 or bytes ~= math.floor(bytes) then
+    error("Owned public artifact byte count is invalid.", 2)
+  end
+  if bytes > limit then
+    error("MIR public artifact exceeds its hard byte budget: " .. kind
+      .. " bytes=" .. bytes .. " budget=" .. limit, 2)
+  end
+  return bytes, limit
+end
+
 function M.sample_limit()
   return SAMPLE_LIMIT
 end

@@ -74,6 +74,9 @@ function M.build_for(key, ingredients)
     local pack_name = pair.name or pair[1]
     for _, prereq in ipairs(science.prereq_techs_for_science_pack(pack_name) or {}) do add(prereq) end
   end
+  for _, prereq in ipairs(science_selector.retained_prerequisites_for_stream(key, packs) or {}) do
+    add(prereq)
+  end
   for _, tech_name in ipairs(spec.required_technologies or {}) do
     add(tech_name)
   end

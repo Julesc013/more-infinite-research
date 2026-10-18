@@ -62,17 +62,13 @@ end
 
 local has_category = recipe_semantics.has_recipe_category
 
-local function apply_recipe_productivity_cap(value, recycling_chance, options)
+local function apply_recipe_productivity_cap(value, recycling_chance)
   if value == nil then return 0 end
 
   local changed = 0
   local scoped = effective_settings.get(prototype_limit_settings.self_recycling_scope_setting_name) == true
   local scope_threshold = inverse_recycling_productivity_bonus(recycling_chance)
   local scope_active = scoped and value > scope_threshold + EPSILON
-  if scope_active and options and options.allow_material_analysis == false then
-    log("[more-infinite-research] Classic compiler: scoped productivity-cap override not evaluated; recipe caps remain unchanged.")
-    return 0, "not-evaluated-classic-material-scope"
-  end
   local scope_classifier = scope_active
     and require("prototypes.mir.policy.productivity_cap_scope").build(scope_threshold) or nil
   local approved = 0
@@ -237,10 +233,10 @@ local function apply_positive_power_floor()
   return changed
 end
 
-function P.apply(options)
+function P.apply()
   local productivity_cap = selected("productivity")
   local recycling = apply_recycling_return_chance(productivity_cap)
-  local productivity, productivity_status = apply_recipe_productivity_cap(productivity_cap, recycling.chance, options)
+  local productivity, productivity_status = apply_recipe_productivity_cap(productivity_cap, recycling.chance)
   local changed = {
     recycling = recycling,
     productivity = productivity,

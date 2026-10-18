@@ -19,6 +19,7 @@ if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version: 2[.]1[.]') { throw 'This
 $modules=[ordered]@{
  'prototypes.mir.core.deepcopy'='source/prototypes/mir/core/deepcopy.lua'
  'prototypes.mir.platform.factorio.data_raw'='source/prototypes/mir/platform/factorio/data_raw.lua'
+ 'prototypes.mir.platform.factorio.prototype_lookup'='source/prototypes/mir/platform/factorio/prototype_lookup.lua'
  'prototypes.mir.capabilities.science_integration.lab_compatibility'='source/prototypes/mir/capabilities/science_integration/lab_compatibility.lua'
  'prototypes.mir.capabilities.science_integration.science_selection_policy'='source/prototypes/mir/capabilities/science_integration/science_selection_policy.lua'
  'prototypes.mir.capabilities.science_integration.science_selector'='source/prototypes/mir/capabilities/science_integration/science_selector.lua'
@@ -26,8 +27,9 @@ $modules=[ordered]@{
  'prototypes.mir.policy.owner_policy'='source/prototypes/mir/policy/owner_policy.lua'
  'prototypes.mir.planner.native_owner_binding'='source/prototypes/mir/planner/native_owner_binding.lua'
  'prototypes.mir.planner.science'='source/prototypes/mir/planner/science.lua'
+ 'prototypes.mir.planner.prerequisites'='source/prototypes/mir/planner/prerequisites.lua'
  'prototypes.streams.productivity'='source/prototypes/streams/productivity.lua'
- 'prototypes.mir.planner.stream_compiler.qualify'='source/adapters/f200/prototypes/mir/planner/stream_compiler/qualify.lua'
+ 'prototypes.mir.planner.stream_compiler.qualify'='source/prototypes/mir/planner/stream_compiler/qualify.lua'
 }
 $lua=[Text.StringBuilder]::new()
 [void]$lua.AppendLine('local host_log=log; local loaders={}; local env=setmetatable({package={loaded={}}},{__index=_G}); env._G=env; env.print=function(s) host_log(s) end')

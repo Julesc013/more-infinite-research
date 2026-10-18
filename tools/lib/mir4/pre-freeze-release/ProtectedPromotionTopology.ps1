@@ -724,6 +724,15 @@ function Assert-MIR4A08ConfiguredRemote {
   if ($RemoteName-cnotmatch'^[A-Za-z0-9][A-Za-z0-9._-]{0,80}$'){throw '[mir4-a08-remote-identity]'};$url=((Invoke-MIR4A08Git -RepoRoot $RepoRoot -Arguments @('remote','get-url',$RemoteName))-join'').Trim();if (-not$Rehearsal-and-not(Test-MIR4A08CanonicalGitHubRemote -Url $url -Repository ([string]$Plan.policy.repository))){throw '[mir4-a08-remote-identity]'};return $url
 }
 
+function Get-MIR4A08NineTargetPromotionPlanReleaseLine {
+  param([Parameter(Mandatory)][string]$Status)
+  switch ($Status) {
+    'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' { return '4.2' }
+    'MIR-4.4-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' { return '4.4' }
+    default { throw '[mir4-a08-nine-transport-plan]' }
+  }
+}
+
 function Get-MIR4A08NineTargetPromotionPlanProjection {
   param([Parameter(Mandatory)]$PromotionPlan)
   $targets=@('f210','f200','f110','f100','f017','f016','f015','f014','f013')
@@ -737,11 +746,12 @@ function Get-MIR4A08NineTargetPromotionPlanProjection {
   Assert-MIR4A08PropertyNames $PromotionPlan.candidate_manifest @('sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
   Assert-MIR4A08PropertyNames $PromotionPlan.current_programme @('path','sha256','record_sha256') '[mir4-a08-nine-transport-plan]'
   Assert-MIR4A08PropertyNames $PromotionPlan.proofs $proofNames '[mir4-a08-nine-transport-plan]'
+  $releaseLine=Get-MIR4A08NineTargetPromotionPlanReleaseLine -Status ([string]$PromotionPlan.status)
   if ([int]$PromotionPlan.schema-ne1-or[string]$PromotionPlan.kind-cne'MIR42NineTargetProtectedMainPromotionPlanV1'-or
-      [string]$PromotionPlan.status-cne'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY'-or[string]$PromotionPlan.scope-cne'nine-target'-or
+      [string]$PromotionPlan.scope-cne'nine-target'-or
       [string]$PromotionPlan.source.commit-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.source.tree-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.source.package_source_sha256-cnotmatch'^[A-F0-9]{64}$'-or
       [string]$PromotionPlan.main_before-cnotmatch'^[0-9a-f]{40}$'-or[string]$PromotionPlan.frozen_dev.ref-cne'refs/heads/dev'-or[string]$PromotionPlan.frozen_dev.commit-cne[string]$PromotionPlan.source.commit-or[string]$PromotionPlan.frozen_dev.tree-cne[string]$PromotionPlan.source.tree-or
-      [string]$PromotionPlan.candidate.ref-cne('refs/heads/release/mir-4.2-candidate-'+([string]$PromotionPlan.source.commit).Substring(0,12))-or[string]$PromotionPlan.candidate.base_ref-cne'refs/heads/main'-or[string]$PromotionPlan.candidate.base_commit-cne[string]$PromotionPlan.main_before-or[int]$PromotionPlan.candidate.parent_count-ne1-or[string]$PromotionPlan.candidate.exact_tree-cne[string]$PromotionPlan.source.tree-or[string]$PromotionPlan.candidate.source_commit_trailer-cne("MIR4-Frozen-Dev-Commit: $([string]$PromotionPlan.source.commit)")-or
+      [string]$PromotionPlan.candidate.ref-cne('refs/heads/release/mir-'+$releaseLine+'-candidate-'+([string]$PromotionPlan.source.commit).Substring(0,12))-or[string]$PromotionPlan.candidate.base_ref-cne'refs/heads/main'-or[string]$PromotionPlan.candidate.base_commit-cne[string]$PromotionPlan.main_before-or[int]$PromotionPlan.candidate.parent_count-ne1-or[string]$PromotionPlan.candidate.exact_tree-cne[string]$PromotionPlan.source.tree-or[string]$PromotionPlan.candidate.source_commit_trailer-cne("MIR4-Frozen-Dev-Commit: $([string]$PromotionPlan.source.commit)")-or
       $PromotionPlan.candidate.create_only-isnot[bool]-or-not[bool]$PromotionPlan.candidate.create_only-or$PromotionPlan.candidate.remote_ref_must_be_absent-isnot[bool]-or-not[bool]$PromotionPlan.candidate.remote_ref_must_be_absent-or
       [string]$PromotionPlan.target-cne'main'-or[string]$PromotionPlan.merge_method-cne'squash'-or$PromotionPlan.pull_request_required-isnot[bool]-or-not[bool]$PromotionPlan.pull_request_required-or$PromotionPlan.linear_history_required-isnot[bool]-or-not[bool]$PromotionPlan.linear_history_required-or
       (@($PromotionPlan.required_status_checks)-join'|')-cne'branch-policy|verification-gate'-or[int]$PromotionPlan.bypass_actors_allowed-ne0-or$PromotionPlan.force_push-isnot[bool]-or[bool]$PromotionPlan.force_push-or$PromotionPlan.ruleset_mutation-isnot[bool]-or[bool]$PromotionPlan.ruleset_mutation-or

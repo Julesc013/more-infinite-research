@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 
-SOURCE_PATH = Path("source/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
+SOURCE_PATH = Path("tests/reference/retired-discovery/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua")
 FIXTURE_PATH = Path("tests/compiler/item_acquisition_service_isolation.lua")
 
 
@@ -110,6 +110,7 @@ end
     result = runtime.execute(fixture)
     record = {
         "status": "MIR-ITEM-ACQUISITION-SERVICE-ISOLATION-CONTROLS-PASSED",
+        "scope": "retired-discovery-characterization-not-current-package-certification",
         "assertions": int(result["assertions"]),
         "calls": int(result["calls"]),
         "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),

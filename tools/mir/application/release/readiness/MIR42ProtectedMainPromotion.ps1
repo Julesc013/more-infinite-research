@@ -366,7 +366,18 @@ function Assert-MIR42PromotionReadinessScope {
     throw '[mir42-promotion-current-programme]'
   }
   Assert-MIR42SealTargetSet -Rows @($state.programme.record.selected_targets | ForEach-Object { [pscustomobject]@{target=[string]$_} }) -Code 'mir42-promotion-current-programme' -Scope $RequiredScope
-  Assert-MIR42SealTargetSet -Rows @($state.programme.record.direct_predecessors) -Code 'mir42-promotion-current-programme-predecessors' -Scope $RequiredScope
+  if ($RequiredScope -ceq 'nine-target') {
+    $candidateRelease = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $state.candidate
+    if ([string]$state.programme.record.release_line -cne [string]$candidateRelease.release_line) { throw '[mir42-promotion-current-programme-release-line]' }
+    $predecessorRows = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) {
+      $maintenanceInputs = if ($state.PSObject.Properties.Name -ccontains 'maintenance_inputs') { $state.maintenance_inputs } else { $null }
+      if ($null -eq $maintenanceInputs -or $null -eq $maintenanceInputs.targets) { throw '[mir42-promotion-maintenance-predecessor-required]' }
+      @($maintenanceInputs.targets)
+    } else { @($state.programme.record.direct_predecessors) }
+    Assert-MIR42SealTargetSet -Rows $predecessorRows -Code 'mir42-promotion-current-programme-predecessors' -Scope $RequiredScope
+  } else {
+    Assert-MIR42SealTargetSet -Rows @($state.programme.record.direct_predecessors) -Code 'mir42-promotion-current-programme-predecessors' -Scope $RequiredScope
+  }
   if ($null -eq $state.t16_trust_root -or $null -eq $state.t16_trust_root.record -or
       [string]$state.t16_trust_root.record.kind -cne [string]$contract.trust_root_kind) {
     throw '[mir42-promotion-trust-root-scope]'
@@ -503,7 +514,10 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     throw '[mir42-promotion-frozen-ref-drift]'
   }
   $main = [string]$freeze.promotion_base.commit
-  $candidateRef = 'refs/heads/release/mir-4.2-candidate-' + ([string]$candidate.source.commit).Substring(0,12)
+  $candidateRelease = if ($RequiredScope -ceq 'nine-target') { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate $candidate } else { $null }
+  $candidateRef = if ($null -ne $candidateRelease) {
+    [string]$candidateRelease.candidate_ref_prefix + ([string]$candidate.source.commit).Substring(0,12)
+  } else { 'refs/heads/release/mir-4.2-candidate-' + ([string]$candidate.source.commit).Substring(0,12) }
   if (-not $PostPromotionReadback) {
     $observedMain = Get-MIR42PromotionRemoteRef -RepoRoot $repo -Ref 'refs/heads/main' -Code 'mir42-promotion-main-ref-readback'
     $dev = Get-MIR42PromotionRemoteRef -RepoRoot $repo -Ref 'refs/heads/dev' -Code 'mir42-promotion-dev-ref-readback'
@@ -511,7 +525,7 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     Assert-MIR42PromotionRemoteRefAbsent -RepoRoot $repo -Ref $candidateRef
   }
   $planKind = if ($RequiredScope -ceq 'nine-target') { 'MIR42NineTargetProtectedMainPromotionPlanV1' } else { 'MIR42ProtectedMainPromotionPlanV1' }
-  $planStatus = if ($RequiredScope -ceq 'nine-target') { 'MIR-4.2-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' } else { 'MIR-4.2-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' }
+  $planStatus = if ($RequiredScope -ceq 'nine-target') { [string]$candidateRelease.promotion_plan_status } else { 'MIR-4.2-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' }
   $plan = [ordered]@{
     schema = 1
     kind = $planKind
@@ -552,7 +566,9 @@ function Get-MIR42ProtectedMainPromotionPlanShared {
     $plan.scope = 'nine-target'
     $plan.candidate_manifest = [ordered]@{sha256=[string]$candidate.identity.sha256;record_sha256=[string]$candidate.identity.record.record_sha256}
     $plan.current_programme = [ordered]@{path=[string]$readiness._state.programme.path;sha256=[string]$readiness._state.programme.sha256;record_sha256=[string]$readiness._state.programme.record.record_sha256}
-    $plan.direct_predecessors = @($readiness._state.programme.record.direct_predecessors)
+    $plan.direct_predecessors = if ([string]$candidateRelease.source_version -cin @('4.4.0','4.4.2','4.5.0','4.5.2')) {
+      @($readiness._state.maintenance_inputs.targets)
+    } else { @($readiness._state.programme.record.direct_predecessors) }
     $plan.target_assets = @($candidate.targets | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.archive_sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
     $plan.proofs = [ordered]@{
       qualification = [ordered]@{sha256=[string]$readiness._state.qualification.sha256;record_sha256=[string]$readiness._state.qualification.record.record_sha256}
@@ -750,8 +766,9 @@ function Get-MIR42NineTargetProtectedMainReadback {
   $policy=Get-MIR4A08PolicyObservation -CanonicalRepository 'Julesc013/more-infinite-research' -PolicyProvider (New-MIR4A08GitHubRestPolicyProvider -GhExecutable $gh.Source)
   if([string]$policy.policy_sha256 -cne [string]$transport.policy.policy_sha256){throw '[mir42-main-readback-protected-policy-drift]'}
   $promotion=Get-MIR42NineTargetMergedPromotionObservation -PromotionPlan $plan -PrimarySnapshot $snapshot -Transport $transport -PullRequestNumber $PullRequestNumber
+  $release = Get-MIR42NineTargetPromotionPlanStatusReleaseLineContract -Status ([string]$plan.status)
   $record=[pscustomobject][ordered]@{
-    schema=1;kind='MIR42NineTargetProtectedMainReadbackV1';status='MIR-4.2-NINE-TARGET-SEALED-ON-MAIN-AWAITING-HUMAN-PLAYTEST';scope='nine-target'
+    schema=1;kind='MIR42NineTargetProtectedMainReadbackV1';status=[string]$release.main_readback_status;scope='nine-target'
     source=$plan.source;primary_main=$snapshot
     protected_pull_request=$promotion
     promotion_transport=[ordered]@{scope='nine-target';binding_sha256=[string]$transport.binding_sha256;promotion_plan_sha256=[string]$transport.promotion_plan_sha256;allocated_candidate=$transport.candidate;intention=$transport.intention;request=$transport.request;policy_sha256=[string]$policy.policy_sha256}

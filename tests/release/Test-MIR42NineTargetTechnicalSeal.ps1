@@ -219,6 +219,60 @@ Assert-MIR42NineSealTest -Condition ([string]$nineContract.evidence_kind -ceq 'M
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.engine_run_kind -ceq 'MIR42NineTargetEngineRunV1') -Code 'nine-engine-contract'
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.binder_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED') -Code 'nine-binder-contract'
 Assert-MIR42NineSealTest -Condition ([string]$nineContract.campaign_status -ceq 'MIR-4.2-NINE-TARGET-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED') -Code 'nine-campaign-contract'
+$release450 = Get-MIR42NineTargetReleaseLineContract -SourceVersion '4.5.0'
+Assert-MIR42NineSealTest -Condition ([string]$release450.release_line -ceq '4.5' -and
+  [string]$release450.programme_pending_status -ceq 'active-current-4.5-release-cut-pre-freeze-no-transition-authority' -and
+  [string]$release450.promotion_plan_status -ceq 'MIR-4.5-NINE-TARGET-PROTECTED-MAIN-PROMOTION-PLAN-ONLY' -and
+  [string]$release450.candidate_ref_prefix -ceq 'refs/heads/release/mir-4.5-candidate-') -Code '450-release-line-contract-is-exact'
+$candidateRelease450 = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.0'})
+Assert-MIR42NineSealTest -Condition ([string]$candidateRelease450.release_line -ceq '4.5') -Code '450-candidate-release-line-is-explicit'
+
+
+function Test-MIR452SealAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+
+  # The central construction reader owns schema/hash validation. This compact
+  # unit verifies only this module's V12 admission and keeps V11 predecessor
+  # bytes out of normal candidate evidence.
+  $targets = @($script:MIR42SealNineTargetCandidates | ForEach-Object { [pscustomobject]@{target=$_} })
+  $candidate = [pscustomobject]@{targets=$targets;identity=[pscustomobject]@{record=[pscustomobject]@{fixture_source_version='4.5.2'}}}
+  $reader = (Get-Command Get-MIR42SealCandidateConstructionVersionContract -CommandType Function -ErrorAction Stop).ScriptBlock
+  try {
+    Set-Item -LiteralPath Function:Get-MIR42SealCandidateConstructionVersionContract -Value {
+      param($RepoRoot,$Manifest)
+      [pscustomobject]@{source_version=[string]$Manifest.fixture_source_version}
+    }
+    $contract = Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance
+    Assert-MIR42NineSealTest -Condition ([string]$contract.maintenance_source_version -ceq '4.5.2' -and
+      [string]$contract.engine_run_kind -ceq 'MIR42NineTargetMaintenanceIndividualEngineRunV1') -Code '452-individual-maintenance-contract'
+    $candidate.identity.record.fixture_source_version='4.5.1'
+    $rejected=$false
+    # The outer maintenance source gate rejects this predecessor before the
+    # individual-receipt contract can be selected.
+    try { Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance | Out-Null } catch { $rejected=$_.Exception.Message -ceq '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    Assert-MIR42NineSealTest -Condition $rejected -Code '451-remains-predecessor-not-normal-individual-candidate'
+  } finally {
+    Set-Item -LiteralPath Function:Get-MIR42SealCandidateConstructionVersionContract -Value $reader
+  }
+
+  $release452 = Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.2'})
+  Assert-MIR42NineSealTest -Condition ([string]$release452.release_line -ceq '4.5') -Code '452-candidate-release-line-is-explicit'
+  $futureRejected=$false
+  try { Get-MIR42NineTargetCandidateReleaseLineContract -Candidate ([pscustomobject]@{source_version='4.5.3'}) | Out-Null } catch { $futureRejected=$_.Exception.Message -ceq '[mir42-nine-target-release-line-candidate-version]' }
+  Assert-MIR42NineSealTest -Condition $futureRejected -Code '453-candidate-release-line-rejected'
+
+  $published = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.5.2'
+  $programme = [pscustomobject]@{release_line='4.5';published_maintenance_predecessor=$published}
+  Assert-MIR42NineSealTest -Condition ((Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme) -ceq '4.5.2') -Code '452-programme-binds-published-451-custody'
+  $programme.published_maintenance_predecessor.tree=('0' * 40)
+  $custodyRejected=$false
+  try { Resolve-MIR42NineTargetProgrammeSourceVersion -Programme $programme | Out-Null } catch { $custodyRejected=$_.Exception.Message -ceq '[mir42-seal-current-programme-maintenance-binding]' }
+  Assert-MIR42NineSealTest -Condition $custodyRejected -Code '452-programme-rejects-wrong-published-451-custody'
+}
+
+if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR452SealAdmission -RepoRoot $repo
+}
 
 function Test-MIR42NineCriterionEvidenceReader {
   param([Parameter(Mandatory)][string]$RepoRoot)
@@ -350,6 +404,39 @@ try {
   $freshCandidate = [pscustomobject][ordered]@{source=[pscustomobject][ordered]@{commit=$freshSource}}
   $freshExecution = [pscustomobject][ordered]@{executable_path=$freshEnginePath;executable_sha256=$freshEngine;version='0.17.79';fresh_loads=@($freshRefs)}
   Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution
+  $writeFreshVersionFixture = {
+    param([string]$DistributionVersion,[string]$LoggedVersion)
+    $freshTarget.distribution_version = $DistributionVersion
+    $freshRecord.candidate.version = $DistributionVersion
+    [IO.File]::WriteAllText($freshLog,"Loading mod more-infinite-research $LoggedVersion (data.lua)`nFactorio initialised`nCreating new map",[Text.UTF8Encoding]::new($false))
+    $freshRecord.log.sha256 = (Get-FileHash -LiteralPath $freshLog -Algorithm SHA256).Hash.ToUpperInvariant()
+    $freshRefs.log.sha256 = $freshRecord.log.sha256
+    $freshRecord.record_sha256 = ''
+    Write-MIR4BootstrapRecord -Record $freshRecord -Path $freshReceipt | Out-Null
+    $freshRefs.receipt.sha256 = (Get-FileHash -LiteralPath $freshReceipt -Algorithm SHA256).Hash.ToUpperInvariant()
+  }
+  foreach ($versionCase in @(
+    @{distribution='4.3.01700';logged='4.3.1700'},
+    @{distribution='4.4.01700';logged='4.4.1700'},
+    @{distribution='4.4.01702';logged='4.4.1702'},
+    @{distribution='4.5.01700';logged='4.5.1700'}
+  )) {
+    & $writeFreshVersionFixture $versionCase.distribution $versionCase.logged
+    Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution
+  }
+  # Hash-valid observations must still reject an unadmitted minor and a
+  # different loaded patch; expanding 4.5 support must not loosen either guard.
+  & $writeFreshVersionFixture '4.6.01700' '4.6.1700'
+  $futureMinorRejected = $false
+  try { Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution }
+  catch { $futureMinorRejected = $_.Exception.Message -ceq '[mir42-seal-historical-distribution-version] f017' }
+  Assert-MIR42NineSealTest -Condition $futureMinorRejected -Code 'historical-fresh-unadmitted-minor-rejected'
+  & $writeFreshVersionFixture '4.4.01702' '4.4.1701'
+  $wrongLoadedPatchRejected = $false
+  try { Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidate -Execution $freshExecution }
+  catch { $wrongLoadedPatchRejected = $_.Exception.Message -ceq '[mir42-seal-real-engine-fresh-load-log-marker] f017/package-zip-base' }
+  Assert-MIR42NineSealTest -Condition $wrongLoadedPatchRejected -Code 'historical-fresh-wrong-loaded-patch-rejected'
+  & $writeFreshVersionFixture '4.4.01702' '4.4.1702'
   $freshRecord.source_commit = 'b' * 40
   $freshRecord.record_sha256 = ''
   $wrongFreshReceipt = Join-Path $readerFixtureRoot 'historical-fresh-wrong-source.json'
@@ -635,7 +722,7 @@ function Test-MIR42IndividualNativeInputReader {
         } else {
           $summary = [pscustomobject][ordered]@{
             schema=2;status='passed';git_commit=$source.commit;validation_package_sha256=$candidateTarget.archive_sha256
-            validation_package_content_sha256=$candidateTarget.content_sha256;factorio_binary_version=$engineProductVersion
+            validation_package_content_sha256=$candidateTarget.content_sha256;factorio_binary_version=$engineVersion
             expected_scenarios=@($scenario);scenarios=@([pscustomobject][ordered]@{name=$scenario;status='passed';assertions_executed=1})
           }
           $summaryReference = Write-HostJson (Join-Path $root ($prefix + '.json')) $summary
@@ -651,7 +738,7 @@ function Test-MIR42IndividualNativeInputReader {
       source=$source;candidate_manifest=[pscustomobject][ordered]@{path=$manifest.path;sha256=$manifest.sha256;record_sha256=$manifest.record.record_sha256}
       predecessor_authority=[pscustomobject][ordered]@{path='host-only-predecessor-authority.json';sha256=('1' * 64);record_sha256=('2' * 64)}
       public_v410_checksum_asset=[pscustomobject][ordered]@{release_id=1;asset_id=2;digest=('sha256:' + ('3' * 64));bytes=1;download_verified=$true}
-      runner=(Write-HostText (Join-Path $root 'runner.ps1') 'Test-MIRUpgrade.ps1');harness=(Write-HostText (Join-Path $root 'harness.ps1') 'Test-MIRUpgrade.ps1 upgraded-save-second-reload-passed')
+      runner=(Write-HostText (Join-Path $root 'runner.ps1') 'Test-MIRUpgrade.ps1');harness=(Write-HostText (Join-Path $root 'harness.ps1') 'upgraded-save-second-reload-passed')
       historical_target_authorities=@($script:MIR42SealHistoricalTargets | ForEach-Object { [pscustomobject][ordered]@{target=$_;authority=[pscustomobject][ordered]@{host_only=$true;target=$_}} })
       published_maintenance_predecessor=$script:mir42IndividualReaderPublished;individual_upgrade_receipts=$receipts;fresh_loads=$fresh
       factorio_processes=46;release_qualification='not-performed';publication_authorized=$false;record_sha256=''
@@ -661,6 +748,176 @@ function Test-MIR42IndividualNativeInputReader {
     $bound = Get-MIR42BoundEngineRun -Reference $baseReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
+
+    # Fresh-load producers record the full executable FileVersion, just like
+    # the upgrade runner. A different build or a truncated product version
+    # must not bind to the same exact engine observation.
+    $differentBuild = $engineProductVersion + '.999999'
+    foreach ($versionCase in @(
+      [pscustomobject]@{name='different-build';version=$differentBuild},
+      [pscustomobject]@{name='truncated-version';version=$engineProductVersion}
+    )) {
+      if ([string]$versionCase.version -ceq $engineVersion) { continue }
+      $wrongFreshVersion = Copy-HostValue $baseRecord
+      $freshVersionSummary = Get-Content -LiteralPath $wrongFreshVersion.fresh_loads[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $freshVersionSummary.factorio_binary_version = [string]$versionCase.version
+      $freshVersionReference = Write-HostJson (Join-Path $root ('fresh-' + $versionCase.name + '.json')) $freshVersionSummary
+      $wrongFreshVersion.fresh_loads[0].receipt = [ordered]@{path=$freshVersionReference.path;sha256=$freshVersionReference.sha256}
+      Assert-HostReaderRefusal ('fresh-engine-' + $versionCase.name) $wrongFreshVersion '[mir42-seal-real-engine-fresh-load-binding]'
+    }
+
+    # Factorio 0.13 has no Windows PE version metadata.  The fallback is
+    # admissible only for its exact sealed binary and semantic version; a
+    # populated receipt value, or either version/hash drift, remains a refusal.
+    $f013Authority = Get-MIR42HistoricalTerminalAuthority -RepoRoot $RepoRoot -Target 'f013' -PredecessorIdentityOnly
+    $f013Engine = $f013Authority.target_record.record.engine
+    $f013FallbackAccepted = Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version)
+    $f013MissingReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $false -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013WhitespaceReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ArrayReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedReceiptRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $false -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedFileVersionRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion ([string]$f013Engine.version) -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedPEFieldRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion ([string]$f013Engine.version) `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedVersionRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion '0.13.999')
+    $f013ForgedHashRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath ([string]$f013Engine.path) -EngineSha256 ('0' * 64) -EngineVersion ([string]$f013Engine.version))
+    $f013ForgedPathRejected = -not (Test-MIR42F013BlankPEVersionReceiptFallback -ReceiptVersionPresent $true -ReceiptVersionTokenIsBlank $true -FileVersion '' -ProductVersion '' `
+      -EnginePath (Join-Path (Split-Path -Parent ([string]$f013Engine.path)) 'factorio-other.exe') -EngineSha256 ([string]$f013Engine.sha256) -EngineVersion ([string]$f013Engine.version))
+    Assert-MIR42NineSealTest -Condition ($f013FallbackAccepted -and $f013MissingReceiptRejected -and $f013WhitespaceReceiptRejected -and $f013ArrayReceiptRejected -and $f013ForgedReceiptRejected -and $f013ForgedFileVersionRejected -and $f013ForgedPEFieldRejected -and $f013ForgedVersionRejected -and $f013ForgedHashRejected -and $f013ForgedPathRejected) -Code 'individual-f013-blank-pe-version-requires-sealed-engine'
+    $checks++
+
+    # The integrated reader case needs a real local file so it can verify the
+    # exact immutable-file binding.  This deliberately plain-text .exe has no
+    # Windows PE version resources; it is a host-only structural fixture, not
+    # a substitute for the sealed 0.13 engine or native qualification.
+    $f013ReaderEngineRoot = Join-Path $root 'f013-blank-pe-version-engine'
+    New-Item -ItemType Directory -Force -Path $f013ReaderEngineRoot | Out-Null
+    $f013ReaderEngineFile = Write-HostText (Join-Path $f013ReaderEngineRoot 'factorio.exe') 'host-only f013 blank-pe-version fixture'
+    $f013ReaderEngineInfo = Get-Item -LiteralPath $f013ReaderEngineFile.path
+    $f013ReaderFileVersion = [string]$f013ReaderEngineInfo.VersionInfo.FileVersion
+    $f013ReaderProductVersion = [string]$f013ReaderEngineInfo.VersionInfo.ProductVersion
+    Assert-MIR42NineSealTest -Condition ($f013ReaderFileVersion -ceq '' -and $f013ReaderProductVersion -ceq '') -Code 'individual-f013-host-fixture-has-blank-pe-version'
+    $checks++
+    $f013ReaderEngine = [pscustomobject][ordered]@{
+      path = [string]$f013ReaderEngineFile.path
+      sha256 = [string]$f013ReaderEngineFile.sha256
+      version = [string]$f013Engine.version
+    }
+    # The production reader always loads the sealed historical authority.  The
+    # host-only integrated case replaces only that read with equivalent sealed
+    # fixture metadata, so hosted CI never requires D:\Programs\Factorio\0.13.
+    $f013ReaderAuthority = [pscustomobject][ordered]@{
+      target_record = [pscustomobject][ordered]@{
+        record = [pscustomobject][ordered]@{
+          engine = [pscustomobject][ordered]@{
+            path = [string]$f013ReaderEngine.path
+            sha256 = [string]$f013ReaderEngine.sha256
+            version = [string]$f013ReaderEngine.version
+          }
+        }
+      }
+      terminal_seal = [pscustomobject][ordered]@{
+        record = [pscustomobject][ordered]@{
+          engine = [pscustomobject][ordered]@{
+            binary_sha256 = [string]$f013ReaderEngine.sha256
+            version = [string]$f013ReaderEngine.version
+          }
+        }
+      }
+    }
+    function New-F013BlankPEVersionReaderRecord {
+      $record = Copy-HostValue $baseRecord
+      $f013EnginePath = Resolve-MIR42SealImmutableFile -Path ([string]$f013ReaderEngine.path) -Sha256 ([string]$f013ReaderEngine.sha256) -Code 'mir42-individual-f013-reader-engine'
+      $receiptIndex = @($record.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      Assert-MIR42NineSealTest -Condition ($receiptIndex -ge 0) -Code 'individual-f013-reader-row'
+      $receipt = Get-Content -LiteralPath $record.individual_upgrade_receipts[$receiptIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $receipt.factorio_binary_sha256 = [string]$f013ReaderEngine.sha256
+      $receipt.factorio_binary_version = $null
+      Set-HostReceiptField $record $receiptIndex $receipt
+      $record.individual_upgrade_receipts[$receiptIndex].engine = [ordered]@{path=$f013EnginePath;sha256=[string]$f013ReaderEngine.sha256;version=[string]$f013ReaderEngine.version}
+      foreach ($freshIndex in 0..($record.fresh_loads.Count - 1)) {
+        if ([string]$record.fresh_loads[$freshIndex].target -cne 'f013') { continue }
+        $summary = Get-Content -LiteralPath $record.fresh_loads[$freshIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+        $summary.engine = [ordered]@{path=$f013EnginePath;sha256=[string]$f013ReaderEngine.sha256}
+        $reference = Write-HostBootstrap (Join-Path $root ('f013-fresh-reader-' + [guid]::NewGuid().ToString('N') + '.json')) $summary
+        $record.fresh_loads[$freshIndex].receipt = [ordered]@{path=$reference.path;sha256=$reference.sha256}
+      }
+      return $record
+    }
+    $f013AuthorityReader = (Get-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority).ScriptBlock
+    try {
+      $script:mir42F013ReaderFixtureAuthority = $f013ReaderAuthority
+      $script:mir42F013ReaderAuthorityReader = $f013AuthorityReader
+      Set-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority -Value {
+        param($RepoRoot,$Target,[switch]$PredecessorIdentityOnly)
+        if ([string]$Target -ceq 'f013') { return $script:mir42F013ReaderFixtureAuthority }
+        return & $script:mir42F013ReaderAuthorityReader -RepoRoot $RepoRoot -Target $Target -PredecessorIdentityOnly:$PredecessorIdentityOnly
+      }
+      $f013NullVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013NullVersionReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'f013-null-pe-version.json') $f013NullVersionRecord)
+      $f013NullVersionBound = Get-MIR42BoundEngineRun -Reference $f013NullVersionReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
+      Assert-MIR42NineSealTest -Condition ((@($f013NullVersionBound.record.targets | Where-Object target -CEQ 'f013').engine_execution.executable_sha256) -ceq [string]$f013ReaderEngine.sha256) -Code 'individual-f013-null-pe-version-reader'
+      $checks++
+      $f013BlankSemanticVersion = New-F013BlankPEVersionReaderRecord
+      $f013BlankSemanticIndex = @($f013BlankSemanticVersion.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013BlankSemanticVersion.individual_upgrade_receipts[$f013BlankSemanticIndex].engine.version = ''
+      $f013BlankSemanticReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'f013-blank-sealed-semantic-version.json') $f013BlankSemanticVersion)
+      $f013BlankSemanticRefused = $false
+      try { $null = Get-MIR42BoundEngineRun -Reference $f013BlankSemanticReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+      catch { $f013BlankSemanticRefused = $true }
+      Assert-MIR42NineSealTest -Condition $f013BlankSemanticRefused -Code 'individual-f013-blank-sealed-semantic-version-rejected'
+      $checks++;$script:mir42IndividualReaderChecks++
+      $f013MissingVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013MissingVersionIndex = @($f013MissingVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013MissingVersionReceipt = Get-Content -LiteralPath $f013MissingVersionRecord.individual_upgrade_receipts[$f013MissingVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $null = $f013MissingVersionReceipt.Remove('factorio_binary_version');Set-HostReceiptField $f013MissingVersionRecord $f013MissingVersionIndex $f013MissingVersionReceipt
+      Assert-HostReaderRefusal 'f013-missing-pe-version' $f013MissingVersionRecord '[mir42-individual-engine-run-engine-version]'
+      $f013WhitespaceVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013WhitespaceVersionIndex = @($f013WhitespaceVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013WhitespaceVersionReceipt = Get-Content -LiteralPath $f013WhitespaceVersionRecord.individual_upgrade_receipts[$f013WhitespaceVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $f013WhitespaceVersionReceipt.factorio_binary_version = ' ';Set-HostReceiptField $f013WhitespaceVersionRecord $f013WhitespaceVersionIndex $f013WhitespaceVersionReceipt
+      Assert-HostReaderRefusal 'f013-whitespace-pe-version' $f013WhitespaceVersionRecord '[mir42-individual-engine-run-engine-version]'
+      $f013ArrayVersionRecord = New-F013BlankPEVersionReaderRecord
+      $f013ArrayVersionIndex = @($f013ArrayVersionRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+      $f013ArrayVersionReceipt = Get-Content -LiteralPath $f013ArrayVersionRecord.individual_upgrade_receipts[$f013ArrayVersionIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+      $f013ArrayVersionReceipt.factorio_binary_version = @();Set-HostReceiptField $f013ArrayVersionRecord $f013ArrayVersionIndex $f013ArrayVersionReceipt
+      Assert-HostReaderRefusal 'f013-array-pe-version' $f013ArrayVersionRecord '[mir42-individual-engine-run-engine-version]'
+      foreach ($arrayCase in @(
+        [pscustomobject]@{name='null-array';value=@($null)},
+        [pscustomobject]@{name='empty-string-array';value=@('')}
+      )) {
+        $arrayRecord = New-F013BlankPEVersionReaderRecord
+        $arrayIndex = @($arrayRecord.individual_upgrade_receipts | ForEach-Object { [string]$_.target }).IndexOf('f013')
+        $arrayReceipt = Get-Content -LiteralPath $arrayRecord.individual_upgrade_receipts[$arrayIndex].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+        $arrayReceipt.factorio_binary_version = $arrayCase.value;Set-HostReceiptField $arrayRecord $arrayIndex $arrayReceipt
+        Assert-HostReaderRefusal ('f013-' + $arrayCase.name + '-pe-version') $arrayRecord '[mir42-individual-engine-run-engine-version]'
+      }
+    } finally {
+      Set-Item -LiteralPath Function:Get-MIR42HistoricalTerminalAuthority -Value $f013AuthorityReader
+      Remove-Variable -Name mir42F013ReaderFixtureAuthority -Scope Script -ErrorAction SilentlyContinue
+      Remove-Variable -Name mir42F013ReaderAuthorityReader -Scope Script -ErrorAction SilentlyContinue
+    }
+
+    # The normal reader still refuses an empty version on a modern executable;
+    # the F013 target guard cannot relax its PE-version contract.
+    $modernBlankVersion = Copy-HostValue $baseRecord
+    $modernBlankReceipt = Get-Content -LiteralPath $modernBlankVersion.individual_upgrade_receipts[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+    $modernBlankReceipt.factorio_binary_version = ''
+    Set-HostReceiptField $modernBlankVersion 0 $modernBlankReceipt
+    Assert-HostReaderRefusal 'modern-blank-pe-version' $modernBlankVersion '[mir42-individual-engine-run-engine-version]'
+
+    $wrongRunner = Copy-HostValue $baseRecord;$wrongRunner.runner = Write-HostText (Join-Path $root 'runner-no-upgrade-invocation.ps1') 'upgraded-save-second-reload-passed'
+    Assert-HostReaderRefusal 'runner-without-upgrade-invocation' $wrongRunner '[mir42-individual-engine-run-runner-content]'
+    $wrongHarness = Copy-HostValue $baseRecord;$wrongHarness.harness = Write-HostText (Join-Path $root 'harness-without-reload-marker.ps1') 'Test-MIRUpgrade.ps1'
+    Assert-HostReaderRefusal 'harness-without-reload-marker' $wrongHarness '[mir42-individual-engine-run-harness-content]'
 
     $missing = Copy-HostValue $baseRecord;$missing.individual_upgrade_receipts = @($missing.individual_upgrade_receipts | Select-Object -Skip 1)
     Assert-HostReaderRefusal 'missing-receipt' $missing '[mir42-individual-engine-run-receipt-target-set]'

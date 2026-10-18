@@ -170,7 +170,7 @@
         "required_result": "passed",
         "maximum_dependency_failures": 0,
         "required_log_fragments": [
-          "[mir-fixture-assert-recycler-progression-routes] PASS recycler-1-routes-rejected=true"
+          "[mir-fixture-assert-recycler-progression-routes] PASS recycler-1-routes-excluded-from-bindings=true"
         ],
         "forbidden_log_fragments": [
           "MIR Recycler Progression route assertion failed"
@@ -178,7 +178,7 @@
       },
       "timeout_seconds": 900,
       "claim_level": "diagnostic-only",
-      "notes": "Exact Recycler Progression 1.1.1 assertion harness on Factorio 2.1.14. It proves that recycler-1 hidden recycling unlocks remain rejected, explainable routes rather than general science-pack prerequisites."
+      "notes": "Exact Recycler Progression 1.1.1 assertion harness on Factorio 2.1.14. It proves that current declared bindings exclude recycler recipes and recycler-1 does not become a general science-pack prerequisite."
     },
     {
       "name": "local-2-1-muluna-secretas-astroponics-cycle",

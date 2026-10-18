@@ -108,22 +108,62 @@ foreach ($artifact in @($budgetProfile.artifacts)) {
     throw "Runtime public artifact budget differs from governed policy: $($artifact.kind)"
   }
 }
-if (-not $publicProjector.Contains('artifact_budget.limit(artifact and artifact.kind)') -or
-    -not $coveragePublisher.Contains('public_artifacts.assert_byte_budget(public)')) {
-  throw "One or more public compiler artifacts bypass the hard canonical-byte budget."
+# Generic callers remain a fresh canonical traversal. The production helper
+# is only legal at the immediate owned builder/publisher boundary.
+if (-not $publicProjector.Contains('function M.assert_byte_budget(artifact)') -or
+    $publicProjector.Contains('function M.assert_byte_budget(artifact, bytes)') -or
+    -not $publicProjector.Contains('local bytes = #fingerprint.canonical(artifact)')) {
+  throw "Generic public-artifact budget validation no longer performs a fresh untrusted traversal."
 }
-$evidenceConstruction = [regex]::Matches($publication,
-  'public_artifacts[.]compiler_evidence\(evidence_input\)').Count
-if ($evidenceConstruction -ne 1 -or $publication -match 'for\s+_\s*=\s*1\s*,\s*publishes_mod_data\s+and\s+4') {
-  throw "Compiler evidence publication must construct one byte-budgeted, pre-publication telemetry projection."
+if (-not $publicProjector.Contains('local function self_fingerprinted_public(public, field)') -or
+    -not $publicProjector.Contains('fingerprint.of_canonical(pre_fingerprint_text)') -or
+    [regex]::Matches($publicProjector, 'return self_fingerprinted_public\(public, "(?:public|evidence)_fingerprint"\)').Count -ne 4) {
+  throw "Owned self-fingerprinted public artifacts no longer share one exact pre-field serialization boundary."
 }
-$telemetrySnapshot = $publication.IndexOf('evidence_input.telemetry = telemetry.snapshot()')
-$publicEvidence = $publication.IndexOf('local public_evidence = public_artifacts.compiler_evidence(evidence_input)')
-$byteBudget = $publication.IndexOf('local evidence_bytes = public_artifacts.assert_byte_budget(public_evidence)')
-$evidenceBytes = $publication.IndexOf('telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)')
-if ($telemetrySnapshot -lt 0 -or $publicEvidence -le $telemetrySnapshot -or
-    $byteBudget -le $publicEvidence -or $evidenceBytes -le $byteBudget) {
-  throw "Compiler evidence must freeze telemetry before construction and record exact artifact bytes afterward."
+if (-not $budgetContract.Contains('function M.assert_byte_count_within_limit(kind, bytes)')) {
+  throw "Public-artifact budget authority no longer exposes its scalar count/limit boundary."
+}
+foreach ($publisher in @($publication, $coveragePublisher)) {
+  if ($publisher.Contains('local function assert_owned_public_byte_budget') -or
+      -not $publisher.Contains('artifact_budget.assert_byte_count_within_limit(')) {
+    throw "An owned publisher no longer delegates scalar limit enforcement to the shared budget authority."
+  }
+}
+foreach ($route in @(
+  'public_artifacts.generation_plan(plan.stream_plan)',
+  'public_artifacts.technology_catalog(',
+  'public_artifacts.compiler_evidence(evidence_input)'
+)) {
+  $position=$publication.IndexOf($route)
+  if ($position-lt0 -or $publication.IndexOf('artifact_budget.assert_byte_count_within_limit(', $position)-lt$position) {
+    throw "Publication no longer applies its shared owned count limit after $route."
+  }
+}
+if ($coveragePublisher.IndexOf('public_artifacts.coverage(artifact)') -lt 0 -or
+    $coveragePublisher.IndexOf('artifact_budget.assert_byte_count_within_limit(public.kind, public_bytes)') -lt 0 -or
+    $publication.IndexOf('public_artifacts.assert_byte_budget(research_cost_support)') -lt 0) {
+  throw "Coverage-owned or research-cost generic budget route is missing."
+}
+$telemetrySnapshot=$publication.IndexOf('evidence_input.telemetry = telemetry.snapshot()')
+$publicEvidence=$publication.IndexOf('public_artifacts.compiler_evidence(evidence_input)')
+$ownedBudget=$publication.IndexOf('artifact_budget.assert_byte_count_within_limit(public_evidence.kind, evidence_bytes)')
+$evidenceBytes=$publication.IndexOf('telemetry.observe_max("compiler_evidence_public_bytes", evidence_bytes)')
+if ($telemetrySnapshot-lt0 -or $publicEvidence-le$telemetrySnapshot -or $ownedBudget-le$publicEvidence -or $evidenceBytes-le$ownedBudget) {
+  throw "Compiler evidence no longer freezes telemetry, validates its owned budget, then records final bytes in order."
+}
+# The executable Lua fixture independently checks exact builder bytes, all
+# four owned limits at below/equal/above thresholds, and hostile generic data.
+$publicationFixture=Get-Content -Raw -LiteralPath (Join-Path $repo 'tests/compiler/publication_measurement.lua')
+foreach ($sentinel in @(
+  'owned boundary has exact independently canonicalized bytes',
+  'owned publisher honors below/equal/above hard limit',
+  'generic budget guard reserializes a post-return public mutation instead of accepting an owned scalar',
+  'generic budget guard rejects a post-return public cycle',
+  'owned public plan projection is copy isolated from a returned-record mutation',
+  'generic budget guard resolves unknown artifact kind before canonicalizing arbitrary material',
+  'shared owned scalar boundary rejects an invalid byte count'
+)) {
+  if (-not $publicationFixture.Contains($sentinel)) { throw "Owned public-artifact executable control is missing: $sentinel" }
 }
 & (Join-Path $repo 'tests/compiler/Test-MIR4NativeEffectCoverageA20.ps1') -RepoRoot $repo
 $expectedActions = @("disabled", "preview", "apply")

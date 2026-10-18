@@ -1,0 +1,587 @@
+{
+  "schema": 1,
+  "kind": "MIR42FinalReleaseManifestV1",
+  "source_version": "4.4.0",
+  "source_tag": "v4.4.0",
+  "status": "emergency-accepted-unsigned-partially-qualified",
+  "acceptance_record_kind": "MIR440CurrentCandidateEmergencyAcceptanceV1",
+  "source": {
+    "commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+    "tree": "fe63974c649ddba389da5979ba94a59bffdd5e72"
+  },
+  "built_from_dev_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+  "promotion_pull_request": null,
+  "package_source_sha256": "DF86418FF03D830518828DA02BAF9542803FA001A8D2C92A26A3C510B4E51B5B",
+  "candidate_manifest_sha256": "4630A11A5537D75B3E5130A24FBE7C90F5658F2E05A199092ED0CBCC4BB278F7",
+  "targets": [
+    {
+      "target": "f210",
+      "distribution_version": "4.4.21000",
+      "filename": "more-infinite-research_4.4.21000.zip",
+      "factorio_version": "2.1",
+      "bytes": 1407744,
+      "sha256": "BD72F63F0E41214416E0D49515BFB94BAA5A98080F42CD378298C5654F39FDF4",
+      "content_sha256": "B93D870E78B518A9B45C3595E5AF9BE1313F8E6D99E3D4E224BB80EEC8EA4052",
+      "entry_count": 343
+    },
+    {
+      "target": "f200",
+      "distribution_version": "4.4.20000",
+      "filename": "more-infinite-research_4.4.20000.zip",
+      "factorio_version": "2.0",
+      "bytes": 1403874,
+      "sha256": "29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4",
+      "content_sha256": "81E5F4224B1AA0707AF4E5ED7D7147C98A9C2B5DEB6472797C0136BF337E4F1B",
+      "entry_count": 341
+    },
+    {
+      "target": "f110",
+      "distribution_version": "4.4.11000",
+      "filename": "more-infinite-research_4.4.11000.zip",
+      "factorio_version": "1.1",
+      "bytes": 665409,
+      "sha256": "6DE689B3D2A5963B42F55CA24E540EAECF01A8F3B70DF03F0063170E906A2FF9",
+      "content_sha256": "E203D81D13BBDCB7852DDC415F3F28012D54B7D96CD80D5DA0EE281E2094BDD7",
+      "entry_count": 281
+    },
+    {
+      "target": "f100",
+      "distribution_version": "4.4.10000",
+      "filename": "more-infinite-research_4.4.10000.zip",
+      "factorio_version": "1.0",
+      "bytes": 665388,
+      "sha256": "71D3C3B8C741B8EE80CDC5ECBC8E1A9FCCD667F7E37B8D06141114DC13E37E8C",
+      "content_sha256": "902F3A7153BB2F1A8C0CA3D7E437FE90A5FA80FB41905BC9E4C77F2089EC7ED4",
+      "entry_count": 281
+    },
+    {
+      "target": "f017",
+      "distribution_version": "4.4.01700",
+      "filename": "more-infinite-research_4.4.01700.zip",
+      "factorio_version": "0.17",
+      "bytes": 650978,
+      "sha256": "39B83D30B56D8437EE95D8EFD3DBBC41142C6C9E1781368514E942CD6D391783",
+      "content_sha256": "16BB3896844F92061F39C6E5CEAAADF6380CA01DB02F8084ACEFE06282376838",
+      "entry_count": 281
+    },
+    {
+      "target": "f016",
+      "distribution_version": "4.4.01600",
+      "filename": "more-infinite-research_4.4.01600.zip",
+      "factorio_version": "0.16",
+      "bytes": 651240,
+      "sha256": "83C509FF40B7AACB259FD61139492DCBCBEBE12F10F407F3ADEE5A69DECC00A8",
+      "content_sha256": "0502D1D7A881B5D6FE5EA2A4B7197C470644C100EFE3EC791CA56D7DD763AC10",
+      "entry_count": 281
+    },
+    {
+      "target": "f015",
+      "distribution_version": "4.4.01500",
+      "filename": "more-infinite-research_4.4.01500.zip",
+      "factorio_version": "0.15",
+      "bytes": 651227,
+      "sha256": "AA4BD43F320378C8EB03DF2AACC5F5F247CAD2E9AE4102BBDEEA42462DF49F8D",
+      "content_sha256": "9F12402B56633525C8487A881A3CFF5D12377B7C3036F472979BED37BAB1EEC1",
+      "entry_count": 281
+    },
+    {
+      "target": "f014",
+      "distribution_version": "4.4.01400",
+      "filename": "more-infinite-research_4.4.01400.zip",
+      "factorio_version": "0.14",
+      "bytes": 651478,
+      "sha256": "12285355951F7710C0F09839EF22DC58D1C4CA6C8C9DC069F8AE3097296155E7",
+      "content_sha256": "A0B6A400C952BB04E8DEC6899D9F5C0BC8E004BD510256196C3710EBAE2EBCA2",
+      "entry_count": 281
+    },
+    {
+      "target": "f013",
+      "distribution_version": "4.4.01300",
+      "filename": "more-infinite-research_4.4.01300.zip",
+      "factorio_version": "0.13",
+      "bytes": 651478,
+      "sha256": "F0AB39998B452932CC59C31EFEAE64C8B34BC87DE03650D5DAC3A9DA841A27C5",
+      "content_sha256": "B4CBB3E36D22BBF74EB56E4B65AE452F5C0ECE495C1DDA4E83AC7817FC52ECF9",
+      "entry_count": 281
+    }
+  ],
+  "signing": {
+    "status": "unsigned",
+    "signature_present": false,
+    "secure_signer_capability": "not-available-at-preparation"
+  },
+  "technical_seal": "not-performed",
+  "promotion": {
+    "status": "not-performed",
+    "main": "remains-published-4.3.0",
+    "inherited_430_waiver_reused": false
+  },
+  "completed_native_evidence": [
+    {
+      "case": "f200-base-immediate-430",
+      "result_status": "passed",
+      "result_sha256": "74031BE3829B509E21B171779719027285CB2646F7F3CBBAE832EB3C8CC48DBD",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "base-only-mod-set-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f200-base-immediate-430/snapshots/4.4.20000-upgrade-base-default-from-4.3.20000-full-state-source.json",
+          "sha256": "42A694F202BA7234C89A79ECF5E8B93CBF84A8A60B16101498B24684EF26AAFE",
+          "bytes": 629576
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f200-base-immediate-430/snapshots/4.4.20000-upgrade-base-default-from-4.3.20000-full-state-upgrade.json",
+          "sha256": "7E2915EFF1805E31CDE34E8B522221CB45F386C3050A11A090E7FA199E6A66C5",
+          "bytes": 629577
+        },
+        {
+          "stage": "reload",
+          "path": "native/f200-base-immediate-430/snapshots/4.4.20000-upgrade-base-default-from-4.3.20000-full-state-reload-2.json",
+          "sha256": "9C2899A5BBF03BB26D5889A10F9764990BD5390796EAF0B92255F6A34059C7D8",
+          "bytes": 629576
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f200-galore-direct-422",
+      "result_status": "passed",
+      "result_sha256": "733E62671B5F0EBEAD52C5143207A4CAB9ABA96F6939E100887B200BE6B9866D",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "f200-galore-space-age-exact-upstream-closure-retained",
+        "f200-galore-space-age-exact-builtin-closure-retained",
+        "all-existing-technology-state-retained",
+        "all-existing-recipe-research-bonuses-retained",
+        "full-research-queue-retained",
+        "complete-active-mod-table-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f200-galore-direct-422/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.2.20002-full-state-source.json",
+          "sha256": "8EAC9FBAA665A42B55B2C9DE02619DCB54E7D81B6D668BB33FD5AF81CD80BA87",
+          "bytes": 1215246
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f200-galore-direct-422/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.2.20002-full-state-upgrade.json",
+          "sha256": "80C2CD0E01A2D0DDECF530DC4587C5AB2F9D293006C82A2D00158F87357FBD2B",
+          "bytes": 1215337
+        },
+        {
+          "stage": "reload",
+          "path": "native/f200-galore-direct-422/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.2.20002-full-state-reload-2.json",
+          "sha256": "6591C0AA406D783469CB3D72D018404CE7F304A0A909A983E92BCEC202C849A0",
+          "bytes": 1215336
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f200-galore-immediate-430",
+      "result_status": "passed",
+      "result_sha256": "4C13551D8650B7E70FB5754B84FCCB70F3722DC28868C8308103F5148EC41672",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "f200-galore-space-age-exact-upstream-closure-retained",
+        "f200-galore-space-age-exact-builtin-closure-retained",
+        "all-existing-technology-state-retained",
+        "all-existing-recipe-research-bonuses-retained",
+        "full-research-queue-retained",
+        "complete-active-mod-table-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f200-galore-immediate-430/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.3.20000-full-state-source.json",
+          "sha256": "E4F9933A3EF8775AC494658A6E0870A9A44FFFC3A57C952E1973D14993EE8A81",
+          "bytes": 1215336
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f200-galore-immediate-430/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.3.20000-full-state-upgrade.json",
+          "sha256": "FA01222C50C2C7FB6472769E249155CC9226C096D56D21C9EC1546FE4A24FC62",
+          "bytes": 1215337
+        },
+        {
+          "stage": "reload",
+          "path": "native/f200-galore-immediate-430/snapshots/4.4.20000-upgrade-f200-galore-space-age-from-4.3.20000-full-state-reload-2.json",
+          "sha256": "60A4F7DE57CC3016651DD792B4229AC347D417CD7ABBCBCDE1A32C9366C3DA0F",
+          "bytes": 1215336
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f200-base-direct-422",
+      "result_status": "passed",
+      "result_sha256": "A929BE5CD638A8F86095E9FA2678C0B89EFBB12B6F9A8A2B4A24F47AE0FB4BEE",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "base-only-mod-set-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f200-base-direct-422/snapshots/4.4.20000-upgrade-base-default-from-4.2.20002-full-state-source.json",
+          "sha256": "DB2F83921DAA85019580B7F05D170C4733E908C1FC349CBE9EBFC9018EFFC61E",
+          "bytes": 629486
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f200-base-direct-422/snapshots/4.4.20000-upgrade-base-default-from-4.2.20002-full-state-upgrade.json",
+          "sha256": "23E97F191D72D88E2C96E58EA00BCE7286CA4BE28E4A15F2AB0D3B68572F7DF4",
+          "bytes": 629577
+        },
+        {
+          "stage": "reload",
+          "path": "native/f200-base-direct-422/snapshots/4.4.20000-upgrade-base-default-from-4.2.20002-full-state-reload-2.json",
+          "sha256": "D665F2DDCA627EED43BB7AE56F44FF4284EDA206985C23A8FB13F755DED2F347",
+          "bytes": 629576
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f110-base-direct-422",
+      "result_status": "passed",
+      "result_sha256": "24A191D6BA132883D935B80E7983121AE8C16215A109B952EB301A5F17F23DF9",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "base-only-mod-set-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f110-base-direct-422/snapshots/4.4.11000-upgrade-base-default-from-4.2.11002-full-state-source.json",
+          "sha256": "A1EAB885CA707C3C870775759C3D112C511697BA3FDDC2692D28310FF032E178",
+          "bytes": 403937
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f110-base-direct-422/snapshots/4.4.11000-upgrade-base-default-from-4.2.11002-full-state-upgrade.json",
+          "sha256": "800157A22559FFF9E88E560261EB7E2904E231ECA5A9DA51A3FD7D47BB5A8E42",
+          "bytes": 404028
+        },
+        {
+          "stage": "reload",
+          "path": "native/f110-base-direct-422/snapshots/4.4.11000-upgrade-base-default-from-4.2.11002-full-state-reload-2.json",
+          "sha256": "E290C3CF60865398BD19D4289B658AE34805A54A920FDEC9EBBECECF0B6689C5",
+          "bytes": 404027
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f210-space-age-immediate-430",
+      "result_status": "passed",
+      "result_sha256": "1008DDB7F4739881745C82DB76D565481F4E934F8C1AB8BA54928EF72BBBA181",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "space-age-native-owner-retained",
+        "all-existing-technology-state-retained",
+        "all-existing-recipe-research-bonuses-retained",
+        "full-research-queue-retained",
+        "reported-missing-technologies-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f210-space-age-immediate-430/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.3.21000-full-state-source.json",
+          "sha256": "46824DC6690FDA60D9A6D76EB150110137F00DE88A5DD2DCBC8D77BE5CAD5FC1",
+          "bytes": 1005264
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f210-space-age-immediate-430/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.3.21000-full-state-upgrade.json",
+          "sha256": "A7A9845690C54B5BCAA665A2712CE70E3D42FD3DB6F1047951DEC6DDDC9991C4",
+          "bytes": 1005265
+        },
+        {
+          "stage": "reload",
+          "path": "native/f210-space-age-immediate-430/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.3.21000-full-state-reload-2.json",
+          "sha256": "6CD345FF43EDAE82090E479A392AFE36BE25508156164476925AF70BC435F18C",
+          "bytes": 1005264
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    },
+    {
+      "case": "f210-space-age-direct-422",
+      "result_status": "passed",
+      "result_sha256": "387DC9EC260898C802A67684C26B1F1FFF224225C3D435578657FA77D979A544",
+      "factorio_processes": 4,
+      "assertions": [
+        "startup-profile-retained",
+        "technology-level-retained",
+        "current-research-retained",
+        "fractional-research-progress-retained",
+        "fixture-storage-retained",
+        "exact-candidate-normal-mod-directory-load",
+        "upgraded-save-reload-passed",
+        "upgraded-save-second-reload-passed",
+        "space-age-native-owner-retained",
+        "all-existing-technology-state-retained",
+        "all-existing-recipe-research-bonuses-retained",
+        "full-research-queue-retained",
+        "reported-missing-technologies-retained",
+        "all-existing-technology-state-and-definitions-retained",
+        "all-exposed-earned-effects-retained",
+        "all-supported-research-queue-retained",
+        "full-state-oracle-executed-upgrade-and-two-reloads"
+      ],
+      "snapshots": [
+        {
+          "stage": "source",
+          "path": "native/f210-space-age-direct-422/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.2.21002-full-state-source.json",
+          "sha256": "BD617157C8296320DB4D163E840585A4CEC8C056E7BEB340DB0C0BF5CBA7E4F7",
+          "bytes": 1005174
+        },
+        {
+          "stage": "upgrade",
+          "path": "native/f210-space-age-direct-422/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.2.21002-full-state-upgrade.json",
+          "sha256": "E53CF7BE5905F4CDAC619CEC2F197B5360D94E28F4392A1E6D156238FA202E66",
+          "bytes": 1005265
+        },
+        {
+          "stage": "reload",
+          "path": "native/f210-space-age-direct-422/snapshots/4.4.21000-upgrade-space-age-native-owner-from-4.2.21002-full-state-reload-2.json",
+          "sha256": "7D5CDD4FF6C2029DFE47FC0FC07EE4A0978B06F064832E5EB9F974C6C3C783C4",
+          "bytes": 1005264
+        }
+      ],
+      "raw_result_not_in_public_bundle_reason": "contains local absolute paths; original raw receipt retained locally and its SHA is bound here"
+    }
+  ],
+  "completed_performance_profiles": [
+    "F200 Galore/Space Age headless --create diagnostic (3 rotated blocks per arm; not menu/report/client qualification)"
+  ],
+  "catalogue_baseline": "not-claimed",
+  "compiler_profile": "full",
+  "maintainer_authorization": {
+    "kind": "current-candidate-specific-emergency-authorization",
+    "release_permission": "explicit",
+    "scope": [
+      "exact R05 candidate",
+      "unsigned release",
+      "partial qualification disclosure"
+    ],
+    "normal_signed_seal_claimed": false,
+    "prior_release_waiver_reused": false,
+    "authorization_record": "maintainer authorization retained outside public asset text"
+  },
+  "qualification_gaps": [
+    "all remaining native upgrade/fresh/library/client scenarios pending or not run",
+    "canonical all-nine run stopped before F210 engine child at resource admission",
+    "normal technical seal not performed",
+    "protected-main promotion not performed",
+    "reported mining-yield/core-drill behavior not claimed fixed",
+    "original Secretas reporter save and F210 Secretas 1.0.37 incompatibility outside focused F200 scenario",
+    "ore mining yield, Space Exploration, and client behavior outside focused drill manufacturing observation"
+  ],
+  "release_immutable": false,
+  "prepared_utc": "2026-10-15T08:10:09.534708Z",
+  "publication": {
+    "status": "prepared-prepublication",
+    "as_of_utc": "2026-10-15T08:10:09.534708Z",
+    "tag": "v4.4.0",
+    "tag_target": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+    "anonymous_readback": "pending; record separately in PUBLICATION-RECEIPT.json after publication without rewriting this manifest or ZIPs",
+    "portal": "manual upload pending"
+  },
+  "performance_evidence": {
+    "analysis_path": "performance/mir440-r05-galore-matched-analysis-r01.json",
+    "analysis_sha256": "26F38D6648B44D9F267E43F078B0B20CFF5CF68340846B91DA32E82606DC68DB",
+    "raw_execution_sha256": "7E06BF4024F1F7605CF99137C9F3113AA6F66F6DF7F05E5DE5ED889D5CA0CB64",
+    "profile": "F200 Galore/Space Age",
+    "endpoint": "headless --create only",
+    "native_process_count": 18,
+    "rotation_blocks": 3,
+    "controls_restored": true,
+    "owned_archives_restored": true,
+    "changed_configuration": {
+      "without_mir_median_seconds": 7.088092,
+      "published_430_median_seconds": 11.162559,
+      "candidate_440_median_seconds": 9.807684,
+      "whole_run_seconds_saved": 1.354875,
+      "whole_run_percent_reduction": 12.1377,
+      "mir_added_time_percent_reduction": 33.2528,
+      "candidate_over_no_mir_percent": 38.3685
+    },
+    "warm_repeat": {
+      "without_mir_median_seconds": 7.054975,
+      "published_430_median_seconds": 11.092049,
+      "candidate_440_median_seconds": 9.821707,
+      "whole_run_seconds_saved": 1.270342,
+      "whole_run_percent_reduction": 11.4527,
+      "mir_added_time_percent_reduction": 31.4669,
+      "candidate_over_no_mir_percent": 39.2168
+    },
+    "ten_percent_destination_met": false,
+    "limitations": [
+      "headless --create diagnostic only",
+      "not an ordinary menu, report, or 313-mod profile measurement"
+    ]
+  },
+  "focused_native_observations": [
+    {
+      "schema": 1,
+      "kind": "MIR440SecretasFocusedNativePublicIndexV1",
+      "status": "passed-focused-native-secretas-continuation",
+      "native_qualification": true,
+      "source_commit": "72b5c72eab810baf74c9a785ac4ebbc0d438c94a",
+      "candidate_source_version": "4.4.0",
+      "candidate_archive_sha256": "29D85A53ABC69A6B3FDC0E4EA58C77FC9B53E5671B84441192AEE5E65A4CFBD4",
+      "scenario_sha256": "7FBF1216235B5B356CFF6543042EBC0EA86294B9C4A9DDCEAEBECA1C4A6B74C7",
+      "fixture": {
+        "name": "mir-fixture-assert-secretas-finite-continuation-hotfix",
+        "version": "0.1.5",
+        "sha256": "45B3EB7CC07294DB8524510F089AA048A2A6327D8EAE5FDDB31664036C7473B8"
+      },
+      "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "active_mods": [
+        "base@2.0.77",
+        "elevated-rails@2.0.77",
+        "mir-fixture-assert-secretas-finite-continuation-hotfix@0.1.5",
+        "more-infinite-research@4.4.20000",
+        "pretty-frozeta@0.1.0",
+        "quality@2.0.77",
+        "secretas@1.0.33",
+        "space-age@2.0.77"
+      ],
+      "actors": 4,
+      "cold_reloads": 2,
+      "scope": "F200 Secretas 1.0.33 plus Pretty Frozeta 0.1.0 finite level 8 to MIR infinite level 9; reward, queue and fractional progress",
+      "exclusions": [
+        "reporter save",
+        "F210 Secretas 1.0.37 incompatibility",
+        "general Secretas/Frozeta compatibility"
+      ],
+      "raw_result_sha256": "85CEBB17571B09BFA1F73FE218E0BBB42E19FAB122471E917C1069304D51D245",
+      "raw_logs": [
+        {
+          "stage": "create",
+          "filename": "create.factorio.log",
+          "sha256": "7BB6F2BB16C0B1756DF113165DEA90155E2EDBA22B6295554B63B3DDEEFBC3BC",
+          "bytes": 30445
+        },
+        {
+          "stage": "award",
+          "filename": "award.factorio.log",
+          "sha256": "DDF3E764BD3C39E6220D637EEA6390947702688FD0CD03BBDED543DB1F36B5ED",
+          "bytes": 32332
+        },
+        {
+          "stage": "reload-1",
+          "filename": "reload-1.factorio.log",
+          "sha256": "C7F50CB3711BD891EDFFCB80AECD7F7D1FE36B9872DDFA53BAE164C6DB1FC9A5",
+          "bytes": 30925
+        },
+        {
+          "stage": "reload-2",
+          "filename": "reload-2.factorio.log",
+          "sha256": "9361A3BF2E89DC06D10DD61BEB922B36C4B5F85F1DE85340DEE7A3520112E8B4",
+          "bytes": 30925
+        }
+      ],
+      "library_controls_status": "restored-direct-library-controls",
+      "raw_receipts_excluded_from_public_archive_reason": "contain local absolute paths; retained locally and bound by SHA-256"
+    },
+    {
+      "kind": "MIR440DrillManufacturingFocusedObservationV1",
+      "result_sha256": "8357977B924BAB3C9D6F337484FF41925EBCCD632821BFDCD806D0C0B1203EBE",
+      "raw_runtime_path": "native/f200-drill-manufacturing/observation.json",
+      "raw_runtime_sha256": "A40A9425C657329901DA0CE7255B0FD1B181ADACD29DC3701C9569BDA94610D8",
+      "scope": "F200 manufacturing productivity only; 20 cycles per arm; no productivity modules",
+      "findings": {
+        "burner_unresearched_output": 20,
+        "burner_researched_output": 24,
+        "electric_unresearched_output": 20,
+        "electric_researched_output": 22
+      },
+      "exclusions": [
+        "ore mining yield not tested",
+        "Space Exploration not tested",
+        "client not tested",
+        "not whole-release qualification"
+      ]
+    }
+  ]
+}

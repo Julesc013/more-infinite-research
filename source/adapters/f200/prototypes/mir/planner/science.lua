@@ -12,6 +12,10 @@ function M.ingredients_for_selected(key, selected)
   return ingredients, lab_status or "full"
 end
 
+function M.phase_diagnostic_fields(_)
+  return nil
+end
+
 function M.ingredients_for_stream(key, spec)
   return M.ingredients_for_selected(key,
     science_selector.pick_science_for_stream(spec, key))
