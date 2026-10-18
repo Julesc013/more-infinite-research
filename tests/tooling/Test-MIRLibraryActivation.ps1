@@ -536,6 +536,25 @@ $activation=Start-MIRLibraryActivation -LibraryDirectory $Library -EngineDataDir
   $harness=Join-Path $RepoRoot 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
   $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
   Assert-LibraryTest ($errors.Count -eq 0) 'K2 direct-library consumer parses'
+  # Execute the actual initial binding expression before a selected current
+  # fixture has been built. Preflight exits before this native-only path.
+  $archiveBindings=@(foreach($assignment in @($ast.FindAll({param($node)
+    $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -ceq '$inputBinding'
+  },$true))){
+    foreach($table in @($assignment.Right.FindAll({param($node)$node -is [Management.Automation.Language.HashtableAst]},$true))){
+      if(@($table.KeyValuePairs|ForEach-Object{$_.Item1.Extent.Text}) -ccontains 'fixture'){continue} # earlier current-preflight binding
+      foreach($pair in $table.KeyValuePairs){if($pair.Item1.Extent.Text -ceq 'archive_hashes'){$pair.Item2}}
+    }
+  })
+  Assert-LibraryTest ($archiveBindings.Count -eq 1) 'K2 initial archive binding has one actual owner'
+  $bindingExpression=[scriptblock]::Create($archiveBindings[0].Extent.Text)
+  $baseInputs=[pscustomobject]@{archive_hashes=@{'base-input.zip'='BASE'}}
+  $directInputs=$null
+  $initialHashes=& $bindingExpression
+  Assert-LibraryTest ($initialHashes.Count -eq 1 -and $initialHashes['base-input.zip'] -ceq 'BASE') 'K2 native setup retains base hashes before current fixture preparation'
+  $directInputs=[pscustomobject]@{archive_hashes=@{'base-input.zip'='BASE';'selected-fixture.zip'='FIXTURE'}}
+  $completeHashes=& $bindingExpression
+  Assert-LibraryTest ($completeHashes.Count -eq 2 -and $completeHashes['selected-fixture.zip'] -ceq 'FIXTURE') 'K2 prepared and retained paths bind the complete direct-library hashes'
   foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213BaseLibraryInputs','Read-K2213DirectLibraryInputs')){
     $nodes=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$false))
     if($nodes.Count -ne 1){throw "K2 input function is absent or duplicated: $name"}

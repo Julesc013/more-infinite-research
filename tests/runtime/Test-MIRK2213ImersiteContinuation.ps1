@@ -10,7 +10,7 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$CandidateZip,
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
-  [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion = '4.2.1',
+  [ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion = '4.2.1',
   [string]$V5ObservationResultPath = '',
   [string]$InputProfilePath = '',
   [string]$RepoRoot = '',
@@ -44,7 +44,7 @@ function Get-K2213Property { param($Object,[string]$Name,$Default=$null)
   return $property.Value
 }
 function Read-K2213CurrentCandidate([string]$Archive,[string]$ReceiptPath,
-  [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion='4.2.1') {
+  [ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion='4.2.1') {
   Read-MIRNativeProbeF210CurrentCandidate -Repository $RepoRoot -Archive $Archive -ReceiptPath $ReceiptPath -SourceVersion $SourceVersion
 }
 function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries,[string]$ObservationPath) {
@@ -71,24 +71,25 @@ function Read-K2213DependencyInputs($Observation,[Collections.IDictionary]$Expec
   return $inputs
 }
 function Get-K2213SelectedFixtureProfile {
-  param([ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion='4.2.1')
+  param([ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion='4.2.1')
   $profiles=[ordered]@{
-    '4.2.1'=[ordered]@{fixture_version='0.1.4';mir_version='4.2.21001';retained=$true}
-    '4.2.2'=[ordered]@{fixture_version='0.1.4';mir_version='4.2.21002';retained=$true}
-    '4.4.0'=[ordered]@{fixture_version='0.1.5';mir_version='4.4.21000';retained=$false}
+    '4.2.1'=[ordered]@{fixture_version='0.1.4';mir_version='4.2.21001';input_profile='';retained=$true}
+    '4.2.2'=[ordered]@{fixture_version='0.1.4';mir_version='4.2.21002';input_profile='';retained=$true}
+    '4.4.0'=[ordered]@{fixture_version='0.1.5';mir_version='4.4.21000';input_profile='fixtures/run-profiles/k2-213-imersite-f210-440.json';retained=$false}
+    '4.6.0'=[ordered]@{fixture_version='0.1.6';mir_version='4.6.21000';input_profile='fixtures/run-profiles/k2-213-imersite-f210-460.json';retained=$false}
   }
   return [pscustomobject]$profiles[$SourceVersion]
 }
 function Assert-K2213SelectedInputMode {
-  param([ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion,[string]$V5Path,[string]$ProfilePath)
+  param([ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion,[string]$V5Path,[string]$ProfilePath)
   Assert-K2213 (([bool]$V5Path) -xor ([bool]$ProfilePath)) 'supply-one-input-profile-or-historical-observation'
-  if($SourceVersion-ceq'4.4.0'){
+  if($SourceVersion -cin @('4.4.0','4.6.0')){
     Assert-K2213 ([bool]$ProfilePath -and -not [bool]$V5Path) 'current-440-requires-explicit-profile'
   }
 }
 function New-K2213SelectedFixture {
   param([Parameter(Mandatory)][string]$Source,[Parameter(Mandatory)][string]$Run,
-    [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion,
+    [ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$SelectedMIRVersion)
   $profile=Get-K2213SelectedFixtureProfile -SourceVersion $SourceVersion
   Assert-K2213 ($SelectedMIRVersion-ceq[string]$profile.mir_version) 'selected-fixture-candidate-version'
@@ -121,7 +122,7 @@ function New-K2213SelectedFixture {
 }
 function Read-K2213ProfileInputs {
   param([string]$Path,[Collections.IDictionary]$ExpectedDependencies,[string[]]$Libraries,
-    [ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion='4.2.1')
   $profile=Read-K2213Json -Path $Path -Code 'input-profile'
   Assert-K2213 ($profile.schema -eq 1 -and $profile.target -ceq 'f210' -and $profile.factorio_line -ceq '2.1') 'input-profile-schema-target'
   Assert-K2213 ($profile.engine_version -cin @('2.1.20','2.1.21')) 'input-profile-engine-version'
@@ -253,7 +254,7 @@ function Read-K2213DirectLibraryInputs {
   return [pscustomobject]@{mod_list=[ordered]@{mods=$rows};archive_hashes=$hashes;fixture_archive=$fixtureArchive}
 }
 function Get-K2213FixtureEnvelope {
-  param([Parameter(Mandatory)][string]$Path,[ValidateSet('4.2.1','4.2.2','4.4.0')][string]$SourceVersion='4.2.1')
+  param([Parameter(Mandatory)][string]$Path,[ValidateSet('4.2.1','4.2.2','4.4.0','4.6.0')][string]$SourceVersion='4.2.1')
   $text = Get-Content -Raw -LiteralPath $Path
   $fixtureId = 'k2-213-imersite-continuation'
   $match = [regex]::Match($text,"(?ms)^  $fixtureId`:\s*\r?\n(?<body>.*?)(?=^  [A-Za-z0-9][A-Za-z0-9_-]*:\s*\r?\n|\z)")
@@ -266,13 +267,21 @@ function Get-K2213FixtureEnvelope {
     'Krastorio2: "2.1.3"',
     'Krastorio2-spaced-out: "2.0.13"',
     'more-infinite-research: "4.2.21001"',
-    'candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000"]',
-    'current_input_profile: fixtures/run-profiles/k2-213-imersite-f210-440.json',
-    'current_fixture_version: "0.1.5"'
+    'candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000", "4.6.21000"]',
+    'current_input_profile: fixtures/run-profiles/k2-213-imersite-f210-460.json',
+    'current_fixture_version: "0.1.6"',
+    'current_candidate_version: "4.6.21000"',
+    'input_profiles:',
+    '  - fixtures/run-profiles/k2-213-imersite-f210-440.json',
+    '  - fixtures/run-profiles/k2-213-imersite-f210-460.json'
   )
   foreach ($line in $required) { Assert-K2213 ($body.Contains($line,[StringComparison]::Ordinal)) "registered-fixture-field:$line" }
-  if($SourceVersion-ceq'4.4.0'){Assert-K2213 ($body.Contains('current_candidate_version: "4.4.21000"',[StringComparison]::Ordinal)) 'registered-fixture-current-candidate'}
-  return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path}
+  $selected=Get-K2213SelectedFixtureProfile -SourceVersion $SourceVersion
+  if(-not [bool]$selected.retained){
+    Assert-K2213 (-not [string]::IsNullOrWhiteSpace([string]$selected.input_profile) -and $body.Contains('  - '+[string]$selected.input_profile,[StringComparison]::Ordinal)) 'registered-fixture-selected-profile'
+  }
+  if($SourceVersion-ceq'4.6.0'){Assert-K2213 ($body.Contains('current_candidate_version: "4.6.21000"',[StringComparison]::Ordinal)) 'registered-fixture-current-candidate'}
+  return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path;selected_profile=$selected}
 }
 function New-K2213FailureResult {
   param([string]$RunRoot,[string]$Message,$Activation,$Resources)
@@ -348,6 +357,10 @@ try {
   $predecessorLock=$null
   $inputProfile=$null
   if($profilePath){
+    if(-not [bool]$fixtureRegistry.selected_profile.retained){
+      $expectedProfilePath=(Resolve-Path -LiteralPath (Join-Path $RepoRoot ([string]$fixtureRegistry.selected_profile.input_profile))).Path
+      Assert-K2213 ($profilePath -ceq $expectedProfilePath) 'input-profile-registry-selection'
+    }
     $bound=Read-K2213ProfileInputs -Path $profilePath -ExpectedDependencies $expectedDependencies -Libraries $LocalModLibraryDirs -SourceVersion $SourceVersion
     $expectedEngineVersion=[string]$bound.profile.engine_version
     Assert-K2213 ($engineHash -ceq $bound.profile.engine_sha256) 'engine-sha256'
@@ -375,7 +388,7 @@ try {
   Assert-K2213 ((Get-Item -LiteralPath $engine).VersionInfo.ProductVersion -ceq $expectedEngineVersion) 'engine-product-version'
   $inputs += [ordered]@{source_path=$candidate;file_name=([IO.Path]::GetFileName($candidate));expected_sha256=([string]$materialization.archive_sha256);role='candidate';identity=[ordered]@{name='more-infinite-research';version=$materialization.distribution_version;materialization_record_sha256=[string]$materialization.record_sha256};provenance=[ordered]@{kind='current-candidate-materialization';raw_materialization_sha256=Get-K2213Sha256 $materializationPath};immutable=$true}
   $baseInputs=Read-K2213BaseLibraryInputs -Library $library -Inputs $inputs -EngineVersion $expectedEngineVersion
-  if($SourceVersion-ceq'4.4.0' -and $PreflightOnly){
+  if($SourceVersion -cin @('4.4.0','4.6.0') -and $PreflightOnly){
     $inputBinding=[ordered]@{
       source_commit=(& git -C $RepoRoot rev-parse HEAD).Trim();harness=Get-K2213Artifact $PSCommandPath
       candidate_sha256=[string]$materialization.archive_sha256;materialization_sha256=Get-K2213Sha256 $materializationPath
@@ -394,13 +407,16 @@ try {
     } | ConvertTo-Json -Depth 20
     return
   }
-  $directInputs=if($SourceVersion-ceq'4.4.0'){$null}else{Read-K2213DirectLibraryInputs -Library $library -Inputs $inputs -FixtureRoot $fixtureRoot -EngineVersion $expectedEngineVersion}
+  $directInputs=if($SourceVersion -cin @('4.4.0','4.6.0')){$null}else{Read-K2213DirectLibraryInputs -Library $library -Inputs $inputs -FixtureRoot $fixtureRoot -EngineVersion $expectedEngineVersion}
   $inputBinding=[ordered]@{
     source_commit=(& git -C $RepoRoot rev-parse HEAD).Trim();harness=Get-K2213Artifact $PSCommandPath
     candidate_sha256=[string]$materialization.archive_sha256;materialization_sha256=Get-K2213Sha256 $materializationPath
     source_version=$materialization.source_version;distribution_version=$materialization.distribution_version
     engine_version=$expectedEngineVersion;engine_sha256=$engineHash;runtime_api_sha256=Get-K2213Sha256 $runtimeApi
-    input_profile=$inputProfile;predecessor_observation_lock=$predecessorLock;archive_hashes=$directInputs.archive_hashes
+    # Current fixtures are specialized after this binding is established.
+    # Retain the authenticated base selection until its fixture archive exists;
+    # preparation below replaces this with the complete direct-library set.
+    input_profile=$inputProfile;predecessor_observation_lock=$predecessorLock;archive_hashes=$(if($null -ne $directInputs){$directInputs.archive_hashes}else{$baseInputs.archive_hashes})
   }
 
   if ($PreflightOnly) {
@@ -430,7 +446,7 @@ try {
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
   [IO.Directory]::CreateDirectory((Join-Path $runRoot 'saves')) | Out-Null
   $fixturePreparation=$null
-  if($SourceVersion-ceq'4.4.0'){
+  if($SourceVersion -cin @('4.4.0','4.6.0')){
     $fixtureRoot=New-K2213SelectedFixture -Source $fixtureTemplateRoot -Run $runRoot -SourceVersion $SourceVersion -SelectedMIRVersion ([string]$materialization.distribution_version)
     $fixtureInfoPath=Join-Path $fixtureRoot 'info.json'
     $fixtureDataPath=Join-Path $fixtureRoot 'data-final-fixes.lua'
