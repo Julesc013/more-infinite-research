@@ -968,7 +968,9 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   }
   local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
   local A_L_U = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}}
-  local AL_EFFECTS = {{type="change-recipe-productivity",recipe="angels-plate-aluminium",modifier=0.02},{type="change-recipe-productivity",recipe="angels-plate-aluminium-2",modifier=0.02}}
+  -- LuaTechnologyPrototype exposes recipe-productivity magnitude as change.
+  -- Compare that runtime snapshot schema, retaining the reviewed 2% policy.
+  local AL_EFFECTS = {{type="change-recipe-productivity",recipe="angels-plate-aluminium",change=0.02},{type="change-recipe-productivity",recipe="angels-plate-aluminium-2",change=0.02}}
   local contracts = {
     ["recipe-prod-research_material_aluminium-1"] = {
       level=1,max_level=3,order="p[research_material_aluminium]",

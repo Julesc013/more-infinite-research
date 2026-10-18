@@ -2160,13 +2160,13 @@ foreach($route in $mir460Routes){
     if($route.bob){
       Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
       $bobOracle=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
-      foreach($needle in @('["recipe-prod-research_material_aluminium-1"] = true','["recipe-prod-research_material_aluminium-4"] = true','angels-plate-aluminium-2','angels-aluminium-casting-2','1600+200*(L-4)','reviewed Aluminium addition state differs')){
+      foreach($needle in @('["recipe-prod-research_material_aluminium-1"] = true','["recipe-prod-research_material_aluminium-4"] = true','angels-plate-aluminium-2','angels-aluminium-casting-2','1600+200*(L-4)','reviewed Aluminium addition state differs','recipe="angels-plate-aluminium",change=0.02','recipe="angels-plate-aluminium-2",change=0.02')){
         if(-not$bobOracle.Contains($needle)){throw "4.6 Bob/Angel strict oracle omitted reviewed Aluminium contract: $needle"}
       }
-      foreach($forbidden in @('recipe-prod-research_material_copper_tungsten-1','reviewed finite terminal differs')){
+      foreach($forbidden in @('recipe-prod-research_material_copper_tungsten-1','reviewed finite terminal differs','recipe="angels-plate-aluminium",modifier=','recipe="angels-plate-aluminium-2",modifier=')){
         if($bobOracle.Contains($forbidden)){throw "4.6 Bob/Angel strict oracle inherited unrelated 4.4.2 allowance: $forbidden"}
       }
-      $mir43Assertions+=8
+      $mir43Assertions+=12
     }
   }
   $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
