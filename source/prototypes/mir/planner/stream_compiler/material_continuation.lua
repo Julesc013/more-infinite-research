@@ -164,6 +164,11 @@ function M.plan(legacy_row)
   fields.prerequisites = prerequisites
   fields.ingredients = ingredients
   fields.count_formula = continuation_cost.count_formula
+  fields.count = nil
+  if target_line.feature_enabled("legacy_numeric_research_cost") then
+    fields.count = math.ceil(continuation_cost.base_cost)
+    fields.count_formula = nil
+  end
   fields.cost_model = continuation_cost
   fields.max_level = target_line.feature_enabled("scripted_techs")
     and target_line.mod_data_supported() and "infinite" or maximum

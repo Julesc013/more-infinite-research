@@ -82,7 +82,16 @@ local function validate_row(row, options)
     required(row.fields, "effects")
     required(row.fields, "ingredients")
     required(row.fields, "prerequisites")
-    required(row.fields, "count_formula")
+    if row.fields.count_formula ~= nil then
+      if row.fields.count ~= nil then
+        error("GenerationPlan row must use exactly one research cost representation", 3)
+      end
+    else
+      local count = row.fields.count
+      if type(count) ~= "number" or count < 1 or count >= math.huge or count % 1 ~= 0 then
+        error("GenerationPlan row requires a count formula or a positive finite integer count", 3)
+      end
+    end
     required(row.fields, "research_time")
     required(row.fields, "max_level")
   elseif row.action == "adopt" then

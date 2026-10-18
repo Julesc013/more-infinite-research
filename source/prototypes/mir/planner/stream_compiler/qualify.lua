@@ -72,6 +72,11 @@ local function plan_stream(key, raw_spec)
     and "infinite"
     or max_level
   local count_formula = cost_model.count_formula
+  local count
+  if target_line.feature_enabled("legacy_numeric_research_cost") then
+    count = math.ceil(cost_model.base_cost)
+    count_formula = nil
+  end
   local research_time = costs.research_time_for(key, spec)
 
   local direct_effects = nil
@@ -150,6 +155,7 @@ local function plan_stream(key, raw_spec)
       effects = emitted_effects,
       prerequisites = prerequisites,
       count_formula = count_formula,
+      count = count,
       cost_model = cost_model,
       ingredients = ingredients,
       research_time = research_time,
@@ -230,6 +236,7 @@ local function plan_stream(key, raw_spec)
     effects = emitted_effects,
     prerequisites = prerequisites,
     count_formula = count_formula,
+    count = count,
     cost_model = cost_model,
     ingredients = ingredients,
     research_time = research_time,
