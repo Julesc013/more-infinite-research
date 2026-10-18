@@ -50,6 +50,11 @@ local function select(catalog, rows, allow_proposals)
     rows_by_key[tostring(row.stream_key) .. ":" .. tostring(row.manifest_id or row.stream_key)] = row
   end
   local selections = {}
+  -- Selection records are constructed locally. The only value copied from a
+  -- planning row is reason; record whether it is scalar so the catalog can
+  -- safely reuse the fingerprint captured before this function's defensive
+  -- selection copy. Non-scalar reasons retain the existing returned-copy hash.
+  local returned_copy_equivalent = true
   for _, candidate in ipairs(catalog.candidates or {}) do
     local row = rows_by_key[candidate.selection_key]
     if not row then error("SelectionPolicy candidate lacks a planning row: " .. candidate.selection_key, 2) end
@@ -58,12 +63,16 @@ local function select(catalog, rows, allow_proposals)
     local deferred_rejection
     if not selected then selected, deferred_rejection = deferred_rejected_primary(candidate, row) end
     if not selected then error("SelectionPolicy candidate has no qualified alternative: " .. candidate.candidate_id, 2) end
+    -- Read once at the original selection-construction boundary. A foreign row
+    -- may have a metatable, so do not add a second __index observation.
+    local reason = row.reason
+    if reason ~= nil and type(reason) ~= "string" then returned_copy_equivalent = false end
     local selection = {
       selection_key = candidate.selection_key,
       candidate_id = candidate.candidate_id,
       alternative_id = selected.alternative_id,
       action = selected.action,
-      reason = row.reason,
+      reason = reason,
       design_fingerprint = selected.design_fingerprint,
       qualification_fingerprint = selected.qualification_fingerprint,
       policy = "stable-owner-promoted-diagnostic-v1"
@@ -81,7 +90,7 @@ local function select(catalog, rows, allow_proposals)
     table.insert(selections, selection)
   end
   table.sort(selections, function(left, right) return left.candidate_id < right.candidate_id end)
-  return deepcopy(selections), fingerprint.of(selections)
+  return deepcopy(selections), fingerprint.of(selections), returned_copy_equivalent
 end
 
 function M.select_prequalification(catalog, rows)
@@ -93,8 +102,10 @@ function M.select_final(catalog, rows)
 end
 
 function M.select(catalog, rows)
-  return catalog.phase == "final" and M.select_final(catalog, rows)
-    or M.select_prequalification(catalog, rows)
+  -- Preserve all results from the chosen producer: the catalog consumes the
+  -- first defensive copy and, when safe, its companion fingerprint.
+  if catalog.phase == "final" then return M.select_final(catalog, rows) end
+  return M.select_prequalification(catalog, rows)
 end
 
 function M.assert_generation_projection(selections, rows)
