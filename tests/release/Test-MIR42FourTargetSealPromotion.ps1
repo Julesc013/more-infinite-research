@@ -97,8 +97,9 @@ try {
   foreach ($target in @('f210','f200','f110','f100')) {
     $identity = Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $target -SourceVersion '4.2.0'
     $targetAuthority.Add([pscustomobject][ordered]@{target=[string]$identity.target;target_id=[string]$identity.target_id;source_version=[string]$identity.source_version;distribution_version=[string]$identity.distribution_version})
-    $assetRelative = "assets/$([string]$identity.package_name)"
+    $assetRelative = "assets/$target/$([string]$identity.package_name)"
     $assetPath = Join-Path $root $assetRelative
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $assetPath)) | Out-Null
     $stage = Join-Path $root "staging/$target/$([string]$identity.distribution_root)"
     New-Item -ItemType Directory -Force -Path $stage | Out-Null
     [IO.File]::WriteAllText((Join-Path $stage 'info.json'), (([ordered]@{name='more-infinite-research';version=[string]$identity.distribution_version;factorio_version=([string]$identity.target_id -replace '^factorio-','')} | ConvertTo-Json -Compress)), [Text.UTF8Encoding]::new($false))
@@ -119,7 +120,8 @@ try {
   }
   $manifest = [pscustomobject][ordered]@{
     schema=1;kind='MIR42FourTargetDeterministicCandidateManifestV1';status='private-deterministic-four-target-candidate-built-unqualified';build_complete=$true
-    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@($targetAuthority);resource_admission=@{}
+    source=[pscustomobject]$source;package_authority_sha256=('B' * 64);package_source_sha256=$packageSource;target_authority=@($targetAuthority)
+    resource_admission=@{admitted=$true;minimum_free_memory_bytes=1;minimum_free_work_bytes=1}
     targets=@($targets);failures=@();qualification='not-performed';technical_seal='not-performed';signing='not-performed';tagging='not-performed';publication_authorized=$false;record_sha256=''
   }
   $manifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $manifest
