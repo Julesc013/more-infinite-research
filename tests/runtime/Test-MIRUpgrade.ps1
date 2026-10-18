@@ -87,7 +87,7 @@ function Resolve-MIR42UpgradePredecessorReaderVersion {
   if($Target-cnotmatch '^f(?<code>210|200|110|100|017|016|015|014|013)$'){throw '[mir42-upgrade-predecessor-target]'}
   $code=$Matches.code
   $source=[version]$SourceVersion
-  $match=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5)[.]'+$code+'(?<patch>00|01|02)$'))
+  $match=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5|6)[.]'+$code+'(?<patch>00|01|02)$'))
   if(-not$match.Success){throw '[mir42-upgrade-predecessor-version]'}
   $fromMinor=[int]$match.Groups['minor'].Value
   $patch=[int]$match.Groups['patch'].Value
@@ -669,6 +669,10 @@ $fullPreservationSpecialization=[bool](
       $FixtureName-ceq'assert-upgrade-4-0-21000-to-4-1-21000'-and$Archetype-cin@('base-default','space-age-native-owner')-and-not$SpaceIsFake) -or
     ($SelectedTarget-ceq'f200'-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@('4.4.20002','4.5.20001')-and$ToVersion-ceq'4.5.20002'-and
       $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-cin@('base-default','f200-galore-space-age')-and-not$SpaceIsFake-and(($Archetype-cne'f200-galore-space-age')-or$f200GaloreSpaceAgeScenario)) -or
+    ($SelectedTarget-ceq'f210'-and$SourceVersion-ceq'4.6.0'-and$FromVersion-ceq'4.5.21002'-and$ToVersion-ceq'4.6.21000'-and
+      $FixtureName-ceq'assert-upgrade-4-0-21000-to-4-1-21000'-and$Archetype-cin@('base-default','space-age-native-owner')-and-not$SpaceIsFake) -or
+    ($SelectedTarget-ceq'f200'-and$SourceVersion-ceq'4.6.0'-and$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000'-and
+      $FixtureName-ceq'assert-upgrade-4-0-20000-to-4-1-20000'-and$Archetype-cin@('base-default','f200-galore-space-age')-and-not$SpaceIsFake-and(($Archetype-cne'f200-galore-space-age')-or$f200GaloreSpaceAgeScenario)) -or
     ($SelectedTarget-cin@('f110','f100')-and$SourceVersion-ceq'4.5.0'-and$FromVersion-cin@(('4.2.'+$SelectedTarget.Substring(1)+'02'),('4.4.'+$SelectedTarget.Substring(1)+'02'))-and$ToVersion-ceq('4.5.'+$SelectedTarget.Substring(1)+'00')-and
       $FixtureName-ceq('assert-upgrade-4-0-'+$SelectedTarget.Substring(1)+'00-to-4-1-'+$SelectedTarget.Substring(1)+'00')-and$Archetype-ceq'base-default'-and-not$SpaceIsFake) -or
     ($SelectedTarget-cin@('f110','f100')-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@(('4.4.'+$SelectedTarget.Substring(1)+'02'),('4.5.'+$SelectedTarget.Substring(1)+'01'))-and$ToVersion-ceq('4.5.'+$SelectedTarget.Substring(1)+'02')-and
@@ -798,13 +802,13 @@ Copy-Item -LiteralPath $fixture -Destination $stagedFixture -Recurse
 if ($SpaceIsFake) { Copy-Item -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Destination (Join-Path $stagedFixture 'mir421_space_fake_upgrade.lua') }
 $mir42UpgradeSpecialized=$false
 if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-4-0-20000-to-4-1-20000', 'assert-upgrade-4-0-11000-to-4-1-11000', 'assert-upgrade-4-0-10000-to-4-1-10000') -and
-    $ToVersion -match '^4[.](?<minor>2|3|4|5)[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
+    $ToVersion -match '^4[.](?<minor>2|3|4|5|6)[.](?<target>210|200|110|100)(?<patch>[0-9]{2})$') {
   $toMinor=[int]$Matches.minor
   $targetCode=[string]$Matches.target
   $toPatch=[int]$Matches.patch
   $code = $targetCode+'00'
   $expectedFrom = "4.1.$code"
-  $maintenanceMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5)[.]'+$targetCode+'(?<patch>[0-9]{2})$'))
+  $maintenanceMatch=[regex]::Match($FromVersion,('^4[.](?<minor>2|3|4|5|6)[.]'+$targetCode+'(?<patch>[0-9]{2})$'))
   $earlierPatch=$maintenanceMatch.Success -and (([int]$maintenanceMatch.Groups['minor'].Value -lt $toMinor) -or
     (([int]$maintenanceMatch.Groups['minor'].Value -eq $toMinor) -and ([int]$maintenanceMatch.Groups['patch'].Value -lt $toPatch)))
   if ($FromVersion -cne $expectedFrom -and -not $earlierPatch) { throw 'MIR 4 upgrade specialization requires its exact baseline or an earlier same-target maintenance version.' }
@@ -818,6 +822,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     ($SourceVersion -ceq'4.4.2' -and $FromVersion -cin @(('4.2.'+$targetCode+'02'),('4.4.'+$targetCode+'00'),('4.4.'+$targetCode+'01')) -and $ToVersion -ceq ('4.4.'+$targetCode+'02')) -or
     ($targetCode-cin@('210','200','110','100')-and$SourceVersion-ceq'4.5.0'-and$FromVersion-cin@("4.2.${targetCode}02","4.4.${targetCode}02")-and$ToVersion-ceq("4.5.${targetCode}00")) -or
     ($targetCode-cin@('210','200','110','100')-and$SourceVersion-ceq'4.5.2'-and$FromVersion-cin@("4.4.${targetCode}02","4.5.${targetCode}01")-and$ToVersion-ceq("4.5.${targetCode}02")) -or
+    ($targetCode-cin@('210','200')-and$SourceVersion-ceq'4.6.0'-and$FromVersion-ceq("4.5.${targetCode}02")-and$ToVersion-ceq("4.6.${targetCode}00")) -or
     ($targetCode-ceq'200'-and$SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.1.20000'-and$ToVersion-ceq'4.3.20000')
   )
   $mir42UpgradeSpecialized=$true
@@ -846,7 +851,7 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
     if($f210HistoricalSettingOracle){
       Set-MIR423F210HistoricalSettingDefaultOracle -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
     }
-    if($targetCode-ceq'210'-and$SourceVersion-cin@('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','space-age-native-owner')){
+    if($targetCode-ceq'210'-and$SourceVersion-cin@('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','space-age-native-owner')){
       Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion `
         -BaseDefaultCompleteState:($Archetype-ceq'base-default'-and(
           ($FromVersion-ceq'4.2.21002'-and$ToVersion-ceq'4.3.21000') -or
@@ -855,10 +860,11 @@ if ($FixtureName -in @('assert-upgrade-4-0-21000-to-4-1-21000', 'assert-upgrade-
           ($FromVersion-cin@('4.2.21002','4.3.21000')-and$ToVersion-ceq'4.4.21000') -or
                ($FromVersion-cin@('4.2.21002','4.4.21000','4.4.21001')-and$ToVersion-ceq'4.4.21002') -or
           ($FromVersion-cin@('4.2.21002','4.4.21002')-and$ToVersion-ceq'4.5.21000') -or
-          ($FromVersion-cin@('4.4.21002','4.5.21001')-and$ToVersion-ceq'4.5.21002')))
+          ($FromVersion-cin@('4.4.21002','4.5.21001')-and$ToVersion-ceq'4.5.21002') -or
+          ($FromVersion-ceq'4.5.21002'-and$ToVersion-ceq'4.6.21000')))
     }
   }
-  if($targetCode-ceq'200'-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','f200-bob-angel','f200-galore-space-age')){
+  if($targetCode-ceq'200'-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')-and-not$classicReducedPolicy-and-not$SpaceIsFake-and$Archetype-cin@('base-default','f200-bob-angel','f200-galore-space-age')){
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $stagedFixture -FromVersion $FromVersion -ToVersion $ToVersion
   }
   if($f200GaloreSpaceAgeScenario){
@@ -979,7 +985,7 @@ if($k2Scenario){
   $capOverride=New-MIR421K2CapOverride -Root (Join-Path $root 'cap-settings') -Cap $K2ImersiteCap
   if($capOverride){$persistentFixtureDirectories+=,$capOverride}
 }
-$requiresCompleteCatalogue = -not$classicReducedPolicy-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')-and-not$SpaceIsFake-and-not$k2Scenario-and
+$requiresCompleteCatalogue = -not$classicReducedPolicy-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')-and-not$SpaceIsFake-and-not$k2Scenario-and
   (($mir42UpgradeSpecialized-and$Archetype-cin@('base-default','space-age-native-owner','f200-bob-angel','f200-galore-space-age'))-or$isHistoricalTerminalFixture)
 $completeCatalogueSnapshotEvidence = [ordered]@{}
 $classicUpgradeSnapshotEvidence = [ordered]@{}
