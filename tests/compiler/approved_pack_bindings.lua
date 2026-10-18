@@ -1411,4 +1411,82 @@ do
   check(work[128].rules - work[64].rules == 3 * 64,
     "Additional science owners add three rules each rather than competing route combinations")
 end
+
+-- A disabled/replaced named recipe must not veto an independently valid
+-- direct producer. In particular, automation science may itself be moved
+-- behind a trigger unlock by an overhaul, so it cannot require its own pack.
+for _, pack in ipairs({roles[1], "promethium-science-pack", "electromagnetic-science-pack"}) do
+  for _, failure in ipairs({"no-owner", "disabled-owner", "broken-owner", "missing-recipe"}) do
+    local raw = world(0, false)
+    raw.tool[pack] = {type = "tool", name = pack}
+    if pack ~= roles[1] then raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack end
+    raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    raw.technology[pack] = {type = "technology", name = pack,
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1}, effects = {}}
+    if failure ~= "no-owner" then
+      raw.technology[pack].effects = {{type = "unlock-recipe", recipe = pack}}
+      if failure == "disabled-owner" then raw.technology[pack].enabled = false end
+      if failure == "broken-owner" then raw.technology[pack].prerequisites = {"missing-upstream-tech"} end
+      if failure == "missing-recipe" then raw.recipe[pack] = nil end
+    end
+    local alternate = "replacement-" .. pack
+    raw.recipe[alternate] = {type = "recipe", name = alternate, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    raw.technology["replacement-seed"] = {type = "technology", name = "replacement-seed",
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+      effects = {{type = "unlock-recipe", recipe = alternate}}}
+    raw.technology["circular-replacement"] = {type = "technology", name = "circular-replacement",
+      unit = {count = 1, ingredients = {{pack, 1}}},
+      effects = {{type = "unlock-recipe", recipe = alternate}}}
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(pack)
+      local source = science_packs.production_route_for_pack(pack)
+      check(status == "research" and gate == "replacement-seed" and source.recipe_name == alternate,
+        "A " .. failure .. " named source cannot veto a valid direct replacement for " .. pack)
+      check(#source.unlockers == 1 and source.unlockers[1] == "replacement-seed",
+        "The replacement keeps its independently established seed, never its circular alternate")
+    end)
+    raw.technology["replacement-seed"].enabled = false
+    Context.with_active(Context.new(), function()
+      local ok, status = pcall(science_packs.pack_production_status, pack)
+      check(not ok or (status ~= "initial" and status ~= "research"),
+        "A missing named source and an unseeded replacement cannot invent pack availability")
+    end)
+  end
+end
+do
+  local work = {}
+  for _, count in ipairs({64, 128}) do
+    local raw = world(count, true)
+    raw.technology[roles[1]].effects = {}
+    for index = 1, count do
+      local owner = raw.technology["later-automation-alternative-" .. index]
+      owner.prerequisites, owner.unit = {}, nil
+      owner.research_trigger = {type = "craft-item", item = "iron-plate", count = 1}
+      owner.effects[2] = deepcopy(owner.effects[1])
+    end
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(roles[1])
+      check(status == "research" and gate == "later-automation-alternative-1",
+        "Replacement recipes use deterministic ordering and deduplicated unlock effects")
+      work[count] = science_packs.binding_snapshot().work
+      check(work[count].dependency_notifications <= work[count].dependency_edges
+          and work[count].factory_acquisition_calls == 0,
+        "Replacement producers reuse bounded reference propagation without factory discovery")
+    end)
+  end
+  check(work[128].rules - work[64].rules == 3 * 64,
+    "Replacement recipes add three rules each rather than enumerating producer combinations")
+  local raw = world(1, false)
+  raw.technology[roles[1]].effects = {}
+  raw.recipe["later-automation-alternative-1"].enabled = true
+  Context.with_active(Context.new(), function()
+    local status = science_packs.pack_production_status(roles[1])
+    local source = science_packs.production_route_for_pack(roles[1])
+    check(status == "initial" and #source.unlockers == 0
+        and source.recipe_name == "later-automation-alternative-1",
+      "An actual initial replacement remains initial despite a disabled named recipe")
+  end)
+end
 return checks
