@@ -4824,10 +4824,12 @@
         ".mir/sanitation-budgets.json",
         "validation/scenarios/local-2.1.json",
         "validation/scenarios/local-2.0.json",
-        "package:prototypes/mir/compatibility/policies/k2_science_phase.lua",
-        "package:prototypes/mir/planner/science.lua",
-        "package:prototypes/mir/capabilities/science_integration/science_packs.lua",
-        "package:prototypes/mir/planner/base_continuations.lua",
+        "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
+        "source:source/prototypes/mir/planner/science.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+        "source:source/prototypes/mir/planner/base_continuations.lua",
+        "source/package-source.json",
+        "targets/f210/composition.json",
         "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
         "fixtures/assert-k2-science-phase-policy/info.json",
         "docs/architecture/module-boundaries.md",
@@ -8700,5 +8702,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ba221240d82cc3d8054f05067c98a9f0f219632532908dae6bfec6b5ad6b24a5"
+  "digest": "sha256:d123b991733cf05f9a5514d789ed72e4420d4cb8f2dc0fa37ace72408b6e986b"
 }
