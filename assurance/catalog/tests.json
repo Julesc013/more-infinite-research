@@ -5930,8 +5930,8 @@
         ".mir/fixtures.yml",
         "docs/compatibility/targets/cubium.md",
         "docs/compatibility/targets/recycler-progression.md",
-        "package:prototypes/mir/capabilities/science_integration/production_route_policy.lua",
-        "package:prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
+        "historical:ea5b37983e4f682c841eba662a87276f082d4afd:prototypes/mir/capabilities/science_integration/production_route_policy.lua",
+        "historical:ea5b37983e4f682c841eba662a87276f082d4afd:prototypes/mir/capabilities/science_integration/pack_production_reachability.lua",
         "historical:297aa5cc902da96847165a4f9caa1048608839fb:prototypes/mir/compatibility/repairs/factorio_2_1_ambient_sound_schema.lua",
         "fixtures/assert-generated-prerequisite-safety/data-final-fixes.lua",
         "fixtures/assert-cubium-production-routes/data-final-fixes.lua",
@@ -8700,5 +8700,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f171ad6951be0ed7fdf7486761b6646b10dac826dad6f657cd22ac66a8b34870"
+  "digest": "sha256:ba221240d82cc3d8054f05067c98a9f0f219632532908dae6bfec6b5ad6b24a5"
 }
