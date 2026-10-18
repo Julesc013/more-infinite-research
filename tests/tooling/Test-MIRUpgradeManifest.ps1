@@ -1622,6 +1622,28 @@ foreach($route in $mir452Routes){
   $mir43Assertions+=5
 }
 if(@($mir452FixtureVersions|Sort-Object -Unique).Count-ne22){throw '4.5.2 fixture identities collide across all admitted routes'}
+# The historical resolver is also reached before PrepareInputsOnly. Exercise
+# every already admitted 4.5.2 historical predecessor here so its narrow
+# terminal/same-target transition gate cannot lag the input-mode contract.
+$mir452HistoricalResolverAssertions=0
+foreach($route in @($mir452Routes|Where-Object {[bool]$_.historical})){
+  $resolved=Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $route.from -ToVersion $route.to
+  if($resolved.target-cne$route.to-or$resolved.predecessor_kind-cne'same-target-maintenance'-or$resolved.line-cne('0.'+[int]$route.target.Substring(1))){throw "4.5.2 historical resolver lost exact route: $($route.target)/$($route.from)"}
+  $mir452HistoricalResolverAssertions++
+}
+foreach($invalidHistorical452 in @(
+  @{from='1.3.9';to='4.5.01302'},
+  @{from='4.5.01300';to='4.5.01302'},
+  @{from='4.4.01301';to='4.5.01302'},
+  @{from='4.5.01401';to='4.5.01302'},
+  @{from='4.5.01302';to='4.5.01302'},
+  @{from='4.5.01301';to='4.5.01301'}
+)){
+  $rejected=$false;try{Resolve-MIRHistoricalUpgradeTransition -RepoRoot $RepoRoot -FromVersion $invalidHistorical452.from -ToVersion $invalidHistorical452.to|Out-Null}catch{$rejected=$_.Exception.Message.StartsWith('MIR historical upgrade specialization requires an exact terminal predecessor')}
+  if(-not$rejected){throw "4.5.2 historical resolver admitted an unbound route: $($invalidHistorical452.from) -> $($invalidHistorical452.to)"}
+  $mir452HistoricalResolverAssertions++
+}
+$mir43Assertions += $mir452HistoricalResolverAssertions
 foreach($bad in @(
   @{target='f210';from='4.5.21002';to='4.5.21002';archetype='base-default';historical=$false},
   @{target='f200';from='4.4.20001';to='4.5.20002';archetype='base-default';historical=$false},

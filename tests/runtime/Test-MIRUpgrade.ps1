@@ -225,18 +225,22 @@ function Resolve-MIRHistoricalUpgradeTransition {
   $toPatch = [int]$Matches.patch
   $target = $targets[$code]
   if($toMinor-eq5){
-    $mir450HistoricalPredecessors=@{
+    $corrected442Predecessors=@{
       '017'='4.4.01702';'016'='4.4.01602';'015'='4.4.01502';'014'='4.4.01402';'013'='4.4.01302'
     }
-    $direct422Predecessor='4.2.'+$code+'02'
-    if(-not$mir450HistoricalPredecessors.ContainsKey($code)-or$ToVersion-cne('4.5.'+$code+'00')-or
-       $FromVersion-cnotin@($mir450HistoricalPredecessors[$code],$direct422Predecessor)){throw $failure}
+    if(-not$corrected442Predecessors.ContainsKey($code)){throw $failure}
+    $allowedPredecessors=@(switch($toPatch){
+      0 {@($corrected442Predecessors[$code],('4.2.'+$code+'02'))}
+      2 {@($corrected442Predecessors[$code],('4.5.'+$code+'01'))}
+      default {@()}
+    })
+    if($allowedPredecessors.Count-eq0-or$FromVersion-cnotin$allowedPredecessors){throw $failure}
   }
   . (Join-Path $RepoRoot 'tools/lib/validation/MIR4DistributionIdentity.ps1')
   $null = New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $toMinor -SourcePatch $toPatch -DistributionVersion $ToVersion
   $predecessorKind = 'historical-terminal'
   if ($FromVersion -cne [string]$target.terminal) {
-    if ($FromVersion -cnotmatch ('^4[.](?<minor>2|3|4)[.]' + $code + '(?<patch>[0-9]{2})$')) { throw $failure }
+    if ($FromVersion -cnotmatch ('^4[.](?<minor>2|3|4|5)[.]' + $code + '(?<patch>[0-9]{2})$')) { throw $failure }
     $fromMinor = [int]$Matches.minor
     $fromPatch = [int]$Matches.patch
     if ($fromMinor -gt $toMinor -or ($fromMinor -eq $toMinor -and $fromPatch -ge $toPatch)) { throw $failure }
