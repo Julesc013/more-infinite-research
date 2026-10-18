@@ -297,7 +297,7 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
       if ($SourceVersion -ceq '4.4.1') {
         $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
       } elseif ($SourceVersion -ceq '4.5.2') {
-        $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n"
+        $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
         $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
       } elseif ($SourceVersion -ceq '4.5.1') {
         $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"

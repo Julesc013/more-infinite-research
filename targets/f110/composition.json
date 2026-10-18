@@ -2796,8 +2796,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 16239,
-      "expected_sha256": "682ADE3FEFB4F11F5DA77D3B1862BA491C29C954BB95266F15FDF807515EA48A",
+      "expected_bytes": 16632,
+      "expected_sha256": "5CB75E5B01AACC1845130BB9815F33BC8FA1178F81E854AF7A1F9CA604B3FD99",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2892,8 +2892,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 12589,
-      "expected_sha256": "2D7C9C8FE0B5278AB5C601B621BAB42E9BA8BC2EF19547A2C259F229DDBC1969",
+      "expected_bytes": 12787,
+      "expected_sha256": "685B9010626BDF852F71E03C2D6B5C418FB17C37308E93F0BFD7DB8497F25363",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3788,8 +3788,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the shared material continuation planner for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 8790,
-      "expected_sha256": "E9A563B8FCFD6F82DACF21D876B83D5CFC2745E2C586D3ABD01D7C757B95BF17",
+      "expected_bytes": 8976,
+      "expected_sha256": "D0EFEB4808AB74F92E50F4BF8EEFA6476A8DA74ED42E674BA5915660466F4310",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "96FBA7356CCC1F1A688E5B513BC982E4B2D52D86F2A8F21A066DCC9478B85754"
+  "record_sha256": "AF7CFD6D3F6ADA51D0B5EB28BF5E07320DDBF45060D1A5BC2831CAC5AF4DA952"
 }

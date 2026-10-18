@@ -70,13 +70,19 @@ package.loaded["prototypes.mir.planner.science"] = {
 }
 local scripted = true
 local mod_data_supported = true
+local legacy_numeric_research_cost = false
 package.loaded["prototypes.mir.platform.factorio.target_line"] = {
-  feature_enabled = function(name) return name == "scripted_techs" and scripted end,
+  feature_enabled = function(name)
+    return (name == "scripted_techs" and scripted)
+      or (name == "legacy_numeric_research_cost" and legacy_numeric_research_cost)
+  end,
   mod_data_supported = function() return mod_data_supported end
 }
 package.loaded["prototypes.mir.domain.research_cost.model"] = {
   evaluate = function() return 400 end,
-  new = function(input) return {count_formula = "400+100*(L-4)", input = input} end
+  new = function(input)
+    return {count_formula = "400+100*(L-4)", base_cost = input.base_cost, input = input}
+  end
 }
 package.loaded["prototypes.mir.planner.stream_compiler.diagnostics"] = {
   plan_row = function(key, spec, action, reason, diagnostics, extra)
@@ -133,6 +139,16 @@ check(stage.fields.cost_model.input.anchor_level == 4
 check(stage.fields.effects[1].recipe == legacy.fields.effects[1].recipe
     and stage.fields.effects[1].change == legacy.fields.effects[1].change,
   "the continuation retains the exact qualified effect")
+check(stage.fields.count == nil and stage.fields.count_formula == "400+100*(L-4)",
+  "the normal continuation retains its formula-only research cost")
+legacy_numeric_research_cost = true
+local numeric_stage = continuation.plan(legacy)
+check(numeric_stage.fields.count == 400 and numeric_stage.fields.count_formula == nil,
+  "a legacy numeric continuation has exactly one integer research cost")
+legacy_numeric_research_cost = false
+local restored_formula_stage = continuation.plan(legacy)
+check(restored_formula_stage.fields.count == nil and restored_formula_stage.fields.count_formula == "400+100*(L-4)",
+  "leaving the legacy target restores formula-only continuation cost")
 
 -- An already required later pack must not turn a lower ordinary pack into
 -- a new frontier. These cases exercise the real shared planner, retaining

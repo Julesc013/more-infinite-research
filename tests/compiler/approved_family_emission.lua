@@ -239,6 +239,60 @@ Context.with_active(Context.new(), function()
       "GenerationDraft row authority binds inherited " .. case[1] .. " semantics")
   end
 
+  do
+    local target_line = require("prototypes.mir.platform.factorio.target_line")
+    local qualify = require("prototypes.mir.planner.stream_compiler.qualify")
+    local registry = require("prototypes.mir.streams.registry")
+    local prior = target_line.supports.legacy_numeric_research_cost
+    target_line.supports.legacy_numeric_research_cost = true
+    local descriptor = require("prototypes.mir.domain.streams.descriptor")
+    local cases = {
+      {"research_iron", registry.get("research_iron")},
+      {"mir452_numeric_crafting_probe", descriptor.normalize("mir452_numeric_crafting_probe", {
+        icon_item = "iron-plate", science_packs = roles,
+        direct_effects = {{type = "character-crafting-speed", modifier = 0.1}}
+      })}
+    }
+    for _, case in ipairs(cases) do
+      local key = case[1]
+      local input = qualify.plan(key, case[2])
+      check(input.action == "emit", "Numeric-cost control uses an actual admitted " .. key .. ":" .. tostring(input.reason))
+      local draft = generation_plan.prepare({input})
+      local handles = generation_plan.assert_trusted_draft(draft)
+      -- The planner row and its graph projection must agree on the actual
+      -- numeric target cost before any technology reaches emission.
+      local projection = technology_design.prepared_graph_projection(handles[input], input)
+      check(input.fields.count_formula == nil and input.fields.count == 8000,
+        "Numeric target row carries its actual first-level cost")
+      check(projection.unit.count == 8000 and projection.unit.count_formula == nil,
+        "Numeric graph projection agrees with its source row")
+      check(input.fields.cost_model.count_formula ~= nil,
+        "The full progression cost model remains available")
+      local final = generation_plan.materialize_draft(draft)
+      check(final.rows[1].fields.count == 8000 and final.rows[1].technology_design ~= nil,
+        "Complete public numeric plan retains its design and exact cost")
+      local changed = {}
+      for k, v in pairs(input) do changed[k] = v end
+      changed.fields = deepcopy(input.fields)
+      changed.fields.count = 8001
+      check(not pcall(technology_design.prepared_graph_projection, handles[input], changed),
+        "Strict preparation rejects a changed numeric cost")
+      for _, invalid in ipairs({0, -1, 0.5, math.huge, '8000'}) do
+        local bad = deepcopy(input)
+        bad.fields.count = invalid
+        check(not pcall(generation_plan.prepare, {bad}),
+          "Numeric row rejects invalid cost " .. tostring(invalid))
+      end
+      local missing = deepcopy(input)
+      missing.fields.count = nil
+      check(not pcall(generation_plan.prepare, {missing}), "Missing both cost forms is rejected")
+      local ambiguous = deepcopy(input)
+      ambiguous.fields.count_formula = ambiguous.fields.cost_model.count_formula
+      check(not pcall(generation_plan.prepare, {ambiguous}), "Two cost representations are rejected")
+    end
+    target_line.supports.legacy_numeric_research_cost = prior
+  end
+
   local plan = compiler.compile(context)
   local iron
   for _, row in ipairs(plan.stream_plan.rows) do
