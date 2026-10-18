@@ -1275,4 +1275,69 @@ do
     "nested exported-plan mutation cannot alter owned adoption")
 end
 
+
+-- The selection policy owns its local vector and already computes its exact
+-- canonical digest.  The catalog may reuse that digest only for scalar
+-- selection reasons; all exported selections remain defensive copies and a
+-- non-scalar reason follows the existing returned-copy fingerprint path.
+do
+  local selection_policy = require("prototypes.mir.planner.technology_selection_policy")
+  local final_direct, final_fingerprint, final_reusable = selection_policy.select_final(catalog_full, {catalog_emit})
+  local final_facade, final_facade_fingerprint, final_facade_reusable = selection_policy.select(
+    catalog_full, {catalog_emit})
+  check(fingerprint.canonical(final_facade) == fingerprint.canonical(final_direct),
+    "final selection facade preserves its established first return")
+  check(final_facade_fingerprint == final_fingerprint
+      and final_facade_fingerprint == fingerprint.of(final_facade),
+    "final selection facade forwards the exact producer digest")
+  check(final_facade_reusable == true,
+    "ordinary scalar final selection declares its owned digest reusable")
+
+  local pre_row = catalog_emit_row("preselection")
+  local pre_direct, pre_fingerprint, pre_reusable = selection_policy.select_prequalification(
+    catalog_preselection, {pre_row})
+  local pre_facade, pre_facade_fingerprint, pre_facade_reusable = selection_policy.select(
+    catalog_preselection, {pre_row})
+  check(fingerprint.canonical(pre_facade) == fingerprint.canonical(pre_direct),
+    "prequalification selection facade preserves its established first return")
+  check(pre_facade_fingerprint == pre_fingerprint
+      and pre_facade_fingerprint == fingerprint.of(pre_facade),
+    "prequalification selection facade forwards the exact producer digest")
+  check(pre_reusable == true and pre_facade_reusable == true,
+    "ordinary scalar prequalification selection declares its owned digest reusable")
+
+  final_facade[1].reason = "forged-exported-selection"
+  local final_again = selection_policy.select(catalog_full, {catalog_emit})
+  check(final_again[1].reason == catalog_emit.reason,
+    "mutating a returned selection cannot alter a later policy selection")
+
+  local scalar_seed = finalize_catalog(catalog_emit, false)
+  fingerprint.reset_metrics()
+  local scalar_bound = technology_catalog.bind_selections(
+    scalar_seed, {catalog_emit}, {trusted_owned = true, defer_validation = true})
+  local scalar_metrics = fingerprint.metrics()
+  check(scalar_bound.selection_fingerprint == final_fingerprint
+      and scalar_metrics.fingerprint_calls == 2,
+    "catalog binds the scalar producer digest without recanonicalizing its returned selection")
+
+  local fallback_row = {}
+  for key, value in pairs(catalog_emit) do fallback_row[key] = value end
+  fallback_row.reason = {kind = "non-scalar-selection-reason"}
+  local fallback_direct, fallback_fingerprint, fallback_reusable = selection_policy.select(
+    scalar_seed, {fallback_row})
+  check(fallback_reusable == false,
+    "non-scalar selection reason refuses producer-digest reuse")
+  check(fallback_fingerprint == fingerprint.of(fallback_direct),
+    "non-scalar selection retains the exact returned-copy digest")
+
+  local fallback_seed = finalize_catalog(catalog_emit, false)
+  fingerprint.reset_metrics()
+  local fallback_bound = technology_catalog.bind_selections(
+    fallback_seed, {fallback_row}, {trusted_owned = true, defer_validation = true})
+  local fallback_metrics = fingerprint.metrics()
+  check(fallback_bound.selection_fingerprint == fallback_fingerprint
+      and fallback_metrics.fingerprint_calls == scalar_metrics.fingerprint_calls + 1,
+    "catalog rehashes the returned selection when scalar compatibility is absent")
+end
+
 print("MIR-TECHNOLOGY-DESIGN-CHARACTERIZATION-PASS " .. assertions)

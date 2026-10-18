@@ -4406,8 +4406,6 @@
       "inputs": [
         "source:source/prototypes/mir/planner/stream_compiler.lua",
         "source:source/prototypes/mir/planner/stream_compiler/**",
-        "source:source/prototypes/mir/planner/stream_compiler.lua",
-        "source:source/adapters/f200/prototypes/mir/planner/stream_compiler/**",
         "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/f210/composition.json",
@@ -6152,6 +6150,8 @@
         "factorio",
         "tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1",
         "tests/compiler/technology_design_characterization.lua",
+        "source:source/prototypes/mir/planner/technology_selection_policy.lua",
+        "source:source/prototypes/mir/planner/technology_catalog/build.lua",
         "tests/compiler/publication_measurement.lua",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",

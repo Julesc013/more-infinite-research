@@ -178,9 +178,14 @@ function M.bind_selections(catalog, rows, options)
   if not options.trusted_owned then validate.verify_untrusted(catalog) end
   if not options.trusted_owned then model.authority.count_full_copy() end
   local result = options.trusted_owned and catalog or deepcopy(catalog)
-  local selections = selection_policy.select(result, rows)
+  local selections, selection_fingerprint, returned_copy_equivalent = selection_policy.select(result, rows)
   result.current_selections = selections
-  result.selection_fingerprint = fingerprint.of(selections)
+  -- The policy fingerprints its transient, locally constructed selection list
+  -- before returning the defensive copy. For scalar row reasons that copy has
+  -- identical canonical bytes. A non-scalar reason keeps the established
+  -- returned-copy traversal and its original mutation/error behavior.
+  result.selection_fingerprint = returned_copy_equivalent and selection_fingerprint
+    or fingerprint.of(selections)
   result.catalog_fingerprint = fingerprint.of(model.catalog_material(result))
   if not options.defer_validation then
     if options.trusted_owned then validate.assert_owned(result)

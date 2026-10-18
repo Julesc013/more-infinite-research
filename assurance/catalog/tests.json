@@ -1537,6 +1537,8 @@
         "factorio",
         "tests/compiler/Test-MIRTechnologyDesignCharacterization.ps1",
         "tests/compiler/technology_design_characterization.lua",
+        "source:source/prototypes/mir/planner/technology_selection_policy.lua",
+        "source:source/prototypes/mir/planner/technology_catalog/build.lua",
         "tests/compiler/publication_measurement.lua",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
@@ -7222,8 +7224,6 @@
       "inputs": [
         "source:source/prototypes/mir/planner/stream_compiler.lua",
         "source:source/prototypes/mir/planner/stream_compiler/**",
-        "source:source/prototypes/mir/planner/stream_compiler.lua",
-        "source:source/adapters/f200/prototypes/mir/planner/stream_compiler/**",
         "source:source/package-source.json",
         "targets/package-authority.json",
         "targets/f210/composition.json",
@@ -8700,5 +8700,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:95b5baef34fc85f83004514737036e180a922fd6f73feadf236bf4bb05225f6c"
+  "digest": "sha256:f171ad6951be0ed7fdf7486761b6646b10dac826dad6f657cd22ac66a8b34870"
 }
