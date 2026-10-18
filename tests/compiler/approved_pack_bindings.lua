@@ -1278,4 +1278,137 @@ for _, reversed in ipairs({false, true}) do
       "Promethium preserves its actual native prerequisite rather than requiring every alternate owner")
   end)
 end
+
+-- Modded science can move the recipe unlock away from the native technology
+-- and add several real owners. These owners are alternatives, not a single
+-- mandatory gate and not an excuse to discard the science pack.
+for _, pack in ipairs({"promethium-science-pack", "electromagnetic-science-pack"}) do
+  for _, reversed in ipairs({false, true}) do
+    local raw = world(0, false)
+    raw.tool[pack] = {type = "tool", name = pack}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+    raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    local owners = reversed and {"z-direct-science-unlock", "a-self-locked-science-unlock"}
+      or {"a-self-locked-science-unlock", "z-direct-science-unlock"}
+    for _, name in ipairs(owners) do
+      raw.technology[name] = {type = "technology", name = name,
+        unit = {count = 1, time = 1, ingredients = {{
+          name == "a-self-locked-science-unlock" and pack or roles[1], 1}}},
+        effects = {{type = "unlock-recipe", recipe = pack}}}
+    end
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(pack)
+      check(status == "research" and gate == "z-direct-science-unlock",
+        "Multiple direct science owners select an established alternative after a circular first owner")
+      local source = science_packs.production_route_for_pack(pack)
+      check(#source.unlockers == 1 and source.unlockers[1] == "z-direct-science-unlock",
+        "A selected alternative never unions mutually alternative research prerequisites")
+      local selected = science_packs.best_lab_compatible_ingredients(
+        {{roles[1], 1}, {pack, 1}}, "multiple-science-unlock-regression", {pack})
+      check(selected and #selected == 2,
+        "The multi-unlock repair retains the required science pack and compatible lab")
+      check(science_packs.binding_snapshot().work.factory_acquisition_calls == 0,
+        "Direct science unlock alternatives never invoke factory acquisition")
+    end)
+  end
+end
+for _, pack in ipairs({"promethium-science-pack", "electromagnetic-science-pack"}) do
+  local raw = world(0, false)
+  raw.tool[pack] = {type = "tool", name = pack}
+  raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+  raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+    results = {{type = "item", name = pack, amount = 1}}}
+  raw.technology["unavailable-named-science-owner"] = {type = "technology", name = "unavailable-named-science-owner",
+    unit = {count = 1, ingredients = {{"unknown-upstream-pack", 1}}},
+    effects = {{type = "unlock-recipe", recipe = pack}}}
+  local alternate = "alternate-" .. pack
+  raw.recipe[alternate] = {type = "recipe", name = alternate, enabled = false,
+    results = {{type = "item", name = pack, amount = 1}}}
+  for _, name in ipairs({"a-circular-alternate-owner", "z-valid-alternate-owner"}) do
+    raw.technology[name] = {type = "technology", name = name,
+      unit = {count = 1, ingredients = {{
+        name == "a-circular-alternate-owner" and pack or roles[1], 1}}},
+      effects = {{type = "unlock-recipe", recipe = alternate}}}
+  end
+  Context.with_active(Context.new(), function()
+    local status, gate = science_packs.pack_production_status(pack)
+    local source = science_packs.production_route_for_pack(pack)
+    check(status == "research" and gate == "z-valid-alternate-owner"
+        and source.recipe_name == alternate and #source.unlockers == 1,
+      "An independently established alternate recipe with several owners resolves an unavailable named recipe")
+    local selected = science_packs.best_lab_compatible_ingredients(
+      {{roles[1], 2}, {pack, 3}}, "multi-owner-alternate-recipe", {pack})
+    check(selected and #selected == 2 and selected[1][2] == 2 and selected[2][2] == 3,
+      "Alternate recipe owners preserve required science quantities")
+  end)
+  raw.technology["z-valid-alternate-owner"].unit.ingredients = {{"unknown-upstream-pack", 1}}
+  Context.with_active(Context.new(), function()
+    local ok, reason = pcall(science_packs.pack_production_status, pack)
+    check(not ok and tostring(reason):find("unresolved-approved-pack-dependencies:" .. pack, 1, true),
+      "Multiple unknown or circular alternate owners never manufacture a valid science source")
+  end)
+end
+do
+  local function owner_world(pack, count, circular)
+    local raw = world(0, false)
+    raw.tool[pack] = {type = "tool", name = pack}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+    raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    for index = count, 1, -1 do
+      local name = string.format("alternative-science-owner-%04d", index)
+      raw.technology[name] = {type = "technology", name = name,
+        unit = {count = 1, ingredients = {{circular and pack or roles[1], 1}}},
+        effects = {{type = "unlock-recipe", recipe = pack}, {type = "unlock-recipe", recipe = pack}}}
+    end
+    return raw
+  end
+  for _, pack in ipairs({"promethium-science-pack", "electromagnetic-science-pack", "modded-direct-science-pack"}) do
+    owner_world(pack, 3, false)
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(pack)
+      check(status == "research" and gate == "alternative-science-owner-0001",
+        "Equivalent direct owners retain deterministic name ordering regardless of insertion order")
+      local strict = deepcopy(catalogue.shared)
+      strict.science_binding_policy.direct_unlock_alternatives = false
+      local index = bindings.compile_references(strict, lab_bindings.view())
+      local strict_status, reason = bindings.bound_pack_status(index, pack)
+      check(strict_status == nil and reason == "ambiguous-approved-pack-unlock:" .. pack,
+        "Multiple-owner admission requires its explicit approved policy")
+    end)
+    local raw = owner_world(pack, 2, false)
+    raw.technology["alternative-science-owner-0001"].enabled = false
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(pack)
+      check(status == "research" and gate == "alternative-science-owner-0002",
+        "A disabled owner neither vetoes a valid owner nor supplies a gate")
+    end)
+    owner_world(pack, 2, true)
+    Context.with_active(Context.new(), function()
+      local ok, status = pcall(science_packs.pack_production_status, pack)
+      check(not ok or (status ~= "initial" and status ~= "research"),
+        "Circular alternatives without a seed cannot fabricate science availability")
+    end)
+    owner_world(pack, 0, false)
+    Context.with_active(Context.new(), function()
+      check(not pcall(science_packs.pack_production_status, pack),
+        "A recipe with no unlock remains unresolved rather than being granted for free")
+    end)
+  end
+  local work = {}
+  for _, count in ipairs({64, 128}) do
+    owner_world("promethium-science-pack", count, false)
+    Context.with_active(Context.new(), function()
+      check(science_packs.pack_production_status("promethium-science-pack") == "research",
+        "A broad direct-owner list completes through the same finite reference rules")
+      work[count] = science_packs.binding_snapshot().work
+      check(work[count].dependency_notifications <= work[count].dependency_edges
+          and work[count].factory_acquisition_calls == 0,
+        "Each direct-owner dependency is notified at most once without factory acquisition")
+    end)
+  end
+  check(work[128].rules - work[64].rules == 3 * 64,
+    "Additional science owners add three rules each rather than competing route combinations")
+end
 return checks
