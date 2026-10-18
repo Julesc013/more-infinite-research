@@ -413,7 +413,10 @@ try {
     candidate_sha256=[string]$materialization.archive_sha256;materialization_sha256=Get-K2213Sha256 $materializationPath
     source_version=$materialization.source_version;distribution_version=$materialization.distribution_version
     engine_version=$expectedEngineVersion;engine_sha256=$engineHash;runtime_api_sha256=Get-K2213Sha256 $runtimeApi
-    input_profile=$inputProfile;predecessor_observation_lock=$predecessorLock;archive_hashes=$directInputs.archive_hashes
+    # Current fixtures are specialized after this binding is established.
+    # Retain the authenticated base selection until its fixture archive exists;
+    # preparation below replaces this with the complete direct-library set.
+    input_profile=$inputProfile;predecessor_observation_lock=$predecessorLock;archive_hashes=$(if($null -ne $directInputs){$directInputs.archive_hashes}else{$baseInputs.archive_hashes})
   }
 
   if ($PreflightOnly) {
