@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-17.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-18.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -197,7 +197,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/mir4-m4c01-runbook.md | MIR 4 M4C01 Candidate Runbook | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
 | docs/maintainer/mir4-pre-freeze-hardening.md | MIR 4 Pre-Freeze Hardening | current | release-manager | how-to | mir-maintainers | 2026-09-09 |
 | docs/maintainer/mir4-qualification-and-promotion.md | MIR 4 Qualification and Promotion | current | release-manager | how-to | mir-maintainers | 2026-08-18 |
-| docs/maintainer/mir4-release-governance.md | MIR 4 Release Governance | current | release-manager | how-to | mir-maintainers | 2026-08-27 |
+| docs/maintainer/mir4-release-governance.md | MIR 4 Release Governance | current | release-manager | how-to | mir-maintainers | 2026-10-18 |
 | docs/maintainer/mir4-release-operations.md | MIR 4 Release Operations | current | release-manager | how-to | mir-maintainers | 2026-09-29 |
 | docs/maintainer/mir4-spark-sol-handoff.md | MIR 4 Spark To Sol Handoff And Completion Plan | current | release-manager | release-plan | mir-maintainers | 2026-08-20 |
 | docs/maintainer/mir4-supply-chain-preservation.md | MIR 4 Supply-Chain and Preservation | current | release-manager | how-to | mir-maintainers | 2026-08-31 |
