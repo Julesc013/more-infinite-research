@@ -71,7 +71,8 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     if($SpaceAge){'0.1.1131'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1130'}else{throw '[mir460-f210-fixture-transition]'}
   }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.6.0'){
     if($FromVersion-cne'4.5.20002'){throw '[mir460-f200-fixture-transition]'}
-    if($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1133'}
+    if($F200BobAngel-and-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){'0.1.1136'}
+    elseif($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1133'}
     elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1132'}
     else{throw '[mir460-f200-fixture-transition]'}
   }elseif($Target-ceq'f210'-and$SourceVersion-ceq'4.5.2'){
@@ -885,13 +886,16 @@ function Read-MIR423F200BobAngelUpgradeProfile {
 
 function Assert-MIR423F200BobAngelUpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
-    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]$SourceVersion='4.2.3')
+    [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),[ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.6.0')][string]$SourceVersion='4.2.3')
   $maintenance=[bool]($SourceVersion-ceq'4.2.3'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.2.20003')
   $full430=[bool]($SourceVersion-ceq'4.3.0'-and$FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.3.20000')
   $full431=[bool]($SourceVersion-ceq'4.3.1'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.3.20001')
   $full440=[bool]($SourceVersion-ceq'4.4.0'-and$FromVersion-cin@('4.2.20002','4.3.20000')-and$ToVersion-ceq'4.4.20000')
   $full442=[bool]($SourceVersion-ceq'4.4.2'-and$FromVersion-cin@('4.2.20002','4.4.20000','4.4.20001')-and$ToVersion-ceq'4.4.20002')
-  if($Target-cne'f200'-or-not($maintenance-or$full430-or$full431-or$full440-or$full442)-or
+  # The affected Bob/Angel lane has one reviewed published predecessor and
+  # one Full destination. Do not admit adjacent 4.5/4.6 versions here.
+  $full460=[bool]($SourceVersion-ceq'4.6.0'-and$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
+  if($Target-cne'f200'-or-not($maintenance-or$full430-or$full431-or$full440-or$full442-or$full460)-or
      $FixtureName-cne'assert-upgrade-4-0-20000-to-4-1-20000'-or$Archetype-cne'f200-bob-angel'-or
      $SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir423-f200-bob-angel-transition]'
@@ -909,10 +913,13 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $full442Direct=[bool]($FromVersion-ceq'4.2.20002'-and$ToVersion-ceq'4.4.20002')
   $full442Retained=[bool]($FromVersion-ceq'4.4.20000'-and$ToVersion-ceq'4.4.20002')
   $full442Immediate=[bool]($FromVersion-ceq'4.4.20001'-and$ToVersion-ceq'4.4.20002')
+  # Fixed against the independently reviewed R05 Aluminium contract. This is
+  # deliberately not derived from the candidate's observed technology table.
+  $full460=[bool]($FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000')
   $full431=[bool]($full431Direct-or$full431Immediate)
   $full440=[bool]($full440Direct-or$full440Immediate)
   $full442=[bool]($full442Direct-or$full442Retained-or$full442Immediate)
-  if(-not($maintenance-or$full430-or$full431-or$full440-or$full442)){throw '[mir423-f200-bob-angel-oracle-transition]'}
+  if(-not($maintenance-or$full430-or$full431-or$full440-or$full442-or$full460)){throw '[mir423-f200-bob-angel-oracle-transition]'}
   $directory=Resolve-MIR441RecoveryScratchPath -Path $FixtureDirectory
   $controlPath=Join-Path $directory 'control.lua';$settingsPath=Join-Path $directory 'settings.lua';$infoPath=Join-Path $directory 'info.json'
   foreach($path in @($controlPath,$settingsPath,$infoPath)){Assert-MIRLibraryPath $path}
@@ -928,7 +935,64 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   $permissiveTechnologySetGuard='(?m)^  for name, after in pairs\(observed\.technologies\) do\r?\n    if not expected\.technologies\[name\] and after\.researched then fail\("new research was awarded without earning it: " \.\. name\) end\r?\n  end$'
   $technologySetGuard=[regex]::new($permissiveTechnologySetGuard)
   if($technologySetGuard.Matches($control).Count-ne1){throw '[mir423-f200-bob-angel-performance-only-anchor]'}
-  $strictTechnologySetGuard=if($full442Direct){@'
+  $strictTechnologySetGuard=if($full460){@'
+  local function equal_names(left, right)
+    if #left ~= #right then return false end
+    for index, value in ipairs(left) do if value ~= right[index] then return false end end
+    return true
+  end
+  local function exact_addition_state(name, after, level)
+    if after.level ~= level or after.researched ~= false or after.enabled ~= true
+      or after.visible_when_disabled ~= false or math.abs((after.saved_progress or 0)) > epsilon then
+      fail("reviewed Aluminium addition state differs: " .. name)
+    end
+  end
+  local function exact_prototype_fields(name, prototype, contract)
+    if prototype.hidden ~= false or prototype.hidden_in_factoriopedia ~= false
+      or prototype.max_level ~= contract.max_level or prototype.order ~= contract.order
+      or not equal_names(prototype.prerequisites, contract.prerequisites)
+      or not equal_state(prototype.ingredients, contract.ingredients)
+      or not equal_state(prototype.effects, contract.effects)
+      or prototype.unit_count ~= contract.unit_count
+      or prototype.unit_count_formula ~= contract.count_formula
+      or prototype.unit_energy ~= contract.unit_energy then
+      fail("reviewed Aluminium definition differs: " .. name)
+    end
+  end
+  -- These two records are the independently reviewed R05 BOB_ANGEL_422_MODS
+  -- contract for the published 4.5.2 -> 4.6.0 Full upgrade. They are fixed
+  -- policy facts, never values learned from the upgraded candidate snapshot.
+  local reviewed_added_names = {
+    ["recipe-prod-research_material_aluminium-1"] = true,
+    ["recipe-prod-research_material_aluminium-4"] = true
+  }
+  local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
+  local A_L_U = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}}
+  local AL_EFFECTS = {{type="change-recipe-productivity",recipe="angels-plate-aluminium",modifier=0.02},{type="change-recipe-productivity",recipe="angels-plate-aluminium-2",modifier=0.02}}
+  local contracts = {
+    ["recipe-prod-research_material_aluminium-1"] = {
+      level=1,max_level=3,order="p[research_material_aluminium]",
+      prerequisites={"angels-aluminium-casting-2","angels-aluminium-smelting-1","automation-science-pack","logistic-science-pack"},
+      ingredients=A_L,effects=AL_EFFECTS,unit_count=200,count_formula="200*2^(L-1)",unit_energy=1800
+    },
+    ["recipe-prod-research_material_aluminium-4"] = {
+      level=4,max_level=150,order="p[research_material_aluminium__continuation]",
+      prerequisites={"angels-aluminium-casting-2","angels-aluminium-smelting-1","automation-science-pack","logistic-science-pack","recipe-prod-research_material_aluminium-1","utility-science-pack"},
+      ingredients=A_L_U,effects=AL_EFFECTS,unit_count=1600,count_formula="1600+200*(L-4)",unit_energy=1800
+    }
+  }
+  for name, after in pairs(observed.technologies) do
+    if not expected.technologies[name] then
+      local contract = contracts[name]
+      if not reviewed_added_names[name] or not contract then fail("new technology added in reviewed Bob/Angel upgrade: " .. name) end
+      exact_addition_state(name, after, contract.level)
+      exact_prototype_fields(name, after.prototype, contract)
+    end
+  end
+  for name in pairs(reviewed_added_names) do
+    if not observed.technologies[name] then fail("reviewed Aluminium technology missing: " .. name) end
+  end
+'@.TrimEnd()}elseif($full442Direct){@'
   local function sorted_names_with(prerequisites, additions, context)
     local out, seen = {}, {}
     for _, value in ipairs(prerequisites or {}) do
@@ -1092,8 +1156,8 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   # Fixture identity remains unique across the two 4.3.1 predecessor lanes.
   # The direct published 4.2.2 lane has source patch 1 plus predecessor patch
   # 2 (0.1.45); the immediate 4.3.0 lane is 0.1.43.
-  $expectedVersion=if($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
-  $nextVersion=if($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
+  $expectedVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
   if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
   $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))

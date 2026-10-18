@@ -2136,45 +2136,59 @@ foreach($case in @(
 # V13 has one published V12 predecessor. Exercise all currently selected F210/F200
 # Full fixture specializations without constructing a native process or library archive.
 $mir460Routes=@(
-  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='base-default';space_age=$false;galore=$false;fixture_version='0.1.1130'},
-  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='space-age-native-owner';space_age=$true;galore=$false;fixture_version='0.1.1131'},
-  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='base-default';space_age=$false;galore=$false;fixture_version='0.1.1132'},
-  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';space_age=$false;galore=$true;fixture_version='0.1.1133'}
+  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='base-default';space_age=$false;galore=$false;bob=$false;fixture_version='0.1.1130'},
+  [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='space-age-native-owner';space_age=$true;galore=$false;bob=$false;fixture_version='0.1.1131'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='base-default';space_age=$false;galore=$false;bob=$false;fixture_version='0.1.1132'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';space_age=$false;galore=$true;bob=$false;fixture_version='0.1.1133'},
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';space_age=$false;galore=$false;bob=$true;fixture_version='0.1.1136'}
 )
 $mir460FixtureVersions=@()
 foreach($route in $mir460Routes){
   $code=$route.target.Substring(1)
   $fixture='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
-  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile=$(if($route.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
+  $mode=@{Target=$route.target;FromVersion=$route.from;ToVersion=$route.to;FixtureName=$fixture;Archetype=$route.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$(if($route.bob){$bobAngelProfilePath}else{''});F200GaloreSpaceAgeInputProfile=$(if($route.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
   Assert-MIR421CurrentUpgradeInputMode @mode
   if((Resolve-MIR42UpgradePredecessorReaderVersion -Target $route.target -FromVersion $route.from -SourceVersion '4.6.0')-cne'4.6.0'){throw "4.6 reader identity mismatch: $($route.target)/$($route.archetype)"}
   $fixtureRoot=Join-Path $mir43FixtureRoot ('mir460-'+$route.target+'-'+$route.archetype)
   Copy-Item -LiteralPath (Join-Path $RepoRoot ('fixtures/'+$fixture)) -Destination $fixtureRoot -Recurse
-  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.6.0' -FromVersion $route.from -SpaceAge:([bool]$route.space_age) -F200GaloreSpaceAge:([bool]$route.galore)
+  Set-MIR421ModernBaseUpgradeFixtureIdentity -FixtureDirectory $fixtureRoot -Target $route.target -SourceVersion '4.6.0' -FromVersion $route.from -SpaceAge:([bool]$route.space_age) -F200GaloreSpaceAge:([bool]$route.galore) -F200BobAngel:([bool]$route.bob)
   if($route.target-ceq'f210'){
     Set-MIR430FullCompilerProfileUpgradeAllowance -Target f210 -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to -BaseDefaultCompleteState:($route.archetype-ceq'base-default')
   }else{
     Set-MIR422F200CompleteStateUpgradeOracle -RepoRoot $RepoRoot -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
     if($route.galore){Set-MIR431F200GaloreSpaceAgeCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to}
+    if($route.bob){
+      Set-MIR423F200BobAngelCompleteStateUpgradeOracle -FixtureDirectory $fixtureRoot -FromVersion $route.from -ToVersion $route.to
+      $bobOracle=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
+      foreach($needle in @('["recipe-prod-research_material_aluminium-1"] = true','["recipe-prod-research_material_aluminium-4"] = true','angels-plate-aluminium-2','angels-aluminium-casting-2','1600+200*(L-4)','reviewed Aluminium addition state differs')){
+        if(-not$bobOracle.Contains($needle)){throw "4.6 Bob/Angel strict oracle omitted reviewed Aluminium contract: $needle"}
+      }
+      foreach($forbidden in @('recipe-prod-research_material_copper_tungsten-1','reviewed finite terminal differs')){
+        if($bobOracle.Contains($forbidden)){throw "4.6 Bob/Angel strict oracle inherited unrelated 4.4.2 allowance: $forbidden"}
+      }
+      $mir43Assertions+=8
+    }
   }
   $info=Get-Content -LiteralPath (Join-Path $fixtureRoot 'info.json') -Raw|ConvertFrom-Json
   if($info.version-cne$route.fixture_version){throw "4.6 fixture identity mismatch: $($route.target)/$($route.archetype)"}
   $mir460FixtureVersions += [string]$info.version
   $SelectedTarget=$route.target;$SourceVersion='4.6.0';$FromVersion=$route.from;$ToVersion=$route.to
-  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=$false;$f200GaloreSpaceAgeScenario=[bool]$route.galore
+  $FixtureName=$fixture;$Archetype=$route.archetype;$SpaceIsFake=$false;$f200BobAngelScenario=[bool]$route.bob;$f200GaloreSpaceAgeScenario=[bool]$route.galore
   if(-not(& $fullSpecializationCode)){throw "4.6 Full specialization missing: $($route.target)/$($route.archetype)"}
   $mir42UpgradeSpecialized=$true;$isHistoricalTerminalFixture=$false;$k2Scenario=$false;$classicReducedPolicy=$false
   if(-not(& $completeCatalogueEvaluator)){throw "4.6 complete catalogue missing: $($route.target)/$($route.archetype)"}
   $mir43Assertions+=5
 }
-if(@($mir460FixtureVersions|Sort-Object -Unique).Count-ne4){throw '4.6 fixture identities collide'}
+if(@($mir460FixtureVersions|Sort-Object -Unique).Count-ne5){throw '4.6 fixture identities collide'}
 foreach($bad in @(
-  @{target='f210';from='4.5.21001';to='4.6.21000';archetype='base-default';galore=$false},
-  @{target='f200';from='4.5.20002';to='4.6.20001';archetype='base-default';galore=$false},
-  @{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';galore=$false}
+  @{target='f210';from='4.5.21001';to='4.6.21000';archetype='base-default';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20001';archetype='base-default';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';galore=$false;bob=$false},
+  @{target='f200';from='4.5.20001';to='4.6.20000';archetype='f200-bob-angel';galore=$false;bob=$true}
 )){
   $code=$bad.target.Substring(1);$fixture='assert-upgrade-4-0-'+$code+'00-to-4-1-'+$code+'00'
-  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile=$(if($bad.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
+  $mode=@{Target=$bad.target;FromVersion=$bad.from;ToVersion=$bad.to;FixtureName=$fixture;Archetype=$bad.archetype;SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-452.json';Retention='Always';K2ImersiteInputProfile='';F200BobAngelInputProfile=$(if($bad.bob){$bobAngelProfilePath}else{''});F200GaloreSpaceAgeInputProfile=$(if($bad.galore){$galoreProfilePath}else{''});SourceVersion='4.6.0'}
   $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @mode}catch{$rejected=$_.Exception.Message-ceq'[mir421-current-upgrade-transition]' -or $_.Exception.Message-ceq'[mir421-current-upgrade-scenario]'}
   if(-not$rejected){throw "4.6 input mode admitted invalid route: $($bad.target)/$($bad.from)/$($bad.to)/$($bad.archetype)"}
   $mir43Assertions++
