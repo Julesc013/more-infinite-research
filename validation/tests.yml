@@ -1073,7 +1073,7 @@
         "source:source/prototypes/mir/planner/science.lua",
         "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
         "source:source/prototypes/mir/planner/base_continuations.lua",
-        "source/package-source.json",
+        "source:source/package-source.json",
         "targets/f210/composition.json",
         "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
         "fixtures/assert-k2-science-phase-policy/info.json",

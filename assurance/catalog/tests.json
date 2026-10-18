@@ -4828,7 +4828,7 @@
         "source:source/prototypes/mir/planner/science.lua",
         "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
         "source:source/prototypes/mir/planner/base_continuations.lua",
-        "source/package-source.json",
+        "source:source/package-source.json",
         "targets/f210/composition.json",
         "fixtures/assert-k2-science-phase-policy/data-final-fixes.lua",
         "fixtures/assert-k2-science-phase-policy/info.json",
@@ -8702,5 +8702,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d123b991733cf05f9a5514d789ed72e4420d4cb8f2dc0fa37ace72408b6e986b"
+  "digest": "sha256:4a78cf38b37ca997d808ba678c07044099d84dbd2b95e3d9c6b9d5be48e7cb53"
 }
