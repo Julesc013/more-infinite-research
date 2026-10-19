@@ -716,6 +716,7 @@
         "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
         "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
         "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1"
       ]

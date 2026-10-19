@@ -10,7 +10,7 @@ param(
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
   [ValidateSet('Observe','Qualification')][string]$Mode='Observe',
   [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.7.0',
-  [string]$OutputRoot='build/tests/f210-ba-gunmetal-invar',
+  [string]$OutputRoot='build/tmp/f210-ba-gunmetal-invar',
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=2048,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=384,
   [switch]$PrepareOnly

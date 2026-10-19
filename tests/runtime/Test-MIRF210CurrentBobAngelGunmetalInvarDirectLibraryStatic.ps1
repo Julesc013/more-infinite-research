@@ -32,6 +32,14 @@ foreach($fragment in @('DATA PASS','unique-owners=true')){Assert-GIStatic ($qual
 foreach($fragment in @('RUNTIME PASS','stage=create technologies=researched','RELOAD PASS','technologies=researched save-state=preserved')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-runtime-marker'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'
 $parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath);$missing=@(@('FactorioBin','LocalModLibraryDirs','SettingsPath','SettingsSha256','CandidateZip','SourceMaterializationPath','Mode','PrepareOnly')|Where-Object {$_ -notin $parameters});Assert-GIStatic ($missing.Count -eq 0) 'runner-inputs'
+$outputParameter=@($ast.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath -ceq 'OutputRoot'})
+Assert-GIStatic ($outputParameter.Count -eq 1) 'runner-output-parameter'
+. (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
+$defaultOutput=Join-Path $repo ([string]$outputParameter[0].DefaultValue.SafeGetValue())
+Assert-GIStatic ((Resolve-MIR441RecoveryScratchPath -Path $defaultOutput) -ceq ([IO.Path]::GetFullPath($defaultOutput))) 'default-output-admitted-by-actual-governor'
+$outsideOutputRejected=$false
+try{Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo 'build/tests/f210-gi-refusal-control')|Out-Null}catch{$outsideOutputRejected=$_.Exception.Message -match '\[mir441-resource-output-root\]'}
+Assert-GIStatic $outsideOutputRejected 'outside-output-rejected-by-actual-governor'
 $text=[IO.File]::ReadAllText($runner)
 foreach($required in @('Start-MIRLibraryActivation','Complete-MIRLibraryActivation','Resolve-MIRNativeProbeDependencyInputs','Assert-MIRLibraryFixtureArchive','-SettingsMode File','--create','--benchmark','Add-MIRNativeProbeLibraryActivation','Get-GIObservation','failed-terminal-result-retained','controls_restoration','f210-ba-gunmetal-invar.reload-','foreach($ordinal in 1..2)')){Assert-GIStatic ($text.Contains($required,[StringComparison]::Ordinal)) 'runner-direct-library'}
 foreach($forbidden in @('mir-native-obsolete-runner','ImmutableInputStaging.ps1','New-MIRImmutableInputLease','RequireHardLinks','Publish-MIRModDirectoryArchive','ExactStageRoot','RecoverRun')){Assert-GIStatic (-not$text.Contains($forbidden,[StringComparison]::Ordinal)) 'runner-no-staging'}

@@ -1977,6 +1977,7 @@
         "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
         "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
         "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1"
       ],
@@ -8728,5 +8729,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:98376e94216d8b233bc0b04c954f84f41c521cd020e4b3446c844503ebbfa1f3"
+  "digest": "sha256:ffda2dc0bd0f4eba378e77c7f67338eeb048a6254a5bf7f944a3e899811b2736"
 }
