@@ -49,6 +49,14 @@ Assert-GIStatic ((Resolve-MIR441RecoveryScratchPath -Path $defaultOutput) -ceq (
 $outsideOutputRejected=$false
 try{Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo 'build/tests/f210-gi-refusal-control')|Out-Null}catch{$outsideOutputRejected=$_.Exception.Message -match '\[mir441-resource-output-root\]'}
 Assert-GIStatic $outsideOutputRejected 'outside-output-rejected-by-actual-governor'
+. (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
+$oldInvocation="   0.000 2026-10-20 01:00:00; Factorio 2.1.22 (build test)`nold-state`n"
+$newInvocation="   0.000 2026-10-20 01:01:00; Factorio 2.1.22 (build test)`nnew-state`n"
+Assert-GIStatic ((Get-MIRLibraryLatestInvocationText -Text ($oldInvocation+$newInvocation)) -ceq $newInvocation) 'current-invocation-excludes-prior-state'
+Assert-GIStatic ((Get-MIRLibraryLatestInvocationText -Text $newInvocation) -ceq $newInvocation) 'single-current-invocation-preserved'
+$missingInvocationRejected=$false
+try{Get-MIRLibraryLatestInvocationText -Text 'new-state without a launch boundary'|Out-Null}catch{$missingInvocationRejected=$_.Exception.Message -match '\[mir-library-loaded-invocation\]'}
+Assert-GIStatic $missingInvocationRejected 'missing-current-invocation-rejected'
 $text=[IO.File]::ReadAllText($runner)
 foreach($required in @('Start-MIRLibraryActivation','Complete-MIRLibraryActivation','Resolve-MIRNativeProbeDependencyInputs','Assert-MIRLibraryFixtureArchive','-SettingsMode File','--create','--benchmark','Add-MIRNativeProbeLibraryActivation','Get-GIObservation','failed-terminal-result-retained','controls_restoration','f210-ba-gunmetal-invar.reload-','foreach($ordinal in 1..2)')){Assert-GIStatic ($text.Contains($required,[StringComparison]::Ordinal)) 'runner-direct-library'}
 foreach($forbidden in @('mir-native-obsolete-runner','ImmutableInputStaging.ps1','New-MIRImmutableInputLease','RequireHardLinks','Publish-MIRModDirectoryArchive','ExactStageRoot','RecoverRun')){Assert-GIStatic (-not$text.Contains($forbidden,[StringComparison]::Ordinal)) 'runner-no-staging'}

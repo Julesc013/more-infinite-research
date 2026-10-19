@@ -73,7 +73,11 @@ function Invoke-GIGovernedEngine([string]$Scenario,[string[]]$Arguments,[int]$Ti
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds
   $log=Join-Path $run ($safe+'.factorio.log');$captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $run -Destination $log
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources;Assert-GI (-not [string]::IsNullOrWhiteSpace($captured)) 'Factorio log is absent'
-  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $captured -ActiveModsObserver ([string]$fixtureSpec.name)
+  # Factorio appends to the raw current log across cold launches. Keep that raw
+  # file, and bind each scenario capture/assertion to its own native invocation.
+  $currentInvocation=Get-MIRLibraryLatestInvocationText -Text ([IO.File]::ReadAllText($captured))
+  [IO.File]::WriteAllText($captured,$currentInvocation,[Text.UTF8Encoding]::new($false))
+  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $captured -LatestInvocation -ActiveModsObserver ([string]$fixtureSpec.name)
   [pscustomobject]@{scenario=$Scenario;passed=$true;duration_seconds=$actor.result.duration_seconds;stdout=$actor.stdout;stderr=$actor.stderr;factorio_log=$captured}
 }
 function Invoke-GIReload([string]$SavePath,[int]$Ordinal,[int]$TimeoutSeconds){
