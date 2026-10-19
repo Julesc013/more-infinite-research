@@ -493,6 +493,10 @@ $current460 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.
 Assert-MIR42CandidateBuildTest (
   [string]$current460.source_version -ceq '4.6.0' -and [int]$current460.source_minor -eq 6 -and [int]$current460.source_patch -eq 0
 ) 'current-package-metadata-admits-4-6-identity'
+$current470 = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.7.0'
+Assert-MIR42CandidateBuildTest (
+  [string]$current470.source_version -ceq '4.7.0' -and [int]$current470.source_minor -eq 7 -and [int]$current470.source_patch -eq 0
+) 'current-package-metadata-admits-4-7-development-identity'
 $current453Rejected = $false
 try { Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion '4.5.3' | Out-Null }
 catch { $current453Rejected = $_.Exception.Message -ceq '[mir4-current-package-metadata-source-version]' }
