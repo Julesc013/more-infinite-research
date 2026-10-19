@@ -78,9 +78,9 @@ except Exception as exc:
 }
 function Assert-ControlledProbeActorInventory {
   param([Parameter(Mandatory)][object[]]$Runs,[Parameter(Mandatory)][string]$RunRoot)
-  # Exact 4.4.1 Browser and 4.4.2 Science package projections add two
-  # governed actors to the prior fourteen. Keep missing, duplicate and extra actors rejected.
-  $expectedIndices=@(1..16)
+  # Retain the original sixteen actors and the three current canonical
+  # forwarding controls. Keep missing, duplicate and extra actors rejected.
+  $expectedIndices=@(1..19)
   $indices=@($Runs|ForEach-Object {[int]$_.index})
   if(@($indices|Sort-Object -Unique).Count-ne$indices.Count){throw '[native-probe-actor-duplicate]'}
   if($indices.Count-lt$expectedIndices.Count){throw '[native-probe-actor-missing]'}
@@ -1108,7 +1108,18 @@ function New-MIR4TargetPackage {
     $callerIdentity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $caller.target.Substring(1) -SourceMinor ([int]$callerParts[1]) -SourcePatch ([int]$callerParts[2])
     Assert-Probe ($callerPackage.target-ceq$caller.target-and$callerPackage.source_version-ceq$caller.source-and$callerPackage.distribution_version-ceq$callerIdentity.distribution_version-and$callerPackage.candidate_id.StartsWith($caller.target.ToUpperInvariant()+'-'+$caller.prefix+'-')) "$($caller.prefix) caller source identity did not reach the governed package materializer."
   }
-  Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -CandidatePrefix BROWSER -Target f200 -SourceVersion '4.4.3'} 'Cannot validate argument'
+  # The probe forwards current canonical identities to the existing writer;
+  # this fake writer checks forwarding only, never real package admission.
+  foreach($case in @(@{target='f200';source='4.7.0';minor=7;patch=0},@{target='f210';source='4.7.3';minor=7;patch=3},@{target='f200';source='4.10.0';minor=10;patch=0})){
+    $forward=New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -CandidatePrefix BROWSER -Target $case.target -SourceVersion $case.source
+    $expectedForward=New-MIR4DistributionIdentityProjection -DistributionTargetCode $case.target.Substring(1) -SourceMinor $case.minor -SourcePatch $case.patch
+    Assert-Probe ($forward.source_version-ceq$case.source-and$forward.distribution_version-ceq$expectedForward.distribution_version-and-not$forward.actual_package) 'current probe identity forwarding changed the target codec or implied an actual package.'
+  }
+  $beforeMalformedVersion=$context.process_index
+  foreach($malformedVersion in @('4.07.0','4.7.00','4.7.100')){
+    Refuses-Probe {New-MIRNativeProbeTargetPackage -Context $context -RepoRoot $fakeRepo -CandidatePrefix BROWSER -Target f200 -SourceVersion $malformedVersion} 'Cannot validate argument'
+  }
+  Assert-Probe ($context.process_index-eq$beforeMalformedVersion) 'Malformed source identities launched a materializer child.'
   $echo=Join-Path $context.root 'argv-echo.ps1'
   [IO.File]::WriteAllText($echo,@'
 param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
@@ -1138,14 +1149,14 @@ param([Parameter(ValueFromRemainingArguments=$true)][string[]]$Values)
   $actorRows=@(Assert-ControlledProbeActorInventory -Runs @($context.runs) -RunRoot $context.root)
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows|Select-Object -Skip 1) -RunRoot $context.root} 'native-probe-actor-missing'
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$actorRows[0]) -RunRoot $context.root} 'native-probe-actor-duplicate'
-  $extraActor=[pscustomobject]@{index=17;status='passed';ledger=(Join-Path $context.root 'process-15.resources.jsonl')}
+  $extraActor=[pscustomobject]@{index=20;status='passed';ledger=(Join-Path $context.root 'process-15.resources.jsonl')}
   Refuses-Probe {Assert-ControlledProbeActorInventory -Runs @($actorRows+$extraActor) -RunRoot $context.root} 'native-probe-actor-extra'
   $actorRecord=@($actorRows|ForEach-Object {[ordered]@{index=[int]$_.index;status=[string]$_.status;ledger=[IO.Path]::GetFileName([string]$_.ledger)}})
   Write-MIRNativeProbeResult -Context $context -Record @{status='controlled-passed';native_factorio=$false;actual_materialization=$false;actor_count=$actorRecord.Count;actors=$actorRecord}
   $resultActorRows=@((Get-Content -LiteralPath (Join-Path $context.root 'result.json') -Raw | ConvertFrom-Json).actors)
   $expectedActorIdentities=@($actorRecord|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
   $resultActorIdentities=@($resultActorRows|ForEach-Object {([int]$_.index).ToString()+'|'+[string]$_.status+'|'+[string]$_.ledger})
-  Assert-Probe ($resultActorRows.Count-eq16-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
+  Assert-Probe ($resultActorRows.Count-eq19-and($resultActorIdentities-join"`n")-ceq($expectedActorIdentities-join"`n")) 'reserved result did not preserve all admitted actor identities.'
   $resultPath=Join-Path $context.root 'result.json';Remove-Item -LiteralPath $resultPath
   [IO.File]::WriteAllBytes($budgetFile,[byte[]]::new(960KB))
   Refuses-Probe {Write-MIRNativeProbeResult -Context $context -Record @{payload=('x'*128KB)}} 'resource-output-budget'
