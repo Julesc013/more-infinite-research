@@ -159,6 +159,15 @@ function M.is_trusted(record)
   return authority.is_trusted(record)
 end
 
+-- A final TechnologyDesign may detach an already-admitted Gate record from a
+-- mutable planner row.  It intentionally asserts the exact existing proof
+-- instead of re-validating/re-hashing its evidence.  Untrusted imports still
+-- enter through verify_untrusted above.
+function M.capture_owned(record)
+  M.assert_trusted(record)
+  return trust(deepcopy(record))
+end
+
 function M.is_authoritatively_resolved(record)
   M.assert_trusted(record)
   return record.status == "passed" or record.status == "failed" or record.status == "not-applicable"

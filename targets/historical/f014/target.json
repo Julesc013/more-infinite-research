@@ -69,7 +69,7 @@
     },
     {
       "output_path": "prototypes/mir/domain/technology/technology_design.lua",
-      "base_sha256": "C81EEDAAD44B8FDB7B14E5F9D8B3934ED84D967883AE7A511BD6844527DBAE9C",
+      "base_sha256": "FEC6B43FC8486641E22CA86074EBC8C40074BC7592412B10A902CF579C7A8710",
       "find": "  local cost = {\n    count_formula = fields.count_formula or (expected.unit or {}).count_formula,\n    count = fields.count or (expected.unit or {}).count,\n    research_time = fields.research_time or (expected.unit or {}).time,\n    max_level = fields.max_level or expected.max_level\n  }",
       "replace": "  local cost = {\n    count_formula = fields.count_formula or (expected.unit or {}).count_formula,\n    count = fields.count or (expected.unit or {}).count,\n    research_time = fields.research_time or (expected.unit or {}).time,\n    max_level = fields.max_level or expected.max_level\n  }\n  if require(\"prototypes.mir.platform.factorio.target_line\").feature_enabled(\"legacy_numeric_research_cost\") then\n    local model = fields.cost_model\n    if type(model) == \"table\" then\n      cost.count = math.ceil(model.base_cost)\n      cost.count_formula = nil\n    end\n  end"
     },
@@ -82,5 +82,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "5CE0818F36E19F13AD6A2922EAD280817FC5AACE7834753046A79191D1BBD44F"
+  "record_sha256": "DD1E7ABB0C9EAB20AFE47095F509CC7FE64B9D134EEC96609E081D9DD7B2CD67"
 }

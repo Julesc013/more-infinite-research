@@ -385,6 +385,115 @@ Context.with_active(emitted_context, function()
   local generation_plan = require("prototypes.mir.planner.generation_plan")
   local technology_design = require("prototypes.mir.domain.technology.technology_design")
   local compilation_plan = require("prototypes.mir.planner.compilation_plan")
+
+  -- P17 owns final rows only after graph qualification.  The real ordinary
+  -- compiler result supplies the input here; isolated rows exercise the
+  -- compact private handoff and every exported complete-record boundary.
+  local p17_actual_plan = emitted_context:state_snapshot("compilation_plan")
+  local p17_ordinary
+  for _, row in ipairs((p17_actual_plan.stream_plan or {}).rows or {}) do
+    if row.stream_key == "research_iron" then p17_ordinary = row; break end
+  end
+  check(p17_ordinary and p17_ordinary.action == "emit"
+    and p17_ordinary.gates.prerequisites_acyclic.evaluator == "technology-graph",
+    "P17 ordinary final ownership starts from the post-graph emitted row")
+
+  local p17_input = deepcopy(p17_ordinary)
+  p17_input.gates.target_supported.p17_unknown = {nested = {captured = true}}
+  p17_input.technology_design = technology_design.from_generation_row(p17_input)
+  p17_input.technology_design.provenance.fields["ownership.action"].p17_unknown = {
+    nested = {captured = true}
+  }
+  local p17_owner = generation_plan.new({source_fingerprints = {
+    p17 = {nested = {captured = true}}
+  }})
+  p17_owner:add_owned_derived(p17_input)
+  local p17_view = p17_owner:finalize():artifact_view()
+  check(p17_view.rows[1].gates == nil and p17_view.rows[1].technology_design == nil,
+    "P17 stores compact final row handles only in its trusted internal Plan view")
+
+  local p17_first_export = generation_plan.export_artifact(p17_view)
+  local p17_first_row = p17_first_export.rows[1]
+  check(p17_first_row.gates.prerequisites_acyclic.evaluator == "technology-graph"
+    and p17_first_row.gates.target_supported.p17_unknown.nested.captured == true
+    and p17_first_row.technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured == true,
+    "P17 expands complete post-graph Gate and Design provenance at export")
+  p17_first_row.gates.target_supported.evidence.p17_export_mutation = {caller = true}
+  p17_first_row.technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured = false
+  p17_first_export.source_fingerprints.p17.nested.captured = false
+  p17_first_export.validation_summary.action_counts.emit = 999
+  local p17_second_export = generation_plan.export_artifact(p17_view)
+  check(p17_second_export.rows[1].gates.target_supported.evidence.p17_export_mutation == nil
+    and p17_second_export.rows[1].technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured == true
+    and p17_second_export.source_fingerprints.p17.nested.captured == true
+    and p17_second_export.validation_summary.action_counts.emit == 1,
+    "P17 row, metadata, and summary export mutations cannot reach private ownership")
+  p17_input.gates.target_supported.evidence.p17_producer_mutation = {after_capture = true}
+  p17_input.technology_design.design.ownership.value.action = "p17-tampered-action"
+  p17_input.technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured = false
+  local p17_third_export = generation_plan.export_artifact(p17_view)
+  check(p17_third_export.rows[1].gates.target_supported.evidence.p17_producer_mutation == nil
+    and p17_third_export.rows[1].technology_design.design.ownership.value.action ~= "p17-tampered-action"
+    and p17_third_export.rows[1].technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured == true,
+    "P17 producer mutation after final capture cannot reach the owned row")
+
+  local p17_forged_external = generation_plan.export_artifact(p17_view)
+  p17_forged_external.rows[1].gates.target_supported.evidence.p17_forged_external = true
+  check(not pcall(compilation_plan.finalize, p17_forged_external, {}, {
+    effect_target_inventory = emitted_context:service("effect_target_inventory")
+  }), "P17 forged external schema-3 rows re-enter through untrusted Gate admission")
+
+  -- The same owner boundary also covers an existing native technology patch,
+  -- including its complete expected snapshot rather than an emit-only shape.
+  local p17_adopt = deepcopy(p17_ordinary)
+  local p17_native_owner = "p17-owned-native-owner"
+  p17_adopt.action, p17_adopt.reason, p17_adopt.technology_name = "adopt", p17_native_owner, nil
+  local p17_expected_snapshot = {
+    name = p17_native_owner,
+    effects = deepcopy(p17_adopt.fields.effects),
+    prerequisites = deepcopy(p17_adopt.fields.prerequisites),
+    unit = {
+      ingredients = deepcopy(p17_adopt.fields.ingredients),
+      count_formula = p17_adopt.fields.count_formula,
+      count = p17_adopt.fields.count,
+      time = p17_adopt.fields.research_time
+    },
+    max_level = p17_adopt.fields.max_level,
+    localised_name = deepcopy(p17_adopt.fields.localised_name),
+    localised_description = deepcopy(p17_adopt.fields.localised_description),
+    icon = p17_adopt.fields.icon,
+    icon_size = p17_adopt.fields.icon_size,
+    icons = deepcopy(p17_adopt.fields.icons),
+    order = p17_adopt.fields.order,
+    level = p17_adopt.fields.level,
+    enabled = p17_adopt.fields.enabled,
+    hidden = p17_adopt.fields.hidden,
+    upgrade = p17_adopt.fields.upgrade
+  }
+  p17_adopt.adoption = {
+    schema = 2, owner = p17_native_owner, operation = "fixture-patch",
+    configured_fields = {}, effects = deepcopy(p17_adopt.fields.effects),
+    input_snapshot = deepcopy(p17_expected_snapshot), expected_snapshot = deepcopy(p17_expected_snapshot)
+  }
+  p17_adopt.adoption.input_fingerprint = fingerprint.of(p17_adopt.adoption.input_snapshot)
+  p17_adopt.technology_design = technology_design.from_generation_row(p17_adopt)
+  p17_adopt.adoption.output_fingerprint = p17_adopt.technology_design.prototype_fingerprint
+  p17_adopt.technology_design = technology_design.from_generation_row(p17_adopt)
+  local p17_adopt_owner = generation_plan.new()
+  p17_adopt_owner:add_owned_derived(p17_adopt)
+  local p17_adopt_view = p17_adopt_owner:finalize():artifact_view()
+  local p17_adopt_export = generation_plan.export_artifact(p17_adopt_view)
+  check(p17_adopt_view.rows[1].gates == nil and p17_adopt_export.rows[1].action == "adopt"
+    and p17_adopt_export.rows[1].adoption.owner == p17_native_owner
+    and type(p17_adopt_export.rows[1].technology_design.gates) == "table",
+    "P17 native patch rows retain compact internal identity and complete export")
+  p17_adopt.adoption.expected_snapshot.effects[1].change = 999
+  p17_adopt.gates.target_supported.evidence.p17_adoption_source_mutation = {after_capture = true}
+  local p17_adopt_again = generation_plan.export_artifact(p17_adopt_view)
+  check(p17_adopt_again.rows[1].adoption.expected_snapshot.effects[1].change ~= 999
+    and p17_adopt_again.rows[1].gates.target_supported.evidence.p17_adoption_source_mutation == nil,
+    "P17 native patch producer mutation cannot reach its owned snapshot or Gate")
+
   local function compare_draft_case(change)
     local input = deepcopy(draft_fixture_row)
     change(input)

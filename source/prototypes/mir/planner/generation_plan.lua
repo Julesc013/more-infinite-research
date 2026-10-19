@@ -10,6 +10,9 @@ local Plan = {}
 Plan.__index = Plan
 local trusted_artifacts = setmetatable({}, {__mode = "k"})
 local trusted_drafts = setmetatable({}, {__mode = "k"})
+-- Keys are the compact, final-only internal rows.  The complete row never
+-- escapes this module except through an explicit detached export.
+local owned_rows = setmetatable({}, {__mode = "k"})
 
 local ACTIONS = {
   adopt = true,
@@ -143,7 +146,7 @@ function Plan:add(row)
   table.insert(self.rows, deepcopy(row))
 end
 
-local function row_fingerprint_material(row, preparation)
+local function unowned_row_fingerprint_material(row, preparation)
   local design = row.technology_design or {}
   local adoption = row.adoption
   return {
@@ -195,11 +198,130 @@ local function row_fingerprint_material(row, preparation)
   }
 end
 
+local function row_fingerprint_material(row, preparation)
+  local owner = owned_rows[row]
+  if owner then
+    return {
+      schema = 5,
+      record_type = "OwnedGenerationPlanRow",
+      identity = owner.identity
+    }
+  end
+  return unowned_row_fingerprint_material(row, preparation)
+end
+
 local function rows_fingerprint_material(rows, preparations)
   local out = {}
   for index, row in ipairs(rows) do
     out[index] = row_fingerprint_material(row, preparations and preparations[row])
   end
+  return out
+end
+
+local owned_row_identity_material
+
+local function final_design_for_owned_row(row)
+  if type(row) ~= "table" or type(row.gates) ~= "table" then
+    error("GenerationPlan owned row capture requires a complete row and Gate map.", 3)
+  end
+  hard_gate_authority.assert_total(row.gates)
+  if type(row.technology_design) ~= "table" then
+    error("GenerationPlan owned row capture requires its final TechnologyDesign.", 3)
+  end
+  -- The construction/import boundary has already admitted the full Gate proof.
+  -- This final handoff requires the exact admitted Gate instances bound into
+  -- the final Design, then detaches them once without re-admission.
+  technology_design.assert_trusted(row.technology_design)
+  local exact = true
+  for _, gate_name in ipairs(REQUIRED_GATES) do
+    gate_contract.assert_trusted(row.gates[gate_name])
+    if not rawequal(row.gates[gate_name], row.technology_design.gates[gate_name]) then
+      exact = false
+    end
+  end
+  if exact then return row.technology_design end
+  -- A supported public Plan re-entry has already been defensively copied, so
+  -- its independently admitted Design/Gate tables are not reference-equal and
+  -- sanitation may have changed the row action. Reconstruct only this explicit
+  -- re-entry path from the authoritative final row; ordinary graph rows retain
+  -- the no-refresh fast path above.
+  return technology_design.from_generation_row(row)
+end
+
+local function capture_owned_row(row)
+  local owned_design = technology_design.capture_owned(final_design_for_owned_row(row))
+  local full = {}
+  for key, value in pairs(row) do
+    if key ~= "technology_design" and key ~= "gates" then
+      full[deepcopy(key)] = deepcopy(value)
+    end
+  end
+  full.technology_design = owned_design
+  -- The owned Design and owned row must use the same freshly admitted Gate
+  -- values; an external source-row alias cannot reach either after capture.
+  full.gates = owned_design.gates
+  validate_row(full, {design_derived = true})
+  local compact = {
+    schema = full.schema,
+    stream_key = full.stream_key,
+    manifest_id = full.manifest_id,
+    action = full.action,
+    technology_name = full.technology_name
+  }
+  owned_rows[compact] = {
+    full = full,
+    -- The complete record is isolated above. Schema 5 deliberately hashes
+    -- this compact semantic identity rather than re-traversing its proof.
+    identity = owned_row_identity_material(full)
+  }
+  return compact
+end
+
+local function owned_row(row)
+  local owner = owned_rows[row]
+  return owner and owner.full or row
+end
+
+owned_row_identity_material = function(row)
+  local design = row.technology_design or {}
+  local adoption = row.adoption or {}
+  -- Schema-5 Plan material names the closed owner and its semantic outputs.
+  -- It deliberately does not recanonicalize the private complete proof record:
+  -- that record was already admitted and is detached from every producer
+  -- alias. Full proof content remains in all explicit exports.
+  return {
+    schema = row.schema,
+    stream_key = row.stream_key,
+    manifest_id = row.manifest_id,
+    action = row.action,
+    reason = row.reason,
+    technology_name = row.technology_name,
+    target_profile_fingerprint = row.target_profile_fingerprint,
+    stage_kind = row.stage_kind,
+    staged_parent_technology = row.staged_parent_technology,
+    staged_parent_stream_key = row.staged_parent_stream_key,
+    configured_stream_key = row.configured_stream_key,
+    adoption = next(adoption) and {
+      owner = adoption.owner,
+      operation = adoption.operation,
+      input_fingerprint = adoption.input_fingerprint,
+      output_fingerprint = adoption.output_fingerprint
+    } or nil,
+    design = {
+      candidate_id = design.candidate_id,
+      technology_id = design.technology_id,
+      subject_fingerprint = design.subject_fingerprint,
+      design_fingerprint = design.design_fingerprint,
+      prototype_fingerprint = design.prototype_fingerprint,
+      qualification_fingerprint = design.qualification_fingerprint,
+      semantic_fingerprint = design.semantic_fingerprint
+    }
+  }
+end
+
+local function exported_rows(rows)
+  local out = {}
+  for index, row in ipairs(rows or {}) do out[index] = deepcopy(owned_row(row)) end
   return out
 end
 
@@ -223,9 +345,10 @@ end
 function Plan:add_owned_derived(row)
   if self.finalized then error("GenerationPlan is already finalized", 2) end
   -- This path receives a compiler-owned row and finalizes immediately. Keep
-  -- the exact reference, then perform the complete row and cross-row checks
-  -- once in finalize() rather than once here and again in finalize().
-  table.insert(self.rows, row)
+  -- the draft's mutable row until graph work has completed.  The final Plan
+  -- captures one isolated complete row and leaves only a compact handle in
+  -- its ordinary internal row list.
+  table.insert(self.rows, self.preparations and row or capture_owned_row(row))
 end
 
 function Plan:finalize()
@@ -243,7 +366,8 @@ function Plan:finalize()
   local adopted_recipes = {}
   local adopted_owners = {}
   local materialized_effects = {}
-  for _, row in ipairs(self.rows) do
+  for _, stored_row in ipairs(self.rows) do
+    local row = owned_row(stored_row)
     -- Recheck the inexpensive row and gate invariants at the ownership
     -- boundary without repeating complete TechnologyDesign fingerprints.
     validate_row(row, {design_derived = true,
@@ -297,13 +421,15 @@ function Plan:finalize()
 
   self.finalized = true
   local action_counts, reason_counts = {}, {}
-  for _, row in ipairs(self.rows) do
+  for _, stored_row in ipairs(self.rows) do
+    local row = owned_row(stored_row)
     action_counts[row.action] = (action_counts[row.action] or 0) + 1
     local reason = row.reason or row.action
     reason_counts[reason] = (reason_counts[reason] or 0) + 1
   end
   local ownership_conflict_count = 0
-  for _, row in ipairs(self.rows) do
+  for _, stored_row in ipairs(self.rows) do
+    local row = owned_row(stored_row)
     ownership_conflict_count = ownership_conflict_count + #((row.effect_ownership and row.effect_ownership.lost) or {})
   end
   self.validation_summary = {
@@ -314,7 +440,7 @@ function Plan:finalize()
     effect_ownership_conflict_count = ownership_conflict_count
   }
   self.plan_fingerprint = fingerprint.of({
-    schema = self.preparations and 1 or 3,
+    schema = self.preparations and 1 or 5,
     record_type = self.preparations and "GenerationDraft" or nil,
     source_fingerprints = self.source_fingerprints,
     rows = rows_fingerprint_material(self.rows, self.preparations),
@@ -325,7 +451,7 @@ end
 
 function Plan:snapshot()
   if not self.finalized then error("GenerationPlan must be finalized before snapshot", 2) end
-  return deepcopy(self.rows)
+  return exported_rows(self.rows)
 end
 
 function Plan:count(action)
@@ -338,13 +464,13 @@ end
 
 function Plan:artifact()
   if not self.finalized then error("GenerationPlan must be finalized before artifact export", 2) end
-  return deepcopy({
+  return {
     schema = 3,
     plan_fingerprint = self.plan_fingerprint,
-    source_fingerprints = self.source_fingerprints,
-    rows = self.rows,
-    validation_summary = self.validation_summary
-  })
+    source_fingerprints = deepcopy(self.source_fingerprints),
+    rows = exported_rows(self.rows),
+    validation_summary = deepcopy(self.validation_summary)
+  }
 end
 
 function Plan:artifact_view()
@@ -376,6 +502,40 @@ function M.assert_trusted_artifact(artifact)
     error("GenerationPlan artifact is not the exact trusted finalized view", 2)
   end
   return artifact
+end
+
+function M.is_trusted_artifact(artifact)
+  return trusted_artifacts[artifact] ~= nil
+end
+
+-- The compact rows belong only to a trusted internal artifact.  Consumers
+-- during the one compiler run receive the private authority records; all
+-- caller-visible surfaces receive a detached complete reconstruction.
+function M.rows_for_consumption(artifact)
+  local rows = {}
+  for index, row in ipairs((artifact or {}).rows or {}) do rows[index] = owned_row(row) end
+  return rows
+end
+
+function M.internal_artifact(artifact)
+  M.assert_trusted_artifact(artifact)
+  local view = {}
+  for key, value in pairs(artifact) do view[key] = value end
+  view.rows = M.rows_for_consumption(artifact)
+  return view
+end
+
+function M.export_artifact(artifact)
+  if type(artifact) ~= "table" then return deepcopy(artifact) end
+  local exported = {}
+  for key, value in pairs(artifact) do
+    if key == "rows" and type(value) == "table" then
+      exported.rows = exported_rows(value)
+    else
+      exported[deepcopy(key)] = deepcopy(value)
+    end
+  end
+  return exported
 end
 
 -- The private pre-graph handoff is deliberately not a schema-3 GenerationPlan.
