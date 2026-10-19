@@ -71,7 +71,7 @@ function Set-MIR421ModernBaseUpgradeFixtureIdentity {
     if($SpaceAge){'0.1.1131'}elseif(-not$SpaceIsFake-and-not$F200GaloreSpaceAge-and-not$F200BobAngel-and-not$HistoricalSettingsOracle){'0.1.1130'}else{throw '[mir460-f210-fixture-transition]'}
   }elseif($Target-ceq'f200'-and$SourceVersion-ceq'4.6.0'){
     if($FromVersion-cne'4.5.20002'){throw '[mir460-f200-fixture-transition]'}
-    if($F200BobAngel-and-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){'0.1.1136'}
+    if($F200BobAngel-and-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$HistoricalSettingsOracle)){'0.1.1137'}
     elseif($F200GaloreSpaceAge-and-not($SpaceIsFake-or$SpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1133'}
     elseif(-not($SpaceIsFake-or$SpaceAge-or$F200GaloreSpaceAge-or$F200BobAngel-or$HistoricalSettingsOracle)){'0.1.1132'}
     else{throw '[mir460-f200-fixture-transition]'}
@@ -978,12 +978,18 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
       fail("reviewed Aluminium definition differs: " .. name)
     end
   end
-  -- These two records are the independently reviewed R05 BOB_ANGEL_422_MODS
-  -- contract for the published 4.5.2 -> 4.6.0 Full upgrade. They are fixed
+  -- These records are the independently reviewed staged-material contracts
+  -- for the 4.5.2 -> replacement 4.6.0 Full upgrade. They are fixed
   -- policy facts, never values learned from the upgraded candidate snapshot.
   local reviewed_added_names = {
     ["recipe-prod-research_material_aluminium-1"] = true,
-    ["recipe-prod-research_material_aluminium-4"] = true
+    ["recipe-prod-research_material_aluminium-4"] = true,
+    ["recipe-prod-research_material_gold-1"] = true,
+    ["recipe-prod-research_material_gold-4"] = true,
+    ["recipe-prod-research_material_tin-1"] = true,
+    ["recipe-prod-research_material_tin-4"] = true,
+    ["recipe-prod-research_material_titanium-1"] = true,
+    ["recipe-prod-research_material_titanium-4"] = true
   }
   local A_L = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1}}
   local A_L_U = {{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="utility-science-pack",amount=1}}
@@ -1002,6 +1008,40 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
       ingredients=A_L_U,effects=AL_EFFECTS,unit_count=1600,count_formula="1600+200*(L-4)",unit_energy=1800
     }
   }
+  -- Approved family inputs and policy, fixed before reading candidate state.
+  -- Tin retains its published Automation-only early research policy.
+  local material_recipes = {
+    gold={"angels-plate-gold","angels-plate-gold-2","angels-wire-gold-2"},
+    tin={"angels-plate-tin","angels-plate-tin-2"},
+    titanium={"angels-plate-titanium","angels-plate-titanium-2"}
+  }
+  for material, recipes in pairs(material_recipes) do
+    local effects={}
+    for _, recipe in ipairs(recipes) do
+      effects[#effects+1]={type="change-recipe-productivity",recipe=recipe,change=0.02}
+    end
+    for _, level in ipairs({1,4}) do
+      local ingredients={{name="automation-science-pack",amount=1}}
+      local prerequisites={"angels-"..material.."-casting-2","angels-"..material.."-smelting-1","automation-science-pack"}
+      if material~="tin" then
+        ingredients[#ingredients+1]={name="logistic-science-pack",amount=1}
+        prerequisites[#prerequisites+1]="logistic-science-pack"
+      end
+      if level==4 then
+        ingredients[#ingredients+1]={name="utility-science-pack",amount=1}
+        prerequisites[#prerequisites+1]="recipe-prod-research_material_"..material.."-1"
+        prerequisites[#prerequisites+1]="utility-science-pack"
+      end
+      table.sort(prerequisites)
+      contracts["recipe-prod-research_material_"..material.."-"..level]={
+        level=level,max_level=level==1 and 3 or 150,
+        order="p[research_material_"..material..(level==1 and "" or "__continuation").."]",
+        prerequisites=prerequisites,ingredients=ingredients,effects=effects,
+        unit_count=level==1 and 200 or 1600,
+        count_formula=level==1 and "200*2^(L-1)" or "1600+200*(L-4)",unit_energy=1800
+      }
+    end
+  end
   for name, after in pairs(observed.technologies) do
     if not expected.technologies[name] then
       local contract = contracts[name]
@@ -1177,8 +1217,8 @@ function Set-MIR423F200BobAngelCompleteStateUpgradeOracle {
   # Fixture identity remains unique across the two 4.3.1 predecessor lanes.
   # The direct published 4.2.2 lane has source patch 1 plus predecessor patch
   # 2 (0.1.45); the immediate 4.3.0 lane is 0.1.43.
-  $expectedVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
-  $nextVersion=if($full460){'0.1.1136'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
+  $expectedVersion=if($full460){'0.1.1137'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.32'}
+  $nextVersion=if($full460){'0.1.1137'}elseif($full442Direct){'0.1.1089'}elseif($full442Retained){'0.1.1086'}elseif($full442Immediate){'0.1.1087'}elseif($full440Direct){'0.1.62'}elseif($full440Immediate){'0.1.60'}elseif($full431Direct){'0.1.45'}elseif($full431Immediate){'0.1.43'}elseif($full430){'0.1.42'}else{'0.1.33'}
   if($info.version-cne$expectedVersion){throw '[mir423-f200-bob-angel-fixture-identity]'}
   $info.version=$nextVersion
   [IO.File]::WriteAllText($infoPath,($info|ConvertTo-Json -Depth 20),[Text.UTF8Encoding]::new($false))

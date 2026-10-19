@@ -2140,7 +2140,7 @@ $mir460Routes=@(
   [ordered]@{target='f210';from='4.5.21002';to='4.6.21000';archetype='space-age-native-owner';space_age=$true;galore=$false;bob=$false;fixture_version='0.1.1131'},
   [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='base-default';space_age=$false;galore=$false;bob=$false;fixture_version='0.1.1132'},
   [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-galore-space-age';space_age=$false;galore=$true;bob=$false;fixture_version='0.1.1133'},
-  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';space_age=$false;galore=$false;bob=$true;fixture_version='0.1.1136'}
+  [ordered]@{target='f200';from='4.5.20002';to='4.6.20000';archetype='f200-bob-angel';space_age=$false;galore=$false;bob=$true;fixture_version='0.1.1137'}
 )
 $mir460FixtureVersions=@()
 foreach($route in $mir460Routes){
@@ -2162,6 +2162,14 @@ foreach($route in $mir460Routes){
       $bobOracle=Get-Content -LiteralPath (Join-Path $fixtureRoot 'control.lua') -Raw
       foreach($needle in @('["recipe-prod-research_material_aluminium-1"] = true','["recipe-prod-research_material_aluminium-4"] = true','angels-plate-aluminium-2','angels-aluminium-casting-2','1600+200*(L-4)','reviewed Aluminium addition state differs','recipe="angels-plate-aluminium",change=0.02','recipe="angels-plate-aluminium-2",change=0.02')){
         if(-not$bobOracle.Contains($needle)){throw "4.6 Bob/Angel strict oracle omitted reviewed Aluminium contract: $needle"}
+      }
+      foreach($material in @('gold','tin','titanium')){
+        foreach($level in @(1,4)){
+          if(-not$bobOracle.Contains('["recipe-prod-research_material_'+$material+'-'+$level+'"] = true')){throw "Replacement 4.6 Bob/Angel oracle omitted reviewed addition: $material/$level"}
+        }
+      }
+      foreach($needle in @('angels-wire-gold-2','angels-plate-tin-2','angels-plate-titanium-2','if material~="tin" then','prototype.hidden_in_factoriopedia ~= false')){
+        if(-not$bobOracle.Contains($needle)){throw "Replacement 4.6 Bob/Angel oracle omitted effect, policy or visibility: $needle"}
       }
       foreach($forbidden in @('recipe-prod-research_material_copper_tungsten-1','reviewed finite terminal differs','recipe="angels-plate-aluminium",modifier=','recipe="angels-plate-aluminium-2",modifier=')){
         if($bobOracle.Contains($forbidden)){throw "4.6 Bob/Angel strict oracle inherited unrelated 4.4.2 allowance: $forbidden"}

@@ -28,10 +28,10 @@
     {
       "output_path": "changelog.txt",
       "source_path": "source/presentation/historical/f017/changelog.txt.template",
-      "source_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A",
-      "source_bytes": 2034,
-      "output_bytes": 2034,
-      "output_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A"
+      "source_sha256": "928E6B3C81CD1CCA5C47A2CF9A1B350A036B6ED9D2EC49FB94CF645EA39F88F8",
+      "source_bytes": 4660,
+      "output_bytes": 4660,
+      "output_sha256": "928E6B3C81CD1CCA5C47A2CF9A1B350A036B6ED9D2EC49FB94CF645EA39F88F8"
     },
     {
       "output_path": "README.md",
@@ -61,5 +61,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "07F4BBB8F7807F332D631CC163DD2843CAEE78D77E9372D8904EF3A8D16FA301"
+  "record_sha256": "B69369C392DF7460B093584D498D0AF69767AA5B5121F5CABDE6C2CAFE587B7C"
 }

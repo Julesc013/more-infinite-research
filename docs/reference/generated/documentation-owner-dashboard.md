@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation owner dashboard
 
-Generated from Markdown front matter as of 2026-10-18.
+Generated from Markdown front matter as of 2026-10-19.
 
 | Owner | Total | Current | Draft | Historical or retired |
 | --- | ---: | ---: | ---: | ---: |

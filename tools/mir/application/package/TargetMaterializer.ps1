@@ -190,7 +190,17 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
   if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
-    if ($SourceVersion -ceq '4.4.1') {
+    if ($SourceVersion -ceq '4.6.0') {
+      $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+      if ($targetCode -ceq '200') {
+        $entry += "  Compatibility:`n    - Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.`n    - Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.`n    - Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.`n"
+      }
+      if ($targetCode -cin @('210','200','110','100')) {
+        $entry += "  Bugfixes:`n    - Accept an independently available replacement science recipe when its named source has no usable unlock.`n    - Keep disabled and circular alternatives from inventing science availability.`n"
+        $entry += "  Performance:`n    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.`n"
+      }
+      $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.`n    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.`n"
+    } elseif ($SourceVersion -ceq '4.4.1') {
       $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
     } elseif ($SourceVersion -ceq '4.5.2') {
       $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
