@@ -11,6 +11,30 @@ local recipe_matching = require("__more-infinite-research__/prototypes/mir/capab
 local relationships = require("__more-infinite-research__/prototypes/mir/index/relationships")
 local data_raw = require("__more-infinite-research__/prototypes/mir/platform/factorio/data_raw")
 
+local direct_producers = {
+  {family = "gunmetal", role = "recycler", recipe = "bob-gunmetal-alloy-recycling"},
+  {family = "gunmetal", role = "hidden-direct-producer", recipe = "bob-gunmetal-alloy"},
+  {family = "invar", role = "recycler", recipe = "bob-invar-alloy-recycling"},
+  {family = "invar", role = "hidden-direct-producer", recipe = "bob-invar-alloy"}
+}
+
+local function line(value)
+  if type(serpent) ~= "table" or type(serpent.line) ~= "function" then
+    error("[mir-f210-current-ba-gunmetal-invar-observer] serpent.line is unavailable")
+  end
+  return serpent.line(value, {comment = false, sortkeys = true})
+end
+
+local function direct_producer_observation(subject)
+  local raw = (data.raw.recipe or {})[subject.recipe]
+  local normalized = recipe_facts.view(subject.recipe)
+  if type(raw) ~= "table" or type(normalized) ~= "table" then
+    error("[mir-f210-current-ba-gunmetal-invar-observer] direct producer fact is absent " .. subject.recipe)
+  end
+  log("[mir-f210-current-ba-gunmetal-invar-observer] FACT family=" .. subject.family
+    .. " role=" .. subject.role .. " recipe=" .. subject.recipe
+    .. " raw=" .. line(raw) .. " normalized=" .. line(normalized))
+end
 local subjects = {
   {family = "gunmetal", technology = "recipe-prod-research_material_gunmetal-1", recipe = "angels-plate-gunmetal"},
   {family = "invar", technology = "recipe-prod-research_material_invar-1", recipe = "angels-plate-invar"}
@@ -82,6 +106,7 @@ end
 
 compiler_context.with_active(compiler_context.new(), function()
   local input = relationships.view("input") or {}
+  for _, producer in ipairs(direct_producers) do direct_producer_observation(producer) end
   for _, subject in ipairs(subjects) do
     local fact = recipe_facts.view(subject.recipe)
     local risk = recipe_risk_facts.view(subject.recipe)
