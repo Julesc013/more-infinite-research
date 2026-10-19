@@ -5,7 +5,7 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 function Assert-GIStatic([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir-f210-ba-gunmetal-invar-direct-library-static-$Code]"}}
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-$dossierPath=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/direct-library-qualification-dossier.json'
+$dossierPath=Join-Path $repo 'fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json'
 $dossier=Get-Content -LiteralPath $dossierPath -Raw|ConvertFrom-Json -Depth 50 -DateKind String
 Assert-GIStatic (([int]$dossier.schema -eq 1) -and ([string]$dossier.kind -ceq 'MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV3')) 'dossier-identity'
 Assert-GIStatic (([string]$dossier.target.engine.version -ceq '2.1.22') -and ([string]$dossier.target.engine.sha256 -ceq 'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B')) 'engine-identity'
@@ -26,8 +26,10 @@ $observerData=[IO.File]::ReadAllText((Join-Path $observer 'data-final-fixes.lua'
 foreach($fragment in @('ROUTE family=', 'CERTIFICATE family=', 'BINDING family=', 'EMISSION family=', 'DATA PASS read-only-finalized-fact-capture')){Assert-GIStatic ($observerData.Contains($fragment,[StringComparison]::Ordinal)) 'observer-data-capture'}
 foreach($forbidden in @('researched = true','enable_all_prototypes','game.create','force.reset')){Assert-GIStatic (-not$observerControl.Contains($forbidden,[StringComparison]::Ordinal)) 'observer-no-gameplay-mutation'}
 foreach($fragment in @('RUNTIME stage=create','RUNTIME stage=reload')){Assert-GIStatic ($observerControl.Contains($fragment,[StringComparison]::Ordinal)) 'observer-runtime-capture'}
+Assert-GIStatic ($observerData.Contains('[MIR_ACTIVE_MODS]',[StringComparison]::Ordinal)) 'observer-complete-mod-table'
 $qualification=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.fixtures.qualification.source_path))).Path
 $qualificationData=[IO.File]::ReadAllText((Join-Path $qualification 'data-final-fixes.lua'));$qualificationControl=[IO.File]::ReadAllText((Join-Path $qualification 'control.lua'))
+Assert-GIStatic ($qualificationData.Contains('[MIR_ACTIVE_MODS]',[StringComparison]::Ordinal)) 'qualification-complete-mod-table'
 foreach($fragment in @('DATA PASS','unique-owners=true')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-data-marker'}
 foreach($fragment in @('RUNTIME PASS','stage=create technologies=researched','RELOAD PASS','technologies=researched save-state=preserved')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-runtime-marker'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'

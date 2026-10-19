@@ -62,3 +62,7 @@ log("[mir-f210-current-ba-gunmetal-invar] DATA PASS"
   .. " gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02"
   .. " invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02"
   .. " unique-owners=true")
+local active_mods = {}
+for name, version in pairs(mods or {}) do active_mods[#active_mods + 1] = name .. "@" .. version end
+table.sort(active_mods)
+log("[MIR_ACTIVE_MODS] " .. table.concat(active_mods, "|"))

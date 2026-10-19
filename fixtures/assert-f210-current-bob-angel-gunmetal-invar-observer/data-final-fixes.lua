@@ -1,5 +1,9 @@
 -- Package-excluded read-only capture for exact F210 Bob/Angel Gunmetal/Invar.
 -- It records finalized facts and never admits a route or mutates a prototype.
+local active_mods = {}
+for name, version in pairs(mods or {}) do active_mods[#active_mods + 1] = name .. "@" .. version end
+table.sort(active_mods)
+log("[MIR_ACTIVE_MODS] " .. table.concat(active_mods, "|"))
 local compiler_context = require("__more-infinite-research__/prototypes/mir/pipeline/compiler_context")
 local recipe_facts = require("__more-infinite-research__/prototypes/mir/index/recipe_facts")
 local recipe_risk_facts = require("__more-infinite-research__/prototypes/mir/index/recipe_risk_facts")

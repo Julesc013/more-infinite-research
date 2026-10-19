@@ -73,7 +73,7 @@ function Invoke-GIGovernedEngine([string]$Scenario,[string[]]$Arguments,[int]$Ti
   $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds
   $log=Join-Path $run ($safe+'.factorio.log');$captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $run -Destination $log
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources;Assert-GI (-not [string]::IsNullOrWhiteSpace($captured)) 'Factorio log is absent'
-  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $captured
+  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $captured -ActiveModsObserver ([string]$fixtureSpec.name)
   [pscustomobject]@{scenario=$Scenario;passed=$true;duration_seconds=$actor.result.duration_seconds;stdout=$actor.stdout;stderr=$actor.stderr;factorio_log=$captured}
 }
 function Invoke-GIReload([string]$SavePath,[int]$Ordinal,[int]$TimeoutSeconds){
@@ -107,7 +107,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-$dossierPath=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/direct-library-qualification-dossier.json'
+$dossierPath=Join-Path $repo 'fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json'
 Assert-GI (Test-Path -LiteralPath $dossierPath -PathType Leaf) 'direct-library dossier is absent'
 $dossier=Read-GIDossier $dossierPath
 $fixtureSpec=if($Mode -ceq 'Observe'){$dossier.fixtures.observe}else{$dossier.fixtures.qualification}

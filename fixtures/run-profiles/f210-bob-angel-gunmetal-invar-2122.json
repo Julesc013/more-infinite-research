@@ -39,7 +39,7 @@
     "observe": {
       "source_path": "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer",
       "name": "mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-observer",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "mode": "read-only-finalized-fact-capture",
       "data_marker": "[mir-f210-current-ba-gunmetal-invar-observer] DATA PASS read-only-finalized-fact-capture",
       "runtime_marker": "[mir-f210-current-ba-gunmetal-invar-observer] RUNTIME"
@@ -47,7 +47,7 @@
     "qualification": {
       "source_path": "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification",
       "name": "mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-qualification",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "mode": "narrow-structural-admission",
       "data_marker": "[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02 invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02 unique-owners=true",
       "create_marker": "[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create technologies=researched",
