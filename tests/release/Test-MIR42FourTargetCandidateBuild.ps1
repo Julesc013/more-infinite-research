@@ -721,13 +721,13 @@ try {
     $presentation = if ($i -lt 4) { "source/presentation/$target" } else { "source/presentation/historical/$target" }
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
-    # The V3 fixture remains bound to 4.2.2.  Only f210/f200 advanced their
-    # authored changelog heads to the admitted 4.4.2 identity; every other
-    # retained target must keep its exact 4.2.2 head.
-    $admittedAuthoredVersions = @([string]$currentIdentity.distribution_version)
-    if ($target -in @('f210','f200')) {
-      $admittedAuthoredVersions += [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.4.2').distribution_version
-    }
+    # The V3 fixture remains bound to 4.2.2.  Every retained template also
+    # preserves its exact authored 4.5.2 head; constructed 4.2.2 metadata is
+    # separately bound above.
+    $admittedAuthoredVersions = @(
+      [string]$currentIdentity.distribution_version,
+      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.5.2').distribution_version
+    )
     Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and ($admittedAuthoredVersions -ccontains [string]$authoredVersion.Groups[1].Value)) "422-authored-current-changelog-version-$i"
   }
   $rejected=$false
@@ -794,9 +794,8 @@ try {
     $crossVersion = $mir43Manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
     $crossVersion.target_authority[0].source_version = '4.2.3'
     $crossVersion.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $crossVersion
-    $crossVersionRejected = $false
-    try { $crossVersion | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path | Out-Null } catch { $crossVersionRejected = $true }
-    Assert-MIR42CandidateBuildTest $crossVersionRejected "$sourceVersion-schema-refuses-cross-source-authority"
+    $crossVersionValid = $crossVersion | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop
+    Assert-MIR42CandidateBuildTest (-not $crossVersionValid) "$sourceVersion-schema-refuses-cross-source-authority"
     # Exercise the complete writer output, including historical leading-zero
     # codes. A schema accepting a mismatched source patch in any identity
     # field must fail.
@@ -812,10 +811,8 @@ try {
             'asset-path' { $wrongPatch.targets[$i].asset.path = "assets/$($descriptors[$i].target)/more-infinite-research_$oldVersion.zip" }
           }
           $wrongPatch.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $wrongPatch
-          $wrongPatchRejected = $false
-          try { $wrongPatch | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop | Out-Null }
-          catch { $wrongPatchRejected = $true }
-          Assert-MIR42CandidateBuildTest $wrongPatchRejected "$($sourceVersion.Replace('.',''))-schema-refuses-mismatched-source-patch-$($descriptors[$i].target)-$field"
+          $wrongPatchValid = $wrongPatch | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop
+          Assert-MIR42CandidateBuildTest (-not $wrongPatchValid) "$($sourceVersion.Replace('.',''))-schema-refuses-mismatched-source-patch-$($descriptors[$i].target)-$field"
         }
       }
     }
