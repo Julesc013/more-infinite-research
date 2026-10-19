@@ -625,28 +625,6 @@ function M.is_trusted(design)
   return authority.is_trusted(design)
 end
 
--- GenerationPlan's final private handoff needs a Design that no longer shares
--- mutable row/Gate tables with graph work.  The source Design has already
--- crossed its untrusted boundary; capture clones those exact admitted Gate
--- records rather than admitting or fingerprinting every Gate again.
-function M.capture_owned(design)
-  M.assert_trusted(design)
-  -- The final Plan owns a complete private Design, including every unknown
-  -- nested provenance field. No mutable producer subtable remains reachable.
-  -- Gate records retain their existing admission and are re-registered only
-  -- after the one defensive copy; this is not an untrusted re-verification.
-  authority.count_full_copy()
-  local result = {}
-  for key, value in pairs(design) do
-    if key ~= "gates" then result[deepcopy(key)] = deepcopy(value) end
-  end
-  result.gates = {}
-  for gate_name, gate in pairs(design.gates or {}) do
-    result.gates[gate_name] = gate_contract.capture_owned(gate)
-  end
-  return trust(result)
-end
-
 function M.refresh_fingerprints(design, options)
   options = options or {}
   design.subject_fingerprint = fingerprint.of(subject_material(design))

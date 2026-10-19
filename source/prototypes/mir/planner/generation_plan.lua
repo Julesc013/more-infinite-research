@@ -10,8 +10,8 @@ local Plan = {}
 Plan.__index = Plan
 local trusted_artifacts = setmetatable({}, {__mode = "k"})
 local trusted_drafts = setmetatable({}, {__mode = "k"})
--- Keys are the compact, final-only internal rows.  The complete row never
--- escapes this module except through an explicit detached export.
+-- Keys are compact final-only rows. Complete rows remain in the private owner;
+-- the active compiler uses an internal view and public exports are detached.
 local owned_rows = setmetatable({}, {__mode = "k"})
 
 local ACTIONS = {
@@ -230,7 +230,7 @@ local function final_design_for_owned_row(row)
   end
   -- The construction/import boundary has already admitted the full Gate proof.
   -- This final handoff requires the exact admitted Gate instances bound into
-  -- the final Design, then detaches them once without re-admission.
+  -- the final Design before consuming the graph builder's transient row.
   technology_design.assert_trusted(row.technology_design)
   local exact = true
   for _, gate_name in ipairs(REQUIRED_GATES) do
@@ -248,19 +248,21 @@ local function final_design_for_owned_row(row)
   return technology_design.from_generation_row(row)
 end
 
-local function capture_owned_row(row)
-  local owned_design = technology_design.capture_owned(final_design_for_owned_row(row))
+local function consume_owned_row(row)
+  local owned_design = final_design_for_owned_row(row)
+  -- This is the consuming, internal post-graph handoff. The graph builder has
+  -- finished with this transient row; its Design and Gate values already own
+  -- their immutable inputs. Move that record rather than copying those values
+  -- again. Mutable public input uses Plan:add and its deep admission/copy.
+  validate_row(row, {design_derived = true})
   local full = {}
   for key, value in pairs(row) do
-    if key ~= "technology_design" and key ~= "gates" then
-      full[deepcopy(key)] = deepcopy(value)
-    end
+    full[key] = value
+    row[key] = nil
   end
   full.technology_design = owned_design
-  -- The owned Design and owned row must use the same freshly admitted Gate
-  -- values; an external source-row alias cannot reach either after capture.
+  -- Preserve the exact final admitted Gate vector in both projections.
   full.gates = owned_design.gates
-  validate_row(full, {design_derived = true})
   local compact = {
     schema = full.schema,
     stream_key = full.stream_key,
@@ -270,7 +272,7 @@ local function capture_owned_row(row)
   }
   owned_rows[compact] = {
     full = full,
-    -- The complete record is isolated above. Schema 5 deliberately hashes
+    -- The complete record is consumed above. Schema 5 deliberately hashes
     -- this compact semantic identity rather than re-traversing its proof.
     identity = owned_row_identity_material(full)
   }
@@ -287,8 +289,8 @@ owned_row_identity_material = function(row)
   local adoption = row.adoption or {}
   -- Schema-5 Plan material names the closed owner and its semantic outputs.
   -- It deliberately does not recanonicalize the private complete proof record:
-  -- that record was already admitted and is detached from every producer
-  -- alias. Full proof content remains in all explicit exports.
+  -- that record was already admitted and the graph builder has completed its
+  -- ownership transfer. Full proof content remains in all explicit exports.
   return {
     schema = row.schema,
     stream_key = row.stream_key,
@@ -346,9 +348,9 @@ function Plan:add_owned_derived(row)
   if self.finalized then error("GenerationPlan is already finalized", 2) end
   -- This path receives a compiler-owned row and finalizes immediately. Keep
   -- the draft's mutable row until graph work has completed.  The final Plan
-  -- captures one isolated complete row and leaves only a compact handle in
+  -- consumes the complete row and leaves only a compact handle in
   -- its ordinary internal row list.
-  table.insert(self.rows, self.preparations and row or capture_owned_row(row))
+  table.insert(self.rows, self.preparations and row or consume_owned_row(row))
 end
 
 function Plan:finalize()

@@ -1484,8 +1484,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6810,
-      "expected_sha256": "F2617327C0BBA992BEA071047947FCDEBCA0826F93F9FD4658A6F3AEDE861A73",
+      "expected_bytes": 6440,
+      "expected_sha256": "E004FF72A468543BE5D13B110AFB8CF46BDEFBD9597DD583E6E5783BDD863AC3",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -1644,8 +1644,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 56991,
-      "expected_sha256": "FEC6B43FC8486641E22CA86074EBC8C40074BC7592412B10A902CF579C7A8710",
+      "expected_bytes": 55988,
+      "expected_sha256": "C81EEDAAD44B8FDB7B14E5F9D8B3934ED84D967883AE7A511BD6844527DBAE9C",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2796,8 +2796,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed Factorio 1 compatibility source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 22665,
-      "expected_sha256": "DBE67CCD808136563BA761FEEC0518D46055809711AC3AEA59F7B4DD930B2081",
+      "expected_bytes": 22822,
+      "expected_sha256": "ED69191B5BDCA293A46E8375480806D9C21787BDC648AB69E4E0CF1A98F35BE4",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "C7F5D9717197F24B7BD2D741A495C9A19F08537A451CAFB8351437C9EA432795"
+  "record_sha256": "BA7909FC131F4AB77D2050F0FFAD08904C300A1135050EF6A56D123819624D6D"
 }
