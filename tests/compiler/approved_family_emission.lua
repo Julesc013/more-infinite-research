@@ -294,6 +294,21 @@ Context.with_active(Context.new(), function()
   end
 
   local plan = compiler.compile(context)
+  local input_snapshot = plan.compiler_input.compilation_snapshot
+  local snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
+  local exported_snapshot = snapshot_contract.snapshot(input_snapshot, {full = true})
+  local original_inventory = fingerprint.canonical(input_snapshot.effect_target_inventory)
+  exported_snapshot.effect_target_inventory.recipe = {}
+  check(fingerprint.canonical(input_snapshot.effect_target_inventory) == original_inventory,
+    "Mutating an exported snapshot cannot change the shared planning target inventory")
+  check(not pcall(snapshot_contract.verify_untrusted, exported_snapshot),
+    "An imported snapshot with a changed target inventory fails independent verification")
+  local original_recipe = data.raw.recipe["iron-plate"]
+  data.raw.recipe["iron-plate"] = nil
+  check(not pcall(effect_safety.assert_current_target_inventory,
+    context:service("effect_target_inventory")),
+    "Removing an actual target remains detectable at the mutation boundary")
+  data.raw.recipe["iron-plate"] = original_recipe
   local iron
   for _, row in ipairs(plan.stream_plan.rows) do
     if row.stream_key == "research_iron" then iron = row end

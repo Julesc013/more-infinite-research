@@ -2396,8 +2396,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compiler-orchestrator context_construction responsibility for f200.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11104,
-      "expected_sha256": "B7F0686B306DAA948695E25679CED66E4E99D1F210588F4DF7EBBC5922C99795",
+      "expected_bytes": 11009,
+      "expected_sha256": "F3963CA9ABCD1270B7C1FC1F997C03F4E9B4AEC7827563556D6FB2234A4AF945",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -3899,5 +3899,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "F078A6423FB48DB956093243AAA1580AD832961A780A78C7042E359B5D60A836"
+  "record_sha256": "54D97C2AB02973B80E8048E52BDC6D3511865A3239E2A8BC7D16CADBD9B35A05"
 }

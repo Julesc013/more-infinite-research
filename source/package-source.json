@@ -4856,10 +4856,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11104,
-      "source_sha256": "B7F0686B306DAA948695E25679CED66E4E99D1F210588F4DF7EBBC5922C99795",
-      "output_bytes": 11104,
-      "output_sha256": "B7F0686B306DAA948695E25679CED66E4E99D1F210588F4DF7EBBC5922C99795"
+      "source_bytes": 11009,
+      "source_sha256": "F3963CA9ABCD1270B7C1FC1F997C03F4E9B4AEC7827563556D6FB2234A4AF945",
+      "output_bytes": 11009,
+      "output_sha256": "F3963CA9ABCD1270B7C1FC1F997C03F4E9B4AEC7827563556D6FB2234A4AF945"
     },
     {
       "layer": "capability",
@@ -7678,5 +7678,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "E6F93C3A1DE77FD12492377219D55EBDB0F1DD9200845859D4FCF3B3E5314323"
+  "record_sha256": "0171FC1674E5916C46FDF05CD4B4320961CC7165A73B9490CCDCCC349F206378"
 }
