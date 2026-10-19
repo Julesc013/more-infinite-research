@@ -16,9 +16,9 @@ $portable=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.settings
 Assert-GIStatic (([string]$dossier.settings.mode -ceq 'File') -and [bool]$dossier.settings.portable_input_required -and ($portableSha -ceq [string]$dossier.settings.portable_sha256) -and ($portableSha -cne [string]$dossier.historical_2_1_20.settings_sha256)) 'portable-settings'
 Assert-GIStatic (([string]$dossier.historical_2_1_20.engine_version -ceq '2.1.20') -and ([string]$dossier.historical_2_1_20.settings_sha256 -ceq '2D258A213E7A4230563651ABD1B7D8268318A2DED5E23F3B20AFB6F1D56ECA6A')) 'historical-provenance'
 foreach($mode in @('observe','qualification')){
-  $fixture=$dossier.fixtures.$mode;$root=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$fixture.source_path))).Path;$info=Get-Content -LiteralPath (Join-Path $root 'info.json') -Raw|ConvertFrom-Json
+  $fixture=$dossier.fixtures.$mode;$fixtureDirectory=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$fixture.source_path))).Path;$info=Get-Content -LiteralPath (Join-Path $fixtureDirectory 'info.json') -Raw|ConvertFrom-Json
   Assert-GIStatic (([string]$info.name -ceq [string]$fixture.name) -and ([string]$info.version -ceq [string]$fixture.version)) "fixture-identity-$mode"
-  foreach($file in @('data-final-fixes.lua','control.lua')){Assert-GIStatic (Test-Path -LiteralPath (Join-Path $root $file) -PathType Leaf) "fixture-file-$mode"}
+  foreach($file in @('data-final-fixes.lua','control.lua')){Assert-GIStatic (Test-Path -LiteralPath (Join-Path $fixtureDirectory $file) -PathType Leaf) "fixture-file-$mode"}
 }
 $observer=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.fixtures.observe.source_path))).Path
 Assert-GIStatic (Test-Path -LiteralPath (Join-Path $observer 'settings-updates.lua') -PathType Leaf) 'observer-phase-aware-setting'
