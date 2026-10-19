@@ -9,6 +9,7 @@ param(
   [string]$OutputRoot='build/tmp/m42mig',
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
+  [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1',
   [string]$PredecessorCandidateZip='',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
@@ -141,7 +142,7 @@ $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-Migration ($running.Count -eq 0) 'requires one Factorio process tree; an engine is already running.'
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 $predecessorInput=Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $PredecessorCandidateZip
-$currentInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$currentInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $SourceVersion
 $predecessorCandidate=[string]$predecessorInput.path
 $predecessorCommitTree=[string]$predecessorInput.source_tree
 $currentCandidate=[string]$currentInput.path
@@ -221,7 +222,7 @@ function New-Stage([string]$Name,[string]$Candidate,[string]$FixtureVersion,[int
   New-Item -ItemType Directory -Force -Path $userdata,(Join-Path $userdata 'saves')|Out-Null
   $isPredecessor=$Candidate -ceq $predecessorCandidate
   $hash=if($isPredecessor){$predecessorInput.archive_sha256}else{$currentInput.receipt.archive_sha256}
-  $version=if($isPredecessor){'4.2.21000'}else{'4.2.21001'}
+  $version=if($isPredecessor){'4.2.21000'}else{[string]$currentInput.receipt.distribution_version}
   $candidateName=[IO.Path]::GetFileName($Candidate);$installed=Join-Path $library $candidateName
   Assert-MIRLibraryPath $installed
   Assert-Exact 'installed candidate hash' (Get-MigrationSha $installed) ([string]$hash)
@@ -344,7 +345,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210V2ToV3MaximumLevelMigrationQualificationV1'
   status='passed-current-f210-v2-to-v3-cap-migration-only'
-  scope='Pinned origin/dev F210 V2 package verified against the exact f7f9bab binding set, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into a supplied current 4.2.21001 F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.'
+  scope=('Pinned origin/dev F210 V2 package verified against the exact f7f9bab binding set, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into the supplied '+[string]$currentInput.receipt.distribution_version+' F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.')
   target=[ordered]@{
     factorio_line='2.1'
     factorio_version=[string]$engineResolution.engine.version

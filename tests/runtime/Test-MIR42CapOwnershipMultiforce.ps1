@@ -8,6 +8,7 @@ param(
   [switch]$PrepareInputsOnly,
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
+  [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
   [string]$OutputRoot='build/p/m421-f210-cap'
@@ -216,7 +217,7 @@ $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-MIR42 ($running.Count-eq0) 'requires the one-Factorio-process policy; a Factorio process is already running.'
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
-$candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $SourceVersion
 $candidateZip=[string]$candidateInput.path
 trap {
   $failure=$_
@@ -326,7 +327,7 @@ function New-MIR42Stage([string]$Name,[int]$Cap,[bool]$UseBlocker,[bool]$UsePoli
     $hashes[[IO.Path]::GetFileName($policyBlockerArchive)]=Get-MIR42Sha $policyBlockerArchive
   }
   $modList=[ordered]@{mods=@(@('base','elevated-rails','quality','recycler','space-age')|ForEach-Object{[ordered]@{name=$_;version=[string]$engineResolution.engine.version;enabled=$true}})}
-  $modList.mods+=@(@{name='more-infinite-research';version='4.2.21001';enabled=$true},@{name=$fixtureName;version='0.1.0';enabled=$true},@{name='mir-validation-settings-overrides';version=$settings.version;enabled=$true})
+  $modList.mods+=@(@{name='more-infinite-research';version=[string]$candidateInput.receipt.distribution_version;enabled=$true},@{name=$fixtureName;version='0.1.0';enabled=$true},@{name='mir-validation-settings-overrides';version=$settings.version;enabled=$true})
   if($UseBlocker){$modList.mods+=,@{name=$blockerName;version='0.1.0';enabled=$true}}
   if($UsePolicyBlocker){$modList.mods+=,@{name=$policyBlockerName;version='0.1.0';enabled=$true}}
   $modListPath=Join-Path $stageRoot 'selection.json'
@@ -533,7 +534,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210CapOwnershipMultiforceQualificationV1'
   status='passed-current-f210-candidate-cap-ownership-multiforce-only'
-  scope='Verified supplied 4.2.21001 F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.'
+  scope=('Verified supplied '+[string]$candidateInput.receipt.distribution_version+' F210 candidate: strict V3 policy admission, copper absolute cap ownership, named-force isolation, late policy forgery refusal, force-reset stale-ownership discard, cap removal, and terminal serialized reload; isolated/cooperative package-excluded fixture evidence.')
   target=[ordered]@{
     factorio_line='2.1'
     factorio_version=[string]$engineResolution.engine.version

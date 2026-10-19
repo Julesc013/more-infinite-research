@@ -127,10 +127,10 @@ function Assert-F210CapSharedInputs {
     }
     $library=Join-Path $capRoot 'library';[IO.Directory]::CreateDirectory($library)|Out-Null
     $tiny=Join-Path $capRoot 'tiny-candidate';[IO.Directory]::CreateDirectory($tiny)|Out-Null
-    @{name='more-infinite-research';version='4.2.21001';factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $tiny 'info.json')
-    $candidateZip=Publish-MIRModDirectoryArchive -Source $tiny -Name more-infinite-research -Version 4.2.21001 -ModsDir $library
+    @{name='more-infinite-research';version='4.7.21000';factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json|Set-Content -LiteralPath (Join-Path $tiny 'info.json')
+    $candidateZip=Publish-MIRModDirectoryArchive -Source $tiny -Name more-infinite-research -Version 4.7.21000 -ModsDir $library
     $candidateHash=Get-MIRImmutableInputSha256 $candidateZip
-    $candidateInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=$candidateHash;package_source_sha256=('A'*64)}}
+    $candidateInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=$candidateHash;distribution_version='4.7.21000';package_source_sha256=('A'*64)}}
     $fixture=Join-Path $repo 'fixtures/assert-mir42-cap-ownership-multiforce';$fixtureName='mir-fixture-assert-mir42-cap-ownership-multiforce'
     $blockerFixture=Join-Path $repo 'fixtures/late-mir42-cap-binding-blocker';$blockerName='late-mir42-cap-binding-blocker'
     $policyBlockerFixture=Join-Path $repo 'fixtures/late-mir42-policy-binding-blocker';$policyBlockerName='late-mir42-policy-binding-blocker'
@@ -153,6 +153,7 @@ function Assert-F210CapSharedInputs {
       $list=Get-Content -Raw -LiteralPath $stage.mod_list|ConvertFrom-Json
       Assert-Probe (($blockerName-in@($list.mods.name))-eq$stage.blocker -and ($policyBlockerName-in@($list.mods.name))-eq$stage.policy_blocker) 'F210 blocker selection changed.'
       Assert-Probe (@($list.mods|Where-Object{-not$_.version}).Count-eq0) 'F210 selection contains an unpinned input.'
+      Assert-Probe (@($list.mods|Where-Object name -CEQ 'more-infinite-research')[0].version-ceq'4.7.21000') 'F210 selected a historical numeric identity instead of the admitted candidate.'
       Start-MIR42CapStage $stage
       Assert-Probe (-not(Test-Path (Join-Path $library 'mod-settings.dat'))) 'F210 defaults inherited preceding settings.'
       $active=Get-Content (Join-Path $library 'mod-list.json') -Raw|ConvertFrom-Json
