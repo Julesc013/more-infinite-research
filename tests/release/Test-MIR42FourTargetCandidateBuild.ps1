@@ -1,5 +1,6 @@
 [CmdletBinding()]
-param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly,[switch]$HistoricalIdentityProjectionOnly,[switch]$HistoricalAuthenticationOnly)
+param([switch]$IdentityContractsOnly,[switch]$MaterializerReceiptContractsOnly,[switch]$HistoricalIdentityProjectionOnly,[switch]$HistoricalAuthenticationOnly,
+  [ValidateSet('4.4.2','4.5.2','4.6.0','4.7.0')][string[]]$HistoricalAuthenticationSourceVersions=@())
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -121,7 +122,7 @@ function Test-MIR43HistoricalBaselineProjection {
 }
 
 function Test-MIR43HistoricalCandidateAuthentication {
-  param([Parameter(Mandatory)][string]$OutputRoot)
+  param([Parameter(Mandatory)][string]$OutputRoot,[string[]]$SelectedSourceVersions=@())
 
   . (Join-Path $repo 'tests/support/MIR43HistoricalCandidateAuthentication.ps1')
   $projectionChecks = 0
@@ -166,8 +167,10 @@ function Test-MIR43HistoricalCandidateAuthentication {
   $authenticationCases = @(
     [pscustomobject][ordered]@{ label = '442'; source_version = '4.4.2'; candidate_id = 'AUTHENTICATION-CONTROL-442'; output_root = $auth442Root },
     [pscustomobject][ordered]@{ label = '452'; source_version = '4.5.2'; candidate_id = 'AUTHENTICATION-CONTROL-452'; output_root = $auth452Root },
-    [pscustomobject][ordered]@{ label = '460'; source_version = '4.6.0'; candidate_id = 'AUTHENTICATION-CONTROL-460'; output_root = (Join-Path $OutputRoot 'authentication-460') }
+    [pscustomobject][ordered]@{ label = '460'; source_version = '4.6.0'; candidate_id = 'AUTHENTICATION-CONTROL-460'; output_root = (Join-Path $OutputRoot 'authentication-460') },
+    [pscustomobject][ordered]@{ label = '470'; source_version = '4.7.0'; candidate_id = 'AUTHENTICATION-CONTROL-470'; output_root = (Join-Path $OutputRoot 'authentication-470') }
   )
+  if($SelectedSourceVersions.Count){$authenticationCases=@($authenticationCases|Where-Object {$_.source_version -cin $SelectedSourceVersions})}
   $authenticationAssertions = 0
   $authorityInputAssertions = 0
   $receiptCustodyAssertions = 0
@@ -226,8 +229,8 @@ function Test-MIR43HistoricalCandidateAuthentication {
           if ($null -eq $entry) { throw '[mir42-candidate-build-test] historical-authentication-opponent-changelog-missing' }
           $entry.Delete()
           $replacement = $zip.CreateEntry($entryPath)
-          $writer = [IO.StreamWriter]::new($replacement.Open(), [Text.UTF8Encoding]::new($false))
-          try { $writer.Write("---------------------------------------------------------------------------------------------------`nVersion: 4.5.01702`n  Info:`n    - Stale historical changelog entry.`n") } finally { $writer.Dispose() }
+          $entryWriter = [IO.StreamWriter]::new($replacement.Open(), [Text.UTF8Encoding]::new($false))
+          try { $entryWriter.Write("---------------------------------------------------------------------------------------------------`nVersion: 4.5.01702`n  Info:`n    - Stale historical changelog entry.`n") } finally { $entryWriter.Dispose() }
         } finally { $zip.Dispose() }
         $forgedManifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100 -DateKind String
         $forgedInventory = Get-MIR4ArchiveInventory -Path $forgedArchive
@@ -261,6 +264,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
     }
   }
   return [pscustomobject][ordered]@{
+    archive_source_versions = @($authenticationCases.source_version)
     authority_projection_checks = $projectionChecks
     authentication_assertions = $authenticationAssertions
     authority_input_assertions = $authorityInputAssertions
@@ -521,11 +525,11 @@ try {
     return
   }
   if ($HistoricalAuthenticationOnly) {
-    $historicalAuthentication = Test-MIR43HistoricalCandidateAuthentication -OutputRoot $historicalAuthenticationRoot
+    $historicalAuthentication = Test-MIR43HistoricalCandidateAuthentication -OutputRoot $historicalAuthenticationRoot -SelectedSourceVersions $HistoricalAuthenticationSourceVersions
     [pscustomobject][ordered]@{
       status = 'MIR-4.3-HISTORICAL-CANDIDATE-AUTHENTICATION-CONTROLS-PASSED'
       targets = 5
-      source_versions = @('4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.2')
+      source_versions = @($historicalAuthentication.archive_source_versions)
       authority_projection_checks = [int]$historicalAuthentication.authority_projection_checks
       authentication_assertions = [int]$historicalAuthentication.authentication_assertions
       authority_input_assertions = [int]$historicalAuthentication.authority_input_assertions

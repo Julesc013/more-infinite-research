@@ -24,6 +24,8 @@
       "command": "./tests/tooling/Test-MIRUpgradeManifest.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/support/MIR43HistoricalCandidateAuthentication.ps1",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
         "tests/tooling/Test-MIRUpgradeManifest.ps1",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "tests/support/MIR421K2Upgrade.ps1",
