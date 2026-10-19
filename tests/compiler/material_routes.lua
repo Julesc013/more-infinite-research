@@ -622,8 +622,8 @@ local function graph_certificate_for(world, bindings)
   value.relevant_return_graph_contract=facts
   return value
 end
-local function graph_routes(world, route_certificate, bindings)
-  environment(world)
+local function graph_routes(world, route_certificate, bindings, items)
+  environment(world, items)
   risks={smelting=risk_row("smelting")}
   mods=graph_mods
   productivity_owners=(bindings and bindings.owners) or {}
@@ -1002,11 +1002,11 @@ local missing_f210_tin_streams=material_streams_for({factorio_version="2.1"},mis
 check(recipe_patterns(missing_f210_tin_streams.research_material_tin)=="^bob%-tin%-plate$" and missing_f210_tin_streams.research_material_tin.reviewed_forward_routes==nil,"missing F210 Angel provider withdraws Tin finals and certificates")
 
 local f210_bob_angel_gunmetal_invar_mods={
-  base="2.1.20",["elevated-rails"]="2.1.20",quality="2.1.20",recycler="2.1.20",["space-age"]="2.1.20",
+  base="2.1.22",["elevated-rails"]="2.1.22",quality="2.1.22",recycler="2.1.22",["space-age"]="2.1.22",
   boblibrary="3.0.1",bobores="3.0.0",bobplates="3.0.2",bobelectronics="3.0.1",bobtech="3.0.0",
   angelsrefining="2.1.2",angelsrefininggraphics="2.1.0",angelspetrochem="2.1.3",angelspetrochemgraphics="2.1.0",
   angelssmelting="2.1.1",angelssmeltinggraphics="2.1.1",["more-infinite-research"]="4.2.21000",
-  ["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.0"
+  ["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.1"
 }
 local exact_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},f210_bob_angel_gunmetal_invar_mods,f200_items)
 local exact_f210_gunmetal_certificate=exact_f210_gunmetal_invar_streams.research_material_gunmetal.reviewed_forward_routes
@@ -1015,14 +1015,24 @@ local exact_f210_invar_certificate=exact_f210_gunmetal_invar_streams.research_ma
   and exact_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"]
 check(recipe_patterns(exact_f210_gunmetal_invar_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and recipe_patterns(exact_f210_gunmetal_invar_streams.research_material_invar)=="^angels%-plate%-invar$","exact current F210 Bob/Angel profile selects only visible Gunmetal and Invar finals")
 check(exact_f210_gunmetal_certificate and exact_f210_invar_certificate and exact_f210_gunmetal_certificate.require_exact_route_certificate and exact_f210_invar_certificate.require_exact_route_certificate,"exact current F210 Gunmetal and Invar finals require reviewed certificates")
-check(exact_f210_gunmetal_certificate.id=="F210-BA-gunmetal-final-v1" and exact_f210_gunmetal_certificate.ingredients[1].name=="angels-liquid-molten-gunmetal" and exact_f210_gunmetal_certificate.results[1].name=="bob-gunmetal-alloy" and exact_f210_gunmetal_certificate.relevant_input_contract==nil and exact_f210_gunmetal_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-d075395b" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f5b0b17f" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Gunmetal certificate binds its IO and no-return owner/unlock boundary")
-check(exact_f210_invar_certificate.id=="F210-BA-invar-final-v1" and exact_f210_invar_certificate.ingredients[1].name=="angels-liquid-molten-invar" and exact_f210_invar_certificate.results[1].name=="bob-invar-alloy" and exact_f210_invar_certificate.relevant_input_contract==nil and exact_f210_invar_certificate.relevant_return_graph_contract.return_graph_fingerprint=="mir32-7cafb4f4" and exact_f210_invar_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f6107c3a" and exact_f210_invar_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Invar certificate binds its IO and no-return owner/unlock boundary")
+check(exact_f210_gunmetal_certificate.id=="F210-BA-gunmetal-final-v2" and exact_f210_gunmetal_certificate.ingredients[1].name=="angels-liquid-molten-gunmetal" and exact_f210_gunmetal_certificate.results[1].name=="bob-gunmetal-alloy" and exact_f210_gunmetal_certificate.relevant_input_contract==nil and exact_f210_gunmetal_certificate.relevant_return_graph_contract.schema==3 and exact_f210_gunmetal_certificate.relevant_return_graph_contract.return_graph_fingerprint==nil and exact_f210_gunmetal_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f5b0b17f" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.closed_output.name=="bob-gunmetal-alloy" and table.concat(exact_f210_gunmetal_certificate.relevant_return_graph_contract.closed_output.direct_output_producers,",")=="angels-plate-gunmetal,bob-gunmetal-alloy,bob-gunmetal-alloy-recycling" and exact_f210_gunmetal_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Gunmetal certificate binds its closed output plus IO and owner/unlock boundary")
+check(exact_f210_invar_certificate.id=="F210-BA-invar-final-v2" and exact_f210_invar_certificate.ingredients[1].name=="angels-liquid-molten-invar" and exact_f210_invar_certificate.results[1].name=="bob-invar-alloy" and exact_f210_invar_certificate.relevant_input_contract==nil and exact_f210_invar_certificate.relevant_return_graph_contract.schema==3 and exact_f210_invar_certificate.relevant_return_graph_contract.return_graph_fingerprint==nil and exact_f210_invar_certificate.relevant_return_graph_contract.bindings_fingerprint=="mir32-f6107c3a" and exact_f210_invar_certificate.relevant_return_graph_contract.closed_output.name=="bob-invar-alloy" and table.concat(exact_f210_invar_certificate.relevant_return_graph_contract.closed_output.direct_output_producers,",")=="angels-plate-invar,bob-invar-alloy,bob-invar-alloy-recycling" and exact_f210_invar_certificate.relevant_return_graph_contract.relevant_recipe_count==3,"exact current F210 Invar certificate binds its closed output plus IO and owner/unlock boundary")
 
 local no_observer_f210_gunmetal_invar_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
 no_observer_f210_gunmetal_invar_mods["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]=nil
 local no_observer_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},no_observer_f210_gunmetal_invar_mods,f200_items)
 check(recipe_patterns(no_observer_f210_gunmetal_invar_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and no_observer_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"]~=nil,"F210 Gunmetal/Invar route declarations do not require the package-excluded observer")
 
+local historical_f210_gunmetal_invar_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
+for _, official in ipairs({"base","elevated-rails","quality","recycler","space-age"}) do historical_f210_gunmetal_invar_mods[official]="2.1.20" end
+historical_f210_gunmetal_invar_mods["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.0"
+local historical_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},historical_f210_gunmetal_invar_mods,f200_items)
+check(recipe_patterns(historical_f210_gunmetal_invar_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and historical_f210_gunmetal_invar_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"].relevant_return_graph_contract.schema==3,"F210 .20 retains the property-checked Gunmetal/Invar candidate declaration")
+
+local changed_f210_gunmetal_invar_official_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
+changed_f210_gunmetal_invar_official_mods.base="2.1.23"
+local changed_f210_gunmetal_invar_official_streams=material_streams_for({factorio_version="2.1"},changed_f210_gunmetal_invar_official_mods,f200_items)
+check(recipe_patterns(changed_f210_gunmetal_invar_official_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and changed_f210_gunmetal_invar_official_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"].relevant_return_graph_contract.schema==3,"official patch changes retain only a schema-3 structural declaration; the real matcher still proves the loaded boundary")
 local changed_f210_gunmetal_invar_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
 changed_f210_gunmetal_invar_mods.bobplates="3.0.3"
 local changed_f210_gunmetal_invar_streams=material_streams_for({factorio_version="2.1"},changed_f210_gunmetal_invar_mods,f200_items)
@@ -1031,7 +1041,7 @@ check(recipe_patterns(changed_f210_gunmetal_invar_streams.research_material_gunm
 local changed_f210_gunmetal_invar_observer_mods=clone_map(f210_bob_angel_gunmetal_invar_mods)
 changed_f210_gunmetal_invar_observer_mods["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.1"
 local changed_f210_gunmetal_invar_observer_streams=material_streams_for({factorio_version="2.1"},changed_f210_gunmetal_invar_observer_mods,f200_items)
-check(recipe_patterns(changed_f210_gunmetal_invar_observer_streams.research_material_gunmetal)=="^bob%-gunmetal%-alloy$" and changed_f210_gunmetal_invar_observer_streams.research_material_invar.reviewed_forward_routes==nil,"changed F210 observer identity withdraws Gunmetal/Invar finals and certificates")
+check(recipe_patterns(changed_f210_gunmetal_invar_observer_streams.research_material_gunmetal)=="^angels%-plate%-gunmetal$" and changed_f210_gunmetal_invar_observer_streams.research_material_invar.reviewed_forward_routes["angels-plate-invar"]~=nil,"package-excluded observer identity does not gate the structural Gunmetal/Invar declarations")
 
 local f210_streams=material_streams_for({factorio_version="2.1"},exact_f200_mods,f200_items)
 check(recipe_patterns(f210_streams.research_material_tin)=="^bob%-tin%-plate$" and recipe_patterns(f210_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(f210_streams.research_material_silver)=="^bob%-silver%-plate$" and f210_streams.research_material_nickel.reviewed_forward_routes==nil,"F210 retains F200-only Angel additions outside the exact current Tin certificate")
@@ -1966,6 +1976,137 @@ end)()
 end)()
 
 
+-- A schema-3 closed-output certificate has a deliberately smaller reusable
+-- proof surface than a schema-2 full cone. It accepts a changed hidden
+-- non-target direct-producer fact only while every consumer is either absent or the
+-- bounded lossy self recycler, no native conversion remains, and the target route's
+-- regular risk, ownership, unlock, permission, cap, and I/O checks still hold.
+do
+  local original_mods = graph_mods
+  local function closed_output_world()
+    local world = {
+      smelting=canonical_route("smelting","ore","plate"),
+      hidden_output=canonical_route("hidden_output","scrap","plate")
+    }
+    world.hidden_output.hidden = true
+    world.hidden_output.source_class = "hidden-internal"
+    world.hidden_output.variants[1].hidden = true
+    return world
+  end
+  local function closed_output_certificate(world)
+    local value = graph_certificate_for(world)
+    local facts = assert(matcher.relevant_route_fingerprints(world.smelting, 1))
+    value.profiles[1].mod_locks = {fixture_provider="9.9.9"}
+    value.relevant_return_graph_contract = {
+      schema=3,
+      bindings_fingerprint=facts.bindings_fingerprint,
+      reachable_identity_count=1,
+      relevant_recipe_count=2,
+      direct_output_producer_count=2,
+      closed_output={type="item",name="plate",direct_output_producers={"hidden_output","smelting"}}
+    }
+    return value
+  end
+  graph_mods = {fixture_provider="9.9.9", official_capability="2.1.22"}
+  local value = closed_output_certificate(closed_output_world())
+  check(table.concat(graph_routes(closed_output_world(), value), ",") == "smelting",
+    "schema3 admits the exact closed output after its loaded property check")
+  local function lossy_recycling_direct_producer(world)
+    local recycler = world.hidden_output
+    recycler.hidden = true
+    recycler.source_class = "recycling"
+    recycler.categories = {"recycling"}
+    recycler.enabled_without_research = false
+    recycler.allow_productivity = false
+    recycler.declared_allow_productivity = nil
+    recycler.effective_allow_productivity = false
+    local variant = recycler.variants[1]
+    variant.hidden = true
+    variant.enabled = false
+    variant.categories = {"recycling"}
+    variant.allow_productivity = false
+    variant.declared_allow_productivity = nil
+    variant.effective_allow_productivity = false
+    variant.ingredients = {{type="item",name="plate",amount=1,probability=1,independent_probability=1,ignored_by_stats=1}}
+    variant.results = {{type="item",name="plate",amount=1,probability=0.25,independent_probability=0.25,
+      declared_independent_probability=0.25,ignored_by_stats=1}}
+    return world
+  end
+  local recycling_direct_producer = lossy_recycling_direct_producer(closed_output_world())
+  check(table.concat(graph_routes(recycling_direct_producer, value), ",") == "smelting",
+    "schema3 accepts one hidden, non-productive and strictly lossy self recycler")
+  local deterministic_recycler = lossy_recycling_direct_producer(closed_output_world())
+  deterministic_recycler.hidden_output.variants[1].results[1].probability = 1
+  deterministic_recycler.hidden_output.variants[1].results[1].independent_probability = 1
+  deterministic_recycler.hidden_output.variants[1].results[1].declared_independent_probability = 1
+  check(#graph_routes(deterministic_recycler, value) == 0,
+    "schema3 rejects a deterministic self recycler")
+  local unknown_probability_recycler = lossy_recycling_direct_producer(closed_output_world())
+  unknown_probability_recycler.hidden_output.variants[1].results[1].probability = "unknown"
+  unknown_probability_recycler.hidden_output.variants[1].results[1].independent_probability = "unknown"
+  unknown_probability_recycler.hidden_output.variants[1].results[1].declared_independent_probability = "unknown"
+  check(#graph_routes(unknown_probability_recycler, value) == 0,
+    "schema3 rejects an unknown self-recycler probability")
+  local amplifying_recycler = lossy_recycling_direct_producer(closed_output_world())
+  amplifying_recycler.hidden_output.variants[1].results[1].amount = 2
+  amplifying_recycler.hidden_output.variants[1].results[1].ignored_by_stats = 2
+  check(#graph_routes(amplifying_recycler, value) == 0,
+    "schema3 rejects an amplifying self recycler")
+  local extra_output_recycler = lossy_recycling_direct_producer(closed_output_world())
+  extra_output_recycler.hidden_output.variants[1].results[2] = {type="item",name="waste",amount=1,
+    probability=1,independent_probability=1}
+  check(#graph_routes(extra_output_recycler, value) == 0,
+    "schema3 rejects a self recycler with another output")
+  local benign_direct_fact_drift = closed_output_world()
+  benign_direct_fact_drift.hidden_output.variants[1].ingredients[1].amount = 2
+  check(table.concat(graph_routes(benign_direct_fact_drift, value), ",") == "smelting",
+    "schema3 accepts a non-target direct-producer fact drift while its closed output remains exact")
+  local missing_producer = closed_output_world()
+  missing_producer.hidden_output = nil
+  check(#graph_routes(missing_producer, value) == 0,
+    "schema3 rejects a missing named finished-output producer")
+  local extra_producer = closed_output_world()
+  extra_producer.other_output = canonical_route("other_output","waste","plate")
+  extra_producer.other_output.hidden = true
+  extra_producer.other_output.source_class = "hidden-internal"
+  check(#graph_routes(extra_producer, value) == 0,
+    "schema3 rejects an added finished-output producer")
+  local output_consumer = closed_output_world()
+  output_consumer.return_edge = canonical_route("return_edge","plate","ore")
+  check(#graph_routes(output_consumer, value) == 0,
+    "schema3 rejects a new forward or return conversion from its final output")
+  local self_consuming_producer = closed_output_world()
+  self_consuming_producer.hidden_output.variants[1].ingredients[1].name = "plate"
+  check(#graph_routes(self_consuming_producer, value) == 0,
+    "schema3 rejects a named direct producer which consumes its final output")
+  local visible_direct_producer = closed_output_world()
+  visible_direct_producer.hidden_output.hidden = false
+  visible_direct_producer.hidden_output.source_class = "ordinary"
+  check(#graph_routes(visible_direct_producer, value) == 0,
+    "schema3 rejects a non-target direct producer which becomes player-visible")
+  local native_transition = closed_output_world()
+  check(#graph_routes(native_transition, value, nil, {plate={spoil_ticks=60,spoil_result="waste"}}) == 0,
+    "schema3 rejects a native transition from its finished output")
+  local target_io = closed_output_world()
+  target_io.smelting.variants[1].ingredients[1].amount = 2
+  check(#graph_routes(target_io, value) == 0,
+    "schema3 retains the target route exact I/O check")
+  local target_permission = closed_output_world()
+  target_permission.smelting.allow_productivity = false
+  target_permission.smelting.declared_allow_productivity = false
+  target_permission.smelting.effective_allow_productivity = false
+  check(#graph_routes(target_permission, value) == 0,
+    "schema3 retains the target route permission check")
+  local wrong_binding = closed_output_certificate(closed_output_world())
+  wrong_binding.relevant_return_graph_contract.bindings_fingerprint = "mir32-deadbeef"
+  check(#graph_routes(closed_output_world(), wrong_binding) == 0,
+    "schema3 retains the target owner and unlock binding check")
+  local malformed = closed_output_certificate(closed_output_world())
+  malformed.relevant_return_graph_contract.closed_output.direct_output_producers = {}
+  check(#graph_routes(closed_output_world(), malformed) == 0,
+    "schema3 rejects an empty or malformed closed-output producer property")
+  graph_mods = original_mods
+end
 -- An approved complete structural boundary does not depend on an entire
 -- provider-version tuple. Each negative still passes through the real matcher.
 do
@@ -1976,7 +2117,7 @@ do
     return value
   end
   local value = unpinned_certificate(graph_world())
-  graph_mods = {different_provider="99.0.0", unrelated="1.2.3"}
+  graph_mods = {fixture_provider="9.9.9", official_capability="2.1.22"}
   check(table.concat(graph_routes(graph_world(), value), ",") == "smelting",
     "structural schema2 admits unchanged approved boundary without provider tuple")
   graph_mods = {}
@@ -2035,7 +2176,7 @@ do
   local original_mods = graph_mods
   local original_observation_enabled = observation_enabled
   observation_enabled = false
-  graph_mods = {different_provider="99.0.0", unrelated="1.2.3"}
+  graph_mods = {fixture_provider="9.9.9", official_capability="2.1.22"}
   local value = graph_certificate_for(graph_world())
   value.profiles[1].mod_locks = {}
   local original_fingerprints = matcher.relevant_route_fingerprints

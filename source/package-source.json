@@ -2901,10 +2901,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 59878,
-      "source_sha256": "8159FF23A9423222491F691CEBE6FB5315FB389E8F099E41BACB0E5DAB9FBDC7",
-      "output_bytes": 59878,
-      "output_sha256": "8159FF23A9423222491F691CEBE6FB5315FB389E8F099E41BACB0E5DAB9FBDC7"
+      "source_bytes": 67955,
+      "source_sha256": "5989466C2DCBBBBDBE015B091B24C52AB74AE9CE3CA42E0FD338293F3F6585F4",
+      "output_bytes": 67955,
+      "output_sha256": "5989466C2DCBBBBDBE015B091B24C52AB74AE9CE3CA42E0FD338293F3F6585F4"
     },
     {
       "layer": "capability",
@@ -6362,10 +6362,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/streams/productivity.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 79953,
-      "source_sha256": "2E1E76E2C76141EE778C7B92819C0D52D671B3E42D7F4B4D9239C05621FBFA08",
-      "output_bytes": 79953,
-      "output_sha256": "2E1E76E2C76141EE778C7B92819C0D52D671B3E42D7F4B4D9239C05621FBFA08"
+      "source_bytes": 80311,
+      "source_sha256": "D96A4C945E74B9F1FEF474314D32F4F1CAA0B0E438A63D9771787394D38C925A",
+      "output_bytes": 80311,
+      "output_sha256": "D96A4C945E74B9F1FEF474314D32F4F1CAA0B0E438A63D9771787394D38C925A"
     },
     {
       "layer": "presentation",
@@ -7678,5 +7678,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "0171FC1674E5916C46FDF05CD4B4320961CC7165A73B9490CCDCCC349F206378"
+  "record_sha256": "B419D71AE56A12DC6E9C2C0755192A12679604300A4AFC471F530A7B5EC18C95"
 }
