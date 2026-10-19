@@ -228,3 +228,5 @@ tests/release/Test-MIR4PromotionRecovery.ps1 text eol=lf
 spec/programmes/evidence/community-2026-09-06/*.json text eol=lf
 fixtures/release-inputs/mir470-published-460-consolidated-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json text eol=lf
+# Native observer receipts bind these authored CRLF bytes exactly.
+fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/* -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
