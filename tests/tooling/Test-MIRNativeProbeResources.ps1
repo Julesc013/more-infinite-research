@@ -183,7 +183,7 @@ function Assert-F210CapSharedInputs {
       param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
       Assert-Probe ($Context-eq$resources -and $FilePath-ceq(Get-Command pwsh).Source -and $TimeoutSeconds-eq30 -and $Arguments-contains$FactorioBin -and $Arguments-contains$SteamManifest) 'F210 resolver lost its governed inputs.'
       $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
-      Assert-Probe ($driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3')) 'F210 bypassed its admission oracle.'
+      Assert-Probe ($driver.Contains("Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot `$Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin `$Engine -SteamManifest `$Manifest")) 'F210 bypassed its current admission oracle or changed its governed inputs.'
       [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"},"record_sha256":"controlled"}')
     }
     $resolution=Get-MIR42GovernedEngineResolution
