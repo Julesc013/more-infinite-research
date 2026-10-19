@@ -100,8 +100,6 @@ local function prepare_subject(force, subject)
 end
 
 local function prepare_next_level_queue(force, prepared)
-  if not force.research_queue_enabled then force.research_queue_enabled = true end
-  if not force.research_queue_enabled then fail("research queue could not be enabled") end
   force.research_queue = nil
   local gunmetal, invar = prepared.gunmetal.continuation, prepared.invar.continuation
   if not force.add_research(gunmetal) or not force.add_research(invar) then
@@ -131,7 +129,7 @@ local function assert_runtime_state(stage)
     end
   end
   local queue = force.research_queue or {}
-  if not force.research_queue_enabled or not force.current_research or force.current_research.name ~= subjects[1].continuation
+  if not force.current_research or force.current_research.name ~= subjects[1].continuation
       or #queue ~= 2 or queue[1].name ~= subjects[1].continuation
       or queue[2].name ~= subjects[2].continuation
       or not near(force.research_progress, PROGRESS) then

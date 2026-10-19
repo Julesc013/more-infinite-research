@@ -47,7 +47,7 @@
     "qualification": {
       "source_path": "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification",
       "name": "mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-qualification",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "mode": "earned-productivity-and-queued-next-level",
       "data_marker": "[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:1-3+recipe-prod-research_material_gunmetal-4:4+ invar=recipe-prod-research_material_invar-1:1-3+recipe-prod-research_material_invar-4:4+ effects=0.02 staged-owners=true",
       "create_marker": "[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create finite=researched continuation-level=5 bonuses=0.08 queue=gunmetal-then-invar progress=0.42",
