@@ -954,7 +954,10 @@ local changed_f200_streams=material_streams_for({factorio_version="2.0"},changed
 check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$" and changed_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==2,"changed F200 provider retains Aluminium only behind a schema-2 structural certificate")
 check(recipe_patterns(changed_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$" and changed_f200_streams.research_material_nickel.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel nickel routes and certificate")
 check(recipe_patterns(changed_f200_streams.research_material_silver)=="^bob%-silver%-plate$" and changed_f200_streams.research_material_silver.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel silver routes and certificate")
-check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$" and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$","changed F200 closure withdraws unproven Angel gold and platinum finals")
+check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$"
+  and changed_f200_streams.research_material_gold.reviewed_forward_routes["angels-plate-gold"].relevant_return_graph_contract.schema==2
+  and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$",
+  "changed F200 closure selects captured Gold only behind schema 2 and still withholds unproven Platinum")
 
 local extra_f200_mods=clone_map(exact_f200_mods)
 extra_f200_mods.qol="1.0.0"
@@ -2145,6 +2148,60 @@ do
   check(recipe_patterns(f210_streams.research_material_aluminium)=="^bob%-aluminium%-plate$"
       and f210_streams.research_material_aluminium.reviewed_forward_routes==nil,
     "R07 F200 structural declaration cannot cross the engine phase boundary")
+end
+
+do
+  -- Independent canonical input-phase observations, not post-emission hashes.
+  -- Their original native log/reader identities remain in the R02 capture.
+  local expected = {
+    {"gold", "angels-plate-gold", "mir32-82b81bf5", "mir32-9f025ab8", "mir32-15171775", 73, 78, "fluid", "angels-liquid-molten-gold", 40, "bob-gold-plate", 4},
+    {"gold", "angels-plate-gold-2", "mir32-a5ba136b", "mir32-2ceacaf2", "mir32-2f6c2701", 73, 78, "item", "angels-roll-gold", 1, "bob-gold-plate", 4},
+    {"gold", "angels-wire-gold-2", "mir32-f4af2099", "mir32-9cee8462", "mir32-15a309fc", 71, 75, "item", "angels-wire-coil-gold", 4, "bob-gilded-copper-cable", 16},
+    {"tin", "angels-plate-tin", "mir32-42e8ee87", "mir32-0642f4ca", "mir32-184cb1c5", 225, 232, "fluid", "angels-liquid-molten-tin", 40, "bob-tin-plate", 4},
+    {"tin", "angels-plate-tin-2", "mir32-beddbea4", "mir32-7139eb7d", "mir32-22db51fb", 225, 232, "item", "angels-roll-tin", 1, "bob-tin-plate", 4},
+    {"titanium", "angels-plate-titanium", "mir32-b51c3afe", "mir32-d9559f25", "mir32-020b9885", 68, 70, "fluid", "angels-liquid-molten-titanium", 40, "bob-titanium-plate", 4},
+    {"titanium", "angels-plate-titanium-2", "mir32-2addeacf", "mir32-ede374f2", "mir32-6f504961", 68, 70, "item", "angels-roll-titanium", 1, "bob-titanium-plate", 4}
+  }
+  local active = clone_map(exact_f200_mods)
+  active.bobtech = nil
+  local actual = material_streams_for({factorio_version="2.0"}, active, f200_items)
+  for _, row in ipairs(expected) do
+    local stream = actual["research_material_" .. row[1]]
+    local certificate = assert(stream.reviewed_forward_routes[row[2]])
+    local contract, profile = certificate.relevant_return_graph_contract, certificate.profiles[1]
+    check(certificate.require_exact_route_certificate and certificate.maximum_productivity==3
+      and profile.mod_lock_scope=="relevant-return-graph" and next(profile.mod_locks)==nil
+      and contract.schema==2 and profile.canonical_risk_fingerprint==row[3]
+      and contract.return_graph_fingerprint==row[4] and contract.bindings_fingerprint==row[5]
+      and contract.reachable_identity_count==row[6] and contract.relevant_recipe_count==row[7]
+      and contract.direct_output_producer_count==3,
+      "captured R02 route binds its complete typed input graph: " .. row[2])
+    check(#certificate.ingredients==1 and #certificate.results==1
+      and certificate.ingredients[1].type==row[8] and certificate.ingredients[1].name==row[9]
+      and certificate.ingredients[1].amount==row[10] and certificate.results[1].type=="item"
+      and certificate.results[1].name==row[11] and certificate.results[1].amount==row[12],
+      "captured R02 route retains its actual ingredient/output contract: " .. row[2])
+    check(exact_f200_streams["research_material_" .. row[1]].reviewed_forward_routes[row[2]].relevant_return_graph_contract.schema==1,
+      "retained provider-pinned F200 route keeps its original schema-1 contract: " .. row[2])
+  end
+  check(recipe_patterns(actual.research_material_tin)=="^bob%-tin%-plate$|^angels%-plate%-tin$|^angels%-plate%-tin%-2$"
+    and recipe_patterns(actual.research_material_titanium)=="^bob%-titanium%-plate$|^angels%-plate%-titanium$|^angels%-plate%-titanium%-2$",
+    "new structural declarations retain existing Bob candidates alongside exactly two captured finals")
+  local outputs = actual.research_material_gold.groups[1].required_productive_outputs
+  check(#outputs==2 and outputs[1].name=="bob-gold-plate" and outputs[2].name=="bob-gilded-copper-cable",
+    "combined Gold wire selector binds the actual Bob cable output instead of a nonexistent Angel wire")
+  local f210 = material_streams_for({factorio_version="2.1"}, active, f200_items)
+  for _, material in ipairs({"gold", "tin", "titanium"}) do
+    local stream = f210["research_material_" .. material]
+    check(stream.reviewed_forward_routes==nil and recipe_patterns(stream)==("^bob%-" .. material .. "%-plate$"),
+      "F200 structural capture cannot authorize the F210 graph: " .. material)
+  end
+  active.angelssmelting = nil
+  local bob_only = material_streams_for({factorio_version="2.0"}, active, f200_items)
+  for _, material in ipairs({"gold", "tin", "titanium"}) do
+    check(bob_only["research_material_" .. material].reviewed_forward_routes==nil,
+      "absent Angel provider cannot select its structural recipes: " .. material)
+  end
 end
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)

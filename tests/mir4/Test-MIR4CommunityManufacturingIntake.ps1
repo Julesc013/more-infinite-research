@@ -302,7 +302,7 @@ Assert-CMI ($a19.Count -eq 1 -and [string]$a19[0].state -ceq 'active') 'A19 must
 Assert-CMI ((@($a19[0].evidence)-join '|') -ceq ($a19Evidence-join '|')) 'A19 evidence must bind its existing outcomes and exact package-excluded Py source intake.'
 
 Assert-CMI ($sourceText.Contains('local function bob_or_angel_wire_material_family(material)',[StringComparison]::Ordinal)) 'wire family must use the shared material-family mechanism.'
-Assert-CMI ($sourceText.Contains('if aluminium_mod_active("angelssmelting") and not aluminium_mod_active("bobplates") then',[StringComparison]::Ordinal)) 'wire family must exclude Bob plates to prevent serial plate/wire ownership.'
+Assert-CMI ($sourceText.Contains('if material_mod_active("angelssmelting") and not material_mod_active("bobplates") then',[StringComparison]::Ordinal)) 'wire family must exclude Bob plates to prevent serial plate/wire ownership.'
 $wireFamilyStart=$sourceText.IndexOf('local function bob_or_angel_wire_material_family(material)',[StringComparison]::Ordinal)
 $wireFamilyEnd=$sourceText.IndexOf("`n`n-- Separate requested materials",$wireFamilyStart,[StringComparison]::Ordinal)
 Assert-CMI ($wireFamilyStart -ge 0 -and $wireFamilyEnd -gt $wireFamilyStart) 'wire family declaration boundary is absent.'

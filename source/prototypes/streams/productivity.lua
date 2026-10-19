@@ -960,10 +960,23 @@ end
 
 local f210_bob_angel_gunmetal_invar_routes = f210_bob_angel_gunmetal_invar_profile()
 
-local function f200_material_routes(existing, additions)
+local function material_mod_active(name)
+  return (mods and mods[name] ~= nil) or (script and script.active_mods and script.active_mods[name] ~= nil)
+end
+
+-- These declarations select candidates only. The shared matcher must still
+-- validate each recipe's complete typed schema-2 input boundary.
+local function f200_bob_angel_structural_declaration()
+  return target_profiles.current().factorio_version == "2.0"
+    and material_mod_active("bobplates")
+    and material_mod_active("angelssmelting")
+end
+
+local function f200_material_routes(existing, additions, structural)
   local routes = {}
   for _, recipe in ipairs(existing) do routes[#routes + 1] = recipe end
-  if f200_bob_angel_relevant_return_graph_routes then
+  if f200_bob_angel_relevant_return_graph_routes
+    or (structural and f200_bob_angel_structural_declaration()) then
     for _, recipe in ipairs(additions) do routes[#routes + 1] = recipe end
   end
   return routes
@@ -976,7 +989,7 @@ local function tin_material_routes()
   if f210_bob_angel_tin_return_graph_routes then
     return {"angels-plate-tin", "angels-plate-tin-2"}
   end
-  return f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"})
+  return f200_material_routes({"bob-tin-plate"}, {"angels-plate-tin", "angels-plate-tin-2"}, true)
 end
 
 local function f210_gunmetal_invar_material_routes(existing, final_route)
@@ -987,10 +1000,6 @@ end
 -- manufacturing routes and the player-facing item differ by installed
 -- ecosystem. The graph guard remains responsible for withholding unsafe or
 -- hidden candidates in each final mod state.
-local function aluminium_mod_active(name)
-  return (mods and mods[name] ~= nil) or (script and script.active_mods and script.active_mods[name] ~= nil)
-end
-
 -- Stream declarations are also loaded by settings and control. Prototype
 -- lookup is meaningful only during the data stage; retain the normal Bob
 -- declaration whenever that stage is unavailable.
@@ -1000,20 +1009,10 @@ local function data_stage_item_prototype(name)
   return lookup.item_prototype(name)
 end
 
--- The R07 capture has no BobTech package.  Keep the retained exact
--- provider-pinned F200 closure unchanged, but declare its two Aluminium
--- finals here so the shared matcher can decide from their complete schema-2
--- graph/ownership/science boundary below.  This is F200-only.
-local function f200_bob_angel_aluminium_structural_declaration()
-  return target_profiles.current().factorio_version == "2.0"
-    and aluminium_mod_active("bobplates")
-    and aluminium_mod_active("angelssmelting")
-end
-
 local function aluminium_material_family()
-  if aluminium_mod_active("bobplates") and aluminium_mod_active("angelssmelting") then
+  if material_mod_active("bobplates") and material_mod_active("angelssmelting") then
     if f200_bob_angel_relevant_return_graph_routes
-      or f200_bob_angel_aluminium_structural_declaration() then
+      or f200_bob_angel_structural_declaration() then
       return material_family("bob-aluminium-plate", {
         "bob-aluminium-plate",
         "angels-plate-aluminium",
@@ -1022,7 +1021,7 @@ local function aluminium_material_family()
     end
     return material_family("bob-aluminium-plate", {"bob-aluminium-plate"}, {"bobplates"})
   end
-  if aluminium_mod_active("angelssmelting") then
+  if material_mod_active("angelssmelting") then
     return material_family("angels-plate-aluminium", {
       "angels-plate-aluminium",
       "angels-plate-aluminium-2"
@@ -1038,7 +1037,10 @@ end
 -- routes; direct wire and coolant-returning coil routes remain outside this
 -- declaration and continue through the shared recipe safety guard.
 local function bob_or_angel_wire_material_family(material)
-  if aluminium_mod_active("angelssmelting") and not aluminium_mod_active("bobplates") then
+  local structural_gold = material == "gold"
+    and not f200_bob_angel_relevant_return_graph_routes
+    and f200_bob_angel_structural_declaration()
+  if material_mod_active("angelssmelting") and not material_mod_active("bobplates") then
     local item = "angels-wire-" .. material
     return material_family(item, {item .. "-2"}, {"angelssmelting"})
   end
@@ -1049,14 +1051,14 @@ local function bob_or_angel_wire_material_family(material)
   -- remain outside the declaration and the material-family graph guard.
   if material == "platinum"
     and f200_bob_angel_relevant_return_graph_routes
-    and aluminium_mod_active("angelssmelting")
+    and material_mod_active("angelssmelting")
     and data_stage_item_prototype("bob-platinum-plate") == nil
     and data_stage_item_prototype("angels-wire-platinum") ~= nil then
     return material_family("angels-wire-platinum", {"angels-wire-platinum-2"}, {"bobplates", "angelssmelting"})
   end
   local routes = {"bob-" .. material .. "-plate"}
   if (material == "gold" or material == "silver")
-    and f200_bob_angel_relevant_return_graph_routes then
+    and (f200_bob_angel_relevant_return_graph_routes or structural_gold) then
     -- The finalized combined Bob/Angel profile makes Bob's plate through
     -- these ordinary Angel recipes; its Bob recipe is hidden in that profile.
     -- The exact, productivity-permitted wire final uses a distinct molten-wire
@@ -1069,11 +1071,13 @@ local function bob_or_angel_wire_material_family(material)
   end
   local spec = material_family("bob-" .. material .. "-plate", routes, {"bobplates", "angelssmelting"})
   if (material == "gold" or material == "silver")
-    and f200_bob_angel_relevant_return_graph_routes then
+    and (f200_bob_angel_relevant_return_graph_routes or structural_gold) then
     -- These exact combined-world declarations already include a distinct
     -- wire final. Keep its typed output alongside the plate; its existing
     -- required return-cone certificate still binds the particular recipe.
-    spec.groups[1].required_productive_outputs[2] = {type = "item", name = "angels-wire-" .. material}
+    spec.groups[1].required_productive_outputs[2] = {
+      type = "item", name = structural_gold and "bob-gilded-copper-cable" or ("angels-wire-" .. material)
+    }
   end
   return spec
 end
@@ -1088,7 +1092,7 @@ streams.research_material_nickel = material_family("bob-nickel-plate", f200_bob_
 streams.research_material_platinum = bob_or_angel_wire_material_family("platinum")
 streams.research_material_silver = bob_or_angel_wire_material_family("silver")
 streams.research_material_tin = material_family("bob-tin-plate", tin_material_routes(), {"bobplates", "angelssmelting"})
-streams.research_material_titanium = material_family("bob-titanium-plate", f200_material_routes({"bob-titanium-plate"}, {"angels-plate-titanium", "angels-plate-titanium-2"}), {"bobplates", "angelssmelting"})
+streams.research_material_titanium = material_family("bob-titanium-plate", f200_material_routes({"bob-titanium-plate"}, {"angels-plate-titanium", "angels-plate-titanium-2"}, true), {"bobplates", "angelssmelting"})
 streams.research_material_copper_tungsten = material_family("bob-copper-tungsten-alloy", {"bob-copper-tungsten-alloy"}, {"bobplates", "angelssmelting"})
 streams.research_material_zinc = material_family("bob-zinc-plate", f200_material_routes({"bob-zinc-plate"}, {"angels-plate-zinc", "angels-plate-zinc-2"}), {"bobplates", "angelssmelting"})
 streams.research_material_bronze = material_family("bob-bronze-alloy", f200_material_routes({"bob-bronze-alloy"}, {"angels-plate-bronze"}), {"bobplates", "angelssmelting"})
@@ -1245,12 +1249,13 @@ local F200_BOB_ANGEL_RETURN_GRAPH_ROUTES = {
   ["angels-wire-silver-2"]={id="F200-BA-silver-wire-final-v1",risk="mir32-ce67b188",graph="mir32-99c58542",bindings="mir32-53f936f8",identities=130,recipes=134,producers=2,ingredients={f200_entry("item","angels-wire-coil-silver",4)},results={f200_entry("item","angels-wire-silver",16)}}
 }
 
--- This is the distinct F200 Bob/Angel-no-BobTech shape recorded by R07.
+-- These are distinct pre-emission F200 Bob/Angel-no-BobTech input captures.
 -- Empty provider pins are intentional only because the schema-2 return-graph
 -- contract below binds the whole affected graph, typed IO, owners, and
 -- unlock/science boundary through its recorded bindings fingerprint.
-local F200_BOB_ANGEL_ALUMINIUM_STRUCTURAL_ROUTES = {
+local F200_BOB_ANGEL_STRUCTURAL_ROUTES = {
   ["angels-plate-aluminium"] = {
+    material="aluminium",
     id="F200-BA-aluminium-casting-structural-r07-v1",
     risk="mir32-28583fe9", graph="mir32-34df6bfc", bindings="mir32-1793ad3e",
     identities=90, recipes=92, producers=3,
@@ -1258,24 +1263,70 @@ local F200_BOB_ANGEL_ALUMINIUM_STRUCTURAL_ROUTES = {
     results={f200_entry("item","bob-aluminium-plate",4)}
   },
   ["angels-plate-aluminium-2"] = {
+    material="aluminium",
     id="F200-BA-aluminium-roll-structural-r07-v1",
     risk="mir32-6ae1add6", graph="mir32-555427be", bindings="mir32-d5f1b456",
     identities=90, recipes=92, producers=3,
     ingredients={f200_entry("item","angels-roll-aluminium",1)},
     results={f200_entry("item","bob-aluminium-plate",4)}
+  },
+  ["angels-plate-gold"] = {
+    material="gold", risk="mir32-82b81bf5", graph="mir32-9f025ab8", bindings="mir32-15171775",
+    identities=73, recipes=78, producers=3,
+    ingredients={f200_entry("fluid","angels-liquid-molten-gold",40)},
+    results={f200_entry("item","bob-gold-plate",4)}
+  },
+  ["angels-plate-gold-2"] = {
+    material="gold", risk="mir32-a5ba136b", graph="mir32-2ceacaf2", bindings="mir32-2f6c2701",
+    identities=73, recipes=78, producers=3,
+    ingredients={f200_entry("item","angels-roll-gold",1)},
+    results={f200_entry("item","bob-gold-plate",4)}
+  },
+  ["angels-wire-gold-2"] = {
+    material="gold", risk="mir32-f4af2099", graph="mir32-9cee8462", bindings="mir32-15a309fc",
+    identities=71, recipes=75, producers=3,
+    ingredients={f200_entry("item","angels-wire-coil-gold",4)},
+    results={f200_entry("item","bob-gilded-copper-cable",16)}
+  },
+  ["angels-plate-tin"] = {
+    material="tin", risk="mir32-42e8ee87", graph="mir32-0642f4ca", bindings="mir32-184cb1c5",
+    identities=225, recipes=232, producers=3,
+    ingredients={f200_entry("fluid","angels-liquid-molten-tin",40)},
+    results={f200_entry("item","bob-tin-plate",4)}
+  },
+  ["angels-plate-tin-2"] = {
+    material="tin", risk="mir32-beddbea4", graph="mir32-7139eb7d", bindings="mir32-22db51fb",
+    identities=225, recipes=232, producers=3,
+    ingredients={f200_entry("item","angels-roll-tin",1)},
+    results={f200_entry("item","bob-tin-plate",4)}
+  },
+  ["angels-plate-titanium"] = {
+    material="titanium", risk="mir32-b51c3afe", graph="mir32-d9559f25", bindings="mir32-020b9885",
+    identities=68, recipes=70, producers=3,
+    ingredients={f200_entry("fluid","angels-liquid-molten-titanium",40)},
+    results={f200_entry("item","bob-titanium-plate",4)}
+  },
+  ["angels-plate-titanium-2"] = {
+    material="titanium", risk="mir32-2addeacf", graph="mir32-ede374f2", bindings="mir32-6f504961",
+    identities=68, recipes=70, producers=3,
+    ingredients={f200_entry("item","angels-roll-titanium",1)},
+    results={f200_entry("item","bob-titanium-plate",4)}
   }
 }
 
-local function f200_bob_angel_aluminium_structural_route(recipe_name)
-  local observed = F200_BOB_ANGEL_ALUMINIUM_STRUCTURAL_ROUTES[recipe_name]
-  if not observed then error("MIR F200 missing Aluminium structural observation " .. recipe_name) end
+local function f200_bob_angel_structural_route(recipe_name)
+  local observed = F200_BOB_ANGEL_STRUCTURAL_ROUTES[recipe_name]
+  if not observed then error("MIR F200 missing material structural observation " .. recipe_name) end
+  local id = observed.id or ("F200-BA-" .. recipe_name .. "-structural-input-r02-v1")
   return {
-    id=observed.id,
-    evidence_id="F200-BobAngel-Aluminium-schema2-input-2.0.77-r07",
+    id=id,
+    evidence_id=observed.material == "aluminium"
+      and "F200-BobAngel-Aluminium-schema2-input-2.0.77-r07"
+      or "F200-BobAngel-GoldTinTitanium-schema2-input-2.0.77-r02",
     require_exact_route_certificate=true,
     maximum_productivity=3.0,
     profiles={{
-      id=observed.id .. "-profile",
+      id=id .. "-profile",
       mod_locks={},
       mod_lock_scope="relevant-return-graph",
       canonical_risk_fingerprint=observed.risk
@@ -1359,15 +1410,16 @@ if f200_bob_angel_relevant_return_graph_routes then
   }
 end
 
--- Preserve the retained exact schema-1 profile when present.  The R07
--- BobTech-absent profile is separately admitted only by the exact schema-2
--- structural contract above; declaration does not itself authorize emission.
-if f200_bob_angel_aluminium_structural_declaration()
+-- Preserve the retained exact schema-1 profile when present. Independently
+-- captured routes share one schema-2 binding constructor; an unrelated mod
+-- version cannot admit a changed graph or ownership/progression boundary.
+if f200_bob_angel_structural_declaration()
   and not f200_bob_angel_relevant_return_graph_routes then
-  streams.research_material_aluminium.reviewed_forward_routes = {
-    ["angels-plate-aluminium"] = f200_bob_angel_aluminium_structural_route("angels-plate-aluminium"),
-    ["angels-plate-aluminium-2"] = f200_bob_angel_aluminium_structural_route("angels-plate-aluminium-2")
-  }
+  for recipe_name, observed in pairs(F200_BOB_ANGEL_STRUCTURAL_ROUTES) do
+    local stream = streams["research_material_" .. observed.material]
+    stream.reviewed_forward_routes = stream.reviewed_forward_routes or {}
+    stream.reviewed_forward_routes[recipe_name] = f200_bob_angel_structural_route(recipe_name)
+  end
 end
 
 -- The exact 2.1.20 combined world has two visible Tin finals. Both graph
@@ -1538,7 +1590,7 @@ local function bob_aluminium_forward_route()
     results={{type="item",name="bob-aluminium-plate",amount=2}}
   }
 end
-if aluminium_mod_active("bobplates") and not aluminium_mod_active("angelssmelting") then
+if material_mod_active("bobplates") and not material_mod_active("angelssmelting") then
   streams.research_material_aluminium.reviewed_forward_routes = {
     ["bob-aluminium-plate"] = bob_aluminium_forward_route()
   }
