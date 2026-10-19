@@ -24,6 +24,8 @@
       "command": "./tests/tooling/Test-MIRUpgradeManifest.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/support/MIR43HistoricalCandidateAuthentication.ps1",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
         "tests/tooling/Test-MIRUpgradeManifest.ps1",
         "tests/runtime/Test-MIRUpgrade.ps1",
         "tests/support/MIR421K2Upgrade.ps1",
@@ -130,6 +132,12 @@
       "command": "./tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v11.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v12.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v13.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v14.schema.json",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
+        "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v4.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v5.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v6.schema.json",
@@ -702,6 +710,24 @@
         "tests/compiler/Test-MIRCompilerContractCoverage.ps1",
         "tests/compiler/Test-MIRCompilerSchemaDrift.ps1",
         "tools/commands/compiler/Update-MIRCompilerAuthorities.ps1"
+      ]
+    },
+    {
+      "id": "static.f210-gunmetal-invar-direct-library",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
+        "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1"
       ]
     },
     {
@@ -3480,6 +3506,13 @@
       "command": "./tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV3Authority.ps1",
+        "tests/mir4/Test-MIR4F210QualificationPolicyV3.ps1",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
@@ -3505,7 +3538,11 @@
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "source:source/presentation/f210/info.json.template",
         "validation/profiles/factorio-2.1.json",
-        "repository"
+        "repository",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentCapHarnessAdmissionAuthority.ps1"
       ]
     },
     {
@@ -4016,6 +4053,8 @@
       "command": "./tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
         ".github/workflows/assurance-scheduled.yml",
         "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "spec/programmes/mir4-4x-operating-programme-v1.json",
@@ -5937,7 +5976,15 @@
         "source:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
         "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ]
     },
     {
@@ -6097,7 +6144,15 @@
         "targets/f210/composition.json",
         "targets/f200/composition.json",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ]
     },
     {

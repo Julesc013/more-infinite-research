@@ -930,30 +930,24 @@ end
 local f210_bob_angel_tin_return_graph_routes = f210_bob_angel_tin_return_graph_profile()
 
 -- Gunmetal and Invar are the first F210 Bob/Angel final routes with an
--- observed empty return cone. Keep the profile exact: later routes with a
--- return edge need their own finalized boundary evidence.
-local F210_BOB_ANGEL_GUNMETAL_INVAR_LOCK = {
-  base="2.1.20", ["elevated-rails"]="2.1.20", quality="2.1.20",
-  recycler="2.1.20", ["space-age"]="2.1.20", boblibrary="3.0.1",
-  bobores="3.0.0", bobplates="3.0.2", bobelectronics="3.0.1",
+-- observed empty return cone. Declaration and admission keep the exact
+-- third-party provider family, while the loaded Factorio 2.1 prototypes must
+-- prove the closed finished-output property below. It is neither a graph-hash
+-- refresh nor a general compatibility claim for unobserved versions.
+local F210_BOB_ANGEL_GUNMETAL_INVAR_DECLARATION_LOCK = {
+  boblibrary="3.0.1", bobores="3.0.0", bobplates="3.0.2", bobelectronics="3.0.1",
   bobtech="3.0.0", angelsrefining="2.1.2", angelsrefininggraphics="2.1.0",
   angelspetrochem="2.1.3", angelspetrochemgraphics="2.1.0",
   angelssmelting="2.1.1", angelssmeltinggraphics="2.1.1"
 }
 
-local F210_BOB_ANGEL_GUNMETAL_INVAR_OBSERVER_LOCKS = {
-  ["mir-fixture-assert-f210-current-bob-angel-final-routes-observer"]="0.1.0"
-}
 
 local function f210_bob_angel_gunmetal_invar_profile()
   if target_profiles.current().factorio_version ~= "2.1" then return false end
   local active = mods or (script and script.active_mods)
   if type(active) ~= "table" then return false end
-  for name, version in pairs(F210_BOB_ANGEL_GUNMETAL_INVAR_LOCK) do
+  for name, version in pairs(F210_BOB_ANGEL_GUNMETAL_INVAR_DECLARATION_LOCK) do
     if active[name] ~= version then return false end
-  end
-  for name, version in pairs(F210_BOB_ANGEL_GUNMETAL_INVAR_OBSERVER_LOCKS) do
-    if active[name] ~= nil and active[name] ~= version then return false end
   end
   return true
 end
@@ -1508,23 +1502,28 @@ if f210_bob_angel_tin_return_graph_routes then
   }
 end
 
--- The current F210 combined-world observation found no recipe return path
--- for these two finals. Bind the complete typed cone anyway: its binding
--- fingerprint covers the observed empty productivity-owner set and the exact
--- unlock boundary. A relevant-input contract would be false evidence here,
--- because that contract requires a real return path and hidden witness.
+-- Gunmetal and Invar have a closed final output: exactly the named target and
+-- two hidden direct producers (internal/recycling) remain. The recycling producer is
+-- admitted only when it is the bounded lossy self-recycler shape; no ordinary or native
+-- transition leaves the output. The 2.1.22 observation changed the broad
+-- recipe-fact fingerprint while retaining that property, target risk, exact
+-- bindings, cardinalities, permissions, and I/O. Schema 3 verifies this
+-- property against the loaded Factorio 2.1 prototypes under exact third-party
+-- provider locks; it is not a hash refresh or a blanket version allowance.
 local F210_BOB_ANGEL_GUNMETAL_INVAR_RETURN_GRAPH_ROUTES = {
   ["angels-plate-gunmetal"]={
-    id="F210-BA-gunmetal-final-v1", risk="mir32-df72e755",
-    graph="mir32-d075395b", bindings="mir32-f5b0b17f", identities=1,
+    id="F210-BA-gunmetal-final-v2", risk="mir32-df72e755", bindings="mir32-f5b0b17f", identities=1,
     recipes=3, producers=3,
+    output={type="item",name="bob-gunmetal-alloy"},
+    direct_output_producers={"angels-plate-gunmetal","bob-gunmetal-alloy","bob-gunmetal-alloy-recycling"},
     ingredients={f200_entry("fluid","angels-liquid-molten-gunmetal",40)},
     results={f200_entry("item","bob-gunmetal-alloy",4)}
   },
   ["angels-plate-invar"]={
-    id="F210-BA-invar-final-v1", risk="mir32-85ae1247",
-    graph="mir32-7cafb4f4", bindings="mir32-f6107c3a", identities=1,
+    id="F210-BA-invar-final-v2", risk="mir32-85ae1247", bindings="mir32-f6107c3a", identities=1,
     recipes=3, producers=3,
+    output={type="item",name="bob-invar-alloy"},
+    direct_output_producers={"angels-plate-invar","bob-invar-alloy","bob-invar-alloy-recycling"},
     ingredients={f200_entry("fluid","angels-liquid-molten-invar",40)},
     results={f200_entry("item","bob-invar-alloy",4)}
   }
@@ -1532,9 +1531,8 @@ local F210_BOB_ANGEL_GUNMETAL_INVAR_RETURN_GRAPH_ROUTES = {
 
 local function f210_bob_angel_gunmetal_invar_return_graph_profile(risk_fingerprint)
   return {{
-    id="F210-BobAngel-2.1.20-GunmetalInvar-return-graph-final-v1",
-    mod_locks=F210_BOB_ANGEL_GUNMETAL_INVAR_LOCK,
-    observer_mod_locks=F210_BOB_ANGEL_GUNMETAL_INVAR_OBSERVER_LOCKS,
+    id="F210-BobAngel-GunmetalInvar-closed-final-output-v2",
+    mod_locks=F210_BOB_ANGEL_GUNMETAL_INVAR_DECLARATION_LOCK,
     mod_lock_scope="relevant-return-graph",
     canonical_risk_fingerprint=risk_fingerprint
   }}
@@ -1542,26 +1540,29 @@ end
 
 local function f210_bob_angel_gunmetal_invar_return_graph_route(recipe_name)
   local observed = F210_BOB_ANGEL_GUNMETAL_INVAR_RETURN_GRAPH_ROUTES[recipe_name]
-  if not observed then error("MIR F210 missing Gunmetal/Invar return-graph observation " .. recipe_name) end
+  if not observed then error("MIR F210 missing Gunmetal/Invar closed-output observation " .. recipe_name) end
   return {
     id=observed.id,
-    evidence_id="F210-BobAngel-GunmetalInvar-return-graph-2.1.20-v1",
+    evidence_id="F210-BobAngel-GunmetalInvar-closed-final-output-structural-v1",
     require_exact_route_certificate=true,
     maximum_productivity=3.0,
     profiles=f210_bob_angel_gunmetal_invar_return_graph_profile(observed.risk),
     ingredients=observed.ingredients,
     results=observed.results,
     relevant_return_graph_contract={
-      schema=1,
-      return_graph_fingerprint=observed.graph,
+      schema=3,
       bindings_fingerprint=observed.bindings,
       reachable_identity_count=observed.identities,
       relevant_recipe_count=observed.recipes,
-      direct_output_producer_count=observed.producers
+      direct_output_producer_count=observed.producers,
+      closed_output={
+        type=observed.output.type,
+        name=observed.output.name,
+        direct_output_producers=observed.direct_output_producers
+      }
     }
   }
 end
-
 if f210_bob_angel_gunmetal_invar_routes then
   streams.research_material_gunmetal.reviewed_forward_routes = {
     ["angels-plate-gunmetal"] = f210_bob_angel_gunmetal_invar_return_graph_route("angels-plate-gunmetal")

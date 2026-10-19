@@ -240,7 +240,7 @@ param([string]$Repository,[string]$Engine,[string]$Manifest,[string]$Receipt)
 $ErrorActionPreference='Stop'
 $env:SteamAppId='427520';$env:SteamGameId='427520'
 . (Join-Path $Repository 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $Engine -SteamManifest $Manifest
+$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot $Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $Engine -SteamManifest $Manifest
 [IO.File]::WriteAllText($Receipt,(($record|ConvertTo-Json -Depth 50)+"`n"),[Text.UTF8Encoding]::new($false))
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))

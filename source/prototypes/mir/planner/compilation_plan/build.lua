@@ -21,7 +21,7 @@ local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.finger
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
 
-local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled)
+local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled, gate_vector_session)
   local allowances = {}
   if enabled ~= true then return allowances end
   for _, row in ipairs(stream_artifact.rows or {}) do
@@ -45,7 +45,7 @@ local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabl
           candidate_id = row.technology_design.candidate_id,
           design_fingerprint = row.technology_design.design_fingerprint,
           hard_gates_resolved = true,
-          gates_fingerprint = fingerprint.of(row.gates)
+          gate_vector_receipt = gate_contract.capture_initial_skip_gate_vector(gate_vector_session, row.gates)
         }
       end
     end
@@ -243,7 +243,7 @@ end
 local function materialized_stream_operations(artifact, options, preparations)
   options = options or {}
   local out = {}
-  for _, row in ipairs(artifact.rows or {}) do
+  for _, row in ipairs(generation_plan.rows_for_consumption(artifact)) do
     if row.action == "emit" then
       local preparation = preparations and preparations[row]
       if not row.technology_design and not (preparation and options.virtual_projection) then
@@ -398,6 +398,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     trusted_stream_artifact = true
   elseif type(stream_plan.artifact) == "function" then
     stream_artifact = stream_plan:artifact()
+  elseif generation_plan.is_trusted_artifact(stream_plan) then
+    stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
+    trusted_stream_artifact = true
   elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
     stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
     trusted_stream_artifact = true
@@ -407,9 +410,17 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   if not stream_artifact or (not preparations and stream_artifact.schema ~= 3) then
     error("CompilationPlan requires GenerationPlan schema 3 or its exact private draft", 2)
   end
+  if trusted_stream_artifact and not generation_plan.is_draft(stream_artifact) then
+    -- A completed Plan exposes compact private rows only through its trusted
+    -- planning view.  Rehydrate the module-owned records for this compiler
+    -- pass; public exports are detached again below.
+    stream_artifact = generation_plan.internal_artifact(stream_artifact)
+  end
   if not trusted_stream_artifact then validation.admit_stream_artifact(stream_artifact) end
+  local initial_skip_gate_vector_session = gate_contract.new_initial_skip_gate_vector_session()
   local initial_skip_diagnostic_allowances = capture_initial_skip_diagnostic_allowances(
-    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true)
+    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true,
+    initial_skip_gate_vector_session)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
@@ -518,13 +529,18 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
+  -- The post-graph Plan is module-owned and retains full trusted rows for the
+  -- remaining compiler pass.  Public Context reads deep-copy these full rows;
+  -- do not feed a detached export back into the qualification snapshot, which
+  -- would force every Design and Gate through untrusted admission again.
+  local owned_stream_plan = generation_plan.internal_artifact(stream_artifact)
   local artifact = {
     schema = 2,
     compiler_input = exact_input,
     source_fingerprints = source_fingerprints,
     input_sanitation_ledger = deepcopy((compiler_inputs or {}).input_sanitation_ledger),
     operations = operations,
-    stream_plan = stream_artifact,
+    stream_plan = owned_stream_plan,
     base_extension_operations = normalized_base,
     validation_summary = validation_summary
   }
@@ -557,7 +573,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   for _, candidate in pairs(base_candidates_by_id) do table.insert(final_base_candidates, candidate) end
   table.sort(final_base_candidates, function(left, right) return left.candidate_id < right.candidate_id end)
   artifact.technology_catalog = technology_catalog.finalize(
-    stream_artifact.rows,
+    generation_plan.rows_for_consumption(stream_artifact),
     source_fingerprints,
     operations,
     {
@@ -566,6 +582,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       trusted_designs = true,
       defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
       initial_skip_diagnostic_allowances = initial_skip_diagnostic_allowances,
+      initial_skip_gate_vector_session = initial_skip_gate_vector_session,
       base_candidates = final_base_candidates
     }
   )
@@ -579,7 +596,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   artifact.fingerprint = artifact.compilation_fingerprint
   local operation_fingerprints = plan_fingerprint.operation_fingerprints(operations)
   local rejected_candidates = {}
-  for _, row in ipairs(stream_artifact.rows or {}) do
+  for _, row in ipairs(generation_plan.rows_for_consumption(stream_artifact)) do
     if row.action == "skip" then
       table.insert(rejected_candidates, {
         candidate_id = row.technology_design.candidate_id,

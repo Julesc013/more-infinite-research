@@ -9,7 +9,6 @@ local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local environment_adapter = require("prototypes.mir.platform.factorio.environment_identity")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
-local effect_target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory")
 local compilation_snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
 local policy_snapshot_adapter = require("prototypes.mir.pipeline.policy_snapshot_adapter")
 local compilation_snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
@@ -110,7 +109,7 @@ local function compile_active(context)
     stream_plan_trusted = true,
     defer_diagnostic_alternatives = not diagnostics.enabled()
       and not execution_mode.include_full_diagnostics(policy_snapshot.execution_mode),
-    effect_target_inventory = effect_target_inventory.capture()
+    effect_target_inventory = input_snapshot.effect_target_inventory
   })
   local qualification_started = now()
   local final_snapshot = compilation_snapshot_contract.qualify(input_snapshot, {

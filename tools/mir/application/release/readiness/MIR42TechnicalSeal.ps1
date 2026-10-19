@@ -1109,7 +1109,7 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
-      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) {
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) {
         $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
       }
     }

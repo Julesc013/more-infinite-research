@@ -289,12 +289,12 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     $builtArguments=@($built.arguments)
     Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedReleaseManifest') -ceq 'controlled-candidate-manifest.json' -and (Get-MIR42ControlledArgumentValue $builtArguments '-Retention') -ceq 'OnFailure') '423 historical upgrade changed its legacy candidate or retention binding.'
     Assert-MIR42ControlledArgumentAbsent $builtArguments '-SourceMaterializationPath'
-    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')){
+    foreach($currentSourceVersion in @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')){
       foreach($currentTarget in @('f210','f200','f110','f100','f017','f016','f015','f014','f013')){
         $built=Invoke-MIR42ActualMaintenanceArgumentConstruction -RequestedTarget $currentTarget -RequestedSourceVersion $currentSourceVersion -WithMaintenance $true
         $builtArguments=@($built.arguments);$historical=$currentTarget -cin @('f017','f016','f015','f014','f013')
         $expectedReceipt=Join-Path $built.candidate_root ('materializations/'+$currentTarget+'.json')
-        $fromVersion=if($currentSourceVersion -ceq '4.5.0'){'4.4.'+$currentTarget.Substring(1)+'02'}elseif($currentSourceVersion -ceq '4.5.2'){'4.5.'+$currentTarget.Substring(1)+'01'}else{'4.2.'+$currentTarget.Substring(1)+'02'}
+        $fromVersion=if($currentSourceVersion -ceq '4.7.0'){'4.6.'+$currentTarget.Substring(1)+'00'}elseif($currentSourceVersion -ceq '4.6.0'){'4.5.'+$currentTarget.Substring(1)+'02'}elseif($currentSourceVersion -ceq '4.5.0'){'4.4.'+$currentTarget.Substring(1)+'02'}elseif($currentSourceVersion -ceq '4.5.2'){'4.5.'+$currentTarget.Substring(1)+'01'}else{'4.2.'+$currentTarget.Substring(1)+'02'}
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SelectedTarget') -ceq $currentTarget) "$currentTarget/$currentSourceVersion lost its target binding."
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-PublishedMaintenancePredecessorManifestPath') -ceq 'controlled-published.json') "$currentTarget/$currentSourceVersion lost its published predecessor binding."
         Check ((Get-MIR42ControlledArgumentValue $builtArguments '-SourceMaterializationPath') -ceq $expectedReceipt) "$currentTarget/$currentSourceVersion lost its exact materialization receipt binding."

@@ -394,13 +394,18 @@ function Assert-MIRLibraryActivation {
   }else{Write-MIRLibraryControl -Path (Join-Path $Activation.library 'mod-list.json') -Bytes $Activation.mod_list_bytes}
 }
 
+function Get-MIRLibraryLatestInvocationText {
+  param([Parameter(Mandatory)][string]$Text)
+  $starts=[regex]::Matches($Text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
+  if($starts.Count-eq0){throw '[mir-library-loaded-invocation] Native launch boundary is absent.'}
+  return $Text.Substring($starts[$starts.Count-1].Index)
+}
+
 function Assert-MIRLibraryLoadedSelection {
   param([Parameter(Mandatory)]$Activation,[Parameter(Mandatory)][string]$LogPath,[switch]$LatestInvocation,[string]$ActiveModsObserver='',[ValidateSet('data-final-fixes.lua','control.lua')][string]$ActiveModsObserverScript='data-final-fixes.lua')
   $text=[IO.File]::ReadAllText($LogPath)
   if($LatestInvocation){
-    $starts=[regex]::Matches($text,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio [0-9]+\.[0-9]+\.[0-9]+ ')
-    if($starts.Count-eq0){throw '[mir-library-loaded-invocation] Native launch boundary is absent.'}
-    $text=$text.Substring($starts[$starts.Count-1].Index)
+    $text=Get-MIRLibraryLatestInvocationText -Text $text
   }
   $matches=[regex]::Matches($text,'(?m)Loading mod (?:settings )?([^\r\n]+?) (\d+\.\d+\.\d+) \(')
   # Historical engines print numeric components without leading zeroes. The

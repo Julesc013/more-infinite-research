@@ -16,9 +16,11 @@ source_of_truth_for:
 
 F210 follows the latest Factorio 2.1 experimental build installed by Steam. It does not pin a long-lived 2.1 patch while no official 2.1 stable line exists. MIR may adopt newer 2.1 APIs and raise its declared Factorio compatibility floor when an exact qualified change requires them.
 
+The current read-only intake records installed Steam experimental 2.1.22.87719. It changes the exact current-engine observation only: F210 package dependencies retain their 2.1.18 support floor, and no engine admission, runtime, upgrade, reload, multiplayer, graphical, client, performance, or support-fixture result is implied.
+
 The selector and the proof identity are different facts:
 
-- `spec/engines/mir4-factorio-2.1-experimental-channel-v1.json` selects the moving `latest-experimental` channel.
+- `spec/engines/mir4-factorio-2.1-experimental-channel-v2.json` selects the moving `latest-experimental` channel.
 - Every build, test, upgrade, performance run, qualification, and release receipt records the exact selected version and executable hash.
 - Evidence from one 2.1 patch is not reused for another patch. An update selects a new exact execution identity and requires new affected proof.
 - Historical 2.1.14 records remain immutable evidence for the bytes they originally qualified; they are not current F210 selection authority.

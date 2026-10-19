@@ -140,7 +140,7 @@ foreach ($contract in $progressionHarnessContracts) {
   $harnessText = [IO.File]::ReadAllText((Join-Path $repo ([string]$contract.harness)))
   foreach ($requiredText in @(
     'tools/mir/application/release/F210QualificationPolicy.ps1',
-    'Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3',
+    'Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot',
     ([string]$contract.harness_id)
   )) {
     if (-not $harnessText.Contains($requiredText,[StringComparison]::Ordinal)) {
@@ -160,9 +160,9 @@ foreach ($contract in $progressionHarnessContracts) {
   $fixturePattern = '(?ms)^  ' + [regex]::Escape([string]$contract.id) + ':\r?\n(?<body>.*?)(?=^  [^\s].*:\r?$|\z)'
   $fixtureMatch = [regex]::Match($fixtureAuthorityText,$fixturePattern)
   if (-not $fixtureMatch.Success -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]21"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]21[.]87673"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3[.]json' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]22"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]22[.]87719"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4[.]json' -or
       $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only' -or
       $fixtureMatch.Groups['body'].Value -match 'factorio_version:\s*"2[.]1[.]17"|exact-engine-2[.]1[.]17') {
     throw "[mir4-f210-progression-fixture-authority] $($contract.id)"
@@ -264,6 +264,16 @@ if ($IsWindows -and (Test-Path -LiteralPath ([string]$policy.pre_freeze.steam.fa
   $scopeRejected = $false
   try { Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.not-admitted' | Out-Null } catch { $scopeRejected = $_.Exception.Message -match 'current-cap-harness-admission-scope' }
   if (-not $scopeRejected) { throw '[mir4-f210-current-cap-harness-admission-scope-fail-closed]' }
+  $installedEngineHash=(Get-FileHash -LiteralPath ([string]$policy.pre_freeze.steam.factorio_binary) -Algorithm SHA256).Hash
+  if($installedEngineHash -cne [string]$admission.engine.binary.sha256){
+    # Steam has advanced. The retained exact 2.1.21 admission must reject the
+    # new install; it must never be replayed as a current-engine pass.
+    $installedDriftRejected=$false
+    try { Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' | Out-Null }
+    catch { $installedDriftRejected=$_.Exception.Message -match '^\[mir4-f210-current-cap-harness-admission-drift\] engine\.(version|build|file-version|sha256)$' }
+    if(-not$installedDriftRejected){throw '[mir4-f210-retained-cap-admission-must-reject-installed-drift]'}
+    Write-Host '[ok] The installed engine differs; retained 2.1.21 admission rejects it. No current-engine cap-harness execution or qualification is claimed.'
+  } else {
   $resolved = Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210'
   $rawResolution = $resolved | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
   $rawResolution.PSObject.Properties.Remove('admission')
@@ -282,6 +292,9 @@ if ($IsWindows -and (Test-Path -LiteralPath ([string]$policy.pre_freeze.steam.fa
       [bool]$resolved.admission.release_transition_authorized) {
     throw '[mir4-f210-current-cap-harness-admission-resolution]'
   }
+  }
 }
 
 Write-Host '[ok] Historical F210 evidence and current V2 policy remain immutable; the V3 successor admits only the exact 2.1.21.87673 cap harnesses while qualification and release boundaries stay closed.'
+
+& (Join-Path $repo 'tests/mir4/Test-MIR4F210QualificationPolicyV3.ps1') -RepoRoot $repo

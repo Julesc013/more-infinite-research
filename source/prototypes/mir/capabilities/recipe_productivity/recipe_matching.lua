@@ -674,7 +674,7 @@ local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope
     if type(name) ~= "string" or name == "" or type(expected) ~= "string" or expected == "" or runtime_mods[name] ~= expected then return false end
   end
   -- Only a schema-2 cone contract can replace provider-version pins.
-  -- Closed profiles and schema-1 direct-route records retain their locks.
+  -- Schema-3 closed-output records retain their explicit provider locks.
   if count == 0 and not (scope == "relevant-return-graph" and complete_structural_binding) then return false end
   observer_mod_locks = observer_mod_locks or {}
   if type(observer_mod_locks) ~= "table" then return false end
@@ -843,9 +843,148 @@ local function relevant_input_contract_matches(recipe_name, contract)
   return true, "accepted"
 end
 
+-- Schema 3 names the stable safety property for a closed final output rather
+-- than fingerprinting every field of its direct producers. It keeps explicit
+-- provider locks: unlike schema 2, it never authorizes an empty-pin profile.
+-- A hidden recycler may consume and return the finished item, but only the
+-- exact lossy, non-productive self-recycler shape is outside the ordinary
+-- return path. All other consumers remain material to the boundary.
+-- Permission, risk, target ownership, unlock progression, and exact route I/O
+-- remain checked by the normal certificate path.
+local function safe_recycling_entry_shape(entry)
+  return has_only_reviewed_entry_fields(entry)
+    and entry.amount_min == nil and entry.amount_max == nil
+    and entry.shared_probability == nil and zero_or_nil(entry.extra_count_fraction)
+    and zero_or_nil(entry.catalyst_amount) and zero_or_nil(entry.ignored_by_productivity)
+    and entry.temperature == nil and entry.minimum_temperature == nil and entry.maximum_temperature == nil
+    and entry.fluidbox_index == nil and entry.percent_spoiled == nil
+    and entry.always_fresh == nil and entry.reset_freshness_on_craft == nil
+    and entry.quality_min == nil and entry.quality_max == nil
+    and entry.quality_change == nil and entry.affected_by_quality == nil
+end
+
+local function safe_recycling_input(entry, expected_identity)
+  local amount = tonumber(type(entry) == "table" and entry.amount or nil)
+  return safe_recycling_entry_shape(entry) and typed_identity(entry) == expected_identity
+    and positive_fixed_amount(amount) and normalized_probability(entry, "probability") == 1
+    and normalized_probability(entry, "independent_probability") == 1
+    and (entry.declared_probability == nil or entry.declared_probability == 1)
+    and (entry.declared_independent_probability == nil or entry.declared_independent_probability == 1)
+    and tonumber(entry.ignored_by_stats) == amount
+end
+
+local function safe_recycling_result(entry, expected_identity, input_amount)
+  local amount = tonumber(type(entry) == "table" and entry.amount or nil)
+  local probability = normalized_probability(entry, "independent_probability")
+  return safe_recycling_entry_shape(entry) and typed_identity(entry) == expected_identity
+    and positive_fixed_amount(amount) and positive_fixed_amount(input_amount) and amount <= input_amount
+    and probability ~= nil and probability > 0 and probability < 1
+    and normalized_probability(entry, "probability") == probability
+    and entry.declared_probability == nil and entry.declared_independent_probability == probability
+    and tonumber(entry.ignored_by_stats) == amount
+end
+
+local function non_productive_recycling_variant(variant)
+  if variant.allow_productivity == false and variant.effective_allow_productivity == false then return true end
+  if variant.allow_productivity ~= nil or variant.effective_allow_productivity ~= nil
+    or variant.declared_allow_productivity ~= nil then return false end
+  -- The current fact schema retains nil for an absent declaration whose
+  -- native default is false. Do not reinterpret unknown fields or defaults,
+  -- or rewrite historical fact fingerprints merely to admit this recycler.
+  local profile = target_profiles.current()
+  local defaults = profile and profile.prototype_shapes and profile.prototype_shapes.recipe_property_defaults
+  return type(defaults) == "table" and defaults.allow_productivity == false
+end
+
+local function safe_lossy_recycling_self_return(fact, expected_identity)
+  if type(fact) ~= "table" or fact.hidden ~= true or fact.source_class ~= "recycling"
+    or fact.enabled_without_research ~= false or fact.allow_productivity ~= false
+    or fact.effective_allow_productivity ~= false
+    or not exact_string_list(fact.categories, {"recycling"})
+    or type(fact.variants) ~= "table" or #fact.variants ~= 1 then
+    return false
+  end
+  local variant = fact.variants[1]
+  if type(variant) ~= "table" or variant.hidden ~= true or variant.enabled ~= false
+    or not non_productive_recycling_variant(variant)
+    or not exact_string_list(variant.categories, {"recycling"})
+    or type(variant.ingredients) ~= "table" or #variant.ingredients ~= 1
+    or type(variant.results) ~= "table" or #variant.results ~= 1 then
+    return false
+  end
+  local input, result = variant.ingredients[1], variant.results[1]
+  if not safe_recycling_input(input, expected_identity) then return false end
+  return safe_recycling_result(result, expected_identity, tonumber(input.amount))
+end
+
+local function closed_output_boundary_matches(recipe, contract)
+  local closed = contract.closed_output
+  if type(closed) ~= "table" or type(closed.type) ~= "string" or closed.type == ""
+    or type(closed.name) ~= "string" or closed.name == ""
+    or not exact_string_list(closed.direct_output_producers, closed.direct_output_producers) or #closed.direct_output_producers == 0 then
+    return false, "closed-output-contract"
+  end
+  for field in pairs(closed) do
+    if field ~= "type" and field ~= "name" and field ~= "direct_output_producers" then
+      return false, "closed-output-contract"
+    end
+  end
+  local expected_identity = typed_identity({type = closed.type, name = closed.name})
+  if not expected_identity then return false, "closed-output-contract" end
+  local boundary, reason = relevant_return_graph(recipe)
+  if not boundary then return false, reason end
+  if #boundary.output_identities ~= 1 or boundary.output_identities[1] ~= expected_identity
+    or #boundary.reachable_identities ~= 1 or boundary.reachable_identities[1] ~= expected_identity
+    or #boundary.reachable_identities ~= contract.reachable_identity_count
+    or #boundary.facts ~= contract.relevant_recipe_count
+    or #boundary.direct_output_producers ~= contract.direct_output_producer_count
+    or #(boundary.spoilage_transitions or {}) ~= 0 or #(boundary.fuel_burning_transitions or {}) ~= 0 then
+    return false, "closed-output-reachability"
+  end
+  local fact_names = {}
+  for _, row in ipairs(boundary.facts) do
+    local fact = type(row) == "table" and row.fact or nil
+    if type(row) ~= "table" or type(row.name) ~= "string" or row.name == ""
+      or type(fact) ~= "table" or fact.name ~= row.name or type(fact.variants) ~= "table" then
+      return false, "closed-output-facts"
+    end
+    -- The target remains subject to the ordinary exact route checks. Another
+    -- finished-output producer is either hidden internal with no self-return,
+    -- or the constrained lossy native recycler described above.
+    if row.name ~= recipe.name then
+      if fact.source_class == "recycling" then
+        if not safe_lossy_recycling_self_return(fact, expected_identity) then
+          return false, "closed-output-recycling-self-return"
+        end
+      elseif fact.hidden ~= true or fact.source_class ~= "hidden-internal" then
+        return false, "closed-output-hidden-producer"
+      end
+    end
+    local produces_expected = false
+    for _, variant in ipairs(fact.variants) do
+      if type(variant) ~= "table" then return false, "closed-output-facts" end
+      for _, ingredient in ipairs(variant.ingredients or {}) do
+        if typed_identity(ingredient) == expected_identity and row.name ~= recipe.name
+          and fact.source_class ~= "recycling" then
+          return false, "closed-output-consumer"
+        end
+      end
+      for _, result in ipairs(variant.results or {}) do
+        if typed_identity(result) == expected_identity then produces_expected = true end
+      end
+    end
+    if not produces_expected then return false, "closed-output-producer" end
+    fact_names[#fact_names + 1] = row.name
+  end
+  if #fact_names ~= #boundary.direct_output_producers
+    or not exact_string_list(fact_names, closed.direct_output_producers)
+    or not exact_string_list(boundary.direct_output_producers, closed.direct_output_producers) then
+    return false, "closed-output-producers"
+  end
+  return true, "accepted"
+end
 local function relevant_return_graph_contract_matches(recipe, contract)
-  if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2)
-    or not valid_mir32_fingerprint(contract.return_graph_fingerprint)
+  if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2 and contract.schema ~= 3)
     or not valid_mir32_fingerprint(contract.bindings_fingerprint)
     or type(contract.reachable_identity_count) ~= "number" or contract.reachable_identity_count < 1
     or contract.reachable_identity_count ~= math.floor(contract.reachable_identity_count)
@@ -855,6 +994,22 @@ local function relevant_return_graph_contract_matches(recipe, contract)
     or contract.direct_output_producer_count ~= math.floor(contract.direct_output_producer_count) then
     return false, "return-graph-contract"
   end
+  if contract.schema == 3 then
+    for field in pairs(contract) do
+      if field ~= "schema" and field ~= "bindings_fingerprint"
+        and field ~= "reachable_identity_count" and field ~= "relevant_recipe_count"
+        and field ~= "direct_output_producer_count" and field ~= "closed_output" then
+        return false, "return-graph-contract"
+      end
+    end
+    local closed, closed_reason = closed_output_boundary_matches(recipe, contract)
+    if not closed then return false, "return-graph-" .. closed_reason end
+    local bindings, bindings_reason = relevant_route_bindings(recipe.name)
+    if not bindings then return false, "return-graph-" .. bindings_reason end
+    if fingerprint.of(bindings) ~= contract.bindings_fingerprint then return false, "return-graph-bindings" end
+    return true, "accepted"
+  end
+  if not valid_mir32_fingerprint(contract.return_graph_fingerprint) then return false, "return-graph-contract" end
   for field in pairs(contract) do
     if field ~= "schema" and field ~= "return_graph_fingerprint" and field ~= "bindings_fingerprint"
       and field ~= "reachable_identity_count" and field ~= "relevant_recipe_count"
@@ -873,7 +1028,6 @@ local function relevant_return_graph_contract_matches(recipe, contract)
   end
   return true, "accepted"
 end
-
 local function matching_profile(profiles, runtime_mods, graph_contract, fact, risk)
   if type(profiles) ~= "table" or #profiles == 0 then return nil, "profile-missing" end
   local structural_binding_matches
