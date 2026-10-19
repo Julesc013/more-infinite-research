@@ -163,7 +163,9 @@ try {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     Check ($Context -eq $resources -and $FilePath -ceq (Get-Command pwsh).Source -and $TimeoutSeconds -eq 30 -and $Arguments -contains $FactorioBin -and $Arguments -contains $SteamManifest) 'resolver lost its governed transport.'
     $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
-    Check ($driver.Contains("-HarnessId 'runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot')) 'existing engine oracle was bypassed.'
+    # The cap-only tooling control also executes this driver against a mock
+    # authority and checks the actual omitted/explicit manifest arguments.
+    Check ($driver.Contains("HarnessId='runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments')) 'existing engine oracle was bypassed.'
     [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"}}')
   }
   Check ((Get-MigrationGovernedEngineResolution).engine.version -ceq 'controlled') 'resolver response was lost.'

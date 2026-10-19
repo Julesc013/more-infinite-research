@@ -8,7 +8,7 @@ param(
   [switch]$PrepareInputsOnly,
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
-  [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1',
+  [AllowEmptyString()][ValidatePattern('^(?:|4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?))$')][string]$SourceVersion='',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,
   [string]$OutputRoot='build/p/m421-f210-cap'
@@ -52,6 +52,29 @@ function Assert-MIR42([bool]$Condition,[string]$Message){
   if(-not $Condition){throw "[mir42-cap-ownership-multiforce] $Message"}
 }
 function Get-MIR42Sha([string]$Path){return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+
+function Resolve-MIR42CurrentCandidateSourceVersion {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$ReceiptPath,
+    [AllowEmptyString()][string]$RequestedSourceVersion=''
+  )
+  if(-not [string]::IsNullOrWhiteSpace($RequestedSourceVersion)){return $RequestedSourceVersion}
+  if([string]::IsNullOrWhiteSpace($ReceiptPath) -or -not (Test-Path -LiteralPath $ReceiptPath -PathType Leaf)){
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt is required when SourceVersion is omitted.'
+  }
+  try{
+    $receipt=Get-Content -LiteralPath $ReceiptPath -Raw -ErrorAction Stop|ConvertFrom-Json -Depth 30 -DateKind String -ErrorAction Stop
+    $receiptSourceVersion=[string]$receipt.source_version
+  }catch{
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt is unreadable.'
+  }
+  if($receiptSourceVersion -notmatch '^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$'){
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt has no valid source_version.'
+  }
+  return $receiptSourceVersion
+}
+
 function Assert-Exact([string]$Name,$Actual,$Expected){
   if($null -eq $Actual -and $null -eq $Expected){return}
   if($null -eq $Actual -or $null -eq $Expected -or $Actual -cne $Expected){
@@ -217,7 +240,8 @@ $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-MIR42 ($running.Count-eq0) 'requires the one-Factorio-process policy; a Factorio process is already running.'
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
-$candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $SourceVersion
+$effectiveSourceVersion=Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $SourceMaterializationPath -RequestedSourceVersion $SourceVersion
+$candidateInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $effectiveSourceVersion
 $candidateZip=[string]$candidateInput.path
 trap {
   $failure=$_
@@ -241,11 +265,17 @@ param([string]$Repository,[string]$Engine,[string]$Manifest,[string]$Receipt)
 $ErrorActionPreference='Stop'
 $env:SteamAppId='427520';$env:SteamGameId='427520'
 . (Join-Path $Repository 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot $Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin $Engine -SteamManifest $Manifest
+$arguments=@{RepoRoot=$Repository;HarnessId='runtime.maximum-level-cap-ownership-multiforce-f210';FactorioBin=$Engine}
+if(-not [string]::IsNullOrWhiteSpace($Manifest)){$arguments.SteamManifest=$Manifest}
+$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments
 [IO.File]::WriteAllText($Receipt,(($record|ConvertTo-Json -Depth 50)+"`n"),[Text.UTF8Encoding]::new($false))
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
-  $null=Invoke-MIRNativeProbeProcess -Context $resources -FilePath (Get-Command pwsh).Source -TimeoutSeconds 30 -Arguments @('-NoProfile','-File',$driver,'-Repository',$repo,'-Engine',$FactorioBin,'-Manifest',$SteamManifest,'-Receipt',$receipt)
+  $driverArguments=[Collections.Generic.List[string]]::new()
+  foreach($value in @('-NoProfile','-File',$driver,'-Repository',$repo,'-Engine',$FactorioBin)){$driverArguments.Add($value)}
+  if(-not [string]::IsNullOrWhiteSpace($SteamManifest)){$driverArguments.Add('-Manifest');$driverArguments.Add($SteamManifest)}
+  $driverArguments.Add('-Receipt');$driverArguments.Add($receipt)
+  $null=Invoke-MIRNativeProbeProcess -Context $resources -FilePath (Get-Command pwsh).Source -TimeoutSeconds 30 -Arguments $driverArguments.ToArray()
   Assert-MIR42 (Test-Path -LiteralPath $receipt -PathType Leaf) 'governed engine resolution receipt is absent.'
   Get-Content -LiteralPath $receipt -Raw|ConvertFrom-Json -Depth 50 -DateKind String
 }

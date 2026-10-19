@@ -106,17 +106,67 @@ function Assert-F210CapSharedInputs {
   . (Join-Path $repo 'tools/lib/validation/SettingsOverrides.ps1')
   $capRoot=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $repo ('build/tmp/f210-cap-controls-'+[guid]::NewGuid().ToString('N')))
   $harness=Join-Path $repo 'tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1'
+  $migrationHarness=Join-Path $repo 'tests/runtime/Test-MIR42V2V3CapMigration.ps1'
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($harness,[ref]$tokens,[ref]$errors)
   Assert-Probe (@($errors).Count-eq0) 'F210 cap harness no longer parses.'
-  foreach($name in @('Assert-MIR42','Assert-Exact','Get-MIR42Sha','New-MIR42CapSettingsSource','New-MIR42Stage','Start-MIR42CapStage','Complete-MIR42CapStage','Invoke-MIR42Engine','Invoke-MIR42ServerSave','Get-MIR42GovernedEngineResolution')){
+  $migrationTokens=$null;$migrationErrors=$null
+  $migrationAst=[Management.Automation.Language.Parser]::ParseFile($migrationHarness,[ref]$migrationTokens,[ref]$migrationErrors)
+  Assert-Probe (@($migrationErrors).Count-eq0) 'F210 migration harness no longer parses.'
+  foreach($name in @('Assert-MIR42','Assert-Exact','Get-MIR42Sha','Resolve-MIR42CurrentCandidateSourceVersion','New-MIR42CapSettingsSource','New-MIR42Stage','Start-MIR42CapStage','Complete-MIR42CapStage','Invoke-MIR42Engine','Invoke-MIR42ServerSave','Get-MIR42GovernedEngineResolution')){
     $definition=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$false))
     Assert-Probe ($definition.Count-eq1) "Expected one consumed F210 cap function: $name"
+    . ([scriptblock]::Create($definition[0].Extent.Text))
+  }
+  foreach($name in @('Assert-Migration','Get-MigrationGovernedEngineResolution')){
+    $definition=@($migrationAst.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq$name},$false))
+    Assert-Probe ($definition.Count-eq1) "Expected one consumed F210 migration function: $name"
     . ([scriptblock]::Create($definition[0].Extent.Text))
   }
   $activeStage=$null;$script:activeStage=$null
   try{
     [IO.Directory]::CreateDirectory($capRoot)|Out-Null
+    $sourceReceipt=Join-Path $capRoot 'current-materialization.json'
+    $badSourceReceipt=Join-Path $capRoot 'malformed-current-materialization.json'
+    $missingSourceReceipt=Join-Path $capRoot 'missing-current-materialization.json'
+    [IO.File]::WriteAllText($sourceReceipt,'{"source_version":"4.7.0"}',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($badSourceReceipt,'{"source_version":"4.7"}',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($missingSourceReceipt,'{}',[Text.UTF8Encoding]::new($false))
+    $mockRepo=Join-Path $capRoot 'mock-f210-policy-repository'
+    $mockPolicy=Join-Path $mockRepo 'tools/mir/application/release/F210QualificationPolicy.ps1'
+    [IO.Directory]::CreateDirectory((Split-Path -Parent $mockPolicy))|Out-Null
+    $mockPolicyText=@'
+function Resolve-MIR4F210CurrentEngineCapHarnessAdmission {
+  param([string]$RepoRoot,[string]$HarnessId,[string]$FactorioBin,[string]$SteamManifest)
+  [pscustomobject][ordered]@{
+    engine=[ordered]@{version='controlled'}
+    oracle=[ordered]@{
+      repo_root=$RepoRoot
+      harness_id=$HarnessId
+      factorio_bin=$FactorioBin
+      steam_manifest_bound=$PSBoundParameters.ContainsKey('SteamManifest')
+      steam_manifest=$SteamManifest
+    }
+  }
+}
+'@
+    [IO.File]::WriteAllText($mockPolicy,$mockPolicyText,[Text.UTF8Encoding]::new($false))
+    foreach($runner in @(
+      [pscustomobject]@{name='cap';ast=$ast;path=$harness},
+      [pscustomobject]@{name='migration';ast=$migrationAst;path=$migrationHarness}
+    )){
+      $resolver=@($runner.ast.FindAll({param($n)$n-is[Management.Automation.Language.FunctionDefinitionAst]-and$n.Name-ceq'Resolve-MIR42CurrentCandidateSourceVersion'},$false))
+      Assert-Probe ($resolver.Count-eq1) "$($runner.name) runner does not define one receipt-derived source-version resolver."
+      $resolved=& {param($definition,$receiptPath). ([scriptblock]::Create($definition.Extent.Text));Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $receiptPath -RequestedSourceVersion ''} $resolver[0] $sourceReceipt
+      Assert-Probe ($resolved-ceq'4.7.0') "$($runner.name) runner did not derive source_version from its receipt."
+      $explicit=& {param($definition,$receiptPath). ([scriptblock]::Create($definition.Extent.Text));Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $receiptPath -RequestedSourceVersion '4.2.1'} $resolver[0] $sourceReceipt
+      Assert-Probe ($explicit-ceq'4.2.1') "$($runner.name) runner did not retain an explicit source version for authenticated-reader mismatch refusal."
+      Refuses-Probe {& {param($definition,$receiptPath). ([scriptblock]::Create($definition.Extent.Text));Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $receiptPath -RequestedSourceVersion ''} $resolver[0] $badSourceReceipt} 'mir42-current-candidate-source-version-receipt'
+      Refuses-Probe {& {param($definition,$receiptPath). ([scriptblock]::Create($definition.Extent.Text));Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $receiptPath -RequestedSourceVersion ''} $resolver[0] $missingSourceReceipt} 'mir42-current-candidate-source-version-receipt'
+      Assert-Probe ((Get-Content -LiteralPath $runner.path -Raw).Contains('Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $effectiveSourceVersion')) "$($runner.name) runner no longer forwards an explicit/derived source version into the authenticated current-candidate reader."
+    }
+    $migrationText=Get-Content -LiteralPath $migrationHarness -Raw
+    Assert-Probe ($migrationText.Contains('$predecessorInput=Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $PredecessorCandidateZip') -and $migrationText.Contains("`$version=if(`$isPredecessor){'4.2.21000'}else{[string]`$currentInput.receipt.distribution_version}")) 'Migration runner altered the pinned V2 predecessor reader or identity.'
     $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $capRoot -ExpectedPeakMemoryMiB 768 -MaxNewOutputMiB 4
     $run=$resources.root;$engineRoot=Join-Path $capRoot 'engine';$engine=Join-Path $engineRoot 'bin/x64/factorio.exe'
     $FactorioBin='controlled requested engine';$SteamManifest='controlled requested manifest'
@@ -180,15 +230,36 @@ function Assert-F210CapSharedInputs {
     Assert-Probe (-not(Test-Path -LiteralPath (Join-Path $capRoot 'absent-run'))) 'Unbound entry point allocated output.'
     Assert-Probe ((@(Get-ChildItem -LiteralPath $library -Filter '*.zip'|ForEach-Object{$_.Name+'|'+(Get-FileHash $_.FullName).Hash})-join "`n")-ceq$inventory) 'Stage switching wrote dependency archives.'
     Assert-Probe (@(Get-ChildItem -LiteralPath $run -Recurse -Filter '*.zip').Count-eq0 -and $resources.shared_alias_bytes-eq0) 'Stage switching copied or linked archives.'
+    $actualRepo=$repo;$repo=$mockRepo
+    $resolverCalls=[Collections.Generic.List[object]]::new()
     function Invoke-MIRNativeProbeProcess {
       param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds)
-      Assert-Probe ($Context-eq$resources -and $FilePath-ceq(Get-Command pwsh).Source -and $TimeoutSeconds-eq30 -and $Arguments-contains$FactorioBin -and $Arguments-contains$SteamManifest) 'F210 resolver lost its governed inputs.'
+      Assert-Probe ($Context-eq$resources -and $FilePath-ceq(Get-Command pwsh).Source -and $TimeoutSeconds-eq30 -and $Arguments-contains$FactorioBin -and $Arguments-notcontains'') 'F210 resolver did not retain governed inputs or forwarded an empty process argument.'
       $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
-      Assert-Probe ($driver.Contains("Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot `$Repository -HarnessId 'runtime.maximum-level-cap-ownership-multiforce-f210' -FactorioBin `$Engine -SteamManifest `$Manifest")) 'F210 bypassed its current admission oracle or changed its governed inputs.'
-      [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"},"record_sha256":"controlled"}')
+      $driverOutput=@(& $FilePath @Arguments 2>&1);$driverExit=$LASTEXITCODE
+      Assert-Probe ($driverExit-eq0) "controlled F210 policy driver failed: $($driverOutput-join'; ')"
+      $receiptIndex=[Array]::IndexOf([string[]]$Arguments,'-Receipt')
+      Assert-Probe ($receiptIndex-ge0-and$receiptIndex-lt($Arguments.Count-1)) 'F210 resolver omitted its receipt argument.'
+      $record=Get-Content -LiteralPath $Arguments[$receiptIndex+1] -Raw|ConvertFrom-Json -Depth 20
+      $resolverCalls.Add([pscustomobject]@{arguments=@($Arguments);driver=$driver;record=$record})
     }
+    $SteamManifest=''
     $resolution=Get-MIR42GovernedEngineResolution
-    Assert-Probe ($resolution.engine.version-ceq'controlled') 'Resolver transport changed.'
+    $capEmpty=$resolverCalls[$resolverCalls.Count-1]
+    Assert-Probe ($resolution.engine.version-ceq'controlled' -and $capEmpty.arguments-notcontains'-Manifest' -and $capEmpty.driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments') -and $capEmpty.record.oracle.repo_root-ceq$mockRepo -and $capEmpty.record.oracle.harness_id-ceq'runtime.maximum-level-cap-ownership-multiforce-f210' -and $capEmpty.record.oracle.factorio_bin-ceq$FactorioBin -and-not$capEmpty.record.oracle.steam_manifest_bound) 'Cap resolver did not omit an absent optional manifest through its existing oracle.'
+    $SteamManifest='controlled requested manifest'
+    $resolution=Get-MIR42GovernedEngineResolution
+    $capExplicit=$resolverCalls[$resolverCalls.Count-1];$capIndex=[Array]::IndexOf([string[]]$capExplicit.arguments,'-Manifest')
+    Assert-Probe ($capIndex-ge0-and$capIndex-lt($capExplicit.arguments.Count-1)-and$capExplicit.arguments[$capIndex+1]-ceq$SteamManifest-and$capExplicit.driver.Contains('if(-not [string]::IsNullOrWhiteSpace($Manifest)){$arguments.SteamManifest=$Manifest}') -and $capExplicit.record.oracle.repo_root-ceq$mockRepo -and $capExplicit.record.oracle.harness_id-ceq'runtime.maximum-level-cap-ownership-multiforce-f210' -and $capExplicit.record.oracle.factorio_bin-ceq$FactorioBin -and $capExplicit.record.oracle.steam_manifest_bound -and $capExplicit.record.oracle.steam_manifest-ceq$SteamManifest) 'Cap resolver did not preserve an explicit manifest through its existing oracle.'
+    $SteamManifest=''
+    $migrationResolution=Get-MigrationGovernedEngineResolution
+    $migrationEmpty=$resolverCalls[$resolverCalls.Count-1]
+    Assert-Probe ($migrationResolution.engine.version-ceq'controlled' -and $migrationEmpty.arguments-notcontains'-Manifest' -and $migrationEmpty.driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments') -and $migrationEmpty.record.oracle.repo_root-ceq$mockRepo -and $migrationEmpty.record.oracle.harness_id-ceq'runtime.maximum-level-v2-v3-migration-f210' -and $migrationEmpty.record.oracle.factorio_bin-ceq$FactorioBin -and-not$migrationEmpty.record.oracle.steam_manifest_bound) 'Migration resolver did not omit an absent optional manifest through its existing oracle.'
+    $SteamManifest='controlled requested manifest'
+    $migrationResolution=Get-MigrationGovernedEngineResolution
+    $migrationExplicit=$resolverCalls[$resolverCalls.Count-1];$migrationIndex=[Array]::IndexOf([string[]]$migrationExplicit.arguments,'-Manifest')
+    Assert-Probe ($migrationIndex-ge0-and$migrationIndex-lt($migrationExplicit.arguments.Count-1)-and$migrationExplicit.arguments[$migrationIndex+1]-ceq$SteamManifest-and$migrationExplicit.driver.Contains('if(-not [string]::IsNullOrWhiteSpace($Manifest)){$arguments.SteamManifest=$Manifest}') -and $migrationExplicit.record.oracle.repo_root-ceq$mockRepo -and $migrationExplicit.record.oracle.harness_id-ceq'runtime.maximum-level-v2-v3-migration-f210' -and $migrationExplicit.record.oracle.factorio_bin-ceq$FactorioBin -and $migrationExplicit.record.oracle.steam_manifest_bound -and $migrationExplicit.record.oracle.steam_manifest-ceq$SteamManifest) 'Migration resolver did not preserve an explicit manifest through its existing oracle.'
+    $repo=$actualRepo
     $expectedSave=Join-Path $stages[0].userdata 'saves/successor.zip';$reportCompletion=$true
     function Invoke-MIRNativeProbeFactorioProcess {
       param($Context,[string]$FilePath,[string[]]$Arguments,[int]$TimeoutSeconds,[scriptblock]$CompletionPredicate)
