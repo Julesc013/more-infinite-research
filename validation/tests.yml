@@ -705,6 +705,22 @@
       ]
     },
     {
+      "id": "static.f210-gunmetal-invar-direct-library",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
+        "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1"
+      ]
+    },
+    {
       "id": "static.recipe-productivity-permissions",
       "kind": "static",
       "layer": "F0",

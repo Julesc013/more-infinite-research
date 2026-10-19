@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 238,
+  "test_count": 239,
   "tests": [
     {
       "id": "docs.check",
@@ -1953,6 +1953,32 @@
         "tools/lib/assurance/evidence/CommandExecution.ps1",
         "fixtures/assert-mir42-f200-settings-cap-transition/**",
         ".mir/fixtures.yml"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.f210-gunmetal-invar-direct-library",
+      "proposition": "The governed test 'static.f210-gunmetal-invar-direct-library' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
+        "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8685,11 +8711,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 70,
-      "runtime-upgrade": 61,
+      "runtime-upgrade": 62,
       "compiler-static": 23,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 225,
+    "canonical_test_commands": 226,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8702,5 +8728,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4a78cf38b37ca997d808ba678c07044099d84dbd2b95e3d9c6b9d5be48e7cb53"
+  "digest": "sha256:98376e94216d8b233bc0b04c954f84f41c521cd020e4b3446c844503ebbfa1f3"
 }

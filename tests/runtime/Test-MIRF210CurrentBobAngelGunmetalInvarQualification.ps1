@@ -2,258 +2,157 @@
 [CmdletBinding()]
 param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
-  [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
-  [string]$ExactStageRoot='C:\Projects\Factorio\more-infinite-research\build\tests\wed-material-f210\current-ba-20260930',
-  [string]$OutputRoot='build/tests/ba-gi',
-  [switch]$PrepareOnly,
-  [string]$RecoverRun=''
+  [Parameter(Mandatory)][string]$FactorioBin,
+  [Parameter(Mandatory)][string[]]$LocalModLibraryDirs,
+  [Parameter(Mandatory)][string]$SettingsPath,
+  [Parameter(Mandatory)][ValidatePattern('^[0-9A-F]{64}$')][string]$SettingsSha256,
+  [Parameter(Mandatory)][string]$CandidateZip,
+  [Parameter(Mandatory)][string]$SourceMaterializationPath,
+  [ValidateSet('Observe','Qualification')][string]$Mode='Observe',
+  [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.7.0',
+  [string]$OutputRoot='build/tests/f210-ba-gunmetal-invar',
+  [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB=2048,
+  [ValidateRange(1,2048)][int]$MaxNewOutputMiB=384,
+  [switch]$PrepareOnly
 )
 $ErrorActionPreference='Stop'
-# Native execution is retired; the preserved oracle is not current acceptance.
-throw '[mir-native-obsolete-runner] This native runner still materializes a mod directory. Use a migrated direct-library consumer; retain this scenario and its historical evidence until conversion. No engine or staging was started.'
 Set-StrictMode -Version Latest
 
-function Assert-GI([bool]$Condition,[string]$Message) {
-  if (-not $Condition) { throw "[mir-f210-current-ba-gunmetal-invar] $Message" }
+function Assert-GI([bool]$Condition,[string]$Message) { if(-not $Condition){throw "[mir-f210-current-ba-gunmetal-invar] $Message"} }
+function Get-GISha([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+function Get-GIRelative([string]$Repository,[string]$Path){
+  $full=[IO.Path]::GetFullPath($Path);$prefix=$Repository.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
+  Assert-GI ($full.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "artifact outside repository: $full"
+  $full.Substring($prefix.Length).Replace('\','/')
 }
-function Get-GISha([string]$Path) {
-  (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+function Get-GIArtifact([string]$Repository,[string]$Path,[switch]$AllowExternalInput){
+  $item=Get-Item -LiteralPath $Path -ErrorAction Stop;Assert-MIRLibraryPath $item.FullName
+  [ordered]@{path=$(if($AllowExternalInput){$item.FullName}else{Get-GIRelative $Repository $item.FullName});path_kind=$(if($AllowExternalInput){'machine-local-input'}else{'repository-relative'});bytes=[int64]$item.Length;raw_sha256=Get-GISha $item.FullName}
+}
+function Assert-GIPath([string]$Path,[string]$Context){Assert-MIRFactorioPathBudget -Path $Path -Context $Context -MaximumLength 240}
+function Copy-GIRecord($Value){($Value|ConvertTo-Json -Depth 50)|ConvertFrom-Json -AsHashtable -Depth 50}
+function Get-GIFailureCode($ErrorRecord){
+  $message=[string]$ErrorRecord.Exception.Message
+  if($message -match '^\[(?<code>[^\]]+)\]'){return '['+$Matches.code+']'}
+  return '[mir-f210-current-ba-gunmetal-invar-unclassified-failure]'
+}
+function Read-GICandidate([string]$Repository,[string]$Archive,[string]$Receipt,[string]$Version){Read-MIRNativeProbeF210CurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $Receipt -SourceVersion $Version}
+function Read-GIDossier([string]$Path){
+  $dossier=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 50 -DateKind String
+  Assert-GI ([int]$dossier.schema -eq 1 -and [string]$dossier.kind -ceq 'MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV3') 'fixture direct-library dossier identity differs'
+  Assert-GI ([string]$dossier.target.engine.version -ceq '2.1.22' -and [string]$dossier.target.engine.sha256 -ceq 'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B') 'fixture 2.1.22 engine identity differs'
+  Assert-GI ((@($dossier.target.official_mods).Count -eq 5) -and (@($dossier.target.archives).Count -eq 11)) 'fixture closure cardinality differs'
+  Assert-GI ([string]$dossier.settings.mode -ceq 'File' -and [bool]$dossier.settings.portable_input_required) 'fixture settings contract differs'
+  foreach($fixtureMode in @('observe','qualification')){
+    $fixture=$dossier.fixtures.$fixtureMode
+    Assert-GI ($null -ne $fixture -and [string]$fixture.name -match '^mir-fixture-' -and [string]$fixture.version -ceq '0.1.0') "fixture contract differs: $fixtureMode"
+  }
+  $dossier
+}
+function Read-GIDirectLibraryInputs($Dossier,[string]$Library,$Candidate,[string]$FixtureRoot,$FixtureSpec){
+  Assert-GI (Test-Path -LiteralPath $Library -PathType Container) 'selected direct library is absent';Assert-MIRLibraryPath $Library
+  $hashes=[ordered]@{};$rows=@(foreach($name in @($Dossier.target.official_mods)){[ordered]@{name=[string]$name;version=[string]$Dossier.target.engine.version;enabled=$true}})
+  foreach($archive in @($Dossier.target.archives)){
+    $file=[string]$archive.file;Assert-GI ($file -ceq (([string]$archive.name)+'_'+([string]$archive.version)+'.zip')) "dossier archive filename differs: $file"
+    $hashes[$file]=[string]$archive.sha256;$rows+=[ordered]@{name=[string]$archive.name;version=[string]$archive.version;enabled=$true}
+  }
+  $null=Resolve-MIRNativeProbeDependencyInputs -ExpectedArchives $hashes -LocalModLibraryDirs @($Library)
+  $candidateName=[IO.Path]::GetFileName([string]$Candidate.path);$candidatePath=Join-Path $Library $candidateName
+  Assert-GI (Test-Path -LiteralPath $candidatePath -PathType Leaf) 'install-selected-candidate-once-in-library';Assert-MIRLibraryPath $candidatePath
+  $candidateSha=Get-GISha $Candidate.path;Assert-GI ((Get-GISha $candidatePath) -ceq $candidateSha) 'library candidate bytes differ'
+  $hashes[$candidateName]=$candidateSha;$rows+=[ordered]@{name='more-infinite-research';version=[string]$Candidate.receipt.distribution_version;enabled=$true}
+  $fixtureInfo=Get-Content -LiteralPath (Join-Path $FixtureRoot 'info.json') -Raw|ConvertFrom-Json -Depth 20
+  Assert-GI ([string]$fixtureInfo.name -ceq [string]$FixtureSpec.name -and [string]$fixtureInfo.version -ceq [string]$FixtureSpec.version) 'selected fixture identity differs'
+  $fixtureName=([string]$fixtureInfo.name)+'_'+([string]$fixtureInfo.version)+'.zip';$fixtureArchive=Join-Path $Library $fixtureName
+  Assert-GI (Test-Path -LiteralPath $fixtureArchive -PathType Leaf) 'install-prebuilt-fixture-once-in-library';Assert-MIRLibraryFixtureArchive -Archive $fixtureArchive -SourceDirectory $FixtureRoot
+  $hashes[$fixtureName]=Get-GISha $fixtureArchive;$rows+=[ordered]@{name=[string]$fixtureInfo.name;version=[string]$fixtureInfo.version;enabled=$true}
+  [pscustomobject]@{mod_list=[ordered]@{mods=$rows};archive_hashes=$hashes;candidate=$candidatePath;fixture_archive=$fixtureArchive}
+}
+function Invoke-GIGovernedEngine([string]$Scenario,[string[]]$Arguments,[int]$TimeoutSeconds){
+  $safe=Get-MIRSafeScenarioFileName -Name $Scenario;Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $Arguments
+  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds
+  $log=Join-Path $run ($safe+'.factorio.log');$captured=Copy-MIRCompatFactorioCurrentLog -UserDataDir $run -Destination $log
+  $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources;Assert-GI (-not [string]::IsNullOrWhiteSpace($captured)) 'Factorio log is absent'
+  $null=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $captured
+  [pscustomobject]@{scenario=$Scenario;passed=$true;duration_seconds=$actor.result.duration_seconds;stdout=$actor.stdout;stderr=$actor.stderr;factorio_log=$captured}
+}
+function Invoke-GIReload([string]$SavePath,[int]$Ordinal,[int]$TimeoutSeconds){
+  $save=(Resolve-Path -LiteralPath $SavePath).Path;$before=Get-GISha $save
+  $arguments=@('--config',(Join-Path $run 'mir-compat-config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',$activation.library,'--benchmark',$save,'--benchmark-ticks','30000','--benchmark-runs','1','--benchmark-sanitize')
+  $process=Invoke-GIGovernedEngine -Scenario ('f210-ba-gunmetal-invar.reload-'+$Ordinal.ToString('00')) -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
+  $after=Get-GISha $save
+  [pscustomobject]@{ordinal=$Ordinal;cold_process=true;passed=[bool]($process.passed -and $before -ceq $after);duration_seconds=$process.duration_seconds;maximum_duration_seconds=$TimeoutSeconds;input_save_sha256=$before;save_sha256=$after;save_byte_identical=[bool]($before -ceq $after);stdout=$process.stdout;stderr=$process.stderr;factorio_log=$process.factorio_log}
+}
+function Convert-GIObservationLine([string]$Kind,[string]$Text){
+  $row=[ordered]@{kind=$Kind}
+  foreach($part in @($Text -split ' ')){
+    $pair=$part.Split('=',2)
+    if($pair.Count -eq 2 -and $pair[0] -match '^[a-z_]+$'){$row[$pair[0]]=$pair[1]}
+  }
+  $row
+}
+function Get-GIObservation([string]$LogText){
+  Assert-GI ($LogText.Contains('[mir-f210-current-ba-gunmetal-invar-observer] DATA PASS read-only-finalized-fact-capture',[StringComparison]::Ordinal)) 'read-only data marker is absent'
+  $rows=@();foreach($match in [regex]::Matches($LogText,'(?m)^.*\[mir-f210-current-ba-gunmetal-invar-observer\] (?<kind>ROUTE|CERTIFICATE|BINDING|EMISSION) (?<text>[^\r\n]+)$')){$rows+=,(Convert-GIObservationLine $match.Groups['kind'].Value $match.Groups['text'].Value)}
+  foreach($kind in @('ROUTE','CERTIFICATE','BINDING','EMISSION')){
+    $selected=@($rows|Where-Object {$_.kind -ceq $kind}|Sort-Object family)
+    Assert-GI ($selected.Count -eq 2 -and ((@($selected.family)-join ',') -ceq 'gunmetal,invar')) "read-only $kind records differ"
+  }
+  [ordered]@{records=$rows;runtime_markers=@([regex]::Matches($LogText,'\[mir-f210-current-ba-gunmetal-invar-observer\] RUNTIME stage=(?:create|reload) [^\r\n]+')|ForEach-Object {$_.Value})}
 }
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-$stage=(Resolve-Path -LiteralPath $ExactStageRoot).Path
-$output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
-$outputPrefix=$output.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
-$buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
-Assert-GI ($output.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)) 'output root must be inside build'
 . (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
+. (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
-. (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1')
+. (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-
-function Get-GIRelative([string]$Path) {
-  $full=[IO.Path]::GetFullPath($Path)
-  $prefix=$repo.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
-  Assert-GI ($full.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)) "artifact is outside repository: $full"
-  $full.Substring($prefix.Length).Replace('\','/')
-}
-function Get-GIArtifact([string]$Path) {
-  $item=Get-Item -LiteralPath $Path -ErrorAction Stop
-  [pscustomobject][ordered]@{path=Get-GIRelative $item.FullName;bytes=[int64]$item.Length;raw_sha256=Get-GISha $item.FullName}
-}
-function New-GIInput([string]$Path,[string]$Role,[object]$Identity,[object]$Provenance) {
-  $resolved=(Resolve-Path -LiteralPath $Path).Path
-  [ordered]@{
-    source_path=$resolved
-    file_name=(Split-Path -Leaf $resolved)
-    expected_sha256=Get-GISha $resolved
-    role=$Role
-    identity=$Identity
-    provenance=$Provenance
-    immutable=$true
-  }
-}
-function Assert-GIPath([string]$Path,[string]$Context) {
-  Assert-MIRFactorioPathBudget -Path $Path -Context $Context -MaximumLength 240
-}
-function Copy-GIPreparedRecord($Record) {
-  $copy=[ordered]@{}
-  foreach($entry in $Record.GetEnumerator()) { $copy[$entry.Key]=$entry.Value }
-  return $copy
-}
-
-& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') | Out-Host
-$changes=@(& git -C $repo status --porcelain --untracked-files=all)
-Assert-GI ($changes.Count -eq 0) "qualification requires a clean worktree: $($changes -join '; ')"
-
-$fixtureRoot=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification'
-$fixtureName='mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-qualification'
-$fixtureVersion='0.1.0'
-foreach($fixtureFile in @('info.json','data-final-fixes.lua','control.lua')) {
-  Assert-GI (Test-Path -LiteralPath (Join-Path $fixtureRoot $fixtureFile) -PathType Leaf) "fixture is incomplete: $fixtureFile"
-}
-
-$receiptPath=Join-Path $stage 'result.json'
-Assert-GI (Test-Path -LiteralPath $receiptPath -PathType Leaf) 'exact F210 Bob/Angel stage receipt is absent'
-$stageReceipt=Get-Content -Raw -LiteralPath $receiptPath | ConvertFrom-Json -ErrorAction Stop
-$expectedEngineSha='E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92'
-Assert-GI ([string]$stageReceipt.engine_sha256 -ceq $expectedEngineSha) 'exact stage engine identity differs'
-$expectedArchives=[ordered]@{
-  'boblibrary_3.0.1.zip'='3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B'
-  'bobores_3.0.0.zip'='7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B'
-  'bobplates_3.0.2.zip'='0C9A4910E2DCAA8DCABBE5BFFA67333F214EAB2EFD8C798D5EF84D90B691862D'
-  'bobelectronics_3.0.1.zip'='50C2718E38D507CF4D4ACA2DBFE3240997172309413397C9C70083BBAE6927BE'
-  'bobtech_3.0.0.zip'='397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B'
-  'angelsrefining_2.1.2.zip'='AF5E79E35E591F68D52F13EDA082950E10AC98A4B7722B3F568D0211E3FEB813'
-  'angelsrefininggraphics_2.1.0.zip'='79F373BC628F619EDE3B1875827172390D2C3F5EAB56310F6F1572C4553CB6EF'
-  'angelspetrochem_2.1.3.zip'='95FA8F1740A180E5CF5617EFDA7C409A7974E29B236F9F5AB28D789193AC44B4'
-  'angelspetrochemgraphics_2.1.0.zip'='DECDC2FCD5BBBDEF70784943C142C30FAA7294B98E814296C5D44D09A9DE4790'
-  'angelssmelting_2.1.1.zip'='1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9'
-  'angelssmeltinggraphics_2.1.1.zip'='71E89ABF7CC372FADE39B11FB4FE83A1B5E629226AF123BFE8DDA08C7C228DD3'
-}
-$receiptArchives=@{}
-foreach($row in @($stageReceipt.mods)) { $receiptArchives[[string]$row.archive]=[string]$row.sha256 }
-Assert-GI ($receiptArchives.Count -eq $expectedArchives.Count) 'exact stage archive count differs'
-$stageMods=Join-Path $stage 'mods'
-foreach($entry in $expectedArchives.GetEnumerator()) {
-  $archive=Join-Path $stageMods $entry.Key
-  Assert-GI ($receiptArchives.ContainsKey($entry.Key) -and $receiptArchives[$entry.Key] -ceq $entry.Value) "stage receipt archive differs: $($entry.Key)"
-  Assert-GI (Test-Path -LiteralPath $archive -PathType Leaf) "stage archive absent: $($entry.Key)"
-  Assert-GI ((Get-GISha $archive) -ceq $entry.Value) "stage archive bytes differ: $($entry.Key)"
-}
-$stageSettings=Join-Path $stageMods 'mod-settings.dat'
-$expectedSettingsSha='2D258A213E7A4230563651ABD1B7D8268318A2DED5E23F3B20AFB6F1D56ECA6A'
-Assert-GI (Test-Path -LiteralPath $stageSettings -PathType Leaf) 'exact stage settings are absent'
-Assert-GI ((Get-GISha $stageSettings) -ceq $expectedSettingsSha) 'exact stage settings identity differs'
-
-$candidateResult=New-MIR4TargetPackage -RepoRoot $repo -Target f210 -CandidateId ('F210-BA-GI-'+[guid]::NewGuid().ToString('N').Substring(0,10).ToUpperInvariant()) -SourceVersion '4.2.0' -DistributionVersion '4.2.21000' -OutputRoot 'build/tests/ba-gi/pkg'
-$candidate=(Resolve-Path -LiteralPath ([string]$candidateResult.archive_path)).Path
-$sourceCommit=(& git -C $repo rev-parse HEAD).Trim()
-$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim()
-Assert-GI ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'source Git identity is invalid'
+$dossierPath=Join-Path $repo 'fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/direct-library-qualification-dossier.json'
+Assert-GI (Test-Path -LiteralPath $dossierPath -PathType Leaf) 'direct-library dossier is absent'
+$dossier=Read-GIDossier $dossierPath
+$fixtureSpec=if($Mode -ceq 'Observe'){$dossier.fixtures.observe}else{$dossier.fixtures.qualification}
+$fixtureRoot=Join-Path $repo ([string]$fixtureSpec.source_path)
+foreach($file in @('info.json','data-final-fixes.lua','control.lua')){Assert-GI (Test-Path -LiteralPath (Join-Path $fixtureRoot $file) -PathType Leaf) "fixture is incomplete: $file"}
+if($Mode -ceq 'Observe'){Assert-GI (Test-Path -LiteralPath (Join-Path $fixtureRoot 'settings-updates.lua') -PathType Leaf) 'observer phase-aware setting path is absent'}
+Assert-GI ($LocalModLibraryDirs.Count -eq 1) 'supply exactly one explicit flat archive library'
+$library=(Resolve-Path -LiteralPath $LocalModLibraryDirs[0]).Path;$settings=(Resolve-Path -LiteralPath $SettingsPath).Path
+$portableSettings=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.settings.portable_path))).Path
+Assert-MIRLibraryPath $settings;Assert-GI ($settings -ceq $portableSettings -and $SettingsSha256 -ceq [string]$dossier.settings.portable_sha256 -and (Get-GISha $settings) -ceq $SettingsSha256) 'portable settings identity differs'
+$candidate=Read-GICandidate -Repository $repo -Archive $CandidateZip -Receipt $SourceMaterializationPath -Version $SourceVersion
+$direct=Read-GIDirectLibraryInputs -Dossier $dossier -Library $library -Candidate $candidate -FixtureRoot $fixtureRoot -FixtureSpec $fixtureSpec
+$engine=(Resolve-Path -LiteralPath $FactorioBin).Path;Assert-MIRLibraryPath $engine;Assert-GI ((Get-GISha $engine) -ceq [string]$dossier.target.engine.sha256) 'selected engine binary differs'
+$sourceCommit=(& git -C $repo rev-parse HEAD).Trim();$sourceTree=(& git -C $repo rev-parse 'HEAD^{tree}').Trim();Assert-GI ($sourceCommit -match '^[0-9a-f]{40}$' -and $sourceTree -match '^[0-9a-f]{40}$') 'source Git identity is invalid'
 $prepared=[ordered]@{
-  schema=1
-  kind='MIRF210CurrentBobAngelGunmetalInvarQualificationV1'
-  status='prepared'
-  scope='Exact Factorio 2.1.20, Space Age and current 11-archive Bob/Angel closure: Gunmetal and Invar early technology effects, unique ownership, one create and one reload.'
-  source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;package_source_sha256=Get-GISha (Join-Path $repo 'source/package-source.json')}
-  exact_stage=[ordered]@{path=$stage;engine_sha256=$expectedEngineSha;settings_sha256=$expectedSettingsSha;archives=$expectedArchives}
-  candidate=Get-GIArtifact $candidate
-  fixture=@('info.json','data-final-fixes.lua','control.lua' | ForEach-Object { Get-GIArtifact (Join-Path $fixtureRoot $_) })
-  harness=Get-GIArtifact $PSCommandPath
-  non_claims=@('No late-stage or infinite-continuation claim is made.','No other Bob/Angel final route is admitted.','This is an exact configured current tuple, not a general Bob/Angel compatibility claim.')
+  schema=3;kind='MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV3';status='prepared-direct-library-not-run';mode=$Mode
+  scope=if($Mode -ceq 'Observe'){'Read-only finalized Gunmetal/Invar fact capture with fresh create and two cold reloads. It does not assert generated technologies, mutate force state, admit a route, or establish production or upgrade investment.'}else{'Narrow structural admission only: emitted effects, fresh create, and two distinct cold reloads. It sets fixture research state but does not establish earned production, force effects, investment, compatibility breadth, performance, multiplayer or release readiness.'}
+  source=[ordered]@{commit=$sourceCommit;tree=$sourceTree;source_version=$candidate.receipt.source_version;distribution_version=$candidate.receipt.distribution_version;package_source_sha256=$candidate.receipt.package_source_sha256}
+  prior_environment=$dossier.historical_2_1_20
+  target=[ordered]@{engine=[ordered]@{version=$dossier.target.engine.version;sha256=$dossier.target.engine.sha256};official_mods=@($dossier.target.official_mods);archives=@($dossier.target.archives);settings=[ordered]@{mode='File';portable_input=$true;sha256=$SettingsSha256}}
+  candidate=Get-GIArtifact $repo $candidate.path -AllowExternalInput;fixture=@(Get-ChildItem -LiteralPath $fixtureRoot -Recurse -File|Sort-Object FullName|ForEach-Object{Get-GIArtifact $repo $_.FullName});portable_settings=Get-GIArtifact $repo $portableSettings;harness=Get-GIArtifact $repo $PSCommandPath
+  non_claims=@($dossier.explicit_non_claims)
 }
-if($PrepareOnly) { $prepared | ConvertTo-Json -Depth 20; return }
-
-if(-not [string]::IsNullOrWhiteSpace($RecoverRun)) {
-  $recoveryRun=(Resolve-Path -LiteralPath $RecoverRun).Path
-  Assert-GI ($recoveryRun.StartsWith($outputPrefix,[StringComparison]::OrdinalIgnoreCase)) 'recovery run escapes output root'
-  $leasePath=Join-Path $recoveryRun 'mir-immutable-input-lease.json'
-  $lease=Get-Content -Raw -LiteralPath $leasePath | ConvertFrom-Json -ErrorAction Stop
-  Assert-GI ([string]$lease.state -ceq 'completed' -and [string]$lease.outcome -ceq 'passed' -and [bool]$lease.inputs_sha256_match) 'recovery run immutable input lease is not terminal and clean'
-  $recoveryCandidate=@($lease.inputs | Where-Object { $_.role -ceq 'candidate' })
-  Assert-GI ($recoveryCandidate.Count -eq 1) 'recovery run candidate cardinality differs'
-  $recoveryCandidateStage=[string]$recoveryCandidate[0].stage_path
-  Assert-GI ((Get-GISha $recoveryCandidateStage) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run candidate bytes differ'
-  $recoveryCommit=[string]$recoveryCandidate[0].provenance.source_commit
-  $recoveryTree=[string]$recoveryCandidate[0].provenance.source_tree
-  Assert-GI ($recoveryCommit -match '^[0-9a-f]{40}$' -and $recoveryTree -match '^[0-9a-f]{40}$') 'recovery run source identity is invalid'
-  $recoveryPackageBlob=(& git -C $repo rev-parse ($recoveryCommit+':source/package-source.json')).Trim()
-  $currentPackageBlob=(& git -C $repo rev-parse 'HEAD:source/package-source.json').Trim()
-  Assert-GI ($recoveryPackageBlob -ceq $currentPackageBlob -and (Get-GISha $candidate) -ceq [string]$recoveryCandidate[0].expected_sha256) 'recovery run package source or fresh materialization differs'
-  $freshLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.factorio.log'
-  $reloadLogPath=Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.factorio.log'
-  $freshLog=[IO.File]::ReadAllText($freshLogPath)
-  $reloadLog=[IO.File]::ReadAllText($reloadLogPath)
-  $dataMarker='[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02 invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02 unique-owners=true'
-  $runtimeMarker='[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create technologies=researched'
-  $reloadMarker='[mir-f210-current-ba-gunmetal-invar] RELOAD PASS technologies=researched save-state=preserved'
-  Assert-GI ($freshLog.Contains($dataMarker,[StringComparison]::Ordinal) -and $freshLog.Contains($runtimeMarker,[StringComparison]::Ordinal)) 'recovery run fresh markers differ'
-  Assert-GI ($reloadLog.Contains($dataMarker,[StringComparison]::Ordinal) -and $reloadLog.Contains($reloadMarker,[StringComparison]::Ordinal)) 'recovery run reload markers differ'
-  foreach($log in @($freshLog,$reloadLog)) { Assert-GI (-not $log.Contains('Error while running event',[StringComparison]::Ordinal) -and $log.Contains('Goodbye',[StringComparison]::Ordinal)) 'recovery run Factorio lifecycle differs' }
-  $result=Copy-GIPreparedRecord $prepared
-  $result.status='passed-recovered'
-  $result.recovery=[ordered]@{
-    reason='The original runner reached result construction only after both helper assertions passed, then failed because OrderedDictionary has no Clone method.'
-    source_run=Get-GIRelative $recoveryRun
-    source_commit=$recoveryCommit
-    source_tree=$recoveryTree
-    terminal_input_lease_sha256=[string]$lease.terminal_record_sha256
-    input_hashes_match=[bool]$lease.inputs_sha256_match
-  }
-  $result.fresh_create=[ordered]@{passed=$true;save=Get-GIArtifact (Join-Path $recoveryRun 'saves/f210-ba-gunmetal-invar.zip');stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.stderr.log');factorio_log=Get-GIArtifact $freshLogPath}
-  $result.reloads=@([ordered]@{ordinal=1;passed=$true;reload_log_contract_passed=$true;required_log_assertions=@([ordered]@{fragment=$reloadMarker;passed=$true});stdout=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stdout.log');stderr=Get-GIArtifact (Join-Path $recoveryRun 'f210-ba-gunmetal-invar.reload-01.stderr.log');factorio_log=Get-GIArtifact $reloadLogPath})
-  $result.mod_closure=[ordered]@{candidate=Get-GIArtifact $recoveryCandidateStage;fixture=Get-GIArtifact (Join-Path $recoveryRun 'mods' ($fixtureName+'_'+$fixtureVersion+'.zip'));mod_list=Get-GIArtifact (Join-Path $recoveryRun 'mods/mod-list.json');input_staging=$lease}
-  $resultPath=Join-Path $recoveryRun 'result.json'
-  [IO.File]::WriteAllText($resultPath,(ConvertTo-Json $result -Depth 100),[Text.UTF8Encoding]::new($false))
-  Write-Output "[MIR-F210-BA-GUNMETAL-INVAR-RECOVERED] $(Get-GIRelative $resultPath)"
-  return
+if($PrepareOnly){$prepared|ConvertTo-Json -Depth 50;return}
+$output=[IO.Path]::GetFullPath($(if([IO.Path]::IsPathRooted($OutputRoot)){$OutputRoot}else{Join-Path $repo $OutputRoot}));$buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build')).TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar;Assert-GI ($output.StartsWith($buildPrefix,[StringComparison]::OrdinalIgnoreCase)) 'output root must be inside build'
+& (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32|Out-Host
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
+$run=$resources.root;Assert-GIPath $run 'F210 Gunmetal/Invar direct-library run root';$activation=$null;$terminal=$null;$restoration=[ordered]@{attempted=$false;status='not-needed'};$stage='initialize';$failure=$null
+try{
+  New-Item -ItemType Directory -Force -Path (Join-Path $run 'saves')|Out-Null
+  $profile=Join-Path $run 'selection.json';[IO.File]::WriteAllText($profile,($direct.mod_list|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+  $engineRoot=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $engine))
+  $stage='activate-direct-library';$activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $profile -ArchiveHashes $direct.archive_hashes -SettingsMode File -SettingsPath $settings -SettingsSha256 $SettingsSha256;Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+  $config=Join-Path $run 'mir-compat-config.ini';[IO.File]::WriteAllText($config,"[path]`nread-data=$(Join-Path $engineRoot 'data')`nwrite-data=$run`n`n[general]`nlocale=auto`n`n[other]`nenable-new-mods=false`nenable-steam-networking=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
+  $stage='verify-engine';$versionActor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10;$version=Get-Content -LiteralPath $versionActor.stdout -Raw;Assert-GI ($version -match 'Version:\s+2[.]1[.]22(?:\s|$)') 'engine reported a different version'
+  $stage='fresh-create';$save=Join-Path $run 'saves/f210-ba-gunmetal-invar.zip';$fresh=Invoke-GIGovernedEngine -Scenario ('f210-ba-gunmetal-invar.'+$Mode.ToLowerInvariant()+'.create') -Arguments @('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',$library,'--disable-audio') -TimeoutSeconds 300;Assert-GI (Test-Path -LiteralPath $save -PathType Leaf) 'fresh create save is absent'
+  $freshLog=[IO.File]::ReadAllText($fresh.factorio_log)
+  if($Mode -ceq 'Observe'){$observation=Get-GIObservation $freshLog;Assert-GI (@($observation.runtime_markers|Where-Object {$_ -match 'stage=create'}).Count -eq 1) 'read-only create marker differs'}else{Assert-GI ($freshLog.Contains([string]$fixtureSpec.data_marker,[StringComparison]::Ordinal) -and $freshLog.Contains([string]$fixtureSpec.create_marker,[StringComparison]::Ordinal)) 'fresh structural/create markers differ'}
+  $reloads=@();foreach($ordinal in 1..2){$stage='cold-reload-'+$ordinal;$reload=Invoke-GIReload -SavePath $save -Ordinal $ordinal -TimeoutSeconds 300;Assert-GI ([bool]$reload.passed) "bounded cold reload failed: $ordinal";$reloadLog=[IO.File]::ReadAllText($reload.factorio_log);if($Mode -ceq 'Observe'){Assert-GI ($reloadLog.Contains('[mir-f210-current-ba-gunmetal-invar-observer] RUNTIME stage=reload',[StringComparison]::Ordinal)) "read-only reload marker differs: $ordinal"}else{Assert-GI ($reloadLog.Contains([string]$fixtureSpec.data_marker,[StringComparison]::Ordinal) -and $reloadLog.Contains([string]$fixtureSpec.reload_marker,[StringComparison]::Ordinal)) "reload structural/state markers differ: $ordinal"};$reloads+=,$reload}
+  $stage='source-stability';Assert-GI ((Get-GISha $engine) -ceq [string]$dossier.target.engine.sha256 -and (&git -C $repo rev-parse HEAD).Trim() -ceq $sourceCommit -and @(&git -C $repo status --porcelain --untracked-files=all).Count -eq 0) 'engine or source changed during run'
+  $stage='restore-direct-library';$restoration.attempted=$true
+  try{$terminal=Complete-MIRLibraryActivation $activation;$activation=$null;$restoration.status='restored';$restoration.record=$terminal}catch{$restoration.status='restore-failed';$restoration.failure_code=Get-GIFailureCode $_;throw}
+  $result=Copy-GIRecord $prepared;$result.status=if($Mode -ceq 'Observe'){'observed-read-only'}else{'passed-narrow-structural-admission'};$result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-GISha $engine};$result.run_root=Get-GIRelative $repo $run;$result.fresh_create=[ordered]@{passed=$fresh.passed;duration_seconds=$fresh.duration_seconds;save=Get-GIArtifact $repo $save;stdout=Get-GIArtifact $repo $fresh.stdout;stderr=Get-GIArtifact $repo $fresh.stderr;factorio_log=Get-GIArtifact $repo $fresh.factorio_log};$result.cold_reloads=@($reloads|ForEach-Object{[ordered]@{ordinal=$_.ordinal;cold_process=$_.cold_process;passed=$_.passed;duration_seconds=$_.duration_seconds;maximum_duration_seconds=$_.maximum_duration_seconds;input_save_sha256=$_.input_save_sha256;save_sha256=$_.save_sha256;save_byte_identical=$_.save_byte_identical;stdout=Get-GIArtifact $repo $_.stdout;stderr=Get-GIArtifact $repo $_.stderr;factorio_log=Get-GIArtifact $repo $_.factorio_log}});if($Mode -ceq 'Observe'){$result.observation=$observation};$result.mod_closure=[ordered]@{candidate=Get-GIArtifact $repo $direct.candidate -AllowExternalInput;fixture=Get-GIArtifact $repo $direct.fixture_archive -AllowExternalInput;settings=[ordered]@{mode='File';sha256=$SettingsSha256};library_activation=$terminal};$result.controls_restoration=$restoration;$result.resource_runs=$resources.runs.ToArray();Write-MIRNativeProbeResult -Context $resources -Record $result;Write-Output "[MIR-F210-BA-GUNMETAL-INVAR] $(Get-GIRelative $repo (Join-Path $run 'result.json'))"
+}catch{$failure=$_}finally{
+  if($null -ne $activation -and -not $activation.closed){$restoration.attempted=$true;try{$terminal=Complete-MIRLibraryActivation $activation;$activation=$null;$restoration.status='restored-after-terminal-failure';$restoration.record=$terminal}catch{$restoration.status='restore-failed-after-terminal-failure';$restoration.failure_code=Get-GIFailureCode $_;if($null -eq $failure){$failure=$_}}}
+  if($null -ne $failure){$failed=Copy-GIRecord $prepared;$failed.status='failed-terminal-result-retained';$failed.terminal=[ordered]@{stage=$stage;failure_code=Get-GIFailureCode $failure;exception_type=$failure.Exception.GetType().FullName;controls_restoration=$restoration};$failed.run_root=if($null -ne $resources -and (Test-Path -LiteralPath $resources.root -PathType Container)){Get-GIRelative $repo $resources.root}else{''};if($null -ne $resources){$failed.resource_runs=$resources.runs.ToArray();try{Write-MIRNativeProbeResult -Context $resources -Record $failed}catch{}}}
 }
-
-$engine=(Resolve-Path -LiteralPath $FactorioBin).Path
-Assert-GI ((Get-GISha $engine) -ceq $expectedEngineSha) 'Factorio executable differs from the exact stage'
-$version=(& $engine --version | Out-String)
-Assert-GI ($LASTEXITCODE -eq 0 -and $version -match 'Version:\s+2[.]1[.]20') 'requires Factorio 2.1.20'
-
-$runName='g-'+[guid]::NewGuid().ToString('N').Substring(0,12)
-$run=Join-Path $output $runName
-$runPrefix=$outputPrefix
-Assert-GI ($run.StartsWith($runPrefix,[StringComparison]::OrdinalIgnoreCase)) 'run root escapes output root'
-Assert-GIPath $run 'F210 Gunmetal/Invar run root'
-$inputLease=$null
-try {
-  New-Item -ItemType Directory -Force -Path (Join-Path $run 'mods'),(Join-Path $run 'saves') | Out-Null
-  $mods=Join-Path $run 'mods'
-  $inputs=@()
-  foreach($entry in $expectedArchives.GetEnumerator()) {
-    $archive=Join-Path $stageMods $entry.Key
-    $inputs += New-GIInput -Path $archive -Role 'dependency-mod' -Identity ([ordered]@{archive=$entry.Key;sha256=$entry.Value}) -Provenance ([ordered]@{kind='retained-exact-f210-ba-stage';stage=$stage})
-  }
-  $inputs += New-GIInput -Path $candidate -Role 'candidate' -Identity ([ordered]@{target='f210';sha256=(Get-GISha $candidate)}) -Provenance ([ordered]@{kind='fresh-f210-target-materialization';source_commit=$sourceCommit;source_tree=$sourceTree})
-  $inputLease=New-MIRImmutableInputLease -RunRoot $run -StageDirectory $mods -Inputs $inputs -RequireHardLinks
-  $fixtureArchive=Publish-MIRModDirectoryArchive -Source $fixtureRoot -Name $fixtureName -Version $fixtureVersion -ModsDir $mods
-  Assert-GIPath $fixtureArchive 'F210 Gunmetal/Invar fixture archive'
-  $enabled=@('base','elevated-rails','quality','recycler','space-age')
-  $enabled += @($expectedArchives.Keys | ForEach-Object { [regex]::Replace($_,'_[0-9]+(?:[.][0-9]+)*[.]zip$','') })
-  $enabled += @('more-infinite-research',$fixtureName)
-  $modList=[ordered]@{mods=@($enabled | ForEach-Object { [ordered]@{name=$_;enabled=$true} })}
-  [IO.File]::WriteAllText((Join-Path $mods 'mod-list.json'),(($modList | ConvertTo-Json -Depth 10)+"`n"),[Text.UTF8Encoding]::new($false))
-  # Factorio updates mod-settings.dat on startup.  It remains hash-bound to
-  # the retained source before launch, but must not be held by the immutable
-  # archive lease while the engine atomically rewrites it.
-  $stagedSettings=Join-Path $mods 'mod-settings.dat'
-  Copy-Item -LiteralPath $stageSettings -Destination $stagedSettings -Force
-  Assert-GI ((Get-GISha $stagedSettings) -ceq $expectedSettingsSha) 'copied exact stage settings differ before create'
-  $initialSettingsArtifact=Get-GIArtifact $stagedSettings
-  Assert-GIPath (Join-Path $mods 'mod-list.json') 'F210 Gunmetal/Invar mod list'
-
-  $load=Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $run -ScenarioName 'f210-ba-gunmetal-invar' -ScenarioTimeoutSeconds 300
-  Assert-GI ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'fresh create failed'
-  $freshLog=[IO.File]::ReadAllText([string]$load.factorio_log)
-  $dataMarker='[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:angels-plate-gunmetal:0.02 invar=recipe-prod-research_material_invar-1:angels-plate-invar:0.02 unique-owners=true'
-  $runtimeMarker='[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create technologies=researched'
-  Assert-GI ($freshLog.Contains($dataMarker,[StringComparison]::Ordinal)) 'fresh data effect/owner marker is absent'
-  Assert-GI ($freshLog.Contains($runtimeMarker,[StringComparison]::Ordinal)) 'fresh runtime effect marker is absent'
-
-  $reloadMarker='[mir-f210-current-ba-gunmetal-invar] RELOAD PASS technologies=researched save-state=preserved'
-  $reload=Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $run -ScenarioName 'f210-ba-gunmetal-invar' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 300 -RequiredLogFragments @($reloadMarker)
-  Assert-GI ([bool]$reload.passed) 'single reload or saved runtime-state contract failed'
-
-  $staging=Complete-MIRImmutableInputLease -Lease $inputLease
-  $inputLease=$null
-  $archiveArtifacts=@($staging.inputs | Where-Object { $_.role -ceq 'dependency-mod' } | ForEach-Object { ConvertTo-MIRImmutableInputArtifact -Receipt $staging -Input $_ -Locator (Get-GIRelative ([string]$_.stage_path)) } | Sort-Object path)
-  $candidateInput=@($staging.inputs | Where-Object { $_.role -ceq 'candidate' })
-  Assert-GI ($candidateInput.Count -eq 1) 'terminal staged candidate cardinality differs'
-  $reloadArtifacts=@($reload.reloads | ForEach-Object {
-    [ordered]@{
-      ordinal=$_.ordinal;passed=$_.passed;duration_seconds=$_.duration_seconds;maximum_duration_seconds=$_.maximum_duration_seconds
-      input_save_sha256=$_.input_save_sha256;save_sha256=$_.save_sha256;save_byte_identical=$_.save_byte_identical
-      reload_log_contract_passed=$_.reload_log_contract_passed;required_log_assertions=$_.required_log_assertions
-      stdout=Get-GIArtifact $_.stdout;stderr=Get-GIArtifact $_.stderr;factorio_log=Get-GIArtifact $_.factorio_log
-    }
-  })
-  $result=Copy-GIPreparedRecord $prepared
-  $result.status='passed'
-  $result.engine=[ordered]@{version=([regex]::Match($version,'Version:\s+[^\r\n]+').Value).Trim();executable_sha256=Get-GISha $engine}
-  $result.run_root=Get-GIRelative $run
-  $result.fresh_create=[ordered]@{passed=$load.passed;duration_seconds=$load.duration_seconds;save=Get-GIArtifact $load.save;stdout=Get-GIArtifact $load.stdout;stderr=Get-GIArtifact $load.stderr;factorio_log=Get-GIArtifact $load.factorio_log}
-  $result.reloads=$reloadArtifacts
-  $result.mod_closure=[ordered]@{
-    enabled_mods=$enabled
-    archives=$archiveArtifacts
-    candidate=ConvertTo-MIRImmutableInputArtifact -Receipt $staging -Input $candidateInput[0] -Locator (Get-GIRelative ([string]$candidateInput[0].stage_path))
-    settings=[ordered]@{source_sha256=$expectedSettingsSha;initial=$initialSettingsArtifact;after_engine=Get-GIArtifact $stagedSettings}
-    fixture=Get-GIArtifact $fixtureArchive
-    mod_list=Get-GIArtifact (Join-Path $mods 'mod-list.json')
-    input_staging=$staging
-  }
-  $resultPath=Join-Path $run 'result.json'
-  [IO.File]::WriteAllText($resultPath,(ConvertTo-Json $result -Depth 100),[Text.UTF8Encoding]::new($false))
-  Write-Output "[MIR-F210-BA-GUNMETAL-INVAR] $(Get-GIRelative $resultPath)"
-} catch {
-  $failure=$_
-  if($null -ne $inputLease -and -not $inputLease.closed) {
-    try { Complete-MIRImmutableInputLease -Lease $inputLease -Outcome failed | Out-Null } catch {}
-  }
-  throw $failure
-}
+if($null -ne $failure){throw $failure}
