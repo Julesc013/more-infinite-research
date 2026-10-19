@@ -140,7 +140,9 @@ foreach ($contract in $progressionHarnessContracts) {
   $harnessText = [IO.File]::ReadAllText((Join-Path $repo ([string]$contract.harness)))
   foreach ($requiredText in @(
     'tools/mir/application/release/F210QualificationPolicy.ps1',
-    'Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot',
+    'Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments',
+    'RepoRoot=$Repository',
+    'FactorioBin=$Engine',
     ([string]$contract.harness_id)
   )) {
     if (-not $harnessText.Contains($requiredText,[StringComparison]::Ordinal)) {
