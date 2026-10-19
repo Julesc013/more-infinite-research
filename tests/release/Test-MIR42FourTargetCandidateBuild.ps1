@@ -40,6 +40,24 @@ function Assert-MIR42CandidateBuildTest {
   if ($Message.StartsWith('422-',[StringComparison]::Ordinal)) { $script:mir422ConstructionAssertions++ }
 }
 
+function Test-MIR42CandidateSchema {
+  param([Parameter(Mandatory)][string]$Json, [Parameter(Mandatory)][string]$SchemaPath)
+  # Test-Json releases differ in whether a schema rejection returns False or
+  # reports InvalidJsonAgainstSchema. Only that rejection is a Boolean result;
+  # broken schema files, JSON syntax, IO and binding failures must still fail.
+  try {
+    $valid = Test-Json -Json $Json -SchemaFile $SchemaPath -ErrorAction Stop
+  } catch {
+    if ($_.FullyQualifiedErrorId -cin @(
+      'InvalidJsonAgainstSchema,Microsoft.PowerShell.Commands.TestJsonCommand',
+      'InvalidJsonAgainstSchemaDetailed,Microsoft.PowerShell.Commands.TestJsonCommand'
+    )) { return $false }
+    throw
+  }
+  if ($valid -isnot [bool]) { throw '[mir42-candidate-schema-result-not-boolean]' }
+  return $valid
+}
+
 function Test-MIR460ManifestIdentityOpponents {
   param([Parameter(Mandatory)]$Manifest, [Parameter(Mandatory)][string]$SchemaPath)
   foreach ($field in @('distribution_version', 'asset.path')) {
@@ -49,7 +67,7 @@ function Test-MIR460ManifestIdentityOpponents {
     } else {
       $changed.targets[0].asset.path = 'assets/f210/more-infinite-research_4.6.21001.zip'
     }
-    $accepted = $changed | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $SchemaPath -ErrorAction SilentlyContinue
+    $accepted = Test-MIR42CandidateSchema -Json ($changed | ConvertTo-Json -Depth 100) -SchemaPath $SchemaPath
     Assert-MIR42CandidateBuildTest (-not $accepted) "460-schema-rejects-wrong-$field"
   }
 }
@@ -771,7 +789,7 @@ try {
       [string]$mir43VersionContract.source_version -ceq $sourceVersion -and
       $mir43VersionContract.requires_nine_targets -and
       (Test-MIR4BootstrapRecordHash -Record $mir43Manifest) -and
-      (Get-Content -Raw -LiteralPath (Join-Path $mir43Root 'candidate-manifest.json') | Test-Json -SchemaFile $mir43VersionContract.schema_path)
+      (Test-MIR42CandidateSchema -Json (Get-Content -Raw -LiteralPath (Join-Path $mir43Root 'candidate-manifest.json')) -SchemaPath $mir43VersionContract.schema_path)
     ) "$sourceVersion-writer-selects-current-nine-target-schema"
     if ($sourceVersion -ceq '4.6.0') {
       Test-MIR460ManifestIdentityOpponents -Manifest $mir43Manifest -SchemaPath $mir43VersionContract.schema_path
@@ -794,7 +812,7 @@ try {
     $crossVersion = $mir43Manifest | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
     $crossVersion.target_authority[0].source_version = '4.2.3'
     $crossVersion.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $crossVersion
-    $crossVersionValid = $crossVersion | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop
+    $crossVersionValid = Test-MIR42CandidateSchema -Json ($crossVersion | ConvertTo-Json -Depth 100) -SchemaPath $mir43VersionContract.schema_path
     Assert-MIR42CandidateBuildTest (-not $crossVersionValid) "$sourceVersion-schema-refuses-cross-source-authority"
     # Exercise the complete writer output, including historical leading-zero
     # codes. A schema accepting a mismatched source patch in any identity
@@ -811,7 +829,7 @@ try {
             'asset-path' { $wrongPatch.targets[$i].asset.path = "assets/$($descriptors[$i].target)/more-infinite-research_$oldVersion.zip" }
           }
           $wrongPatch.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $wrongPatch
-          $wrongPatchValid = $wrongPatch | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $mir43VersionContract.schema_path -ErrorAction Stop
+          $wrongPatchValid = Test-MIR42CandidateSchema -Json ($wrongPatch | ConvertTo-Json -Depth 100) -SchemaPath $mir43VersionContract.schema_path
           Assert-MIR42CandidateBuildTest (-not $wrongPatchValid) "$($sourceVersion.Replace('.',''))-schema-refuses-mismatched-source-patch-$($descriptors[$i].target)-$field"
         }
       }
@@ -966,7 +984,7 @@ try {
   foreach ($case in $schemaMutations.GetEnumerator()) {
     $invalid = $schemaComplete | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
     & $case.Value $invalid
-    $valid = $invalid | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue
+    $valid = Test-MIR42CandidateSchema -Json ($invalid | ConvertTo-Json -Depth 100) -SchemaPath $schemaPath
     Assert-MIR42CandidateBuildTest (-not $valid) "patch-schema-refuses-$($case.Key)"
     $invalid.record_sha256=''
     $invalid.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $invalid
@@ -1007,7 +1025,7 @@ try {
   $duplicatePartialRow = $invalidPartial.targets[0] | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
   $duplicatePartialRow.asset.sha256='C'*64
   $invalidPartial.targets=@($invalidPartial.targets[0],$duplicatePartialRow)
-  $valid = $invalidPartial | ConvertTo-Json -Depth 100 | Test-Json -SchemaFile $schemaPath -ErrorAction SilentlyContinue
+  $valid = Test-MIR42CandidateSchema -Json ($invalidPartial | ConvertTo-Json -Depth 100) -SchemaPath $schemaPath
   Assert-MIR42CandidateBuildTest (-not $valid) 'patch-schema-refuses-partial-same-target-different-row'
   foreach($legacyCount in @(4,9)){
     $legacyDescriptors=@($nineDescriptors|Select-Object -First $legacyCount)
@@ -1646,6 +1664,10 @@ function New-MIR42NineTargetCriterionEvidence {
     independent_input_controls = 'v1-v2-first-row-and-required-predecessor-refusals-engine-lookup-fixture-only'
     engine_runs = 0
   }
+} catch {
+  # The assurance caller retains the thrown message. Include the location so a
+  # hosted-only failure can be diagnosed without rerunning unchanged controls.
+  throw ("[mir42-candidate-build-failure] {0}`n{1}`n{2}" -f $_.FullyQualifiedErrorId, $_.Exception.Message, $_.ScriptStackTrace)
 } finally {
   foreach ($path in @($root, $partialRoot, $historicalRoot, $nineRoot, $identityRoot, $patchRoot, $receiptRoot, $historicalAuthenticationRoot)) {
     if (Test-Path -LiteralPath $path) {
