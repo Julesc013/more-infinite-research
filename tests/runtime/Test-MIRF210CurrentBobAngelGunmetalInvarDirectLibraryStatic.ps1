@@ -33,13 +33,23 @@ Assert-GIStatic ($qualificationData.Contains('[MIR_ACTIVE_MODS]',[StringComparis
 foreach($fragment in @('DATA PASS','unique-owners=true')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-data-marker'}
 foreach($fragment in @('RUNTIME PASS','stage=create technologies=researched','RELOAD PASS','technologies=researched save-state=preserved')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-runtime-marker'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'
-foreach($readerFunction in @('Assert-GI','Read-GIDossier')){
+foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload')){
   $readerNodes=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $readerFunction},$true))
   Assert-GIStatic ($readerNodes.Count -eq 1) 'unique-actual-dossier-reader'
   . ([scriptblock]::Create($readerNodes[0].Extent.Text))
 }
 $actualDossier=Read-GIDossier -Path $dossierPath
 Assert-GIStatic ([string]$actualDossier.fixtures.observe.version -ceq [string]$dossier.fixtures.observe.version) 'actual-dossier-reader-accepts-selected-fixture'
+$run=Join-Path $repo 'build/tmp/gi-controlled-no-process'
+$activation=[pscustomobject]@{library='controlled-library-not-opened'}
+$controlledProcessPassed=$true
+function Invoke-GIGovernedEngine([string]$Scenario,[string[]]$Arguments,[int]$TimeoutSeconds){
+  [pscustomobject]@{passed=$controlledProcessPassed;duration_seconds=0;stdout='controlled';stderr='controlled';factorio_log='controlled'}
+}
+$controlledReload=Invoke-GIReload -SavePath $portable -Ordinal 2 -TimeoutSeconds 1
+Assert-GIStatic ($controlledReload.passed -and $controlledReload.cold_process -eq $true -and $controlledReload.ordinal -eq 2 -and $controlledReload.save_byte_identical) 'actual-cold-reload-return-controls'
+$controlledProcessPassed=$false
+Assert-GIStatic (-not (Invoke-GIReload -SavePath $portable -Ordinal 2 -TimeoutSeconds 1).passed) 'failed-engine-result-is-not-a-passing-reload'
 $parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath);$missing=@(@('FactorioBin','LocalModLibraryDirs','SettingsPath','SettingsSha256','CandidateZip','SourceMaterializationPath','Mode','PrepareOnly')|Where-Object {$_ -notin $parameters});Assert-GIStatic ($missing.Count -eq 0) 'runner-inputs'
 $outputParameter=@($ast.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath -ceq 'OutputRoot'})
 Assert-GIStatic ($outputParameter.Count -eq 1) 'runner-output-parameter'

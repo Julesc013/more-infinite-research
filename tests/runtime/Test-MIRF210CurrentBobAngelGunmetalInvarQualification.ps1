@@ -85,7 +85,7 @@ function Invoke-GIReload([string]$SavePath,[int]$Ordinal,[int]$TimeoutSeconds){
   $arguments=@('--config',(Join-Path $run 'mir-compat-config.ini'),'--no-log-rotation','--disable-audio','--mod-directory',$activation.library,'--benchmark',$save,'--benchmark-ticks','30000','--benchmark-runs','1','--benchmark-sanitize')
   $process=Invoke-GIGovernedEngine -Scenario ('f210-ba-gunmetal-invar.reload-'+$Ordinal.ToString('00')) -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
   $after=Get-GISha $save
-  [pscustomobject]@{ordinal=$Ordinal;cold_process=true;passed=[bool]($process.passed -and $before -ceq $after);duration_seconds=$process.duration_seconds;maximum_duration_seconds=$TimeoutSeconds;input_save_sha256=$before;save_sha256=$after;save_byte_identical=[bool]($before -ceq $after);stdout=$process.stdout;stderr=$process.stderr;factorio_log=$process.factorio_log}
+  [pscustomobject]@{ordinal=$Ordinal;cold_process=$true;passed=[bool]($process.passed -and $before -ceq $after);duration_seconds=$process.duration_seconds;maximum_duration_seconds=$TimeoutSeconds;input_save_sha256=$before;save_sha256=$after;save_byte_identical=[bool]($before -ceq $after);stdout=$process.stdout;stderr=$process.stderr;factorio_log=$process.factorio_log}
 }
 function Convert-GIObservationLine([string]$Kind,[string]$Text){
   $row=[ordered]@{kind=$Kind}
