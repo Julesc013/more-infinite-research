@@ -46,7 +46,7 @@ try{
   $published=Write-TestArchive -Library $library -Version '4.2.20002';$candidate=Write-TestArchive -Library $library -Version '4.2.20003'
   $playerReadyArchive=Write-PlayerReadyObserverArchive -Library $library
   $publishedSha=Get-MIRImmutableInputSha256 -Path $published;$manifest=Join-Path $root 'mir-4.2.2.release.json'
-  [IO.File]::WriteAllText($manifest,(@{release=@{source_version='4.2.2'};package_assets=@(@{target='f200';distribution_version='4.2.20002';sha256=$publishedSha})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText($manifest,(@{schema=1;release=@{source_version='4.2.2'};package_assets=@(@{target='f200';distribution_version='4.2.20002';sha256=$publishedSha})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $template=Join-Path $root 'profile.json';[IO.File]::WriteAllText($template,(@{mods=@(@{name='base';version='2.0.77';enabled=$true},@{name='more-infinite-research';version='4.2.20002';enabled=$true})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $publishedIdentity=Get-MIRDirectLibraryStartupArchive -Archive $published -LibraryDirectory $library;$candidateIdentity=Get-MIRDirectLibraryStartupArchive -Archive $candidate -LibraryDirectory $library
   Assert-DirectStartup ($publishedIdentity.version-ceq'4.2.20002'-and$candidateIdentity.version-ceq'4.2.20003') 'archive identities were not read from selected library bytes.'
@@ -243,8 +243,8 @@ loading-multithreading=true
   Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('Wait-MIRDirectLibraryStartupAdmission')-and$source.Contains('AdmissionWaitSeconds')-and$source.Contains('Get-MIRNativeProbeRemainingOutputBytes')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('graphical-player-ready-diagnostic')-and$source.Contains('ordinary-native-window-diagnostic')-and$source.Contains('Get-MIRDirectLibraryPlayerReadyObserverArchive')-and$source.Contains('Invoke-MIRDirectLibraryPlayerReadyPreparation')-and$source.Contains('New-MIRDirectLibraryOrdinaryPlayerConfig')-and$source.Contains('automatic-window-image-not-attempted')-and$source.Contains('menu_ready_confirmation')-and$source.Contains('--benchmark-graphics')-and$source.Contains('[MIR_PLAYER_READY]')-and$source.Contains('engine_log_player_ready_seconds')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('PrintWindow')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not bind the base-only graphical observer and its prepared save, or omits bounded pre-launch admission handling.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
   $runner=(Get-Command Invoke-MIRDirectLibraryStartupMeasurement)
-  $runnerVersions=@($runner.Parameters['StartupCandidateSourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
-  Assert-DirectStartup ((@($runnerVersions|Sort-Object)-join'|')-ceq'4.2.3|4.3.0|4.3.1|4.4.0|4.4.2') 'startup runner does not admit exactly the current candidate source versions.'
+  $runnerPatterns=@($runner.Parameters['StartupCandidateSourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidatePatternAttribute]}|ForEach-Object RegexPattern)
+  Assert-DirectStartup ($runnerPatterns.Count-eq1-and$runnerPatterns[0]-ceq'^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$') 'startup candidate source must bind the canonical source-version shape.'
   foreach($case in @(@{source='4.2.3';distribution='4.2.20003'},@{source='4.3.0';distribution='4.3.20000'},@{source='4.3.1';distribution='4.3.20001'},@{source='4.4.0';distribution='4.4.20000'},@{source='4.4.2';distribution='4.4.20002'})){
     $identity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f200 -SourceVersion $case.source
     Assert-DirectStartup ($identity.source_version-ceq$case.source-and$identity.distribution_version-ceq$case.distribution) "startup runner cannot project $($case.source) to its f200 candidate identity."
@@ -252,17 +252,15 @@ loading-multithreading=true
   Assert-DirectStartup ($source.Contains(". (Join-Path `$repo 'tools/mir/application/package/PackageAuthority.ps1')")-and$source.Contains(". (Join-Path `$repo 'tools/mir/application/package/TargetMaterializer.ps1')")-and$source.Contains('$candidateIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target $Target -SourceVersion $StartupCandidateSourceVersion')-and$source.Contains('Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive $CandidateMaterializationArchive -ReceiptPath $CandidateMaterializationReceiptPath -Target $Target -SourceVersion $StartupCandidateSourceVersion')-and$source.Contains("label=('candidate-'+`$StartupCandidateSourceVersion)")-and$source.Contains('candidate=$(if($hasCandidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate')) 'startup runner does not load its canonical identity authority or bind the selected candidate source identity through archive validation, receipt validation, label, and report input.'
   $entry=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1')
   Assert-DirectStartup ($entry.Contains('Invoke-MIRDirectLibraryStartupMeasurement')-and$entry.Contains('ObserveStartup')-and$entry.Contains('ObserveResearchAll')-and$entry.Contains('ActiveModsObserver')-and$entry.Contains('GraphicalPlayerReady')-and$entry.Contains('PlayerReadyObserverArchive')-and$entry.Contains('PlayerReadyBenchmarkTicks')-and$entry.Contains('OrdinaryMenu')-and$entry.Contains('OrdinaryPlayerConfigPath')-and$entry.Contains('AdmissionWaitSeconds')-and$entry.Contains('endpoint-mode-conflict')-and$entry.Contains('ExpectedPeakMemoryMiB')-and$entry.Contains('mir-native-obsolete-runner')) 'performance entrypoint does not preserve direct-library admission-wait forwarding around its selected endpoint mode.'
-  Assert-DirectStartup ($entry.Contains("[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]`$StartupCandidateSourceVersion='4.2.3'")-and$entry.Contains('StartupCandidateSourceVersion=$StartupCandidateSourceVersion')) 'performance entrypoint does not preserve the default or selected startup candidate source version.'
+  Assert-DirectStartup ($entry.Contains("[ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]`$StartupCandidateSourceVersion='4.2.3'")-and$entry.Contains('StartupCandidateSourceVersion=$StartupCandidateSourceVersion')) 'performance entrypoint does not preserve the default or selected startup candidate source version.'
   $entryPath=Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1'
   $startupCliInputs=@{RepoRoot=$repo;ObserveStartup=$true;FactorioBin='fixture-factorio.exe';LocalModZipDir='fixture-library';StartupProfileTemplatePath='fixture-profile.json';Published422Archive='fixture-published.zip';Published422ManifestPath='fixture-manifest.json';Published422ManifestSha256=('0'*64);StartupOutputRoot='fixture-output';ExpectedSourceCommit=('0'*40)}
   $conflictingEndpointRejected=$false;try{& $entryPath @startupCliInputs -GraphicalPlayerReady -OrdinaryMenu|Out-Null}catch{$conflictingEndpointRejected=$_.Exception.Message-ceq'[mir-direct-startup-endpoint-mode-conflict]'}
   Assert-DirectStartup $conflictingEndpointRejected 'performance entrypoint accepted simultaneous graphical-player and ordinary-window endpoint flags.'
   $missingOrdinaryConfigRejected=$false;try{& $entryPath @startupCliInputs -OrdinaryMenu|Out-Null}catch{$missingOrdinaryConfigRejected=$_.Exception.Message-ceq'[mir-direct-startup-input-required] OrdinaryPlayerConfigPath'}
   Assert-DirectStartup $missingOrdinaryConfigRejected 'performance entrypoint accepted ordinary-window mode without an explicit player configuration input.'
-  $accepted=@((Get-Command Read-MIRNativeProbeCurrentCandidate).Parameters['SourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidateSetAttribute]}|ForEach-Object ValidValues)
-  Assert-DirectStartup ('4.2.3'-in$accepted) 'native candidate reader rejects the 4.2.3 materialization identity.'
-  Assert-DirectStartup ('4.3.0'-in$accepted-and'4.3.1'-in$accepted) 'native candidate reader rejects current 4.3 materialization identities.'
-  Assert-DirectStartup ('4.4.0'-in$accepted-and'4.4.2'-in$accepted) 'native candidate reader rejects admitted current 4.4 materialization identities.'
+  $readerPatterns=@((Get-Command Read-MIRNativeProbeCurrentCandidate).Parameters['SourceVersion'].Attributes|Where-Object {$_ -is [Management.Automation.ValidatePatternAttribute]}|ForEach-Object RegexPattern)
+  Assert-DirectStartup ($readerPatterns.Count-eq1-and$readerPatterns[0]-ceq'^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$') 'native candidate receipt reader must validate canonical source-version shape.'
   $privateReadme=Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes ([Text.UTF8Encoding]::new($false).GetBytes('MIR package')) -DistributionVersion '4.2.20003' -SourceVersion '4.2.3'
   Assert-DirectStartup (([Text.UTF8Encoding]::new($false).GetString($privateReadme)).StartsWith("MIR 4.2.20003, source 4.2.3.`n`n",[StringComparison]::Ordinal)) 'materializer does not support private 4.2.3 package identity presentation.'
   foreach($case in @(@{source='4.3.0';distribution='4.3.20000'},@{source='4.3.1';distribution='4.3.20001'})){
@@ -280,7 +278,7 @@ loading-multithreading=true
   $stressEngine=Join-Path $root 'engine/bin/x64/factorio.exe'
   [IO.Directory]::CreateDirectory((Split-Path -Parent $stressEngine))|Out-Null
   [IO.File]::WriteAllText($stressEngine,'controlled-process-actor-not-an-engine',[Text.UTF8Encoding]::new($false))
-  $script:stressCalls=[Collections.Generic.List[object]]::new()
+  $script:stressCalls=[Collections.Generic.List[object]]::new();$script:stressSampleFailure=$false;$script:stressLastRecord=$null
   function Wait-MIRDirectLibraryStartupAdmission {param($Policy,$WorkRoot,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$AdmissionWaitSeconds,$Phase);[pscustomobject]@{status='controlled-no-native-actor'}}
   function New-MIRNativeProbeResourceContext {param($RepoRoot,$OutputRoot,$ExpectedPeakMemoryMiB,$MaxNewOutputMiB,[switch]$UseExactOutputRoot);[pscustomobject]@{root=$OutputRoot;policy=[pscustomobject]@{minimum_free_ram_gib=4};peak_memory_bytes=[int64]$ExpectedPeakMemoryMiB*1MB;max_new_output_bytes=[int64]$MaxNewOutputMiB*1MB;runs=@()}}
   function Get-MIRNativeProbeRemainingOutputBytes {param($Context);[int64]1MB}
@@ -291,13 +289,14 @@ loading-multithreading=true
   function Assert-MIRDirectLibraryPublished422Manifest {throw 'Controlled predecessor must never execute in candidate-only mode.'}
   function Invoke-MIRDirectLibraryStartupSample {
     param($FactorioBin,$LibraryDirectory,$EngineDataDirectory,$BaseRows,$RunRoot,$WriteDataRoot,$Label,$Resources,$MirArchive,$TimeoutSeconds,$ActiveModsObserver,$MapGenerationSeed)
+    if($script:stressSampleFailure){throw '[controlled-startup-sample-failure]'}
     $script:stressCalls.Add([pscustomobject]@{label=$Label;archive=$MirArchive;seed=$MapGenerationSeed})
     [pscustomobject]@{label=$Label;endpoint_class='headless-create-diagnostic';exit_code=0;controlled_actor=$true}
   }
-  function Write-MIRNativeProbeResult {param($Context,$Record)}
+  function Write-MIRNativeProbeResult {param($Context,$Record);$script:stressLastRecord=$Record}
   $stressArgs=@{FactorioBin=$stressEngine;LibraryDirectory=$library;ProfileTemplatePath=$template;CandidateArchive=$stressCandidate;CandidateMaterializationArchive=$stressCandidate;CandidateMaterializationReceiptPath=$stressReceipt;StartupCandidateSourceVersion='4.3.0';OutputRoot=(Join-Path $root 'candidate-only-run');Target='f200';WarmupRuns=0;MeasuredRuns=1;TimeoutSeconds=1;ExpectedPeakMemoryMiB=1;MaxNewOutputMiB=1;SourceCommit=(& git -C $repo rev-parse HEAD).Trim();CandidateOnly=$true}
   $stressResult=Invoke-MIRDirectLibraryStartupMeasurement @stressArgs
-  Assert-DirectStartup ($stressResult.mode-ceq'candidate-only-stress-diagnostic'-and$null-eq$stressResult.inputs.published_422-and$stressResult.samples.Count-eq2) 'candidate-only orchestration invented a comparison or did not perform the selected cold/warm pair.'
+  Assert-DirectStartup ($stressResult.mode-ceq'candidate-only-stress-diagnostic'-and$null-eq$stressResult.inputs.baseline-and$null-eq$stressResult.inputs.published_422-and$stressResult.samples.Count-eq2) 'candidate-only orchestration invented a comparison or did not perform the selected cold/warm pair.'
   Assert-DirectStartup ($script:stressCalls.Count-eq2-and@($script:stressCalls|Where-Object {$_.label-cne'candidate-4.3.0'-or$_.archive.sha256-cne$stressCandidateSha}).Count-eq0) 'candidate-only orchestration called a baseline or a different candidate.'
   Assert-DirectStartup ($stressResult.samples[0].cache_state-ceq'initial-selection'-and$stressResult.samples[1].cache_state-ceq'warm-repeat'-and$stressResult.samples[0].sample-eq1-and$stressResult.samples[1].sample-eq2) 'candidate-only sample sequencing is not explicit.'
   Assert-DirectStartup (@($stressResult.measurement_notes|Where-Object {$_-match'no relative speedup'}).Count-eq1) 'candidate-only result lacks its comparison limitation.'
@@ -317,9 +316,9 @@ loading-multithreading=true
   $wrong442=$args442.Clone();$wrong442.CandidateArchive=$candidate440;$wrong442.OutputRoot=Join-Path $root 'reject-442-wrong-source'
   $wrong442Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @wrong442|Out-Null}catch{$wrong442Rejected=$_.Exception.Message-ceq'[mir-direct-startup-candidate-identity]'}
   Assert-DirectStartup $wrong442Rejected '4.4.2 measurement accepted a non-CCC02 candidate archive.'
-  $unadmitted443=$args442.Clone();$unadmitted443.StartupCandidateSourceVersion='4.4.3'
-  $unadmitted443Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @unadmitted443|Out-Null}catch{$unadmitted443Rejected=$_.FullyQualifiedErrorId-match'^ParameterArgumentValidationError'}
-  Assert-DirectStartup $unadmitted443Rejected 'startup runner admitted unregistered 4.4.3.'
+  $unadmitted443=$args442.Clone();$unadmitted443.StartupCandidateSourceVersion='4.7.0';$unadmitted443.OutputRoot=Join-Path $root 'reject-current-source-wrong-archive'
+  $unadmitted443Rejected=$false;try{Invoke-MIRDirectLibraryStartupMeasurement @unadmitted443|Out-Null}catch{$unadmitted443Rejected=$_.Exception.Message-ceq'[mir-direct-startup-candidate-identity]'}
+  Assert-DirectStartup $unadmitted443Rejected 'startup runner accepted a current source version paired with another version archive.'
   foreach($case in @('missing-comparison','preliminary','supplied-comparison','graphical')){
     $argsCopy=$stressArgs.Clone();$argsCopy.OutputRoot=Join-Path $root ('reject-'+$case)
     $code=switch($case){
@@ -335,6 +334,35 @@ loading-multithreading=true
   $zeroWarmupBound=$false
   try{& $entryPath @startupCliInputs -WarmupRuns 0 -StartupCandidateOnly -PreliminaryStartup|Out-Null}catch{$zeroWarmupBound=$_.Exception.Message-ceq'[mir-direct-startup-candidate-only-mode]'}
   Assert-DirectStartup $zeroWarmupBound 'actual public caller still rejects the callee zero-warmup binding before mode validation.'
+
+  foreach($future in @(@{source='4.7.0';distribution='4.7.20000'},@{source='4.7.3';distribution='4.7.20003'},@{source='4.10.0';distribution='4.10.20000'})){
+    $futureArchive=Write-TestArchive -Library $library -Version $future.distribution
+    $futureArgs=$stressArgs.Clone();$futureArgs.StartupCandidateSourceVersion=$future.source;$futureArgs.CandidateArchive=$futureArchive;$futureArgs.CandidateMaterializationArchive=$futureArchive;$futureArgs.OutputRoot=Join-Path $root ('candidate-only-'+$future.source)
+    $futureResult=Invoke-MIRDirectLibraryStartupMeasurement @futureArgs
+    Assert-DirectStartup ($futureResult.inputs.candidate.source_version-ceq$future.source-and$futureResult.inputs.candidate.archive.version-ceq$future.distribution-and$null-eq$futureResult.inputs.baseline-and@($futureResult.samples|Where-Object label -CNE ('candidate-'+$future.source)).Count-eq0) 'Current-version orchestration lost the source/codec/archive/baseline binding.'
+  }
+  $failedArgs=$stressArgs.Clone();$failedArgs.OutputRoot=Join-Path $root 'candidate-only-expected-failure'
+  $script:stressSampleFailure=$true;$actualFailure=''
+  try{Invoke-MIRDirectLibraryStartupMeasurement @failedArgs|Out-Null}catch{$actualFailure=$_.Exception.Message}finally{$script:stressSampleFailure=$false}
+  Assert-DirectStartup ($actualFailure-ceq'[controlled-startup-sample-failure]'-and$script:stressLastRecord.status-ceq'failed'-and$script:stressLastRecord.mode-ceq'candidate-only-stress-diagnostic'-and$null-eq$script:stressLastRecord.inputs.baseline) 'Candidate-only failure receipt invented a baseline or lost the original error.'
+
+  $legacyArgs=$stressArgs.Clone();$legacyArgs.CandidateOnly=$false;$legacyArgs.BaselineSourceVersion='4.2.2';$legacyArgs.BaselineArchive=$published;$legacyArgs.BaselineManifestPath=$manifest;$legacyArgs.BaselineManifestSha256=Get-MIRImmutableInputSha256 -Path $manifest;$legacyArgs.OutputRoot=Join-Path $root 'legacy-matched-receipt'
+  $legacyResult=Invoke-MIRDirectLibraryStartupMeasurement @legacyArgs
+  Assert-DirectStartup ($legacyResult.inputs.published_422.archive.sha256-ceq$publishedSha-and($legacyResult.inputs.published_422|ConvertTo-Json -Depth 10 -Compress)-ceq($legacyResult.inputs.baseline|ConvertTo-Json -Depth 10 -Compress)) 'Legacy V1 baseline receipt lost its exact published_422 field.'
+  $genericBaseline=Write-TestArchive -Library $library -Version '4.6.20000'
+  $genericManifest=Join-Path $root 'generic-baseline-manifest.json'
+  [IO.File]::WriteAllText($genericManifest,(@{schema=1;release=@{source_version='4.6.0'};package_assets=@(@{target='f200';distribution_version='4.6.20000';sha256=(Get-MIRImmutableInputSha256 -Path $genericBaseline)})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  $genericArgs=$legacyArgs.Clone();$genericArgs.BaselineSourceVersion='4.6.0';$genericArgs.BaselineArchive=$genericBaseline;$genericArgs.BaselineManifestPath=$genericManifest;$genericArgs.BaselineManifestSha256=Get-MIRImmutableInputSha256 -Path $genericManifest;$genericArgs.OutputRoot=Join-Path $root 'generic-matched-receipt'
+  $genericResult=Invoke-MIRDirectLibraryStartupMeasurement @genericArgs
+  Assert-DirectStartup ($null-eq$genericResult.inputs.published_422-and$genericResult.inputs.baseline.archive.version-ceq'4.6.20000'-and$genericResult.inputs.baseline.authenticated_manifest.source_version-ceq'4.6.0') 'New baseline was mislabeled as historical 4.2.2.'
+
+  foreach($noncanonical in @('4.07.0','4.7.00','4.00.0')){
+    $badSpelling=$stressArgs.Clone();$badSpelling.StartupCandidateSourceVersion=$noncanonical;$badSpelling.OutputRoot=Join-Path $root ('reject-spelling-'+$noncanonical)
+    $spellingRejected=$false
+    try{Invoke-MIRDirectLibraryStartupMeasurement @badSpelling|Out-Null}catch{$spellingRejected=$_.FullyQualifiedErrorId-match'^ParameterArgumentValidationError'}
+    Assert-DirectStartup $spellingRejected ('Noncanonical source spelling was admitted: '+$noncanonical)
+  }
+
   [pscustomobject][ordered]@{status='MIR-DIRECT-LIBRARY-STARTUP-CONTROLS-PASSED';assertions=$assertions;engine_runs=0;archive_copies_created=0;archive_links_created=0;populated_profiles_created=0}
 }finally{
   $buildPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build'))+[IO.Path]::DirectorySeparatorChar

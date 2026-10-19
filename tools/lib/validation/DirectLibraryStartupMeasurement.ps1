@@ -74,7 +74,9 @@ function Get-MIRDirectLibraryStartupArchive {
   Assert-MIRDirectLibraryStartupMeasurement ([string]$info.name -ceq 'more-infinite-research') 'archive-name'
   Assert-MIRDirectLibraryStartupMeasurement ([string]$info.version -match '^4[.][0-9]{1,5}[.]\d{5}$') 'archive-version'
   Assert-MIRDirectLibraryStartupMeasurement ([IO.Path]::GetFileName($path) -ceq ('more-infinite-research_'+[string]$info.version+'.zip')) 'archive-filename'
-  [pscustomobject][ordered]@{path=$path;name=[string]$info.name;version=[string]$info.version;sha256=Get-MIRImmutableInputSha256 -Path $path}
+  $root=$entries[0].FullName.Substring(0,$entries[0].FullName.Length-'/info.json'.Length)
+  Assert-MIRDirectLibraryStartupMeasurement ($root -ceq ([string]$info.name+'_'+[string]$info.version)) 'archive-root'
+  [pscustomobject][ordered]@{path=$path;name=[string]$info.name;version=[string]$info.version;root=$root;factorio_version=[string]$info.factorio_version;sha256=Get-MIRImmutableInputSha256 -Path $path}
 }
 
 function Get-MIRDirectLibraryPlayerReadyObserverArchive {
@@ -113,23 +115,52 @@ function Get-MIRDirectLibraryPlayerReadyObserverArchive {
   [pscustomobject][ordered]@{path=$path;name=[string]$info.name;version=[string]$info.version;sha256=Get-MIRImmutableInputSha256 -Path $path;target=$Target;marker='MIR_PLAYER_READY';marker_file='factorio-current.log';scenario='base-only-player-ready-observer-v1'}
 }
 
-function Assert-MIRDirectLibraryPublished422Manifest {
-  param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$ExpectedSha256,[Parameter(Mandatory)]$PublishedArchive,[Parameter(Mandatory)][string]$Target)
+function Assert-MIRDirectLibraryBaselineManifest {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$ManifestPath,
+    [Parameter(Mandatory)][string]$ExpectedSha256,
+    [Parameter(Mandatory)]$PublishedArchive,
+    [Parameter(Mandatory)][ValidateSet('f200','f210')][string]$Target,
+    [Parameter(Mandatory)][string]$SourceVersion
+  )
+  . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
+  $identity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $RepoRoot -Target $Target -SourceVersion $SourceVersion
+  Assert-MIRDirectLibraryStartupMeasurement ($identity.source_version -ceq $SourceVersion) 'published-source-canonical'
   Assert-MIRDirectLibraryStartupMeasurement ($ExpectedSha256 -match '^[A-Fa-f0-9]{64}$') 'published-manifest-expected-hash'
   $path=(Resolve-Path -LiteralPath $ManifestPath).Path;$actual=Get-MIRImmutableInputSha256 -Path $path
   Assert-MIRDirectLibraryStartupMeasurement ($actual -ceq $ExpectedSha256.ToUpperInvariant()) 'published-manifest-hash'
   $manifest=Get-Content -Raw -LiteralPath $path|ConvertFrom-Json -Depth 100 -DateKind String
-  $sourceVersion=if($manifest.PSObject.Properties['release']){[string]$manifest.release.source_version}else{[string]$manifest.source_version}
-  Assert-MIRDirectLibraryStartupMeasurement ($sourceVersion -ceq '4.2.2') 'published-manifest-release'
-  $assets=@()
-  if($manifest.PSObject.Properties['package_assets']){$assets=@($manifest.package_assets)}
-  elseif($manifest.PSObject.Properties['targets']){$assets=@($manifest.targets)}
-  elseif($manifest.PSObject.Properties['assets']){$assets=@($manifest.assets|Where-Object {[string]$_.target -ceq $Target})}
-  $rows=@($assets|Where-Object {[string]$_.target -ceq $Target})
+  Assert-MIRDirectLibraryStartupMeasurement ($manifest.PSObject.Properties['schema'] -and ($manifest.schema -is [int] -or $manifest.schema -is [long]) -and $manifest.schema -in @(1,13)) 'published-manifest-schema'
+  $manifestSourceVersion=''
+  if($manifest.PSObject.Properties['release']){$manifestSourceVersion=[string]$manifest.release.source_version}
+  elseif($manifest.PSObject.Properties['source_version']){$manifestSourceVersion=[string]$manifest.source_version}
+  elseif($manifest.schema -eq 13 -and $manifest.PSObject.Properties['target_authority']){
+    $authorities=@($manifest.target_authority|Where-Object {[string]$_.target -ceq $Target})
+    Assert-MIRDirectLibraryStartupMeasurement ($authorities.Count -eq 1) 'published-manifest-target-authority'
+    Assert-MIRDirectLibraryStartupMeasurement ([string]$authorities[0].distribution_version -ceq [string]$identity.distribution_version) 'published-manifest-target-authority'
+    $manifestSourceVersion=[string]$authorities[0].source_version
+  }
+  Assert-MIRDirectLibraryStartupMeasurement ($manifestSourceVersion -ceq $SourceVersion) 'published-manifest-release'
+  $surfaces=@('package_assets','targets','assets'|Where-Object {$manifest.PSObject.Properties[$_]})
+  Assert-MIRDirectLibraryStartupMeasurement ($surfaces.Count -eq 1) 'published-manifest-surface'
+  $rows=@($manifest.($surfaces[0])|Where-Object {[string]$_.target -ceq $Target})
   Assert-MIRDirectLibraryStartupMeasurement ($rows.Count -eq 1) 'published-manifest-target'
   $row=$rows[0]
-  Assert-MIRDirectLibraryStartupMeasurement ([string]$row.distribution_version -ceq [string]$PublishedArchive.version -and [string]$row.sha256 -ceq [string]$PublishedArchive.sha256) 'published-manifest-archive'
-  return [pscustomobject][ordered]@{path=$path;sha256=$actual;source_version=$sourceVersion;source_commit=$(if($manifest.PSObject.Properties['source']){[string]$manifest.source.commit}else{''});source_tree=$(if($manifest.PSObject.Properties['source']){[string]$manifest.source.tree}else{''});target=$Target;archive_sha256=[string]$row.sha256}
+  Assert-MIRDirectLibraryStartupMeasurement (($manifest.schema -eq 1 -and -not $row.PSObject.Properties['asset']) -or ($manifest.schema -eq 13 -and $row.PSObject.Properties['asset'] -and [string]$manifest.kind -ceq 'MIR42FourTargetDeterministicCandidateManifestV13')) 'published-manifest-schema'
+  $asset=if($row.PSObject.Properties['asset']){$row.asset}else{$row}
+  Assert-MIRDirectLibraryStartupMeasurement ([string]$row.distribution_version -ceq [string]$identity.distribution_version -and [string]$PublishedArchive.version -ceq [string]$identity.distribution_version -and [string]$asset.sha256 -ceq [string]$PublishedArchive.sha256) 'published-manifest-archive'
+  if($asset.PSObject.Properties['filename']){Assert-MIRDirectLibraryStartupMeasurement ([string]$asset.filename -ceq [IO.Path]::GetFileName([string]$PublishedArchive.path)) 'published-manifest-filename'}
+  if($asset.PSObject.Properties['path']){Assert-MIRDirectLibraryStartupMeasurement ([IO.Path]::GetFileName([string]$asset.path) -ceq [IO.Path]::GetFileName([string]$PublishedArchive.path)) 'published-manifest-filename'}
+  Assert-MIRDirectLibraryStartupMeasurement ([string]$PublishedArchive.root -ceq [string]$identity.distribution_root -and [string]$PublishedArchive.factorio_version -ceq $(if($Target -ceq 'f200'){'2.0'}else{'2.1'})) 'published-archive-root-target'
+  return [pscustomobject][ordered]@{path=$path;sha256=$actual;source_version=$manifestSourceVersion;source_commit=$(if($manifest.PSObject.Properties['source']){[string]$manifest.source.commit}else{''});source_tree=$(if($manifest.PSObject.Properties['source']){[string]$manifest.source.tree}else{''});target=$Target;archive_sha256=[string]$asset.sha256}
+}
+
+# Retain the old named caller with its original 4.2.2 contract. New callers
+# use the same canonical reader with an explicitly selected baseline.
+function Assert-MIRDirectLibraryPublished422Manifest {
+  param([Parameter(Mandatory)][string]$ManifestPath,[Parameter(Mandatory)][string]$ExpectedSha256,[Parameter(Mandatory)]$PublishedArchive,[Parameter(Mandatory)][string]$Target,[string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path)
+  Assert-MIRDirectLibraryBaselineManifest -RepoRoot $RepoRoot -ManifestPath $ManifestPath -ExpectedSha256 $ExpectedSha256 -PublishedArchive $PublishedArchive -Target $Target -SourceVersion '4.2.2'
 }
 
 function Get-MIRDirectLibraryStartupEngineIdentity {
@@ -557,9 +588,10 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)][string]$FactorioBin,[Parameter(Mandatory)][string]$LibraryDirectory,[Parameter(Mandatory)][string]$ProfileTemplatePath,
-    [string]$Published422Archive='',[string]$Published422ManifestPath='',[string]$Published422ManifestSha256='',
+    [Alias('Published422Archive')][string]$BaselineArchive='',[Alias('Published422ManifestPath')][string]$BaselineManifestPath='',[Alias('Published422ManifestSha256')][string]$BaselineManifestSha256='',
+  [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$BaselineSourceVersion='4.2.2',
     [string]$CandidateArchive='',[string]$CandidateMaterializationArchive='',[string]$CandidateMaterializationReceiptPath='',
-    [ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2')][string]$StartupCandidateSourceVersion='4.2.3',
+    [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$StartupCandidateSourceVersion='4.2.3',
     [switch]$Preliminary,[switch]$CandidateOnly,[Parameter(Mandatory)][string]$OutputRoot,
     [ValidateSet('f200','f210')][string]$Target='f200',[ValidateRange(0,5)][int]$WarmupRuns=1,[ValidateRange(1,25)][int]$MeasuredRuns=3,[ValidateRange(1,3600)][int]$TimeoutSeconds=300,
     [Parameter(Mandatory)][ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB,[ValidateRange(1,2048)][int]$MaxNewOutputMiB=120,[ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
@@ -578,14 +610,13 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
   Assert-MIRDirectLibraryStartupMeasurement (-not(Test-Path -LiteralPath $OutputRoot)) 'output-exists'
   $engineIdentity=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $data
   Assert-MIRDirectLibraryStartupMeasurement (-not($CandidateOnly-and($Preliminary-or$GraphicalPlayerReady-or$OrdinaryMenu))) 'candidate-only-mode'
-  $published=$null;$publishedManifest=$null;$code=$Target.Substring(1)
+  $published=$null;$publishedManifest=$null
   if($CandidateOnly){
-    Assert-MIRDirectLibraryStartupMeasurement ([string]::IsNullOrWhiteSpace($Published422Archive)-and[string]::IsNullOrWhiteSpace($Published422ManifestPath)-and[string]::IsNullOrWhiteSpace($Published422ManifestSha256)) 'candidate-only-no-comparison'
+    Assert-MIRDirectLibraryStartupMeasurement ([string]::IsNullOrWhiteSpace($BaselineArchive)-and[string]::IsNullOrWhiteSpace($BaselineManifestPath)-and[string]::IsNullOrWhiteSpace($BaselineManifestSha256)) 'candidate-only-no-comparison'
   }else{
-    Assert-MIRDirectLibraryStartupMeasurement (-not[string]::IsNullOrWhiteSpace($Published422Archive)-and-not[string]::IsNullOrWhiteSpace($Published422ManifestPath)-and-not[string]::IsNullOrWhiteSpace($Published422ManifestSha256)) 'published-inputs'
-    $published=Get-MIRDirectLibraryStartupArchive -Archive $Published422Archive -LibraryDirectory $library
-    Assert-MIRDirectLibraryStartupMeasurement ($published.version -ceq "4.2.${code}02") 'published-identity'
-    $publishedManifest=Assert-MIRDirectLibraryPublished422Manifest -ManifestPath $Published422ManifestPath -ExpectedSha256 $Published422ManifestSha256 -PublishedArchive $published -Target $Target
+    Assert-MIRDirectLibraryStartupMeasurement (-not[string]::IsNullOrWhiteSpace($BaselineArchive)-and-not[string]::IsNullOrWhiteSpace($BaselineManifestPath)-and-not[string]::IsNullOrWhiteSpace($BaselineManifestSha256)) 'published-inputs'
+    $published=Get-MIRDirectLibraryStartupArchive -Archive $BaselineArchive -LibraryDirectory $library
+    $publishedManifest=Assert-MIRDirectLibraryBaselineManifest -RepoRoot $repo -ManifestPath $BaselineManifestPath -ExpectedSha256 $BaselineManifestSha256 -PublishedArchive $published -Target $Target -SourceVersion $BaselineSourceVersion
   }
   $seedTarget=if($Target-ceq'f200'){'2.0'}else{'2.1'}
   $seedProfile=Get-Content -LiteralPath (Join-Path $repo ('validation/profiles/factorio-'+$seedTarget+'.json')) -Raw|ConvertFrom-Json
@@ -634,7 +665,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $admissionPolicy -WorkRoot $OutputRoot -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'resource-context'))
     $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
     [IO.Directory]::CreateDirectory($resources.root)|Out-Null;$records=[Collections.Generic.List[object]]::new();$preparations=[Collections.Generic.List[object]]::new()
-    $kinds=@([pscustomobject]@{label='without-mir';archive=$null},[pscustomobject]@{label='released-4.2.2';archive=$published})
+    $kinds=@([pscustomobject]@{label='without-mir';archive=$null},[pscustomobject]@{label=('released-'+$BaselineSourceVersion);archive=$published})
     if($hasCandidate){$kinds+=,[pscustomobject]@{label=('candidate-'+$StartupCandidateSourceVersion);archive=$candidate}}
     # Absolute work qualification must not wait for a known pathological
     # predecessor. This mode records no baseline or relative speedup.
@@ -691,7 +722,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
       $previousSelection=[string]$kind.label
     }
     }
-    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=$(if($CandidateOnly){$null}else{[ordered]@{archive=$published;authenticated_manifest=$publishedManifest}});candidate=$(if($hasCandidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
+    $inputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=$(if($CandidateOnly-or$BaselineSourceVersion-cne'4.2.2'){$null}else{[ordered]@{archive=$published;authenticated_manifest=$publishedManifest}});baseline=$(if($CandidateOnly){$null}else{[ordered]@{archive=$published;authenticated_manifest=$publishedManifest}});candidate=$(if($hasCandidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=[ordered]@{archive_path=$candidateMaterialization.path;archive_sha256=$candidateMaterialization.receipt.archive_sha256;receipt_path=$CandidateMaterializationReceiptPath;receipt_sha256=Get-MIRImmutableInputSha256 -Path $CandidateMaterializationReceiptPath;source_version=$candidateMaterialization.receipt.source_version;package_source_sha256=$candidateMaterialization.receipt.package_source_sha256;source_manifest_sha256=$candidateMaterialization.receipt.source_manifest_sha256}}}else{$null})}
     $endpointClass=if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'}
     $notes=@('Elapsed time is native process start-to-exit time recorded by NativeProbeResources.','Peak process values are monitored process-tree samples, not whole-system memory.','Each selected configuration retains one private write-data root across blocks; per-sample logs and saves stay isolated.','Each first sample records its actual prior selection and whether it changed; immediate repeats are marked warm-repeat.','All configurations use the same selected archive library serially; controls are restored after every sample.','Optional pre-launch admission waiting is recorded separately from every native startup elapsed time. It repeats only the existing physical-memory or commit admission check, retains only bounded first/last refusal snapshots, and never retries a governed sample after launch.')
     if($GraphicalPlayerReady){$notes+=@('Each configuration receives one neutral base-only observer save before samples. Preparation processes are recorded separately and are not startup samples.','Graphical process elapsed includes the bounded post-ready benchmark and exit. engine_log_player_ready_seconds is recorded separately from the Factorio log. This diagnostic is not a main-menu readiness or full-startup claim.')}
@@ -704,7 +735,7 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     $admissionWaitFailure=$_.Exception.Data['mir_direct_startup_admission_wait']
     if($null-ne$admissionWaitFailure){$admissionWaits.Add($admissionWaitFailure)}
     if($null-ne$resources){
-      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=[ordered]@{archive=$published;authenticated_manifest=$publishedManifest};candidate=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
+      $failureInputs=[ordered]@{active_mods_observer=$(if([string]::IsNullOrWhiteSpace($selectedActiveModsObserver)){$null}else{[string]$selectedActiveModsObserver});player_ready_observer=$playerReadyObserver;ordinary_player_config=$(if($null-eq$ordinaryPlayerConfig){$null}else{[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}});published_422=$(if($CandidateOnly-or$BaselineSourceVersion-cne'4.2.2'){$null}else{[ordered]@{archive=$published;authenticated_manifest=$publishedManifest}});baseline=$(if($CandidateOnly){$null}else{[ordered]@{archive=$published;authenticated_manifest=$publishedManifest}});candidate=$(if($hasCandidate -and $null-ne$candidate){[ordered]@{source_version=$StartupCandidateSourceVersion;archive=$candidate;materialization=$candidateMaterialization}}else{$null})}
       $failure=[pscustomobject][ordered]@{schema=1;kind='MIRDirectLibraryStartupMeasurementV1';status='failed';mode=$(if($CandidateOnly){'candidate-only-stress-diagnostic'}elseif($hasCandidate){'matched-three-input'}else{'preliminary-two-input'});target=$Target;source_observation=$sourceObservation;factorio=$engineIdentity;library=$library;profile_template_sha256=$templateSha;inputs=$failureInputs;endpoint_class=$(if($GraphicalPlayerReady){'graphical-player-ready-diagnostic'}elseif($OrdinaryMenu){'ordinary-native-window-diagnostic'}else{'headless-create-diagnostic'});current_label=$currentLabel;preparations=$(if($null-ne$preparations){@($preparations)}else{@()});admission_wait_seconds=$AdmissionWaitSeconds;admission_waits=@($admissionWaits);samples_so_far=$(if($null-ne$records){@($records)}else{@()});error=$_.Exception.Message;library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')));resource_context=[ordered]@{expected_peak_memory_bytes=$resources.peak_memory_bytes;max_new_output_bytes=$resources.max_new_output_bytes;processes=@($resources.runs)}}
       $failure|Add-Member -NotePropertyName duration_measurement -NotePropertyValue $durationMeasurement
       try{Write-MIRNativeProbeResult -Context $resources -Record $failure}catch{Write-Warning "[mir-direct-startup-failure-receipt] $($_.Exception.Message)"}
