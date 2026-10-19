@@ -2035,6 +2035,33 @@ do
   local recycling_direct_producer = lossy_recycling_direct_producer(closed_output_world())
   check(table.concat(graph_routes(recycling_direct_producer, value), ",") == "smelting",
     "schema3 accepts one hidden, non-productive and strictly lossy self recycler")
+  do
+    local profiles = require("fixtures.material_routes.target_profiles")
+    local provider = require("prototypes.mir.platform.factorio.target_profiles")
+    local previous_current = provider.current
+    provider.current = function() return profiles.profiles["2.1"] end
+    local raw = {type="recipe", name="hidden_output", hidden=true, enabled=false, categories={"recycling"},
+      ingredients={{type="item",name="plate",amount=1,ignored_by_stats=1}},
+      results={{type="item",name="plate",amount=1,independent_probability=0.25,ignored_by_stats=1}}}
+    local world = closed_output_world()
+    world.hidden_output = require("prototypes.mir.index.recipe_facts").index_prototypes({hidden_output=raw}).facts.hidden_output
+    check(world.hidden_output.effective_allow_productivity == false
+      and world.hidden_output.variants[1].effective_allow_productivity == nil,
+      "schema3 reproduces the native implicit-false recycler through the actual fact normalizer")
+    check(table.concat(graph_routes(world, value), ",") == "smelting",
+      "schema3 admits the captured native recycler under the declared false target default")
+    provider.current = function() return {prototype_shapes={recipe_property_defaults={allow_productivity=true}}} end
+    check(#graph_routes(world, value) == 0, "schema3 refuses implicit permission under a true target default")
+    provider.current = function() return {} end
+    check(#graph_routes(world, value) == 0, "schema3 refuses an undeclared target default")
+    provider.current = function() return profiles.profiles["2.1"] end
+    world.hidden_output.variants[1].effective_allow_productivity = "unknown"
+    check(#graph_routes(world, value) == 0, "schema3 refuses an unknown normalized recycler permission")
+    world.hidden_output.variants[1].effective_allow_productivity = true
+    world.hidden_output.variants[1].allow_productivity = true
+    check(#graph_routes(world, value) == 0, "schema3 refuses an explicitly productive recycler")
+    provider.current = previous_current
+  end
   local deterministic_recycler = lossy_recycling_direct_producer(closed_output_world())
   deterministic_recycler.hidden_output.variants[1].results[1].probability = 1
   deterministic_recycler.hidden_output.variants[1].results[1].independent_probability = 1

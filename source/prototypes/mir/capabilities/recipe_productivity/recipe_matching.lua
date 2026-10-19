@@ -884,6 +884,18 @@ local function safe_recycling_result(entry, expected_identity, input_amount)
     and tonumber(entry.ignored_by_stats) == amount
 end
 
+local function non_productive_recycling_variant(variant)
+  if variant.allow_productivity == false and variant.effective_allow_productivity == false then return true end
+  if variant.allow_productivity ~= nil or variant.effective_allow_productivity ~= nil
+    or variant.declared_allow_productivity ~= nil then return false end
+  -- The current fact schema retains nil for an absent declaration whose
+  -- native default is false. Do not reinterpret unknown fields or defaults,
+  -- or rewrite historical fact fingerprints merely to admit this recycler.
+  local profile = target_profiles.current()
+  local defaults = profile and profile.prototype_shapes and profile.prototype_shapes.recipe_property_defaults
+  return type(defaults) == "table" and defaults.allow_productivity == false
+end
+
 local function safe_lossy_recycling_self_return(fact, expected_identity)
   if type(fact) ~= "table" or fact.hidden ~= true or fact.source_class ~= "recycling"
     or fact.enabled_without_research ~= false or fact.allow_productivity ~= false
@@ -894,7 +906,7 @@ local function safe_lossy_recycling_self_return(fact, expected_identity)
   end
   local variant = fact.variants[1]
   if type(variant) ~= "table" or variant.hidden ~= true or variant.enabled ~= false
-    or variant.allow_productivity ~= false or variant.effective_allow_productivity ~= false
+    or not non_productive_recycling_variant(variant)
     or not exact_string_list(variant.categories, {"recycling"})
     or type(variant.ingredients) ~= "table" or #variant.ingredients ~= 1
     or type(variant.results) ~= "table" or #variant.results ~= 1 then
