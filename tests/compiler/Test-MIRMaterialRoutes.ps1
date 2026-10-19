@@ -34,6 +34,7 @@ $modules=[ordered]@{
  'prototypes.mir.families.material_progression'='source/prototypes/mir/families/material_progression.lua'
  'prototypes.mir.families.operator_dsl'='source/prototypes/mir/families/operator_dsl.lua'
  'prototypes.mir.compatibility.policies.k2_science_phase'='source/prototypes/mir/compatibility/policies/k2_science_phase.lua'
+ 'prototypes.mir.core.fingerprint'='source/prototypes/mir/core/fingerprint.lua'
  'prototypes.mir.index.recipe_risk_facts'='source/prototypes/mir/index/recipe_risk_facts.lua'
  'prototypes.mir.index.recipe_facts'='source/prototypes/mir/index/recipe_facts.lua'
  'prototypes.mir.index.item_prototype_facts'='source/prototypes/mir/index/item_prototype_facts.lua'
