@@ -6,7 +6,7 @@ function Get-MIR4Factorio21ChannelAuthority {
   } else {
     (Resolve-Path -LiteralPath $RepoRoot).Path
   }
-  $path = Join-Path $repo "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json"
+  $path = Join-Path $repo "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json"
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Factorio 2.1 channel authority is missing: $path" }
   return Get-Content -Raw -LiteralPath $path | ConvertFrom-Json
 }

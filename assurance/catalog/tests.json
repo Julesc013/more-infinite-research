@@ -4216,6 +4216,13 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV3Authority.ps1",
+        "tests/mir4/Test-MIR4F210QualificationPolicyV3.ps1",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
@@ -4306,6 +4313,8 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
         ".github/workflows/assurance-scheduled.yml",
         "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "spec/programmes/mir4-4x-operating-programme-v1.json",
@@ -8736,5 +8745,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1045d9c9cbff62fcc72fdbb7bca7d8cb0044ef56f170ff7c4e2adefbd65fd8aa"
+  "digest": "sha256:2bcc152ac01527b1721985e7d40ffacde68895aa07761624abaecefa2a42be36"
 }

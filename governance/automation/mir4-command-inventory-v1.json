@@ -2553,6 +2553,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV3Authority.ps1",
+      "classification": "migration-only",
+      "sha256": "218F5DBF4C8C9106B413901A5818163298ACCBD92093630FE0DE2E0A0D700907",
+      "hash_mode": "canonical-text-v1",
+      "lines": 73,
+      "package_visible": false
+    },
+    {
       "path": "tools/commands/mir4/Update-MIR4F210QualificationPolicyAuthority.ps1",
       "classification": "migration-only",
       "sha256": "609FB1670635C9F525FB5CBA6160F888ABD5DB4F89924927FB5855EE1B45FA77",
@@ -4475,7 +4483,7 @@
     {
       "path": "tools/lib/validation/FactorioVersionPolicy.ps1",
       "classification": "canonical-internal",
-      "sha256": "37EB17FBD60D449390D2A052375CC9941E348F422C7277F2264A8AF13D96C7DE",
+      "sha256": "1B90007EF52785EEA6A61C2C0C39FFEBE7E38494CB1DF1AA63E6EDEA5ECB5DFB",
       "hash_mode": "canonical-text-v1",
       "lines": 276,
       "package_visible": false
@@ -5235,9 +5243,9 @@
     {
       "path": "tools/mir/application/release/F210QualificationPolicy.ps1",
       "classification": "canonical-internal",
-      "sha256": "EE9993E1190377EBEFA6CCCC7FF27F2CF7416614C6E84412F240DEC67F909995",
+      "sha256": "A2B520693F9460EC4AD2BAB1915F189784633197FDB1509B7E6526CD19A130F0",
       "hash_mode": "canonical-text-v1",
-      "lines": 750,
+      "lines": 830,
       "package_visible": false
     },
     {
@@ -6045,7 +6053,7 @@
     "canonical_public": 1,
     "canonical_internal": 421,
     "compatibility_wrapper": 168,
-    "migration_only": 59,
+    "migration_only": 60,
     "historical": 18,
     "obsolete": 0,
     "unknown": 0,
@@ -6058,5 +6066,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:64f8338245a449e0528c21b139d56b75ba5b134292b7e0bdfdf6bc4714ea8c3a"
+  "digest": "sha256:aa380114b94fac4f07bb2e187a6feee75c9a89b20564f7b3a59fccc04cc21bdd"
 }

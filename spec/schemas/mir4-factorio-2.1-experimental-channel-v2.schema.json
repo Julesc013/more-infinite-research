@@ -1,0 +1,407 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://julesc013.github.io/more-infinite-research/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
+  "title": "MIR 4 Factorio 2.1 experimental channel policy V2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "kind",
+    "status",
+    "target",
+    "selection",
+    "execution_evidence",
+    "change_review",
+    "current_review"
+  ],
+  "properties": {
+    "schema": {
+      "const": 2
+    },
+    "kind": {
+      "const": "MIR4Factorio21ExperimentalChannelV2"
+    },
+    "status": {
+      "const": "active-until-first-official-2.1-stable"
+    },
+    "target": {
+      "const": "f210"
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factorio_line",
+        "channel",
+        "source",
+        "patch_pinned",
+        "minimum_version",
+        "rule",
+        "stable_transition"
+      ],
+      "properties": {
+        "factorio_line": {
+          "const": "2.1"
+        },
+        "channel": {
+          "const": "latest-experimental"
+        },
+        "source": {
+          "const": "official-steam-current-installation"
+        },
+        "patch_pinned": {
+          "const": false
+        },
+        "minimum_version": {
+          "pattern": "^2\\.1\\.[0-9]+$"
+        },
+        "rule": {
+          "const": "select-latest-installed-official-2.1-experimental"
+        },
+        "stable_transition": {
+          "const": "stop-and-reopen-policy-when-official-2.1-stable-appears"
+        }
+      }
+    },
+    "execution_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exact_version_required",
+        "binary_sha256_required",
+        "api_document_sha256_required",
+        "cross_version_reuse"
+      ],
+      "properties": {
+        "exact_version_required": {
+          "const": true
+        },
+        "binary_sha256_required": {
+          "const": true
+        },
+        "api_document_sha256_required": {
+          "const": true
+        },
+        "cross_version_reuse": {
+          "const": false
+        }
+      }
+    },
+    "change_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trigger",
+        "workflow",
+        "required_tasks"
+      ],
+      "properties": {
+        "trigger": {
+          "const": "version-binary-or-api-identity-change"
+        },
+        "workflow": {
+          "const": ".github/workflows/assurance-scheduled.yml#factorio-2-1-channel-review"
+        },
+        "required_tasks": {
+          "type": "array",
+          "minItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          }
+        }
+      }
+    },
+    "current_review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewed_at",
+        "previous_version",
+        "version",
+        "file_version",
+        "binary_sha256",
+        "runtime_api",
+        "prototype_api",
+        "changelog_sha256",
+        "review_tasks",
+        "findings",
+        "steam",
+        "official_mods",
+        "observed_at"
+      ],
+      "properties": {
+        "status": {
+          "const": "reviewed-current-observation"
+        },
+        "reviewed_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "previous_version": {
+          "pattern": "^2\\.1\\.[0-9]+$"
+        },
+        "version": {
+          "pattern": "^2\\.1\\.[0-9]+$"
+        },
+        "file_version": {
+          "pattern": "^2\\.1\\.[0-9]+(?:\\.[0-9]+)?$"
+        },
+        "binary_sha256": {
+          "pattern": "^[0-9A-F]{64}$"
+        },
+        "runtime_api": {
+          "$ref": "#/$defs/apiIdentity"
+        },
+        "prototype_api": {
+          "$ref": "#/$defs/apiIdentity"
+        },
+        "changelog_sha256": {
+          "pattern": "^[0-9A-F]{64}$"
+        },
+        "review_tasks": {
+          "type": "array",
+          "minItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "status",
+              "disposition"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "const": "complete"
+              },
+              "disposition": {
+                "type": "string",
+                "minLength": 8
+              }
+            }
+          }
+        },
+        "findings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "steam": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "app_id",
+            "branch",
+            "build_id",
+            "state_flags",
+            "app_manifest_sha256"
+          ],
+          "properties": {
+            "app_id": {
+              "const": "427520"
+            },
+            "branch": {
+              "const": "experimental"
+            },
+            "build_id": {
+              "const": "25956922"
+            },
+            "state_flags": {
+              "const": "4"
+            },
+            "app_manifest_sha256": {
+              "const": "DC46C3B23799E96666BD0F3ADF206EF30403E012AFCD15E5D64B661BE7908618"
+            }
+          }
+        },
+        "official_mods": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base",
+            "elevated_rails",
+            "quality",
+            "recycler",
+            "space_age"
+          ],
+          "properties": {
+            "base": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version",
+                "info_path",
+                "raw_sha256",
+                "canonical_sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "base"
+                },
+                "version": {
+                  "const": "2.1.22"
+                },
+                "info_path": {
+                  "const": "data/base/info.json"
+                },
+                "raw_sha256": {
+                  "const": "E4E2C8B15C448DC3DFD21D01E864DC721EDE133E84AF456CAACAB31C2EA542E8"
+                },
+                "canonical_sha256": {
+                  "const": "10C6C4F8BE56F269AC7E4CBE49D875E19BFCCC745D8A45112A6ED267BBBF2E6D"
+                }
+              }
+            },
+            "elevated_rails": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version",
+                "info_path",
+                "raw_sha256",
+                "canonical_sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "elevated-rails"
+                },
+                "version": {
+                  "const": "2.1.22"
+                },
+                "info_path": {
+                  "const": "data/elevated-rails/info.json"
+                },
+                "raw_sha256": {
+                  "const": "BE925D023851ED71D2129CACCDAC6AA0ECBF897E74F268C02018CD9F5516A38E"
+                },
+                "canonical_sha256": {
+                  "const": "B2CDCE0BCFBB377D8BA252652F6BCE5F92A9C29BE8A31502714325F01FA4E737"
+                }
+              }
+            },
+            "quality": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version",
+                "info_path",
+                "raw_sha256",
+                "canonical_sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "quality"
+                },
+                "version": {
+                  "const": "2.1.22"
+                },
+                "info_path": {
+                  "const": "data/quality/info.json"
+                },
+                "raw_sha256": {
+                  "const": "045153FF5F4C536C5E080612B674C5194B4CEE890497356BD6986DC014571622"
+                },
+                "canonical_sha256": {
+                  "const": "D73F9FF5C78632DCA6A1934C0F1A6D0C30F2776FDCCD76F748BB03FEC07ED526"
+                }
+              }
+            },
+            "recycler": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version",
+                "info_path",
+                "raw_sha256",
+                "canonical_sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "recycler"
+                },
+                "version": {
+                  "const": "2.1.22"
+                },
+                "info_path": {
+                  "const": "data/recycler/info.json"
+                },
+                "raw_sha256": {
+                  "const": "09E210425D0DA4D56C38B2B3E79B84BB69F6D78AF83D82A011B91D34ACBEBEA2"
+                },
+                "canonical_sha256": {
+                  "const": "A519C1201603CA230528D04BE6FB204D4D46E83E4881573B42DB1332DAD7C14A"
+                }
+              }
+            },
+            "space_age": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "name",
+                "version",
+                "info_path",
+                "raw_sha256",
+                "canonical_sha256"
+              ],
+              "properties": {
+                "name": {
+                  "const": "space-age"
+                },
+                "version": {
+                  "const": "2.1.22"
+                },
+                "info_path": {
+                  "const": "data/space-age/info.json"
+                },
+                "raw_sha256": {
+                  "const": "6EE7D7E9C201B751770836D072697FE1D5703B1313DA0D10CA534EC410884942"
+                },
+                "canonical_sha256": {
+                  "const": "EBDBF96E27DD03D5159E5FE4DAA8FAF0D8D87E22EBABF9CB0080CCE17FFCCF74"
+                }
+              }
+            }
+          }
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "apiIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "application_version",
+        "sha256",
+        "surface_count"
+      ],
+      "properties": {
+        "application_version": {
+          "pattern": "^2\\.1\\.[0-9]+$"
+        },
+        "sha256": {
+          "pattern": "^[0-9A-F]{64}$"
+        },
+        "surface_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
