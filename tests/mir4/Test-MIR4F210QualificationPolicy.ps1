@@ -140,7 +140,7 @@ foreach ($contract in $progressionHarnessContracts) {
   $harnessText = [IO.File]::ReadAllText((Join-Path $repo ([string]$contract.harness)))
   foreach ($requiredText in @(
     'tools/mir/application/release/F210QualificationPolicy.ps1',
-    'Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3',
+    'Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot',
     ([string]$contract.harness_id)
   )) {
     if (-not $harnessText.Contains($requiredText,[StringComparison]::Ordinal)) {
@@ -160,9 +160,9 @@ foreach ($contract in $progressionHarnessContracts) {
   $fixturePattern = '(?ms)^  ' + [regex]::Escape([string]$contract.id) + ':\r?\n(?<body>.*?)(?=^  [^\s].*:\r?$|\z)'
   $fixtureMatch = [regex]::Match($fixtureAuthorityText,$fixturePattern)
   if (-not $fixtureMatch.Success -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]21"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]21[.]87673"' -or
-      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3[.]json' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_version:\s*"2[.]1[.]22"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'factorio_file_version:\s*"2[.]1[.]22[.]87719"' -or
+      $fixtureMatch.Groups['body'].Value -notmatch 'engine_selection_authority:\s*[.]mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4[.]json' -or
       $fixtureMatch.Groups['body'].Value -notmatch 'engine_admission:\s*admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only' -or
       $fixtureMatch.Groups['body'].Value -match 'factorio_version:\s*"2[.]1[.]17"|exact-engine-2[.]1[.]17') {
     throw "[mir4-f210-progression-fixture-authority] $($contract.id)"

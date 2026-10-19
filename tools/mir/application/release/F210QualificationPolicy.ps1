@@ -601,7 +601,24 @@ function Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
     [string]$SteamManifest = ''
   )
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $admission = Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo
+  Resolve-MIR4F210AdmittedCapHarnessEngine -RepoRoot $repo -HarnessId $HarnessId -FactorioBin $FactorioBin -SteamManifest $SteamManifest -AuthorityPath $script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath
+}
+
+# Both retained and current admissions use the same complete engine/data
+# oracle. Selecting a successor never weakens or silently updates the old one.
+function Resolve-MIR4F210AdmittedCapHarnessEngine {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$HarnessId,
+    [string]$FactorioBin='', [string]$SteamManifest='',
+    [Parameter(Mandatory)][string]$AuthorityPath
+  )
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  if($AuthorityPath-ceq$script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath){
+    $admission=Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo
+  }elseif($AuthorityPath-ceq$script:MIR4F210CapHarnessV4Path){
+    $admission=Get-MIR4F210CapHarnessCapsuleV4 -RepoRoot $repo
+  }else{throw '[mir4-f210-current-cap-harness-admission-authority]'}
   if (-not [bool]$admission.admission.admitted -or
       -not [bool]$admission.qualification.current_engine_api_prototype_data_mod_capsule_admitted -or
       -not [bool]$admission.qualification.current_engine_cap_harness_execution_admitted -or
@@ -667,7 +684,7 @@ function Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 {
     Assert-MIR4F210CurrentEngineCapHarnessBindingV3 -Name ($property.Name + '.version') -Actual ([string]$modInfo.version) -Expected ([string]$mod.version)
   }
   $resolution | Add-Member -NotePropertyName admission -NotePropertyValue ([pscustomobject][ordered]@{
-    authority = $script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath
+    authority = $AuthorityPath
     record_sha256 = [string]$admission.record_sha256
     harness_id = $HarnessId
     scope = [string]$admission.admission.scope
@@ -827,4 +844,84 @@ function New-MIR4F210CurrentQualificationPolicySuccessionV2 {
   }
   $record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record
   return $record
+}
+
+$script:MIR4F210CapHarnessV4Path='.mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json'
+$script:MIR4F210CapHarnessV4Schema='spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json'
+
+function Get-MIR4F210CapHarnessInputsV4 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $records=[ordered]@{
+    admission_v3=@{path=$script:MIR4F210CurrentEngineCapHarnessAdmissionRelativePath;value=(Get-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $repo)}
+    policy_v3=@{path=$script:MIR4F210CurrentPolicyV3RelativePath;value=(Get-MIR4F210CurrentQualificationPolicyV3 -RepoRoot $repo)}
+    policy_succession_v2=@{path=$script:MIR4F210CurrentPolicySuccessionV2RelativePath;value=(Get-MIR4F210CurrentQualificationPolicySuccessionV2 -RepoRoot $repo)}
+  }
+  $channelPath=Join-Path $repo $script:MIR4F210CurrentEngineChannelReviewV2RelativePath
+  $raw=Get-Content -Raw -LiteralPath $channelPath
+  if(-not($raw|Test-Json -SchemaFile (Join-Path $repo 'spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json') -ErrorAction SilentlyContinue)){throw '[mir4-f210-cap-v4-channel-schema]'}
+  $channel=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+  $tasks=@($channel.current_review.review_tasks|ForEach-Object {[string]$_.id}|Sort-Object)
+  if(($tasks-join'|')-cne(@($channel.change_review.required_tasks|Sort-Object)-join'|') -or @($channel.current_review.review_tasks|Where-Object status -cne 'complete').Count){throw '[mir4-f210-cap-v4-review-incomplete]'}
+  [pscustomobject]@{records=$records;channel=$channel;channel_path=$channelPath}
+}
+
+function New-MIR4F210CurrentEngineCapHarnessAdmissionV4 {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$RecordedAt)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $inputs=Get-MIR4F210CapHarnessInputsV4 -RepoRoot $repo
+  $predecessor=[ordered]@{}
+  foreach($name in $inputs.records.Keys){
+    $binding=$inputs.records[$name]
+    $predecessor[$name]=[ordered]@{path=$binding.path;sha256=(Get-FileHash -LiteralPath (Join-Path $repo $binding.path)).Hash;record_sha256=[string]$binding.value.record_sha256}
+  }
+  $record=[pscustomobject][ordered]@{
+    schema=4;kind='MIR4F210CurrentEngineCapHarnessAdmissionV4';recorded_at=$RecordedAt
+    predecessor=$predecessor
+    engine_channel_review=[ordered]@{path=$script:MIR4F210CurrentEngineChannelReviewV2RelativePath;sha256=(Get-FileHash -LiteralPath $inputs.channel_path).Hash;kind=$inputs.channel.kind;version=$inputs.channel.current_review.version}
+    admission=[ordered]@{target='F210';scope='exact-current-engine-cap-harness-execution-only';admitted=$true;harnesses=@('runtime.maximum-level-cap-ownership-multiforce-f210','runtime.maximum-level-v2-v3-migration-f210');package_visible=$false}
+    qualification=[ordered]@{current_engine_api_prototype_data_mod_capsule_admitted=$true;current_engine_cap_harness_execution_admitted=$true;current_engine_qualification_passed=$false;stable_transition_recorded=$false;stable_qualification_passed=$false}
+    boundaries=[ordered]@{prototype_mutation_authorized=$false;source_freeze_authorized=$false;candidate_allocation_authorized=$false;signing_authorized=$false;promotion_to_main_authorized=$false;publication_authorized=$false}
+    status='active-current-experimental-exact-engine-cap-harness-admitted-qualification-pending';record_sha256=''
+  }
+  $record.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $record
+  if(-not(($record|ConvertTo-Json -Depth 100)|Test-Json -SchemaFile (Join-Path $repo $script:MIR4F210CapHarnessV4Schema) -ErrorAction SilentlyContinue)){throw '[mir4-f210-cap-v4-schema]'}
+  $record
+}
+
+function Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+  $raw=Get-Content -Raw -LiteralPath (Join-Path $repo $script:MIR4F210CapHarnessV4Path)
+  if(-not($raw|Test-Json -SchemaFile (Join-Path $repo $script:MIR4F210CapHarnessV4Schema) -ErrorAction SilentlyContinue)){throw '[mir4-f210-cap-v4-schema]'}
+  $record=$raw|ConvertFrom-Json -Depth 100 -DateKind String
+  if(-not(Test-MIR4BootstrapRecordHash -Record $record)){throw '[mir4-f210-cap-v4-hash]'}
+  $expected=New-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $repo -RecordedAt $record.recorded_at
+  if($record.record_sha256-cne$expected.record_sha256){throw '[mir4-f210-cap-v4-authority-binding]'}
+  $record
+}
+
+function Get-MIR4F210CapHarnessCapsuleV4 {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $record=Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $RepoRoot
+  $review=(Get-MIR4F210CapHarnessInputsV4 -RepoRoot $RepoRoot).channel.current_review
+  # The raw successor binds the complete reviewed capsule instead of copying
+  # its binary, Steam, API and five official-mod identities into another file.
+  [pscustomobject]@{
+    admission=$record.admission;qualification=$record.qualification;boundaries=$record.boundaries;record_sha256=$record.record_sha256
+    engine=[pscustomobject]@{version=$review.version;build=[int]($review.file_version.Split('.')[-1]);file_version=$review.file_version;platform='win64';distribution='steam';binary=@{path='bin/x64/factorio.exe';sha256=$review.binary_sha256}}
+    steam=[pscustomobject]@{app_id=$review.steam.app_id;branch=$review.steam.branch;build_id=$review.steam.build_id;state_flags=$review.steam.state_flags;app_manifest=@{path='appmanifest_427520.acf';sha256=$review.steam.app_manifest_sha256}}
+    official_data=[pscustomobject]@{
+      runtime_api=@{path='doc-html/runtime-api.json';application_version=$review.runtime_api.application_version;sha256=$review.runtime_api.sha256}
+      prototype_api=@{path='doc-html/prototype-api.json';application_version=$review.prototype_api.application_version;sha256=$review.prototype_api.sha256}
+      changelog=@{path='data/changelog.txt';sha256=$review.changelog_sha256};mods=$review.official_mods
+    }
+  }
+}
+
+function Resolve-MIR4F210CurrentEngineCapHarnessAdmission {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$HarnessId,[string]$FactorioBin='',[string]$SteamManifest='')
+  $resolution=Resolve-MIR4F210AdmittedCapHarnessEngine -RepoRoot $RepoRoot -HarnessId $HarnessId -FactorioBin $FactorioBin -SteamManifest $SteamManifest -AuthorityPath $script:MIR4F210CapHarnessV4Path
+  $resolution.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $resolution
+  $resolution
 }

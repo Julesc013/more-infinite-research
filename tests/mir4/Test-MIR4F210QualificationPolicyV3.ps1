@@ -30,3 +30,62 @@ if([string]$current.status-cne'current' -or [string]$current.recorded_at-cne$obs
 $timestampConflict=$false;try{& $writer -RepoRoot $repo -RecordedAt '2026-10-19T12:39:30.3637648+00:00'|Out-Null}catch{$timestampConflict=$_.Exception.Message-match'existing-timestamp-immutable'}
 if(-not$timestampConflict){throw '[mir4-f210-v3-timestamp-immutable]'}
 Write-Host '[ok] F210 2.1.22 observation successor is host-validated; package support floor and native boundaries remain unchanged.'
+
+# Current cap execution is a separate successor, not a mutation of the
+# observation or a claim that either of the native harnesses has passed.
+$capWriter=Join-Path $repo 'tools/commands/mir4/Update-MIR4F210CurrentCapHarnessAdmissionAuthority.ps1'
+$cap=Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $repo
+$capPath=Join-Path $repo $script:MIR4F210CapHarnessV4Path
+$capHash=(Get-FileHash -LiteralPath $capPath).Hash
+$testInputs=(Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json -Depth 100).tests
+foreach($id in @('static.mir4-f210-qualification-policy')+@($cap.admission.harnesses)){
+  $rows=@($testInputs|Where-Object id -ceq $id)
+  if($rows.Count-ne1){throw '[mir4-f210-cap-v4-test-input-row]'}
+  foreach($inputPath in @($script:MIR4F210CapHarnessV4Path,$script:MIR4F210CapHarnessV4Schema,$script:MIR4F210CurrentPolicyV3RelativePath,$script:MIR4F210CurrentPolicySuccessionV2RelativePath,$script:MIR4F210CurrentEngineChannelReviewV2RelativePath)){
+    if($inputPath-notin@($rows[0].inputs)){throw "[mir4-f210-cap-v4-test-input-missing] $id : $inputPath"}
+  }
+}
+if((& $capWriter -RepoRoot $repo -Check).status-cne'current'){throw '[mir4-f210-cap-v4-writer-check]'}
+$null=& $capWriter -RepoRoot $repo
+if((Get-FileHash -LiteralPath $capPath).Hash-cne$capHash){throw '[mir4-f210-cap-v4-writer-rewrote-authority]'}
+$conflict=$false
+try{& $capWriter -RepoRoot $repo -RecordedAt ([DateTimeOffset]::Parse($cap.recorded_at).AddSeconds(1).ToString('o'))|Out-Null}catch{$conflict=$_.Exception.Message-match'existing-timestamp-immutable'}
+if(-not$conflict){throw '[mir4-f210-cap-v4-timestamp-mutable]'}
+
+$scratch=Join-Path $repo ('build/tmp/f210-cap-v4-controls-'+[guid]::NewGuid().ToString('N'))
+$paths=@(Get-Variable -Scope Script -Name 'MIR4F210*'|Where-Object {$_.Value-is[string]-and$_.Value-match'^(?:[.]mir|spec)/'}|ForEach-Object {$_.Value})
+$paths+=@('spec/schemas/mir4-f210-release-qualification-policy-v1.schema.json','spec/schemas/mir4-f210-qualification-policy-authority-evolution-receipt-v1.schema.json','spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json')
+foreach($relative in @($paths|Sort-Object -Unique)){
+  $target=Join-Path $scratch $relative
+  [IO.Directory]::CreateDirectory((Split-Path -Parent $target))|Out-Null
+  [IO.File]::WriteAllBytes($target,[IO.File]::ReadAllBytes((Join-Path $repo $relative)))
+}
+$null=Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $scratch
+$scratchCap=Join-Path $scratch $script:MIR4F210CapHarnessV4Path
+$original=[IO.File]::ReadAllBytes($scratchCap)
+$cases=@(
+  @{id='claimed-native-pass';mutate={param($r)$r.qualification.current_engine_qualification_passed=$true};code='cap-v4-schema'},
+  @{id='release-authority';mutate={param($r)$r.boundaries.publication_authorized=$true};code='cap-v4-schema'},
+  @{id='extra-harness';mutate={param($r)$r.admission.harnesses+=,'unreviewed-harness'};code='cap-v4-schema'},
+  @{id='different-engine';mutate={param($r)$r.engine_channel_review.version='2.1.23'};code='cap-v4-schema'},
+  @{id='changed-review-binding';mutate={param($r)$r.engine_channel_review.sha256='0'*64};code='cap-v4-authority-binding'},
+  @{id='changed-predecessor';mutate={param($r)$r.predecessor.admission_v3.record_sha256='0'*64};code='cap-v4-authority-binding'},
+  @{id='unknown-field';mutate={param($r)$r|Add-Member -NotePropertyName bypass -NotePropertyValue $true};code='cap-v4-schema'}
+)
+foreach($case in $cases){
+  $changed=[Text.Encoding]::UTF8.GetString($original)|ConvertFrom-Json -Depth 100 -DateKind String
+  & $case.mutate $changed
+  $changed.record_sha256=Get-MIR4BootstrapRecordSha256 -Record $changed
+  [IO.File]::WriteAllText($scratchCap,(ConvertTo-MIR4BootstrapCanonicalJson -Value $changed),[Text.UTF8Encoding]::new($false))
+  $failure='';try{Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $scratch|Out-Null}catch{$failure=$_.Exception.Message}
+  if($failure-notmatch$case.code){throw "[mir4-f210-cap-v4-opponent] $($case.id): $failure"}
+}
+[IO.File]::WriteAllBytes($scratchCap,$original)
+$wrongScope=$false
+try{Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot $scratch -HarnessId 'unreviewed-harness'|Out-Null}catch{$wrongScope=$_.Exception.Message-match'cap-harness-admission-scope'}
+if(-not$wrongScope){throw '[mir4-f210-cap-v4-unreviewed-harness-admitted]'}
+$wrongAuthority=$false
+try{Resolve-MIR4F210AdmittedCapHarnessEngine -RepoRoot $scratch -HarnessId $cap.admission.harnesses[0] -AuthorityPath 'unreviewed.json'|Out-Null}catch{$wrongAuthority=$_.Exception.Message-match'cap-harness-admission-authority'}
+if(-not$wrongAuthority){throw '[mir4-f210-cap-v4-unreviewed-authority-admitted]'}
+$null=Get-MIR4F210CurrentEngineCapHarnessAdmissionV4 -RepoRoot $scratch
+Write-Host '[ok] Exact 2.1.22 cap admission: current reader/writer, seven rehashed authority opponents and unknown-harness refusal passed without an engine process. Native qualification remains pending.'

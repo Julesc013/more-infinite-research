@@ -52,24 +52,50 @@ try {
   Check ($verified.verified_bindings -eq 337 -and $verified.source_commit -ceq $pinned.commit -and $verified.archive_sha256 -ceq (Get-MIRImmutableInputSha256 $coupon)) 'complete pinned source coupon was not authenticated.'
   Check ($verified.distribution_version -ceq '4.2.21000' -and $verified.classification -ceq 'pinned-private-V2-source-input-only') 'private predecessor acquired another identity.'
   Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive (Join-Path $tree 'info.json')} 'mir421-v2-archive-identity'
+  $couponState=[pscustomobject]@{path=$coupon;version=0}
+  function Write-CouponMutation([scriptblock]$Mutation){
+    # Keep each authenticated coupon immutable. Editor archive readers can hold
+    # a read handle; mutating the synthetic bytes in memory avoids that lock
+    # without relaxing the production reader or changing archive membership.
+    $memory=[IO.MemoryStream]::new()
+    try {
+      $archiveBytes=[IO.File]::ReadAllBytes($couponState.path);$memory.Write($archiveBytes,0,$archiveBytes.Length);$memory.Position=0
+      $zip=[IO.Compression.ZipArchive]::new($memory,[IO.Compression.ZipArchiveMode]::Update,$true)
+      try{& $Mutation $zip}finally{$zip.Dispose()}
+      $nextVersion=$couponState.version+1
+      $directory=Join-Path $scratch ('coupon-'+$nextVersion);$null=New-Item -ItemType Directory -Path $directory
+      $nextCoupon=Join-Path $directory 'more-infinite-research_4.2.21000.zip'
+      [IO.File]::WriteAllBytes($nextCoupon,$memory.ToArray())
+      $couponState.version=$nextVersion
+      $couponState.path=$nextCoupon
+    }finally{$memory.Dispose()}
+  }
   function Replace-CouponEntry([string]$Member,[byte[]]$Bytes){
-    $zip=[IO.Compression.ZipFile]::Open($coupon,[IO.Compression.ZipArchiveMode]::Update)
-    try{$old=$zip.GetEntry($root+'/'+$Member);if($null -ne $old){$old.Delete()};$entry=$zip.CreateEntry($root+'/'+$Member);$stream=$entry.Open();try{$stream.Write($Bytes,0,$Bytes.Length)}finally{$stream.Dispose()}}finally{$zip.Dispose()}
+    Write-CouponMutation {
+      param($zip)
+      $old=$zip.GetEntry($root+'/'+$Member);if($null -ne $old){$old.Delete()}
+      $entry=$zip.CreateEntry($root+'/'+$Member);$stream=$entry.Open()
+      try{$stream.Write($Bytes,0,$Bytes.Length)}finally{$stream.Dispose()}
+    }
   }
   $controller='prototypes/mir/runtime/maximum_level_control.lua'
   $changed=[Text.Encoding]::UTF8.GetBytes([Text.Encoding]::UTF8.GetString($pinned.entries[$controller]).Replace('local POLICY_VERSION = 1','local POLICY_VERSION = 3'))
   Replace-CouponEntry $controller $changed
-  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $coupon} 'mir421-v2-archive-binding'
+  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $couponState.path} 'mir421-v2-archive-binding'
   Replace-CouponEntry $controller $pinned.entries[$controller]
   $info=$pinned.entries['info.json'];$changed=[Text.Encoding]::UTF8.GetBytes([Text.Encoding]::UTF8.GetString($info).Replace('4.2.21000','4.2.21002'))
   Replace-CouponEntry 'info.json' $changed
-  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $coupon} 'mir421-v2-archive-binding'
+  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $couponState.path} 'mir421-v2-archive-binding'
   Replace-CouponEntry 'info.json' $info
   Replace-CouponEntry 'unexpected.lua' ([Text.Encoding]::UTF8.GetBytes('tiny unexpected member'))
-  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $coupon} 'mir421-v2-archive-membership'
-  $zip=[IO.Compression.ZipFile]::Open($coupon,[IO.Compression.ZipArchiveMode]::Update)
-  try{$zip.GetEntry($root+'/unexpected.lua').Delete();$zip.GetEntry($root+'/'+$controller).Delete();$entry=$zip.CreateEntry($root+'/info.json');$stream=$entry.Open();try{$stream.Write($info,0,$info.Length)}finally{$stream.Dispose()}}finally{$zip.Dispose()}
-  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $coupon} 'mir421-v2-archive-binding'
+  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $couponState.path} 'mir421-v2-archive-membership'
+  Write-CouponMutation {
+    param($zip)
+    $zip.GetEntry($root+'/unexpected.lua').Delete();$zip.GetEntry($root+'/'+$controller).Delete()
+    $entry=$zip.CreateEntry($root+'/'+$controller);$stream=$entry.Open()
+    try{$stream.Write($info,0,$info.Length)}finally{$stream.Dispose()}
+  }
+  Refuses {Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $couponState.path} 'mir421-v2-archive-binding'
 
   # Stage controls use tiny files rather than another materialized mod profile.
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $scratch -ExpectedPeakMemoryMiB 256 -MaxNewOutputMiB 4
@@ -137,7 +163,7 @@ try {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     Check ($Context -eq $resources -and $FilePath -ceq (Get-Command pwsh).Source -and $TimeoutSeconds -eq 30 -and $Arguments -contains $FactorioBin -and $Arguments -contains $SteamManifest) 'resolver lost its governed transport.'
     $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
-    Check ($driver.Contains("-HarnessId 'runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3')) 'existing engine oracle was bypassed.'
+    Check ($driver.Contains("-HarnessId 'runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot')) 'existing engine oracle was bypassed.'
     [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"}}')
   }
   Check ((Get-MigrationGovernedEngineResolution).engine.version -ceq 'controlled') 'resolver response was lost.'
@@ -173,7 +199,7 @@ try {
   foreach($expected in @("-FactorioBin 'controlled engine with spaces'","-CandidateZip 'controlled current package'","-SourceMaterializationPath 'controlled canonical receipt'","-PredecessorCandidateZip 'controlled pinned V2 input'","-LibraryDirectory 'controlled relocated library'",'-ExpectedPeakMemoryMiB 2048','-MaxNewOutputMiB 120')){Check ($command.Contains($expected)) "consumed command lost $expected"}
   $commandContext.prior_release='';Refuses {Resolve-MIRAssuranceCommandText -Command $row[0].command -Context $commandContext -Plan ([pscustomobject]@{})} 'requires <prior-release>'
   $commandContext.prior_release='controlled pinned V2 input';$commandContext.candidate_materialization='';Refuses {Resolve-MIRAssuranceCommandText -Command $row[0].command -Context $commandContext -Plan ([pscustomobject]@{})} 'requires <candidate-materialization>'
-  [pscustomobject]@{status='passed';assertions=$assertions;controlled_source_coupon_entries=337;controlled_stages=4;archive_payload_bytes_copied=0;factorio_processes=0;qualification='none; pinned-input authentication and consumed adapter controls only'}
+  [pscustomobject]@{status='passed';assertions=$assertions;controlled_source_coupon_entries=337;controlled_source_coupon_versions=($couponState.version+1);controlled_stages=4;stage_archive_payload_bytes_copied=0;factorio_processes=0;qualification='none; pinned-input authentication and consumed adapter controls only'}
 } finally {
   if($null -ne $activeStage -and $null -ne $activeStage.activation -and -not $activeStage.activation.closed){$null=Complete-MIRLibraryActivation $activeStage.activation}
   if(Test-Path $scratch){$resolved=(Resolve-Path -LiteralPath $scratch).Path;$prefix=(Resolve-Path -LiteralPath (Join-Path $repo 'build/tmp')).Path.TrimEnd('\')+'\';if(-not $resolved.StartsWith($prefix,[StringComparison]::OrdinalIgnoreCase)){throw 'Synthetic migration cleanup escapes its owned parent'};Remove-Item -LiteralPath $resolved -Recurse -Force}

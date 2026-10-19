@@ -1012,7 +1012,15 @@
         "source:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
         "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -1096,7 +1104,15 @@
         "targets/f210/composition.json",
         "targets/f200/composition.json",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -4248,7 +4264,11 @@
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "source:source/presentation/f210/info.json.template",
         "validation/profiles/factorio-2.1.json",
-        "repository"
+        "repository",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentCapHarnessAdmissionAuthority.ps1"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8747,5 +8767,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a0874849b204e029c06bc0917a2dbc373d47d538bf3f0dd4d5a57fecfbd525a0"
+  "digest": "sha256:ab60727a2fc1061f0df4021b4340554b523633f559f4db60b069ec3841880bf3"
 }
