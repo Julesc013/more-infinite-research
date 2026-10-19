@@ -30,7 +30,7 @@ Assert-GIStatic ($observerData.Contains('[MIR_ACTIVE_MODS]',[StringComparison]::
 $qualification=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.fixtures.qualification.source_path))).Path
 $qualificationData=[IO.File]::ReadAllText((Join-Path $qualification 'data-final-fixes.lua'));$qualificationControl=[IO.File]::ReadAllText((Join-Path $qualification 'control.lua'))
 Assert-GIStatic ($qualificationData.Contains('[MIR_ACTIVE_MODS]',[StringComparison]::Ordinal)) 'qualification-complete-mod-table'
-foreach($fragment in @('DATA PASS','unique-owners=true')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-data-marker'}
+foreach($fragment in @('DATA PASS','staged-owners=true')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-data-marker'}
 foreach($fragment in @('RUNTIME PASS','stage=create technologies=researched','RELOAD PASS','technologies=researched save-state=preserved')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-runtime-marker'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'
 foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload')){
