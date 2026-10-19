@@ -147,7 +147,8 @@ function Test-MIR43HistoricalCandidateAuthentication {
   ) 'historical-authentication-fixture-output-roots-are-distinct'
   $authenticationCases = @(
     [pscustomobject][ordered]@{ label = '442'; source_version = '4.4.2'; candidate_id = 'AUTHENTICATION-CONTROL-442'; output_root = $auth442Root },
-    [pscustomobject][ordered]@{ label = '452'; source_version = '4.5.2'; candidate_id = 'AUTHENTICATION-CONTROL-452'; output_root = $auth452Root }
+    [pscustomobject][ordered]@{ label = '452'; source_version = '4.5.2'; candidate_id = 'AUTHENTICATION-CONTROL-452'; output_root = $auth452Root },
+    [pscustomobject][ordered]@{ label = '460'; source_version = '4.6.0'; candidate_id = 'AUTHENTICATION-CONTROL-460'; output_root = (Join-Path $OutputRoot 'authentication-460') }
   )
   $authenticationAssertions = 0
   $authorityInputAssertions = 0
@@ -181,6 +182,65 @@ function Test-MIR43HistoricalCandidateAuthentication {
     $authorityInputAssertions += [int]$controls.authority_input_assertions
     $receiptCustodyAssertions += [int]$controls.receipt_custody_assertions
     $authenticCandidateZipBuilds += 2
+    if ([string]$case.source_version -ceq '4.6.0') {
+      $currentHistory = Read-MIR4ArchiveText -Path $archive -RelativePath 'changelog.txt'
+      $currentVersion = [string]$manifest.distribution_version
+      Assert-MIR42CandidateBuildTest (
+        $currentHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: $currentVersion`n", [StringComparison]::Ordinal) -and
+        $currentHistory.Contains('Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.') -and
+        $currentHistory.Contains('Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.')
+      ) 'historical-authentication-accepts-current-460-enriched-history'
+      $authenticationAssertions++
+
+      # A self-consistent manifest cannot authenticate stale or changed
+      # changelog bytes: the independent member projection remains binding.
+      $historyOpponent = Join-Path ([string]$case.output_root) 'history-opponent'
+      try {
+        New-Item -ItemType Directory -Force -Path $historyOpponent | Out-Null
+        $forgedArchive = Join-Path $historyOpponent ([IO.Path]::GetFileName($archive))
+        $forgedManifestPath = Join-Path $historyOpponent 'forged-history.json'
+        Copy-Item -LiteralPath $archive -Destination $forgedArchive
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+        $zip = [IO.Compression.ZipFile]::Open($forgedArchive, [IO.Compression.ZipArchiveMode]::Update)
+        try {
+          $entryPath = ([string]$manifest.authentication_projection.distribution_root) + '/changelog.txt'
+          $entry = $zip.GetEntry($entryPath)
+          if ($null -eq $entry) { throw '[mir42-candidate-build-test] historical-authentication-opponent-changelog-missing' }
+          $entry.Delete()
+          $replacement = $zip.CreateEntry($entryPath)
+          $writer = [IO.StreamWriter]::new($replacement.Open(), [Text.UTF8Encoding]::new($false))
+          try { $writer.Write("---------------------------------------------------------------------------------------------------`nVersion: 4.5.01702`n  Info:`n    - Stale historical changelog entry.`n") } finally { $writer.Dispose() }
+        } finally { $zip.Dispose() }
+        $forgedManifest = Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json -Depth 100 -DateKind String
+        $forgedInventory = Get-MIR4ArchiveInventory -Path $forgedArchive
+        $forgedManifest.distribution.sha256 = [string]$forgedInventory.archive_sha256
+        $forgedManifest.distribution.content_sha256 = [string]$forgedInventory.content_sha256
+        $forgedManifest.distribution.entry_count = [int]$forgedInventory.entry_count
+        $forgedManifest.candidate_row.asset.bytes = [int64](Get-Item -LiteralPath $forgedArchive).Length
+        $forgedManifest.candidate_row.asset.sha256 = [string]$forgedInventory.archive_sha256
+        $forgedManifest.candidate_row.content_sha256 = [string]$forgedInventory.content_sha256
+        $forgedManifest.candidate_row.entry_count = [int]$forgedInventory.entry_count
+        $forgedManifest.candidate_row.build_a_sha256 = [string]$forgedInventory.archive_sha256
+        $forgedManifest.candidate_row.build_b_sha256 = [string]$forgedInventory.archive_sha256
+        $forgedManifest.record_sha256 = Get-MIR4BootstrapRecordSha256 -Record $forgedManifest
+        [IO.File]::WriteAllText($forgedManifestPath, (($forgedManifest | ConvertTo-Json -Depth 100).Replace("`r`n", "`n") + "`n"), [Text.UTF8Encoding]::new($false))
+        $rejected = $false
+        try {
+          Read-MIR43HistoricalCurrentCandidate -Repository $repo -Archive $forgedArchive -ManifestPath $forgedManifestPath -Target f017 -SourceVersion '4.6.0' | Out-Null
+        } catch {
+          $rejected = $_.Exception.Message.Contains('candidate member differs: changelog.txt', [StringComparison]::Ordinal)
+        }
+        Assert-MIR42CandidateBuildTest $rejected 'historical-authentication-rejects-stale-460-history'
+        $authenticationAssertions++
+      } finally {
+        if (Test-Path -LiteralPath $historyOpponent) {
+          $resolvedOpponent = (Resolve-Path -LiteralPath $historyOpponent).Path
+          $null = Assert-MIR4DescendantPath -Root (Join-Path $repo 'build') -Path $resolvedOpponent
+          $null = Assert-MIR4NoReparseAncestors -Root $repo -Path $resolvedOpponent
+          Remove-Item -LiteralPath $resolvedOpponent -Recurse -Force
+        }
+      }
+    }
   }
   return [pscustomobject][ordered]@{
     authority_projection_checks = $projectionChecks

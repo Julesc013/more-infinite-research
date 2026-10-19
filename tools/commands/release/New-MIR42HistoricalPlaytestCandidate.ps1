@@ -289,30 +289,10 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     $info.version = [string]$identity.distribution_version
     $memberBytes['info.json'] = $utf8.GetBytes((($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"))
 
-    $changelog = $utf8.GetString($memberBytes['changelog.txt']).Replace("`r`n", "`n")
+    $changelog = $utf8.GetString($memberBytes['changelog.txt'])
     $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
     if (-not $firstVersion.Success) { throw '[mir42-historical-authentication-changelog-identity]' }
-    if ($firstVersion.Groups[1].Value -cne [string]$identity.distribution_version) {
-      $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
-      if ($SourceVersion -ceq '4.4.1') {
-        $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
-      } elseif ($SourceVersion -ceq '4.5.2') {
-        $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
-        $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
-      } elseif ($SourceVersion -ceq '4.5.1') {
-        $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
-      } elseif ($SourceVersion -ceq '4.5.0') {
-        $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
-      } elseif ($SourceVersion -ceq '4.4.2') {
-        $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
-        if ([string]$Record.factorio_line -ceq '0.15') {
-          $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
-        } elseif ([string]$Record.factorio_line -ceq '0.16') {
-          $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
-        }
-      }
-      $changelog = $entry + $changelog
-    }
+    $changelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
     $memberBytes['changelog.txt'] = $utf8.GetBytes($changelog)
     $memberBytes['README.md'] = Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $memberBytes['README.md'] -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
   }

@@ -155,6 +155,64 @@ function Get-MIR4PrivatePatchPackageReadmeBytes {
   return ,$utf8.GetBytes($readme)
 }
 
+function Get-MIR4PrivatePatchPackageChangelogText {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Changelog,
+    [Parameter(Mandatory)][string]$DistributionVersion,
+    [string]$SourceVersion = '4.2.1'
+  )
+
+  # This is deliberately a pure authority shared by the private package
+  # writer and historical authentication projection.  Both consumers must
+  # derive the exact same current entry before member bytes are compared.
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
+  $targetCode = [string]$decoded.distribution_target_code
+  if ($targetCode -cnotin @('210','200','110','100','017','016','015','014','013')) { throw '[mir4-private-patch-package-target]' }
+
+  $normalized = $Changelog.Replace("`r`n", "`n")
+  $firstVersion = [regex]::Match($normalized, '(?m)^Version:\s*(\S+)')
+  if ($firstVersion.Success -and $firstVersion.Groups[1].Value -ceq $DistributionVersion) {
+    # The writer previously left an already-current member byte-for-byte
+    # untouched. Return the original text so its idempotence is preserved.
+    return $Changelog
+  }
+
+  $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
+  if ($SourceVersion -ceq '4.6.0') {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    if ($targetCode -ceq '200') {
+      $entry += "  Compatibility:`n    - Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.`n    - Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.`n    - Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.`n"
+    }
+    if ($targetCode -cin @('210','200','110','100')) {
+      $entry += "  Bugfixes:`n    - Accept an independently available replacement science recipe when its named source has no usable unlock.`n    - Keep disabled and circular alternatives from inventing science availability.`n"
+      $entry += "  Performance:`n    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.`n"
+    }
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.`n    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.`n"
+  } elseif ($SourceVersion -ceq '4.4.1') {
+    $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+  } elseif ($SourceVersion -ceq '4.5.2') {
+    $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
+    $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
+  } elseif ($SourceVersion -ceq '4.5.1') {
+    $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
+  } elseif ($SourceVersion -ceq '4.5.0') {
+    $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
+  } elseif ($SourceVersion -ceq '4.4.2') {
+    $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
+    if ($targetCode -ceq '015') {
+      $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+    } elseif ($targetCode -ceq '016') {
+      $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
+    }
+  }
+  return $entry + $normalized
+}
+
 function Write-MIR4PrivatePatchPackageIdentity {
   [CmdletBinding()]
   param(
@@ -181,44 +239,14 @@ function Write-MIR4PrivatePatchPackageIdentity {
   }
   # Read every authored input before changing this private materialized copy.
   $changelogPath = Join-Path $Tree 'changelog.txt'
-  $changelog = [IO.File]::ReadAllText($changelogPath).Replace("`r`n", "`n")
+  $changelog = [IO.File]::ReadAllText($changelogPath)
   $readmePath = Join-Path $Tree 'README.md'
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $info.version = $DistributionVersion
   [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
-  $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
-  if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
-    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
-    if ($SourceVersion -ceq '4.6.0') {
-      $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
-      if ($targetCode -ceq '200') {
-        $entry += "  Compatibility:`n    - Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.`n    - Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.`n    - Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.`n"
-      }
-      if ($targetCode -cin @('210','200','110','100')) {
-        $entry += "  Bugfixes:`n    - Accept an independently available replacement science recipe when its named source has no usable unlock.`n    - Keep disabled and circular alternatives from inventing science availability.`n"
-        $entry += "  Performance:`n    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.`n"
-      }
-      $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.`n    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.`n"
-    } elseif ($SourceVersion -ceq '4.4.1') {
-      $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
-    } elseif ($SourceVersion -ceq '4.5.2') {
-      $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
-      $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
-    } elseif ($SourceVersion -ceq '4.5.1') {
-      $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
-    } elseif ($SourceVersion -ceq '4.5.0') {
-      $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
-    } elseif ($SourceVersion -ceq '4.4.2') {
-      $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
-      if ($targetCode -ceq '015') {
-        $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
-      } elseif ($targetCode -ceq '016') {
-        $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
-      }
-    }
-    [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
-  }
+  $updatedChangelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion
+  if ($updatedChangelog -cne $changelog) { [IO.File]::WriteAllText($changelogPath, $updatedChangelog, $utf8) }
   if ($null -ne $readme) {
     [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion))
   }
