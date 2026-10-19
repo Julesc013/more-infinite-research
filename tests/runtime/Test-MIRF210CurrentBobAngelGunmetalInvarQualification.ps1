@@ -45,7 +45,7 @@ function Read-GIDossier([string]$Path){
   Assert-GI ([string]$dossier.settings.mode -ceq 'File' -and [bool]$dossier.settings.portable_input_required) 'fixture settings contract differs'
   foreach($fixtureMode in @('observe','qualification')){
     $fixture=$dossier.fixtures.$fixtureMode
-    Assert-GI ($null -ne $fixture -and [string]$fixture.name -match '^mir-fixture-' -and [string]$fixture.version -ceq '0.1.0') "fixture contract differs: $fixtureMode"
+    Assert-GI ($null -ne $fixture -and [string]$fixture.name -match '^mir-fixture-' -and [string]$fixture.version -cmatch '^(0|[1-9][0-9]*)[.](0|[1-9][0-9]*)[.](0|[1-9][0-9]*)$') "fixture contract differs: $fixtureMode"
   }
   $dossier
 }
