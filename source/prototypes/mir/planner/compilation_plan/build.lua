@@ -21,7 +21,7 @@ local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.finger
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
 
-local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled)
+local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled, gate_vector_session)
   local allowances = {}
   if enabled ~= true then return allowances end
   for _, row in ipairs(stream_artifact.rows or {}) do
@@ -45,7 +45,7 @@ local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabl
           candidate_id = row.technology_design.candidate_id,
           design_fingerprint = row.technology_design.design_fingerprint,
           hard_gates_resolved = true,
-          gates_fingerprint = fingerprint.of(row.gates)
+          gate_vector_receipt = gate_contract.capture_initial_skip_gate_vector(gate_vector_session, row.gates)
         }
       end
     end
@@ -417,8 +417,10 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     stream_artifact = generation_plan.internal_artifact(stream_artifact)
   end
   if not trusted_stream_artifact then validation.admit_stream_artifact(stream_artifact) end
+  local initial_skip_gate_vector_session = gate_contract.new_initial_skip_gate_vector_session()
   local initial_skip_diagnostic_allowances = capture_initial_skip_diagnostic_allowances(
-    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true)
+    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true,
+    initial_skip_gate_vector_session)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
@@ -580,6 +582,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       trusted_designs = true,
       defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
       initial_skip_diagnostic_allowances = initial_skip_diagnostic_allowances,
+      initial_skip_gate_vector_session = initial_skip_gate_vector_session,
       base_candidates = final_base_candidates
     }
   )

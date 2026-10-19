@@ -1484,8 +1484,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 6440,
-      "expected_sha256": "E004FF72A468543BE5D13B110AFB8CF46BDEFBD9597DD583E6E5783BDD863AC3",
+      "expected_bytes": 10852,
+      "expected_sha256": "73E9C55BD8FD7D00B0D0C824D0FB9A98B4A0B27C45216617A0637C7C1257F853",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2620,8 +2620,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 36300,
-      "expected_sha256": "D9E998F3EF09BEE2F20AD48562804DC9813DCD82AA39D7E8D1ED908DE78FAB00",
+      "expected_bytes": 36585,
+      "expected_sha256": "5143D00A173258ED09639A4274912D878883586E5C41DC44E5A156D54F514962",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -2924,8 +2924,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 10939,
-      "expected_sha256": "D5FB7DCBC55234CE255578BA021FF66B1BDF8B68826C270EC3B25506CDCF1E0B",
+      "expected_bytes": 11074,
+      "expected_sha256": "22306E6BBB4D8EF3409C5736AD3D529FA7DB7A24E2F532AF80E1BADAF97E6398",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "9A7A6F66CE460633C6F25BFEA41D7F54158B07732F9BAF193FFFEA4010B0C7C8"
+  "record_sha256": "5C55D7D6554C2FC0BC6BCAD1D599309EB58151F22496E484E8FD9310B1FB5859"
 }

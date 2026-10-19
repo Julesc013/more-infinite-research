@@ -18,7 +18,7 @@ local function resolved_hard_gates(gates)
   return true
 end
 
-local function initial_skip_deferment(row, candidate, primary, allowances)
+local function initial_skip_deferment(row, candidate, primary, allowances, gate_vector_session)
   if row.action ~= "skip" or primary.disposition ~= "rejected"
     or primary.qualification_decision ~= "rejected"
     or not resolved_hard_gates(row.gates)
@@ -33,7 +33,8 @@ local function initial_skip_deferment(row, candidate, primary, allowances)
     or allowance.candidate_id ~= candidate.candidate_id
     or allowance.design_fingerprint ~= primary.design_fingerprint
     or allowance.hard_gates_resolved ~= true
-    or allowance.gates_fingerprint ~= fingerprint.of(row.gates) then
+    or not gate_contract.matches_initial_skip_gate_vector(
+      gate_vector_session, allowance.gate_vector_receipt, row.gates) then
     return nil
   end
   return allowance
@@ -108,7 +109,8 @@ function M.from_preselection_rows(rows, context_material, options)
       and primary_disposition == "materialize"
       and primary.qualification_decision == "qualified"
     local initial_skip_allowance = defer_diagnostic_alternatives
-      and initial_skip_deferment(row, candidate, primary, options.initial_skip_diagnostic_allowances)
+      and initial_skip_deferment(row, candidate, primary, options.initial_skip_diagnostic_allowances,
+        options.initial_skip_gate_vector_session)
     if defer_diagnostic then
       candidate.diagnostic_evaluation = model.deferred_diagnostic_evaluation(primary)
       deferred_diagnostic_alternatives = deferred_diagnostic_alternatives + 1

@@ -312,25 +312,26 @@ local function catalog_operation(row_value)
   return {stream_key = row_value.stream_key, technology_design = row_value.technology_design}
 end
 
-local function initial_skip_allowance(row_value)
+local function initial_skip_allowance(row_value, session, allowances)
   local selection_key = tostring(row_value.stream_key) .. ":" .. tostring(row_value.manifest_id or row_value.stream_key)
   local resolved = true
   for _, gate_name in ipairs(hard_gate_authority.order()) do
     if not gate.is_authoritatively_resolved(row_value.gates[gate_name]) then resolved = false end
   end
-  return {
-    [selection_key] = {
-      selection_key = selection_key,
-      reason = row_value.reason,
-      candidate_id = row_value.technology_design.candidate_id,
-      design_fingerprint = row_value.technology_design.design_fingerprint,
-      hard_gates_resolved = resolved,
-      gates_fingerprint = fingerprint.of(row_value.gates)
-    }
+  session = session or gate.new_initial_skip_gate_vector_session()
+  allowances = allowances or {}
+  allowances[selection_key] = {
+    selection_key = selection_key,
+    reason = row_value.reason,
+    candidate_id = row_value.technology_design.candidate_id,
+    design_fingerprint = row_value.technology_design.design_fingerprint,
+    hard_gates_resolved = resolved,
+    gate_vector_receipt = resolved and gate.capture_initial_skip_gate_vector(session, row_value.gates) or nil
   }
+  return allowances, session
 end
 
-local function finalize_catalog(row_value, defer, allowances)
+local function finalize_catalog(row_value, defer, allowances, session)
   local operations = (row_value.action == "emit" or row_value.action == "adopt")
     and {catalog_operation(row_value)} or {}
   return technology_catalog.finalize(
@@ -339,7 +340,8 @@ local function finalize_catalog(row_value, defer, allowances)
     operations,
     {
       defer_diagnostic_alternatives = defer == true,
-      initial_skip_diagnostic_allowances = allowances
+      initial_skip_diagnostic_allowances = allowances,
+      initial_skip_gate_vector_session = session
     }
   )
 end
@@ -393,12 +395,30 @@ check(catalog_skip_final.alternative_evaluation.mode == "full-diagnostics"
 -- rejected primary. Player compilation can retain that primary and select its
 -- rejection directly; it never invents a qualified safe-diagnostic identity.
 local catalog_initial_skip = catalog_emit_row("initial-skip", "skip")
+local function finalize_owned_initial_skip_catalog(row_value, allowances, session)
+  local operations = (row_value.action == "emit" or row_value.action == "adopt")
+    and {catalog_operation(row_value)} or {}
+  return technology_catalog.finalize(
+    {row_value},
+    {fixture = "catalog-owned-initial-skip-diagnostics"},
+    operations,
+    {
+      defer_diagnostic_alternatives = true,
+      initial_skip_diagnostic_allowances = allowances,
+      initial_skip_gate_vector_session = session,
+      trusted_designs = true,
+      children_admitted = true
+    }
+  )
+end
+
+local catalog_initial_skip_allowances, catalog_initial_skip_session = initial_skip_allowance(catalog_initial_skip)
 local original_as_diagnostic_alternative = technology_design.as_diagnostic_alternative
 technology_design.as_diagnostic_alternative = function()
   error("initial skip must not construct a safe diagnostic alternative")
 end
 local catalog_initial_skip_deferred = finalize_catalog(
-  catalog_initial_skip, true, initial_skip_allowance(catalog_initial_skip))
+  catalog_initial_skip, true, catalog_initial_skip_allowances, catalog_initial_skip_session)
 technology_design.as_diagnostic_alternative = original_as_diagnostic_alternative
 local catalog_initial_skip_primary = catalog_initial_skip_deferred.candidates[1].alternatives[1]
 local catalog_initial_skip_selection = catalog_initial_skip_deferred.current_selections[1]
@@ -428,24 +448,25 @@ check(catalog_initial_skip_full_primary.design_fingerprint == catalog_initial_sk
     == catalog_initial_skip_primary.qualification_fingerprint
   and catalog_initial_skip_full.current_selections[1].action == "diagnose",
   "initial skip deferral preserves the full rejected primary while full diagnostics retain diagnose")
-local forged_initial_skip_allowance = initial_skip_allowance(catalog_initial_skip)
+local forged_initial_skip_allowance, forged_initial_skip_session = initial_skip_allowance(catalog_initial_skip)
 forged_initial_skip_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].design_fingerprint = "mir32-forged"
-local catalog_forged_allowance = finalize_catalog(catalog_initial_skip, true, forged_initial_skip_allowance)
+local catalog_forged_allowance = finalize_catalog(
+  catalog_initial_skip, true, forged_initial_skip_allowance, forged_initial_skip_session)
 check(catalog_forged_allowance.alternative_evaluation.complete
   and #catalog_forged_allowance.candidates[1].alternatives == 2,
   "forged initial skip allowance cannot defer diagnostics")
-local catalog_forged_candidate_allowance = initial_skip_allowance(catalog_initial_skip)
+local catalog_forged_candidate_allowance, catalog_forged_candidate_session = initial_skip_allowance(catalog_initial_skip)
 catalog_forged_candidate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].candidate_id
   = "mir-candidate/forged"
 local catalog_forged_candidate = finalize_catalog(
-  catalog_initial_skip, true, catalog_forged_candidate_allowance)
+  catalog_initial_skip, true, catalog_forged_candidate_allowance, catalog_forged_candidate_session)
 check(catalog_forged_candidate.alternative_evaluation.complete
   and #catalog_forged_candidate.candidates[1].alternatives == 2,
   "forged initial skip candidate identity cannot defer diagnostics")
-local catalog_forged_gate_allowance = initial_skip_allowance(catalog_initial_skip)
-catalog_forged_gate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].gates_fingerprint
-  = "mir32-forged"
-local catalog_forged_gate = finalize_catalog(catalog_initial_skip, true, catalog_forged_gate_allowance)
+local catalog_forged_gate_allowance, catalog_forged_gate_session = initial_skip_allowance(catalog_initial_skip)
+catalog_forged_gate_allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"].gate_vector_receipt = "mir32-forged"
+local catalog_forged_gate = finalize_catalog(
+  catalog_initial_skip, true, catalog_forged_gate_allowance, catalog_forged_gate_session)
 check(catalog_forged_gate.alternative_evaluation.complete
   and #catalog_forged_gate.candidates[1].alternatives == 2,
   "forged initial skip hard-gate binding cannot defer diagnostics")
@@ -454,32 +475,129 @@ for _, mutation in ipairs({
   {field = "selection_key", value = "different:selection", label = "selection key"},
   {field = "hard_gates_resolved", value = false, label = "resolved-gate assertion"}
 }) do
-  local allowance = initial_skip_allowance(catalog_initial_skip)
+  local allowance, allowance_session = initial_skip_allowance(catalog_initial_skip)
   allowance["fixture-catalog-initial-skip:fixture-catalog-initial-skip"][mutation.field] = mutation.value
-  local fallback = finalize_catalog(catalog_initial_skip, true, allowance)
+  local fallback = finalize_catalog(catalog_initial_skip, true, allowance, allowance_session)
   check(fallback.alternative_evaluation.complete and #fallback.candidates[1].alternatives == 2,
     "forged initial skip " .. mutation.label .. " retains full diagnostics")
 end
+-- The gate contract trusts stable scalar identity. The opaque receipt must
+-- still fail closed when a nested non-identity field or an unknown gate changes.
+local function mutated_initial_skip_fallback(mutator, label)
+  local row_value = catalog_emit_row("initial-skip-" .. label, "skip")
+  local allowances, session = initial_skip_allowance(row_value)
+  mutator(row_value.gates)
+  local fallback = finalize_owned_initial_skip_catalog(row_value, allowances, session)
+  check(fallback.alternative_evaluation.complete and #fallback.candidates[1].alternatives == 2,
+    "mutated initial skip " .. label .. " retains full diagnostics")
+end
+mutated_initial_skip_fallback(function(gates)
+  gates.effect_valid.evidence.nested = {reason = {code = "added-after-capture"}}
+end, "nested evidence")
+mutated_initial_skip_fallback(function(gates)
+  gates.effect_valid.reason = "forged-reason"
+end, "reason")
+mutated_initial_skip_fallback(function(gates)
+  gates.effect_valid.applicability = {predicate = "forged", input_fingerprint = "mir32-forged", result = false}
+end, "applicability")
+mutated_initial_skip_fallback(function(gates)
+  gates.unknown_after_capture = gate.passed("fixture:unknown", {"unknown"})
+end, "unknown gate")
+local direct_session = gate.new_initial_skip_gate_vector_session()
+local direct_superseded = gate.supersede(gate.failed("fixture:prior", "rejected", {"prior"}),
+  "fixture:replacement", gate.passed("fixture:replacement", {"replacement"}))
+local direct_vector = {effect_valid = direct_superseded}
+local direct_receipt = gate.capture_initial_skip_gate_vector(direct_session, direct_vector)
+direct_superseded.superseded_by.extra = "forged"
+check(not gate.matches_initial_skip_gate_vector(direct_session, direct_receipt, direct_vector),
+  "receipt compares nested superseded-by fields")
+local direct_not_applicable = gate.not_applicable("fixture:not-applicable", "fixture-predicate", "mir32-not-applicable", {"na"})
+local applicability_session = gate.new_initial_skip_gate_vector_session()
+local applicability_vector = {effect_valid = direct_not_applicable}
+local applicability_receipt = gate.capture_initial_skip_gate_vector(applicability_session, applicability_vector)
+direct_not_applicable.applicability.result = true
+check(not gate.matches_initial_skip_gate_vector(applicability_session, applicability_receipt, applicability_vector),
+  "receipt compares not-applicable proof fields")
+
+-- Match canonical scalar edge semantics without rebuilding a full vector.
+local function numeric_receipt_matches(original, changed)
+  local record = gate.passed("fixture:numeric", {value = original})
+  local session = gate.new_initial_skip_gate_vector_session()
+  local vector = {effect_valid = record}
+  local receipt = gate.capture_initial_skip_gate_vector(session, vector)
+  record.evidence.value = changed
+  return gate.matches_initial_skip_gate_vector(session, receipt, vector)
+end
+local signed_zero_expected = fingerprint.canonical({value = 0}) == fingerprint.canonical({value = -0})
+check(numeric_receipt_matches(0, -0) == signed_zero_expected,
+  "receipt preserves canonical signed-zero semantics")
+local function numeric_key_receipt_matches(original, changed)
+  local record = gate.passed("fixture:numeric-key", {metadata = {[original] = "same"}})
+  local session = gate.new_initial_skip_gate_vector_session()
+  local vector = {effect_valid = record}
+  local receipt = gate.capture_initial_skip_gate_vector(session, vector)
+  record.evidence.metadata = {[changed] = "same"}
+  return gate.matches_initial_skip_gate_vector(session, receipt, vector)
+end
+local signed_zero_key_expected = fingerprint.canonical({metadata = {[0] = "same"}})
+  == fingerprint.canonical({metadata = {[-0] = "same"}})
+check(numeric_key_receipt_matches(0, -0) == signed_zero_key_expected,
+  "receipt preserves canonical signed-zero numeric-map-key semantics")
+local nan = 0 / 0
+local nan_expected = fingerprint.canonical({value = nan}) == fingerprint.canonical({value = 0 / 0})
+check(numeric_receipt_matches(nan, 0 / 0) == nan_expected,
+  "receipt preserves canonical NaN semantics")
+
+-- A session snapshots each original gate once, but canonical text does not
+-- encode alias topology. A shared actual child across two gate records may
+-- compare to two independent snapshots when the field values are unchanged.
+local shared_evidence = {nested = {value = "shared"}}
+local shared_left = gate.passed("fixture:shared-left", shared_evidence)
+local shared_right = gate.passed("fixture:shared-right", shared_evidence)
+shared_left.evidence, shared_right.evidence = shared_evidence, shared_evidence
+local shared_session = gate.new_initial_skip_gate_vector_session()
+local shared_vector = {effect_valid = shared_left, loop_safe = shared_right}
+local shared_receipt = gate.capture_initial_skip_gate_vector(shared_session, shared_vector)
+check(gate.matches_initial_skip_gate_vector(shared_session, shared_receipt, shared_vector),
+  "receipt ignores unchanged cross-gate alias topology")
+
+local function capture_refuses_mutated_gate(label, mutate)
+  local record = gate.passed("fixture:hostile-" .. label, {value = label})
+  mutate(record)
+  expect_error(function()
+    gate.capture_initial_skip_gate_vector(gate.new_initial_skip_gate_vector_session(), {effect_valid = record})
+  end, "Initial-skip gate-vector capture refuses non-plain, cyclic, or metatable records.")
+end
+capture_refuses_mutated_gate("function", function(record) record.evidence.value = function() end end)
+capture_refuses_mutated_gate("table-key", function(record) record.evidence[{}] = "invalid-key" end)
+capture_refuses_mutated_gate("cycle", function(record) record.evidence.self = record.evidence end)
+
 local catalog_initial_skip_unresolved = catalog_emit_row("initial-skip-unresolved", "skip", "pending")
+local catalog_initial_skip_unresolved_allowances, catalog_initial_skip_unresolved_session = initial_skip_allowance(catalog_initial_skip_unresolved)
 local catalog_initial_skip_unresolved_full = finalize_catalog(
-  catalog_initial_skip_unresolved, true, initial_skip_allowance(catalog_initial_skip_unresolved))
+  catalog_initial_skip_unresolved, true, catalog_initial_skip_unresolved_allowances,
+  catalog_initial_skip_unresolved_session)
 check(catalog_initial_skip_unresolved_full.alternative_evaluation.complete
   and #catalog_initial_skip_unresolved_full.candidates[1].alternatives == 2,
   "unresolved initial skip retains full diagnostics")
+local catalog_initial_skip_preselection_allowances, catalog_initial_skip_preselection_session = initial_skip_allowance(catalog_initial_skip)
 local catalog_initial_skip_preselection = technology_catalog.from_generation_rows(
   {catalog_initial_skip}, {fixture = "catalog-initial-skip-preselection"}, {
     defer_diagnostic_alternatives = true,
-    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_initial_skip)
+    initial_skip_diagnostic_allowances = catalog_initial_skip_preselection_allowances,
+    initial_skip_gate_vector_session = catalog_initial_skip_preselection_session
   })
 check(catalog_initial_skip_preselection.phase == "preselection"
   and catalog_initial_skip_preselection.alternative_evaluation.complete
   and #catalog_initial_skip_preselection.candidates[1].alternatives == 2,
   "preselection proposal inventory never defers initial skip diagnostics")
 local catalog_converted_failed_emit = catalog_emit_row("converted-failed-emit", "emit", "failed")
+local catalog_converted_failed_emit_allowances, catalog_converted_failed_emit_session = initial_skip_allowance(catalog_converted_failed_emit)
 local catalog_converted_failed_emit_full = technology_catalog.from_preselection_rows(
   {catalog_converted_failed_emit}, {fixture = "catalog-converted-failed-emit"}, {
     phase = "final", defer_diagnostic_alternatives = true,
-    initial_skip_diagnostic_allowances = initial_skip_allowance(catalog_converted_failed_emit),
+    initial_skip_diagnostic_allowances = catalog_converted_failed_emit_allowances,
+    initial_skip_gate_vector_session = catalog_converted_failed_emit_session,
     defer_validation = true, children_admitted = true
   })
 check(catalog_converted_failed_emit_full.alternative_evaluation.complete
@@ -541,12 +659,13 @@ check(fingerprint.of(permutation_forward.current_selections) == fingerprint.of(p
 
 local deferred_skip_left = catalog_emit_row("deferred-skip-left", "skip")
 local deferred_skip_right = catalog_emit_row("deferred-skip-right", "skip")
-local deferred_skip_allowances = initial_skip_allowance(deferred_skip_left)
-for key, value in pairs(initial_skip_allowance(deferred_skip_right)) do deferred_skip_allowances[key] = value end
+local deferred_skip_allowances, deferred_skip_session = initial_skip_allowance(deferred_skip_left)
+initial_skip_allowance(deferred_skip_right, deferred_skip_session, deferred_skip_allowances)
 local function finalize_deferred_skips(rows)
   return technology_catalog.finalize(rows, {fixture = "catalog-deferred-skip-permutation"}, {}, {
     defer_diagnostic_alternatives = true,
-    initial_skip_diagnostic_allowances = deferred_skip_allowances
+    initial_skip_diagnostic_allowances = deferred_skip_allowances,
+    initial_skip_gate_vector_session = deferred_skip_session
   })
 end
 local deferred_skip_forward = finalize_deferred_skips({deferred_skip_left, deferred_skip_right})
