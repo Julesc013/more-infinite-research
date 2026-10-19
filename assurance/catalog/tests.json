@@ -7945,6 +7945,12 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v11.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v12.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v13.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v14.schema.json",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
+        "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v4.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v5.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v6.schema.json",
@@ -8730,5 +8736,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:bac95d520db131464a4f7df53e30f2850190358aed44785740b0c3c8a086f4fb"
+  "digest": "sha256:1045d9c9cbff62fcc72fdbb7bca7d8cb0044ef56f170ff7c4e2adefbd65fd8aa"
 }

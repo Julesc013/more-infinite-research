@@ -223,3 +223,4 @@ tests/release/Test-MIR4PromotionRecovery.ps1 text eol=lf
 
 # Community receipts are compared by exact SHA-256 on every checkout.
 spec/programmes/evidence/community-2026-09-06/*.json text eol=lf
+fixtures/release-inputs/mir470-published-460-consolidated-construction.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

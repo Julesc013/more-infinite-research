@@ -6,8 +6,8 @@ $script:MIR42HistoricalCandidateTargets = @('f017', 'f016', 'f015', 'f014', 'f01
 $script:MIR42NineTargetCandidateOrder = @($script:MIR42CanonicalCandidateTargets + $script:MIR42HistoricalCandidateTargets)
 $script:MIR42CanonicalCandidateLines = [ordered]@{ f210 = '2.1'; f200 = '2.0'; f110 = '1.1'; f100 = '1.0' }
 $script:MIR42HistoricalCandidateLines = [ordered]@{ f017 = '0.17'; f016 = '0.16'; f015 = '0.15'; f014 = '0.14'; f013 = '0.13' }
-$script:MIR42CandidateSourceVersions = @('4.2.0', '4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1', '4.4.0', '4.4.1', '4.4.2', '4.5.0', '4.5.1', '4.5.2', '4.6.0')
-$script:MIR42MaintenanceCandidateSourceVersions = @('4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1', '4.4.0', '4.4.1', '4.4.2', '4.5.0', '4.5.1', '4.5.2', '4.6.0')
+$script:MIR42CandidateSourceVersions = @('4.2.0', '4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1', '4.4.0', '4.4.1', '4.4.2', '4.5.0', '4.5.1', '4.5.2', '4.6.0','4.7.0')
+$script:MIR42MaintenanceCandidateSourceVersions = @('4.2.1', '4.2.2', '4.2.3', '4.3.0', '4.3.1', '4.4.0', '4.4.1', '4.4.2', '4.5.0', '4.5.1', '4.5.2', '4.6.0','4.7.0')
 if (-not (Get-Command Test-MIR4BootstrapRecordHash -ErrorAction SilentlyContinue)) {
   . (Join-Path $mir42CandidateBuildRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 }
@@ -198,7 +198,7 @@ function Get-MIR42CandidateManifestSchemaVersion {
   [CmdletBinding()]
   param(
     [Parameter(Mandatory)]
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')]
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')]
     [string]$SourceVersion
   )
 
@@ -216,6 +216,7 @@ function Get-MIR42CandidateManifestSchemaVersion {
     '4.5.1' { return 11 }
     '4.5.2' { return 12 }
     '4.6.0' { return 13 }
+    '4.7.0' { return 14 }
   }
 }
 
@@ -231,7 +232,7 @@ function Get-MIR42CandidateTargetDescriptors {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion = '4.2.0'
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')][string]$SourceVersion = '4.2.0'
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
@@ -482,7 +483,7 @@ function New-MIR42FourTargetCandidate {
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidatePattern('^[0-9a-fA-F]{40}$')][string]$FinalSourceCommit,
     [Parameter(Mandatory)][ValidatePattern('^[A-Z0-9][A-Z0-9.-]{0,47}$')][string]$BuildId,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')][string]$SourceVersion = '4.2.0',
     [string[]]$SelectedTargets = $script:MIR42CanonicalCandidateTargets,
     [string]$OutputRoot,
     [ValidateRange(1, 9223372036854775807)][Int64]$MinimumFreeMemoryBytes = 1GB,
