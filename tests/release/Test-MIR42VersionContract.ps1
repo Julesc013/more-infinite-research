@@ -6,6 +6,23 @@ $ErrorActionPreference = 'Stop'
 . (Join-Path $RepoRoot 'tools/mir/application/package/PackageAuthority.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
 $assertions = 0
+# Every editable target keeps the published MIR 4 history, independently of
+# the current package identity writer. A new release must not drop it again.
+foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
+  $presentation = if ($code -cin @('210','200','110','100')) { "source/presentation/f$code" } else { "source/presentation/historical/f$code" }
+  $historyText = [IO.File]::ReadAllText((Join-Path $RepoRoot "$presentation/changelog.txt.template"))
+  $versions = @([regex]::Matches($historyText, '(?m)^Version:\s*(\S+)') | ForEach-Object { $_.Groups[1].Value })
+  foreach ($release in @(@(5,2),@(5,1),@(5,0),@(4,2),@(4,1),@(4,0),@(3,0))) {
+    $expectedVersion = '4.' + $release[0] + '.' + $code + ([int]$release[1]).ToString('D2')
+    if (@($versions | Where-Object { $_ -ceq $expectedVersion }).Count -ne 1) { throw "[mir460-published-history-missing-or-duplicated] $expectedVersion" }
+    $assertions++
+  }
+  $mir4Versions = @($versions | Where-Object { $_.StartsWith('4.', [StringComparison]::Ordinal) })
+  $sortedMir4Versions = @($mir4Versions | Sort-Object { [version]$_ } -Descending)
+  if (($mir4Versions -join '|') -cne ($sortedMir4Versions -join '|')) { throw "[mir460-published-history-order] f$code" }
+  if (@($historyText -split '\r?\n' | Where-Object Length -gt 132).Count) { throw "[mir460-published-history-width] f$code" }
+  $assertions += 2
+}
 foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
   foreach ($patch in @(0,1,2,3)) {
     $expected = "4.2.$code$($patch.ToString('D2'))"
@@ -141,10 +158,26 @@ try {
     $assertions++
     $rejected = $false
     try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion $source450Version -SourceVersion '4.5.1' | Out-Null }
-    catch { $rejected = $_.Exception.Message -match 'source-version' }
+    catch { $rejected = $_.Exception.Message -match 'source-(version|identity)' }
     $after = @(Get-ChildItem -LiteralPath $tree -File | Sort-Object Name | Get-FileHash | ForEach-Object Hash)
-    if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir451-unapproved-source-mutated-input]' }
+    if (-not $rejected -or ($before -join '|') -cne ($after -join '|')) { throw '[mir451-mismatched-source-patch-mutated-input]' }
     $assertions++
+    $info.version = "4.6.${code}00"
+    [IO.File]::WriteAllText($infoPath, ($info | ConvertTo-Json -Depth 10), [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($historyPath, $source450History, [Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText($readmePath, $readme, [Text.UTF8Encoding]::new($false))
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.6.${code}00" -SourceVersion '4.6.0'
+    $replacementHistory = [IO.File]::ReadAllText($historyPath)
+    if (-not $replacementHistory.StartsWith("---------------------------------------------------------------------------------------------------`nVersion: 4.6.${code}00`n") -or
+        -not $replacementHistory.EndsWith($source450History, [StringComparison]::Ordinal) -or
+        -not $replacementHistory.Contains('Retain the research, settings, cap and save-continuity repairs')) { throw '[mir460-replacement-changelog-identity]' }
+    if ($replacementHistory.Contains('Restore staged Aluminium, Gold, Tin and Titanium') -ne ($code -ceq '200')) { throw '[mir460-target-specific-material-claim]' }
+    if ($replacementHistory.Contains('independently available replacement science recipe') -ne ($code -cin @('210','200','110','100'))) { throw '[mir460-target-specific-science-claim]' }
+    if (@($replacementHistory.Split("`n") | Where-Object Length -gt 132).Count) { throw '[mir460-changelog-line-width]' }
+    $identityBefore = (Get-FileHash -LiteralPath $historyPath).Hash
+    Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.6.${code}00" -SourceVersion '4.6.0'
+    if ((Get-FileHash -LiteralPath $historyPath).Hash -cne $identityBefore) { throw '[mir460-repeated-write-duplicated-entry]' }
+    $assertions += 5
   }
 } finally {
   if (Test-Path -LiteralPath $root) {

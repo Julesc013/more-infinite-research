@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-19
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,9 +14,19 @@ source_of_truth_for:
 
 # MIR 4.x operating programme
 
+## Current: consolidated 4.6.0 replacement and substantial 4.7.0
+
+On 19 October the maintainer explicitly directed withdrawal and replacement of the published `v4.6.0` release and tag, consolidating the latest qualified fixes under source 4.6.0. This supersedes the earlier instruction to preserve that public release identity unchanged. The replacement is being prepared; preparation is not publication. Preserve the withdrawn source, package hashes and test receipts internally so same-version continuity and evidence reuse remain exact.
+
+PR #716 adds the F200 Bob/Angel Gold, Tin and Titanium routes to the shared material binding constructor, preserving Aluminium and the retained provider-pinned declarations. Its focused native test proves six technologies, fourteen effects, seven recipes, production output and both cold reloads on its private development package. The replacement still requires destination-bound upgrades, applicable visibility fields, current checks and matching signed delivery; the private package is not already release acceptance.
+
+The separate 4.7.0 campaign remains the substantial performance-and-support overhaul. Its scope gate requires at least 50% less MIR-added ordinary menu-startup time than the authenticated comparison package on the predeclared Galore/Space Age and Bob/Angel conditions, or the existing `delta <= min(0.10 * without-MIR startup, 30 seconds)` destination where a smaller reduction suffices. The 25% checkpoint is intermediate. Remove a complete measured chain of redundant production representations through the existing catalogue, binding path and emitter while preserving mutation validation, research, saves and multiplayer. A tested small release does not satisfy that scope gate.
+
+The proposed checkpoints remain 19 October at 22:00 AEDT for the first changed-chain pilot, then 20 October at 10:00, 14:00 and 20:00 for the intermediate result, substantive freeze decision and conditional publication. The intervening maintainer-directed 4.6.0 replacement does not restart those clocks or lower the overhaul gate. GitHub publication, primary-checkout delivery and actual maintainer-managed Portal uploads remain separately reported.
+
 <a id="active-campaign-mir-440-unified-research-generation"></a>
 
-## Published 4.4.2 and active 4.4.x continuation
+## Historical 4.4.2 and 4.4.x continuation
 
 The maintainer's 14 October direction superseded the separate 4.3.1 publication attempt and rolled its verified repairs into 4.4.0. The fixed **15 October 2026, 15:36 AEDT / 04:36 UTC** request is historical; it did not replace acceptance evidence or create a reusable waiver.
 

@@ -6380,10 +6380,10 @@
         "predecessor_source_path": "targets/f100/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 53526,
-      "source_sha256": "7B0C69B137F8AFB72258CCFB8256E02F5C86A5EA85001459E7CC8A6084600B7E",
-      "output_bytes": 53526,
-      "output_sha256": "7B0C69B137F8AFB72258CCFB8256E02F5C86A5EA85001459E7CC8A6084600B7E"
+      "source_bytes": 56152,
+      "source_sha256": "E74D5CC6BB700E6070AB3AF67362872B73D63F35BBD3A39F43AFE190AEB27E27",
+      "output_bytes": 56152,
+      "output_sha256": "E74D5CC6BB700E6070AB3AF67362872B73D63F35BBD3A39F43AFE190AEB27E27"
     },
     {
       "layer": "presentation",
@@ -6458,10 +6458,10 @@
         "predecessor_source_path": "targets/f110/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 53508,
-      "source_sha256": "50D660DCB7BBE27C9240907389F6649C48D824B050EBFACE3C69FA40E4D80812",
-      "output_bytes": 53508,
-      "output_sha256": "50D660DCB7BBE27C9240907389F6649C48D824B050EBFACE3C69FA40E4D80812"
+      "source_bytes": 56134,
+      "source_sha256": "0F891664918E4F86D840FBA97757E193DC9BDC5B32F3FE98C7B7CDAAD6671E15",
+      "output_bytes": 56134,
+      "output_sha256": "0F891664918E4F86D840FBA97757E193DC9BDC5B32F3FE98C7B7CDAAD6671E15"
     },
     {
       "layer": "presentation",
@@ -6512,10 +6512,10 @@
         "predecessor_source_path": "targets/f200/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 84296,
-      "source_sha256": "05E86483EE153AA1C2324E4BFF728D602C14A4730C7AB833B5816A06C2DA82BE",
-      "output_bytes": 84296,
-      "output_sha256": "05E86483EE153AA1C2324E4BFF728D602C14A4730C7AB833B5816A06C2DA82BE"
+      "source_bytes": 86479,
+      "source_sha256": "342395D9B7634AA8E40265E60D839329D52052B62DCF0B1E3988C625973527CE",
+      "output_bytes": 86479,
+      "output_sha256": "342395D9B7634AA8E40265E60D839329D52052B62DCF0B1E3988C625973527CE"
     },
     {
       "layer": "presentation",
@@ -6731,10 +6731,10 @@
         "predecessor_source_path": "targets/f210/generation/changelog.txt.template"
       },
       "transform": "exact-template-v1",
-      "source_bytes": 86035,
-      "source_sha256": "7E4EFB2CC34F6864E3864F92F5469937D15B1188932E0D86B67D941B7DBDC7A5",
-      "output_bytes": 86035,
-      "output_sha256": "7E4EFB2CC34F6864E3864F92F5469937D15B1188932E0D86B67D941B7DBDC7A5"
+      "source_bytes": 88218,
+      "source_sha256": "EE81C3245884482A14613575DF50AAA21BDFD1A9436D23F5FAFA8F703FD9E6D3",
+      "output_bytes": 88218,
+      "output_sha256": "EE81C3245884482A14613575DF50AAA21BDFD1A9436D23F5FAFA8F703FD9E6D3"
     },
     {
       "layer": "presentation",
@@ -7343,10 +7343,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 2034,
-      "source_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A",
-      "output_bytes": 2034,
-      "output_sha256": "689DA5AC3D70C2C0449B9B2CB6760A21F5C530B85114E73735D84CC4CB35E50A"
+      "source_bytes": 4660,
+      "source_sha256": "928E6B3C81CD1CCA5C47A2CF9A1B350A036B6ED9D2EC49FB94CF645EA39F88F8",
+      "output_bytes": 4660,
+      "output_sha256": "928E6B3C81CD1CCA5C47A2CF9A1B350A036B6ED9D2EC49FB94CF645EA39F88F8"
     },
     {
       "layer": "presentation",
@@ -7381,10 +7381,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 2274,
-      "source_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945",
-      "output_bytes": 2274,
-      "output_sha256": "B53354A3206B7D7F94BC48F54005A4CC0444DCDA28F060CB6893418FA861A945"
+      "source_bytes": 5010,
+      "source_sha256": "180384743705EF27ED678D2579828CC53282AF7C013AC5B93189BF65F6D064F7",
+      "output_bytes": 5010,
+      "output_sha256": "180384743705EF27ED678D2579828CC53282AF7C013AC5B93189BF65F6D064F7"
     },
     {
       "layer": "presentation",
@@ -7419,10 +7419,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 2274,
-      "source_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE",
-      "output_bytes": 2274,
-      "output_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE"
+      "source_bytes": 5019,
+      "source_sha256": "9ED50AD367BDC06C7190A8752AB519AFC8CEB562C3C942BC574C314317FF42C9",
+      "output_bytes": 5019,
+      "output_sha256": "9ED50AD367BDC06C7190A8752AB519AFC8CEB562C3C942BC574C314317FF42C9"
     },
     {
       "layer": "presentation",
@@ -7457,10 +7457,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 2502,
-      "source_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635",
-      "output_bytes": 2502,
-      "output_sha256": "58C761D9FA12FBB4AC28FAD73C6200A4A5B136BC6BA3FF8857ACAF012D0A6635"
+      "source_bytes": 5128,
+      "source_sha256": "D8AF07F216EEE692696DDD62F2241D25762FA7717C9DD1D4ED764B521968A41D",
+      "output_bytes": 5128,
+      "output_sha256": "D8AF07F216EEE692696DDD62F2241D25762FA7717C9DD1D4ED764B521968A41D"
     },
     {
       "layer": "presentation",
@@ -7495,10 +7495,10 @@
         "reason": "Registers a source-rooted private historical playtest adapter while leaving current-four target selection unchanged."
       },
       "transform": "exact-template-v1",
-      "source_bytes": 2502,
-      "source_sha256": "D302D92FDED4A8E6110FCCD4F67839415D05801296B6425D7A257090EF80CA46",
-      "output_bytes": 2502,
-      "output_sha256": "D302D92FDED4A8E6110FCCD4F67839415D05801296B6425D7A257090EF80CA46"
+      "source_bytes": 5128,
+      "source_sha256": "BF9F28D2892141EEE6598D425DCA958D9C1CAF8135F3759B7CE114111CDB6626",
+      "output_bytes": 5128,
+      "output_sha256": "BF9F28D2892141EEE6598D425DCA958D9C1CAF8135F3759B7CE114111CDB6626"
     },
     {
       "layer": "shared",
@@ -7678,5 +7678,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "2111A827CBFEEE2162C118C4929E0C1ECFF31522AFD4F80C1D90E52D2B88F3F3"
+  "record_sha256": "E6F93C3A1DE77FD12492377219D55EBDB0F1DD9200845859D4FCF3B3E5314323"
 }

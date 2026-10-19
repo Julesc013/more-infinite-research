@@ -1,4 +1,61 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.5.11002
+  Info:
+    - Target package from source 4.5.2.
+  Bugfixes:
+    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.
+    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.
+    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.
+  Performance:
+    - Reuse final journal and public-artifact representation preparation without changing generated research.
+    - Bind each prepared design once after effect sanitation.
+    - Use the common qualifier while retaining target-specific science diagnostics.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.5.11001
+  Info:
+    - Target package from source 4.5.1.
+  Bugfixes:
+    - Preserve native Promethium science binding and validated direct science alternatives.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.5.11000
+  Info:
+    - Target package from source 4.5.0.
+  Bugfixes:
+    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.
+  Performance:
+    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.
+    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.4.11002
+  Info:
+    - Target package from source 4.4.2.
+  Performance:
+    - Reuse lab acceptance data and approved bindings within each compilation.
+    - Avoid copying the public compiler snapshot solely to measure its serialized size.
+  Changes:
+    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.4.11001
+  Info:
+    - Target package from source 4.4.1.
+  Fixes:
+    - Prevent multiplayer join failures caused by a load-only on_tick event registration.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.4.11000
+  Info:
+    - Target package from source 4.4.0.
+
+---------------------------------------------------------------------------------------------------
+Version: 4.3.11000
+  Info:
+    - Target package from source 4.3.0.
+
+---------------------------------------------------------------------------------------------------
 Version: 4.2.11002
 
   Changes:
