@@ -13,7 +13,7 @@ local function stub(name, value)
     package.loaded[name] = value or {}
   end
 end
-for _, name in ipairs{"core.fingerprint","platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
+for _, name in ipairs{"platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   each_entity_prototype=function() end,
   each_item_prototype=function(callback)
@@ -36,7 +36,6 @@ local function test_fingerprint(value)
   for index=1,#text do hash=(hash*65599+string.byte(text,index))%4294967291 end
   return "mir32-"..string.format("%08x",hash)
 end
-stub("prototypes.mir.core.fingerprint", {of=test_fingerprint})
 stub("prototypes.mir.platform.factorio.target_profiles", {current=function() return {} end})
 stub("prototypes.mir.report.compiler_telemetry", {count=function() end,observe_max=function() end})
 stub("prototypes.mir.settings.automatic_compiler_policy", {current=function() return {apply_changes=true} end})
@@ -1081,6 +1080,67 @@ distinct_route.ingredient_identities[1].type=nil
 local malformed_ok,malformed_error=pcall(canonical_risks.index_facts,{names={"smelting"},facts={smelting=distinct_route}},{items={}})
 check(not malformed_ok and string.find(tostring(malformed_error),"canonical typed identities",1,true),"malformed canonical identity input is rejected explicitly before risk admission")
 
+-- Use the normal canonical writer for public risk-index shape coverage. The
+-- fixture continues to use test_fingerprint only for unrelated raw-input
+-- mutation witnesses; recipe_risk_facts itself must take the product writer.
+;(function()
+  local canonical_fingerprint=require("prototypes.mir.core.fingerprint")
+  check(type(canonical_fingerprint.canonical)=="function" and type(canonical_fingerprint.of_canonical)=="function",
+    "material-route risk checks use the product canonical fingerprint writer")
+  local function risk_index_source(names)
+    local facts={}
+    for _, name in ipairs(names) do facts[name]=canonical_route(name,"ore","plate") end
+    return {names=names,facts=facts}
+  end
+  local function risk_material(row)
+    return {schema=row.schema,recipe=row.recipe,hard_flags=row.hard_flags,review_flags=row.review_flags,
+      evidence=row.evidence,shared_input_output=row.shared_input_output,evidence_confidence=row.evidence_confidence}
+  end
+  local function assert_risk_index_public_shape(id, source, fact_prefix)
+    local source_before=canonical_fingerprint.canonical(source)
+    local index=canonical_risks.index_facts(source,{items={}})
+    local material={schema=index.schema,names=index.names,facts=index.facts}
+    local material_canonical=canonical_fingerprint.canonical(material)
+    check(index.risk_index_fingerprint==canonical_fingerprint.of_canonical(material_canonical),
+      "risk index "..id.." preserves the generic public index fingerprint")
+    check(canonical_fingerprint.canonical(source)==source_before,
+      "risk index "..id.." preserves public source input")
+    check(string.sub(canonical_fingerprint.canonical(index.facts),1,1)==fact_prefix,
+      "risk index "..id.." preserves canonical facts shape")
+    for _, row in pairs(index.facts) do
+      check(row.risk_fingerprint==canonical_fingerprint.of(risk_material(row)),
+        "risk index "..id.." preserves each generic seven-field row fingerprint")
+    end
+    local first_name=index.names[1]
+    if first_name~=nil then
+      local returned_before=canonical_fingerprint.canonical(index)
+      index.facts[first_name].hard_flags[1]="tampered-returned-row"
+      check(canonical_fingerprint.canonical(canonical_risks.index_facts(source,{items={}}))==returned_before,
+        "risk index "..id.." returns nested data isolated from a later public call")
+    end
+    return index
+  end
+  local empty_risk_index=assert_risk_index_public_shape("empty",{names={},facts={}},"[")
+  check(#empty_risk_index.names==0 and next(empty_risk_index.facts)==nil,
+    "risk index empty public shape retains array facts canonical form")
+  local duplicate_risk_index=assert_risk_index_public_shape("duplicate-string",risk_index_source({"alpha","alpha"}),"{")
+  check(#duplicate_risk_index.names==2 and duplicate_risk_index.facts.alpha~=nil and next(duplicate_risk_index.facts,"alpha")==nil,
+    "risk index duplicate names retain one public fact map member")
+  local numeric_array_risk_index=assert_risk_index_public_shape("numeric-array",risk_index_source({1,2}),"[")
+  check(numeric_array_risk_index.facts[1] and numeric_array_risk_index.facts[2],
+    "risk index numeric array names retain numeric public fact keys")
+  local numeric_sparse_risk_index=assert_risk_index_public_shape("numeric-sparse-map",risk_index_source({2,5}),"{")
+  check(numeric_sparse_risk_index.facts[2] and numeric_sparse_risk_index.facts[5],
+    "risk index numeric sparse names retain numeric map fact keys")
+  local escaped_name="quoted\"name\nline"
+  local metatable_names=setmetatable({"beta",escaped_name},{__pairs=function(value) return next,value,nil end})
+  local metatable_risk_index=assert_risk_index_public_shape("metatable-names",risk_index_source(metatable_names),"{")
+  local reordered_risk_index=assert_risk_index_public_shape("reordered-escaped",risk_index_source({escaped_name,"beta"}),"{")
+  check(canonical_fingerprint.canonical(metatable_risk_index)==canonical_fingerprint.canonical(reordered_risk_index),
+    "risk index reordered escaped names retain exact public output")
+  check(metatable_risk_index.names[1]=="beta" and metatable_risk_index.names[2]==escaped_name,
+    "risk index name admission preserves canonical ordering after benign metatable input")
+end)()
 -- Consume a real audit row from the production diagnostics formatter. This
 -- exercises the capture/serialization handoff without retaining a context or
 -- treating diagnostic observation as native execution or route admission.

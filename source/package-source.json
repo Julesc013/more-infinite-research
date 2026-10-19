@@ -4667,10 +4667,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/index/recipe_risk_facts.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 9442,
-      "source_sha256": "D3572FB06002079BE40B08BBA3577238F3200EA56E694974B92C2680119F38AB",
-      "output_bytes": 9442,
-      "output_sha256": "D3572FB06002079BE40B08BBA3577238F3200EA56E694974B92C2680119F38AB"
+      "source_bytes": 12622,
+      "source_sha256": "EE48AF36BFB2FA3AE1FE668A0836665F1C8C084BE0F08FBA8C26540D439702FA",
+      "output_bytes": 12622,
+      "output_sha256": "EE48AF36BFB2FA3AE1FE668A0836665F1C8C084BE0F08FBA8C26540D439702FA"
     },
     {
       "layer": "capability",
@@ -7678,5 +7678,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "EFDA2BE5294E286990C266BDEED7AE51A1B4953E0AEDE4737D3842481855C4C8"
+  "record_sha256": "7D0BF77FD9EFDF1133F9EB135FB39610F42F4C51CCF14A693C4D0C1C09D90270"
 }

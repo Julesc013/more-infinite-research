@@ -2252,8 +2252,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the canonical shared capability required by the complete Factorio 1 module dependency closure.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 9442,
-      "expected_sha256": "D3572FB06002079BE40B08BBA3577238F3200EA56E694974B92C2680119F38AB",
+      "expected_bytes": 12622,
+      "expected_sha256": "EE48AF36BFB2FA3AE1FE668A0836665F1C8C084BE0F08FBA8C26540D439702FA",
       "proof_obligations": [
         "exact-path-and-source-identity",
         "complete-literal-module-dependency-closure",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "76A78B83269C76BE7947759C96003E7DA4EBE1DCA13718AAF84973431678E24C"
+  "record_sha256": "D6D242E5CD5EA85403D55D5759F9BD08FEEB142B1777141012754926620C06F9"
 }

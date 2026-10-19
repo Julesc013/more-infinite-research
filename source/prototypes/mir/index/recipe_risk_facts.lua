@@ -173,22 +173,85 @@ local function build_row(recipe_name, fact, indexes)
     shared_input_output = shared,
     evidence_confidence = #review > 0 and 0.75 or 1.0
   }
-  row.risk_fingerprint = fingerprint.of(risk_material(row))
-  return row
+  -- This freshly built row is private to this construction pass.  Keep its
+  -- exact canonical risk material long enough to derive both its self digest
+  -- and the enclosing index bytes, then discard it with build_index().
+  -- Nothing keys on table identity or survives into the returned/public row.
+  local material_canonical = fingerprint.canonical(risk_material(row))
+  row.risk_fingerprint = fingerprint.of_canonical(material_canonical)
+  return row, material_canonical
+end
+
+local function owned_row_canonical(material_canonical, risk_fingerprint)
+  -- risk_material has the fixed seven string-keyed fields above.  Its normal
+  -- canonical key order places `schema` after `review_flags`; insert the
+  -- eighth owned scalar at that exact boundary to reproduce canonical(row)
+  -- without traversing the freshly built row a second time.
+  local marker = ',"schema":'
+  local boundary = string.find(material_canonical, marker, 1, true)
+  if not boundary then
+    error("recipe_risk_facts internal risk material lost its fixed schema boundary", 2)
+  end
+  return string.sub(material_canonical, 1, boundary - 1)
+    .. ',"risk_fingerprint":' .. string.format("%q", risk_fingerprint)
+    .. string.sub(material_canonical, boundary)
+end
+
+local function owned_index_canonical(names, fact_names, row_canonicals)
+  -- This is deliberately owner-specific composition, not a generic fragment
+  -- API.  names and facts are both raw-sorted strings in the canonical writer;
+  -- duplicate names remain in names but are one map member in facts.
+  -- The core canonical writer represents an empty table as an array.  A
+  -- nonempty facts map is string-keyed and therefore uses braces.
+  local out = {'{"facts":'}
+  if #fact_names == 0 then
+    out[#out + 1] = '[]'
+  else
+    out[#out + 1] = '{'
+    for index, recipe_name in ipairs(fact_names) do
+      if index > 1 then out[#out + 1] = ',' end
+      out[#out + 1] = string.format("%q", recipe_name)
+      out[#out + 1] = ':'
+      out[#out + 1] = row_canonicals[recipe_name]
+    end
+    out[#out + 1] = '}'
+  end
+  out[#out + 1] = ',"names":'
+  out[#out + 1] = fingerprint.canonical(names)
+  out[#out + 1] = ',"schema":'
+  out[#out + 1] = fingerprint.canonical(SCHEMA)
+  out[#out + 1] = '}'
+  return table.concat(out)
 end
 
 local function build_index(source, indexes)
-  local facts, hard_count, review_count = {}, 0, 0
+  local facts, row_canonicals, fact_names = {}, {}, {}
+  local hard_count, review_count = 0, 0
   local names = deepcopy(source.names or {})
   table.sort(names)
+  -- `deepcopy` is the established names admission boundary. It returns a new
+  -- plain table under the local fallback and current Factorio implementation;
+  -- retain the normal whole-index writer if that assumption or string-keyed
+  -- facts does not hold. The generic writer is the authority for numeric map
+  -- keys and empty/array distinctions outside this owned string-name path.
+  local compose_owned_index = getmetatable(names) == nil
   for _, recipe_name in ipairs(names) do
-    local row = build_row(recipe_name, source.facts[recipe_name], indexes)
+    if type(recipe_name) ~= "string" then compose_owned_index = false; break end
+  end
+  for _, recipe_name in ipairs(names) do
+    local row, material_canonical = build_row(recipe_name, source.facts[recipe_name], indexes)
     facts[recipe_name] = row
+    if compose_owned_index then
+      if row_canonicals[recipe_name] == nil then fact_names[#fact_names + 1] = recipe_name end
+      row_canonicals[recipe_name] = owned_row_canonical(material_canonical, row.risk_fingerprint)
+    end
     if #row.hard_flags > 0 then hard_count = hard_count + 1 end
     if #row.review_flags > 0 then review_count = review_count + 1 end
   end
   local index = {schema = SCHEMA, names = names, facts = facts}
-  index.risk_index_fingerprint = fingerprint.of({schema = index.schema, names = index.names, facts = index.facts})
+  index.risk_index_fingerprint = compose_owned_index
+    and fingerprint.of_canonical(owned_index_canonical(names, fact_names, row_canonicals))
+    or fingerprint.of({schema = index.schema, names = index.names, facts = index.facts})
   return index, hard_count, review_count
 end
 
