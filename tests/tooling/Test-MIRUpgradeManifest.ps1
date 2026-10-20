@@ -2,6 +2,7 @@
 [CmdletBinding()]
 param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,[string]$SelectedManifestPath='')
 $ErrorActionPreference='Stop'
+$k2FullStateScenario=$false
 $tokens=$null;$errors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
 if($errors.Count -ne 0){throw 'Upgrade harness syntax error'}
@@ -973,7 +974,7 @@ $k2ReaderCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.Ass
 $k2Selectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$k2Scenario'},$true))
 $reloadSelectors=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$requiresReloadProof'},$true))
 $k2MarkerCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.CommandAst]-and$n.GetCommandName()-ceq'Assert-MIR421K2UpgradeMarker'},$true))
-$k2ResultCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$result.native_scenario'-and$n.Right.Extent.Text.StartsWith("'K2-'" )},$true))
+$k2ResultCalls=@($ast.FindAll({param($n)$n-is[Management.Automation.Language.AssignmentStatementAst]-and$n.Left.Extent.Text-ceq'$result.native_scenario'-and$n.Right.Extent.Text.Contains("'K2-'" )},$true))
 if($k2ReaderCalls.Count-ne1-or$k2Selectors.Count-ne1-or$reloadSelectors.Count-ne1-or$k2MarkerCalls.Count-ne4-or$k2ResultCalls.Count-ne1){throw 'K2 maintenance call sites changed'}
 foreach($patch in @(1,2)){
   $SourceVersion="4.2.$patch";$FromVersion="4.2.2100$($patch-1)";$ToVersion="4.2.2100$patch"
@@ -1013,6 +1014,83 @@ foreach($patch in @(1,2)){
     if(-not$rejected){throw "K2 mixed maintenance mode accepted: $field"};$k2Assertions++
   }
 }
+$profile470=Join-Path $RepoRoot 'fixtures/run-profiles/k2-214-imersite-f210-470.json'
+$bound470=Read-MIR421K2UpgradeProfile -Path $profile470 -SourceVersion '4.7.0'
+if($bound470.sha256-cne'5DF2F1A1FC611B578759AE5F6332CFB589F316EE0395A0E21E4E44BFD3DCC7CD' -or
+   $bound470.profile.engine_version-cne'2.1.22' -or
+   $bound470.profile.engine_sha256-cne'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B' -or
+   @($bound470.inputs|Where-Object {$_.file_name-ceq'Krastorio2_2.1.4.zip'-and$_.expected_sha256-ceq'9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E'}).Count-ne1 -or
+   @($bound470.inputs|Where-Object {$_.file_name-ceq'Krastorio2-spaced-out_2.0.19.zip'-and$_.expected_sha256-ceq'8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B'}).Count-ne1){
+  throw 'Current K2 profile identity or upstream archive hashes differ'
+}
+Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $profile470
+# Host controls must also run on a clean CI checkout without local dist ZIPs.
+# The exact published positive input belongs to the native upgrade; this
+# opposing input proves that the archive gate refuses unrelated real bytes.
+$rejected=$false
+try{Assert-MIR470K2CurrentPredecessorArchive -Path $profile470}catch{$rejected=$_.Exception.Message-ceq'[mir470-k2-published-460-archive-hash]'}
+if(-not$rejected){throw 'Current K2 predecessor gate accepted profile JSON as a published archive'}
+$k2Assertions++
+$transition470=@{Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SourceVersion='4.7.0'}
+Assert-MIR421K2UpgradeTransition @transition470
+$mode470=@{Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-460.json';Retention='Always';K2ImersiteInputProfile=$profile470;F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.7.0'}
+Assert-MIR421CurrentUpgradeInputMode @mode470
+if((Resolve-MIR42UpgradePredecessorReaderVersion -Target f210 -FromVersion '4.6.21000' -SourceVersion '4.7.0')-cne'4.7.0'){throw 'Current K2 predecessor reader identity differs'}
+$SourceVersion='4.7.0';$FromVersion='4.6.21000';$ToVersion='4.7.21000';$FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';$K2ImersiteInputProfile=$profile470
+. ([scriptblock]::Create($k2ReaderCalls[0].Extent.Text));. ([scriptblock]::Create($k2Selectors[0].Extent.Text));. ([scriptblock]::Create($reloadSelectors[0].Extent.Text))
+if($k2Inputs.source_version-cne$SourceVersion-or-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 route bypassed profile, scenario, or reload selection'}
+$runnerText=$ast.Extent.Text
+if(-not$runnerText.Contains('if($k2FullStateScenario-and$K2ImersiteCap-ne0){throw ''[mir470-k2-imersite-cap-required]''}')){throw 'Current K2 route did not require explicit zero cap'}
+$k2FullStateScenario=$true;$classicReducedPolicy=$false;$SpaceIsFake=$false;$mir42UpgradeSpecialized=$false;$Archetype=''
+if(-not(& $completeCatalogueEvaluator)){throw 'Current K2 route did not select the complete full-state collector'}
+$result=[ordered]@{};. ([scriptblock]::Create($k2ResultCalls[0].Extent.Text))
+if($result.native_scenario-cne'K2-470-published-4.6.0-to-4.7.0-current-profile-full-state'){throw 'Current K2 result identity differs'}
+$k2FullStateScenario=$false
+if(& $completeCatalogueEvaluator){throw 'Pinned 4.2 K2 route was broadened into the full-state collector'}
+$fixture470=Join-Path $fixtureRoot 'assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000'
+$info470=Get-Content -LiteralPath (Join-Path $fixture470 'info.json') -Raw|ConvertFrom-Json
+$control470=Get-Content -LiteralPath (Join-Path $fixture470 'control.lua') -Raw
+if($info470.name-cne'mir-fixture-assert-k2-imersite-460-to-470-upgrade'-or$info470.version-cne'0.1.4700'-or
+   @($info470.dependencies).Count-ne4-or$info470.dependencies-cnotcontains'base = 2.1.22'-or
+   $info470.dependencies-cnotcontains'more-infinite-research >= 4.6.21000'-or
+   $info470.dependencies-cnotcontains'Krastorio2 = 2.1.4'-or$info470.dependencies-cnotcontains'Krastorio2-spaced-out = 2.0.19'){
+  throw 'Current K2 fixture identity does not bind the published predecessor and exact upstream'
+}
+foreach($needle in @('published 4.6 source must expose its genuine infinite Imersite predecessor','all_force_states()','active_mods = deep_copy(script.active_mods)','seed_infinite_progress(zero, 0)','seed_infinite_progress(low, 2)','seed_infinite_progress(player, 3)','seed_infinite_progress(high, 7)','low earned finite stage changed or was over-credited','low earned finite Imersite queue was transferred too early','continuation.level ~= case.next_level','preserved Imersite powder bonus','verify_unrelated_state','K2-470 infinite predecessor split mapping verified completed=0,2,3,7;progress=0.42','mir-upgrade-full-state-')){
+  if(-not$control470.Contains($needle)){throw "Current K2 full-state fixture lost required assertion: $needle"}
+}
+foreach($forbidden in @('published predecessor lacks genuine finite Imersite levels one through three','new level-four continuation was not initially unresearched','force.research_progress = 1')){
+  if($control470.Contains($forbidden)){throw "Current K2 full-state fixture retained stale finite-predecessor assumption: $forbidden"}
+}
+$snapshotMods=[ordered]@{}
+foreach($row in @($bound470.profile.mods)){$snapshotMods[[string]$row.name]=[string]$row.version}
+$snapshot470=[pscustomobject]@{active_mods=[pscustomobject]$snapshotMods}
+$null=Assert-MIR470K2FullStateActiveMods -Snapshot $snapshot470 -ExpectedSelection @($bound470.profile.mods) -Stage source
+$snapshot470.active_mods.Krastorio2='2.1.3'
+$rejected=$false;try{$null=Assert-MIR470K2FullStateActiveMods -Snapshot $snapshot470 -ExpectedSelection @($bound470.profile.mods) -Stage upgrade}catch{$rejected=$_.Exception.Message.StartsWith('[mir470-k2-full-state-active-mod:upgrade:Krastorio2]')}
+if(-not$rejected){throw 'Current K2 full-state active-mod assertion accepted an older upstream'}
+foreach($stage in @('source','upgrade','reload')){
+  Assert-MIR421K2UpgradeMarker -Text "[mir-fixture] K2-470 maintenance state verified stage=$stage;cap=0" -Stage $stage -Cap 0 -SourceVersion '4.7.0'
+}
+$k2Assertions+=9
+foreach($field in @('SourceVersion','FromVersion','ToVersion','FixtureName','K2ImersiteInputProfile','PublishedPredecessorManifest','Retention')){
+  $bad=$mode470.Clone();$bad[$field]=switch($field){
+    'SourceVersion' {'4.6.0'}
+    'FromVersion' {'4.5.21002'}
+    'ToVersion' {'4.7.21001'}
+    'FixtureName' {'assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002'}
+    'K2ImersiteInputProfile' {''}
+    'PublishedPredecessorManifest' {''}
+    'Retention' {'OnFailure'}
+  }
+  $rejected=$false;try{Assert-MIR421CurrentUpgradeInputMode @bad}catch{$rejected=$_.Exception.Message.StartsWith('[mir421-')}
+  if(-not$rejected){throw "Current K2 route accepted invalid input: $field"};$k2Assertions++
+}
+foreach($wrongProfile in @($profilePath,$profile422)){
+  $rejected=$false;try{Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $wrongProfile}catch{$rejected=$_.Exception.Message.StartsWith('[mir470-k2-upgrade-profile-path]')}
+  if(-not$rejected){throw 'Current K2 profile path gate accepted a pinned 4.2 profile'};$k2Assertions++
+}
+$k2FullStateScenario=$false
 # 4.3.0 destinations retain the full current-package contract while binding
 # each row to an exact published 4.2 predecessor.  4.3.1 retains two required
 # Full lanes for every target: direct published 4.2.2 and immediate published

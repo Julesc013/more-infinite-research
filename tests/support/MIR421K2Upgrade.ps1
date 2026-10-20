@@ -2,17 +2,22 @@
 # releases. Its assertion fixture replaces that profile's fresh-game fixture.
 function Read-MIR421K2UpgradeProfile {
   param([Parameter(Mandatory)][string]$Path,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.7.0')][string]$SourceVersion='4.2.1')
   $profile=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 20
+  $current470=$SourceVersion-ceq'4.7.0'
+  $engineVersion=if($current470){'2.1.22'}else{'2.1.21'}
   if($profile.schema-ne1-or$profile.target-cne'f210'-or$profile.factorio_line-cne'2.1'-or
-     $profile.engine_version-cne'2.1.21'-or$profile.settings_mode-cne'Defaults') {throw '[mir421-k2-upgrade-profile]'}
+     $profile.engine_version-cne$engineVersion-or$profile.settings_mode-cne'Defaults') {throw '[mir421-k2-upgrade-profile]'}
   foreach($field in @('engine_sha256','runtime_api_sha256')){
     if([string]$profile.$field-cnotmatch'^[0-9A-F]{64}$'){throw '[mir421-k2-upgrade-engine-hash]'}
   }
-  $expected=[ordered]@{base='2.1.21';'elevated-rails'='2.1.21';quality='2.1.21';recycler='2.1.21';'space-age'='2.1.21';
-    flib='0.17.2';'k2so-assets'='1.0.7';Krastorio2='2.1.3';'Krastorio2-spaced-out'='2.0.13';
+  if($current470-and(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash-cne'5DF2F1A1FC611B578759AE5F6332CFB589F316EE0395A0E21E4E44BFD3DCC7CD'){
+    throw '[mir470-k2-upgrade-profile-hash]'
+  }
+  $expected=[ordered]@{base=$engineVersion;'elevated-rails'=$engineVersion;quality=$engineVersion;recycler=$engineVersion;'space-age'=$engineVersion;
+    flib='0.17.2';'k2so-assets'='1.0.7';Krastorio2=$(if($current470){'2.1.4'}else{'2.1.3'});'Krastorio2-spaced-out'=$(if($current470){'2.0.19'}else{'2.0.13'});
     Krastorio2Assets='2.1.0';Krastorio2MenuSimulations='2.1.0';'xy-k2so-enhancements-nulls-fork'='0.8.3';
-    'more-infinite-research'=('4.2.2100'+([version]$SourceVersion).Build);'mir-fixture-assert-k2-213-imersite-continuation'=$(if($SourceVersion-ceq'4.2.2'){@('0.1.4')}else{@('0.1.3','0.1.4')})}
+    'more-infinite-research'=$(if($current470){'4.7.21000'}else{'4.2.2100'+([version]$SourceVersion).Build});'mir-fixture-assert-k2-213-imersite-continuation'=$(if($current470){@('0.1.8')}elseif($SourceVersion-ceq'4.2.2'){@('0.1.4')}else{@('0.1.3','0.1.4')})}
   # Both retained profile versions select the same dependency releases. The
   # fresh-game fixture is excluded below and replaced by the upgrade fixture.
   if(@($profile.mods).Count-ne$expected.Count){throw '[mir421-k2-upgrade-selection]'}
@@ -35,10 +40,14 @@ function Read-MIR421K2UpgradeProfile {
 function Assert-MIR421K2UpgradeTransition {
   param([string]$Target,[string]$FromVersion,[string]$ToVersion,[string]$FixtureName,[string]$Archetype,
     [bool]$SpaceIsFake,[string[]]$SourceOnlyFixtureNames=@(),
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
-  $patch=([version]$SourceVersion).Build
-  $expectedFrom='4.2.2100'+($patch-1);$expectedTo='4.2.2100'+$patch
-  $expectedFixture='assert-upgrade-k2-imersite-'+$expectedFrom.Replace('.','-')+'-to-'+$expectedTo.Replace('.','-')
+    [ValidateSet('4.2.1','4.2.2','4.7.0')][string]$SourceVersion='4.2.1')
+  if($SourceVersion-ceq'4.7.0'){
+    $expectedFrom='4.6.21000';$expectedTo='4.7.21000';$expectedFixture='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000'
+  }else{
+    $patch=([version]$SourceVersion).Build
+    $expectedFrom='4.2.2100'+($patch-1);$expectedTo='4.2.2100'+$patch
+    $expectedFixture='assert-upgrade-k2-imersite-'+$expectedFrom.Replace('.','-')+'-to-'+$expectedTo.Replace('.','-')
+  }
   if($Target-cne'f210'-or$FromVersion-cne$expectedFrom-or$ToVersion-cne$expectedTo-or
      $FixtureName-cne$expectedFixture-or$Archetype-or$SpaceIsFake-or$SourceOnlyFixtureNames.Count){
     throw '[mir421-k2-upgrade-transition]'
@@ -47,9 +56,39 @@ function Assert-MIR421K2UpgradeTransition {
 
 function Assert-MIR421K2UpgradeMarker {
   param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage,[ValidateSet(0,3)][int]$Cap=3,
-    [ValidateSet('4.2.1','4.2.2')][string]$SourceVersion='4.2.1')
+    [ValidateSet('4.2.1','4.2.2','4.7.0')][string]$SourceVersion='4.2.1')
   $token=$SourceVersion.Replace('.','')
   if($Text-notmatch ('\[mir-fixture\] K2-'+$token+' maintenance state verified stage='+$Stage+';cap='+$Cap+'(?:\r?\n|$)')){throw "[mir421-k2-upgrade-$Stage-marker]"}
+}
+
+function Assert-MIR470K2CurrentUpgradeProfilePath {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path)
+  $expected=[IO.Path]::GetFullPath((Join-Path $RepoRoot 'fixtures/run-profiles/k2-214-imersite-f210-470.json'))
+  $actual=[IO.Path]::GetFullPath((Resolve-Path -LiteralPath $Path).Path)
+  if($actual-cne$expected){throw '[mir470-k2-upgrade-profile-path]'}
+  if((Get-FileHash -LiteralPath $actual -Algorithm SHA256).Hash-cne'5DF2F1A1FC611B578759AE5F6332CFB589F316EE0395A0E21E4E44BFD3DCC7CD'){
+    throw '[mir470-k2-upgrade-profile-hash]'
+  }
+}
+
+function Assert-MIR470K2CurrentPredecessorArchive {
+  param([Parameter(Mandatory)][string]$Path)
+  if((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash-cne'5A1CA84B0AA8E9690B9095DB12DC991C26EF9081481E2A530B953F47384A945A'){
+    throw '[mir470-k2-published-460-archive-hash]'
+  }
+}
+
+function Assert-MIR470K2FullStateActiveMods {
+  param([Parameter(Mandatory)]$Snapshot,[Parameter(Mandatory)][object[]]$ExpectedSelection,[Parameter(Mandatory)][ValidateSet('source','upgrade','reload')][string]$Stage)
+  $expected=[ordered]@{}
+  foreach($row in @($ExpectedSelection|Where-Object {[bool]$_.enabled})){$expected[[string]$row.name]=[string]$row.version}
+  $actual=[ordered]@{}
+  foreach($property in @($Snapshot.active_mods.PSObject.Properties)){$actual[[string]$property.Name]=[string]$property.Value}
+  if($expected.Count-ne$actual.Count){throw ('[mir470-k2-full-state-active-mod-count:{0}]' -f $Stage)}
+  foreach($name in $expected.Keys){if(-not$actual.Contains($name)-or$actual[$name]-cne$expected[$name]){throw ('[mir470-k2-full-state-active-mod:{0}:{1}]' -f $Stage,$name)}}
+  foreach($name in @('Krastorio2','Krastorio2-spaced-out','more-infinite-research')){if(-not$actual.Contains($name)){throw ('[mir470-k2-full-state-required-mod:{0}:{1}]' -f $Stage,$name)}}
+  if($actual['Krastorio2']-cne'2.1.4'-or$actual['Krastorio2-spaced-out']-cne'2.0.19'){throw ('[mir470-k2-full-state-upstream:{0}]' -f $Stage)}
+  return [ordered]@{active_mods=$actual}
 }
 
 # Use the shared settings writer. Cap three deliberately has no override so

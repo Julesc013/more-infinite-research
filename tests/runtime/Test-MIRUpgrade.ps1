@@ -191,8 +191,8 @@ function Assert-MIR421CurrentUpgradeInputMode {
   } elseif($F200BobAngelInputProfile){
     if($SpaceIsFake-or$K2ImersiteInputProfile){throw '[mir421-current-upgrade-input-mode]'}
     Assert-MIR423F200BobAngelUpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
-  } elseif ($K2ImersiteInputProfile -or $FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')) {
-    if ($source.Minor-ne2-or-not $K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
+  } elseif ($K2ImersiteInputProfile -or $FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002','assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000')) {
+    if (($source.Minor-ne2-and$SourceVersion-cne'4.7.0')-or-not$K2ImersiteInputProfile) { throw '[mir421-k2-upgrade-inputs-required]' }
     Assert-MIR421K2UpgradeTransition -Target $Target -FromVersion $FromVersion -ToVersion $ToVersion -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake $SpaceIsFake -SourceOnlyFixtureNames $SourceOnlyFixtureNames -SourceVersion $SourceVersion
   } elseif ($SpaceIsFake) {
     if($source.Minor-ne2){throw '[mir421-current-upgrade-scenario]'}
@@ -497,7 +497,9 @@ if($PersistedDamageZip -or $PublishedDamageManifestPath){
 . (Join-Path $RepoRoot 'tests/support/MIR421K2Upgrade.ps1')
 . (Join-Path $RepoRoot 'tests/support/MIR430ClassicUpgrade.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
-$k2Scenario=$FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002')
+$k2Scenario=$FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002','assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000')
+$k2FullStateScenario=$FixtureName-ceq'assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000'
+if($k2FullStateScenario-and$K2ImersiteCap-ne0){throw '[mir470-k2-imersite-cap-required]'}
 $f200BobAngelScenario=[bool]$F200BobAngelInputProfile
 $f200GaloreSpaceAgeScenario=[bool]$F200GaloreSpaceAgeInputProfile
 if($f200BobAngelScenario-and$f200GaloreSpaceAgeScenario){throw '[mir421-current-upgrade-input-mode]'}
@@ -610,6 +612,8 @@ if($PersistedDamageZip){
 }
 $k2Inputs=$null
 if($k2Scenario){
+  if($SourceVersion-ceq'4.7.0'){Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $K2ImersiteInputProfile}
+  if($k2FullStateScenario){Assert-MIR470K2CurrentPredecessorArchive -Path $from}
   $k2Inputs=Read-MIR421K2UpgradeProfile -Path (Resolve-MIRUpgradePath $K2ImersiteInputProfile) -SourceVersion $SourceVersion
   if((Get-FileHash -LiteralPath $factorio).Hash-cne$k2Inputs.profile.engine_sha256-or
      (Get-FileHash -LiteralPath (Join-Path (Split-Path -Parent $engineData) 'doc-html/runtime-api.json')).Hash-cne$k2Inputs.profile.runtime_api_sha256){throw '[mir421-k2-upgrade-engine-identity]'}
@@ -1009,8 +1013,8 @@ if($k2Scenario){
   $capOverride=New-MIR421K2CapOverride -Root (Join-Path $root 'cap-settings') -Cap $K2ImersiteCap
   if($capOverride){$persistentFixtureDirectories+=,$capOverride}
 }
-$requiresCompleteCatalogue = -not$classicReducedPolicy-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')-and-not$SpaceIsFake-and-not$k2Scenario-and
-  (($mir42UpgradeSpecialized-and$Archetype-cin@('base-default','space-age-native-owner','f200-bob-angel','f200-galore-space-age'))-or$isHistoricalTerminalFixture)
+$requiresCompleteCatalogue = -not$classicReducedPolicy-and$SourceVersion-cin@('4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')-and-not$SpaceIsFake-and
+  ($k2FullStateScenario-or((-not$k2Scenario)-and(($mir42UpgradeSpecialized-and$Archetype-cin@('base-default','space-age-native-owner','f200-bob-angel','f200-galore-space-age'))-or$isHistoricalTerminalFixture)))
 $completeCatalogueSnapshotEvidence = [ordered]@{}
 $classicUpgradeSnapshotEvidence = [ordered]@{}
 if ($PrepareInputsOnly) {
@@ -1109,6 +1113,7 @@ $nativeBaseArgs=@('--config',$config,'--no-log-rotation','--mod-directory',$mods
 $requiresReloadProof = $FixtureName -in @(
   'assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001',
   'assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002',
+  'assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000',
   "assert-upgrade-3-2-11-to-4-0-21000",
   "assert-upgrade-2-5-11-to-4-0-20000",
   "assert-upgrade-3-2-2-to-3-2-3",
@@ -1340,7 +1345,12 @@ if ($SpaceIsFake) {
 }
 if($k2Scenario){
   if(-not$reloadEvidence-or-not$secondReloadEvidence){throw '[mir421-k2-upgrade-two-reloads-required]'}
-  if($SourceVersion-ceq'4.2.2'){
+  if($k2FullStateScenario){
+      $assertions=@('published-4.6-infinite-imersite-levels-three-and-seven-mapped-to-staged-continuation','exact-current-k2-214-profile-and-archive-hashes-bound',
+        'configured-imersite-cap-and-fixture-storage-retained','total-powder-bonus-and-next-level-progress-preserved-through-staged-transfer',
+      'exact-archive-selection-and-library-controls-restored','upgraded-save-reload-passed','upgraded-save-second-reload-passed',
+        'only-staged-definition-deltas-and-existing-state-preservation-contract')
+  }elseif($SourceVersion-ceq'4.2.2'){
     $assertions=@('published-4.2.1-k2-finite-earned-domain-retained','independent-crystal-ten-percent-retained',
       'existing-queue-level-and-completed-work-retained','configured-imersite-cap-and-fixture-storage-retained',
       'exact-archive-selection-and-library-controls-restored','upgraded-save-reload-passed','upgraded-save-second-reload-passed')
@@ -1411,7 +1421,10 @@ if($requiresCompleteCatalogue){
     $snapshotValue=Get-Content -LiteralPath $retained.path -Raw|ConvertFrom-Json -Depth 100
     if($snapshotValue.from_version-cne$FromVersion-or$snapshotValue.to_version-cne$ToVersion-or$snapshotValue.stage-cne$retained.snapshot_stage){throw '[mir422-full-state-snapshot-identity]'}
     $entry=[ordered]@{stage=$stage;path=$retained.path;sha256=$retained.sha256;bytes=$retained.bytes}
-    if($f200BobAngelScenario-or$f200GaloreSpaceAgeScenario){
+    if($k2FullStateScenario){
+      $selection=if($stage-ceq'source'){@($sourceSelection.mod_list.mods)}else{@($candidateSelection.mod_list.mods)}
+      $entry.active_mods=(Assert-MIR470K2FullStateActiveMods -Snapshot $snapshotValue -ExpectedSelection $selection -Stage $stage).active_mods
+    }elseif($f200BobAngelScenario-or$f200GaloreSpaceAgeScenario){
       $selection=if($stage-ceq'source'){@($sourceSelection.mod_list.mods)}else{@($candidateSelection.mod_list.mods)}
       $entry.active_mods=if($f200BobAngelScenario){
         (Assert-MIR423F200BobAngelFullStateActiveMods -Snapshot $snapshotValue -ExpectedSelection $selection -Stage $stage).active_mods
@@ -1469,7 +1482,7 @@ if ($SpaceIsFake) {
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $RepoRoot 'tests/support/MIR421SpaceFakeUpgrade.lua') -Algorithm SHA256).Hash
 }
 if($k2Scenario){
-  $result.native_scenario='K2-'+$SourceVersion.Replace('.','')+'-published-4.2.'+(([version]$SourceVersion).Build-1)+'-to-'+$SourceVersion
+  $result.native_scenario=if($k2FullStateScenario){'K2-470-published-4.6.0-to-4.7.0-current-profile-full-state'}else{'K2-'+$SourceVersion.Replace('.','')+'-published-4.2.'+(([version]$SourceVersion).Build-1)+'-to-'+$SourceVersion}
   $result.input_profile_sha256=$k2Inputs.sha256
   $result.dependency_inputs=$sifTerminal.selected
   $result.native_oracle_sha256=(Get-FileHash -LiteralPath (Join-Path $fixture 'control.lua')).Hash

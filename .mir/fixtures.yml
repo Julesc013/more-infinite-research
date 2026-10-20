@@ -710,6 +710,24 @@ fixtures:
       - direct-master-library-with-no-dependency-staging-and-restored-controls
       - no-natural-acquisition-production-throughput-or-broader-profile-claim
 
+  k2-214-imersite-current-predecessor-upgrade:
+    requires_features: []
+    path: fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/k2-214-imersite-f210-470.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - exact-published-460-f210-predecessor-identity-and-current-470-candidate-binding
+      - exact-2122-k2-214-k2so-2019-profile-hashes-and-direct-library-selection
+      - published-460-infinite-imersite-predecessor-at-completed-levels-zero-two-three-and-seven
+      - below-split-levels-remain-on-finite-legacy-stage-without-invented-credit
+      - completed-finite-stage-levels-transfer-total-powder-bonus-and-the-next-level-queue-progress
+      - independent-native-crystal-owner-and-all-unrelated-technology-effect-and-setting-state
+      - explicit-untouched-control-and-unseeded-force-preservation-around-only-staged-definition-deltas
+      - two-distinct-cold-reloads-with-full-state-comparisons
+      - no-native-acceptance-until-exact-predecessor-candidate-upgrade-and-two-reloads-pass
+
   f200-bob-angel-maintenance-upgrade-423:
     requires_features: []
     path: fixtures/assert-upgrade-4-0-20000-to-4-1-20000
