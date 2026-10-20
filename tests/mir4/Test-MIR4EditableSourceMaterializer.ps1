@@ -65,6 +65,7 @@ $historicalBindings=@($introducedBindings|Where-Object{[string]$_.provenance.int
 $compilerTransitionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
 $approvedScienceBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
 $angelsRepairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
+$k2StateBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR47-K2-STAGED-STATE-CARRIERS'})
 $repairBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-REPAIR-02'})
 $progressionBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION'})
 $progressionPlannerBindings=@($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-MATERIAL-CONTINUATION-PLANNER'})
@@ -83,9 +84,9 @@ $approvedScienceSources=@(
   'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua',
   'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'
 )
-if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne375-or
+if(@($manifest.bindings).Count-ne379-or@($manifest.bindings.source_path|Sort-Object -Unique).Count-ne379-or
    $migratedBindings.Count-ne354-or@($migratedBindings.provenance.predecessor_source_path|Sort-Object -Unique).Count-ne354-or
-   $introducedBindings.Count-ne21-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or$angelsRepairBindings.Count-ne1-or
+   $introducedBindings.Count-ne25-or$historicalBindings.Count-ne12-or$compilerTransitionBindings.Count-ne1-or$approvedScienceBindings.Count-ne2-or$angelsRepairBindings.Count-ne1-or$k2StateBindings.Count-ne4-or
    @($introducedBindings|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{$_-cin@($manifest.bindings.source_path)}).Count-ne0-or
    @($retiredCurrentSources|Where-Object{Test-Path -LiteralPath (Join-Path $repo $_)}).Count-ne0-or
@@ -103,6 +104,20 @@ if(@($manifest.bindings).Count-ne375-or@($manifest.bindings.source_path|Sort-Obj
    (@($repairBindings[0].target_scope|ForEach-Object{[string]$_}|Sort-Object -Unique)-join'|')-cne'f200|f210'-or
    [string]$repairBindings[0].provenance.kind-cne'current-introduction'){
   throw '[mir4-editable-source-binding-uniqueness]'
+}
+$expectedK2StateBindings=@(
+  @{source='source/prototypes/mir/domain/research/k2_imersite_staged_state.lua';layer='capability';semantic='target-overlay';targets='f210|f200|f110|f100'},
+  @{source='source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua';layer='compatibility';semantic='target-overlay';targets='f210'},
+  @{source='source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua';layer='compatibility';semantic='target-overlay';targets='f210'},
+  @{source='source/migrations/more-infinite-research_4.7.0.json';layer='compatibility';semantic='migration';targets='f210'}
+)
+foreach($expectedK2 in $expectedK2StateBindings){
+  $row=@($k2StateBindings|Where-Object{[string]$_.source_path-ceq$expectedK2.source})
+  if($row.Count-ne1-or[string]$row[0].layer-cne$expectedK2.layer-or
+     [string]$row[0].semantic_class-cne$expectedK2.semantic-or
+     [string]$row[0].output_path-cne$expectedK2.source.Substring('source/'.Length)-or
+     [string]$row[0].transform-cne'copy-exact-bytes'-or
+     (@($row[0].target_scope)-join'|')-cne$expectedK2.targets){throw '[mir4-editable-source-k2-state-binding]'}
 }
 foreach($source in $compilerTransitionSources){
   $row=@($compilerTransitionBindings|Where-Object{[string]$_.source_path-ceq$source})
@@ -275,7 +290,10 @@ foreach($target in @('f210','f200','f110','f100')){
   # Angel repair. The frozen baseline identities remain exact; current semantic
   # changes are not historical byte parity. The succession guard above authenticates
   # the repair's exact binding rather than accepting an arbitrary extra file.
-  $expectedDelta=if($target-in@('f210','f200')){38}else{107}
+  $baselineDelta=if($target-in@('f210','f200')){38}else{107}
+  # Only the four exact reviewed K2 bindings above change the prior file count:
+  # one shared descriptor everywhere and three F210 migration/carrier modules.
+  $expectedDelta=$baselineDelta+@($k2StateBindings|Where-Object{$target-cin@($_.target_scope)}).Count
   if($expected.Count-ne1-or$actualRow.Count-ne1-or
      [string]$actualRow[0].baseline_content_sha256-cne[string]$expected[0].archive.content_sha256-or
      [int]$actualRow[0].baseline_entry_count-ne[int]$expected[0].archive.entry_count-or
