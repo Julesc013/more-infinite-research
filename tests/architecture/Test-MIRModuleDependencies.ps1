@@ -113,6 +113,27 @@ foreach ($module in @($graph.Keys | Sort-Object)) {
   Visit-Module $module ([Collections.Generic.List[string]]::new())
 }
 
+# The active CompilerInput authenticates the existing deterministic
+# GenerationPlan owner. Check the complete pure-compiler dependency closure,
+# rather than allowing that semantic edge to import lifecycle adapters later.
+$purePending = [Collections.Generic.Stack[string]]::new()
+$purePending.Push('prototypes/mir/planner/compiler.lua')
+$pureVisited = @{}
+while ($purePending.Count -gt 0) {
+  $module = $purePending.Pop()
+  if ($pureVisited.ContainsKey($module)) { continue }
+  $pureVisited[$module] = $true
+  if ((Get-Layer $module) -notin @('core','domain','planner','integrity')) {
+    throw "Pure compiler dependency reaches an ambient adapter: $module"
+  }
+  $path = Resolve-MIR4CurrentTargetPackageOutputPath -Context $targetPackage -RelativePath $module
+  $text = Get-Content -Raw -LiteralPath $path
+  if ($text -match 'data[.]raw|\bsettings\s*[.\[]|\bmods\b|os[.]clock|compiler_telemetry|compiler_context') {
+    throw "Pure compiler dependency reads ambient authority: $module"
+  }
+  foreach ($target in $graph[$module]) { $purePending.Push($target) }
+}
+
 $overlayPrefix = ([string]$policy.overlay_policy.path).TrimEnd('/') + '/'
 foreach ($file in Get-MIR4CurrentTargetPackageOutputEntries -Context $targetPackage -Prefix $overlayPrefix) {
   if (-not ([string]$file.output_path -like '*.lua')) { continue }

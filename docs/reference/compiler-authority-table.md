@@ -5,7 +5,7 @@ applies_to: "3.1.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-08-03
+last_reviewed: 2026-10-21
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -44,15 +44,17 @@ This table names one machine authority, validator, and reference contract for ea
 | CompilationSnapshot | 2 | `prototypes/mir/domain/compiler/compilation_snapshot.lua` | compiler-contract replay, sharing, and tamper tests | normalized fact domains with Merkle fingerprints and compact qualification deltas |
 | PolicySnapshot | 1 | `prototypes/mir/domain/compiler/policy_snapshot.lua` | compiler-contract replay and authority tests | immutable settings, policy, gate, quality, and promotion input |
 | CompilerInput | 2 | `prototypes/mir/domain/compiler/compiler_input.lua` | compiler-contract fixture | exact snapshot, policy, sanitation, and runtime-environment request |
+| ActiveCompilerInput | 1 | `prototypes/mir/domain/compiler/compiler_input.lua` | approved-family ownership and export opponents | owned ordinary compiler inputs; exact GenerationPlan admission remains with its planner owner |
 | CompilerResult | 3 | `prototypes/mir/domain/compiler/compiler_result.lua` | compiler-contract fixture | immutable planned result plus final journal, parity, and multidimensional dispositions |
 | RuntimeEnvironmentIdentity | 2 | `prototypes/mir/domain/environment_identity.lua` and Factorio adapter | compiler-contract fixture | exact target, mod closure, settings, policy, and promotion identity |
 | QualificationEnvironmentIdentity | 1 | `prototypes/mir/domain/qualification_environment_identity.lua` | assurance seal and schema tests | candidate, binary, runner, verifier, plan, test-set, and trust identity |
 | TransformationOperation | 2 | `prototypes/mir/domain/compiler/transformation_operation.lua` | compiler-contract and mutation journal tests | exact source-bound create/patch envelope with realized pre/post projections |
-| TransformationPlan | 2 | `prototypes/mir/domain/compiler/transformation_plan.lua` | pure compiler replay tests | canonically ordered mandatory plan bound to execution mode |
+| TransformationPlan | 3 | `prototypes/mir/domain/compiler/transformation_plan.lua` | pure compiler replay tests | active-input-bound mandatory plan; generic snapshot-bound schema 2 remains readable and writable |
 | MutationJournal | 2 | `prototypes/mir/domain/compiler/mutation_journal.lua` | executor and compiler-contract tests | plan membership, before/after evidence, violations, and completeness |
 | Compiler orchestration | 1 | `prototypes/mir/pipeline/compiler_orchestrator.lua` | architecture gate and compiler-contract fixture | compile/apply/assert/publish sequencing and context ownership |
 | Shared technology graph | 1 | `prototypes/mir/graph/` | planner/emitter parity and compiler-contract fixtures | virtual and realized graph qualification |
 | CompilerContext | 4 | `prototypes/mir/pipeline/compiler_context.lua` | architecture and A/B/A nested-context fixtures | scoped activation, run-owned services, state epochs, caches, and artifacts |
+| CompilerOrchestratorSnapshot | 2 | `prototypes/mir/pipeline/compiler_orchestrator/contract_checks.lua` | command/export opponents | explicit active-input identity and optional genuine pre-emission generic snapshot identities |
 | CompilerEvidence | 2 | `prototypes/mir/domain/evidence/compiler_evidence.lua` | postcondition publication, transport adapters, and content fingerprints | assurance evidence and sanitation review |
 | Public compiler artifact projections | 1 | `prototypes/mir/report/public_compiler_artifacts.lua` | architecture gate and compiler-contract fixtures | normal-load `mod-data` publication |
 | RecipeFactV2 | 2 | `prototypes/mir/index/recipe_facts.lua` | generation-integrity and compiler fixtures | rules, safety, coverage, ownership |

@@ -537,7 +537,10 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 if ($dataFinalFixesStageText -match 'classic_compiler|compiler_profile[.]get') {
   throw 'The public data-final-fixes stage must execute the single preservation-capable command DAG without profile dispatch.'
 }
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
+$commandContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
+foreach ($contextOption in @('compiler_context.new({', 'execution_mode = options.execution_mode,', 'legacy_compiler_export_requested = options.return_snapshot ~= false')) {
+  Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandContextText -Needle $contextOption
+}
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -672,8 +675,11 @@ foreach ($forbiddenPureCompilerToken in @("data.raw", "settings.", "mods", "os.c
 }
 foreach ($pureCompilerNeedle in @(
   'function M.compile(snapshot, policy)',
-  'if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)',
+  'local active = compiler_input.is_active(snapshot)',
+  'elseif compilation_snapshot.is_trusted(snapshot) then',
   'if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)',
+  'if input_identity_record then plan_values.input_identity = input_identity_record',
+  'if not input_identity_record then result.compilation_snapshot_fingerprint = compiler_input_fingerprint end',
   'transformation_plan.new('
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle

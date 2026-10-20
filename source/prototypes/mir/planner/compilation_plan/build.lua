@@ -425,8 +425,25 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
   else compiler_input.verify_untrusted(exact_input) end
+  -- Ordinary input ownership is direct and complete. Legacy CompilerInput
+  -- imports retain their existing snapshot fields; this is one production
+  -- branch selected by the owner, not a second compiler.
+  local active_input = compiler_input.is_active(exact_input)
+    and compiler_input.active_view(exact_input) or nil
+  if active_input then
+    generation_plan.assert_owned_view(active_input.stream_plan)
+    if not rawequal(stream_plan, active_input.stream_plan) then
+      error("Active CompilerInput GenerationPlan differs from CompilationPlan input.", 2)
+    end
+    base_plan = active_input.base_continuation_inputs
+    planned_base_candidates = deepcopy(active_input.base_candidates)
+  end
+  local input_policy = active_input and active_input.policy_snapshot or exact_input.policy_snapshot
+  local input_provider = active_input and active_input.provider_inputs
+    or exact_input.compilation_snapshot.provider_inputs
   local stream_effect_integrity
-  local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
+  local target_inventory = active_input and active_input.effect_target_inventory
+    or (compiler_inputs and compiler_inputs.effect_target_inventory)
     or effect_target_inventory.capture()
   stream_artifact, stream_effect_integrity, preparations = sanitize_stream_artifact(
     stream_artifact, target_inventory, preparations)
@@ -437,7 +454,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local normalized_base, base_effect_integrity = model.sanitize_base_operations(base_plan, target_inventory)
   for _, operation in ipairs(normalized_base) do
     local normalized, covered_by_native = apply_weapon_overlap_policy(
-      operation, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
+      operation, stream_artifact.rows, input_policy.weapon_overlap_mode)
     -- Preserve the existing post-policy copy boundary without eagerly binding
     -- a TechnologyDesign.  Only a terminal native-coverage, ownership, or graph
     -- decision may require the final design below.
@@ -469,7 +486,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end
   local combined_ownership, ownership_omissions
   operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations, {
-    weapon_overlap_mode = exact_input.policy_snapshot.weapon_overlap_mode
+    weapon_overlap_mode = input_policy.weapon_overlap_mode
   })
   normalized_base = {}
   for _, operation in ipairs(operations) do
@@ -635,7 +652,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end)
 
   local provider_claims, review_required_candidates = {}, {}
-  for _, decision in ipairs(exact_input.compilation_snapshot.provider_inputs.decisions or {}) do
+  for _, decision in ipairs(input_provider.decisions or {}) do
     local projection = {
       provider_id = decision.provider_id,
       provider_version = decision.provider_version,
@@ -683,7 +700,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
         design_fingerprint = selection.design_fingerprint,
         profile_id = profile_id,
         status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
-        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+        profile_authority_fingerprint = input_policy.quality_profile_fingerprint
       })
       table.insert(promotion_dispositions, {
         candidate_id = selection.candidate_id,
@@ -703,7 +720,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
         design_fingerprint = candidate.design_fingerprint,
         profile_id = "base-continuation-v1",
         status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
-        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+        profile_authority_fingerprint = input_policy.quality_profile_fingerprint
       })
       table.insert(promotion_dispositions, {
         candidate_id = candidate.candidate_id,

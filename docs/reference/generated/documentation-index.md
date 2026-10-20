@@ -217,7 +217,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |
 | docs/README.md | More Infinite Research 4 documentation | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |
-| docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-08-03 |
+| docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/compiler-diagnostics.md | Compiler Diagnostic Codes | current | developer | reference | mir-maintainers | 2026-07-13 |
 | docs/reference/factorio-api-proof-points.md | API Proof Points | current | developer | reference | mir-maintainers | 2026-09-01 |
 | docs/reference/factorio-integration-reference.md | Factorio Integration Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
@@ -262,10 +262,10 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/research-cost-v2-preview.md | ResearchCostModel V2 Preview | draft | developer | reference | mir-maintainers | 2026-08-21 |
 | docs/reference/schemas/compatibility-claim.md | Compatibility Claim Schema | current | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/schemas/compatibility-pack.md | CompatibilityPack Schema | current | developer | reference | mir-maintainers | 2026-07-24 |
-| docs/reference/schemas/compiler-boundary.md | Compiler Boundary Schemas | current | developer | reference | mir-maintainers | 2026-07-24 |
+| docs/reference/schemas/compiler-boundary.md | Compiler Boundary Schemas | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/schemas/compiler-evidence.md | CompilerEvidence Schema | current | developer | reference | mir-maintainers | 2026-10-11 |
 | docs/reference/schemas/compiler-provider.md | CompilerProvider Schema | current | developer | reference | mir-maintainers | 2026-07-13 |
-| docs/reference/schemas/compiler-runtime-contracts.md | Compiler Runtime Contracts | current | developer | reference | mir-maintainers | 2026-07-24 |
+| docs/reference/schemas/compiler-runtime-contracts.md | Compiler Runtime Contracts | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/schemas/decision-record.md | Decision Records And Stream Specs | current | developer | reference | mir-maintainers | 2026-07-12 |
 | docs/reference/schemas/family-operator-dsl.md | Family Operator DSL | current | developer | reference | mir-maintainers | 2026-07-18 |
 | docs/reference/schemas/family-rule.md | FamilyRule Schema | current | developer | reference | mir-maintainers | 2026-07-12 |

@@ -171,7 +171,9 @@ local function assert_preserved()
   assert(fingerprint.of(projection) == fingerprint.of(expected), "Established iron definition changed")
 end
 local counts, emitted_plan, emitted_journal, emitted_context, draft_fixture_row
-Context.with_active(Context.new(), function()
+-- The ordinary approved-family path is deliberately active-only: it must not
+-- construct the generic snapshot/export representation simply to compile.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
   local context = Context.current()
   local effect_safety = require("prototypes.mir.emit.effect_safety")
   local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
@@ -338,16 +340,156 @@ Context.with_active(Context.new(), function()
     target_line.supports.legacy_numeric_research_cost = prior
   end
 
-  local plan = compiler.compile(context)
-  local input_snapshot = plan.compiler_input.compilation_snapshot
   local snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
-  local exported_snapshot = snapshot_contract.snapshot(input_snapshot, {full = true})
-  local original_inventory = fingerprint.canonical(input_snapshot.effect_target_inventory)
-  exported_snapshot.effect_target_inventory.recipe = {}
-  check(fingerprint.canonical(input_snapshot.effect_target_inventory) == original_inventory,
-    "Mutating an exported snapshot cannot change the shared planning target inventory")
-  check(not pcall(snapshot_contract.verify_untrusted, exported_snapshot),
-    "An imported snapshot with a changed target inventory fails independent verification")
+  local snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
+  local snapshot_counts = {capture = 0, new = 0, qualify = 0}
+  local prior_capture, prior_new, prior_qualify = snapshot_adapter.capture,
+    snapshot_contract.new, snapshot_contract.qualify
+  snapshot_adapter.capture = function(...)
+    snapshot_counts.capture = snapshot_counts.capture + 1
+    return prior_capture(...)
+  end
+  snapshot_contract.new = function(...)
+    snapshot_counts.new = snapshot_counts.new + 1
+    return prior_new(...)
+  end
+  snapshot_contract.qualify = function(...)
+    snapshot_counts.qualify = snapshot_counts.qualify + 1
+    return prior_qualify(...)
+  end
+  local plan = compiler.compile(context)
+  snapshot_adapter.capture, snapshot_contract.new, snapshot_contract.qualify =
+    prior_capture, prior_new, prior_qualify
+
+  local compiler_input_contract = require("prototypes.mir.domain.compiler.compiler_input")
+  local active_input = plan.compiler_input
+  check(compiler_input_contract.is_active(active_input)
+    and snapshot_counts.capture == 0 and snapshot_counts.new == 0 and snapshot_counts.qualify == 0,
+    "Ordinary active compilation constructs zero generic snapshots")
+  local active_owner = compiler_input_contract.active_view(active_input)
+  local original_inventory = fingerprint.canonical(active_owner.effect_target_inventory)
+  local exported_inventory = deepcopy(active_owner.effect_target_inventory)
+  exported_inventory.recipe = {}
+  check(fingerprint.canonical(active_owner.effect_target_inventory) == original_inventory
+    and fingerprint.canonical(exported_inventory) ~= original_inventory,
+    "Active CompilerInput retains its target inventory behind its private owner")
+  check(not pcall(compiler_input_contract.legacy_view, active_input)
+    and not pcall(compiler_input_contract.snapshot, active_input),
+    "Active CompilerInput refuses a post-construction generic export")
+
+  local active_identity_fields = {
+    "schema", "record_type", "contract", "base_input_fingerprint",
+    "stream_plan_fingerprint", "base_continuation_input_fingerprint",
+    "base_candidates_fingerprint", "provider_input_fingerprint",
+    "effect_target_inventory_fingerprint", "source_fingerprint", "policy_fingerprint",
+    "runtime_environment_fingerprint", "input_sanitation_fingerprint", "input_fingerprint"
+  }
+  local rejected_identity_mutations = 0
+  for _, field in ipairs(active_identity_fields) do
+    local prior = active_input[field]
+    active_input[field] = type(prior) == "number" and prior + 1
+      or (prior == nil and "outside-writer" or prior .. "-outside-writer")
+    if not pcall(compiler_input_contract.assert_active, active_input) then
+      rejected_identity_mutations = rejected_identity_mutations + 1
+    end
+    active_input[field] = prior
+    compiler_input_contract.assert_active(active_input)
+  end
+  check(rejected_identity_mutations == #active_identity_fields,
+    "Active CompilerInput rejects every registered post-admission identity mutation")
+
+  local policy_fingerprint = active_owner.policy_snapshot.policy_fingerprint
+  local environment_fingerprint = active_owner.runtime_environment.environment_fingerprint
+  active_owner.policy_snapshot.policy_fingerprint = policy_fingerprint .. "-outside-writer"
+  local policy_rejected = not pcall(compiler_input_contract.assert_active, active_input)
+  active_owner.policy_snapshot.policy_fingerprint = policy_fingerprint
+  active_owner.runtime_environment.environment_fingerprint = environment_fingerprint .. "-outside-writer"
+  local environment_rejected = not pcall(compiler_input_contract.assert_active, active_input)
+  active_owner.runtime_environment.environment_fingerprint = environment_fingerprint
+  compiler_input_contract.assert_active(active_input)
+  check(policy_rejected and environment_rejected,
+    "Active CompilerInput reasserts retained policy and environment owners")
+
+  local supplied_base = deepcopy(active_owner.base_continuation_inputs)
+  local supplied_candidates = deepcopy(active_owner.base_candidates)
+  local supplied_providers = deepcopy(active_owner.provider_inputs)
+  local supplied_inventory = deepcopy(active_owner.effect_target_inventory)
+  local supplied_sources = deepcopy(active_owner.source_fingerprints)
+  local detached_active = compiler_input_contract.new_active({
+    stream_plan = active_owner.stream_plan,
+    base_continuation_inputs = supplied_base,
+    base_candidates = supplied_candidates,
+    provider_inputs = supplied_providers,
+    effect_target_inventory = supplied_inventory,
+    source_fingerprints = supplied_sources,
+    policy_snapshot = active_owner.policy_snapshot,
+    runtime_environment = active_owner.runtime_environment,
+    input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+  })
+  supplied_base.outside_writer = true
+  supplied_candidates.outside_writer = true
+  supplied_providers.outside_writer = true
+  supplied_inventory.outside_writer = true
+  supplied_sources.outside_writer = true
+  local detached_values = compiler_input_contract.active_view(detached_active)
+  check(detached_values.base_continuation_inputs.outside_writer == nil
+    and detached_values.base_candidates.outside_writer == nil
+    and detached_values.provider_inputs.outside_writer == nil
+    and detached_values.effect_target_inventory.outside_writer == nil
+    and detached_values.source_fingerprints.outside_writer == nil,
+    "Active CompilerInput deep-copies all caller-owned nested inputs")
+
+  -- The carrier binds only the structural GenerationPlan identity. Both real
+  -- planner consumers must reject a copied plan before traversing or emitting it.
+  local forged_plan = deepcopy(active_owner.stream_plan)
+  local forged_active = compiler_input_contract.new_active({
+    stream_plan = forged_plan,
+    base_continuation_inputs = active_owner.base_continuation_inputs,
+    base_candidates = active_owner.base_candidates,
+    provider_inputs = active_owner.provider_inputs,
+    effect_target_inventory = active_owner.effect_target_inventory,
+    source_fingerprints = active_owner.source_fingerprints,
+    policy_snapshot = active_owner.policy_snapshot,
+    runtime_environment = active_owner.runtime_environment,
+    input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+  })
+  local output_before_forged_admission = fingerprint.of(data.raw.technology)
+  local pure_admission_rejected = not pcall(require("prototypes.mir.planner.compiler").compile,
+    forged_active, active_owner.policy_snapshot)
+  local finalization_admission_rejected = not pcall(
+    require("prototypes.mir.planner.compilation_plan").finalize,
+    forged_plan, active_owner.base_continuation_inputs,
+    {compiler_input = forged_active, stream_plan_trusted = true})
+  check(pure_admission_rejected and finalization_admission_rejected
+    and fingerprint.of(data.raw.technology) == output_before_forged_admission,
+    "Planner consumers reject a detached GenerationPlan before any emission")
+
+  local pure = plan.pure_compilation
+  check(pure and pure.schema == 2 and pure.input_identity
+    and pure.compilation_snapshot_fingerprint == nil
+    and pure.transformation_plan.schema == 3,
+    "Active pure compilation labels its identity and omits the legacy snapshot field")
+  local transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
+  local active_plan = pure.transformation_plan
+  local rejected_nested_identity_mutations = 0
+  for _, field in ipairs({"schema", "kind", "input_fingerprint"}) do
+    local prior = active_plan.input_identity[field]
+    active_plan.input_identity[field] = type(prior) == "number" and prior + 1
+      or prior .. "-outside-writer"
+    if not pcall(transformation_plan.assert_trusted, active_plan) then
+      rejected_nested_identity_mutations = rejected_nested_identity_mutations + 1
+    end
+    active_plan.input_identity[field] = prior
+    transformation_plan.assert_trusted(active_plan)
+  end
+  check(rejected_nested_identity_mutations == 3,
+    "Schema-3 TransformationPlan rejects every nested active identity mutation")
+  local legacy_plan = transformation_plan.new({phase = "legacy-snapshot-control", execution_mode = "SAFE",
+    compilation_snapshot_fingerprint = "approved-family-legacy-snapshot", policy_fingerprint = "approved-family-policy",
+    operations = {}})
+  legacy_plan.compilation_snapshot_fingerprint = "approved-family-legacy-snapshot-outside-writer"
+  check(not pcall(transformation_plan.assert_trusted, legacy_plan),
+    "Schema-2 TransformationPlan retains and authenticates its legacy snapshot binding")
   local original_recipe = data.raw.recipe["iron-plate"]
   data.raw.recipe["iron-plate"] = nil
   check(not pcall(effect_safety.assert_current_target_inventory,
@@ -366,8 +508,7 @@ Context.with_active(Context.new(), function()
     and stream_compiler.latest_artifact(context).record_type == nil,
     "Only the complete final GenerationPlan is installed before publication and emission")
   check(#plan.stream_plan.rows > 100, "Use the actual catalogue, not a replacement five-family catalogue")
-  local initial_base = ((plan.compiler_input or {}).compilation_snapshot or {}).base_continuation_inputs or {}
-  local initial_operations = initial_base.operations or {}
+  local initial_operations = active_owner.base_continuation_inputs or {}
   local final_operations = plan.base_extension_operations or {}
   check(#initial_operations > 0 and #final_operations > 0
     and initial_operations[1].technology_design ~= nil and final_operations[1].technology_design ~= nil,
@@ -428,12 +569,10 @@ end)
 
 Context.with_active(emitted_context, function()
   if not (os and type(os.clock) == "function") then
-    local snapshot = emitted_context:state_view("compilation_snapshot")
-    local clock_witness = emitted_context:state_view("compiler_telemetry").witnesses.snapshot_construction_clock
-    check(snapshot.metrics.construction_seconds == "unavailable",
-      "Clockless compilation retains an explicitly unavailable construction duration")
-    check(clock_witness and #clock_witness == 1 and clock_witness[1] == "unavailable",
-      "Clockless compilation retains its bounded unavailable-clock witness")
+    check(emitted_context:state_view("compilation_snapshot") == nil,
+      "Clockless active compilation retains no generic input snapshot")
+    check(emitted_context:state_view("qualification_snapshot") == nil,
+      "Clockless active compilation retains no generic qualified snapshot")
   end
   local generation_plan = require("prototypes.mir.planner.generation_plan")
   local technology_design = require("prototypes.mir.domain.technology.technology_design")
@@ -904,9 +1043,11 @@ rejected(function() compilation_model.sanitize_base_operations({missing_technolo
   "TechnologyDesign base continuation operation is required.")
 stable_finalization(emitted_journal, emitted_journal:finalize(), true, "actual emitted catalogue")
 local function plan_for(operations)
-  return transformation_plan.new({phase = "journal-finalization-control", execution_mode = "SAFE",
-    compilation_snapshot_fingerprint = emitted_plan.compilation_snapshot_fingerprint,
-    policy_fingerprint = emitted_plan.policy_fingerprint, operations = operations})
+  local values = {phase = "journal-finalization-control", execution_mode = "SAFE",
+    policy_fingerprint = emitted_plan.policy_fingerprint, operations = operations}
+  if emitted_plan.input_identity then values.input_identity = emitted_plan.input_identity
+  else values.compilation_snapshot_fingerprint = emitted_plan.compilation_snapshot_fingerprint end
+  return transformation_plan.new(values)
 end
 local empty = mutation_journal.new(plan_for({}))
 local empty_result = empty:finalize()
@@ -1071,11 +1212,18 @@ do
   local snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot").new({
     stream_inputs = {rows = {row}}, base_continuation_inputs = {operations = {}}
   })
-  local compiled = require("prototypes.mir.planner.compiler").compile(snapshot,
+  local saved_data = data
+  data = nil
+  local compiled_ok, compiled = pcall(require("prototypes.mir.planner.compiler").compile, snapshot,
     require("prototypes.mir.domain.compiler.policy_snapshot").new({}))
+  data = saved_data
+  assert(compiled_ok, compiled)
   local patch_plan = compiled.transformation_plan
-  check(#patch_plan.operations == 1 and patch_plan.operations[1].action == "patch",
-    "Actual planner admits the native patch control")
+  check(compiled.schema == 1 and compiled.input_identity == nil
+    and compiled.compilation_snapshot_fingerprint == snapshot.snapshot_fingerprint
+    and patch_plan.schema == 2 and patch_plan.input_identity == nil
+    and #patch_plan.operations == 1 and patch_plan.operations[1].action == "patch",
+    "Pure compiler remains context-free and preserves the generic native-patch contract")
   local journal = mutation_journal.new(patch_plan)
   Context.with_active(Context.new(), function()
     require("prototypes.mir.emit.technology_operation_executor").apply_plan(patch_plan, journal)

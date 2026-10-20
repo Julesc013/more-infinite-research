@@ -1524,6 +1524,9 @@ mutation_commands:
     - diagnostic catalog alternatives qualify against the exact trusted gate set constructed with their immutable diagnostic design
     - owned constructors compute aggregate fingerprints once while untrusted imports always recompute and verify them
     - CompilationSnapshot PolicySnapshot RuntimeEnvironmentIdentity and CompilerInput use private validation-once authorities; trusted internal consumers assert stored identities while copied or imported values receive complete component and aggregate verification
+    - ordinary compilation uses ActiveCompilerInput schema 1 with complete owned decision inputs; the existing GenerationPlan owner authenticates the exact retained plan at both planner consumption boundaries without a domain-to-planner dependency
+    - generic CompilerInput schema 2 and CompilationSnapshot exports are captured before emission only for explicit Context export demand; active-only late exports refuse rather than recapturing the mutated world
+    - active TransformationPlan schema 3 binds an explicitly named active-input identity while generic schema 2 retains its canonical snapshot-bound payload
     - CompilationSnapshot hashes its already canonicalized captured fact domains without serializing them a second time and qualified snapshots reuse only exact trusted component fingerprints
     - the MIR32 canonical hash consumes bytes in identity-preserving sixteen-byte reads with an eight-byte tail while retaining the exact per-byte recurrence and modulus
     - canonical encoding avoids allocation for arrays, captures ordinary string-key maps in one traversal with direct raw-key sorting, reuses at most 4096 quoted string tokens, and preserves the existing typed-key ordering and byte encoding

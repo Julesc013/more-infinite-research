@@ -25,7 +25,11 @@ function M.new(options)
     state_epochs = {},
     frozen_state = {},
     services = {},
-    services_frozen = false
+    services_frozen = false,
+    -- This is a demand bit for the existing Context export boundary, not a
+    -- compiler/execution mode. The established manual/default Context is
+    -- export-capable; the player data stage explicitly selects false.
+    _legacy_compiler_export_requested = options.legacy_compiler_export_requested ~= false
   }, Context)
 end
 
@@ -63,6 +67,10 @@ end
 
 function Context:execution_mode()
   return self.compiler_execution_mode
+end
+
+function Context:legacy_compiler_export_requested()
+  return self._legacy_compiler_export_requested == true
 end
 
 function Context:set_service(name, implementation)
@@ -211,14 +219,29 @@ function Context:state_key_count()
 end
 
 function Context:snapshot()
+  -- An explicitly active-only context did not retain a generic pre-mutation
+  -- input. Returning schema 4 after it compiled would silently remove the
+  -- supported snapshot contract, so refuse that late request instead.
+  if not self:legacy_compiler_export_requested() and self.state.compilation_plan ~= nil then
+    error("Active-only CompilerContext cannot export legacy snapshots after compilation; request export before compilation.", 2)
+  end
   local complete_risks = self.services["recipe_risk.materialize_export"]
   if complete_risks then M.with_active(self, complete_risks) end
+  local exported_state = deepcopy(self.state)
+  -- A requested Context export must not carry the private active handle that
+  -- the plan used while compiling. The generic input stored for this export is
+  -- the original schema-2 record and is independently import-verifiable.
+  local exported_plan = exported_state.compilation_plan
+  if self:legacy_compiler_export_requested() and type(exported_plan) == "table"
+    and type(exported_state.compiler_input) == "table" then
+    exported_plan.compiler_input = deepcopy(exported_state.compiler_input)
+  end
   local payload = {
     schema = self.schema,
     compiler_execution_mode = self.compiler_execution_mode,
     command_state = deepcopy(self.command_state),
     artifacts = deepcopy(self.artifacts),
-    state = deepcopy(self.state),
+    state = exported_state,
     state_epochs = deepcopy(self.state_epochs),
     frozen_state = deepcopy(self.frozen_state),
     services = {},
