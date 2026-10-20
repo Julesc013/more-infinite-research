@@ -2,6 +2,8 @@ local from_version, to_version = "4.6.21000", "4.7.21000"
 local fixture_name = "mir-fixture-assert-k2-imersite-460-to-470-upgrade"
 local legacy_name = "recipe-prod-research_material_imersite-1"
 local continuation_name = "recipe-prod-research_material_imersite-4"
+local holder_name = "mir-k2-imersite-staged-state-1"
+local continuation_holder_name = "mir-k2-imersite-continuation-state-4"
 local native_name = "kr-imersite-productivity"
 local powder_name, crystal_name = "kr-imersite-powder", "kr-imersite-crystal"
 local zero_force_name, low_force_name = "mir-k2-migration-zero", "mir-k2-migration-low"
@@ -192,6 +194,25 @@ local function candidate_definitions(force)
   if not native then fail("candidate native Imersite crystal owner absent") end
   exact_productivity_effect(native, crystal_name, 0.10, "candidate native Imersite crystal effect")
   no_productivity_effect(native, powder_name, "candidate native Imersite owner")
+  for _, identity in ipairs({{holder_name, 1}, {continuation_holder_name, 4}}) do
+    local name, minimum_level = identity[1], identity[2]
+    local holder = force.technologies[name]
+    if not holder or not holder.prototype.hidden or not holder.prototype.hidden_in_factoriopedia
+        or holder.prototype.max_level < infinite_level or holder.enabled or holder.visible_when_disabled
+        or holder.level ~= minimum_level or holder.researched then
+      fail("candidate compatibility holder is absent, visible, enabled or retains duplicate earned credit: " .. name)
+    end
+    if #(holder.prototype.effects or {}) ~= 1 then fail("compatibility holder has unexpected extra effects: " .. name) end
+    exact_productivity_effect(holder, powder_name, 0.02, "compatibility holder powder effect " .. name)
+    no_productivity_effect(holder, crystal_name, "compatibility holder crystal ownership " .. name)
+    close("cleared compatibility holder investment " .. name, holder.saved_progress, 0)
+    for _, technology in ipairs(force.research_queue or {}) do
+      if technology.name == name then fail("compatibility holder remains in the active queue: " .. name) end
+    end
+    if force.current_research and force.current_research.name == name then
+      fail("compatibility holder remains current research: " .. name)
+    end
+  end
 end
 
 local function seed_infinite_progress(force, completed)
@@ -220,6 +241,9 @@ local function seed_infinite_progress(force, completed)
     fail("source infinite Imersite queue differs for " .. force.name)
   end
   close("seeded research progress " .. force.name, force.research_progress, progress)
+  -- A force-wide effect reset would erase this independent scripted bonus.
+  -- Technology-level transfer must retain it alongside researched effects.
+  force.character_running_speed_modifier = force.character_running_speed_modifier + 0.125
   return {force_name = force.name, completed = completed, next_level = next_level, powder_bonus = completed * 0.02}
 end
 
@@ -282,6 +306,16 @@ local function expected_policy_technology_state(name, prior)
   return expected
 end
 
+local function verify_holder_investment_descriptor(name, holder, prior_unit)
+  if not holder then fail("candidate compatibility holder omitted for " .. name) end
+  if not equal_state(holder.prototype.ingredients, prior_unit.ingredients)
+      or holder.prototype.unit_count_formula ~= prior_unit.unit_count_formula
+      or holder.prototype.unit_energy ~= prior_unit.unit_energy
+      or (not prior_unit.unit_count_formula and holder.prototype.unit_count ~= prior_unit.unit_count) then
+    fail("compatibility holder changed the predecessor investment descriptor for " .. name)
+  end
+end
+
 local function verify_unrelated_state(name, force, before)
   local current = complete_state(force)
   for technology_name, prior in pairs(before.technologies) do
@@ -292,11 +326,13 @@ local function verify_unrelated_state(name, force, before)
     end
   end
   for technology_name in pairs(current.technologies) do
-    if not before.technologies[technology_name] and technology_name ~= continuation_name then
+    if not before.technologies[technology_name] and technology_name ~= continuation_name
+        and technology_name ~= holder_name and technology_name ~= continuation_holder_name then
       fail("unexpected technology added for " .. name .. ": " .. technology_name)
     end
   end
   if not current.technologies[continuation_name] then fail("candidate continuation omitted for " .. name) end
+  verify_holder_investment_descriptor(name, current.technologies[holder_name], before.technologies[legacy_name].prototype)
   for recipe, prior_bonus in pairs(before.bonuses) do
     if current.bonuses[recipe] == nil or math.abs(current.bonuses[recipe] - prior_bonus) > epsilon then
       fail("unrelated recipe research bonus changed for " .. name .. ": " .. recipe)
