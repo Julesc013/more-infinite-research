@@ -870,3 +870,299 @@ function Invoke-MIRDirectLibraryStartupMeasurement {
     throw
   }
 }
+
+# Responsive-menu primary analysis is deliberately separate from the raw native
+# receipt. It consumes only completed, hash-bound direct-library results and
+# cannot create a release, native-acceptance, or product-performance claim.
+function Assert-MIRDirectLibraryResponsiveMenuAnalysis {
+  param([bool]$Condition,[Parameter(Mandatory)][string]$Code)
+  if(-not $Condition){throw "[mir-responsive-menu-analysis-$Code]"}
+}
+
+function Get-MIRDirectLibraryResponsiveMenuAnalysisField {
+  param([Parameter(Mandatory)]$Object,[Parameter(Mandatory)][string]$Name,[Parameter(Mandatory)][string]$Code)
+  $property=$Object.PSObject.Properties[$Name]
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($null-ne$property-and$null-ne$property.Value) $Code
+  return $property.Value
+}
+
+function Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 {
+  param([AllowNull()][string]$Value)
+  return (-not[string]::IsNullOrWhiteSpace($Value)-and$Value-match'^[A-Fa-f0-9]{64}$')
+}
+
+function Get-MIRDirectLibraryResponsiveMenuAnalysisMedian {
+  param([Parameter(Mandatory)][double[]]$Values)
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($Values.Count-gt0) 'median-empty'
+  $sorted=[double[]]::new($Values.Count)
+  [Array]::Copy($Values,$sorted,$Values.Count)
+  [Array]::Sort($sorted)
+  $middle=[int][Math]::Floor($sorted.Count/2)
+  if(($sorted.Count%2)-eq0){return ([double]$sorted[$middle-1]+[double]$sorted[$middle])/2}
+  return [double]$sorted[$middle]
+}
+
+function Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile {
+  param([Parameter(Mandatory)][double[]]$Values,[Parameter(Mandatory)][double]$Probability)
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($Values.Count-gt0-and$Probability-gt0-and$Probability-lt1) 'quantile-input'
+  # Frozen before primary launches: lower-tail nearest-rank (ceiling) order
+  # statistic, with no interpolation or caller-controlled quantile rule.
+  $sorted=[double[]]::new($Values.Count)
+  [Array]::Copy($Values,$sorted,$Values.Count)
+  [Array]::Sort($sorted)
+  $index=[Math]::Max(0,[Math]::Ceiling($Probability*$sorted.Count)-1)
+  return [double]$sorted[$index]
+}
+
+function Get-MIRDirectLibraryResponsiveMenuAnalysisSummary {
+  param([Parameter(Mandatory)][double[]]$Values)
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($Values.Count-gt0) 'summary-empty'
+  $sum=0.0;foreach($value in $Values){$sum+=[double]$value}
+  $sorted=[double[]]@($Values|Sort-Object)
+  return [ordered]@{
+    observations_seconds=@($Values|ForEach-Object {[double]$_})
+    median_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values $Values
+    mean_seconds=$sum/$Values.Count
+    minimum_seconds=[double]$sorted[0]
+    maximum_seconds=[double]$sorted[-1]
+    p90_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $Values -Probability 0.9
+  }
+}
+
+function Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap {
+  param([Parameter(Mandatory)][object[]]$Rows)
+  $count=$Rows.Count
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($count-in@(5,10)) 'bootstrap-block-count'
+  $iterations=if($count-eq5){3125}else{100000}
+  $baselineLower=[double[]]::new($iterations)
+  $marginLower=[double[]]::new($iterations)
+  $selectedBaseline=[double[]]::new($count)
+  $selectedCandidate=[double[]]::new($count)
+  # xorshift32-v1 with this nonzero seed is the frozen ten-block procedure.
+  # Five blocks enumerate all ordered draws instead of using it.
+  [uint32]$state=0x4D495247
+  for($iteration=0;$iteration-lt$iterations;$iteration++){
+    if($count-eq5){
+      [int64]$encoded=$iteration
+      for($slot=0;$slot-lt$count;$slot++){
+        $pick=[int]($encoded%$count);$encoded=[int64][Math]::Floor($encoded/$count)
+        $selectedBaseline[$slot]=[double]$Rows[$pick].baseline_addition_lower_seconds
+        $selectedCandidate[$slot]=[double]$Rows[$pick].candidate_addition_upper_seconds
+      }
+    } else {
+      for($slot=0;$slot-lt$count;$slot++){
+        $state=[uint32]($state-bxor([uint32]($state-shl13)))
+        $state=[uint32]($state-bxor([uint32]($state-shr17)))
+        $state=[uint32]($state-bxor([uint32]($state-shl5)))
+        $pick=[int](([uint64]$state)%[uint64]$count)
+        $selectedBaseline[$slot]=[double]$Rows[$pick].baseline_addition_lower_seconds
+        $selectedCandidate[$slot]=[double]$Rows[$pick].candidate_addition_upper_seconds
+      }
+    }
+    # Use the frozen median interpolation without allocating per-draw copies.
+    [Array]::Sort($selectedBaseline);[Array]::Sort($selectedCandidate)
+    if($count%2-eq1){$drawBaseline=$selectedBaseline[[int](($count-1)/2)];$drawCandidate=$selectedCandidate[[int]( ($count-1)/2 )]}else{$upper=[int]($count/2);$drawBaseline=($selectedBaseline[$upper-1]+$selectedBaseline[$upper])/2.0;$drawCandidate=($selectedCandidate[$upper-1]+$selectedCandidate[$upper])/2.0}
+    $baselineLower[$iteration]=$drawBaseline
+    $marginLower[$iteration]=(0.5*$drawBaseline)-$drawCandidate
+  }
+  return [ordered]@{
+    procedure=$(if($count-eq5){'ordered-block-enumeration-v1'}else{'xorshift32-joint-block-bootstrap-v1'})
+    block_count=$count
+    resample_count=$iterations
+    lower_tail_probability=0.0125
+    quantile_rule='nearest-rank-ceiling-v1'
+    random_seed=$(if($count-eq5){$null}else{'0x4D495247'})
+    baseline_addition_lower_bound_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $baselineLower -Probability 0.0125
+    halving_margin_lower_bound_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $marginLower -Probability 0.0125
+  }
+}
+
+function Get-MIRDirectLibraryResponsiveMenuPrimaryAnalysis {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$PredeclarationPath,
+    [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string[]]$MeasurementPaths
+  )
+  # This reader deliberately accepts exactly an initial five-block result for
+  # every predeclared profile, or those two results followed by exactly one
+  # five-block extension for every profile.  It never selects a subset of a
+  # longer campaign or fills in a missing arm.
+  $predeclarationFile=Get-Item -LiteralPath $PredeclarationPath -ErrorAction Stop
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($predeclarationFile.Length-gt0-and$predeclarationFile.Length-le2MB-and-not($predeclarationFile.Attributes-band[IO.FileAttributes]::ReparsePoint)) 'predeclaration-file'
+  $predeclaration=Get-Content -Raw -LiteralPath $predeclarationFile.FullName|ConvertFrom-Json -Depth 40 -DateKind String
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ([string]$predeclaration.kind-ceq'MIR47ResponsiveMenuAnalysisPredeclaration'-and[bool]$predeclaration.declared_before_primary_launches-and[int]$predeclaration.primary_samples_so_far-eq0) 'predeclaration-identity'
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ([string]$predeclaration.gate-ceq'At least 50% less MIR-added process-start to observed Settings response time in each of the four fixed cells; no absolute-overhead alternative.') 'predeclaration-gate'
+  $conditions=@($predeclaration.conditions|ForEach-Object {[string]$_})
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($conditions.Count-eq2-and$conditions[0]-ceq'changed-configuration'-and$conditions[1]-ceq'warm-repeat') 'predeclaration-conditions'
+  $arms=@($predeclaration.arms|ForEach-Object {[string]$_})
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis (($arms-join"`n")-ceq('without-mir'+"`n"+'published corrected 4.6.0'+"`n"+'complete frozen 4.7.0 candidate including support additions')) 'predeclaration-arms'
+  $profiles=@($predeclaration.profiles)
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($profiles.Count-eq2) 'predeclaration-profiles'
+  $profileAuthority=@{}
+  foreach($profile in $profiles){
+    $profileSha=([string]$profile.sha256).ToUpperInvariant()
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ((Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $profileSha)-and-not$profileAuthority.ContainsKey($profileSha)-and-not[string]::IsNullOrWhiteSpace([string]$profile.path)) 'predeclaration-profile-row'
+    $profileAuthority[$profileSha]=[ordered]@{path=[string]$profile.path;sha256=$profileSha}
+  }
+  # Only the predeclared initial two result files, or those two followed in
+  # the same profile order by exactly one extension pair, are admissible.
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ($MeasurementPaths.Count-in@(2,4)) 'measurement-path-count'
+  $extensionRequested=($MeasurementPaths.Count-eq4)
+
+  $seenPaths=@{};$seenResultHashes=@{};$entries=[Collections.Generic.List[object]]::new();$rawReferences=[Collections.Generic.List[object]]::new();$globalIdentity=$null;$globalActorIdentity=$null
+  for($inputIndex=0;$inputIndex-lt$MeasurementPaths.Count;$inputIndex++){
+    $measurementFile=Get-Item -LiteralPath $MeasurementPaths[$inputIndex] -ErrorAction Stop
+    $resolved=$measurementFile.FullName
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($measurementFile.Length-gt0-and$measurementFile.Length-le64MB-and-not($measurementFile.Attributes-band[IO.FileAttributes]::ReparsePoint)-and-not$seenPaths.ContainsKey($resolved)) 'measurement-file'
+    $seenPaths[$resolved]=$true
+    $measurementSha=(Get-FileHash -LiteralPath $resolved -Algorithm SHA256).Hash.ToUpperInvariant()
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis (-not$seenResultHashes.ContainsKey($measurementSha)) 'measurement-duplicate-content'
+    $seenResultHashes[$measurementSha]=$true
+    $measurement=Get-Content -Raw -LiteralPath $resolved|ConvertFrom-Json -Depth 60 -DateKind String
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ([int]$measurement.schema-eq1-and[string]$measurement.kind-ceq'MIRDirectLibraryStartupMeasurementV1'-and[string]$measurement.status-ceq'completed'-and[string]$measurement.mode-ceq'matched-three-input'-and[string]$measurement.endpoint_class-ceq'ordinary-responsive-menu'-and[bool]$measurement.library_controls_restored) 'measurement-status'
+    $profileSha=([string]$measurement.profile_template_sha256).ToUpperInvariant()
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($profileAuthority.ContainsKey($profileSha)) 'measurement-profile'
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ((Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$measurement.factorio.sha256))-and[string]$measurement.target-ceq'f200') 'measurement-engine'
+    $baseline=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $measurement.inputs -Name 'baseline' -Code 'measurement-baseline'
+    $baselineArchive=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $baseline -Name 'archive' -Code 'measurement-baseline-archive'
+    $baselineManifest=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $baseline -Name 'authenticated_manifest' -Code 'measurement-baseline-manifest'
+    $candidate=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $measurement.inputs -Name 'candidate' -Code 'measurement-candidate'
+    $candidateArchive=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $candidate -Name 'archive' -Code 'measurement-candidate-archive'
+    $candidateMaterialization=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $candidate -Name 'materialization' -Code 'measurement-candidate-materialization'
+    $ordinaryConfig=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $measurement.inputs -Name 'ordinary_player_config' -Code 'measurement-ordinary-config'
+    $ordinaryPlayerData=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $measurement.inputs -Name 'ordinary_menu_player_data' -Code 'measurement-ordinary-player-data'
+    $baselineHash=([string]$baselineArchive.sha256).ToUpperInvariant();$candidateHash=([string]$candidateArchive.sha256).ToUpperInvariant();$materializationHash=([string]$candidateMaterialization.archive_sha256).ToUpperInvariant();$configHash=([string]$ordinaryConfig.sha256).ToUpperInvariant();$playerDataHash=([string]$ordinaryPlayerData.sha256).ToUpperInvariant()
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ([string]$baselineManifest.source_version-ceq'4.6.0'-and[string]$candidate.source_version-ceq'4.7.0'-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $baselineHash)-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $candidateHash)-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $materializationHash)-and$materializationHash-ceq$candidateHash-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $configHash)-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $playerDataHash)) 'measurement-candidate-equivalence'
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($null-ne$measurement.ordinary_menu_preparation-and-not[bool]$measurement.ordinary_menu_preparation.primary_measurement-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$measurement.ordinary_menu_preparation.source.sha256))-and([string]$measurement.ordinary_menu_preparation.source.sha256).ToUpperInvariant()-ceq$playerDataHash) 'measurement-preparation'
+    $identity=[ordered]@{target=[string]$measurement.target;factorio_sha256=([string]$measurement.factorio.sha256).ToUpperInvariant();baseline_archive_sha256=$baselineHash;baseline_manifest_sha256=([string]$baselineManifest.sha256).ToUpperInvariant();candidate_archive_sha256=$candidateHash;candidate_materialization_archive_sha256=$materializationHash;original_player_config_sha256=$configHash;prepared_player_data_sha256=$playerDataHash}
+    foreach($identityHash in @($identity.factorio_sha256,$identity.baseline_archive_sha256,$identity.baseline_manifest_sha256,$identity.candidate_archive_sha256,$identity.candidate_materialization_archive_sha256,$identity.original_player_config_sha256,$identity.prepared_player_data_sha256)){Assert-MIRDirectLibraryResponsiveMenuAnalysis (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 $identityHash) 'measurement-identity-hash'}
+    $identityText=ConvertTo-Json -InputObject $identity -Compress
+    if($null-eq$globalIdentity){$globalIdentity=$identityText}else{Assert-MIRDirectLibraryResponsiveMenuAnalysis ($globalIdentity-ceq$identityText) 'measurement-global-identity-drift'}
+    $entries.Add([pscustomobject][ordered]@{input_index=$inputIndex;path=$resolved;sha256=$measurementSha;result=$measurement;profile_sha256=$profileSha;identity=$identity;phase=$null;blocks=$null;actor_identity=$null})
+  }
+  # Paths must retain the profile order stated by the predeclaration.  In an
+  # extension, the first pair is the immutable five-block checkpoint and the
+  # second pair is the only admitted incremental five-block addition.
+  foreach($entry in @($entries)){
+    $round=[Math]::Floor([double]$entry.input_index/[double]$profiles.Count)
+    $profileIndex=$entry.input_index%$profiles.Count
+    $expectedProfile=([string]$profiles[$profileIndex].sha256).ToUpperInvariant()
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($entry.profile_sha256-ceq$expectedProfile-and$round-lt$(if($extensionRequested){2}else{1})) 'measurement-input-order'
+    $entry.phase=$(if($round-eq0){'initial-five-blocks'}else{'extension-five-blocks'})
+  }
+
+  $rowsByCell=@{};$initialRowsByCell=@{}
+  foreach($entry in @($entries)){
+    $measurement=$entry.result;$identity=$entry.identity;$samples=@($measurement.samples)
+    # The current runner has one complete warmup block plus exactly five
+    # measured blocks.  Reading the original chronological array prevents an
+    # after-the-fact reordering from being treated as the same shared cache.
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($samples.Count-eq36) 'sample-layout-count'
+    $blocks=@{};$previousSelection=$null;$writeDataRoot=$null;$selectionHashByLabel=@{}
+    $cursor=0
+    for($block=1;$block-le6;$block++){
+      $offset=($block-1)%3;$order=@('without-mir','released-4.6.0','candidate-4.7.0')
+      $rotated=@();for($rotationIndex=0;$rotationIndex-lt3;$rotationIndex++){$rotated+=$order[($offset+$rotationIndex)%3]}
+      foreach($position in 0..2){
+        $label=$rotated[$position]
+        for($repeat=0;$repeat-lt2;$repeat++){
+          $sample=$samples[$cursor];$cursor++
+          $isWarmup=($block-eq1);$isRepeat=($repeat-eq1)
+          $expectedCache=if($isRepeat){'warm-repeat'}elseif($null-eq$previousSelection){'initial-selection'}else{'changed-configuration'}
+          $expectedPrior=if($isRepeat){$label}else{$previousSelection}
+          $expectedChanged=if($isRepeat){$false}elseif($null-eq$previousSelection){$null}else{$true}
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ([string]$sample.label-ceq$label-and[int]$sample.measurement_block-eq$block-and[int]$sample.configuration_order-eq($position+1)-and[bool]$sample.warmup-eq$isWarmup-and[string]$sample.cache_state-ceq$expectedCache) 'sample-cache-order'
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ((($null-eq$expectedPrior)-and($null-eq$sample.prior_selection_label)) -or (($null-ne$expectedPrior)-and([string]$sample.prior_selection_label-ceq$expectedPrior))) 'sample-cache-transition'
+          $changedValid=(($null-eq$expectedChanged)-and($null-eq$sample.selection_changed)) -or (($null-ne$expectedChanged)-and($sample.selection_changed-is[bool])-and([bool]$sample.selection_changed-eq$expectedChanged))
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis $changedValid 'sample-cache-transition'
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ([string]$sample.endpoint_class-ceq'ordinary-responsive-menu'-and[string]$sample.menu_response.status-ceq'validated-recorded-menu-interaction-response'-and[string]$sample.menu_response.endpoint_class-ceq'ordinary-responsive-menu'-and-not[bool]$sample.menu_response.shutdown_and_cleanup_included-and-not[bool]$sample.menu_response.claims_live_process_or_native_acceptance) 'sample-endpoint'
+          $upper=[double]$sample.elapsed_seconds;$responseElapsed=[double]$sample.menu_response.elapsed_seconds;$lower=[double]$sample.menu_response.elapsed_lower_bound_seconds;$bracket=[double]$sample.menu_response.process_start_bracket_seconds
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ($upper-gt0-and[Math]::Abs($upper-$responseElapsed)-le0.000000001-and$lower-gt0-and$bracket-ge0-and$lower-le$upper-and[Math]::Abs($upper-($lower+$bracket))-le0.000001) 'sample-response-elapsed'
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ([int]$sample.menu_response.process_id-gt0-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.menu_response.first_menu_sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.menu_response.settings_response_sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.responsive_menu_actor.sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.responsive_menu_actor.script_sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.responsive_menu_actor.observation_sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.responsive_menu_actor.window_sha256)) -and (Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sample.responsive_menu_actor.launch_spec.sha256))) 'sample-ownership-hashes'
+          $sampleConfig=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $sample -Name 'ordinary_player_config' -Code 'sample-producer-link'
+          $samplePreparation=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $sample -Name 'ordinary_menu_preparation' -Code 'sample-producer-link'
+          $controls=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $sample -Name 'execution_controls' -Code 'sample-producer-link'
+          $cache=Get-MIRDirectLibraryResponsiveMenuAnalysisField -Object $sample -Name 'cache_context' -Code 'sample-producer-link'
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis (([string]$sampleConfig.source.sha256).ToUpperInvariant()-ceq$identity.original_player_config_sha256-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$sampleConfig.private_config.sha256)) -and([string]$sampleConfig.private_config.sha256).ToUpperInvariant()-ceq([string]$controls.config.sha256).ToUpperInvariant()-and([string]$samplePreparation.source.sha256).ToUpperInvariant()-ceq$identity.prepared_player_data_sha256-and([string]$controls.player_data.preparation_sha256).ToUpperInvariant()-ceq$identity.prepared_player_data_sha256-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$controls.config.sha256))-and([string]$cache.configuration_sha256).ToUpperInvariant()-ceq([string]$controls.config.sha256).ToUpperInvariant()-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$controls.selection.sha256))-and([string]$cache.selection_sha256).ToUpperInvariant()-ceq([string]$controls.selection.sha256).ToUpperInvariant()-and([string]$cache.player_data_sha256_before).ToUpperInvariant()-ceq([string]$controls.player_data.sha256_before).ToUpperInvariant()-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$controls.player_data.sha256_before))) 'sample-producer-link'
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis ([bool]$cache.shared_across_arms-and(Test-MIRDirectLibraryResponsiveMenuAnalysisSha256 ([string]$controls.engine_sha256))-and([string]$controls.engine_sha256).ToUpperInvariant()-ceq$identity.factorio_sha256-and-not[string]::IsNullOrWhiteSpace([string]$cache.write_data_root)) 'sample-custody'
+          if($null-eq$writeDataRoot){$writeDataRoot=[string]$cache.write_data_root}else{Assert-MIRDirectLibraryResponsiveMenuAnalysis ($writeDataRoot-ceq[string]$cache.write_data_root) 'sample-cache-root-drift'}
+          $selectionHash=([string]$controls.selection.sha256).ToUpperInvariant()
+          if($selectionHashByLabel.ContainsKey($label)){Assert-MIRDirectLibraryResponsiveMenuAnalysis ($selectionHashByLabel[$label]-ceq$selectionHash) 'sample-selection-drift'}else{$selectionHashByLabel[$label]=$selectionHash}
+          $loaded=@($sample.loaded_selection|ForEach-Object {[string]$_})
+          $mirLoaded=@($loaded|Where-Object {$_-cmatch'^more-infinite-research@'})
+          if($label-ceq'without-mir'){Assert-MIRDirectLibraryResponsiveMenuAnalysis ($loaded.Count-gt0-and$mirLoaded.Count-eq0) 'sample-loaded-selection'}else{
+            $expectedVersion=if($label-ceq'released-4.6.0'){[version][string]$measurement.inputs.baseline.archive.version}else{[version][string]$measurement.inputs.candidate.archive.version}
+            Assert-MIRDirectLibraryResponsiveMenuAnalysis ($loaded.Count-gt0-and$mirLoaded.Count-eq1-and$mirLoaded[0]-ceq('more-infinite-research@'+$expectedVersion.ToString())) 'sample-loaded-selection'
+          }
+          $actorIdentity=([string]$sample.responsive_menu_actor.script_sha256).ToUpperInvariant()+'|'+([string]$sample.responsive_menu_actor.observation_sha256).ToUpperInvariant()+'|'+([string]$sample.responsive_menu_actor.window_sha256).ToUpperInvariant()
+          if($null-eq$globalActorIdentity){$globalActorIdentity=$actorIdentity}else{Assert-MIRDirectLibraryResponsiveMenuAnalysis ($globalActorIdentity-ceq$actorIdentity) 'measurement-global-actor-drift'}
+          if(-not$isRepeat){$previousSelection=$label}
+          if($isWarmup){continue}
+          $arm=if($label-ceq'without-mir'){'without'}elseif($label-ceq'released-4.6.0'){'released'}else{'candidate'}
+          $condition=if($isRepeat){'warm-repeat'}else{'changed-configuration'}
+          if(-not$blocks.ContainsKey($block)){$blocks[$block]=@{}}
+          if(-not$blocks[$block].ContainsKey($condition)){$blocks[$block][$condition]=@{}}
+          Assert-MIRDirectLibraryResponsiveMenuAnalysis (-not$blocks[$block][$condition].ContainsKey($arm)) 'sample-duplicate-arm'
+          $blocks[$block][$condition][$arm]=[pscustomobject][ordered]@{upper_seconds=$upper;lower_seconds=$lower;source_result_sha256=$entry.sha256;measurement_block=[int]$block;label=$label;run_relative_path=[string]$sample.run_relative_path}
+        }
+      }
+    }
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($cursor-eq$samples.Count-and$selectionHashByLabel.Count-eq3-and@($selectionHashByLabel.Values|Sort-Object -Unique).Count-eq3) 'sample-selection-layout'
+    $entry.blocks=$blocks;$entry.actor_identity=$globalActorIdentity
+    foreach($block in 2..6){
+      foreach($condition in $conditions){
+        Assert-MIRDirectLibraryResponsiveMenuAnalysis ($blocks.ContainsKey($block)-and$blocks[$block].ContainsKey($condition)) 'block-condition'
+        foreach($arm in @('without','released','candidate')){Assert-MIRDirectLibraryResponsiveMenuAnalysis ($blocks[$block][$condition].ContainsKey($arm)) 'block-arm'}
+        $without=$blocks[$block][$condition]['without'];$released=$blocks[$block][$condition]['released'];$candidateRow=$blocks[$block][$condition]['candidate']
+        $row=[pscustomobject][ordered]@{phase=$entry.phase;source_result_sha256=$entry.sha256;measurement_block=[int]$block;without_mir=$without;released_46=$released;candidate_47=$candidateRow;baseline_addition_seconds=([double]$released.upper_seconds-[double]$without.upper_seconds);candidate_addition_seconds=([double]$candidateRow.upper_seconds-[double]$without.upper_seconds);baseline_addition_lower_seconds=([double]$released.lower_seconds-[double]$without.upper_seconds);candidate_addition_upper_seconds=([double]$candidateRow.upper_seconds-[double]$without.lower_seconds)}
+        $cellKey=$entry.profile_sha256+'|'+$condition
+        if(-not$rowsByCell.ContainsKey($cellKey)){$rowsByCell[$cellKey]=[Collections.Generic.List[object]]::new()}
+        $rowsByCell[$cellKey].Add($row)
+        if($entry.phase-ceq'initial-five-blocks'){
+          if(-not$initialRowsByCell.ContainsKey($cellKey)){$initialRowsByCell[$cellKey]=[Collections.Generic.List[object]]::new()}
+          $initialRowsByCell[$cellKey].Add($row)
+        }
+      }
+    }
+    $rawReferences.Add([ordered]@{phase=$entry.phase;path=$entry.path;sha256=$entry.sha256;profile_template_sha256=$entry.profile_sha256;target=$identity.target;factorio_sha256=$identity.factorio_sha256;baseline_archive_sha256=$identity.baseline_archive_sha256;candidate_archive_sha256=$identity.candidate_archive_sha256;candidate_materialization_archive_sha256=$identity.candidate_materialization_archive_sha256;original_player_config_sha256=$identity.original_player_config_sha256;prepared_player_data_sha256=$identity.prepared_player_data_sha256})
+  }
+
+  $initialCells=[Collections.Generic.List[object]]::new();$initialAllPointHalve=$true;$initialAllBoundsPass=$true
+  foreach($profile in $profiles){foreach($condition in $conditions){
+    $cellKey=([string]$profile.sha256).ToUpperInvariant()+'|'+$condition;$initialRows=@($initialRowsByCell[$cellKey])
+    Assert-MIRDirectLibraryResponsiveMenuAnalysis ($initialRows.Count-eq5) 'initial-cell-block-count'
+    $initialD46=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values ([double[]]@($initialRows|ForEach-Object {[double]$_.baseline_addition_seconds}))
+    $initialD47=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values ([double[]]@($initialRows|ForEach-Object {[double]$_.candidate_addition_seconds}))
+    $initialMargin=(0.5*$initialD46)-$initialD47;$initialBootstrap=Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap -Rows $initialRows;$initialPass=($initialD46-gt0-and$initialMargin-ge0);$initialBoundsPass=([double]$initialBootstrap.baseline_addition_lower_bound_seconds-gt0-and[double]$initialBootstrap.halving_margin_lower_bound_seconds-ge0)
+    if(-not$initialPass){$initialAllPointHalve=$false};if(-not$initialBoundsPass){$initialAllBoundsPass=$false}
+    $initialCells.Add([ordered]@{profile=[ordered]@{path=[string]$profile.path;sha256=([string]$profile.sha256).ToUpperInvariant()};condition=$condition;block_count=5;baseline_added_time_median_seconds=$initialD46;candidate_added_time_median_seconds=$initialD47;halving_margin_seconds=$initialMargin;reduction_fraction=$(if($initialD46-gt0){1-($initialD47/$initialD46)}else{$null});point_estimate_halves_added_time=$initialPass;bootstrap=$initialBootstrap;bounds_pass=$initialBoundsPass})
+  }}
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ((-not$extensionRequested)-or$initialAllPointHalve) 'extension-initial-point-estimate'
+  Assert-MIRDirectLibraryResponsiveMenuAnalysis ((-not$extensionRequested)-or-not$initialAllBoundsPass) 'extension-initial-uncertainty'
+
+  $cells=[Collections.Generic.List[object]]::new();$allPointHalve=$true;$allBoundsPass=$true;$blockCount=$null
+  foreach($profile in $profiles){
+    $profileSha=([string]$profile.sha256).ToUpperInvariant()
+    foreach($condition in $conditions){
+      $rows=@($rowsByCell[$profileSha+'|'+$condition])
+      $expectedRows=if($extensionRequested){10}else{5}
+      Assert-MIRDirectLibraryResponsiveMenuAnalysis ($rows.Count-eq$expectedRows) 'cell-block-count'
+      if($null-eq$blockCount){$blockCount=$rows.Count}else{Assert-MIRDirectLibraryResponsiveMenuAnalysis ($blockCount-eq$rows.Count) 'cell-block-count-mismatch'}
+      $baselineValues=[double[]]@($rows|ForEach-Object {[double]$_.baseline_addition_seconds});$candidateValues=[double[]]@($rows|ForEach-Object {[double]$_.candidate_addition_seconds})
+      $d46=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values $baselineValues;$d47=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values $candidateValues;$margin=(0.5*$d46)-$d47
+      $bootstrap=Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap -Rows $rows;$pointHalves=($d46-gt0-and$margin-ge0);$boundsPass=([double]$bootstrap.baseline_addition_lower_bound_seconds-gt0-and[double]$bootstrap.halving_margin_lower_bound_seconds-ge0)
+      if(-not$pointHalves){$allPointHalve=$false};if(-not$boundsPass){$allBoundsPass=$false}
+      $cells.Add([ordered]@{profile=[ordered]@{path=[string]$profile.path;sha256=$profileSha};condition=$condition;block_count=$rows.Count;paired_blocks=@($rows|ForEach-Object {[ordered]@{phase=$_.phase;source_result_sha256=$_.source_result_sha256;measurement_block=$_.measurement_block;without_mir_upper_seconds=$_.without_mir.upper_seconds;without_mir_lower_seconds=$_.without_mir.lower_seconds;released_46_upper_seconds=$_.released_46.upper_seconds;released_46_lower_seconds=$_.released_46.lower_seconds;candidate_47_upper_seconds=$_.candidate_47.upper_seconds;candidate_47_lower_seconds=$_.candidate_47.lower_seconds;baseline_addition_seconds=$_.baseline_addition_seconds;candidate_addition_seconds=$_.candidate_addition_seconds;baseline_addition_lower_seconds=$_.baseline_addition_lower_seconds;candidate_addition_upper_seconds=$_.candidate_addition_upper_seconds}});baseline_added_time=Get-MIRDirectLibraryResponsiveMenuAnalysisSummary -Values $baselineValues;candidate_added_time=Get-MIRDirectLibraryResponsiveMenuAnalysisSummary -Values $candidateValues;halving_margin_seconds=$margin;reduction_fraction=$(if($d46-gt0){1-($d47/$d46)}else{$null});point_estimate_halves_added_time=$pointHalves;bootstrap=$bootstrap;bounds_pass=$boundsPass})
+    }
+  }
+  $decision=if(-not$allPointHalve){'return-development'}elseif($allBoundsPass){'analysis-gate-satisfied'}elseif($blockCount-eq5){'extend-to-10'}else{'inconclusive-after-10'}
+  $initialReferences=@($rawReferences|Where-Object {$_.phase -ceq 'initial-five-blocks'});$extensionReferences=@($rawReferences|Where-Object {$_.phase -ceq 'extension-five-blocks'})
+  [pscustomobject][ordered]@{
+    schema=1;kind='MIRDirectLibraryResponsiveMenuPrimaryAnalysisV1';status='completed-analysis-only';claims_final_release_authority=$false;claims_native_acceptance=$false
+    raw_references=[ordered]@{predeclaration=[ordered]@{path=$predeclarationFile.FullName;sha256=(Get-FileHash -LiteralPath $predeclarationFile.FullName -Algorithm SHA256).Hash.ToUpperInvariant()};measurements=@($rawReferences);initial_measurements=@($initialReferences);extension_measurements=@($extensionReferences)}
+    input_identity=($globalIdentity|ConvertFrom-Json -Depth 10)
+    extension_protocol=[ordered]@{predeclared_one_time_extension=$extensionRequested;input_order='initial profile order, then one extension in the same profile order';initial_five_block_checkpoint=@($initialCells);all_initial_point_estimates_halve=$initialAllPointHalve;all_initial_bounds_pass=$initialAllBoundsPass;extension_admitted=($extensionRequested-and$initialAllPointHalve-and-not$initialAllBoundsPass);limitation='The existing result schema has no launch-time continuation receipt. This analysis binds the retained input order and raw initial references, and rejects any other result count or profile order; it cannot independently prove wall-clock chronology between separate completed result files.'}
+    method=[ordered]@{endpoint='actor-qpc-process-start-bracket-to-owned-settings-response';comparison='paired complete blocks, separate medians of released46-minus-without-mir and candidate47-minus-without-mir';halving_margin='0.5*median(B)-median(C)';launch_bracket_bounds='baseline lower uses released lower minus without upper; candidate upper uses candidate upper minus without lower';five_block_bootstrap='enumerate all 5^5 ordered joint triple-arm resamples';ten_block_bootstrap='100000 xorshift32-v1 joint triple-arm resamples, seed 0x4D495247';lower_bound='one-sided 1.25th percentile, nearest-rank-ceiling-v1';warmups='one complete initial block is retained and excluded from metric rows';failure_policy='failed, incomplete, wrong-endpoint, ownership, producer-link, hash, cache-order, selection, or input-drift records are rejected; no duration-based exclusion or synthetic replacement'}
+    cells=@($cells);decision=$decision
+  }
+}

@@ -11,7 +11,10 @@ local powder_name, crystal_name = "kr-imersite-powder", "kr-imersite-crystal"
 local zero_force_name, low_force_name = "mir-k2-migration-zero", "mir-k2-migration-low"
 local high_force_name, control_force_name = "mir-k2-migration-high", "mir-k2-migration-control"
 local epsilon, infinite_level, progress = 0.000001, 4294967295, 0.42
-local loaded, reload_checked = false, false
+-- `on_load` also runs while an old save is being upgraded.  It becomes a
+-- cold-reload signal only when the prior process persisted the verified target
+-- state.  The local flags intentionally do not survive a save.
+local cold_reload_pending, reload_checked = false, false
 
 local function fail(message)
   error("MIR K2 4.6 to 4.7 Imersite migration validation failed: " .. message)
@@ -510,7 +513,8 @@ script.on_init(function()
   local cases = {
     seed_infinite_progress(zero, 0), seed_infinite_progress(low, 2),
     seed_infinite_progress(player, 3), seed_infinite_progress(high, 7)
-  }  seal_owned_speed_sentinel(cases)
+  }
+  seal_owned_speed_sentinel(cases)
 
   -- The control and pre-existing forces intentionally receive no seed,
   -- research mutation, or queue rewrite. Their candidate state is compared
@@ -534,18 +538,33 @@ script.on_configuration_changed(function()
   -- distinct observation is never a successful upgrade acceptance record.
   export_state("upgrade-observed-before-check")
   verify_candidate(state, "upgrade")
-  state.phase = "upgraded"
+  -- The upgrade process receives on_load for the predecessor save before this
+  -- callback.  Do not treat that event as a cold reload.  A later tick moves
+  -- this persisted state to save-pending and requests the actual server save.
+  state.phase = "upgrade-verified"
   export_state("upgrade")
   marker("upgrade")
   log("[mir-fixture] " .. from_version .. " to " .. to_version .. " upgrade proof complete")
-  game.server_save("mir-4721000-upgraded")
 end)
 
-script.on_load(function() loaded = true end)
+script.on_load(function()
+  local state = storage.mir_k2_460_to_470
+  cold_reload_pending = state ~= nil and state.source_version == from_version
+    and state.phase == "save-pending"
+end)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage.mir_k2_460_to_470
-  if not loaded or reload_checked or not state or state.phase ~= "upgraded" then return end
+  if not state or state.source_version ~= from_version then return end
+  if state.phase == "upgrade-verified" then
+    -- Persist the state transition before asking the server to save.  A retry
+    -- tick cannot request another save, and an old-save on_load cannot reach
+    -- the reload branch below.
+    state.phase = "save-pending"
+    game.server_save("mir-4721000-upgraded")
+    return
+  end
+  if not cold_reload_pending or reload_checked or state.phase ~= "save-pending" then return end
   verify_candidate(state, "reload")
   export_state("reload")
   marker("reload")
