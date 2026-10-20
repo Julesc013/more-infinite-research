@@ -1,5 +1,10 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
 local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local artifact_budget = require("prototypes.mir.domain.compiler.public_artifact_budget")
 
@@ -103,7 +108,10 @@ function M.generation_plan(artifact)
   end
   local rows = {}
   for _, row in ipairs(artifact.rows or {}) do
-    local design = row.technology_design or {}
+    -- Carrier rows are exact private state handoffs, not player research or
+    -- public catalogue/Library candidates.
+    if not migration_state_alias_row(row) then
+      local design = row.technology_design or {}
     local identities = sorted_effect_identities(row_effects(row))
     local public_row = {
       schema = 1,
@@ -125,7 +133,8 @@ function M.generation_plan(artifact)
         gates = row.gates
       })
     }
-    table.insert(rows, public_row)
+      table.insert(rows, public_row)
+    end
   end
   local public = {
     schema = 1,

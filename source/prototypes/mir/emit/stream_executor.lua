@@ -36,6 +36,9 @@ function M.apply(artifact, transformation_plan, journal)
   end
   local realized = technology_operation_executor.apply_plan(
     transformation_plan, journal, {kind = "stream"})
+  local compatibility_state_realized = technology_operation_executor.apply_plan(
+    transformation_plan, journal, {kind = "migration_state_alias"})
+  for _, row in ipairs(compatibility_state_realized) do table.insert(realized, row) end
   if D.enabled() then
     for _, row in ipairs(realized) do
       if row.result and row.result.name then

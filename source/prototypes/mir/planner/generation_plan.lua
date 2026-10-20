@@ -4,6 +4,11 @@ local effect_contracts = require("prototypes.mir.integrity.effect_contracts")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
 
 local M = {}
 local Plan = {}
@@ -391,15 +396,20 @@ function Plan:finalize()
       end
       manifest_ids[row.manifest_id] = true
       technology_names[row.technology_name] = true
-      for _, effect in ipairs(row.fields.effects or {}) do
-        local identity = effect_identity(effect)
-        if identity ~= "" then
-          local previous = materialized_effects[identity]
-          if previous and not same_qualified_material_stage(
-              previous.row, row, previous.effect, effect) then
-            error("GenerationPlan contains duplicate materialized effect identity: " .. identity, 2)
+      -- The hidden K2 state carrier intentionally retains the predecessor's
+      -- one powder effect until on_configuration_changed transfers its paid
+      -- state. It is a checked compatibility identity, not a second owner.
+      if not migration_state_alias_row(row) then
+        for _, effect in ipairs(row.fields.effects or {}) do
+          local identity = effect_identity(effect)
+          if identity ~= "" then
+            local previous = materialized_effects[identity]
+            if previous and not same_qualified_material_stage(
+                previous.row, row, previous.effect, effect) then
+              error("GenerationPlan contains duplicate materialized effect identity: " .. identity, 2)
+            end
+            materialized_effects[identity] = {row = row, effect = effect}
           end
-          materialized_effects[identity] = {row = row, effect = effect}
         end
       end
     elseif row.action == "adopt" then

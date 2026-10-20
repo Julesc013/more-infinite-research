@@ -728,6 +728,20 @@ fixtures:
       - explicit-untouched-control-and-unseeded-force-preservation-around-staged-and-declared-science-deltas
       - two-distinct-cold-reloads-with-full-state-comparisons
       - no-native-acceptance-until-exact-predecessor-candidate-upgrade-and-two-reloads-pass
+      - exact-test-owned-running-speed-contribution-restored-by-its-owner-before-mir-configuration
+
+  k2-470-owned-speed-sentinel:
+    requires_features: []
+    path: fixtures/aaa-mir47-owned-speed-sentinel
+    harness: tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1
+    shipped: false
+    qualification_status: host-controls-passed-native-pending
+    validates:
+      - exact-current-k2-upgrade-fixture-only-internal-admission
+      - source-owned-contribution-capture-and-one-time-configuration-restoration
+      - strict-source-total-and-unrelated-state-oracles-remain-unchanged
+      - full-source-fixture-exporter-lexical-binding-and-real-remote-interface-shape
+      - no-product-recovery-of-opaque-third-party-contributions
 
   f200-bob-angel-maintenance-upgrade-423:
     requires_features: []

@@ -500,6 +500,12 @@ if($PersistedDamageZip -or $PublishedDamageManifestPath){
 $k2Scenario=$FixtureName -cin @('assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001','assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002','assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000')
 $k2FullStateScenario=$FixtureName-ceq'assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000'
 if($k2FullStateScenario-and$K2ImersiteCap-ne0){throw '[mir470-k2-imersite-cap-required]'}
+# This source-and-target companion belongs only to the exact K2 full-state
+# scenario. It is an internal fixture selection, never a caller-provided
+# general-purpose fixture name.
+$k2OwnedSpeedSentinelFixture=if($k2FullStateScenario){
+  Get-MIR470K2OwnedSpeedSentinelFixture -RepoRoot $RepoRoot -FixtureName $FixtureName -SourceVersion $SourceVersion
+}else{$null}
 $f200BobAngelScenario=[bool]$F200BobAngelInputProfile
 $f200GaloreSpaceAgeScenario=[bool]$F200GaloreSpaceAgeInputProfile
 if($f200BobAngelScenario-and$f200GaloreSpaceAgeScenario){throw '[mir421-current-upgrade-input-mode]'}
@@ -1008,6 +1014,16 @@ if ($Archetype -and -not $isHistoricalTerminalFixture) {
 }
 
 $persistentFixtureDirectories=@($stagedFixture)
+$persistentFixtureRecords=@()
+if($k2OwnedSpeedSentinelFixture){
+  $persistentFixtureDirectories+=,[string]$k2OwnedSpeedSentinelFixture.directory
+  $persistentFixtureRecords+=,[ordered]@{
+    name=[string]$k2OwnedSpeedSentinelFixture.name
+    version=[string]$k2OwnedSpeedSentinelFixture.version
+    info_sha256=[string]$k2OwnedSpeedSentinelFixture.info_sha256
+    control_sha256=[string]$k2OwnedSpeedSentinelFixture.control_sha256
+  }
+}
 if($k2Scenario){
   . (Join-Path $RepoRoot 'tools/lib/validation/SettingsOverrides.ps1')
   $capOverride=New-MIR421K2CapOverride -Root (Join-Path $root 'cap-settings') -Cap $K2ImersiteCap
@@ -1166,6 +1182,7 @@ if ($requiresCompleteCatalogue) { Assert-MIR42CompleteCatalogueUpgradeMarker -Te
 if($classicReducedPolicy){Assert-MIR430ClassicUpgradeMarker -Text $loadText -Stage upgrade}
 if ($SpaceIsFake) { Assert-MIR421SpaceFakeUpgradeMarker -Text $loadText -Stage upgrade }
 if ($k2Scenario) { Assert-MIR421K2UpgradeMarker -Text $loadText -Stage upgrade -Cap $K2ImersiteCap -SourceVersion $SourceVersion }
+if($k2OwnedSpeedSentinelFixture){Assert-MIR470K2OwnedSpeedSentinelConfigurationOrder -Text $loadText}
 $loadMarker = "[mir-fixture] $FromVersion to $ToVersion$proofSuffix upgrade proof complete$archetypeSuffix"
 if (-not $loadText.Contains($loadMarker)) {
   throw "MIR $ToVersion upgrade proof marker is missing: $loadMarker. Temporary root: $root"
@@ -1395,6 +1412,7 @@ $result = [ordered]@{
   from = [ordered]@{ version = $FromVersion; path = (Split-Path -Leaf $from); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = (Split-Path -Leaf $to); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }
   source_only_fixtures = @($SourceOnlyFixtureNames)
+  persistent_fixtures = @($persistentFixtureRecords)
   assertions = $assertions
   create_log = (Split-Path -Leaf $createEvidence)
   create_log_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $createEvidence).Hash

@@ -2,6 +2,23 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.k2-owned-speed-sentinel",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+        "tests/runtime/run_k2_owned_speed_sentinel_controls.py",
+        "tests/runtime/k2_owned_speed_sentinel_controls.lua",
+        "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421K2Upgrade.ps1",
+        "fixtures/aaa-mir47-owned-speed-sentinel/**",
+        "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/**"
+      ]
+    },
+    {
       "id": "static.mir422-secretas-native-harness",
       "kind": "static",
       "layer": "F3",
@@ -6276,6 +6293,14 @@
         "tests/compiler/Test-MIRK2ImersiteContinuation.ps1",
         "tests/compiler/material_progression.lua",
         "tests/compiler/material_continuation.lua",
+        "tests/runtime/k2_imersite_staged_state_controls.lua",
+        "source:source/prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+        "source:source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+        "source:source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+        ".mir/streams.yml",
+        "source:source/prototypes/mir/streams/generated_stream_manifest.json",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
