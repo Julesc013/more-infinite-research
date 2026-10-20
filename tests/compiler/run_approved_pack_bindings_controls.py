@@ -29,12 +29,10 @@ def main() -> None:
 
     def approved_family_preamble() -> str:
         text = (repo / 'tests/compiler/approved_family_emission.lua').read_text(encoding='utf-8')
-        anchor = ("Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()\n"
-                  "  local context = Context.current()\n"
-                  "  local effect_safety = require(\"prototypes.mir.emit.effect_safety\")")
-        position = text.find(anchor)
-        if position < 0:
-            raise RuntimeError('approved-family active-only command preamble anchor changed')
+        anchor = '-- MIR-COMMAND-EXPORT-PREAMBLE-END'
+        if text.count(anchor) != 1:
+            raise RuntimeError('approved-family command preamble requires exactly one explicit boundary')
+        position = text.index(anchor)
         return text[:position]
 
     def command_export_source(shape: str) -> str:

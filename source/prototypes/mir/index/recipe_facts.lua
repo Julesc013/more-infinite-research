@@ -9,6 +9,20 @@ local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local M = {}
 local SCHEMA = 2
 local RECIPE_DOMAIN_FIELDS = {"facts", "names", "schema"}
+-- This is the active compiler's source-input contract, not the established
+-- full recipe-index fingerprint used by generic snapshot/export consumers.
+-- Index maps are deterministic derived views of this normalized domain; the
+-- explicit revision makes a change to that derivation an input change too.
+local ACTIVE_INPUT_SCHEMA = 1
+local ACTIVE_INPUT_CONTRACT = "mir-recipe-normalized-input-v1"
+local INDEX_DERIVATION_REVISION = 1
+
+-- A Factorio recipe map is ordinarily a plain unique-keyed table. A custom
+-- __pairs iterator can yield a recipe key more than once: facts
+-- keep the final row but discovery maps retain every yielded row. Keep that
+-- exceptional complete-index binding private to this owner; normal maps still
+-- hash only their normalized fact domain.
+local exceptional_complete_index_identity = setmetatable({}, {__mode = "k"})
 
 -- replace_source() is a controlled pre-snapshot operation, not a general
 -- mutable-prototype escape hatch. The science indexes below deliberately
@@ -327,6 +341,7 @@ local function build_index(recipe_prototypes)
   local by_output, by_output_identity = {}, {}
   local by_productive_output, by_productive_output_identity = {}, {}
   local by_ingredient, by_ingredient_identity, by_category, names = {}, {}, {}, {}
+  local duplicate_recipe_name = false
   for recipe_name, recipe in pairs(recipe_prototypes or {}) do
     local semantics = recipe_semantics.resolve(recipe, recipe, target_profiles.current())
     local normalized_variants = variant_facts(recipe)
@@ -344,6 +359,7 @@ local function build_index(recipe_prototypes)
     local categories = categories_for(normalized_variants)
     local is_hidden = hidden(recipe)
     local productive_outputs, productive_output_identities = productive_results(recipe)
+    if facts[recipe_name] ~= nil then duplicate_recipe_name = true end
     facts[recipe_name] = {
       schema = SCHEMA,
       name = recipe_name,
@@ -408,6 +424,7 @@ local function build_index(recipe_prototypes)
     by_ingredient_identity = by_ingredient_identity,
     by_category = by_category
   }
+  if duplicate_recipe_name then exceptional_complete_index_identity[canonical] = true end
   return canonical
 end
 
@@ -485,6 +502,56 @@ local function fingerprint_material(context)
   return material
 end
 
+local function active_input_identity_material(context, index)
+  local identity = {
+    schema = ACTIVE_INPUT_SCHEMA,
+    record_type = "RecipeNormalizedInput",
+    contract = ACTIVE_INPUT_CONTRACT,
+    recipe_index_schema = index.schema,
+    index_derivation_revision = INDEX_DERIVATION_REVISION,
+    normalized_fact_domain_fingerprint = fingerprint.of({
+      schema = index.schema,
+      names = index.names,
+      facts = index.facts
+    })
+  }
+  -- For a duplicate virtual source key the normalized fact domain cannot
+  -- identify every consumed discovery map. Bind the exact already-built index
+  -- only in that exceptional shape; no table identity is trusted as a digest.
+  if exceptional_complete_index_identity[index] then
+    identity.exceptional_complete_index_fingerprint = fingerprint.of(index)
+  end
+  return {
+    recipe_source_epoch = source_epoch(context),
+    recipe_index_epoch = context:state_epoch("recipe_index"),
+    identity = identity
+  }
+end
+
+-- The ordinary compiler records a versioned identity of every normalized
+-- recipe fact it can consume. It deliberately excludes only index maps that
+-- build_index deterministically derives from those facts; the derivation
+-- revision binds that algorithm. Generic snapshot/export paths keep using
+-- fingerprint(), whose legacy full-index digest remains unchanged.
+function M.active_input_identity()
+  local context = compiler_context.current()
+  local index = build()
+  local source = source_epoch(context)
+  local index_epoch = context:state_epoch("recipe_index")
+  local cached = context:state_view("recipe_active_input_identity")
+  if cached and cached.recipe_source_epoch == source and cached.recipe_index_epoch == index_epoch then
+    return deepcopy(cached.identity)
+  end
+  local material = active_input_identity_material(context, index)
+  if cached then
+    context:replace_epoch("recipe_active_input_identity", material,
+      context:state_epoch("recipe_active_input_identity"))
+  else
+    context:set_state("recipe_active_input_identity", material)
+  end
+  return deepcopy(material.identity)
+end
+
 -- Builds the same canonical index from an explicit prototype map.
 -- Offline review and scale tooling use this without mutating the prototype registry
 -- or the active CompilerContext.
@@ -542,6 +609,13 @@ function M.replace_source(recipe_prototypes, expected_epoch)
       "recipe_index_fingerprint",
       fingerprint.of(build()),
       context:state_epoch("recipe_index_fingerprint")
+    )
+  end
+  if context:has_state("recipe_active_input_identity") then
+    context:replace_epoch(
+      "recipe_active_input_identity",
+      active_input_identity_material(context, build()),
+      context:state_epoch("recipe_active_input_identity")
     )
   end
   return next_epoch

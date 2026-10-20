@@ -262,11 +262,21 @@ function M.source_fingerprint()
     for name, item in pairs(state.relationships.items) do
       if item.place_result then placeable[name] = item.place_result end
     end
-    state.source_fingerprint = fingerprint.of({
+    local source = {
       schema = 1, record_type = "RecipeRiskInputs", hard_rule_revision = 1,
-      recipe_facts = recipe_facts.fingerprint(), placeable_items = placeable,
+      placeable_items = placeable,
       review_patterns = REVIEW_PATTERNS
-    })
+    }
+    -- Explicit generic snapshot/export requests retain the established full
+    -- index digest. The active compiler binds the complete normalized input
+    -- contract instead, so it need not serialize derived index maps merely to
+    -- name its ordinary source inputs.
+    if compiler_context.current():legacy_compiler_export_requested() then
+      source.recipe_facts = recipe_facts.fingerprint()
+    else
+      source.recipe_input = recipe_facts.active_input_identity()
+    end
+    state.source_fingerprint = fingerprint.of(source)
   end
   return state.source_fingerprint
 end

@@ -117,7 +117,7 @@
     "more-infinite-research.research-cost-compatibility-public"
   ],
   "context_owned_state": [
-    "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
+    "recipe-index", "recipe-active-input-identity", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
     "technology-researchability-index", "pack-production-reachability-cache",
     "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
     "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",

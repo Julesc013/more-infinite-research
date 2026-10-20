@@ -97,6 +97,143 @@ do
   recipes.fingerprint = original
   assert(ok, failure)
 end
+
+-- The active compiler names the complete normalized facts it consumes; it
+-- cannot substitute a selected subset or the legacy full discovery-index
+-- digest. All writers go through replace_source(), which advances both
+-- Context-owned epochs before a later identity can be returned.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local original = deepcopy(data.raw.recipe)
+  local identity = recipes.active_input_identity()
+  local source_epoch = recipes.source_epoch()
+  local index_epoch = Context.current():state_epoch("recipe_index")
+  local active_epoch = Context.current():state_epoch("recipe_active_input_identity")
+  local returned = recipes.active_input_identity()
+  returned.normalized_fact_domain_fingerprint = "outside-writer"
+  check(recipes.active_input_identity().normalized_fact_domain_fingerprint
+      == identity.normalized_fact_domain_fingerprint,
+    "Active recipe input identity returns a detached value")
+
+  local function replace_and_identity(source)
+    recipes.replace_source(source, recipes.source_epoch())
+    return recipes.active_input_identity()
+  end
+  local changed_output = deepcopy(original)
+  changed_output["iron-plate"].results[1].name = "identity-output-control"
+  local output_identity = replace_and_identity(changed_output)
+  check(recipes.source_epoch() == source_epoch + 1
+      and Context.current():state_epoch("recipe_index") == index_epoch + 1
+      and Context.current():state_epoch("recipe_active_input_identity") == active_epoch + 1
+      and output_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint,
+    "Output change advances source/index epochs and invalidates active recipe identity")
+
+  local changed_ingredient = deepcopy(original)
+  changed_ingredient["iron-plate"].ingredients[1][1] = "identity-ingredient-control"
+  local ingredient_identity = replace_and_identity(changed_ingredient)
+  local changed_category = deepcopy(original)
+  changed_category["iron-plate"].category = "identity-category-control"
+  local category_identity = replace_and_identity(changed_category)
+  check(ingredient_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint
+      and category_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint,
+    "Ingredient and category changes each invalidate complete normalized recipe identity")
+
+  local gross_only = deepcopy(original)
+  gross_only["iron-plate"].results[1].ignored_by_productivity = 1
+  local gross_index = recipes.index_prototypes(gross_only)
+  local productive_index = recipes.index_prototypes(original)
+  local gross_identity = replace_and_identity(gross_only)
+  local productive_identity = replace_and_identity(original)
+  check(fingerprint.of(gross_index.by_output) == fingerprint.of(productive_index.by_output)
+      and fingerprint.of(gross_index.by_productive_output) ~= fingerprint.of(productive_index.by_productive_output)
+      and gross_identity.normalized_fact_domain_fingerprint ~= productive_identity.normalized_fact_domain_fingerprint,
+    "Productive-output change invalidates active identity even when gross output membership is unchanged")
+
+  check(recipes.snapshot_recipe_domain_fingerprint(deepcopy(recipes.index_view())) == nil,
+    "Copied recipe maps cannot claim Context-owned identity material")
+  local malformed = deepcopy(original)
+  malformed["iron-plate"].surface_conditions = {bad = function() end}
+  check(not pcall(replace_and_identity, malformed),
+    "Malformed caller-supplied nested recipe source remains generically rejected")
+end)
+
+-- A virtual __pairs source can yield the same recipe key twice. Facts retain
+-- only the last row, while the discovery indexes consume both yielded rows.
+-- The active identity must bind that exceptional complete index, without
+-- making normal unique recipe maps pay for the legacy full index digest.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local function duplicate_source(first_output)
+    local first = {name = "identity-duplicate", enabled = true, category = "crafting", result = first_output}
+    local final = {name = "identity-duplicate", enabled = true, category = "crafting", result = "identity-stable"}
+    return setmetatable({}, {
+      __pairs = function()
+        local position = 0
+        return function()
+          position = position + 1
+          if position == 1 then return "identity-duplicate", first end
+          if position == 2 then return "identity-duplicate", final end
+        end
+      end
+    })
+  end
+
+  local original_of = fingerprint.of
+  fingerprint.of = function(value)
+    if type(value) == "table" and value.by_output ~= nil then
+      error("Unique maps must not hash their complete index")
+    end
+    return original_of(value)
+  end
+  recipes.replace_source({["identity-unique"] = {name = "identity-unique", enabled = true,
+    category = "crafting", result = "identity-only"}}, recipes.source_epoch())
+  local unique_identity = recipes.active_input_identity()
+  fingerprint.of = original_of
+  check(unique_identity.exceptional_complete_index_fingerprint == nil,
+    "Ordinary unique recipe maps retain normalized-domain-only active identity")
+
+  local function replace_and_observe(source)
+    recipes.replace_source(source, recipes.source_epoch())
+    local index = recipes.index_view()
+    local legacy = recipes.fingerprint()
+    return recipes.active_input_identity(), index, legacy, fingerprint.of(index)
+  end
+  local identity_a, index_a, legacy_a, complete_a = replace_and_observe(duplicate_source("identity-first-a"))
+  local identity_b, index_b, legacy_b, complete_b = replace_and_observe(duplicate_source("identity-first-b"))
+  check(index_a.facts["identity-duplicate"].main_product == "identity-stable"
+      and index_b.facts["identity-duplicate"].main_product == "identity-stable"
+      and #index_a.names == 2 and #index_b.names == 2,
+    "Duplicate virtual recipe observations retain matching final fact/name domains")
+  check(index_a.by_output["identity-first-a"] and index_b.by_output["identity-first-b"]
+      and not index_b.by_output["identity-first-a"] and complete_a ~= complete_b,
+    "Duplicate virtual recipe observations retain their distinct consumed discovery maps")
+  check(legacy_a == complete_a and legacy_b == complete_b
+      and identity_a.normalized_fact_domain_fingerprint == identity_b.normalized_fact_domain_fingerprint
+      and identity_a.exceptional_complete_index_fingerprint == complete_a
+      and identity_b.exceptional_complete_index_fingerprint == complete_b
+      and identity_a.exceptional_complete_index_fingerprint ~= identity_b.exceptional_complete_index_fingerprint,
+    "Exceptional duplicate recipe keys bind the unchanged complete index identity beside stable normalized facts")
+end)
+
+-- The existing default Context/export contract continues to name the exact
+-- legacy full index digest. It is distinct from the active-only identity.
+Context.with_active(Context.new(), function()
+  local context = Context.current()
+  local effect_safety = require("prototypes.mir.emit.effect_safety")
+  local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
+  context:set_service("effect_target_inventory", target_inventory)
+  context:record_artifact("input_sanitation_ledger", input_ledger)
+  local plan = compiler.compile(context)
+  local snapshot = context:snapshot()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local sources = plan.stream_plan.source_fingerprints
+  check(type(sources.facts) == "string" and sources.facts == recipes.fingerprint()
+      and sources.recipe_input == nil,
+    "Default export compilation retains the exact legacy full recipe-index digest")
+  check(snapshot.state.compilation_snapshot.source_fingerprints.facts == sources.facts
+      and snapshot.state.compilation_plan.stream_plan.source_fingerprints.facts == sources.facts,
+    "Generic Context snapshot and plan preserve the matching legacy recipe digest")
+end)
 -- Target adapters own phase reporting; the common qualifier owns the decision.
 local f200_science = require("prototypes.mir.planner.science")
 check(f200_science.phase_diagnostic_fields(nil) == nil,
@@ -171,10 +308,18 @@ local function assert_preserved()
   assert(fingerprint.of(projection) == fingerprint.of(expected), "Established iron definition changed")
 end
 local counts, emitted_plan, emitted_journal, emitted_context, draft_fixture_row
+-- MIR-COMMAND-EXPORT-PREAMBLE-END
 -- The ordinary approved-family path is deliberately active-only: it must not
 -- construct the generic snapshot/export representation simply to compile.
 Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
   local context = Context.current()
+  local monitored_recipe_facts = require("prototypes.mir.index.recipe_facts")
+  local original_recipe_fingerprint = monitored_recipe_facts.fingerprint
+  local ordinary_full_recipe_fingerprint_calls = 0
+  monitored_recipe_facts.fingerprint = function(...)
+    ordinary_full_recipe_fingerprint_calls = ordinary_full_recipe_fingerprint_calls + 1
+    return original_recipe_fingerprint(...)
+  end
   local effect_safety = require("prototypes.mir.emit.effect_safety")
   local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
   context:set_service("effect_target_inventory", target_inventory)
@@ -360,6 +505,9 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local plan = compiler.compile(context)
   snapshot_adapter.capture, snapshot_contract.new, snapshot_contract.qualify =
     prior_capture, prior_new, prior_qualify
+  monitored_recipe_facts.fingerprint = original_recipe_fingerprint
+  check(ordinary_full_recipe_fingerprint_calls == 0,
+    "Ordinary active approved-family compilation does not request the legacy full recipe-index digest")
 
   local compiler_input_contract = require("prototypes.mir.domain.compiler.compiler_input")
   local active_input = plan.compiler_input
@@ -367,6 +515,15 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
     and snapshot_counts.capture == 0 and snapshot_counts.new == 0 and snapshot_counts.qualify == 0,
     "Ordinary active compilation constructs zero generic snapshots")
   local active_owner = compiler_input_contract.active_view(active_input)
+  local active_sources = plan.stream_plan.source_fingerprints
+  check(type(active_sources.recipe_input) == "table"
+      and active_sources.recipe_input.schema == 1
+      and active_sources.recipe_input.record_type == "RecipeNormalizedInput"
+      and active_sources.recipe_input.contract == "mir-recipe-normalized-input-v1"
+      and active_sources.facts == nil
+      and active_owner.source_fingerprints.recipe_input.normalized_fact_domain_fingerprint
+        == active_sources.recipe_input.normalized_fact_domain_fingerprint,
+    "Ordinary active plan and private CompilerInput bind the same versioned complete recipe identity")
   local original_inventory = fingerprint.canonical(active_owner.effect_target_inventory)
   local exported_inventory = deepcopy(active_owner.effect_target_inventory)
   exported_inventory.recipe = {}

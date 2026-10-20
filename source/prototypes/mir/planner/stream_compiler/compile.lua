@@ -30,9 +30,19 @@ local function compile_active(context, return_view)
   if cached then return return_view and cached or exported_artifact(cached) end
   local streams, native_owner_inputs, shared_rules = discover.source_snapshot()
   telemetry.start_phase("stream_compiler")
+  local recipe_source = {}
+  -- A Context export is the established generic snapshot boundary and keeps
+  -- its legacy full recipe-index source digest. The active data-stage path
+  -- publishes a distinct, explicitly versioned normalized-input identity.
+  if context:legacy_compiler_export_requested() then
+    recipe_source.facts = recipe_facts.fingerprint()
+  else
+    recipe_source.recipe_input = recipe_facts.active_input_identity()
+  end
   local metadata = {
     source_fingerprints = {
-      facts = recipe_facts.fingerprint(),
+      facts = recipe_source.facts,
+      recipe_input = recipe_source.recipe_input,
       risk_inputs = recipe_risk_facts.source_fingerprint(),
       rules = fingerprint.of({streams = streams, families = family_registry.view(),
         science_bindings = shared_rules.science_bindings, science_binding_policy = shared_rules.science_binding_policy}),
