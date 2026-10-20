@@ -538,7 +538,7 @@ if ($dataFinalFixesStageText -match 'classic_compiler|compiler_profile[.]get') {
   throw 'The public data-final-fixes stage must execute the single preservation-capable command DAG without profile dispatch.'
 }
 $commandContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
-foreach ($contextOption in @('compiler_context.new({', 'execution_mode = options.execution_mode,', 'legacy_compiler_export_requested = options.return_snapshot ~= false')) {
+foreach ($contextOption in @('local returns_snapshot = options.return_snapshot ~= false', 'compiler_context.new({', 'execution_mode = options.execution_mode,', 'legacy_compiler_export_requested = returns_snapshot')) {
   Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandContextText -Needle $contextOption
 }
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
