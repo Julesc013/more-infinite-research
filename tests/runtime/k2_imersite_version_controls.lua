@@ -48,4 +48,17 @@ for _, base in ipairs({"2.1.20", "2.1.21"}) do
 end
 probe("2.1.22", "4.2.21002", "2.1.3", false)
 probe("2.1.22", "4.4.21000", "2.1.3", false, false, MIR_K2_DATA_SOURCE_440, MIR_K2_CONTROL_SOURCE_440)
+if MIR_K2_SELECTED_DATA_SOURCE then
+  local data_source, control_source = MIR_K2_SELECTED_DATA_SOURCE, MIR_K2_SELECTED_CONTROL_SOURCE
+  local engine, mir = MIR_K2_SELECTED_ENGINE, MIR_K2_SELECTED_MIR
+  local engine_prefix, engine_patch = string.match(engine, "^(%d+%.%d+%.)(%d+)$")
+  local mir_prefix, mir_patch = string.match(mir, "^(%d+%.%d+%.)(%d+)$")
+  assert(engine_prefix and mir_prefix, "selected exact version inputs")
+  probe(engine, mir, "2.1.3", true, false, data_source, control_source)
+  probe(engine, mir, "2.1.3", true, true, data_source, control_source)
+  probe(engine, mir, "2.1.2", false, false, data_source, control_source)
+  probe(engine_prefix .. tostring(tonumber(engine_patch) + 1), mir, "2.1.3", false, false, data_source, control_source)
+  probe(engine_prefix .. tostring(tonumber(engine_patch) - 1), mir, "2.1.3", false, false, data_source, control_source)
+  probe(engine, mir_prefix .. tostring(tonumber(mir_patch) + 1), "2.1.3", false, false, data_source, control_source)
+end
 print("MIR-K2-VERSION-CONTROLS-PASS " .. checks .. " (host only)")

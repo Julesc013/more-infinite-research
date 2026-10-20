@@ -39,7 +39,11 @@ function Invoke-K2213LuaVersionControls {
     [Parameter(Mandatory)][string]$CurrentControlSource,
     [Parameter(Mandatory)][string]$VersionControlSource,
     [Parameter(Mandatory)][string]$WorkRoot,
-    [Parameter(Mandatory)][string]$DiagnosticPath
+    [Parameter(Mandatory)][string]$DiagnosticPath,
+    [string]$SelectedDataSource='',
+    [string]$SelectedControlSource='',
+    [string]$SelectedEngineVersion='',
+    [string]$SelectedMIRVersion=''
   )
   $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $RuntimeDirectory -PythonExe $PythonExe
   $control=Join-Path $WorkRoot 'k2-version-controls.py'
@@ -60,6 +64,11 @@ try:
     globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
     globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
     globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
+    if len(sys.argv) == 11 and sys.argv[7]:
+        globals_.MIR_K2_SELECTED_DATA_SOURCE = Path(sys.argv[7]).read_text(encoding='utf-8')
+        globals_.MIR_K2_SELECTED_CONTROL_SOURCE = Path(sys.argv[8]).read_text(encoding='utf-8')
+        globals_.MIR_K2_SELECTED_ENGINE = sys.argv[9]
+        globals_.MIR_K2_SELECTED_MIR = sys.argv[10]
     runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
 except Exception as exc:
     print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "failed", "python": sys.version,
@@ -67,7 +76,9 @@ except Exception as exc:
     raise
 '@
   [IO.File]::WriteAllText($control,$source,[Text.UTF8Encoding]::new($false))
-  $output=@(& $luaHost.python $control $luaHost.runtime $DataSource $ControlSource $CurrentDataSource $CurrentControlSource $VersionControlSource 2>&1)
+  $luaArguments=@($control,$luaHost.runtime,$DataSource,$ControlSource,$CurrentDataSource,$CurrentControlSource,$VersionControlSource)
+  if($SelectedDataSource){$luaArguments+=@($SelectedDataSource,$SelectedControlSource,$SelectedEngineVersion,$SelectedMIRVersion)}
+  $output=@(& $luaHost.python @luaArguments 2>&1)
   $exitCode=$LASTEXITCODE
   $text=(@($output|ForEach-Object {[string]$_})-join"`n")
   [IO.File]::WriteAllText($DiagnosticPath,((@{schema=1;kind='MIRK2213LuaHostExecutionV1';runtime_directory=$luaHost.runtime;python=$luaHost.python;exit_code=$exitCode;success_marker=($text-match'MIR-K2-VERSION-CONTROLS-PASS');output=$text}|ConvertTo-Json -Depth 5)+"`n"),[Text.UTF8Encoding]::new($false))
@@ -689,7 +700,7 @@ try {
     $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
     $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
     Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
-    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Get-K2213SelectedFixtureProfile','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs')) {
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213CurrentFixtureRegistration','Get-K2213SelectedFixtureProfile','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs','Get-K2213FixtureEnvelope')) {
       $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
       Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
       . ([scriptblock]::Create($function[0].Extent.Text))
@@ -744,7 +755,9 @@ try {
     $binding.output_bytes=$bytes.Length
     $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
     foreach($target in @('f210','f200','f110','f100')) {
-      foreach($sourceVersion in @('4.2.1','4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')) {
+      $selectedSources=@('4.2.1','4.2.2','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2')
+      if($target-ceq'f210'){$selectedSources+='4.7.0'}
+      foreach($sourceVersion in $selectedSources) {
         $sourceParts=$sourceVersion.Split('.')
         $identity=New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor ([int]$sourceParts[1]) -SourcePatch ([int]$sourceParts[2])
         $caseRoot=Join-Path $run ($target+'-'+$sourceVersion);[IO.Directory]::CreateDirectory($caseRoot)|Out-Null
@@ -778,6 +791,11 @@ try {
           }
         }
         $other=if($sourceVersion-ceq'4.2.1'){'4.2.2'}else{'4.2.1'}
+        if($target-ceq'f210'-and$sourceVersion-ceq'4.7.0'){
+          $k2Read=Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion
+          Assert-Probe ($k2Read.receipt.source_version-ceq$sourceVersion-and$k2Read.receipt.archive_sha256-ceq$inventory.archive_sha256) 'K2 current caller lost canonical candidate identity.'
+          Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
+        }
         if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $other} 'materialization identity differs'
@@ -800,6 +818,9 @@ try {
         Refuses-Probe {Read-MIRNativeProbeCurrentCandidate @selected} 'binding hash differs'
         if($target-ceq'f210' -and $sourceVersion -in @('4.2.1','4.2.2','4.4.0')) {
           Refuses-Probe {Read-TinCurrentCandidate -Repository $repo -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
+          Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
+        }
+        if($target-ceq'f210'-and$sourceVersion-ceq'4.7.0'){
           Refuses-Probe {Read-K2213CurrentCandidate -Archive $candidate -ReceiptPath $receiptPath -SourceVersion $sourceVersion} 'binding hash differs'
         }
         $binding.output_sha256=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes))
@@ -843,6 +864,30 @@ try {
     # Current 4.4 requires its explicit profile: V5's exact historical lock
     # cannot be repurposed as a current-candidate input.
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
+    $registeredCurrent=Read-K2213CurrentFixtureRegistration
+    $currentIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion '4.7.0'
+    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.7'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/engine identity.'
+    $registrationPath=Join-Path $run 'controlled-k2-registration.yml'
+    $registeredText=[IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
+    $entry=[regex]::Match($registeredText,'(?ms)^  k2-213-imersite-continuation:\s*\r?\n.*?(?=^  [A-Za-z0-9][A-Za-z0-9_-]*:\s*\r?\n|\z)').Value
+    Assert-Probe ($entry.Contains('base: "2.1.21"')-and$entry.Contains('current_engine_version: "2.1.22"')) 'K2 historical and current engine authorities were conflated.'
+    [IO.File]::WriteAllText($registrationPath,$entry.Replace('base: "2.1.21"','base: "2.1.22"'))
+    Refuses-Probe {Get-K2213FixtureEnvelope -Path $registrationPath -SourceVersion '4.7.0'} 'registered-fixture-field:base:'
+    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.22"','current_engine_version: "2.1.21"'))
+    Refuses-Probe {Read-K2213CurrentFixtureRegistration -Path $registrationPath} 'registered-fixture-current-engine-profile'
+    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.22"',"current_engine_version: `"2.1.22`"`n    current_engine_version: `"2.1.22`""))
+    Refuses-Probe {Read-K2213CurrentFixtureRegistration -Path $registrationPath} 'registered-fixture-current-field:current_engine_version'
+    Refuses-Probe {Get-K2213SelectedFixtureProfile -SourceVersion '4.7.1'} 'registered-fixture-current-candidate'
+    Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.7.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
+    $portable.engine_version='2.1.22'
+    foreach($mod in $portable.mods[0..4]){$mod.version='2.1.22'}
+    $portable.mods[6].version=$currentIdentity.distribution_version;$portable.mods[7].version=$registeredCurrent.fixture_version;Save-ControlledK2Profile
+    $currentBound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.7.0'
+    Assert-Probe ($currentBound.profile.engine_version-ceq'2.1.22'-and$currentBound.inputs[0].source_path-ceq$dependency) 'K2 current source did not use its exact registered engine and existing archive.'
+    $portable.engine_version='2.1.21';Save-ControlledK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.7.0'} 'input-profile-engine-version'
+    foreach($mod in $portable.mods[0..4]){$mod.version='2.1.21'}
+    $portable.mods[6].version='4.2.21001';$portable.mods[7].version='0.1.4';Save-ControlledK2Profile
     $fixtureTemplate=Join-Path $repo 'fixtures/assert-k2-213-imersite-continuation'
     $fixtureSpecializationRoot=Join-Path $run 'current-k2-fixture'
     $selectedFixture=New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.4.21000'
@@ -859,6 +904,13 @@ try {
     $templateSettings=Join-Path $fixtureTemplate 'settings-updates.lua'
     Assert-Probe ((Test-Path -LiteralPath $selectedSettings -PathType Leaf) -and (Get-K2213Sha256 $selectedSettings) -ceq (Get-K2213Sha256 $templateSettings)) 'K2 selected fixture omitted or changed its required diagnostic setting.'
     Assert-Probe ((New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.2.2' -SelectedMIRVersion '4.2.21002') -ceq $fixtureTemplate) 'K2 historical fixture bytes were not retained.'
+    $currentFixture=New-K2213SelectedFixture -Source $fixtureTemplate -Run (Join-Path $run 'current-k2-registered-fixture') -SourceVersion '4.7.0' -SelectedMIRVersion $currentIdentity.distribution_version
+    $currentInfo=Get-Content -Raw -LiteralPath (Join-Path $currentFixture 'info.json')|ConvertFrom-Json
+    Assert-Probe ($currentInfo.version-ceq$registeredCurrent.fixture_version-and@($currentInfo.dependencies)-contains('more-infinite-research = '+$currentIdentity.distribution_version)) 'K2 registered fixture did not specialize its candidate identity.'
+    foreach($member in @('data-final-fixes.lua','control.lua')){
+      $currentText=Get-Content -Raw -LiteralPath (Join-Path $currentFixture $member)
+      Assert-Probe ($currentText.Contains('base ~= "2.1.22"')-and-not$currentText.Contains('base ~= "2.1.20"')-and-not$currentText.Contains('base ~= "2.1.21"')) ('K2 selected fixture retained a different engine guard: '+$member)
+    }
     Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
     # Exercise the Windows checkout that failed hosted CI as well as LF. The
     # actual specializer must produce the same current guard without editing
@@ -893,7 +945,7 @@ try {
     Refuses-Probe {Resolve-K2213LuaHost -RuntimeDirectory (Join-Path $run 'missing-k2-lua-runtime') -PythonExe $luaPython} '[mir-native-probe-k2-lua-runtime-missing]'
     $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $luaRuntime -PythonExe $luaPython
     $luaDiagnostic=Join-Path $run 'k2-version-controls-diagnostic.json'
-    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic
+    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic -SelectedDataSource (Join-Path $currentFixture 'data-final-fixes.lua') -SelectedControlSource (Join-Path $currentFixture 'control.lua') -SelectedEngineVersion $registeredCurrent.engine_versions[0] -SelectedMIRVersion $currentIdentity.distribution_version
     $luaRecord=Get-Content -Raw -LiteralPath $luaResult.diagnostic|ConvertFrom-Json
     Assert-Probe ([int]$luaRecord.exit_code-eq0-and[bool]$luaRecord.success_marker-and[string]$luaRecord.output-match'MIRK2213LuaHostV1') 'K2 retained/current fixture Lua control did not retain its host identity.'
     $luaReject=Join-Path $run 'k2-version-controls-rejected.lua'
