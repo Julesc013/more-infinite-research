@@ -111,14 +111,16 @@ try{
   # Admission waiting is host-only: it repeats the existing governor's exact
   # memory/commit decision before launch and records bounded snapshots without
   # starting a native process or changing its declared reservation.
-  $script:admissionOutcomes=[Collections.Generic.List[object]]::new();$script:admissionCalls=0;$script:admissionSnapshotCalls=0
+  $script:admissionOutcomes=[Collections.Generic.List[object]]::new();$script:admissionCalls=0;$script:admissionSnapshotCalls=0;$script:admissionDelayMilliseconds=0;$script:admissionDelayAtCall=0
   function Assert-MIR441ResourceAdmission {
     param($Policy,$WorkRoot,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes)
     $script:admissionCalls++
+    if($script:admissionDelayMilliseconds -gt 0 -and $script:admissionCalls -ge $script:admissionDelayAtCall){$delay=[int]$script:admissionDelayMilliseconds;$script:admissionDelayMilliseconds=0;Start-Sleep -Milliseconds $delay}
     if($script:admissionOutcomes.Count-eq0){throw '[mir441-resource-admission-memory]'}
     $outcome=$script:admissionOutcomes[0];$script:admissionOutcomes.RemoveAt(0)
-    if($outcome-is[string]){throw $outcome}
-    return $outcome
+    if($outcome -is [scriptblock]){$outcome=& $outcome}
+    if($outcome -is [string]){throw $outcome}
+    return [pscustomobject]@{memory=$outcome.memory;observed_at=$outcome.observed_at}
   }
   function Get-MIR441ResourceSnapshot {
     param($WorkRoot)
@@ -136,6 +138,67 @@ try{
   $script:admissionOutcomes.Add('[mir441-resource-admission-memory]');$script:admissionOutcomes.Add('[mir441-resource-admission-memory]');$capacityTimeoutError='';$capacityTimeoutRecord=$null
   try{Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $root -EstimatedPeakBytes 120MB -ExpectedPeakMemoryBytes 750MB -AdmissionWaitSeconds 1 -Phase 'host-timeout'|Out-Null}catch{$capacityTimeoutError=$_.Exception.Message;$capacityTimeoutRecord=$_.Exception.Data['mir_direct_startup_admission_wait']}
   Assert-DirectStartup ($capacityTimeoutError-ceq'[mir441-resource-admission-memory]'-and$null-ne$capacityTimeoutRecord-and$capacityTimeoutRecord.status-ceq'capacity-timeout'-and$capacityTimeoutRecord.refusal_count-ge2-and$capacityTimeoutRecord.first_refusal.error-ceq'[mir441-resource-admission-memory]'-and$capacityTimeoutRecord.last_refusal.error-ceq'[mir441-resource-admission-memory]') 'admission wait obscured the original exhausted-memory disposition or lost bounded timeout evidence.'
+  # The governor owns both pre-start admissions.  Exercise the real guarded
+  # actor with a controlled admission sequence: first check admits, the
+  # under-lock check refuses, then the same phase deadline admits before one
+  # child starts.  This is deliberately not a retry of a launched process.
+  function Add-DirectAdmissionOutcomes([object[]]$Values){
+    $script:admissionOutcomes.Clear()
+    foreach($value in $Values){$script:admissionOutcomes.Add($value)}
+  }
+  $admitted=[pscustomobject]@{memory=[ordered]@{free_bytes=6GB};observed_at='2026-10-12T00:00:02.0000000+00:00'}
+  $nativePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
+  $nativeBin=(Get-Command pwsh).Source
+  $prelaunchMarker=Join-Path $root 'prelaunch-once.marker'
+  Add-DirectAdmissionOutcomes @($admitted,'[mir441-resource-admission-memory]',$admitted,$admitted,$admitted,$admitted,$admitted,$admitted)
+  $script:admissionDelayMilliseconds=3500
+  # Delay the under-lock check, after the old governor started its watchdog.
+  # Delaying only the first admission would not detect that clock defect.
+  $script:admissionDelayAtCall=$script:admissionCalls+2
+  $prelaunchWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 6 -Phase 'controlled-prelaunch'
+  $prelaunchCommand="[IO.File]::WriteAllText('$prelaunchMarker','started'); Start-Sleep -Milliseconds 600"
+  $prelaunchRun=Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',$prelaunchCommand) -WorkRoot $root -LedgerPath (Join-Path $root 'prelaunch.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 3 -PreStartAdmissionWait $prelaunchWait
+  Assert-DirectStartup ($prelaunchRun.passed-and(Test-Path -LiteralPath $prelaunchMarker)-and$prelaunchWait.status-ceq'admitted-after-wait'-and$prelaunchWait.attempt_count-eq3-and$prelaunchWait.refusal_count-eq1-and$null-ne$prelaunchRun.admission_wait) 'governor did not retain one deadline across admitted/refused/admitted pre-launch checks.'
+  Assert-DirectStartup ($prelaunchWait.elapsed_seconds-ge3.5-and$prelaunchRun.duration_seconds-lt3) 'pre-start delay must exceed the native timeout while the child itself completes within that timeout.'
+  $timeoutMarker=Join-Path $root 'timeout-not-started.marker'
+  Add-DirectAdmissionOutcomes @('[mir441-resource-admission-memory]')
+  $timeoutWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'controlled-timeout';$timeoutStarted=[DateTimeOffset]::UtcNow.AddSeconds(-2);$timeoutWait.started_at=$timeoutStarted.ToString('o');$timeoutWait.deadline_at=$timeoutStarted.AddSeconds(1).ToString('o')
+  $timeoutError=$null;$timeoutAlias=$null
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("[IO.File]::WriteAllText('$timeoutMarker','started')")) -WorkRoot $root -LedgerPath (Join-Path $root 'timeout.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $timeoutWait|Out-Null}catch{$timeoutError=$_.Exception.Message;$timeoutAlias=$_.Exception.Data['mir441_prestart_admission_wait']}
+  Assert-DirectStartup ($timeoutError-ceq'[mir441-resource-admission-wait-timeout]'-and$timeoutAlias-eq$timeoutWait-and$timeoutWait.status-ceq'capacity-timeout'-and-not(Test-Path -LiteralPath $timeoutMarker)) 'governor timeout launched a child or lost its canonical pre-start wait receipt.'
+  $invalidDeadline=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'forged-deadline';$invalidStarted=[DateTimeOffset]::Parse([string]$invalidDeadline.started_at);$invalidDeadline.deadline_at=$invalidStarted.AddSeconds(2).ToString('o');$invalidDeadlineError=''
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot $root -LedgerPath (Join-Path $root 'forged-deadline.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $invalidDeadline|Out-Null}catch{$invalidDeadlineError=$_.Exception.Message}
+  Assert-DirectStartup ($invalidDeadlineError-ceq'[mir441-resource-prestart-wait-state]') 'governor accepted a pre-start wait state whose deadline was extended beyond its admitted budget.'
+  $forgedZero=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 0 -Phase 'forged-zero';$forgedZeroError=''
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command','exit 0') -WorkRoot $root -LedgerPath (Join-Path $root 'forged-zero.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $forgedZero|Out-Null}catch{$forgedZeroError=$_.Exception.Message}
+  Assert-DirectStartup ($forgedZeroError-ceq'[mir441-resource-prestart-wait-state]') 'governor accepted a zero-second pre-start wait state and bypassed its admission guards.'
+  $diskMarker=Join-Path $root 'disk-not-started.marker'
+  Add-DirectAdmissionOutcomes @('[mir441-resource-admission-system-disk]')
+  $diskWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'controlled-disk';$diskError=''
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("[IO.File]::WriteAllText('$diskMarker','started')")) -WorkRoot $root -LedgerPath (Join-Path $root 'disk.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $diskWait|Out-Null}catch{$diskError=$_.Exception.Message}
+  Assert-DirectStartup ($diskError-ceq'[mir441-resource-admission-system-disk]'-and$diskWait.attempt_count-eq1-and-not(Test-Path -LiteralPath $diskMarker)) 'governor retried a non-memory pre-start refusal or launched a child.'
+  $defaultMarker=Join-Path $root 'default-once.marker'
+  Add-DirectAdmissionOutcomes @($admitted,$admitted,$admitted,$admitted,$admitted,$admitted,$admitted,$admitted)
+  $defaultRun=Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("[IO.File]::WriteAllText('$defaultMarker','started')")) -WorkRoot $root -LedgerPath (Join-Path $root 'default.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5
+  Assert-DirectStartup ($defaultRun.passed-and(Test-Path -LiteralPath $defaultMarker)-and$null-eq$defaultRun.PSObject.Properties['admission_wait']) 'default governed actor changed its immediate-admission result shape or launch behavior.'
+  $postlaunchMarker=Join-Path $root 'postlaunch-once.marker'
+  # Process.Start does not guarantee the child has executed its first statement.
+  # Synchronize this synthetic post-launch refusal with a real child signal;
+  # otherwise the governor can correctly stop a slow-starting child before it
+  # writes the marker, and the test incorrectly reports that it was retried.
+  $postlaunchRefusal={
+    $deadline=[DateTimeOffset]::UtcNow.AddSeconds(5)
+    while(-not(Test-Path -LiteralPath $postlaunchMarker)){
+      if([DateTimeOffset]::UtcNow -ge $deadline){throw '[direct-startup-controlled-child-signal-timeout]'}
+      Start-Sleep -Milliseconds 10
+    }
+    '[mir441-resource-admission-memory]'
+  }.GetNewClosure()
+  Add-DirectAdmissionOutcomes @($admitted,$admitted,$postlaunchRefusal)
+  $postlaunchWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'controlled-postlaunch';$postlaunchError=''
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("Start-Sleep -Milliseconds 300; [IO.File]::AppendAllText('$postlaunchMarker','started'); Start-Sleep -Seconds 3")) -WorkRoot $root -LedgerPath (Join-Path $root 'postlaunch.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $postlaunchWait|Out-Null}catch{$postlaunchError=$_.Exception.Message}
+  Assert-DirectStartup ($postlaunchError-ceq'[mir441-resource-admission-memory]'-and(Test-Path -LiteralPath $postlaunchMarker)) 'controlled post-launch refusal did not observe its real child start signal.'
+  Assert-DirectStartup (([IO.File]::ReadAllText($postlaunchMarker)-ceq'started')-and$postlaunchWait.attempt_count-eq2-and$postlaunchWait.refusal_count-eq0-and$script:admissionOutcomes.Count-eq0) 'governor retried after a post-launch admission error.'
   # Exercise the graphical diagnostic's narrow launch shape without starting
   # Factorio. The native process, library transaction and loaded-selection
   # actor are replaced only inside this host control.

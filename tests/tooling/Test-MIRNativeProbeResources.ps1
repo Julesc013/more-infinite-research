@@ -43,7 +43,9 @@ function Invoke-K2213LuaVersionControls {
     [string]$SelectedDataSource='',
     [string]$SelectedControlSource='',
     [string]$SelectedEngineVersion='',
-    [string]$SelectedMIRVersion=''
+    [string]$SelectedMIRVersion='',
+    [string]$SelectedK2Version='',
+    [string]$SelectedK2SOVersion=''
   )
   $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $RuntimeDirectory -PythonExe $PythonExe
   $control=Join-Path $WorkRoot 'k2-version-controls.py'
@@ -64,11 +66,13 @@ try:
     globals_.MIR_K2_CONTROL_SOURCE = Path(sys.argv[3]).read_text(encoding='utf-8')
     globals_.MIR_K2_DATA_SOURCE_440 = Path(sys.argv[4]).read_text(encoding='utf-8')
     globals_.MIR_K2_CONTROL_SOURCE_440 = Path(sys.argv[5]).read_text(encoding='utf-8')
-    if len(sys.argv) == 11 and sys.argv[7]:
+    if len(sys.argv) == 13 and sys.argv[7]:
         globals_.MIR_K2_SELECTED_DATA_SOURCE = Path(sys.argv[7]).read_text(encoding='utf-8')
         globals_.MIR_K2_SELECTED_CONTROL_SOURCE = Path(sys.argv[8]).read_text(encoding='utf-8')
         globals_.MIR_K2_SELECTED_ENGINE = sys.argv[9]
         globals_.MIR_K2_SELECTED_MIR = sys.argv[10]
+        globals_.MIR_K2_SELECTED_K2 = sys.argv[11]
+        globals_.MIR_K2_SELECTED_K2SO = sys.argv[12]
     runtime.execute(Path(sys.argv[6]).read_text(encoding='utf-8'))
 except Exception as exc:
     print(json.dumps({"kind": "MIRK2213LuaHostV1", "status": "failed", "python": sys.version,
@@ -77,7 +81,10 @@ except Exception as exc:
 '@
   [IO.File]::WriteAllText($control,$source,[Text.UTF8Encoding]::new($false))
   $luaArguments=@($control,$luaHost.runtime,$DataSource,$ControlSource,$CurrentDataSource,$CurrentControlSource,$VersionControlSource)
-  if($SelectedDataSource){$luaArguments+=@($SelectedDataSource,$SelectedControlSource,$SelectedEngineVersion,$SelectedMIRVersion)}
+  if($SelectedDataSource){
+    foreach($selected in @($SelectedControlSource,$SelectedEngineVersion,$SelectedMIRVersion,$SelectedK2Version,$SelectedK2SOVersion)){if([string]::IsNullOrWhiteSpace($selected)){throw '[mir-native-probe-k2-lua-selected-input] incomplete selected K2 version control input'}}
+    $luaArguments+=@($SelectedDataSource,$SelectedControlSource,$SelectedEngineVersion,$SelectedMIRVersion,$SelectedK2Version,$SelectedK2SOVersion)
+  }
   $output=@(& $luaHost.python @luaArguments 2>&1)
   $exitCode=$LASTEXITCODE
   $text=(@($output|ForEach-Object {[string]$_})-join"`n")
@@ -700,7 +707,7 @@ try {
     $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
     $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
     Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
-    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213CurrentFixtureRegistration','Get-K2213SelectedFixtureProfile','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs','Get-K2213FixtureEnvelope')) {
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213CurrentFixtureRegistration','Get-K2213SelectedFixtureProfile','Get-K2213ProfileExternalDependencies','Get-K2213ExpectedDependencies','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs','Get-K2213FixtureEnvelope','Invoke-K2213NativeActor')) {
       $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
       Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
       . ([scriptblock]::Create($function[0].Extent.Text))
@@ -718,7 +725,7 @@ try {
       Refuses-Probe {& $bindWait -AdmissionWaitSeconds -1} 'AdmissionWaitSeconds'
       Refuses-Probe {& $bindWait -AdmissionWaitSeconds 301} 'AdmissionWaitSeconds'
       $blocks=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.IfStatementAst]-and$node.Extent.Text.Contains('Wait-MIRDirectLibraryStartupAdmission',[StringComparison]::Ordinal)},$true)|Sort-Object {$_.Extent.StartOffset})
-      Assert-Probe ($blocks.Count-eq4) 'K2 must wait only before resource context, version, create and reload.'
+      Assert-Probe ($blocks.Count-eq1) 'K2 must retain only its resource-context snapshot wait; native admission belongs to the actual guarded actor.'
       $calls=[Collections.Generic.List[object]]::new()
       $admissionWaits=[Collections.Generic.List[object]]::new()
       $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=2048;$MaxNewOutputMiB=120;$outputRootFull=$run
@@ -732,25 +739,36 @@ try {
         [pscustomobject]@{phase=$Phase;status='admitted-without-wait';attempt_count=1}
       }
       foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
-      Assert-Probe (($calls.phase-join'|')-ceq'resource-context|engine-version|create|reload'-and$admissionWaits.Count-eq4) 'K2 changed wait order or discarded bounded decisions.'
+      Assert-Probe (($calls.phase-join'|')-ceq'resource-context'-and$admissionWaits.Count-eq1) 'K2 changed resource-context admission or discarded its decision.'
       foreach($call in $calls){
         Assert-Probe ($call.policy.minimum_free_ram_gib-eq4-and$call.root-ceq$run-and$call.peak-eq2GB-and$call.seconds-eq45) 'K2 changed the governor reserve, declared peak, path, or wait bound.'
       }
-      Assert-Probe ($calls[0].output-eq120MB-and@($calls|Select-Object -Skip 1|Where-Object output -ne 117MB).Count-eq0) 'K2 did not retain initial/remaining output budgets.'
+      Assert-Probe ($calls[0].output-eq120MB) 'K2 did not retain its initial output budget.'
+      $actorDefinition=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-K2213NativeActor'},$false))
+      Assert-Probe ($actorDefinition.Count-eq1) 'K2 actual native admission adapter is absent.'
+      . ([scriptblock]::Create($actorDefinition[0].Extent.Text))
+      $actorCalls=[Collections.Generic.List[object]]::new()
+      function Invoke-MIRNativeProbeFactorioProcess {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds,$AdmissionWaitSeconds=0,$AdmissionPhase='')
+        $actorCalls.Add([ordered]@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds;seconds=$AdmissionWaitSeconds;phase=$AdmissionPhase;wait_bound=$PSBoundParameters.ContainsKey('AdmissionWaitSeconds');phase_bound=$PSBoundParameters.ContainsKey('AdmissionPhase')})
+        [pscustomobject]@{admission_wait=[pscustomobject]@{phase=$AdmissionPhase;status='admitted-after-wait';attempt_count=2;refusal_count=1}}
+      }
+      foreach($phase in @('engine-version','create','reload')){$null=Invoke-K2213NativeActor -Phase $phase -FactorioBin 'controlled-factorio' -Arguments @('--version') -TimeoutSeconds 30}
+      Assert-Probe (($actorCalls.phase-join'|')-ceq'engine-version|create|reload'-and$admissionWaits.Count-eq4) 'K2 did not retain actual actor admission order.'
+      foreach($call in $actorCalls){Assert-Probe ([object]::ReferenceEquals($call.context,$resources)-and$call.seconds-eq45-and$call.wait_bound-and$call.phase_bound-and$call.path-ceq'controlled-factorio'-and$call.timeout-eq30) 'K2 actual actor changed its context, bounds, executable or timeout.'}
       $successTable=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.HashtableAst]-and$node.Extent.Text.Contains('resource_runs=$resources.runs.ToArray();',[StringComparison]::Ordinal)},$true))
       Assert-Probe ($successTable.Count-eq1) 'K2 success receipt owner is absent.'
       $waitValue=@($successTable[0].KeyValuePairs|Where-Object {$_.Item1.SafeGetValue()-ceq'admission_waits'})
       Assert-Probe ($waitValue.Count-eq1) 'K2 success receipt dropped bounded decisions.'
       $successWaits=@(& ([scriptblock]::Create($waitValue[0].Item2.Extent.Text)))
       Assert-Probe (($successWaits.phase-join'|')-ceq($admissionWaits.phase-join'|')) 'K2 success receipt altered wait order.'
-      foreach($phase in @(@('resource-context','New-MIRNativeProbeResourceContext'),@('engine-version','Invoke-MIRNativeProbeFactorioProcess'),@('create','Invoke-MIRFactorioLoadCheck'),@('reload','Invoke-MIRFactorioReloadContract'))){
-        $wait=@($blocks|Where-Object {$_.Extent.Text.Contains("-Phase '"+$phase[0]+"'",[StringComparison]::Ordinal)})
-        $actor=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq$phase[1]-and$node.Extent.StartOffset-gt$blocks[0].Extent.StartOffset},$true))
-        Assert-Probe ($wait.Count-eq1-and$actor.Count-eq1-and$wait[0].Extent.EndOffset-lt$actor[0].Extent.StartOffset) ('K2 wait is not before its guarded actor: '+$phase[0])
-      }
+      $contextActor=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'New-MIRNativeProbeResourceContext'},$true))
+      Assert-Probe ($contextActor.Count-eq1-and$blocks[0].Extent.EndOffset-lt$contextActor[0].Extent.StartOffset) 'K2 resource wait is not before its context.'
       $calls.Clear();$admissionWaits.Clear();$AdmissionWaitSeconds=0
       foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
       Assert-Probe ($calls.Count-eq0-and$admissionWaits.Count-eq0) 'K2 default zero wait added capacity probes or records.'
+      $actorCalls.Clear();$null=Invoke-K2213NativeActor -Phase 'engine-version' -FactorioBin 'controlled-factorio' -Arguments @('--version') -TimeoutSeconds 30
+      Assert-Probe ($actorCalls.Count-eq1-and-not$actorCalls[0].wait_bound-and-not$actorCalls[0].phase_bound-and$admissionWaits.Count-eq0) 'K2 default actor passed optional wait arguments or manufactured a wait receipt.'
       $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=0
       & ([scriptblock]::Create($blocks[0].Extent.Text))
       Assert-Probe ($calls.Count-eq0) 'K2 waited instead of retaining the required-peak refusal.'
@@ -940,7 +958,7 @@ try {
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
     $registeredCurrent=Read-K2213CurrentFixtureRegistration
     $currentIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion '4.7.0'
-    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.7'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/engine identity.'
+    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.8'-and$registeredCurrent.input_profile-ceq'fixtures/run-profiles/k2-214-imersite-f210-470.json'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/profile/engine identity.'
     $registrationPath=Join-Path $run 'controlled-k2-registration.yml'
     $registeredText=[IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
     $entry=[regex]::Match($registeredText,'(?ms)^  k2-213-imersite-continuation:\s*\r?\n.*?(?=^  [A-Za-z0-9][A-Za-z0-9_-]*:\s*\r?\n|\z)').Value
@@ -953,13 +971,61 @@ try {
     Refuses-Probe {Read-K2213CurrentFixtureRegistration -Path $registrationPath} 'registered-fixture-current-field:current_engine_version'
     Refuses-Probe {Get-K2213SelectedFixtureProfile -SourceVersion '4.7.1'} 'registered-fixture-current-candidate'
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.7.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
-    $portable.engine_version='2.1.22'
-    foreach($mod in $portable.mods[0..4]){$mod.version='2.1.22'}
-    $portable.mods[6].version=$currentIdentity.distribution_version;$portable.mods[7].version=$registeredCurrent.fixture_version;Save-ControlledK2Profile
-    $currentBound=Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.7.0'
-    Assert-Probe ($currentBound.profile.engine_version-ceq'2.1.22'-and$currentBound.inputs[0].source_path-ceq$dependency) 'K2 current source did not use its exact registered engine and existing archive.'
-    $portable.engine_version='2.1.21';Save-ControlledK2Profile
-    Refuses-Probe {Read-K2213ProfileInputs -Path $portablePath -ExpectedDependencies $expected -Libraries @($flat) -SourceVersion '4.7.0'} 'input-profile-engine-version'
+    # Current inputs come only from the registered .1.8 profile.  Build a tiny
+    # exact closure so this checks the runner reader without acquiring or
+    # launching any real archive.
+    $currentExpected=Get-K2213ExpectedDependencies -SourceVersion '4.7.0'
+    Assert-Probe ($currentExpected.Count-eq7-and$currentExpected.Keys-contains'Krastorio2_2.1.4.zip'-and$currentExpected['Krastorio2_2.1.4.zip'][1]-ceq'2.1.4'-and$currentExpected.Keys-contains'Krastorio2-spaced-out_2.0.19.zip'-and$currentExpected['Krastorio2-spaced-out_2.0.19.zip'][1]-ceq'2.0.19'-and-not($currentExpected.Keys-contains'Krastorio2_2.1.3.zip')-and-not($currentExpected.Keys-contains'Krastorio2-spaced-out_2.0.13.zip')) 'K2 current profile did not derive its complete new upstream closure.'
+    Assert-Probe (($registeredCurrent.external_dependencies.Keys-join'|')-ceq($currentExpected.Keys-join'|')) 'K2 registered current external archive map differs from the selected profile.'
+    $currentFlat=Join-Path $run 'current-flat-library';New-Item -ItemType Directory -Path $currentFlat|Out-Null
+    foreach($fileName in $currentExpected.Keys){
+      $identity=$currentExpected[$fileName]
+      $archive=Join-Path $currentFlat $fileName
+      $zip=[IO.Compression.ZipFile]::Open($archive,[IO.Compression.ZipArchiveMode]::Create)
+      try{
+        $stream=[IO.StreamWriter]::new($zip.CreateEntry(($identity[0]+'_'+$identity[1]+'/info.json')).Open())
+        try{$stream.Write(('{"name":"'+$identity[0]+'","version":"'+$identity[1]+'","factorio_version":"2.1"}'))}finally{$stream.Dispose()}
+      }finally{$zip.Dispose()}
+    }
+    $currentPortablePath=Join-Path $run 'current-portable-inputs.json'
+    $currentPortable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.22';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=[ordered]@{}}
+    foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$currentPortable.mods+=@{name=$name;version='2.1.22';enabled=$true}}
+    foreach($fileName in $currentExpected.Keys){
+      $identity=$currentExpected[$fileName]
+      $currentPortable.mods+=@{name=$identity[0];version=$identity[1];enabled=$true}
+      $currentPortable.archive_sha256[$fileName]=Get-K2213Sha256 (Join-Path $currentFlat $fileName)
+    }
+    $currentPortable.mods+=@(@{name='more-infinite-research';version=$currentIdentity.distribution_version;enabled=$true},@{name='mir-fixture-assert-k2-213-imersite-continuation';version=$registeredCurrent.fixture_version;enabled=$true})
+    function Save-ControlledCurrentK2Profile {$currentPortable|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $currentPortablePath}
+    Save-ControlledCurrentK2Profile
+    $currentK2Row=@($currentPortable.mods|Where-Object {$_.name-ceq'Krastorio2'})[0]
+    $currentK2Row.enabled='false';Save-ControlledCurrentK2Profile
+    Refuses-Probe {Get-K2213ProfileExternalDependencies -Profile (Get-Content -Raw -LiteralPath $currentPortablePath|ConvertFrom-Json) -Code 'controlled-current-profile'} 'controlled-current-profile-mod-enabled:Krastorio2'
+    $currentK2Row.enabled=$true;Save-ControlledCurrentK2Profile
+    $currentBound=Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'
+    Assert-Probe ($currentBound.profile.engine_version-ceq'2.1.22'-and$currentBound.inputs.Count-eq7-and$currentBound.inputs[0].identity.name-ceq'flib'-and$currentBound.inputs[-1].identity.name-ceq'xy-k2so-enhancements-nulls-fork') 'K2 current source did not retain its exact registered engine or complete archive closure.'
+    $currentPortable.archive_sha256['Krastorio2_2.1.4.zip']='0'*64;Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'dependency-hash'
+    $currentPortable.archive_sha256['Krastorio2_2.1.4.zip']=Get-K2213Sha256 (Join-Path $currentFlat 'Krastorio2_2.1.4.zip');$currentPortable.archive_sha256.Remove('Krastorio2-spaced-out_2.0.19.zip');Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'input-profile-archive-count'
+    $currentPortable.archive_sha256['Krastorio2-spaced-out_2.0.19.zip']=Get-K2213Sha256 (Join-Path $currentFlat 'Krastorio2-spaced-out_2.0.19.zip');$currentPortable.archive_sha256['unexpected.zip']='C'*64;Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'input-profile-archive-count'
+    $currentPortable.archive_sha256.Remove('unexpected.zip');$currentK2Row.version='2.1.3';Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'input-profile-selection:Krastorio2'
+    $currentK2Row.version='2.1.4';$currentPortable.mods+=@{name='unexpected-current-input';version='1.0.0';enabled=$true};Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'input-profile-selection-count'
+    $currentPortable.mods=@($currentPortable.mods|Where-Object {$_.name-cne'unexpected-current-input'})
+    $k2Archive=Join-Path $currentFlat 'Krastorio2_2.1.4.zip';Remove-Item -LiteralPath $k2Archive
+    $zip=[IO.Compression.ZipFile]::Open($k2Archive,[IO.Compression.ZipArchiveMode]::Create)
+    try{
+      $stream=[IO.StreamWriter]::new($zip.CreateEntry('Krastorio2_2.1.4/info.json').Open())
+      try{$stream.Write('{"name":"Krastorio2","version":"2.1.3","factorio_version":"2.1"}')}finally{$stream.Dispose()}
+    }finally{$zip.Dispose()}
+    $currentPortable.archive_sha256['Krastorio2_2.1.4.zip']=Get-K2213Sha256 $k2Archive;Save-ControlledCurrentK2Profile
+    Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'archive-version:Krastorio2'
+    # Do not repurpose the current profile: retained cases continue with their
+    # original engine, candidate and fixture selection.
+    $portable.engine_version='2.1.21'
     foreach($mod in $portable.mods[0..4]){$mod.version='2.1.21'}
     $portable.mods[6].version='4.2.21001';$portable.mods[7].version='0.1.4';Save-ControlledK2Profile
     $fixtureTemplate=Join-Path $repo 'fixtures/assert-k2-213-imersite-continuation'
@@ -980,10 +1046,11 @@ try {
     Assert-Probe ((New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.2.2' -SelectedMIRVersion '4.2.21002') -ceq $fixtureTemplate) 'K2 historical fixture bytes were not retained.'
     $currentFixture=New-K2213SelectedFixture -Source $fixtureTemplate -Run (Join-Path $run 'current-k2-registered-fixture') -SourceVersion '4.7.0' -SelectedMIRVersion $currentIdentity.distribution_version
     $currentInfo=Get-Content -Raw -LiteralPath (Join-Path $currentFixture 'info.json')|ConvertFrom-Json
-    Assert-Probe ($currentInfo.version-ceq$registeredCurrent.fixture_version-and@($currentInfo.dependencies)-contains('more-infinite-research = '+$currentIdentity.distribution_version)) 'K2 registered fixture did not specialize its candidate identity.'
+    Assert-Probe ($currentInfo.version-ceq$registeredCurrent.fixture_version-and@($currentInfo.dependencies)-contains('more-infinite-research = '+$currentIdentity.distribution_version)-and@($currentInfo.dependencies)-contains'Krastorio2 = 2.1.4'-and@($currentInfo.dependencies)-contains'Krastorio2-spaced-out = 2.0.19') 'K2 registered fixture did not specialize its candidate or new upstream identities.'
     foreach($member in @('data-final-fixes.lua','control.lua')){
       $currentText=Get-Content -Raw -LiteralPath (Join-Path $currentFixture $member)
       Assert-Probe ($currentText.Contains('base ~= "2.1.22"')-and-not$currentText.Contains('base ~= "2.1.20"')-and-not$currentText.Contains('base ~= "2.1.21"')) ('K2 selected fixture retained a different engine guard: '+$member)
+      Assert-Probe ($currentText.Contains('Krastorio2 = "2.1.4"')-and$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.19"')-and-not$currentText.Contains('Krastorio2 = "2.1.3"')-and-not$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.13"')) ('K2 selected fixture retained a historical upstream guard: '+$member)
     }
     Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
     # Exercise the Windows checkout that failed hosted CI as well as LF. The
@@ -1019,9 +1086,12 @@ try {
     Refuses-Probe {Resolve-K2213LuaHost -RuntimeDirectory (Join-Path $run 'missing-k2-lua-runtime') -PythonExe $luaPython} '[mir-native-probe-k2-lua-runtime-missing]'
     $luaHost=Resolve-K2213LuaHost -RuntimeDirectory $luaRuntime -PythonExe $luaPython
     $luaDiagnostic=Join-Path $run 'k2-version-controls-diagnostic.json'
-    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic -SelectedDataSource (Join-Path $currentFixture 'data-final-fixes.lua') -SelectedControlSource (Join-Path $currentFixture 'control.lua') -SelectedEngineVersion $registeredCurrent.engine_versions[0] -SelectedMIRVersion $currentIdentity.distribution_version
+    # The immutable fixture remains byte-for-byte retained. The existing Lua
+    # host receives the selected current tuple and probes its positive guard
+    # plus adjacent K2 and K2SO refusal paths.
+    $luaResult=Invoke-K2213LuaVersionControls -RuntimeDirectory $luaHost.runtime -PythonExe $luaHost.python -DataSource (Join-Path $fixtureTemplate 'data-final-fixes.lua') -ControlSource (Join-Path $fixtureTemplate 'control.lua') -CurrentDataSource (Join-Path $selectedFixture 'data-final-fixes.lua') -CurrentControlSource (Join-Path $selectedFixture 'control.lua') -VersionControlSource (Join-Path $repo 'tests/runtime/k2_imersite_version_controls.lua') -WorkRoot $run -DiagnosticPath $luaDiagnostic -SelectedDataSource (Join-Path $currentFixture 'data-final-fixes.lua') -SelectedControlSource (Join-Path $currentFixture 'control.lua') -SelectedEngineVersion $registeredCurrent.engine_versions[0] -SelectedMIRVersion $currentIdentity.distribution_version -SelectedK2Version $registeredCurrent.external_versions['Krastorio2'] -SelectedK2SOVersion $registeredCurrent.external_versions['Krastorio2-spaced-out']
     $luaRecord=Get-Content -Raw -LiteralPath $luaResult.diagnostic|ConvertFrom-Json
-    Assert-Probe ([int]$luaRecord.exit_code-eq0-and[bool]$luaRecord.success_marker-and[string]$luaRecord.output-match'MIRK2213LuaHostV1') 'K2 retained/current fixture Lua control did not retain its host identity.'
+    Assert-Probe ([int]$luaRecord.exit_code-eq0-and[bool]$luaRecord.success_marker-and[string]$luaRecord.output-match'MIRK2213LuaHostV1') 'K2 retained fixture Lua control did not retain its host identity.'
     $luaReject=Join-Path $run 'k2-version-controls-rejected.lua'
     [IO.File]::WriteAllText($luaReject,"error('MIR-K2-DIAGNOSTIC-OPPOSING')`n",[Text.UTF8Encoding]::new($false))
     $luaRejectDiagnostic=Join-Path $run 'k2-version-controls-rejected-diagnostic.json'
@@ -1106,10 +1176,11 @@ try {
     Refuses-Probe {Invoke-TinGovernedEngine -Scenario wrong-library -Arguments $wrongPathArgs -TimeoutSeconds 240} 'mir-library-launch-directory'
     Assert-Probe ($calls.Count-eq$beforeWrongPath-and-not(Test-Path -LiteralPath (Join-Path $run 'obsolete-mods'))) 'Tin ran or staged after an obsolete library path.'
     $calls.Clear();$budgets=[Collections.Generic.List[object]]::new()
+    $AdmissionWaitSeconds=45;$admissionWaits=[Collections.Generic.List[object]]::new()
     function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
     function Invoke-MIRNativeProbeFactorioProcess {
-      param($Context,$FilePath,$Arguments,$TimeoutSeconds)
-      $calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      param($Context,$FilePath,$Arguments,$TimeoutSeconds,$AdmissionWaitSeconds=0,$AdmissionPhase='')
+      $calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds;seconds=$AdmissionWaitSeconds;phase=$AdmissionPhase})
       if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'}
       $index=[Array]::IndexOf($Arguments,'--create')
       if($index-ge0){[IO.File]::WriteAllText($Arguments[$index+1],'controlled save; not Factorio data');$marker='initial'}else{$marker='reload'}
@@ -1117,11 +1188,12 @@ try {
       $lines+=('0.2 Script @__controlled-k2__/data-final-fixes.lua:1: [MIR_ACTIVE_MODS] '+(@($activation.selected|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'))
       $lines+=('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42')
       [IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),$lines)
-      [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
+      [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;admission_wait=[pscustomobject]@{phase=$AdmissionPhase;status='admitted-after-wait';refusal_count=1};result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
     }
     $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation -ActiveModsObserver controlled-k2
     $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation -ActiveModsObserver controlled-k2
     Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
+    Assert-Probe (($calls.phase-join'|')-ceq'create|reload'-and@($calls|Where-Object seconds -ne 45).Count-eq0-and($admissionWaits.phase-join'|')-ceq'create|reload') 'K2 actual create/reload actors lost bounded admission or its receipts.'
     Assert-Probe ($calls[0].context.controlled-and$calls[1].context.controlled-and$calls[0].path-ceq$controlledEngine-and$calls[0].timeout-eq90-and$calls[1].timeout-eq90) 'K2 collector lost actor/context/timeout identity.'
     Assert-Probe ('--create'-in$calls[0].arguments-and'--benchmark'-in$calls[1].arguments-and'--benchmark-sanitize'-in$calls[1].arguments-and$reload.reloads[0].save_byte_identical) 'K2 native create/reload arguments or saved-state custody changed.'
     Assert-Probe ($create.stderr_sha256-ceq'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'-and$reload.reloads[0].reload_log_contract_passed) 'K2 collector lost stderr or exact reload-marker checks.'

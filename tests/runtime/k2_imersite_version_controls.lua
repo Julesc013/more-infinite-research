@@ -4,8 +4,8 @@ local checks = 0
 local function effect(recipe, change)
   return {type="change-recipe-productivity", recipe=recipe, change=change}
 end
-local function probe(base, mir, k2, accepted, wrong_effect, data_source, control_source)
-  local mods = {base=base, Krastorio2=k2, ["Krastorio2-spaced-out"]="2.0.13",
+local function probe(base, mir, k2, accepted, wrong_effect, data_source, control_source, k2so)
+  local mods = {base=base, Krastorio2=k2, ["Krastorio2-spaced-out"]=k2so or "2.0.13",
     ["more-infinite-research"]=mir}
   local env = setmetatable({mods=mods, log=function() end}, {__index=_G})
   env.data = {raw={technology={
@@ -51,14 +51,16 @@ probe("2.1.22", "4.4.21000", "2.1.3", false, false, MIR_K2_DATA_SOURCE_440, MIR_
 if MIR_K2_SELECTED_DATA_SOURCE then
   local data_source, control_source = MIR_K2_SELECTED_DATA_SOURCE, MIR_K2_SELECTED_CONTROL_SOURCE
   local engine, mir = MIR_K2_SELECTED_ENGINE, MIR_K2_SELECTED_MIR
+  local k2, k2so = MIR_K2_SELECTED_K2, MIR_K2_SELECTED_K2SO
   local engine_prefix, engine_patch = string.match(engine, "^(%d+%.%d+%.)(%d+)$")
   local mir_prefix, mir_patch = string.match(mir, "^(%d+%.%d+%.)(%d+)$")
-  assert(engine_prefix and mir_prefix, "selected exact version inputs")
-  probe(engine, mir, "2.1.3", true, false, data_source, control_source)
-  probe(engine, mir, "2.1.3", true, true, data_source, control_source)
-  probe(engine, mir, "2.1.2", false, false, data_source, control_source)
-  probe(engine_prefix .. tostring(tonumber(engine_patch) + 1), mir, "2.1.3", false, false, data_source, control_source)
-  probe(engine_prefix .. tostring(tonumber(engine_patch) - 1), mir, "2.1.3", false, false, data_source, control_source)
-  probe(engine, mir_prefix .. tostring(tonumber(mir_patch) + 1), "2.1.3", false, false, data_source, control_source)
+  assert(engine_prefix and mir_prefix and type(k2) == "string" and type(k2so) == "string", "selected exact version inputs")
+  probe(engine, mir, k2, true, false, data_source, control_source, k2so)
+  probe(engine, mir, k2, true, true, data_source, control_source, k2so)
+  probe(engine, mir, "2.1.3", false, false, data_source, control_source, k2so)
+  probe(engine, mir, k2, false, false, data_source, control_source, "2.0.13")
+  probe(engine_prefix .. tostring(tonumber(engine_patch) + 1), mir, k2, false, false, data_source, control_source, k2so)
+  probe(engine_prefix .. tostring(tonumber(engine_patch) - 1), mir, k2, false, false, data_source, control_source, k2so)
+  probe(engine, mir_prefix .. tostring(tonumber(mir_patch) + 1), k2, false, false, data_source, control_source, k2so)
 end
 print("MIR-K2-VERSION-CONTROLS-PASS " .. checks .. " (host only)")

@@ -14,6 +14,12 @@ local M = {
   v4_policy_id = "K2SciencePhasePolicyV4",
   v5_policy_id = "K2SciencePhasePolicyV5",
   v6_policy_id = "K2SciencePhasePolicyV6",
+  v7_policy_id = "K2SciencePhasePolicyV7",
+  v7_applicability = {
+    base = "2.1.22",
+    Krastorio2 = "2.1.4",
+    ["Krastorio2-spaced-out"] = "2.0.19"
+  },
   v6_applicability = {
     base = "2.1.22",
     Krastorio2 = "2.1.3",
@@ -74,15 +80,19 @@ end
 -- declared successor contract. Historical decision identities remain intact;
 -- an unobserved engine or overhaul revision does not inherit admission.
 local SUCCESSOR_POLICIES = {
-  [M.v3_applicability.base] = {id = M.v3_policy_id, versions = M.v3_applicability},
-  [M.v5_applicability.base] = {id = M.v5_policy_id, versions = M.v5_applicability},
-  [M.v6_applicability.base] = {id = M.v6_policy_id, versions = M.v6_applicability}
+  [M.v3_applicability.base] = {{id = M.v3_policy_id, versions = M.v3_applicability}},
+  [M.v5_applicability.base] = {{id = M.v5_policy_id, versions = M.v5_applicability}},
+  [M.v6_applicability.base] = {
+    {id = M.v6_policy_id, versions = M.v6_applicability},
+    {id = M.v7_policy_id, versions = M.v7_applicability}
+  }
 }
 
 local function matching_successor(active_mods)
-  local selected = SUCCESSOR_POLICIES[(active_mods or {}).base]
-  if selected and matches_exact_tuple(active_mods, selected.versions) then
-    return selected.id, selected.versions
+  for _, selected in ipairs(SUCCESSOR_POLICIES[(active_mods or {}).base] or {}) do
+    if matches_exact_tuple(active_mods, selected.versions) then
+      return selected.id, selected.versions
+    end
   end
   return nil, nil
 end

@@ -516,6 +516,23 @@ for _, tuple in ipairs({
   check(load_streams_for(tuple).research_material_imersite.staged_progression == nil,
     "2.1.22 continuation does not admit a changed overhaul contract")
 end
+local compatible_streams = load_streams_for({
+  base="2.1.22", Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19"
+})
+local compatible_imersite = compatible_streams.research_material_imersite.staged_progression
+check(progression.validate("research_material_imersite", compatible_imersite)
+    and compatible_imersite.continuation.technology_name == exact_imersite.continuation.technology_name
+    and compatible_imersite.legacy.last_level == 3,
+  "the engine-compatible upstream releases retain finite powder levels and the same level-four continuation")
+for _, tuple in ipairs({
+  {base="2.1.23", Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.19"},
+  {base="2.1.22", Krastorio2="2.1.5", ["Krastorio2-spaced-out"]="2.0.19"},
+  {base="2.1.22", Krastorio2="2.1.4", ["Krastorio2-spaced-out"]="2.0.20"},
+  {base="2.1.22", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.19"}
+}) do
+  check(load_streams_for(tuple).research_material_imersite.staged_progression == nil,
+    "the compatible declaration cannot admit mixed or unobserved upstream contracts")
+end
 mods = prior_mods
 
 local function effect(recipe, change)

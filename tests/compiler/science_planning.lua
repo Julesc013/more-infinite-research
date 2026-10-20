@@ -179,6 +179,28 @@ for _, tuple in ipairs({
   check('V603',not k2.imersite_continuation_applies(tuple) and not refused.applicable
     and names(unchanged)==names(v3_original),'Unobserved engines/mods cannot select either successor consumer')
 end
+local active_mods_v7={base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'}
+local v7_normalized,v7_decision=k2.normalize(v3_original,active_mods_v7)
+check('V701',v7_decision.policy_id=='K2SciencePhasePolicyV7' and v7_decision.applicable
+  and v7_decision.exact_versions.Krastorio2=='2.1.4'
+  and v7_decision.exact_versions['Krastorio2-spaced-out']=='2.0.19'
+  and k2.imersite_continuation_applies(active_mods_v7),
+  'The upstream 2.1.22 compatibility releases share one science and continuation admission')
+check('V702',names(v7_normalized)==names(v6_normalized) and v7_normalized[1].amount==3
+  and v7_normalized[2].amount==7
+  and table.concat(v7_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and #v3_original==3 and v3_original[1].amount==2,
+  'The compatible upstream releases retain phase retirement, late triggers, amounts and input isolation')
+for _, tuple in ipairs({
+  {base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.22',Krastorio2='2.1.5',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.20'},
+  {base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.19'}
+}) do
+  local unchanged,refused=k2.normalize(v3_original,tuple)
+  check('V703',not k2.imersite_continuation_applies(tuple) and not refused.applicable
+    and names(unchanged)==names(v3_original),'Mixed or unobserved upstream contracts remain unadmitted')
+end
 roles={{role='exclude',pack='automation-science-pack'}}
 local spec={science_packs={'automation-science-pack','utility-science-pack'}}
 local selected=selector.pick_science_for_stream(spec,'audit_stream')

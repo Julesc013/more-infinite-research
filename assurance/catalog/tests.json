@@ -1936,6 +1936,7 @@
         "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1"
       ],
@@ -2094,6 +2095,7 @@
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/run-profiles/k2-213-imersite-f210-460.json",
         "fixtures/run-profiles/k2-213-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470.json",
         "fixtures/assert-k2-213-imersite-continuation/info.json",
         "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
         "fixtures/assert-k2-213-imersite-continuation/control.lua",
@@ -8697,6 +8699,7 @@
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
         "fixtures/run-profiles/k2-213-imersite-f210-460.json",
         "fixtures/run-profiles/k2-213-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -8773,5 +8776,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:14f84a3b698f693682cb073965bd8b6e20a90f2f72518cfd02bf785b705ede0d"
+  "digest": "sha256:9f8039dc5f833ef89dc274ecc7f130953c8772dd00bc41ae3d2939003e03ca7c"
 }
