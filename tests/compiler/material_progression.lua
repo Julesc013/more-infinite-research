@@ -494,12 +494,27 @@ check(current_imersite.continuation.technology_name == exact_imersite.continuati
     and current_imersite.legacy.last_level == exact_imersite.legacy.last_level,
   "current engine preserves the existing finite and continuation identities")
 for _, tuple in ipairs({
-  {base="2.1.22", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.13"},
+  {base="2.1.23", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.13"},
   {base="2.1.21", Krastorio2="2.1.2", ["Krastorio2-spaced-out"]="2.0.13"},
   {base="2.1.21", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.14"}
 }) do
   check(load_streams_for(tuple).research_material_imersite.staged_progression == nil,
     "neighboring engine and overhaul tuples remain outside continuation admission")
+end
+local updated_streams = load_streams_for({
+  base="2.1.22", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.13"
+})
+local updated_imersite = updated_streams.research_material_imersite.staged_progression
+check(progression.validate("research_material_imersite", updated_imersite)
+    and updated_imersite.continuation.technology_name == exact_imersite.continuation.technology_name
+    and updated_imersite.legacy.last_level == 3,
+  "2.1.22 preserves the existing finite powder stage and level-four continuation identity")
+for _, tuple in ipairs({
+  {base="2.1.22", Krastorio2="2.1.2", ["Krastorio2-spaced-out"]="2.0.13"},
+  {base="2.1.22", Krastorio2="2.1.3", ["Krastorio2-spaced-out"]="2.0.14"}
+}) do
+  check(load_streams_for(tuple).research_material_imersite.staged_progression == nil,
+    "2.1.22 continuation does not admit a changed overhaul contract")
 end
 mods = prior_mods
 

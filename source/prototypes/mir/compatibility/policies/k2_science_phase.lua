@@ -13,6 +13,12 @@ local M = {
   v3_policy_id = "K2SciencePhasePolicyV3",
   v4_policy_id = "K2SciencePhasePolicyV4",
   v5_policy_id = "K2SciencePhasePolicyV5",
+  v6_policy_id = "K2SciencePhasePolicyV6",
+  v6_applicability = {
+    base = "2.1.22",
+    Krastorio2 = "2.1.3",
+    ["Krastorio2-spaced-out"] = "2.0.13"
+  },
   v5_applicability = {
     base = "2.1.21",
     Krastorio2 = "2.1.3",
@@ -64,10 +70,26 @@ local function matches_exact_tuple(active_mods, exact_versions)
   return true
 end
 
-local function matching_policy(active_mods)
-  if matches_exact_tuple(active_mods, M.v5_applicability) then
-    return M.v5_policy_id, M.v5_applicability
+-- Both science normalization and continuation assembly select the same
+-- declared successor contract. Historical decision identities remain intact;
+-- an unobserved engine or overhaul revision does not inherit admission.
+local SUCCESSOR_POLICIES = {
+  [M.v3_applicability.base] = {id = M.v3_policy_id, versions = M.v3_applicability},
+  [M.v5_applicability.base] = {id = M.v5_policy_id, versions = M.v5_applicability},
+  [M.v6_applicability.base] = {id = M.v6_policy_id, versions = M.v6_applicability}
+}
+
+local function matching_successor(active_mods)
+  local selected = SUCCESSOR_POLICIES[(active_mods or {}).base]
+  if selected and matches_exact_tuple(active_mods, selected.versions) then
+    return selected.id, selected.versions
   end
+  return nil, nil
+end
+
+local function matching_policy(active_mods)
+  local successor_id, successor_versions = matching_successor(active_mods)
+  if successor_id then return successor_id, successor_versions end
   -- Current-engine profiles expose base. Do not apply the historical V1
   -- tuple to a different engine merely because its two named mods match.
   if matches_exact_tuple(active_mods, M.v4_applicability) then
@@ -78,9 +100,6 @@ local function matching_policy(active_mods)
   end
   if matches_exact_tuple(active_mods, M.applicability) then
     return M.policy_id, M.applicability
-  end
-  if matches_exact_tuple(active_mods, M.v3_applicability) then
-    return M.v3_policy_id, M.v3_applicability
   end
   return nil, nil
 end
@@ -93,8 +112,7 @@ end
 -- This selects the existing continuation declaration only. Recipe safety,
 -- useful output and ownership still require their ordinary planner gates.
 function M.imersite_continuation_applies(active_mods)
-  return matches_exact_tuple(active_mods, M.v3_applicability)
-    or matches_exact_tuple(active_mods, M.v5_applicability)
+  return matching_successor(active_mods) ~= nil
 end
 
 function M.normalize(ingredients, active_mods)
