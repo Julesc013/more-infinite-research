@@ -273,6 +273,9 @@ function New-MIR4F210CurrentQualificationPolicySuccessionV1 {
     current_generation_inputs = @(
       [ordered]@{
         path = 'source/presentation/f210/info.json.template'
+        # Frozen lower-bound requirements, not an observed dependency array.
+        # A release may declare a stronger tested patch floor; its actual
+        # metadata and qualification remain separately bound by that release.
         required_dependencies = @('base >= 2.1.18','? recycler >= 2.1.18','? space-age >= 2.1.18')
       }
     )

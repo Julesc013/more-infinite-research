@@ -6,6 +6,6 @@
   "description": "Adds configurable infinite research for Factorio 1.0 logistics, combat, laboratory, and character bonuses.",
   "factorio_version": "1.0",
   "dependencies": [
-    "base >= 1.0"
+    "base >= 1.0.0"
   ]
 }

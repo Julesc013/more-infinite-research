@@ -160,7 +160,8 @@ function Get-MIR4PrivatePatchPackageChangelogText {
   param(
     [Parameter(Mandatory)][string]$Changelog,
     [Parameter(Mandatory)][string]$DistributionVersion,
-    [string]$SourceVersion = '4.2.1'
+    [string]$SourceVersion = '4.2.1',
+    [string]$MinimumFactorioVersion = ''
   )
 
   # This is deliberately a pure authority shared by the private package
@@ -173,6 +174,9 @@ function Get-MIR4PrivatePatchPackageChangelogText {
   if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
   $targetCode = [string]$decoded.distribution_target_code
   if ($targetCode -cnotin @('210','200','110','100','017','016','015','014','013')) { throw '[mir4-private-patch-package-target]' }
+  if ($MinimumFactorioVersion -and $MinimumFactorioVersion -cnotmatch '^[0-9]+[.][0-9]+[.][0-9]+$') {
+    throw '[mir4-private-patch-package-minimum-factorio-version]'
+  }
 
   $normalized = $Changelog.Replace("`r`n", "`n")
   $firstVersion = [regex]::Match($normalized, '(?m)^Version:\s*(\S+)')
@@ -193,6 +197,9 @@ function Get-MIR4PrivatePatchPackageChangelogText {
       $entry += "  Performance:`n    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.`n"
     }
     $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.`n    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.`n"
+    if ($MinimumFactorioVersion) {
+      $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
+    }
   } elseif ($SourceVersion -ceq '4.4.1') {
     $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
   } elseif ($SourceVersion -ceq '4.5.2') {
@@ -245,7 +252,13 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $utf8 = [Text.UTF8Encoding]::new($false)
   $info.version = $DistributionVersion
   [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
-  $updatedChangelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion
+  $minimumFactorioVersion = ''
+  if ($SourceVersion -ceq '4.6.0') {
+    $baseRequirements = @($info.dependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
+    if ($baseRequirements.Count -ne 1) { throw '[mir4-private-patch-package-base-minimum]' }
+    $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''
+  }
+  $updatedChangelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion -MinimumFactorioVersion $minimumFactorioVersion
   if ($updatedChangelog -cne $changelog) { [IO.File]::WriteAllText($changelogPath, $updatedChangelog, $utf8) }
   if ($null -ne $readme) {
     [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion))
