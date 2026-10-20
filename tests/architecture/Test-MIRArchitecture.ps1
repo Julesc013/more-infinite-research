@@ -774,6 +774,9 @@ foreach ($executorNeedle in @(
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
 }
+if ($technologyOperationExecutor -match 'journal\s*:\s*(?:assert_before|record)\s*\(') {
+  throw '[mir-owned-mutation-executor-legacy] The executor must use the single journal-owned execution boundary.'
+}
 
 $mutationJournalText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua"
 foreach ($journalNeedle in @(
@@ -790,6 +793,25 @@ foreach ($journalNeedle in @(
   '"mutation-error"'
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua" -Text $mutationJournalText -Needle $journalNeedle
+}
+$ownedExecution = [regex]::Match($mutationJournalText, '(?ms)^function Journal:execute\(.*?(?=^function Journal:|\z)').Value
+$executionCursor = 0
+foreach ($executionStep in @(
+  'self:assert_operation(operation)',
+  'local before = deepcopy(capture(operation) or {})',
+  'local before_fingerprint = fingerprint.of(before)',
+  'before_fingerprint ~= operation.expected_before_fingerprint',
+  'local ok, result = xpcall(function() return apply(operation) end, debug.traceback)',
+  'local after = capture(operation)',
+  'record_owned(self, operation, before, before_fingerprint, after,',
+  'ok and "applied" or "failed", failure_code)'
+)) {
+  $stepPosition = $ownedExecution.IndexOf($executionStep, $executionCursor, [StringComparison]::Ordinal)
+  if ($stepPosition -lt 0) { throw "[mir-owned-mutation-order] Missing or reordered execution boundary: $executionStep" }
+  $executionCursor = $stepPosition + $executionStep.Length
+}
+if ([regex]::Matches($ownedExecution, 'capture\(operation\)').Count -ne 2) {
+  throw '[mir-owned-mutation-captures] Execution requires exactly one before capture and one after capture.'
 }
 
 $trustedRecordText = Read-MIRFile -RelativePath "prototypes/mir/core/trusted_record.lua"
