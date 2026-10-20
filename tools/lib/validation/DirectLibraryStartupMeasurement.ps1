@@ -23,39 +23,8 @@ function Wait-MIRDirectLibraryStartupAdmission {
     [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
     [Parameter(Mandatory)][string]$Phase
   )
-  $record=[ordered]@{phase=$Phase;admission_wait_seconds=$AdmissionWaitSeconds;status='not-requested';attempt_count=0;refusal_count=0;elapsed_seconds=0.0;first_refusal=$null;last_refusal=$null;last_error=$null}
-  if($AdmissionWaitSeconds -eq 0){return [pscustomobject]$record}
-  $watch=[Diagnostics.Stopwatch]::StartNew()
-  while($true){
-    $record.attempt_count=[int]$record.attempt_count+1
-    try {
-      $admission=Assert-MIR441ResourceAdmission -Policy $Policy -WorkRoot $WorkRoot -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes
-      $record.status=if([int]$record.refusal_count -gt 0){'admitted-after-wait'}else{'admitted-without-wait'}
-      $record.elapsed_seconds=[Math]::Round($watch.Elapsed.TotalSeconds,3)
-      $record.admission=$admission
-      return [pscustomobject]$record
-    } catch {
-      $message=$_.Exception.Message
-      if($message -cnotin @('[mir441-resource-admission-memory]','[mir441-resource-admission-commit]')){throw}
-      $snapshot=Get-MIR441ResourceSnapshot -WorkRoot $WorkRoot
-      $refusal=[ordered]@{observed_at=[DateTimeOffset]::UtcNow.ToString('o');error=$message;snapshot=$snapshot}
-      if($null -eq $record.first_refusal){$record.first_refusal=$refusal}
-      $record.last_refusal=$refusal;$record.last_error=$message
-      $record.refusal_count=[int]$record.refusal_count+1
-      $record.elapsed_seconds=[Math]::Round($watch.Elapsed.TotalSeconds,3)
-      # Preserve the governor's original memory/commit disposition at timeout.
-      # The bounded record is attached for an enclosing failure receipt; this
-      # path has not created a resource context or started a native process.
-      if($watch.Elapsed.TotalSeconds -ge $AdmissionWaitSeconds){
-        $record.status='capacity-timeout'
-        $_.Exception.Data['mir_direct_startup_admission_wait']=[pscustomobject]$record
-        throw
-      }
-      $remaining=[Math]::Max(0.0,[double]$AdmissionWaitSeconds-$watch.Elapsed.TotalSeconds)
-      $sleepMilliseconds=[Math]::Max(1,[Math]::Min(5000,[int][Math]::Ceiling($remaining*1000)))
-      Start-Sleep -Milliseconds $sleepMilliseconds
-    }
-  }
+  $record=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase $Phase
+  Wait-MIR441PreStartResourceAdmission -Policy $Policy -WorkRoot $WorkRoot -EstimatedPeakBytes $EstimatedPeakBytes -ExpectedPeakMemoryBytes $ExpectedPeakMemoryBytes -State $record
 }
 
 function Get-MIRDirectLibraryStartupArchive {

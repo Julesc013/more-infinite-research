@@ -539,6 +539,7 @@
         "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1"
       ]

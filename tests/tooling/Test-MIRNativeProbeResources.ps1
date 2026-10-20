@@ -707,7 +707,7 @@ try {
     $k2Path=Join-Path $repo 'tests/runtime/Test-MIRK2213ImersiteContinuation.ps1'
     $k2Ast=[Management.Automation.Language.Parser]::ParseFile($k2Path,[ref]$tokens,[ref]$errors)
     Assert-Probe ($errors.Count-eq0) 'K2 continuation harness parse failed.'
-    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213CurrentFixtureRegistration','Get-K2213SelectedFixtureProfile','Get-K2213ProfileExternalDependencies','Get-K2213ExpectedDependencies','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs','Get-K2213FixtureEnvelope')) {
+    foreach($name in @('Fail-K2213','Assert-K2213','Get-K2213Sha256','Get-K2213Property','Read-K2213Json','Get-K2213ZipInfo','Assert-K2213ArchiveIdentity','Read-K2213CurrentCandidate','Read-K2213DependencyInputs','Read-K2213CurrentFixtureRegistration','Get-K2213SelectedFixtureProfile','Get-K2213ProfileExternalDependencies','Get-K2213ExpectedDependencies','Assert-K2213SelectedInputMode','New-K2213SelectedFixture','Read-K2213ProfileInputs','Get-K2213FixtureEnvelope','Invoke-K2213NativeActor')) {
       $function=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq$name},$false))
       Assert-Probe ($function.Count-eq1) "K2 continuation consumed adapter absent: $name"
       . ([scriptblock]::Create($function[0].Extent.Text))
@@ -725,7 +725,7 @@ try {
       Refuses-Probe {& $bindWait -AdmissionWaitSeconds -1} 'AdmissionWaitSeconds'
       Refuses-Probe {& $bindWait -AdmissionWaitSeconds 301} 'AdmissionWaitSeconds'
       $blocks=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.IfStatementAst]-and$node.Extent.Text.Contains('Wait-MIRDirectLibraryStartupAdmission',[StringComparison]::Ordinal)},$true)|Sort-Object {$_.Extent.StartOffset})
-      Assert-Probe ($blocks.Count-eq4) 'K2 must wait only before resource context, version, create and reload.'
+      Assert-Probe ($blocks.Count-eq1) 'K2 must retain only its resource-context snapshot wait; native admission belongs to the actual guarded actor.'
       $calls=[Collections.Generic.List[object]]::new()
       $admissionWaits=[Collections.Generic.List[object]]::new()
       $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=2048;$MaxNewOutputMiB=120;$outputRootFull=$run
@@ -739,25 +739,36 @@ try {
         [pscustomobject]@{phase=$Phase;status='admitted-without-wait';attempt_count=1}
       }
       foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
-      Assert-Probe (($calls.phase-join'|')-ceq'resource-context|engine-version|create|reload'-and$admissionWaits.Count-eq4) 'K2 changed wait order or discarded bounded decisions.'
+      Assert-Probe (($calls.phase-join'|')-ceq'resource-context'-and$admissionWaits.Count-eq1) 'K2 changed resource-context admission or discarded its decision.'
       foreach($call in $calls){
         Assert-Probe ($call.policy.minimum_free_ram_gib-eq4-and$call.root-ceq$run-and$call.peak-eq2GB-and$call.seconds-eq45) 'K2 changed the governor reserve, declared peak, path, or wait bound.'
       }
-      Assert-Probe ($calls[0].output-eq120MB-and@($calls|Select-Object -Skip 1|Where-Object output -ne 117MB).Count-eq0) 'K2 did not retain initial/remaining output budgets.'
+      Assert-Probe ($calls[0].output-eq120MB) 'K2 did not retain its initial output budget.'
+      $actorDefinition=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-K2213NativeActor'},$false))
+      Assert-Probe ($actorDefinition.Count-eq1) 'K2 actual native admission adapter is absent.'
+      . ([scriptblock]::Create($actorDefinition[0].Extent.Text))
+      $actorCalls=[Collections.Generic.List[object]]::new()
+      function Invoke-MIRNativeProbeFactorioProcess {
+        param($Context,$FilePath,$Arguments,$TimeoutSeconds,$AdmissionWaitSeconds=0,$AdmissionPhase='')
+        $actorCalls.Add([ordered]@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds;seconds=$AdmissionWaitSeconds;phase=$AdmissionPhase;wait_bound=$PSBoundParameters.ContainsKey('AdmissionWaitSeconds');phase_bound=$PSBoundParameters.ContainsKey('AdmissionPhase')})
+        [pscustomobject]@{admission_wait=[pscustomobject]@{phase=$AdmissionPhase;status='admitted-after-wait';attempt_count=2;refusal_count=1}}
+      }
+      foreach($phase in @('engine-version','create','reload')){$null=Invoke-K2213NativeActor -Phase $phase -FactorioBin 'controlled-factorio' -Arguments @('--version') -TimeoutSeconds 30}
+      Assert-Probe (($actorCalls.phase-join'|')-ceq'engine-version|create|reload'-and$admissionWaits.Count-eq4) 'K2 did not retain actual actor admission order.'
+      foreach($call in $actorCalls){Assert-Probe ([object]::ReferenceEquals($call.context,$resources)-and$call.seconds-eq45-and$call.wait_bound-and$call.phase_bound-and$call.path-ceq'controlled-factorio'-and$call.timeout-eq30) 'K2 actual actor changed its context, bounds, executable or timeout.'}
       $successTable=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.HashtableAst]-and$node.Extent.Text.Contains('resource_runs=$resources.runs.ToArray();',[StringComparison]::Ordinal)},$true))
       Assert-Probe ($successTable.Count-eq1) 'K2 success receipt owner is absent.'
       $waitValue=@($successTable[0].KeyValuePairs|Where-Object {$_.Item1.SafeGetValue()-ceq'admission_waits'})
       Assert-Probe ($waitValue.Count-eq1) 'K2 success receipt dropped bounded decisions.'
       $successWaits=@(& ([scriptblock]::Create($waitValue[0].Item2.Extent.Text)))
       Assert-Probe (($successWaits.phase-join'|')-ceq($admissionWaits.phase-join'|')) 'K2 success receipt altered wait order.'
-      foreach($phase in @(@('resource-context','New-MIRNativeProbeResourceContext'),@('engine-version','Invoke-MIRNativeProbeFactorioProcess'),@('create','Invoke-MIRFactorioLoadCheck'),@('reload','Invoke-MIRFactorioReloadContract'))){
-        $wait=@($blocks|Where-Object {$_.Extent.Text.Contains("-Phase '"+$phase[0]+"'",[StringComparison]::Ordinal)})
-        $actor=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq$phase[1]-and$node.Extent.StartOffset-gt$blocks[0].Extent.StartOffset},$true))
-        Assert-Probe ($wait.Count-eq1-and$actor.Count-eq1-and$wait[0].Extent.EndOffset-lt$actor[0].Extent.StartOffset) ('K2 wait is not before its guarded actor: '+$phase[0])
-      }
+      $contextActor=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq'New-MIRNativeProbeResourceContext'},$true))
+      Assert-Probe ($contextActor.Count-eq1-and$blocks[0].Extent.EndOffset-lt$contextActor[0].Extent.StartOffset) 'K2 resource wait is not before its context.'
       $calls.Clear();$admissionWaits.Clear();$AdmissionWaitSeconds=0
       foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
       Assert-Probe ($calls.Count-eq0-and$admissionWaits.Count-eq0) 'K2 default zero wait added capacity probes or records.'
+      $actorCalls.Clear();$null=Invoke-K2213NativeActor -Phase 'engine-version' -FactorioBin 'controlled-factorio' -Arguments @('--version') -TimeoutSeconds 30
+      Assert-Probe ($actorCalls.Count-eq1-and-not$actorCalls[0].wait_bound-and-not$actorCalls[0].phase_bound-and$admissionWaits.Count-eq0) 'K2 default actor passed optional wait arguments or manufactured a wait receipt.'
       $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=0
       & ([scriptblock]::Create($blocks[0].Extent.Text))
       Assert-Probe ($calls.Count-eq0) 'K2 waited instead of retaining the required-peak refusal.'
@@ -1165,10 +1176,11 @@ try {
     Refuses-Probe {Invoke-TinGovernedEngine -Scenario wrong-library -Arguments $wrongPathArgs -TimeoutSeconds 240} 'mir-library-launch-directory'
     Assert-Probe ($calls.Count-eq$beforeWrongPath-and-not(Test-Path -LiteralPath (Join-Path $run 'obsolete-mods'))) 'Tin ran or staged after an obsolete library path.'
     $calls.Clear();$budgets=[Collections.Generic.List[object]]::new()
+    $AdmissionWaitSeconds=45;$admissionWaits=[Collections.Generic.List[object]]::new()
     function Get-MIRNativeProbeRemainingOutputBytes {param($Context);$budgets.Add($Context);return 1MB}
     function Invoke-MIRNativeProbeFactorioProcess {
-      param($Context,$FilePath,$Arguments,$TimeoutSeconds)
-      $calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds})
+      param($Context,$FilePath,$Arguments,$TimeoutSeconds,$AdmissionWaitSeconds=0,$AdmissionPhase='')
+      $calls.Add(@{context=$Context;path=$FilePath;arguments=$Arguments;timeout=$TimeoutSeconds;seconds=$AdmissionWaitSeconds;phase=$AdmissionPhase})
       if($Arguments-contains'controlled-failure'){throw 'controlled governed interruption'}
       $index=[Array]::IndexOf($Arguments,'--create')
       if($index-ge0){[IO.File]::WriteAllText($Arguments[$index+1],'controlled save; not Factorio data');$marker='initial'}else{$marker='reload'}
@@ -1176,11 +1188,12 @@ try {
       $lines+=('0.2 Script @__controlled-k2__/data-final-fixes.lua:1: [MIR_ACTIVE_MODS] '+(@($activation.selected|Sort-Object name|ForEach-Object {$_.name+'@'+$_.version})-join '|'))
       $lines+=('[MIR42_K2_213_IMERSITE_CONTINUATION] stage='+$marker+';completed_level=4;next_level=5;bonus=0.08;progress=0.42')
       [IO.File]::WriteAllLines((Join-Path $run 'factorio-current.log'),$lines)
-      [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
+      [pscustomobject]@{stdout=$tinActorStdout;stderr=$tinActorStderr;admission_wait=[pscustomobject]@{phase=$AdmissionPhase;status='admitted-after-wait';refusal_count=1};result=@{passed=$true;exit_code=0;timed_out=$false;duration_seconds=0.01}}
     }
     $create=Invoke-MIRFactorioLoadCheck -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -ScenarioTimeoutSeconds 90 -LibraryActivation $activation -ActiveModsObserver controlled-k2
     $reload=Invoke-MIRFactorioReloadContract -FactorioBin $controlledEngine -UserDataDir $run -ScenarioName controlled-k2 -SavePath $create.save -RequiredReloadCount 1 -MaxReloadDurationSeconds 90 -RequiredLogFragments '[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42' -LibraryActivation $activation -ActiveModsObserver controlled-k2
     Assert-Probe ($create.passed-and$reload.passed-and$calls.Count-eq2-and$budgets.Count-eq2) 'K2 create/reload collectors did not use the shared governed row.'
+    Assert-Probe (($calls.phase-join'|')-ceq'create|reload'-and@($calls|Where-Object seconds -ne 45).Count-eq0-and($admissionWaits.phase-join'|')-ceq'create|reload') 'K2 actual create/reload actors lost bounded admission or its receipts.'
     Assert-Probe ($calls[0].context.controlled-and$calls[1].context.controlled-and$calls[0].path-ceq$controlledEngine-and$calls[0].timeout-eq90-and$calls[1].timeout-eq90) 'K2 collector lost actor/context/timeout identity.'
     Assert-Probe ('--create'-in$calls[0].arguments-and'--benchmark'-in$calls[1].arguments-and'--benchmark-sanitize'-in$calls[1].arguments-and$reload.reloads[0].save_byte_identical) 'K2 native create/reload arguments or saved-state custody changed.'
     Assert-Probe ($create.stderr_sha256-ceq'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'-and$reload.reloads[0].reload_log_contract_passed) 'K2 collector lost stderr or exact reload-marker checks.'

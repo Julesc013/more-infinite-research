@@ -255,6 +255,21 @@ function Read-K2213ProfileInputs {
   })
   return [pscustomobject]@{profile=$profile;inputs=$inputs;fixture_profile=$fixtureProfile}
 }
+function Invoke-K2213NativeActor {
+  param([ValidateSet('engine-version','create','reload')][string]$Phase,[string]$FactorioBin,[string[]]$Arguments,[int]$TimeoutSeconds)
+  $parameters=@{Context=$resources;FilePath=$FactorioBin;Arguments=$Arguments;TimeoutSeconds=$TimeoutSeconds}
+  if($AdmissionWaitSeconds -gt 0){
+    $parameters.AdmissionWaitSeconds=$AdmissionWaitSeconds
+    $parameters.AdmissionPhase=$Phase
+  }
+  $actor=Invoke-MIRNativeProbeFactorioProcess @parameters
+  if($AdmissionWaitSeconds -gt 0){
+    $wait=Get-K2213Property $actor 'admission_wait'
+    Assert-K2213 ($null-ne$wait-and[string]$wait.phase-ceq$Phase) 'native-actor-admission-receipt'
+    $admissionWaits.Add($wait)
+  }
+  return $actor
+}
 function Invoke-MIRCompatFactorioProcess {
   param([string]$FactorioBin,[object[]]$ArgumentList,[string]$StdoutPath,[string]$StderrPath,[int]$TimeoutSeconds,$LibraryActivation)
   # Preserve the existing create/reload collector and its exact oracles,
@@ -264,7 +279,9 @@ function Invoke-MIRCompatFactorioProcess {
   # shared collector's one-tick default for every other native consumer.
   $tickIndex=[Array]::IndexOf($ArgumentList,'--benchmark-ticks')
   if($tickIndex-ge0){$ArgumentList[$tickIndex+1]='25000'}
-  $actor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $FactorioBin -Arguments ([string[]]$ArgumentList) -TimeoutSeconds $TimeoutSeconds
+  Assert-K2213 ($tickIndex-ge0-or$ArgumentList-contains'--create') 'native-actor-phase'
+  $phase=if($tickIndex-ge0){'reload'}else{'create'}
+  $actor=Invoke-K2213NativeActor -Phase $phase -FactorioBin $FactorioBin -Arguments ([string[]]$ArgumentList) -TimeoutSeconds $TimeoutSeconds
   Copy-Item -LiteralPath $actor.stdout -Destination $StdoutPath
   Copy-Item -LiteralPath $actor.stderr -Destination $StderrPath
   $null=Get-MIRNativeProbeRemainingOutputBytes -Context $resources
@@ -569,10 +586,7 @@ try {
     $inputBinding.archive_hashes=$directInputs.archive_hashes
     $inputBinding.fixture=[ordered]@{template_version='0.1.4';selected_version=[string]$fixtureInfo.version;temporary_specialization=$true;preparation_controls=$fixturePreparation}
   }
-  if ($AdmissionWaitSeconds -gt 0) {
-    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'engine-version'))
-  }
-  $versionRun=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
+  $versionRun=Invoke-K2213NativeActor -Phase 'engine-version' -FactorioBin $engine -Arguments @('--version') -TimeoutSeconds 30
   $engineVersion=(Get-Content -LiteralPath $versionRun.stdout -Raw).Trim()
   Assert-K2213 ($engineVersion -match ('(?m)^Version:\s*'+[regex]::Escape($expectedEngineVersion)+'(?:\s|$)')) 'engine-version'
   $fixtureArchive=$directInputs.fixture_archive
@@ -595,18 +609,12 @@ try {
   # It never inherits an unbound settings file from a previous test.
   Assert-K2213 (-not (Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat') -PathType Leaf)) 'unexpected-unbound-mod-settings'
 
-  if ($AdmissionWaitSeconds -gt 0) {
-    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'create'))
-  }
   $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'create'
   Assert-K2213 ([string]$load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') 'create-stderr'
   $loadLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION_DATA]',[StringComparison]::Ordinal)) 'create-data-marker'
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42',[StringComparison]::Ordinal)) 'create-initial-marker'
-  if ($AdmissionWaitSeconds -gt 0) {
-    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'reload'))
-  }
   $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments @('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42','[MIR42_K2_213_IMERSITE_PRODUCTION] ore=300;powder=324;sand=324;control_powder=300;control_sand=300;after_reload=true') -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$reload.passed) 'single-reload'
   $productionPath=Join-Path $runRoot 'script-output/k2-imersite-production.json'
