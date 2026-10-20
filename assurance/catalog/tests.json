@@ -961,6 +961,9 @@
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
         "source:source/prototypes/mir/index/item_prototype_facts.lua",
+        "source:source/prototypes/mir/index/recipe_facts.lua",
+        "source:source/prototypes/mir/pipeline/compiler_context.lua",
+        "source:source/prototypes/mir/domain/compiler/execution_mode.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
@@ -8776,5 +8779,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:9f8039dc5f833ef89dc274ecc7f130953c8772dd00bc41ae3d2939003e03ca7c"
+  "digest": "sha256:4620a33226ad759b8e66f38930632faf44215e1fb41e6c579d30739c17220ae9"
 }

@@ -191,6 +191,10 @@ function Context:freeze_state(name)
 end
 
 function Context:state_snapshot(name)
+  if name == "recipe_risk_materialization" then return nil end
+  if name == "recipe_risk_index" and self.services["recipe_risk.materialize_export"] then
+    M.with_active(self, self.services["recipe_risk.materialize_export"])
+  end
   return deepcopy(self.state[name])
 end
 
@@ -200,11 +204,15 @@ end
 
 function Context:state_key_count()
   local count = 0
-  for _ in pairs(self.state) do count = count + 1 end
+  for name in pairs(self.state) do
+    if name ~= "recipe_risk_materialization" then count = count + 1 end
+  end
   return count
 end
 
 function Context:snapshot()
+  local complete_risks = self.services["recipe_risk.materialize_export"]
+  if complete_risks then M.with_active(self, complete_risks) end
   local payload = {
     schema = self.schema,
     compiler_execution_mode = self.compiler_execution_mode,
@@ -216,7 +224,14 @@ function Context:snapshot()
     services = {},
     services_frozen = self.services_frozen
   }
-  for name in pairs(self.services) do table.insert(payload.services, name) end
+  -- The complete schema-1 risk index above is the public state. Its private
+  -- demand-driven preparation contains borrowed input views, not an export.
+  payload.state.recipe_risk_materialization = nil
+  payload.state_epochs.recipe_risk_materialization = nil
+  payload.frozen_state.recipe_risk_materialization = nil
+  for name in pairs(self.services) do
+    if name ~= "recipe_risk.materialize_export" then table.insert(payload.services, name) end
+  end
   table.sort(payload.services)
   local telemetry_state = payload.state.compiler_telemetry
   if telemetry_state and telemetry_state.counters then

@@ -1250,59 +1250,48 @@ local F200_BOB_ANGEL_RETURN_GRAPH_ROUTES = {
 local F200_BOB_ANGEL_STRUCTURAL_ROUTES = {
   ["angels-plate-aluminium"] = {
     material="aluminium",
-    id="F200-BA-aluminium-casting-structural-r07-v1",
-    risk="mir32-28583fe9", graph="mir32-34df6bfc", bindings="mir32-1793ad3e",
-    identities=90, recipes=92, producers=3,
+    risk="mir32-28583fe9", root_bindings="mir32-bf1d1b0e",
     ingredients={f200_entry("fluid","angels-liquid-molten-aluminium",40)},
     results={f200_entry("item","bob-aluminium-plate",4)}
   },
   ["angels-plate-aluminium-2"] = {
     material="aluminium",
-    id="F200-BA-aluminium-roll-structural-r07-v1",
-    risk="mir32-6ae1add6", graph="mir32-555427be", bindings="mir32-d5f1b456",
-    identities=90, recipes=92, producers=3,
+    risk="mir32-6ae1add6", root_bindings="mir32-d51a65ae",
     ingredients={f200_entry("item","angels-roll-aluminium",1)},
     results={f200_entry("item","bob-aluminium-plate",4)}
   },
   ["angels-plate-gold"] = {
-    material="gold", risk="mir32-82b81bf5", graph="mir32-9f025ab8", bindings="mir32-15171775",
-    identities=73, recipes=78, producers=3,
+    material="gold", risk="mir32-82b81bf5", root_bindings="mir32-d4567136",
     ingredients={f200_entry("fluid","angels-liquid-molten-gold",40)},
     results={f200_entry("item","bob-gold-plate",4)}
   },
   ["angels-plate-gold-2"] = {
-    material="gold", risk="mir32-a5ba136b", graph="mir32-2ceacaf2", bindings="mir32-2f6c2701",
-    identities=73, recipes=78, producers=3,
+    material="gold", risk="mir32-a5ba136b", root_bindings="mir32-2f72d9cd",
     ingredients={f200_entry("item","angels-roll-gold",1)},
     results={f200_entry("item","bob-gold-plate",4)}
   },
   ["angels-wire-gold-2"] = {
-    material="gold", risk="mir32-f4af2099", graph="mir32-9cee8462", bindings="mir32-15a309fc",
-    identities=71, recipes=75, producers=3,
+    material="gold", risk="mir32-f4af2099", root_bindings="mir32-f029b315",
     ingredients={f200_entry("item","angels-wire-coil-gold",4)},
     results={f200_entry("item","bob-gilded-copper-cable",16)}
   },
   ["angels-plate-tin"] = {
-    material="tin", risk="mir32-42e8ee87", graph="mir32-0642f4ca", bindings="mir32-184cb1c5",
-    identities=225, recipes=232, producers=3,
+    material="tin", risk="mir32-42e8ee87", root_bindings="mir32-1a2afdfa",
     ingredients={f200_entry("fluid","angels-liquid-molten-tin",40)},
     results={f200_entry("item","bob-tin-plate",4)}
   },
   ["angels-plate-tin-2"] = {
-    material="tin", risk="mir32-beddbea4", graph="mir32-7139eb7d", bindings="mir32-22db51fb",
-    identities=225, recipes=232, producers=3,
+    material="tin", risk="mir32-beddbea4", root_bindings="mir32-2fbc823d",
     ingredients={f200_entry("item","angels-roll-tin",1)},
     results={f200_entry("item","bob-tin-plate",4)}
   },
   ["angels-plate-titanium"] = {
-    material="titanium", risk="mir32-b51c3afe", graph="mir32-d9559f25", bindings="mir32-020b9885",
-    identities=68, recipes=70, producers=3,
+    material="titanium", risk="mir32-b51c3afe", root_bindings="mir32-d8eb8681",
     ingredients={f200_entry("fluid","angels-liquid-molten-titanium",40)},
     results={f200_entry("item","bob-titanium-plate",4)}
   },
   ["angels-plate-titanium-2"] = {
-    material="titanium", risk="mir32-2addeacf", graph="mir32-ede374f2", bindings="mir32-6f504961",
-    identities=68, recipes=70, producers=3,
+    material="titanium", risk="mir32-2addeacf", root_bindings="mir32-6a2e39c1",
     ingredients={f200_entry("item","angels-roll-titanium",1)},
     results={f200_entry("item","bob-titanium-plate",4)}
   }
@@ -1311,12 +1300,10 @@ local F200_BOB_ANGEL_STRUCTURAL_ROUTES = {
 local function f200_bob_angel_structural_route(recipe_name)
   local observed = F200_BOB_ANGEL_STRUCTURAL_ROUTES[recipe_name]
   if not observed then error("MIR F200 missing material structural observation " .. recipe_name) end
-  local id = observed.id or ("F200-BA-" .. recipe_name .. "-structural-input-r02-v1")
+  local id = "F200-BA-" .. recipe_name .. "-acyclic-forward-r47-v1"
   return {
     id=id,
-    evidence_id=observed.material == "aluminium"
-      and "F200-BobAngel-Aluminium-schema2-input-2.0.77-r07"
-      or "F200-BobAngel-GoldTinTitanium-schema2-input-2.0.77-r02",
+    evidence_id="F200-BobAngel-approved-forward-root-2.0.77-r47",
     require_exact_route_certificate=true,
     maximum_productivity=3.0,
     profiles={{
@@ -1328,12 +1315,9 @@ local function f200_bob_angel_structural_route(recipe_name)
     ingredients=observed.ingredients,
     results=observed.results,
     relevant_return_graph_contract={
-      schema=2,
-      return_graph_fingerprint=observed.graph,
-      bindings_fingerprint=observed.bindings,
-      reachable_identity_count=observed.identities,
-      relevant_recipe_count=observed.recipes,
-      direct_output_producer_count=observed.producers
+      schema=4,
+      proof="acyclic-forward",
+      bindings_fingerprint=observed.root_bindings
     }
   }
 end

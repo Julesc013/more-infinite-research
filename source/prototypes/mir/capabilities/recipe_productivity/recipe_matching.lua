@@ -529,7 +529,7 @@ local function observe_route_contract(recipe)
   diagnostics.material_route_certificate(row)
 end
 
-function R.material_route_is_acyclic(recipe)
+function R.material_route_is_acyclic(recipe, include_placement_mining)
   if not recipe or recipe.allow_productivity ~= true then return false, "productivity-not-allowed" end
   if type(recipe.variants) ~= "table" or #recipe.variants == 0 then return false, "missing-process-variants" end
   local graph = material_graph()
@@ -549,6 +549,17 @@ function R.material_route_is_acyclic(recipe)
         queue[#queue + 1] = identity; visited[identity] = true
       end
     end
+    local function append_edges(edges, native_kind, native_edges, conversion)
+      for next_identity in pairs(edges or {}) do
+        local kind = native_kind or conversion or native_edges and native_edges[next_identity]
+        local seen = kind and native_visited or visited
+        if not seen[next_identity] then
+          seen[next_identity] = true
+          queue[#queue + 1] = next_identity
+          if kind then native_steps[#queue] = kind end
+        end
+      end
+    end
     local head = 1
     while head <= #queue do
       if head > 30000 then return false, "process-search-budget" end
@@ -560,17 +571,24 @@ function R.material_route_is_acyclic(recipe)
         -- second path that uses a native conversion.
         if native_kind then return false, "potential-" .. native_kind .. "-return-path:" .. inputs[identity] end
         recipe_return = "potential-return-path:" .. inputs[identity]
-        if next(graph.native_edges) == nil then return false, recipe_return end
+        if not include_placement_mining and next(graph.native_edges) == nil then return false, recipe_return end
       end
       local native_edges = graph.native_edges[identity]
-      for next_identity in pairs(graph.typed_edges[identity] or {}) do
-        local kind = native_kind or native_edges and native_edges[next_identity]
-        local seen = kind and native_visited or visited
-        if not seen[next_identity] then
-          seen[next_identity] = true
-          queue[#queue + 1] = next_identity
-          if kind then native_steps[#queue] = kind end
+      append_edges(graph.typed_edges[identity], native_kind, native_edges)
+      if include_placement_mining and string.sub(identity, 1, 5) == "item\30" then
+        graph.placement_mining_edges = graph.placement_mining_edges or {}
+        local edges = graph.placement_mining_edges[identity]
+        if not edges then
+          edges = {}
+          local complete, reason = item_prototype_facts.for_each_placement_mining_return(string.sub(identity, 6), function(result)
+            if not recipe_semantics.result_is_definitely_zero(result, target_profiles.current(), false) then
+              edges[typed_identity(result)] = true
+            end
+          end)
+          if not complete then return false, reason end
+          graph.placement_mining_edges[identity] = edges
         end
+        append_edges(edges, native_kind, nil, "placement-mining")
       end
     end
   end
@@ -983,7 +1001,76 @@ local function closed_output_boundary_matches(recipe, contract)
   end
   return true, "accepted"
 end
+-- The forward proof binds only its root process, while the already-built
+-- science reference index validates the complete research/lab closure.  This
+-- is independent of the later prerequisite selector: a rejected root cannot
+-- be silently omitted after the productivity route has been admitted.
+local function approved_forward_bindings(recipe_name)
+  local bindings, reason = relevant_route_bindings(recipe_name)
+  if not bindings then return nil, reason end
+  local context = compiler_context.current()
+  if not context:has_service("science.technology_researchability_reason") then
+    return nil, "researchability-service"
+  end
+  local researchability = context:service("science.technology_researchability_reason")
+  local function eligible(name)
+    local technology = data_raw.technology(name)
+    if type(technology) ~= "table" or technology.hidden == true then return false end
+    return researchability(name) == nil
+  end
+  for _, unlock in ipairs(bindings.unlock_technologies) do
+    if not eligible(unlock.name) then return nil, "unlock-researchability" end
+  end
+  -- Use the authoritative stream classifier, not a name-prefix exemption.
+  -- Native continuations and foreign MIR-looking owners remain significant.
+  local owners = {}
+  local index = relationships.view("input")
+  for _, name in ipairs((index.technologies_by_recipe_effect or {})[recipe_name] or {}) do
+    if not generated_registry.is_stream(name) then
+      if not eligible(name) then return nil, "owner-researchability" end
+      local changes = {}
+      for _, effect in ipairs(data_raw.technology(name).effects or {}) do
+        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+          local change = effect.change
+          if type(change) ~= "number" or change ~= change or change == math.huge or change == -math.huge then
+            return nil, "owner-effect"
+          end
+          changes[#changes + 1] = change
+        end
+      end
+      if #changes == 0 then return nil, "owner-effect" end
+      table.sort(changes)
+      owners[#owners + 1] = {name = name, changes = changes}
+    end
+  end
+  table.sort(owners, function(left, right) return left.name < right.name end)
+  bindings.productivity_owner_technologies = owners
+  return bindings
+end
+
 local function relevant_return_graph_contract_matches(recipe, contract)
+  -- A forward declaration binds its actual root process and progression.
+  -- Shared typed reachability still rejects every recipe/native return; this
+  -- contract does not reconstruct and serialize the reachable factory.
+  if type(contract) == "table" and contract.schema == 4 then
+    if contract.proof ~= "acyclic-forward"
+      or not valid_mir32_fingerprint(contract.bindings_fingerprint) then
+      return false, "forward-contract"
+    end
+    for field in pairs(contract) do
+      if field ~= "schema" and field ~= "proof" and field ~= "bindings_fingerprint" then
+        return false, "forward-contract"
+      end
+    end
+    local acyclic, reason = R.material_route_is_acyclic(recipe, true)
+    if not acyclic then return false, "forward-" .. tostring(reason) end
+    local bindings, binding_reason = approved_forward_bindings(recipe.name)
+    if not bindings then return false, "forward-" .. tostring(binding_reason) end
+    if fingerprint.of(bindings) ~= contract.bindings_fingerprint then
+      return false, "forward-bindings"
+    end
+    return true, "accepted"
+  end
   if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2 and contract.schema ~= 3)
     or not valid_mir32_fingerprint(contract.bindings_fingerprint)
     or type(contract.reachable_identity_count) ~= "number" or contract.reachable_identity_count < 1
@@ -1036,7 +1123,7 @@ local function matching_profile(profiles, runtime_mods, graph_contract, fact, ri
     local structural_contract_validated = false
     if type(profile) == "table" and profile.mod_lock_scope == "relevant-return-graph"
       and type(profile.mod_locks) == "table" and next(profile.mod_locks) == nil
-      and type(graph_contract) == "table" and graph_contract.schema == 2 then
+      and type(graph_contract) == "table" and (graph_contract.schema == 2 or graph_contract.schema == 4) then
       -- An empty-pin replacement must agree with the already validated
       -- canonical risk before paying for its complete graph traversal. This
       -- keeps a wrong-risk structural profile from masking a later pinned one.

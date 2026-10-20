@@ -16,6 +16,8 @@ end
 for _, name in ipairs{"platform.factorio.target_profiles","report.compiler_telemetry","settings.automatic_compiler_policy"} do stub("prototypes.mir." .. name) end
 stub("prototypes.mir.platform.factorio.prototype_lookup", {
   each_entity_prototype=function() end,
+  item_prototype=function(name) return item_prototypes[name] end,
+  entity_prototype=function(name) return (cached.test_entities or {})[name] end,
   each_item_prototype=function(callback)
     item_scans=item_scans+1
     for name, prototype in pairs(item_prototypes) do callback(name, prototype, "item") end
@@ -116,22 +118,24 @@ stub("prototypes.mir.index.recipe_facts", {
     return names
   end
 })
-stub("prototypes.mir.pipeline.compiler_context", {current=function() return {
+local test_context={
   state_view=function(_,name,builder) if not cached[name] and builder then cached[name]=builder() end; return cached[name] end,
   set_state=function(_,name,value) cached[name]=value end,
   freeze_state=function() end,
   command_status=function(_,id) return planning_input_available and id=="sanitize-input-technology-effects" and "applied" or nil end
-} end})
+}
+stub("prototypes.mir.pipeline.compiler_context", {current=function() return test_context end})
 local matcher=require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
 local count=0
 local function check(value,message) assert(value,message); count=count+1 end
 local function recipe(input,output,input_type,output_type)
  return {allow_productivity=true,variants={{ingredients={{type=input_type or "item",name=input}},results={{type=output_type or "item",name=output,amount=1}}}}}
 end
-local function environment(value, items)
+local function environment(value, items, entities)
   records=value; cached={}; builds=0
   recipe_index_mode="typed"
   item_prototypes=items or {}; item_scans=0
+  cached.test_entities=entities or {}
   productivity_owners, recipe_unlocks, technologies = {}, {}, {}
 end
 local forward=recipe("ore","plate")
@@ -950,13 +954,14 @@ check(exact_f200_streams.research_material_silicon.reviewed_forward_routes["kr-s
 local changed_f200_mods=clone_map(exact_f200_mods)
 changed_f200_mods.angelssmelting="2.0.6"
 local changed_f200_streams=material_streams_for({factorio_version="2.0"},changed_f200_mods,f200_items)
-check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$" and changed_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==2,"changed F200 provider retains Aluminium only behind a schema-2 structural certificate")
+check(recipe_patterns(changed_f200_streams.research_material_aluminium)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$" and changed_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==4 and changed_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.proof=="acyclic-forward","changed F200 provider retains Aluminium only behind a schema-4 forward declaration")
 check(recipe_patterns(changed_f200_streams.research_material_nickel)=="^bob%-nickel%-plate$" and changed_f200_streams.research_material_nickel.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel nickel routes and certificate")
 check(recipe_patterns(changed_f200_streams.research_material_silver)=="^bob%-silver%-plate$" and changed_f200_streams.research_material_silver.reviewed_forward_routes==nil,"changed F200 closure withdraws Angel silver routes and certificate")
 check(recipe_patterns(changed_f200_streams.research_material_gold)=="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$"
-  and changed_f200_streams.research_material_gold.reviewed_forward_routes["angels-plate-gold"].relevant_return_graph_contract.schema==2
+  and changed_f200_streams.research_material_gold.reviewed_forward_routes["angels-plate-gold"].relevant_return_graph_contract.schema==4
+  and changed_f200_streams.research_material_gold.reviewed_forward_routes["angels-plate-gold"].relevant_return_graph_contract.proof=="acyclic-forward"
   and recipe_patterns(changed_f200_streams.research_material_platinum)=="^bob%-platinum%-plate$",
-  "changed F200 closure selects captured Gold only behind schema 2 and still withholds unproven Platinum")
+  "changed F200 closure selects captured Gold only behind schema-4 forward declaration and still withholds unproven Platinum")
 
 local extra_f200_mods=clone_map(exact_f200_mods)
 extra_f200_mods.qol="1.0.0"
@@ -2372,96 +2377,102 @@ do
   graph_mods = original_mods
 end
 
--- The R07 F200 Bob/Angel input has no BobTech lock.  These two routes are
--- declared under one family/emitter but only schema-2 full graph contracts;
--- altered actual inputs still fail in the shared matcher above.
+-- The current F200 Bob/Angel declarations keep their established families.
+-- Expected root pins, typed IO, risk and cap are explicit below. Declaration
+-- presence does not establish acyclicity or native profile qualification.
 do
   local r07_mods = clone_map(exact_f200_mods)
   r07_mods.bobtech = nil
   local r07_streams = material_streams_for({factorio_version="2.0"}, r07_mods, f200_items)
   local r07_family = r07_streams.research_material_aluminium
-  local casting = assert(r07_family.reviewed_forward_routes["angels-plate-aluminium"])
-  local rolling = assert(r07_family.reviewed_forward_routes["angels-plate-aluminium-2"])
-  check(recipe_patterns(r07_family)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$",
-    "R07 F200 Aluminium keeps one family with Bob and two ordinary Angel finals")
-  for _, certificate in ipairs({casting, rolling}) do
-    local profile = certificate.profiles[1]
-    local contract = certificate.relevant_return_graph_contract
-    check(certificate.require_exact_route_certificate and certificate.maximum_productivity==3
+  local expected = {
+    {route="angels-plate-aluminium",risk="mir32-28583fe9",pin="mir32-bf1d1b0e",ingredient_type="fluid",ingredient="angels-liquid-molten-aluminium",ingredient_amount=40,output="bob-aluminium-plate",output_amount=4},
+    {route="angels-plate-aluminium-2",risk="mir32-6ae1add6",pin="mir32-d51a65ae",ingredient_type="item",ingredient="angels-roll-aluminium",ingredient_amount=1,output="bob-aluminium-plate",output_amount=4}
+  }
+  check(r07_family.required_items[1]=="bob-aluminium-plate" and r07_family.identity_state=="stable-unreleased"
+      and recipe_patterns(r07_family)=="^bob%-aluminium%-plate$|^angels%-plate%-aluminium$|^angels%-plate%-aluminium%-2$",
+    "R03 F200 Aluminium preserves its stable family identity and Bob plus two Angel finals")
+  for _, row in ipairs(expected) do
+    local certificate = assert(r07_family.reviewed_forward_routes[row.route])
+    local profile, contract = certificate.profiles[1], certificate.relevant_return_graph_contract
+    check(certificate.id==("F200-BA-"..row.route.."-acyclic-forward-r47-v1")
+      and certificate.evidence_id=="F200-BobAngel-approved-forward-root-2.0.77-r47"
+      and certificate.require_exact_route_certificate and certificate.maximum_productivity==3
       and profile.mod_lock_scope=="relevant-return-graph" and next(profile.mod_locks)==nil
-      and profile.observer_mod_locks==nil and contract.schema==2
-      and contract.reachable_identity_count==90 and contract.relevant_recipe_count==92
-      and contract.direct_output_producer_count==3,
-      "R07 Aluminium admits only an explicit empty-pin full schema-2 boundary")
+      and profile.observer_mod_locks==nil and profile.canonical_risk_fingerprint==row.risk
+      and contract.schema==4 and contract.proof=="acyclic-forward" and contract.bindings_fingerprint==row.pin
+      and contract.return_graph_fingerprint==nil and contract.reachable_identity_count==nil
+      and contract.relevant_recipe_count==nil and contract.direct_output_producer_count==nil,
+      "R03 Aluminium declares only its schema-4 forward proof and retained root pin: "..row.route)
+    check(#certificate.ingredients==1 and #certificate.results==1
+      and certificate.ingredients[1].type==row.ingredient_type and certificate.ingredients[1].name==row.ingredient
+      and certificate.ingredients[1].amount==row.ingredient_amount and certificate.results[1].type=="item"
+      and certificate.results[1].name==row.output and certificate.results[1].amount==row.output_amount,
+      "R03 Aluminium retains the observed typed IO contract: "..row.route)
   end
-  check(casting.profiles[1].canonical_risk_fingerprint=="mir32-28583fe9"
-      and casting.relevant_return_graph_contract.return_graph_fingerprint=="mir32-34df6bfc"
-      and casting.relevant_return_graph_contract.bindings_fingerprint=="mir32-1793ad3e"
-      and casting.ingredients[1].type=="fluid"
-      and casting.ingredients[1].name=="angels-liquid-molten-aluminium"
-      and casting.ingredients[1].amount==40
-      and casting.results[1].type=="item" and casting.results[1].name=="bob-aluminium-plate"
-      and casting.results[1].amount==4,
-    "R07 casting binds its recorded typed IO and full risk/graph/ownership/science evidence")
-  check(rolling.profiles[1].canonical_risk_fingerprint=="mir32-6ae1add6"
-      and rolling.relevant_return_graph_contract.return_graph_fingerprint=="mir32-555427be"
-      and rolling.relevant_return_graph_contract.bindings_fingerprint=="mir32-d5f1b456"
-      and rolling.ingredients[1].type=="item" and rolling.ingredients[1].name=="angels-roll-aluminium"
-      and rolling.ingredients[1].amount==1
-      and rolling.results[1].type=="item" and rolling.results[1].name=="bob-aluminium-plate"
-      and rolling.results[1].amount==4,
-    "R07 rolling binds its distinct typed IO and full risk/graph/ownership/science evidence")
   local exact = exact_f200_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"]
   check(exact.relevant_return_graph_contract.schema==1 and next(exact.profiles[1].mod_locks)~=nil,
     "retained exact F200 profile retains its pinned schema-1 Aluminium certificate")
-  local unrelated = clone_map(r07_mods)
-  unrelated.qol = "1.0.0"
+  local unrelated = clone_map(r07_mods); unrelated.qol = "1.0.0"
   local unrelated_streams = material_streams_for({factorio_version="2.0"}, unrelated, f200_items)
-  check(unrelated_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract.schema==2,
-    "unrelated provider remains outside the schema-2 affected graph declaration")
+  local unrelated_contract=unrelated_streams.research_material_aluminium.reviewed_forward_routes["angels-plate-aluminium"].relevant_return_graph_contract
+  check(unrelated_contract.schema==4 and unrelated_contract.proof=="acyclic-forward",
+    "unrelated provider remains outside the current schema-4 forward declaration")
   local f210_streams = material_streams_for({factorio_version="2.1"}, r07_mods, f200_items)
   check(recipe_patterns(f210_streams.research_material_aluminium)=="^bob%-aluminium%-plate$"
       and f210_streams.research_material_aluminium.reviewed_forward_routes==nil,
-    "R07 F200 structural declaration cannot cross the engine phase boundary")
+    "R03 F200 forward declaration cannot cross the engine phase boundary")
 end
-
 do
-  -- Independent canonical input-phase observations, not post-emission hashes.
-  -- Their original native log/reader identities remain in the R02 capture.
+  -- These seven rows complete the two Aluminium rows above. They retain the
+  -- stable F200 families, typed IO, risk and root pins while changing only the
+  -- current declaration proof shape.
   local expected = {
-    {"gold", "angels-plate-gold", "mir32-82b81bf5", "mir32-9f025ab8", "mir32-15171775", 73, 78, "fluid", "angels-liquid-molten-gold", 40, "bob-gold-plate", 4},
-    {"gold", "angels-plate-gold-2", "mir32-a5ba136b", "mir32-2ceacaf2", "mir32-2f6c2701", 73, 78, "item", "angels-roll-gold", 1, "bob-gold-plate", 4},
-    {"gold", "angels-wire-gold-2", "mir32-f4af2099", "mir32-9cee8462", "mir32-15a309fc", 71, 75, "item", "angels-wire-coil-gold", 4, "bob-gilded-copper-cable", 16},
-    {"tin", "angels-plate-tin", "mir32-42e8ee87", "mir32-0642f4ca", "mir32-184cb1c5", 225, 232, "fluid", "angels-liquid-molten-tin", 40, "bob-tin-plate", 4},
-    {"tin", "angels-plate-tin-2", "mir32-beddbea4", "mir32-7139eb7d", "mir32-22db51fb", 225, 232, "item", "angels-roll-tin", 1, "bob-tin-plate", 4},
-    {"titanium", "angels-plate-titanium", "mir32-b51c3afe", "mir32-d9559f25", "mir32-020b9885", 68, 70, "fluid", "angels-liquid-molten-titanium", 40, "bob-titanium-plate", 4},
-    {"titanium", "angels-plate-titanium-2", "mir32-2addeacf", "mir32-ede374f2", "mir32-6f504961", 68, 70, "item", "angels-roll-titanium", 1, "bob-titanium-plate", 4}
+    {"gold", "angels-plate-gold", "mir32-82b81bf5", "mir32-d4567136", "fluid", "angels-liquid-molten-gold", 40, "bob-gold-plate", 4},
+    {"gold", "angels-plate-gold-2", "mir32-a5ba136b", "mir32-2f72d9cd", "item", "angels-roll-gold", 1, "bob-gold-plate", 4},
+    {"gold", "angels-wire-gold-2", "mir32-f4af2099", "mir32-f029b315", "item", "angels-wire-coil-gold", 4, "bob-gilded-copper-cable", 16},
+    {"tin", "angels-plate-tin", "mir32-42e8ee87", "mir32-1a2afdfa", "fluid", "angels-liquid-molten-tin", 40, "bob-tin-plate", 4},
+    {"tin", "angels-plate-tin-2", "mir32-beddbea4", "mir32-2fbc823d", "item", "angels-roll-tin", 1, "bob-tin-plate", 4},
+    {"titanium", "angels-plate-titanium", "mir32-b51c3afe", "mir32-d8eb8681", "fluid", "angels-liquid-molten-titanium", 40, "bob-titanium-plate", 4},
+    {"titanium", "angels-plate-titanium-2", "mir32-2addeacf", "mir32-6a2e39c1", "item", "angels-roll-titanium", 1, "bob-titanium-plate", 4}
+  }
+  local stable_families = {
+    gold={item="bob-gold-plate", pattern="^bob%-gold%-plate$|^angels%-plate%-gold$|^angels%-plate%-gold%-2$|^angels%-wire%-gold%-2$"},
+    tin={item="bob-tin-plate", pattern="^bob%-tin%-plate$|^angels%-plate%-tin$|^angels%-plate%-tin%-2$"},
+    titanium={item="bob-titanium-plate", pattern="^bob%-titanium%-plate$|^angels%-plate%-titanium$|^angels%-plate%-titanium%-2$"}
   }
   local active = clone_map(exact_f200_mods)
   active.bobtech = nil
   local actual = material_streams_for({factorio_version="2.0"}, active, f200_items)
+  local seen_materials, route_count = {}, 0
   for _, row in ipairs(expected) do
     local stream = actual["research_material_" .. row[1]]
     local certificate = assert(stream.reviewed_forward_routes[row[2]])
     local contract, profile = certificate.relevant_return_graph_contract, certificate.profiles[1]
-    check(certificate.require_exact_route_certificate and certificate.maximum_productivity==3
+    local family = assert(stable_families[row[1]])
+    check(stream.required_items[1]==family.item and stream.identity_state=="stable-unreleased"
+      and recipe_patterns(stream)==family.pattern,
+      "R03 preserves the stable F200 material family identity: "..row[1])
+    check(certificate.id==("F200-BA-"..row[2].."-acyclic-forward-r47-v1")
+      and certificate.evidence_id=="F200-BobAngel-approved-forward-root-2.0.77-r47"
+      and certificate.require_exact_route_certificate and certificate.maximum_productivity==3
       and profile.mod_lock_scope=="relevant-return-graph" and next(profile.mod_locks)==nil
-      and contract.schema==2 and profile.canonical_risk_fingerprint==row[3]
-      and contract.return_graph_fingerprint==row[4] and contract.bindings_fingerprint==row[5]
-      and contract.reachable_identity_count==row[6] and contract.relevant_recipe_count==row[7]
-      and contract.direct_output_producer_count==3,
-      "captured R02 route binds its complete typed input graph: " .. row[2])
+      and profile.observer_mod_locks==nil and profile.canonical_risk_fingerprint==row[3]
+      and contract.schema==4 and contract.proof=="acyclic-forward" and contract.bindings_fingerprint==row[4]
+      and contract.return_graph_fingerprint==nil and contract.reachable_identity_count==nil
+      and contract.relevant_recipe_count==nil and contract.direct_output_producer_count==nil,
+      "R03 current route declares retained root binding and acyclic-forward proof: " .. row[2])
     check(#certificate.ingredients==1 and #certificate.results==1
-      and certificate.ingredients[1].type==row[8] and certificate.ingredients[1].name==row[9]
-      and certificate.ingredients[1].amount==row[10] and certificate.results[1].type=="item"
-      and certificate.results[1].name==row[11] and certificate.results[1].amount==row[12],
-      "captured R02 route retains its actual ingredient/output contract: " .. row[2])
+      and certificate.ingredients[1].type==row[5] and certificate.ingredients[1].name==row[6]
+      and certificate.ingredients[1].amount==row[7] and certificate.results[1].type=="item"
+      and certificate.results[1].name==row[8] and certificate.results[1].amount==row[9],
+      "R03 current route retains its actual ingredient/output contract: " .. row[2])
     check(exact_f200_streams["research_material_" .. row[1]].reviewed_forward_routes[row[2]].relevant_return_graph_contract.schema==1,
       "retained provider-pinned F200 route keeps its original schema-1 contract: " .. row[2])
+    seen_materials[row[1]]=true; route_count=route_count+1
   end
-  check(recipe_patterns(actual.research_material_tin)=="^bob%-tin%-plate$|^angels%-plate%-tin$|^angels%-plate%-tin%-2$"
-    and recipe_patterns(actual.research_material_titanium)=="^bob%-titanium%-plate$|^angels%-plate%-titanium$|^angels%-plate%-titanium%-2$",
-    "new structural declarations retain existing Bob candidates alongside exactly two captured finals")
+  check(route_count==7 and seen_materials.gold and seen_materials.tin and seen_materials.titanium,
+    "R03 declaration update covers exactly the remaining seven current F200 structural routes")
   local outputs = actual.research_material_gold.groups[1].required_productive_outputs
   check(#outputs==2 and outputs[1].name=="bob-gold-plate" and outputs[2].name=="bob-gilded-copper-cable",
     "combined Gold wire selector binds the actual Bob cable output instead of a nonexistent Angel wire")
@@ -2478,5 +2489,246 @@ do
       "absent Angel provider cannot select its structural recipes: " .. material)
   end
 end
+
+-- Forward proofs consume the existing Context science service. These
+-- disabled/cycle/no-lab cases check that boundary; the separate science
+-- fixtures exercise actual prerequisite and pack/lab propagation.
+do
+  local fingerprint=require("prototypes.mir.core.fingerprint")
+  local saved_has_service,saved_service=test_context.has_service,test_context.service
+  local forward_context_services={}
+  test_context.has_service=function(_,name) return forward_context_services[name]~=nil end
+  test_context.service=function(_,name) return forward_context_services[name] end
+
+  local function forward_root() return canonical_route("forward-root","ore","plate") end
+  local function forward_technology(prerequisites)
+    return {unit={ingredients={{"automation-science-pack",1}}},prerequisites=prerequisites or {"forward-prerequisite"}}
+  end
+  local function forward_setup(options)
+    options=options or {}
+    package.loaded["prototypes.mir.platform.factorio.target_profiles"].current=function()
+      return {prototype_shapes={product_probability_fields={"probability"}}}
+    end
+    local root=forward_root()
+    environment({["forward-root"]=root,downstream=canonical_route("downstream","plate","gear")},options.items,options.entities)
+    risks={["forward-root"]=risk_row("forward-root"),downstream=risk_row("downstream")}
+    mods={base="2.0.77",arbitrary_provider="1.0.0"}
+    productivity_owners={["forward-root"]=options.owners or {}}
+    recipe_unlocks={["forward-root"]={"forward-unlock"}}
+    technologies={["forward-unlock"]=forward_technology(options.prerequisites),["forward-prerequisite"]={unit={ingredients={{"automation-science-pack",1}}},prerequisites={}}}
+    for name,technology in pairs(options.extra_technologies or {}) do technologies[name]=technology end
+    generated_owners=options.generated_owners or {}
+    forward_context_services={}
+    if not options.missing_service then
+      local reasons=options.researchability_reasons or {}
+      forward_context_services["science.technology_researchability_reason"]=function(name) return reasons[name] end
+    end
+    return root
+  end
+  local function forward_bindings()
+    local owners={}
+    for _,name in ipairs(productivity_owners["forward-root"] or {}) do
+      if not generated_owners[name] or (generated_owners[name]~=true and generated_owners[name]~="stream") then
+        local changes={}
+        for _,effect in ipairs(technologies[name].effects or {}) do
+          if effect.type=="change-recipe-productivity" and effect.recipe=="forward-root" then changes[#changes+1]=effect.change end
+        end
+        table.sort(changes); owners[#owners+1]={name=name,changes=changes}
+      end
+    end
+    table.sort(owners,function(left,right) return left.name<right.name end)
+    local technology=technologies["forward-unlock"]
+    local science={}
+    for _,entry in ipairs(technology.unit.ingredients or {}) do science[#science+1]={name=entry.name or entry[1],amount=entry.amount or entry[2]} end
+    table.sort(science,function(left,right) return left.name<right.name end)
+    local prerequisites={};for _,name in ipairs(technology.prerequisites or {}) do prerequisites[#prerequisites+1]=name end;table.sort(prerequisites)
+    return {schema=1,recipe="forward-root",productivity_owner_technologies=owners,
+      unlock_technologies={{name="forward-unlock",science_ingredients=science,prerequisites=prerequisites}}}
+  end
+  local function forward_certificate(schema,root)
+    local value=certificate("ore","plate")
+    value.id="forward-schema-"..tostring(schema);value.evidence_id="private-forward-r03";value.require_exact_route_certificate=true
+    value.profiles[1].mod_locks={};value.profiles[1].mod_lock_scope="relevant-return-graph"
+    if schema==2 then value.relevant_return_graph_contract=assert(matcher.relevant_route_fingerprints(root,2))
+    else value.relevant_return_graph_contract={schema=4,proof="acyclic-forward",bindings_fingerprint=fingerprint.of(forward_bindings())} end
+    return value
+  end
+  local function forward_selected(certificate_value)
+    local buckets=matcher.recipes_for_stream({items={"plate"},recipe_patterns={"^forward%-root$"},require_acyclic_process=true,
+      require_exact_route_certificate=true,reviewed_forward_routes={["forward-root"]=certificate_value}},0.02)
+    return #buckets[1].recipes==1 and buckets[1].recipes[1]=="forward-root"
+  end
+  local function refuse(label,value) check(not forward_selected(value),"schema-4 forward proof refuses "..label) end
+
+  local root=forward_setup();local schema2=forward_certificate(2,root)
+  check(forward_selected(schema2),"schema-2 route remains readable in R03 matcher")
+  root=forward_setup();local schema4=forward_certificate(4,root)
+  check(forward_selected(schema4),"schema-4 acyclic-forward route admits the exact root process")
+  root=forward_setup({missing_service=true});refuse("missing researchability service",forward_certificate(4,root))
+  for _,case in ipairs({
+    {name="disabled",reason="disabled-prerequisite-forward-unlock"},
+    {name="cycle",reason="technology-cycle-1"},
+    {name="no-lab",reason="no-accepting-lab"}
+  }) do
+    root=forward_setup({researchability_reasons={["forward-unlock"]=case.reason}})
+    refuse("Context science service "..case.name,forward_certificate(4,root))
+  end
+  root=forward_setup();technologies["forward-unlock"].hidden=true;refuse("hidden direct unlock",forward_certificate(4,root))
+  local foreign="recipe-prod-research_lookalike"
+  root=forward_setup({owners={foreign},extra_technologies={[foreign]={effects={{type="change-recipe-productivity",recipe="forward-root",change=0.10}},unit={ingredients={{"automation-science-pack",1}}},prerequisites={}}}})
+  local foreign_certificate=forward_certificate(4,root)
+  check(forward_selected(foreign_certificate),"nonregistered MIR-looking direct owner remains explicitly bound")
+  technologies[foreign].effects[1].change=0.20;refuse("direct owner effect change",foreign_certificate)
+  root=forward_setup({owners={foreign},generated_owners={[foreign]="stream"},extra_technologies={[foreign]={effects={{type="change-recipe-productivity",recipe="forward-root",change=0.10}},unit={ingredients={{"automation-science-pack",1}}},prerequisites={}}}})
+  local generated_certificate=forward_certificate(4,root);technologies[foreign].effects[1].change=0.20
+  check(forward_selected(generated_certificate),"authoritative generated-stream classification is the only direct owner exemption")
+  root=forward_setup();local io_certificate=forward_certificate(4,root);root.variants[1].ingredients[1].amount=11;refuse("root IO",io_certificate)
+  root=forward_setup();local cap_certificate=forward_certificate(4,root);root.effective_maximum_productivity=3.01;refuse("root cap",cap_certificate)
+  root=forward_setup();local risk_certificate=forward_certificate(4,root);risks["forward-root"].risk_fingerprint="mir32-99999999";refuse("root risk",risk_certificate)
+  root=forward_setup();local recipe_return_certificate=forward_certificate(4,root);records.reclaim=canonical_route("reclaim","plate","ore");cached={};refuse("recipe return",recipe_return_certificate)
+  root=forward_setup({items={plate={fuel_value="1MJ",burnt_result="ore",fuel_category="chemical"}}});refuse("native item return",forward_certificate(4,root))
+  for _,minable in ipairs({
+    {result="ore"},
+    {results={{name="ore",amount=1}}},
+    {results={{"ore",1}}},
+    {results={{type="fluid",name="recovered",amount=1}}}
+  }) do
+    root=forward_setup({items={gear={place_result="recovery-machine"}},entities={
+      ["recovery-machine"]={minable=minable}
+    }})
+    records["recovery-fluid"]=canonical_route("recovery-fluid","recovered","ore")
+    records["recovery-fluid"].variants[1].ingredients[1].type="fluid"
+    refuse("downstream placement/mining recovery",forward_certificate(4,root))
+  end
+  for _,minable in ipairs({
+    {result="gear"},
+    {results={{name="ore",amount=0}}},
+    {results={{name="ore",amount=1,probability=0}}}
+  }) do
+    root=forward_setup({items={gear={place_result="ordinary-machine"}},entities={
+      ["ordinary-machine"]={minable=minable}
+    }})
+    check(forward_selected(forward_certificate(4,root)),"ordinary or definitely zero mining conversion remains admissible")
+  end
+  root=forward_setup({items={gear={place_result="missing-machine"}}})
+  refuse("unresolved placement entity",forward_certificate(4,root))
+  root=forward_setup({items={gear={place_result="malformed-machine"}},entities={
+    ["malformed-machine"]={minable={results={[2]={name="ore",amount=1}}}}
+  }})
+  refuse("malformed mining result list",forward_certificate(4,root))
+  root=forward_setup();local unrelated_certificate=forward_certificate(4,root);records.unrelated=canonical_route("unrelated","coal","ash");cached={}
+  check(forward_selected(unrelated_certificate),"unrelated acyclic addition stays outside the root proof")
+  root=forward_setup();local wrong_binding=forward_certificate(4,root);wrong_binding.relevant_return_graph_contract.bindings_fingerprint="mir32-deadbeef";refuse("wrong retained root pin",wrong_binding)
+  test_context.has_service,test_context.service=saved_has_service,saved_service
+end
+
+-- Actual risk owner: candidate reads are demand-driven, while explicit full
+-- exports retain the complete eager classifier's bytes and copy isolation.
+;(function()
+  local names={"prototypes.mir.index.recipe_risk_facts","prototypes.mir.index.recipe_facts",
+    "prototypes.mir.index.relationships","prototypes.mir.pipeline.compiler_context",
+    "prototypes.mir.report.compiler_telemetry"}
+  local saved={};for _,name in ipairs(names) do saved[name]=package.loaded[name] end
+  local fp=require("prototypes.mir.core.fingerprint")
+  local copy=require("prototypes.mir.core.deepcopy")
+  local source,items,source_digest,states,counters,context
+  local actual_context=require("fixtures.material_routes.compiler_context")
+  package.loaded[names[4]]=actual_context
+  package.loaded[names[2]]=nil
+  local source_owner=require(names[2])
+  package.loaded[names[2]]={index_view=function() return source end,fingerprint=function() return source_digest end}
+  package.loaded[names[3]]={view=function() return {items=items} end}
+  package.loaded[names[5]]={start_phase=function() end,finish_phase=function() end,
+    count=function(name,value) counters[name]=(counters[name] or 0)+value end}
+  package.loaded[names[1]]=nil
+  local owner=require(names[1])
+  local function call(method,...) return actual_context.with_active(context,owner[method],...) end
+  local function prepare(value,item_rows)
+    source,items,counters=value,item_rows or {},{}
+    context=actual_context.new();states=context.state
+    source_digest=fp.of(source)
+  end
+  local function typed(name,input,output)
+    local row=canonical_route(name,input,output)
+    row.ingredient_identities={{type="item",name=input}}
+    row.productive_result_identities={{type="item",name=output}}
+    return row
+  end
+  local input={schema=2,names={"safe","unsafe"},facts={safe=typed("safe","ore","plate"),unsafe=typed("unsafe","ore","ore")}}
+  for i=1,200 do
+    local name="unused-"..i;input.names[#input.names+1]=name;input.facts[name]=typed(name,"ore","plate")
+  end
+  prepare(input)
+  local expected=owner.index_facts(source,{items=items})
+  local first_identity=call("source_fingerprint")
+  check((counters.recipe_risk_facts or 0)==0 and states.recipe_risk_index==nil,
+    "risk source identity does not classify or publish an unrequested complete index")
+  check(fp.canonical(call("view","safe"))==fp.canonical(expected.facts.safe),"demand-driven safe row equals complete eager classifier")
+  check(counters.recipe_risk_facts==1 and states.recipe_risk_index==nil,
+    "one selected recipe does not classify 201 unrelated recipes")
+  call("view","safe");call("get","safe");call("view","absent")
+  check(counters.recipe_risk_facts==1,"repeated and absent risk reads add no classification")
+  local detached=call("get","safe");detached.hard_flags[1]="forged"
+  check(#call("view","safe").hard_flags==0,"risk get remains an isolated copy")
+  check(owner.has_hard_flag(call("view","unsafe"),"catalyst_or_self_return") and counters.recipe_risk_facts==2,
+    "actual selected self-return classification remains authoritative")
+  local full=call("snapshot")
+  check(counters.recipe_risk_facts==202 and fp.canonical(full)==fp.canonical(expected),
+    "full risk snapshot completes all rows with exactly the established public bytes")
+  check(call("fingerprint")==expected.risk_index_fingerprint and counters.recipe_risk_facts==202,
+    "full risk fingerprint remains exact and does not rebuild classified rows")
+  full.facts.safe.hard_flags[1]="forged";full.names[1]="forged"
+  check(fp.canonical(call("snapshot"))==fp.canonical(expected),"full risk snapshot mutation cannot change the owner")
+  check(call("source_fingerprint")==first_identity,"diagnostic materialization does not change risk input identity")
+  local changed=copy(input);changed.facts.safe.effective_allow_productivity=false
+  prepare(changed)
+  check(call("source_fingerprint")~=first_identity and owner.has_hard_flag(call("view","safe"),"productivity_disabled"),
+    "new Context binds changed normalized facts and applies the actual changed risk")
+  local multi=typed("multi","ore","plate")
+  multi.productive_result_names={"plate","gear"}
+  multi.variants[1].results[2]={type="item",name="gear",amount=1}
+  multi.productive_result_identities[2]={type="item",name="gear"}
+  local multi_source={schema=2,names={"multi"},facts={multi=multi}}
+  prepare(multi_source)
+  local no_placement=call("source_fingerprint")
+  check(not owner.has_hard_flag(call("view","multi"),"ambiguous_placeable_output"),"ordinary coproduct without placeability remains unchanged")
+  prepare(multi_source,{gear={place_result="gear-machine"}})
+  check(call("source_fingerprint")~=no_placement and owner.has_hard_flag(call("view","multi"),"ambiguous_placeable_output"),
+    "risk source identity includes item placeability independently of recipe identity")
+  local reversed=copy(input)
+  for i=1,math.floor(#reversed.names/2) do
+    local j=#reversed.names-i+1;reversed.names[i],reversed.names[j]=reversed.names[j],reversed.names[i]
+  end
+  prepare(reversed);call("view","unsafe");call("view","safe")
+  check(fp.canonical(call("snapshot"))==fp.canonical(expected),"query and input-name order do not change the full risk index")
+  for _,first_read in ipairs({"source_fingerprint","view"}) do
+    prepare(input);context:set_state("recipe_source",{old={name="old"}})
+    call(first_read,"safe")
+    local before_epoch=context:state_epoch("recipe_source")
+    local ok,message=pcall(actual_context.with_active,context,source_owner.replace_source,{changed={name="changed"}},before_epoch)
+    check(not ok and tostring(message):find("recipe_risk_materialization",1,true)
+      and context:state_epoch("recipe_source")==before_epoch and states.recipe_source.old~=nil,
+      "partial risk ownership refuses recipe-source replacement before advancing epoch: "..first_read)
+  end
+  prepare(input);context:set_state("compiler_telemetry",{counters={}});call("view","safe")
+  local exported=context:snapshot()
+  check(counters.recipe_risk_facts==202 and fp.canonical(exported.state.recipe_risk_index)==fp.canonical(expected),
+    "actual generic Context snapshot completes the risk index after lazy compilation")
+  check(exported.state.recipe_risk_materialization==nil and exported.state_epochs.recipe_risk_materialization==nil
+    and context:state_snapshot("recipe_risk_materialization")==nil,
+    "generic state exports omit the private partial risk owner")
+  local exported_keys=0;for _ in pairs(exported.state) do exported_keys=exported_keys+1 end
+  check(exported.state.compiler_telemetry.counters.context_state_keys==exported_keys,
+    "generic Context telemetry counts the actual exported state keys")
+  check(not table.concat(exported.services,"|"):find("recipe_risk.materialize_export",1,true),
+    "private risk completion service is not a public capability inventory entry")
+  exported.state.recipe_risk_index.facts.safe.hard_flags[1]="forged"
+  check(fp.canonical(context:state_snapshot("recipe_risk_index"))==fp.canonical(expected),
+    "generic risk state exports remain isolated complete snapshots")
+  prepare(input);call("source_fingerprint")
+  check(fp.canonical(context:state_snapshot("recipe_risk_index"))==fp.canonical(expected) and counters.recipe_risk_facts==202,
+    "direct risk state export completes a source-only materialization")
+  for _,name in ipairs(names) do package.loaded[name]=saved[name] end
+end)()
 
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
