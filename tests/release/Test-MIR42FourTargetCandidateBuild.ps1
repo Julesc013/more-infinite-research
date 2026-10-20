@@ -623,11 +623,11 @@ try {
   $v14Predecessor = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion '4.7.0'
   Assert-MIR42CandidateBuildTest (
     $v14Predecessor.source_version -ceq '4.6.0' -and $v14Predecessor.source_patch -eq 0 -and
-    $v14Predecessor.release_id -eq 417286963 -and $v14Predecessor.asset_count -eq 19 -and
-    $v14Predecessor.commit -ceq '69d4286a702209a7a3e6d70c5cf1e8f2df2fd6d5' -and
-    $v14Predecessor.tree -ceq 'e905fa72d32bbe19ab933f4825305721313e1edc' -and
-    $v14Predecessor.tag_object -ceq '14c4dea57b90ec02d906b2bc585551c2ec836340' -and
-    $v14Predecessor.manifest_sha256 -ceq '3ABA2417A82C18C3693D6424C746ACEC1D2F0A8EACB0FD9E2D51863310C21437'
+    $v14Predecessor.release_id -eq 418350860 -and $v14Predecessor.asset_count -eq 11 -and
+    $v14Predecessor.commit -ceq '9d6a9de1d77ca526da78428f8de52d5c61f9f55b' -and
+    $v14Predecessor.tree -ceq 'da6bafdd17c6246c90edad3fef7a6ba6166ac920' -and
+    $v14Predecessor.tag_object -ceq 'cd67ea9b93415819444c2bdf7f25873a0b906c6c' -and
+    $v14Predecessor.manifest_sha256 -ceq '543F8D525248F984B14E181AA251C4D3288A6E2FE5FB7158A6F46D1B06B198D2'
   ) 'v14-predecessor-is-consolidated-460-publication'
   $v14Selection = Get-MIR42EngineMaintenanceSelection -CandidateSourceVersion '4.7.0'
   Assert-MIR42CandidateBuildTest ($v14Selection.source_version -ceq '4.6.0' -and $v14Selection.reader_version -ceq '4.7.0') 'v14-engine-selection-deduplicates-immediate-and-prior-minor-predecessor'
@@ -646,22 +646,24 @@ try {
   ) 'v14-pinned-construction-retains-original-honest-boundaries'
   # Synthetic API rows exercise the actual production custody reader. They do
   # not replace the retained public-download readback or make an engine pass.
-  $v14Assets = @([pscustomobject]@{id=1;name=$v14Predecessor.manifest_name;state='uploaded';size=$v14Pinned.bytes;digest=('sha256:'+$v14Pinned.sha256).ToLowerInvariant()})
-  $v14AssetId = 2
+  $v14AssetId = 1
+  $v14Assets = @($v14Predecessor.public_auxiliaries | ForEach-Object { [pscustomobject]@{id=$v14AssetId++;name=$_.name;state='uploaded';size=$_.bytes;digest=('sha256:'+$_.sha256).ToLowerInvariant()} })
   foreach ($row in $v14Pinned.manifest.targets) {
     $v14Assets += [pscustomobject]@{id=$v14AssetId++;name=('more-infinite-research_'+$row.distribution_version+'.zip');state='uploaded';size=$row.asset.bytes;digest=('sha256:'+$row.asset.sha256).ToLowerInvariant()}
   }
-  while ($v14Assets.Count -lt 19) { $v14Assets += [pscustomobject]@{id=$v14AssetId++;name=('other-'+$v14Assets.Count);state='uploaded';size=1;digest=('sha256:'+('0'*64))} }
   $v14Release = [pscustomobject]@{id=$v14Predecessor.release_id;tag_name='v4.6.0';target_commitish=$v14Predecessor.commit;draft=$false;prerelease=$false;immutable=$false;assets=$v14Assets}
   $v14Rows = @(Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $v14Pinned -ReleaseMetadata $v14Release -CandidateSourceVersion '4.7.0')
   Assert-MIR42CandidateBuildTest ($v14Rows.Count -eq 9 -and ($v14Rows.target -join '|') -ceq ($patchDescriptors.target -join '|')) 'v14-custody-reader-accepts-all-nine-consolidated-assets'
-  foreach ($tamper in @('withdrawn-release','changed-commit','changed-archive','changed-manifest')) {
+  foreach ($tamper in @('withdrawn-release','superseded-metadata-release','changed-commit','changed-archive','changed-checksums','changed-signature','surplus-manifest')) {
     $badRelease = $v14Release | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
     switch ($tamper) {
       'withdrawn-release' { $badRelease.id=416765779 }
+      'superseded-metadata-release' { $badRelease.id=417286963 }
       'changed-commit' { $badRelease.target_commitish=('0'*40) }
-      'changed-archive' { $badRelease.assets[1].digest=('sha256:'+('0'*64)) }
-      'changed-manifest' { $badRelease.assets[0].digest=('sha256:'+('0'*64)) }
+      'changed-archive' { $badRelease.assets[2].digest=('sha256:'+('0'*64)) }
+      'changed-checksums' { $badRelease.assets[0].digest=('sha256:'+('0'*64)) }
+      'changed-signature' { $badRelease.assets[1].digest=('sha256:'+('0'*64)) }
+      'surplus-manifest' { $badRelease.assets += [pscustomobject]@{id=999;name=$v14Predecessor.manifest_name;state='uploaded';size=$v14Pinned.bytes;digest=('sha256:'+$v14Pinned.sha256).ToLowerInvariant()} }
     }
     $rejected=$false
     try { Assert-MIR42PublishedMaintenancePredecessorMetadata -PinnedManifest $v14Pinned -ReleaseMetadata $badRelease -CandidateSourceVersion '4.7.0' | Out-Null } catch { $rejected=$_.Exception.Message -match '^\[mir42-maintenance-predecessor-' }

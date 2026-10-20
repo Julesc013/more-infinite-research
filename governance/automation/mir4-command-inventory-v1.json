@@ -5363,9 +5363,9 @@
     {
       "path": "tools/mir/application/release/readiness/MIR42FourTargetPreflight.ps1",
       "classification": "canonical-internal",
-      "sha256": "963A94B6F040C2791F68A001745BC172A898E24A99F51DD073368D1423AB4F66",
+      "sha256": "AA75E12A303B6830248B0433C340A3B16BD41D18C7EF0BFADC396C3FA7736A71",
       "hash_mode": "canonical-text-v1",
-      "lines": 618,
+      "lines": 640,
       "package_visible": false
     },
     {
@@ -6074,5 +6074,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:23f89578dd61390fefd5a58ff98287f1cb232695acaa6d474d33e2cfcc7e3246"
+  "digest": "sha256:cc23452f8bc790f89747e8dadafa244da88fc7735763b7d49703ae3dbd8cee13"
 }

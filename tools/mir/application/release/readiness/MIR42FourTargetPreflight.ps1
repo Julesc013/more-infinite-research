@@ -118,11 +118,16 @@ function Get-MIR42PublishedMaintenancePredecessorContract {
   # original 4.6.0 bytes. Its version alone cannot identify the predecessor.
   if ($CandidateSourceVersion -ceq '4.7.0') {
     return [pscustomobject][ordered]@{
-      source_version='4.6.0';source_patch=0;source_tag='v4.6.0';release_id=417286963;asset_count=19;target_commitish='69d4286a702209a7a3e6d70c5cf1e8f2df2fd6d5'
-      commit='69d4286a702209a7a3e6d70c5cf1e8f2df2fd6d5';tree='e905fa72d32bbe19ab933f4825305721313e1edc'
-      tag_object='14c4dea57b90ec02d906b2bc585551c2ec836340'
+      source_version='4.6.0';source_patch=0;source_tag='v4.6.0';release_id=418350860;asset_count=11;target_commitish='9d6a9de1d77ca526da78428f8de52d5c61f9f55b'
+      commit='9d6a9de1d77ca526da78428f8de52d5c61f9f55b';tree='da6bafdd17c6246c90edad3fef7a6ba6166ac920'
+      tag_object='cd67ea9b93415819444c2bdf7f25873a0b906c6c'
       manifest_name='mir-4.6.0.construction.json';manifest_bytes=5014
-      manifest_sha256='3ABA2417A82C18C3693D6424C746ACEC1D2F0A8EACB0FD9E2D51863310C21437'
+      manifest_sha256='543F8D525248F984B14E181AA251C4D3288A6E2FE5FB7158A6F46D1B06B198D2'
+      manifest_delivery='local-pinned-not-public'
+      public_auxiliaries=@(
+        [pscustomobject]@{name='SHA256SUMS.txt';bytes=936;sha256='AD23E0925338B44FB60CA2047FD1E76B908BFC5ADC5A46124146250714146F99'},
+        [pscustomobject]@{name='SHA256SUMS.txt.sig';bytes=306;sha256='E92B8267569163BD6473BBC5AA7C50CE40DA95BC56062C2DD32AA3B7749789A5'}
+      )
     }
   }
   # V13 consumes the exact final 4.5.2 publication. Its construction record stays
@@ -265,11 +270,28 @@ function Assert-MIR42PublishedMaintenancePredecessorMetadata {
       (@($manifest.targets.target) -join '|') -cne (@($script:MIR42FourTargetLines.Keys) -join '|')) {
     throw '[mir42-maintenance-predecessor-release-metadata]'
   }
-  $manifestAsset = @($ReleaseMetadata.assets | Where-Object { [string]$_.name -ceq $contract.manifest_name })
-  if ($manifestAsset.Count -ne 1 -or [int64]$manifestAsset[0].id -le 0 -or
-      [string]$manifestAsset[0].state -cne 'uploaded' -or [int64]$manifestAsset[0].size -ne [int64]$PinnedManifest.bytes -or
-      [string]$manifestAsset[0].digest -cne ('sha256:' + [string]$PinnedManifest.sha256).ToLowerInvariant()) {
-    throw '[mir42-maintenance-predecessor-published-manifest]'
+  if ($contract.PSObject.Properties['manifest_delivery'] -and $contract.manifest_delivery -ceq 'local-pinned-not-public') {
+    # The exact construction is retained locally. The public release deliberately
+    # contains only nine player ZIPs and the two checksum files. Authenticate
+    # that inventory rather than require a removed developer download.
+    if (@($ReleaseMetadata.assets | Where-Object name -CEQ $contract.manifest_name).Count -ne 0) {
+      throw '[mir42-maintenance-predecessor-unexpected-public-manifest]'
+    }
+    foreach ($auxiliary in $contract.public_auxiliaries) {
+      $actual = @($ReleaseMetadata.assets | Where-Object name -CEQ $auxiliary.name)
+      if ($actual.Count -ne 1 -or [int64]$actual[0].id -le 0 -or
+          [string]$actual[0].state -cne 'uploaded' -or [int64]$actual[0].size -ne $auxiliary.bytes -or
+          [string]$actual[0].digest -cne ('sha256:' + $auxiliary.sha256).ToLowerInvariant()) {
+        throw '[mir42-maintenance-predecessor-public-checksums]'
+      }
+    }
+  } else {
+    $manifestAsset = @($ReleaseMetadata.assets | Where-Object { [string]$_.name -ceq $contract.manifest_name })
+    if ($manifestAsset.Count -ne 1 -or [int64]$manifestAsset[0].id -le 0 -or
+        [string]$manifestAsset[0].state -cne 'uploaded' -or [int64]$manifestAsset[0].size -ne [int64]$PinnedManifest.bytes -or
+        [string]$manifestAsset[0].digest -cne ('sha256:' + [string]$PinnedManifest.sha256).ToLowerInvariant()) {
+      throw '[mir42-maintenance-predecessor-published-manifest]'
+    }
   }
   $rows = @(
     foreach ($target in $manifest.targets) {
