@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-assert-k2-imersite-460-to-470-upgrade",
+  "version": "0.1.4700",
+  "title": "MIR K2 4.6 to 4.7 full-state upgrade assertion",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base = 2.1.22", "more-infinite-research >= 4.6.21000", "Krastorio2 = 2.1.4", "Krastorio2-spaced-out = 2.0.19"]
+}
