@@ -687,7 +687,10 @@ try {
     # an apparent later-source maintenance patch.
     $mir43IdentityTree = Join-Path $identityRoot ("mir43-private-identity-" + $sourceVersion.Replace('.', '-'))
     New-Item -ItemType Directory -Force -Path $mir43IdentityTree | Out-Null
-    $mir43Info = [ordered]@{ name='more-infinite-research'; version=$baselineVersion; factorio_version='2.1'; dependencies=@('base'); title='Preserved authored title' }
+    # The 4.6 metadata writer requires the accepted exact engine floor. Keep
+    # this synthetic identity fixture subject to the same input contract.
+    $identityBase = if ($sourceVersion -ceq '4.6.0') { 'base >= 2.1.21' } else { 'base' }
+    $mir43Info = [ordered]@{ name='more-infinite-research'; version=$baselineVersion; factorio_version='2.1'; dependencies=@($identityBase); title='Preserved authored title' }
     [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'info.json'), ($mir43Info | ConvertTo-Json -Depth 20), $utf8)
     [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'changelog.txt'), "---------------------------------------------------------------------------------------------------`nVersion: $baselineVersion`n  Changes:`n    - Preserved historical entry.`n", $utf8)
     [IO.File]::WriteAllText((Join-Path $mir43IdentityTree 'README.md'), "# Preserved authored README`n", $utf8)
