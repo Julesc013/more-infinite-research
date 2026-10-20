@@ -186,11 +186,22 @@ function Get-MIR4RetiredRootReaderViolations {
       ForEach-Object { Get-MIR4RootReaderScopeKey -Ast $_ }) |
       Sort-Object -Unique
   )
+  # AST nodes are immutable. Group ForEach nodes by their exact function/script
+  # scope once; the fixed-point propagation below only consumes this view.
+  $foreachAstsByScope = @{}
+  foreach ($foreachAst in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true))) {
+    $foreachScope = Get-MIR4RootReaderScopeKey -Ast $foreachAst
+    if (-not $foreachAstsByScope.ContainsKey($foreachScope)) {
+      $foreachAstsByScope[$foreachScope] = [Collections.Generic.List[object]]::new()
+    }
+    $foreachAstsByScope[$foreachScope].Add($foreachAst)
+  }
   $factsByScope = @{}
   $rootVariablesByScope = @{}
   $taintedPathVariablesByScope = @{}
   foreach ($scope in $scopeKeys) {
     $scopeAssignments = @($assignmentData | Where-Object scope -ceq $scope)
+    $scopeForeachAsts = if ($foreachAstsByScope.ContainsKey($scope)) { $foreachAstsByScope[$scope] } else { @() }
     $facts = @{}
     foreach ($entry in $scopeAssignments) {
       if (-not $entry.name) { continue }
@@ -203,7 +214,7 @@ function Get-MIR4RetiredRootReaderViolations {
         $next = @(@($facts[$entry.name]) + $entry.literals + @($entry.references | ForEach-Object { @($facts[$_]) }) | Sort-Object -Unique)
         if ((@($facts[$entry.name]) -join "`n") -cne ($next -join "`n")) { $facts[$entry.name] = $next; $changed = $true }
       }
-      foreach ($foreachAst in @($ast.FindAll({ param($node) $node -is [System.Management.Automation.Language.ForEachStatementAst] }, $true) | Where-Object { (Get-MIR4RootReaderScopeKey -Ast $_) -ceq $scope })) {
+      foreach ($foreachAst in $scopeForeachAsts) {
         $name = Get-MIR4RootReaderVariableName -Ast $foreachAst.Variable
         if (-not $name) { continue }
         $next = @(@($facts[$name]) + @(Get-MIR4RootReaderExpressionValues -Ast $foreachAst.Condition -Facts $facts) | Sort-Object -Unique)
