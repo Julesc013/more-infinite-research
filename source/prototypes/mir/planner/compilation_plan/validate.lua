@@ -4,6 +4,11 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 local gate_contract = require("prototypes.mir.domain.technology.gate")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local ownership_facts = require("prototypes.mir.planner.effect_ownership.facts")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_operation(operation)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_operation(operation)
+end
 
 local M = {}
 
@@ -54,36 +59,41 @@ function M.operations(operations)
   for _, operation in ipairs(operations) do
     local expected_effects = operation.effects or (operation.technology and operation.technology.effects) or {}
     technology_effects.assert_effects_allowed(expected_effects, "CompilationPlan " .. tostring(operation.technology_name))
-    for _, effect in ipairs(expected_effects) do
-      local identity = generation_plan.effect_identity(effect)
-      if identity ~= "" then
-        if effects[identity] then
-          if not material_stage_overlaps[identity] and ownership_facts.material_stage_pair(
-              effects[identity], operation, effect_values[identity], effect) then
-            material_stage_overlaps[identity] = true
-            table.insert(planned_overlaps, {
-              identity = identity,
-              owners = {effects[identity].technology_name, operation.technology_name},
-              policy = "material-stage-same-qualified-recipe"
-            })
-          elseif not weapon_speed_overlaps[identity]
-            and ownership_facts.weapon_speed_overlap_pair(
-              effects[identity], operation, effect_values[identity], effect)
-            and (ownership_facts.retained_overlap(operation, identity)
-              or ownership_facts.retained_overlap(effects[identity], identity)) then
-            weapon_speed_overlaps[identity] = true
-            table.insert(planned_overlaps, {
-              identity = identity,
-              owners = {effects[identity].technology_name, operation.technology_name},
-              policy = "weapon-speed-overlap-retained"
-            })
-          else
-            error("CompilationPlan contains duplicate direct-effect identity: " .. identity, 2)
+    -- A fully identified K2 compatibility holder may mirror the predecessor
+    -- effect while JSON migration is in flight. It remains effect-validated,
+    -- but is never entered into the ordinary ownership identity map.
+    if not migration_state_alias_operation(operation) then
+      for _, effect in ipairs(expected_effects) do
+        local identity = generation_plan.effect_identity(effect)
+        if identity ~= "" then
+          if effects[identity] then
+            if not material_stage_overlaps[identity] and ownership_facts.material_stage_pair(
+                effects[identity], operation, effect_values[identity], effect) then
+              material_stage_overlaps[identity] = true
+              table.insert(planned_overlaps, {
+                identity = identity,
+                owners = {effects[identity].technology_name, operation.technology_name},
+                policy = "material-stage-same-qualified-recipe"
+              })
+            elseif not weapon_speed_overlaps[identity]
+              and ownership_facts.weapon_speed_overlap_pair(
+                effects[identity], operation, effect_values[identity], effect)
+              and (ownership_facts.retained_overlap(operation, identity)
+                or ownership_facts.retained_overlap(effects[identity], identity)) then
+              weapon_speed_overlaps[identity] = true
+              table.insert(planned_overlaps, {
+                identity = identity,
+                owners = {effects[identity].technology_name, operation.technology_name},
+                policy = "weapon-speed-overlap-retained"
+              })
+            else
+              error("CompilationPlan contains duplicate direct-effect identity: " .. identity, 2)
+            end
           end
-        end
-        if not effects[identity] then
-          effects[identity] = operation
-          effect_values[identity] = effect
+          if not effects[identity] then
+            effects[identity] = operation
+            effect_values[identity] = effect
+          end
         end
       end
     end

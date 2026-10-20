@@ -2,6 +2,10 @@ local from_version, to_version = "4.6.21000", "4.7.21000"
 local fixture_name = "mir-fixture-assert-k2-imersite-460-to-470-upgrade"
 local legacy_name = "recipe-prod-research_material_imersite-1"
 local continuation_name = "recipe-prod-research_material_imersite-4"
+local owned_speed_sentinel_interface = "aaa-mir47-owned-speed-sentinel"
+local owned_speed_sentinel_version = "0.1.4700"
+local holder_name = "mir-k2-imersite-staged-state-1"
+local continuation_holder_name = "mir-k2-imersite-continuation-state-4"
 local native_name = "kr-imersite-productivity"
 local powder_name, crystal_name = "kr-imersite-powder", "kr-imersite-crystal"
 local zero_force_name, low_force_name = "mir-k2-migration-zero", "mir-k2-migration-low"
@@ -46,8 +50,8 @@ end
 local function profile(version)
   local expected = {
     base = "2.1.22", Krastorio2 = "2.1.4", ["Krastorio2-spaced-out"] = "2.0.19",
-    ["more-infinite-research"] = version, [fixture_name] = "0.1.4700"
-  }
+    ["more-infinite-research"] = version, [fixture_name] = "0.1.4700",
+    [owned_speed_sentinel_interface] = owned_speed_sentinel_version  }
   for name, value in pairs(expected) do
     if script.active_mods[name] ~= value then
       fail("wrong input " .. name .. "=" .. tostring(script.active_mods[name]))
@@ -133,11 +137,26 @@ local function startup_settings()
   return out
 end
 
+-- LuaRemote.interfaces exposes registered method names as true, while calls
+-- remain dispatched through remote.call. This local is declared before the
+-- exporter so that the real fixture captures it lexically.
+local function owned_sentinel_call(method, ...)
+  local interfaces = remote and remote.interfaces
+  local interface = interfaces and interfaces[owned_speed_sentinel_interface]
+  if not interface or interface[method] ~= true then
+    fail("owned speed sentinel interface or method is unavailable: " .. tostring(method))
+  end
+  local ok, result = pcall(remote.call, owned_speed_sentinel_interface, method, ...)
+  if not ok then
+    fail("owned speed sentinel " .. tostring(method) .. " failed: " .. tostring(result))
+  end
+  return result
+end
 local function export_state(stage)
   helpers.write_file("mir-upgrade-full-state-" .. stage .. ".json", helpers.table_to_json({
     from_version = from_version, to_version = to_version, stage = stage,
-    active_mods = deep_copy(script.active_mods), startup_settings = startup_settings(), forces = all_force_states()
-  }))
+    active_mods = deep_copy(script.active_mods), startup_settings = startup_settings(), forces = all_force_states(),
+    owned_speed_sentinel = owned_sentinel_call("snapshot")  }))
 end
 
 local function exact_productivity_effect(technology, recipe, expected, label)
@@ -192,8 +211,65 @@ local function candidate_definitions(force)
   if not native then fail("candidate native Imersite crystal owner absent") end
   exact_productivity_effect(native, crystal_name, 0.10, "candidate native Imersite crystal effect")
   no_productivity_effect(native, powder_name, "candidate native Imersite owner")
+  for _, identity in ipairs({{holder_name, 1}, {continuation_holder_name, 4}}) do
+    local name, minimum_level = identity[1], identity[2]
+    local holder = force.technologies[name]
+    if not holder or not holder.prototype.hidden or not holder.prototype.hidden_in_factoriopedia
+        or holder.prototype.max_level < infinite_level or holder.enabled or holder.visible_when_disabled
+        or holder.level ~= minimum_level or holder.researched then
+      fail("candidate compatibility holder is absent, visible, enabled or retains duplicate earned credit: " .. name)
+    end
+    if #(holder.prototype.effects or {}) ~= 1 then fail("compatibility holder has unexpected extra effects: " .. name) end
+    exact_productivity_effect(holder, powder_name, 0.02, "compatibility holder powder effect " .. name)
+    no_productivity_effect(holder, crystal_name, "compatibility holder crystal ownership " .. name)
+    close("cleared compatibility holder investment " .. name, holder.saved_progress, 0)
+    for _, technology in ipairs(force.research_queue or {}) do
+      if technology.name == name then fail("compatibility holder remains in the active queue: " .. name) end
+    end
+    if force.current_research and force.current_research.name == name then
+      fail("compatibility holder remains current research: " .. name)
+    end
+  end
 end
 
+local function install_owned_speed_sentinel(force)
+  local record = owned_sentinel_call("capture", force.name)
+  if type(record) ~= "table" or record.force_name ~= force.name or record.delta ~= 0.125 then
+    fail("owned speed sentinel did not capture its exact per-force contribution: " .. force.name)
+  end
+  close("owned speed sentinel source total " .. force.name,
+    force.character_running_speed_modifier, record.source_total)
+end
+
+local function seal_owned_speed_sentinel(cases)
+  local names = {}
+  for _, case in ipairs(cases) do names[#names + 1] = case.force_name end
+  local snapshot = owned_sentinel_call("seal_source", names)
+  if type(snapshot) ~= "table" or snapshot.phase ~= "captured" then
+    fail("owned speed sentinel did not seal the exact source force set")
+  end
+end
+
+local function verify_owned_speed_sentinel(state, stage)
+  local snapshot = owned_sentinel_call("snapshot")
+  if type(snapshot) ~= "table" or snapshot.phase ~= "restored"
+      or snapshot.source_mir_version ~= from_version or snapshot.target_mir_version ~= to_version
+      or snapshot.configuration_changed_events ~= 1 then
+    fail("owned speed sentinel target lifecycle differs at " .. stage)
+  end
+  for _, case in ipairs(state.cases) do
+    local record = snapshot.records and snapshot.records[case.force_name]
+    local force = game.forces[case.force_name]
+    if type(record) ~= "table" or not force or record.delta ~= 0.125
+        or record.force_index ~= force.index or record.before_target ~= record.baseline
+        or record.source_total ~= record.baseline + record.delta
+        or record.restored_total ~= record.source_total then
+      fail("owned speed sentinel record differs for " .. case.force_name .. " at " .. stage)
+    end
+    close("owned speed sentinel restored force effect " .. case.force_name .. " at " .. stage,
+      force.character_running_speed_modifier, record.restored_total)
+  end
+end
 local function seed_infinite_progress(force, completed)
   local legacy = force.technologies[legacy_name]
   source_definition(force)
@@ -220,6 +296,9 @@ local function seed_infinite_progress(force, completed)
     fail("source infinite Imersite queue differs for " .. force.name)
   end
   close("seeded research progress " .. force.name, force.research_progress, progress)
+  -- This owned fixture contribution replaces the old raw opaque offset. It
+  -- captures its exact source baseline and cannot restore unknown totals.
+  install_owned_speed_sentinel(force)
   return {force_name = force.name, completed = completed, next_level = next_level, powder_bonus = completed * 0.02}
 end
 
@@ -282,6 +361,16 @@ local function expected_policy_technology_state(name, prior)
   return expected
 end
 
+local function verify_holder_investment_descriptor(name, holder, prior_unit)
+  if not holder then fail("candidate compatibility holder omitted for " .. name) end
+  if not equal_state(holder.prototype.ingredients, prior_unit.ingredients)
+      or holder.prototype.unit_count_formula ~= prior_unit.unit_count_formula
+      or holder.prototype.unit_energy ~= prior_unit.unit_energy
+      or (not prior_unit.unit_count_formula and holder.prototype.unit_count ~= prior_unit.unit_count) then
+    fail("compatibility holder changed the predecessor investment descriptor for " .. name)
+  end
+end
+
 local function verify_unrelated_state(name, force, before)
   local current = complete_state(force)
   for technology_name, prior in pairs(before.technologies) do
@@ -292,11 +381,13 @@ local function verify_unrelated_state(name, force, before)
     end
   end
   for technology_name in pairs(current.technologies) do
-    if not before.technologies[technology_name] and technology_name ~= continuation_name then
+    if not before.technologies[technology_name] and technology_name ~= continuation_name
+        and technology_name ~= holder_name and technology_name ~= continuation_holder_name then
       fail("unexpected technology added for " .. name .. ": " .. technology_name)
     end
   end
   if not current.technologies[continuation_name] then fail("candidate continuation omitted for " .. name) end
+  verify_holder_investment_descriptor(name, current.technologies[holder_name], before.technologies[legacy_name].prototype)
   for recipe, prior_bonus in pairs(before.bonuses) do
     if current.bonuses[recipe] == nil or math.abs(current.bonuses[recipe] - prior_bonus) > epsilon then
       fail("unrelated recipe research bonus changed for " .. name .. ": " .. recipe)
@@ -385,6 +476,7 @@ local function verify_candidate(state, stage)
   profile(to_version)
   if state.cap ~= cap() then fail("configured unlimited cap changed") end
   if not equal_state(startup_settings(), state.startup_settings) then fail("startup setting changed") end
+  verify_owned_speed_sentinel(state, stage)
   for _, case in ipairs(state.cases) do verify_case(case, state, stage) end
   verify_control_force(state, stage)
   verify_other_forces(state, stage)
@@ -418,7 +510,8 @@ script.on_init(function()
   local cases = {
     seed_infinite_progress(zero, 0), seed_infinite_progress(low, 2),
     seed_infinite_progress(player, 3), seed_infinite_progress(high, 7)
-  }
+  }  seal_owned_speed_sentinel(cases)
+
   -- The control and pre-existing forces intentionally receive no seed,
   -- research mutation, or queue rewrite. Their candidate state is compared
   -- around only the independently specified staged-definition delta.

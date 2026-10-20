@@ -10,6 +10,48 @@ $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
+$k2StateRows = @(
+  [ordered]@{name='mir-k2-imersite-staged-state-1';stream_key='__migration_state/k2_imersite_staged_v1';source='compatibility-migration-state:k2-imersite-staged'},
+  [ordered]@{name='mir-k2-imersite-continuation-state-4';stream_key='__migration_state/k2_imersite_continuation_v1';source='compatibility-migration-state:k2-imersite-continuation'}
+)
+function Assert-MIRK2StagedStateManifest {
+  param([string]$Repository)
+  $streamsPath=Join-Path $Repository '.mir/streams.yml'
+  $manifestPath=Join-Path $Repository 'source/prototypes/mir/streams/generated_stream_manifest.json'
+  $streams=[IO.File]::ReadAllText($streamsPath)
+  $manifest=Get-Content -Raw -LiteralPath $manifestPath | ConvertFrom-Json
+  foreach($expected in $k2StateRows) {
+    $name=[regex]::Escape($expected.name)
+    $rowMatch=[regex]::Match($streams,"(?ms)^    $name`:`r?`n(?<row>.*?)(?=^    [A-Za-z0-9_][^:`r`n]*:|`z)")
+    if(-not $rowMatch.Success) { throw "K2 staged-state stream row missing: $($expected.name)" }
+    $required=@(
+      "canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.$($expected.name)",
+      'introduced_in: "4.7.0"',
+      "source: $($expected.source)",
+      'policy: retain-hidden-alias',
+      'identity_state: stable-unreleased',
+      "generated_technology: $($expected.name)",
+      "stream_key: $($expected.stream_key)",
+      'migration_policy: stable'
+    )
+    foreach($line in $required) {
+      if($rowMatch.Groups['row'].Value -notmatch ('(?m)^      '+[regex]::Escape($line)+'\r?$')) {
+        throw "K2 staged-state stream row lacks exact '$line': $($expected.name)"
+      }
+    }
+    $entry=$manifest.streams.PSObject.Properties[$expected.name].Value
+    if($null -eq $entry) { throw "K2 staged-state generated manifest row missing: $($expected.name)" }
+    foreach($property in @('introduced_in','source','policy','identity_state','generated_technology','stream_key','migration_policy','stable')) {
+      if($null -eq $entry.PSObject.Properties[$property]) { throw "K2 staged-state manifest property missing: $($expected.name).$property" }
+    }
+    if($entry.introduced_in -cne '4.7.0' -or $entry.source -cne $expected.source -or $entry.policy -cne 'retain-hidden-alias' -or
+        $entry.identity_state -cne 'stable-unreleased' -or $entry.generated_technology -cne $expected.name -or
+        $entry.stream_key -cne $expected.stream_key -or $entry.migration_policy -cne 'stable' -or $entry.stable -ne $true) {
+      throw "K2 staged-state generated manifest row differs from the exact retained-alias contract: $($expected.name)"
+    }
+  }
+}
+Assert-MIRK2StagedStateManifest -Repository $repo
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $output=[IO.Path]::GetFullPath((Join-Path $repo $OutputRoot))
 if(-not $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparatorChar,[StringComparison]::OrdinalIgnoreCase)) {
@@ -17,8 +59,8 @@ if(-not $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparat
 }
 $version=(& $engine --version | Out-String)
 $engineSha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
-if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version:\s*2[.]1[.]20(?:\s|$)') {
-  throw 'The K2 Imersite continuation compiler regression requires Factorio 2.1.20.'
+if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version:\s*2[.]1[.]22(?:\s|$)') {
+  throw 'The K2 Imersite continuation compiler regression requires Factorio 2.1.22.'
 }
 if(-not [string]::IsNullOrWhiteSpace($ExpectedEngineSha256) -and $engineSha256 -cne $ExpectedEngineSha256) {
   throw "This regression requires exact engine SHA-256 $ExpectedEngineSha256."
@@ -39,8 +81,18 @@ $modules=[ordered]@{
   'prototypes.mir.domain.effects.metadata'='source/prototypes/mir/domain/effects/metadata.lua'
   'prototypes.mir.domain.technology.technology_risk'='source/prototypes/mir/domain/technology/technology_risk.lua'
   'prototypes.mir.platform.factorio.target_line'='source/prototypes/mir/platform/factorio/target_line.lua'
+  'prototypes.mir.platform.factorio.data_raw'='source/prototypes/mir/platform/factorio/data_raw.lua'
+  'prototypes.mir.platform.factorio.prototype_lookup'='source/prototypes/mir/platform/factorio/prototype_lookup.lua'
+  'prototypes.mir.capabilities.science_integration.science_packs'='source/prototypes/mir/capabilities/science_integration/science_packs.lua'
+  'prototypes.mir.planner.costs'='source/prototypes/mir/planner/costs.lua'
+  'prototypes.mir.domain.research_cost.model'='source/prototypes/mir/domain/research_cost/model.lua'
+  'prototypes.mir.planner.stream_compiler.diagnostics'='source/prototypes/mir/planner/stream_compiler/diagnostics.lua'
+  'prototypes.mir.report.diagnostics_sink'='source/prototypes/mir/report/diagnostics_sink.lua'
   'fixtures.material_progression.target_profiles'='source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua'
   'prototypes.mir.domain.technology.maximum_level_binding'='source/prototypes/mir/domain/technology/maximum_level_binding.lua'
+  'prototypes.mir.domain.research.k2_imersite_staged_state'='source/prototypes/mir/domain/research/k2_imersite_staged_state.lua'
+  'prototypes.mir.planner.stream_compiler.k2_imersite_migration_alias'='source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua'
+  'prototypes.mir.runtime.k2_imersite_staged_state_migration'='source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua'
   'prototypes.mir.runtime.maximum_level_control'='source/prototypes/mir/runtime/maximum_level_control.lua'
   'prototypes.mir.planner.stream_compiler.material_continuation'='source/prototypes/mir/planner/stream_compiler/material_continuation.lua'
   'prototypes.mir.policy.max_level'='source/prototypes/mir/policy/max_level.lua'
@@ -49,6 +101,7 @@ $modules=[ordered]@{
 $tests=[ordered]@{
   progression='tests/compiler/material_progression.lua'
   continuation='tests/compiler/material_continuation.lua'
+  k2_staged_state='tests/runtime/k2_imersite_staged_state_controls.lua'
   worker_robot_speed_cap='tests/runtime/worker_robot_speed_cap.lua'
 }
 
@@ -101,13 +154,14 @@ $log=Get-Content -Raw -LiteralPath $nativeLog
 $progressionMatch=[regex]::Match($log,'MIR-MATERIAL-PROGRESSION-PASS ([0-9]+)')
 $continuationMatch=[regex]::Match($log,'MIR-MATERIAL-CONTINUATION-PASS ([0-9]+)')
 $workerRobotSpeedCapMatch=[regex]::Match($log,'MIR-WORKER-ROBOT-SPEED-CAP-PASS')
-if($exitCode -ne 0 -or -not $progressionMatch.Success -or -not $continuationMatch.Success -or -not $workerRobotSpeedCapMatch.Success) {
+$k2StagedStateMatch=[regex]::Match($log,'MIR-K2-STAGED-STATE-PASS ([0-9]+)')
+if($exitCode -ne 0 -or -not $progressionMatch.Success -or -not $continuationMatch.Success -or -not $k2StagedStateMatch.Success -or -not $workerRobotSpeedCapMatch.Success) {
   throw "K2 Imersite continuation compiler regression failed: $nativeLog"
 }
 $receipt=[ordered]@{
   status='passed'
   scope='controlled-material-declarations-and-continuation-planner-not-K2-profile-qualification'
-  assertions=[ordered]@{progression=[int]$progressionMatch.Groups[1].Value;continuation=[int]$continuationMatch.Groups[1].Value;worker_robot_speed_cap=$true}
+  assertions=[ordered]@{progression=[int]$progressionMatch.Groups[1].Value;continuation=[int]$continuationMatch.Groups[1].Value;k2_staged_state=[int]$k2StagedStateMatch.Groups[1].Value;worker_robot_speed_cap=$true}
   engine_version=$version.Trim()
   engine_sha256=$engineSha256
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash

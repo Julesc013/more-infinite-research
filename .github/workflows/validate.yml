@@ -218,14 +218,14 @@ jobs:
             mir-ledger-${{ runner.os }}-${{ github.ref_name }}-
             mir-ledger-${{ runner.os }}-
       - name: Select exact Python ABI for registered Lua 5.2 controls
-        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle') }}
+        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle' || matrix.test_id == 'static.k2-owned-speed-sentinel') }}
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.14'
           architecture: 'x64'
           check-latest: false
       - name: Provision exact Lua 5.2 host for registered Lua 5.2 controls
-        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle') }}
+        if: ${{ matrix.no_op != true && (matrix.test_id == 'static.immutable-input-staging' || matrix.test_id == 'static.recipe-productivity-permissions' || matrix.test_id == 'static.approved-pack-bindings' || matrix.test_id == 'static.approved-lab-bindings' || matrix.test_id == 'static.provider-metrics-lazy' || matrix.test_id == 'static.settings-catalogue-lifecycle' || matrix.test_id == 'static.k2-owned-speed-sentinel') }}
         shell: pwsh
         run: |
           $ErrorActionPreference='Stop'

@@ -54,6 +54,38 @@ function Assert-MIR421K2UpgradeTransition {
   }
 }
 
+function Get-MIR470K2OwnedSpeedSentinelFixture {
+  param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$FixtureName,[Parameter(Mandatory)][string]$SourceVersion)
+  if($FixtureName-cne'assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000'-or$SourceVersion-cne'4.7.0'){
+    throw '[mir470-k2-owned-speed-sentinel-fixture-admission]'
+  }
+  $directory=Join-Path $RepoRoot 'fixtures/aaa-mir47-owned-speed-sentinel'
+  $infoPath=Join-Path $directory 'info.json'
+  $controlPath=Join-Path $directory 'control.lua'
+  if(-not(Test-Path -LiteralPath $infoPath -PathType Leaf)-or-not(Test-Path -LiteralPath $controlPath -PathType Leaf)){
+    throw '[mir470-k2-owned-speed-sentinel-fixture-files]'
+  }
+  $info=Get-Content -LiteralPath $infoPath -Raw|ConvertFrom-Json
+  if([string]$info.name-cne'aaa-mir47-owned-speed-sentinel'-or[string]$info.version-cne'0.1.4700'-or[string]$info.factorio_version-cne'2.1'){
+    throw '[mir470-k2-owned-speed-sentinel-fixture-identity]'
+  }
+  [pscustomobject]@{
+    name=[string]$info.name;version=[string]$info.version;directory=$directory
+    info_sha256=(Get-FileHash -LiteralPath $infoPath -Algorithm SHA256).Hash
+    control_sha256=(Get-FileHash -LiteralPath $controlPath -Algorithm SHA256).Hash
+  }
+}
+
+function Assert-MIR470K2OwnedSpeedSentinelConfigurationOrder {
+  param([Parameter(Mandatory)][string]$Text)
+  $sentinel='[mir-owned-speed-sentinel] target-restored event=1'
+  $mir='[more-infinite-research] Maximum-level state'
+  $sentinelIndex=$Text.IndexOf($sentinel,[StringComparison]::Ordinal)
+  if($sentinelIndex-lt0){throw '[mir470-k2-owned-speed-sentinel-configuration-order] missing companion restoration'}
+  $mirIndex=$Text.IndexOf($mir,$sentinelIndex,[StringComparison]::Ordinal)
+  if($mirIndex-lt0){throw '[mir470-k2-owned-speed-sentinel-configuration-order] no later MIR maximum-level callback observation'}
+}
+
 function Assert-MIR421K2UpgradeMarker {
   param([string]$Text,[ValidateSet('source','upgrade','reload')][string]$Stage,[ValidateSet(0,3)][int]$Cap=3,
     [ValidateSet('4.2.1','4.2.2','4.7.0')][string]$SourceVersion='4.2.1')

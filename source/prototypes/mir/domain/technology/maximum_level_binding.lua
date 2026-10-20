@@ -1,5 +1,10 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
 
 local M = {}
 
@@ -253,7 +258,9 @@ end
 local function candidate_rows(plan, options)
   local rows = {}
   for _, row in ipairs((plan.stream_plan and plan.stream_plan.rows) or {}) do
-    if row.action == "emit" then
+    -- Exact hidden compatibility carriers retain migration state only. They
+    -- have no player setting/cap binding and cannot become a managed stream.
+    if row.action == "emit" and not migration_state_alias_row(row) then
       table.insert(rows, new_binding({
         technology_id = row.technology_name,
         stream_id = row.manifest_id or row.stream_key,
