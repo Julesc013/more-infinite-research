@@ -185,7 +185,7 @@ Ages are measured against the newest governed review date, 2026-10-21, so checko
 | docs/maintainer/developer-tools.md | current | 2026-08-03 | 79 | current-window |
 | docs/maintainer/documentation-governance.md | current | 2026-08-26 | 56 | current-window |
 | docs/maintainer/factorio-2.1-experimental-channel.md | current | 2026-09-01 | 50 | current-window |
-| docs/maintainer/fixture-workflow.md | current | 2026-10-20 | 1 | current-window |
+| docs/maintainer/fixture-workflow.md | current | 2026-10-21 | 0 | current-window |
 | docs/maintainer/localization.md | current | 2026-08-03 | 79 | current-window |
 | docs/maintainer/manual-test-plan.md | current | 2026-07-21 | 92 | review-soon |
 | docs/maintainer/mir3-terminal-repository-protections.md | current | 2026-08-15 | 67 | current-window |

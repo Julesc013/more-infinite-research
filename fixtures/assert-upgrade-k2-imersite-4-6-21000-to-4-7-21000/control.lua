@@ -223,12 +223,71 @@ local function seed_infinite_progress(force, completed)
   return {force_name = force.name, completed = completed, next_level = next_level, powder_bonus = completed * 0.02}
 end
 
+-- Independently reviewed V7 phase retirement on the published predecessor.
+-- These identities come from its manifests and declared late-science inputs;
+-- the destination cannot teach this oracle which changes to accept.
+local v7_phase_two_technologies = {
+  ["braking-force-8"] = true,
+  ["laser-shooting-speed-8"] = true,
+  ["recipe-prod-research_artificial_soil-1"] = true,
+  ["recipe-prod-research_belts-1"] = true,
+  ["recipe-prod-research_bullets-1"] = true,
+  ["recipe-prod-research_carbon-1"] = true,
+  ["recipe-prod-research_cargo_bay_unloading_distance-1"] = true,
+  ["recipe-prod-research_cargo_landing_pad_count-1"] = true,
+  ["recipe-prod-research_concrete-1"] = true,
+  ["recipe-prod-research_flamethrower_shooting_speed-1"] = true,
+  ["recipe-prod-research_grenades-1"] = true,
+  ["recipe-prod-research_heavy_ammo-1"] = true,
+  ["recipe-prod-research_ice-1"] = true,
+  ["recipe-prod-research_inserters-1"] = true,
+  ["recipe-prod-research_landfill-1"] = true,
+  ["recipe-prod-research_platform-1"] = true,
+  ["recipe-prod-research_rails-1"] = true,
+  ["recipe-prod-research_robot_battery-1"] = true,
+  ["recipe-prod-research_science_pack_productivity-1"] = true,
+  ["recipe-prod-research_spoilage_preservation-1"] = true,
+  ["recipe-prod-research_thruster_fuel_productivity-1"] = true,
+  ["recipe-prod-research_thruster_oxidizer_productivity-1"] = true,
+  ["recipe-prod-research_walls-1"] = true,
+  ["research-speed-7"] = true,
+  ["weapon-shooting-speed-7"] = true,
+}
+local v7_early_science = {
+  ["kr-basic-tech-card"] = true, ["automation-science-pack"] = true,
+  ["logistic-science-pack"] = true, ["military-science-pack"] = true,
+  ["chemical-science-pack"] = true
+}
+local v7_phase_two_triggers = {
+  ["space-science-pack"] = true, ["kr-advanced-tech-card"] = true,
+  ["kr-matter-tech-card"] = true, ["kr-singularity-tech-card"] = true
+}
+
+local function expected_policy_technology_state(name, prior)
+  if not v7_phase_two_technologies[name] then return prior end
+  local expected = deep_copy(prior)
+  local has_late_source = false
+  for _, ingredient in ipairs(prior.prototype.ingredients) do
+    if v7_phase_two_triggers[ingredient.name] then has_late_source = true end
+  end
+  if not has_late_source then fail("reviewed V7 predecessor lost its late-science trigger: " .. name) end
+  local ingredients, prerequisites = {}, {}
+  for _, ingredient in ipairs(prior.prototype.ingredients) do
+    if not v7_early_science[ingredient.name] then ingredients[#ingredients + 1] = deep_copy(ingredient) end
+  end
+  for _, prerequisite in ipairs(prior.prototype.prerequisites) do
+    if not v7_early_science[prerequisite] then prerequisites[#prerequisites + 1] = prerequisite end
+  end
+  expected.prototype.ingredients, expected.prototype.prerequisites = ingredients, prerequisites
+  return expected
+end
+
 local function verify_unrelated_state(name, force, before)
   local current = complete_state(force)
   for technology_name, prior in pairs(before.technologies) do
     local observed = current.technologies[technology_name]
     if not observed then fail("existing technology disappeared for " .. name .. ": " .. technology_name) end
-    if technology_name ~= legacy_name and not equal_state(observed, prior) then
+    if technology_name ~= legacy_name and not equal_state(observed, expected_policy_technology_state(technology_name, prior)) then
       fail("unrelated technology state or definition changed for " .. name .. ": " .. technology_name)
     end
   end
