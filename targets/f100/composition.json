@@ -28,8 +28,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 326,
-      "expected_sha256": "452DF65FD62C4C8C0F4BB182F5EF765FD2F3DE95A671D6EF43A4A736DD69B81C",
+      "expected_bytes": 328,
+      "expected_sha256": "8B11DFCD07BCA3A9A55A15E44668DC9B231C6C05888DCE0615BE3F38F4A21161",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5508,
-      "expected_sha256": "54F1F8939EA3391A42767031315E3F3E321EF0589D614CCED39F295EF3A01DBB",
+      "expected_bytes": 5510,
+      "expected_sha256": "D4780F713944243CB501CB48E886FBBE7575F22949D0A7488EB4E7FF1A42BBB5",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "E2B6F4B91D1E3666827FB4D5A60DE72BEB1D653434C4FADB5FC319563DAC793D"
+  "record_sha256": "BFB00C4323B27461BB7F43AA368C06EC9497DBE349B4569B78AA26C26494A9A1"
 }

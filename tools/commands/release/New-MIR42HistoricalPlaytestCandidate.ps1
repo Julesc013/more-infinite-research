@@ -127,8 +127,12 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
     # source patch in the historical projection.
     $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.(?<minor>[2345])\.100[0-9]{2})(?:\r?\n|$)')
     if (-not $readmeIdentity.Success) { throw '[mir42-historical-readme-source-identity]' }
+    $baseFloor = [regex]::Matches($text, '`base >= 1[.]0(?:[.][0-9]+)?`')
+    if ($baseFloor.Count -ne 1) { throw '[mir42-historical-readme-source-floor]' }
+    $testedVersion = [regex]::Match($engineVersion, '^(?<version>[0-9]+[.][0-9]+[.][0-9]+)(?:[.][0-9]+)?$')
+    if (-not $testedVersion.Success) { throw '[mir42-historical-readme-tested-engine]' }
     $replacements = @(
-      @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
+      @{ from = $baseFloor[0].Value; to = ('`base >= ' + $testedVersion.Groups['version'].Value + '`') },
       @{ from = 'It is a reduced target-native projection from the current MIR source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a reduced target-specific projection from the current MIR source. Emitted streams and progression depend on the actual engine and prototype capabilities.' },
       @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
       @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },

@@ -28,8 +28,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 326,
-      "expected_sha256": "192AE792EF34CA559410D677D7C66D6ED11D4473FE5112EDD4244ADEEA9FD8AA",
+      "expected_bytes": 330,
+      "expected_sha256": "330F1A4C4717995C1D3FE2F48056795743820A8B448ED44E981DA27A49366A95",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3772,8 +3772,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f110 adapter source for f110.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 5545,
-      "expected_sha256": "2CCC76A6D1E5FD362D30A0A47017EDE788808FC90064E96631491923E36B9522",
+      "expected_bytes": 5549,
+      "expected_sha256": "A2DE32DC5E51A267BE9FA5CC3004F57E3C243E3EB327995081F8A311AA855003",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3835,5 +3835,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "1587DB34322F6EF9655FAD035C2D5E90410ACF9B517E9AF6AF4860BA7B676121"
+  "record_sha256": "E8862ADF3CE470C53FDB9BC93890B0B641CB98ADD8CA852BFFE87D4F7507F23C"
 }
