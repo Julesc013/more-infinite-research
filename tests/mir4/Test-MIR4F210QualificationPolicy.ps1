@@ -77,8 +77,11 @@ if ((Get-FileHash -LiteralPath (Join-Path $repo '.mir/control/MIR4-F210-Current-
   throw '[mir4-f210-current-policy-v2-immutability]'
 }
 $f210GenerationInput = Get-Content -Raw -LiteralPath (Join-Path $repo 'source/presentation/f210/info.json.template') | ConvertFrom-Json -Depth 20
-$requiredF210Dependencies = @('base >= 2.1.18','? recycler >= 2.1.18','? space-age >= 2.1.18')
-if (@($requiredF210Dependencies | Where-Object { $_ -notin @($f210GenerationInput.dependencies) }).Count -ne 0 -or
+$requiredF210Dependencies = @('? recycler >= 2.1.18','? space-age >= 2.1.18')
+$baseRequirements = @($f210GenerationInput.dependencies | Where-Object { $_ -match '^base >= 2[.]1[.][0-9]+$' })
+if ($baseRequirements.Count -ne 1 -or
+    [version]($baseRequirements[0] -replace '^base >= ', '') -lt [version]$policy.support_floor -or
+    @($requiredF210Dependencies | Where-Object { $_ -notin @($f210GenerationInput.dependencies) }).Count -ne 0 -or
     @($f210GenerationInput.dependencies | Where-Object { $_ -match '^(base|\? recycler|\? space-age) >= 2\.1\.(8|17)$' }).Count -ne 0) {
   throw '[mir4-f210-current-generation-input-floor]'
 }

@@ -296,7 +296,13 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     $changelog = $utf8.GetString($memberBytes['changelog.txt'])
     $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
     if (-not $firstVersion.Success) { throw '[mir42-historical-authentication-changelog-identity]' }
-    $changelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
+    $minimumFactorioVersion = ''
+    if ($SourceVersion -ceq '4.6.0') {
+      $baseRequirements = @($info.dependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
+      if ($baseRequirements.Count -ne 1) { throw '[mir42-historical-authentication-base-minimum]' }
+      $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''
+    }
+    $changelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion -MinimumFactorioVersion $minimumFactorioVersion
     $memberBytes['changelog.txt'] = $utf8.GetBytes($changelog)
     $memberBytes['README.md'] = Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $memberBytes['README.md'] -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
   }
