@@ -35,13 +35,19 @@ local function build(phase)
   local canonical = compiler_context.current():state_view("relationship_indexes", function() return {} end)
   if canonical[phase] then return canonical[phase] end
 
-  local recipe_index = recipe_facts.index_view()
+  -- Preserve the established relationship build lifetime: these derived maps
+  -- were sorted/deduplicated in the recipe index before this snapshot existed.
+  -- The recipe owner now performs that exact normalization privately, then
+  -- returns detached fields for relationship-local mutation.
+  recipe_facts.normalize_relationship_indexes()
   local out = {
     schema = 2,
     phase = phase,
-    recipes_by_output = recipe_index.by_productive_output,
-    recipes_by_ingredient = recipe_index.by_ingredient,
-    recipes_by_category = recipe_index.by_category,
+    -- Relationships sorts and deduplicates these three maps. Ask the recipe
+    -- owner for fresh detached fields rather than copying an active view.
+    recipes_by_output = recipe_facts.copy_active_index_field("by_productive_output"),
+    recipes_by_ingredient = recipe_facts.copy_active_index_field("by_ingredient"),
+    recipes_by_category = recipe_facts.copy_active_index_field("by_category"),
     items = {},
     items_by_place_result = {},
     items_by_subgroup = {},
@@ -55,7 +61,7 @@ local function build(phase)
     technologies_by_recipe_effect = {},
     labs_by_pack = {},
     modules_by_tier = {},
-    surface_conditions = {recipes = {}, entities = {}}
+    surface_conditions = {recipes = recipe_facts.copy_surface_conditions_by_recipe(), entities = {}}
   }
 
   lookup.each_item_prototype(function(name, item, prototype_type)
@@ -81,12 +87,6 @@ local function build(phase)
       out.surface_conditions.entities[name] = deepcopy(entity.surface_conditions)
     end
   end)
-
-  for recipe_name, fact in pairs(recipe_index.facts) do
-    if fact.surface_conditions then
-      out.surface_conditions.recipes[recipe_name] = deepcopy(fact.surface_conditions)
-    end
-  end
 
   for technology_name, technology in pairs(data_raw.prototypes("technology")) do
     for _, effect in ipairs(technology.effects or {}) do

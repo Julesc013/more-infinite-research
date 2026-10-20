@@ -45,26 +45,26 @@ local function risk_identity(entry)
 end
 
 local function productive_intersection(fact)
-  local ingredients, out = {}, {}
-  -- Canonical facts already retain type/name identities. Keep the public
-  -- evidence names and fingerprints unchanged for actual shared identities,
-  -- while avoiding an item/fluid name collision in the risk disposition.
-  if type(fact.ingredient_identities) == "table" and type(fact.productive_result_identities) == "table" then
+  local ingredient_set, out = {}, {}
+  -- Canonical facts retain one ingredients array. Keep the public evidence
+  -- names and fingerprints unchanged while avoiding item/fluid name collisions.
+  local ingredients = fact.ingredients or fact.ingredient_identities
+  if type(ingredients) == "table" and type(fact.productive_result_identities) == "table" then
     local shared = {}
-    for _, entry in ipairs(fact.ingredient_identities) do
-      ingredients[risk_identity(entry)] = true
+    for _, entry in ipairs(ingredients) do
+      ingredient_set[risk_identity(entry)] = true
     end
     for _, entry in ipairs(fact.productive_result_identities) do
-      if ingredients[risk_identity(entry)] then shared[entry.name] = true end
+      if ingredient_set[risk_identity(entry)] then shared[entry.name] = true end
     end
     for name in pairs(shared) do out[#out + 1] = name end
     table.sort(out)
     return out
   end
   -- Historical name-only callers retain their conservative disposition.
-  for _, name in ipairs(fact.ingredient_names or {}) do ingredients[name] = true end
+  for _, name in ipairs(fact.ingredient_names or {}) do ingredient_set[name] = true end
   for _, name in ipairs(fact.productive_result_names or {}) do
-    if ingredients[name] then table.insert(out, name) end
+    if ingredient_set[name] then table.insert(out, name) end
   end
   table.sort(out)
   return out
@@ -179,7 +179,7 @@ end
 
 local function build_index(source, indexes)
   local facts, hard_count, review_count = {}, 0, 0
-  local names = deepcopy(source.names or {})
+  local names = recipe_facts.all_names()
   table.sort(names)
   for _, recipe_name in ipairs(names) do
     local row = build_row(recipe_name, source.facts[recipe_name], indexes)
@@ -196,7 +196,7 @@ local function materialization()
   local context = compiler_context.current()
   return context:state_view("recipe_risk_materialization", function()
     local source = recipe_facts.index_view()
-    local names = deepcopy(source.names or {})
+    local names = recipe_facts.all_names()
     table.sort(names)
     -- Reuse the Context service boundary for complete external inspection.
     -- Capture the owner function, not a mutable caller-supplied exporter.

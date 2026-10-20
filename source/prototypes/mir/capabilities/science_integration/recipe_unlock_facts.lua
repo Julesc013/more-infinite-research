@@ -15,10 +15,17 @@ end
 
 function M.recipe_outputs_item(recipe, item_name, diagnostic_observer)
   local recipe_name = type(recipe) == "table" and recipe.name or recipe
+  if recipe_name and type(recipe_facts.has_typed_result) == "function" then
+    return recipe_facts.has_typed_result(recipe_name, "item", item_name,
+      diagnostic_observer and diagnostic_visit or nil, diagnostic_observer)
+  end
   local fact = recipe_name and recipe_facts.view(recipe_name) or nil
   if not fact then return false end
-  if fact.result_identities then
-    for _, result in ipairs(fact.result_identities) do
+  -- ActiveRecipeFact1 retains results once. The identities branch remains a
+  -- narrow historical-fixture fallback; ordinary compilation never builds it.
+  local typed_results = fact.results or fact.result_identities
+  if typed_results then
+    for _, result in ipairs(typed_results) do
       if not diagnostic_visit(diagnostic_observer) then return false end
       if result.type == "item" and result.name == item_name then return true end
     end
@@ -45,6 +52,9 @@ end
 
 function M.recipe_enabled_without_research(recipe)
   local recipe_name = type(recipe) == "table" and recipe.name or recipe
+  if recipe_name and type(recipe_facts.is_enabled_without_research) == "function" then
+    return recipe_facts.is_enabled_without_research(recipe_name)
+  end
   local fact = recipe_name and recipe_facts.view(recipe_name) or nil
   return fact ~= nil and fact.enabled_without_research == true
 end
@@ -71,10 +81,9 @@ local function build_science_pack_recipe_status_cache(diagnostic_observer)
     local status = science_pack_recipe_status_cache[pack_name]
     for _, recipe_name in ipairs(recipes_by_item_output_view(pack_name)) do
       if not diagnostic_visit(diagnostic_observer) then return {} end
-      local recipe = recipe_facts.view(recipe_name)
       status.has_recipe = true
       table.insert(status.recipes, recipe_name)
-      if recipe and recipe.enabled_without_research == true then
+      if M.recipe_enabled_without_research(recipe_name) then
         status.initially_available = true
       end
     end
@@ -104,10 +113,9 @@ function M.pack_recipe_status(pack_name, diagnostic_observer)
     }
     for _, recipe_name in ipairs(recipes_by_item_output_view(pack_name)) do
       if not diagnostic_visit(diagnostic_observer) then return nil end
-      local recipe = recipe_facts.view(recipe_name)
       status.has_recipe = true
       table.insert(status.recipes, recipe_name)
-      if recipe and recipe.enabled_without_research == true then status.initially_available = true end
+      if M.recipe_enabled_without_research(recipe_name) then status.initially_available = true end
     end
     table.sort(status.recipes)
     return deepcopy(status)

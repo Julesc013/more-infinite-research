@@ -1,4 +1,22 @@
 local M = {}
+-- Active recipe views are deliberate read-only owner queries, not generic
+-- records. Reject them before any canonical traversal so private views cannot
+-- become stale public identities.
+-- This is a weak rejection registry, not a hash/value cache: callers still
+-- receive ordinary deep validation for every supplied/copy-owned table.
+local opaque_recipe_views = setmetatable({}, {__mode = "k"})
+local function reject_active_recipe_view(value)
+  if type(value) == "table" and opaque_recipe_views[value] then
+    error("Active recipe owner views require an explicit recipe_facts export boundary.", 3)
+  end
+end
+
+function M.register_opaque_recipe_view(value)
+  if type(value) ~= "table" then error("Opaque fingerprint view must be a table.", 2) end
+  opaque_recipe_views[value] = true
+  return value
+end
+
 local ONE_MIB = 1024 * 1024
 local MAXIMUM_QUOTED_STRING_CACHE_ENTRIES = 4096
 local MAXIMUM_NUMERIC_TEXT_CACHE_ENTRIES = 4096
@@ -127,6 +145,7 @@ encode = function(value, seen, path, diagnostic, root, out, count)
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint value of type " .. kind .. " at " .. path, 3)
   end
+  reject_active_recipe_view(value)
   if seen[value] then
     if not diagnostic then return diagnose(root) end
     error("Cannot fingerprint cyclic table at " .. path .. " (first seen at " .. seen[value] .. ")", 3)

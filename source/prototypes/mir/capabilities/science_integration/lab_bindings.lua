@@ -54,7 +54,9 @@ end
 
 local function ingredient_packs(fact, lab_inputs)
   local seen, packs = {}, {}
-  for _, ingredient in ipairs((fact and fact.ingredient_identities) or {}) do
+  -- ActiveRecipeFact1 uses its typed ingredients directly; the alias is only
+  -- retained for narrow historical fixture inputs.
+  for _, ingredient in ipairs((fact and (fact.ingredients or fact.ingredient_identities)) or {}) do
     if ingredient.type == "item" and lab_inputs[ingredient.name] and not seen[ingredient.name] then
       seen[ingredient.name] = true
       packs[#packs + 1] = ingredient.name

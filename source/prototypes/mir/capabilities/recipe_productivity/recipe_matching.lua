@@ -241,8 +241,9 @@ end
 -- route.  A missing, malformed, or replaced typed projection returns nil so
 -- the caller can preserve the established full-scan semantics.
 local function indexed_relevant_return_facts(index, reached, outputs)
-  if index ~= compiler_context.current():state_view("recipe_index")
-    or type(index) ~= "table" or index.schema ~= 2 or type(index.facts) ~= "table"
+  if not recipe_facts.is_active_index(index)
+    or type(index) ~= "table" or index.schema ~= 1 or index.record_type ~= "ActiveRecipeIndex"
+    or type(index.facts) ~= "table"
     or type(index.by_ingredient_identity) ~= "table" or type(index.by_output_identity) ~= "table" then
     return nil
   end
@@ -335,7 +336,10 @@ local function relevant_return_graph(recipe)
   end
   local facts = {}
   for _, recipe_name in ipairs(sorted_keys(selected)) do
-    facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]}
+    -- This reachability witness is independently fingerprinted below. Expand
+    -- a detached legacy fact for its selected rows instead of allowing an
+    -- ActiveRecipeFact view to enter generic canonicalization.
+    facts[#facts + 1] = {name = recipe_name, fact = recipe_facts.get(recipe_name)}
   end
   local boundary = {
     schema = 1,
@@ -1474,7 +1478,7 @@ local function stream_match_identity(stream_key, spec, per_level_default)
     descriptor = spec,
     per_level_default = per_level_default,
     recipe_source_epoch = recipe_facts.source_epoch(),
-    recipe_index_epoch = context:state_epoch("recipe_index"),
+    recipe_index_epoch = recipe_facts.index_epoch(),
     target_profile = target_profiles.current(),
     automatic_productivity_action = automatic_compiler_policy.current().action
   })

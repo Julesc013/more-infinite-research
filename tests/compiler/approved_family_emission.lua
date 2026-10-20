@@ -151,6 +151,55 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
 
   check(recipes.snapshot_recipe_domain_fingerprint(deepcopy(recipes.index_view())) == nil,
     "Copied recipe maps cannot claim Context-owned identity material")
+
+  -- Exact Factorio 2.0 util.lua table.deepcopy first function body. Active
+  -- views protect the live owner through a private metatable, while a copied
+  -- facade must remain a detached traversable table and cannot claim owner
+  -- fingerprint material.
+  local function factorio_table_deepcopy(object)
+    local lookup_table = {}
+    local function _copy(value)
+      if type(value) ~= "table" then return value
+      elseif lookup_table[value] then return lookup_table[value] end
+      local copied = {}
+      lookup_table[value] = copied
+      for index, nested in pairs(value) do copied[_copy(index)] = _copy(nested) end
+      return setmetatable(copied, getmetatable(value))
+    end
+    return _copy(object)
+  end
+  local held_index = recipes.index_view()
+  local held_fact = held_index.facts["iron-plate"]
+  local held_result = held_fact.results[1]
+  local retained_output, retained_enabled = held_result.name, held_fact.enabled_without_research
+  local retained_recipe = held_index.by_output[retained_output][1]
+  local owner_identity = fingerprint.of(recipes.active_input_identity())
+  check(not pcall(fingerprint.of, held_index),
+    "Generic fingerprints refuse a live active recipe owner view")
+  rawset(held_index, "facts", {outside_writer = true})
+  rawset(held_fact, "enabled_without_research", not retained_enabled)
+  rawset(held_result, "name", "outside-writer-result")
+  rawset(held_index.by_output[retained_output], 1, "outside-writer-recipe")
+  local copy_lock = getmetatable(held_fact)
+  copy_lock.__index = function() return "outside-writer-meta" end
+  check(not pcall(setmetatable, held_fact, {}),
+    "Active recipe facade rejects replacement of its protected live metatable")
+  local fresh_index = recipes.index_view()
+  local fresh_fact = recipes.view("iron-plate")
+  check(fresh_fact.enabled_without_research == retained_enabled
+      and fresh_fact.results[1].name == retained_output
+      and fresh_index.by_output[retained_output][1] == retained_recipe
+      and fingerprint.of(recipes.active_input_identity()) == owner_identity,
+    "rawset and exposed metatable-lock mutation cannot change owned recipe decisions or identity")
+  local copied_active = factorio_table_deepcopy(recipes.index_view())
+  local copied_hashes = pcall(fingerprint.of, copied_active)
+  copied_active.facts["iron-plate"].results[1].name = "outside-writer-copy"
+  check(type(copied_active.facts["iron-plate"].results[1]) == "table"
+      and copied_hashes
+      and recipes.snapshot_recipe_domain_fingerprint(copied_active) == nil
+      and recipes.view("iron-plate").results[1].name == retained_output,
+    "Factorio deepcopy expands a detached traversable facade and cannot retain recipe-owner authority")
+
   local malformed = deepcopy(original)
   malformed["iron-plate"].surface_conditions = {bad = function() end}
   check(not pcall(replace_and_identity, malformed),
@@ -163,6 +212,8 @@ end)
 -- making normal unique recipe maps pay for the legacy full index digest.
 Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
   local recipes = require("prototypes.mir.index.recipe_facts")
+  local relationships = require("prototypes.mir.index.relationships")
+  local snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
   local function duplicate_source(first_output)
     local first = {name = "identity-duplicate", enabled = true, category = "crafting", result = first_output}
     local final = {name = "identity-duplicate", enabled = true, category = "crafting", result = "identity-stable"}
@@ -196,7 +247,7 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
     recipes.replace_source(source, recipes.source_epoch())
     local index = recipes.index_view()
     local legacy = recipes.fingerprint()
-    return recipes.active_input_identity(), index, legacy, fingerprint.of(index)
+    return recipes.active_input_identity(), index, legacy, fingerprint.of(recipes.snapshot())
   end
   local identity_a, index_a, legacy_a, complete_a = replace_and_observe(duplicate_source("identity-first-a"))
   local identity_b, index_b, legacy_b, complete_b = replace_and_observe(duplicate_source("identity-first-b"))
@@ -213,6 +264,34 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
       and identity_b.exceptional_complete_index_fingerprint == complete_b
       and identity_a.exceptional_complete_index_fingerprint ~= identity_b.exceptional_complete_index_fingerprint,
     "Exceptional duplicate recipe keys bind the unchanged complete index identity beside stable normalized facts")
+
+  -- relationships historically deduplicated three borrowed recipe index maps
+  -- in place. The owner must make the same post-relationship schema-2 export
+  -- observable while advancing only the active exceptional identity epoch.
+  recipes.replace_source(duplicate_source("identity-relationship-first"), recipes.source_epoch())
+  local pre_relationship_identity = recipes.active_input_identity()
+  local pre_relationship_epoch = recipes.index_epoch()
+  local pre_relationship_legacy = recipes.fingerprint()
+  local pre_relationship_snapshot = recipes.snapshot()
+  check(#pre_relationship_snapshot.by_category.crafting == 2,
+    "Virtual duplicate recipe source starts with both category observations")
+  local relationship = relationships.view("input")
+  local post_relationship_identity = recipes.active_input_identity()
+  local post_relationship_legacy = recipes.fingerprint()
+  local post_relationship_snapshot = recipes.snapshot()
+  local normalized_again = recipes.normalize_relationship_indexes()
+  check(#relationship.recipes_by_category.crafting == 1
+      and #post_relationship_snapshot.by_category.crafting == 1
+      and pre_relationship_legacy == post_relationship_legacy
+      and recipes.index_epoch() == pre_relationship_epoch + 1
+      and pre_relationship_identity.exceptional_complete_index_fingerprint
+        ~= post_relationship_identity.exceptional_complete_index_fingerprint
+      and normalized_again == false and type(normalized_again) == "boolean",
+    "Relationship normalization has no raw escape, preserves cached legacy digest, and reseals active identity")
+  local captured = snapshot_adapter.capture({})
+  check(#captured.relationship_indexes.recipes_by_category.crafting == 1
+      and #recipes.snapshot().by_category.crafting == 1,
+    "Generic snapshot capture observes the same post-relationship duplicate normalization")
 end)
 
 -- The existing default Context/export contract continues to name the exact
@@ -517,9 +596,10 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local active_owner = compiler_input_contract.active_view(active_input)
   local active_sources = plan.stream_plan.source_fingerprints
   check(type(active_sources.recipe_input) == "table"
-      and active_sources.recipe_input.schema == 1
+      and active_sources.recipe_input.schema == 2
       and active_sources.recipe_input.record_type == "RecipeNormalizedInput"
-      and active_sources.recipe_input.contract == "mir-recipe-normalized-input-v1"
+      and active_sources.recipe_input.contract == "mir-recipe-normalized-input-v2"
+      and active_sources.recipe_input.index_derivation_revision == 2
       and active_sources.facts == nil
       and active_owner.source_fingerprints.recipe_input.normalized_fact_domain_fingerprint
         == active_sources.recipe_input.normalized_fact_domain_fingerprint,

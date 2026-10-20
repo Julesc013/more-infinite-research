@@ -130,7 +130,9 @@ end
 local function build_recipe_facts(unlocks)
   local facts = {}
   for _, name in ipairs(canonical_recipe_facts.all_names()) do
-    local recipe = canonical_recipe_facts.view(name)
+    -- Registry construction is a diagnostic/export boundary, so take the
+    -- established detached schema-2 fact rather than retaining an active view.
+    local recipe = canonical_recipe_facts.get(name)
     local owner_records = productivity_owners.external_recipe_productivity_owner_records(name, {snapshot_phase = "output"})
     local owner_names = {}
     for _, owner in ipairs(owner_records) do

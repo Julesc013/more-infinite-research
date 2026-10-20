@@ -66,7 +66,9 @@ local function binding(pack_name, declaration, reference_only)
     -- acquisition proof and must never be published as one.
     acquisition_proof = false
   }
-  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
+  -- ActiveRecipeFact1 retains typed ingredients once. Older fixture facts
+  -- may still provide the legacy identities alias.
+  for _, ingredient in ipairs(fact.ingredients or fact.ingredient_identities or {}) do
     if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
       out.ingredient_packs[#out.ingredient_packs + 1] = ingredient.name
     end

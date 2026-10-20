@@ -130,12 +130,17 @@ function M.capture(options)
   options = options or {}
   local started_at, memory_before = clock_now(), memory_bytes()
   local relationship_index = relationships.view("input")
-  local recipe_index = recipe_facts.index_view()
-  -- Only the exact Context-owned recipe index can supply this component.  The
-  -- scalar digest was derived while validating the complete immutable index;
-  -- copied or caller-owned tables deliberately fall back to snapshot.new's
-  -- ordinary canonicalization and deep verification path.
-  local recipe_domain = recipe_facts.snapshot_recipe_domain_fingerprint(recipe_index)
+  -- Generic snapshot export is the supported boundary that expands the
+  -- active owner record back to its established schema-2 fact/index bytes.
+  -- Hold the active index only as the exact owner token for the paired scalar
+  -- component; no ordinary compiler path constructs this legacy projection.
+  local active_recipe_index = recipe_facts.index_view()
+  local recipe_index = recipe_facts.snapshot()
+  -- Only the exact Context-owned active index can supply this component. The
+  -- scalar digest is computed from the exact expanded schema-2 export; copied
+  -- or caller-owned tables deliberately fall back to snapshot.new's ordinary
+  -- canonicalization and deep verification path.
+  local recipe_domain = recipe_facts.snapshot_recipe_domain_fingerprint(active_recipe_index)
   local graph = graph_snapshot.new(data_raw.prototypes("technology"))
   local domains = {
     recipes = {schema = recipe_index.schema, names = recipe_index.names, facts = recipe_index.facts},
