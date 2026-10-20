@@ -1938,6 +1938,7 @@
       "inputs": [
         "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/ResponsiveMenuRecord.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
@@ -8779,5 +8780,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:4620a33226ad759b8e66f38930632faf44215e1fb41e6c579d30739c17220ae9"
+  "digest": "sha256:74e50c524ea766efcc1347d3ffa3c2585b8f7653d8c6c87f199de0fab90ee410"
 }
