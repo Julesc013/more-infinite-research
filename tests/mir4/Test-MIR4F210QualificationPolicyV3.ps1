@@ -15,8 +15,9 @@ $channel=Get-Content -Raw -LiteralPath (Join-Path $repo 'spec/engines/mir4-facto
 $observedAt=[string]$channel.current_review.observed_at
 if([string]$v2.support_floor-cne'2.1.18' -or [string]$v3.support_floor-cne'2.1.18' -or [string]$receipt.current_policy.record_sha256-cne[string]$v3.record_sha256 -or [string]$v3.recorded_at-cne$observedAt -or [string]$receipt.recorded_at-cne$observedAt -or [string]$v3.observed_engine_channel_review.observed_at-cne$observedAt){throw '[mir4-f210-v3-policy-binding]'}
 $info=Get-Content -Raw -LiteralPath (Join-Path $repo 'source/presentation/f210/info.json.template')|ConvertFrom-Json -Depth 20
-$required=@('base >= 2.1.18','? recycler >= 2.1.18','? space-age >= 2.1.18')
-if(@($required|Where-Object {$_ -notin @($info.dependencies)}).Count-ne0){throw '[mir4-f210-v3-metadata-floor]'}
+$required=@('? recycler >= 2.1.18','? space-age >= 2.1.18')
+$baseRequirements=@($info.dependencies|Where-Object {$_ -match '^base >= 2[.]1[.][0-9]+$'})
+if($baseRequirements.Count-ne1 -or [version]($baseRequirements[0] -replace '^base >= ','')-lt[version]$v3.support_floor -or @($required|Where-Object {$_ -notin @($info.dependencies)}).Count-ne0){throw '[mir4-f210-v3-metadata-floor]'}
 $profile=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/profiles/factorio-2.1.json')|ConvertFrom-Json -Depth 20
 if([string]$profile.minimum_factorio_version-cne'2.1.18' -or [string]$profile.qualification_factorio_channel_authority-cne'spec/engines/mir4-factorio-2.1-experimental-channel-v2.json'){throw '[mir4-f210-v3-profile-binding]'}
 if([string]$channel.current_review.version-cne'2.1.22' -or [string]$channel.current_review.binary_sha256-cne'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B' -or [string]$observedAt-cne'2026-10-19T12:39:29.3637648+00:00' -or @($channel.current_review.review_tasks|Where-Object status -ne 'complete').Count-ne0){throw '[mir4-f210-v3-channel-binding]'}
