@@ -872,6 +872,62 @@ check(default_entry:snapshot().entries[1].after_projection.changed_default_entry
 local reduced_entry = mutation_journal.new(one_plan)
 check(reduced_entry:record(operation, before, after, "applied", nil, {return_entry = false}) == nil,
   "Internal executor record can omit its discarded entry copy")
+do
+  -- The former executor sequence is an independent full-journal oracle. The
+  -- new owner must bind the actual capture, not merely reuse expected digests.
+  local old = mutation_journal.new(one_plan)
+  fingerprint.reset_metrics()
+  old:assert_before(operation, before)
+  old:record(operation, before, after, "applied", nil, {skip_precheck = true, return_entry = false})
+  local old_metrics = fingerprint.metrics()
+  local owned = mutation_journal.new(one_plan)
+  local captured = deepcopy(before)
+  local captures, applied = 0, 0
+  fingerprint.reset_metrics()
+  local returned = owned:execute(operation, function()
+    captures = captures + 1
+    return captures == 1 and captured or after
+  end, function(actual_operation)
+    check(actual_operation == operation, "Execution retains the exact admitted operation")
+    applied = applied + 1
+    captured.changed_during_mutation = true
+    return "actual-emitter-result"
+  end)
+  local owned_metrics = fingerprint.metrics()
+  check(owned_metrics.fingerprint_calls == old_metrics.fingerprint_calls - 1
+      and owned_metrics.canonical_calls == old_metrics.canonical_calls - 1,
+    "Owned execution eliminates one complete before-state encoding per operation")
+  check(captures == 2 and applied == 1 and returned == "actual-emitter-result",
+    "Owned execution captures both actual states and invokes emission once")
+  check(fingerprint.canonical(owned:finalize()) == fingerprint.canonical(old:finalize()),
+    "Owned execution preserves full journal bytes and isolates before-state aliases")
+  local exported = owned:snapshot()
+  exported.entries[1].before_snapshot.changed_export = true
+  check(owned:snapshot().entries[1].before_snapshot.changed_export == nil,
+    "Owned execution retains defensive full snapshot exports")
+  rejected(function() owned:execute(operation, function() return before end, function() end) end,
+    "MutationJournal is finalized")
+  for _, failure in ipairs({"precondition", "postcondition", "mutation"}) do
+    local journal = mutation_journal.new(one_plan)
+    local reads, writes = 0, 0
+    rejected(function()
+      journal:execute(operation, function()
+        reads = reads + 1
+        if failure == "precondition" or (failure == "postcondition" and reads == 2) then return {} end
+        return reads == 1 and before or after
+      end, function()
+        writes = writes + 1
+        if failure == "mutation" then error("controlled-emitter-failure") end
+      end)
+    end, failure == "mutation" and "mutation-error" or failure .. "-mismatch")
+    local result = journal:finalize({allow_failed = true})
+    check(result.terminal_counts.failed == 1 and result.missing_operation_count == 0,
+      failure .. " failure remains an actual failed terminal record")
+    check(reads == (failure == "precondition" and 1 or 2)
+        and writes == (failure == "precondition" and 0 or 1),
+      failure .. " failure preserves before/after capture and mutation boundaries")
+  end
+end
 local reduced_finalization = reduced_entry:finalize({return_snapshot = false})
 check(reduced_finalization.entries == nil
   and reduced_finalization.executed_operation_count == 1
@@ -935,6 +991,51 @@ local out_of_plan_result = out_of_plan:finalize({allow_failed = true})
 check(out_of_plan_result.out_of_plan_operation_count == 1 and out_of_plan_result.missing_operation_count == 1,
   "changed operation retains its bound-plan violation")
 stable_finalization(out_of_plan, out_of_plan_result, false, "out-of-plan operation")
+do
+  -- Exercise the real patch executor and adoption transaction as well as the
+  -- ordinary create operations already executed above. No emitter is mocked.
+  local native_contract = require("prototypes.mir.domain.native_owner.contract")
+  local design_contract = require("prototypes.mir.domain.technology.technology_design")
+  local row
+  for _, candidate in ipairs(emitted_context:state_view("compilation_plan").stream_plan.rows) do
+    if candidate.action == "emit" then row = deepcopy(candidate); break end
+  end
+  check(row ~= nil, "Native patch control starts from a real admitted stream")
+  local owner = "mir-owned-mutation-native-control"
+  local expected = native_contract.snapshot(data.raw.technology[row.technology_name])
+  expected.name = owner
+  local input = deepcopy(expected)
+  input.unit.count_formula = "50*L+1"
+  local prototype = deepcopy(input)
+  prototype.type = "technology"
+  data.raw.technology[owner] = prototype
+  row.action = "adopt"
+  row.technology_name = nil
+  row.adoption = {owner = owner, key = row.stream_key, operation = "configure_native_owner",
+    configured_fields = {"unit"}, input_snapshot = input, expected_snapshot = expected,
+    input_fingerprint = fingerprint.of(input), output_fingerprint = fingerprint.of(expected)}
+  row.technology_design = design_contract.from_generation_row(row)
+  local snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot").new({
+    stream_inputs = {rows = {row}}, base_continuation_inputs = {operations = {}}
+  })
+  local compiled = require("prototypes.mir.planner.compiler").compile(snapshot,
+    require("prototypes.mir.domain.compiler.policy_snapshot").new({}))
+  local patch_plan = compiled.transformation_plan
+  check(#patch_plan.operations == 1 and patch_plan.operations[1].action == "patch",
+    "Actual planner admits the native patch control")
+  local journal = mutation_journal.new(patch_plan)
+  Context.with_active(Context.new(), function()
+    require("prototypes.mir.emit.technology_operation_executor").apply_plan(patch_plan, journal)
+  end)
+  local result = journal:finalize()
+  check(result.complete and result.terminal_counts.applied == 1
+      and fingerprint.of(native_contract.snapshot(prototype)) == row.adoption.output_fingerprint,
+    "Real native patch emission satisfies the independently captured postcondition")
+  check(fingerprint.canonical(result.entries[1].before_snapshot) == fingerprint.canonical(input)
+      and fingerprint.canonical(result.entries[1].after_projection) == fingerprint.canonical(expected),
+    "Real patch journal preserves both actual native snapshots")
+  data.raw.technology[owner] = nil
+end
 local emitted = data.raw.technology[name]
 data.raw.technology[name] = nil
 check(not pcall(assert_preserved), "The preservation oracle rejects deletion of non-core research")

@@ -50,14 +50,7 @@ function M.apply_plan(plan, journal, options)
   local realized = {}
   for _, operation in ipairs(plan.operations) do
     if options.kind == nil or operation.payload.kind == options.kind then
-      local before = capture(operation)
-      journal:assert_before(operation, before)
-      local ok, result = xpcall(function() return apply_operation(operation) end, debug.traceback)
-      local after = capture(operation)
-      if not ok then
-        journal:record(operation, before, after, "failed", "mutation-error", {skip_precheck = true, return_entry = false})
-      end
-      journal:record(operation, before, after, "applied", nil, {skip_precheck = true, return_entry = false})
+      local result = journal:execute(operation, capture, apply_operation)
       table.insert(realized, {
         operation_id = operation.operation_id,
         subject = deepcopy(operation.subject),
