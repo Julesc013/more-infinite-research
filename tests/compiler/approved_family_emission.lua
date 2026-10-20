@@ -52,6 +52,51 @@ local Context = require("prototypes.mir.pipeline.compiler_context")
 local compiler = require("prototypes.mir.pipeline.compiler_orchestrator")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+-- Matching is a Context-local memo, not a complete-world fingerprint reader.
+-- Exercise the actual recipe owner and matcher before any compiler snapshots.
+do
+  local matcher = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local original = recipes.fingerprint
+  recipes.fingerprint = function()
+    error("Unexpected complete recipe-index fingerprint for a local matching memo")
+  end
+  local ok, failure = pcall(function()
+    Context.with_active(Context.new(), function()
+      local spec = {items = {"iron-plate"}, include_hidden = false}
+      local buckets = matcher.buckets_view("scoped-match-control", spec, 0.1)
+      check(#buckets == 1 and #buckets[1].recipes == 1 and buckets[1].recipes[1] == "iron-plate",
+        "Context-bound matching retains the actual approved output")
+      check(matcher.buckets_view("scoped-match-control", spec, 0.1) == buckets,
+        "The same owned matching inputs reuse the memo")
+      local changed_amount = matcher.buckets_view("scoped-match-control", spec, 0.2)
+      check(changed_amount ~= buckets and changed_amount[1].change == 0.2,
+        "Changed bonus cannot reuse a stale matching result")
+      spec.items = {"missing-output"}
+      local changed_spec = matcher.buckets_view("scoped-match-control", spec, 0.1)
+      check(changed_spec ~= buckets and #changed_spec[1].recipes == 0,
+        "Changed descriptor cannot reuse stale recipe membership")
+      spec.items = {"iron-plate"}
+      local exported = matcher.recipes_for_stream(spec, 0.1, "scoped-match-control")
+      exported[1].recipes[1] = "mutated-export"
+      check(matcher.buckets_view("scoped-match-control", spec, 0.1)[1].recipes[1] == "iron-plate",
+        "Public matching exports remain isolated from the owned memo")
+      local epoch = recipes.source_epoch()
+      local replaced, message = pcall(recipes.replace_source, {}, epoch)
+      check(not replaced and tostring(message):find("stream_match_index", 1, true)
+          and recipes.source_epoch() == epoch and recipes.view("iron-plate") ~= nil,
+        "The real recipe owner rejects replacement across the matching boundary")
+    end)
+    Context.with_active(Context.new(), function()
+      recipes.replace_source({}, recipes.source_epoch())
+      local buckets = matcher.buckets_view("scoped-match-control", {items = {"iron-plate"}}, 0.1)
+      check(#buckets == 1 and #buckets[1].recipes == 0,
+        "A fresh matching Context reads its own recipe source")
+    end)
+  end)
+  recipes.fingerprint = original
+  assert(ok, failure)
+end
 -- Target adapters own phase reporting; the common qualifier owns the decision.
 local f200_science = require("prototypes.mir.planner.science")
 check(f200_science.phase_diagnostic_fields(nil) == nil,

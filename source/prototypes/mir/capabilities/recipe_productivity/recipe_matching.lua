@@ -1463,12 +1463,18 @@ local function recipes_for_stream_uncached(spec, per_level_default)
 end
 
 local function stream_match_identity(stream_key, spec, per_level_default)
+  -- The memo belongs to this Context, and the recipe owner rejects source
+  -- replacement once stream_match_index exists. Bind its actual source/index
+  -- epochs without encoding the complete world merely to name a local entry.
+  recipe_facts.index_view()
+  local context = compiler_context.current()
   return fingerprint.of({
-    schema = 1,
+    schema = 2,
     stream_key = stream_key,
     descriptor = spec,
     per_level_default = per_level_default,
-    recipe_facts = recipe_facts.fingerprint(),
+    recipe_source_epoch = recipe_facts.source_epoch(),
+    recipe_index_epoch = context:state_epoch("recipe_index"),
     target_profile = target_profiles.current(),
     automatic_productivity_action = automatic_compiler_policy.current().action
   })
@@ -1480,7 +1486,7 @@ function R.buckets_view(stream_key, spec, per_level_default)
   end
   local context = compiler_context.current()
   local cache = context:state_view("stream_match_index", function()
-    return {schema = 1, by_identity = {}, computations_by_identity = {}}
+    return {schema = 2, by_identity = {}, computations_by_identity = {}}
   end)
   local identity = stream_match_identity(stream_key, spec, per_level_default)
   local cached = cache.by_identity[identity]
