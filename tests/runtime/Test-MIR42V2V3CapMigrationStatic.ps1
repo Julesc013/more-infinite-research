@@ -113,9 +113,9 @@ try {
     try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
     $path
   }
-  $predecessorCandidate=New-TinyInput 'more-infinite-research' '4.2.21000';$currentCandidate=New-TinyInput 'more-infinite-research' '4.2.21001';$extra=New-TinyInput 'unrequested' '1.0.0'
+  $predecessorCandidate=New-TinyInput 'more-infinite-research' '4.2.21000';$currentCandidate=New-TinyInput 'more-infinite-research' '4.7.21000';$extra=New-TinyInput 'unrequested' '1.0.0'
   $predecessorInput=[pscustomobject]@{archive_sha256=Get-MIRImmutableInputSha256 $predecessorCandidate;source_commit=$pinned.commit}
-  $currentInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=Get-MIRImmutableInputSha256 $currentCandidate;package_source_sha256='B'*64}}
+  $currentInput=[pscustomobject]@{receipt=[pscustomobject]@{archive_sha256=Get-MIRImmutableInputSha256 $currentCandidate;distribution_version='4.7.21000';package_source_sha256='B'*64}}
   $fixture=Join-Path $repo 'fixtures/assert-mir42-v2-v3-cap-migration';$fixtureName='mir-fixture-assert-mir42-v2-v3-cap-migration'
   $preparedFixtures=@{};$preparedSettings=@{}
   foreach($version in @('0.1.0','0.1.1','0.1.2','0.1.3')){
@@ -134,7 +134,7 @@ try {
     Check ($stage.mods -ceq $library -and -not(Test-Path (Join-Path $stage.root 'mods')) -and @(Get-ChildItem -LiteralPath $stage.root -Recurse -File -Filter '*.zip').Count -eq 0) "$($stage.name) materialized archives."
     $selection=Get-Content -LiteralPath $stage.mod_list -Raw|ConvertFrom-Json
     $mir=@($selection.mods|Where-Object name -CEQ 'more-infinite-research')
-    Check ($mir.Count -eq 1 -and $mir[0].version -ceq $(if($stage.name.StartsWith('v2-')){'4.2.21000'}else{'4.2.21001'})) "$($stage.name) selected the wrong input lineage."
+    Check ($mir.Count -eq 1 -and $mir[0].version -ceq $(if($stage.name.StartsWith('v2-')){'4.2.21000'}else{'4.7.21000'})) "$($stage.name) selected the wrong input lineage."
     $zip=[IO.Compression.ZipFile]::OpenRead($stage.settings_archive)
     try{$reader=[IO.StreamReader]::new($zip.GetEntry('mir-validation-settings-overrides_'+$preparedSettings[$stage.cap].version+'/settings-updates.lua').Open());try{$text=$reader.ReadToEnd()}finally{$reader.Dispose()}}finally{$zip.Dispose()}
     Check ($text.Contains('override("ips-max-level-research_copper", '+$stage.cap+')')) "$($stage.name) lost its private cap."
@@ -163,7 +163,9 @@ try {
     param($Context,$FilePath,$Arguments,$TimeoutSeconds)
     Check ($Context -eq $resources -and $FilePath -ceq (Get-Command pwsh).Source -and $TimeoutSeconds -eq 30 -and $Arguments -contains $FactorioBin -and $Arguments -contains $SteamManifest) 'resolver lost its governed transport.'
     $driver=Get-Content -Raw (Join-Path $Context.root 'resolve-engine.ps1')
-    Check ($driver.Contains("-HarnessId 'runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission -RepoRoot')) 'existing engine oracle was bypassed.'
+    # The cap-only tooling control also executes this driver against a mock
+    # authority and checks the actual omitted/explicit manifest arguments.
+    Check ($driver.Contains("HarnessId='runtime.maximum-level-v2-v3-migration-f210'") -and $driver.Contains('Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments')) 'existing engine oracle was bypassed.'
     [IO.File]::WriteAllText((Join-Path $Context.root 'engine-resolution.json'),'{"engine":{"version":"controlled"}}')
   }
   Check ((Get-MigrationGovernedEngineResolution).engine.version -ceq 'controlled') 'resolver response was lost.'

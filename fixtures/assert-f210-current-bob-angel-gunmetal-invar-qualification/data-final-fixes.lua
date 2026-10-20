@@ -1,6 +1,6 @@
 -- Package-excluded qualification of the exact staged Gunmetal/Invar technology
--- contract. It binds declaration-level owners and effects only; control.lua
--- retains its narrow persisted early-research create/reload check.
+-- contract. It binds declaration-level owners and effects; control.lua then proves
+-- admitted finite and continuation research, force modifiers, queue/progress, and reload persistence.
 local subjects = {
   {
     family = "gunmetal",

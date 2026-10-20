@@ -7,7 +7,7 @@ function Assert-GIStatic([bool]$Condition,[string]$Code){if(-not$Condition){thro
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $dossierPath=Join-Path $repo 'fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json'
 $dossier=Get-Content -LiteralPath $dossierPath -Raw|ConvertFrom-Json -Depth 50 -DateKind String
-Assert-GIStatic (([int]$dossier.schema -eq 1) -and ([string]$dossier.kind -ceq 'MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV3')) 'dossier-identity'
+Assert-GIStatic (([int]$dossier.schema -eq 1) -and ([string]$dossier.kind -ceq 'MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV4')) 'dossier-identity'
 Assert-GIStatic (([string]$dossier.target.engine.version -ceq '2.1.22') -and ([string]$dossier.target.engine.sha256 -ceq 'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B')) 'engine-identity'
 Assert-GIStatic ((@($dossier.target.official_mods) -join ',') -ceq 'base,elevated-rails,quality,recycler,space-age') 'official-closure'
 Assert-GIStatic ((@($dossier.target.archives).Count -eq 11) -and (@($dossier.target.archives|Group-Object file|Where-Object Count -gt 1).Count -eq 0)) 'archive-cardinality'
@@ -31,15 +31,26 @@ $qualification=(Resolve-Path -LiteralPath (Join-Path $repo ([string]$dossier.fix
 $qualificationData=[IO.File]::ReadAllText((Join-Path $qualification 'data-final-fixes.lua'));$qualificationControl=[IO.File]::ReadAllText((Join-Path $qualification 'control.lua'))
 Assert-GIStatic ($qualificationData.Contains('[MIR_ACTIVE_MODS]',[StringComparison]::Ordinal)) 'qualification-complete-mod-table'
 foreach($fragment in @('DATA PASS','staged-owners=true')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-data-marker'}
-foreach($fragment in @('RUNTIME PASS','stage=create technologies=researched','RELOAD PASS','technologies=researched save-state=preserved')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-runtime-marker'}
+$earned=$dossier.fixtures.qualification.earned_modifier
+Assert-GIStatic ($null -ne $earned -and [double]$earned.effect_change -eq 0.02 -and [int]$earned.finite_completed_levels -eq 3 -and [double]$earned.finite_productivity_bonus -eq 0.06 -and [int]$earned.continuation_start_level -eq 4 -and [int]$earned.continuation_next_level -eq 5 -and [double]$earned.continuation_productivity_bonus -eq 0.08 -and [double]$earned.progress -eq 0.42 -and ((@($earned.queue)-join ',') -ceq 'recipe-prod-research_material_gunmetal-4,recipe-prod-research_material_invar-4')) 'qualification-earned-contract'
+Assert-GIStatic ([string]$dossier.fixtures.qualification.mode -ceq 'earned-productivity-and-queued-next-level') 'qualification-earned-mode'
+Assert-GIStatic (-not $qualificationControl.Contains('research_queue_enabled',[StringComparison]::Ordinal)) 'qualification-no-retired-f210-queue-api'
+foreach($fragment in @('runtime_marker("RUNTIME PASS stage=create")','runtime_marker("RELOAD PASS stage=reload")','finite=researched continuation-level=5 bonuses=0.08','queue=gunmetal-then-invar progress=0.42','force.add_research(technology)','force.add_research(gunmetal) or not force.add_research(invar)','#queue ~= 2','queue[1].name ~= subjects[1].continuation','queue[2].name ~= subjects[2].continuation','continuation.level ~= 5','next-level queue or progress differs','earned productivity differs','state.version ~= 2')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-earned-runtime-and-rejection'}
+foreach($fragment in @('recipe-prod-research_material_gunmetal-4','recipe-prod-research_material_invar-4','effect.change ~= 0.02','continuation level 4+ range differs')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-staged-effect-contract'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'
-foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload')){
+foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload','Assert-GIQualificationRuntime')){
   $readerNodes=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $readerFunction},$true))
   Assert-GIStatic ($readerNodes.Count -eq 1) 'unique-actual-dossier-reader'
   . ([scriptblock]::Create($readerNodes[0].Extent.Text))
 }
 $actualDossier=Read-GIDossier -Path $dossierPath
 Assert-GIStatic ([string]$actualDossier.fixtures.observe.version -ceq [string]$dossier.fixtures.observe.version) 'actual-dossier-reader-accepts-selected-fixture'
+$qualificationFixture=$actualDossier.fixtures.qualification
+Assert-GIQualificationRuntime -LogText (([string]$qualificationFixture.data_marker)+"`n"+([string]$qualificationFixture.create_marker)) -FixtureSpec $qualificationFixture -Stage create
+Assert-GIQualificationRuntime -LogText (([string]$qualificationFixture.data_marker)+"`n"+([string]$qualificationFixture.reload_marker)) -FixtureSpec $qualificationFixture -Stage reload
+$wrongQualificationMarkerRejected=$false
+try{Assert-GIQualificationRuntime -LogText (([string]$qualificationFixture.data_marker)+"`n"+(([string]$qualificationFixture.create_marker).Replace('bonuses=0.08','bonuses=0.06'))) -FixtureSpec $qualificationFixture -Stage create}catch{$wrongQualificationMarkerRejected=$_.Exception.Message -match 'earned research state marker differs'}
+Assert-GIStatic $wrongQualificationMarkerRejected 'earned-qualification-opposing-state-marker-rejected'
 $run=Join-Path $repo 'build/tmp/gi-controlled-no-process'
 $activation=[pscustomobject]@{library='controlled-library-not-opened'}
 $controlledProcessPassed=$true
@@ -68,7 +79,7 @@ $missingInvocationRejected=$false
 try{Get-MIRLibraryLatestInvocationText -Text 'new-state without a launch boundary'|Out-Null}catch{$missingInvocationRejected=$_.Exception.Message -match '\[mir-library-loaded-invocation\]'}
 Assert-GIStatic $missingInvocationRejected 'missing-current-invocation-rejected'
 $text=[IO.File]::ReadAllText($runner)
-foreach($required in @('Start-MIRLibraryActivation','Complete-MIRLibraryActivation','Resolve-MIRNativeProbeDependencyInputs','Assert-MIRLibraryFixtureArchive','-SettingsMode File','--create','--benchmark','Add-MIRNativeProbeLibraryActivation','Get-GIObservation','failed-terminal-result-retained','controls_restoration','f210-ba-gunmetal-invar.reload-','foreach($ordinal in 1..2)')){Assert-GIStatic ($text.Contains($required,[StringComparison]::Ordinal)) 'runner-direct-library'}
+foreach($required in @('Start-MIRLibraryActivation','Complete-MIRLibraryActivation','Resolve-MIRNativeProbeDependencyInputs','Assert-MIRLibraryFixtureArchive','-SettingsMode File','--create','--benchmark','Add-MIRNativeProbeLibraryActivation','Get-GIObservation','failed-terminal-result-retained','controls_restoration','f210-ba-gunmetal-invar.reload-','foreach($ordinal in 1..2)','Assert-GIQualificationRuntime','passed-narrow-earned-productivity-qualification')){Assert-GIStatic ($text.Contains($required,[StringComparison]::Ordinal)) 'runner-direct-library'}
 foreach($forbidden in @('mir-native-obsolete-runner','ImmutableInputStaging.ps1','New-MIRImmutableInputLease','RequireHardLinks','Publish-MIRModDirectoryArchive','ExactStageRoot','RecoverRun')){Assert-GIStatic (-not$text.Contains($forbidden,[StringComparison]::Ordinal)) 'runner-no-staging'}
 Assert-GIStatic ((@($dossier.certificate.routes|ForEach-Object {[string]$_.technology})-join',') -ceq 'recipe-prod-research_material_gunmetal-1,recipe-prod-research_material_invar-1') 'certificate-subjects'
 Write-Host '[ok] F210 Gunmetal/Invar direct-library statics passed; observer fact capture and qualification remain distinct, with no engine process.'
