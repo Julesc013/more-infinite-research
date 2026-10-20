@@ -1644,6 +1644,39 @@ streams:
         tests:
           - tests/compiler/material_continuation.lua
 
+    mir-k2-imersite-continuation-state-4:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-k2-imersite-continuation-state-4
+      introduced_in: "4.7.0"
+      source: compatibility-migration-state:k2-imersite-continuation
+      capability: recipe-productivity
+      family: material_imersite
+      policy: retain-hidden-alias
+      identity_state: stable-unreleased
+      generated_technology: mir-k2-imersite-continuation-state-4
+      stream_key: __migration_state/k2_imersite_continuation_v1
+      migration_policy: stable
+      targets:
+        - stream:research_material_imersite
+      evidence:
+        fixtures:
+          - fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000
+
+    mir-k2-imersite-staged-state-1:
+      canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.mir-k2-imersite-staged-state-1
+      introduced_in: "4.7.0"
+      source: compatibility-migration-state:k2-imersite-staged
+      capability: recipe-productivity
+      family: material_imersite
+      policy: retain-hidden-alias
+      identity_state: stable-unreleased
+      generated_technology: mir-k2-imersite-staged-state-1
+      stream_key: __migration_state/k2_imersite_staged_v1
+      migration_policy: stable
+      targets:
+        - stream:research_material_imersite
+      evidence:
+        fixtures:
+          - fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000
     recipe-prod-research_material_imersite-1:
       canonical_row: prototypes/mir/streams/generated_stream_manifest.json#streams.recipe-prod-research_material_imersite-1
       introduced_in: "4.2.0"

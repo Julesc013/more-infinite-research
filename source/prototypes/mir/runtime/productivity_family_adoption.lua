@@ -2,6 +2,12 @@ local M = {}
 M.requires_features = {"productivity_family_adoption"}
 local runtime_state = require("prototypes.mir.runtime.state")
 local transition_descriptor = require("prototypes.mir.domain.research_cost.transition_descriptor")
+local target_line = require("prototypes.mir.platform.factorio.target_line")
+-- F200 has scripted technologies too; only F210 carries this JSON/state
+-- compatibility contract and materializes these private carrier modules.
+local k2_imersite_staged_state_migration = target_line.factorio_version == "2.1"
+  and target_line.feature_enabled("scripted_techs")
+  and require("prototypes.mir.runtime.k2_imersite_staged_state_migration") or nil
 
 local ADOPTION_DATA_NAME = "more-infinite-research-productivity-family-adoption"
 
@@ -79,11 +85,30 @@ function M.on_init()
   state.adopted_count = current.count
   state.bindings = current.bindings
   state.signature = current.signature
+  -- New games have no predecessor record.  Disable only untouched default
+  -- carriers through the same established owner; unexpected active carriers
+  -- remain intact for explicit configuration reconciliation.
+  if k2_imersite_staged_state_migration then
+    k2_imersite_staged_state_migration.initialize_fresh(state)
+  end
 end
 
-function M.on_configuration_changed()
-  local current = current_adoption_state()
+function M.on_force_created(event)
+  -- A later force starts with the package's default carrier rows too.  This
+  -- path never fabricates migration state or clears an active holder.
+  if k2_imersite_staged_state_migration then
+    k2_imersite_staged_state_migration.initialize_fresh(ensure_state(), event and event.force)
+  end
+end
+
+function M.on_configuration_changed(event)
   local state = ensure_state()
+  -- JSON migration has already placed any old Imersite state on the hidden
+  -- carrier. Reconcile through this existing lifecycle owner before caps.
+  if k2_imersite_staged_state_migration then
+    k2_imersite_staged_state_migration.reconcile(event, state)
+  end
+  local current = current_adoption_state()
   local previous_bindings = state.bindings or {}
   local previous_signature = state.signature
 

@@ -17,6 +17,15 @@ local native_effect_coverage = require("prototypes.mir.policy.native_effect_cove
 local model = require("prototypes.mir.planner.compilation_plan.model")
 local validation = require("prototypes.mir.planner.compilation_plan.validate")
 local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.fingerprint")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
+
+local function migration_state_alias_operation(operation)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_operation(operation)
+end
 
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
@@ -283,7 +292,7 @@ local function materialized_stream_operations(artifact, options, preparations)
         technology_design = options.include_design == false and nil or design,
         technology = virtual_technology
           or technology_design.prototype_shape(design, {validated = true}),
-        registry = {kind = "stream", key = row.stream_key},
+        registry = {kind = migration_state_alias_row(row) and k2_imersite_state_alias.registry_kind or "stream", key = row.stream_key},
         stage_kind = row.stage_kind,
         staged_parent_technology = row.staged_parent_technology,
         staged_parent_stream_key = row.staged_parent_stream_key
@@ -323,6 +332,43 @@ local function materialized_stream_operations(artifact, options, preparations)
         expected_snapshot = deepcopy(row.adoption.expected_snapshot)
       })
     end
+  end
+  return out
+end
+
+-- The compatibility holder is intentionally effect-identical to its old
+-- Imersite stream during the JSON-to-runtime handoff. Keep that one checked
+-- operation outside normal owner arbitration; all ordinary operations remain
+-- subject to the existing single-owner resolver.
+local function partition_compatibility_state_operations(operations)
+  local ordinary, aliases = {}, {}
+  for _, operation in ipairs(operations or {}) do
+    if migration_state_alias_operation(operation) then
+      table.insert(aliases, operation)
+    else
+      table.insert(ordinary, operation)
+    end
+  end
+  return ordinary, aliases
+end
+
+local function append_operations(target, values)
+  for _, value in ipairs(values or {}) do table.insert(target, value) end
+  return target
+end
+
+local function player_catalog_rows(rows)
+  local out = {}
+  for _, row in ipairs(rows or {}) do
+    if not migration_state_alias_row(row) then table.insert(out, row) end
+  end
+  return out
+end
+
+local function player_catalog_operations(operations)
+  local out = {}
+  for _, operation in ipairs(operations or {}) do
+    if not migration_state_alias_operation(operation) then table.insert(out, operation) end
   end
   return out
 end
@@ -484,10 +530,13 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       table.insert(operations, model.copy_operation_with_design_view(normalized))
     end
   end
+  local compatibility_state_operations
+  operations, compatibility_state_operations = partition_compatibility_state_operations(operations)
   local combined_ownership, ownership_omissions
   operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations, {
     weapon_overlap_mode = input_policy.weapon_overlap_mode
   })
+  append_operations(operations, compatibility_state_operations)
   normalized_base = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_base_extension" then table.insert(normalized_base, operation) end
@@ -589,10 +638,14 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local final_base_candidates = {}
   for _, candidate in pairs(base_candidates_by_id) do table.insert(final_base_candidates, candidate) end
   table.sort(final_base_candidates, function(left, right) return left.candidate_id < right.candidate_id end)
+  -- Exact migration-state carriers travel through the emitter and actual
+  -- result validation, but never enter player selection/catalogue state.
+  local catalog_rows = player_catalog_rows(generation_plan.rows_for_consumption(stream_artifact))
+  local catalog_operations = player_catalog_operations(operations)
   artifact.technology_catalog = technology_catalog.finalize(
-    generation_plan.rows_for_consumption(stream_artifact),
+    catalog_rows,
     source_fingerprints,
-    operations,
+    catalog_operations,
     {
       generation_plan_fingerprint = stream_artifact.plan_fingerprint,
       compilation_plan_fingerprint = artifact.compilation_fingerprint,

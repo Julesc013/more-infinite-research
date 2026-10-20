@@ -9,6 +9,11 @@ local gate_contract = require("prototypes.mir.domain.technology.gate")
 local operation_contract = require("prototypes.mir.domain.compiler.transformation_operation")
 local transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
 local technology_design = require("prototypes.mir.domain.technology.technology_design")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
 
 local M = {}
 
@@ -79,7 +84,7 @@ local function stream_operation(row, policy)
       alternative_id = action .. ":" .. tostring(subject_id)
     },
     payload = {
-      kind = "stream",
+      kind = migration_state_alias_row(row) and k2_imersite_state_alias.registry_kind or "stream",
       stream_key = row.stream_key,
       manifest_id = row.manifest_id,
       technology_design = design,

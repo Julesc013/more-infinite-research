@@ -7,6 +7,7 @@ local generated_registry = require("prototypes.mir.domain.facts.generated_techno
 local mod_data = require("prototypes.mir.emit.mod_data")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
 local adoption = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
@@ -29,17 +30,30 @@ local CATEGORIES = {
   "unclassified"
 }
 
+local function private_state_alias(technology_name)
+  if k2_imersite_state_alias == nil then return false end
+  local holder = k2_imersite_state_alias.holder_for_technology(technology_name)
+  local entry = generated_registry.get(technology_name)
+  return holder ~= nil and entry ~= nil
+    and entry.kind == k2_imersite_state_alias.registry_kind
+    and entry.key == holder.stream_key
+end
+
 local function owner_index()
   local by_recipe = {}
   local counts = {technologies = 0, effects = 0, graph_edges = 0, technology_passes = 1}
   for technology_name, technology in pairs(data_raw.prototypes("technology")) do
-    counts.technologies = counts.technologies + 1
-    counts.graph_edges = counts.graph_edges + #(technology.prerequisites or {})
-    for _, effect in ipairs(technology.effects or {}) do
-      counts.effects = counts.effects + 1
-      if effect.type == "change-recipe-productivity" and effect.recipe then
-        by_recipe[effect.recipe] = by_recipe[effect.recipe] or {}
-        table.insert(by_recipe[effect.recipe], technology_name)
+    -- The two exact JSON carriers temporarily mirror a predecessor effect.
+    -- They are neither coverage owners nor player-visible technologies.
+    if not private_state_alias(technology_name) then
+      counts.technologies = counts.technologies + 1
+      counts.graph_edges = counts.graph_edges + #(technology.prerequisites or {})
+      for _, effect in ipairs(technology.effects or {}) do
+        counts.effects = counts.effects + 1
+        if effect.type == "change-recipe-productivity" and effect.recipe then
+          by_recipe[effect.recipe] = by_recipe[effect.recipe] or {}
+          table.insert(by_recipe[effect.recipe], technology_name)
+        end
       end
     end
   end

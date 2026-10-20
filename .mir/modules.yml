@@ -1287,6 +1287,7 @@ modules:
     - prototypes/mir/domain/effects/generated_target_contracts.lua
     - prototypes/mir/domain/native_owner/contract.lua
     - prototypes/mir/domain/native_owner/cost_model.lua
+    - prototypes/mir/domain/research/k2_imersite_staged_state.lua
     - prototypes/mir/domain/research_cost/model.lua
     - prototypes/mir/domain/research_cost/formula.lua
     - prototypes/mir/domain/research_cost/validation.lua
@@ -1394,6 +1395,7 @@ modules:
     - prototypes/mir/planner/stream_compiler/ownership.lua
     - prototypes/mir/planner/stream_compiler/qualify.lua
     - prototypes/mir/planner/stream_compiler/material_continuation.lua
+    - prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua
     - prototypes/mir/planner/generation_plan.lua
     - prototypes/mir/planner/output_validator.lua
     - prototypes/mir/planner/costs.lua
@@ -1478,6 +1480,7 @@ modules:
     - prototypes/mir/runtime/research_browser_actions.lua
     - prototypes/mir/runtime/planet_discovery_recovery.lua
     - prototypes/mir/runtime/productivity_family_adoption.lua
+    - prototypes/mir/runtime/k2_imersite_staged_state_migration.lua
     - prototypes/mir/runtime/maximum_level_control.lua
     - prototypes/mir/runtime/state.lua
     - prototypes/mir/runtime/effects/agricultural_growth_speed.lua
@@ -1494,7 +1497,7 @@ mutation_commands:
     - only emission commands may create generated technology prototypes
     - mutation commands may change existing prototypes only through their listed implementation
     - CompilationPlan schema 2 globally finalizes stream adoption and base-extension operations before emission
-    - CompilationSnapshot schema 2 and PolicySnapshot schema 1 are the only inputs to the pure planner compiler API
+    - ActiveCompilerInput schema 1 and PolicySnapshot schema 1 carry ordinary pure compiler inputs; explicit generic imports and exports retain CompilerInput and CompilationSnapshot schema 2
     - RuntimeEnvironmentIdentity and QualificationEnvironmentIdentity bind runtime behavior and assurance machinery separately
     - decoded external records are deeply verified once before a module-private weak-key authority admits them to the compiler trust domain
     - compiler-owned immutable records use cheap trusted identity assertions internally and reserve complete canonical revalidation and deep copies for explicit import export and final postcondition boundaries
