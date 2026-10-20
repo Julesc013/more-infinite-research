@@ -2066,6 +2066,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        ".mir/fixtures.yml",
         ".github/workflows/validate.yml",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/workspace/RepoPaths.ps1",
@@ -2090,6 +2091,8 @@
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-460.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-470.json",
         "fixtures/assert-k2-213-imersite-continuation/info.json",
         "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
         "fixtures/assert-k2-213-imersite-continuation/control.lua",
@@ -8691,6 +8694,8 @@
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-460.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-470.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -8767,5 +8772,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:ab60727a2fc1061f0df4021b4340554b523633f559f4db60b069ec3841880bf3"
+  "digest": "sha256:a671529a447cc47e0c819a95b458c3f60a3fd33bb257a218f7ae78cf5e824f43"
 }
