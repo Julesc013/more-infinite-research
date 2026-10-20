@@ -12,8 +12,9 @@ local snapshot_contract = require("prototypes.mir.domain.compiler.compilation_sn
 
 local M = {}
 
-local function now()
-  return os and type(os.clock) == "function" and os.clock() or 0
+local function clock_now()
+  if os and type(os.clock) == "function" then return os.clock() end
+  return nil
 end
 
 local function memory_bytes()
@@ -127,7 +128,7 @@ end
 
 function M.capture(options)
   options = options or {}
-  local started_at, memory_before = now(), memory_bytes()
+  local started_at, memory_before = clock_now(), memory_bytes()
   local relationship_index = relationships.view("input")
   local recipe_index = recipe_facts.index_view()
   -- Only the exact Context-owned recipe index can supply this component.  The
@@ -170,9 +171,10 @@ function M.capture(options)
       copied_domains = {"technologies", "items", "entities", "labs", "science_packs", "graph", "effect_targets"}
     },
     metrics = {
-      construction_seconds = math.max(0, now() - started_at),
+      -- Replaced immediately after the constructor returns.
+      construction_seconds = 0,
       memory_before_bytes = memory_before,
-      memory_after_bytes = memory_bytes(),
+      memory_after_bytes = memory_before,
       deep_copy_count = 3,
       -- This is the exact public recipes-domain byte length whose encoder and
       -- rolling digest were shared with the full owned recipe index. It is
@@ -185,7 +187,19 @@ function M.capture(options)
     -- public constructor's supplied-component verification fail-closed.
     trusted_components = recipe_domain ~= nil
   })
+  -- Finalize this interval as soon as the constructor returns, including its
+  -- hashes but excluding the following public-byte accounting. It is not a
+  -- measurement of the whole adapter capture.
+  result.metrics.memory_after_bytes = memory_bytes()
   result.metrics.peak_memory_bytes = math.max(result.metrics.memory_before_bytes, result.metrics.memory_after_bytes)
+  local finished_at = clock_now()
+  -- A host without os.clock has no construction-duration observation. Keep
+  -- that distinction explicit instead of manufacturing a zero-duration fact.
+  result.metrics.construction_seconds = started_at and finished_at
+    and math.max(0, finished_at - started_at) or "unavailable"
+  -- Public byte counting is intentionally outside construction_seconds. The
+  -- metric itself and the pass counter remain absent from this pre-metric
+  -- projection, preserving snapshot_bytes' existing exact contract.
   result.metrics.snapshot_bytes = snapshot_contract.snapshot_canonical_bytes(result)
   result.metrics.canonicalization_passes = result.metrics.canonicalization_passes + 1
   return result

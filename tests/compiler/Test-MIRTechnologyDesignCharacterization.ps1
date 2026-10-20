@@ -122,8 +122,8 @@ try{
     throw "TechnologyDesign characterization failed: $nativeLog"
   }
   $assertionCount=[int]$Matches[1]
-  if($assertionCount-ne5000) {
-    throw "TechnologyDesign characterization expected 5000 assertions, observed $assertionCount`: $nativeLog"
+  if($assertionCount-ne5003) {
+    throw "TechnologyDesign characterization expected 5003 assertions, observed $assertionCount`: $nativeLog"
   }
   if($log-notmatch'MIR-PUBLICATION-MEASUREMENT-PASS ([0-9]+)') {
     throw "Publication measurement characterization failed: $nativeLog"

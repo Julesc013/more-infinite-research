@@ -1180,7 +1180,38 @@ do
     check(recipe_facts.snapshot_recipe_domain_fingerprint(deepcopy(index)) == nil,
       "copied recipe index cannot claim owned digest authority")
     local capture_metrics_before = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
-    local captured = snapshot_adapter.capture()
+    -- Advance a deterministic host clock only inside the real constructor.
+    -- Sampling before new() would miss that work; sampling after public byte
+    -- accounting would incorrectly include a different measurement interval.
+    local original_os, original_gc = os, collectgarbage
+    local original_new = compilation_snapshot.new
+    local original_bytes = compilation_snapshot.snapshot_canonical_bytes
+    local clock, heap = 10, 12
+    os = {clock = function() return clock end}
+    collectgarbage = function(kind)
+      if kind == "count" then return heap end
+      return original_gc(kind)
+    end
+    compilation_snapshot.new = function(...)
+      local result = original_new(...)
+      clock, heap = clock + 2, 24
+      return result
+    end
+    compilation_snapshot.snapshot_canonical_bytes = function(...)
+      clock, heap = clock + 100, 99
+      return original_bytes(...)
+    end
+    local capture_ok, captured = pcall(snapshot_adapter.capture)
+    os, collectgarbage = original_os, original_gc
+    compilation_snapshot.new = original_new
+    compilation_snapshot.snapshot_canonical_bytes = original_bytes
+    check(capture_ok, "adapter capture succeeds with controlled clock and heap: " .. tostring(captured))
+    check(captured.metrics.construction_seconds == 2,
+      "construction interval includes constructor hashes and excludes public byte accounting")
+    check(captured.metrics.memory_before_bytes == 12 * 1024
+        and captured.metrics.memory_after_bytes == 24 * 1024
+        and captured.metrics.peak_memory_bytes == 24 * 1024,
+      "construction heap observation follows the constructor and precedes byte accounting")
     local capture_metrics_after = require("prototypes.mir.core.trusted_record").metrics().CompilationSnapshot
     check(captured.domain_fingerprints.recipes == component.fingerprint,
       "adapter reuses only the owned recipes-domain digest")

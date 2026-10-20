@@ -118,11 +118,19 @@ local function compile_active(context)
       candidates = latest.technology_catalog.base_candidates},
     source_fingerprints = input_snapshot.source_fingerprints
   })
+  local construction_seconds = input_snapshot.metrics.construction_seconds
+  local construction_milliseconds = type(construction_seconds) == "number"
+    and math.max(0, construction_seconds) * 1000 or nil
+  if construction_milliseconds == nil then
+    -- Preserve the adapter's explicit unavailable-clock result. The numeric
+    -- telemetry counter remains untouched: unmeasured must not become zero.
+    telemetry.witness("snapshot_construction_clock", "unavailable")
+  end
   for name, value in pairs({
     snapshot_prototype_bytes = input_snapshot.metrics.prototype_bytes_captured,
     snapshot_deep_copies = input_snapshot.metrics.deep_copy_count,
     snapshot_canonicalization_passes = input_snapshot.metrics.canonicalization_passes,
-    snapshot_construction_milliseconds = (input_snapshot.metrics.construction_seconds or 0) * 1000,
+    snapshot_construction_milliseconds = construction_milliseconds,
     snapshot_peak_memory_bytes = input_snapshot.metrics.peak_memory_bytes,
     input_snapshot_bytes = input_snapshot.metrics.snapshot_bytes,
     qualification_snapshot_bytes = compilation_snapshot_contract.snapshot_canonical_bytes(final_snapshot),

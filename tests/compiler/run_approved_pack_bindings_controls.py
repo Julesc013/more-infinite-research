@@ -49,6 +49,17 @@ def main() -> None:
     emitted.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
     emission_fixture = repo / 'tests/compiler/approved_family_emission.lua'
     emission = emitted.execute(emission_fixture.read_text(encoding='utf-8'))
+    # Exercise the complete actual catalogue/planner/emitter path in a fresh
+    # runtime with no host os table; the
+    # fixture checks unavailable timing instead of inventing a zero duration.
+    clockless = lua52.LuaRuntime(unpack_returned_tuples=True)
+    clockless.globals().source_root = (repo / 'source').as_posix()
+    clockless.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
+    clockless.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path; os = nil")
+    clockless_emission = clockless.execute(emission_fixture.read_text(encoding='utf-8'))
+    assert int(clockless_emission['assertions']) == int(emission['assertions']) + 2
+    assert int(clockless_emission['rows']) == int(emission['rows'])
+    assert int(clockless_emission['operations']) == int(emission['operations'])
     stubbed_modules = {'prototypes.mir.platform.factorio.target_profiles',
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
@@ -74,6 +85,10 @@ def main() -> None:
                                            'catalogue_rows': int(emission['rows']),
                                            'operations': int(emission['operations']),
                                            'stubbed_module_boundaries': [], 'target': 'f200'},
+                      'clockless_emission_control': {'assertions': int(clockless_emission['assertions']),
+                                                    'catalogue_rows': int(clockless_emission['rows']),
+                                                    'operations': int(clockless_emission['operations']),
+                                                    'stubbed_module_boundaries': [], 'target': 'f200'},
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 

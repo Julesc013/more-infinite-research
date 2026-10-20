@@ -302,6 +302,47 @@ loading-multithreading=true
   $script:ordinaryWindowReturned=$false;$script:ordinaryLogInitialised=$false;$ordinarySplashRejected=$false
   try{Invoke-MIRDirectLibraryOrdinaryWindowSample -FactorioBin (Join-Path $root 'factorio.exe') -LibraryDirectory $library -EngineDataDirectory $data -BaseRows $base -RunRoot (Join-Path $root 'ordinary-run-before-initialised') -WriteDataRoot (Join-Path $root 'ordinary-write-data-before-initialised') -Label 'without-mir' -Resources ([pscustomobject]@{root=$root}) -MirArchive $null -TimeoutSeconds 30 -OrdinaryPlayerConfig $ordinaryInput|Out-Null}catch{$ordinarySplashRejected=$_.Exception.Message-ceq'[mir-direct-startup-ordinary-window-process]'}finally{$script:ordinaryLogInitialised=$true}
   Assert-DirectStartup ($ordinarySplashRejected-and-not$script:ordinaryWindowReturned) 'ordinary window diagnostic accepted or captured a splash/loading window before the Factorio initialisation boundary.'
+  # Host-only controls for the responsive-menu endpoint. They exercise the
+  # canonical record boundary and its opposing cases without loading WinForms,
+  # starting a GUI process, or treating a retained small-window pilot as a
+  # primary large-profile result.
+  $source=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
+  $menuControls=0
+  $actorSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1')
+  $windowSource=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1')
+  $entrySource=Get-Content -Raw -LiteralPath (Join-Path $repo 'scripts/Measure-MIRPerformanceRegression.ps1')
+  Assert-DirectStartup ($source.Contains("ResponsiveMenuRecord.ps1") -and $source.Contains('Invoke-MIRDirectLibraryResponsiveMenuSample') -and $source.Contains('Invoke-MIRNativeProbeProcess') -and $source.Contains('Read-MIRDirectLibraryResponsiveMenuRecord') -and $source.Contains('ordinary-menu-shared') -and $source.Contains('ordinary-menu-player-data-required') -and $source.Contains('ordinary-menu-warmup-required') -and $source.Contains('MIRDirectLibraryOwnedMenuLaunchV1') -and $source.Contains('MIRDirectLibraryOwnedMenuObservationV1') -and $source.Contains('claims_library_selection_validation') -and $source.Contains('claims_final_acceptance') -and -not $source.Contains('PrintWindow') -and -not $source.Contains('[Diagnostics.Process]::Start')) 'responsive-menu runner does not preserve canonical actor ownership, shared cache custody, warmup exclusion, or diagnostic separation.';$menuControls++
+  Assert-DirectStartup ($entrySource.Contains('OrdinaryMenuPlayerDataPath') -and $entrySource.Contains("[mir-direct-startup-input-required] OrdinaryMenuPlayerDataPath") -and $entrySource.Contains('OrdinaryMenuPlayerDataPath=$OrdinaryMenuPlayerDataPath')) 'performance entrypoint does not require and forward the prepared ordinary-menu player-data input.';$menuControls++
+  Assert-DirectStartup ($actorSource.Contains('MIRDirectLibraryOwnedMenuLaunchV1') -and $actorSource.Contains('MIRDirectLibraryOwnedMenuObservationV1') -and $actorSource.IndexOf('Initialize-MIROwnedMenuWindow') -lt $actorSource.IndexOf('$beforeQpc') -and $actorSource.IndexOf('Initialize-MIRMenuOcr') -lt $actorSource.IndexOf('$beforeQpc')) 'responsive-menu actor does not preheat before its measured QPC launch bracket.';$menuControls++
+  Assert-DirectStartup ($windowSource.Contains('[IO.FileShare]::ReadWrite -bor [IO.FileShare]::Delete') -and $windowSource.Contains('GetForegroundWindow') -and $windowSource.Contains('WindowFromPoint') -and $windowSource.Contains('PostMessage')) 'responsive-menu observer does not retain live-log and exact owned-HWND controls.';$menuControls++
+  $menuRoot=Join-Path $root 'responsive-menu-record-controls';[IO.Directory]::CreateDirectory($menuRoot)|Out-Null
+  $mainImage=Join-Path $menuRoot 'main.png';$settingsImage=Join-Path $menuRoot 'settings.png'
+  [IO.File]::WriteAllBytes($mainImage,[byte[]](1,2,3,4));[IO.File]::WriteAllBytes($settingsImage,[byte[]](5,6,7,8))
+  $menuStart='2026-10-20T12:30:18.8834562Z';$menuPid=15884;$menuHandle=56624142;$menuFrequency=1000L;$menuLaunchBefore=1000L;$menuLaunchAfter=1010L
+  $newMenuFrame={param([string]$Path,[string]$Sha256,[long]$CaptureStart,[long]$CaptureComplete,[long]$Observed,[string[]]$Words)
+    [ordered]@{capture=[ordered]@{window=[ordered]@{process_id=$menuPid;start_utc=$menuStart;handle=$menuHandle;x=0;y=29;width=640;height=480};method='owned-hwnd-printwindow-client';capture_started_qpc=$CaptureStart;capture_completed_qpc=$CaptureComplete;path=$Path;sha256=$Sha256};ocr=[ordered]@{width=640;height=480;lines=@($Words|ForEach-Object {[ordered]@{normalized=$_}})};observed_qpc=$Observed}
+  }
+  $menuMain=&$newMenuFrame $mainImage (Get-FileHash -LiteralPath $mainImage -Algorithm SHA256).Hash 1100 1150 1200 @('main menu','single player','multiplayer','settings')
+  $menuSettings=&$newMenuFrame $settingsImage (Get-FileHash -LiteralPath $settingsImage -Algorithm SHA256).Hash 1300 1350 1400 @('graphics','controls','interface','mod settings')
+  $menuObservation=[ordered]@{status='owned-menu-settings-response-observed';process_id=$menuPid;launch_qpc=$menuLaunchBefore;clock_frequency=$menuFrequency;first_menu=$menuMain;action=[ordered]@{kind='owned-window-settings-click';process_id=$menuPid;window_handle=$menuHandle;x=320;y=240;posted_qpc=1210};response=$menuSettings;confirmed_response_seconds=0.4;observer_max_iteration_seconds=0.1;poll_interval_milliseconds=100;claims_factorio_acceptance=$false}|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+  $menuArguments=@{Observation=$menuObservation;OwnedProcessId=$menuPid;OwnedProcessStartUtc=[datetime]$menuStart;LaunchBeforeQpc=$menuLaunchBefore;LaunchAfterQpc=$menuLaunchAfter;ClockFrequency=$menuFrequency;ArtifactRoot=$menuRoot;TimeoutSeconds=30}
+  $menuResult=Read-MIRDirectLibraryResponsiveMenuRecord @menuArguments
+  Assert-DirectStartup ($menuResult.endpoint_class-ceq'ordinary-responsive-menu'-and$menuResult.elapsed_seconds-eq0.4-and-not$menuResult.shutdown_and_cleanup_included-and-not$menuResult.claims_live_process_or_native_acceptance) 'valid owned response record did not retain the bounded response endpoint.';$menuControls++
+  $menuMutations=@(
+    {param($Observation)$Observation.process_id++},
+    {param($Observation)$Observation.response.capture.window.handle++},
+    {param($Observation)$Observation.response.capture.sha256='0'*64},
+    {param($Observation)$Observation.action.posted_qpc=$Observation.response.observed_qpc},
+    {param($Observation)$Observation.response.ocr.lines=@([pscustomobject]@{normalized='single player'})}
+  )
+  foreach($mutate in $menuMutations){
+    $changed=$menuObservation|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20
+    &$mutate $changed
+    $changedArguments=@{}+$menuArguments;$changedArguments.Observation=$changed
+    $rejected=$false;try{Read-MIRDirectLibraryResponsiveMenuRecord @changedArguments|Out-Null}catch{$rejected=$true}
+    Assert-DirectStartup $rejected 'invalid, foreign, or unresponsive menu record was accepted.';$menuControls++
+  }
+  if($menuControls-ne10){throw 'Responsive-menu host controls did not execute their full opposing set.'}
   $source=Get-Content -Raw -LiteralPath (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
   Assert-DirectStartup ($source.Contains('Invoke-MIRNativeProbeFactorioProcess')-and$source.Contains('Add-MIRNativeProbeLibraryActivation')-and$source.Contains('Wait-MIRDirectLibraryStartupAdmission')-and$source.Contains('AdmissionWaitSeconds')-and$source.Contains('Get-MIRNativeProbeRemainingOutputBytes')-and$source.Contains('changed-configuration')-and$source.Contains('same-selection')-and$source.Contains('prior_selection_label')-and$source.Contains('warm-repeat')-and$source.Contains('headless-create-diagnostic')-and$source.Contains('graphical-player-ready-diagnostic')-and$source.Contains('ordinary-native-window-diagnostic')-and$source.Contains('Get-MIRDirectLibraryPlayerReadyObserverArchive')-and$source.Contains('Invoke-MIRDirectLibraryPlayerReadyPreparation')-and$source.Contains('New-MIRDirectLibraryOrdinaryPlayerConfig')-and$source.Contains('automatic-window-image-not-attempted')-and$source.Contains('menu_ready_confirmation')-and$source.Contains('--benchmark-graphics')-and$source.Contains('[MIR_PLAYER_READY]')-and$source.Contains('engine_log_player_ready_seconds')-and$source.Contains('factorio-current.log')-and$source.Contains('ready-initialised')-and$source.Contains('ready-save-map-data')-and$source.Contains('run_relative_path=[IO.Path]::GetRelativePath($Resources.root,$RunRoot)')-and-not$source.Contains('PrintWindow')-and-not$source.Contains('[Diagnostics.Process]::Start')) 'runner bypasses the governed native process actor, does not bind the base-only graphical observer and its prepared save, or omits bounded pre-launch admission handling.'
   . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
