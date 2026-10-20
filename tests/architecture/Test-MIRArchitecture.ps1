@@ -770,10 +770,26 @@ $technologyOperationExecutor = Read-MIRFile -RelativePath "prototypes/mir/emit/t
 foreach ($executorNeedle in @(
   "function M.apply_plan(plan, journal, options)",
   "plan_contract.assert_trusted(plan)",
-  "journal:assert_before(operation, before)",
-  'journal:record(operation, before, after, "applied"'
+  "journal:execute(operation, capture, apply_operation)"
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
+}
+
+$mutationJournalText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua"
+foreach ($journalNeedle in @(
+  "function Journal:execute(operation, capture, apply)",
+  "self:assert_operation(operation)",
+  "local before = deepcopy(capture(operation) or {})",
+  "local before_fingerprint = fingerprint.of(before)",
+  "before_fingerprint ~= operation.expected_before_fingerprint",
+  "local after = capture(operation)",
+  "after_fingerprint = fingerprint.of(after or {})",
+  "entry.after_fingerprint ~= operation.expected_after_fingerprint",
+  '"precondition-mismatch"',
+  '"postcondition-mismatch"',
+  '"mutation-error"'
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua" -Text $mutationJournalText -Needle $journalNeedle
 }
 
 $trustedRecordText = Read-MIRFile -RelativePath "prototypes/mir/core/trusted_record.lua"
