@@ -569,7 +569,7 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
 
   local supplied_base = deepcopy(active_owner.base_continuation_inputs)
   local supplied_candidates = deepcopy(active_owner.base_candidates)
-  local supplied_providers = deepcopy(active_owner.provider_inputs)
+  local supplied_providers = compiler_input_contract.provider_inputs_snapshot(active_input)
   local supplied_inventory = deepcopy(active_owner.effect_target_inventory)
   local supplied_sources = deepcopy(active_owner.source_fingerprints)
   local detached_active = compiler_input_contract.new_active({
@@ -591,10 +591,117 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local detached_values = compiler_input_contract.active_view(detached_active)
   check(detached_values.base_continuation_inputs.outside_writer == nil
     and detached_values.base_candidates.outside_writer == nil
-    and detached_values.provider_inputs.outside_writer == nil
+    and compiler_input_contract.provider_inputs_snapshot(detached_active).outside_writer == nil
     and detached_values.effect_target_inventory.outside_writer == nil
     and detached_values.source_fingerprints.outside_writer == nil,
     "Active CompilerInput deep-copies all caller-owned nested inputs")
+
+  -- Provider state has one private owner across initial/qualified handoff.
+  -- Full diagnostic fields still affect identity, but do not escape through
+  -- ordinary consumer projections or the other active compiler values.
+  local provider_probe = {
+    schema = 1, decision_set_fingerprint = "owned-provider-control",
+    decisions = {{provider_id = "fixture-provider", provider_version = "1",
+      candidate_family = "fixture-family", prototype_type = "recipe",
+      prototype_name = "iron-plate", target_stream = "fixture-stream",
+      final_state = "review-required", claim_fingerprint = "fixture-claim",
+      decision_fingerprint = "fixture-decision", risk_fingerprint = "fixture-risk",
+      risk_disposition = "REVIEW_REQUIRED", diagnostic_detail = {"retained-full-input"}}}
+  }
+  local function probe_input(provider)
+    return compiler_input_contract.new_active({
+      stream_plan = active_owner.stream_plan,
+      base_continuation_inputs = active_owner.base_continuation_inputs,
+      base_candidates = active_owner.base_candidates,
+      provider_inputs = provider, effect_target_inventory = active_owner.effect_target_inventory,
+      source_fingerprints = active_owner.source_fingerprints,
+      policy_snapshot = active_owner.policy_snapshot,
+      runtime_environment = active_owner.runtime_environment,
+      input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+    })
+  end
+  local original_of, provider_encodings = fingerprint.of, 0
+  fingerprint.of = function(value, ...)
+    if type(value) == "table" and value.decision_set_fingerprint == "owned-provider-control" then
+      provider_encodings = provider_encodings + 1
+    end
+    return original_of(value, ...)
+  end
+  local provider_input = probe_input(provider_probe)
+  local qualified_provider_input = compiler_input_contract.qualify_active(provider_input, {
+    stream_plan = plan.stream_plan, base_continuation_inputs = plan.base_extension_operations,
+    base_candidates = plan.technology_catalog.base_candidates
+  })
+  fingerprint.of = original_of
+  check(provider_encodings == 1, "Qualification does not copy/hash its unchanged private provider child again")
+  check(provider_input.provider_input_fingerprint == qualified_provider_input.provider_input_fingerprint,
+    "Qualification retains exact full provider identity")
+  check(compiler_input_contract.active_view(provider_input).provider_inputs == nil,
+    "Ordinary active values expose no private provider state")
+  local expected_provider_projection = {
+    provider_id = "fixture-provider", provider_version = "1", candidate_family = "fixture-family",
+    prototype_type = "recipe", prototype_name = "iron-plate", target_stream = "fixture-stream",
+    final_state = "review-required", claim_fingerprint = "fixture-claim",
+    decision_fingerprint = "fixture-decision", risk_fingerprint = "fixture-risk",
+    risk_disposition = "REVIEW_REQUIRED"
+  }
+  local detached_decisions = compiler_input_contract.provider_decisions(provider_input)
+  check(#detached_decisions == 1
+    and fingerprint.canonical(detached_decisions[1]) == fingerprint.canonical(expected_provider_projection),
+    "Consumer projection preserves every used claim, risk, family and review field")
+  local provider_pure = require("prototypes.mir.planner.compiler").compile(
+    qualified_provider_input, active_owner.policy_snapshot)
+  local expected_pure_claim = {
+    provider_id = "fixture-provider", provider_version = "1",
+    subject = {prototype_type = "recipe", prototype_name = "iron-plate"},
+    target_stream = "fixture-stream", final_state = "review-required",
+    claim_fingerprint = "fixture-claim", decision_fingerprint = "fixture-decision",
+    risk_disposition = "REVIEW_REQUIRED"
+  }
+  check(#provider_pure.provider_claims == 1
+    and fingerprint.canonical(provider_pure.provider_claims[1]) == fingerprint.canonical(expected_pure_claim)
+    and provider_pure.status == "REVIEW_REQUIRED"
+    and #provider_pure.dispositions.review_required > 0,
+    "Actual pure compiler consumes complete provider fields and retains review disposition")
+  local provider_finalized = require("prototypes.mir.planner.compilation_plan").finalize(
+    active_owner.stream_plan, active_owner.base_continuation_inputs,
+    {compiler_input = provider_input, stream_plan_trusted = true,
+      base_candidates = active_owner.base_candidates})
+  local expected_plan_claim = deepcopy(expected_pure_claim)
+  expected_plan_claim.candidate_family = "fixture-family"
+  expected_plan_claim.risk_fingerprint = "fixture-risk"
+  check(#provider_finalized.compiler_result.provider_claims == 1
+    and fingerprint.canonical(provider_finalized.compiler_result.provider_claims[1])
+      == fingerprint.canonical(expected_plan_claim)
+    and #provider_finalized.compiler_result.review_required_candidates == 1
+    and provider_finalized.compiler_result.dimensions.review == "REQUIRED",
+    "Actual CompilationPlan consumes family/risk fields and retains provider review evidence")
+  detached_decisions[1].claim_fingerprint = "outside-writer"
+  provider_probe.decisions[1].claim_fingerprint = "outside-writer"
+  local provider_export = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  provider_export.decisions[1].diagnostic_detail[1] = "outside-writer"
+  provider_export.decisions[1].claim_fingerprint = "outside-writer"
+  check(compiler_input_contract.provider_decisions(provider_input)[1].claim_fingerprint == "fixture-claim"
+    and compiler_input_contract.provider_decisions(qualified_provider_input)[1].claim_fingerprint == "fixture-claim"
+    and compiler_input_contract.provider_inputs_snapshot(qualified_provider_input).decisions[1].diagnostic_detail[1]
+      == "retained-full-input", "Caller, consumer and inspection mutation cannot change initial or qualified provider state")
+  local changed_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  changed_provider.decisions[1].diagnostic_detail[1] = "changed-before-admission"
+  check(probe_input(changed_provider).provider_input_fingerprint ~= provider_input.provider_input_fingerprint,
+    "Provider identity still covers the full diagnostic input, not only consumer fields")
+  local dynamic_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  setmetatable(dynamic_provider.decisions[1], {__index = {provider_id = "dynamic-provider"}})
+  check(not pcall(probe_input, dynamic_provider),
+    "Active provider admission rejects metatables retained by Factorio deepcopy")
+  local duplicate_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  duplicate_provider.decisions[2] = deepcopy(duplicate_provider.decisions[1])
+  duplicate_provider.decisions[2].provider_id = "second-provider"
+  duplicate_provider.decisions[3] = deepcopy(duplicate_provider.decisions[1])
+  local duplicate_input = probe_input(duplicate_provider)
+  local projected_order = compiler_input_contract.provider_decisions(duplicate_input)
+  check(#projected_order == 3 and projected_order[1].provider_id == "fixture-provider"
+    and projected_order[2].provider_id == "second-provider"
+    and projected_order[3].provider_id == "fixture-provider", "Provider query retains sequence and duplicate rows")
 
   -- The carrier binds only the structural GenerationPlan identity. Both real
   -- planner consumers must reject a copied plan before traversing or emitting it.
@@ -603,7 +710,7 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
     stream_plan = forged_plan,
     base_continuation_inputs = active_owner.base_continuation_inputs,
     base_candidates = active_owner.base_candidates,
-    provider_inputs = active_owner.provider_inputs,
+    provider_inputs = compiler_input_contract.provider_inputs_snapshot(active_input),
     effect_target_inventory = active_owner.effect_target_inventory,
     source_fingerprints = active_owner.source_fingerprints,
     policy_snapshot = active_owner.policy_snapshot,
