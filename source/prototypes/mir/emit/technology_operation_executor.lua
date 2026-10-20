@@ -30,7 +30,7 @@ local function apply_operation(operation)
   technology_design.assert_trusted(design)
   if operation.action == "create" then
     return technology_design_adapter.emit(design, {
-      kind = payload.kind == "base-continuation" and "base_extension" or "stream",
+      kind = payload.kind == "base-continuation" and "base_extension" or payload.kind == "migration_state_alias" and "migration_state_alias" or "stream",
       key = payload.key or payload.stream_key
     })
   end

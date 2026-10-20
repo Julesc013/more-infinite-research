@@ -68,6 +68,23 @@ The schema-3 `TechnologyCatalog` becomes final only after sanitation and graph p
 
 Every materializing stream, base continuation, and native-owner patch becomes one schema-2 `TransformationOperation`. Each operation binds its candidate and selected alternative, subject, action, exact expected-before snapshot, exact expected-after projection, allowed delta, qualification, authority, payload, and evidence. The active schema-3 or generic schema-2 plan binds canonical operation order and membership fingerprints. The shared technology executor applies that exact plan and records realized before/after state in its plan-bound schema-2 `MutationJournal`. Missing, duplicate, undeclared, fingerprint-mismatched, precondition-mismatched, postcondition-mismatched, failed, and out-of-plan operations fail closed.
 
+## K2 staged research continuity
+
+The F210 Imersite transition uses JSON renames before the existing productivity-family adoption handler reconciles saved state. The two hidden carrier identities preserve the released infinite chain and an already staged continuation independently:
+
+| Saved technology | Temporary carrier |
+| --- | --- |
+| `recipe-prod-research_material_imersite-1` | `mir-k2-imersite-staged-state-1` |
+| `recipe-prod-research_material_imersite-4` | `mir-k2-imersite-continuation-state-4` |
+
+Both carriers pass through the existing TechnologyDesign and emitter checks and have stable manifest rows. They are excluded from player research coverage, Library entries and cap bindings. Only F210 packages contain the JSON migration, carrier planner and runtime reconciler; the shared compiler uses the pure identity descriptor on other targets without activating the migration.
+
+Reconciliation runs before maximum-level control, preserves completed levels and queued fractional investment, and reads the applied queue back before clearing carrier effects. Its saved record binds the source version and force, supports a retry after an incomplete handoff, and avoids replacing a subsequently changed player queue. Actual technology setters update their effects; reconciliation performs no force-wide effect reset and adds no load hook or tick subscription.
+
+Carrier cost and time come from the existing configured Imersite authorities. Unchanged custom settings retain that source unit. Factorio can normalize fractional progress before Lua when cost or time settings change during the same upgrade; the runtime record cannot reconstruct a fraction already discarded by that earlier engine step. Native upgrade qualification must include the complete research/effect state and both cold reloads on the actual destination ZIP.
+
+This JSON-carrier implementation remains an unqualified development candidate. The item-aware native upgrade retained tested Imersite levels, powder bonuses, queues and fractional work, but an independent scripted running-speed offset was already lost at the earliest read-only Lua observation. The unchanged published predecessor retained that offset during a configuration-only control. The preservation assertion remains failing; this candidate must not be promoted as a passed migration or included in accepted release bytes while that boundary is unresolved.
+
 ## Public artifact and telemetry boundary
 
 Normal loads publish compact schema-1 generation-plan, technology-catalog, coverage, and compiler-evidence projections. Full catalog candidates, alternatives, qualifications, and internal evidence are available only in `PREVIEW`, diagnostics-enabled validation, or exact offline exports. The compact catalog carries counts, selected identities, reason histograms, provider summaries, bounded samples, and explicit truncation markers; it does not carry full candidates or qualifications.

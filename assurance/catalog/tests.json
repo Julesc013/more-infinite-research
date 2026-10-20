@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 239,
+  "test_count": 240,
   "tests": [
     {
       "id": "docs.check",
@@ -889,6 +889,14 @@
         "tests/compiler/Test-MIRK2ImersiteContinuation.ps1",
         "tests/compiler/material_progression.lua",
         "tests/compiler/material_continuation.lua",
+        "tests/runtime/k2_imersite_staged_state_controls.lua",
+        "source:source/prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+        "source:source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+        "source:source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+        ".mir/streams.yml",
+        "source:source/prototypes/mir/streams/generated_stream_manifest.json",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
@@ -2128,6 +2136,33 @@
         "targets/package-authority.json",
         "targets/f200/composition.json",
         "targets/f210/composition.json"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
+      "id": "static.k2-owned-speed-sentinel",
+      "proposition": "The governed test 'static.k2-owned-speed-sentinel' passes for its exact selected inputs.",
+      "cohort": "runtime-upgrade",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+      "canonical_implementation": "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+        "tests/runtime/run_k2_owned_speed_sentinel_controls.py",
+        "tests/runtime/k2_owned_speed_sentinel_controls.lua",
+        "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421K2Upgrade.ps1",
+        "fixtures/aaa-mir47-owned-speed-sentinel/**",
+        "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/**"
       ],
       "captured_artifacts": [],
       "matrix": null
@@ -8763,11 +8798,11 @@
     "cohorts": {
       "package-repository": 69,
       "tooling-release": 70,
-      "runtime-upgrade": 62,
+      "runtime-upgrade": 63,
       "compiler-static": 23,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 226,
+    "canonical_test_commands": 227,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8780,5 +8815,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:74e50c524ea766efcc1347d3ffa3c2585b8f7653d8c6c87f199de0fab90ee410"
+  "digest": "sha256:097777d9e327f13f467c692cde891a01c94d2e5565b545f40d9bc5ffacafbcf6"
 }
