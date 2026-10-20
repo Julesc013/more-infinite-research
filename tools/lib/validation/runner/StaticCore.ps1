@@ -145,8 +145,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 1.1 metadata must not carry Factorio 2.x or DLC dependencies: $($newerDeps -join ', ')"
     }
   } elseif ($isLegacyFactorio20) {
-    if ($deps -notcontains "base >= 2.0") {
-      throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
+    if (@($deps | Where-Object { $_ -match '^base >= 2[.]0(?:[.][0-9]+)?$' }).Count -ne 1) {
+      throw "Factorio 2.0 metadata must declare one base minimum in the 2.0 line."
     }
 
     $factorio21Deps = @($deps | Where-Object { $_ -match ">=\s*2\.1" })
