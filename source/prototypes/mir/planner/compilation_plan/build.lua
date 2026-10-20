@@ -423,8 +423,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     initial_skip_gate_vector_session)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
-  if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
-  else compiler_input.verify_untrusted(exact_input) end
+  compiler_input.assert_compilation_input(exact_input)
   local stream_effect_integrity
   local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
     or effect_target_inventory.capture()
@@ -635,7 +634,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end)
 
   local provider_claims, review_required_candidates = {}, {}
-  for _, decision in ipairs(exact_input.compilation_snapshot.provider_inputs.decisions or {}) do
+  for _, decision in ipairs(compiler_input.provider_inputs(exact_input).decisions or {}) do
     local projection = {
       provider_id = decision.provider_id,
       provider_version = decision.provider_version,

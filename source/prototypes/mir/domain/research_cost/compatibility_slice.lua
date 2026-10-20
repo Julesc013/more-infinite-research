@@ -149,6 +149,11 @@ local function verify(record)
       error("Research-cost compatibility compiler linkage is missing: " .. field, 3)
     end
   end
+  -- Historical schema-1 records predate this additive domain label and can
+  -- only be interpreted as the legacy full schema-2 identity. Fresh records
+  -- emitted by build() always carry one known self-fingerprinted domain.
+  compiler_input.verify_public_identity_domain(record.linkage.compiler_identity_domain,
+    record.linkage.compiler_input_fingerprint, {allow_legacy_full = true})
   local assertion = record.proof_assertion
   if type(assertion) ~= "table" or assertion.schema ~= 1
     or assertion.assertion_type ~= ASSERTION_TYPE or assertion.proposition_id ~= PROPOSITION_ID
@@ -160,6 +165,11 @@ local function verify(record)
     or not nonempty(assertion.environment.environment_fingerprint)
     or type(assertion.evidence) ~= "table"
     or assertion.evidence.compiler_input_fingerprint ~= record.linkage.compiler_input_fingerprint
+    or (record.linkage.compiler_identity_domain ~= nil
+      and fingerprint.of(assertion.evidence.compiler_identity_domain or {})
+        ~= fingerprint.of(record.linkage.compiler_identity_domain))
+    or (record.linkage.compiler_identity_domain == nil
+      and assertion.evidence.compiler_identity_domain ~= nil)
     or assertion.evidence.compilation_plan_fingerprint ~= record.linkage.compilation_plan_fingerprint
     or assertion.evidence.compiler_result_fingerprint ~= record.linkage.compiler_result_fingerprint
     or assertion.evidence.realized_output_fingerprint ~= record.linkage.realized_output_fingerprint
@@ -213,7 +223,7 @@ end
 
 function M.build(values)
   values = values or {}
-  compiler_input.assert_trusted(values.compiler_input)
+  compiler_input.assert_publication_input(values.compiler_input)
   compiler_result.assert_trusted(values.compiler_result)
   if values.compiler_result.result_phase ~= "final"
     or values.compiler_result.dimensions.execution ~= "APPLIED" then
@@ -241,8 +251,10 @@ function M.build(values)
   local disposition_status = expected_disposition(#models, override_count)
   local disposition_contract = DISPOSITIONS[disposition_status]
   local semantic_set_fingerprint = fingerprint.of(models)
+  local compiler_identity_domain = compiler_input.public_identity_domain(values.compiler_input)
   local linkage = {
     compiler_input_fingerprint = values.compiler_input.input_fingerprint,
+    compiler_identity_domain = compiler_identity_domain,
     compilation_fingerprint = values.compilation_fingerprint,
     qualification_fingerprint = values.qualification_fingerprint,
     compilation_plan_fingerprint = values.compiler_result.compilation_plan_fingerprint,
@@ -265,6 +277,7 @@ function M.build(values)
     },
     evidence = {
       compiler_input_fingerprint = linkage.compiler_input_fingerprint,
+      compiler_identity_domain = deepcopy(linkage.compiler_identity_domain),
       compilation_plan_fingerprint = linkage.compilation_plan_fingerprint,
       compiler_result_fingerprint = linkage.compiler_result_fingerprint,
       realized_output_fingerprint = linkage.realized_output_fingerprint

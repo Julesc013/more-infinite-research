@@ -6,6 +6,7 @@ local M = {}
 local Context = {}
 Context.__index = Context
 local active = nil
+local stage_auto_contexts = setmetatable({}, {__mode = "k"})
 
 local function assert_context(context, level)
   if getmetatable(context) ~= Context then
@@ -14,11 +15,17 @@ local function assert_context(context, level)
   return context
 end
 
-function M.new(options)
+local function new_context(options, stage_auto)
   options = options or {}
-  return setmetatable({
+  local output_collection = options.output_collection or "full"
+  if output_collection ~= "full" and output_collection ~= "ordinary"
+    and not (stage_auto and output_collection == "stage-auto") then
+    error("MIR compiler Context output collection must be full or ordinary.", 3)
+  end
+  local context = setmetatable({
     schema = 4,
     compiler_execution_mode = execution_mode.normalize(options.execution_mode),
+    output_collection = output_collection,
     command_state = {},
     artifacts = {},
     state = {},
@@ -27,6 +34,19 @@ function M.new(options)
     services = {},
     services_frozen = false
   }, Context)
+  if stage_auto then stage_auto_contexts[context] = true end
+  return context
+end
+
+function M.new(options)
+  return new_context(options, false)
+end
+
+-- Only the installed stage invokes this.  It remains unresolved until
+-- commands.run_stage activates the Context and reads effective settings.
+function M.new_stage_context(options)
+  options = options or {}
+  return new_context({execution_mode = options.execution_mode, output_collection = "stage-auto"}, true)
 end
 
 local function activate(context)
@@ -63,6 +83,52 @@ end
 
 function Context:execution_mode()
   return self.compiler_execution_mode
+end
+
+-- Only commands.run_all resolves a stage-auto request, while this Context is
+-- active and before the first command observes compiler state.
+function Context:resolve_output_collection(kind)
+  if self.output_collection ~= "stage-auto" or not stage_auto_contexts[self] then
+    error("MIR compiler Context output collection was not an owned stage request.", 2)
+  end
+  if kind ~= "full" and kind ~= "ordinary" then
+    error("MIR compiler Context stage output collection must resolve to full or ordinary.", 2)
+  end
+  -- Reading effective settings may populate only its context-owned import
+  -- cache.  No command, artifact, service, frozen state, or other compiler
+  -- state can predate the stage capture decision.
+  if next(self.command_state) ~= nil or next(self.artifacts) ~= nil
+    or next(self.services) ~= nil or next(self.frozen_state) ~= nil then
+    error("MIR compiler Context output collection resolved after pipeline work began.", 2)
+  end
+  for name in pairs(self.state) do
+    if name ~= "effective_settings_import" then
+      error("MIR compiler Context output collection resolved after compiler state began: "
+        .. tostring(name), 2)
+    end
+  end
+  for name in pairs(self.state_epochs) do
+    if name ~= "effective_settings_import" then
+      error("MIR compiler Context output collection resolved after compiler state epoch began: "
+        .. tostring(name), 2)
+    end
+  end
+  self.output_collection = kind
+  stage_auto_contexts[self] = nil
+  return kind
+end
+
+-- Collection controls only what pre-emission evidence is retained.  It does
+-- not select a compiler, planner, qualifier, or emitter path.
+function Context:output_collection_kind()
+  if self.output_collection == "stage-auto" then
+    error("MIR compiler Context stage output collection was not resolved before compilation.", 2)
+  end
+  return self.output_collection
+end
+
+function Context:collects_full_compilation_input()
+  return self:output_collection_kind() == "full"
 end
 
 function Context:set_service(name, implementation)
@@ -205,6 +271,9 @@ function Context:state_key_count()
 end
 
 function Context:snapshot()
+  if not self:collects_full_compilation_input() then
+    error("MIR ordinary stage did not collect exportable pre-emission compilation evidence; request full collection before running the stage.", 2)
+  end
   local payload = {
     schema = self.schema,
     compiler_execution_mode = self.compiler_execution_mode,

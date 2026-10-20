@@ -191,4 +191,28 @@ function M.capture(options)
   return result
 end
 
+-- The installed stage has no consumer for exportable prototype fact domains.
+-- It still captures and owns every semantic compiler input before planning;
+-- the full schema-2 capture above remains the only export/import authority.
+function M.capture_ordinary(options)
+  options = options or {}
+  local started_at, memory_before = now(), memory_bytes()
+  local target_inventory = effect_target_inventory.capture()
+  return {
+    provider_inputs = options.provider_inputs or {},
+    effect_target_inventory = target_inventory,
+    source_fingerprints = options.source_fingerprints or {},
+    stream_input_fingerprint = snapshot_contract.stream_input_fingerprint(options.stream_inputs or {}),
+    base_continuation_input_fingerprint = snapshot_contract.base_continuation_input_fingerprint(
+      options.base_continuation_inputs or {}),
+    base_candidates_fingerprint = fingerprint.of(((options.base_continuation_inputs or {}).candidates or {})),
+    metrics = {
+      construction_seconds = math.max(0, now() - started_at),
+      memory_before_bytes = memory_before,
+      memory_after_bytes = memory_bytes(),
+      capture_kind = "ordinary-semantic"
+    }
+  }
+end
+
 return M

@@ -74,6 +74,9 @@ local function record_work_volume()
 end
 
 local function compile_active(context)
+  -- Reject an unresolved stage request before stream preparation or any
+  -- prototype-affecting command can run.
+  context:output_collection_kind()
   local latest = context:state_view("compilation_plan")
   if latest then return latest end
   local compile_started = now()
@@ -82,12 +85,6 @@ local function compile_active(context)
   local base_plan, base_candidates = base_continuations.plan_all()
   local provider_inputs = family_resolver.compilation_projection()
   local policy_snapshot = policy_snapshot_adapter.capture(context)
-  local input_snapshot = compilation_snapshot_adapter.capture({
-    stream_inputs = {plan = stream_plan},
-    base_continuation_inputs = {operations = base_plan, candidates = base_candidates},
-    provider_inputs = provider_inputs,
-    source_fingerprints = stream_plan.source_fingerprints
-  })
   local environment = environment_adapter.current({
     effective_settings = policy_snapshot.effective_settings,
     policy_snapshot = policy_snapshot
@@ -95,13 +92,42 @@ local function compile_active(context)
   local input_sources = deepcopy(stream_plan.source_fingerprints)
   input_sources.base_extension_plan = fingerprint.of(base_plan)
   local input_sanitation_ledger = context:artifact_view("input_sanitation_ledger") or {}
-  local input = compiler_input.new({
-    source_fingerprints = input_sources,
-    compilation_snapshot = input_snapshot,
-    policy_snapshot = policy_snapshot,
-    runtime_environment = environment,
-    input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
-  })
+  local full_collection = context:collects_full_compilation_input()
+  local input_snapshot, ordinary_capture, ordinary_snapshot, input
+  if full_collection then
+    input_snapshot = compilation_snapshot_adapter.capture({
+      stream_inputs = {plan = stream_plan},
+      base_continuation_inputs = {operations = base_plan, candidates = base_candidates},
+      provider_inputs = provider_inputs,
+      source_fingerprints = stream_plan.source_fingerprints
+    })
+    input = compiler_input.new({
+      source_fingerprints = input_sources,
+      compilation_snapshot = input_snapshot,
+      policy_snapshot = policy_snapshot,
+      runtime_environment = environment,
+      input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
+    })
+  else
+    ordinary_capture = compilation_snapshot_adapter.capture_ordinary({
+      stream_inputs = {plan = stream_plan},
+      base_continuation_inputs = {operations = base_plan, candidates = base_candidates},
+      provider_inputs = provider_inputs,
+      source_fingerprints = input_sources
+    })
+    ordinary_snapshot = compilation_snapshot_contract.new_ordinary(ordinary_capture)
+    input = compiler_input.new_ordinary({
+      compilation_snapshot = ordinary_snapshot,
+      policy_snapshot = policy_snapshot,
+      runtime_environment = environment,
+      input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
+    })
+  end
+  if not full_collection then
+    compiler_input.assert_ordinary_planning_inputs(input, {plan = stream_plan}, {
+      operations = base_plan, candidates = base_candidates
+    })
+  end
   latest = compilation_plan.finalize(stream_plan, base_plan, {
     compiler_input = input,
     base_candidates = base_candidates,
@@ -109,36 +135,50 @@ local function compile_active(context)
     stream_plan_trusted = true,
     defer_diagnostic_alternatives = not diagnostics.enabled()
       and not execution_mode.include_full_diagnostics(policy_snapshot.execution_mode),
-    effect_target_inventory = input_snapshot.effect_target_inventory
+    effect_target_inventory = compiler_input.effect_target_inventory(input)
   })
-  local qualification_started = now()
-  local final_snapshot = compilation_snapshot_contract.qualify(input_snapshot, {
-    stream_inputs = {plan = latest.stream_plan},
-    base_continuation_inputs = {operations = latest.base_extension_operations,
-      candidates = latest.technology_catalog.base_candidates},
-    source_fingerprints = input_snapshot.source_fingerprints
-  })
-  for name, value in pairs({
-    snapshot_prototype_bytes = input_snapshot.metrics.prototype_bytes_captured,
-    snapshot_deep_copies = input_snapshot.metrics.deep_copy_count,
-    snapshot_canonicalization_passes = input_snapshot.metrics.canonicalization_passes,
-    snapshot_construction_milliseconds = (input_snapshot.metrics.construction_seconds or 0) * 1000,
-    snapshot_peak_memory_bytes = input_snapshot.metrics.peak_memory_bytes,
-    input_snapshot_bytes = input_snapshot.metrics.snapshot_bytes,
-    qualification_snapshot_bytes = compilation_snapshot_contract.snapshot_canonical_bytes(final_snapshot),
-    snapshot_reused_domains = final_snapshot.metrics.reused_domain_count,
-    snapshot_copied_domains = final_snapshot.metrics.copied_domain_count,
-    qualification_snapshot_construction_milliseconds = math.max(0, now() - qualification_started) * 1000,
-    qualification_peak_memory_bytes = memory_bytes()
-  }) do telemetry.observe_max(name, value or 0) end
-  local pure_compilation = pure_compiler.compile(final_snapshot, policy_snapshot)
+  local final_snapshot, ordinary_qualified_input, pure_compilation
+  if full_collection then
+    local qualification_started = now()
+    final_snapshot = compilation_snapshot_contract.qualify(input_snapshot, {
+      stream_inputs = {plan = latest.stream_plan},
+      base_continuation_inputs = {operations = latest.base_extension_operations,
+        candidates = latest.technology_catalog.base_candidates},
+      source_fingerprints = input_snapshot.source_fingerprints
+    })
+    for name, value in pairs({
+      snapshot_prototype_bytes = input_snapshot.metrics.prototype_bytes_captured,
+      snapshot_deep_copies = input_snapshot.metrics.deep_copy_count,
+      snapshot_canonicalization_passes = input_snapshot.metrics.canonicalization_passes,
+      snapshot_construction_milliseconds = (input_snapshot.metrics.construction_seconds or 0) * 1000,
+      snapshot_peak_memory_bytes = input_snapshot.metrics.peak_memory_bytes,
+      input_snapshot_bytes = input_snapshot.metrics.snapshot_bytes,
+      qualification_snapshot_bytes = compilation_snapshot_contract.snapshot_canonical_bytes(final_snapshot),
+      snapshot_reused_domains = final_snapshot.metrics.reused_domain_count,
+      snapshot_copied_domains = final_snapshot.metrics.copied_domain_count,
+      qualification_snapshot_construction_milliseconds = math.max(0, now() - qualification_started) * 1000,
+      qualification_peak_memory_bytes = memory_bytes()
+    }) do telemetry.observe_max(name, value or 0) end
+    pure_compilation = pure_compiler.compile(final_snapshot, policy_snapshot)
+  else
+    ordinary_qualified_input = compiler_input.qualify_ordinary(
+      input, policy_snapshot, latest.stream_plan, latest.base_extension_operations)
+    pure_compilation = pure_compiler.compile_ordinary(ordinary_qualified_input)
+  end
   if pure_compilation.status == "REVIEW_REQUIRED"
     and execution_mode.review_is_fatal(policy_snapshot.execution_mode, policy_snapshot.review_policy) then
     error("Pure compiler did not produce a fully qualified transformation plan: "
       .. tostring(pure_compilation.status), 2)
   end
-  latest.compilation_snapshot_fingerprint = input_snapshot.snapshot_fingerprint
-  latest.qualification_snapshot_fingerprint = final_snapshot.snapshot_fingerprint
+  if full_collection then
+    latest.compilation_snapshot_fingerprint = compiler_input.compilation_identity(input)
+    latest.qualification_snapshot_fingerprint = final_snapshot.snapshot_fingerprint
+  else
+    latest.compilation_input_identity_kind = "ordinary-semantic"
+    latest.compilation_input_fingerprint = compiler_input.compilation_identity(input)
+    latest.qualification_input_identity_kind = "ordinary-semantic"
+    latest.qualification_input_fingerprint = ordinary_qualified_input.qualified_input_fingerprint
+  end
   latest.policy_fingerprint = policy_snapshot.policy_fingerprint
   latest.pure_compilation = pure_compilation
   latest.transformation_plan = pure_compilation.transformation_plan
@@ -156,8 +196,10 @@ local function compile_active(context)
     })
   end
   context:set_state("compiler_input", input)
-  context:set_state("compilation_snapshot", input_snapshot)
-  context:set_state("qualification_snapshot", final_snapshot)
+  if full_collection then
+    context:set_state("compilation_snapshot", input_snapshot)
+    context:set_state("qualification_snapshot", final_snapshot)
+  end
   context:set_state("policy_snapshot", policy_snapshot)
   context:set_state("pure_compilation", pure_compilation)
   context:set_state("compilation_plan", latest)

@@ -5,6 +5,7 @@ local trusted_record = require("prototypes.mir.core.trusted_record")
 local M = {}
 local authority = trusted_record.new("CompilationSnapshot")
 local SCHEMA = 2
+local ordinary_records = setmetatable({}, {__mode = "k"})
 
 local REQUIRED_DOMAINS = {
   "recipes", "technologies", "items", "entities", "labs", "science_packs"
@@ -78,6 +79,31 @@ local function base_input_material(inputs)
     })
   end
   return out
+end
+
+local function ordinary_material(record)
+  return {
+    schema = record.schema,
+    record_type = record.record_type,
+    capture_scope = record.capture_scope,
+    provider_inputs = record.provider_inputs,
+    effect_target_inventory = record.effect_target_inventory,
+    source_fingerprints = record.source_fingerprints,
+    stream_input_fingerprint = record.stream_input_fingerprint,
+    base_continuation_input_fingerprint = record.base_continuation_input_fingerprint,
+    base_candidates_fingerprint = record.base_candidates_fingerprint
+  }
+end
+
+-- These identities are also meaningful for the non-exporting installed
+-- collection path.  Keeping the material here prevents a second, subtly
+-- different stream/base identity codec at the capture boundary.
+function M.stream_input_fingerprint(inputs)
+  return fingerprint.of(stream_input_material(inputs))
+end
+
+function M.base_continuation_input_fingerprint(inputs)
+  return fingerprint.of(base_input_material(inputs))
 end
 
 local function trust_identity(record)
@@ -196,9 +222,9 @@ function M.new(values, options)
     or fingerprint.of(record.effect_target_inventory)
   record.provider_input_fingerprint = values.provider_input_fingerprint or fingerprint.of(record.provider_inputs)
   record.stream_input_fingerprint = values.stream_input_fingerprint
-    or fingerprint.of(stream_input_material(record.stream_inputs))
+    or M.stream_input_fingerprint(record.stream_inputs)
   record.base_continuation_input_fingerprint = values.base_continuation_input_fingerprint
-    or fingerprint.of(base_input_material(record.base_continuation_inputs))
+    or M.base_continuation_input_fingerprint(record.base_continuation_inputs)
   canonicalization_passes = canonicalization_passes + 2
     + (values.relationship_fingerprint and 0 or 1)
     + (values.owner_index_fingerprint and 0 or 1)
@@ -227,6 +253,62 @@ function M.new(values, options)
     verify_fingerprint = false
   })
   return authority.register(record, trust_identity(record))
+end
+
+-- This is a distinct private capture contract, never a partially-populated
+-- schema-2 CompilationSnapshot.  It owns only the semantic values consumed
+-- by the shared planner/compiler in the installed data stage.  Full snapshot
+-- construction and imported schema-2 admission remain on M.new()/verify.
+function M.new_ordinary(values)
+  values = values or {}
+  if type(values.provider_inputs) ~= "table" or type(values.effect_target_inventory) ~= "table"
+    or type(values.source_fingerprints) ~= "table" then
+    error("Ordinary compilation input requires provider, target, and source material.", 2)
+  end
+  for _, field in ipairs({
+    "stream_input_fingerprint", "base_continuation_input_fingerprint", "base_candidates_fingerprint"
+  }) do
+    if type(values[field]) ~= "string" or values[field] == "" then
+      error("Ordinary compilation input requires " .. field .. ".", 2)
+    end
+  end
+  local record = {
+    schema = SCHEMA,
+    record_type = "CompilationSemanticInput",
+    capture_scope = "ordinary-stage",
+    provider_inputs = deepcopy(values.provider_inputs),
+    effect_target_inventory = deepcopy(values.effect_target_inventory),
+    source_fingerprints = deepcopy(values.source_fingerprints),
+    stream_input_fingerprint = values.stream_input_fingerprint,
+    base_continuation_input_fingerprint = values.base_continuation_input_fingerprint,
+    base_candidates_fingerprint = values.base_candidates_fingerprint
+  }
+  record.semantic_input_fingerprint = fingerprint.of(ordinary_material(record))
+  ordinary_records[record] = record.semantic_input_fingerprint
+  return record
+end
+
+function M.is_ordinary(record)
+  return type(record) == "table" and record.record_type == "CompilationSemanticInput"
+    and record.capture_scope == "ordinary-stage" and ordinary_records[record] ~= nil
+end
+
+function M.assert_ordinary(record)
+  if not M.is_ordinary(record)
+    or record.semantic_input_fingerprint ~= ordinary_records[record]
+    or record.semantic_input_fingerprint ~= fingerprint.of(ordinary_material(record)) then
+    error("Ordinary compilation input semantic material or private ownership changed after capture.", 2)
+  end
+  return true
+end
+
+function M.assert_ordinary_planning_inputs(record, stream_inputs, base_inputs)
+  if record.stream_input_fingerprint ~= M.stream_input_fingerprint(stream_inputs)
+    or record.base_continuation_input_fingerprint ~= M.base_continuation_input_fingerprint(base_inputs)
+    or record.base_candidates_fingerprint ~= fingerprint.of((base_inputs or {}).candidates or {}) then
+    error("Ordinary compilation input planning inputs changed after capture.", 2)
+  end
+  return true
 end
 
 function M.qualify(base, values)

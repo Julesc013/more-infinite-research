@@ -8,6 +8,10 @@ local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local M = {}
 
 function M.snapshot(context)
+  context = context or compiler_context.current()
+  if not context:collects_full_compilation_input() then
+    error("MIR compiler artifact snapshot requires explicit full pre-emission collection.", 2)
+  end
   local plan = context_construction.compile(context)
   local current_result = context:state_view("compiler_result") or plan.compiler_result
   local snapshot = {

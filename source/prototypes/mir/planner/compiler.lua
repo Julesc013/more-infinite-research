@@ -1,6 +1,7 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local compilation_snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 local policy_snapshot = require("prototypes.mir.domain.compiler.policy_snapshot")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
@@ -10,7 +11,7 @@ local technology_design = require("prototypes.mir.domain.technology.technology_d
 
 local M = {}
 
-local function input_identity(row)
+local function row_input_identity(row)
   local design = row.technology_design
   if technology_design.is_trusted(design) then technology_design.assert_trusted(design)
   else technology_design.verify_untrusted(design) end
@@ -18,16 +19,22 @@ local function input_identity(row)
 end
 
 local function compilation_material(result)
-  return {
+  local out = {
     schema = result.schema,
     record_type = result.record_type,
-    compilation_snapshot_fingerprint = result.compilation_snapshot_fingerprint,
     policy_fingerprint = result.policy_fingerprint,
     transformation_plan_fingerprint = result.transformation_plan.plan_fingerprint,
     provider_claims = result.provider_claims,
     dispositions = result.dispositions,
     status = result.status
   }
+  if result.input_identity_kind == "ordinary-semantic" then
+    out.input_identity_kind = "ordinary-semantic"
+    out.input_fingerprint = result.input_fingerprint
+  else
+    out.compilation_snapshot_fingerprint = result.compilation_snapshot_fingerprint
+  end
+  return out
 end
 
 local function gate_disposition(row)
@@ -117,16 +124,13 @@ local function base_operation(operation, policy)
   })
 end
 
-function M.compile(snapshot, policy)
-  if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)
-  else compilation_snapshot.verify_untrusted(snapshot) end
-  if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)
-  else policy_snapshot.verify_untrusted(policy) end
-  local stream_plan = snapshot.stream_inputs.plan or snapshot.stream_inputs
-  local base_plan = snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs
+local function compile_components(input_identity, provider_inputs, stream_plan, base_plan, policy)
+  if type(input_identity) ~= "table" or type(input_identity.fingerprint) ~= "string" then
+    error("Pure compiler requires a typed compilation input identity.", 2)
+  end
   local operations, dispositions = {}, {accepted = {}, rejected = {}, review_required = {}}
   local provider_claims = {}
-  for _, row in ipairs(snapshot.provider_inputs.decisions or {}) do
+  for _, row in ipairs(provider_inputs.decisions or {}) do
     if type(row.claim_fingerprint) ~= "string" or row.claim_fingerprint == "" then
       error("Provider decision lacks its exact semantic claim fingerprint.", 2)
     end
@@ -154,7 +158,7 @@ function M.compile(snapshot, policy)
   for _, row in ipairs(stream_plan.rows or {}) do
     local unresolved, failed = gate_disposition(row)
     local record = {candidate = tostring(row.stream_key), action = row.action,
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = input_identity(row)}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = row_input_identity(row)}
     if #failed > 0 or (row.action ~= "emit" and row.action ~= "adopt") then
       table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then
@@ -168,7 +172,7 @@ function M.compile(snapshot, policy)
     local gates = operation.gates or (operation.technology_design or {}).gates
     local unresolved, failed = gate_disposition({gates = gates})
     local record = {candidate = "base-continuation/" .. tostring(operation.key), action = "create",
-      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = input_identity(operation)}
+      unresolved_gates = unresolved, failed_gates = failed, input_fingerprint = row_input_identity(operation)}
     if #failed > 0 then table.insert(dispositions.rejected, record)
     elseif #unresolved > 0 then table.insert(dispositions.review_required, record)
     else table.insert(dispositions.accepted, record); table.insert(operations, base_operation(operation, policy)) end
@@ -182,26 +186,64 @@ function M.compile(snapshot, policy)
     end
     return tostring(left.provider_id) < tostring(right.provider_id)
   end)
-  local plan = transformation_plan.new({
+  local plan_values = {
     phase = "qualified-only",
     execution_mode = policy.execution_mode,
-    compilation_snapshot_fingerprint = snapshot.snapshot_fingerprint,
     policy_fingerprint = policy.policy_fingerprint,
-    execution_mode = policy.execution_mode,
     operations = operations
-  })
+  }
+  local result_identity = {}
+  if input_identity.kind == "ordinary-semantic" then
+    plan_values.input_identity_kind = "ordinary-semantic"
+    plan_values.input_fingerprint = input_identity.fingerprint
+    plan_values.ordinary_qualified_components = input_identity.ordinary_qualified_components
+    result_identity.input_identity_kind = "ordinary-semantic"
+    result_identity.input_fingerprint = input_identity.fingerprint
+  elseif input_identity.kind == "compilation-snapshot" then
+    plan_values.compilation_snapshot_fingerprint = input_identity.fingerprint
+    result_identity.compilation_snapshot_fingerprint = input_identity.fingerprint
+  else
+    error("Pure compiler input identity domain is invalid.", 2)
+  end
+  local plan = transformation_plan.new(plan_values)
   local result = {
     schema = 1,
     record_type = "PureCompilation",
-    compilation_snapshot_fingerprint = snapshot.snapshot_fingerprint,
     policy_fingerprint = policy.policy_fingerprint,
     transformation_plan = plan,
     provider_claims = provider_claims,
     dispositions = dispositions,
     status = #dispositions.review_required > 0 and "REVIEW_REQUIRED" or "PASS"
   }
+  for key, value in pairs(result_identity) do result[key] = value end
   result.compilation_fingerprint = fingerprint.of(compilation_material(result))
   return result
+end
+
+function M.compile(snapshot, policy)
+  if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)
+  else compilation_snapshot.verify_untrusted(snapshot) end
+  if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)
+  else policy_snapshot.verify_untrusted(policy) end
+  return compile_components(
+    {kind = "compilation-snapshot", fingerprint = snapshot.snapshot_fingerprint},
+    snapshot.provider_inputs,
+    snapshot.stream_inputs.plan or snapshot.stream_inputs,
+    snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs,
+    policy)
+end
+
+function M.compile_ordinary(qualified_input)
+  local owned = compiler_input.ordinary_qualified_components(qualified_input)
+  -- The component projection is issued only after the one actual mutation
+  -- boundary.  It remains private to this nonyielding compiler call.
+  return compile_components(
+    {kind = "ordinary-semantic", fingerprint = qualified_input.qualified_input_fingerprint,
+      ordinary_qualified_components = owned},
+    compiler_input.provider_inputs(owned.compiler_input),
+    owned.stream_plan,
+    owned.base_operations,
+    owned.policy_snapshot)
 end
 
 return M

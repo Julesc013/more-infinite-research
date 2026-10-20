@@ -2,22 +2,31 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local trusted_record = require("prototypes.mir.core.trusted_record")
 local operation_contract = require("prototypes.mir.domain.compiler.transformation_operation")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
 
 local M = {}
 local SCHEMA = 2
 local authority = trusted_record.new("TransformationPlan")
 
+local function input_identity_material(record)
+  if record.input_identity_kind == "ordinary-semantic" then
+    return {input_identity_kind = "ordinary-semantic", input_fingerprint = record.input_fingerprint}
+  end
+  return {compilation_snapshot_fingerprint = record.compilation_snapshot_fingerprint}
+end
+
 local function material(record)
-  return {
+  local out = {
     schema = record.schema,
     record_type = record.record_type,
     phase = record.phase,
     execution_mode = record.execution_mode,
-    compilation_snapshot_fingerprint = record.compilation_snapshot_fingerprint,
     policy_fingerprint = record.policy_fingerprint,
     operation_counts = record.operation_counts,
     operation_fingerprints = record.operation_fingerprints
   }
+  for key, value in pairs(input_identity_material(record)) do out[key] = value end
+  return out
 end
 
 local function trust_identity(record)
@@ -25,6 +34,8 @@ local function trust_identity(record)
     schema = record.schema,
     phase = record.phase,
     compilation_snapshot_fingerprint = record.compilation_snapshot_fingerprint,
+    input_identity_kind = record.input_identity_kind,
+    input_fingerprint = record.input_fingerprint,
     policy_fingerprint = record.policy_fingerprint,
     plan_fingerprint = record.plan_fingerprint
   }
@@ -34,6 +45,8 @@ local function trust_identity_unchanged(record, registered)
   return record.schema == registered.schema
     and record.phase == registered.phase
     and record.compilation_snapshot_fingerprint == registered.compilation_snapshot_fingerprint
+    and record.input_identity_kind == registered.input_identity_kind
+    and record.input_fingerprint == registered.input_fingerprint
     and record.policy_fingerprint == registered.policy_fingerprint
     and record.plan_fingerprint == registered.plan_fingerprint
 end
@@ -45,6 +58,22 @@ local function verify(record, options)
     or type(record.operations) ~= "table" or type(record.operation_counts) ~= "table"
     or type(record.operation_fingerprints) ~= "table" then
     error("TransformationPlan schema 2 record is required.", 2)
+  end
+  local identity_kind = record.input_identity_kind or "compilation-snapshot"
+  if identity_kind == "compilation-snapshot" then
+    if type(record.compilation_snapshot_fingerprint) ~= "string" or record.compilation_snapshot_fingerprint == "" then
+      error("TransformationPlan full input requires a CompilationSnapshot fingerprint.", 2)
+    end
+    if record.input_identity_kind ~= nil or record.input_fingerprint ~= nil then
+      error("TransformationPlan full input has an unexpected semantic identity.", 2)
+    end
+  elseif identity_kind == "ordinary-semantic" then
+    if options.trusted_ordinary ~= true or type(record.input_fingerprint) ~= "string"
+      or record.input_fingerprint == "" or record.compilation_snapshot_fingerprint ~= nil then
+      error("TransformationPlan ordinary semantic input requires its private qualified authority.", 2)
+    end
+  else
+    error("TransformationPlan input identity domain is invalid.", 2)
   end
   local previous, counts, seen, operation_fingerprints = nil, {}, {}, {}
   for _, operation in ipairs(record.operations) do
@@ -90,9 +119,19 @@ end
 
 function M.new(values)
   values = values or {}
+  local ordinary_components = values.ordinary_qualified_components
+  local ordinary_input = ordinary_components
+    and compiler_input.assert_ordinary_component_projection(ordinary_components)
   local record = {}
   for key, value in pairs(values) do
-    if key ~= "operations" then record[key] = deepcopy(value) end
+    if key ~= "operations" and key ~= "ordinary_qualified_components" then record[key] = deepcopy(value) end
+  end
+  if ordinary_components then
+    if record.input_identity_kind ~= "ordinary-semantic"
+      or record.input_fingerprint ~= ordinary_components.qualified_input_fingerprint then
+      error("TransformationPlan ordinary input identity differs from its qualified authority.", 2)
+    end
+    record.compilation_snapshot_fingerprint = nil
   end
   record.operations = {}
   for index, operation in ipairs(values.operations or {}) do record.operations[index] = operation end
@@ -109,7 +148,8 @@ function M.new(values)
     record.operation_fingerprints[operation.operation_id] = operation.operation_fingerprint
   end
   record.plan_fingerprint = fingerprint.of(material(record))
-  verify(record, {trusted_children = true, verify_fingerprints = false})
+  verify(record, {trusted_children = true, trusted_ordinary = ordinary_input ~= nil,
+    verify_fingerprints = false})
   return authority.register(record, trust_identity(record))
 end
 

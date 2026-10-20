@@ -244,9 +244,7 @@ function M.run(id, context)
   end)
 end
 
-function M.run_all(options)
-  options = options or {}
-  local context = compiler_context.new({execution_mode = options.execution_mode})
+local function run_context(context)
   local ok, result = pcall(compiler_context.with_active, context, function()
     for _, id in ipairs(M.order()) do M.run(id, context) end
   end)
@@ -254,8 +252,43 @@ function M.run_all(options)
     pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)
     error(result, 2)
   end
+  return context
+end
+
+function M.run_all(options)
+  options = options or {}
+  local output_collection = options.output_collection or "full"
+  if output_collection ~= "full" and output_collection ~= "ordinary" then
+    error("MIR pipeline output collection must be full or ordinary.", 2)
+  end
+  if output_collection == "ordinary" and options.return_snapshot ~= false then
+    error("MIR ordinary output collection cannot return an export snapshot; request full collection.", 2)
+  end
+  local context = compiler_context.new({
+    execution_mode = options.execution_mode,
+    output_collection = output_collection
+  })
+  context = run_context(context)
   if options.return_snapshot == false then return context end
   return context:snapshot()
+end
+
+-- Stage-only collection selection happens after this Context is active, so
+-- diagnostics/effective-settings retain their real import/context semantics.
+function M.run_stage(options)
+  options = options or {}
+  local context = compiler_context.new_stage_context({execution_mode = options.execution_mode})
+  local ok, result = pcall(compiler_context.with_active, context, function()
+    local diagnostics = require("prototypes.mir.report.diagnostics_sink")
+    local resolved = (options.capture_full_export == true or diagnostics.enabled()) and "full" or "ordinary"
+    context:resolve_output_collection(resolved)
+    for _, id in ipairs(M.order()) do M.run(id, context) end
+  end)
+  if not ok then
+    pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)
+    error(result, 2)
+  end
+  return context
 end
 
 function M.new_context(options)
