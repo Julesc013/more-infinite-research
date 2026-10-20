@@ -708,6 +708,80 @@ try {
     $RepoRoot=$repo
     # Synthetic membership isolates the reader; this is not a MIR package.
     $run=Join-Path $fixture 'tin-continuation';New-Item -ItemType Directory -Path $run|Out-Null
+    & {
+      # Execute the actual K2 admission blocks against a controlled governor
+      # boundary. No engine, capacity override, or scheduler reimplementation.
+      $waitParameter=@($k2Ast.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ceq'AdmissionWaitSeconds'})
+      Assert-Probe ($waitParameter.Count-eq1) 'K2 bounded wait parameter is absent or duplicated.'
+      $bindWait=[scriptblock]::Create('param('+$waitParameter[0].Extent.Text+') $AdmissionWaitSeconds')
+      Assert-Probe ((& $bindWait)-eq0) 'K2 wait changed the default immediate-admission path.'
+      Refuses-Probe {& $bindWait -AdmissionWaitSeconds -1} 'AdmissionWaitSeconds'
+      Refuses-Probe {& $bindWait -AdmissionWaitSeconds 301} 'AdmissionWaitSeconds'
+      $blocks=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.IfStatementAst]-and$node.Extent.Text.Contains('Wait-MIRDirectLibraryStartupAdmission',[StringComparison]::Ordinal)},$true)|Sort-Object {$_.Extent.StartOffset})
+      Assert-Probe ($blocks.Count-eq4) 'K2 must wait only before resource context, version, create and reload.'
+      $calls=[Collections.Generic.List[object]]::new()
+      $admissionWaits=[Collections.Generic.List[object]]::new()
+      $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=2048;$MaxNewOutputMiB=120;$outputRootFull=$run
+      $resources=[pscustomobject]@{root=$run;policy=[pscustomobject]@{minimum_free_ram_gib=4};peak_memory_bytes=2GB;runs=[Collections.Generic.List[object]]::new()}
+      $controlledFailure=$null
+      function Get-MIRNativeProbeRemainingOutputBytes {param($Context);Assert-Probe ([object]::ReferenceEquals($Context,$resources)) 'K2 wait read another resource context.';117MB}
+      function Wait-MIRDirectLibraryStartupAdmission {
+        param($Policy,$WorkRoot,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$AdmissionWaitSeconds,$Phase)
+        $calls.Add([ordered]@{policy=$Policy;root=$WorkRoot;output=$EstimatedPeakBytes;peak=$ExpectedPeakMemoryBytes;seconds=$AdmissionWaitSeconds;phase=$Phase})
+        if($null-ne$controlledFailure){throw $controlledFailure}
+        [pscustomobject]@{phase=$Phase;status='admitted-without-wait';attempt_count=1}
+      }
+      foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
+      Assert-Probe (($calls.phase-join'|')-ceq'resource-context|engine-version|create|reload'-and$admissionWaits.Count-eq4) 'K2 changed wait order or discarded bounded decisions.'
+      foreach($call in $calls){
+        Assert-Probe ($call.policy.minimum_free_ram_gib-eq4-and$call.root-ceq$run-and$call.peak-eq2GB-and$call.seconds-eq45) 'K2 changed the governor reserve, declared peak, path, or wait bound.'
+      }
+      Assert-Probe ($calls[0].output-eq120MB-and@($calls|Select-Object -Skip 1|Where-Object output -ne 117MB).Count-eq0) 'K2 did not retain initial/remaining output budgets.'
+      $successTable=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.HashtableAst]-and$node.Extent.Text.Contains('resource_runs=$resources.runs.ToArray();',[StringComparison]::Ordinal)},$true))
+      Assert-Probe ($successTable.Count-eq1) 'K2 success receipt owner is absent.'
+      $waitValue=@($successTable[0].KeyValuePairs|Where-Object {$_.Item1.SafeGetValue()-ceq'admission_waits'})
+      Assert-Probe ($waitValue.Count-eq1) 'K2 success receipt dropped bounded decisions.'
+      $successWaits=@(& ([scriptblock]::Create($waitValue[0].Item2.Extent.Text)))
+      Assert-Probe (($successWaits.phase-join'|')-ceq($admissionWaits.phase-join'|')) 'K2 success receipt altered wait order.'
+      foreach($phase in @(@('resource-context','New-MIRNativeProbeResourceContext'),@('engine-version','Invoke-MIRNativeProbeFactorioProcess'),@('create','Invoke-MIRFactorioLoadCheck'),@('reload','Invoke-MIRFactorioReloadContract'))){
+        $wait=@($blocks|Where-Object {$_.Extent.Text.Contains("-Phase '"+$phase[0]+"'",[StringComparison]::Ordinal)})
+        $actor=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CommandAst]-and$node.GetCommandName()-ceq$phase[1]-and$node.Extent.StartOffset-gt$blocks[0].Extent.StartOffset},$true))
+        Assert-Probe ($wait.Count-eq1-and$actor.Count-eq1-and$wait[0].Extent.EndOffset-lt$actor[0].Extent.StartOffset) ('K2 wait is not before its guarded actor: '+$phase[0])
+      }
+      $calls.Clear();$admissionWaits.Clear();$AdmissionWaitSeconds=0
+      foreach($block in $blocks){& ([scriptblock]::Create($block.Extent.Text))}
+      Assert-Probe ($calls.Count-eq0-and$admissionWaits.Count-eq0) 'K2 default zero wait added capacity probes or records.'
+      $AdmissionWaitSeconds=45;$ExpectedPeakMemoryMiB=0
+      & ([scriptblock]::Create($blocks[0].Extent.Text))
+      Assert-Probe ($calls.Count-eq0) 'K2 waited instead of retaining the required-peak refusal.'
+
+      $failureDefinition=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'New-K2213FailureResult'},$false))
+      Assert-Probe ($failureDefinition.Count-eq1) 'K2 failure receipt owner is absent.'
+      . ([scriptblock]::Create($failureDefinition[0].Extent.Text))
+      $inputBinding=@{controlled=$true};$capturedFailure=$null
+      function Write-MIRNativeProbeResult {param($Context,$Record);$script:capturedK2WaitFailure=$Record}
+      $script:capturedK2WaitFailure=$null
+      $runRoot=$run;$activation=$null;$ExpectedPeakMemoryMiB=2048
+      $timeout=[pscustomobject]@{phase='resource-context';status='capacity-timeout';first_refusal=@{error='[mir441-resource-admission-memory]'};last_refusal=@{error='[mir441-resource-admission-memory]'};refusal_count=2}
+      $controlledFailure=[InvalidOperationException]::new('[mir441-resource-admission-memory]')
+      $controlledFailure.Data['mir_direct_startup_admission_wait']=$timeout
+      $catch=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.CatchClauseAst]-and$node.Body.Extent.Text.Contains("mir_k2213_admission_waits",[StringComparison]::Ordinal)},$true))
+      Assert-Probe ($catch.Count-eq1) 'K2 bounded failure preservation owner is absent.'
+      $catchText=($catch[0].Body.Statements|ForEach-Object {$_.Extent.Text})-join"`n"
+      $controlledTry=[scriptblock]::Create("try {`n"+$blocks[0].Extent.Text+"`n} catch {`n"+$catchText+"`n}")
+      try{& $controlledTry}catch{$capturedFailure=$_}
+      Assert-Probe ($null-ne$capturedFailure-and$capturedFailure.Exception.Message-ceq'[mir441-resource-admission-memory]') 'K2 changed the original capacity refusal.'
+      Assert-Probe ($capturedFailure.Exception.Data['mir_k2213_admission_waits'].Count-eq1-and$capturedFailure.Exception.Data['mir_k2213_admission_waits'][0].status-ceq'capacity-timeout') 'K2 lost bounded initial refusal data before creating a context.'
+      Assert-Probe ($null-ne$script:capturedK2WaitFailure-and$script:capturedK2WaitFailure.admission_waits.Count-eq1-and$script:capturedK2WaitFailure.status-ceq'failed') 'K2 failure receipt dropped wait evidence or claimed success.'
+      # An initial refusal has no admitted context or run directory. Preserve
+      # its exception data without manufacturing a native result directory.
+      $resources=$null;$runRoot='';$admissionWaits.Clear();$script:capturedK2WaitFailure=$null;$capturedFailure=$null
+      try{& $controlledTry}catch{$capturedFailure=$_}
+      Assert-Probe ($null-ne$capturedFailure-and$capturedFailure.Exception.Data['mir_k2213_admission_waits'].Count-eq1) 'K2 initial refusal lost its bounded exception evidence.'
+      Assert-Probe ($null-eq$script:capturedK2WaitFailure) 'K2 created a result before resource admission.'
+      $controlledFailure=$null
+      Remove-Variable capturedK2WaitFailure -Scope Script
+    }
     $candidate=Join-Path $run 'more-infinite-research_4.2.21001.zip'
     $receiptPath=Join-Path $run 'materialized.json'
     $bytes=[Text.Encoding]::UTF8.GetBytes('controlled runtime bytes')

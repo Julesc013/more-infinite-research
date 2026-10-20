@@ -18,6 +18,7 @@ param(
   [string[]]$LocalModLibraryDirs = @(),
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
+  [ValidateRange(0,300)][int]$AdmissionWaitSeconds = 0,
   [switch]$PreflightOnly,
   [ValidateRange(1,180)][int]$CreateTimeoutSeconds = 90,
   [ValidateRange(1,180)][int]$ReloadTimeoutSeconds = 90
@@ -33,6 +34,9 @@ $RepoRoot = (Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $RepoRoot 'tools/lib/mir4/BootstrapMaterialization.ps1')
 . (Join-Path $RepoRoot 'tools/mir/application/package/TargetMaterializer.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
+if ($AdmissionWaitSeconds -gt 0) {
+  . (Join-Path $RepoRoot 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
+}
 
 function Fail-K2213 { param([string]$Code) throw "[mir42-k2-213-imersite] $Code" }
 function Assert-K2213 { param([bool]$Condition,[string]$Code) if (-not $Condition) { Fail-K2213 $Code } }
@@ -319,7 +323,7 @@ function Get-K2213FixtureEnvelope {
   return [pscustomobject][ordered]@{id=$fixtureId;path='fixtures/assert-k2-213-imersite-continuation';raw_sha256=Get-K2213Sha256 $Path;selected_profile=$selected}
 }
 function New-K2213FailureResult {
-  param([string]$RunRoot,[string]$Message,$Activation,$Resources)
+  param([string]$RunRoot,[string]$Message,$Activation,$Resources,[object[]]$AdmissionWaits=@())
   if ([string]::IsNullOrWhiteSpace($RunRoot) -or -not (Test-Path -LiteralPath $RunRoot -PathType Container)) { return }
   $terminal = $null
   if ($null -ne $Activation -and -not [bool]$Activation.closed) {
@@ -333,6 +337,7 @@ function New-K2213FailureResult {
     input_binding=$inputBinding;
     library_activation=$terminal
     resource_runs=if($Resources){$Resources.runs.ToArray()}else{@()}
+    admission_waits=$AdmissionWaits
   }
   if($Resources){Write-MIRNativeProbeResult -Context $Resources -Record $record}
 }
@@ -341,6 +346,7 @@ $runRoot = ''
 $activation = $null
 $resources = $null
 $inputBinding = $null
+$admissionWaits = [Collections.Generic.List[object]]::new()
 try {
   $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
   $candidate = (Resolve-Path -LiteralPath $CandidateZip).Path
@@ -476,6 +482,10 @@ try {
   }
 
   & (Join-Path $RepoRoot 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -RepoRoot $RepoRoot -MaxScanSeconds 3 -MaxEntriesPerRoot 400 -MaxWorktrees 8 -MaxBranches 32 | Out-Host
+  if ($AdmissionWaitSeconds -gt 0 -and $ExpectedPeakMemoryMiB -gt 0) {
+    [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
+    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $outputRootFull -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'resource-context'))
+  }
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
   $runRoot=$resources.root
   [IO.Directory]::CreateDirectory($runRoot) | Out-Null
@@ -508,6 +518,9 @@ try {
     $inputBinding.archive_hashes=$directInputs.archive_hashes
     $inputBinding.fixture=[ordered]@{template_version='0.1.4';selected_version=[string]$fixtureInfo.version;temporary_specialization=$true;preparation_controls=$fixturePreparation}
   }
+  if ($AdmissionWaitSeconds -gt 0) {
+    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'engine-version'))
+  }
   $versionRun=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 30
   $engineVersion=(Get-Content -LiteralPath $versionRun.stdout -Raw).Trim()
   Assert-K2213 ($engineVersion -match ('(?m)^Version:\s*'+[regex]::Escape($expectedEngineVersion)+'(?:\s|$)')) 'engine-version'
@@ -531,12 +544,18 @@ try {
   # It never inherits an unbound settings file from a previous test.
   Assert-K2213 (-not (Test-Path -LiteralPath (Join-Path $library 'mod-settings.dat') -PathType Leaf)) 'unexpected-unbound-mod-settings'
 
+  if ($AdmissionWaitSeconds -gt 0) {
+    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'create'))
+  }
   $load = Invoke-MIRFactorioLoadCheck -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -ScenarioTimeoutSeconds $CreateTimeoutSeconds -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$load.passed -and -not [bool]$load.timed_out -and [int]$load.exit_code -eq 0) 'create'
   Assert-K2213 ([string]$load.stderr_sha256 -ceq 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855') 'create-stderr'
   $loadLog = [IO.File]::ReadAllText([string]$load.factorio_log)
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION_DATA]',[StringComparison]::Ordinal)) 'create-data-marker'
   Assert-K2213 ($loadLog.Contains('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=initial;completed_level=4;next_level=5;bonus=0.08;progress=0.42',[StringComparison]::Ordinal)) 'create-initial-marker'
+  if ($AdmissionWaitSeconds -gt 0) {
+    $admissionWaits.Add((Wait-MIRDirectLibraryStartupAdmission -Policy $resources.policy -WorkRoot $resources.root -EstimatedPeakBytes (Get-MIRNativeProbeRemainingOutputBytes -Context $resources) -ExpectedPeakMemoryBytes $resources.peak_memory_bytes -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'reload'))
+  }
   $reload = Invoke-MIRFactorioReloadContract -FactorioBin $engine -UserDataDir $runRoot -ScenarioName 'k2-213-imersite-continuation' -SavePath $load.save -RequiredReloadCount 1 -MaxReloadDurationSeconds $ReloadTimeoutSeconds -RequiredLogFragments @('[MIR42_K2_213_IMERSITE_CONTINUATION] stage=reload;completed_level=4;next_level=5;bonus=0.08;progress=0.42','[MIR42_K2_213_IMERSITE_PRODUCTION] ore=300;powder=324;sand=324;control_powder=300;control_sand=300;after_reload=true') -LibraryActivation $activation -ActiveModsObserver $fixtureInfo.name
   Assert-K2213 ([bool]$reload.passed) 'single-reload'
   $productionPath=Join-Path $runRoot 'script-output/k2-imersite-production.json'
@@ -567,6 +586,7 @@ try {
     reload=$reload;
     production=[ordered]@{evidence=Get-K2213Artifact $productionPath;benchmark_ticks=25000;recipe='kr-imersite-powder';machine='kr-crusher';cases=$production.cases};
     resource_runs=$resources.runs.ToArray();
+    admission_waits=$admissionWaits.ToArray();
     non_claims=@('The supplied V5 observation remains non-authorizing and is not rebound.','Only generated MIR Imersite powder continuation is exercised. Native Imersite crystal ownership and witnessed withheld K2 routes remain outside this receipt.','No player delivery, broad K2 admission, support, release, signing, or publication claim.')
   }
   $resultPath = Join-Path $runRoot 'result.json'
@@ -574,6 +594,9 @@ try {
   Write-Host "[MIR42_K2_213_IMERSITE_CONTINUATION_RUNTIME] $(Get-K2213Relative $resultPath)"
 } catch {
   $failure = $_.Exception.Message
-  try{New-K2213FailureResult -RunRoot $runRoot -Message $failure -Activation $activation -Resources $resources}catch{Write-Warning 'Failed K2 result exceeded its output budget; owned ledgers remain preserved.'}
+  $waitFailure=$_.Exception.Data['mir_direct_startup_admission_wait']
+  if($null-ne$waitFailure){$admissionWaits.Add($waitFailure)}
+  $_.Exception.Data['mir_k2213_admission_waits']=$admissionWaits.ToArray()
+  try{New-K2213FailureResult -RunRoot $runRoot -Message $failure -Activation $activation -Resources $resources -AdmissionWaits $admissionWaits.ToArray()}catch{Write-Warning 'Failed K2 result exceeded its output budget; owned ledgers remain preserved.'}
   throw
 }
