@@ -109,8 +109,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
   $deps = @($repoInfo.dependencies)
 
   if ($isFactorio017Line) {
-    if ($deps -notcontains "base >= 0.17") {
-      throw "Factorio 0.17 metadata must declare base >= 0.17."
+    if (@($deps | Where-Object { $_ -match '^base >= 0[.]17(?:[.][0-9]+)?$' }).Count -ne 1) {
+      throw "Factorio 0.17 metadata must declare one base minimum in the 0.17 line."
     }
 
     $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(0\.18|1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
@@ -127,8 +127,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 0.18 metadata must not carry Factorio 1.x, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
     }
   } elseif ($isFactorio10Line) {
-    if ($deps -notcontains "base >= 1.0") {
-      throw "Factorio 1.0 metadata must declare base >= 1.0."
+    if (@($deps | Where-Object { $_ -match '^base >= 1[.]0(?:[.][0-9]+)?$' }).Count -ne 1) {
+      throw "Factorio 1.0 metadata must declare one base minimum in the 1.0 line."
     }
 
     $newerDeps = @($deps | Where-Object { $_ -match ">=\s*(1\.1|2)\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
@@ -136,8 +136,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 1.0 metadata must not carry Factorio 1.1, 2.x, or DLC dependencies: $($newerDeps -join ', ')"
     }
   } elseif ($isFactorio11Line) {
-    if ($deps -notcontains "base >= 1.1") {
-      throw "Factorio 1.1 metadata must declare base >= 1.1."
+    if (@($deps | Where-Object { $_ -match '^base >= 1[.]1(?:[.][0-9]+)?$' }).Count -ne 1) {
+      throw "Factorio 1.1 metadata must declare one base minimum in the 1.1 line."
     }
 
     $newerDeps = @($deps | Where-Object { $_ -match ">=\s*2\." -or $_ -match "(space-age|quality|recycler|elevated-rails)" })
@@ -145,8 +145,8 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 1.1 metadata must not carry Factorio 2.x or DLC dependencies: $($newerDeps -join ', ')"
     }
   } elseif ($isLegacyFactorio20) {
-    if ($deps -notcontains "base >= 2.0") {
-      throw "Factorio 2.0 legacy metadata must declare base >= 2.0."
+    if (@($deps | Where-Object { $_ -match '^base >= 2[.]0(?:[.][0-9]+)?$' }).Count -ne 1) {
+      throw "Factorio 2.0 metadata must declare one base minimum in the 2.0 line."
     }
 
     $factorio21Deps = @($deps | Where-Object { $_ -match ">=\s*2\.1" })
@@ -154,8 +154,12 @@ Invoke-RepoCheck "release metadata matches Factorio line" {
       throw "Factorio 2.0 legacy metadata must not carry Factorio 2.1 dependency floors: $($factorio21Deps -join ', ')"
     }
   } elseif ($isFactorio21Line) {
+    $baseRequirements = @($deps | Where-Object { $_ -match '^base >= 2[.]1[.][0-9]+$' })
+    if ($baseRequirements.Count -ne 1 -or
+        [version]($baseRequirements[0] -replace '^base >= ', '') -lt [version]'2.1.18') {
+      throw "Factorio 2.1 metadata must declare one patch minimum at or above 2.1.18."
+    }
     $requiredDeps = @(
-      "base >= 2.1.18",
       "(?) elevated-rails",
       "(?) angelssmelting",
       "? recycler >= 2.1.18",

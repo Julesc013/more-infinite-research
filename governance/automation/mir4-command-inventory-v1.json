@@ -3203,9 +3203,9 @@
     {
       "path": "tools/commands/release/New-MIR42HistoricalPlaytestCandidate.ps1",
       "classification": "historical",
-      "sha256": "B48395C2CC2683881A6F32DBC08871230EAC2C7C5FEBD658EA3F92B35DF18C88",
+      "sha256": "39C61D5B95538E8742B666EB679497E4FED3EC8CE3596DC8FD636517EE5B311D",
       "hash_mode": "canonical-text-v1",
-      "lines": 532,
+      "lines": 542,
       "package_visible": false
     },
     {
@@ -4691,9 +4691,9 @@
     {
       "path": "tools/lib/validation/runner/StaticCore.ps1",
       "classification": "canonical-internal",
-      "sha256": "3D3E911E263145F4ED62961F5993B18341A89660A80BEE64F55ED736DDA5A555",
+      "sha256": "C7F8A7E086DF73DA61D85C3BE525E56106F7009F9BE4986CF5CF027EDB8CDE8F",
       "hash_mode": "canonical-text-v1",
-      "lines": 517,
+      "lines": 521,
       "package_visible": false
     },
     {
@@ -5203,9 +5203,9 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "0B7ECC95A4DD744D0A3C78A107E24309C5BD098C9F4F41213094F11D6C97C8A3",
+      "sha256": "C9F724E71BD26817266F472C23F06300144688B3890BD61734B8AAD85BCF4893",
       "hash_mode": "canonical-text-v1",
-      "lines": 695,
+      "lines": 708,
       "package_visible": false
     },
     {
@@ -5251,9 +5251,9 @@
     {
       "path": "tools/mir/application/release/F210QualificationPolicy.ps1",
       "classification": "canonical-internal",
-      "sha256": "E2C487327AE7B9A9B9FD71CA7C1C6389583C9EBF0DFF0F2CC846FAD8B2D3D190",
+      "sha256": "8853A7830B6364899E670E19291A2E48D1F28877FA4C0B2F457B2E2778D28166",
       "hash_mode": "canonical-text-v1",
-      "lines": 928,
+      "lines": 931,
       "package_visible": false
     },
     {
@@ -6074,5 +6074,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:24f1918fc6688827bda8fa556b79381c9f187defa0df656b7c0acef29a3ce61a"
+  "digest": "sha256:23f89578dd61390fefd5a58ff98287f1cb232695acaa6d474d33e2cfcc7e3246"
 }

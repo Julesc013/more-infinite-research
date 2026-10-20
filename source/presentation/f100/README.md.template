@@ -13,7 +13,7 @@ It is a reduced target-native projection from the current MIR source. It preserv
 ## Requirements
 
 - Factorio 1.0. Earlier fresh-load evidence used 1.0.0; current qualification belongs to the matching release record.
-- `base >= 1.0`.
+- `base >= 1.0.0`.
 - No optional dependency is required.
 
 ## Included Research
