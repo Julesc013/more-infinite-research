@@ -2079,6 +2079,7 @@
         "tools/lib/assurance/Core.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tests/support/MIRMaterialAuditInputs.ps1",
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
@@ -8772,5 +8773,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:a671529a447cc47e0c819a95b458c3f60a3fd33bb257a218f7ae78cf5e824f43"
+  "digest": "sha256:14f84a3b698f693682cb073965bd8b6e20a90f2f72518cfd02bf785b705ede0d"
 }
