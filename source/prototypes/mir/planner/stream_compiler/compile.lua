@@ -33,7 +33,7 @@ local function compile_active(context, return_view)
   local metadata = {
     source_fingerprints = {
       facts = recipe_facts.fingerprint(),
-      risks = recipe_risk_facts.fingerprint(),
+      risk_inputs = recipe_risk_facts.source_fingerprint(),
       rules = fingerprint.of({streams = streams, families = family_registry.view(),
         science_bindings = shared_rules.science_bindings, science_binding_policy = shared_rules.science_binding_policy}),
       providers = provider_registry.fingerprint(),

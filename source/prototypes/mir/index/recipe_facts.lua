@@ -20,6 +20,7 @@ local RECIPE_SNAPSHOT_STATE_NAMES = {
   "approved_research_bindings",
   "relationship_indexes",
   "recipe_risk_index",
+  "recipe_risk_materialization",
   "mod_progression_cache",
   "material_route_graph",
   "stream_match_index",

@@ -2622,4 +2622,113 @@ do
   test_context.has_service,test_context.service=saved_has_service,saved_service
 end
 
+-- Actual risk owner: candidate reads are demand-driven, while explicit full
+-- exports retain the complete eager classifier's bytes and copy isolation.
+;(function()
+  local names={"prototypes.mir.index.recipe_risk_facts","prototypes.mir.index.recipe_facts",
+    "prototypes.mir.index.relationships","prototypes.mir.pipeline.compiler_context",
+    "prototypes.mir.report.compiler_telemetry"}
+  local saved={};for _,name in ipairs(names) do saved[name]=package.loaded[name] end
+  local fp=require("prototypes.mir.core.fingerprint")
+  local copy=require("prototypes.mir.core.deepcopy")
+  local source,items,source_digest,states,counters,context
+  local actual_context=require("fixtures.material_routes.compiler_context")
+  package.loaded[names[4]]=actual_context
+  package.loaded[names[2]]=nil
+  local source_owner=require(names[2])
+  package.loaded[names[2]]={index_view=function() return source end,fingerprint=function() return source_digest end}
+  package.loaded[names[3]]={view=function() return {items=items} end}
+  package.loaded[names[5]]={start_phase=function() end,finish_phase=function() end,
+    count=function(name,value) counters[name]=(counters[name] or 0)+value end}
+  package.loaded[names[1]]=nil
+  local owner=require(names[1])
+  local function call(method,...) return actual_context.with_active(context,owner[method],...) end
+  local function prepare(value,item_rows)
+    source,items,counters=value,item_rows or {},{}
+    context=actual_context.new();states=context.state
+    source_digest=fp.of(source)
+  end
+  local function typed(name,input,output)
+    local row=canonical_route(name,input,output)
+    row.ingredient_identities={{type="item",name=input}}
+    row.productive_result_identities={{type="item",name=output}}
+    return row
+  end
+  local input={schema=2,names={"safe","unsafe"},facts={safe=typed("safe","ore","plate"),unsafe=typed("unsafe","ore","ore")}}
+  for i=1,200 do
+    local name="unused-"..i;input.names[#input.names+1]=name;input.facts[name]=typed(name,"ore","plate")
+  end
+  prepare(input)
+  local expected=owner.index_facts(source,{items=items})
+  local first_identity=call("source_fingerprint")
+  check((counters.recipe_risk_facts or 0)==0 and states.recipe_risk_index==nil,
+    "risk source identity does not classify or publish an unrequested complete index")
+  check(fp.canonical(call("view","safe"))==fp.canonical(expected.facts.safe),"demand-driven safe row equals complete eager classifier")
+  check(counters.recipe_risk_facts==1 and states.recipe_risk_index==nil,
+    "one selected recipe does not classify 201 unrelated recipes")
+  call("view","safe");call("get","safe");call("view","absent")
+  check(counters.recipe_risk_facts==1,"repeated and absent risk reads add no classification")
+  local detached=call("get","safe");detached.hard_flags[1]="forged"
+  check(#call("view","safe").hard_flags==0,"risk get remains an isolated copy")
+  check(owner.has_hard_flag(call("view","unsafe"),"catalyst_or_self_return") and counters.recipe_risk_facts==2,
+    "actual selected self-return classification remains authoritative")
+  local full=call("snapshot")
+  check(counters.recipe_risk_facts==202 and fp.canonical(full)==fp.canonical(expected),
+    "full risk snapshot completes all rows with exactly the established public bytes")
+  check(call("fingerprint")==expected.risk_index_fingerprint and counters.recipe_risk_facts==202,
+    "full risk fingerprint remains exact and does not rebuild classified rows")
+  full.facts.safe.hard_flags[1]="forged";full.names[1]="forged"
+  check(fp.canonical(call("snapshot"))==fp.canonical(expected),"full risk snapshot mutation cannot change the owner")
+  check(call("source_fingerprint")==first_identity,"diagnostic materialization does not change risk input identity")
+  local changed=copy(input);changed.facts.safe.effective_allow_productivity=false
+  prepare(changed)
+  check(call("source_fingerprint")~=first_identity and owner.has_hard_flag(call("view","safe"),"productivity_disabled"),
+    "new Context binds changed normalized facts and applies the actual changed risk")
+  local multi=typed("multi","ore","plate")
+  multi.productive_result_names={"plate","gear"}
+  multi.variants[1].results[2]={type="item",name="gear",amount=1}
+  multi.productive_result_identities[2]={type="item",name="gear"}
+  local multi_source={schema=2,names={"multi"},facts={multi=multi}}
+  prepare(multi_source)
+  local no_placement=call("source_fingerprint")
+  check(not owner.has_hard_flag(call("view","multi"),"ambiguous_placeable_output"),"ordinary coproduct without placeability remains unchanged")
+  prepare(multi_source,{gear={place_result="gear-machine"}})
+  check(call("source_fingerprint")~=no_placement and owner.has_hard_flag(call("view","multi"),"ambiguous_placeable_output"),
+    "risk source identity includes item placeability independently of recipe identity")
+  local reversed=copy(input)
+  for i=1,math.floor(#reversed.names/2) do
+    local j=#reversed.names-i+1;reversed.names[i],reversed.names[j]=reversed.names[j],reversed.names[i]
+  end
+  prepare(reversed);call("view","unsafe");call("view","safe")
+  check(fp.canonical(call("snapshot"))==fp.canonical(expected),"query and input-name order do not change the full risk index")
+  for _,first_read in ipairs({"source_fingerprint","view"}) do
+    prepare(input);context:set_state("recipe_source",{old={name="old"}})
+    call(first_read,"safe")
+    local before_epoch=context:state_epoch("recipe_source")
+    local ok,message=pcall(actual_context.with_active,context,source_owner.replace_source,{changed={name="changed"}},before_epoch)
+    check(not ok and tostring(message):find("recipe_risk_materialization",1,true)
+      and context:state_epoch("recipe_source")==before_epoch and states.recipe_source.old~=nil,
+      "partial risk ownership refuses recipe-source replacement before advancing epoch: "..first_read)
+  end
+  prepare(input);context:set_state("compiler_telemetry",{counters={}});call("view","safe")
+  local exported=context:snapshot()
+  check(counters.recipe_risk_facts==202 and fp.canonical(exported.state.recipe_risk_index)==fp.canonical(expected),
+    "actual generic Context snapshot completes the risk index after lazy compilation")
+  check(exported.state.recipe_risk_materialization==nil and exported.state_epochs.recipe_risk_materialization==nil
+    and context:state_snapshot("recipe_risk_materialization")==nil,
+    "generic state exports omit the private partial risk owner")
+  local exported_keys=0;for _ in pairs(exported.state) do exported_keys=exported_keys+1 end
+  check(exported.state.compiler_telemetry.counters.context_state_keys==exported_keys,
+    "generic Context telemetry counts the actual exported state keys")
+  check(not table.concat(exported.services,"|"):find("recipe_risk.materialize_export",1,true),
+    "private risk completion service is not a public capability inventory entry")
+  exported.state.recipe_risk_index.facts.safe.hard_flags[1]="forged"
+  check(fp.canonical(context:state_snapshot("recipe_risk_index"))==fp.canonical(expected),
+    "generic risk state exports remain isolated complete snapshots")
+  prepare(input);call("source_fingerprint")
+  check(fp.canonical(context:state_snapshot("recipe_risk_index"))==fp.canonical(expected) and counters.recipe_risk_facts==202,
+    "direct risk state export completes a source-only materialization")
+  for _,name in ipairs(names) do package.loaded[name]=saved[name] end
+end)()
+
 print("MIR-MATERIAL-ROUTES-PASS " .. count)
