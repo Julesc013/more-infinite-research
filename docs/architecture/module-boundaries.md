@@ -5,7 +5,7 @@ applies_to: "4.0.0+"
 audience: maintainer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-20
+last_reviewed: 2026-10-21
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 ---
 # MIR 4 Repository and Module Boundaries
 
-Updated: 2026-10-20
+Updated: 2026-10-21
 
 This page records current MIR 4 authority and package boundaries while retaining explicitly labelled historical transitions that explain them.
 
@@ -33,6 +33,8 @@ The reduced Classic implementation and its bounded omission tests are historical
 `source/` is the sole editable player-source authority. `source/package-source.json`, `targets/package-authority.json`, `targets/registry.json`, and `targets/support-policy.json` define the source-to-target contract; target composition selects shared components and narrow platform adapters, not a second editable mod tree. `tools/mir/application/package/TargetMaterializer.ps1` is the sole current package writer and writes to the caller's explicit output root; current development and qualification runners keep their generated packages beneath ignored `build/` roots. The repository-root Factorio-shaped projection remains historical reconstruction material and cannot be reactivated as package source.
 
 The package-excluded operational plane consists of documentation, fixtures, tests, tools, contracts, governance, `build`, `dist`, and `.mir` authorities. `.mir/control/paths.yml` owns their current logical paths, `.mir/modules.yml` assigns module ownership, and Markdown front matter owns editable document metadata. `tools/commands/docs/Update-MIRDocumentationIndex.ps1` is the writer for `.mir/docs.yml` and generated documentation views; never hand-edit those projections. A preview, shadow, compatibility reader, or historical reconstruction does not gain player mutation, package, release, signing, promotion, tagging, or publication authority merely by existing.
+
+`DirectLibraryStartupMeasurement.ps1` owns native startup selection, configuration, archive identity and restoration. Its ordinary-menu endpoint delegates bounded Windows capture and a harmless Settings interaction to a governed actor, then validates the owned process/window, captured response, monotonic launch interval and actual loaded mods. OCR preparation and shutdown are outside that interval. An explicit engine-prepared player-data seed and at least one warmup block precede measured samples; all arms share one write-data/cache root, and immediate repeats retain their actual preceding selection. The existing direct-library host controls cover the record reader and ownership boundaries. A valid recorded response or small native adapter test does not establish a large-profile comparison, migration acceptance or release performance gate.
 
 Current science selection uses the finite approved binding graph. `pack_registry.lua` establishes physical science-pack and lab-input membership; `pack_bindings.lua` and `lab_bindings.lua` validate declared pack and laboratory references; and the stable `science_packs.lua` facade registers the resulting status, prerequisite and lab-binding services. The approved binding graph records only declared sources and finite reference relationships. Missing, unapproved or unseeded references remain explicit and cannot invoke production discovery or silently remove established research.
 

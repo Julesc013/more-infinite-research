@@ -947,9 +947,9 @@
     {
       "path": "scripts/Measure-MIRPerformanceRegression.ps1",
       "classification": "canonical-internal",
-      "sha256": "FC178C3F600CDA44EAAB17C01F0DDD93F24FFA94453435C8DF37047927BF373D",
+      "sha256": "0B14620F6D7709C5CA69DAA2D52B15454DF8690396C4B5700F3BC21875EE8670",
       "hash_mode": "canonical-text-v1",
-      "lines": 900,
+      "lines": 902,
       "package_visible": false
     },
     {
@@ -4475,9 +4475,9 @@
     {
       "path": "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
       "classification": "canonical-internal",
-      "sha256": "5662FEE1A3B1E96F767DF33DB4C8F196F1430C839DD034EED0E67D11C83F60CA",
+      "sha256": "116E83D55AEBA8267BF95E58F089C0540ADE1E157D1329C03F6C72553662F13D",
       "hash_mode": "canonical-text-v1",
-      "lines": 715,
+      "lines": 873,
       "package_visible": false
     },
     {
@@ -4550,6 +4550,38 @@
       "sha256": "64281E8FAB7013362BD79099CE7ACA8DC22562DE55CA59FDDC0165175933C557",
       "hash_mode": "canonical-text-v1",
       "lines": 106,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "classification": "canonical-internal",
+      "sha256": "021FEC5223A9F261FD712E1F6B95D42773D55500E11373572C7C84F1F2A50ABB",
+      "hash_mode": "canonical-text-v1",
+      "lines": 64,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "classification": "canonical-internal",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC",
+      "hash_mode": "canonical-text-v1",
+      "lines": 96,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "classification": "canonical-internal",
+      "sha256": "E2198E3419791E8BE16683EA2B2D792EE32C3A7A5D3D9AA17F8254084809713E",
+      "hash_mode": "canonical-text-v1",
+      "lines": 160,
+      "package_visible": false
+    },
+    {
+      "path": "tools/lib/validation/ResponsiveMenuRecord.ps1",
+      "classification": "canonical-internal",
+      "sha256": "7F74EF416DC4C06B85B3479C02DEF13837F9D69420BBE2F88ADAFB8E5E18DFFB",
+      "hash_mode": "canonical-text-v1",
+      "lines": 64,
       "package_visible": false
     },
     {
@@ -6059,7 +6091,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 421,
+    "canonical_internal": 425,
     "compatibility_wrapper": 168,
     "migration_only": 61,
     "historical": 18,
@@ -6074,5 +6106,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:cc23452f8bc790f89747e8dadafa244da88fc7735763b7d49703ae3dbd8cee13"
+  "digest": "sha256:15dbd25501d407641b48b8943aef29c2452b9a0ce57e7cd01bbce1865ad75118"
 }
