@@ -427,6 +427,14 @@ Context.with_active(Context.new(), function()
 end)
 
 Context.with_active(emitted_context, function()
+  if not (os and type(os.clock) == "function") then
+    local snapshot = emitted_context:state_view("compilation_snapshot")
+    local clock_witness = emitted_context:state_view("compiler_telemetry").witnesses.snapshot_construction_clock
+    check(snapshot.metrics.construction_seconds == "unavailable",
+      "Clockless compilation retains an explicitly unavailable construction duration")
+    check(clock_witness and #clock_witness == 1 and clock_witness[1] == "unavailable",
+      "Clockless compilation retains its bounded unavailable-clock witness")
+  end
   local generation_plan = require("prototypes.mir.planner.generation_plan")
   local technology_design = require("prototypes.mir.domain.technology.technology_design")
   local compilation_plan = require("prototypes.mir.planner.compilation_plan")
