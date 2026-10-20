@@ -118,6 +118,7 @@ try{
     if($script:admissionDelayMilliseconds -gt 0 -and $script:admissionCalls -ge $script:admissionDelayAtCall){$delay=[int]$script:admissionDelayMilliseconds;$script:admissionDelayMilliseconds=0;Start-Sleep -Milliseconds $delay}
     if($script:admissionOutcomes.Count-eq0){throw '[mir441-resource-admission-memory]'}
     $outcome=$script:admissionOutcomes[0];$script:admissionOutcomes.RemoveAt(0)
+    if($outcome -is [scriptblock]){$outcome=& $outcome}
     if($outcome -is [string]){throw $outcome}
     return [pscustomobject]@{memory=$outcome.memory;observed_at=$outcome.observed_at}
   }
@@ -181,10 +182,23 @@ try{
   $defaultRun=Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("[IO.File]::WriteAllText('$defaultMarker','started')")) -WorkRoot $root -LedgerPath (Join-Path $root 'default.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5
   Assert-DirectStartup ($defaultRun.passed-and(Test-Path -LiteralPath $defaultMarker)-and$null-eq$defaultRun.PSObject.Properties['admission_wait']) 'default governed actor changed its immediate-admission result shape or launch behavior.'
   $postlaunchMarker=Join-Path $root 'postlaunch-once.marker'
-  Add-DirectAdmissionOutcomes @($admitted,$admitted,'[mir441-resource-admission-memory]')
+  # Process.Start does not guarantee the child has executed its first statement.
+  # Synchronize this synthetic post-launch refusal with a real child signal;
+  # otherwise the governor can correctly stop a slow-starting child before it
+  # writes the marker, and the test incorrectly reports that it was retried.
+  $postlaunchRefusal={
+    $deadline=[DateTimeOffset]::UtcNow.AddSeconds(5)
+    while(-not(Test-Path -LiteralPath $postlaunchMarker)){
+      if([DateTimeOffset]::UtcNow -ge $deadline){throw '[direct-startup-controlled-child-signal-timeout]'}
+      Start-Sleep -Milliseconds 10
+    }
+    '[mir441-resource-admission-memory]'
+  }.GetNewClosure()
+  Add-DirectAdmissionOutcomes @($admitted,$admitted,$postlaunchRefusal)
   $postlaunchWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'controlled-postlaunch';$postlaunchError=''
-  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("[IO.File]::WriteAllText('$postlaunchMarker','started'); Start-Sleep -Seconds 3")) -WorkRoot $root -LedgerPath (Join-Path $root 'postlaunch.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $postlaunchWait|Out-Null}catch{$postlaunchError=$_.Exception.Message}
-  Assert-DirectStartup ($postlaunchError-ceq'[mir441-resource-admission-memory]'-and(Test-Path -LiteralPath $postlaunchMarker)-and([IO.File]::ReadAllText($postlaunchMarker)-ceq'started')-and$postlaunchWait.attempt_count-eq2-and$postlaunchWait.refusal_count-eq0) 'governor retried after a post-launch admission error.'
+  try{Invoke-MIR441MonitoredProcess -FilePath $nativeBin -Arguments @('-NoProfile','-Command',("Start-Sleep -Milliseconds 300; [IO.File]::AppendAllText('$postlaunchMarker','started'); Start-Sleep -Seconds 3")) -WorkRoot $root -LedgerPath (Join-Path $root 'postlaunch.resources.jsonl') -Policy $nativePolicy -EstimatedPeakBytes 64KB -ExpectedPeakMemoryBytes 64MB -TimeoutSeconds 5 -PreStartAdmissionWait $postlaunchWait|Out-Null}catch{$postlaunchError=$_.Exception.Message}
+  Assert-DirectStartup ($postlaunchError-ceq'[mir441-resource-admission-memory]'-and(Test-Path -LiteralPath $postlaunchMarker)) 'controlled post-launch refusal did not observe its real child start signal.'
+  Assert-DirectStartup (([IO.File]::ReadAllText($postlaunchMarker)-ceq'started')-and$postlaunchWait.attempt_count-eq2-and$postlaunchWait.refusal_count-eq0-and$script:admissionOutcomes.Count-eq0) 'governor retried after a post-launch admission error.'
   # Exercise the graphical diagnostic's narrow launch shape without starting
   # Factorio. The native process, library transaction and loaded-selection
   # actor are replaced only inside this host control.
