@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-10-21
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,11 +21,13 @@ source_of_truth_for:
 | `CompilationSnapshot` | 2 | Structurally shared normalized facts, graph input, target inventory, candidate inputs, and Merkle domain fingerprints |
 | `PolicySnapshot` | 1 | Effective settings, compatibility, streams, gates, targets, quality, promotion, and mutation policy |
 | `CompilerInput` | 2 | Exact compilation, policy, runtime environment, sanitation, and source fingerprints |
+| `ActiveCompilerInput` | 1 | Privately owned ordinary decision inputs with explicit active identity; planner consumers authenticate the exact retained GenerationPlan |
 | `CompilerResult` | 3 | Immutable planned material plus final journal, parity, execution, safety, review, promotion, and release evidence |
 | `RuntimeEnvironmentIdentity` | 2 | Runtime target, exact mods, effective settings/import, policy, and promotion authority |
 | `QualificationEnvironmentIdentity` | 1 | Candidate, Factorio binary, runner, verifier, test set, plan, and trust class |
 | `TransformationOperation` | 2 | One create or patch with exact source, before snapshot, after projection, allowed delta, authority, qualification, and evidence |
-| `TransformationPlan` | 2 | Canonically ordered mandatory operations bound to snapshot, policy, and execution mode |
+| `TransformationPlan` | 3 | Canonically ordered mandatory operations bound to active-input identity, policy and execution mode; generic snapshot-bound schema 2 remains supported |
+| `CompilerOrchestratorSnapshot` | 2 | Explicit active-input identity and optional genuine generic snapshot identities under `mir-compiler-orchestrator-snapshot-v2` |
 | `MutationJournal` | 2 | Plan membership, realized before/after evidence, violations, and terminal completeness |
 
 ## Gate closure

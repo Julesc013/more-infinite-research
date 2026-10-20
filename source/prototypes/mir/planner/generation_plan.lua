@@ -10,6 +10,9 @@ local Plan = {}
 Plan.__index = Plan
 local trusted_artifacts = setmetatable({}, {__mode = "k"})
 local trusted_drafts = setmetatable({}, {__mode = "k"})
+-- Internal compiler views are distinct from public exports. They retain the
+-- exact finalized GenerationPlan authority during one compiler scope.
+local trusted_internal_artifacts = setmetatable({}, {__mode = "k"})
 -- Keys are compact final-only rows. Complete rows remain in the private owner;
 -- the active compiler uses an internal view and public exports are detached.
 local owned_rows = setmetatable({}, {__mode = "k"})
@@ -524,7 +527,45 @@ function M.internal_artifact(artifact)
   local view = {}
   for key, value in pairs(artifact) do view[key] = value end
   view.rows = M.rows_for_consumption(artifact)
+  trusted_internal_artifacts[view] = {
+    plan_fingerprint = artifact.plan_fingerprint,
+    source_fingerprints = artifact.source_fingerprints,
+    rows = view.rows,
+    validation_summary = artifact.validation_summary
+  }
   return view
+end
+
+-- One private GenerationPlan admission surface for compiler-scope handoffs.
+-- It keeps exact-instance authentication with this owner while allowing both
+-- pre-graph drafts and finalized internal views through their existing paths.
+function M.assert_owned_view(artifact)
+  if M.is_draft(artifact) then
+    M.assert_trusted_draft(artifact)
+  elseif M.is_trusted_internal_artifact(artifact) then
+    M.assert_trusted_internal_artifact(artifact)
+  elseif M.is_trusted_artifact(artifact) then
+    M.assert_trusted_artifact(artifact)
+  else
+    error("GenerationPlan compiler handoff is not an exact owned view.", 2)
+  end
+  return artifact
+end
+function M.is_trusted_internal_artifact(artifact)
+  return trusted_internal_artifacts[artifact] ~= nil
+end
+
+function M.assert_trusted_internal_artifact(artifact)
+  local authority = trusted_internal_artifacts[artifact]
+  if not authority
+    or artifact.schema ~= 3
+    or artifact.plan_fingerprint ~= authority.plan_fingerprint
+    or artifact.source_fingerprints ~= authority.source_fingerprints
+    or artifact.rows ~= authority.rows
+    or artifact.validation_summary ~= authority.validation_summary then
+    error("GenerationPlan internal artifact is not the exact owned compiler view", 2)
+  end
+  return artifact
 end
 
 function M.export_artifact(artifact)

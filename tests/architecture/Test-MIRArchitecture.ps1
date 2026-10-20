@@ -537,7 +537,10 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 if ($dataFinalFixesStageText -match 'classic_compiler|compiler_profile[.]get') {
   throw 'The public data-final-fixes stage must execute the single preservation-capable command DAG without profile dispatch.'
 }
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
+$commandContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
+foreach ($contextOption in @('local returns_snapshot = options.return_snapshot ~= false', 'compiler_context.new({', 'execution_mode = options.execution_mode,', 'legacy_compiler_export_requested = returns_snapshot')) {
+  Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandContextText -Needle $contextOption
+}
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -604,7 +607,7 @@ foreach ($commandId in @(
     -Needle ('["' + $commandId + '"]')
 }
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all(options)"
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "if options.return_snapshot == false then return context end"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "if not returns_snapshot then return context end"
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle 'pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)'
 
 Assert-MIRNoPatternInLuaTree `
@@ -672,11 +675,16 @@ foreach ($forbiddenPureCompilerToken in @("data.raw", "settings.", "mods", "os.c
 }
 foreach ($pureCompilerNeedle in @(
   'function M.compile(snapshot, policy)',
-  'if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)',
+  'local active = compiler_input.is_active(snapshot)',
+  'elseif compilation_snapshot.is_trusted(snapshot) then',
   'if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)',
+  'if input_identity_record then plan_values.input_identity = input_identity_record',
   'transformation_plan.new('
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle
+}
+if ($pureCompilerText -notmatch 'if\s+not\s+input_identity_record\s+then\s+result\.compilation_snapshot_fingerprint\s*=\s*compiler_input_fingerprint\s+end') {
+  throw 'Pure compiler must retain the generic snapshot identity only for a non-active input.'
 }
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"

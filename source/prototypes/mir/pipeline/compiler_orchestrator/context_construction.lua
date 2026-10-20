@@ -10,8 +10,9 @@ local environment_adapter = require("prototypes.mir.platform.factorio.environmen
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 local diagnostics = require("prototypes.mir.report.diagnostics_sink")
 local compilation_snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
-local policy_snapshot_adapter = require("prototypes.mir.pipeline.policy_snapshot_adapter")
 local compilation_snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
+local policy_snapshot_adapter = require("prototypes.mir.pipeline.policy_snapshot_adapter")
+local effect_target_inventory = require("prototypes.mir.platform.factorio.effect_target_inventory")
 local pure_compiler = require("prototypes.mir.planner.compiler")
 local family_resolver = require("prototypes.mir.families.resolver")
 local execution_mode = require("prototypes.mir.domain.compiler.execution_mode")
@@ -82,12 +83,6 @@ local function compile_active(context)
   local base_plan, base_candidates = base_continuations.plan_all()
   local provider_inputs = family_resolver.compilation_projection()
   local policy_snapshot = policy_snapshot_adapter.capture(context)
-  local input_snapshot = compilation_snapshot_adapter.capture({
-    stream_inputs = {plan = stream_plan},
-    base_continuation_inputs = {operations = base_plan, candidates = base_candidates},
-    provider_inputs = provider_inputs,
-    source_fingerprints = stream_plan.source_fingerprints
-  })
   local environment = environment_adapter.current({
     effective_settings = policy_snapshot.effective_settings,
     policy_snapshot = policy_snapshot
@@ -95,9 +90,31 @@ local function compile_active(context)
   local input_sources = deepcopy(stream_plan.source_fingerprints)
   input_sources.base_extension_plan = fingerprint.of(base_plan)
   local input_sanitation_ledger = context:artifact_view("input_sanitation_ledger") or {}
-  local input = compiler_input.new({
+  -- Generic snapshot construction is demanded only by commands.run_all when
+  -- that command will return a complete Context export. The ordinary data
+  -- stage uses return_snapshot=false and never enters this branch.
+  local legacy_input_snapshot
+  local target_inventory
+  if context:legacy_compiler_export_requested() then
+    legacy_input_snapshot = compilation_snapshot_adapter.capture({
+      stream_inputs = {plan = stream_plan},
+      base_continuation_inputs = {operations = base_plan, candidates = base_candidates},
+      provider_inputs = provider_inputs,
+      source_fingerprints = stream_plan.source_fingerprints
+    })
+    target_inventory = legacy_input_snapshot.effect_target_inventory
+  else
+    target_inventory = effect_target_inventory.capture()
+  end
+  -- The existing CompilerInput owner retains every value read by plan
+  -- construction. It owns no generic snapshot on the ordinary path.
+  local input = compiler_input.new_active({
+    stream_plan = stream_plan,
+    base_continuation_inputs = base_plan,
+    base_candidates = base_candidates,
+    provider_inputs = provider_inputs,
+    effect_target_inventory = target_inventory,
     source_fingerprints = input_sources,
-    compilation_snapshot = input_snapshot,
     policy_snapshot = policy_snapshot,
     runtime_environment = environment,
     input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
@@ -108,45 +125,54 @@ local function compile_active(context)
     input_sanitation_ledger = input_sanitation_ledger,
     stream_plan_trusted = true,
     defer_diagnostic_alternatives = not diagnostics.enabled()
-      and not execution_mode.include_full_diagnostics(policy_snapshot.execution_mode),
-    effect_target_inventory = input_snapshot.effect_target_inventory
+      and not execution_mode.include_full_diagnostics(policy_snapshot.execution_mode)
   })
-  local qualification_started = now()
-  local final_snapshot = compilation_snapshot_contract.qualify(input_snapshot, {
-    stream_inputs = {plan = latest.stream_plan},
-    base_continuation_inputs = {operations = latest.base_extension_operations,
-      candidates = latest.technology_catalog.base_candidates},
-    source_fingerprints = input_snapshot.source_fingerprints
+  local final_input = compiler_input.qualify_active(input, {
+    stream_plan = latest.stream_plan,
+    base_continuation_inputs = latest.base_extension_operations,
+    base_candidates = latest.technology_catalog.base_candidates,
+    source_fingerprints = input_sources
   })
-  local construction_seconds = input_snapshot.metrics.construction_seconds
-  local construction_milliseconds = type(construction_seconds) == "number"
-    and math.max(0, construction_seconds) * 1000 or nil
-  if construction_milliseconds == nil then
-    -- Preserve the adapter's explicit unavailable-clock result. The numeric
-    -- telemetry counter remains untouched: unmeasured must not become zero.
-    telemetry.witness("snapshot_construction_clock", "unavailable")
+  local legacy_input, legacy_final_input, legacy_final_snapshot
+  if legacy_input_snapshot then
+    legacy_input = compiler_input.new({
+      source_fingerprints = input_sources,
+      compilation_snapshot = legacy_input_snapshot,
+      policy_snapshot = policy_snapshot,
+      runtime_environment = environment,
+      input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
+    })
+    legacy_final_snapshot = compilation_snapshot_contract.qualify(legacy_input_snapshot, {
+      stream_inputs = {plan = latest.stream_plan},
+      base_continuation_inputs = {operations = latest.base_extension_operations,
+        candidates = latest.technology_catalog.base_candidates},
+      source_fingerprints = legacy_input_snapshot.source_fingerprints
+    })
+    legacy_final_input = compiler_input.new({
+      source_fingerprints = input_sources,
+      compilation_snapshot = legacy_final_snapshot,
+      policy_snapshot = policy_snapshot,
+      runtime_environment = environment,
+      input_sanitation_fingerprint = fingerprint.of(input_sanitation_ledger)
+    })
+    telemetry.witness("compiler_input_representation", "active-owned-v1+generic-export-v2")
+  else
+    telemetry.witness("compiler_input_representation", "active-owned-v1")
   end
-  for name, value in pairs({
-    snapshot_prototype_bytes = input_snapshot.metrics.prototype_bytes_captured,
-    snapshot_deep_copies = input_snapshot.metrics.deep_copy_count,
-    snapshot_canonicalization_passes = input_snapshot.metrics.canonicalization_passes,
-    snapshot_construction_milliseconds = construction_milliseconds,
-    snapshot_peak_memory_bytes = input_snapshot.metrics.peak_memory_bytes,
-    input_snapshot_bytes = input_snapshot.metrics.snapshot_bytes,
-    qualification_snapshot_bytes = compilation_snapshot_contract.snapshot_canonical_bytes(final_snapshot),
-    snapshot_reused_domains = final_snapshot.metrics.reused_domain_count,
-    snapshot_copied_domains = final_snapshot.metrics.copied_domain_count,
-    qualification_snapshot_construction_milliseconds = math.max(0, now() - qualification_started) * 1000,
-    qualification_peak_memory_bytes = memory_bytes()
-  }) do telemetry.observe_max(name, value or 0) end
-  local pure_compilation = pure_compiler.compile(final_snapshot, policy_snapshot)
+  local pure_compilation = pure_compiler.compile(final_input, policy_snapshot)
   if pure_compilation.status == "REVIEW_REQUIRED"
     and execution_mode.review_is_fatal(policy_snapshot.execution_mode, policy_snapshot.review_policy) then
     error("Pure compiler did not produce a fully qualified transformation plan: "
       .. tostring(pure_compilation.status), 2)
   end
-  latest.compilation_snapshot_fingerprint = input_snapshot.snapshot_fingerprint
-  latest.qualification_snapshot_fingerprint = final_snapshot.snapshot_fingerprint
+  -- Active identities are deliberately named as such. Snapshot names remain
+  -- present only on an actual generic-export request and retain schema-2 meaning.
+  latest.compiler_input_fingerprint = input.input_fingerprint
+  latest.qualified_compiler_input_fingerprint = final_input.input_fingerprint
+  if legacy_input_snapshot then
+    latest.compilation_snapshot_fingerprint = legacy_input_snapshot.snapshot_fingerprint
+    latest.qualification_snapshot_fingerprint = legacy_final_snapshot.snapshot_fingerprint
+  end
   latest.policy_fingerprint = policy_snapshot.policy_fingerprint
   latest.pure_compilation = pure_compilation
   latest.transformation_plan = pure_compilation.transformation_plan
@@ -163,9 +189,19 @@ local function compile_active(context)
       native_worker_robot_speed_input = native_worker_robot_speed_input
     })
   end
-  context:set_state("compiler_input", input)
-  context:set_state("compilation_snapshot", input_snapshot)
-  context:set_state("qualification_snapshot", final_snapshot)
+  -- The context's generic export surface is populated only for its existing
+  -- export request.  The ordinary compiler retains the active owner instead,
+  -- so it cannot accidentally construct or label active identities as schema-2
+  -- snapshots.
+  if legacy_input_snapshot then
+    context:set_state("compiler_input", legacy_input)
+    context:set_state("qualified_compiler_input", legacy_final_input)
+    context:set_state("compilation_snapshot", legacy_input_snapshot)
+    context:set_state("qualification_snapshot", legacy_final_snapshot)
+  else
+    context:set_state("compiler_input", input)
+    context:set_state("qualified_compiler_input", final_input)
+  end
   context:set_state("policy_snapshot", policy_snapshot)
   context:set_state("pure_compilation", pure_compilation)
   context:set_state("compilation_plan", latest)

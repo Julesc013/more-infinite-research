@@ -1,6 +1,8 @@
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local compilation_snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
+local generation_plan = require("prototypes.mir.planner.generation_plan")
 local policy_snapshot = require("prototypes.mir.domain.compiler.policy_snapshot")
 local hard_gate_authority = require("prototypes.mir.domain.technology.hard_gate_authority")
 local gate_contract = require("prototypes.mir.domain.technology.gate")
@@ -18,16 +20,18 @@ local function input_identity(row)
 end
 
 local function compilation_material(result)
-  return {
+  local out = {
     schema = result.schema,
     record_type = result.record_type,
-    compilation_snapshot_fingerprint = result.compilation_snapshot_fingerprint,
     policy_fingerprint = result.policy_fingerprint,
     transformation_plan_fingerprint = result.transformation_plan.plan_fingerprint,
     provider_claims = result.provider_claims,
     dispositions = result.dispositions,
     status = result.status
   }
+  if result.input_identity then out.input_identity = result.input_identity
+  else out.compilation_snapshot_fingerprint = result.compilation_snapshot_fingerprint end
+  return out
 end
 
 local function gate_disposition(row)
@@ -118,15 +122,32 @@ local function base_operation(operation, policy)
 end
 
 function M.compile(snapshot, policy)
-  if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)
-  else compilation_snapshot.verify_untrusted(snapshot) end
+  local active = compiler_input.is_active(snapshot)
+  local active_values
+  if active then
+    compiler_input.assert_active(snapshot)
+    active_values = compiler_input.active_view(snapshot)
+    generation_plan.assert_owned_view(active_values.stream_plan)
+  elseif compilation_snapshot.is_trusted(snapshot) then
+    compilation_snapshot.assert_trusted(snapshot)
+  else
+    compilation_snapshot.verify_untrusted(snapshot)
+  end
+  policy = policy or (active_values and active_values.policy_snapshot)
   if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)
   else policy_snapshot.verify_untrusted(policy) end
-  local stream_plan = snapshot.stream_inputs.plan or snapshot.stream_inputs
-  local base_plan = snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs
+  local stream_plan = active_values and active_values.stream_plan
+    or snapshot.stream_inputs.plan or snapshot.stream_inputs
+  local base_plan = active_values and active_values.base_continuation_inputs
+    or snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs
+  local provider_inputs = active_values and active_values.provider_inputs or snapshot.provider_inputs
+  local compiler_input_fingerprint = active and snapshot.input_fingerprint or snapshot.snapshot_fingerprint
+  local input_identity_record = active and {
+    schema = 1, kind = "active-compiler-input-v1", input_fingerprint = compiler_input_fingerprint
+  } or nil
   local operations, dispositions = {}, {accepted = {}, rejected = {}, review_required = {}}
   local provider_claims = {}
-  for _, row in ipairs(snapshot.provider_inputs.decisions or {}) do
+  for _, row in ipairs(provider_inputs.decisions or {}) do
     if type(row.claim_fingerprint) ~= "string" or row.claim_fingerprint == "" then
       error("Provider decision lacks its exact semantic claim fingerprint.", 2)
     end
@@ -182,24 +203,28 @@ function M.compile(snapshot, policy)
     end
     return tostring(left.provider_id) < tostring(right.provider_id)
   end)
-  local plan = transformation_plan.new({
+  local plan_values = {
     phase = "qualified-only",
     execution_mode = policy.execution_mode,
-    compilation_snapshot_fingerprint = snapshot.snapshot_fingerprint,
     policy_fingerprint = policy.policy_fingerprint,
-    execution_mode = policy.execution_mode,
     operations = operations
-  })
+  }
+  if input_identity_record then plan_values.input_identity = input_identity_record
+  else plan_values.compilation_snapshot_fingerprint = compiler_input_fingerprint end
+  local plan = transformation_plan.new(plan_values)
   local result = {
-    schema = 1,
+    schema = input_identity_record and 2 or 1,
     record_type = "PureCompilation",
-    compilation_snapshot_fingerprint = snapshot.snapshot_fingerprint,
+    input_identity = input_identity_record,
     policy_fingerprint = policy.policy_fingerprint,
     transformation_plan = plan,
     provider_claims = provider_claims,
     dispositions = dispositions,
     status = #dispositions.review_required > 0 and "REVIEW_REQUIRED" or "PASS"
   }
+  if not input_identity_record then
+    result.compilation_snapshot_fingerprint = compiler_input_fingerprint
+  end
   result.compilation_fingerprint = fingerprint.of(compilation_material(result))
   return result
 end

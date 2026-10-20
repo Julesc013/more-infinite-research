@@ -2,6 +2,7 @@ local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
 local context_construction = require("prototypes.mir.pipeline.compiler_orchestrator.context_construction")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
+local compiler_input_contract = require("prototypes.mir.domain.compiler.compiler_input")
 local compiler_result_contract = require("prototypes.mir.domain.compiler.compiler_result")
 local telemetry = require("prototypes.mir.report.compiler_telemetry")
 
@@ -10,18 +11,35 @@ local M = {}
 function M.snapshot(context)
   local plan = context_construction.compile(context)
   local current_result = context:state_view("compiler_result") or plan.compiler_result
+  local plan_input = plan.compiler_input
+  local active_input = compiler_input_contract.is_active(plan_input)
+  local exported_input = context:state_view("compiler_input")
+  if compiler_input_contract.is_active(exported_input) then exported_input = nil end
   local snapshot = {
-    schema = plan.schema,
+    schema = 2,
+    record_type = "CompilerOrchestratorSnapshot",
+    identity_contract = "mir-compiler-orchestrator-snapshot-v2",
     fingerprint = plan.fingerprint,
     compilation_fingerprint = plan.compilation_fingerprint,
     qualification_fingerprint = plan.qualification_fingerprint,
     semantic_fingerprint = plan.semantic_fingerprint,
     source_fingerprints = plan.source_fingerprints,
-    compiler_input = plan.compiler_input,
+    -- Never place a private ActiveCompilerInput handle into the legacy generic
+    -- CompilerInput field. A generic export gets its generic state record;
+    -- active-only snapshots expose only an explicitly typed identity summary.
+    compiler_input = exported_input,
+    compiler_input_identity = active_input and {
+      schema = 1,
+      record_type = "ActiveCompilerInputIdentity",
+      contract = plan_input.contract,
+      input_fingerprint = plan_input.input_fingerprint
+    } or nil,
+    compiler_input_fingerprint = plan.compiler_input_fingerprint,
+    qualified_compiler_input_fingerprint = plan.qualified_compiler_input_fingerprint,
     compiler_result = current_result,
     planned_compiler_result = plan.compiler_result,
-    compilation_snapshot_fingerprint = plan.compilation_snapshot_fingerprint,
-    qualification_snapshot_fingerprint = plan.qualification_snapshot_fingerprint,
+    legacy_compilation_snapshot_fingerprint = plan.compilation_snapshot_fingerprint,
+    legacy_qualification_snapshot_fingerprint = plan.qualification_snapshot_fingerprint,
     policy_fingerprint = plan.policy_fingerprint,
     transformation_plan = plan.transformation_plan,
     transformation_plan_fingerprint = plan.transformation_plan_fingerprint,

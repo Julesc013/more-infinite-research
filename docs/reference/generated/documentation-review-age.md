@@ -217,7 +217,7 @@ Ages are measured against the newest governed review date, 2026-10-21, so checko
 | docs/PROJECT-CONTINUITY.md | current | 2026-09-15 | 36 | current-window |
 | docs/README.md | current | 2026-08-31 | 51 | current-window |
 | docs/reference/asset-sources.md | current | 2026-07-23 | 90 | current-window |
-| docs/reference/compiler-authority-table.md | current | 2026-08-03 | 79 | current-window |
+| docs/reference/compiler-authority-table.md | current | 2026-10-21 | 0 | current-window |
 | docs/reference/compiler-diagnostics.md | current | 2026-07-13 | 100 | review-soon |
 | docs/reference/factorio-api-proof-points.md | current | 2026-09-01 | 50 | current-window |
 | docs/reference/factorio-integration-reference.md | current | 2026-07-07 | 106 | review-soon |
@@ -262,10 +262,10 @@ Ages are measured against the newest governed review date, 2026-10-21, so checko
 | docs/reference/research-cost-v2-preview.md | draft | 2026-08-21 | 61 | current-window |
 | docs/reference/schemas/compatibility-claim.md | current | 2026-07-07 | 106 | review-soon |
 | docs/reference/schemas/compatibility-pack.md | current | 2026-07-24 | 89 | current-window |
-| docs/reference/schemas/compiler-boundary.md | current | 2026-07-24 | 89 | current-window |
+| docs/reference/schemas/compiler-boundary.md | current | 2026-10-21 | 0 | current-window |
 | docs/reference/schemas/compiler-evidence.md | current | 2026-10-11 | 10 | current-window |
 | docs/reference/schemas/compiler-provider.md | current | 2026-07-13 | 100 | review-soon |
-| docs/reference/schemas/compiler-runtime-contracts.md | current | 2026-07-24 | 89 | current-window |
+| docs/reference/schemas/compiler-runtime-contracts.md | current | 2026-10-21 | 0 | current-window |
 | docs/reference/schemas/decision-record.md | current | 2026-07-12 | 101 | review-soon |
 | docs/reference/schemas/family-operator-dsl.md | current | 2026-07-18 | 95 | review-soon |
 | docs/reference/schemas/family-rule.md | current | 2026-07-12 | 101 | review-soon |

@@ -17,6 +17,93 @@ def main() -> None:
     sys.path.insert(0, str(Path(args.lua_runtime_dir).resolve()))
     from lupa import lua52
 
+    def plain(value):
+        if hasattr(value, 'items'):
+            return {str(key): plain(item) for key, item in value.items()}
+        if hasattr(value, '__len__') and not isinstance(value, (str, bytes, dict)):
+            try:
+                return [plain(value[index]) for index in range(1, len(value) + 1)]
+            except Exception:
+                pass
+        return value
+
+    def approved_family_preamble() -> str:
+        text = (repo / 'tests/compiler/approved_family_emission.lua').read_text(encoding='utf-8')
+        anchor = '-- MIR-COMMAND-EXPORT-PREAMBLE-END'
+        if text.count(anchor) != 1:
+            raise RuntimeError('approved-family command preamble requires exactly one explicit boundary')
+        position = text.index(anchor)
+        return text[:position]
+
+    def command_export_source(shape: str) -> str:
+        common = r'''
+local commands = require("prototypes.mir.pipeline.commands")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
+local function assert_generic_export(exported)
+  assert(exported.schema == 4 and exported.state.compilation_snapshot
+    and exported.state.qualification_snapshot and exported.state.compiler_input
+    and exported.state.qualified_compiler_input,
+    "requested Context export retains complete generic compiler state")
+  local state_input = exported.state.compiler_input
+  local plan_input = exported.state.compilation_plan and exported.state.compilation_plan.compiler_input
+  assert(state_input and plan_input and not compiler_input.is_active(state_input)
+    and not compiler_input.is_active(plan_input),
+    "requested Context export contains no detached active CompilerInput handle")
+  compiler_input.verify_untrusted(state_input)
+  compiler_input.verify_untrusted(plan_input)
+  assert(state_input.input_fingerprint == plan_input.input_fingerprint,
+    "exported compilation plan binds its matching generic CompilerInput")
+  local original = state_input.input_fingerprint
+  plan_input.input_fingerprint = original .. "-outside-writer"
+  assert(state_input.input_fingerprint == original,
+    "returned Context snapshot keeps nested CompilerInput copies isolated")
+  plan_input.input_fingerprint = original
+  return {input_fingerprint = original,
+    snapshot_fingerprint = exported.state.compilation_snapshot.snapshot_fingerprint,
+    plan_input_fingerprint = plan_input.input_fingerprint}
+end
+'''
+        if shape == 'run_all_default':
+            body = r'''
+local exported = commands.run_all()
+local result = assert_generic_export(exported)
+result.shape = "run_all_default"
+return result
+'''
+        elif shape == 'run_all_active_only':
+            body = r'''
+local context = commands.run_all({return_snapshot = false})
+assert(not context:legacy_compiler_export_requested(),
+  "run_all(false) creates the explicit active-only data-stage Context")
+local active = context:state_view("compiler_input")
+assert(compiler_input.is_active(active), "active-only Context retains the owned active input")
+local late_ok, late_error = pcall(function() return context:snapshot() end)
+assert(not late_ok and string.find(tostring(late_error), "cannot export legacy snapshots"),
+  "active-only Context refuses a late partial generic export")
+return {shape = "run_all_active_only", input_fingerprint = active.input_fingerprint}
+'''
+        elif shape == 'manual_new_context':
+            body = r'''
+local context = commands.new_context()
+assert(context:legacy_compiler_export_requested(),
+  "manual new_context preserves the historical export-capable default")
+for _, id in ipairs(commands.order()) do commands.run(id, context) end
+local exported = context:snapshot()
+local result = assert_generic_export(exported)
+result.shape = "manual_new_context"
+return result
+'''
+        else:
+            raise ValueError(shape)
+        return approved_family_preamble() + common + body
+
+    def run_command_export(shape: str):
+        runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+        runtime.globals().source_root = (repo / 'source').as_posix()
+        runtime.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
+        runtime.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
+        return plain(runtime.execute(command_export_source(shape)))
+
     lua = lua52.LuaRuntime(unpack_returned_tuples=True)
     lua.globals().repo_source = (repo / 'source').as_posix()
     lua.execute('''
@@ -60,6 +147,10 @@ def main() -> None:
     assert int(clockless_emission['assertions']) == int(emission['assertions']) + 2
     assert int(clockless_emission['rows']) == int(emission['rows'])
     assert int(clockless_emission['operations']) == int(emission['operations'])
+    command_export_control = {
+        shape: run_command_export(shape) for shape in (
+            'run_all_default', 'run_all_active_only', 'manual_new_context')
+    }
     stubbed_modules = {'prototypes.mir.platform.factorio.target_profiles',
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
@@ -89,6 +180,7 @@ def main() -> None:
                                                     'catalogue_rows': int(clockless_emission['rows']),
                                                     'operations': int(clockless_emission['operations']),
                                                     'stubbed_module_boundaries': [], 'target': 'f200'},
+                      'command_export_control': command_export_control,
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 

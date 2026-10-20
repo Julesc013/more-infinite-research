@@ -53,14 +53,18 @@ if ([int]$compilerSchemaAuthority.schema -ne 1 -or
   throw "Compiler schema compatibility authority is invalid."
 }
 foreach ($entry in @{
-  CompilationSnapshot=2; PolicySnapshot=1; CompilerInput=2; CompilerResult=3;
-  RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1;
+  CompilationSnapshot=2; PolicySnapshot=1; CompilerInput=2; ActiveCompilerInput=1; CompilerResult=3;
+  RuntimeEnvironmentIdentity=2; QualificationEnvironmentIdentity=1; CompilerOrchestratorSnapshot=2;
   ResearchCostModel=1; ResearchCostCompatibilitySlice=1;
-  TransformationOperation=2; TransformationPlan=2; MutationJournal=2
+  TransformationOperation=2; TransformationPlan=3; MutationJournal=2
 }.GetEnumerator()) {
   if ([int]$compilerSchemaAuthority.records.($entry.Key).current -ne [int]$entry.Value) {
     throw "Compiler schema authority drifted for $($entry.Key)."
   }
+}
+if ((@($compilerSchemaAuthority.records.TransformationPlan.readable) -join '|') -ne '2|3' -or
+    (@($compilerSchemaAuthority.records.TransformationPlan.writable) -join '|') -ne '2|3') {
+  throw 'TransformationPlan must retain schema-2 generic and schema-3 active contracts.'
 }
 $technologyDesignText = Read-MIRText "prototypes\mir\domain\technology\technology_design.lua"
 $technologyDesignDoc = Read-MIRText "docs\reference\schemas\technology-design.md"
@@ -120,6 +124,9 @@ Assert-MIRText "prototypes\mir\domain\technology\technology_design.lua" "Technol
 Assert-MIRText "prototypes\mir\planner\generation_plan.lua" "GenerationPlan row schema must be 3"
 Assert-MIRText "prototypes\mir\planner\compilation_plan\build.lua" "schema = 2"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "CompilerInput schema 2 record is required"
+Assert-MIRText "prototypes\mir\domain\compiler\compiler_input.lua" "ActiveCompilerInput"
+Assert-MIRText "prototypes\mir\domain\compiler\transformation_plan.lua" "TransformationPlan schema 2 or 3 record is required"
+Assert-MIRText "prototypes\mir\pipeline\compiler_orchestrator\contract_checks.lua" "CompilerOrchestratorSnapshot"
 Assert-MIRText "prototypes\mir\domain\compiler\compiler_result.lua" "CompilerResult schema 3 planned or final record is required"
 Assert-MIRText "prototypes\mir\domain\environment_identity.lua" "RuntimeEnvironmentIdentity schema 2"
 Assert-MIRText "prototypes\mir\domain\research_cost\model.lua" 'M.formula_abi = "mir-research-cost-v1"'
@@ -150,7 +157,7 @@ foreach ($row in @(
   "| RuntimeEnvironmentIdentity | 2 |",
   "| QualificationEnvironmentIdentity | 1 |",
   "| TransformationOperation | 2 |",
-  "| TransformationPlan | 2 |",
+  "| TransformationPlan | 3 |",
   "| MutationJournal | 2 |",
   "| CompilerEvidence | 2 |",
   "| Public compiler artifact projections | 1 |",
