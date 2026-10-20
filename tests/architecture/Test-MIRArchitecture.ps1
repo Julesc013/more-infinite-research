@@ -679,10 +679,12 @@ foreach ($pureCompilerNeedle in @(
   'elseif compilation_snapshot.is_trusted(snapshot) then',
   'if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)',
   'if input_identity_record then plan_values.input_identity = input_identity_record',
-  'if not input_identity_record then result.compilation_snapshot_fingerprint = compiler_input_fingerprint end',
   'transformation_plan.new('
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle
+}
+if ($pureCompilerText -notmatch 'if\s+not\s+input_identity_record\s+then\s+result\.compilation_snapshot_fingerprint\s*=\s*compiler_input_fingerprint\s+end') {
+  throw 'Pure compiler must retain the generic snapshot identity only for a non-active input.'
 }
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
