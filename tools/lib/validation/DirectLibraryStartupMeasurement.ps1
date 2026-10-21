@@ -936,6 +936,7 @@ function Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap {
   $iterations=if($count-eq5){3125}else{100000}
   $baselineLower=[double[]]::new($iterations)
   $marginLower=[double[]]::new($iterations)
+  $nonRegressionLower=[double[]]::new($iterations)
   $selectedBaseline=[double[]]::new($count)
   $selectedCandidate=[double[]]::new($count)
   # xorshift32-v1 with this nonzero seed is the frozen ten-block procedure.
@@ -964,6 +965,7 @@ function Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap {
     if($count%2-eq1){$drawBaseline=$selectedBaseline[[int](($count-1)/2)];$drawCandidate=$selectedCandidate[[int]( ($count-1)/2 )]}else{$upper=[int]($count/2);$drawBaseline=($selectedBaseline[$upper-1]+$selectedBaseline[$upper])/2.0;$drawCandidate=($selectedCandidate[$upper-1]+$selectedCandidate[$upper])/2.0}
     $baselineLower[$iteration]=$drawBaseline
     $marginLower[$iteration]=(0.5*$drawBaseline)-$drawCandidate
+    $nonRegressionLower[$iteration]=$drawBaseline-$drawCandidate
   }
   return [ordered]@{
     procedure=$(if($count-eq5){'ordered-block-enumeration-v1'}else{'xorshift32-joint-block-bootstrap-v1'})
@@ -974,6 +976,7 @@ function Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap {
     random_seed=$(if($count-eq5){$null}else{'0x4D495247'})
     baseline_addition_lower_bound_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $baselineLower -Probability 0.0125
     halving_margin_lower_bound_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $marginLower -Probability 0.0125
+    non_regression_margin_lower_bound_seconds=Get-MIRDirectLibraryResponsiveMenuAnalysisQuantile -Values $nonRegressionLower -Probability 0.0125
   }
 }
 
@@ -1152,9 +1155,19 @@ function Get-MIRDirectLibraryResponsiveMenuPrimaryAnalysis {
       $d46=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values $baselineValues;$d47=Get-MIRDirectLibraryResponsiveMenuAnalysisMedian -Values $candidateValues;$margin=(0.5*$d46)-$d47
       $bootstrap=Get-MIRDirectLibraryResponsiveMenuAnalysisBootstrap -Rows $rows;$pointHalves=($d46-gt0-and$margin-ge0);$boundsPass=([double]$bootstrap.baseline_addition_lower_bound_seconds-gt0-and[double]$bootstrap.halving_margin_lower_bound_seconds-ge0)
       if(-not$pointHalves){$allPointHalve=$false};if(-not$boundsPass){$allBoundsPass=$false}
+      $nonRegressionMargin=$d46-$d47
+      $nonRegressionPass=($nonRegressionMargin-ge0-and[double]$bootstrap.non_regression_margin_lower_bound_seconds-ge0)
       $cells.Add([ordered]@{profile=[ordered]@{path=[string]$profile.path;sha256=$profileSha};condition=$condition;block_count=$rows.Count;paired_blocks=@($rows|ForEach-Object {[ordered]@{phase=$_.phase;source_result_sha256=$_.source_result_sha256;measurement_block=$_.measurement_block;without_mir_upper_seconds=$_.without_mir.upper_seconds;without_mir_lower_seconds=$_.without_mir.lower_seconds;released_46_upper_seconds=$_.released_46.upper_seconds;released_46_lower_seconds=$_.released_46.lower_seconds;candidate_47_upper_seconds=$_.candidate_47.upper_seconds;candidate_47_lower_seconds=$_.candidate_47.lower_seconds;baseline_addition_seconds=$_.baseline_addition_seconds;candidate_addition_seconds=$_.candidate_addition_seconds;baseline_addition_lower_seconds=$_.baseline_addition_lower_seconds;candidate_addition_upper_seconds=$_.candidate_addition_upper_seconds}});baseline_added_time=Get-MIRDirectLibraryResponsiveMenuAnalysisSummary -Values $baselineValues;candidate_added_time=Get-MIRDirectLibraryResponsiveMenuAnalysisSummary -Values $candidateValues;halving_margin_seconds=$margin;reduction_fraction=$(if($d46-gt0){1-($d47/$d46)}else{$null});point_estimate_halves_added_time=$pointHalves;bootstrap=$bootstrap;bounds_pass=$boundsPass})
+      $cell=$cells[$cells.Count-1]
+      $cell['non_regression_margin_seconds']=$nonRegressionMargin
+      $cell['point_estimate_not_slower']=($nonRegressionMargin-ge0)
+      $cell['non_regression_bounds_pass']=$nonRegressionPass
     }
   }
+  # The maintainer's later fallback is reported separately. It neither changes
+  # the original halving decision nor opens another sample-extension loop.
+  # Uncertain bounds do not establish non-regression, even with a better median.
+  $nonRegressionEstablished=(@($cells|Where-Object {-not$_.non_regression_bounds_pass}).Count-eq0)
   $decision=if(-not$allPointHalve){'return-development'}elseif($allBoundsPass){'analysis-gate-satisfied'}elseif($blockCount-eq5){'extend-to-10'}else{'inconclusive-after-10'}
   $initialReferences=@($rawReferences|Where-Object {$_.phase -ceq 'initial-five-blocks'});$extensionReferences=@($rawReferences|Where-Object {$_.phase -ceq 'extension-five-blocks'})
   [pscustomobject][ordered]@{
@@ -1164,5 +1177,6 @@ function Get-MIRDirectLibraryResponsiveMenuPrimaryAnalysis {
     extension_protocol=[ordered]@{predeclared_one_time_extension=$extensionRequested;input_order='initial profile order, then one extension in the same profile order';initial_five_block_checkpoint=@($initialCells);all_initial_point_estimates_halve=$initialAllPointHalve;all_initial_bounds_pass=$initialAllBoundsPass;extension_admitted=($extensionRequested-and$initialAllPointHalve-and-not$initialAllBoundsPass);limitation='The existing result schema has no launch-time continuation receipt. This analysis binds the retained input order and raw initial references, and rejects any other result count or profile order; it cannot independently prove wall-clock chronology between separate completed result files.'}
     method=[ordered]@{endpoint='actor-qpc-process-start-bracket-to-owned-settings-response';comparison='paired complete blocks, separate medians of released46-minus-without-mir and candidate47-minus-without-mir';halving_margin='0.5*median(B)-median(C)';launch_bracket_bounds='baseline lower uses released lower minus without upper; candidate upper uses candidate upper minus without lower';five_block_bootstrap='enumerate all 5^5 ordered joint triple-arm resamples';ten_block_bootstrap='100000 xorshift32-v1 joint triple-arm resamples, seed 0x4D495247';lower_bound='one-sided 1.25th percentile, nearest-rank-ceiling-v1';warmups='one complete initial block is retained and excluded from metric rows';failure_policy='failed, incomplete, wrong-endpoint, ownership, producer-link, hash, cache-order, selection, or input-drift records are rejected; no duration-based exclusion or synthetic replacement'}
     cells=@($cells);decision=$decision
+    non_regression=[ordered]@{established=$nonRegressionEstablished;criterion='median(B)-median(C) >= 0 and its conservative one-sided 1.25th-percentile joint-block bootstrap lower bound >= 0 in every fixed cell';decision=$(if($nonRegressionEstablished){'non-regression-supported'}else{'non-regression-not-established'});changes_halving_decision=$false;authorizes_additional_samples=$false;claims_release_authority=$false;limitation='Approximate bootstrap evidence for the predeclared profiles and conditions only; unresolved variation or endpoint uncertainty is not a pass. A nonpositive added-time denominator still cannot support a percentage-reduction claim.'}
   }
 }

@@ -22,7 +22,7 @@ Corrected [MIR 4.6.0](https://github.com/Julesc013/more-infinite-research/releas
 
 ### Implemented since corrected 4.6.0
 
-This is a development inventory, not final-package acceptance or a published 4.7 release. PR #747 merged the reviewed combined tree into `dev` as `58ab9d3160067d0b7fe1fd0d9d0e15b958b2b239`. Its reviewed-head checks completed with 56 successes and two expected conditional skips; the separate merged-`dev` verification run also passed, with 54 successes and one conditional skip. PR #750 contains the current-engine qualification and changelog follow-up. All nine candidate packages construct at `1df5b2b732970d6674e71542da46ad2d134cdc8c`, with exact published 4.6 history retained. Native-fixture verification and final-package acceptance remain unfinished.
+This is a development inventory, not final-package acceptance or a published 4.7 release. PR #747 merged the reviewed combined tree into `dev` as `58ab9d3160067d0b7fe1fd0d9d0e15b958b2b239`. Its reviewed-head checks completed with 56 successes and two expected conditional skips; the separate merged-`dev` verification run also passed, with 54 successes and one conditional skip. PR #750 merged the current-engine qualification and changelog follow-up as `5d9037ba9dd48e44c955a123316d0d6c03084fa2`, with 58 successful checks and two conditional skips. All nine candidate packages construct at `1df5b2b732970d6674e71542da46ad2d134cdc8c`, with exact published 4.6 history retained. Native-fixture verification and final-package acceptance remain unfinished.
 
 | Area | Concrete change | Evidence and remaining boundary |
 | --- | --- | --- |
@@ -42,6 +42,8 @@ The outstanding-PR audit found #720, #721 and #722 already incorporated through 
 All nine **R48 Base** upgrades from corrected 4.6 now pass independent receipt review on **0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79, 1.0.0, 1.1.110, 2.0.77 and 2.1.23**. Each includes source creation, upgrade, two cold reloads and the Full oracle across three forces: captured technology definitions/state, exposed effects, supported queues, fractional investment and settings. Original package, engine and executing-harness identities remain in their receipts. Controls and owned library archives were restored. Earlier resource-interrupted attempts remain separate incomplete observations.
 
 This completes the selected nine-target **Base continuity** lane only. It does not qualify the remaining Space Age, changed science-source, modded production, client or responsive-menu cases. The current F210 review is `build/tmp/mir47-current-modern-base-r48-remaining-r01/review-f210-r05.json` (`683B86454BD85B72E386D405C74A4167D28194383C8D44D7353BA9916133F802`); the other compact reviews remain beside their original primary-checkout receipts.
+
+Eight current-package Base fresh-load leaves also pass independent review: F013, F014, F015, F016, F017, F100, F110 and F200. Each retains its native save/log and restored library custody. F210 Base was refused by the memory governor before a child started, and F210 Space Age remains unexecuted; neither is an engine crash or a pass. The complete ten-case fresh lane remains unfinished.
 
 ### Technology and support outcomes
 
@@ -67,6 +69,8 @@ R04 has one three-arm diagnostic block per profile on F200 2.0.77. These are **h
 | Bob/Angel observer / warm repeat | 7.194 s | 11.200 s | 10.222 s | 24.4% |
 
 Retain all observations, including substantial baseline variation. These points do not establish repeatability, causal non-regression, changed-configuration menu performance or the 50% target. Accepted primary responsive-menu samples are **zero** at this checkpoint. The existing primary design is two profiles × two conditions × three arms × five blocks: 60 measured launches plus preparation and controls.
+
+The primary analyzer retains its original halving decision and reports the maintainer's later non-regression fallback separately. The latter requires nonnegative `median(B)-median(C)` and a nonnegative conservative joint-block bootstrap lower bound in every fixed profile/condition; a better median alone is insufficient. This report changes neither the halving target nor its predeclared sample-extension rule and supplies no release authority. A nonpositive baseline addition still cannot establish a percentage reduction.
 
 Relationship-list reuse preserves complete recipe, input/output relationship and Context exports and wins all four bounded synthetic pairs. It is a component result, not a Factorio speedup. The separate source-capture cost split has zero accepted Lua samples; it does not justify another encoder/cache redesign for this release.
 

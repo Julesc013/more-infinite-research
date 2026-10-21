@@ -381,12 +381,15 @@ function Read-MIR423UpgradeProofReference {
 
 function Get-MIR423PublishedUpgradePredecessor {
   param([Parameter(Mandatory)][string]$Target,[Parameter(Mandatory)][string]$PredecessorSourceVersion,
-    [ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
+    [ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$CandidateSourceVersion='4.2.3')
 
+  # 4.7.0 selects only the corrected published 4.6.0 immediate predecessor;
   # 4.6.0 selects only the published final 4.5.2 immediate predecessor.
   # 4.5.2 retains its published 4.5.1 patch predecessor and corrected 4.4.2
   # minor predecessor. Earlier pairs retain exact public custody.
-  $allowedPredecessors = if ($CandidateSourceVersion -ceq '4.6.0') {
+  $allowedPredecessors = if ($CandidateSourceVersion -ceq '4.7.0') {
+    @('4.6.0')
+  } elseif ($CandidateSourceVersion -ceq '4.6.0') {
     @('4.5.2')
   } elseif ($CandidateSourceVersion -ceq '4.5.2') {
     @('4.5.1','4.4.2')
@@ -410,6 +413,7 @@ function Get-MIR423PublishedUpgradePredecessor {
     '4.4.2' { if ($CandidateSourceVersion -cin @('4.5.0','4.5.2')) { '4.5.0' } else { throw '[mir423-upgrade-predecessor-version]' } }
     '4.5.1' { if ($CandidateSourceVersion -ceq '4.5.2') { '4.5.2' } else { throw '[mir423-upgrade-predecessor-version]' } }
     '4.5.2' { if ($CandidateSourceVersion -ceq '4.6.0') { '4.6.0' } else { throw '[mir423-upgrade-predecessor-version]' } }
+    '4.6.0' { if ($CandidateSourceVersion -ceq '4.7.0') { '4.7.0' } else { throw '[mir423-upgrade-predecessor-version]' } }
     default { throw '[mir423-upgrade-predecessor-version]' }
   }
   $manifestRelative = switch -CaseSensitive ($PredecessorSourceVersion) {
@@ -422,6 +426,7 @@ function Get-MIR423PublishedUpgradePredecessor {
     '4.4.2' { 'fixtures/release-inputs/mir450-published-442-r24-construction.json' }
     '4.5.1' { 'fixtures/release-inputs/mir452-published-451-construction.json' }
     '4.5.2' { 'fixtures/release-inputs/mir460-published-452-construction.json' }
+    '4.6.0' { 'fixtures/release-inputs/mir470-published-460-consolidated-construction.json' }
     default { throw '[mir423-upgrade-predecessor-version]' }
   }
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $manifestRelative) -CandidateSourceVersion $contractVersion
@@ -729,12 +734,12 @@ function Assert-MIR430ClassicNativeUpgradeProof {
 }
 
 function Assert-MIR423NativeUpgradeProof {
-  param($Row,$Package,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
+  param($Row,$Package,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$CandidateSourceVersion='4.2.3')
   $proof=Read-MIR423UpgradeProofReference $Row.receipt
   $r=$proof.record;$dir=Split-Path $proof.path
   $code=$Row.target.Substring(1);$predecessor=[version]$Row.predecessor_source_version
   $candidate=[version]$CandidateSourceVersion
-  $allowedPredecessors = if($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')}
+  $allowedPredecessors = if($CandidateSourceVersion -ceq '4.7.0'){@('4.6.0')}elseif($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')}
   if([string]$Row.predecessor_source_version -cnotin $allowedPredecessors){throw '[mir423-upgrade-predecessor-version]'}
   $from=('4.'+$predecessor.Minor+'.'+$code+$predecessor.Build.ToString('00'))
   $to=(New-MIR4DistributionIdentityProjection -DistributionTargetCode $code -SourceMinor $candidate.Minor -SourcePatch $candidate.Build).distribution_version
@@ -751,7 +756,7 @@ function Assert-MIR423NativeUpgradeProof {
   }
   # Release evidence is Full-only. Reduced Classic behavior remains private
   # characterization and may never stand in for retained catalogue/state proof.
-  if($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0') -and $r.Contains('upgrade_policy')){throw "[$errorPrefix-classic-reduced-policy-not-release-preservation]"}
+  if($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0') -and $r.Contains('upgrade_policy')){throw "[$errorPrefix-classic-reduced-policy-not-release-preservation]"}
   if($CandidateSourceVersion -cnotin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2') -and $r.Contains('upgrade_policy')){throw "[$errorPrefix-upgrade-policy]"}
   foreach($stage in @('create','load','reload','second_reload')){
     $name=$r[$stage+'_log'];if([IO.Path]::GetFileName($name)-cne$name){throw "[$errorPrefix-log-path]"}
@@ -785,7 +790,7 @@ function Assert-MIR423NativeUpgradeProof {
   foreach($phase in @('upgrade','reload')){
     Assert-MIR422CompleteSavedState $states.source $states[$phase] `
       -RequireExactResearchDefinitions:($candidate.Minor -gt 2 -or $predecessor.Build-eq2) `
-      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) `
+      -AllowMIR430FullCompilerProfileDefault:($CandidateSourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) `
       -ReviewedAddedTechnologyContracts $reviewedAddedTechnologyContracts
   }
   return $proof

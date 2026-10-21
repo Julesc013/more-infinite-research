@@ -15,6 +15,108 @@ function Assert-MIR42NineSealTest {
   param([Parameter(Mandatory)][bool]$Condition,[Parameter(Mandatory)][string]$Code)
   if (-not $Condition) { throw "[mir42-nine-seal-test-$Code]" }
 }
+
+function Test-MIR42CurrentIndividualProducerBinding {
+  param([Parameter(Mandatory)][string]$RepoRoot)
+  $root = Join-Path $RepoRoot ('build/test-results/mir42-current-individual-producer-' + [guid]::NewGuid().ToString('N'))
+  $fixture = Join-Path $root 'repo'
+  $checks = 0
+  function Invoke-MIR42CurrentProducerGit([string[]]$Arguments) {
+    & git -C $fixture @Arguments
+    if ($LASTEXITCODE -ne 0) { throw '[mir42-current-individual-test-git]' }
+  }
+  function Get-MIR42CurrentProducerSource([string]$Commit,[string]$PackageSource) {
+    return [pscustomobject][ordered]@{
+      commit=$Commit;tree=((& git -C $fixture rev-parse "$Commit^{tree}").Trim());package_source_sha256=$PackageSource
+    }
+  }
+  function New-MIR42CurrentProducer([string]$Commit,[string]$Kind,[string]$PackageSource) {
+    $source = Get-MIR42CurrentProducerSource -Commit $Commit -PackageSource $PackageSource
+    if ($Kind -ceq 'upgrade') {
+      $path = 'tests/runtime/Test-MIRUpgrade.ps1'
+      $hash = Get-MIR42SealGitPathSha256 -RepoRoot $fixture -Commit $Commit -Path $path -Code 'mir42-current-individual-test-producer'
+      return [pscustomobject][ordered]@{source=$source;runner=[pscustomobject]@{path=$path;sha256=$hash};harness=[pscustomobject]@{path=$path;sha256=$hash}}
+    }
+    $path = 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'
+    $hash = Get-MIR42SealGitPathSha256 -RepoRoot $fixture -Commit $Commit -Path $path -Code 'mir42-current-individual-test-producer'
+    return [pscustomobject][ordered]@{source=$source;runner=[pscustomobject]@{path=$path;sha256=$hash}}
+  }
+  function Assert-MIR42CurrentProducerRefusal($Candidate,$Producer,[string]$Kind,[string]$Expected,[string]$Code) {
+    $failure = ''
+    try { $null = Assert-MIR42IndividualEvidenceProducer -RepoRoot $fixture -CandidateSource $Candidate -Producer $Producer -Kind $Kind -Code 'mir42-current-individual-test-producer' }
+    catch { $failure = $_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith($Expected,[StringComparison]::Ordinal)) -Code $Code
+  }
+  try {
+    Assert-MIR42NineSealTest -Condition (Test-MIR42CandidateToolingEquivalenceSourceVersion -SourceVersion '4.7.0') -Code 'current-individual-allows-current-source-equivalence'
+    $checks++
+    Assert-MIR42NineSealTest -Condition (-not (Test-MIR42CandidateToolingEquivalenceSourceVersion -SourceVersion '4.5.2')) -Code 'current-individual-keeps-legacy-source-exact'
+    $checks++
+    New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'source'),(Join-Path $fixture 'targets'),(Join-Path $fixture 'tests/runtime'),(Join-Path $fixture 'tools/commands/release') | Out-Null
+    Invoke-MIR42CurrentProducerGit -Arguments @('init','--quiet')
+    Invoke-MIR42CurrentProducerGit -Arguments @('config','user.email','mir42-test@example.invalid')
+    Invoke-MIR42CurrentProducerGit -Arguments @('config','user.name','MIR42 test')
+    [IO.File]::WriteAllText((Join-Path $fixture 'source/player.lua'),'return "candidate"',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $fixture 'targets/f200.json'),'{}',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $fixture 'tests/runtime/Test-MIRUpgrade.ps1'),'upgraded-save-second-reload-passed',[Text.UTF8Encoding]::new($false))
+    [IO.File]::WriteAllText((Join-Path $fixture 'tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'),'Invoke-MIR42FourTargetEngineRun',[Text.UTF8Encoding]::new($false))
+    Invoke-MIR42CurrentProducerGit -Arguments @('add','.')
+    Invoke-MIR42CurrentProducerGit -Arguments @('-c','commit.gpgsign=false','commit','--quiet','-m','base')
+    $beforeCandidate = (& git -C $fixture rev-parse HEAD).Trim()
+    [IO.File]::WriteAllText((Join-Path $fixture 'README.md'),'candidate tooling',[Text.UTF8Encoding]::new($false))
+    Invoke-MIR42CurrentProducerGit -Arguments @('add','README.md')
+    Invoke-MIR42CurrentProducerGit -Arguments @('-c','commit.gpgsign=false','commit','--quiet','-m','candidate')
+    $candidateCommit = (& git -C $fixture rev-parse HEAD).Trim()
+    $packageSource = 'A' * 64
+    $candidate = Get-MIR42CurrentProducerSource -Commit $candidateCommit -PackageSource $packageSource
+    [IO.File]::WriteAllText((Join-Path $fixture 'tools/reader.ps1'),'tooling-only producer',[Text.UTF8Encoding]::new($false))
+    Invoke-MIR42CurrentProducerGit -Arguments @('add','tools/reader.ps1')
+    Invoke-MIR42CurrentProducerGit -Arguments @('-c','commit.gpgsign=false','commit','--quiet','-m','tooling producer')
+    $producerCommit = (& git -C $fixture rev-parse HEAD).Trim()
+    $producer = New-MIR42CurrentProducer -Commit $producerCommit -Kind 'upgrade' -PackageSource $packageSource
+    $bound = Assert-MIR42IndividualEvidenceProducer -RepoRoot $fixture -CandidateSource $candidate -Producer $producer -Kind 'upgrade' -Code 'mir42-current-individual-test-producer'
+    Assert-MIR42NineSealTest -Condition ([string]$bound.source.commit -ceq $producerCommit -and [string]$bound.harness.sha256 -ceq [string]$producer.harness.sha256) -Code 'current-individual-upgrade-producer'
+    $checks++
+    $fresh = New-MIR42CurrentProducer -Commit $producerCommit -Kind 'fresh' -PackageSource $packageSource
+    $boundFresh = Assert-MIR42IndividualEvidenceProducer -RepoRoot $fixture -CandidateSource $candidate -Producer $fresh -Kind 'fresh' -Code 'mir42-current-individual-test-producer'
+    Assert-MIR42NineSealTest -Condition ([string]$boundFresh.runner.sha256 -ceq [string]$fresh.runner.sha256) -Code 'current-individual-fresh-producer'
+    $checks++
+    $receipt = [ordered]@{git_commit=$producerCommit;harness_sha256=[string]$producer.harness.sha256}
+    Assert-MIR42IndividualReceiptProducerBinding -Receipt $receipt -CandidateSource $candidate -Producer $producer
+    Assert-MIR42NineSealTest -Condition $true -Code 'current-individual-receipt-producer'
+    $checks++
+    $changedReceipt = [ordered]@{git_commit=('0' * 40);harness_sha256=[string]$producer.harness.sha256}
+    $failure = ''
+    try { Assert-MIR42IndividualReceiptProducerBinding -Receipt $changedReceipt -CandidateSource $candidate -Producer $producer } catch { $failure = $_.Exception.Message }
+    Assert-MIR42NineSealTest -Condition ($failure.StartsWith('[mir42-individual-engine-run-receipt-binding]',[StringComparison]::Ordinal)) -Code 'current-individual-rejects-changed-receipt'
+    $checks++
+    [IO.File]::WriteAllText((Join-Path $fixture 'source/player.lua'),'return "changed package"',[Text.UTF8Encoding]::new($false))
+    Invoke-MIR42CurrentProducerGit -Arguments @('add','source/player.lua')
+    Invoke-MIR42CurrentProducerGit -Arguments @('-c','commit.gpgsign=false','commit','--quiet','-m','changed package')
+    $changedPackageCommit = (& git -C $fixture rev-parse HEAD).Trim()
+    $wrongPackage = New-MIR42CurrentProducer -Commit $changedPackageCommit -Kind 'upgrade' -PackageSource $packageSource
+    Assert-MIR42CurrentProducerRefusal -Candidate $candidate -Producer $wrongPackage -Kind 'upgrade' -Expected '[mir42-current-individual-test-producer-package-source]' -Code 'current-individual-rejects-changed-package'
+    $checks++
+    $wrongHarness = New-MIR42CurrentProducer -Commit $producerCommit -Kind 'upgrade' -PackageSource $packageSource
+    $wrongHarness.harness.sha256 = '0' * 64
+    Assert-MIR42CurrentProducerRefusal -Candidate $candidate -Producer $wrongHarness -Kind 'upgrade' -Expected '[mir42-current-individual-test-producer-harness-binding]' -Code 'current-individual-rejects-wrong-harness'
+    $checks++
+    $wrongTree = New-MIR42CurrentProducer -Commit $producerCommit -Kind 'upgrade' -PackageSource $packageSource
+    $wrongTree.source.tree = '0' * 40
+    Assert-MIR42CurrentProducerRefusal -Candidate $candidate -Producer $wrongTree -Kind 'upgrade' -Expected '[mir42-current-individual-test-producer-source-tree]' -Code 'current-individual-rejects-wrong-source-tree'
+    $checks++
+    $wrongSource = New-MIR42CurrentProducer -Commit $beforeCandidate -Kind 'upgrade' -PackageSource $packageSource
+    Assert-MIR42CurrentProducerRefusal -Candidate $candidate -Producer $wrongSource -Kind 'upgrade' -Expected '[mir42-current-individual-test-producer-source-ancestry]' -Code 'current-individual-rejects-producer-before-candidate'
+    $checks++
+  } finally {
+    $trimCharacters = [char[]]@([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar)
+    $buildRoot = [IO.Path]::GetFullPath((Join-Path $RepoRoot 'build/test-results')).TrimEnd($trimCharacters) + [IO.Path]::DirectorySeparatorChar
+    if (-not (([IO.Path]::GetFullPath($root).TrimEnd($trimCharacters) + [IO.Path]::DirectorySeparatorChar).StartsWith($buildRoot,[StringComparison]::OrdinalIgnoreCase))) { throw '[mir42-current-individual-test-containment]' }
+    if (Test-Path -LiteralPath $root) { Remove-Item -LiteralPath $root -Recurse -Force }
+  }
+  Write-Output ('MIR42-CURRENT-INDIVIDUAL-PRODUCER-BINDING-PASSED assertions=' + $checks + ' native-records=0')
+}
+
 function Test-MIR42ConsumedEngineRunReferences {
   param([Parameter(Mandatory)][string]$RepoRoot)
   $ErrorActionPreference = 'Stop'
@@ -32,6 +134,14 @@ function Test-MIR42ConsumedEngineRunReferences {
     Assert-MIR42NineSealTest -Condition ($guards.Count -eq 1 -and $writes.Count -eq 1) -Code 'campaign-prewrite-native-guard-cardinality'
     $assertions++
     Assert-MIR42NineSealTest -Condition ($guards[0].Extent.StartOffset -lt $writes[0].Extent.StartOffset) -Code 'campaign-native-guard-precedes-qualified-artifact-write'
+    $assertions++
+    $campaignExecution = @($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Assert-MIR42RealEngineCampaignExecution'},$true))
+    Assert-MIR42NineSealTest -Condition ($campaignExecution.Count -eq 1) -Code 'campaign-current-fresh-target-reader-cardinality'
+    $assertions++
+    $freshCalls = @($campaignExecution[0].Body.FindAll({param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.GetCommandName() -ceq 'Assert-MIR42FreshEngineLoads'},$true))
+    Assert-MIR42NineSealTest -Condition ($freshCalls.Count -eq 1 -and
+      $freshCalls[0].Extent.Text -match '-CandidateTarget\s+\$freshCandidateTarget' -and
+      $campaignExecution[0].Body.Extent.Text -match '\$freshCandidateTarget\s*=\s*if\s*\(\$currentIndividual\)\s*\{\s*\$candidateTarget\s*\}\s*else\s*\{\s*\$Candidate\s*\}') -Code 'campaign-current-fresh-target-reader-uses-per-target-archive'
     $assertions++
     New-Item -ItemType Directory -Path $root | Out-Null
     $path = Join-Path $root 'unqualified-reference-probe.json'
@@ -509,7 +619,7 @@ try {
   $programmeReader = (Get-Item Function:Get-MIR42LiveProgrammeTransition).ScriptBlock
   try {
     Set-Item Function:Get-MIR42ExactFourTargetCandidate -Value {
-      param($RepoRoot, $CandidateManifestPath)
+      param($RepoRoot, $CandidateManifestPath, $AllowCurrentCandidateToolingDescendant)
       return $fixtureCandidate
     }
     Set-Item Function:Get-MIR42LiveProgrammeTransition -Value { throw '[test-programme-must-not-be-read]' }
@@ -555,6 +665,8 @@ function Test-MIR42IndividualNativeInputReader {
   # exercising the individual-input reader's complete receipt, custody and
   # fresh-load binding path below.
   $individualContractReader = (Get-Command Get-MIR42IndividualEngineEvidenceBindingContract -CommandType Function -ErrorAction Stop).ScriptBlock
+  $individualProducerReader = (Get-Command Assert-MIR42IndividualEvidenceProducer -CommandType Function -ErrorAction Stop).ScriptBlock
+  $individualUpgradeReceiptReader = (Get-Command Assert-MIR42IndividualUpgradeReceipt -CommandType Function -ErrorAction Stop).ScriptBlock
   $checks = 0
   function Get-HostHash([string]$Path) { (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant() }
   function Write-HostText([string]$Path,[string]$Text) {
@@ -748,6 +860,152 @@ function Test-MIR42IndividualNativeInputReader {
     $bound = Get-MIR42BoundEngineRun -Reference $baseReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
     Assert-MIR42NineSealTest -Condition ([string]$bound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and @($bound.record.targets).Count -eq 9 -and [int]$bound.record.factorio_processes -eq 46) -Code 'individual-positive-nine-receipt-ten-fresh-reader'
     $checks++;$script:mir42IndividualReaderChecks++
+
+    # Current 4.7 individual evidence is V2 because receipt producers may be
+    # tooling-only descendants. Run the actual dispatch through both entry
+    # points with complete row producers; the temporary-Git fixture above
+    # verifies those producers against real object bytes.
+    Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value {
+      param($Candidate,[switch]$PublishedMaintenance)
+      if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
+      return [pscustomobject][ordered]@{
+        maintenance_source_version='4.7.0'
+        engine_run_kind='MIR42NineTargetCurrentIndividualEngineRunV2'
+        engine_run_status='nine-target-current-individual-real-engine-probes-passed-private-unqualified'
+        binder_kind='MIR42NineTargetCurrentIndividualRealEngineEvidenceBinderV2'
+        binder_status='MIR-4.7.0-NINE-TARGET-CURRENT-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+      }
+    }
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualEvidenceProducer -Value {
+      param($RepoRoot,$CandidateSource,$Producer,[string]$Kind,[string]$Code)
+      if ($null -eq $Producer -or $null -eq $Producer.source -or [string]$Producer.source.commit -cne [string]$CandidateSource.commit) {
+        throw "[$Code-source-commit]"
+      }
+      if ($Kind -ceq 'upgrade' -and ($null -eq $Producer.runner -or $null -eq $Producer.harness)) { throw "[$Code-shape]" }
+      if ($Kind -ceq 'fresh' -and $null -eq $Producer.runner) { throw "[$Code-shape]" }
+      return $Producer
+    }
+    # This V2 entry control stops at producer-row dispatch. Native receipts are
+    # independently validated by their retained exact-input controls, so this
+    # avoids fabricating a synthetic nine-target native campaign.
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualUpgradeReceipt -Value {
+      param($ReceiptReference,$CandidateTarget,$PublishedInput,$PublishedMaintenanceInputs,$Engine,$HarnessExitCode,$Candidate,$Producer)
+      return [pscustomobject][ordered]@{
+        factorio_processes=4
+        native_candidate_archive=[pscustomobject][ordered]@{path=[string]$CandidateTarget.archive_path}
+        execution=[pscustomobject][ordered]@{
+          version=[string]$Engine.version;executable_path=[string]$Engine.path;executable_sha256=[string]$Engine.sha256
+          fresh_loads=@();producer=$Producer
+        }
+      }
+    }
+    try {
+      $currentRecord = Copy-HostValue $baseRecord
+      $currentRecord.schema = 2
+      $currentRecord.kind = 'MIR42NineTargetCurrentIndividualEngineRunV2'
+      $currentRecord.status = 'nine-target-current-individual-real-engine-probes-passed-private-unqualified'
+      foreach ($row in @($currentRecord.individual_upgrade_receipts)) {
+        $receipt = Get-Content -LiteralPath $row.receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+        # The older host receipt predates producer binding. Give the V2 fixture
+        # its explicit immutable harness digest before the row is sealed.
+        $receipt.harness_sha256 = ('E' * 64)
+        $receiptReference = Write-HostJson (Join-Path $root ('current-v2-upgrade-' + [string]$row.target + '.json')) $receipt
+        $row.receipt = [ordered]@{path=$receiptReference.path;sha256=$receiptReference.sha256}
+        $row.producer = [ordered]@{
+          source=[ordered]@{commit=[string]$source.commit;tree=[string]$source.tree;package_source_sha256=[string]$source.package_source_sha256}
+          runner=[ordered]@{path='tests/runtime/Test-MIRUpgrade.ps1';sha256=[string]$receipt.harness_sha256}
+          harness=[ordered]@{path='tests/runtime/Test-MIRUpgrade.ps1';sha256=[string]$receipt.harness_sha256}
+        }
+      }
+      foreach ($row in @($currentRecord.fresh_loads)) {
+        $row.producer = [ordered]@{
+          source=[ordered]@{commit=[string]$source.commit;tree=[string]$source.tree;package_source_sha256=[string]$source.package_source_sha256}
+          runner=[ordered]@{path='tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1';sha256=('D' * 64)}
+        }
+      }
+      # A custody-restored selected-library path is absent after the run. The
+      # V2 reader may use only the same-name, digest-bound canonical target
+      # archive; a present selected path remains authoritative below.
+      $currentF013Fresh = @($currentRecord.fresh_loads | Where-Object { [string]$_.target -ceq 'f013' })
+      Assert-MIR42NineSealTest -Condition ($currentF013Fresh.Count -eq 1) -Code 'current-individual-v2-f013-fresh-row'
+      $restoredSummary = Get-Content -LiteralPath $currentF013Fresh[0].receipt.path -Raw | ConvertFrom-Json -Depth 100
+      $restoredCandidatePath = Join-Path (Join-Path $root 'restored-selected-library') ([IO.Path]::GetFileName([string]$restoredSummary.candidate.path))
+      $restoredSummary.candidate.path = $restoredCandidatePath
+      $restoredSummaryReference = Write-HostBootstrap (Join-Path $root 'current-v2-f013-restored-selected.json') $restoredSummary
+      $currentF013Fresh[0].receipt = [ordered]@{path=$restoredSummaryReference.path;sha256=$restoredSummaryReference.sha256}
+      $currentReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'current-individual-v2.json') $currentRecord)
+      $currentBound = Get-MIR42BoundEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
+      Assert-MIR42NineSealTest -Condition ([string]$currentBound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads' -and
+        [string]$currentBound.record.kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2' -and
+        [string]$currentBound.record.targets[0].engine_execution.producer.source.commit -ceq [string]$source.commit) -Code 'current-individual-v2-dispatch-accepts-producer-rows'
+      $checks++
+      $script:mir42IndividualReaderChecks++
+      $restoredDirectory = Split-Path -Parent $restoredCandidatePath
+      New-Item -ItemType Directory -Force -Path $restoredDirectory | Out-Null
+      [IO.File]::WriteAllText($restoredCandidatePath,'wrong retained selected archive',[Text.UTF8Encoding]::new($false))
+      $wrongSelectedFailure = ''
+      try { $null = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+      catch { $wrongSelectedFailure = $_.Exception.Message }
+      Remove-Item -LiteralPath $restoredCandidatePath -Force
+      Assert-MIR42NineSealTest -Condition $wrongSelectedFailure.StartsWith('[mir42-seal-historical-fresh-candidate-hash]',[StringComparison]::Ordinal) -Code 'current-individual-v2-present-selected-bytes-rejected'
+      $checks++
+      $script:mir42IndividualReaderChecks++
+      $f013CanonicalArchive = [string](@($packages | Where-Object { [string]$_.target -ceq 'f013' })[0].archive_path)
+      $f013CanonicalBytes = [IO.File]::ReadAllBytes($f013CanonicalArchive)
+      $changedCanonicalFailure = ''
+      try {
+        [IO.File]::WriteAllText($f013CanonicalArchive,'changed canonical archive',[Text.UTF8Encoding]::new($false))
+        try { $null = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+        catch { $changedCanonicalFailure = $_.Exception.Message }
+      } finally { [IO.File]::WriteAllBytes($f013CanonicalArchive,$f013CanonicalBytes) }
+      Assert-MIR42NineSealTest -Condition $changedCanonicalFailure.StartsWith('[mir42-seal-historical-fresh-candidate-hash]',[StringComparison]::Ordinal) -Code 'current-individual-v2-changed-canonical-bytes-rejected'
+      $checks++
+      $script:mir42IndividualReaderChecks++
+      $missingProducer = Copy-HostValue $currentRecord
+      $null = $missingProducer.individual_upgrade_receipts[0].Remove('producer')
+      $missingReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'current-individual-v2-missing-producer.json') $missingProducer)
+      $missingFailure = ''
+      try { $null = Get-MIR42BoundIndividualEngineRun -Reference $missingReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+      catch { $missingFailure = $_.Exception.Message }
+      Assert-MIR42NineSealTest -Condition $missingFailure.StartsWith('[mir42-individual-engine-run-receipt-row-shape]',[StringComparison]::Ordinal) -Code 'current-individual-v2-missing-producer-rejected'
+      $checks++
+      $script:mir42IndividualReaderChecks++
+      $mutatedProducer = Copy-HostValue $currentRecord
+      $mutatedProducer.individual_upgrade_receipts[0].producer.source.commit = ('F' * 40)
+      $mutatedReference = Get-HostBootstrapReference (Write-HostBootstrap (Join-Path $root 'current-individual-v2-mutated-producer.json') $mutatedProducer)
+      $mutatedFailure = ''
+      try { $null = Get-MIR42BoundEngineRun -Reference $mutatedReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
+      catch { $mutatedFailure = $_.Exception.Message }
+      Assert-MIR42NineSealTest -Condition $mutatedFailure.StartsWith('[mir42-individual-engine-run-receipt-producer-source-commit]',[StringComparison]::Ordinal) -Code 'current-individual-v2-mutated-producer-rejected'
+      $checks++
+      $script:mir42IndividualReaderChecks++
+    } finally {
+      Set-Item -LiteralPath Function:script:Assert-MIR42IndividualEvidenceProducer -Value $individualProducerReader
+      Set-Item -LiteralPath Function:script:Assert-MIR42IndividualUpgradeReceipt -Value $individualUpgradeReceiptReader
+      Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value {
+        param($Candidate,[switch]$PublishedMaintenance)
+        if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
+        return [pscustomobject][ordered]@{
+          maintenance_source_version='4.2.3'
+          engine_run_kind='MIR42NineTargetMaintenanceIndividualEngineRunV1'
+          engine_run_status='nine-target-maintenance-individual-real-engine-probes-passed-private-unqualified'
+          binder_kind='MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
+          binder_status='MIR-4.2.3-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+        }
+      }
+    }
+
+    # Legacy V1 does not borrow the canonical archive when its selected path
+    # is gone; only V2 records carry the custody-restoration contract.
+    $legacyMissing = Copy-HostValue $baseRecord
+    $legacyF013Fresh = @($legacyMissing.fresh_loads | Where-Object { [string]$_.target -ceq 'f013' })
+    Assert-MIR42NineSealTest -Condition ($legacyF013Fresh.Count -eq 1) -Code 'legacy-individual-f013-fresh-row'
+    $legacySummary = Get-Content -LiteralPath $legacyF013Fresh[0].receipt.path -Raw | ConvertFrom-Json -Depth 100
+    $legacySummary.candidate.path = Join-Path (Join-Path $root 'legacy-missing-selected-library') ([IO.Path]::GetFileName([string]$legacySummary.candidate.path))
+    $legacySummaryReference = Write-HostBootstrap (Join-Path $root 'legacy-v1-f013-missing-selected.json') $legacySummary
+    $legacyF013Fresh[0].receipt = [ordered]@{path=$legacySummaryReference.path;sha256=$legacySummaryReference.sha256}
+    Assert-HostReaderRefusal 'legacy-v1-missing-selected-candidate' $legacyMissing '[mir42-seal-historical-fresh-candidate-missing]'
+    $checks++
 
     # Fresh-load producers record the full executable FileVersion, just like
     # the upgrade runner. A different build or a truncated product version
@@ -987,6 +1245,8 @@ function Test-MIR42IndividualNativeInputReader {
     $checks += $script:mir42IndividualReaderChecks
   } finally {
     Set-Item -LiteralPath Function:script:Get-MIR42IndividualEngineEvidenceBindingContract -Value $individualContractReader
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualEvidenceProducer -Value $individualProducerReader
+    Set-Item -LiteralPath Function:script:Assert-MIR42IndividualUpgradeReceipt -Value $individualUpgradeReceiptReader
     Remove-Variable -Name mir42IndividualReaderCandidate -Scope Script -ErrorAction SilentlyContinue
     Remove-Variable -Name mir42IndividualReaderPublished -Scope Script -ErrorAction SilentlyContinue
     Remove-Variable -Name mir42IndividualReaderChecks -Scope Script -ErrorAction SilentlyContinue
@@ -1212,6 +1472,7 @@ function Test-MIR430ClassicSnapshotProjection {
 }
 
 if (-not $OnlyClassicSealSnapshotProjection) {
+  Test-MIR42CurrentIndividualProducerBinding -RepoRoot $repo
   Test-MIR42IndividualNativeInputReader -RepoRoot $repo
 }
 Test-MIR42HistoricalReceiptCustodyProjection -RepoRoot $repo
