@@ -8207,6 +8207,8 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
+        "tests/release/Test-MIROrdinaryCandidate.ps1",
+        "tools/mir/application/release/readiness/OrdinaryCandidate.ps1",
         "tests/support/MIR423ReleaseUpgradeControls.ps1",
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
@@ -8821,5 +8823,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:cc4f873c4ed443d29fbbaab45cf96a008da5aea82d6563f94c48b1096dad02de"
+  "digest": "sha256:1f7cab8564443c8c59bdfe06909230518d46493b8bc2a3754b2acbdffb249c27"
 }
