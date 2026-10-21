@@ -809,11 +809,12 @@ try {
     $authoredHistory = [IO.File]::ReadAllText((Join-Path $repo "$presentation/changelog.txt.template")).Replace("`r`n", "`n")
     $authoredVersion = [regex]::Match($authoredHistory, '(?m)^Version:\s*(\S+)')
     # The V3 fixture remains bound to 4.2.2.  Every retained template also
-    # preserves its exact authored 4.5.2 head; constructed 4.2.2 metadata is
+    # preserves its exact authored published head; constructed 4.2.2 metadata is
     # separately bound above.
     $admittedAuthoredVersions = @(
       [string]$currentIdentity.distribution_version,
-      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.5.2').distribution_version
+      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.5.2').distribution_version,
+      [string](Get-MIR42ReleaseTargetIdentity -RepoRoot $repo -Target $target -SourceVersion '4.6.0').distribution_version
     )
     Assert-MIR42CandidateBuildTest ($authoredVersion.Success -and ($admittedAuthoredVersions -ccontains [string]$authoredVersion.Groups[1].Value)) "422-authored-current-changelog-version-$i"
   }
