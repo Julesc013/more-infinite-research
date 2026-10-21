@@ -26,6 +26,11 @@ param(
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$SelectedFreshTarget,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][ValidateSet('package-zip-base','package-zip-space-age')][string]$SelectedFreshScenario,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshEngine,
+  # Current F210 FreshLeaf callers bind this exact executable identity themselves.
+  # These remain optional for every preserved leaf and become required only for the
+  # current 4.7/F210 branch below.
+  [Parameter(ParameterSetName='FreshLeaf')][string]$SelectedFreshEngineVersion = '',
+  [Parameter(ParameterSetName='FreshLeaf')][string]$SelectedFreshEngineSha256 = '',
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshPredecessor,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshLibraryDirectory
 )
@@ -105,6 +110,67 @@ function Get-MIR42EngineCandidateVersionContract {
   return [pscustomobject][ordered]@{
     path=$path;manifest=$manifest;source_version=[string]$version.source_version
     nine_targets=$nine;four_targets=$four;targets=$targets
+  }
+}
+
+function Assert-MIR42SelectedFreshCurrentF210Engine {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f210')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('4.7.0')][string]$CandidateSourceVersion,
+    [Parameter(Mandatory)][string]$EngineProductVersion,
+    [Parameter(Mandatory)][string]$EngineFileVersion,
+    [Parameter(Mandatory)][string]$EngineSha256,
+    [Parameter(Mandatory)][string]$SelectedEngineVersion,
+    [Parameter(Mandatory)][string]$SelectedEngineSha256,
+    [Parameter(Mandatory)][string]$CandidateArchive
+  )
+  if ([string]::IsNullOrWhiteSpace($SelectedEngineVersion) -or
+      [string]::IsNullOrWhiteSpace($SelectedEngineSha256)) {
+    throw '[mir42-f210-fresh-current-engine-input-required]'
+  }
+  if ($SelectedEngineSha256 -notmatch '^[A-Fa-f0-9]{64}$' -or
+      $EngineSha256 -notmatch '^[A-Fa-f0-9]{64}$') {
+    throw '[mir42-f210-fresh-current-engine-hash]'
+  }
+  # Read the selected immutable package rather than an ambient channel policy.
+  # Current FreshLeaf is intentionally limited to the declared F210 2.1.23 floor.
+  $archive = [IO.Compression.ZipFile]::OpenRead($CandidateArchive)
+  try {
+    $entries = @($archive.Entries | Where-Object { $_.FullName -match '^[^/]+/info[.]json$' })
+    if ($entries.Count -ne 1) { throw '[mir42-f210-fresh-current-package-info]' }
+    $reader = [IO.StreamReader]::new($entries[0].Open())
+    try { $info = $reader.ReadToEnd() | ConvertFrom-Json -Depth 20 -DateKind String }
+    finally { $reader.Dispose() }
+  } finally { $archive.Dispose() }
+  $baseRequirements = @(
+    foreach ($dependency in @($info.dependencies)) {
+      $text = [string]$dependency
+      if ($text -match '^base\s+>=\s+([0-9]+[.][0-9]+[.][0-9]+)$') { [string]$Matches[1] }
+    }
+  )
+  if ([string]$info.factorio_version -cne '2.1' -or $baseRequirements.Count -ne 1 -or
+      [string]$baseRequirements[0] -cne '2.1.23') {
+    throw '[mir42-f210-fresh-current-package-minimum]'
+  }
+  $minimum = [string]$baseRequirements[0]
+  if ($SelectedEngineVersion -notmatch ('^' + [regex]::Escape($minimum) + '[.][0-9]+$') -or
+      $EngineFileVersion -cne $SelectedEngineVersion) {
+    throw '[mir42-f210-fresh-current-engine-version]'
+  }
+  if ($EngineProductVersion -cne $minimum) {
+    throw '[mir42-f210-fresh-current-engine-product-version]'
+  }
+  if ($EngineSha256.ToUpperInvariant() -cne $SelectedEngineSha256.ToUpperInvariant()) {
+    throw '[mir42-f210-fresh-current-engine-hash]'
+  }
+  return [pscustomobject][ordered]@{
+    target = $Target
+    source_version = $CandidateSourceVersion
+    factorio_family = [string]$info.factorio_version
+    declared_minimum = $minimum
+    product_version = $EngineProductVersion
+    file_version = $EngineFileVersion
+    sha256 = $EngineSha256.ToUpperInvariant()
   }
 }
 
@@ -892,6 +958,7 @@ foreach ($target in $targets) {
   $row = $selected[$target]
   $row['source_version'] = $sourceVersion
   $isHistoricalTarget = $target -in $script:MIR42HistoricalEngineTargets
+  $isSelectedFreshCurrentF210 = $freshLeafMode -and $sourceVersion -ceq '4.7.0' -and $target -ceq 'f210'
   $lock = if ($isHistoricalTarget) { $null } else { @($inputAuthority.targets | Where-Object { [string]$_.target -ceq $target })[0] }
   $row.engine = Assert-MIR42EngineRunFile -Path $row.engine -Label "mir42-$target-engine"
   $row.predecessor = Assert-MIR42EngineRunFile -Path $row.predecessor -Label "mir42-$target-predecessor"
@@ -950,6 +1017,10 @@ foreach ($target in $targets) {
       }
     }
     $row.engine_version = [string]$historical.engine.version
+  } elseif ($isSelectedFreshCurrentF210) {
+    # The exact selected-current engine is authenticated below after the F210
+    # candidate archive has been bound and its declared package floor inspected.
+    $row.engine_version=$row.engine_file_version
   } elseif ($null -ne $maintenanceInputs) {
     Assert-MIR421NativeEngineIdentity -RepoRoot $repo -Target $target -Observed ([pscustomobject]@{
       product_version=$row.engine_product_version;file_version=$row.engine_file_version;sha256=$row.engine_sha256
@@ -1006,6 +1077,11 @@ foreach ($target in $targets) {
     throw "[mir42-$target-candidate-content]"
   }
   $row.candidate_sha256 = [string]$candidate.asset.sha256
+  if ($isSelectedFreshCurrentF210) {
+    $null = Assert-MIR42SelectedFreshCurrentF210Engine -Target $target -CandidateSourceVersion $sourceVersion `
+      -EngineProductVersion $row.engine_product_version -EngineFileVersion $row.engine_file_version -EngineSha256 $row.engine_sha256 `
+      -SelectedEngineVersion $SelectedFreshEngineVersion -SelectedEngineSha256 $SelectedFreshEngineSha256 -CandidateArchive $row.candidate
+  }
 }
 $pwsh = Assert-MIR42EngineRunFile -Path (Get-Command pwsh).Source -Label 'mir42-pwsh'
 $harness = Assert-MIR42EngineRunFile -Path (Join-Path $repo 'tests/runtime/Test-MIRUpgrade.ps1') -Label 'mir42-upgrade-harness'
