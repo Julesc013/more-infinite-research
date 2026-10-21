@@ -2451,7 +2451,8 @@ function Get-MIR42RealEngineCandidateCampaign {
 function Assert-MIR42RealEngineCampaignExecution {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Campaign,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$EngineRun,$PublishedMaintenanceInputs = $null)
   $record = $Campaign.record
-  $currentIndividual = [string]$EngineRun.record.kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2'
+  $currentIndividual = $null -ne $EngineRun.record.PSObject.Properties['kind'] -and
+    [string]$EngineRun.record.kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2'
   if ([int]$record.factorio_processes -ne [int]$engineRun.record.factorio_processes) { throw '[mir42-seal-real-engine-process-count-binding]' }
   if ($null -ne $PublishedMaintenanceInputs) { Assert-MIR42MaintenanceCampaignCustody -Record $record -PublishedInputs $PublishedMaintenanceInputs }
   foreach ($target in @($record.targets)) {
