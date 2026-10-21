@@ -22,12 +22,21 @@ function Invoke-MIR470TriggerOutputRepresentativeFixtureControls {
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($UpgradeRunnerPath,[ref]$tokens,[ref]$errors)
   if($errors.Count-ne0){throw '[mir470-trigger-output-representative-runner-syntax]'}
+  # PowerShell variable names ignore case. A descriptor assignment must never
+  # overwrite the typed input switch, even if the helpers pass in isolation.
+  $flag=@($ast.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ieq'TriggerOutputRepresentativeFixture'})
+  $flagWrites=@($ast.EndBlock.FindAll({param($node)
+    $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+    $node.Left-is[Management.Automation.Language.VariableExpressionAst]-and
+    $node.Left.VariablePath.UserPath-ieq'TriggerOutputRepresentativeFixture'
+  },$false))
+  if($flag.Count-ne1-or$flag[0].StaticType-ne[Management.Automation.SwitchParameter]-or$flagWrites.Count){throw '[mir470-trigger-output-representative-switch-overwrite]'}
   foreach($name in @('Assert-MIR470TriggerOutputRepresentativeTransition','Get-MIR470TriggerOutputRepresentativeFixture','Set-MIR470TriggerOutputRepresentativeDefinitionAllowance','Assert-MIR470TriggerOutputRepresentativeMarker')){
     $matches=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$true))
     if($matches.Count-ne1){throw "[mir470-trigger-output-representative-runner-function] $name"}
     . ([scriptblock]::Create($matches[0].Extent.Text))
   }
-  $assertions=0
+  $assertions=1
   $mode=[ordered]@{
     Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';FixtureName='assert-upgrade-4-0-21000-to-4-1-21000'
     Archetype='space-age-native-owner';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SourceVersion='4.7.0'
@@ -2642,5 +2651,13 @@ if(-not(Test-Path -LiteralPath $triggerFixture -PathType Container)-or-not(Test-
 }
 $triggerOutputRepresentative=Invoke-MIR470TriggerOutputRepresentativeFixtureControls -RepoRoot $RepoRoot -TestRoot $testRoot
 $assertions+=[int]$triggerOutputRepresentative.assertions
+$collidingRunner=Join-Path $testRoot 'trigger-output-switch-collision.ps1'
+$runnerText=[IO.File]::ReadAllText((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'))
+if(-not$runnerText.Contains('$triggerOutputRepresentativeFixtureDescriptor')){throw '[mir470-trigger-output-descriptor-anchor]'}
+[IO.File]::WriteAllText($collidingRunner,$runnerText.Replace('$triggerOutputRepresentativeFixtureDescriptor','$triggerOutputRepresentativeFixture'),[Text.UTF8Encoding]::new($false))
+$collisionRejected=$false
+try{Invoke-MIR470TriggerOutputRepresentativeFixtureControls -RepoRoot $RepoRoot -TestRoot $testRoot -UpgradeRunnerPath $collidingRunner|Out-Null}catch{$collisionRejected=$_.Exception.Message-ceq'[mir470-trigger-output-representative-switch-overwrite]'}
+if(-not$collisionRejected){throw '[mir470-trigger-output-switch-collision-opponent]'}
+$assertions++
 
 [pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;f200_galore_space_age_upgrade_assertions=$f200GaloreSpaceAgeAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false;trigger_output_representative_assertions=$(if($triggerOutputRepresentative){[int]$triggerOutputRepresentative.assertions}else{0})}|ConvertTo-Json

@@ -595,7 +595,7 @@ $k2OwnedSpeedSentinelFixture=if($k2FullStateScenario){
   Get-MIR470K2OwnedSpeedSentinelFixture -RepoRoot $RepoRoot -FixtureName $FixtureName -SourceVersion $SourceVersion
 }else{$null}
 $triggerOutputRepresentativeScenario=[bool]$TriggerOutputRepresentativeFixture
-$triggerOutputRepresentativeFixture=if($triggerOutputRepresentativeScenario){
+$triggerOutputRepresentativeFixtureDescriptor=if($triggerOutputRepresentativeScenario){
   Assert-MIR470TriggerOutputRepresentativeTransition -Target $SelectedTarget -FromVersion $FromVersion -ToVersion $ToVersion `
     -FixtureName $FixtureName -Archetype $Archetype -SpaceIsFake ([bool]$SpaceIsFake) -SourceOnlyFixtureNames $SourceOnlyFixtureNames `
     -SourceVersion $SourceVersion -SourceMaterializationPath $SourceMaterializationPath `
@@ -1143,15 +1143,15 @@ if($k2OwnedSpeedSentinelFixture){
     control_sha256=[string]$k2OwnedSpeedSentinelFixture.control_sha256
   }
 }
-if($triggerOutputRepresentativeFixture){
-  $persistentFixtureDirectories+=,[string]$triggerOutputRepresentativeFixture.directory
+if($triggerOutputRepresentativeFixtureDescriptor){
+  $persistentFixtureDirectories+=,[string]$triggerOutputRepresentativeFixtureDescriptor.directory
   $persistentFixtureRecords+=,[ordered]@{
-    name=[string]$triggerOutputRepresentativeFixture.name
-    version=[string]$triggerOutputRepresentativeFixture.version
-    info_sha256=[string]$triggerOutputRepresentativeFixture.info_sha256
-    data_updates_sha256=[string]$triggerOutputRepresentativeFixture.data_updates_sha256
-    data_final_fixes_sha256=[string]$triggerOutputRepresentativeFixture.data_final_fixes_sha256
-    control_sha256=[string]$triggerOutputRepresentativeFixture.control_sha256
+    name=[string]$triggerOutputRepresentativeFixtureDescriptor.name
+    version=[string]$triggerOutputRepresentativeFixtureDescriptor.version
+    info_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.info_sha256
+    data_updates_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.data_updates_sha256
+    data_final_fixes_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.data_final_fixes_sha256
+    control_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.control_sha256
   }
 }
 if($k2Scenario){
@@ -1578,15 +1578,15 @@ $result = [ordered]@{
     migration_fixture=$k2CurrentFixtureSpecialization.migration
     owned_speed_sentinel=$k2CurrentFixtureSpecialization.owned_speed_sentinel
   }}else{$null}
-  trigger_output_representative = if($triggerOutputRepresentativeFixture){[ordered]@{
+  trigger_output_representative = if($triggerOutputRepresentativeFixtureDescriptor){[ordered]@{
     scope='candidate-only altered Space Age input; published 4.6 altered-input old-failure is separate'
     fixture=[ordered]@{
-      name=[string]$triggerOutputRepresentativeFixture.name
-      version=[string]$triggerOutputRepresentativeFixture.version
-      info_sha256=[string]$triggerOutputRepresentativeFixture.info_sha256
-      data_updates_sha256=[string]$triggerOutputRepresentativeFixture.data_updates_sha256
-      data_final_fixes_sha256=[string]$triggerOutputRepresentativeFixture.data_final_fixes_sha256
-      control_sha256=[string]$triggerOutputRepresentativeFixture.control_sha256
+      name=[string]$triggerOutputRepresentativeFixtureDescriptor.name
+      version=[string]$triggerOutputRepresentativeFixtureDescriptor.version
+      info_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.info_sha256
+      data_updates_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.data_updates_sha256
+      data_final_fixes_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.data_final_fixes_sha256
+      control_sha256=[string]$triggerOutputRepresentativeFixtureDescriptor.control_sha256
     }
     generic_fixture_allowance='space-science-pack prerequisites space-platform to rocket-silo and one unlock-recipe effect to none only'
   }}else{$null}
