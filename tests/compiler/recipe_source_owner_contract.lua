@@ -387,6 +387,65 @@ function M.run(check)
       "Deferred export follows explicit owner epoch replacement rather than a stale source")
   end)
 
+  -- Relationship construction may reuse only the exact current normalized
+  -- recipe maps. Public copies, other Contexts and source replacements must
+  -- retain their own boundary rather than inheriting an ownership claim.
+  local relationships = require("prototypes.mir.index.relationships")
+  Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+    local candidates = source("normal-z", "normalized-part")
+    candidates["normal-a"] = source("normal-a", "normalized-part")["normal-a"]
+    candidates["normal-a"].results[2] = {name = "normalized-part", amount = 2}
+    for _, candidate in pairs(candidates) do
+      candidate.ingredients = {
+        {type = "item", name = "normalized-ore", amount = 1},
+        {type = "item", name = "normalized-ore", amount = 2}
+      }
+    end
+    recipes.replace_source(candidates, recipes.source_epoch())
+    local projection = recipes.relationship_projection_view()
+    verify(recipes.current_normalized_relationship_projection(projection, "input")
+        and recipes.current_normalized_relationship_projection(projection, "output"),
+      "Current normalized recipe maps serve both independently built relationship phases")
+    verify(not recipes.current_normalized_relationship_projection(deepcopy(projection), "input"),
+      "Copied recipe maps cannot inherit private normalization ownership")
+    verify(not recipes.current_normalized_relationship_projection(projection, "unknown"),
+      "Unknown relationship phases cannot inherit normalization ownership")
+    Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+      verify(not recipes.current_normalized_relationship_projection(projection, "input"),
+        "A recipe projection cannot carry normalization ownership across Contexts")
+    end)
+    verify(recipes.current_normalized_relationship_projection(projection, "input"),
+      "A foreign Context query leaves the actual recipe owner intact")
+    local input = relationships.view("input")
+    local output = relationships.view("output")
+    local expected = fingerprint.canonical({"normal-a", "normal-z"})
+    verify(input ~= output and input.phase == "input" and output.phase == "output"
+        and fingerprint.canonical(input.recipes_by_output["normalized-part"]) == expected
+        and fingerprint.canonical(output.recipes_by_output["normalized-part"]) == expected
+        and fingerprint.canonical(input.recipes_by_ingredient["normalized-ore"]) == expected
+        and fingerprint.canonical(output.recipes_by_ingredient["normalized-ore"]) == expected
+        and fingerprint.canonical(input.recipes_by_category.crafting) == expected
+        and fingerprint.canonical(output.recipes_by_category.crafting) == expected,
+      "Separate relationship phases retain sorted unique recipe membership")
+    local exported = relationships.snapshot("input")
+    exported.recipes_by_output["normalized-part"][1] = "public-mutation"
+    verify(fingerprint.canonical(input.recipes_by_output["normalized-part"]) == expected,
+      "Public relationship snapshots cannot mutate reused owned recipe lists")
+  end)
+  Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+    local previous = recipes.relationship_projection_view()
+    recipes.replace_source(source("normal-replacement", "replacement-part"), recipes.source_epoch())
+    verify(not recipes.current_normalized_relationship_projection(previous, "input"),
+      "Replacing a source invalidates its previous normalized recipe projection")
+    verify(recipes.current_normalized_relationship_projection(recipes.relationship_projection_view(), "input"),
+      "The new source epoch receives its own normalized recipe projection")
+  end)
+  Context.with_active(Context.new(), function()
+    recipes.replace_source(source("generic-normal", "generic-part"), recipes.source_epoch())
+    verify(not recipes.current_normalized_relationship_projection(recipes.relationship_projection_view(), "input"),
+      "Generic recipe-index exports retain the established relationship normalizer")
+  end)
+
   return checks
 end
 

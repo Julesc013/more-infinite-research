@@ -1359,6 +1359,21 @@ function M.relationship_projection_view()
   }
 end
 
+-- This is a narrow ownership query, not an immutability marker. The semantic
+-- projection is created only after its source normalizer has de-duplicated and
+-- sorted every relationship map. A current Context/material/epoch match and
+-- an admitted phase are therefore sufficient to skip the relationship
+-- builder's identical second pass. Copied, generic, dynamic, stale, and
+-- cross-Context values fail closed to its existing normalizer.
+function M.current_normalized_relationship_projection(projection, phase)
+  if phase ~= "input" and phase ~= "output" then return false end
+  local context = compiler_context.current()
+  local material = semantic_projections[context]
+  return material ~= nil
+    and material.projection == projection
+    and material.recipe_source_epoch == source_epoch(context)
+end
+
 function M.route_projection_view()
   local projection = semantic_projection(compiler_context.current())
   if projection then return {
