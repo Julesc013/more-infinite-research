@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "runtime_api_sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+  "settings_mode": "Defaults",
+  "mods": [
+    { "name": "base", "version": "2.1.23", "enabled": true },
+    { "name": "elevated-rails", "version": "2.1.23", "enabled": true },
+    { "name": "quality", "version": "2.1.23", "enabled": true },
+    { "name": "recycler", "version": "2.1.23", "enabled": true },
+    { "name": "space-age", "version": "2.1.23", "enabled": true },
+    { "name": "flib", "version": "0.17.2", "enabled": true },
+    { "name": "k2so-assets", "version": "1.0.7", "enabled": true },
+    { "name": "Krastorio2", "version": "2.1.4", "enabled": true },
+    { "name": "Krastorio2-spaced-out", "version": "2.0.19", "enabled": true },
+    { "name": "Krastorio2Assets", "version": "2.1.0", "enabled": true },
+    { "name": "Krastorio2MenuSimulations", "version": "2.1.0", "enabled": true },
+    { "name": "xy-k2so-enhancements-nulls-fork", "version": "0.8.3", "enabled": true },
+    { "name": "more-infinite-research", "version": "4.7.21000", "enabled": true },
+    { "name": "mir-fixture-assert-k2-213-imersite-continuation", "version": "0.1.10", "enabled": true }
+  ],
+  "archive_sha256": {
+    "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
+    "k2so-assets_1.0.7.zip": "C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017",
+    "Krastorio2_2.1.4.zip": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E",
+    "Krastorio2-spaced-out_2.0.19.zip": "8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B",
+    "Krastorio2Assets_2.1.0.zip": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
+    "Krastorio2MenuSimulations_2.1.0.zip": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
+    "xy-k2so-enhancements-nulls-fork_0.8.3.zip": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE"
+  }
+}

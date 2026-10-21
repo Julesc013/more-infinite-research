@@ -958,20 +958,25 @@ try {
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
     $registeredCurrent=Read-K2213CurrentFixtureRegistration
     $currentIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion '4.7.0'
-    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.9'-and$registeredCurrent.input_profile-ceq'fixtures/run-profiles/k2-214-imersite-f210-470.json'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/profile/engine identity.'
+    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.10'-and$registeredCurrent.input_profile-ceq'fixtures/run-profiles/k2-214-imersite-f210-470-2123.json'-and$registeredCurrent.engine_versions[0]-ceq'2.1.23') 'K2 current fixture lost registered candidate/profile/engine identity.'
+    $registeredProfile=Get-Content -Raw -LiteralPath (Join-Path $repo $registeredCurrent.input_profile)|ConvertFrom-Json
+    $retainedProfile=Get-Content -Raw -LiteralPath (Join-Path $repo 'fixtures/run-profiles/k2-214-imersite-f210-470.json')|ConvertFrom-Json
+    $registeredFixture=@($registeredProfile.mods|Where-Object {$_.name-ceq'mir-fixture-assert-k2-213-imersite-continuation'})[0]
+    $retainedFixture=@($retainedProfile.mods|Where-Object {$_.name-ceq'mir-fixture-assert-k2-213-imersite-continuation'})[0]
+    Assert-Probe ($registeredProfile.engine_version-ceq'2.1.23'-and$registeredProfile.engine_sha256-ceq'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'-and$registeredProfile.runtime_api_sha256-ceq'7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373'-and@($registeredProfile.mods|Where-Object {$_.name-in@('base','elevated-rails','quality','recycler','space-age') -and $_.version-ceq'2.1.23'}).Count-eq5-and$registeredFixture.version-ceq'0.1.10'-and$retainedProfile.engine_version-ceq'2.1.22'-and$retainedFixture.version-ceq'0.1.9') 'K2 current 2.1.23 profile did not retain the prior 2.1.22/.1.9 identity.'
     $registrationPath=Join-Path $run 'controlled-k2-registration.yml'
     $registeredText=[IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
     $entry=[regex]::Match($registeredText,'(?ms)^  k2-213-imersite-continuation:\s*\r?\n.*?(?=^  [A-Za-z0-9][A-Za-z0-9_-]*:\s*\r?\n|\z)').Value
-    Assert-Probe ($entry.Contains('base: "2.1.21"')-and$entry.Contains('current_engine_version: "2.1.22"')) 'K2 historical and current engine authorities were conflated.'
+    Assert-Probe ($entry.Contains('base: "2.1.21"')-and$entry.Contains('current_engine_version: "2.1.23"')-and$entry.Contains('      - fixtures/run-profiles/k2-214-imersite-f210-470.json')-and$entry.Contains('      - fixtures/run-profiles/k2-214-imersite-f210-470-2123.json')) 'K2 historical and current engine authorities were conflated.'
     [IO.File]::WriteAllText($registrationPath,$entry.Replace('base: "2.1.21"','base: "2.1.22"'))
     Refuses-Probe {Get-K2213FixtureEnvelope -Path $registrationPath -SourceVersion '4.7.0'} 'registered-fixture-field:base:'
-    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.22"','current_engine_version: "2.1.21"'))
+    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.23"','current_engine_version: "2.1.22"'))
     Refuses-Probe {Read-K2213CurrentFixtureRegistration -Path $registrationPath} 'registered-fixture-current-engine-profile'
-    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.22"',"current_engine_version: `"2.1.22`"`n    current_engine_version: `"2.1.22`""))
+    [IO.File]::WriteAllText($registrationPath,$entry.Replace('current_engine_version: "2.1.23"',"current_engine_version: `"2.1.23`"`n    current_engine_version: `"2.1.23`""))
     Refuses-Probe {Read-K2213CurrentFixtureRegistration -Path $registrationPath} 'registered-fixture-current-field:current_engine_version'
     Refuses-Probe {Get-K2213SelectedFixtureProfile -SourceVersion '4.7.1'} 'registered-fixture-current-candidate'
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.7.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
-    # Current inputs come only from the registered .1.8 profile.  Build a tiny
+    # Current inputs come only from the registered .1.10 profile.  Build a tiny
     # exact closure so this checks the runner reader without acquiring or
     # launching any real archive.
     $currentExpected=Get-K2213ExpectedDependencies -SourceVersion '4.7.0'
@@ -988,8 +993,8 @@ try {
       }finally{$zip.Dispose()}
     }
     $currentPortablePath=Join-Path $run 'current-portable-inputs.json'
-    $currentPortable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.22';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=[ordered]@{}}
-    foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$currentPortable.mods+=@{name=$name;version='2.1.22';enabled=$true}}
+    $currentPortable=[ordered]@{schema=1;target='f210';factorio_line='2.1';engine_version='2.1.23';engine_sha256=('A'*64);runtime_api_sha256=('B'*64);settings_mode='Defaults';mods=@();archive_sha256=[ordered]@{}}
+    foreach($name in @('base','elevated-rails','quality','recycler','space-age')){$currentPortable.mods+=@{name=$name;version='2.1.23';enabled=$true}}
     foreach($fileName in $currentExpected.Keys){
       $identity=$currentExpected[$fileName]
       $currentPortable.mods+=@{name=$identity[0];version=$identity[1];enabled=$true}
@@ -1003,7 +1008,7 @@ try {
     Refuses-Probe {Get-K2213ProfileExternalDependencies -Profile (Get-Content -Raw -LiteralPath $currentPortablePath|ConvertFrom-Json) -Code 'controlled-current-profile'} 'controlled-current-profile-mod-enabled:Krastorio2'
     $currentK2Row.enabled=$true;Save-ControlledCurrentK2Profile
     $currentBound=Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'
-    Assert-Probe ($currentBound.profile.engine_version-ceq'2.1.22'-and$currentBound.inputs.Count-eq7-and$currentBound.inputs[0].identity.name-ceq'flib'-and$currentBound.inputs[-1].identity.name-ceq'xy-k2so-enhancements-nulls-fork') 'K2 current source did not retain its exact registered engine or complete archive closure.'
+    Assert-Probe ($currentBound.profile.engine_version-ceq'2.1.23'-and$currentBound.inputs.Count-eq7-and$currentBound.inputs[0].identity.name-ceq'flib'-and$currentBound.inputs[-1].identity.name-ceq'xy-k2so-enhancements-nulls-fork') 'K2 current source did not retain its exact registered engine or complete archive closure.'
     $currentPortable.archive_sha256['Krastorio2_2.1.4.zip']='0'*64;Save-ControlledCurrentK2Profile
     Refuses-Probe {Read-K2213ProfileInputs -Path $currentPortablePath -ExpectedDependencies $currentExpected -Libraries @($currentFlat) -SourceVersion '4.7.0'} 'dependency-hash'
     $currentPortable.archive_sha256['Krastorio2_2.1.4.zip']=Get-K2213Sha256 (Join-Path $currentFlat 'Krastorio2_2.1.4.zip');$currentPortable.archive_sha256.Remove('Krastorio2-spaced-out_2.0.19.zip');Save-ControlledCurrentK2Profile
@@ -1049,7 +1054,7 @@ try {
     Assert-Probe ($currentInfo.version-ceq$registeredCurrent.fixture_version-and@($currentInfo.dependencies)-contains('more-infinite-research = '+$currentIdentity.distribution_version)-and@($currentInfo.dependencies)-contains'Krastorio2 = 2.1.4'-and@($currentInfo.dependencies)-contains'Krastorio2-spaced-out = 2.0.19') 'K2 registered fixture did not specialize its candidate or new upstream identities.'
     foreach($member in @('data-final-fixes.lua','control.lua')){
       $currentText=Get-Content -Raw -LiteralPath (Join-Path $currentFixture $member)
-      Assert-Probe ($currentText.Contains('base ~= "2.1.22"')-and-not$currentText.Contains('base ~= "2.1.20"')-and-not$currentText.Contains('base ~= "2.1.21"')) ('K2 selected fixture retained a different engine guard: '+$member)
+      Assert-Probe ($currentText.Contains('base ~= "2.1.23"')-and-not$currentText.Contains('base ~= "2.1.20"')-and-not$currentText.Contains('base ~= "2.1.21"')-and-not$currentText.Contains('base ~= "2.1.22"')) ('K2 selected fixture retained a different engine guard: '+$member)
       Assert-Probe ($currentText.Contains('Krastorio2 = "2.1.4"')-and$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.19"')-and-not$currentText.Contains('Krastorio2 = "2.1.3"')-and-not$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.13"')) ('K2 selected fixture retained a historical upstream guard: '+$member)
     }
     $currentControl=Get-Content -Raw -LiteralPath (Join-Path $currentFixture 'control.lua')
