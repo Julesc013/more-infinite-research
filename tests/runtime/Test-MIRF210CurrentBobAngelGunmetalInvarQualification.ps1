@@ -8,6 +8,8 @@ param(
   [Parameter(Mandatory)][ValidatePattern('^[0-9A-F]{64}$')][string]$SettingsSha256,
   [Parameter(Mandatory)][string]$CandidateZip,
   [Parameter(Mandatory)][string]$SourceMaterializationPath,
+  [ValidateSet('fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json','fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json')]
+  [string]$InputProfile='fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json',
   [ValidateSet('Observe','Qualification')][string]$Mode='Observe',
   [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.7.0',
   [string]$OutputRoot='build/tmp/f210-ba-gunmetal-invar',
@@ -40,7 +42,12 @@ function Read-GICandidate([string]$Repository,[string]$Archive,[string]$Receipt,
 function Read-GIDossier([string]$Path){
   $dossier=Get-Content -LiteralPath $Path -Raw|ConvertFrom-Json -Depth 50 -DateKind String
   Assert-GI ([int]$dossier.schema -eq 1 -and [string]$dossier.kind -ceq 'MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV4') 'fixture direct-library dossier identity differs'
-  Assert-GI ([string]$dossier.target.engine.version -ceq '2.1.22' -and [string]$dossier.target.engine.sha256 -ceq 'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B') 'fixture 2.1.22 engine identity differs'
+  $enginePins=@{
+    '2.1.22'='D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B'
+    '2.1.23'='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'
+  }
+  $engineVersion=[string]$dossier.target.engine.version
+  Assert-GI ($enginePins.ContainsKey($engineVersion) -and [string]$dossier.target.engine.sha256 -ceq $enginePins[$engineVersion]) 'fixture exact engine identity differs'
   Assert-GI ((@($dossier.target.official_mods).Count -eq 5) -and (@($dossier.target.archives).Count -eq 11)) 'fixture closure cardinality differs'
   Assert-GI ([string]$dossier.settings.mode -ceq 'File' -and [bool]$dossier.settings.portable_input_required) 'fixture settings contract differs'
   foreach($fixtureMode in @('observe','qualification')){
@@ -52,6 +59,10 @@ function Read-GIDossier([string]$Path){
   Assert-GI ((@($earned.queue) -join ',') -ceq 'recipe-prod-research_material_gunmetal-4,recipe-prod-research_material_invar-4') 'earned modifier queue differs'
   Assert-GI ([string]$dossier.fixtures.qualification.mode -ceq 'earned-productivity-and-queued-next-level') 'qualification mode differs'
   $dossier
+}
+function Assert-GIReportedEngineVersion([string]$Text,[string]$ExpectedVersion){
+  $pattern='Version:\s+'+[regex]::Escape($ExpectedVersion)+'(?:\s|$)'
+  Assert-GI ($Text -match $pattern) 'engine reported a different version'
 }
 function Assert-GIQualificationRuntime([string]$LogText,$FixtureSpec,[ValidateSet('create','reload')][string]$Stage){
   Assert-GI ($LogText.Contains([string]$FixtureSpec.data_marker,[StringComparison]::Ordinal)) "$Stage qualification data marker differs"
@@ -120,7 +131,7 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 . (Join-Path $repo 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $repo 'tools/mir/application/package/TargetMaterializer.ps1')
-$dossierPath=Join-Path $repo 'fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json'
+$dossierPath=Join-Path $repo $InputProfile
 Assert-GI (Test-Path -LiteralPath $dossierPath -PathType Leaf) 'direct-library dossier is absent'
 $dossier=Read-GIDossier $dossierPath
 $fixtureSpec=if($Mode -ceq 'Observe'){$dossier.fixtures.observe}else{$dossier.fixtures.qualification}
@@ -156,7 +167,7 @@ try{
   $engineRoot=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $engine))
   $stage='activate-direct-library';$activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory (Join-Path $engineRoot 'data') -ProfilePath $profile -ArchiveHashes $direct.archive_hashes -SettingsMode File -SettingsPath $settings -SettingsSha256 $SettingsSha256;Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   $config=Join-Path $run 'mir-compat-config.ini';[IO.File]::WriteAllText($config,"[path]`nread-data=$(Join-Path $engineRoot 'data')`nwrite-data=$run`n`n[general]`nlocale=auto`n`n[other]`nenable-new-mods=false`nenable-steam-networking=false`ndisable-blueprint-storage=true`n",[Text.UTF8Encoding]::new($false))
-  $stage='verify-engine';$versionActor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10;$version=Get-Content -LiteralPath $versionActor.stdout -Raw;Assert-GI ($version -match 'Version:\s+2[.]1[.]22(?:\s|$)') 'engine reported a different version'
+  $stage='verify-engine';$versionActor=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments @('--version') -TimeoutSeconds 10;$version=Get-Content -LiteralPath $versionActor.stdout -Raw;Assert-GIReportedEngineVersion -Text $version -ExpectedVersion ([string]$dossier.target.engine.version)
   $stage='fresh-create';$save=Join-Path $run 'saves/f210-ba-gunmetal-invar.zip';$fresh=Invoke-GIGovernedEngine -Scenario ('f210-ba-gunmetal-invar.'+$Mode.ToLowerInvariant()+'.create') -Arguments @('--config',$config,'--no-log-rotation','--create',$save,'--mod-directory',$library,'--disable-audio') -TimeoutSeconds 300;Assert-GI (Test-Path -LiteralPath $save -PathType Leaf) 'fresh create save is absent'
   $freshLog=[IO.File]::ReadAllText($fresh.factorio_log)
   if($Mode -ceq 'Observe'){$observation=Get-GIObservation $freshLog;Assert-GI (@($observation.runtime_markers|Where-Object {$_ -match 'stage=create'}).Count -eq 1) 'read-only create marker differs'}else{Assert-GIQualificationRuntime -LogText $freshLog -FixtureSpec $fixtureSpec -Stage create}

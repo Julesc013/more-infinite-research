@@ -38,13 +38,45 @@ Assert-GIStatic (-not $qualificationControl.Contains('research_queue_enabled',[S
 foreach($fragment in @('runtime_marker("RUNTIME PASS stage=create")','runtime_marker("RELOAD PASS stage=reload")','finite=researched continuation-level=5 bonuses=0.08','queue=gunmetal-then-invar progress=0.42','force.add_research(technology)','force.add_research(gunmetal) or not force.add_research(invar)','#queue ~= 2','queue[1].name ~= subjects[1].continuation','queue[2].name ~= subjects[2].continuation','continuation.level ~= 5','next-level queue or progress differs','earned productivity differs','state.version ~= 2')){Assert-GIStatic ($qualificationControl.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-earned-runtime-and-rejection'}
 foreach($fragment in @('recipe-prod-research_material_gunmetal-4','recipe-prod-research_material_invar-4','effect.change ~= 0.02','continuation level 4+ range differs')){Assert-GIStatic ($qualificationData.Contains($fragment,[StringComparison]::Ordinal)) 'qualification-staged-effect-contract'}
 $runner=Join-Path $repo 'tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1';$tokens=$null;$errors=$null;$ast=[Management.Automation.Language.Parser]::ParseFile($runner,[ref]$tokens,[ref]$errors);Assert-GIStatic (@($errors).Count -eq 0) 'runner-parses'
-foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload','Assert-GIQualificationRuntime')){
+foreach($readerFunction in @('Assert-GI','Read-GIDossier','Get-GISha','Invoke-GIReload','Assert-GIQualificationRuntime','Assert-GIReportedEngineVersion')){
   $readerNodes=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $readerFunction},$true))
   Assert-GIStatic ($readerNodes.Count -eq 1) 'unique-actual-dossier-reader'
   . ([scriptblock]::Create($readerNodes[0].Extent.Text))
 }
 $actualDossier=Read-GIDossier -Path $dossierPath
 Assert-GIStatic ([string]$actualDossier.fixtures.observe.version -ceq [string]$dossier.fixtures.observe.version) 'actual-dossier-reader-accepts-selected-fixture'
+$currentDossierPath=Join-Path $repo 'fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json'
+$currentDossier=Read-GIDossier -Path $currentDossierPath
+Assert-GIStatic ([string]$currentDossier.target.engine.version -ceq '2.1.23' -and [string]$currentDossier.target.engine.sha256 -ceq 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060') 'current-engine-identity'
+foreach($field in @('settings','fixtures','certificate','historical_2_1_20')){
+  Assert-GIStatic (($actualDossier.$field|ConvertTo-Json -Depth 50 -Compress) -ceq ($currentDossier.$field|ConvertTo-Json -Depth 50 -Compress)) ('retained-contract-'+$field)
+}
+Assert-GIStatic (($actualDossier.target.archives|ConvertTo-Json -Depth 20 -Compress) -ceq ($currentDossier.target.archives|ConvertTo-Json -Depth 20 -Compress)) 'current-upstream-closure-unchanged'
+Assert-GIStatic ((@($actualDossier.target.official_mods)-join ',') -ceq (@($currentDossier.target.official_mods)-join ',')) 'current-official-names-unchanged'
+$controlledDossierPath=Join-Path $repo ('build/tmp/gi-dossier-input-'+[guid]::NewGuid().ToString('N')+'.json')
+$controlledDossierPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build/tmp')).TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
+Assert-GIStatic ([IO.Path]::GetFullPath($controlledDossierPath).StartsWith($controlledDossierPrefix,[StringComparison]::OrdinalIgnoreCase)) 'controlled-dossier-contained'
+try{
+  foreach($engine in @(
+    @{version='2.1.24';sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'},
+    @{version='2.1.22';sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'},
+    @{version='2.1.23';sha256='D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B'}
+  )){
+    $changed=$currentDossier|ConvertTo-Json -Depth 50|ConvertFrom-Json -Depth 50
+    $changed.target.engine.version=$engine.version;$changed.target.engine.sha256=$engine.sha256
+    [IO.File]::WriteAllText($controlledDossierPath,($changed|ConvertTo-Json -Depth 50),[Text.UTF8Encoding]::new($false))
+    $rejected=$false
+    try{Read-GIDossier -Path $controlledDossierPath|Out-Null}catch{$rejected=$_.Exception.Message.Contains('fixture exact engine identity differs')}
+    Assert-GIStatic $rejected 'unaccepted-engine-pair-rejected'
+  }
+}finally{if(Test-Path -LiteralPath $controlledDossierPath -PathType Leaf){Remove-Item -LiteralPath $controlledDossierPath -Force}}
+Assert-GIReportedEngineVersion -Text 'Version: 2.1.22 (build retained)' -ExpectedVersion '2.1.22'
+Assert-GIReportedEngineVersion -Text 'Version: 2.1.23 (build current)' -ExpectedVersion '2.1.23'
+foreach($wrongVersion in @('2.1.22','2.1.230')){
+  $rejected=$false
+  try{Assert-GIReportedEngineVersion -Text ('Version: '+$wrongVersion+' (build wrong)') -ExpectedVersion '2.1.23'}catch{$rejected=$_.Exception.Message.Contains('engine reported a different version')}
+  Assert-GIStatic $rejected 'reported-engine-version-rejected'
+}
 $qualificationFixture=$actualDossier.fixtures.qualification
 Assert-GIQualificationRuntime -LogText (([string]$qualificationFixture.data_marker)+"`n"+([string]$qualificationFixture.create_marker)) -FixtureSpec $qualificationFixture -Stage create
 Assert-GIQualificationRuntime -LogText (([string]$qualificationFixture.data_marker)+"`n"+([string]$qualificationFixture.reload_marker)) -FixtureSpec $qualificationFixture -Stage reload
@@ -61,7 +93,7 @@ $controlledReload=Invoke-GIReload -SavePath $portable -Ordinal 2 -TimeoutSeconds
 Assert-GIStatic ($controlledReload.passed -and $controlledReload.cold_process -eq $true -and $controlledReload.ordinal -eq 2 -and $controlledReload.save_byte_identical) 'actual-cold-reload-return-controls'
 $controlledProcessPassed=$false
 Assert-GIStatic (-not (Invoke-GIReload -SavePath $portable -Ordinal 2 -TimeoutSeconds 1).passed) 'failed-engine-result-is-not-a-passing-reload'
-$parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath);$missing=@(@('FactorioBin','LocalModLibraryDirs','SettingsPath','SettingsSha256','CandidateZip','SourceMaterializationPath','Mode','PrepareOnly')|Where-Object {$_ -notin $parameters});Assert-GIStatic ($missing.Count -eq 0) 'runner-inputs'
+$parameters=@($ast.ParamBlock.Parameters.Name.VariablePath.UserPath);$missing=@(@('FactorioBin','LocalModLibraryDirs','SettingsPath','SettingsSha256','CandidateZip','SourceMaterializationPath','InputProfile','Mode','PrepareOnly')|Where-Object {$_ -notin $parameters});Assert-GIStatic ($missing.Count -eq 0) 'runner-inputs'
 $outputParameter=@($ast.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath -ceq 'OutputRoot'})
 Assert-GIStatic ($outputParameter.Count -eq 1) 'runner-output-parameter'
 . (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
