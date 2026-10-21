@@ -254,6 +254,8 @@
       "command": "./tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/release/Test-MIROrdinaryCandidate.ps1",
+        "tools/mir/application/release/readiness/OrdinaryCandidate.ps1",
         "tests/support/MIR423ReleaseUpgradeControls.ps1",
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",

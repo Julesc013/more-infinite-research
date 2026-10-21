@@ -544,4 +544,6 @@ if (-not $maintenance) {
     & (Get-Process -Id $PID).Path -NoProfile -File $PSCommandPath -RepoRoot $repo -SourceVersion $maintenanceVersion
     if ($LASTEXITCODE -ne 0) { throw "[mir42-release-assets-maintenance-controls-failed] $maintenanceVersion" }
   }
+  & (Get-Process -Id $PID).Path -NoProfile -File (Join-Path $repo 'tests/release/Test-MIROrdinaryCandidate.ps1') -RepoRoot $repo
+  if ($LASTEXITCODE -ne 0) { throw '[mir42-release-assets-ordinary-candidate-controls-failed]' }
 }

@@ -5449,6 +5449,14 @@
       "package_visible": false
     },
     {
+      "path": "tools/mir/application/release/readiness/OrdinaryCandidate.ps1",
+      "classification": "canonical-internal",
+      "sha256": "B1A82AFA4D3B5ABF87435C9BA75A611E3EE2EFA4B0C03E0579179184ED25590C",
+      "hash_mode": "canonical-text-v1",
+      "lines": 132,
+      "package_visible": false
+    },
+    {
       "path": "tools/mir/application/release/readiness/Promotion.ps1",
       "classification": "canonical-internal",
       "sha256": "8BF9DB021D24D4CCDAFCF7516CFD6F67F99DDEA339F18C96485390C01572A901",
@@ -6091,7 +6099,7 @@
   ],
   "summary": {
     "canonical_public": 1,
-    "canonical_internal": 425,
+    "canonical_internal": 426,
     "compatibility_wrapper": 168,
     "migration_only": 61,
     "historical": 18,
@@ -6106,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:10476bac1a38872926eb3c16967e6efa5bc495d19647f2eaf9670fc9c4de0169"
+  "digest": "sha256:959221a2ce30e468a66ad36178e188761cc72dbbcbb1296503a23d4dc66c0df9"
 }
