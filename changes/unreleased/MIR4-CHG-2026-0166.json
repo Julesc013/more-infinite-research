@@ -1,0 +1,35 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0166",
+  "status": "draft",
+  "change_type": "changed",
+  "summary": "Capture recipe semantics once and prepare complete recipe facts only when needed.",
+  "details": [
+    "Share one Context-owned recipe source and query indexes across matching, relationships, risk analysis and coverage instead of forcing a complete RecipeFacts representation for every consumer.",
+    "Preserve complete schema-2 inspection exports, defensive copies, detached route callbacks and actual emission checks. Dynamic, metatable-backed and duplicate-key inputs retain the established generic conversion behavior.",
+    "Focused tests retain compiled decisions, emitted definitions and public recipe exports. Current-package migrations and responsive-menu performance remain separate acceptance requirements; no loading-speed improvement is claimed yet."
+  ],
+  "semantic_domains": ["compiler", "performance"],
+  "audiences": ["players", "contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Uses the shared recipe semantic owner; current-package native acceptance remains required."},
+    {"target":"F200","disposition":"affected","reason":"Uses the shared recipe semantic owner; current-package native acceptance remains required."},
+    {"target":"F110","disposition":"affected","reason":"Uses the shared recipe semantic owner; current-package native acceptance remains required."},
+    {"target":"F100","disposition":"affected","reason":"Uses the shared recipe semantic owner; current-package native acceptance remains required."},
+    {"target":"F017","disposition":"unaffected","reason":"Historical capability adapter does not consume these shared recipe compiler modules."},
+    {"target":"F016","disposition":"unaffected","reason":"Historical capability adapter does not consume these shared recipe compiler modules."},
+    {"target":"F015","disposition":"unaffected","reason":"Historical capability adapter does not consume these shared recipe compiler modules."},
+    {"target":"F014","disposition":"unaffected","reason":"Historical capability adapter does not consume these shared recipe compiler modules."},
+    {"target":"F013","disposition":"unaffected","reason":"Historical capability adapter does not consume these shared recipe compiler modules."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"include","mod_portal":"include","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/recipe_source_owner_contract.lua: semantic ownership, source replacement, exceptional inputs and export isolation controls"},
+    {"kind":"finding","value":"tests/compiler/approved_family_emission.lua: controlled creation and native-owner emission equivalence"},
+    {"kind":"document","value":"docs/architecture/module-boundaries.md"}
+  ]
+}

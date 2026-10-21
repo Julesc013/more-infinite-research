@@ -35,13 +35,16 @@ local function build(phase)
   local canonical = compiler_context.current():state_view("relationship_indexes", function() return {} end)
   if canonical[phase] then return canonical[phase] end
 
-  local recipe_index = recipe_facts.index_view()
+  -- The relationship graph needs only these precomputed recipe maps and
+  -- root surface conditions.  It must not force the generic full RecipeFacts
+  -- index merely to borrow them.
+  local recipe_projection = recipe_facts.relationship_projection_view()
   local out = {
     schema = 2,
     phase = phase,
-    recipes_by_output = recipe_index.by_productive_output,
-    recipes_by_ingredient = recipe_index.by_ingredient,
-    recipes_by_category = recipe_index.by_category,
+    recipes_by_output = recipe_projection.by_productive_output,
+    recipes_by_ingredient = recipe_projection.by_ingredient,
+    recipes_by_category = recipe_projection.by_category,
     items = {},
     items_by_place_result = {},
     items_by_subgroup = {},
@@ -82,10 +85,8 @@ local function build(phase)
     end
   end)
 
-  for recipe_name, fact in pairs(recipe_index.facts) do
-    if fact.surface_conditions then
-      out.surface_conditions.recipes[recipe_name] = deepcopy(fact.surface_conditions)
-    end
+  for recipe_name, surface_conditions in pairs(recipe_projection.surface_conditions or {}) do
+    out.surface_conditions.recipes[recipe_name] = deepcopy(surface_conditions)
   end
 
   for technology_name, technology in pairs(data_raw.prototypes("technology")) do

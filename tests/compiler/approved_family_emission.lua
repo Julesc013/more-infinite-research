@@ -98,22 +98,23 @@ do
   assert(ok, failure)
 end
 
--- The active compiler names the complete normalized facts it consumes; it
--- cannot substitute a selected subset or the legacy full discovery-index
--- digest. All writers go through replace_source(), which advances both
--- Context-owned epochs before a later identity can be returned.
+-- The active compiler owns a complete semantic recipe source. Its versioned
+-- identity remains sensitive to every consumed field without constructing the
+-- generic full RecipeFacts index until an explicit export requires one.
 Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
   local recipes = require("prototypes.mir.index.recipe_facts")
   local original = deepcopy(data.raw.recipe)
   local identity = recipes.active_input_identity()
   local source_epoch = recipes.source_epoch()
-  local index_epoch = Context.current():state_epoch("recipe_index")
   local active_epoch = Context.current():state_epoch("recipe_active_input_identity")
   local returned = recipes.active_input_identity()
-  returned.normalized_fact_domain_fingerprint = "outside-writer"
-  check(recipes.active_input_identity().normalized_fact_domain_fingerprint
-      == identity.normalized_fact_domain_fingerprint,
-    "Active recipe input identity returns a detached value")
+  returned.semantic_source_fingerprint = "outside-writer"
+  check(Context.current():state_view("recipe_index") == nil
+      and identity.schema == 2 and identity.record_type == "RecipeSemanticInput"
+      and identity.contract == "mir-recipe-semantic-source-v2"
+      and recipes.active_input_identity().semantic_source_fingerprint
+        == identity.semantic_source_fingerprint,
+    "Active semantic input stays index-free and returns a detached v2 identity")
 
   local function replace_and_identity(source)
     recipes.replace_source(source, recipes.source_epoch())
@@ -123,10 +124,10 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   changed_output["iron-plate"].results[1].name = "identity-output-control"
   local output_identity = replace_and_identity(changed_output)
   check(recipes.source_epoch() == source_epoch + 1
-      and Context.current():state_epoch("recipe_index") == index_epoch + 1
+      and Context.current():state_view("recipe_index") == nil
       and Context.current():state_epoch("recipe_active_input_identity") == active_epoch + 1
-      and output_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint,
-    "Output change advances source/index epochs and invalidates active recipe identity")
+      and output_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint,
+    "Output change advances the owned source epoch and invalidates active recipe identity")
 
   local changed_ingredient = deepcopy(original)
   changed_ingredient["iron-plate"].ingredients[1][1] = "identity-ingredient-control"
@@ -134,9 +135,9 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local changed_category = deepcopy(original)
   changed_category["iron-plate"].category = "identity-category-control"
   local category_identity = replace_and_identity(changed_category)
-  check(ingredient_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint
-      and category_identity.normalized_fact_domain_fingerprint ~= identity.normalized_fact_domain_fingerprint,
-    "Ingredient and category changes each invalidate complete normalized recipe identity")
+  check(ingredient_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint
+      and category_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint,
+    "Ingredient and category changes each invalidate complete semantic recipe identity")
 
   local gross_only = deepcopy(original)
   gross_only["iron-plate"].results[1].ignored_by_productivity = 1
@@ -146,8 +147,8 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local productive_identity = replace_and_identity(original)
   check(fingerprint.of(gross_index.by_output) == fingerprint.of(productive_index.by_output)
       and fingerprint.of(gross_index.by_productive_output) ~= fingerprint.of(productive_index.by_productive_output)
-      and gross_identity.normalized_fact_domain_fingerprint ~= productive_identity.normalized_fact_domain_fingerprint,
-    "Productive-output change invalidates active identity even when gross output membership is unchanged")
+      and gross_identity.semantic_source_fingerprint ~= productive_identity.semantic_source_fingerprint,
+    "Productive-output change invalidates semantic identity even when gross output membership is unchanged")
 
   check(recipes.snapshot_recipe_domain_fingerprint(deepcopy(recipes.index_view())) == nil,
     "Copied recipe maps cannot claim Context-owned identity material")
@@ -517,13 +518,13 @@ Context.with_active(Context.new({legacy_compiler_export_requested = false}), fun
   local active_owner = compiler_input_contract.active_view(active_input)
   local active_sources = plan.stream_plan.source_fingerprints
   check(type(active_sources.recipe_input) == "table"
-      and active_sources.recipe_input.schema == 1
-      and active_sources.recipe_input.record_type == "RecipeNormalizedInput"
-      and active_sources.recipe_input.contract == "mir-recipe-normalized-input-v1"
+      and active_sources.recipe_input.schema == 2
+      and active_sources.recipe_input.record_type == "RecipeSemanticInput"
+      and active_sources.recipe_input.contract == "mir-recipe-semantic-source-v2"
       and active_sources.facts == nil
-      and active_owner.source_fingerprints.recipe_input.normalized_fact_domain_fingerprint
-        == active_sources.recipe_input.normalized_fact_domain_fingerprint,
-    "Ordinary active plan and private CompilerInput bind the same versioned complete recipe identity")
+      and active_owner.source_fingerprints.recipe_input.semantic_source_fingerprint
+        == active_sources.recipe_input.semantic_source_fingerprint,
+    "Ordinary active plan and private CompilerInput bind the same owned semantic recipe identity")
   local original_inventory = fingerprint.canonical(active_owner.effect_target_inventory)
   local exported_inventory = deepcopy(active_owner.effect_target_inventory)
   exported_inventory.recipe = {}
@@ -1510,4 +1511,11 @@ check(not pcall(assert_preserved), "The preservation oracle rejects a changed ef
 data.raw.technology[name] = emitted
 assert_preserved()
 check(true, "Opposing controls restore their copied test output")
-return {assertions = checks, rows = counts.rows, operations = counts.operations}
+local owner_contract = assert(loadfile(source_root .. "/../tests/compiler/recipe_source_owner_contract.lua"))()
+local owner_contract_assertions = owner_contract.run(check)
+return {
+  assertions = checks,
+  rows = counts.rows,
+  operations = counts.operations,
+  recipe_source_owner_assertions = owner_contract_assertions
+}
