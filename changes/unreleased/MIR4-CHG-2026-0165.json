@@ -1,0 +1,34 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0165",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Align modern target profile stream counts with the current declared catalogue.",
+  "details": [
+    "Correct Factorio 2.0 and 2.1 profile counts to 115 and 117 registered streams so native assertion fixtures no longer reject the current catalogue as stale.",
+    "Check both real target adapters against their compiled registry in the existing approved-binding controls; the preceding 97/99 declarations fail this check.",
+    "These counts include unavailable declarations and are not generated-technology totals. This repair makes no loading-speed or broader mod-support claim."
+  ],
+  "semantic_domains": ["assurance", "target-adapters"],
+  "audiences": ["contributors", "maintainers"],
+  "target_dispositions": [
+    {"target":"F210","disposition":"affected","reason":"Declared catalogue count corrected from 99 to 117."},
+    {"target":"F200","disposition":"affected","reason":"Declared catalogue count corrected from 97 to 115."},
+    {"target":"F110","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F100","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F017","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F016","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F015","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F014","disposition":"unaffected","reason":"Historical catalogue count is unchanged."},
+    {"target":"F013","disposition":"unaffected","reason":"Historical catalogue count is unchanged."}
+  ],
+  "package_visibility": "player-package",
+  "impacts": {"save":"none","settings":"none","migration":"none","compatibility":"none","public_contract":"compatible","support_claim":"none"},
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {"source_changelog":"include","target_changelog":"include","github":"omit","mod_portal":"omit","technical":"include","manifest":"include"},
+  "references": [
+    {"kind":"finding","value":"tests/compiler/run_approved_pack_bindings_controls.py: real F200/F210 catalogue count controls"},
+    {"kind":"finding","value":"fixtures/assert-generated-max-level-2-0/data-final-fixes.lua: target profile count consumer"}
+  ]
+}
