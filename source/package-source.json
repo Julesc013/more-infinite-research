@@ -7621,10 +7621,10 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 36736,
-      "source_sha256": "C62F9C1E8057F179166ABE17C40F34A7C22549810608AA3A227F43DC8851D11F",
-      "output_bytes": 36736,
-      "output_sha256": "C62F9C1E8057F179166ABE17C40F34A7C22549810608AA3A227F43DC8851D11F"
+      "source_bytes": 38961,
+      "source_sha256": "80FEC1C63CC21DD77CC9782710C8CD5DE341299D38CC3EF77C2A076985B454C1",
+      "output_bytes": 38961,
+      "output_sha256": "80FEC1C63CC21DD77CC9782710C8CD5DE341299D38CC3EF77C2A076985B454C1"
     },
     {
       "layer": "shared",
@@ -7757,5 +7757,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "7CA5BCA3C8568D02F4421C28622B5B09BBE95CA4EE1FC2A5A32EEAB9F4B25204"
+  "record_sha256": "5C5E5F3155716708B46571A014EC59710155733B7A4242095CA8B40DD2FAD009"
 }
