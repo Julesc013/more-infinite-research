@@ -958,7 +958,7 @@ try {
     Refuses-Probe {Assert-K2213SelectedInputMode -SourceVersion '4.4.0' -V5Path (Join-Path $run 'historical-v5.json') -ProfilePath ''} 'current-440-requires-explicit-profile'
     $registeredCurrent=Read-K2213CurrentFixtureRegistration
     $currentIdentity=Resolve-MIR4CanonicalPackageIdentity -RepoRoot $repo -Target f210 -SourceVersion '4.7.0'
-    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.8'-and$registeredCurrent.input_profile-ceq'fixtures/run-profiles/k2-214-imersite-f210-470.json'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/profile/engine identity.'
+    Assert-Probe ($registeredCurrent.mir_version-ceq$currentIdentity.distribution_version-and$registeredCurrent.fixture_version-ceq'0.1.9'-and$registeredCurrent.input_profile-ceq'fixtures/run-profiles/k2-214-imersite-f210-470.json'-and$registeredCurrent.engine_versions[0]-ceq'2.1.22') 'K2 current fixture lost registered candidate/profile/engine identity.'
     $registrationPath=Join-Path $run 'controlled-k2-registration.yml'
     $registeredText=[IO.File]::ReadAllText((Join-Path $repo '.mir/fixtures.yml'))
     $entry=[regex]::Match($registeredText,'(?ms)^  k2-213-imersite-continuation:\s*\r?\n.*?(?=^  [A-Za-z0-9][A-Za-z0-9_-]*:\s*\r?\n|\z)').Value
@@ -1052,6 +1052,10 @@ try {
       Assert-Probe ($currentText.Contains('base ~= "2.1.22"')-and-not$currentText.Contains('base ~= "2.1.20"')-and-not$currentText.Contains('base ~= "2.1.21"')) ('K2 selected fixture retained a different engine guard: '+$member)
       Assert-Probe ($currentText.Contains('Krastorio2 = "2.1.4"')-and$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.19"')-and-not$currentText.Contains('Krastorio2 = "2.1.3"')-and-not$currentText.Contains('["Krastorio2-spaced-out"] = "2.0.13"')) ('K2 selected fixture retained a historical upstream guard: '+$member)
     }
+    $currentControl=Get-Content -Raw -LiteralPath (Join-Path $currentFixture 'control.lua')
+    $templateControl=Get-Content -Raw -LiteralPath (Join-Path $fixtureTemplate 'control.lua')
+    Assert-Probe ($currentControl.Contains('migration-credit holders must remain unearned')-and$currentControl.Contains('finite Imersite powder bonus')-and-not$currentControl.Contains('force.research_all_technologies()')) 'K2 current fixture did not replace broad research with its exact earned-state setup.'
+    Assert-Probe ($templateControl.Contains('force.research_all_technologies()')-and-not$templateControl.Contains('migration-credit holders must remain unearned')) 'K2 current fixture specialization changed the retained template setup.'
     Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
     # Exercise the Windows checkout that failed hosted CI as well as LF. The
     # actual specializer must produce the same current guard without editing

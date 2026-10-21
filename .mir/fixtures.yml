@@ -645,7 +645,7 @@ fixtures:
     input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
     maintenance_input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
     current_input_profile: fixtures/run-profiles/k2-214-imersite-f210-470.json
-    current_fixture_version: "0.1.8"
+    current_fixture_version: "0.1.9"
     current_candidate_version: "4.7.21000"
     current_engine_version: "2.1.22"
     input_profiles:
