@@ -213,6 +213,71 @@ function New-K2213SelectedFixture {
         Assert-K2213 ($matches -eq 1) ("fixture-external-specialization-anchor:"+$entry.Key+':'+$pair.name)
         $text=$text.Replace($oldExternal,$newExternal)
       }
+      if($entry.Key-ceq'control.lua'){
+        # The retained template remains the historical K2 2.1.3 fixture. The
+        # current 2.1.4/K2SO selection earns only the visible finite levels,
+        # one native crystal level, and the visible continuation below. Hidden
+        # migration-credit holders must stay unresearched or they add .04.
+        $earnedStateAnchor=@'
+  force.research_all_technologies()
+  local legacy = force.technologies[legacy_name]
+  local stage = force.technologies[continuation_name]
+  if not legacy or not stage then fail("required Imersite staged technology absent") end
+'@
+        $earnedStateAnchor=$earnedStateAnchor.Replace("`r`n","`n").TrimEnd("`r","`n")
+        $earnedState=@'
+  local legacy = force.technologies[legacy_name]
+  local stage = force.technologies[continuation_name]
+  local native = force.technologies["kr-imersite-productivity"]
+  local early_holder = force.technologies["mir-k2-imersite-staged-state-1"]
+  local continuation_holder = force.technologies["mir-k2-imersite-continuation-state-4"]
+  if not legacy or not stage or not native or not early_holder or not continuation_holder then
+    fail("required current Imersite technology absent")
+  end
+  local function research_prerequisites(technology)
+    for _, prerequisite in pairs(technology.prerequisites) do prerequisite.research_recursive() end
+  end
+  research_prerequisites(legacy)
+  research_prerequisites(native)
+  research_prerequisites(stage)
+  legacy.level = 3
+  legacy.researched = true
+  native.researched = true
+  force.reset_technology_effects()
+  if legacy.level ~= 3 or legacy.prototype.max_level ~= 3 or not legacy.researched then
+    fail("could not complete exact finite Imersite levels")
+  end
+  assert_close("finite Imersite powder bonus", force.recipes[powder_recipe].productivity_bonus, 0.06)
+  assert_close("native crystal bonus", force.recipes[crystal_recipe].productivity_bonus, 0.1)
+  if early_holder.researched or continuation_holder.researched then
+    fail("migration-credit holders must remain unearned")
+  end
+'@
+        $matches=[regex]::Matches($text,[regex]::Escape($earnedStateAnchor)).Count
+        Assert-K2213 ($matches -eq 1) 'fixture-current-earned-state-anchor'
+        $text=$text.Replace($earnedStateAnchor,$earnedState.Replace("`r`n","`n").TrimEnd("`r","`n"))
+        $continuationAnchor=@'
+  stage.level = 5
+  force.reset_technology_effects()
+'@
+        $continuationAnchor=$continuationAnchor.Replace("`r`n","`n").TrimEnd("`r","`n")
+        $continuationSetup=@'
+  stage.level = 5
+  force.reset_technology_effects()
+  force.recipes[powder_recipe].enabled = true
+  if not force.recipes[powder_recipe].enabled then
+    fail("could not enable Imersite powder production witness")
+  end
+  assert_close("visible continuation powder bonus", force.recipes[powder_recipe].productivity_bonus, 0.08)
+  if early_holder.researched or continuation_holder.researched then
+    fail("migration-credit holders must remain unearned after continuation setup")
+  end
+'@
+        $continuationSetup=$continuationSetup.Replace("`r`n","`n").TrimEnd("`r","`n")
+        $matches=[regex]::Matches($text,[regex]::Escape($continuationAnchor)).Count
+        Assert-K2213 ($matches -eq 1) 'fixture-current-continuation-state-anchor'
+        $text=$text.Replace($continuationAnchor,$continuationSetup)
+      }
     }
     Assert-K2213 ($text.Contains([string]$profile.mir_version,[StringComparison]::Ordinal)-and-not$text.Contains('4.2.21001',[StringComparison]::Ordinal)-and-not$text.Contains('4.2.21002',[StringComparison]::Ordinal)) "fixture-specialization-result:$($entry.Key)"
     [IO.File]::WriteAllText((Join-Path $selected $entry.Key),$text,[Text.UTF8Encoding]::new($false))

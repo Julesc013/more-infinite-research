@@ -107,6 +107,8 @@ local function build(phase)
     for _, pack_name in ipairs(lab.inputs or {}) do append(out.labs_by_pack, pack_name, lab_name) end
   end
 
+  local normalized_recipe_maps = recipe_facts.current_normalized_relationship_projection(
+    recipe_projection, phase)
   for _, index in pairs({
     out.recipes_by_output, out.recipes_by_ingredient, out.recipes_by_category,
     out.items_by_place_result, out.items_by_subgroup, out.entities_by_type,
@@ -114,7 +116,14 @@ local function build(phase)
     out.technologies_by_effect_identity, out.technologies_by_recipe_effect,
     out.labs_by_pack, out.modules_by_tier
   }) do
-    sort_index(index)
+    -- The three recipe maps are already sorted and de-duplicated only when
+    -- the current private semantic-source material admits this projection.
+    -- Every generic, copied, dynamic, stale, or imported projection retains
+    -- the established normalizer and its defensive replacement lists.
+    local is_recipe_map = index == out.recipes_by_output
+      or index == out.recipes_by_ingredient
+      or index == out.recipes_by_category
+    if not (normalized_recipe_maps and is_recipe_map) then sort_index(index) end
   end
 
   canonical[phase] = out

@@ -41,6 +41,16 @@ local function outputs_pack(fact, pack_name)
   return true
 end
 
+local function science_ingredient_packs(fact)
+  local out = {}
+  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
+    if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
+      out[#out + 1] = ingredient.name
+    end
+  end
+  return out
+end
+
 local function binding(pack_name, declaration, reference_only)
   if not pack_registry.science_pack_exists(pack_name) then
     return nil, "not-a-lab-input:" .. tostring(pack_name)
@@ -61,16 +71,11 @@ local function binding(pack_name, declaration, reference_only)
     source_kind = "declared-recipe",
     unlockers = {},
     progression_prerequisites = {},
-    ingredient_packs = {},
+    ingredient_packs = science_ingredient_packs(fact),
     -- This record validates the approved source references. It is not an
     -- acquisition proof and must never be published as one.
     acquisition_proof = false
   }
-  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
-    if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
-      out.ingredient_packs[#out.ingredient_packs + 1] = ingredient.name
-    end
-  end
   if declaration.allow_initial == true and fact.enabled_without_research == true then
     out.status, out.initial = "initial", true
     return out
@@ -329,6 +334,43 @@ local function direct_resource_source(pack_name, shared)
     progression_prerequisites = {}, ingredient_packs = {}, acquisition_proof = false}
 end
 
+-- Factorio's Space Age space-science technology is completed by sending its
+-- trigger item to orbit.  The matching disabled recipe has no unlock-recipe
+-- effect, so a plain recipe-to-effect index cannot express this actual source
+-- relation.  Recognize only the complete native relation: same-name recipe
+-- and technology, a send-item-to-orbit trigger, and a positive typed launch
+-- product on that exact trigger item.  This remains a finite source binding;
+-- it neither proves rocket acquisition nor searches a production graph.
+local function trigger_output_source(pack_name, recipe_name, fact)
+  if recipe_name ~= pack_name or not fact or fact.enabled_without_research == true
+    or not outputs_pack(fact, pack_name) then return nil end
+  -- A trigger/output route represents the otherwise ownerless native recipe.
+  -- Any unlock-recipe effect, even one that is disabled or malformed, remains
+  -- an explicit competing declaration and must stay on the normal owner path.
+  if #recipe_unlocks.for_recipe(recipe_name) ~= 0 then return nil end
+  local technology = data_raw.technology(pack_name)
+  if not technology or technology.name ~= pack_name then return nil end
+  local trigger = technology.research_trigger
+  if type(trigger) ~= "table" or trigger.type ~= "send-item-to-orbit"
+    or type(trigger.item) ~= "string" then return nil end
+  local payload = prototype_lookup.item_prototype(trigger.item)
+  if not payload or not has_item_output(payload.rocket_launch_products, pack_name) then return nil end
+  if technology_reason(pack_name) then return nil end
+  return {
+    pack_name = pack_name,
+    binding_id = "approved-trigger-output/" .. pack_name,
+    source_kind = "declared-trigger-output",
+    recipe_name = recipe_name,
+    status = "research",
+    initial = false,
+    unlocker = pack_name,
+    unlockers = {pack_name},
+    progression_prerequisites = {},
+    ingredient_packs = science_ingredient_packs(fact),
+    acquisition_proof = false
+  }
+end
+
 local function declared_source(pack_name, shared)
   -- The approved mined seed precedes later replication/recycling recipes.
   -- Their existence does not make the original resource research-locked.
@@ -381,6 +423,8 @@ local function declared_source(pack_name, shared)
     end
     if #gates == 0 or (#gates > 1
       and not (shared.science_binding_policy or {}).direct_unlock_alternatives) then
+      local trigger_source = trigger_output_source(pack_name, recipe_name, fact)
+      if trigger_source then return trigger_source, nil, true, {trigger_source.unlocker} end
       return nil, "ambiguous-approved-pack-unlock:" .. pack_name
     end
   end

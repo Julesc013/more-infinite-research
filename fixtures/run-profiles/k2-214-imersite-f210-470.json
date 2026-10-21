@@ -20,7 +20,7 @@
     { "name": "Krastorio2MenuSimulations", "version": "2.1.0", "enabled": true },
     { "name": "xy-k2so-enhancements-nulls-fork", "version": "0.8.3", "enabled": true },
     { "name": "more-infinite-research", "version": "4.7.21000", "enabled": true },
-    { "name": "mir-fixture-assert-k2-213-imersite-continuation", "version": "0.1.8", "enabled": true }
+    { "name": "mir-fixture-assert-k2-213-imersite-continuation", "version": "0.1.9", "enabled": true }
   ],
   "archive_sha256": {
     "flib_0.17.2.zip": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
