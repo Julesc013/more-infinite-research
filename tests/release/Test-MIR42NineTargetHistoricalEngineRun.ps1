@@ -635,7 +635,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($libraryReceipt.status-ceq'restored-direct-library-controls'-and$libraryReceipt.archive_links_created-eq0-and$libraryReceipt.dependency_payload_bytes_copied-eq0-and-not(Test-Path (Join-Path $root 'work/user/mods'))) 'modern direct fresh actor materialized a profile or did not restore activation.'
     }
     $release43ModernRoots=[Collections.Generic.List[string]]::new();$release431ModernCandidate='';$release431ModernInventory=$null
-    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.5.0','4.5.2')){
+    foreach($sourceVersion in @('4.3.0','4.3.1','4.4.0','4.5.0','4.5.2','4.6.0','4.7.0')){
       $source=[version]$sourceVersion;$target='f200';$freshLine='2.0';$freshIsModern=$true;$freshEnableSpaceAge=$false;$freshFailure=''
       $freshVersion=[string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $target.Substring(1) -SourceMinor $source.Minor -SourcePatch $source.Build).distribution_version
       [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version="$freshLine.1";dependencies=@()}|ConvertTo-Json))
@@ -647,7 +647,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Check ($summary.status-ceq'passed'-and$summary.mir_version-ceq$freshVersion-and$summary.validation_package_sha256-ceq$release43ModernParams.CandidateSha256-and$summary.validation_package_content_sha256-ceq[string]$inventory.content_sha256) "$sourceVersion modern fresh load did not retain exact source/target identity."
       if($sourceVersion-ceq'4.3.1'){$release431ModernCandidate=$candidate;$release431ModernInventory=$inventory}
     }
-    Check ($release43ModernRoots.Count-eq5-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) 'current modern fresh-load controls omitted an admitted source version.'
+    Check ($release43ModernRoots.Count-eq7-and-not[string]::IsNullOrWhiteSpace($release431ModernCandidate)) 'current modern fresh-load controls omitted an admitted source version.'
     $target='f200';$freshLine='2.0';$freshVersion=[string]$rows[$target].to;$freshIsModern=$true;$freshEnableSpaceAge=$false
     [IO.File]::WriteAllText((Join-Path $engineRoot 'data/base/info.json'),(@{name='base';version='2.0.1';dependencies=@()}|ConvertTo-Json))
     $modernFailureParams=@{
@@ -679,6 +679,12 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       Refuses {Invoke-MIR42ModernFreshLoad @invalidRelease43} 'modern-fresh-target-binding'
       Check (-not(Test-Path (Join-Path $invalidRelease43.FreshRoot 'summary.json'))) 'invalid 4.3 modern identity produced evidence.'
     }
+    $invalidModernCodec=$release43ModernParams.Clone();$invalidModernCodec.Version='4.7.20001';$invalidModernCodec.FreshRoot=Join-Path $exactRoot 'modern-invalid-4-7-codec'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidModernCodec} 'modern-fresh-target-binding'
+    Check (-not(Test-Path (Join-Path $invalidModernCodec.FreshRoot 'summary.json'))) 'wrong 4.7 modern codec produced evidence.'
+    $invalidModernMinor=$release43ModernParams.Clone();$invalidModernMinor.Version='4.8.20000';$invalidModernMinor.FreshRoot=Join-Path $exactRoot 'modern-invalid-4-8-minor'
+    Refuses {Invoke-MIR42ModernFreshLoad @invalidModernMinor} 'modern-fresh-target-binding'
+    Check (-not(Test-Path (Join-Path $invalidModernMinor.FreshRoot 'summary.json'))) 'unsupported modern source minor produced evidence.'
     Check ($modernRoots.Count-eq5) 'modern direct loader omitted a required base or Space Age control.'
     # Execute the actual runner's FreshLeaf admission AST.  This intentionally
     # stops before candidate/release I/O and native launch; later runner code
@@ -706,7 +712,8 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
       foreach($pair in @(
         @{candidate='4.5.0';predecessor='4.4.2'},
         @{candidate='4.5.2';predecessor='4.5.1'},
-        @{candidate='4.5.2';predecessor='4.4.2'}
+        @{candidate='4.5.2';predecessor='4.4.2'},
+        @{candidate='4.7.0';predecessor='4.6.0'}
       )){
         $admission=Invoke-MIR42ActualFreshLeafAdmission -CandidateSourceVersion $pair.candidate -PredecessorSourceVersion $pair.predecessor
         Check ((@($admission.targets)-join'|')-ceq'f200' -and $admission.library-ceq(Resolve-Path -LiteralPath $sourceRoot).Path) ('FreshLeaf actual entry did not retain its admitted single-target library for '+$pair.candidate+'/'+$pair.predecessor)
@@ -715,6 +722,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         @{candidate='4.5.0';predecessor='4.5.1'},
         @{candidate='4.5.2';predecessor='4.5.0'},
         @{candidate='4.5.2';predecessor='4.2.2'},
+        @{candidate='4.7.0';predecessor='4.5.2'},
         @{candidate='4.4.2';predecessor='4.4.2'},
         @{candidate='4.5.3';predecessor='4.5.2'}
       )){
@@ -757,8 +765,10 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
         return $row
       }
       $leafCommon=@{Manifest=$leafManifest;PackageSourceSha256=('B'*64);LibraryDirectory=$sourceRoot;SourceCommit=('A'*40);RunnerPath=$runnerPath;RuntimeScenarioRegistryPath=$runtimeScenarioRegistry;DeadlineSeconds=60}
-      $f200=Invoke-MIR42SelectedFreshLeaf -Target f200 -Scenario package-zip-base -Row (New-MIR42LeafRow f200) -FreshRoot (Join-Path $leafRoot 'f200') @leafCommon
-      $f210=Invoke-MIR42SelectedFreshLeaf -Target f210 -Scenario package-zip-space-age -Row (New-MIR42LeafRow f210) -FreshRoot (Join-Path $leafRoot 'f210') @leafCommon
+      $f200Row=New-MIR42LeafRow f200;$f200Row.source_version='4.7.0'
+      $f210Row=New-MIR42LeafRow f210;$f210Row.source_version='4.7.0'
+      $f200=Invoke-MIR42SelectedFreshLeaf -Target f200 -Scenario package-zip-base -Row $f200Row -FreshRoot (Join-Path $leafRoot 'f200') @leafCommon
+      $f210=Invoke-MIR42SelectedFreshLeaf -Target f210 -Scenario package-zip-space-age -Row $f210Row -FreshRoot (Join-Path $leafRoot 'f210') @leafCommon
       $f015=Invoke-MIR42SelectedFreshLeaf -Target f015 -Scenario package-zip-base -Row (New-MIR42LeafRow f015) -FreshRoot (Join-Path $leafRoot 'f015') @leafCommon
       Check ((@($script:leafDispatch) -join '|') -ceq 'modern/f200/package-zip-base|modern/f210/package-zip-space-age|historical/f015/package-zip-base') 'FreshLeaf did not select the exact existing modern/historical leaf functions.'
       Check ($f200.scenario-ceq'package-zip-base'-and$f210.scenario-ceq'package-zip-space-age'-and$f015.scenario-ceq'package-zip-base'-and$script:leafUpgradeCalls-eq0) 'FreshLeaf changed the public fresh result shape or reached the upgrade worker.'
@@ -776,6 +786,7 @@ try{& (Join-Path $Repository 'tools/commands/release/Invoke-MIR42FourTargetEngin
     Check ($freshLeafStart-ge0-and$freshLeafTarget-gt$freshLeafStart-and$freshLeafCustody-gt$freshLeafTarget-and$freshLeafCall-gt$freshLeafCustody-and$freshLeafReturn-gt$freshLeafCall-and$upgradeStart-gt$freshLeafReturn) 'FreshLeaf runner ordering no longer retains one target, selected R24 custody, then a leaf-only return before upgrade.'
     $freshLeafSegment=$runner.Substring($freshLeafCall,$upgradeStart-$freshLeafCall)
     Check ($freshLeafSegment.Contains('$freshLoads[0] | ConvertTo-Json -Depth 30')-and-not$freshLeafSegment.Contains('-File,$harness')-and-not$freshLeafSegment.Contains('upgrade.json')) 'FreshLeaf branch could start an upgrade or construct an aggregate receipt.'
+    Check ($runner.Contains("'4.7.0' { @('4.6.0') }") -and $runner.Contains("if (`$sourceVersion -cin @('4.6.0','4.7.0')) {") -and $runner.Contains('Get-MIR42ExactFourTargetCandidate') -and $runner.Contains('-AllowPackageEquivalentToolingDescendant') -and $runner.Contains("elseif (`$head -cne [string]`$manifest.source.commit -or `$tree -cne [string]`$manifest.source.tree)")) 'FreshLeaf runner omitted the bounded 4.7 predecessor, vetted current reader, or legacy exact-source rejection.'
     foreach($target in $originals.Keys){Check ((Test-Path -LiteralPath $originals[$target] -PathType Leaf) -and (Get-MIRImmutableInputSha256 $originals[$target]) -ceq $rows[$target].candidate_sha256) 'stage retirement lost or changed a shared source input.'}
     Write-Output "MIR42-ENGINE-DIRECT-LIBRARY-INPUTS-PASSED assertions=$script:engineSharedAssertions archives=22 fresh_version_controls=24 factorio_processes=0 archive_copies_created=0 archive_links_created=0"
   } finally {

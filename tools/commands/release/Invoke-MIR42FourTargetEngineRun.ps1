@@ -41,6 +41,7 @@ $libraryArchiveBindings=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
 $script:MIR42HistoricalEngineTargets = @('f017','f016','f015','f014','f013')
@@ -514,7 +515,7 @@ function Invoke-MIR42ModernFreshLoad {
     'f110' { '1.1' }
     'f100' { '1.0' }
   }
-  $versionMatch = [regex]::Match($Version,('^4[.](?<source_minor>2|3|4|5)[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
+  $versionMatch = [regex]::Match($Version,('^4[.](?<source_minor>2|3|4|5|6|7)[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
   $sourceVersion = if ($versionMatch.Success) {
     '4.' + $versionMatch.Groups['source_minor'].Value + '.' + [string]([int]$versionMatch.Groups['source_patch'].Value)
   } else { '' }
@@ -701,8 +702,18 @@ if ([string]$manifest.package_authority_sha256 -cne [string]$packageAuthority.re
 $head = (& git -C $repo rev-parse HEAD).Trim()
 $tree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 $dirty = @(& git -C $repo status --porcelain --untracked-files=no)
-if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0 -or
-    $head -cne [string]$manifest.source.commit -or $tree -cne [string]$manifest.source.tree) {
+if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) {
+  throw '[mir42-engine-candidate-source-snapshot-mismatch]'
+}
+if ($sourceVersion -cin @('4.6.0','4.7.0')) {
+  $exactCandidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $manifestPath `
+    -AllowPackageEquivalentToolingDescendant
+  if ([string]$exactCandidate.source_version -cne $sourceVersion -or
+      [string]$exactCandidate.source.commit -cne [string]$manifest.source.commit -or
+      [string]$exactCandidate.source.tree -cne [string]$manifest.source.tree) {
+    throw '[mir42-engine-candidate-reader-binding]'
+  }
+} elseif ($head -cne [string]$manifest.source.commit -or $tree -cne [string]$manifest.source.tree) {
   throw '[mir42-engine-candidate-source-snapshot-mismatch]'
 }
 $candidateRoot = [IO.Path]::GetFullPath((Split-Path -Parent $manifestPath))
@@ -719,13 +730,14 @@ if($running.Count){throw '[mir42-engine-factorio-already-running]'}
 $freshLeafMode = $PSCmdlet.ParameterSetName -ceq 'FreshLeaf'
 if ($freshLeafMode) {
   # Fresh leaves are individual current-package observations.  Keep this
-  # narrower than the aggregate maintenance selector: only the retained
-  # 4.5.0/4.4.2 pair and the current 4.5.2 predecessor pairs have an
-  # individual-fresh contract.  The existing reader below still authenticates
-  # the selected publication, manifest, release metadata and archive bytes.
+  # narrower than the aggregate maintenance selector: only retained individual
+  # predecessor pairs have a fresh-load contract. The existing reader below
+  # still authenticates the selected publication, manifest, release metadata
+  # and archive bytes.
   $freshLeafPredecessors = switch -CaseSensitive ($sourceVersion) {
     '4.5.0' { @('4.4.2') }
     '4.5.2' { @('4.5.1','4.4.2') }
+    '4.7.0' { @('4.6.0') }
     default { @() }
   }
   if ($PublishedMaintenancePredecessorSourceVersion -cnotin $freshLeafPredecessors) {

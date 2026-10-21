@@ -19,6 +19,13 @@ function Invoke-MIR470TriggerOutputRepresentativeFixtureControls {
   foreach($path in @($UpgradeRunnerPath,$RepresentativeFixturePath,$OldSourceFixturePath,$LupaRuntimePath,$ControlScriptPath)){
     if(-not(Test-Path -LiteralPath $path)){throw "[mir470-trigger-output-representative-path] $path"}
   }
+  foreach($directory in @($RepresentativeFixturePath,$OldSourceFixturePath)){
+    $fixtureInfo=Get-Content -LiteralPath (Join-Path $directory 'info.json') -Raw|ConvertFrom-Json
+    $author=$fixtureInfo.PSObject.Properties['author']
+    if($null-eq$author-or$author.Value-isnot[string]-or[string]::IsNullOrWhiteSpace([string]$author.Value)){
+      throw '[mir470-trigger-output-representative-metadata-author]'
+    }
+  }
   $tokens=$null;$errors=$null
   $ast=[Management.Automation.Language.Parser]::ParseFile($UpgradeRunnerPath,[ref]$tokens,[ref]$errors)
   if($errors.Count-ne0){throw '[mir470-trigger-output-representative-runner-syntax]'}
@@ -2582,6 +2589,89 @@ foreach($consumer in $policyConsumers){
 }
 $mir43Assertions+=5
 
+# Upgrade admission waiting is strictly opt-in.  Exercise the actual runner
+# AST and its extracted child wrapper; the ResourceGovernor separately owns
+# the retry decision, including the under-lock check and non-memory refusal.
+$upgradeAdmissionWaitParameters=@($upgradeAst.ParamBlock.Parameters|Where-Object {$_.Name.VariablePath.UserPath-ieq'AdmissionWaitSeconds'})
+if($upgradeAdmissionWaitParameters.Count-ne1){throw 'Upgrade runner lacks one bounded admission-wait parameter'}
+$upgradeAdmissionWaitBinder=[scriptblock]::Create('param('+$upgradeAdmissionWaitParameters[0].Extent.Text+') $AdmissionWaitSeconds')
+if((& $upgradeAdmissionWaitBinder)-ne0){throw 'Upgrade runner admission wait changed the default immediate-admission path'}
+foreach($invalidWait in @(-1,61)){
+  $rejected=$false;try{& $upgradeAdmissionWaitBinder -AdmissionWaitSeconds $invalidWait|Out-Null}catch{$rejected=$_.Exception.Message-match'AdmissionWaitSeconds'}
+  if(-not$rejected){throw 'Upgrade runner admitted an out-of-range admission wait'}
+}
+$assertions+=3
+$initialAdmissionBlocks=@($upgradeAst.FindAll({param($node)
+  $node-is[Management.Automation.Language.IfStatementAst]-and
+  $node.Extent.Text.TrimStart().StartsWith('if($AdmissionWaitSeconds -gt 0)',[StringComparison]::Ordinal)-and
+  $node.Extent.Text.Contains('upgrade-initial-admission',[StringComparison]::Ordinal)
+},$true))
+if($initialAdmissionBlocks.Count-ne1){throw 'Upgrade runner initial admission wait block is missing or ambiguous'}
+$childActors=@($upgradeAst.FindAll({param($node)
+  $node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'Invoke-MIRUpgradeMonitoredProcess'
+},$true))
+if($childActors.Count-ne1){throw 'Upgrade runner child admission wrapper is missing or ambiguous'}
+$childWaitAssignments=@($childActors[0].Body.FindAll({param($node)
+  $node-is[Management.Automation.Language.AssignmentStatementAst]-and
+  $node.Left-is[Management.Automation.Language.MemberExpressionAst]-and
+  $node.Left.Member.Extent.Text-ceq'PreStartAdmissionWait'-and
+  $node.Right-is[Management.Automation.Language.CommandExpressionAst]-and
+  $node.Right.Expression-is[Management.Automation.Language.VariableExpressionAst]-and
+  $node.Right.Expression.VariablePath.UserPath-ieq'processAdmissionWait'
+},$true))
+if($childWaitAssignments.Count-ne1){throw 'Upgrade runner does not bind one fresh child wait state to the governed actor'}
+$initialAdmissionResult=& {
+  param($BlockText,$ControlledRoot)
+  $script:upgradeInitialAdmissionWait=$null
+  $script:calls=[Collections.Generic.List[string]]::new()
+  $upgradeResourcePolicy=[pscustomobject]@{minimum_free_ram_gib=4};$resolvedUpgradeRoot=$ControlledRoot;$upgradeWriteBytes=1L;$upgradePeakBytes=1L
+  function Assert-MIR441ResourceAdmission {$script:calls.Add('assert');[pscustomobject]@{status='admitted'}}
+  function New-MIR441PreStartAdmissionWait {param($AdmissionWaitSeconds,$Phase)$script:calls.Add('new:'+([string]$AdmissionWaitSeconds)+':'+$Phase);[pscustomobject]@{phase=$Phase;admission_wait_seconds=$AdmissionWaitSeconds;status='not-requested'}}
+  function Wait-MIR441PreStartResourceAdmission {param($Policy,$WorkRoot,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$State)$script:calls.Add('wait:'+([string]$State.admission_wait_seconds)+':'+$State.phase);$State.status='admitted-without-wait';$State}
+  $AdmissionWaitSeconds=0;& ([scriptblock]::Create($BlockText));$default=@($script:calls)
+  $script:calls.Clear();$script:upgradeInitialAdmissionWait=$null;$AdmissionWaitSeconds=45;& ([scriptblock]::Create($BlockText));$requested=@($script:calls);$state=$script:upgradeInitialAdmissionWait
+  [pscustomobject]@{default=$default;requested=$requested;state=$state}
+} $initialAdmissionBlocks[0].Extent.Text $testRoot
+if((@($initialAdmissionResult.default)-join'|')-cne'assert'){throw 'Upgrade runner default initial admission invoked an optional wait'}
+if((@($initialAdmissionResult.requested)-join'|')-cne'new:45:upgrade-initial-admission|wait:45:upgrade-initial-admission'-or$initialAdmissionResult.state.status-cne'admitted-without-wait'){
+  throw 'Upgrade runner did not route positive initial admission waiting through the existing governor helper'
+}
+$assertions+=2
+$childAdmissionResult=& {
+  param($DefinitionText,$ControlledRoot)
+  $root=$ControlledRoot;$AdmissionWaitSeconds=0;$upgradeResourcePolicy=[pscustomobject]@{minimum_free_ram_gib=4};$upgradePeakBytes=1MB
+  $script:upgradeActivation=[pscustomobject]@{};$script:upgradeProcessIndex=0;$script:upgradeResourceContext=[pscustomobject]@{};$script:upgradeResourceRuns=@();$script:upgradeLoadedModTables=@()
+  $k2Scenario=$false;$f200BobAngelScenario=$false;$fixtureModName='';$f200BobAngelInputs=$null
+  $calls=[Collections.Generic.List[object]]::new();$newStates=[Collections.Generic.List[object]]::new()
+  function Assert-MIRLibraryLaunch {}
+  function Get-MIRNativeProbeRemainingOutputBytes {param($Context) 1MB}
+  function New-MIR441PreStartAdmissionWait {param($AdmissionWaitSeconds,$Phase)$state=[pscustomobject]@{phase=$Phase;admission_wait_seconds=$AdmissionWaitSeconds;status='not-requested'};$newStates.Add($state);$state}
+  function Invoke-MIR441MonitoredProcess {param($FilePath,$Arguments,$WorkRoot,$LedgerPath,$Policy,$EstimatedPeakBytes,$ExpectedPeakMemoryBytes,$TimeoutSeconds,$StdoutPath,$StderrPath,[switch]$AllowNonZeroExit,$CompletionPredicate,$PreStartAdmissionWait)$calls.Add([pscustomobject]@{bound=$PSBoundParameters;wait=$PreStartAdmissionWait});[pscustomobject]@{exit_code=0;completion_predicate_observed=$false;peak_working_set_bytes=1;duration_seconds=0.01;admission_wait=$PreStartAdmissionWait}}
+  function Assert-MIRLibraryLoadedSelection { @() }
+  . ([scriptblock]::Create($DefinitionText))
+  $null=Invoke-MIRUpgradeMonitoredProcess -FilePath 'controlled-factorio' -Arguments @('--version')
+  $AdmissionWaitSeconds=45
+  $null=Invoke-MIRUpgradeMonitoredProcess -FilePath 'controlled-factorio' -Arguments @('--version')
+  [pscustomobject]@{calls=@($calls);new_states=@($newStates);runs=@($script:upgradeResourceRuns)}
+} $childActors[0].Extent.Text $testRoot
+if($childAdmissionResult.calls.Count-ne2-or$childAdmissionResult.calls[0].bound.ContainsKey('PreStartAdmissionWait')){throw 'Upgrade runner default child admission changed its governed actor call shape'}
+if($childAdmissionResult.new_states.Count-ne1-or$childAdmissionResult.calls[1].wait-ne$childAdmissionResult.new_states[0]-or$childAdmissionResult.runs[1].admission_wait-ne$childAdmissionResult.new_states[0]-or$childAdmissionResult.new_states[0].phase-cne'upgrade-process-2'){
+  throw 'Upgrade runner did not retain the exact fresh child admission state in its resource receipt'
+}
+$assertions+=2
+$nonMemoryAdmissionResult=& {
+  param($GovernorPath,$ControlledRoot)
+  . $GovernorPath
+  function Assert-MIR441ResourceAdmission {throw [InvalidOperationException]::new('[mir441-resource-admission-system-disk]')}
+  $state=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds 1 -Phase 'upgrade-control-non-memory';$failure=''
+  try{Wait-MIR441PreStartResourceAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $ControlledRoot -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1MB -State $state|Out-Null}catch{$failure=$_.Exception.Message}
+  [pscustomobject]@{failure=$failure;attempt_count=$state.attempt_count;refusal_count=$state.refusal_count;status=$state.status}
+} (Join-Path $RepoRoot 'tools/mir/application/release/readiness/ResourceGovernor.ps1') $testRoot
+if($nonMemoryAdmissionResult.failure-cne'[mir441-resource-admission-system-disk]' -or $nonMemoryAdmissionResult.attempt_count-ne1-or$nonMemoryAdmissionResult.refusal_count-ne0-or$nonMemoryAdmissionResult.status-cne'not-requested'){
+  throw 'Upgrade admission waiting retried or rewrote a non-memory governor refusal'
+}
+$assertions++
+
 # Exercise the wrapper's real named-argument call shape with a controlled
 # callee. No engine or mod archive is launched: the fake runner records what
 # the matrix passes and emits only the minimum schema/cleanup receipts which
@@ -2651,6 +2741,16 @@ if(-not(Test-Path -LiteralPath $triggerFixture -PathType Container)-or-not(Test-
 }
 $triggerOutputRepresentative=Invoke-MIR470TriggerOutputRepresentativeFixtureControls -RepoRoot $RepoRoot -TestRoot $testRoot
 $assertions+=[int]$triggerOutputRepresentative.assertions
+$missingAuthorFixture=Join-Path $testRoot 'trigger-output-old-source-missing-author'
+Copy-Item -LiteralPath $triggerOldSourceFixture -Destination $missingAuthorFixture -Recurse
+$missingAuthorInfoPath=Join-Path $missingAuthorFixture 'info.json'
+$missingAuthorInfo=Get-Content -LiteralPath $missingAuthorInfoPath -Raw|ConvertFrom-Json -AsHashtable
+$null=$missingAuthorInfo.Remove('author')
+[IO.File]::WriteAllText($missingAuthorInfoPath,($missingAuthorInfo|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+$missingAuthorRejected=$false
+try{Invoke-MIR470TriggerOutputRepresentativeFixtureControls -RepoRoot $RepoRoot -TestRoot $testRoot -OldSourceFixturePath $missingAuthorFixture|Out-Null}catch{$missingAuthorRejected=$_.Exception.Message-ceq'[mir470-trigger-output-representative-metadata-author]'}
+if(-not$missingAuthorRejected){throw '[mir470-trigger-output-missing-author-opponent]'}
+$assertions++
 $collidingRunner=Join-Path $testRoot 'trigger-output-switch-collision.ps1'
 $runnerText=[IO.File]::ReadAllText((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'))
 if(-not$runnerText.Contains('$triggerOutputRepresentativeFixtureDescriptor')){throw '[mir470-trigger-output-descriptor-anchor]'}

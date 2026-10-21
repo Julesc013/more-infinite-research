@@ -30,6 +30,7 @@ param(
   [string]$WorkRoot = "",
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB = 0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 120,
+  [ValidateRange(0,60)][int]$AdmissionWaitSeconds = 0,
   [ValidateSet('OnFailure','Always','Never')][string]$Retention = 'Always'
 )
 # Canonical validation scripts live three levels below the repository root.
@@ -371,12 +372,26 @@ function Invoke-MIRUpgradeMonitoredProcess {
   # host allocations before native admission, as the shared probe runner does.
   # The active lease, required inputs and all resource limits remain live.
   [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
+  # Each owned child gets one fresh state.  The governor carries that state
+  # through its ordinary check and its under-lock recheck with one deadline.
+  $processAdmissionWait=$null
+  $processAdmissionArguments=@{}
+  if($AdmissionWaitSeconds -gt 0){
+    $processAdmissionWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase ('upgrade-process-'+$script:upgradeProcessIndex)
+    $processAdmissionArguments.PreStartAdmissionWait=$processAdmissionWait
+  }
   $run=Invoke-MIR441MonitoredProcess -FilePath $FilePath -Arguments $Arguments -WorkRoot $root `
     -LedgerPath ($prefix+'.resources.jsonl') -Policy $upgradeResourcePolicy -EstimatedPeakBytes $remaining `
     -ExpectedPeakMemoryBytes $upgradePeakBytes -TimeoutSeconds ([int][Math]::Ceiling($TimeoutMs/1000)) `
     -StdoutPath ($prefix+'.stdout.txt') -StderrPath ($prefix+'.stderr.txt') -AllowNonZeroExit `
-    -CompletionPredicate $CompletionPredicate
-  $script:upgradeResourceRuns+=@([ordered]@{index=$script:upgradeProcessIndex;ledger=($prefix+'.resources.jsonl');exit_code=$run.exit_code;completion_predicate_observed=$run.completion_predicate_observed;peak_working_set_bytes=$run.peak_working_set_bytes;duration_seconds=$run.duration_seconds})
+    -CompletionPredicate $CompletionPredicate @processAdmissionArguments
+  $resourceRun=[ordered]@{index=$script:upgradeProcessIndex;ledger=($prefix+'.resources.jsonl');exit_code=$run.exit_code;completion_predicate_observed=$run.completion_predicate_observed;peak_working_set_bytes=$run.peak_working_set_bytes;duration_seconds=$run.duration_seconds}
+  if($null-ne$processAdmissionWait){
+    $runAdmissionWait=$run.PSObject.Properties['admission_wait']
+    if($null-eq$runAdmissionWait){throw '[mir441-resource-admission-wait-receipt]'}
+    $resourceRun.admission_wait=$runAdmissionWait.Value
+  }
+  $script:upgradeResourceRuns+=@($resourceRun)
   # --no-log-rotation accumulates launches, while benchmark stdout omits mod
   # loading. Verify the native log from its latest engine-start boundary.
   $observer=if($k2Scenario){$fixtureModName}elseif($f200BobAngelScenario){[string]$f200BobAngelInputs.observer.name}else{''}
@@ -558,13 +573,19 @@ if (-not $PrepareInputsOnly -and $ExpectedPeakMemoryMiB -le 0) { throw '[mir441-
 $upgradeResourcePolicy=[pscustomobject]@{minimum_free_ram_gib=4}
 $upgradePeakBytes=[int64]$ExpectedPeakMemoryMiB*1MB
 $upgradeWriteBytes=[int64]$MaxNewOutputMiB*1MB
+$script:upgradeInitialAdmissionWait=$null
 # Refuse before source resolution, staging, evidence allocation or any engine.
 if (-not $PrepareInputsOnly) {
   # This early guard precedes New-MIRNativeProbeResourceContext. Release only
   # completed setup allocations here as well, retaining live inputs and the
   # unchanged child forecast, reserve and watchdog policy.
   [GC]::Collect();[GC]::WaitForPendingFinalizers();[GC]::Collect()
-  $null=Assert-MIR441ResourceAdmission -Policy $upgradeResourcePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+  if($AdmissionWaitSeconds -gt 0){
+    $script:upgradeInitialAdmissionWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'upgrade-initial-admission'
+    $null=Wait-MIR441PreStartResourceAdmission -Policy $upgradeResourcePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes -State $script:upgradeInitialAdmissionWait
+  }else{
+    $null=Assert-MIR441ResourceAdmission -Policy $upgradeResourcePolicy -WorkRoot $resolvedUpgradeRoot -EstimatedPeakBytes $upgradeWriteBytes -ExpectedPeakMemoryBytes $upgradePeakBytes
+  }
 } elseif ([IO.DriveInfo]::new([IO.Path]::GetPathRoot($resolvedUpgradeRoot)).AvailableFreeSpace -lt 544MB) {
   throw '[mir-upgrade-preparation-capacity] Small fixture preparation requires 32 MiB output allowance plus 512 MiB headroom; this does not admit a native run.'
 }
@@ -1501,7 +1522,9 @@ $assertions = if ($isHistoricalTerminalFixture) {
 $resourceEvidence=@(foreach ($resourceRun in $script:upgradeResourceRuns) {
   $resourcePath=Join-Path $outputParent "$ToVersion-upgrade-$artifactSlug-from-$FromVersion-process-$($resourceRun.index).resources.jsonl"
   Copy-Item -LiteralPath $resourceRun.ledger -Destination $resourcePath
-  [ordered]@{filename=(Split-Path -Leaf $resourcePath);sha256=(Get-FileHash -LiteralPath $resourcePath -Algorithm SHA256).Hash;exit_code=$resourceRun.exit_code;completion_predicate_observed=$resourceRun.completion_predicate_observed;peak_working_set_bytes=$resourceRun.peak_working_set_bytes;duration_seconds=$resourceRun.duration_seconds}
+  $resourceReceipt=[ordered]@{filename=(Split-Path -Leaf $resourcePath);sha256=(Get-FileHash -LiteralPath $resourcePath -Algorithm SHA256).Hash;exit_code=$resourceRun.exit_code;completion_predicate_observed=$resourceRun.completion_predicate_observed;peak_working_set_bytes=$resourceRun.peak_working_set_bytes;duration_seconds=$resourceRun.duration_seconds}
+  if($resourceRun.Contains('admission_wait')-and$null-ne$resourceRun['admission_wait']){$resourceReceipt.admission_wait=$resourceRun['admission_wait']}
+  $resourceReceipt
 })
 if ($SpaceIsFake) {
   if (-not $requiresReloadProof -or -not $reloadEvidence -or -not $secondReloadEvidence) { throw '[mir421-sif-two-reloads-required]' }
@@ -1557,6 +1580,13 @@ if($triggerOutputRepresentativeScenario){
   )
 }
 $sifTerminal=Complete-MIRLibraryActivation -Activation $script:upgradeActivation
+$resultResourcePolicy=[ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
+if($AdmissionWaitSeconds -gt 0){
+  # Admission time is recorded separately from child duration so it cannot be
+  # read as engine execution time.
+  $resultResourcePolicy.admission_wait_seconds=$AdmissionWaitSeconds
+  $resultResourcePolicy.initial_admission_wait=$script:upgradeInitialAdmissionWait
+}
 $result = [ordered]@{
   schema = 3
   status = "passed"
@@ -1566,7 +1596,7 @@ $result = [ordered]@{
   factorio_binary_version = $factorioVersionInfo.FileVersion
   factorio_binary_sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $factorio).Hash
   factorio_processes = $factorioProcesses
-  resource_policy = [ordered]@{declared_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB;memory_enforcement='sampled-watchdog-not-hard-cap'}
+  resource_policy = $resultResourcePolicy
   resource_ledgers = $resourceEvidence
   from = [ordered]@{ version = $FromVersion; path = (Split-Path -Leaf $from); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $from).Hash }
   to = [ordered]@{ version = $ToVersion; path = (Split-Path -Leaf $to); sha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $to).Hash }

@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-21
+last_reviewed: 2026-10-22
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -39,11 +39,16 @@ The final changelog must inventory all unique implementation changes above, not 
 
 The outstanding-PR audit found #720, #721 and #722 already incorporated through #725 and later successors, and #685 replaced by the shared historical changelog writer. Those superseded PRs are closed with their original source/evidence preserved. Draft #673 remains an unqualified mixed-performance provenance-cache experiment; #344 is deliberately private historical evidence without public admission. Neither is a finished product addition to merge over the current implementation.
 
+All nine **R48 Base** upgrades from corrected 4.6 now pass independent receipt review on **0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79, 1.0.0, 1.1.110, 2.0.77 and 2.1.23**. Each includes source creation, upgrade, two cold reloads and the Full oracle across three forces: captured technology definitions/state, exposed effects, supported queues, fractional investment and settings. Original package, engine and executing-harness identities remain in their receipts. Controls and owned library archives were restored. Earlier resource-interrupted attempts remain separate incomplete observations.
+
+This completes the selected nine-target **Base continuity** lane only. It does not qualify the remaining Space Age, changed science-source, modded production, client or responsive-menu cases. The current F210 review is `build/tmp/mir47-current-modern-base-r48-remaining-r01/review-f210-r05.json` (`683B86454BD85B72E386D405C74A4167D28194383C8D44D7353BA9916133F802`); the other compact reviews remain beside their original primary-checkout receipts.
+
 ### Technology and support outcomes
 
 | Environment | Established result | Remaining qualification |
 | --- | --- | --- |
-| F200 Base / Galore–Space Age | Compiler reductions retain captured research: 250 Base technologies and 432 Galore technologies. These are retained definitions, not additions. | Final-package Base and Space Age definition/state coverage and performance controls. |
+| F200 Base / Galore–Space Age | R48 Base upgrade and both cold reloads retain 250 technologies per force. Earlier Galore captures retain 432 technologies. These are retained definitions, not additions. | R48 Galore/Space Age definition/state coverage and performance controls remain. |
+| F210 Base on 2.1.23 | R48 upgrade and both cold reloads retain 249 technologies, 217 recipe-bonus entries, 24 exposed effects and 890 settings per force, including queued/current research and 42% investment. | Base-only evidence; Space Age, K2 and the changed trigger/output case remain separate. |
 | F200 Bob/Angel | R04 upgrade and two cold reloads preserve 598 captured technologies and 1,971 recipe-bonus entries per force. Aluminium, Gold, Tin and Titanium are predecessor coverage. | Final-package applicability/effect checks; totals do not establish all sixteen declared material families. |
 | F210 K2 2.1.4 + K2SO 2.0.19 | On 2.1.22, four earned levels give 8% powder productivity: 300 ore produces 324 powder and 324 sand versus 300/300. Separate migration evidence preserves queues, 42% investment, native crystal bonuses and both reloads. | Final-package and 2.1.23 checks. K2SO is Spaced Out, not K2 plus Space Exploration. |
 | F210 Bob/Angel with BobTech | Updated applicability retains four staged Gunmetal/Invar technologies; older scoped definitions/effects/save checks exist. A separate exact 2.1.23 dossier and closed runner selection are prepared without altering prior archive/settings/fixture bytes. | Newest package needs affected native acceptance. Inherited structural certificate labels are not new-engine qualification. Physical alloy production and consumed science are distinct checks. |
@@ -71,7 +76,7 @@ Relationship-list reuse preserves complete recipe, input/output relationship and
 | --- | --- |
 | 21 October evening | Repair the cryogenic boundary; adopt actual installed 2.1.23 identities; integrate completed reviewed units while CI and lightweight checks continue. Reconcile exact missing acceptance cases. |
 | 22 October, 09:00 AEDT | Freeze optional player changes. Include completed work with passing applicable review/checks. Only a concrete release blocker may change player bytes afterward. |
-| 09:00–17:00 AEDT | Finish final-package measurements; Base/Space Age migration and full technology/state checks; both reloads; affected K2/Bob, cap, fresh-load and real-client/Library cases; proportionate stress checks and workload inventory. Start unaffected valid checks earlier where possible. |
+| 09:00–17:00 AEDT | Retain the nine completed Base upgrades; finish final-package measurements and Space Age full technology/state checks with both reloads; affected K2/Bob, cap, fresh-load and real-client/Library cases; proportionate stress checks and workload inventory. Start unaffected valid checks earlier where possible. |
 | 17:00–20:32:18 AEDT | Finish review, signing, required `dev` to `main` promotion and publication. Verify anonymous downloads, root/versioned `dist`, labels and `LATEST` against one accepted inventory. Track actual Portal availability separately. |
 
 These are allocation checkpoints, not measured duration guarantees or permission to skip failures. Use the existing nine-target plan to run missing/affected cases, not another Cartesian sweep. For 4.7.0 the immediate predecessor and final prior minor both resolve to corrected 4.6.0; deduplicate the source while retaining full Base/Space Age technology, investment, queue and progress coverage. Reuse exact trusted package/harness/input evidence; changed science, engine or migration bytes need affected tests.

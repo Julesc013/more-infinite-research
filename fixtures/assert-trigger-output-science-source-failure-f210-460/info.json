@@ -2,6 +2,7 @@
   "name": "mir-fixture-assert-trigger-output-science-source-failure-f210-460",
   "version": "0.1.4600",
   "title": "MIR test-only 4.6 trigger-output source override",
+  "author": "MIR tests",
   "factorio_version": "2.1",
   "dependencies": [
     "base = 2.1.23",
