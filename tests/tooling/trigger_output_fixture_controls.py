@@ -82,7 +82,8 @@ runtime.execute('''
 data.raw.recipe["cryogenic-science-pack"] = {results={{type="item",name="cryogenic-science-pack",amount=1}}}
 data.raw.technology["cryogenic-science-pack"] = {research_trigger={type="craft-item",item="cryogenic-plant"},prerequisites={"cryogenic-plant"},effects={{type="unlock-recipe",recipe="cryogenic-science-pack"}}}
 data.raw.technology["space-path"] = {prerequisites={"space-science-pack"}}
-data.raw.technology["recipe-prod-research_ice-1"] = {unit={ingredients={{name="space-science-pack",amount=1},{name="cryogenic-science-pack",amount=1}}},prerequisites={"space-path"},effects={{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.10},{type="change-recipe-productivity",recipe="advanced-oxide-asteroid-crushing",change=0.10}}}
+data.raw.technology["recipe-prod-research_ice-1"] = {unit={ingredients={{name="space-science-pack",amount=1},{name="cryogenic-science-pack",amount=1}}},prerequisites={"space-path"},effects={}}
+data.raw.technology["asteroid-productivity"] = {effects={{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.10},{type="change-recipe-productivity",recipe="advanced-oxide-asteroid-crushing",change=0.10}}}
 data.raw.technology["recipe-prod-research_platform-1"] = {unit={ingredients={{name="space-science-pack",amount=1},{name="cryogenic-science-pack",amount=1}}},prerequisites={"space-path"},effects={{type="change-recipe-productivity",recipe="ice-platform",change=0.10},{type="change-recipe-productivity",recipe="space-platform-foundation",change=0.05}}}
 data.raw.lab = {lab={inputs={"automation-science-pack","space-science-pack","cryogenic-science-pack"}}}
 data.raw["mod-data"] = {["more-infinite-research-generation-plan-internal"]={data={schema=3,validation_summary={valid=true}}}}
@@ -97,9 +98,10 @@ check(source_final.eval("#logs == 0"), 'data-final companion was not inert on pu
 # tick lifecycle.  The mock deliberately raises if the retired
 # game.technology_prototypes API is consulted; modern 2.1 code must read
 # prototypes.technology instead.
-def runtime_fixture(include_space_science=True, correct_effects=True):
+def runtime_fixture(include_space_science=True, correct_owner_effects=True, duplicate_ice_effect=False):
     science = '{name="space-science-pack", amount=1},{name="cryogenic-science-pack", amount=1}' if include_space_science else '{name="cryogenic-science-pack", amount=1}'
-    ice_second = 'advanced-oxide-asteroid-crushing' if correct_effects else 'incorrect-oxide-recipe'
+    owner_second = 'advanced-oxide-asteroid-crushing' if correct_owner_effects else 'incorrect-oxide-recipe'
+    ice_effects = '{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.10}' if duplicate_ice_effect else ''
     lua_source = r'''
 logs = {}
 log = function(value) logs[#logs + 1] = value end
@@ -119,12 +121,14 @@ prototypes = {technology = {
   ["space-science-pack"] = space,
   ["space-path"] = path,
   ["recipe-prod-research_ice-1"] = {prerequisites = {["space-path"] = path}},
-  ["recipe-prod-research_platform-1"] = {prerequisites = {["space-path"] = path}}
+  ["recipe-prod-research_platform-1"] = {prerequisites = {["space-path"] = path}},
+  ["asteroid-productivity"] = {prerequisites = {}}
 }}
 local sciences = {__SCIENCES__}
-local ice_effects = {
+local ice_effects = {__ICE_EFFECTS__}
+local owner_effects = {
   {type="change-recipe-productivity", recipe="oxide-asteroid-crushing", change=0.10},
-  {type="change-recipe-productivity", recipe="__ICE_SECOND__", change=0.10}
+  {type="change-recipe-productivity", recipe="__OWNER_SECOND__", change=0.10}
 }
 local platform_effects = {
   {type="change-recipe-productivity", recipe="ice-platform", change=0.10},
@@ -132,7 +136,8 @@ local platform_effects = {
 }
 game = setmetatable({forces = {player = {technologies = {
   ["recipe-prod-research_ice-1"] = {research_unit_ingredients = sciences, prototype = {effects = ice_effects}},
-  ["recipe-prod-research_platform-1"] = {research_unit_ingredients = sciences, prototype = {effects = platform_effects}}
+  ["recipe-prod-research_platform-1"] = {research_unit_ingredients = sciences, prototype = {effects = platform_effects}},
+  ["asteroid-productivity"] = {research_unit_ingredients = {}, prototype = {effects = owner_effects}}
 }}}}, {
   __index = function(_, key)
     if key == "technology_prototypes" then error("retired game.technology_prototypes access") end
@@ -141,7 +146,7 @@ game = setmetatable({forces = {player = {technologies = {
 })
 '''
     runtime = lua()
-    runtime.execute(lua_source.replace('__SCIENCES__', science).replace('__ICE_SECOND__', ice_second))
+    runtime.execute(lua_source.replace('__SCIENCES__', science).replace('__OWNER_SECOND__', owner_second).replace('__ICE_EFFECTS__', ice_effects))
     return runtime
 
 control_text = pathlib.Path(runtime_control_path).read_text(encoding="utf-8")
@@ -154,7 +159,8 @@ check(runtime.eval('logs[2] == "[mir-trigger-output-fixture] stage=upgrade emitt
 
 for description, arguments, expected in (
     ('science', {'include_space_science': False}, 'generated science vector is incomplete'),
-    ('effect', {'correct_effects': False}, 'generated productivity effect changed'),
+    ('owner-effect', {'correct_owner_effects': False}, 'existing asteroid productivity owner effect changed'),
+    ('duplicate-ice-effect', {'duplicate_ice_effect': True}, 'generated ice productivity duplicates existing owner'),
 ):
     runtime = runtime_fixture(**arguments)
     runtime.execute(control_text)

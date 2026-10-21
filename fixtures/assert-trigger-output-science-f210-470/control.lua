@@ -41,15 +41,23 @@ local function productivity_effect(technology, recipe_name, amount)
   return false
 end
 
+local function assert_ice_existing_productivity_owner(technology)
+  local owner = game.forces.player.technologies["asteroid-productivity"]
+  if not owner then fail("existing asteroid productivity owner is missing") end
+  for _, recipe_name in ipairs({"oxide-asteroid-crushing", "advanced-oxide-asteroid-crushing"}) do
+    if productivity_effect(technology, recipe_name, 0.10) then
+      fail("generated ice productivity duplicates existing owner: " .. recipe_name)
+    end
+    if not productivity_effect(owner, recipe_name, 0.10) then
+      fail("existing asteroid productivity owner effect changed: " .. recipe_name)
+    end
+  end
+end
+
 local function assert_target_runtime()
-  for name, effects in pairs({
-    ["recipe-prod-research_ice-1"] = {
-      ["oxide-asteroid-crushing"] = 0.10,
-      ["advanced-oxide-asteroid-crushing"] = 0.10
-    },
-    ["recipe-prod-research_platform-1"] = { ["ice-platform"] = 0.10, ["space-platform-foundation"] = 0.05 }
-  }) do
-    local technology = game.forces.player.technologies[name]
+  local ice = game.forces.player.technologies["recipe-prod-research_ice-1"]
+  local platform = game.forces.player.technologies["recipe-prod-research_platform-1"]
+  for name, technology in pairs({["recipe-prod-research_ice-1"] = ice, ["recipe-prod-research_platform-1"] = platform}) do
     if not technology then fail("generated technology is absent: " .. name) end
     local sciences = ingredient_names(technology)
     if not contains(sciences, "space-science-pack") or not contains(sciences, "cryogenic-science-pack") then
@@ -58,10 +66,11 @@ local function assert_target_runtime()
     if not prerequisite_reaches(name, "space-science-pack") then
       fail("generated trigger-output progression is absent: " .. name)
     end
-    for recipe_name, amount in pairs(effects) do
-      if not productivity_effect(technology, recipe_name, amount) then
-        fail("generated productivity effect changed: " .. name .. "/" .. recipe_name)
-      end
+  end
+  assert_ice_existing_productivity_owner(ice)
+  for recipe_name, amount in pairs({["ice-platform"] = 0.10, ["space-platform-foundation"] = 0.05}) do
+    if not productivity_effect(platform, recipe_name, amount) then
+      fail("generated productivity effect changed: recipe-prod-research_platform-1/" .. recipe_name)
     end
   end
 end

@@ -124,15 +124,27 @@ local function assert_emitted_technology(name, recipes)
       fail("emitted productivity effect is missing: " .. name .. "/" .. recipe_name)
     end
   end
+  return technology
+end
+
+local function assert_ice_existing_productivity_owner(technology)
+  local owner = data.raw.technology and data.raw.technology["asteroid-productivity"]
+  if type(owner) ~= "table" then fail("existing asteroid productivity owner is missing") end
+  for _, recipe_name in ipairs({"oxide-asteroid-crushing", "advanced-oxide-asteroid-crushing"}) do
+    if productivity_effect(technology, recipe_name, 0.10) then
+      fail("emitted ice productivity duplicates existing owner: " .. recipe_name)
+    end
+    if not productivity_effect(owner, recipe_name, 0.10) then
+      fail("existing asteroid productivity owner effect is missing: " .. recipe_name)
+    end
+  end
 end
 
 if mods and mods["more-infinite-research"] == "4.7.21000" then
   exact_trigger_input()
   exact_ordinary_cryogenic_input()
-  assert_emitted_technology("recipe-prod-research_ice-1", {
-    ["oxide-asteroid-crushing"] = 0.10,
-    ["advanced-oxide-asteroid-crushing"] = 0.10
-  })
+  local ice = assert_emitted_technology("recipe-prod-research_ice-1", {})
+  assert_ice_existing_productivity_owner(ice)
   assert_emitted_technology("recipe-prod-research_platform-1", {
     ["ice-platform"] = 0.10,
     ["space-platform-foundation"] = 0.05
