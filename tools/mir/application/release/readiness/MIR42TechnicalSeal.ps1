@@ -997,7 +997,7 @@ function Get-MIR42ExactFourTargetCandidate {
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
   $candidate = $candidateInput.record
   $versionContract = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $candidate
-  if ($AllowPackageEquivalentToolingDescendant -and [string]$versionContract.source_version -cne '4.6.0') {
+  if ($AllowPackageEquivalentToolingDescendant -and [string]$versionContract.source_version -cnotin @('4.6.0','4.7.0')) {
     throw '[mir42-seal-candidate-tooling-equivalence-version]'
   }
   if ($candidate.PSObject.Properties.Name -notcontains 'target_authority') { throw '[mir42-seal-candidate-target-authority-missing]' }
