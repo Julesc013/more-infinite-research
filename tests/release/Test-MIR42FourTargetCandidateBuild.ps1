@@ -195,6 +195,7 @@ function Test-MIR43HistoricalCandidateAuthentication {
       [int]$controls.assertions -eq 4 -and
       [int]$controls.authority_input_assertions -eq 5 -and
       [int]$controls.receipt_custody_assertions -eq 6 -and
+      [int]$controls.tooling_equivalence_assertions -eq $(if([string]$case.source_version -cin @('4.6.0','4.7.0')){4}else{0}) -and
       -not [bool]$controls.native_factorio -and
       -not [bool]$controls.package_materialization -and
       -not (Test-Path -LiteralPath $opposingRoot)

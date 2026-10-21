@@ -636,7 +636,7 @@ $currentMaterialization=$null
 $historicalCombinedCandidate=$null
 $historicalCombinedTarget=$null
 $isHistoricalCurrentCandidate=[bool]($SourceMaterializationPath -and $SourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0') -and $SelectedTarget -cin @('f017','f016','f015','f014','f013'))
-$allowHistoricalPackageEquivalentToolingDescendant=[bool]($isHistoricalCurrentCandidate-and$SourceVersion-ceq'4.6.0')
+$allowHistoricalPackageEquivalentToolingDescendant=[bool]($isHistoricalCurrentCandidate-and$SourceVersion-cin@('4.6.0','4.7.0'))
 if($SourceMaterializationPath){
   # Modern packages are authenticated by the canonical materializer receipt.
   # Historical targets have no canonical materializer surface: their input is

@@ -288,7 +288,7 @@ function Read-MIR43HistoricalCurrentCandidate {
   $tree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
   $equivalentToolingDescendant = [bool]$AllowPackageEquivalentToolingDescendant
   if ($equivalentToolingDescendant) {
-    Assert-MIR43HistoricalCandidateAuthentication ($SourceVersion -ceq '4.6.0' -and $null -ne $ExpectedCandidateSource) 'candidate source or distribution identity differs'
+    Assert-MIR43HistoricalCandidateAuthentication ($SourceVersion -cin @('4.6.0','4.7.0') -and $null -ne $ExpectedCandidateSource) 'candidate source or distribution identity differs'
     if (-not (Get-Command Assert-MIR42SealSource -ErrorAction SilentlyContinue)) {
       . (Join-Path $repo 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
     }
@@ -428,6 +428,7 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
     $script:mir43HistoricalCandidateAuthorityInputControlAssertions++
   }
   $script:mir43HistoricalCandidateReceiptCustodyControlAssertions = 0
+  $toolingEquivalenceAssertions = 0
   function Assert-MIR43HistoricalCandidateReceiptCustodyControlRejects {
     param([scriptblock]$Action,[string]$Needle)
     $failure = ''
@@ -458,6 +459,42 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
       throw '[mir43-historical-current-candidate] controlled receipt custody differs'
     }
     $script:mir43HistoricalCandidateReceiptCustodyControlAssertions++
+    if ($SourceVersion -cin @('4.6.0','4.7.0')) {
+      $candidateSource = [pscustomobject]@{
+        commit = [string]$inputReceipt.source.commit
+        tree = [string]$inputReceipt.source.tree
+        package_source_sha256 = Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+      }
+      $equivalenceArguments = @{
+        Repository=$repo;Archive=$inputArchive;ManifestPath=$inputManifest;Target=$Target;SourceVersion=$SourceVersion
+        ExpectedReceiptDescriptor=$receiptDescriptor;AllowPackageEquivalentToolingDescendant=$true
+      }
+      $equivalent = Read-MIR43HistoricalCurrentCandidate @equivalenceArguments -ExpectedCandidateSource $candidateSource
+      if ([string]$equivalent.receipt.source.commit -cne $candidateSource.commit -or
+          [string]$equivalent.receipt.source.tree -cne $candidateSource.tree -or
+          [string]$equivalent.receipt_descriptor.sha256 -cne $receiptDescriptor.sha256) {
+        throw '[mir43-historical-current-candidate] tooling equivalence relabelled original custody'
+      }
+      $toolingEquivalenceAssertions++
+      foreach ($tamper in @('tree','package_source_sha256','missing-source')) {
+        $failure = ''
+        $opposingSource = $candidateSource | ConvertTo-Json | ConvertFrom-Json
+        if ($tamper -ceq 'tree') { $opposingSource.tree = '0' * 40 }
+        elseif ($tamper -ceq 'package_source_sha256') { $opposingSource.package_source_sha256 = '0' * 64 }
+        else { $opposingSource = $null }
+        try { Read-MIR43HistoricalCurrentCandidate @equivalenceArguments -ExpectedCandidateSource $opposingSource | Out-Null }
+        catch { $failure = $_.Exception.Message }
+        $needle = switch ($tamper) {
+          tree { 'source-tree-drift' }
+          package_source_sha256 { 'package-source-drift' }
+          default { 'candidate source or distribution identity differs' }
+        }
+        if (-not $failure.Contains($needle,[StringComparison]::Ordinal)) {
+          throw "[mir43-historical-current-candidate] tooling equivalence accepted $tamper or refused for another reason: $failure"
+        }
+        $toolingEquivalenceAssertions++
+      }
+    }
     foreach ($tamper in @('path','bytes','sha256','record_sha256')) {
       $forgedDescriptor = $receiptDescriptor | ConvertTo-Json -Depth 10 | ConvertFrom-Json -Depth 10 -DateKind String
       switch ($tamper) {
@@ -589,6 +626,7 @@ function Invoke-MIR43HistoricalCurrentCandidateAuthenticationControls {
     assertions = $script:mir43HistoricalCandidateAuthenticationControlAssertions
     authority_input_assertions = $script:mir43HistoricalCandidateAuthorityInputControlAssertions
     receipt_custody_assertions = $script:mir43HistoricalCandidateReceiptCustodyControlAssertions
+    tooling_equivalence_assertions = $toolingEquivalenceAssertions
     native_factorio = $false
     package_materialization = $false
   }
