@@ -101,7 +101,7 @@ check(source_final.eval("#logs == 0"), 'data-final companion was not inert on pu
 def runtime_fixture(include_space_science=True, correct_owner_effects=True, duplicate_ice_effect=False):
     science = '{name="space-science-pack", amount=1},{name="cryogenic-science-pack", amount=1}' if include_space_science else '{name="cryogenic-science-pack", amount=1}'
     owner_second = 'advanced-oxide-asteroid-crushing' if correct_owner_effects else 'incorrect-oxide-recipe'
-    ice_effects = '{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.10}' if duplicate_ice_effect else ''
+    ice_effects = '{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.20}' if duplicate_ice_effect else ''
     lua_source = r'''
 logs = {}
 log = function(value) logs[#logs + 1] = value end

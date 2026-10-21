@@ -76,6 +76,13 @@ local function productivity_effect(technology, recipe_name, amount)
   return false
 end
 
+local function has_productivity_effect(technology, recipe_name)
+  for _, effect in pairs(technology.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then return true end
+  end
+  return false
+end
+
 local function exact_ordinary_cryogenic_input()
   local recipe = data.raw.recipe and data.raw.recipe["cryogenic-science-pack"]
   local technology = data.raw.technology and data.raw.technology["cryogenic-science-pack"]
@@ -131,7 +138,7 @@ local function assert_ice_existing_productivity_owner(technology)
   local owner = data.raw.technology and data.raw.technology["asteroid-productivity"]
   if type(owner) ~= "table" then fail("existing asteroid productivity owner is missing") end
   for _, recipe_name in ipairs({"oxide-asteroid-crushing", "advanced-oxide-asteroid-crushing"}) do
-    if productivity_effect(technology, recipe_name, 0.10) then
+    if has_productivity_effect(technology, recipe_name) then
       fail("emitted ice productivity duplicates existing owner: " .. recipe_name)
     end
     if not productivity_effect(owner, recipe_name, 0.10) then

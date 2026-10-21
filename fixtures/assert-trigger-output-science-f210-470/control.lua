@@ -41,11 +41,18 @@ local function productivity_effect(technology, recipe_name, amount)
   return false
 end
 
+local function has_productivity_effect(technology, recipe_name)
+  for _, effect in pairs(technology.prototype.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then return true end
+  end
+  return false
+end
+
 local function assert_ice_existing_productivity_owner(technology)
   local owner = game.forces.player.technologies["asteroid-productivity"]
   if not owner then fail("existing asteroid productivity owner is missing") end
   for _, recipe_name in ipairs({"oxide-asteroid-crushing", "advanced-oxide-asteroid-crushing"}) do
-    if productivity_effect(technology, recipe_name, 0.10) then
+    if has_productivity_effect(technology, recipe_name) then
       fail("generated ice productivity duplicates existing owner: " .. recipe_name)
     end
     if not productivity_effect(owner, recipe_name, 0.10) then
@@ -57,8 +64,9 @@ end
 local function assert_target_runtime()
   local ice = game.forces.player.technologies["recipe-prod-research_ice-1"]
   local platform = game.forces.player.technologies["recipe-prod-research_platform-1"]
+  if not ice then fail("generated technology is absent: recipe-prod-research_ice-1") end
+  if not platform then fail("generated technology is absent: recipe-prod-research_platform-1") end
   for name, technology in pairs({["recipe-prod-research_ice-1"] = ice, ["recipe-prod-research_platform-1"] = platform}) do
-    if not technology then fail("generated technology is absent: " .. name) end
     local sciences = ingredient_names(technology)
     if not contains(sciences, "space-science-pack") or not contains(sciences, "cryogenic-science-pack") then
       fail("generated science vector is incomplete: " .. name)
