@@ -15,6 +15,12 @@ local M = {
   v5_policy_id = "K2SciencePhasePolicyV5",
   v6_policy_id = "K2SciencePhasePolicyV6",
   v7_policy_id = "K2SciencePhasePolicyV7",
+  v8_policy_id = "K2SciencePhasePolicyV8",
+  v8_applicability = {
+    base = "2.1.23",
+    Krastorio2 = "2.1.4",
+    ["Krastorio2-spaced-out"] = "2.0.19"
+  },
   v7_applicability = {
     base = "2.1.22",
     Krastorio2 = "2.1.4",
@@ -85,7 +91,8 @@ local SUCCESSOR_POLICIES = {
   [M.v6_applicability.base] = {
     {id = M.v6_policy_id, versions = M.v6_applicability},
     {id = M.v7_policy_id, versions = M.v7_applicability}
-  }
+  },
+  [M.v8_applicability.base] = {{id = M.v8_policy_id, versions = M.v8_applicability}}
 }
 
 local function matching_successor(active_mods)

@@ -192,7 +192,6 @@ check('V702',names(v7_normalized)==names(v6_normalized) and v7_normalized[1].amo
   and #v3_original==3 and v3_original[1].amount==2,
   'The compatible upstream releases retain phase retirement, late triggers, amounts and input isolation')
 for _, tuple in ipairs({
-  {base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'},
   {base='2.1.22',Krastorio2='2.1.5',['Krastorio2-spaced-out']='2.0.19'},
   {base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.20'},
   {base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.19'}
@@ -200,6 +199,29 @@ for _, tuple in ipairs({
   local unchanged,refused=k2.normalize(v3_original,tuple)
   check('V703',not k2.imersite_continuation_applies(tuple) and not refused.applicable
     and names(unchanged)==names(v3_original),'Mixed or unobserved upstream contracts remain unadmitted')
+end
+local active_mods_v8={base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'}
+local v8_normalized,v8_decision=k2.normalize(v3_original,active_mods_v8)
+check('V801',v8_decision.policy_id=='K2SciencePhasePolicyV8' and v8_decision.applicable
+  and v8_decision.exact_versions.base=='2.1.23'
+  and v8_decision.exact_versions.Krastorio2=='2.1.4'
+  and v8_decision.exact_versions['Krastorio2-spaced-out']=='2.0.19'
+  and k2.imersite_continuation_applies(active_mods_v8),
+  'The exact 2.1.23 K2/K2SO tuple selects the separately admitted successor')
+check('V802',names(v8_normalized)==names(v7_normalized) and v8_normalized[1].amount==3
+  and v8_normalized[2].amount==7
+  and table.concat(v8_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and #v3_original==3 and v3_original[1].amount==2,
+  'The exact 2.1.23 successor preserves phase retirement, late triggers, amounts and input isolation')
+for _, tuple in ipairs({
+  {base='2.1.24',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.23',Krastorio2='2.1.5',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.20'},
+  {base='2.1.23',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.19'}
+}) do
+  local unchanged,refused=k2.normalize(v3_original,tuple)
+  check('V803',not k2.imersite_continuation_applies(tuple) and not refused.applicable
+    and names(unchanged)==names(v3_original),'The 2.1.23 successor does not widen engine or overhaul admission')
 end
 roles={{role='exclude',pack='automation-science-pack'}}
 local spec={science_packs={'automation-science-pack','utility-science-pack'}}

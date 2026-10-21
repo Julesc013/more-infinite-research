@@ -156,11 +156,13 @@ if mods and mods["more-infinite-research"] == "4.7.21000" then
     ["ice-platform"] = 0.10,
     ["space-platform-foundation"] = 0.05
   })
-  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan-internal"]
+  local prototype = (data.raw["mod-data"] or {})["more-infinite-research-generation-plan"]
   local plan = prototype and prototype.data
-  if type(plan) ~= "table" or plan.schema ~= 3 or type(plan.validation_summary) ~= "table"
+  if type(plan) ~= "table" or plan.schema ~= 1 or plan.kind ~= "mir-generation-plan-public"
+    or plan.generation_plan_schema ~= 3 or type(plan.plan_fingerprint) ~= "string"
+    or type(plan.public_fingerprint) ~= "string" or type(plan.validation_summary) ~= "table"
     or plan.validation_summary.valid ~= true then
-    fail("accepted internal generation plan is missing")
+    fail("accepted public generation plan is missing")
   end
   log("[mir-trigger-output-fixture] data-stage=target binding=declared-trigger-output cryogenic=declared-recipe")
 end

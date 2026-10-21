@@ -86,7 +86,7 @@ data.raw.technology["recipe-prod-research_ice-1"] = {unit={ingredients={{name="s
 data.raw.technology["asteroid-productivity"] = {effects={{type="change-recipe-productivity",recipe="oxide-asteroid-crushing",change=0.10},{type="change-recipe-productivity",recipe="advanced-oxide-asteroid-crushing",change=0.10}}}
 data.raw.technology["recipe-prod-research_platform-1"] = {unit={ingredients={{name="space-science-pack",amount=1},{name="cryogenic-science-pack",amount=1}}},prerequisites={"space-path"},effects={{type="change-recipe-productivity",recipe="ice-platform",change=0.10},{type="change-recipe-productivity",recipe="space-platform-foundation",change=0.05}}}
 data.raw.lab = {lab={inputs={"automation-science-pack","space-science-pack","cryogenic-science-pack"}}}
-data.raw["mod-data"] = {["more-infinite-research-generation-plan-internal"]={data={schema=3,validation_summary={valid=true}}}}
+data.raw["mod-data"] = {["more-infinite-research-generation-plan"]={data={schema=1,kind="mir-generation-plan-public",generation_plan_schema=3,plan_fingerprint="PLAN",public_fingerprint="PUBLIC",validation_summary={valid=true}}}}
 ''')
 runtime.execute(pathlib.Path(data_final_path).read_text(encoding="utf-8"))
 check(runtime.eval('logs[#logs] == "[mir-trigger-output-fixture] data-stage=target binding=declared-trigger-output cryogenic=declared-recipe"'), 'data-final target marker missing')

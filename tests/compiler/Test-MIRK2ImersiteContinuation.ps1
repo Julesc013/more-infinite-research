@@ -4,6 +4,7 @@ param(
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$ExpectedEngineSha256='',
+  [string]$ExpectedEngineVersion='2.1.23',
   [string]$OutputRoot='build/tests/k2-imersite-continuation'
 )
 $ErrorActionPreference='Stop'
@@ -59,8 +60,8 @@ if(-not $output.StartsWith((Join-Path $repo 'build')+[IO.Path]::DirectorySeparat
 }
 $version=(& $engine --version | Out-String)
 $engineSha256=(Get-FileHash -LiteralPath $engine -Algorithm SHA256).Hash
-if($LASTEXITCODE -ne 0 -or $version -notmatch 'Version:\s*2[.]1[.]22(?:\s|$)') {
-  throw 'The K2 Imersite continuation compiler regression requires Factorio 2.1.22.'
+if($LASTEXITCODE -ne 0 -or $version -notmatch ('Version:\s*'+[regex]::Escape($ExpectedEngineVersion)+'(?:\s|$)')) {
+  throw "The K2 Imersite continuation compiler regression requires Factorio $ExpectedEngineVersion."
 }
 if(-not [string]::IsNullOrWhiteSpace($ExpectedEngineSha256) -and $engineSha256 -cne $ExpectedEngineSha256) {
   throw "This regression requires exact engine SHA-256 $ExpectedEngineSha256."
