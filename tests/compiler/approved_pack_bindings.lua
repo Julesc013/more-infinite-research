@@ -628,6 +628,20 @@ Context.with_active(Context.new(), function()
     "The trigger-output source establishes the representative downstream cryogenic-style science chain")
 end)
 
+trigger_raw, trigger_pack, trigger_descendant = trigger_output_world()
+local active_trigger_context = Context.new({legacy_compiler_export_requested = false})
+Context.with_active(active_trigger_context, function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local status, gate = science.pack_production_status(trigger_pack)
+  local source = science.production_route_for_pack(trigger_pack)
+  check(not active_trigger_context:legacy_compiler_export_requested()
+      and status == "research" and gate == trigger_pack
+      and source.source_kind == "declared-trigger-output"
+      and science.pack_production_status(trigger_descendant) == "research"
+      and science.prereq_tech_for_science_pack(trigger_descendant) == trigger_descendant,
+    "The active-only context keeps the trigger-output binding and its required downstream prerequisite semantics")
+end)
+
 for _, change in ipairs({
   function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].name = "wrong-science" end,
   function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].type = "fluid" end,
