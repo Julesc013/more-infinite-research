@@ -52,6 +52,189 @@ local Context = require("prototypes.mir.pipeline.compiler_context")
 local compiler = require("prototypes.mir.pipeline.compiler_orchestrator")
 local deepcopy = require("prototypes.mir.core.deepcopy")
 local fingerprint = require("prototypes.mir.core.fingerprint")
+-- Matching is a Context-local memo, not a complete-world fingerprint reader.
+-- Exercise the actual recipe owner and matcher before any compiler snapshots.
+do
+  local matcher = require("prototypes.mir.capabilities.recipe_productivity.recipe_matching")
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local original = recipes.fingerprint
+  recipes.fingerprint = function()
+    error("Unexpected complete recipe-index fingerprint for a local matching memo")
+  end
+  local ok, failure = pcall(function()
+    Context.with_active(Context.new(), function()
+      local spec = {items = {"iron-plate"}, include_hidden = false}
+      local buckets = matcher.buckets_view("scoped-match-control", spec, 0.1)
+      check(#buckets == 1 and #buckets[1].recipes == 1 and buckets[1].recipes[1] == "iron-plate",
+        "Context-bound matching retains the actual approved output")
+      check(matcher.buckets_view("scoped-match-control", spec, 0.1) == buckets,
+        "The same owned matching inputs reuse the memo")
+      local changed_amount = matcher.buckets_view("scoped-match-control", spec, 0.2)
+      check(changed_amount ~= buckets and changed_amount[1].change == 0.2,
+        "Changed bonus cannot reuse a stale matching result")
+      spec.items = {"missing-output"}
+      local changed_spec = matcher.buckets_view("scoped-match-control", spec, 0.1)
+      check(changed_spec ~= buckets and #changed_spec[1].recipes == 0,
+        "Changed descriptor cannot reuse stale recipe membership")
+      spec.items = {"iron-plate"}
+      local exported = matcher.recipes_for_stream(spec, 0.1, "scoped-match-control")
+      exported[1].recipes[1] = "mutated-export"
+      check(matcher.buckets_view("scoped-match-control", spec, 0.1)[1].recipes[1] == "iron-plate",
+        "Public matching exports remain isolated from the owned memo")
+      local epoch = recipes.source_epoch()
+      local replaced, message = pcall(recipes.replace_source, {}, epoch)
+      check(not replaced and tostring(message):find("stream_match_index", 1, true)
+          and recipes.source_epoch() == epoch and recipes.view("iron-plate") ~= nil,
+        "The real recipe owner rejects replacement across the matching boundary")
+    end)
+    Context.with_active(Context.new(), function()
+      recipes.replace_source({}, recipes.source_epoch())
+      local buckets = matcher.buckets_view("scoped-match-control", {items = {"iron-plate"}}, 0.1)
+      check(#buckets == 1 and #buckets[1].recipes == 0,
+        "A fresh matching Context reads its own recipe source")
+    end)
+  end)
+  recipes.fingerprint = original
+  assert(ok, failure)
+end
+
+-- The active compiler owns a complete semantic recipe source. Its versioned
+-- identity remains sensitive to every consumed field without constructing the
+-- generic full RecipeFacts index until an explicit export requires one.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local original = deepcopy(data.raw.recipe)
+  local identity = recipes.active_input_identity()
+  local source_epoch = recipes.source_epoch()
+  local active_epoch = Context.current():state_epoch("recipe_active_input_identity")
+  local returned = recipes.active_input_identity()
+  returned.semantic_source_fingerprint = "outside-writer"
+  check(Context.current():state_view("recipe_index") == nil
+      and identity.schema == 2 and identity.record_type == "RecipeSemanticInput"
+      and identity.contract == "mir-recipe-semantic-source-v2"
+      and recipes.active_input_identity().semantic_source_fingerprint
+        == identity.semantic_source_fingerprint,
+    "Active semantic input stays index-free and returns a detached v2 identity")
+
+  local function replace_and_identity(source)
+    recipes.replace_source(source, recipes.source_epoch())
+    return recipes.active_input_identity()
+  end
+  local changed_output = deepcopy(original)
+  changed_output["iron-plate"].results[1].name = "identity-output-control"
+  local output_identity = replace_and_identity(changed_output)
+  check(recipes.source_epoch() == source_epoch + 1
+      and Context.current():state_view("recipe_index") == nil
+      and Context.current():state_epoch("recipe_active_input_identity") == active_epoch + 1
+      and output_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint,
+    "Output change advances the owned source epoch and invalidates active recipe identity")
+
+  local changed_ingredient = deepcopy(original)
+  changed_ingredient["iron-plate"].ingredients[1][1] = "identity-ingredient-control"
+  local ingredient_identity = replace_and_identity(changed_ingredient)
+  local changed_category = deepcopy(original)
+  changed_category["iron-plate"].category = "identity-category-control"
+  local category_identity = replace_and_identity(changed_category)
+  check(ingredient_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint
+      and category_identity.semantic_source_fingerprint ~= identity.semantic_source_fingerprint,
+    "Ingredient and category changes each invalidate complete semantic recipe identity")
+
+  local gross_only = deepcopy(original)
+  gross_only["iron-plate"].results[1].ignored_by_productivity = 1
+  local gross_index = recipes.index_prototypes(gross_only)
+  local productive_index = recipes.index_prototypes(original)
+  local gross_identity = replace_and_identity(gross_only)
+  local productive_identity = replace_and_identity(original)
+  check(fingerprint.of(gross_index.by_output) == fingerprint.of(productive_index.by_output)
+      and fingerprint.of(gross_index.by_productive_output) ~= fingerprint.of(productive_index.by_productive_output)
+      and gross_identity.semantic_source_fingerprint ~= productive_identity.semantic_source_fingerprint,
+    "Productive-output change invalidates semantic identity even when gross output membership is unchanged")
+
+  check(recipes.snapshot_recipe_domain_fingerprint(deepcopy(recipes.index_view())) == nil,
+    "Copied recipe maps cannot claim Context-owned identity material")
+  local malformed = deepcopy(original)
+  malformed["iron-plate"].surface_conditions = {bad = function() end}
+  check(not pcall(replace_and_identity, malformed),
+    "Malformed caller-supplied nested recipe source remains generically rejected")
+end)
+
+-- A virtual __pairs source can yield the same recipe key twice. Facts retain
+-- only the last row, while the discovery indexes consume both yielded rows.
+-- The active identity must bind that exceptional complete index, without
+-- making normal unique recipe maps pay for the legacy full index digest.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local function duplicate_source(first_output)
+    local first = {name = "identity-duplicate", enabled = true, category = "crafting", result = first_output}
+    local final = {name = "identity-duplicate", enabled = true, category = "crafting", result = "identity-stable"}
+    return setmetatable({}, {
+      __pairs = function()
+        local position = 0
+        return function()
+          position = position + 1
+          if position == 1 then return "identity-duplicate", first end
+          if position == 2 then return "identity-duplicate", final end
+        end
+      end
+    })
+  end
+
+  local original_of = fingerprint.of
+  fingerprint.of = function(value)
+    if type(value) == "table" and value.by_output ~= nil then
+      error("Unique maps must not hash their complete index")
+    end
+    return original_of(value)
+  end
+  recipes.replace_source({["identity-unique"] = {name = "identity-unique", enabled = true,
+    category = "crafting", result = "identity-only"}}, recipes.source_epoch())
+  local unique_identity = recipes.active_input_identity()
+  fingerprint.of = original_of
+  check(unique_identity.exceptional_complete_index_fingerprint == nil,
+    "Ordinary unique recipe maps retain normalized-domain-only active identity")
+
+  local function replace_and_observe(source)
+    recipes.replace_source(source, recipes.source_epoch())
+    local index = recipes.index_view()
+    local legacy = recipes.fingerprint()
+    return recipes.active_input_identity(), index, legacy, fingerprint.of(index)
+  end
+  local identity_a, index_a, legacy_a, complete_a = replace_and_observe(duplicate_source("identity-first-a"))
+  local identity_b, index_b, legacy_b, complete_b = replace_and_observe(duplicate_source("identity-first-b"))
+  check(index_a.facts["identity-duplicate"].main_product == "identity-stable"
+      and index_b.facts["identity-duplicate"].main_product == "identity-stable"
+      and #index_a.names == 2 and #index_b.names == 2,
+    "Duplicate virtual recipe observations retain matching final fact/name domains")
+  check(index_a.by_output["identity-first-a"] and index_b.by_output["identity-first-b"]
+      and not index_b.by_output["identity-first-a"] and complete_a ~= complete_b,
+    "Duplicate virtual recipe observations retain their distinct consumed discovery maps")
+  check(legacy_a == complete_a and legacy_b == complete_b
+      and identity_a.normalized_fact_domain_fingerprint == identity_b.normalized_fact_domain_fingerprint
+      and identity_a.exceptional_complete_index_fingerprint == complete_a
+      and identity_b.exceptional_complete_index_fingerprint == complete_b
+      and identity_a.exceptional_complete_index_fingerprint ~= identity_b.exceptional_complete_index_fingerprint,
+    "Exceptional duplicate recipe keys bind the unchanged complete index identity beside stable normalized facts")
+end)
+
+-- The existing default Context/export contract continues to name the exact
+-- legacy full index digest. It is distinct from the active-only identity.
+Context.with_active(Context.new(), function()
+  local context = Context.current()
+  local effect_safety = require("prototypes.mir.emit.effect_safety")
+  local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
+  context:set_service("effect_target_inventory", target_inventory)
+  context:record_artifact("input_sanitation_ledger", input_ledger)
+  local plan = compiler.compile(context)
+  local snapshot = context:snapshot()
+  local recipes = require("prototypes.mir.index.recipe_facts")
+  local sources = plan.stream_plan.source_fingerprints
+  check(type(sources.facts) == "string" and sources.facts == recipes.fingerprint()
+      and sources.recipe_input == nil,
+    "Default export compilation retains the exact legacy full recipe-index digest")
+  check(snapshot.state.compilation_snapshot.source_fingerprints.facts == sources.facts
+      and snapshot.state.compilation_plan.stream_plan.source_fingerprints.facts == sources.facts,
+    "Generic Context snapshot and plan preserve the matching legacy recipe digest")
+end)
 -- Target adapters own phase reporting; the common qualifier owns the decision.
 local f200_science = require("prototypes.mir.planner.science")
 check(f200_science.phase_diagnostic_fields(nil) == nil,
@@ -126,8 +309,18 @@ local function assert_preserved()
   assert(fingerprint.of(projection) == fingerprint.of(expected), "Established iron definition changed")
 end
 local counts, emitted_plan, emitted_journal, emitted_context, draft_fixture_row
-Context.with_active(Context.new(), function()
+-- MIR-COMMAND-EXPORT-PREAMBLE-END
+-- The ordinary approved-family path is deliberately active-only: it must not
+-- construct the generic snapshot/export representation simply to compile.
+Context.with_active(Context.new({legacy_compiler_export_requested = false}), function()
   local context = Context.current()
+  local monitored_recipe_facts = require("prototypes.mir.index.recipe_facts")
+  local original_recipe_fingerprint = monitored_recipe_facts.fingerprint
+  local ordinary_full_recipe_fingerprint_calls = 0
+  monitored_recipe_facts.fingerprint = function(...)
+    ordinary_full_recipe_fingerprint_calls = ordinary_full_recipe_fingerprint_calls + 1
+    return original_recipe_fingerprint(...)
+  end
   local effect_safety = require("prototypes.mir.emit.effect_safety")
   local input_ledger, target_inventory = effect_safety.sanitize_all_technology_effects({pass = "input"})
   context:set_service("effect_target_inventory", target_inventory)
@@ -293,7 +486,281 @@ Context.with_active(Context.new(), function()
     target_line.supports.legacy_numeric_research_cost = prior
   end
 
+  local snapshot_contract = require("prototypes.mir.domain.compiler.compilation_snapshot")
+  local snapshot_adapter = require("prototypes.mir.pipeline.compilation_snapshot_adapter")
+  local snapshot_counts = {capture = 0, new = 0, qualify = 0}
+  local prior_capture, prior_new, prior_qualify = snapshot_adapter.capture,
+    snapshot_contract.new, snapshot_contract.qualify
+  snapshot_adapter.capture = function(...)
+    snapshot_counts.capture = snapshot_counts.capture + 1
+    return prior_capture(...)
+  end
+  snapshot_contract.new = function(...)
+    snapshot_counts.new = snapshot_counts.new + 1
+    return prior_new(...)
+  end
+  snapshot_contract.qualify = function(...)
+    snapshot_counts.qualify = snapshot_counts.qualify + 1
+    return prior_qualify(...)
+  end
   local plan = compiler.compile(context)
+  snapshot_adapter.capture, snapshot_contract.new, snapshot_contract.qualify =
+    prior_capture, prior_new, prior_qualify
+  monitored_recipe_facts.fingerprint = original_recipe_fingerprint
+  check(ordinary_full_recipe_fingerprint_calls == 0,
+    "Ordinary active approved-family compilation does not request the legacy full recipe-index digest")
+
+  local compiler_input_contract = require("prototypes.mir.domain.compiler.compiler_input")
+  local active_input = plan.compiler_input
+  check(compiler_input_contract.is_active(active_input)
+    and snapshot_counts.capture == 0 and snapshot_counts.new == 0 and snapshot_counts.qualify == 0,
+    "Ordinary active compilation constructs zero generic snapshots")
+  local active_owner = compiler_input_contract.active_view(active_input)
+  local active_sources = plan.stream_plan.source_fingerprints
+  check(type(active_sources.recipe_input) == "table"
+      and active_sources.recipe_input.schema == 2
+      and active_sources.recipe_input.record_type == "RecipeSemanticInput"
+      and active_sources.recipe_input.contract == "mir-recipe-semantic-source-v2"
+      and active_sources.facts == nil
+      and active_owner.source_fingerprints.recipe_input.semantic_source_fingerprint
+        == active_sources.recipe_input.semantic_source_fingerprint,
+    "Ordinary active plan and private CompilerInput bind the same owned semantic recipe identity")
+  local original_inventory = fingerprint.canonical(active_owner.effect_target_inventory)
+  local exported_inventory = deepcopy(active_owner.effect_target_inventory)
+  exported_inventory.recipe = {}
+  check(fingerprint.canonical(active_owner.effect_target_inventory) == original_inventory
+    and fingerprint.canonical(exported_inventory) ~= original_inventory,
+    "Active CompilerInput retains its target inventory behind its private owner")
+  check(not pcall(compiler_input_contract.legacy_view, active_input)
+    and not pcall(compiler_input_contract.snapshot, active_input),
+    "Active CompilerInput refuses a post-construction generic export")
+
+  local active_identity_fields = {
+    "schema", "record_type", "contract", "base_input_fingerprint",
+    "stream_plan_fingerprint", "base_continuation_input_fingerprint",
+    "base_candidates_fingerprint", "provider_input_fingerprint",
+    "effect_target_inventory_fingerprint", "source_fingerprint", "policy_fingerprint",
+    "runtime_environment_fingerprint", "input_sanitation_fingerprint", "input_fingerprint"
+  }
+  local rejected_identity_mutations = 0
+  for _, field in ipairs(active_identity_fields) do
+    local prior = active_input[field]
+    active_input[field] = type(prior) == "number" and prior + 1
+      or (prior == nil and "outside-writer" or prior .. "-outside-writer")
+    if not pcall(compiler_input_contract.assert_active, active_input) then
+      rejected_identity_mutations = rejected_identity_mutations + 1
+    end
+    active_input[field] = prior
+    compiler_input_contract.assert_active(active_input)
+  end
+  check(rejected_identity_mutations == #active_identity_fields,
+    "Active CompilerInput rejects every registered post-admission identity mutation")
+
+  local policy_fingerprint = active_owner.policy_snapshot.policy_fingerprint
+  local environment_fingerprint = active_owner.runtime_environment.environment_fingerprint
+  active_owner.policy_snapshot.policy_fingerprint = policy_fingerprint .. "-outside-writer"
+  local policy_rejected = not pcall(compiler_input_contract.assert_active, active_input)
+  active_owner.policy_snapshot.policy_fingerprint = policy_fingerprint
+  active_owner.runtime_environment.environment_fingerprint = environment_fingerprint .. "-outside-writer"
+  local environment_rejected = not pcall(compiler_input_contract.assert_active, active_input)
+  active_owner.runtime_environment.environment_fingerprint = environment_fingerprint
+  compiler_input_contract.assert_active(active_input)
+  check(policy_rejected and environment_rejected,
+    "Active CompilerInput reasserts retained policy and environment owners")
+
+  local supplied_base = deepcopy(active_owner.base_continuation_inputs)
+  local supplied_candidates = deepcopy(active_owner.base_candidates)
+  local supplied_providers = compiler_input_contract.provider_inputs_snapshot(active_input)
+  local supplied_inventory = deepcopy(active_owner.effect_target_inventory)
+  local supplied_sources = deepcopy(active_owner.source_fingerprints)
+  local detached_active = compiler_input_contract.new_active({
+    stream_plan = active_owner.stream_plan,
+    base_continuation_inputs = supplied_base,
+    base_candidates = supplied_candidates,
+    provider_inputs = supplied_providers,
+    effect_target_inventory = supplied_inventory,
+    source_fingerprints = supplied_sources,
+    policy_snapshot = active_owner.policy_snapshot,
+    runtime_environment = active_owner.runtime_environment,
+    input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+  })
+  supplied_base.outside_writer = true
+  supplied_candidates.outside_writer = true
+  supplied_providers.outside_writer = true
+  supplied_inventory.outside_writer = true
+  supplied_sources.outside_writer = true
+  local detached_values = compiler_input_contract.active_view(detached_active)
+  check(detached_values.base_continuation_inputs.outside_writer == nil
+    and detached_values.base_candidates.outside_writer == nil
+    and compiler_input_contract.provider_inputs_snapshot(detached_active).outside_writer == nil
+    and detached_values.effect_target_inventory.outside_writer == nil
+    and detached_values.source_fingerprints.outside_writer == nil,
+    "Active CompilerInput deep-copies all caller-owned nested inputs")
+
+  -- Provider state has one private owner across initial/qualified handoff.
+  -- Full diagnostic fields still affect identity, but do not escape through
+  -- ordinary consumer projections or the other active compiler values.
+  local provider_probe = {
+    schema = 1, decision_set_fingerprint = "owned-provider-control",
+    decisions = {{provider_id = "fixture-provider", provider_version = "1",
+      candidate_family = "fixture-family", prototype_type = "recipe",
+      prototype_name = "iron-plate", target_stream = "fixture-stream",
+      final_state = "review-required", claim_fingerprint = "fixture-claim",
+      decision_fingerprint = "fixture-decision", risk_fingerprint = "fixture-risk",
+      risk_disposition = "REVIEW_REQUIRED", diagnostic_detail = {"retained-full-input"}}}
+  }
+  local function probe_input(provider)
+    return compiler_input_contract.new_active({
+      stream_plan = active_owner.stream_plan,
+      base_continuation_inputs = active_owner.base_continuation_inputs,
+      base_candidates = active_owner.base_candidates,
+      provider_inputs = provider, effect_target_inventory = active_owner.effect_target_inventory,
+      source_fingerprints = active_owner.source_fingerprints,
+      policy_snapshot = active_owner.policy_snapshot,
+      runtime_environment = active_owner.runtime_environment,
+      input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+    })
+  end
+  local original_of, provider_encodings = fingerprint.of, 0
+  fingerprint.of = function(value, ...)
+    if type(value) == "table" and value.decision_set_fingerprint == "owned-provider-control" then
+      provider_encodings = provider_encodings + 1
+    end
+    return original_of(value, ...)
+  end
+  local provider_input = probe_input(provider_probe)
+  local qualified_provider_input = compiler_input_contract.qualify_active(provider_input, {
+    stream_plan = plan.stream_plan, base_continuation_inputs = plan.base_extension_operations,
+    base_candidates = plan.technology_catalog.base_candidates
+  })
+  fingerprint.of = original_of
+  check(provider_encodings == 1, "Qualification does not copy/hash its unchanged private provider child again")
+  check(provider_input.provider_input_fingerprint == qualified_provider_input.provider_input_fingerprint,
+    "Qualification retains exact full provider identity")
+  check(compiler_input_contract.active_view(provider_input).provider_inputs == nil,
+    "Ordinary active values expose no private provider state")
+  local expected_provider_projection = {
+    provider_id = "fixture-provider", provider_version = "1", candidate_family = "fixture-family",
+    prototype_type = "recipe", prototype_name = "iron-plate", target_stream = "fixture-stream",
+    final_state = "review-required", claim_fingerprint = "fixture-claim",
+    decision_fingerprint = "fixture-decision", risk_fingerprint = "fixture-risk",
+    risk_disposition = "REVIEW_REQUIRED"
+  }
+  local detached_decisions = compiler_input_contract.provider_decisions(provider_input)
+  check(#detached_decisions == 1
+    and fingerprint.canonical(detached_decisions[1]) == fingerprint.canonical(expected_provider_projection),
+    "Consumer projection preserves every used claim, risk, family and review field")
+  local provider_pure = require("prototypes.mir.planner.compiler").compile(
+    qualified_provider_input, active_owner.policy_snapshot)
+  local expected_pure_claim = {
+    provider_id = "fixture-provider", provider_version = "1",
+    subject = {prototype_type = "recipe", prototype_name = "iron-plate"},
+    target_stream = "fixture-stream", final_state = "review-required",
+    claim_fingerprint = "fixture-claim", decision_fingerprint = "fixture-decision",
+    risk_disposition = "REVIEW_REQUIRED"
+  }
+  check(#provider_pure.provider_claims == 1
+    and fingerprint.canonical(provider_pure.provider_claims[1]) == fingerprint.canonical(expected_pure_claim)
+    and provider_pure.status == "REVIEW_REQUIRED"
+    and #provider_pure.dispositions.review_required > 0,
+    "Actual pure compiler consumes complete provider fields and retains review disposition")
+  local provider_finalized = require("prototypes.mir.planner.compilation_plan").finalize(
+    active_owner.stream_plan, active_owner.base_continuation_inputs,
+    {compiler_input = provider_input, stream_plan_trusted = true,
+      base_candidates = active_owner.base_candidates})
+  local expected_plan_claim = deepcopy(expected_pure_claim)
+  expected_plan_claim.candidate_family = "fixture-family"
+  expected_plan_claim.risk_fingerprint = "fixture-risk"
+  check(#provider_finalized.compiler_result.provider_claims == 1
+    and fingerprint.canonical(provider_finalized.compiler_result.provider_claims[1])
+      == fingerprint.canonical(expected_plan_claim)
+    and #provider_finalized.compiler_result.review_required_candidates == 1
+    and provider_finalized.compiler_result.dimensions.review == "REQUIRED",
+    "Actual CompilationPlan consumes family/risk fields and retains provider review evidence")
+  detached_decisions[1].claim_fingerprint = "outside-writer"
+  provider_probe.decisions[1].claim_fingerprint = "outside-writer"
+  local provider_export = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  provider_export.decisions[1].diagnostic_detail[1] = "outside-writer"
+  provider_export.decisions[1].claim_fingerprint = "outside-writer"
+  check(compiler_input_contract.provider_decisions(provider_input)[1].claim_fingerprint == "fixture-claim"
+    and compiler_input_contract.provider_decisions(qualified_provider_input)[1].claim_fingerprint == "fixture-claim"
+    and compiler_input_contract.provider_inputs_snapshot(qualified_provider_input).decisions[1].diagnostic_detail[1]
+      == "retained-full-input", "Caller, consumer and inspection mutation cannot change initial or qualified provider state")
+  local changed_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  changed_provider.decisions[1].diagnostic_detail[1] = "changed-before-admission"
+  check(probe_input(changed_provider).provider_input_fingerprint ~= provider_input.provider_input_fingerprint,
+    "Provider identity still covers the full diagnostic input, not only consumer fields")
+  local dynamic_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  setmetatable(dynamic_provider.decisions[1], {__index = {provider_id = "dynamic-provider"}})
+  check(not pcall(probe_input, dynamic_provider),
+    "Active provider admission rejects metatables retained by Factorio deepcopy")
+  local duplicate_provider = compiler_input_contract.provider_inputs_snapshot(provider_input)
+  duplicate_provider.decisions[2] = deepcopy(duplicate_provider.decisions[1])
+  duplicate_provider.decisions[2].provider_id = "second-provider"
+  duplicate_provider.decisions[3] = deepcopy(duplicate_provider.decisions[1])
+  local duplicate_input = probe_input(duplicate_provider)
+  local projected_order = compiler_input_contract.provider_decisions(duplicate_input)
+  check(#projected_order == 3 and projected_order[1].provider_id == "fixture-provider"
+    and projected_order[2].provider_id == "second-provider"
+    and projected_order[3].provider_id == "fixture-provider", "Provider query retains sequence and duplicate rows")
+
+  -- The carrier binds only the structural GenerationPlan identity. Both real
+  -- planner consumers must reject a copied plan before traversing or emitting it.
+  local forged_plan = deepcopy(active_owner.stream_plan)
+  local forged_active = compiler_input_contract.new_active({
+    stream_plan = forged_plan,
+    base_continuation_inputs = active_owner.base_continuation_inputs,
+    base_candidates = active_owner.base_candidates,
+    provider_inputs = compiler_input_contract.provider_inputs_snapshot(active_input),
+    effect_target_inventory = active_owner.effect_target_inventory,
+    source_fingerprints = active_owner.source_fingerprints,
+    policy_snapshot = active_owner.policy_snapshot,
+    runtime_environment = active_owner.runtime_environment,
+    input_sanitation_fingerprint = active_input.input_sanitation_fingerprint
+  })
+  local output_before_forged_admission = fingerprint.of(data.raw.technology)
+  local pure_admission_rejected = not pcall(require("prototypes.mir.planner.compiler").compile,
+    forged_active, active_owner.policy_snapshot)
+  local finalization_admission_rejected = not pcall(
+    require("prototypes.mir.planner.compilation_plan").finalize,
+    forged_plan, active_owner.base_continuation_inputs,
+    {compiler_input = forged_active, stream_plan_trusted = true})
+  check(pure_admission_rejected and finalization_admission_rejected
+    and fingerprint.of(data.raw.technology) == output_before_forged_admission,
+    "Planner consumers reject a detached GenerationPlan before any emission")
+
+  local pure = plan.pure_compilation
+  check(pure and pure.schema == 2 and pure.input_identity
+    and pure.compilation_snapshot_fingerprint == nil
+    and pure.transformation_plan.schema == 3,
+    "Active pure compilation labels its identity and omits the legacy snapshot field")
+  local transformation_plan = require("prototypes.mir.domain.compiler.transformation_plan")
+  local active_plan = pure.transformation_plan
+  local rejected_nested_identity_mutations = 0
+  for _, field in ipairs({"schema", "kind", "input_fingerprint"}) do
+    local prior = active_plan.input_identity[field]
+    active_plan.input_identity[field] = type(prior) == "number" and prior + 1
+      or prior .. "-outside-writer"
+    if not pcall(transformation_plan.assert_trusted, active_plan) then
+      rejected_nested_identity_mutations = rejected_nested_identity_mutations + 1
+    end
+    active_plan.input_identity[field] = prior
+    transformation_plan.assert_trusted(active_plan)
+  end
+  check(rejected_nested_identity_mutations == 3,
+    "Schema-3 TransformationPlan rejects every nested active identity mutation")
+  local legacy_plan = transformation_plan.new({phase = "legacy-snapshot-control", execution_mode = "SAFE",
+    compilation_snapshot_fingerprint = "approved-family-legacy-snapshot", policy_fingerprint = "approved-family-policy",
+    operations = {}})
+  legacy_plan.compilation_snapshot_fingerprint = "approved-family-legacy-snapshot-outside-writer"
+  check(not pcall(transformation_plan.assert_trusted, legacy_plan),
+    "Schema-2 TransformationPlan retains and authenticates its legacy snapshot binding")
+  local original_recipe = data.raw.recipe["iron-plate"]
+  data.raw.recipe["iron-plate"] = nil
+  check(not pcall(effect_safety.assert_current_target_inventory,
+    context:service("effect_target_inventory")),
+    "Removing an actual target remains detectable at the mutation boundary")
+  data.raw.recipe["iron-plate"] = original_recipe
   local iron
   for _, row in ipairs(plan.stream_plan.rows) do
     if row.stream_key == "research_iron" then iron = row end
@@ -306,8 +773,7 @@ Context.with_active(Context.new(), function()
     and stream_compiler.latest_artifact(context).record_type == nil,
     "Only the complete final GenerationPlan is installed before publication and emission")
   check(#plan.stream_plan.rows > 100, "Use the actual catalogue, not a replacement five-family catalogue")
-  local initial_base = ((plan.compiler_input or {}).compilation_snapshot or {}).base_continuation_inputs or {}
-  local initial_operations = initial_base.operations or {}
+  local initial_operations = active_owner.base_continuation_inputs or {}
   local final_operations = plan.base_extension_operations or {}
   check(#initial_operations > 0 and #final_operations > 0
     and initial_operations[1].technology_design ~= nil and final_operations[1].technology_design ~= nil,
@@ -367,9 +833,142 @@ Context.with_active(Context.new(), function()
 end)
 
 Context.with_active(emitted_context, function()
+  if not (os and type(os.clock) == "function") then
+    check(emitted_context:state_view("compilation_snapshot") == nil,
+      "Clockless active compilation retains no generic input snapshot")
+    check(emitted_context:state_view("qualification_snapshot") == nil,
+      "Clockless active compilation retains no generic qualified snapshot")
+  end
   local generation_plan = require("prototypes.mir.planner.generation_plan")
   local technology_design = require("prototypes.mir.domain.technology.technology_design")
   local compilation_plan = require("prototypes.mir.planner.compilation_plan")
+
+  -- P17 owns final rows only after graph qualification.  The real ordinary
+  -- compiler result supplies the input here; isolated rows exercise the
+  -- compact private handoff and every exported complete-record boundary.
+  local p17_actual_plan = emitted_context:state_snapshot("compilation_plan")
+  local p17_ordinary
+  for _, row in ipairs((p17_actual_plan.stream_plan or {}).rows or {}) do
+    if row.stream_key == "research_iron" then p17_ordinary = row; break end
+  end
+  check(p17_ordinary and p17_ordinary.action == "emit"
+    and p17_ordinary.gates.prerequisites_acyclic.evaluator == "technology-graph",
+    "P17 ordinary final ownership starts from the post-graph emitted row")
+  local p17_work_counts = emitted_context:state_view("compiler_telemetry").counters
+  check(counts.rows == 115
+    and p17_work_counts.full_record_copy_count == 0
+    and p17_work_counts.technology_design_full_copies == 0,
+    "P17's complete ordinary compiler run retains zero full-record and Design copies for every final row"
+      .. " rows=" .. tostring(counts.rows)
+      .. " full_record_copies=" .. tostring(p17_work_counts.full_record_copy_count)
+      .. " design_full_copies=" .. tostring(p17_work_counts.technology_design_full_copies))
+
+  local p17_input = deepcopy(p17_ordinary)
+  p17_input.gates.target_supported.p17_unknown = {nested = {captured = true}}
+  p17_input.technology_design = technology_design.from_generation_row(p17_input)
+  p17_input.technology_design.provenance.fields["ownership.action"].p17_unknown = {
+    nested = {captured = true}
+  }
+  local p17_owner = generation_plan.new({source_fingerprints = {
+    p17 = {nested = {captured = true}}
+  }})
+  p17_owner:add_owned_derived(p17_input)
+  check(next(p17_input) == nil,
+    "P17 consumes the compiler-owned post-graph row after its transfer into the private Plan owner")
+  local p17_view = p17_owner:finalize():artifact_view()
+  check(p17_view.rows[1].gates == nil and p17_view.rows[1].technology_design == nil,
+    "P17 stores compact final row handles only in its trusted internal Plan view")
+
+  local p17_first_export = generation_plan.export_artifact(p17_view)
+  local p17_first_row = p17_first_export.rows[1]
+  check(p17_first_row.gates.prerequisites_acyclic.evaluator == "technology-graph"
+    and p17_first_row.gates.target_supported.p17_unknown.nested.captured == true
+    and p17_first_row.technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured == true,
+    "P17 expands complete post-graph Gate and Design provenance at export")
+  p17_first_row.gates.target_supported.evidence.p17_export_mutation = {caller = true}
+  p17_first_row.technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured = false
+  p17_first_export.source_fingerprints.p17.nested.captured = false
+  p17_first_export.validation_summary.action_counts.emit = 999
+  local p17_second_export = generation_plan.export_artifact(p17_view)
+  check(p17_second_export.rows[1].gates.target_supported.evidence.p17_export_mutation == nil
+    and p17_second_export.rows[1].technology_design.provenance.fields["ownership.action"].p17_unknown.nested.captured == true
+    and p17_second_export.source_fingerprints.p17.nested.captured == true
+    and p17_second_export.validation_summary.action_counts.emit == 1,
+    "P17 row, metadata, and summary export mutations cannot reach private ownership")
+  -- Public Plan:add is the supported mutable import boundary. It deep-copies
+  -- the caller row, unlike the compiler-owned consumed transfer above.
+  -- Use an unmodified ordinary public record for the public import path. The
+  -- P17 internal row above carries deliberate provenance additions and is
+  -- consumed, so it is not an external untrusted-input fixture.
+  local p17_public_input = deepcopy(p17_ordinary)
+  local p17_public_owner = generation_plan.new({source_fingerprints = {
+    p17_public = {nested = {captured = true}}
+  }})
+  p17_public_owner:add(p17_public_input)
+  p17_public_input.gates.target_supported.evidence.p17_public_producer_mutation = {after_add = true}
+  p17_public_input.technology_design.design.ownership.value.action = "p17-tampered-public-action"
+  p17_public_input.technology_design.provenance.fields["ownership.action"].p17_public_mutation = {
+    nested = {after_add = true}
+  }
+  local p17_public_export = p17_public_owner:finalize():artifact()
+  check(p17_public_export.rows[1].gates.target_supported.evidence.p17_public_producer_mutation == nil
+    and p17_public_export.rows[1].technology_design.design.ownership.value.action ~= "p17-tampered-public-action"
+    and p17_public_export.rows[1].technology_design.provenance.fields["ownership.action"].p17_public_mutation == nil,
+    "P17 supported public Plan:add deep admission isolates mutable producer rows")
+
+  local p17_forged_external = generation_plan.export_artifact(p17_view)
+  p17_forged_external.rows[1].gates.target_supported.evidence.p17_forged_external = true
+  check(not pcall(compilation_plan.finalize, p17_forged_external, {}, {
+    effect_target_inventory = emitted_context:service("effect_target_inventory")
+  }), "P17 forged external schema-3 rows re-enter through untrusted Gate admission")
+
+  -- The same owner boundary also covers an existing native technology patch,
+  -- including its complete expected snapshot rather than an emit-only shape.
+  local p17_adopt = deepcopy(p17_ordinary)
+  local p17_native_owner = "p17-owned-native-owner"
+  p17_adopt.action, p17_adopt.reason, p17_adopt.technology_name = "adopt", p17_native_owner, nil
+  local p17_expected_snapshot = {
+    name = p17_native_owner,
+    effects = deepcopy(p17_adopt.fields.effects),
+    prerequisites = deepcopy(p17_adopt.fields.prerequisites),
+    unit = {
+      ingredients = deepcopy(p17_adopt.fields.ingredients),
+      count_formula = p17_adopt.fields.count_formula,
+      count = p17_adopt.fields.count,
+      time = p17_adopt.fields.research_time
+    },
+    max_level = p17_adopt.fields.max_level,
+    localised_name = deepcopy(p17_adopt.fields.localised_name),
+    localised_description = deepcopy(p17_adopt.fields.localised_description),
+    icon = p17_adopt.fields.icon,
+    icon_size = p17_adopt.fields.icon_size,
+    icons = deepcopy(p17_adopt.fields.icons),
+    order = p17_adopt.fields.order,
+    level = p17_adopt.fields.level,
+    enabled = p17_adopt.fields.enabled,
+    hidden = p17_adopt.fields.hidden,
+    upgrade = p17_adopt.fields.upgrade
+  }
+  p17_adopt.adoption = {
+    schema = 2, owner = p17_native_owner, operation = "fixture-patch",
+    configured_fields = {}, effects = deepcopy(p17_adopt.fields.effects),
+    input_snapshot = deepcopy(p17_expected_snapshot), expected_snapshot = deepcopy(p17_expected_snapshot)
+  }
+  p17_adopt.adoption.input_fingerprint = fingerprint.of(p17_adopt.adoption.input_snapshot)
+  p17_adopt.technology_design = technology_design.from_generation_row(p17_adopt)
+  p17_adopt.adoption.output_fingerprint = p17_adopt.technology_design.prototype_fingerprint
+  p17_adopt.technology_design = technology_design.from_generation_row(p17_adopt)
+  local p17_adopt_owner = generation_plan.new()
+  p17_adopt_owner:add_owned_derived(p17_adopt)
+  check(next(p17_adopt) == nil,
+    "P17 consumes compiler-owned native patch rows after private final transfer")
+  local p17_adopt_view = p17_adopt_owner:finalize():artifact_view()
+  local p17_adopt_export = generation_plan.export_artifact(p17_adopt_view)
+  check(p17_adopt_view.rows[1].gates == nil and p17_adopt_export.rows[1].action == "adopt"
+    and p17_adopt_export.rows[1].adoption.owner == p17_native_owner
+    and type(p17_adopt_export.rows[1].technology_design.gates) == "table",
+    "P17 native patch rows retain compact internal identity and complete export")
+
   local function compare_draft_case(change)
     local input = deepcopy(draft_fixture_row)
     change(input)
@@ -709,9 +1308,11 @@ rejected(function() compilation_model.sanitize_base_operations({missing_technolo
   "TechnologyDesign base continuation operation is required.")
 stable_finalization(emitted_journal, emitted_journal:finalize(), true, "actual emitted catalogue")
 local function plan_for(operations)
-  return transformation_plan.new({phase = "journal-finalization-control", execution_mode = "SAFE",
-    compilation_snapshot_fingerprint = emitted_plan.compilation_snapshot_fingerprint,
-    policy_fingerprint = emitted_plan.policy_fingerprint, operations = operations})
+  local values = {phase = "journal-finalization-control", execution_mode = "SAFE",
+    policy_fingerprint = emitted_plan.policy_fingerprint, operations = operations}
+  if emitted_plan.input_identity then values.input_identity = emitted_plan.input_identity
+  else values.compilation_snapshot_fingerprint = emitted_plan.compilation_snapshot_fingerprint end
+  return transformation_plan.new(values)
 end
 local empty = mutation_journal.new(plan_for({}))
 local empty_result = empty:finalize()
@@ -730,6 +1331,62 @@ check(default_entry:snapshot().entries[1].after_projection.changed_default_entry
 local reduced_entry = mutation_journal.new(one_plan)
 check(reduced_entry:record(operation, before, after, "applied", nil, {return_entry = false}) == nil,
   "Internal executor record can omit its discarded entry copy")
+do
+  -- The former executor sequence is an independent full-journal oracle. The
+  -- new owner must bind the actual capture, not merely reuse expected digests.
+  local old = mutation_journal.new(one_plan)
+  fingerprint.reset_metrics()
+  old:assert_before(operation, before)
+  old:record(operation, before, after, "applied", nil, {skip_precheck = true, return_entry = false})
+  local old_metrics = fingerprint.metrics()
+  local owned = mutation_journal.new(one_plan)
+  local captured = deepcopy(before)
+  local captures, applied = 0, 0
+  fingerprint.reset_metrics()
+  local returned = owned:execute(operation, function()
+    captures = captures + 1
+    return captures == 1 and captured or after
+  end, function(actual_operation)
+    check(actual_operation == operation, "Execution retains the exact admitted operation")
+    applied = applied + 1
+    captured.changed_during_mutation = true
+    return "actual-emitter-result"
+  end)
+  local owned_metrics = fingerprint.metrics()
+  check(owned_metrics.fingerprint_calls == old_metrics.fingerprint_calls - 1
+      and owned_metrics.canonical_calls == old_metrics.canonical_calls - 1,
+    "Owned execution eliminates one complete before-state encoding per operation")
+  check(captures == 2 and applied == 1 and returned == "actual-emitter-result",
+    "Owned execution captures both actual states and invokes emission once")
+  check(fingerprint.canonical(owned:finalize()) == fingerprint.canonical(old:finalize()),
+    "Owned execution preserves full journal bytes and isolates before-state aliases")
+  local exported = owned:snapshot()
+  exported.entries[1].before_snapshot.changed_export = true
+  check(owned:snapshot().entries[1].before_snapshot.changed_export == nil,
+    "Owned execution retains defensive full snapshot exports")
+  rejected(function() owned:execute(operation, function() return before end, function() end) end,
+    "MutationJournal is finalized")
+  for _, failure in ipairs({"precondition", "postcondition", "mutation"}) do
+    local journal = mutation_journal.new(one_plan)
+    local reads, writes = 0, 0
+    rejected(function()
+      journal:execute(operation, function()
+        reads = reads + 1
+        if failure == "precondition" or (failure == "postcondition" and reads == 2) then return {} end
+        return reads == 1 and before or after
+      end, function()
+        writes = writes + 1
+        if failure == "mutation" then error("controlled-emitter-failure") end
+      end)
+    end, failure == "mutation" and "mutation-error" or failure .. "-mismatch")
+    local result = journal:finalize({allow_failed = true})
+    check(result.terminal_counts.failed == 1 and result.missing_operation_count == 0,
+      failure .. " failure remains an actual failed terminal record")
+    check(reads == (failure == "precondition" and 1 or 2)
+        and writes == (failure == "precondition" and 0 or 1),
+      failure .. " failure preserves before/after capture and mutation boundaries")
+  end
+end
 local reduced_finalization = reduced_entry:finalize({return_snapshot = false})
 check(reduced_finalization.entries == nil
   and reduced_finalization.executed_operation_count == 1
@@ -793,6 +1450,58 @@ local out_of_plan_result = out_of_plan:finalize({allow_failed = true})
 check(out_of_plan_result.out_of_plan_operation_count == 1 and out_of_plan_result.missing_operation_count == 1,
   "changed operation retains its bound-plan violation")
 stable_finalization(out_of_plan, out_of_plan_result, false, "out-of-plan operation")
+do
+  -- Exercise the real patch executor and adoption transaction as well as the
+  -- ordinary create operations already executed above. No emitter is mocked.
+  local native_contract = require("prototypes.mir.domain.native_owner.contract")
+  local design_contract = require("prototypes.mir.domain.technology.technology_design")
+  local row
+  for _, candidate in ipairs(emitted_context:state_view("compilation_plan").stream_plan.rows) do
+    if candidate.action == "emit" then row = deepcopy(candidate); break end
+  end
+  check(row ~= nil, "Native patch control starts from a real admitted stream")
+  local owner = "mir-owned-mutation-native-control"
+  local expected = native_contract.snapshot(data.raw.technology[row.technology_name])
+  expected.name = owner
+  local input = deepcopy(expected)
+  input.unit.count_formula = "50*L+1"
+  local prototype = deepcopy(input)
+  prototype.type = "technology"
+  data.raw.technology[owner] = prototype
+  row.action = "adopt"
+  row.technology_name = nil
+  row.adoption = {owner = owner, key = row.stream_key, operation = "configure_native_owner",
+    configured_fields = {"unit"}, input_snapshot = input, expected_snapshot = expected,
+    input_fingerprint = fingerprint.of(input), output_fingerprint = fingerprint.of(expected)}
+  row.technology_design = design_contract.from_generation_row(row)
+  local snapshot = require("prototypes.mir.domain.compiler.compilation_snapshot").new({
+    stream_inputs = {rows = {row}}, base_continuation_inputs = {operations = {}}
+  })
+  local saved_data = data
+  data = nil
+  local compiled_ok, compiled = pcall(require("prototypes.mir.planner.compiler").compile, snapshot,
+    require("prototypes.mir.domain.compiler.policy_snapshot").new({}))
+  data = saved_data
+  assert(compiled_ok, compiled)
+  local patch_plan = compiled.transformation_plan
+  check(compiled.schema == 1 and compiled.input_identity == nil
+    and compiled.compilation_snapshot_fingerprint == snapshot.snapshot_fingerprint
+    and patch_plan.schema == 2 and patch_plan.input_identity == nil
+    and #patch_plan.operations == 1 and patch_plan.operations[1].action == "patch",
+    "Pure compiler remains context-free and preserves the generic native-patch contract")
+  local journal = mutation_journal.new(patch_plan)
+  Context.with_active(Context.new(), function()
+    require("prototypes.mir.emit.technology_operation_executor").apply_plan(patch_plan, journal)
+  end)
+  local result = journal:finalize()
+  check(result.complete and result.terminal_counts.applied == 1
+      and fingerprint.of(native_contract.snapshot(prototype)) == row.adoption.output_fingerprint,
+    "Real native patch emission satisfies the independently captured postcondition")
+  check(fingerprint.canonical(result.entries[1].before_snapshot) == fingerprint.canonical(input)
+      and fingerprint.canonical(result.entries[1].after_projection) == fingerprint.canonical(expected),
+    "Real patch journal preserves both actual native snapshots")
+  data.raw.technology[owner] = nil
+end
 local emitted = data.raw.technology[name]
 data.raw.technology[name] = nil
 check(not pcall(assert_preserved), "The preservation oracle rejects deletion of non-core research")
@@ -802,4 +1511,11 @@ check(not pcall(assert_preserved), "The preservation oracle rejects a changed ef
 data.raw.technology[name] = emitted
 assert_preserved()
 check(true, "Opposing controls restore their copied test output")
-return {assertions = checks, rows = counts.rows, operations = counts.operations}
+local owner_contract = assert(loadfile(source_root .. "/../tests/compiler/recipe_source_owner_contract.lua"))()
+local owner_contract_assertions = owner_contract.run(check)
+return {
+  assertions = checks,
+  rows = counts.rows,
+  operations = counts.operations,
+  recipe_source_owner_assertions = owner_contract_assertions
+}

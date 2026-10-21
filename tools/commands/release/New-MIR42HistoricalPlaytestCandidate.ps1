@@ -2,7 +2,7 @@ param(
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path,
   [ValidateSet('f017', 'f016', 'f015', 'f014', 'f013')][string]$Target = 'f017',
   [ValidatePattern('^[A-Z0-9][A-Z0-9.-]*$')][string]$CandidateId = 'MIR42-HISTORICAL',
-  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion = '4.2.0',
+  [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')][string]$SourceVersion = '4.2.0',
   [ValidateRange(2, 3)][int]$Repetitions = 2,
   [string]$OutputRoot = 'build/mir42-historical-playtest',
   [switch]$RefreshSourceBindings,
@@ -20,7 +20,7 @@ function Set-MIR42HistoricalBaselinePackageIdentity {
   # The verified adapter remains a pinned 4.2 baseline. Project its identity
   # only in this private build tree before the normal patch writer validates
   # the requested minor. Never broaden that writer's accepted input versions.
-  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5|6)[.]0$') {
+  if ($BaselineSourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5|6|7)[.]0$') {
     throw '[mir42-historical-baseline-projection]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -127,8 +127,12 @@ function ConvertTo-MIR42HistoricalAdapterBytes {
     # source patch in the historical projection.
     $readmeIdentity = [regex]::Match($text, '\A# More Infinite Research (?<version>4\.(?<minor>[2345])\.100[0-9]{2})(?:\r?\n|$)')
     if (-not $readmeIdentity.Success) { throw '[mir42-historical-readme-source-identity]' }
+    $baseFloor = [regex]::Matches($text, '`base >= 1[.]0(?:[.][0-9]+)?`')
+    if ($baseFloor.Count -ne 1) { throw '[mir42-historical-readme-source-floor]' }
+    $testedVersion = [regex]::Match($engineVersion, '^(?<version>[0-9]+[.][0-9]+[.][0-9]+)(?:[.][0-9]+)?$')
+    if (-not $testedVersion.Success) { throw '[mir42-historical-readme-tested-engine]' }
     $replacements = @(
-      @{ from = '`base >= 1.0`'; to = ('`base >= ' + $line + '`') },
+      @{ from = $baseFloor[0].Value; to = ('`base >= ' + $testedVersion.Groups['version'].Value + '`') },
       @{ from = 'It is a reduced target-native projection from the current MIR source. It preserves the eleven supported Factorio 1.0 research streams without importing Space Age, `mod-data`, settings-profile, or modern adoption systems.'; to = 'It is a reduced target-specific projection from the current MIR source. Emitted streams and progression depend on the actual engine and prototype capabilities.' },
       @{ from = 'MIR emits eleven stable, manifest-backed infinite research streams when their target effects are available:'; to = 'MIR presents the following manifest-backed research catalog when the target has the required effects, science packs, and prerequisites. A fresh-load receipt does not assert that every catalog entry emits on every historical line:' },
       @{ from = 'MIR also extends supported Factorio 1.0 base infinite technology families for braking force, research speed, worker robot storage, weapon shooting speed, and laser turret shooting speed. Target-aware science selection uses Factorio 1.0 `tool` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission.'; to = "MIR may create qualified continuations for supported Factorio $line base infinite technology families when target-state gates pass. Target-aware science selection uses Factorio $line ``tool`` prototypes and rejects missing, disabled, cyclic, or unreachable prerequisites before emission." },
@@ -205,7 +209,7 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     [Parameter(Mandatory)][string]$TargetRecordPath
   )
 
-  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5|6)[.](?<patch>[0-9]{1,2})$') {
+  if ($SourceVersion -cnotmatch '^4[.](?<minor>2|3|4|5|6|7)[.](?<patch>[0-9]{1,2})$') {
     throw '[mir42-historical-authentication-source-version]'
   }
   $sourceMinor = [int]$Matches.minor
@@ -289,30 +293,16 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     $info.version = [string]$identity.distribution_version
     $memberBytes['info.json'] = $utf8.GetBytes((($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"))
 
-    $changelog = $utf8.GetString($memberBytes['changelog.txt']).Replace("`r`n", "`n")
+    $changelog = $utf8.GetString($memberBytes['changelog.txt'])
     $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
     if (-not $firstVersion.Success) { throw '[mir42-historical-authentication-changelog-identity]' }
-    if ($firstVersion.Groups[1].Value -cne [string]$identity.distribution_version) {
-      $entry = "---------------------------------------------------------------------------------------------------`nVersion: $($identity.distribution_version)`n  Info:`n    - Target package from source $SourceVersion.`n"
-      if ($SourceVersion -ceq '4.4.1') {
-        $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
-      } elseif ($SourceVersion -ceq '4.5.2') {
-        $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
-        $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
-      } elseif ($SourceVersion -ceq '4.5.1') {
-        $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
-      } elseif ($SourceVersion -ceq '4.5.0') {
-        $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
-      } elseif ($SourceVersion -ceq '4.4.2') {
-        $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
-        if ([string]$Record.factorio_line -ceq '0.15') {
-          $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
-        } elseif ([string]$Record.factorio_line -ceq '0.16') {
-          $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
-        }
-      }
-      $changelog = $entry + $changelog
+    $minimumFactorioVersion = ''
+    if ($SourceVersion -cin @('4.6.0','4.7.0')) {
+      $baseRequirements = @($info.dependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
+      if ($baseRequirements.Count -ne 1) { throw '[mir42-historical-authentication-base-minimum]' }
+      $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''
     }
+    $changelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion -MinimumFactorioVersion $minimumFactorioVersion
     $memberBytes['changelog.txt'] = $utf8.GetBytes($changelog)
     $memberBytes['README.md'] = Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $memberBytes['README.md'] -DistributionVersion ([string]$identity.distribution_version) -SourceVersion $SourceVersion
   }
@@ -440,7 +430,7 @@ foreach ($letter in @('A', 'B', 'C') | Select-Object -First $Repetitions) {
   Copy-Item -LiteralPath ([string]$base.tree_path) -Destination $tree -Recurse
   Copy-MIR42HistoricalAdapter -Tree $tree -Record $record -SourceManifest $sourceManifest
   Set-MIR42HistoricalBaselinePackageIdentity -Tree $tree -Record $record -BaselineSourceVersion $baselineSourceVersion
-  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')) {
+  if ($SourceVersion -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')) {
     # Adapter output pins describe the baseline projection. Change only the
     # three current-package identity positions, preserving historical prose.
     $readmePath = Join-Path $tree 'README.md'

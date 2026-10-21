@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-18.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 453 pages as of 2026-10-22.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -79,7 +79,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/architecture/mir4-runtime-continuity.md | MIR 4 Runtime, State, Migration, and Continuity | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-semantic-compiler.md | MIR 4 Semantic Compiler Shadow | current | developer | explanation | mir-maintainers | 2026-08-23 |
 | docs/architecture/mir4-target-compiler.md | MIR 4 Target Compiler | current | developer | explanation | mir-maintainers | 2026-08-28 |
-| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-10-15 |
+| docs/architecture/module-boundaries.md | MIR 4 Repository and Module Boundaries | current | maintainer | explanation | mir-maintainers | 2026-10-21 |
 | docs/architecture/native-owner-binding.md | Native Owner Binding | current | maintainer | explanation | mir-maintainers | 2026-07-20 |
 | docs/architecture/procedural-compatibility-kernel.md | Procedural Compatibility Kernel | current | maintainer | explanation | mir-maintainers | 2026-08-03 |
 | docs/architecture/README.md | Architecture | current | maintainer | explanation | mir-maintainers | 2026-08-08 |
@@ -185,7 +185,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/developer-tools.md | Developer Tools | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/documentation-governance.md | Documentation Governance | current | maintainer | how-to | mir-maintainers | 2026-08-26 |
 | docs/maintainer/factorio-2.1-experimental-channel.md | Factorio 2.1 Experimental Channel Policy | current | maintainer | how-to | mir-maintainers | 2026-09-01 |
-| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-10-15 |
+| docs/maintainer/fixture-workflow.md | Fixture Workflow | current | maintainer | how-to | mir-maintainers | 2026-10-21 |
 | docs/maintainer/localization.md | Localization Governance | current | maintainer | how-to | mir-maintainers | 2026-08-03 |
 | docs/maintainer/manual-test-plan.md | Manual Test Plan | current | maintainer | how-to | mir-maintainers | 2026-07-21 |
 | docs/maintainer/mir3-terminal-repository-protections.md | MIR 3 Terminal Repository Protections | current | release-manager | how-to | mir-maintainers | 2026-08-15 |
@@ -217,7 +217,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |
 | docs/README.md | More Infinite Research 4 documentation | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |
-| docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-08-03 |
+| docs/reference/compiler-authority-table.md | Compiler Authority Table | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/compiler-diagnostics.md | Compiler Diagnostic Codes | current | developer | reference | mir-maintainers | 2026-07-13 |
 | docs/reference/factorio-api-proof-points.md | API Proof Points | current | developer | reference | mir-maintainers | 2026-09-01 |
 | docs/reference/factorio-integration-reference.md | Factorio Integration Reference | current | developer | reference | mir-maintainers | 2026-07-07 |
@@ -262,10 +262,10 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/reference/research-cost-v2-preview.md | ResearchCostModel V2 Preview | draft | developer | reference | mir-maintainers | 2026-08-21 |
 | docs/reference/schemas/compatibility-claim.md | Compatibility Claim Schema | current | developer | reference | mir-maintainers | 2026-07-07 |
 | docs/reference/schemas/compatibility-pack.md | CompatibilityPack Schema | current | developer | reference | mir-maintainers | 2026-07-24 |
-| docs/reference/schemas/compiler-boundary.md | Compiler Boundary Schemas | current | developer | reference | mir-maintainers | 2026-07-24 |
+| docs/reference/schemas/compiler-boundary.md | Compiler Boundary Schemas | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/schemas/compiler-evidence.md | CompilerEvidence Schema | current | developer | reference | mir-maintainers | 2026-10-11 |
 | docs/reference/schemas/compiler-provider.md | CompilerProvider Schema | current | developer | reference | mir-maintainers | 2026-07-13 |
-| docs/reference/schemas/compiler-runtime-contracts.md | Compiler Runtime Contracts | current | developer | reference | mir-maintainers | 2026-07-24 |
+| docs/reference/schemas/compiler-runtime-contracts.md | Compiler Runtime Contracts | current | developer | reference | mir-maintainers | 2026-10-21 |
 | docs/reference/schemas/decision-record.md | Decision Records And Stream Specs | current | developer | reference | mir-maintainers | 2026-07-12 |
 | docs/reference/schemas/family-operator-dsl.md | Family Operator DSL | current | developer | reference | mir-maintainers | 2026-07-18 |
 | docs/reference/schemas/family-rule.md | FamilyRule Schema | current | developer | reference | mir-maintainers | 2026-07-12 |
@@ -389,7 +389,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/releases/mir4-bootstrap-local-beta-plan.md | MIR 4 Bootstrap Local Beta Plan | archived | release-manager | release-plan | mir-maintainers | 2026-08-17 |
 | docs/releases/mir4-community-outcomes-2026-09-06.md | MIR 4.2 community implementation outcomes | current | maintainer | release-plan | mir-maintainers | 2026-09-11 |
 | docs/releases/mir4-integration-and-delivery-plan.md | MIR 4 Integration and Delivery Plan | current | maintainer | release-plan | mir-maintainers | 2026-10-14 |
-| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-10-17 |
+| docs/releases/mir4-post-4.0-roadmap.md | MIR 4 Post-4.0 Roadmap | current | maintainer | release-plan | mir-maintainers | 2026-10-22 |
 | docs/releases/mir42-compatibility-playtest-plan.md | MIR 4.2 Compatibility Scope and Player Playtest Plan | current | maintainer | release-plan | mir-maintainers | 2026-09-27 |
 | docs/releases/mir42-nine-target-candidate-playtest-matrix.md | MIR 4.2 Nine-Target Candidate and Playtest Matrix | current | release-manager | release-plan | mir-maintainers | 2026-10-10 |
 | docs/releases/MIR42-nine-target-rehearsal-input-gap-2026-09-30.md | MIR 4.2 nine-target rehearsal input gap | current | release-manager | reference | mir-maintainers | 2026-09-30 |

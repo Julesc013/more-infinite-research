@@ -42,7 +42,7 @@ function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
 function Read-MIRNativeProbeCurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
     [ValidateSet('f210','f200','f110','f100')][string]$Target='f210',
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion='4.2.1')
+    [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1')
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
   $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
@@ -87,7 +87,7 @@ function Read-MIRNativeProbeCurrentCandidate {
 }
 function Read-MIRNativeProbeF210CurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion='4.2.1')
+    [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1')
   Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive $Archive -ReceiptPath $ReceiptPath -Target f210 -SourceVersion $SourceVersion
 }
 function New-MIRNativeProbeResourceContext {
@@ -206,6 +206,7 @@ function Invoke-MIRNativeProbeProcess {
     [Parameter(Mandatory)][string[]]$Arguments,
     [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
     [switch]$FactorioSteamIdentity,
+    $PreStartAdmissionWait=$null,
     [scriptblock]$CompletionPredicate
   )
   $remaining=Get-MIRNativeProbeRemainingOutputBytes -Context $Context
@@ -221,6 +222,7 @@ function Invoke-MIRNativeProbeProcess {
     # Do not add an unknown named parameter to existing non-Factorio mock
     # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
     if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
+    if($null -ne $PreStartAdmissionWait){$governorArguments.PreStartAdmissionWait=$PreStartAdmissionWait}
     # Library validation builds temporary archive inventories. Release those
     # completed host allocations before admission measures the native child.
     # The active lease, inventories and process/machine reserves remain live.
@@ -234,7 +236,10 @@ function Invoke-MIRNativeProbeProcess {
     $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='interrupted';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');error=$_.Exception.Message})
     throw
   }
-  $Context.runs.Add([pscustomobject]@{index=$Context.process_index;status='passed';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');result=$result})
+  $completed=[pscustomobject]@{index=$Context.process_index;status='passed';ledger=($prefix+'.resources.jsonl');stdout=($prefix+'.stdout.txt');stderr=($prefix+'.stderr.txt');result=$result}
+  $waitProperty=$result.PSObject.Properties['admission_wait']
+  if($null-ne$waitProperty){$completed|Add-Member -NotePropertyName admission_wait -NotePropertyValue $waitProperty.Value}
+  $Context.runs.Add($completed)
   return $Context.runs[$Context.runs.Count-1]
 }
 
@@ -252,6 +257,8 @@ function Invoke-MIRNativeProbeFactorioProcess {
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
     [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
+    [string]$AdmissionPhase='',
     [scriptblock]$CompletionPredicate
   )
   if($Arguments.Count -lt 1 -or $Arguments.Count -gt 128){throw '[mir-native-probe-argument-budget]'}
@@ -265,13 +272,21 @@ function Invoke-MIRNativeProbeFactorioProcess {
   # directly so its duration is native executable start-to-exit, rather than
   # the historical PowerShell-wrapper tree duration. This clock-scope repair
   # removes developer harness work; it is not product-speedup evidence.
-  $run=Invoke-MIRNativeProbeProcess -Context $Context -FilePath $FilePath -Arguments $Arguments -TimeoutSeconds $TimeoutSeconds `
-    -FactorioSteamIdentity -CompletionPredicate $CompletionPredicate
+  $actorArguments=@{Context=$Context;FilePath=$FilePath;Arguments=$Arguments;TimeoutSeconds=$TimeoutSeconds;FactorioSteamIdentity=$true;CompletionPredicate=$CompletionPredicate}
+  if($AdmissionWaitSeconds -gt 0){
+    if([string]::IsNullOrWhiteSpace($AdmissionPhase)){throw '[mir-native-probe-admission-phase]'}
+    $actorArguments.PreStartAdmissionWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase $AdmissionPhase
+  }
+  $run=Invoke-MIRNativeProbeProcess @actorArguments
   $run.result | Add-Member -NotePropertyName duration_measurement -NotePropertyValue ([ordered]@{
     scope='direct-native-executable-start-to-exit'
     historical_scope='governed-powershell-wrapper-tree-start-to-exit'
     comparability='scope-changed; compare only fresh direct-native measurements; no product-speedup claim'
   }) -Force
+  if($actorArguments.ContainsKey('PreStartAdmissionWait')){
+    $run | Add-Member -NotePropertyName admission_wait -NotePropertyValue $actorArguments.PreStartAdmissionWait -Force
+    $run.result | Add-Member -NotePropertyName admission_wait -NotePropertyValue $actorArguments.PreStartAdmissionWait -Force
+  }
   return $run
 }
 
@@ -280,7 +295,7 @@ function New-MIRNativeProbeTargetPackage {
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$RepoRoot,
     [ValidateSet('F210-TIN-OBS','F210-CURRENT-BA-FINAL-ROUTES-OBSERVER','BROWSER','SCIENCE-LAUNCH')][string]$CandidatePrefix='F210-TIN-OBS',
     [ValidateSet('f210','f200')][string]$Target='f210',
-    [ValidateSet('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')][string]$SourceVersion='4.2.1'
+    [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1'
   )
   $targetKey=$Target.ToLowerInvariant()
   if($CandidatePrefix -cnotin @('BROWSER','SCIENCE-LAUNCH') -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}

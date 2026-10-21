@@ -175,4 +175,58 @@ function M.for_each_fuel_burning(callback)
   end
 end
 
+-- Placement followed by mining is a native item conversion. Keep this lazy
+-- under the existing item-fact owner: historical snapshots and route hashes
+-- must not change merely because a new proof consumes this additional fact.
+function M.for_each_placement_mining_return(name, callback)
+  local cache = compiler_context.current():state_view("item_placement_mining_returns", function() return {} end)
+  local row = cache[name]
+  if not row then
+    row = {results = {}}
+    local item = lookup.item_prototype(name)
+    if item and item.place_result then
+      local entity = lookup.entity_prototype(item.place_result)
+      if not entity then
+        row.reason = "missing-placement-entity"
+      elseif entity.minable then
+        local minable = entity.minable
+        if type(minable) ~= "table" or (minable.result ~= nil and minable.results ~= nil) then
+          row.reason = "malformed-mining-results"
+        elseif minable.result ~= nil then
+          if type(minable.result) ~= "string" or minable.result == "" then
+            row.reason = "malformed-mining-result"
+          else row.results[1] = {type = "item", name = minable.result, amount = minable.count or 1} end
+        elseif minable.results ~= nil then
+          if type(minable.results) ~= "table" then row.reason = "malformed-mining-results"
+          else
+            local count = 0
+            for ordinal, result in ipairs(minable.results) do
+              if type(result) ~= "table" then row.reason = "malformed-mining-result"; break end
+              local normalized = deepcopy(result)
+              normalized.type = normalized.type or "item"
+              normalized.name = normalized.name or normalized[1]
+              normalized.amount = normalized.amount or normalized[2]
+              if type(normalized.name) ~= "string" or normalized.name == ""
+                or (normalized.type ~= "item" and normalized.type ~= "fluid") then
+                row.reason = "malformed-mining-result"; break
+              end
+              row.results[ordinal] = normalized
+              count = count + 1
+            end
+            for key in pairs(minable.results) do
+              if type(key) ~= "number" or key < 1 or key > count or key ~= math.floor(key) then
+                row.reason = "malformed-mining-results"; break
+              end
+            end
+          end
+        end
+      end
+    end
+    cache[name] = row
+  end
+  if row.reason then return false, row.reason end
+  for _, result in ipairs(row.results) do callback(deepcopy(result)) end
+  return true
+end
+
 return M

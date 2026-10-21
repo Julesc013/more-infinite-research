@@ -17,11 +17,20 @@ local native_effect_coverage = require("prototypes.mir.policy.native_effect_cove
 local model = require("prototypes.mir.planner.compilation_plan.model")
 local validation = require("prototypes.mir.planner.compilation_plan.validate")
 local plan_fingerprint = require("prototypes.mir.planner.compilation_plan.fingerprint")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
+
+local function migration_state_alias_row(row)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_row(row)
+end
+
+local function migration_state_alias_operation(operation)
+  return k2_imersite_state_alias ~= nil and k2_imersite_state_alias.is_operation(operation)
+end
 
 local M = {}
 local REQUIRED_GATES = hard_gate_authority.order()
 
-local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled)
+local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabled, gate_vector_session)
   local allowances = {}
   if enabled ~= true then return allowances end
   for _, row in ipairs(stream_artifact.rows or {}) do
@@ -45,7 +54,7 @@ local function capture_initial_skip_diagnostic_allowances(stream_artifact, enabl
           candidate_id = row.technology_design.candidate_id,
           design_fingerprint = row.technology_design.design_fingerprint,
           hard_gates_resolved = true,
-          gates_fingerprint = fingerprint.of(row.gates)
+          gate_vector_receipt = gate_contract.capture_initial_skip_gate_vector(gate_vector_session, row.gates)
         }
       end
     end
@@ -243,7 +252,7 @@ end
 local function materialized_stream_operations(artifact, options, preparations)
   options = options or {}
   local out = {}
-  for _, row in ipairs(artifact.rows or {}) do
+  for _, row in ipairs(generation_plan.rows_for_consumption(artifact)) do
     if row.action == "emit" then
       local preparation = preparations and preparations[row]
       if not row.technology_design and not (preparation and options.virtual_projection) then
@@ -283,7 +292,7 @@ local function materialized_stream_operations(artifact, options, preparations)
         technology_design = options.include_design == false and nil or design,
         technology = virtual_technology
           or technology_design.prototype_shape(design, {validated = true}),
-        registry = {kind = "stream", key = row.stream_key},
+        registry = {kind = migration_state_alias_row(row) and k2_imersite_state_alias.registry_kind or "stream", key = row.stream_key},
         stage_kind = row.stage_kind,
         staged_parent_technology = row.staged_parent_technology,
         staged_parent_stream_key = row.staged_parent_stream_key
@@ -323,6 +332,43 @@ local function materialized_stream_operations(artifact, options, preparations)
         expected_snapshot = deepcopy(row.adoption.expected_snapshot)
       })
     end
+  end
+  return out
+end
+
+-- The compatibility holder is intentionally effect-identical to its old
+-- Imersite stream during the JSON-to-runtime handoff. Keep that one checked
+-- operation outside normal owner arbitration; all ordinary operations remain
+-- subject to the existing single-owner resolver.
+local function partition_compatibility_state_operations(operations)
+  local ordinary, aliases = {}, {}
+  for _, operation in ipairs(operations or {}) do
+    if migration_state_alias_operation(operation) then
+      table.insert(aliases, operation)
+    else
+      table.insert(ordinary, operation)
+    end
+  end
+  return ordinary, aliases
+end
+
+local function append_operations(target, values)
+  for _, value in ipairs(values or {}) do table.insert(target, value) end
+  return target
+end
+
+local function player_catalog_rows(rows)
+  local out = {}
+  for _, row in ipairs(rows or {}) do
+    if not migration_state_alias_row(row) then table.insert(out, row) end
+  end
+  return out
+end
+
+local function player_catalog_operations(operations)
+  local out = {}
+  for _, operation in ipairs(operations or {}) do
+    if not migration_state_alias_operation(operation) then table.insert(out, operation) end
   end
   return out
 end
@@ -398,6 +444,9 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     trusted_stream_artifact = true
   elseif type(stream_plan.artifact) == "function" then
     stream_artifact = stream_plan:artifact()
+  elseif generation_plan.is_trusted_artifact(stream_plan) then
+    stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
+    trusted_stream_artifact = true
   elseif compiler_inputs and compiler_inputs.stream_plan_trusted then
     stream_artifact = generation_plan.assert_trusted_artifact(stream_plan)
     trusted_stream_artifact = true
@@ -407,15 +456,40 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   if not stream_artifact or (not preparations and stream_artifact.schema ~= 3) then
     error("CompilationPlan requires GenerationPlan schema 3 or its exact private draft", 2)
   end
+  if trusted_stream_artifact and not generation_plan.is_draft(stream_artifact) then
+    -- A completed Plan exposes compact private rows only through its trusted
+    -- planning view.  Rehydrate the module-owned records for this compiler
+    -- pass; public exports are detached again below.
+    stream_artifact = generation_plan.internal_artifact(stream_artifact)
+  end
   if not trusted_stream_artifact then validation.admit_stream_artifact(stream_artifact) end
+  local initial_skip_gate_vector_session = gate_contract.new_initial_skip_gate_vector_session()
   local initial_skip_diagnostic_allowances = capture_initial_skip_diagnostic_allowances(
-    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true)
+    stream_artifact, compiler_inputs and compiler_inputs.defer_diagnostic_alternatives == true,
+    initial_skip_gate_vector_session)
   local exact_input = compiler_inputs and compiler_inputs.compiler_input
     or model.default_compiler_input(stream_artifact, base_plan, (compiler_inputs or {}).input_sanitation_ledger)
   if compiler_input.is_trusted(exact_input) then compiler_input.assert_trusted(exact_input)
   else compiler_input.verify_untrusted(exact_input) end
+  -- Ordinary input ownership is direct and complete. Legacy CompilerInput
+  -- imports retain their existing snapshot fields; this is one production
+  -- branch selected by the owner, not a second compiler.
+  local active_input = compiler_input.is_active(exact_input)
+    and compiler_input.active_view(exact_input) or nil
+  if active_input then
+    generation_plan.assert_owned_view(active_input.stream_plan)
+    if not rawequal(stream_plan, active_input.stream_plan) then
+      error("Active CompilerInput GenerationPlan differs from CompilationPlan input.", 2)
+    end
+    base_plan = active_input.base_continuation_inputs
+    planned_base_candidates = deepcopy(active_input.base_candidates)
+  end
+  local input_policy = active_input and active_input.policy_snapshot or exact_input.policy_snapshot
+  local provider_decisions = active_input and compiler_input.provider_decisions(exact_input)
+    or exact_input.compilation_snapshot.provider_inputs.decisions or {}
   local stream_effect_integrity
-  local target_inventory = compiler_inputs and compiler_inputs.effect_target_inventory
+  local target_inventory = active_input and active_input.effect_target_inventory
+    or (compiler_inputs and compiler_inputs.effect_target_inventory)
     or effect_target_inventory.capture()
   stream_artifact, stream_effect_integrity, preparations = sanitize_stream_artifact(
     stream_artifact, target_inventory, preparations)
@@ -426,7 +500,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local normalized_base, base_effect_integrity = model.sanitize_base_operations(base_plan, target_inventory)
   for _, operation in ipairs(normalized_base) do
     local normalized, covered_by_native = apply_weapon_overlap_policy(
-      operation, stream_artifact.rows, exact_input.policy_snapshot.weapon_overlap_mode)
+      operation, stream_artifact.rows, input_policy.weapon_overlap_mode)
     -- Preserve the existing post-policy copy boundary without eagerly binding
     -- a TechnologyDesign.  Only a terminal native-coverage, ownership, or graph
     -- decision may require the final design below.
@@ -456,10 +530,13 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
       table.insert(operations, model.copy_operation_with_design_view(normalized))
     end
   end
+  local compatibility_state_operations
+  operations, compatibility_state_operations = partition_compatibility_state_operations(operations)
   local combined_ownership, ownership_omissions
   operations, combined_ownership, ownership_omissions = effect_ownership.resolve_operations(operations, {
-    weapon_overlap_mode = exact_input.policy_snapshot.weapon_overlap_mode
+    weapon_overlap_mode = input_policy.weapon_overlap_mode
   })
+  append_operations(operations, compatibility_state_operations)
   normalized_base = {}
   for _, operation in ipairs(operations) do
     if operation.operation == "emit_base_extension" then table.insert(normalized_base, operation) end
@@ -518,13 +595,18 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   validation_summary.technology_graph = graph_summary
   local source_fingerprints = deepcopy(stream_artifact.source_fingerprints or {})
   source_fingerprints.base_extensions = fingerprint.of(normalized_base)
+  -- The post-graph Plan is module-owned and retains full trusted rows for the
+  -- remaining compiler pass.  Public Context reads deep-copy these full rows;
+  -- do not feed a detached export back into the qualification snapshot, which
+  -- would force every Design and Gate through untrusted admission again.
+  local owned_stream_plan = generation_plan.internal_artifact(stream_artifact)
   local artifact = {
     schema = 2,
     compiler_input = exact_input,
     source_fingerprints = source_fingerprints,
     input_sanitation_ledger = deepcopy((compiler_inputs or {}).input_sanitation_ledger),
     operations = operations,
-    stream_plan = stream_artifact,
+    stream_plan = owned_stream_plan,
     base_extension_operations = normalized_base,
     validation_summary = validation_summary
   }
@@ -556,16 +638,21 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   local final_base_candidates = {}
   for _, candidate in pairs(base_candidates_by_id) do table.insert(final_base_candidates, candidate) end
   table.sort(final_base_candidates, function(left, right) return left.candidate_id < right.candidate_id end)
+  -- Exact migration-state carriers travel through the emitter and actual
+  -- result validation, but never enter player selection/catalogue state.
+  local catalog_rows = player_catalog_rows(generation_plan.rows_for_consumption(stream_artifact))
+  local catalog_operations = player_catalog_operations(operations)
   artifact.technology_catalog = technology_catalog.finalize(
-    stream_artifact.rows,
+    catalog_rows,
     source_fingerprints,
-    operations,
+    catalog_operations,
     {
       generation_plan_fingerprint = stream_artifact.plan_fingerprint,
       compilation_plan_fingerprint = artifact.compilation_fingerprint,
       trusted_designs = true,
       defer_diagnostic_alternatives = compiler_inputs.defer_diagnostic_alternatives == true,
       initial_skip_diagnostic_allowances = initial_skip_diagnostic_allowances,
+      initial_skip_gate_vector_session = initial_skip_gate_vector_session,
       base_candidates = final_base_candidates
     }
   )
@@ -579,7 +666,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   artifact.fingerprint = artifact.compilation_fingerprint
   local operation_fingerprints = plan_fingerprint.operation_fingerprints(operations)
   local rejected_candidates = {}
-  for _, row in ipairs(stream_artifact.rows or {}) do
+  for _, row in ipairs(generation_plan.rows_for_consumption(stream_artifact)) do
     if row.action == "skip" then
       table.insert(rejected_candidates, {
         candidate_id = row.technology_design.candidate_id,
@@ -618,7 +705,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end)
 
   local provider_claims, review_required_candidates = {}, {}
-  for _, decision in ipairs(exact_input.compilation_snapshot.provider_inputs.decisions or {}) do
+  for _, decision in ipairs(provider_decisions) do
     local projection = {
       provider_id = decision.provider_id,
       provider_version = decision.provider_version,
@@ -666,7 +753,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
         design_fingerprint = selection.design_fingerprint,
         profile_id = profile_id,
         status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
-        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+        profile_authority_fingerprint = input_policy.quality_profile_fingerprint
       })
       table.insert(promotion_dispositions, {
         candidate_id = selection.candidate_id,
@@ -686,7 +773,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
         design_fingerprint = candidate.design_fingerprint,
         profile_id = "base-continuation-v1",
         status = released and "NOT_APPLICABLE_EXISTING_RELEASED_ID" or "INCOMPLETE",
-        profile_authority_fingerprint = exact_input.policy_snapshot.quality_profile_fingerprint
+        profile_authority_fingerprint = input_policy.quality_profile_fingerprint
       })
       table.insert(promotion_dispositions, {
         candidate_id = candidate.candidate_id,

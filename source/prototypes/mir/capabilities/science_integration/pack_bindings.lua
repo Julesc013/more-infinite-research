@@ -41,6 +41,16 @@ local function outputs_pack(fact, pack_name)
   return true
 end
 
+local function science_ingredient_packs(fact)
+  local out = {}
+  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
+    if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
+      out[#out + 1] = ingredient.name
+    end
+  end
+  return out
+end
+
 local function binding(pack_name, declaration, reference_only)
   if not pack_registry.science_pack_exists(pack_name) then
     return nil, "not-a-lab-input:" .. tostring(pack_name)
@@ -61,16 +71,11 @@ local function binding(pack_name, declaration, reference_only)
     source_kind = "declared-recipe",
     unlockers = {},
     progression_prerequisites = {},
-    ingredient_packs = {},
+    ingredient_packs = science_ingredient_packs(fact),
     -- This record validates the approved source references. It is not an
     -- acquisition proof and must never be published as one.
     acquisition_proof = false
   }
-  for _, ingredient in ipairs(fact.ingredient_identities or {}) do
-    if ingredient.type == "item" and pack_registry.science_pack_exists(ingredient.name) then
-      out.ingredient_packs[#out.ingredient_packs + 1] = ingredient.name
-    end
-  end
   if declaration.allow_initial == true and fact.enabled_without_research == true then
     out.status, out.initial = "initial", true
     return out
@@ -329,6 +334,43 @@ local function direct_resource_source(pack_name, shared)
     progression_prerequisites = {}, ingredient_packs = {}, acquisition_proof = false}
 end
 
+-- A retained Base/modded orbital-trigger shape uses a disabled ownerless
+-- same-name recipe, a send-item-to-orbit technology trigger, and a positive
+-- typed launch product on that trigger item. A plain recipe-to-effect index
+-- cannot express that finite relation. Ordinary official Space Age differs:
+-- it replaces the trigger with build-entity and an explicit recipe unlock.
+-- This binding neither proves rocket acquisition nor searches a production
+-- graph.
+local function trigger_output_source(pack_name, recipe_name, fact)
+  if recipe_name ~= pack_name or not fact or fact.enabled_without_research == true
+    or not outputs_pack(fact, pack_name) then return nil end
+  -- A trigger/output route represents the otherwise ownerless native recipe.
+  -- Any unlock-recipe effect, even one that is disabled or malformed, remains
+  -- an explicit competing declaration and must stay on the normal owner path.
+  if #recipe_unlocks.for_recipe(recipe_name) ~= 0 then return nil end
+  local technology = data_raw.technology(pack_name)
+  if not technology or technology.name ~= pack_name then return nil end
+  local trigger = technology.research_trigger
+  if type(trigger) ~= "table" or trigger.type ~= "send-item-to-orbit"
+    or type(trigger.item) ~= "string" then return nil end
+  local payload = prototype_lookup.item_prototype(trigger.item)
+  if not payload or not has_item_output(payload.rocket_launch_products, pack_name) then return nil end
+  if technology_reason(pack_name) then return nil end
+  return {
+    pack_name = pack_name,
+    binding_id = "approved-trigger-output/" .. pack_name,
+    source_kind = "declared-trigger-output",
+    recipe_name = recipe_name,
+    status = "research",
+    initial = false,
+    unlocker = pack_name,
+    unlockers = {pack_name},
+    progression_prerequisites = {},
+    ingredient_packs = science_ingredient_packs(fact),
+    acquisition_proof = false
+  }
+end
+
 local function declared_source(pack_name, shared)
   -- The approved mined seed precedes later replication/recycling recipes.
   -- Their existence does not make the original resource research-locked.
@@ -381,6 +423,8 @@ local function declared_source(pack_name, shared)
     end
     if #gates == 0 or (#gates > 1
       and not (shared.science_binding_policy or {}).direct_unlock_alternatives) then
+      local trigger_source = trigger_output_source(pack_name, recipe_name, fact)
+      if trigger_source then return trigger_source, nil, true, {trigger_source.unlocker} end
       return nil, "ambiguous-approved-pack-unlock:" .. pack_name
     end
   end
@@ -392,21 +436,21 @@ local function declared_source(pack_name, shared)
 end
 
 local function direct_alternatives(pack_name, primary, shared, primary_gates)
-  local sources = {primary}
+  local sources = primary and {primary} or {}
   local competing_recipes = {}
   local function append(recipe_name, gate)
-    if recipe_name == primary.recipe_name and gate == primary.unlocker then return end
+    if primary and recipe_name == primary.recipe_name and gate == primary.unlocker then return end
     local source = binding(pack_name,
       {pack = pack_name, recipe = recipe_name, technology = gate, allow_initial = true}, true)
     if source then source = with_retained_progression(shared, source) end
     if source then sources[#sources + 1] = source end
   end
-  if (shared.science_binding_policy or {}).direct_unlock_alternatives and #(primary_gates or {}) > 1 then
+  if primary and (shared.science_binding_policy or {}).direct_unlock_alternatives and #(primary_gates or {}) > 1 then
     competing_recipes[primary.recipe_name] = true
     for _, gate in ipairs(primary_gates) do append(primary.recipe_name, gate) end
   end
   for _, recipe_name in ipairs(recipe_facts.recipes_by_output_identity_view("item", pack_name)) do
-    if recipe_name ~= primary.recipe_name then
+    if not primary or recipe_name ~= primary.recipe_name then
       local fact = recipe_facts.view(recipe_name)
       if outputs_pack(fact, pack_name) then
         local gates = {}
@@ -577,6 +621,17 @@ local function build_reference_bindings(shared, labs)
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
     local source, reason, parameterized, primary_gates = declared_source(pack, shared)
+    local sources, competing_recipes
+    local policy = shared.science_binding_policy or {}
+    if policy.unique_direct_recipe and (parameterized
+      or (not source and reason == "ambiguous-approved-pack-unlock:" .. pack
+        and policy.named_pack_recipe and policy.unique_direct_unlock and policy.direct_unlock_alternatives)) then
+      -- A named recipe with no usable owner is a failed source, not proof
+      -- that every direct producer is unavailable. Reuse the same finite
+      -- alternatives and AND/OR rules, including each owner's actual science.
+      sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
+      if not source and #sources > 0 then source, reason = sources[1], nil end
+    end
     result.packs[pack], result.issues[pack] = source, reason
     if not source then unknown_sources[node("pack", pack)] = true end
     if source and source.status == "not-admitted" then result.has_policy_exclusions = true end
@@ -586,10 +641,7 @@ local function build_reference_bindings(shared, labs)
       if #recipe_facts.recipes_by_output_identity_view("item", pack) > 1 then
         unknown_sources[node("pack", pack)] = true
       end
-      local sources, competing_recipes = {source}, {}
-      if parameterized and (shared.science_binding_policy or {}).unique_direct_recipe then
-        sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
-      end
+      sources, competing_recipes = sources or {source}, competing_recipes or {}
       for index, candidate in ipairs(sources) do
         local required = {}
         for _, gate in ipairs(candidate.unlockers) do required[#required + 1] = node("technology", gate) end

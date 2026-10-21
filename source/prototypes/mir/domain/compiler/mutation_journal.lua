@@ -14,12 +14,6 @@ local function terminal_counts(entries)
   return counts
 end
 
-local function entry_material(entry)
-  local out = deepcopy(entry)
-  out.entry_fingerprint = nil
-  return out
-end
-
 local function journal_fingerprint_material(snapshot)
   local entries = {}
   for index, entry in ipairs(snapshot.entries or {}) do
@@ -147,9 +141,9 @@ function Journal:assert_before(operation, before)
   return true
 end
 
-function Journal:record(operation, before, after, status, failure_code, options)
-  options = options or {}
-  if not options.skip_precheck then self:assert_operation(operation) end
+-- Only this module supplies an owned before snapshot and its actual digest.
+-- The caller-facing record API still copies and measures untrusted inputs.
+local function record_owned(journal, operation, before, before_fingerprint, after, status, failure_code)
   if status ~= "applied" and status ~= "failed" then
     error("MutationJournal terminal status is invalid.", 2)
   end
@@ -158,9 +152,9 @@ function Journal:record(operation, before, after, status, failure_code, options)
     operation_fingerprint = operation.operation_fingerprint,
     status = status,
     failure_code = failure_code,
-    before_snapshot = deepcopy(before or {}),
+    before_snapshot = before,
     after_projection = deepcopy(after or {}),
-    before_fingerprint = fingerprint.of(before or {}),
+    before_fingerprint = before_fingerprint,
     after_fingerprint = fingerprint.of(after or {})
   }
   if status == "applied" and entry.before_fingerprint ~= operation.expected_before_fingerprint then
@@ -170,15 +164,46 @@ function Journal:record(operation, before, after, status, failure_code, options)
     entry.status = "failed"
     entry.failure_code = "postcondition-mismatch"
   end
-  entry.entry_fingerprint = fingerprint.of(entry_material(entry))
-  self.recorded[operation.operation_id] = true
-  table.insert(self.entries, entry)
+  -- This entry is newly owned and has no entry_fingerprint yet. Hashing it
+  -- directly has exactly the same material as copying it and removing that key.
+  entry.entry_fingerprint = fingerprint.of(entry)
+  journal.recorded[operation.operation_id] = true
+  table.insert(journal.entries, entry)
   if entry.status == "failed" then
     error("Transformation execution failed for " .. operation.operation_id
       .. ": " .. tostring(entry.failure_code), 2)
   end
+  return entry
+end
+
+function Journal:record(operation, before, after, status, failure_code, options)
+  options = options or {}
+  if not options.skip_precheck then self:assert_operation(operation) end
+  local entry = record_owned(self, operation, deepcopy(before or {}),
+    fingerprint.of(before or {}), after, status, failure_code)
   if options.return_entry == false then return nil end
   return deepcopy(entry)
+end
+
+-- Own the actual pre-mutation capture across the execution boundary. No
+-- mutable snapshot or trusted digest is handed back to the emitter. Both
+-- create and patch operations use this path, and the postcondition is still
+-- measured from a fresh actual capture after mutation, including on failure.
+function Journal:execute(operation, capture, apply)
+  self:assert_operation(operation)
+  local before = deepcopy(capture(operation) or {})
+  local before_fingerprint = fingerprint.of(before)
+  if before_fingerprint ~= operation.expected_before_fingerprint then
+    record_owned(self, operation, before, before_fingerprint, before,
+      "failed", "precondition-mismatch")
+  end
+  local ok, result = xpcall(function() return apply(operation) end, debug.traceback)
+  local after = capture(operation)
+  local failure_code
+  if not ok then failure_code = "mutation-error" end
+  record_owned(self, operation, before, before_fingerprint, after,
+    ok and "applied" or "failed", failure_code)
+  return result
 end
 
 function Journal:publication_summary()

@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Resolve-MIR4CurrentPackageMetadataSourceVersion {
   param([Parameter(Mandatory)][string]$SourceVersion)
 
-  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')
   if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
     throw '[mir4-current-package-metadata-source-version]'
   }
@@ -155,6 +155,91 @@ function Get-MIR4PrivatePatchPackageReadmeBytes {
   return ,$utf8.GetBytes($readme)
 }
 
+function Get-MIR4PrivatePatchPackageChangelogText {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$Changelog,
+    [Parameter(Mandatory)][string]$DistributionVersion,
+    [string]$SourceVersion = '4.2.1',
+    [string]$MinimumFactorioVersion = ''
+  )
+
+  # This is deliberately a pure authority shared by the private package
+  # writer and historical authentication projection.  Both consumers must
+  # derive the exact same current entry before member bytes are compared.
+  $source = Resolve-MIR4CurrentPackageMetadataSourceVersion -SourceVersion $SourceVersion
+  if ($DistributionVersion -cnotmatch '^4[.][0-9]{1,5}[.]([0-9]{5})$') { throw '[mir4-private-patch-package-version]' }
+  $decoded = ConvertFrom-MIR4DistributionComponent -EncodedComponentText $Matches[1]
+  $expected = New-MIR4DistributionIdentityProjection -DistributionTargetCode ([string]$decoded.distribution_target_code) -SourceMinor $source.source_minor -SourcePatch $source.source_patch
+  if ($DistributionVersion -cne [string]$expected.distribution_version) { throw '[mir4-private-patch-package-source-identity]' }
+  $targetCode = [string]$decoded.distribution_target_code
+  if ($targetCode -cnotin @('210','200','110','100','017','016','015','014','013')) { throw '[mir4-private-patch-package-target]' }
+  if ($MinimumFactorioVersion -and $MinimumFactorioVersion -cnotmatch '^[0-9]+[.][0-9]+[.][0-9]+$') {
+    throw '[mir4-private-patch-package-minimum-factorio-version]'
+  }
+
+  $normalized = $Changelog.Replace("`r`n", "`n")
+  $firstVersion = [regex]::Match($normalized, '(?m)^Version:\s*(\S+)')
+  if ($firstVersion.Success -and $firstVersion.Groups[1].Value -ceq $DistributionVersion) {
+    # The writer previously left an already-current member byte-for-byte
+    # untouched. Return the original text so its idempotence is preserved.
+    return $Changelog
+  }
+
+  $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
+  if ($SourceVersion -ceq '4.6.0') {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    if ($targetCode -ceq '200') {
+      $entry += "  Compatibility:`n    - Restore staged Aluminium, Gold, Tin and Titanium manufacturing productivity for the qualified Bob/Angel inputs.`n    - Check actual recipe outputs, permissions, ownership and progression through the shared material bindings.`n    - Apply Gold wire productivity to its gilded copper cable output; retain Tin's established Automation science policy.`n"
+    }
+    if ($targetCode -cin @('210','200','110','100')) {
+      $entry += "  Bugfixes:`n    - Accept an independently available replacement science recipe when its named source has no usable unlock.`n    - Keep disabled and circular alternatives from inventing science availability.`n"
+      $entry += "  Performance:`n    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.`n"
+    }
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.`n    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.`n"
+    if ($MinimumFactorioVersion) {
+      $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
+    }
+  } elseif ($SourceVersion -ceq '4.7.0') {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    if ($targetCode -cin @('210','200','110','100')) {
+      $entry += "  Performance:`n    - Reuse owned Gate and provider inputs, and capture journal mutation before-state once with independent after checks.`n"
+      $entry += "    - Prepare recipe semantics and full facts lazily; reuse normalized output, ingredient and category relationships.`n"
+    }
+    if ($targetCode -cin @('210','200')) {
+      $entry += "  Bugfixes:`n    - Bind approved trigger-output science sources through positive typed outputs and required prerequisites.`n"
+      $entry += "    - Keep disabled, cyclic and unseeded alternatives unresolved.`n"
+    }
+    if ($targetCode -ceq '210') {
+      $entry += "  Compatibility:`n    - Add finite Imersite levels 1-3 and a level 4+ powder continuation for K2 2.1.4 with K2SO 2.0.19.`n"
+      $entry += "    - Preserve separate native crystal ownership and saved research state through the Imersite migration.`n"
+      $entry += "    - Apply Gunmetal/Invar structural continuation mappings for Bob/Angel with BobsTech.`n"
+    }
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n"
+    $entry += "    - Retain the exact published 4.6 entry and earlier history for this target.`n"
+    if ($MinimumFactorioVersion) {
+      $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching declared package metadata.`n"
+    }
+  } elseif ($SourceVersion -ceq '4.4.1') {
+    $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
+  } elseif ($SourceVersion -ceq '4.5.2') {
+    $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
+    $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
+  } elseif ($SourceVersion -ceq '4.5.1') {
+    $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
+  } elseif ($SourceVersion -ceq '4.5.0') {
+    $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
+  } elseif ($SourceVersion -ceq '4.4.2') {
+    $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
+    if ($targetCode -ceq '015') {
+      $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
+    } elseif ($targetCode -ceq '016') {
+      $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
+    }
+  }
+  return $entry + $normalized
+}
+
 function Write-MIR4PrivatePatchPackageIdentity {
   [CmdletBinding()]
   param(
@@ -181,37 +266,30 @@ function Write-MIR4PrivatePatchPackageIdentity {
   }
   # Read every authored input before changing this private materialized copy.
   $changelogPath = Join-Path $Tree 'changelog.txt'
-  $changelog = [IO.File]::ReadAllText($changelogPath).Replace("`r`n", "`n")
+  $changelog = [IO.File]::ReadAllText($changelogPath)
   $readmePath = Join-Path $Tree 'README.md'
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
+  $minimumFactorioVersion = ''
+  if ($SourceVersion -cin @('4.6.0','4.7.0')) {
+    $dependenciesProperty = $info.PSObject.Properties['dependencies']
+    $declaredDependencies = if ($null -eq $dependenciesProperty) { @() } else { @($dependenciesProperty.Value) }
+    $baseRequirements = @($declaredDependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
+    if ($baseRequirements.Count -ne 1) { throw '[mir4-private-patch-package-base-minimum]' }
+    $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''
+  }
+  # Validate and prepare all three authored member bytes before any write.  A
+  # malformed current-package dependency declaration must not leave a partially
+  # rewritten info.json behind when the writer refuses it.
   $info.version = $DistributionVersion
-  [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
-  $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
-  if (-not $firstVersion.Success -or $firstVersion.Groups[1].Value -cne $DistributionVersion) {
-    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n  Info:`n    - Target package from source $SourceVersion.`n"
-    if ($SourceVersion -ceq '4.4.1') {
-      $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
-    } elseif ($SourceVersion -ceq '4.5.2') {
-      $entry += "  Bugfixes:`n    - Accept independently validated alternative science unlocks, including moved Promethium and electromagnetic unlocks.`n    - Keep circular or unavailable owners from replacing the valid science source or removing required packs.`n    - Preserve numeric research costs consistently through planning and design validation on Factorio 0.13 and 0.14.`n"
-      $entry += "  Performance:`n    - Reuse final journal and public-artifact representation preparation without changing generated research.`n    - Bind each prepared design once after effect sanitation.`n    - Use the common qualifier while retaining target-specific science diagnostics.`n"
-    } elseif ($SourceVersion -ceq '4.5.1') {
-      $entry += "  Bugfixes:`n    - Preserve native Promethium science binding and validated direct science alternatives.`n"
-    } elseif ($SourceVersion -ceq '4.5.0') {
-      $entry += "  Bugfixes:`n    - Repair the reported modules prerequisite on disabled Angel silver research without ignoring other prerequisites.`n  Performance:`n    - Avoid preparing unused provider diagnostics and copying detailed publication evidence during normal startup.`n    - Reuse prepared graph nodes and avoid an unnecessary ordinary-table sort.`n"
-    } elseif ($SourceVersion -ceq '4.4.2') {
-      $entry += "  Performance:`n    - Reuse lab acceptance data and approved bindings within each compilation.`n    - Avoid copying the public compiler snapshot solely to measure its serialized size.`n  Changes:`n    - Remove the obsolete Classic notice module and its inactive lifecycle hooks.`n"
-      if ($targetCode -ceq '015') {
-        $entry += "  Fixes:`n    - Recognize Factorio 0.15 satellite launch results and retain approved science progression prerequisites.`n"
-      } elseif ($targetCode -ceq '016') {
-        $entry += "  Fixes:`n    - Retain published Factorio 0.16 science progression prerequisites through checked declarations.`n"
-      }
-    }
-    [IO.File]::WriteAllText($changelogPath, $entry + $changelog, $utf8)
-  }
-  if ($null -ne $readme) {
-    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion))
-  }
+  $updatedInfo = (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n")
+  $updatedChangelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion -MinimumFactorioVersion $minimumFactorioVersion
+  $updatedReadme = if ($null -ne $readme) {
+    Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion
+  } else { $null }
+  [IO.File]::WriteAllText($infoPath, $updatedInfo, $utf8)
+  if ($updatedChangelog -cne $changelog) { [IO.File]::WriteAllText($changelogPath, $updatedChangelog, $utf8) }
+  if ($null -ne $updatedReadme) { [IO.File]::WriteAllBytes($readmePath, $updatedReadme) }
 }
 
 function New-MIR4TargetPackage {
@@ -273,7 +351,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

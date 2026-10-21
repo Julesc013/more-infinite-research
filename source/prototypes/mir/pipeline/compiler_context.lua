@@ -25,7 +25,11 @@ function M.new(options)
     state_epochs = {},
     frozen_state = {},
     services = {},
-    services_frozen = false
+    services_frozen = false,
+    -- This is a demand bit for the existing Context export boundary, not a
+    -- compiler/execution mode. The established manual/default Context is
+    -- export-capable; the player data stage explicitly selects false.
+    _legacy_compiler_export_requested = options.legacy_compiler_export_requested ~= false
   }, Context)
 end
 
@@ -63,6 +67,10 @@ end
 
 function Context:execution_mode()
   return self.compiler_execution_mode
+end
+
+function Context:legacy_compiler_export_requested()
+  return self._legacy_compiler_export_requested == true
 end
 
 function Context:set_service(name, implementation)
@@ -191,6 +199,13 @@ function Context:freeze_state(name)
 end
 
 function Context:state_snapshot(name)
+  if name == "recipe_risk_materialization" then return nil end
+  if name == "recipe_risk_index" and self.services["recipe_risk.materialize_export"] then
+    M.with_active(self, self.services["recipe_risk.materialize_export"])
+  end
+  if name == "recipe_index" and self.services["recipe_facts.materialize_export"] then
+    M.with_active(self, self.services["recipe_facts.materialize_export"])
+  end
   return deepcopy(self.state[name])
 end
 
@@ -200,23 +215,53 @@ end
 
 function Context:state_key_count()
   local count = 0
-  for _ in pairs(self.state) do count = count + 1 end
+  for name in pairs(self.state) do
+    if name ~= "recipe_risk_materialization" then count = count + 1 end
+  end
   return count
 end
 
 function Context:snapshot()
+  -- An explicitly active-only context did not retain a generic pre-mutation
+  -- input. Returning schema 4 after it compiled would silently remove the
+  -- supported snapshot contract, so refuse that late request instead.
+  if not self:legacy_compiler_export_requested() and self.state.compilation_plan ~= nil then
+    error("Active-only CompilerContext cannot export legacy snapshots after compilation; request export before compilation.", 2)
+  end
+  local complete_risks = self.services["recipe_risk.materialize_export"]
+  if complete_risks then M.with_active(self, complete_risks) end
+  local complete_recipe_facts = self.services["recipe_facts.materialize_export"]
+  if complete_recipe_facts then M.with_active(self, complete_recipe_facts) end
+  local exported_state = deepcopy(self.state)
+  -- A requested Context export must not carry the private active handle that
+  -- the plan used while compiling. The generic input stored for this export is
+  -- the original schema-2 record and is independently import-verifiable.
+  local exported_plan = exported_state.compilation_plan
+  if self:legacy_compiler_export_requested() and type(exported_plan) == "table"
+    and type(exported_state.compiler_input) == "table" then
+    exported_plan.compiler_input = deepcopy(exported_state.compiler_input)
+  end
   local payload = {
     schema = self.schema,
     compiler_execution_mode = self.compiler_execution_mode,
     command_state = deepcopy(self.command_state),
     artifacts = deepcopy(self.artifacts),
-    state = deepcopy(self.state),
+    state = exported_state,
     state_epochs = deepcopy(self.state_epochs),
     frozen_state = deepcopy(self.frozen_state),
     services = {},
     services_frozen = self.services_frozen
   }
-  for name in pairs(self.services) do table.insert(payload.services, name) end
+  -- The complete schema-1 risk index above is the public state. Its private
+  -- demand-driven preparation contains borrowed input views, not an export.
+  payload.state.recipe_risk_materialization = nil
+  payload.state_epochs.recipe_risk_materialization = nil
+  payload.frozen_state.recipe_risk_materialization = nil
+  for name in pairs(self.services) do
+    if name ~= "recipe_risk.materialize_export" and name ~= "recipe_facts.materialize_export" then
+      table.insert(payload.services, name)
+    end
+  end
   table.sort(payload.services)
   local telemetry_state = payload.state.compiler_telemetry
   if telemetry_state and telemetry_state.counters then

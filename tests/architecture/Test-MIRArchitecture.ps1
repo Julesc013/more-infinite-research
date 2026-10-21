@@ -537,7 +537,10 @@ Assert-MIRContains -RelativePath "prototypes/mir/stage/data_final_fixes.lua" -Te
 if ($dataFinalFixesStageText -match 'classic_compiler|compiler_profile[.]get') {
   throw 'The public data-final-fixes stage must execute the single preservation-capable command DAG without profile dispatch.'
 }
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text (Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua") -Needle 'compiler_context.new({execution_mode = options.execution_mode})'
+$commandContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/commands.lua"
+foreach ($contextOption in @('local returns_snapshot = options.return_snapshot ~= false', 'compiler_context.new({', 'execution_mode = options.execution_mode,', 'legacy_compiler_export_requested = returns_snapshot')) {
+  Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandContextText -Needle $contextOption
+}
 if ($dataFinalFixesStageText -match 'commands\.run\("') {
   throw "Data-final-fixes stage must execute the governed command DAG, not name individual commands."
 }
@@ -604,7 +607,7 @@ foreach ($commandId in @(
     -Needle ('["' + $commandId + '"]')
 }
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "function M.run_all(options)"
-Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "if options.return_snapshot == false then return context end"
+Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle "if not returns_snapshot then return context end"
 Assert-MIRContains -RelativePath "prototypes/mir/pipeline/commands.lua" -Text $commandCatalogText -Needle 'pcall(function() require("prototypes.mir.report.diagnostics_sink").flush() end)'
 
 Assert-MIRNoPatternInLuaTree `
@@ -672,11 +675,16 @@ foreach ($forbiddenPureCompilerToken in @("data.raw", "settings.", "mods", "os.c
 }
 foreach ($pureCompilerNeedle in @(
   'function M.compile(snapshot, policy)',
-  'if compilation_snapshot.is_trusted(snapshot) then compilation_snapshot.assert_trusted(snapshot)',
+  'local active = compiler_input.is_active(snapshot)',
+  'elseif compilation_snapshot.is_trusted(snapshot) then',
   'if policy_snapshot.is_trusted(policy) then policy_snapshot.assert_trusted(policy)',
+  'if input_identity_record then plan_values.input_identity = input_identity_record',
   'transformation_plan.new('
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/planner/compiler.lua" -Text $pureCompilerText -Needle $pureCompilerNeedle
+}
+if ($pureCompilerText -notmatch 'if\s+not\s+input_identity_record\s+then\s+result\.compilation_snapshot_fingerprint\s*=\s*compiler_input_fingerprint\s+end') {
+  throw 'Pure compiler must retain the generic snapshot identity only for a non-active input.'
 }
 
 $compilerContextText = Read-MIRFile -RelativePath "prototypes/mir/pipeline/compiler_context.lua"
@@ -770,10 +778,48 @@ $technologyOperationExecutor = Read-MIRFile -RelativePath "prototypes/mir/emit/t
 foreach ($executorNeedle in @(
   "function M.apply_plan(plan, journal, options)",
   "plan_contract.assert_trusted(plan)",
-  "journal:assert_before(operation, before)",
-  'journal:record(operation, before, after, "applied"'
+  "journal:execute(operation, capture, apply_operation)"
 )) {
   Assert-MIRContains -RelativePath "prototypes/mir/emit/technology_operation_executor.lua" -Text $technologyOperationExecutor -Needle $executorNeedle
+}
+if ($technologyOperationExecutor -match 'journal\s*:\s*(?:assert_before|record)\s*\(') {
+  throw '[mir-owned-mutation-executor-legacy] The executor must use the single journal-owned execution boundary.'
+}
+
+$mutationJournalText = Read-MIRFile -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua"
+foreach ($journalNeedle in @(
+  "function Journal:execute(operation, capture, apply)",
+  "self:assert_operation(operation)",
+  "local before = deepcopy(capture(operation) or {})",
+  "local before_fingerprint = fingerprint.of(before)",
+  "before_fingerprint ~= operation.expected_before_fingerprint",
+  "local after = capture(operation)",
+  "after_fingerprint = fingerprint.of(after or {})",
+  "entry.after_fingerprint ~= operation.expected_after_fingerprint",
+  '"precondition-mismatch"',
+  '"postcondition-mismatch"',
+  '"mutation-error"'
+)) {
+  Assert-MIRContains -RelativePath "prototypes/mir/domain/compiler/mutation_journal.lua" -Text $mutationJournalText -Needle $journalNeedle
+}
+$ownedExecution = [regex]::Match($mutationJournalText, '(?ms)^function Journal:execute\(.*?(?=^function Journal:|\z)').Value
+$executionCursor = 0
+foreach ($executionStep in @(
+  'self:assert_operation(operation)',
+  'local before = deepcopy(capture(operation) or {})',
+  'local before_fingerprint = fingerprint.of(before)',
+  'before_fingerprint ~= operation.expected_before_fingerprint',
+  'local ok, result = xpcall(function() return apply(operation) end, debug.traceback)',
+  'local after = capture(operation)',
+  'record_owned(self, operation, before, before_fingerprint, after,',
+  'ok and "applied" or "failed", failure_code)'
+)) {
+  $stepPosition = $ownedExecution.IndexOf($executionStep, $executionCursor, [StringComparison]::Ordinal)
+  if ($stepPosition -lt 0) { throw "[mir-owned-mutation-order] Missing or reordered execution boundary: $executionStep" }
+  $executionCursor = $stepPosition + $executionStep.Length
+}
+if ([regex]::Matches($ownedExecution, 'capture\(operation\)').Count -ne 2) {
+  throw '[mir-owned-mutation-captures] Execution requires exactly one before capture and one after capture.'
 }
 
 $trustedRecordText = Read-MIRFile -RelativePath "prototypes/mir/core/trusted_record.lua"

@@ -28,27 +28,27 @@
     {
       "output_path": "info.json",
       "source_path": "source/presentation/historical/f015/info.json.template",
-      "source_sha256": "742A32CF159AF9935AD07A67252CA03279FF9DC851715E472C10E7DF0A049474",
-      "source_bytes": 282,
-      "output_bytes": 282,
-      "output_sha256": "742A32CF159AF9935AD07A67252CA03279FF9DC851715E472C10E7DF0A049474"
+      "source_sha256": "43023679E5E28B960B2718200560842B8E843BD79FF8D6452E4D953B4140FFC4",
+      "source_bytes": 285,
+      "output_bytes": 285,
+      "output_sha256": "43023679E5E28B960B2718200560842B8E843BD79FF8D6452E4D953B4140FFC4"
     },
     {
       "output_path": "changelog.txt",
       "source_path": "source/presentation/historical/f015/changelog.txt.template",
-      "source_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE",
-      "source_bytes": 2274,
-      "output_bytes": 2274,
-      "output_sha256": "3DE4F6ECEF81A28A4941F731E450AC0F03ADB7C5B1907CA6B6666EFD4A8105BE"
+      "source_sha256": "67EEE1A2F2C10DF7D85E3FB03510E4A999D7907A9DC335A08FC3844D7C2B5414",
+      "source_bytes": 5487,
+      "output_bytes": 5487,
+      "output_sha256": "67EEE1A2F2C10DF7D85E3FB03510E4A999D7907A9DC335A08FC3844D7C2B5414"
     },
     {
       "output_path": "README.md",
       "source_path": "source/presentation/f100/README.md.template",
       "transform": "historical-readme-template-v1",
-      "source_sha256": "54F1F8939EA3391A42767031315E3F3E321EF0589D614CCED39F295EF3A01DBB",
-      "source_bytes": 5508,
-      "output_bytes": 5375,
-      "output_sha256": "4DF6930439D4F68321A013117BE46C9EA1F8E15BF529EFEFD57FD79140E0A642"
+      "source_sha256": "D4780F713944243CB501CB48E886FBBE7575F22949D0A7488EB4E7FF1A42BBB5",
+      "source_bytes": 5510,
+      "output_bytes": 5378,
+      "output_sha256": "C3E909AEE87891055018273F1A3E63C4952DB3DCB8446ED72C5A7C9671F1B6ED"
     },
     {
       "output_path": "prototypes/mir/platform/factorio/target_profiles.lua",
@@ -70,5 +70,5 @@
   ],
   "public_output_authorized": false,
   "publication_authorized": false,
-  "record_sha256": "BDCB06FA8E4F457FBA283314576F1492E65678E1EEB795C1B5D9EE888E066B4C"
+  "record_sha256": "56C18C96B44065CC2AC8044D9EFCD37E4B1441F0F778CBF4CB168DDA79235AC7"
 }

@@ -6,6 +6,6 @@
   "description": "Private MIR 4.2 reduced research playtest for Factorio 0.16.",
   "factorio_version": "0.16",
   "dependencies": [
-    "base >= 0.16"
+    "base >= 0.16.51"
   ]
 }

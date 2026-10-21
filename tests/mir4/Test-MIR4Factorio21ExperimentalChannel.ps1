@@ -6,14 +6,17 @@ function Assert-MIR4F210Channel([bool]$Condition, [string]$Code) {
   if (-not $Condition) { throw "[$Code]" }
 }
 
-$authorityPath = Join-Path $RepoRoot 'spec/engines/mir4-factorio-2.1-experimental-channel-v1.json'
-$schemaPath = Join-Path $RepoRoot 'spec/schemas/mir4-factorio-2.1-experimental-channel-v1.schema.json'
+$authorityPath = Join-Path $RepoRoot 'spec/engines/mir4-factorio-2.1-experimental-channel-v2.json'
+$schemaPath = Join-Path $RepoRoot 'spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json'
 $authorityText = Get-Content -Raw -LiteralPath $authorityPath
 Assert-MIR4F210Channel ($authorityText | Test-Json -SchemaFile $schemaPath) 'mir4-f210-channel-schema'
-$authority = $authorityText | ConvertFrom-Json
+$authority = $authorityText | ConvertFrom-Json -DateKind String
 Assert-MIR4F210Channel (-not [bool]$authority.selection.patch_pinned) 'mir4-f210-channel-not-pinned'
 Assert-MIR4F210Channel (@($authority.change_review.required_tasks).Count -eq 12) 'mir4-f210-channel-review-task-count'
 Assert-MIR4F210Channel (@($authority.current_review.review_tasks | Where-Object status -ne 'complete').Count -eq 0) 'mir4-f210-channel-current-review-complete'
+Assert-MIR4F210Channel ([string]$authority.current_review.version -eq '2.1.22' -and [string]$authority.current_review.observed_at -eq '2026-10-19T12:39:29.3637648+00:00' -and [string]$authority.selection.minimum_version -eq '2.1.18') 'mir4-f210-channel-2122-observation'
+Assert-MIR4F210Channel ([string]$authority.current_review.binary_sha256 -eq 'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B') 'mir4-f210-channel-2122-binary'
+Assert-MIR4F210Channel ([string]$authority.current_review.steam.app_manifest_sha256 -eq 'DC46C3B23799E96666BD0F3ADF206EF30403E012AFCD15E5D64B661BE7908618' -and [string]$authority.current_review.official_mods.space_age.raw_sha256 -eq '6EE7D7E9C201B751770836D072697FE1D5703B1313DA0D10CA534EC410884942' -and @($authority.current_review.official_mods.PSObject.Properties).Count -eq 5) 'mir4-f210-channel-2122-steam-official-mod-closure'
 
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioVersionPolicy.ps1')
 $profile = Get-Content -Raw -LiteralPath (Join-Path $RepoRoot 'validation/profiles/factorio-2.1.json') | ConvertFrom-Json

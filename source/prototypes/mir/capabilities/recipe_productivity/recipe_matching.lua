@@ -125,8 +125,8 @@ local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
     local graph = {typed_edges = {}, native_edges = {}, spoilage_transitions = {},
       fuel_burning_transitions = {}, complete = true, edge_count = 0}
-    recipe_facts.for_each(function(_, fact)
-      for _, variant in ipairs(fact.variants or {}) do
+    recipe_facts.for_each_route_variant(function(_, variant)
+      do
         local outputs = {}
         for _, output in ipairs(variant.results or {}) do
           local identity = typed_identity(output)
@@ -220,7 +220,9 @@ local function indexed_recipe_names(index, names, selected)
   local previous, count = nil, 0
   for ordinal, recipe_name in ipairs(names) do
     if ordinal ~= count + 1 or type(recipe_name) ~= "string" or recipe_name == ""
-      or (previous and previous >= recipe_name) or type(index.facts[recipe_name]) ~= "table" then
+      or (previous and previous >= recipe_name)
+      or (type(index.name_set) == "table" and index.name_set[recipe_name] ~= true)
+      or (type(index.name_set) ~= "table" and type(index.facts[recipe_name]) ~= "table") then
       return false
     end
     selected[recipe_name] = true
@@ -241,8 +243,8 @@ end
 -- route.  A missing, malformed, or replaced typed projection returns nil so
 -- the caller can preserve the established full-scan semantics.
 local function indexed_relevant_return_facts(index, reached, outputs)
-  if index ~= compiler_context.current():state_view("recipe_index")
-    or type(index) ~= "table" or index.schema ~= 2 or type(index.facts) ~= "table"
+  if type(index) ~= "table" or index.schema ~= 2
+    or (type(index.name_set) ~= "table" and type(index.facts) ~= "table")
     or type(index.by_ingredient_identity) ~= "table" or type(index.by_output_identity) ~= "table" then
     return nil
   end
@@ -324,18 +326,24 @@ local function relevant_return_graph(recipe)
     end
   end
 
-  local index = recipe_facts.index_view()
-  if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
-  local selected, direct_output_producers = indexed_relevant_return_facts(index, reached, outputs)
+  local projection = recipe_facts.route_projection_view()
+  local selected, direct_output_producers = indexed_relevant_return_facts(projection, reached, outputs)
   if not selected then
+    -- An invalid projection must remain conservative.  The compatibility
+    -- fallback explicitly requests the established full index rather than
+    -- silently accepting an empty return cone.
     telemetry.count("material_return_graph_index_fallbacks", 1)
+    local index = recipe_facts.index_view()
+    if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
     selected, direct_output_producers = scanned_relevant_return_facts(index, reached, outputs)
   else
     telemetry.count("material_return_graph_index_queries", 1)
   end
   local facts = {}
   for _, recipe_name in ipairs(sorted_keys(selected)) do
-    facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]}
+    local fact = recipe_facts.view(recipe_name)
+    if type(fact) ~= "table" then return nil, "recipe-fact" end
+    facts[#facts + 1] = {name = recipe_name, fact = fact}
   end
   local boundary = {
     schema = 1,
@@ -529,7 +537,7 @@ local function observe_route_contract(recipe)
   diagnostics.material_route_certificate(row)
 end
 
-function R.material_route_is_acyclic(recipe)
+function R.material_route_is_acyclic(recipe, include_placement_mining)
   if not recipe or recipe.allow_productivity ~= true then return false, "productivity-not-allowed" end
   if type(recipe.variants) ~= "table" or #recipe.variants == 0 then return false, "missing-process-variants" end
   local graph = material_graph()
@@ -549,6 +557,17 @@ function R.material_route_is_acyclic(recipe)
         queue[#queue + 1] = identity; visited[identity] = true
       end
     end
+    local function append_edges(edges, native_kind, native_edges, conversion)
+      for next_identity in pairs(edges or {}) do
+        local kind = native_kind or conversion or native_edges and native_edges[next_identity]
+        local seen = kind and native_visited or visited
+        if not seen[next_identity] then
+          seen[next_identity] = true
+          queue[#queue + 1] = next_identity
+          if kind then native_steps[#queue] = kind end
+        end
+      end
+    end
     local head = 1
     while head <= #queue do
       if head > 30000 then return false, "process-search-budget" end
@@ -560,17 +579,24 @@ function R.material_route_is_acyclic(recipe)
         -- second path that uses a native conversion.
         if native_kind then return false, "potential-" .. native_kind .. "-return-path:" .. inputs[identity] end
         recipe_return = "potential-return-path:" .. inputs[identity]
-        if next(graph.native_edges) == nil then return false, recipe_return end
+        if not include_placement_mining and next(graph.native_edges) == nil then return false, recipe_return end
       end
       local native_edges = graph.native_edges[identity]
-      for next_identity in pairs(graph.typed_edges[identity] or {}) do
-        local kind = native_kind or native_edges and native_edges[next_identity]
-        local seen = kind and native_visited or visited
-        if not seen[next_identity] then
-          seen[next_identity] = true
-          queue[#queue + 1] = next_identity
-          if kind then native_steps[#queue] = kind end
+      append_edges(graph.typed_edges[identity], native_kind, native_edges)
+      if include_placement_mining and string.sub(identity, 1, 5) == "item\30" then
+        graph.placement_mining_edges = graph.placement_mining_edges or {}
+        local edges = graph.placement_mining_edges[identity]
+        if not edges then
+          edges = {}
+          local complete, reason = item_prototype_facts.for_each_placement_mining_return(string.sub(identity, 6), function(result)
+            if not recipe_semantics.result_is_definitely_zero(result, target_profiles.current(), false) then
+              edges[typed_identity(result)] = true
+            end
+          end)
+          if not complete then return false, reason end
+          graph.placement_mining_edges[identity] = edges
         end
+        append_edges(edges, native_kind, nil, "placement-mining")
       end
     end
   end
@@ -674,7 +700,7 @@ local function exact_mod_lock(mod_locks, runtime_mods, observer_mod_locks, scope
     if type(name) ~= "string" or name == "" or type(expected) ~= "string" or expected == "" or runtime_mods[name] ~= expected then return false end
   end
   -- Only a schema-2 cone contract can replace provider-version pins.
-  -- Closed profiles and schema-1 direct-route records retain their locks.
+  -- Schema-3 closed-output records retain their explicit provider locks.
   if count == 0 and not (scope == "relevant-return-graph" and complete_structural_binding) then return false end
   observer_mod_locks = observer_mod_locks or {}
   if type(observer_mod_locks) ~= "table" then return false end
@@ -843,9 +869,217 @@ local function relevant_input_contract_matches(recipe_name, contract)
   return true, "accepted"
 end
 
+-- Schema 3 names the stable safety property for a closed final output rather
+-- than fingerprinting every field of its direct producers. It keeps explicit
+-- provider locks: unlike schema 2, it never authorizes an empty-pin profile.
+-- A hidden recycler may consume and return the finished item, but only the
+-- exact lossy, non-productive self-recycler shape is outside the ordinary
+-- return path. All other consumers remain material to the boundary.
+-- Permission, risk, target ownership, unlock progression, and exact route I/O
+-- remain checked by the normal certificate path.
+local function safe_recycling_entry_shape(entry)
+  return has_only_reviewed_entry_fields(entry)
+    and entry.amount_min == nil and entry.amount_max == nil
+    and entry.shared_probability == nil and zero_or_nil(entry.extra_count_fraction)
+    and zero_or_nil(entry.catalyst_amount) and zero_or_nil(entry.ignored_by_productivity)
+    and entry.temperature == nil and entry.minimum_temperature == nil and entry.maximum_temperature == nil
+    and entry.fluidbox_index == nil and entry.percent_spoiled == nil
+    and entry.always_fresh == nil and entry.reset_freshness_on_craft == nil
+    and entry.quality_min == nil and entry.quality_max == nil
+    and entry.quality_change == nil and entry.affected_by_quality == nil
+end
+
+local function safe_recycling_input(entry, expected_identity)
+  local amount = tonumber(type(entry) == "table" and entry.amount or nil)
+  return safe_recycling_entry_shape(entry) and typed_identity(entry) == expected_identity
+    and positive_fixed_amount(amount) and normalized_probability(entry, "probability") == 1
+    and normalized_probability(entry, "independent_probability") == 1
+    and (entry.declared_probability == nil or entry.declared_probability == 1)
+    and (entry.declared_independent_probability == nil or entry.declared_independent_probability == 1)
+    and tonumber(entry.ignored_by_stats) == amount
+end
+
+local function safe_recycling_result(entry, expected_identity, input_amount)
+  local amount = tonumber(type(entry) == "table" and entry.amount or nil)
+  local probability = normalized_probability(entry, "independent_probability")
+  return safe_recycling_entry_shape(entry) and typed_identity(entry) == expected_identity
+    and positive_fixed_amount(amount) and positive_fixed_amount(input_amount) and amount <= input_amount
+    and probability ~= nil and probability > 0 and probability < 1
+    and normalized_probability(entry, "probability") == probability
+    and entry.declared_probability == nil and entry.declared_independent_probability == probability
+    and tonumber(entry.ignored_by_stats) == amount
+end
+
+local function non_productive_recycling_variant(variant)
+  if variant.allow_productivity == false and variant.effective_allow_productivity == false then return true end
+  if variant.allow_productivity ~= nil or variant.effective_allow_productivity ~= nil
+    or variant.declared_allow_productivity ~= nil then return false end
+  -- The current fact schema retains nil for an absent declaration whose
+  -- native default is false. Do not reinterpret unknown fields or defaults,
+  -- or rewrite historical fact fingerprints merely to admit this recycler.
+  local profile = target_profiles.current()
+  local defaults = profile and profile.prototype_shapes and profile.prototype_shapes.recipe_property_defaults
+  return type(defaults) == "table" and defaults.allow_productivity == false
+end
+
+local function safe_lossy_recycling_self_return(fact, expected_identity)
+  if type(fact) ~= "table" or fact.hidden ~= true or fact.source_class ~= "recycling"
+    or fact.enabled_without_research ~= false or fact.allow_productivity ~= false
+    or fact.effective_allow_productivity ~= false
+    or not exact_string_list(fact.categories, {"recycling"})
+    or type(fact.variants) ~= "table" or #fact.variants ~= 1 then
+    return false
+  end
+  local variant = fact.variants[1]
+  if type(variant) ~= "table" or variant.hidden ~= true or variant.enabled ~= false
+    or not non_productive_recycling_variant(variant)
+    or not exact_string_list(variant.categories, {"recycling"})
+    or type(variant.ingredients) ~= "table" or #variant.ingredients ~= 1
+    or type(variant.results) ~= "table" or #variant.results ~= 1 then
+    return false
+  end
+  local input, result = variant.ingredients[1], variant.results[1]
+  if not safe_recycling_input(input, expected_identity) then return false end
+  return safe_recycling_result(result, expected_identity, tonumber(input.amount))
+end
+
+local function closed_output_boundary_matches(recipe, contract)
+  local closed = contract.closed_output
+  if type(closed) ~= "table" or type(closed.type) ~= "string" or closed.type == ""
+    or type(closed.name) ~= "string" or closed.name == ""
+    or not exact_string_list(closed.direct_output_producers, closed.direct_output_producers) or #closed.direct_output_producers == 0 then
+    return false, "closed-output-contract"
+  end
+  for field in pairs(closed) do
+    if field ~= "type" and field ~= "name" and field ~= "direct_output_producers" then
+      return false, "closed-output-contract"
+    end
+  end
+  local expected_identity = typed_identity({type = closed.type, name = closed.name})
+  if not expected_identity then return false, "closed-output-contract" end
+  local boundary, reason = relevant_return_graph(recipe)
+  if not boundary then return false, reason end
+  if #boundary.output_identities ~= 1 or boundary.output_identities[1] ~= expected_identity
+    or #boundary.reachable_identities ~= 1 or boundary.reachable_identities[1] ~= expected_identity
+    or #boundary.reachable_identities ~= contract.reachable_identity_count
+    or #boundary.facts ~= contract.relevant_recipe_count
+    or #boundary.direct_output_producers ~= contract.direct_output_producer_count
+    or #(boundary.spoilage_transitions or {}) ~= 0 or #(boundary.fuel_burning_transitions or {}) ~= 0 then
+    return false, "closed-output-reachability"
+  end
+  local fact_names = {}
+  for _, row in ipairs(boundary.facts) do
+    local fact = type(row) == "table" and row.fact or nil
+    if type(row) ~= "table" or type(row.name) ~= "string" or row.name == ""
+      or type(fact) ~= "table" or fact.name ~= row.name or type(fact.variants) ~= "table" then
+      return false, "closed-output-facts"
+    end
+    -- The target remains subject to the ordinary exact route checks. Another
+    -- finished-output producer is either hidden internal with no self-return,
+    -- or the constrained lossy native recycler described above.
+    if row.name ~= recipe.name then
+      if fact.source_class == "recycling" then
+        if not safe_lossy_recycling_self_return(fact, expected_identity) then
+          return false, "closed-output-recycling-self-return"
+        end
+      elseif fact.hidden ~= true or fact.source_class ~= "hidden-internal" then
+        return false, "closed-output-hidden-producer"
+      end
+    end
+    local produces_expected = false
+    for _, variant in ipairs(fact.variants) do
+      if type(variant) ~= "table" then return false, "closed-output-facts" end
+      for _, ingredient in ipairs(variant.ingredients or {}) do
+        if typed_identity(ingredient) == expected_identity and row.name ~= recipe.name
+          and fact.source_class ~= "recycling" then
+          return false, "closed-output-consumer"
+        end
+      end
+      for _, result in ipairs(variant.results or {}) do
+        if typed_identity(result) == expected_identity then produces_expected = true end
+      end
+    end
+    if not produces_expected then return false, "closed-output-producer" end
+    fact_names[#fact_names + 1] = row.name
+  end
+  if #fact_names ~= #boundary.direct_output_producers
+    or not exact_string_list(fact_names, closed.direct_output_producers)
+    or not exact_string_list(boundary.direct_output_producers, closed.direct_output_producers) then
+    return false, "closed-output-producers"
+  end
+  return true, "accepted"
+end
+-- The forward proof binds only its root process, while the already-built
+-- science reference index validates the complete research/lab closure.  This
+-- is independent of the later prerequisite selector: a rejected root cannot
+-- be silently omitted after the productivity route has been admitted.
+local function approved_forward_bindings(recipe_name)
+  local bindings, reason = relevant_route_bindings(recipe_name)
+  if not bindings then return nil, reason end
+  local context = compiler_context.current()
+  if not context:has_service("science.technology_researchability_reason") then
+    return nil, "researchability-service"
+  end
+  local researchability = context:service("science.technology_researchability_reason")
+  local function eligible(name)
+    local technology = data_raw.technology(name)
+    if type(technology) ~= "table" or technology.hidden == true then return false end
+    return researchability(name) == nil
+  end
+  for _, unlock in ipairs(bindings.unlock_technologies) do
+    if not eligible(unlock.name) then return nil, "unlock-researchability" end
+  end
+  -- Use the authoritative stream classifier, not a name-prefix exemption.
+  -- Native continuations and foreign MIR-looking owners remain significant.
+  local owners = {}
+  local index = relationships.view("input")
+  for _, name in ipairs((index.technologies_by_recipe_effect or {})[recipe_name] or {}) do
+    if not generated_registry.is_stream(name) then
+      if not eligible(name) then return nil, "owner-researchability" end
+      local changes = {}
+      for _, effect in ipairs(data_raw.technology(name).effects or {}) do
+        if effect.type == "change-recipe-productivity" and effect.recipe == recipe_name then
+          local change = effect.change
+          if type(change) ~= "number" or change ~= change or change == math.huge or change == -math.huge then
+            return nil, "owner-effect"
+          end
+          changes[#changes + 1] = change
+        end
+      end
+      if #changes == 0 then return nil, "owner-effect" end
+      table.sort(changes)
+      owners[#owners + 1] = {name = name, changes = changes}
+    end
+  end
+  table.sort(owners, function(left, right) return left.name < right.name end)
+  bindings.productivity_owner_technologies = owners
+  return bindings
+end
+
 local function relevant_return_graph_contract_matches(recipe, contract)
-  if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2)
-    or not valid_mir32_fingerprint(contract.return_graph_fingerprint)
+  -- A forward declaration binds its actual root process and progression.
+  -- Shared typed reachability still rejects every recipe/native return; this
+  -- contract does not reconstruct and serialize the reachable factory.
+  if type(contract) == "table" and contract.schema == 4 then
+    if contract.proof ~= "acyclic-forward"
+      or not valid_mir32_fingerprint(contract.bindings_fingerprint) then
+      return false, "forward-contract"
+    end
+    for field in pairs(contract) do
+      if field ~= "schema" and field ~= "proof" and field ~= "bindings_fingerprint" then
+        return false, "forward-contract"
+      end
+    end
+    local acyclic, reason = R.material_route_is_acyclic(recipe, true)
+    if not acyclic then return false, "forward-" .. tostring(reason) end
+    local bindings, binding_reason = approved_forward_bindings(recipe.name)
+    if not bindings then return false, "forward-" .. tostring(binding_reason) end
+    if fingerprint.of(bindings) ~= contract.bindings_fingerprint then
+      return false, "forward-bindings"
+    end
+    return true, "accepted"
+  end
+  if type(contract) ~= "table" or (contract.schema ~= 1 and contract.schema ~= 2 and contract.schema ~= 3)
     or not valid_mir32_fingerprint(contract.bindings_fingerprint)
     or type(contract.reachable_identity_count) ~= "number" or contract.reachable_identity_count < 1
     or contract.reachable_identity_count ~= math.floor(contract.reachable_identity_count)
@@ -855,6 +1089,22 @@ local function relevant_return_graph_contract_matches(recipe, contract)
     or contract.direct_output_producer_count ~= math.floor(contract.direct_output_producer_count) then
     return false, "return-graph-contract"
   end
+  if contract.schema == 3 then
+    for field in pairs(contract) do
+      if field ~= "schema" and field ~= "bindings_fingerprint"
+        and field ~= "reachable_identity_count" and field ~= "relevant_recipe_count"
+        and field ~= "direct_output_producer_count" and field ~= "closed_output" then
+        return false, "return-graph-contract"
+      end
+    end
+    local closed, closed_reason = closed_output_boundary_matches(recipe, contract)
+    if not closed then return false, "return-graph-" .. closed_reason end
+    local bindings, bindings_reason = relevant_route_bindings(recipe.name)
+    if not bindings then return false, "return-graph-" .. bindings_reason end
+    if fingerprint.of(bindings) ~= contract.bindings_fingerprint then return false, "return-graph-bindings" end
+    return true, "accepted"
+  end
+  if not valid_mir32_fingerprint(contract.return_graph_fingerprint) then return false, "return-graph-contract" end
   for field in pairs(contract) do
     if field ~= "schema" and field ~= "return_graph_fingerprint" and field ~= "bindings_fingerprint"
       and field ~= "reachable_identity_count" and field ~= "relevant_recipe_count"
@@ -873,7 +1123,6 @@ local function relevant_return_graph_contract_matches(recipe, contract)
   end
   return true, "accepted"
 end
-
 local function matching_profile(profiles, runtime_mods, graph_contract, fact, risk)
   if type(profiles) ~= "table" or #profiles == 0 then return nil, "profile-missing" end
   local structural_binding_matches
@@ -882,7 +1131,7 @@ local function matching_profile(profiles, runtime_mods, graph_contract, fact, ri
     local structural_contract_validated = false
     if type(profile) == "table" and profile.mod_lock_scope == "relevant-return-graph"
       and type(profile.mod_locks) == "table" and next(profile.mod_locks) == nil
-      and type(graph_contract) == "table" and graph_contract.schema == 2 then
+      and type(graph_contract) == "table" and (graph_contract.schema == 2 or graph_contract.schema == 4) then
       -- An empty-pin replacement must agree with the already validated
       -- canonical risk before paying for its complete graph traversal. This
       -- keeps a wrong-risk structural profile from masking a later pinned one.
@@ -1222,12 +1471,17 @@ local function recipes_for_stream_uncached(spec, per_level_default)
 end
 
 local function stream_match_identity(stream_key, spec, per_level_default)
+  -- The memo belongs to this Context, and the recipe owner rejects source
+  -- replacement once stream_match_index exists. Bind its actual source/index
+  -- epochs without encoding the complete world merely to name a local entry.
+  local context = compiler_context.current()
   return fingerprint.of({
-    schema = 1,
+    schema = 2,
     stream_key = stream_key,
     descriptor = spec,
     per_level_default = per_level_default,
-    recipe_facts = recipe_facts.fingerprint(),
+    recipe_source_epoch = recipe_facts.source_epoch(),
+    recipe_index_epoch = recipe_facts.projection_epoch(),
     target_profile = target_profiles.current(),
     automatic_productivity_action = automatic_compiler_policy.current().action
   })
@@ -1239,7 +1493,7 @@ function R.buckets_view(stream_key, spec, per_level_default)
   end
   local context = compiler_context.current()
   local cache = context:state_view("stream_match_index", function()
-    return {schema = 1, by_identity = {}, computations_by_identity = {}}
+    return {schema = 2, by_identity = {}, computations_by_identity = {}}
   end)
   local identity = stream_match_identity(stream_key, spec, per_level_default)
   local cached = cache.by_identity[identity]

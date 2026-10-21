@@ -5,7 +5,7 @@ applies_to: "MIR 4.0.1+"
 audience: maintainer
 doc_type: release-plan
 owner: mir-maintainers
-last_reviewed: 2026-10-17
+last_reviewed: 2026-10-22
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,9 +14,91 @@ source_of_truth_for:
 
 # MIR 4.x operating programme
 
+## Current: 4.7.0 delivery by 22 October, 20:32 AEDT
+
+The maintainer's 21 October instruction fixes publication at **Thursday 22 October 2026, 20:32:18 AEDT / 09:32:18 UTC**, superseding the earlier Tuesday and Friday checkpoints. The target remains at least 50% less MIR-added responsive-menu loading time on each agreed Galore/Space Age and Bob/Angel condition. The subsequent maintainer clarification authorizes release below that target if measurements establish no reproducible regression against corrected 4.6.0, functionality is preserved, and all completed work is reviewed, integrated, inventoried and qualified. Missing or inconclusive measurements do not prove either improvement or non-regression.
+
+Corrected [MIR 4.6.0](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.6.0) is published at source `9d6a9de1d77ca526da78428f8de52d5c61f9f55b`. Preserve its signed tag, packages and original receipts. Its consolidated content already includes Aluminium and the Gold/Tin/Titanium additions from PR #716; these are the predecessor, not new 4.7 additions. The public inventory is nine player ZIPs and the checksum/signature pair with exact tested-minimum labels.
+
+### Implemented since corrected 4.6.0
+
+This is a development inventory, not final-package acceptance or a published 4.7 release. PR #747 merged the reviewed combined tree into `dev` as `58ab9d3160067d0b7fe1fd0d9d0e15b958b2b239`. Its reviewed-head checks completed with 56 successes and two expected conditional skips; the separate merged-`dev` verification run also passed, with 54 successes and one conditional skip. PR #750 merged the current-engine qualification and changelog follow-up as `5d9037ba9dd48e44c955a123316d0d6c03084fa2`, with 58 successful checks and two conditional skips. All nine candidate packages construct at `1df5b2b732970d6674e71542da46ad2d134cdc8c`, with exact published 4.6 history retained. Native-fixture verification and final-package acceptance remain unfinished.
+
+| Area | Concrete change | Evidence and remaining boundary |
+| --- | --- | --- |
+| Compiler inputs and decisions | Consume owned compiler rows, Gate snapshots, provider inputs and recipe identities without repeatedly exporting and encoding the same internal records. | PRs #725, #735 and #744; controlled decisions, actual creation/native patching and public-copy boundaries remain checked. |
+| Mutation execution | Keep one actual before-state capture across mutation; retain independent actual-after capture. Remove the second entry copy made solely for its fingerprint. | PR #733; expected digests do not substitute for actual emission checks. |
+| Recipe preparation | Capture one Context-owned semantic source, share query indexes and build complete facts only when requested. Preserve schema-2 inspection and generic handling of dynamic/metatable-backed inputs. | PR #746; current R04 preservation below. One input scan is not a claim that the whole compiler is linear. |
+| Relationship construction | Reuse the recipe owner's sorted unique output, ingredient and category lists in both relationship phases instead of sorting and copying them again. | PR #748; exact current Context/source-epoch admission, defensive snapshots and all three membership maps are checked. Native timing remains separate. |
+| Material applicability | Check admitted Bob/Angel closed-output/forward-route properties rather than reject solely because an official engine patch or an unrelated broad fingerprint changed. | Exact I/O, ownership, progression, permission and relevant provider constraints remain. Current-package native qualification is required. |
+| K2 Imersite | Restore finite levels 1–3 and the level-four powder continuation on current inputs; retain native crystal ownership and old-save investment. | PRs #728, #730, #739 and #741. Hidden migration carriers preserve state; they are not extra player research. |
+| Measurement and fixtures | Observe a responsive-menu interaction; validate whole benchmark blocks; bind fixtures to the actual predecessor/engine; repair catalogue counts and CRLF specialization. | PRs #738, #742, #745 and #747. Current K2 inputs select 2.1.23 with a distinct fixture identity; prior inputs remain intact. Counts 115/117 are registered streams, not generated technologies. |
+| Development tools | Reuse scoped AST traversal in package audit and correct snapshot measurement boundaries. | Development efficiency and attribution only; no player speed or memory claim from these alone. |
+
+The final changelog must inventory all unique implementation changes above, not only the newest change fragments. Existing research, caps, settings, DMR/science-source repairs and multiplayer/Library behavior remain preservation obligations.
+
+The outstanding-PR audit found #720, #721 and #722 already incorporated through #725 and later successors, and #685 replaced by the shared historical changelog writer. Those superseded PRs are closed with their original source/evidence preserved. Draft #673 remains an unqualified mixed-performance provenance-cache experiment; #344 is deliberately private historical evidence without public admission. Neither is a finished product addition to merge over the current implementation.
+
+All nine **R48 Base** upgrades from corrected 4.6 now pass independent receipt review on **0.13.20, 0.14.23, 0.15.40, 0.16.51, 0.17.79, 1.0.0, 1.1.110, 2.0.77 and 2.1.23**. Each includes source creation, upgrade, two cold reloads and the Full oracle across three forces: captured technology definitions/state, exposed effects, supported queues, fractional investment and settings. Original package, engine and executing-harness identities remain in their receipts. Controls and owned library archives were restored. Earlier resource-interrupted attempts remain separate incomplete observations.
+
+This completes the selected nine-target **Base continuity** lane only. It does not qualify the remaining Space Age, changed science-source, modded production, client or responsive-menu cases. The current F210 review is `build/tmp/mir47-current-modern-base-r48-remaining-r01/review-f210-r05.json` (`683B86454BD85B72E386D405C74A4167D28194383C8D44D7353BA9916133F802`); the other compact reviews remain beside their original primary-checkout receipts.
+
+Eight current-package Base fresh-load leaves also pass independent review: F013, F014, F015, F016, F017, F100, F110 and F200. Each retains its native save/log and restored library custody. F210 Base was refused by the memory governor before a child started, and F210 Space Age remains unexecuted; neither is an engine crash or a pass. The complete ten-case fresh lane remains unfinished.
+
+### Technology and support outcomes
+
+| Environment | Established result | Remaining qualification |
+| --- | --- | --- |
+| F200 Base / Galore–Space Age | R48 Base upgrade and both cold reloads retain 250 technologies per force. Earlier Galore captures retain 432 technologies. These are retained definitions, not additions. | R48 Galore/Space Age definition/state coverage and performance controls remain. |
+| F210 Base on 2.1.23 | R48 upgrade and both cold reloads retain 249 technologies, 217 recipe-bonus entries, 24 exposed effects and 890 settings per force, including queued/current research and 42% investment. | Base-only evidence; Space Age, K2 and the changed trigger/output case remain separate. |
+| F200 Bob/Angel | R04 upgrade and two cold reloads preserve 598 captured technologies and 1,971 recipe-bonus entries per force. Aluminium, Gold, Tin and Titanium are predecessor coverage. | Final-package applicability/effect checks; totals do not establish all sixteen declared material families. |
+| F210 K2 2.1.4 + K2SO 2.0.19 | On 2.1.22, four earned levels give 8% powder productivity: 300 ore produces 324 powder and 324 sand versus 300/300. Separate migration evidence preserves queues, 42% investment, native crystal bonuses and both reloads. | Final-package and 2.1.23 checks. K2SO is Spaced Out, not K2 plus Space Exploration. |
+| F210 Bob/Angel with BobTech | Updated applicability retains four staged Gunmetal/Invar technologies; older scoped definitions/effects/save checks exist. A separate exact 2.1.23 dossier and closed runner selection are prepared without altering prior archive/settings/fixture bytes. | Newest package needs affected native acceptance. Inherited structural certificate labels are not new-engine qualification. Physical alloy production and consumed science are distinct checks. |
+| Py / AAI / BZ / SE / K2SE / IR | Some dependency-valid selections and archive closures are prepared. Py native admission was refused before custody for memory reserve. | Preparation is not current support qualification. Broader new coverage follows in bounded batches. |
+| Cryogenic report | PR #749 repairs a missing trigger/output source fact that can leave downstream cryogenic-style science unresolved. The old source reproduces the descendant error; the correction passes 445 host binding assertions, including active-only compilation, invalid owners/outputs and unseeded cycles. | Final-package startup/save/reloads and actual 2.1.23 qualification remain. The full reporter modset is unknown; this is a representative boundary reproduction, not a claim that their save was run. |
+
+### Current performance evidence
+
+R04 has one three-arm diagnostic block per profile on F200 2.0.77. These are **headless creation runs including map creation and saving**, not responsive-menu acceptance. Bob uses the retained observer projection, not a silently changed primary selection.
+
+| Profile / condition | No MIR | Published 4.6.0 | R04 | MIR-added reduction observed |
+| --- | --- | --- | --- | --- |
+| Galore / initial selection | 7.904 s | 9.385 s | 9.149 s | 15.9% |
+| Galore / warm repeat | 7.075 s | 10.669 s | 9.826 s | 23.5% |
+| Bob/Angel observer / initial selection | 9.449 s | 11.367 s | 10.490 s | 45.7% |
+| Bob/Angel observer / warm repeat | 7.194 s | 11.200 s | 10.222 s | 24.4% |
+
+Retain all observations, including substantial baseline variation. These points do not establish repeatability, causal non-regression, changed-configuration menu performance or the 50% target. Accepted primary responsive-menu samples are **zero** at this checkpoint. The existing primary design is two profiles × two conditions × three arms × five blocks: 60 measured launches plus preparation and controls.
+
+The primary analyzer retains its original halving decision and reports the maintainer's later non-regression fallback separately. The latter requires nonnegative `median(B)-median(C)` and a nonnegative conservative joint-block bootstrap lower bound in every fixed profile/condition; a better median alone is insufficient. This report changes neither the halving target nor its predeclared sample-extension rule and supplies no release authority. A nonpositive baseline addition still cannot establish a percentage reduction.
+
+Relationship-list reuse preserves complete recipe, input/output relationship and Context exports and wins all four bounded synthetic pairs. It is a component result, not a Factorio speedup. The separate source-capture cost split has zero accepted Lua samples; it does not justify another encoder/cache redesign for this release.
+
+### Remaining work and freeze
+
+| Checkpoint | Required action |
+| --- | --- |
+| 21 October evening | Repair the cryogenic boundary; adopt actual installed 2.1.23 identities; integrate completed reviewed units while CI and lightweight checks continue. Reconcile exact missing acceptance cases. |
+| 22 October, 09:00 AEDT | Freeze optional player changes. Include completed work with passing applicable review/checks. Only a concrete release blocker may change player bytes afterward. |
+| 09:00–17:00 AEDT | Retain the nine completed Base upgrades; finish final-package measurements and Space Age full technology/state checks with both reloads; affected K2/Bob, cap, fresh-load and real-client/Library cases; proportionate stress checks and workload inventory. Start unaffected valid checks earlier where possible. |
+| 17:00–20:32:18 AEDT | Finish review, signing, required `dev` to `main` promotion and publication. Verify anonymous downloads, root/versioned `dist`, labels and `LATEST` against one accepted inventory. Track actual Portal availability separately. |
+
+These are allocation checkpoints, not measured duration guarantees or permission to skip failures. Use the existing nine-target plan to run missing/affected cases, not another Cartesian sweep. For 4.7.0 the immediate predecessor and final prior minor both resolve to corrected 4.6.0; deduplicate the source while retaining full Base/Space Age technology, investment, queue and progress coverage. Reuse exact trusted package/harness/input evidence; changed science, engine or migration bytes need affected tests.
+
+Graphical capacity is the main measurement risk: original-settings Galore previously exceeded this machine's reserve. A second worker must run all three arms on the same machine/OS with exact settings and cache conditions. Missing capacity is a named blocker, not a sample. Git, review and independent repair continue while native admission is unavailable.
+
+### Deferred scope for 4.8
+
+- Further encoding or graph/representation redesign after valid attribution identifies a worthwhile production consumer.
+- Additional Bob/Angel families and Py/SE/K2SE/IR coverage through shared declarations and actual ownership/process checks.
+- Larger Library/cache experiments and rejected optimizations unless a changed design addresses their recorded failures.
+- Continue the 50% reduction and existing 10%/30-second overhead destination wherever unmet; a deadline or host benchmark proves neither.
+
+Finished verified work is not deferred to make the release smaller. Unfinished work remains discoverable and separate from accepted player bytes. Report actual performance, supported effects, exact tested engines and unresolved limits.
+
 <a id="active-campaign-mir-440-unified-research-generation"></a>
 
-## Published 4.4.2 and active 4.4.x continuation
+## Historical 4.4.2 and 4.4.x continuation
 
 The maintainer's 14 October direction superseded the separate 4.3.1 publication attempt and rolled its verified repairs into 4.4.0. The fixed **15 October 2026, 15:36 AEDT / 04:36 UTC** request is historical; it did not replace acceptance evidence or create a reusable waiver.
 
@@ -204,11 +286,11 @@ The next major begins only when a change cannot be delivered honestly under MIR 
 
 ## Release operation
 
-Public source releases use plain names such as `MIR 4.1.0`, `MIR 4.1.0 Beta 1`, and `MIR 4.1.1`. Internal programme themes do not appear in release titles. Future source tags are annotated and signed; target tags use `dist/fNNN/v<distribution-version>`.
+Public source releases use plain names such as `MIR 4.1.0` and `MIR 4.1.1`. Internal programme themes do not appear in release titles. Future source tags are annotated and signed; target tags use `dist/fNNN/v<distribution-version>`.
 
-A source release is drafted only after source freeze. Every ready target package is attached to the primary source-family release. A target that completes later may use a supplemental target release, preserving source-release immutability without lowering that target's proof bar. The default stable asset set is the affected player ZIPs, one Developer Kit when developer surfaces changed, `SHA256SUMS.txt`, one release manifest, and an optional detailed metadata archive.
+A source release is drafted only after source freeze. Use the authorized mutable-release process without changing repository controls. Public assets contain accepted player ZIPs and useful integrity files; bundles, developer records and upload instructions remain in source/local custody unless specifically requested. Labels state the exact tested minimum from `base >= x.y.z`, without `+`; filenames retain the distribution codec.
 
-Release bodies contain one material-outcome sentence, a small download table, three to eight primary changes, upgrade and compatibility guidance, material known issues, and links to detailed records. They contain no raw logs, local paths, candidate ceremony narrative, or full evidence dump.
+Release titles are exactly `MIR MAJOR.MINOR.PATCH`. Start the body with a short summary, then concise changes and measured performance/support results using bullets or a small results table. Do not repeat the title, use H1/H2 headings or add a redundant downloads table. Keep full specific history in changelogs and qualify claims to actual evidence.
 
 ## Decision gates
 

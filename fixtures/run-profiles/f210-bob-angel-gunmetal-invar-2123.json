@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "MIRF210CurrentBobAngelGunmetalInvarDirectLibraryQualificationV4",
+  "scope": "Two separately named package-excluded fixtures over one exact F210 2.1.23 Bob/Angel closure. Observe captures finalized recipe, owner, science, structural facts, and raw plus normalized direct-producer facts without mutating game state. Qualification binds finite 1-3 and continuation 4+ source-declared technologies, their science/prerequisites/cost ranges/effects and exactly their two legitimate owners per recipe; it then admits research through the force API, verifies earned per-recipe force productivity modifiers, persists an ordered next-level queue at 42 percent, and requires fresh create plus two cold reloads. It does not establish physical Angel-alloy output, science-pack consumption or investment, multiplayer, performance or release readiness.",
+  "historical_2_1_20": {
+    "engine_version": "2.1.20",
+    "engine_sha256": "E4B1FDBDCC77F4C3449318CE1398493EA7A8E77A19D68BD1AC3A858D0F373B92",
+    "settings_sha256": "2D258A213E7A4230563651ABD1B7D8268318A2DED5E23F3B20AFB6F1D56ECA6A",
+    "role": "immutable-historical-provenance-only"
+  },
+  "target": {
+    "engine": {
+      "version": "2.1.23",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "official_mods": ["base", "elevated-rails", "quality", "recycler", "space-age"],
+    "archives": [
+      {"name":"boblibrary","file":"boblibrary_3.0.1.zip","version":"3.0.1","sha256":"3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B"},
+      {"name":"bobores","file":"bobores_3.0.0.zip","version":"3.0.0","sha256":"7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B"},
+      {"name":"bobplates","file":"bobplates_3.0.2.zip","version":"3.0.2","sha256":"0C9A4910E2DCAA8DCABBE5BFFA67333F214EAB2EFD8C798D5EF84D90B691862D"},
+      {"name":"bobelectronics","file":"bobelectronics_3.0.1.zip","version":"3.0.1","sha256":"50C2718E38D507CF4D4ACA2DBFE3240997172309413397C9C70083BBAE6927BE"},
+      {"name":"bobtech","file":"bobtech_3.0.0.zip","version":"3.0.0","sha256":"397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B"},
+      {"name":"angelsrefining","file":"angelsrefining_2.1.2.zip","version":"2.1.2","sha256":"AF5E79E35E591F68D52F13EDA082950E10AC98A4B7722B3F568D0211E3FEB813"},
+      {"name":"angelsrefininggraphics","file":"angelsrefininggraphics_2.1.0.zip","version":"2.1.0","sha256":"79F373BC628F619EDE3B1875827172390D2C3F5EAB56310F6F1572C4553CB6EF"},
+      {"name":"angelspetrochem","file":"angelspetrochem_2.1.3.zip","version":"2.1.3","sha256":"95FA8F1740A180E5CF5617EFDA7C409A7974E29B236F9F5AB28D789193AC44B4"},
+      {"name":"angelspetrochemgraphics","file":"angelspetrochemgraphics_2.1.0.zip","version":"2.1.0","sha256":"DECDC2FCD5BBBDEF70784943C142C30FAA7294B98E814296C5D44D09A9DE4790"},
+      {"name":"angelssmelting","file":"angelssmelting_2.1.1.zip","version":"2.1.1","sha256":"1DFCDD77D075FD545CFEE74BD8A6443E7E90B133D3832FDD47649C84892243A9"},
+      {"name":"angelssmeltinggraphics","file":"angelssmeltinggraphics_2.1.1.zip","version":"2.1.1","sha256":"71E89ABF7CC372FADE39B11FB4FE83A1B5E629226AF123BFE8DDA08C7C228DD3"}
+    ]
+  },
+  "settings": {
+    "mode": "File",
+    "portable_input_required": true,
+    "portable_path": "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+    "portable_sha256": "E0FF04FE281B39BD54AF35B3769F3E320D696E5313E4810EE28F92F72FF443B9",
+    "historical_settings_may_not_be_substituted": true
+  },
+  "fixtures": {
+    "observe": {
+      "source_path": "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer",
+      "name": "mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-observer",
+      "version": "0.1.2",
+      "mode": "read-only-finalized-fact-capture-with-direct-producer-facts",
+      "data_marker": "[mir-f210-current-ba-gunmetal-invar-observer] DATA PASS read-only-finalized-fact-capture",
+      "runtime_marker": "[mir-f210-current-ba-gunmetal-invar-observer] RUNTIME"
+    },
+    "qualification": {
+      "source_path": "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification",
+      "name": "mir-fixture-assert-f210-current-bob-angel-gunmetal-invar-qualification",
+      "version": "0.1.4",
+      "mode": "earned-productivity-and-queued-next-level",
+      "data_marker": "[mir-f210-current-ba-gunmetal-invar] DATA PASS gunmetal=recipe-prod-research_material_gunmetal-1:1-3+recipe-prod-research_material_gunmetal-4:4+ invar=recipe-prod-research_material_invar-1:1-3+recipe-prod-research_material_invar-4:4+ effects=0.02 staged-owners=true",
+      "create_marker": "[mir-f210-current-ba-gunmetal-invar] RUNTIME PASS stage=create finite=researched continuation-level=5 bonuses=0.08 queue=gunmetal-then-invar progress=0.42",
+      "reload_marker": "[mir-f210-current-ba-gunmetal-invar] RELOAD PASS stage=reload finite=researched continuation-level=5 bonuses=0.08 queue=gunmetal-then-invar progress=0.42",
+      "earned_modifier": {
+        "effect_change": 0.02,
+        "finite_completed_levels": 3,
+        "finite_productivity_bonus": 0.06,
+        "continuation_start_level": 4,
+        "continuation_next_level": 5,
+        "continuation_productivity_bonus": 0.08,
+        "queue": ["recipe-prod-research_material_gunmetal-4", "recipe-prod-research_material_invar-4"],
+        "progress": 0.42
+      }
+    }
+  },
+  "certificate": {
+    "profile_id": "F210-BobAngel-2.1.22-GunmetalInvar-return-graph-final-v1",
+    "evidence_id": "F210-BobAngel-GunmetalInvar-return-graph-2.1.22-v1",
+    "routes": [
+      {"family":"gunmetal","technology":"recipe-prod-research_material_gunmetal-1","recipe":"angels-plate-gunmetal","risk":"mir32-df72e755","graph":"mir32-d075395b","bindings":"mir32-f5b0b17f"},
+      {"family":"invar","technology":"recipe-prod-research_material_invar-1","recipe":"angels-plate-invar","risk":"mir32-85ae1247","graph":"mir32-7cafb4f4","bindings":"mir32-f6107c3a"}
+    ]
+  },
+  "explicit_non_claims": [
+    "historical-2.1.20-result-transfer",
+    "default-settings-substitution",
+    "other-Bob-Angel-profiles",
+    "physical-Angel-alloy-production-output",
+    "science-pack-consumption-or-upgrade-investment",
+    "multiplayer-client-performance-or-release-readiness"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "recorded_at", "predecessor", "engine_channel_review", "admission", "qualification", "boundaries", "status", "record_sha256"],
+  "properties": {
+    "schema": {"const": 4},
+    "kind": {"const": "MIR4F210CurrentEngineCapHarnessAdmissionV4"},
+    "recorded_at": {"type": "string", "format": "date-time"},
+    "predecessor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["admission_v3", "policy_v3", "policy_succession_v2"],
+      "properties": {
+        "admission_v3": {"allOf": [{"$ref": "#/$defs/binding"}, {"properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json"}}}]},
+        "policy_v3": {"allOf": [{"$ref": "#/$defs/binding"}, {"properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json"}}}]},
+        "policy_succession_v2": {"allOf": [{"$ref": "#/$defs/binding"}, {"properties": {"path": {"const": ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json"}}}]}
+      }
+    },
+    "engine_channel_review": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "kind", "version"],
+      "properties": {
+        "path": {"const": "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "kind": {"const": "MIR4Factorio21ExperimentalChannelV2"}, "version": {"const": "2.1.22"}
+      }
+    },
+    "admission": {
+      "const": {"target": "F210", "scope": "exact-current-engine-cap-harness-execution-only", "admitted": true, "harnesses": ["runtime.maximum-level-cap-ownership-multiforce-f210", "runtime.maximum-level-v2-v3-migration-f210"], "package_visible": false}
+    },
+    "qualification": {
+      "const": {"current_engine_api_prototype_data_mod_capsule_admitted": true, "current_engine_cap_harness_execution_admitted": true, "current_engine_qualification_passed": false, "stable_transition_recorded": false, "stable_qualification_passed": false}
+    },
+    "boundaries": {
+      "const": {"prototype_mutation_authorized": false, "source_freeze_authorized": false, "candidate_allocation_authorized": false, "signing_authorized": false, "promotion_to_main_authorized": false, "publication_authorized": false}
+    },
+    "status": {"const": "active-current-experimental-exact-engine-cap-harness-admitted-qualification-pending"},
+    "record_sha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "binding": {
+      "type": "object", "additionalProperties": false, "required": ["path", "sha256", "record_sha256"],
+      "properties": {"path": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}, "record_sha256": {"$ref": "#/$defs/sha256"}}
+    }
+  }
+}

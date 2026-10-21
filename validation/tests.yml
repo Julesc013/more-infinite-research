@@ -2,6 +2,23 @@
   "schema": 2,
   "tests": [
     {
+      "id": "static.k2-owned-speed-sentinel",
+      "kind": "static",
+      "layer": "F3",
+      "command": "./tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1",
+        "tests/runtime/run_k2_owned_speed_sentinel_controls.py",
+        "tests/runtime/k2_owned_speed_sentinel_controls.lua",
+        "tests/runtime/k2_owned_speed_sentinel_fixture_controls.lua",
+        "tests/runtime/Test-MIRUpgrade.ps1",
+        "tests/support/MIR421K2Upgrade.ps1",
+        "fixtures/aaa-mir47-owned-speed-sentinel/**",
+        "fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000/**"
+      ]
+    },
+    {
       "id": "static.mir422-secretas-native-harness",
       "kind": "static",
       "layer": "F3",
@@ -24,8 +41,13 @@
       "command": "./tests/tooling/Test-MIRUpgradeManifest.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/support/MIR43HistoricalCandidateAuthentication.ps1",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
         "tests/tooling/Test-MIRUpgradeManifest.ps1",
+        "tests/tooling/trigger_output_fixture_controls.py",
         "tests/runtime/Test-MIRUpgrade.ps1",
+        "fixtures/assert-trigger-output-science-f210-470/**",
+        "fixtures/assert-trigger-output-science-source-failure-f210-460/**",
         "tests/support/MIR421K2Upgrade.ps1",
         "tests/support/MIR421SpaceFakeUpgrade.ps1",
         "tools/lib/validation/MIR4DistributionIdentity.ps1",
@@ -39,6 +61,10 @@
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-460.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -130,6 +156,12 @@
       "command": "./tests/release/Test-MIR42FourTargetCandidateBuild.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v11.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v12.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v13.schema.json",
+        "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v14.schema.json",
+        "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
+        "tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v4.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v5.schema.json",
         "spec/schemas/mir42-four-target-deterministic-candidate-manifest-v6.schema.json",
@@ -222,6 +254,8 @@
       "command": "./tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
       "requires_factorio": false,
       "inputs": [
+        "tests/release/Test-MIROrdinaryCandidate.ps1",
+        "tools/mir/application/release/readiness/OrdinaryCandidate.ps1",
         "tests/support/MIR423ReleaseUpgradeControls.ps1",
         "tests/release/Test-MIR42NineTargetReleaseAssets.ps1",
         "tests/support/MIR421ReleaseAssetControls.ps1",
@@ -527,7 +561,9 @@
       "inputs": [
         "tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1",
         "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
+        "tools/lib/validation/ResponsiveMenuRecord.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "scripts/Measure-MIRPerformanceRegression.ps1"
       ]
@@ -598,6 +634,7 @@
       "command": "./tests/tooling/Test-MIRImmutableInputStaging.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".mir/fixtures.yml",
         ".github/workflows/validate.yml",
         "tools/lib/validation/ImmutableInputStaging.ps1",
         "tools/lib/workspace/RepoPaths.ps1",
@@ -610,6 +647,7 @@
         "tools/lib/assurance/Core.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
         "tools/lib/validation/BrowserContinuityInputs.ps1",
+        "tools/lib/validation/DirectLibraryStartupMeasurement.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tests/support/MIRMaterialAuditInputs.ps1",
         "tests/runtime/Test-MIRBrowserPersonalStateContinuity.ps1",
@@ -622,6 +660,9 @@
         "fixtures/run-profiles/k2-213-imersite-f210.json",
         "fixtures/run-profiles/k2-213-imersite-f210-422.json",
         "fixtures/run-profiles/k2-213-imersite-f210-440.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-460.json",
+        "fixtures/run-profiles/k2-213-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470.json",
         "fixtures/assert-k2-213-imersite-continuation/info.json",
         "fixtures/assert-k2-213-imersite-continuation/data-final-fixes.lua",
         "fixtures/assert-k2-213-imersite-continuation/control.lua",
@@ -705,6 +746,25 @@
       ]
     },
     {
+      "id": "static.f210-gunmetal-invar-direct-library",
+      "kind": "static",
+      "layer": "F0",
+      "command": "./tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarDirectLibraryStatic.ps1",
+        "tests/runtime/Test-MIRF210CurrentBobAngelGunmetalInvarQualification.ps1",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/**",
+        "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
+        "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
+        "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json",
+        "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json",
+        "tools/mir/application/release/readiness/ResourceGovernor.ps1",
+        "tools/lib/compatibility/LibraryActivation.ps1",
+        "tools/lib/validation/NativeProbeResources.ps1"
+      ]
+    },
+    {
       "id": "static.recipe-productivity-permissions",
       "kind": "static",
       "layer": "F0",
@@ -733,6 +793,7 @@
         "tests/compiler/run_approved_pack_bindings_controls.py",
         "tests/compiler/approved_pack_bindings.lua",
         "tests/compiler/approved_family_emission.lua",
+        "tests/compiler/recipe_source_owner_contract.lua",
         ".github/workflows/validate.yml",
         "validation/tests.yml"
       ]
@@ -3480,6 +3541,13 @@
       "command": "./tests/mir4/Test-MIR4F210QualificationPolicy.ps1",
       "requires_factorio": false,
       "inputs": [
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentQualificationPolicyV3Authority.ps1",
+        "tests/mir4/Test-MIR4F210QualificationPolicyV3.ps1",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Release-Qualification-PolicyV1.json",
         ".mir/releases/waves/mir4-r0/MIR4-F210-Qualification-Policy-Authority-Evolution-ReceiptV1.json",
         ".mir/control/MIR4-F210-Current-Qualification-PolicyV2.json",
@@ -3505,7 +3573,11 @@
         "docs/maintainer/mir4-pre-freeze-hardening.md",
         "source:source/presentation/f210/info.json.template",
         "validation/profiles/factorio-2.1.json",
-        "repository"
+        "repository",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
+        "tools/commands/mir4/Update-MIR4F210CurrentCapHarnessAdmissionAuthority.ps1"
       ]
     },
     {
@@ -4016,6 +4088,8 @@
       "command": "./tests/mir4/Test-MIR4Factorio21ExperimentalChannel.ps1",
       "requires_factorio": false,
       "inputs": [
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json",
         ".github/workflows/assurance-scheduled.yml",
         "spec/engines/mir4-factorio-2.1-experimental-channel-v1.json",
         "spec/programmes/mir4-4x-operating-programme-v1.json",
@@ -5937,7 +6011,15 @@
         "source:source/adapters/f210/prototypes/mir/runtime/scripted_techs.lua",
         "source:source/adapters/f200/prototypes/mir/runtime/scripted_techs.lua",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ]
     },
     {
@@ -6097,7 +6179,15 @@
         "targets/f210/composition.json",
         "targets/f200/composition.json",
         "targets/package-authority.json",
-        ".mir/fixtures.yml"
+        ".mir/fixtures.yml",
+        ".mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json",
+        "spec/schemas/mir4-f210-current-engine-cap-harness-admission-v4.schema.json",
+        ".mir/control/MIR4-F210-Current-Qualification-PolicyV3.json",
+        ".mir/control/MIR4-F210-Current-Qualification-Policy-SuccessionV2.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-v3.schema.json",
+        "spec/schemas/mir4-f210-current-qualification-policy-succession-v2.schema.json",
+        "spec/engines/mir4-factorio-2.1-experimental-channel-v2.json",
+        "spec/schemas/mir4-factorio-2.1-experimental-channel-v2.schema.json"
       ]
     },
     {
@@ -6188,6 +6278,9 @@
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/index/recipe_risk_facts.lua",
         "source:source/prototypes/mir/index/item_prototype_facts.lua",
+        "source:source/prototypes/mir/index/recipe_facts.lua",
+        "source:source/prototypes/mir/pipeline/compiler_context.lua",
+        "source:source/prototypes/mir/domain/compiler/execution_mode.lua",
         "source:source/prototypes/mir/core/deepcopy.lua",
         "tests/compiler/Test-MIRMaterialRoutes.ps1",
         "tools/lib/validation/NativeProbeResources.ps1",
@@ -6208,6 +6301,14 @@
         "tests/compiler/Test-MIRK2ImersiteContinuation.ps1",
         "tests/compiler/material_progression.lua",
         "tests/compiler/material_continuation.lua",
+        "tests/runtime/k2_imersite_staged_state_controls.lua",
+        "source:source/prototypes/mir/domain/research/k2_imersite_staged_state.lua",
+        "source:source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua",
+        "source:source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua",
+        "source:source/prototypes/mir/platform/factorio/prototype_lookup.lua",
+        "source:source/prototypes/mir/capabilities/science_integration/science_packs.lua",
+        ".mir/streams.yml",
+        "source:source/prototypes/mir/streams/generated_stream_manifest.json",
         "source:source/prototypes/mir/compatibility/policies/k2_science_phase.lua",
         "source:source/prototypes/mir/families/material_progression.lua",
         "source:source/prototypes/mir/domain/technology/maximum_level_binding.lua",
