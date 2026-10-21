@@ -1056,6 +1056,23 @@ try {
     $templateControl=Get-Content -Raw -LiteralPath (Join-Path $fixtureTemplate 'control.lua')
     Assert-Probe ($currentControl.Contains('migration-credit holders must remain unearned')-and$currentControl.Contains('finite Imersite powder bonus')-and-not$currentControl.Contains('force.research_all_technologies()')) 'K2 current fixture did not replace broad research with its exact earned-state setup.'
     Assert-Probe ($templateControl.Contains('force.research_all_technologies()')-and-not$templateControl.Contains('migration-credit holders must remain unearned')) 'K2 current fixture specialization changed the retained template setup.'
+    # Here-strings inherit the specializer script's checkout line endings.
+    # Run the actual function in both forms; varying only the Lua template
+    # misses a CRLF PowerShell/LF normalized-template anchor mismatch.
+    $specializer=@($k2Ast.FindAll({param($node)$node-is[Management.Automation.Language.FunctionDefinitionAst]-and$node.Name-ceq'New-K2213SelectedFixture'},$false))
+    Assert-Probe ($specializer.Count-eq1) 'K2 fixture specializer definition is not unique.'
+    foreach($scriptLineEnding in @('lf','crlf')){
+      $specializerText=$specializer[0].Extent.Text.Replace("`r`n","`n")
+      if($scriptLineEnding-ceq'crlf'){$specializerText=$specializerText.Replace("`n","`r`n")}
+      $scriptFixture=& {
+        param($Definition,$Template,$RunRoot,$MIRVersion)
+        . ([scriptblock]::Create($Definition))
+        New-K2213SelectedFixture -Source $Template -Run $RunRoot -SourceVersion '4.7.0' -SelectedMIRVersion $MIRVersion
+      } $specializerText $fixtureTemplate (Join-Path $run ('k2-current-specializer-'+$scriptLineEnding)) $currentIdentity.distribution_version
+      foreach($member in @('info.json','data-final-fixes.lua','control.lua','settings-updates.lua')){
+        Assert-Probe ((Get-K2213Sha256 (Join-Path $scriptFixture $member))-ceq(Get-K2213Sha256 (Join-Path $currentFixture $member))) "K2 $scriptLineEnding PowerShell specializer changed current fixture bytes: $member"
+      }
+    }
     Refuses-Probe {New-K2213SelectedFixture -Source $fixtureTemplate -Run $fixtureSpecializationRoot -SourceVersion '4.4.0' -SelectedMIRVersion '4.2.21002'} 'selected-fixture-candidate-version'
     # Exercise the Windows checkout that failed hosted CI as well as LF. The
     # actual specializer must produce the same current guard without editing

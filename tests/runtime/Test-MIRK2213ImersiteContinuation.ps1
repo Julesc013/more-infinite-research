@@ -224,7 +224,7 @@ function New-K2213SelectedFixture {
   local stage = force.technologies[continuation_name]
   if not legacy or not stage then fail("required Imersite staged technology absent") end
 '@
-        $earnedStateAnchor=$earnedStateAnchor.TrimEnd("`r","`n")
+        $earnedStateAnchor=$earnedStateAnchor.Replace("`r`n","`n").TrimEnd("`r","`n")
         $earnedState=@'
   local legacy = force.technologies[legacy_name]
   local stage = force.technologies[continuation_name]
@@ -255,12 +255,12 @@ function New-K2213SelectedFixture {
 '@
         $matches=[regex]::Matches($text,[regex]::Escape($earnedStateAnchor)).Count
         Assert-K2213 ($matches -eq 1) 'fixture-current-earned-state-anchor'
-        $text=$text.Replace($earnedStateAnchor,$earnedState.TrimEnd("`r","`n"))
+        $text=$text.Replace($earnedStateAnchor,$earnedState.Replace("`r`n","`n").TrimEnd("`r","`n"))
         $continuationAnchor=@'
   stage.level = 5
   force.reset_technology_effects()
 '@
-        $continuationAnchor=$continuationAnchor.TrimEnd("`r","`n")
+        $continuationAnchor=$continuationAnchor.Replace("`r`n","`n").TrimEnd("`r","`n")
         $continuationSetup=@'
   stage.level = 5
   force.reset_technology_effects()
@@ -273,7 +273,7 @@ function New-K2213SelectedFixture {
     fail("migration-credit holders must remain unearned after continuation setup")
   end
 '@
-        $continuationSetup=$continuationSetup.TrimEnd("`r","`n")
+        $continuationSetup=$continuationSetup.Replace("`r`n","`n").TrimEnd("`r","`n")
         $matches=[regex]::Matches($text,[regex]::Escape($continuationAnchor)).Count
         Assert-K2213 ($matches -eq 1) 'fixture-current-continuation-state-anchor'
         $text=$text.Replace($continuationAnchor,$continuationSetup)
