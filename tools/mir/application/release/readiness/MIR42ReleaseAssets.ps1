@@ -432,11 +432,11 @@ function Get-MIR423PublishedUpgradePredecessor {
   $pin=Read-MIR42PublishedMaintenancePredecessorManifest -ManifestPath (Join-Path $mir42ReleaseAssetsRepoRoot $manifestRelative) -CandidateSourceVersion $contractVersion
   $published=@($pin.manifest.targets|Where-Object target -CEQ $Target)
   if($published.Count-ne1){throw '[mir423-upgrade-predecessor-target]'}
-  # Published V9/V11/V12 construction records keep archive identity under asset.
+  # Published construction records keep archive identity under asset.
   # Normalize only this reader result so the established full-state proof
   # contract keeps one target shape; authenticated predecessor bytes remain untouched.
   $publishedTarget=$published[0]
-  if($PredecessorSourceVersion -cin @('4.4.2','4.5.1','4.5.2')) {
+  if($PredecessorSourceVersion -cin @('4.4.2','4.5.1','4.5.2','4.6.0')) {
     if($publishedTarget.PSObject.Properties.Name -cnotcontains 'asset' -or $null -eq $publishedTarget.asset -or
       $publishedTarget.asset.PSObject.Properties.Name -cnotcontains 'sha256' -or $publishedTarget.asset.PSObject.Properties.Name -cnotcontains 'bytes') {
       throw '[mir423-upgrade-predecessor-target]'
@@ -797,13 +797,13 @@ function Assert-MIR423NativeUpgradeProof {
 }
 
 function Assert-MIR423MaintenanceUpgradeEvidence {
-  param([string]$Path,[object[]]$PackageAssets,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$CandidateSourceVersion='4.2.3')
+  param([string]$Path,[object[]]$PackageAssets,[ValidateSet('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$CandidateSourceVersion='4.2.3')
   $errorPrefix='mir'+$CandidateSourceVersion.Replace('.','')+'-upgrade'
   if([string]::IsNullOrWhiteSpace($Path)){throw "[$errorPrefix-evidence-required]"}
   $bundle=Read-MIR423UpgradeProofReference ([pscustomobject]@{path=[IO.Path]::GetFullPath($Path);sha256=(Get-FileHash $Path).Hash}) -MaximumBytes 256KB
   $r=$bundle.record
   $kind='MIR'+$CandidateSourceVersion.Replace('.','')+'MaintenanceUpgradeEvidenceV1'
-  $predecessors=@(if($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')})
+  $predecessors=@(if($CandidateSourceVersion -ceq '4.7.0'){@('4.6.0')}elseif($CandidateSourceVersion -ceq '4.6.0'){@('4.5.2')}elseif($CandidateSourceVersion -ceq '4.5.2'){@('4.5.1','4.4.2')}elseif($CandidateSourceVersion -ceq '4.5.0'){@('4.4.2')}elseif($CandidateSourceVersion -ceq '4.4.2'){@('4.2.2','4.4.0','4.4.1')}elseif($CandidateSourceVersion -cin @('4.3.1','4.4.0')){@('4.2.2','4.3.0')}else{@('4.2.0','4.2.1','4.2.2')})
   $expectedCount=$script:MIR42ReleaseAssetTargets.Count*$predecessors.Count
   if($r.schema-ne1-or$r.kind-cne$kind-or$r.source_version-cne$CandidateSourceVersion-or$r.rows.Count-ne$expectedCount){throw "[$errorPrefix-matrix-cardinality]"}
   $seen=@{}

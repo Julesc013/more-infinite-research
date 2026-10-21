@@ -34,7 +34,7 @@ function New-MIR421ReleaseAssetCustodyFixture {
   }
 }
 function Invoke-MIR430FullReleaseUpgradeControls {
-  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')][string]$CandidateSourceVersion='4.3.0')
+  param([Parameter(Mandatory)][string]$Root,[Parameter(Mandatory)][object[]]$PackageAssets,[ValidateSet('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.7.0')][string]$CandidateSourceVersion='4.3.0')
 
   # Host-only structural controls. 4.3.0 proves all direct 4.2.x inputs; 4.3.1
   # and 4.4.0 use direct published 4.2.2 plus published 4.3.0, while 4.4.2
@@ -69,7 +69,7 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   }
 
   $script:mir430UpgradeControlChecks = 0
-  $predecessorVersions = if ($CandidateSourceVersion -ceq '4.5.2') { @('4.5.1','4.4.2') } elseif ($CandidateSourceVersion -ceq '4.5.0') { @('4.4.2') } elseif ($CandidateSourceVersion -ceq '4.4.2') { @('4.2.2','4.4.0','4.4.1') } elseif ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) { @('4.2.2','4.3.0') } else { @('4.2.0','4.2.1','4.2.2') }
+  $predecessorVersions = if ($CandidateSourceVersion -ceq '4.7.0') { @('4.6.0') } elseif ($CandidateSourceVersion -ceq '4.5.2') { @('4.5.1','4.4.2') } elseif ($CandidateSourceVersion -ceq '4.5.0') { @('4.4.2') } elseif ($CandidateSourceVersion -ceq '4.4.2') { @('4.2.2','4.4.0','4.4.1') } elseif ($CandidateSourceVersion -cin @('4.3.1','4.4.0')) { @('4.2.2','4.3.0') } else { @('4.2.0','4.2.1','4.2.2') }
   $rows = @()
   foreach ($package in $PackageAssets) {
     foreach ($sourceVersion in $predecessorVersions) {
@@ -135,7 +135,7 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   $duplicatePath = Join-Path $Root 'duplicate.json'
   $null = Write-MIR430UpgradeJson $duplicatePath $duplicate
   Assert-MIR430Rejected { Assert-MIR423MaintenanceUpgradeEvidence -Path $duplicatePath -PackageAssets $PackageAssets -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-matrix-identity]') 'a duplicate predecessor row'
-  if ($CandidateSourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
+  if ($CandidateSourceVersion -cin @('4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.7.0')) {
     $wrongPredecessor = Copy-MIR430UpgradeValue $rows[0]
     $wrongPredecessor.predecessor_source_version = '4.2.1'
     Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongPredecessor -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } '[mir423-upgrade-predecessor-version]' 'an obsolete 4.2.1 predecessor for a dual-predecessor release'
@@ -158,6 +158,11 @@ function Invoke-MIR430FullReleaseUpgradeControls {
   $publishedRow = Copy-MIR430UpgradeValue $rows[0]
   $publishedRow.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $rows[0].receipt.path) 'wrong-published.json') $badReceipt
   Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $publishedRow -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-published-predecessor]') 'the wrong published predecessor'
+  $wrongPredecessorHashReceipt = Get-Content -LiteralPath $rows[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
+  $wrongPredecessorHashReceipt.from.sha256 = if ([string]$wrongPredecessorHashReceipt.from.sha256 -ceq ('0' * 64)) { '1' * 64 } else { '0' * 64 }
+  $wrongPredecessorHashRow = Copy-MIR430UpgradeValue $rows[0]
+  $wrongPredecessorHashRow.receipt = Write-MIR430UpgradeJson (Join-Path (Split-Path -Parent $rows[0].receipt.path) 'wrong-published-predecessor-hash.json') $wrongPredecessorHashReceipt
+  Assert-MIR430Rejected { Assert-MIR423NativeUpgradeProof -Row $wrongPredecessorHashRow -Package $PackageAssets[0] -CandidateSourceVersion $CandidateSourceVersion } ('[' + $errorPrefix + '-published-predecessor]') 'the wrong published predecessor archive hash'
 
   $mutations = @(
     @{stem='old-definition';stage='upgrade';code='[mir423-upgrade-research-definition]';change={$args[0].forces.player.technologies.a.prototype.effects[0].modifier=0.03}},

@@ -46,6 +46,7 @@ function Test-MIR42CurrentIndividualProducerBinding {
     try { $null = Assert-MIR42IndividualEvidenceProducer -RepoRoot $fixture -CandidateSource $Candidate -Producer $Producer -Kind $Kind -Code 'mir42-current-individual-test-producer' }
     catch { $failure = $_.Exception.Message }
     Assert-MIR42NineSealTest -Condition ($failure.StartsWith($Expected,[StringComparison]::Ordinal)) -Code $Code
+    $global:LASTEXITCODE = 0
   }
   try {
     Assert-MIR42NineSealTest -Condition (Test-MIR42CandidateToolingEquivalenceSourceVersion -SourceVersion '4.7.0') -Code 'current-individual-allows-current-source-equivalence'

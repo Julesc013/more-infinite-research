@@ -224,6 +224,23 @@ try {
     $promotionPlan | Add-Member -NotePropertyName published_maintenance_predecessor -NotePropertyValue $custody
   }
   $fixtureTargetRows = @($fixturePackages | ForEach-Object { [ordered]@{target=[string]$_.target;distribution_version=[string]$_.distribution_version;archive_sha256=[string]$_.sha256;content_sha256=[string]$_.content_sha256;entry_count=[int]$_.entry_count} })
+  if ($SourceVersion -ceq '4.2.0') {
+    $published470 = Get-MIR423PublishedUpgradePredecessor -Target 'f013' -PredecessorSourceVersion '4.6.0' -CandidateSourceVersion '4.7.0'
+    Assert-MIR42ReleaseAssetsTest -Condition (
+      [string]$published470.source_tag -ceq 'v4.6.0' -and
+      [string]$published470.manifest.sha256 -ceq '543F8D525248F984B14E181AA251C4D3288A6E2FE5FB7158A6F46D1B06B198D2' -and
+      [string]$published470.target.distribution_version -ceq '4.6.01300' -and
+      [string]$published470.target.sha256 -ceq '1C4803F6B29068C20906FFE30E1C550A9C6EE9CDCCCBBB5690D62945C6A22A54' -and
+      $published470.target.PSObject.Properties.Name -cnotcontains 'asset'
+    ) -Code '470-proof-reader-normalizes-corrected-460-asset'
+    $proofPackages = @(
+      foreach ($target in $script:MIR42ReleaseAssetTargets) {
+        [pscustomobject][ordered]@{target=$target;distribution_version=('4.7.' + $target.Substring(1) + '00');sha256=('A' * 64)}
+      }
+    )
+    $proofControls = Invoke-MIR430FullReleaseUpgradeControls -Root (Join-Path $root '470-published-460-proof-controls') -PackageAssets $proofPackages -CandidateSourceVersion '4.7.0'
+    Assert-MIR42ReleaseAssetsTest -Condition ($proofControls.checks -ge 15 -and $proofControls.native_runs -eq 0) -Code '470-published-460-valid-and-wrong-hash-proof-controls'
+  }
   $fixtureCandidateBinding = [ordered]@{sha256=('D' * 64);record_sha256=('E' * 64)}
   $fixtureFlags = [ordered]@{human_go_required_after_main_readback=$true;tagging_authorized=$false;publication_authorized=$false}
   $releaseBinding = [ordered]@{source_version=$SourceVersion;tag=$releaseTag}
