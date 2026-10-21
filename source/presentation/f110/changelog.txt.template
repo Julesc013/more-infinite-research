@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.6.11000
+  Bugfixes:
+    - Accept an independently available replacement science recipe when its named source has no usable unlock.
+    - Keep disabled and circular alternatives from inventing science availability.
+  Performance:
+    - Reuse the prepared technology-selection fingerprint instead of encoding the same selection again.
+  Info:
+    - Target package from source 4.6.0.
+    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.
+    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.
+    - Require Factorio 1.1.110 or newer in this target line, matching the accepted exact-engine tests.
+---------------------------------------------------------------------------------------------------
 Version: 4.5.11002
   Info:
     - Target package from source 4.5.2.

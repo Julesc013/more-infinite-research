@@ -334,13 +334,13 @@ local function direct_resource_source(pack_name, shared)
     progression_prerequisites = {}, ingredient_packs = {}, acquisition_proof = false}
 end
 
--- Factorio's Space Age space-science technology is completed by sending its
--- trigger item to orbit.  The matching disabled recipe has no unlock-recipe
--- effect, so a plain recipe-to-effect index cannot express this actual source
--- relation.  Recognize only the complete native relation: same-name recipe
--- and technology, a send-item-to-orbit trigger, and a positive typed launch
--- product on that exact trigger item.  This remains a finite source binding;
--- it neither proves rocket acquisition nor searches a production graph.
+-- A retained Base/modded orbital-trigger shape uses a disabled ownerless
+-- same-name recipe, a send-item-to-orbit technology trigger, and a positive
+-- typed launch product on that trigger item. A plain recipe-to-effect index
+-- cannot express that finite relation. Ordinary official Space Age differs:
+-- it replaces the trigger with build-entity and an explicit recipe unlock.
+-- This binding neither proves rocket acquisition nor searches a production
+-- graph.
 local function trigger_output_source(pack_name, recipe_name, fact)
   if recipe_name ~= pack_name or not fact or fact.enabled_without_research == true
     or not outputs_pack(fact, pack_name) then return nil end

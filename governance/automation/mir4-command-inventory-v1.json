@@ -5235,9 +5235,9 @@
     {
       "path": "tools/mir/application/package/TargetMaterializer.ps1",
       "classification": "canonical-internal",
-      "sha256": "069148E1D1AE51EEA944FCC071A6970F0E603E10D10E2A6DF036D6C3AA83C34D",
+      "sha256": "507FA1D61A7D4AD968F708F786DD92A4CAEB9C4F6DE71E298F4FF817947A2888",
       "hash_mode": "canonical-text-v1",
-      "lines": 715,
+      "lines": 735,
       "package_visible": false
     },
     {
@@ -6106,5 +6106,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:e9b1cb8d5f0ef351f4898b81a75534b2e1f9e0920423e24085552f949a7b520e"
+  "digest": "sha256:a6681df38fd67b790b2706d2a3bc3448cd1a1bf23ceb5993b6ed90492ba210fa"
 }

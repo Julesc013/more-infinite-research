@@ -200,6 +200,26 @@ function Get-MIR4PrivatePatchPackageChangelogText {
     if ($MinimumFactorioVersion) {
       $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
     }
+  } elseif ($SourceVersion -ceq '4.7.0') {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    if ($targetCode -cin @('210','200','110','100')) {
+      $entry += "  Performance:`n    - Reuse owned Gate and provider inputs, and capture journal mutation before-state once with independent after checks.`n"
+      $entry += "    - Prepare recipe semantics and full facts lazily; reuse normalized output, ingredient and category relationships.`n"
+    }
+    if ($targetCode -cin @('210','200')) {
+      $entry += "  Bugfixes:`n    - Bind approved trigger-output science sources through positive typed outputs and required prerequisites.`n"
+      $entry += "    - Keep disabled, cyclic and unseeded alternatives unresolved.`n"
+    }
+    if ($targetCode -ceq '210') {
+      $entry += "  Compatibility:`n    - Add finite Imersite levels 1-3 and a level 4+ powder continuation for K2 2.1.4 with K2SO 2.0.19.`n"
+      $entry += "    - Preserve separate native crystal ownership and saved research state through the Imersite migration.`n"
+      $entry += "    - Apply Gunmetal/Invar structural continuation mappings for Bob/Angel with BobsTech.`n"
+    }
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n"
+    $entry += "    - Retain the exact published 4.6 entry and earlier history for this target.`n"
+    if ($MinimumFactorioVersion) {
+      $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching declared package metadata.`n"
+    }
   } elseif ($SourceVersion -ceq '4.4.1') {
     $entry += "  Fixes:`n    - Prevent multiplayer join failures caused by a load-only on_tick event registration.`n"
   } elseif ($SourceVersion -ceq '4.5.2') {
@@ -251,7 +271,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $minimumFactorioVersion = ''
-  if ($SourceVersion -ceq '4.6.0') {
+  if ($SourceVersion -cin @('4.6.0','4.7.0')) {
     $dependenciesProperty = $info.PSObject.Properties['dependencies']
     $declaredDependencies = if ($null -eq $dependenciesProperty) { @() } else { @($dependenciesProperty.Value) }
     $baseRequirements = @($declaredDependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })

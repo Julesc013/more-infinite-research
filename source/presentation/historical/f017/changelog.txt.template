@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.6.01700
+  Info:
+    - Target package from source 4.6.0.
+    - Restore the published 4.3, 4.4 and 4.5 changelog entries alongside the retained earlier history.
+    - Retain the research, settings, cap and save-continuity repairs included in source 4.5.2.
+    - Require Factorio 0.17.79 or newer in this target line, matching the accepted exact-engine tests.
+---------------------------------------------------------------------------------------------------
 Version: 4.5.01702
   Info:
     - Target package from source 4.5.2.

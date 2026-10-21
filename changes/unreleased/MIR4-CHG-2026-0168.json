@@ -8,7 +8,7 @@
   "details": [
     "Recognize a named disabled science recipe only when its same-named enabled technology uses a send-item-to-orbit trigger whose exact item has a positive typed rocket-launch product for that pack and the recipe has no unlock-recipe effect.",
     "Keep the trigger technology prerequisites as required approved-reference dependencies. Explicit owners remain on the existing direct-owner path; mismatched, zero, disabled, cyclic, unseeded, and separately owned alternatives remain unresolved.",
-    "This fixes the native Space Age space-science source fact used by the downstream cryogenic-science chain. It does not establish rocket acquisition, factory feasibility, a current-engine native qualification, or a performance result."
+    "This corrects the representative trigger/output source relation exercised by the logical downstream cryogenic-science reproducer. It does not assert the installed Space Age source shape, rocket acquisition, factory feasibility, a current-engine native qualification, or a performance result."
   ],
   "semantic_domains": [
     "compiler",
@@ -95,7 +95,7 @@
     },
     {
       "kind": "finding",
-      "value": "build/tmp/mir47-cryogenic-science-pack-binding-r01/old-source-descendant-reproducer-r01.json: logical downstream old-source reproducer"
+      "value": "build/tmp/mir47-cryogenic-science-pack-binding-r01/old-source-descendant-reproducer-r02.json: logical downstream old-source reproducer"
     },
     {
       "kind": "document",

@@ -12,8 +12,8 @@
       "transform": "exact-template-v1",
       "reason": "Materialize the governed f100 adapter source for f100.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 56152,
-      "expected_sha256": "E74D5CC6BB700E6070AB3AF67362872B73D63F35BBD3A39F43AFE190AEB27E27",
+      "expected_bytes": 56943,
+      "expected_sha256": "0FEAE559D7944EB08E1594921153A452C0F3130F75F05FDA6DB850FC0FD80D3D",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3851,5 +3851,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "FE7CFB12D63A8C8CB9AF16BA7128B6636DC129C95CE31488D3DB9DCEC7E0977F"
+  "record_sha256": "6726B3342EFB3F781E08F15C79ABAAD9C6D63878BA9A0E23908C9F9C06D68737"
 }
