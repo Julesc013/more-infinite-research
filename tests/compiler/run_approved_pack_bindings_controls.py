@@ -8,6 +8,52 @@ import sys
 from pathlib import Path
 
 
+# Match the relevant Factorio lualib/util.lua deepcopy behavior before any MIR
+# module loads. The product fallback does not preserve aliases, cycles, or
+# metatables; this bootstrap is self-validating so the host control cannot
+# silently exercise a weaker ownership boundary.
+FACTORIO_DEEPCOPY_BOOTSTRAP = r'''
+function table.deepcopy(object)
+  local lookup_table = {}
+  local function _copy(value)
+    if type(value) ~= "table" then
+      return value
+    elseif lookup_table[value] then
+      return lookup_table[value]
+    end
+    local new_table = {}
+    lookup_table[value] = new_table
+    for index, nested in pairs(value) do
+      new_table[_copy(index)] = _copy(nested)
+    end
+    return setmetatable(new_table, getmetatable(value))
+  end
+  return _copy(object)
+end
+_G.util = _G.util or {}
+_G.util.table = _G.util.table or {}
+_G.util.table.deepcopy = table.deepcopy
+_G.util.copy = table.deepcopy
+
+local deepcopy_meta = {marker = "approved-pack-factorio-deepcopy"}
+local deepcopy_alias = setmetatable({value = "alias"}, deepcopy_meta)
+local deepcopy_input = {first = deepcopy_alias, second = deepcopy_alias}
+deepcopy_input.self = deepcopy_input
+local deepcopy_copy = table.deepcopy(deepcopy_input)
+if deepcopy_copy == deepcopy_input or deepcopy_copy.self ~= deepcopy_copy
+  or deepcopy_copy.first == deepcopy_alias or deepcopy_copy.first ~= deepcopy_copy.second
+  or getmetatable(deepcopy_copy.first) ~= deepcopy_meta then
+  error("Factorio-compatible table.deepcopy bootstrap failed")
+end
+'''
+
+
+def fresh_lua_runtime(lua52):
+    runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+    runtime.execute(FACTORIO_DEEPCOPY_BOOTSTRAP)
+    return runtime
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--repo-root', required=True)
@@ -23,7 +69,7 @@ def main() -> None:
     # the profile consumed by native assertion fixtures behind.
     registered_stream_control = {}
     for target, base_version in (('f200', '2.0.77'), ('f210', '2.1.22')):
-        registry_runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+        registry_runtime = fresh_lua_runtime(lua52)
         registry_runtime.globals().source_root = (repo / 'source').as_posix()
         registry_runtime.globals().adapter_root = (repo / 'source/adapters' / target).as_posix()
         registry_runtime.globals().controlled_base_version = base_version
@@ -126,13 +172,13 @@ return result
         return approved_family_preamble() + common + body
 
     def run_command_export(shape: str):
-        runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+        runtime = fresh_lua_runtime(lua52)
         runtime.globals().source_root = (repo / 'source').as_posix()
         runtime.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
         runtime.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
         return plain(runtime.execute(command_export_source(shape)))
 
-    lua = lua52.LuaRuntime(unpack_returned_tuples=True)
+    lua = fresh_lua_runtime(lua52)
     lua.globals().repo_source = (repo / 'source').as_posix()
     lua.execute('''
       package.path = repo_source .. '/?.lua;' .. package.path
@@ -158,7 +204,7 @@ return result
     assertions = lua.execute(fixture.read_text(encoding='utf-8'))
     # Separate runtime: actual F200 adapters/catalogue/planner/common emitter;
     # none of the facade fixture's module substitutions apply here.
-    emitted = lua52.LuaRuntime(unpack_returned_tuples=True)
+    emitted = fresh_lua_runtime(lua52)
     emitted.globals().source_root = (repo / 'source').as_posix()
     emitted.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
     emitted.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
@@ -167,7 +213,7 @@ return result
     # Exercise the complete actual catalogue/planner/emitter path in a fresh
     # runtime with no host os table; the
     # fixture checks unavailable timing instead of inventing a zero duration.
-    clockless = lua52.LuaRuntime(unpack_returned_tuples=True)
+    clockless = fresh_lua_runtime(lua52)
     clockless.globals().source_root = (repo / 'source').as_posix()
     clockless.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
     clockless.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path; os = nil")
@@ -175,6 +221,8 @@ return result
     assert int(clockless_emission['assertions']) == int(emission['assertions']) + 2
     assert int(clockless_emission['rows']) == int(emission['rows'])
     assert int(clockless_emission['operations']) == int(emission['operations'])
+    assert int(emission['recipe_source_owner_assertions']) >= 29
+    assert int(clockless_emission['recipe_source_owner_assertions']) == int(emission['recipe_source_owner_assertions'])
     command_export_control = {
         shape: run_command_export(shape) for shape in (
             'run_all_default', 'run_all_active_only', 'manual_new_context')
@@ -183,7 +231,8 @@ return result
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
                        'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
-    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo),
+    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo),
+                    Path('tests/compiler/recipe_source_owner_contract.lua'), Path(__file__).resolve().relative_to(repo),
                     Path('.mir/targets.json'),
                     Path('source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua')]
     for name, _ in lua.globals().package.loaded.items():
@@ -205,10 +254,12 @@ return result
                       'emission_control': {'assertions': int(emission['assertions']),
                                            'catalogue_rows': int(emission['rows']),
                                            'operations': int(emission['operations']),
+                                           'recipe_source_owner_assertions': int(emission['recipe_source_owner_assertions']),
                                            'stubbed_module_boundaries': [], 'target': 'f200'},
                       'clockless_emission_control': {'assertions': int(clockless_emission['assertions']),
                                                     'catalogue_rows': int(clockless_emission['rows']),
                                                     'operations': int(clockless_emission['operations']),
+                                                    'recipe_source_owner_assertions': int(clockless_emission['recipe_source_owner_assertions']),
                                                     'stubbed_module_boundaries': [], 'target': 'f200'},
                       'command_export_control': command_export_control,
                       'registered_stream_control': registered_stream_control,

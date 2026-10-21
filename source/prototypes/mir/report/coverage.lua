@@ -143,7 +143,7 @@ function M.build(context, options)
   context = context or compiler_context.current()
   options = options or {}
   local include_rows = options.include_rows ~= false
-  local facts = recipe_facts.index_view()
+  local recipe_names = recipe_facts.all_names()
   local owners_by_recipe, prototype_counts = owner_index()
   local attached, decisions, candidate_count = family_indexes()
   local adopted = adopted_index()
@@ -151,8 +151,7 @@ function M.build(context, options)
   for _, category in ipairs(CATEGORIES) do counts[category] = 0 end
   local visible, eligible, dangling, duplicate = 0, 0, 0, 0
 
-  for _, recipe_name in ipairs(facts.names) do
-    local fact = facts.facts[recipe_name]
+  recipe_facts.for_each_coverage(function(recipe_name, fact)
     local owners = owners_by_recipe[recipe_name] or {}
     if not fact.hidden then visible = visible + 1 end
     local skip_category = base_skip(fact)
@@ -174,17 +173,17 @@ function M.build(context, options)
         owners = deepcopy(owners)
       })
     end
-  end
+  end)
 
   for recipe_name, _ in pairs(owners_by_recipe) do
-    if not facts.facts[recipe_name] then dangling = dangling + 1 end
+    if not recipe_facts.has_name(recipe_name) then dangling = dangling + 1 end
   end
 
   local summary = {
-    total_recipes = #facts.names,
+    total_recipes = #recipe_names,
     visible_recipes = visible,
     productivity_eligible_recipes = eligible,
-    accounted_recipes = #facts.names,
+    accounted_recipes = #recipe_names,
     category_counts = counts,
     dangling_effects = dangling,
     duplicate_owners = duplicate,

@@ -125,8 +125,8 @@ local function material_graph()
   return compiler_context.current():state_view("material_route_graph", function()
     local graph = {typed_edges = {}, native_edges = {}, spoilage_transitions = {},
       fuel_burning_transitions = {}, complete = true, edge_count = 0}
-    recipe_facts.for_each(function(_, fact)
-      for _, variant in ipairs(fact.variants or {}) do
+    recipe_facts.for_each_route_variant(function(_, variant)
+      do
         local outputs = {}
         for _, output in ipairs(variant.results or {}) do
           local identity = typed_identity(output)
@@ -220,7 +220,9 @@ local function indexed_recipe_names(index, names, selected)
   local previous, count = nil, 0
   for ordinal, recipe_name in ipairs(names) do
     if ordinal ~= count + 1 or type(recipe_name) ~= "string" or recipe_name == ""
-      or (previous and previous >= recipe_name) or type(index.facts[recipe_name]) ~= "table" then
+      or (previous and previous >= recipe_name)
+      or (type(index.name_set) == "table" and index.name_set[recipe_name] ~= true)
+      or (type(index.name_set) ~= "table" and type(index.facts[recipe_name]) ~= "table") then
       return false
     end
     selected[recipe_name] = true
@@ -241,8 +243,8 @@ end
 -- route.  A missing, malformed, or replaced typed projection returns nil so
 -- the caller can preserve the established full-scan semantics.
 local function indexed_relevant_return_facts(index, reached, outputs)
-  if index ~= compiler_context.current():state_view("recipe_index")
-    or type(index) ~= "table" or index.schema ~= 2 or type(index.facts) ~= "table"
+  if type(index) ~= "table" or index.schema ~= 2
+    or (type(index.name_set) ~= "table" and type(index.facts) ~= "table")
     or type(index.by_ingredient_identity) ~= "table" or type(index.by_output_identity) ~= "table" then
     return nil
   end
@@ -324,18 +326,24 @@ local function relevant_return_graph(recipe)
     end
   end
 
-  local index = recipe_facts.index_view()
-  if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
-  local selected, direct_output_producers = indexed_relevant_return_facts(index, reached, outputs)
+  local projection = recipe_facts.route_projection_view()
+  local selected, direct_output_producers = indexed_relevant_return_facts(projection, reached, outputs)
   if not selected then
+    -- An invalid projection must remain conservative.  The compatibility
+    -- fallback explicitly requests the established full index rather than
+    -- silently accepting an empty return cone.
     telemetry.count("material_return_graph_index_fallbacks", 1)
+    local index = recipe_facts.index_view()
+    if type(index) ~= "table" or type(index.facts) ~= "table" then return nil, "recipe-index" end
     selected, direct_output_producers = scanned_relevant_return_facts(index, reached, outputs)
   else
     telemetry.count("material_return_graph_index_queries", 1)
   end
   local facts = {}
   for _, recipe_name in ipairs(sorted_keys(selected)) do
-    facts[#facts + 1] = {name = recipe_name, fact = index.facts[recipe_name]}
+    local fact = recipe_facts.view(recipe_name)
+    if type(fact) ~= "table" then return nil, "recipe-fact" end
+    facts[#facts + 1] = {name = recipe_name, fact = fact}
   end
   local boundary = {
     schema = 1,
@@ -1466,7 +1474,6 @@ local function stream_match_identity(stream_key, spec, per_level_default)
   -- The memo belongs to this Context, and the recipe owner rejects source
   -- replacement once stream_match_index exists. Bind its actual source/index
   -- epochs without encoding the complete world merely to name a local entry.
-  recipe_facts.index_view()
   local context = compiler_context.current()
   return fingerprint.of({
     schema = 2,
@@ -1474,7 +1481,7 @@ local function stream_match_identity(stream_key, spec, per_level_default)
     descriptor = spec,
     per_level_default = per_level_default,
     recipe_source_epoch = recipe_facts.source_epoch(),
-    recipe_index_epoch = context:state_epoch("recipe_index"),
+    recipe_index_epoch = recipe_facts.projection_epoch(),
     target_profile = target_profiles.current(),
     automatic_productivity_action = automatic_compiler_policy.current().action
   })

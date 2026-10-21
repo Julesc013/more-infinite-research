@@ -195,8 +195,9 @@ end
 local function materialization()
   local context = compiler_context.current()
   return context:state_view("recipe_risk_materialization", function()
-    local source = recipe_facts.index_view()
-    local names = deepcopy(source.names or {})
+    -- Risk rows are demand-materialized. Ordinary callers need an exact
+    -- selected RecipeFact, not a complete generic RecipeFacts export.
+    local names = recipe_facts.all_names()
     table.sort(names)
     -- Reuse the Context service boundary for complete external inspection.
     -- Capture the owner function, not a mutable caller-supplied exporter.
@@ -204,7 +205,7 @@ local function materialization()
     context:set_service("recipe_risk.materialize_export", function() complete() end)
     return {
       schema = 1, record_type = "RecipeRiskMaterialization", complete = false,
-      source = source, relationships = relationships.view("input"),
+      relationships = relationships.view("input"),
       index = {schema = SCHEMA, names = names, facts = {}}
     }
   end)
@@ -213,7 +214,7 @@ end
 local function materialize_row(state, recipe_name)
   local row = state.index.facts[recipe_name]
   if row then return row end
-  local fact = state.source.facts[recipe_name]
+  local fact = recipe_facts.view(recipe_name)
   if not fact then return nil end
   telemetry.start_phase("recipe_risk_facts")
   row = build_row(recipe_name, fact, state.relationships)

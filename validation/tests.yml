@@ -786,6 +786,7 @@
         "tests/compiler/run_approved_pack_bindings_controls.py",
         "tests/compiler/approved_pack_bindings.lua",
         "tests/compiler/approved_family_emission.lua",
+        "tests/compiler/recipe_source_owner_contract.lua",
         ".github/workflows/validate.yml",
         "validation/tests.yml"
       ]

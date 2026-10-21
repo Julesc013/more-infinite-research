@@ -203,6 +203,9 @@ function Context:state_snapshot(name)
   if name == "recipe_risk_index" and self.services["recipe_risk.materialize_export"] then
     M.with_active(self, self.services["recipe_risk.materialize_export"])
   end
+  if name == "recipe_index" and self.services["recipe_facts.materialize_export"] then
+    M.with_active(self, self.services["recipe_facts.materialize_export"])
+  end
   return deepcopy(self.state[name])
 end
 
@@ -227,6 +230,8 @@ function Context:snapshot()
   end
   local complete_risks = self.services["recipe_risk.materialize_export"]
   if complete_risks then M.with_active(self, complete_risks) end
+  local complete_recipe_facts = self.services["recipe_facts.materialize_export"]
+  if complete_recipe_facts then M.with_active(self, complete_recipe_facts) end
   local exported_state = deepcopy(self.state)
   -- A requested Context export must not carry the private active handle that
   -- the plan used while compiling. The generic input stored for this export is
@@ -253,7 +258,9 @@ function Context:snapshot()
   payload.state_epochs.recipe_risk_materialization = nil
   payload.frozen_state.recipe_risk_materialization = nil
   for name in pairs(self.services) do
-    if name ~= "recipe_risk.materialize_export" then table.insert(payload.services, name) end
+    if name ~= "recipe_risk.materialize_export" and name ~= "recipe_facts.materialize_export" then
+      table.insert(payload.services, name)
+    end
   end
   table.sort(payload.services)
   local telemetry_state = payload.state.compiler_telemetry
