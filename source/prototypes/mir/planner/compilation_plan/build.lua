@@ -485,8 +485,8 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
     planned_base_candidates = deepcopy(active_input.base_candidates)
   end
   local input_policy = active_input and active_input.policy_snapshot or exact_input.policy_snapshot
-  local input_provider = active_input and active_input.provider_inputs
-    or exact_input.compilation_snapshot.provider_inputs
+  local provider_decisions = active_input and compiler_input.provider_decisions(exact_input)
+    or exact_input.compilation_snapshot.provider_inputs.decisions or {}
   local stream_effect_integrity
   local target_inventory = active_input and active_input.effect_target_inventory
     or (compiler_inputs and compiler_inputs.effect_target_inventory)
@@ -705,7 +705,7 @@ function M.finalize(stream_plan, base_plan, compiler_inputs)
   end)
 
   local provider_claims, review_required_candidates = {}, {}
-  for _, decision in ipairs(input_provider.decisions or {}) do
+  for _, decision in ipairs(provider_decisions) do
     local projection = {
       provider_id = decision.provider_id,
       provider_version = decision.provider_version,

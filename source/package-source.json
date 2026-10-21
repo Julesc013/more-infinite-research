@@ -3258,10 +3258,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/domain/compiler/compiler_input.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 15487,
-      "source_sha256": "6CDFF0FDB53148EC471EB0419702F83660BB1DAE533832908E25415AE017A4D6",
-      "output_bytes": 15487,
-      "output_sha256": "6CDFF0FDB53148EC471EB0419702F83660BB1DAE533832908E25415AE017A4D6"
+      "source_bytes": 17923,
+      "source_sha256": "F689ACF4B18708C0A07F46C1F7A8BB2CF763187DD47C3813E00BF4345805F9BC",
+      "output_bytes": 17923,
+      "output_sha256": "F689ACF4B18708C0A07F46C1F7A8BB2CF763187DD47C3813E00BF4345805F9BC"
     },
     {
       "layer": "capability",
@@ -5127,10 +5127,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/compilation_plan/build.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 39621,
-      "source_sha256": "EB48403568A7DDCEF8C4DF691E3ED4C6245C0293F736CA78A546ED649DE68066",
-      "output_bytes": 39621,
-      "output_sha256": "EB48403568A7DDCEF8C4DF691E3ED4C6245C0293F736CA78A546ED649DE68066"
+      "source_bytes": 39647,
+      "source_sha256": "6D5C77911E4682A76C2F06AD5CBC79A55601192929E0E64D341B03842000C4D9",
+      "output_bytes": 39647,
+      "output_sha256": "6D5C77911E4682A76C2F06AD5CBC79A55601192929E0E64D341B03842000C4D9"
     },
     {
       "layer": "capability",
@@ -5211,10 +5211,10 @@
         "predecessor_source_path": "src/mod/families/modern/prototypes/mir/planner/compiler.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 11249,
-      "source_sha256": "C4DAF19492F46B2AC4952864A25E33C88E70E5713AB9E20F5510D6247A76C1F5",
-      "output_bytes": 11249,
-      "output_sha256": "C4DAF19492F46B2AC4952864A25E33C88E70E5713AB9E20F5510D6247A76C1F5"
+      "source_bytes": 11273,
+      "source_sha256": "975629C5BDF73819CA948760B3A9FCFF36ADE833C79B5E34199F5FC1AD5B84A2",
+      "output_bytes": 11273,
+      "output_sha256": "975629C5BDF73819CA948760B3A9FCFF36ADE833C79B5E34199F5FC1AD5B84A2"
     },
     {
       "layer": "capability",
@@ -7757,5 +7757,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "4814210A982AF17B88B44168AEBC3600FCC3DDE6FFB848C2570781FFD5DFF347"
+  "record_sha256": "2D6F77A57554E9434AEA0DA2E5353663FAD4B4EB119F76B968116E2334433A42"
 }

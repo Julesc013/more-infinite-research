@@ -12,6 +12,7 @@ local authority = trusted_record.new("CompilerInput")
 -- import/export record; it is not constructed just to drive the planner.
 local active_authority = trusted_record.new("CompilerInputActive")
 local active_owners = setmetatable({}, {__mode = "k"})
+local active_providers = setmetatable({}, {__mode = "k"})
 local SCHEMA = 2
 local ACTIVE_SCHEMA = 1
 local ACTIVE_CONTRACT = "mir-active-compiler-input-v1"
@@ -195,10 +196,27 @@ end
 -- The active owner copies values that have no existing private owner. Stream
 -- plans and policy/environment records already have their own trust owners;
 -- this record retains those exact owned values only for the compiler scope.
-function M.new_active(values)
+-- Factorio's table.deepcopy preserves metatables. A shared dynamic index or
+-- iterator would therefore invalidate private ownership even after a copy.
+-- The resolver supplies plain records; generic schema-2 imports remain separate.
+local function assert_plain_provider(value, seen)
+  if type(value) ~= "table" then return end
+  if getmetatable(value) ~= nil then
+    error("Active CompilerInput provider records must be plain owned tables.", 3)
+  end
+  if seen[value] then return end
+  seen[value] = true
+  for key, child in pairs(value) do
+    assert_plain_provider(key, seen)
+    assert_plain_provider(child, seen)
+  end
+end
+
+local function new_active(values, provider_owner)
   values = values or {}
   if type(values.stream_plan) ~= "table" or type(values.base_continuation_inputs) ~= "table"
-    or type(values.provider_inputs) ~= "table" or type(values.effect_target_inventory) ~= "table" then
+    or (not provider_owner and type(values.provider_inputs) ~= "table")
+    or type(values.effect_target_inventory) ~= "table" then
     error("Active CompilerInput requires complete stream, base, provider, and target inputs.", 2)
   end
   if not policy_snapshot.is_trusted(values.policy_snapshot) then
@@ -214,12 +232,19 @@ function M.new_active(values)
     stream_plan = values.stream_plan,
     base_continuation_inputs = deepcopy(values.base_continuation_inputs),
     base_candidates = deepcopy(values.base_candidates or {}),
-    provider_inputs = deepcopy(values.provider_inputs),
     effect_target_inventory = deepcopy(values.effect_target_inventory),
     source_fingerprints = deepcopy(values.source_fingerprints or {}),
     policy_snapshot = values.policy_snapshot,
     runtime_environment = values.runtime_environment
   }
+  -- No raw provider handle leaves this owner. Qualification may retain this
+  -- exact private child; caller input and inspection exports stay detached.
+  if not provider_owner then
+    assert_plain_provider(values.provider_inputs, {})
+    local input = deepcopy(values.provider_inputs)
+    assert_plain_provider(input, {})
+    provider_owner = {input = input, fingerprint = fingerprint.of(input)}
+  end
   local record = {
     schema = ACTIVE_SCHEMA,
     record_type = "ActiveCompilerInput",
@@ -228,7 +253,7 @@ function M.new_active(values)
     stream_plan_fingerprint = stream_plan_fingerprint,
     base_continuation_input_fingerprint = fingerprint.of(owner.base_continuation_inputs),
     base_candidates_fingerprint = fingerprint.of(owner.base_candidates),
-    provider_input_fingerprint = fingerprint.of(owner.provider_inputs),
+    provider_input_fingerprint = provider_owner.fingerprint,
     effect_target_inventory_fingerprint = fingerprint.of(owner.effect_target_inventory),
     source_fingerprint = fingerprint.of(owner.source_fingerprints),
     policy_fingerprint = values.policy_snapshot.policy_fingerprint,
@@ -237,7 +262,12 @@ function M.new_active(values)
   }
   record.input_fingerprint = fingerprint.of(active_material(record))
   active_owners[record] = owner
+  active_providers[record] = provider_owner
   return active_authority.register(record, active_identity(record))
+end
+
+function M.new_active(values)
+  return new_active(values)
 end
 
 function M.is_active(record)
@@ -247,7 +277,13 @@ end
 function M.assert_active(record)
   active_authority.assert_trusted(record, active_identity_unchanged)
   local owner = active_owners[record]
-  if type(owner) ~= "table" then error("Active CompilerInput owner is unavailable.", 2) end
+  local provider_owner = active_providers[record]
+  if type(owner) ~= "table" or type(provider_owner) ~= "table" then
+    error("Active CompilerInput owner is unavailable.", 2)
+  end
+  if provider_owner.fingerprint ~= record.provider_input_fingerprint then
+    error("Active CompilerInput provider identity differs from its private owner.", 2)
+  end
   -- The exact GenerationPlan owner is authenticated by its planner consumers.
   -- Keep this carrier bound to the same structural plan identity in the meantime.
   if bound_stream_plan_fingerprint(owner.stream_plan) ~= record.stream_plan_fingerprint then
@@ -265,22 +301,49 @@ function M.active_view(record)
   return active_owners[record]
 end
 
+-- The two production consumers need these decision fields, not each row's
+-- diagnostic detail. Return detached projections; the full input stays owned
+-- and remains covered by provider_input_fingerprint without another encoding.
+local PROVIDER_DECISION_FIELDS = {
+  "provider_id", "provider_version", "candidate_family", "prototype_type",
+  "prototype_name", "target_stream", "final_state", "claim_fingerprint",
+  "decision_fingerprint", "risk_fingerprint", "risk_disposition"
+}
+
+function M.provider_decisions(record)
+  M.assert_active(record)
+  local out = {}
+  for index, decision in ipairs(active_providers[record].input.decisions or {}) do
+    local row = {}
+    for _, field in ipairs(PROVIDER_DECISION_FIELDS) do
+      row[field] = deepcopy(decision[field])
+    end
+    out[index] = row
+  end
+  return out
+end
+
+-- Explicit inspection only; never used to drive ordinary qualification.
+function M.provider_inputs_snapshot(record)
+  M.assert_active(record)
+  return deepcopy(active_providers[record].input)
+end
+
 function M.qualify_active(base, values)
   M.assert_active(base)
   values = values or {}
   local owner = active_owners[base]
-  local qualified = M.new_active({
+  local qualified = new_active({
     base_input_fingerprint = base.input_fingerprint,
     stream_plan = values.stream_plan or owner.stream_plan,
     base_continuation_inputs = values.base_continuation_inputs or owner.base_continuation_inputs,
     base_candidates = values.base_candidates or owner.base_candidates,
-    provider_inputs = owner.provider_inputs,
     effect_target_inventory = owner.effect_target_inventory,
     source_fingerprints = values.source_fingerprints or owner.source_fingerprints,
     policy_snapshot = owner.policy_snapshot,
     runtime_environment = owner.runtime_environment,
     input_sanitation_fingerprint = base.input_sanitation_fingerprint
-  })
+  }, active_providers[base])
   return qualified
 end
 

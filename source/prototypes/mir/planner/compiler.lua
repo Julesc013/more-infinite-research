@@ -145,14 +145,15 @@ function M.compile(snapshot, policy)
     or snapshot.stream_inputs.plan or snapshot.stream_inputs
   local base_plan = active_values and active_values.base_continuation_inputs
     or snapshot.base_continuation_inputs.operations or snapshot.base_continuation_inputs
-  local provider_inputs = active_values and active_values.provider_inputs or snapshot.provider_inputs
+  local provider_decisions = active_values and compiler_input.provider_decisions(snapshot)
+    or snapshot.provider_inputs.decisions or {}
   local compiler_input_fingerprint = active and snapshot.input_fingerprint or snapshot.snapshot_fingerprint
   local input_identity_record = active and {
     schema = 1, kind = "active-compiler-input-v1", input_fingerprint = compiler_input_fingerprint
   } or nil
   local operations, dispositions = {}, {accepted = {}, rejected = {}, review_required = {}}
   local provider_claims = {}
-  for _, row in ipairs(provider_inputs.decisions or {}) do
+  for _, row in ipairs(provider_decisions) do
     if type(row.claim_fingerprint) ~= "string" or row.claim_fingerprint == "" then
       error("Provider decision lacks its exact semantic claim fingerprint.", 2)
     end

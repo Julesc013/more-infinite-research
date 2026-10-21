@@ -1164,8 +1164,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 15487,
-      "expected_sha256": "6CDFF0FDB53148EC471EB0419702F83660BB1DAE533832908E25415AE017A4D6",
+      "expected_bytes": 17923,
+      "expected_sha256": "F689ACF4B18708C0A07F46C1F7A8BB2CF763187DD47C3813E00BF4345805F9BC",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -2636,8 +2636,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed compilation-plan build responsibility for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 39621,
-      "expected_sha256": "EB48403568A7DDCEF8C4DF691E3ED4C6245C0293F736CA78A546ED649DE68066",
+      "expected_bytes": 39647,
+      "expected_sha256": "6D5C77911E4682A76C2F06AD5CBC79A55601192929E0E64D341B03842000C4D9",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "behavior-preserving-decomposition",
@@ -2700,8 +2700,8 @@
       "transform": "copy-exact-bytes",
       "reason": "Materialize the governed canonical capability source for f210.",
       "capability_disposition": "included-for-target",
-      "expected_bytes": 11249,
-      "expected_sha256": "C4DAF19492F46B2AC4952864A25E33C88E70E5713AB9E20F5510D6247A76C1F5",
+      "expected_bytes": 11273,
+      "expected_sha256": "975629C5BDF73819CA948760B3A9FCFF36ADE833C79B5E34199F5FC1AD5B84A2",
       "proof_obligations": [
         "exact-path-and-byte-identity",
         "canonical-package-authority-established-after-replay",
@@ -3963,5 +3963,5 @@
     "independent_target_proof_required": true,
     "era_family_labels_absent": true
   },
-  "record_sha256": "B0F273916DAD5E3CFAF0EEA0A1DB87525DF121DB9799AFFA54ECA0E1AF8C3131"
+  "record_sha256": "F23C41F1B3F76AB3FE68E4DE9884E04F66B0648BC3DB603EF51D51AA281F0012"
 }
