@@ -297,7 +297,7 @@ function Get-MIR42HistoricalCandidateAuthenticationProjection {
     $firstVersion = [regex]::Match($changelog, '(?m)^Version:\s*(\S+)')
     if (-not $firstVersion.Success) { throw '[mir42-historical-authentication-changelog-identity]' }
     $minimumFactorioVersion = ''
-    if ($SourceVersion -ceq '4.6.0') {
+    if ($SourceVersion -cin @('4.6.0','4.7.0')) {
       $baseRequirements = @($info.dependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
       if ($baseRequirements.Count -ne 1) { throw '[mir42-historical-authentication-base-minimum]' }
       $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''

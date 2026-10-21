@@ -6,7 +6,7 @@
   "change_type": "fixed",
   "summary": "Restore complete published 4.6 history when rendering MIR 4.7 target changelogs.",
   "details": [
-    "Keep each target's exact signed 4.6 entry and earlier authored history, then render one target-specific 4.7 leading entry through the shared package writer.",
+    "Keep each target's exact signed 4.6 entry and earlier authored history, then render one target-specific 4.7 leading entry through the shared package writer and authenticate the same declared minimum in historical targets.",
     "Name the concrete current compiler, journal, recipe and relationship changes only for the four modern targets; historical target entries retain presentation history and their declared engine floors without claiming modern behavior.",
     "This presentation correction changes no player runtime, research, setting, save, migration, compatibility acceptance or support claim."
   ],
