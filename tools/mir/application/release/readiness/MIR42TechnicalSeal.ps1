@@ -1395,22 +1395,23 @@ function Assert-MIR42FreshEngineLoads {
       }
       $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.save.path) -Sha256 ([string]$summary.save.sha256) -Code 'mir42-seal-historical-fresh-save'
       $recordedCandidatePath = [string]$summary.candidate.path
-      if (Test-Path -LiteralPath $recordedCandidatePath) {
+      if ($CurrentIndividual) {
+        # A V2 producer and immutable summary bind the historical selected
+        # candidate. Custody restores its library member after the run, so an
+        # ambient later file, directory, or absence cannot authenticate or
+        # refute that historical input.
+        $canonicalCandidatePath = [string]$CandidateTarget.archive_path
+        if ([IO.Path]::GetFileName($recordedCandidatePath) -cne [IO.Path]::GetFileName($canonicalCandidatePath)) {
+          throw "[mir42-seal-historical-fresh-candidate-name] $targetId/$([string]$fresh.scenario)"
+        }
+        $null = Resolve-MIR42SealImmutableFile -Path $canonicalCandidatePath -Sha256 ([string]$Target.archive.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+      } elseif (Test-Path -LiteralPath $recordedCandidatePath) {
         if (-not (Test-Path -LiteralPath $recordedCandidatePath -PathType Leaf)) {
           throw "[mir42-seal-historical-fresh-candidate-type] $targetId/$([string]$fresh.scenario)"
         }
         # A retained selected-library copy, when present, remains the receipt's
         # primary evidence and must bind by its recorded digest.
         $null = Resolve-MIR42SealImmutableFile -Path $recordedCandidatePath -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
-      } elseif ($CurrentIndividual) {
-        # Current individual custody restores a temporary selected library after
-        # a successful run. Its absent path is admissible only when the receipt
-        # already binds the canonical current target archive by digest and name.
-        $canonicalCandidatePath = [string]$CandidateTarget.archive_path
-        if ([IO.Path]::GetFileName($recordedCandidatePath) -cne [IO.Path]::GetFileName($canonicalCandidatePath)) {
-          throw "[mir42-seal-historical-fresh-candidate-name] $targetId/$([string]$fresh.scenario)"
-        }
-        $null = Resolve-MIR42SealImmutableFile -Path $canonicalCandidatePath -Sha256 ([string]$Target.archive.sha256) -Code 'mir42-seal-historical-fresh-candidate'
       } else {
         $null = Resolve-MIR42SealImmutableFile -Path $recordedCandidatePath -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
       }
@@ -1843,6 +1844,25 @@ function Assert-MIR42IndividualNativeCandidateSelection {
   $recordedNativePath = [IO.Path]::GetFullPath([string]$native.path)
   $rootPrefix = $receiptRoot + [IO.Path]::DirectorySeparatorChar
   if ($recordedNativePath.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-individual-engine-run-native-candidate-run-root]' }
+  if ($CurrentIndividual) {
+    # The V2 producer and immutable receipt bind the candidate at actor time.
+    # Direct-library custody restores the selected member later, so its live
+    # path, bytes, type, or file identity are not historical execution proof.
+    # Preserve the recorded path and nonempty identity as provenance while
+    # reading the exact captured bytes through the canonical target archive.
+    if ([string]::IsNullOrWhiteSpace([string]$native.identity)) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    $candidatePath = Resolve-MIR42SealImmutableFile -Path ([string]$CandidateTarget.archive_path) -Sha256 ([string]$CandidateTarget.archive_sha256) -Code 'mir42-individual-engine-run-candidate-authority'
+    if ([IO.Path]::GetFileName($candidatePath) -cne $expectedName -or
+        [int64](Get-Item -LiteralPath $candidatePath).Length -ne [int64]$native.bytes) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    if ($recordedNativePath.Equals($candidatePath, [StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir42-individual-engine-run-native-candidate-authority-path]'
+    }
+    return [pscustomobject][ordered]@{path=$recordedNativePath;canonical_path=$candidatePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
+  }
   if (Test-Path -LiteralPath $recordedNativePath) {
     if (-not (Test-Path -LiteralPath $recordedNativePath -PathType Leaf)) {
       throw '[mir42-individual-engine-run-native-candidate-selection]'
@@ -1868,33 +1888,9 @@ function Assert-MIR42IndividualNativeCandidateSelection {
     if ($nativeIdentity -ceq $candidateIdentity) { throw '[mir42-individual-engine-run-native-candidate-authority-link]' }
     return [pscustomobject][ordered]@{path=$recordedNativePath;canonical_path=$candidatePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
   }
-  if (-not $CurrentIndividual) {
-    # Keep every legacy receipt strict: it has no custody-restoration contract.
-    $null = Resolve-MIR42SealImmutableFile -Path $recordedNativePath -Sha256 ([string]$native.sha256) -Code 'mir42-individual-engine-run-native-candidate'
-    throw '[mir42-individual-engine-run-native-candidate-missing]'
-  }
-  # Current V2 producer-bound custody restores the selected library after the
-  # completed run. The absent execution path may therefore be represented only
-  # by the exact, independently canonical target archive. Return the recorded
-  # execution path and identity; the canonical archive authenticates bytes but
-  # cannot prove a deleted selected file's former inode.
-  if ([string]::IsNullOrWhiteSpace([string]$native.identity)) {
-    throw '[mir42-individual-engine-run-native-candidate-selection]'
-  }
-  $candidatePath = Resolve-MIR42SealImmutableFile -Path ([string]$CandidateTarget.archive_path) -Sha256 ([string]$CandidateTarget.archive_sha256) -Code 'mir42-individual-engine-run-candidate-authority'
-  if ([IO.Path]::GetFileName($candidatePath) -cne $expectedName -or
-      $recordedNativePath.Equals($candidatePath, [StringComparison]::OrdinalIgnoreCase) -or
-      [int64](Get-Item -LiteralPath $candidatePath).Length -ne [int64]$native.bytes) {
-    throw '[mir42-individual-engine-run-native-candidate-selection]'
-  }
-  if (-not (Get-Command Get-MIRImmutableInputFileIdentity -ErrorAction SilentlyContinue)) {
-    . (Join-Path $mir42SealRepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
-  }
-  $canonicalIdentity = Get-MIRImmutableInputFileIdentity -Path $candidatePath
-  if ([string]$native.identity -ceq $canonicalIdentity) {
-    throw '[mir42-individual-engine-run-native-candidate-authority-link]'
-  }
-  return [pscustomobject][ordered]@{path=$recordedNativePath;canonical_path=$candidatePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
+  # Legacy V1 has no producer-bound restored-custody contract.
+  $null = Resolve-MIR42SealImmutableFile -Path $recordedNativePath -Sha256 ([string]$native.sha256) -Code 'mir42-individual-engine-run-native-candidate'
+  throw '[mir42-individual-engine-run-native-candidate-missing]'
 }
 function Assert-MIR42IndividualResourceLedgers {
   param([Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)][string]$ReceiptPath)

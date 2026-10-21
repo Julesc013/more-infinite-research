@@ -924,9 +924,9 @@ function Test-MIR42IndividualNativeInputReader {
           runner=[ordered]@{path='tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1';sha256=('D' * 64)}
         }
       }
-      # A custody-restored selected-library path is absent after the run. The
-      # V2 reader may use only the same-name, digest-bound canonical target
-      # archive; a present selected path remains authoritative below.
+      # V2 records authenticate their captured selection through the same-name,
+      # digest-bound canonical target archive. Later selected-library state is
+      # custody aftermath and does not authenticate or refute the past run.
       $currentF013Fresh = @($currentRecord.fresh_loads | Where-Object { [string]$_.target -ceq 'f013' })
       Assert-MIR42NineSealTest -Condition ($currentF013Fresh.Count -eq 1) -Code 'current-individual-v2-f013-fresh-row'
       $restoredSummary = Get-Content -LiteralPath $currentF013Fresh[0].receipt.path -Raw | ConvertFrom-Json -Depth 100
@@ -944,19 +944,15 @@ function Test-MIR42IndividualNativeInputReader {
       $restoredDirectory = Split-Path -Parent $restoredCandidatePath
       New-Item -ItemType Directory -Force -Path $restoredDirectory | Out-Null
       [IO.File]::WriteAllText($restoredCandidatePath,'wrong retained selected archive',[Text.UTF8Encoding]::new($false))
-      $wrongSelectedFailure = ''
-      try { $null = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
-      catch { $wrongSelectedFailure = $_.Exception.Message }
+      $currentIncumbentBound = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
       Remove-Item -LiteralPath $restoredCandidatePath -Force
-      Assert-MIR42NineSealTest -Condition $wrongSelectedFailure.StartsWith('[mir42-seal-historical-fresh-candidate-hash]',[StringComparison]::Ordinal) -Code 'current-individual-v2-present-selected-bytes-rejected'
+      Assert-MIR42NineSealTest -Condition ([string]$currentIncumbentBound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads') -Code 'current-individual-v2-restored-incumbent-accepted'
       $checks++
       $script:mir42IndividualReaderChecks++
       New-Item -ItemType Directory -Force -Path $restoredCandidatePath | Out-Null
-      $selectedDirectoryFailure = ''
-      try { $null = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished }
-      catch { $selectedDirectoryFailure = $_.Exception.Message }
+      $currentDirectoryBound = Get-MIR42BoundIndividualEngineRun -Reference $currentReference -Candidate $script:mir42IndividualReaderCandidate -PublishedMaintenanceInputs $script:mir42IndividualReaderPublished
       Remove-Item -LiteralPath $restoredCandidatePath -Force -Recurse
-      Assert-MIR42NineSealTest -Condition $selectedDirectoryFailure.StartsWith('[mir42-seal-historical-fresh-candidate-type]',[StringComparison]::Ordinal) -Code 'current-individual-v2-selected-directory-rejected'
+      Assert-MIR42NineSealTest -Condition ([string]$currentDirectoryBound.input_kind -ceq 'individual-upgrade-receipts-and-fresh-loads') -Code 'current-individual-v2-restored-directory-accepted'
       $checks++
       $script:mir42IndividualReaderChecks++
       $f013CanonicalArchive = [string](@($packages | Where-Object { [string]$_.target -ceq 'f013' })[0].archive_path)
@@ -1242,10 +1238,10 @@ function Test-MIR42IndividualNativeInputReader {
     }
     $recordedSelectedPath = Join-Path $currentSelectedRoot $currentName
     $selectionReceiptPath = Join-Path $currentReceiptRoot 'result.json'
-    function New-CurrentRestoredUpgradeSelectionReceipt([string]$Path = $recordedSelectedPath,[string]$Sha256 = [string]$currentCanonical.sha256,[int64]$Bytes = [int64](Get-Item -LiteralPath $currentCanonical.path).Length,[string]$Identity = 'retained-execution-identity') {
+    function New-CurrentRestoredUpgradeSelectionReceipt([string]$Path = $recordedSelectedPath,[string]$Sha256 = [string]$currentCanonical.sha256,[int64]$Bytes = [int64](Get-Item -LiteralPath $currentCanonical.path).Length,[string]$Identity = 'retained-execution-identity',[string]$Version = $currentVersion) {
       return [ordered]@{library_activation=[ordered]@{
         status='restored-direct-library-controls';dependency_payload_bytes_copied=0;archive_links_created=0;archive_extractions=0
-        selected=@([ordered]@{name='more-infinite-research';version=$currentVersion;path=$Path;builtin=$false;identity=$Identity;sha256=$Sha256;bytes=$Bytes})
+        selected=@([ordered]@{name='more-infinite-research';version=$Version;path=$Path;builtin=$false;identity=$Identity;sha256=$Sha256;bytes=$Bytes})
       }}
     }
     function Assert-CurrentRestoredUpgradeSelectionRefusal([string]$Name,$Receipt,[switch]$Current,[string]$Prefix) {
@@ -1268,6 +1264,9 @@ function Test-MIR42IndividualNativeInputReader {
     $wrongSize = New-CurrentRestoredUpgradeSelectionReceipt -Bytes ([int64](Get-Item -LiteralPath $currentCanonical.path).Length + 1)
     Assert-CurrentRestoredUpgradeSelectionRefusal 'size-refused' $wrongSize -Current -Prefix '[mir42-individual-engine-run-native-candidate-selection]'
     $checks++
+    $wrongVersion = New-CurrentRestoredUpgradeSelectionReceipt -Version '4.7.01301'
+    Assert-CurrentRestoredUpgradeSelectionRefusal 'version-refused' $wrongVersion -Current -Prefix '[mir42-individual-engine-run-native-candidate-selection]'
+    $checks++
     $wrongName = New-CurrentRestoredUpgradeSelectionReceipt -Path (Join-Path $currentSelectedRoot 'other.zip')
     Assert-CurrentRestoredUpgradeSelectionRefusal 'name-refused' $wrongName -Current -Prefix '[mir42-individual-engine-run-native-candidate-selection]'
     $checks++
@@ -1276,7 +1275,8 @@ function Test-MIR42IndividualNativeInputReader {
     $checks++
     $canonicalIdentity = Get-MIRImmutableInputFileIdentity -Path $currentCanonical.path
     $authorityIdentity = New-CurrentRestoredUpgradeSelectionReceipt -Identity $canonicalIdentity
-    Assert-CurrentRestoredUpgradeSelectionRefusal 'authority-identity-refused' $authorityIdentity -Current -Prefix '[mir42-individual-engine-run-native-candidate-authority-link]'
+    $currentCanonicalIdentity = Assert-MIR42IndividualNativeCandidateSelection -Receipt $authorityIdentity -ReceiptPath $selectionReceiptPath -CandidateTarget $currentTarget -CurrentIndividual
+    Assert-MIR42NineSealTest -Condition ([string]$currentCanonicalIdentity.identity -ceq $canonicalIdentity -and [string]$currentCanonicalIdentity.canonical_path -ceq [string]$currentCanonical.path) -Code 'current-upgrade-restored-selection-canonical-identity-is-provenance'
     $checks++
     $runRootPath = Join-Path $currentReceiptRoot $currentName
     $runRootReceipt = New-CurrentRestoredUpgradeSelectionReceipt -Path $runRootPath
@@ -1287,19 +1287,25 @@ function Test-MIR42IndividualNativeInputReader {
     $checks++
     [IO.File]::WriteAllText($recordedSelectedPath,'wrong retained selected bytes',[Text.UTF8Encoding]::new($false))
     try {
-      Assert-CurrentRestoredUpgradeSelectionRefusal 'present-wrong-bytes-refused' (New-CurrentRestoredUpgradeSelectionReceipt) -Current -Prefix '[mir42-individual-engine-run-native-candidate-hash]'
+      $currentIncumbent = Assert-MIR42IndividualNativeCandidateSelection -Receipt (New-CurrentRestoredUpgradeSelectionReceipt) -ReceiptPath $selectionReceiptPath -CandidateTarget $currentTarget -CurrentIndividual
+      Assert-MIR42NineSealTest -Condition ([string]$currentIncumbent.canonical_path -ceq [string]$currentCanonical.path) -Code 'current-upgrade-restored-selection-present-incumbent-accepted'
+      Assert-CurrentRestoredUpgradeSelectionRefusal 'legacy-present-wrong-bytes-refused' (New-CurrentRestoredUpgradeSelectionReceipt) -Prefix '[mir42-individual-engine-run-native-candidate-hash]'
       $checks++
     } finally { Remove-Item -LiteralPath $recordedSelectedPath -Force -ErrorAction SilentlyContinue }
     New-Item -ItemType Directory -Force -Path $recordedSelectedPath | Out-Null
     try {
-      Assert-CurrentRestoredUpgradeSelectionRefusal 'present-directory-refused' (New-CurrentRestoredUpgradeSelectionReceipt) -Current -Prefix '[mir42-individual-engine-run-native-candidate-selection]'
+      $currentDirectory = Assert-MIR42IndividualNativeCandidateSelection -Receipt (New-CurrentRestoredUpgradeSelectionReceipt) -ReceiptPath $selectionReceiptPath -CandidateTarget $currentTarget -CurrentIndividual
+      Assert-MIR42NineSealTest -Condition ([string]$currentDirectory.canonical_path -ceq [string]$currentCanonical.path) -Code 'current-upgrade-restored-selection-present-directory-accepted'
+      Assert-CurrentRestoredUpgradeSelectionRefusal 'legacy-present-directory-refused' (New-CurrentRestoredUpgradeSelectionReceipt) -Prefix '[mir42-individual-engine-run-native-candidate-selection]'
       $checks++
     } finally { Remove-Item -LiteralPath $recordedSelectedPath -Force -Recurse -ErrorAction SilentlyContinue }
     $linkedSelectedPath = Join-Path $currentSelectedRoot $currentName
     New-Item -ItemType HardLink -Path $linkedSelectedPath -Target $currentCanonical.path | Out-Null
     try {
       $linkedReceipt = New-CurrentRestoredUpgradeSelectionReceipt -Path $linkedSelectedPath -Identity (Get-MIRImmutableInputFileIdentity -Path $linkedSelectedPath)
-      Assert-CurrentRestoredUpgradeSelectionRefusal 'authority-link-refused' $linkedReceipt -Current -Prefix '[mir42-individual-engine-run-native-candidate-authority-link]'
+      $currentLinked = Assert-MIR42IndividualNativeCandidateSelection -Receipt $linkedReceipt -ReceiptPath $selectionReceiptPath -CandidateTarget $currentTarget -CurrentIndividual
+      Assert-MIR42NineSealTest -Condition ([string]$currentLinked.canonical_path -ceq [string]$currentCanonical.path) -Code 'current-upgrade-restored-selection-present-link-accepted'
+      Assert-CurrentRestoredUpgradeSelectionRefusal 'legacy-authority-link-refused' $linkedReceipt -Prefix '[mir42-individual-engine-run-native-candidate-authority-link]'
       $checks++
     } finally { Remove-Item -LiteralPath $linkedSelectedPath -Force -ErrorAction SilentlyContinue }
     $wrongNativeArchive = Copy-HostValue $baseRecord;$nativeReceipt = Get-Content -LiteralPath $wrongNativeArchive.individual_upgrade_receipts[0].receipt.path -Raw | ConvertFrom-Json -AsHashtable -Depth 100
