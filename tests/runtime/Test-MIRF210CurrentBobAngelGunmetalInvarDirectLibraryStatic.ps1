@@ -56,6 +56,7 @@ Assert-GIStatic ((@($actualDossier.target.official_mods)-join ',') -ceq (@($curr
 $controlledDossierPath=Join-Path $repo ('build/tmp/gi-dossier-input-'+[guid]::NewGuid().ToString('N')+'.json')
 $controlledDossierPrefix=[IO.Path]::GetFullPath((Join-Path $repo 'build/tmp')).TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar
 Assert-GIStatic ([IO.Path]::GetFullPath($controlledDossierPath).StartsWith($controlledDossierPrefix,[StringComparison]::OrdinalIgnoreCase)) 'controlled-dossier-contained'
+[void][IO.Directory]::CreateDirectory((Split-Path -Parent $controlledDossierPath))
 try{
   foreach($engine in @(
     @{version='2.1.24';sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'},

@@ -2,6 +2,82 @@
 [CmdletBinding()]
 param([string]$RepoRoot=(Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path,[string]$SelectedManifestPath='')
 $ErrorActionPreference='Stop'
+function Invoke-MIR470TriggerOutputRepresentativeFixtureControls {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$TestRoot,
+    [string]$UpgradeRunnerPath=(Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),
+    [string]$RepresentativeFixturePath=(Join-Path $RepoRoot 'fixtures/assert-trigger-output-science-f210-470'),
+    [string]$OldSourceFixturePath=(Join-Path $RepoRoot 'fixtures/assert-trigger-output-science-source-failure-f210-460'),
+    [string]$LupaRuntimePath=(Join-Path $RepoRoot 'build/tmp/mir421-lua-runtime'),
+    [string]$ControlScriptPath=(Join-Path $RepoRoot 'tests/tooling/trigger_output_fixture_controls.py')
+  )
+  $activationScript=Join-Path $RepoRoot 'tools/lib/compatibility/LibraryActivation.ps1'
+  if(-not(Test-Path -LiteralPath $activationScript -PathType Leaf)){throw '[mir470-trigger-output-representative-library-activation]'}
+  . $activationScript
+  foreach($path in @($UpgradeRunnerPath,$RepresentativeFixturePath,$OldSourceFixturePath,$LupaRuntimePath,$ControlScriptPath)){
+    if(-not(Test-Path -LiteralPath $path)){throw "[mir470-trigger-output-representative-path] $path"}
+  }
+  $tokens=$null;$errors=$null
+  $ast=[Management.Automation.Language.Parser]::ParseFile($UpgradeRunnerPath,[ref]$tokens,[ref]$errors)
+  if($errors.Count-ne0){throw '[mir470-trigger-output-representative-runner-syntax]'}
+  foreach($name in @('Assert-MIR470TriggerOutputRepresentativeTransition','Get-MIR470TriggerOutputRepresentativeFixture','Set-MIR470TriggerOutputRepresentativeDefinitionAllowance','Assert-MIR470TriggerOutputRepresentativeMarker')){
+    $matches=@($ast.FindAll({param($node) $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$true))
+    if($matches.Count-ne1){throw "[mir470-trigger-output-representative-runner-function] $name"}
+    . ([scriptblock]::Create($matches[0].Extent.Text))
+  }
+  $assertions=0
+  $mode=[ordered]@{
+    Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';FixtureName='assert-upgrade-4-0-21000-to-4-1-21000'
+    Archetype='space-age-native-owner';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SourceVersion='4.7.0'
+    SourceMaterializationPath='controlled-source.zip';PublishedPredecessorManifestPath='controlled-published.json';Retention='Always'
+    K2ImersiteInputProfile='';F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile=''
+  }
+  Assert-MIR470TriggerOutputRepresentativeTransition @mode
+  $assertions++
+  $rejected=$false;$wrong=[ordered]@{};foreach($key in $mode.Keys){$wrong[$key]=$mode[$key]};$wrong.Target='f200'
+  try{Assert-MIR470TriggerOutputRepresentativeTransition @wrong}catch{$rejected=$_.Exception.Message-ceq'[mir470-trigger-output-representative-transition]'}
+  if(-not$rejected){throw '[mir470-trigger-output-representative-selector]'}
+  $assertions++
+  $markerRows=@{
+    source='[mir-trigger-output-fixture] stage=source untouched-published-input=1'
+    upgrade='[mir-trigger-output-fixture] stage=upgrade emitted-science-prerequisite-effects=verified'
+    reload='[mir-trigger-output-fixture] stage=reload emitted-science-prerequisite-effects=verified'
+    'data-stage'='[mir-trigger-output-fixture] data-stage=target binding=declared-trigger-output cryogenic=declared-recipe'
+  }
+  foreach($stage in @('source','upgrade','reload','data-stage')){
+    $text="   0.000 2026-10-21 00:00:00; Factorio 2.1.23 $([Environment]::NewLine)$($markerRows[$stage])$([Environment]::NewLine)"
+    Assert-MIR470TriggerOutputRepresentativeMarker -Text (Get-MIRLibraryLatestInvocationText -Text $text) -Stage $stage
+    $assertions++
+  }
+  $stale="   0.000 2026-10-21 00:00:00; Factorio 2.1.23 $([Environment]::NewLine)$($markerRows.reload)$([Environment]::NewLine)"
+  $latest="   0.000 2026-10-21 00:01:00; Factorio 2.1.23 $([Environment]::NewLine)new invocation without fixture marker$([Environment]::NewLine)"
+  $rejected=$false
+  try{Assert-MIR470TriggerOutputRepresentativeMarker -Text (Get-MIRLibraryLatestInvocationText -Text ($stale+$latest)) -Stage reload}catch{$rejected=$_.Exception.Message-ceq'[mir470-trigger-output-representative-reload-marker]'}
+  if(-not$rejected){throw '[mir470-trigger-output-representative-stale-marker]'}
+  $assertions++
+  $fixtureRoot=Split-Path -Parent (Split-Path -Parent $RepresentativeFixturePath)
+  $fixture=Get-MIR470TriggerOutputRepresentativeFixture -RepoRoot $fixtureRoot
+  if([IO.Path]::GetFullPath([string]$fixture.directory)-cne[IO.Path]::GetFullPath($RepresentativeFixturePath)){throw '[mir470-trigger-output-representative-fixture-directory]'}
+  $assertions++
+  $oldInfo=Get-Content -LiteralPath (Join-Path $OldSourceFixturePath 'info.json') -Raw|ConvertFrom-Json
+  if([string]$oldInfo.name-cne'mir-fixture-assert-trigger-output-science-source-failure-f210-460'-or [string]$oldInfo.version-cne'0.1.4600') {throw '[mir470-trigger-output-representative-old-source-identity]'}
+  $assertions++
+  $stagedDirectory=Join-Path $TestRoot 'mir470-trigger-output-staged-generic';New-Item -ItemType Directory -Force -Path $stagedDirectory|Out-Null
+  $stagedControl=Join-Path $stagedDirectory 'control.lua'
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/control.lua') -Destination $stagedControl -Force
+  Set-MIR470TriggerOutputRepresentativeDefinitionAllowance -FixtureDirectory $stagedDirectory
+  $stagedText=Get-Content -LiteralPath $stagedControl -Raw
+  if($stagedText.Contains(([char]96)+'n') -or -not$stagedText.Contains('trigger_output_representative_delta')){throw '[mir470-trigger-output-representative-staged-lua]'}
+  $assertions++
+  $python=(Get-Command python -ErrorAction Stop).Source
+  $output=@(& $python $ControlScriptPath $LupaRuntimePath $stagedControl (Join-Path $RepresentativeFixturePath 'data-updates.lua') (Join-Path $RepresentativeFixturePath 'data-final-fixes.lua') (Join-Path $OldSourceFixturePath 'data-updates.lua') (Join-Path $RepresentativeFixturePath 'control.lua') 2>&1)
+  if($LASTEXITCODE -ne 0){throw "[mir470-trigger-output-representative-lua] $($output -join [Environment]::NewLine)"}
+  $luaResult=($output -join [Environment]::NewLine)|ConvertFrom-Json
+  if($luaResult.status-cne'passed'-or[int]$luaResult.assertions-lt20){throw '[mir470-trigger-output-representative-lua-result]'}
+  [ordered]@{assertions=($assertions+[int]$luaResult.assertions);staged_control_sha256=(Get-FileHash -LiteralPath $stagedControl -Algorithm SHA256).Hash;lua_assertions=[int]$luaResult.assertions}
+}
 $k2FullStateScenario=$false
 $tokens=$null;$errors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'tests/runtime/Test-MIRUpgrade.ps1'),[ref]$tokens,[ref]$errors)
@@ -1015,15 +1091,35 @@ foreach($patch in @(1,2)){
   }
 }
 $profile470=Join-Path $RepoRoot 'fixtures/run-profiles/k2-214-imersite-f210-470.json'
+$profile470Current=Join-Path $RepoRoot 'fixtures/run-profiles/k2-214-imersite-f210-470-2123.json'
 $bound470=Read-MIR421K2UpgradeProfile -Path $profile470 -SourceVersion '4.7.0'
-if($bound470.sha256-cne'5DF2F1A1FC611B578759AE5F6332CFB589F316EE0395A0E21E4E44BFD3DCC7CD' -or
-   $bound470.profile.engine_version-cne'2.1.22' -or
-   $bound470.profile.engine_sha256-cne'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B' -or
+$bound470Current=Read-MIR421K2UpgradeProfile -Path $profile470Current -SourceVersion '4.7.0'
+if($bound470.sha256-cne'106AB7A6BAEEDE8090CFBAC91CA3C3B7B8D8D470EB63AAEB14FC39ADB9D397A4' -or
+   $bound470.profile.engine_version-cne'2.1.22' -or$bound470.profile.engine_sha256-cne'D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B' -or
+   @($bound470.profile.mods|Where-Object {$_.name-ceq'mir-fixture-assert-k2-213-imersite-continuation'-and$_.version-ceq'0.1.9'}).Count-ne1 -or
+   [string]$bound470.current_profile.migration_fixture_version-cne'0.1.4700' -or
    @($bound470.inputs|Where-Object {$_.file_name-ceq'Krastorio2_2.1.4.zip'-and$_.expected_sha256-ceq'9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E'}).Count-ne1 -or
    @($bound470.inputs|Where-Object {$_.file_name-ceq'Krastorio2-spaced-out_2.0.19.zip'-and$_.expected_sha256-ceq'8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B'}).Count-ne1){
-  throw 'Current K2 profile identity or upstream archive hashes differ'
+  throw 'Retained 2.1.22 K2 profile identity or upstream archive hashes differ'
 }
-Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $profile470
+if($bound470Current.sha256-cne'DC6EE665BDE9D734CF325F1C91902914CE6D6EB79038C1F6A4D7A52425E2F788' -or
+   $bound470Current.profile.engine_version-cne'2.1.23' -or$bound470Current.profile.engine_sha256-cne'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -or
+   $bound470Current.profile.runtime_api_sha256-cne'7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373' -or
+   @($bound470Current.profile.mods|Where-Object {$_.name-ceq'mir-fixture-assert-k2-213-imersite-continuation'-and$_.version-ceq'0.1.10'}).Count-ne1 -or
+   [string]$bound470Current.current_profile.migration_fixture_version-cne'0.1.4701' -or
+   [string]$bound470Current.current_profile.sentinel_fixture_version-cne'0.1.4701'){
+  throw 'Current 2.1.23 K2 profile identity, engine or fixture selection differs'
+}
+$profile470Spec=Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $profile470
+$profile470CurrentSpec=Assert-MIR470K2CurrentUpgradeProfilePath -RepoRoot $RepoRoot -Path $profile470Current
+if($profile470Spec.engine_version-cne'2.1.22'-or$profile470CurrentSpec.engine_version-cne'2.1.23'-or$profile470Spec.profile_file-ceq$profile470CurrentSpec.profile_file){throw 'K2 current profile selector did not keep the 2.1.22 and 2.1.23 paths distinct'}
+$tamperedCurrentProfile=Join-Path $testRoot 'k2-214-imersite-f210-470-2123.json'
+$mutatedCurrent=Get-Content -LiteralPath $profile470Current -Raw|ConvertFrom-Json -Depth 20
+$mutatedCurrent.runtime_api_sha256='0'*64
+$mutatedCurrent|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $tamperedCurrentProfile
+$rejected=$false;try{Read-MIR421K2UpgradeProfile -Path $tamperedCurrentProfile -SourceVersion '4.7.0'|Out-Null}catch{$rejected=$_.Exception.Message-ceq'[mir470-k2-upgrade-profile-hash]'}
+if(-not$rejected){throw 'K2 current reader accepted a tampered named 2.1.23 profile'}
+$k2Assertions+=3
 # Host controls must also run on a clean CI checkout without local dist ZIPs.
 # The exact published positive input belongs to the native upgrade; this
 # opposing input proves that the archive gate refuses unrelated real bytes.
@@ -1035,10 +1131,13 @@ $transition470=@{Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';Fix
 Assert-MIR421K2UpgradeTransition @transition470
 $mode470=@{Target='f210';FromVersion='4.6.21000';ToVersion='4.7.21000';FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';Archetype='';SpaceIsFake=$false;SourceOnlyFixtureNames=@();SelectedReleaseManifest='';PublishedPredecessorManifest='published-460.json';Retention='Always';K2ImersiteInputProfile=$profile470;F200BobAngelInputProfile='';F200GaloreSpaceAgeInputProfile='';SourceVersion='4.7.0'}
 Assert-MIR421CurrentUpgradeInputMode @mode470
+$mode470Current=$mode470.Clone();$mode470Current.K2ImersiteInputProfile=$profile470Current
+Assert-MIR421CurrentUpgradeInputMode @mode470Current
+$k2Assertions++
 if((Resolve-MIR42UpgradePredecessorReaderVersion -Target f210 -FromVersion '4.6.21000' -SourceVersion '4.7.0')-cne'4.7.0'){throw 'Current K2 predecessor reader identity differs'}
-$SourceVersion='4.7.0';$FromVersion='4.6.21000';$ToVersion='4.7.21000';$FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';$K2ImersiteInputProfile=$profile470
+$SourceVersion='4.7.0';$FromVersion='4.6.21000';$ToVersion='4.7.21000';$FixtureName='assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000';$K2ImersiteInputProfile=$profile470Current
 . ([scriptblock]::Create($k2ReaderCalls[0].Extent.Text));. ([scriptblock]::Create($k2Selectors[0].Extent.Text));. ([scriptblock]::Create($reloadSelectors[0].Extent.Text))
-if($k2Inputs.source_version-cne$SourceVersion-or-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 route bypassed profile, scenario, or reload selection'}
+if($k2Inputs.source_version-cne$SourceVersion-or$k2Inputs.profile.engine_version-cne'2.1.23'-or[string]$k2Inputs.current_profile.migration_fixture_version-cne'0.1.4701'-or-not$k2Scenario-or-not$requiresReloadProof){throw 'Current K2 route bypassed the 2.1.23 profile, scenario, or reload selection'}
 $runnerText=$ast.Extent.Text
 if(-not$runnerText.Contains('if($k2FullStateScenario-and$K2ImersiteCap-ne0){throw ''[mir470-k2-imersite-cap-required]''}')){throw 'Current K2 route did not require explicit zero cap'}
 $k2FullStateScenario=$true;$classicReducedPolicy=$false;$SpaceIsFake=$false;$mir42UpgradeSpecialized=$false;$Archetype=''
@@ -1062,6 +1161,29 @@ foreach($needle in @('published 4.6 source must expose its genuine infinite Imer
 foreach($forbidden in @('published predecessor lacks genuine finite Imersite levels one through three','new level-four continuation was not initially unresearched','force.research_progress = 1')){
   if($control470.Contains($forbidden)){throw "Current K2 full-state fixture retained stale finite-predecessor assumption: $forbidden"}
 }
+$ownedSentinel=Get-MIR470K2OwnedSpeedSentinelFixture -RepoRoot $RepoRoot -FixtureName $FixtureName -SourceVersion '4.7.0'
+$sourceFixtureInfoPath=Join-Path $fixture470 'info.json';$sourceFixtureControlPath=Join-Path $fixture470 'control.lua'
+$sourceFixtureInfoHash=(Get-FileHash -LiteralPath $sourceFixtureInfoPath -Algorithm SHA256).Hash;$sourceFixtureControlHash=(Get-FileHash -LiteralPath $sourceFixtureControlPath -Algorithm SHA256).Hash
+$stage2122=Join-Path $testRoot 'k2-470-retained-2122-stage';Copy-Item -LiteralPath $fixture470 -Destination $stage2122 -Recurse
+$retainedStage=New-MIR470K2CurrentMigrationFixtureSpecialization -StagedMigrationFixtureDirectory $stage2122 -OwnedSpeedSentinelFixture $ownedSentinel -FixtureSourcesDirectory $testRoot -CurrentProfile $profile470Spec
+$retainedInfo=Get-Content -LiteralPath (Join-Path $stage2122 'info.json') -Raw|ConvertFrom-Json
+if([bool]$retainedStage.specialized-or$retainedStage.migration.version-cne'0.1.4700'-or$retainedInfo.version-cne'0.1.4700'-or@($retainedInfo.dependencies)-cnotcontains'base = 2.1.22'-or$retainedStage.owned_speed_sentinel.version-cne'0.1.4700'){
+  throw 'K2 retained 2.1.22 migration fixture was rewritten'
+}
+$stage2123=Join-Path $testRoot 'k2-470-current-2123-stage';Copy-Item -LiteralPath $fixture470 -Destination $stage2123 -Recurse
+$currentStage=New-MIR470K2CurrentMigrationFixtureSpecialization -StagedMigrationFixtureDirectory $stage2123 -OwnedSpeedSentinelFixture $ownedSentinel -FixtureSourcesDirectory $testRoot -CurrentProfile $profile470CurrentSpec
+$currentStageInfo=Get-Content -LiteralPath (Join-Path $stage2123 'info.json') -Raw|ConvertFrom-Json
+$currentStageControl=Get-Content -LiteralPath (Join-Path $stage2123 'control.lua') -Raw
+$currentSentinelInfo=Get-Content -LiteralPath (Join-Path $currentStage.owned_speed_sentinel.directory 'info.json') -Raw|ConvertFrom-Json
+if(-not[bool]$currentStage.specialized-or$currentStage.migration.version-cne'0.1.4701'-or$currentStageInfo.version-cne'0.1.4701'-or@($currentStageInfo.dependencies)-cnotcontains'base = 2.1.23'-or
+   -not$currentStageControl.Contains('base = "2.1.23"')-or-not$currentStageControl.Contains('[fixture_name] = "0.1.4701"')-or-not$currentStageControl.Contains('owned_speed_sentinel_version = "0.1.4701"')-or
+   $currentStageControl.Contains('base = "2.1.22"')-or$currentStageControl.Contains('[fixture_name] = "0.1.4700"')-or$currentStageControl.Contains('owned_speed_sentinel_version = "0.1.4700"')-or
+   $currentStage.owned_speed_sentinel.version-cne'0.1.4701'-or$currentSentinelInfo.version-cne'0.1.4701'-or@($currentSentinelInfo.dependencies)-cnotcontains'base = 2.1.23'-or
+   (Get-FileHash -LiteralPath (Join-Path $currentStage.owned_speed_sentinel.directory 'control.lua') -Algorithm SHA256).Hash-cne$ownedSentinel.control_sha256){
+  throw 'K2 current 2.1.23 staged fixture metadata or runtime guard differs'
+}
+if((Get-FileHash -LiteralPath $sourceFixtureInfoPath -Algorithm SHA256).Hash-cne$sourceFixtureInfoHash-or(Get-FileHash -LiteralPath $sourceFixtureControlPath -Algorithm SHA256).Hash-cne$sourceFixtureControlHash){throw 'K2 authored 2.1.22 migration fixture changed during staging'}
+$k2Assertions+=3
 $snapshotMods=[ordered]@{}
 foreach($row in @($bound470.profile.mods)){$snapshotMods[[string]$row.name]=[string]$row.version}
 $snapshot470=[pscustomobject]@{active_mods=[pscustomobject]$snapshotMods}
@@ -2513,4 +2635,12 @@ try {
   if(Test-Path -LiteralPath $matrixBindingRoot){Remove-Item -LiteralPath $matrixBindingRoot -Recurse -Force}
 }
 
-[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;f200_galore_space_age_upgrade_assertions=$f200GaloreSpaceAgeAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false}|ConvertTo-Json
+$triggerFixture=Join-Path $RepoRoot 'fixtures/assert-trigger-output-science-f210-470'
+$triggerOldSourceFixture=Join-Path $RepoRoot 'fixtures/assert-trigger-output-science-source-failure-f210-460'
+if(-not(Test-Path -LiteralPath $triggerFixture -PathType Container)-or-not(Test-Path -LiteralPath $triggerOldSourceFixture -PathType Container)){
+  throw '[mir470-trigger-output-representative-required-fixture]'
+}
+$triggerOutputRepresentative=Invoke-MIR470TriggerOutputRepresentativeFixtureControls -RepoRoot $RepoRoot -TestRoot $testRoot
+$assertions+=[int]$triggerOutputRepresentative.assertions
+
+[pscustomobject]@{status='passed';assertions=$assertions;maintenance422_manifest_assertions=$maintenance422Assertions;historical_transition_assertions=$historicalAssertions;k2_profile_transition_assertions=$k2Assertions;f200_bob_angel_upgrade_assertions=$f200BobAngelAssertions;f200_galore_space_age_upgrade_assertions=$f200GaloreSpaceAgeAssertions;current_package_input_mode_assertions=$currentAssertions;mir43_upgrade_assertions=$mir43Assertions;mir43_classic_snapshot_assertions=$mir43ClassicSnapshotAssertions;mir43_classic_snapshot_control_kind='synthetic-host-only-classic-disposition-controls-v1';mir43_classic_snapshot_native_engine_launched=$false;selected_targets=$manifest.targets.Count;actual_hotfix_archives=([bool]$SelectedManifestPath -and $manifest.kind -ceq 'MIR42FinalReleaseManifestV1');actual_private_candidate_archives=([bool]$SelectedManifestPath -and $construction);future_patch_metadata_fixture=$true;native_engine_launched=$false;trigger_output_representative_assertions=$(if($triggerOutputRepresentative){[int]$triggerOutputRepresentative.assertions}else{0})}|ConvertTo-Json

@@ -716,11 +716,19 @@ fixtures:
     path: fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000
     harness: tests/runtime/Test-MIRUpgrade.ps1
     input_profile: fixtures/run-profiles/k2-214-imersite-f210-470.json
+    current_input_profile: fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
+    current_fixture_version: "0.1.4701"
+    current_candidate_version: "4.7.21000"
+    current_engine_version: "2.1.23"
+    input_profiles:
+      - fixtures/run-profiles/k2-214-imersite-f210-470.json
+      - fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
     shipped: false
     qualification_status: unqualified
     validates:
       - exact-published-460-f210-predecessor-identity-and-current-470-candidate-binding
       - exact-2122-k2-214-k2so-2019-profile-hashes-and-direct-library-selection
+      - distinct-current-2123-staged-fixture-with-retained-2122-source-and-receipt-identities
       - published-460-infinite-imersite-predecessor-at-completed-levels-zero-two-three-and-seven
       - below-split-levels-remain-on-finite-legacy-stage-without-invented-credit
       - completed-finite-stage-levels-transfer-total-powder-bonus-and-the-next-level-queue-progress
@@ -2685,3 +2693,30 @@ fixtures:
       - exact-4-1-candidate-normal-mod-directory-load
 
 # MIR441-DIRECT-UPGRADE-FIXTURES-END
+
+  trigger-output-science-f210-470-representative:
+    requires_features: []
+    path: fixtures/assert-trigger-output-science-f210-470
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    shipped: false
+    qualification_status: host-controls-passed-native-pending
+    explicit_opt_in: true
+    validates:
+      - target-only-space-age-send-item-to-orbit-trigger-output-input
+      - exact-disabled-same-name-recipe-and-positive-satellite-product
+      - selected-trigger-output-science-reaches-emitted-ice-and-platform-productivity-research
+      - ordinary-cryogenic-craft-item-and-unlock-input-remains-exact
+      - complete-state-comparison-with-only-the-explicit-space-science-definition-delta
+      - candidate-save-and-two-cold-loads
+
+  trigger-output-science-published-460-representative-old-input:
+    requires_features: []
+    path: fixtures/assert-trigger-output-science-source-failure-f210-460
+    harness: tests/tooling/Test-MIRUpgradeManifest.ps1
+    shipped: false
+    qualification_status: input-only-shape-host-controls-passed-old-source-native-failure-unbound
+    explicit_opt_in: true
+    validates:
+      - explicit-published-460-altered-input-shape-only
+      - no-source-save-or-migration-claim
+      - actual-old-source-startup-failure-requires-separate-native-scenario-binding

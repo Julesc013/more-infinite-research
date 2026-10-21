@@ -2008,6 +2008,7 @@
         "fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/**",
         "fixtures/inputs/f210-bob-angel-gunmetal-invar-2122/mod-settings.dat",
         "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2122.json",
+        "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json",
         "tools/mir/application/release/readiness/ResourceGovernor.ps1",
         "tools/lib/compatibility/LibraryActivation.ps1",
         "tools/lib/validation/NativeProbeResources.ps1"
@@ -8723,7 +8724,10 @@
         "tests/support/MIR43HistoricalCandidateAuthentication.ps1",
         "fixtures/release-inputs/mir470-published-460-consolidated-construction.json",
         "tests/tooling/Test-MIRUpgradeManifest.ps1",
+        "tests/tooling/trigger_output_fixture_controls.py",
         "tests/runtime/Test-MIRUpgrade.ps1",
+        "fixtures/assert-trigger-output-science-f210-470/**",
+        "fixtures/assert-trigger-output-science-source-failure-f210-460/**",
         "tests/support/MIR421K2Upgrade.ps1",
         "tests/support/MIR421SpaceFakeUpgrade.ps1",
         "tools/lib/validation/MIR4DistributionIdentity.ps1",
@@ -8740,6 +8744,7 @@
         "fixtures/run-profiles/k2-213-imersite-f210-460.json",
         "fixtures/run-profiles/k2-213-imersite-f210-470.json",
         "fixtures/run-profiles/k2-214-imersite-f210-470.json",
+        "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
         "fixtures/run-profiles/f200-bob-angel-upgrade-422.json",
         "fixtures/assert-upgrade-k2-imersite-4-2-21000-to-4-2-21001/**",
         "fixtures/assert-upgrade-k2-imersite-4-2-21001-to-4-2-21002/**",
@@ -8816,5 +8821,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:d5f678cfb79dce27a237c2fef78332455ea03714ed65366c8b8f903b4d848118"
+  "digest": "sha256:cc4f873c4ed443d29fbbaab45cf96a008da5aea82d6563f94c48b1096dad02de"
 }

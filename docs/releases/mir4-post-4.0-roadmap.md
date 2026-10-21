@@ -22,7 +22,7 @@ Corrected [MIR 4.6.0](https://github.com/Julesc013/more-infinite-research/releas
 
 ### Implemented since corrected 4.6.0
 
-This is a development inventory, not final-package acceptance or a published 4.7 release. PR #747 merged the reviewed combined tree into `dev` as `58ab9d3160067d0b7fe1fd0d9d0e15b958b2b239`. Its broader selected CI suite is still running at this checkpoint. Final native-fixture and release-metadata work remains separate until reviewed and integrated.
+This is a development inventory, not final-package acceptance or a published 4.7 release. PR #747 merged the reviewed combined tree into `dev` as `58ab9d3160067d0b7fe1fd0d9d0e15b958b2b239`. Its reviewed-head checks completed with 56 successes and two expected conditional skips; the separate merged-`dev` verification run also passed, with 54 successes and one conditional skip. PR #750 contains the current-engine qualification and changelog follow-up. All nine candidate packages construct at `1df5b2b732970d6674e71542da46ad2d134cdc8c`, with exact published 4.6 history retained. Native-fixture verification and final-package acceptance remain unfinished.
 
 | Area | Concrete change | Evidence and remaining boundary |
 | --- | --- | --- |
