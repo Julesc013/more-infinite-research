@@ -250,19 +250,26 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $readmePath = Join-Path $Tree 'README.md'
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
-  $info.version = $DistributionVersion
-  [IO.File]::WriteAllText($infoPath, (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n"), $utf8)
   $minimumFactorioVersion = ''
   if ($SourceVersion -ceq '4.6.0') {
-    $baseRequirements = @($info.dependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
+    $dependenciesProperty = $info.PSObject.Properties['dependencies']
+    $declaredDependencies = if ($null -eq $dependenciesProperty) { @() } else { @($dependenciesProperty.Value) }
+    $baseRequirements = @($declaredDependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
     if ($baseRequirements.Count -ne 1) { throw '[mir4-private-patch-package-base-minimum]' }
     $minimumFactorioVersion = $baseRequirements[0] -replace '^base >= ', ''
   }
+  # Validate and prepare all three authored member bytes before any write.  A
+  # malformed current-package dependency declaration must not leave a partially
+  # rewritten info.json behind when the writer refuses it.
+  $info.version = $DistributionVersion
+  $updatedInfo = (($info | ConvertTo-Json -Depth 20).Replace("`r`n", "`n") + "`n")
   $updatedChangelog = Get-MIR4PrivatePatchPackageChangelogText -Changelog $changelog -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion -MinimumFactorioVersion $minimumFactorioVersion
+  $updatedReadme = if ($null -ne $readme) {
+    Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion
+  } else { $null }
+  [IO.File]::WriteAllText($infoPath, $updatedInfo, $utf8)
   if ($updatedChangelog -cne $changelog) { [IO.File]::WriteAllText($changelogPath, $updatedChangelog, $utf8) }
-  if ($null -ne $readme) {
-    [IO.File]::WriteAllBytes($readmePath, (Get-MIR4PrivatePatchPackageReadmeBytes -ReadmeBytes $readme -DistributionVersion $DistributionVersion -SourceVersion $SourceVersion))
-  }
+  if ($null -ne $updatedReadme) { [IO.File]::WriteAllBytes($readmePath, $updatedReadme) }
 }
 
 function New-MIR4TargetPackage {

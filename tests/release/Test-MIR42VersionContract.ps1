@@ -77,6 +77,10 @@ foreach ($case in @('different-source','different-patch','numeric-exception','fu
 $root = Join-Path $RepoRoot ('build/test-results/mir42-version-' + [guid]::NewGuid().ToString('N'))
 $utf8 = [Text.UTF8Encoding]::new($false)
 $lines = @{'210'='2.1';'200'='2.0';'110'='1.1';'100'='1.0';'017'='0.17';'016'='0.16';'015'='0.15';'014'='0.14';'013'='0.13'}
+# These are the accepted minimums for the existing 4.6.0 target families.
+# They make this host-only writer control realistic; they do not establish a
+# native engine qualification.
+$minimumBaseVersions = @{'210'='2.1.21';'200'='2.0.77';'110'='1.1.110';'100'='1.0.0';'017'='0.17.79';'016'='0.16.51';'015'='0.15.40';'014'='0.14.23';'013'='0.13.20'}
 try {
   foreach ($code in @('210','200','110','100','017','016','015','014','013')) {
     $tree = Join-Path $root $code
@@ -84,7 +88,7 @@ try {
     $infoPath = Join-Path $tree 'info.json'
     $historyPath = Join-Path $tree 'changelog.txt'
     $readmePath = Join-Path $tree 'README.md'
-    $info = @{name='more-infinite-research';version="4.2.${code}00";factorio_version=$lines[$code];title='Preserved title'}
+    $info = @{name='more-infinite-research';version="4.2.${code}00";factorio_version=$lines[$code];dependencies=@("base >= $($minimumBaseVersions[$code])");title='Preserved title'}
     $history = "---------------------------------------------------------------------------------------------------`nVersion: 4.2.${code}01`n  Fixes:`n    - Preserved previous maintenance notes.`n"
     $readme = "# Preserved catalogue`n`nSettings, examples and troubleshooting.`n"
     [IO.File]::WriteAllText($infoPath, ($info | ConvertTo-Json), $utf8)
@@ -178,6 +182,37 @@ try {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.6.${code}00" -SourceVersion '4.6.0'
     if ((Get-FileHash -LiteralPath $historyPath).Hash -cne $identityBefore) { throw '[mir460-repeated-write-duplicated-entry]' }
     $assertions += 5
+    # The current-package writer authenticates its exact tested base floor
+    # before changing any of its three authored members.  These are host-only
+    # refusal/isolation checks, not native engine qualification.
+    $validInfo = [IO.File]::ReadAllText($infoPath)
+    foreach ($dependencyCase in @('missing','empty','duplicate')) {
+      $probe = $validInfo | ConvertFrom-Json
+      switch ($dependencyCase) {
+        'missing' { [void]$probe.PSObject.Properties.Remove('dependencies') }
+        'empty' { $probe.dependencies = @() }
+        'duplicate' { $probe.dependencies = @("base >= $($minimumBaseVersions[$code])", "base >= $($minimumBaseVersions[$code])") }
+      }
+      # Keep the malformed member deliberately compact.  The former
+      # write-before-validation implementation would have reformatted it
+      # before refusing the base declaration; the current preflight must
+      # preserve these exact bytes.
+      [IO.File]::WriteAllText($infoPath, (($probe | ConvertTo-Json -Depth 20 -Compress) + "`n"), $utf8)
+      $beforeMembers = @('info.json','changelog.txt','README.md' | ForEach-Object {
+        (Get-FileHash -LiteralPath (Join-Path $tree $_) -Algorithm SHA256).Hash
+      })
+      $rejected = $false
+      try { Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion "4.6.${code}00" -SourceVersion '4.6.0' | Out-Null }
+      catch { $rejected = $_.Exception.Message -match '\[mir4-private-patch-package-base-minimum\]' }
+      $afterMembers = @('info.json','changelog.txt','README.md' | ForEach-Object {
+        (Get-FileHash -LiteralPath (Join-Path $tree $_) -Algorithm SHA256).Hash
+      })
+      if (-not $rejected -or ($beforeMembers -join '|') -cne ($afterMembers -join '|')) {
+        throw "[mir460-base-minimum-$dependencyCase-mutated-authored-members] $code"
+      }
+      $assertions++
+    }
+    [IO.File]::WriteAllText($infoPath, $validInfo, $utf8)
   }
 } finally {
   if (Test-Path -LiteralPath $root) {
