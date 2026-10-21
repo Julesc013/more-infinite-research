@@ -17,6 +17,34 @@ def main() -> None:
     sys.path.insert(0, str(Path(args.lua_runtime_dir).resolve()))
     from lupa import lua52
 
+    # These are catalogue rows, including unavailable/disabled declarations,
+    # not the number of technologies emitted in a particular mod profile.
+    # Exercise both real adapters so a new declaration cannot silently leave
+    # the profile consumed by native assertion fixtures behind.
+    registered_stream_control = {}
+    for target, base_version in (('f200', '2.0.77'), ('f210', '2.1.22')):
+        registry_runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+        registry_runtime.globals().source_root = (repo / 'source').as_posix()
+        registry_runtime.globals().adapter_root = (repo / 'source/adapters' / target).as_posix()
+        registry_runtime.globals().controlled_base_version = base_version
+        observed = registry_runtime.execute('''
+          package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path
+          data = {raw = {}, extend = function() error('No catalogue-control mutation admission') end}
+          mods = {base = controlled_base_version}; settings = {startup = {}}
+          feature_flags = {}; log = function() end
+          local registry = require('prototypes.mir.streams.registry')
+          local profile = require('prototypes.mir.platform.factorio.target_profiles').current()
+          local count = 0
+          for _ in pairs(registry.view()) do count = count + 1 end
+          assert(count == profile.expected_stream_count,
+            'Declared stream count differs from actual target catalogue: expected '
+              .. tostring(profile.expected_stream_count) .. ', got ' .. tostring(count))
+          return {declared = profile.expected_stream_count, registered = count}
+        ''')
+        registered_stream_control[target] = {
+            'declared': int(observed['declared']), 'registered': int(observed['registered']),
+            'scope': 'real-adapter-catalogue-not-native-emission'}
+
     def plain(value):
         if hasattr(value, 'items'):
             return {str(key): plain(item) for key, item in value.items()}
@@ -155,7 +183,9 @@ return result
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
                        'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
-    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo)]
+    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo),
+                    Path('.mir/targets.json'),
+                    Path('source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua')]
     for name, _ in lua.globals().package.loaded.items():
         if str(name).startswith('prototypes.') and name not in stubbed_modules:
             path = Path('source') / (str(name).replace('.', '/') + '.lua')
@@ -181,6 +211,7 @@ return result
                                                     'operations': int(clockless_emission['operations']),
                                                     'stubbed_module_boundaries': [], 'target': 'f200'},
                       'command_export_control': command_export_control,
+                      'registered_stream_control': registered_stream_control,
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 
