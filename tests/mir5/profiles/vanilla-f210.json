@@ -1,0 +1,5 @@
+{
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true}
+  ]
+}

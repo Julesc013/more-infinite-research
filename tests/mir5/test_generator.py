@@ -91,13 +91,15 @@ class GeneratorTests(unittest.TestCase):
           assert(config.resolve(startup, codec).base_cost == 100)
         ''')
 
-    def test_disabled_identity_and_finite_cap_refusal(self):
+    def test_disabled_identity_and_finite_cap_preserve_native_tail(self):
         self.lua.execute('''
           local startup = defaults(); startup["ips-enable-research_gears"].value = false
           local a = productivity.gears(config.resolve(startup))
           assert(a.name == "recipe-prod-research_gears-1" and a.enabled == false and a.effects[1].change == .1)
           startup["ips-max-level-research_gears"].value = 10
-          assert(not pcall(productivity.gears, config.resolve(startup)))
+          local capped = productivity.gears(config.resolve(startup))
+          assert(capped.name == a.name and capped.max_level == "infinite" and capped.enabled == false)
+          assert(capped.effects[1].change == .1 and capped.unit.count_formula == a.unit.count_formula)
         ''')
 
     def test_valid_family_forward_reference_and_one_write(self):

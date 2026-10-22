@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-caps-native",
+  "version": "0.1.0",
+  "title": "MIR 5 native gear-cap fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world proof for MIR 5 native gear caps.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

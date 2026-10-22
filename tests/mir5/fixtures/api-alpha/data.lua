@@ -5,13 +5,18 @@ local names = api.add_technologies({
   {
     type = "technology",
     name = "mir-api-fixture-alpha-1",
+    icon = "__base__/graphics/technology/automation-1.png",
+    icon_size = 256,
     prerequisites = {"mir-api-fixture-alpha-2"},
     unit = {count = 25, ingredients = {{"automation-science-pack", 1}}, time = 15},
-    effects = {}
+    max_level = 1,
+    effects = {{type = "character-crafting-speed", modifier = 0.05}}
   },
   {
     type = "technology",
     name = "mir-api-fixture-alpha-2",
+    icon = "__base__/graphics/technology/automation-1.png",
+    icon_size = 256,
     prerequisites = {"automation"},
     unit = {count = 25, ingredients = {{"automation-science-pack", 1}}, time = 15},
     effects = {}

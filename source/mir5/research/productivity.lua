@@ -21,8 +21,6 @@ function M.cost(base, increment, growth)
 end
 
 function M.gears(values)
-  -- A partial development package cannot silently treat a finite cap as unlimited.
-  assert(values.max_level == 0, "MIR private gear slice: finite caps are not implemented yet")
   return {
     type = "technology", name = "recipe-prod-research_gears-1",
     icons = {
