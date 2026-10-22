@@ -8,6 +8,7 @@ param(
   [Parameter(Mandatory)][string]$ExpectedMIRArchiveSha256,
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string[]]$ConsumerMarkers=@(),
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
@@ -29,6 +30,17 @@ function Read-FixtureResult([string]$Text,[string]$Stage) {
   $rows=@([regex]::Matches($Text,'\[MIR5_NATIVE_FIXTURE\] RESULT (\{[^\r\n]+\})') | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json} | Where-Object {$_.case -ceq $CaseName -and $_.stage -ceq $Stage})
   Assert-Fixture ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "missing unique passed $Stage witness for $CaseName"
   $rows[0]
+}
+function Read-ConsumerResults([string]$Text,[string]$Stage) {
+  $results=[ordered]@{}
+  foreach($marker in $ConsumerMarkers){
+    Assert-Fixture ($marker -cmatch '^[A-Z][A-Z0-9_]+$') 'consumer marker name is invalid'
+    $pattern='\['+[regex]::Escape($marker)+'\] RESULT (\{[^\r\n]+\})'
+    $rows=@([regex]::Matches($Text,$pattern) | ForEach-Object {$_.Groups[1].Value | ConvertFrom-Json})
+    Assert-Fixture ($rows.Count -eq 1 -and $rows[0].stage -ceq $Stage) "missing unique $Stage consumer witness for $marker"
+    $results[$marker]=$rows[0]
+  }
+  $results
 }
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {
   $live=Join-Path $writeData 'factorio-current.log'
@@ -103,6 +115,7 @@ try{
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   $seed=Join-Path $writeData 'saves/seed.zip'
   $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
+  $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
   Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
   $server=Join-Path $resources.root 'server-settings.json'
   [IO.File]::WriteAllText($server,(@{name='MIR private native fixture';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false;autosave_interval=0} | ConvertTo-Json),[Text.UTF8Encoding]::new($false))
@@ -117,12 +130,14 @@ try{
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
   }.GetNewClosure()
   $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
+  $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) 'load'
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()
   foreach($ordinal in 1..2){
     $stage=Invoke-FixtureStage ('reload-'+$ordinal) @('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')
     $result=Read-FixtureResult ([IO.File]::ReadAllText($stage.log)) 'reload'
+    $stage.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($stage.log)) 'load'
     Assert-Fixture ((Get-FixtureSha $complete) -ceq $saveHash) 'cold reload changed completed save bytes'
     $record.reloads+=@{ordinal=$ordinal;stage=$stage;result=$result;save_sha256=$saveHash;save_byte_identical=$true}
   }
