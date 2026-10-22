@@ -10,6 +10,7 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot,
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
+  [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -34,7 +35,7 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
   $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio')+$StageArguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
-  $native=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $Completion
+  $native=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $Completion -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase ('fixture-'+$Name)
   $log=Join-Path $resources.root ($Name+'.factorio.log')
   Assert-Fixture (Test-Path -LiteralPath $live -PathType Leaf) "$Name native log absent"
   Copy-Item -LiteralPath $live -Destination $log
@@ -90,6 +91,8 @@ $record=[ordered]@{
   release_qualification=$false
 }
 try{
+  [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
+  $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes 128MB -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 128 -UseExactOutputRoot
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
@@ -125,7 +128,7 @@ try{
   }
   $record.status='passed-private-native-fixture'
 }catch{
-  $record.status='failed';$record.failure=$_.Exception.Message;$failure=$_
+  $record.status='failed';$record.failure=$_.Exception.Message;$record.resource_admission=$_.Exception.Data['mir441_resource_admission'];$failure=$_
 }finally{
   try{
     if($null -ne $activation -and -not $activation.closed){$record.library_control_restoration=Complete-MIRLibraryActivation -Activation $activation}

@@ -11,6 +11,7 @@ param(
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,2048)][int]$MaxNewOutputMiB = 512,
+  [ValidateRange(0,60)][int]$AdmissionWaitSeconds = 30,
   [string]$RepoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 )
 
@@ -145,6 +146,8 @@ $record = [ordered]@{
 }
 
 try {
+  [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
+  $record.initial_admission_wait = Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $output -EstimatedPeakBytes ([int64]$MaxNewOutputMiB*1MB) -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'prototype-capture-initial'
   $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
   $run = $resources.root
   $writeData = Join-Path $run 'write-data'
@@ -168,7 +171,7 @@ try {
 
   $arguments = @('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--dump-data')
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
-  $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds
+  $native = Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase 'prototype-capture-engine'
   $record.process = $native.result
   Assert-MIR5PrototypeCapture ([bool]$native.result.passed -and -not [bool]$native.result.timed_out -and [int]$native.result.exit_code -eq 0) 'Factorio dump process must exit naturally with code zero'
 
@@ -197,6 +200,7 @@ try {
 } catch {
   $record.status = 'failed'
   $record.failure = $_.Exception.Message
+  $record.resource_admission = $_.Exception.Data['mir441_resource_admission']
   $pendingFailure = $_
 } finally {
   if ($null -ne $activation -and -not $activation.closed) {
@@ -208,6 +212,7 @@ try {
   }
   $record.library_controls_restored = -not (Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))
   if ($null -ne $resources) {
+    $record.process_runs = @($resources.runs.ToArray())
     try {Write-MIRNativeProbeResult -Context $resources -Record $record}
     catch {
       if ($null -eq $pendingFailure) {$record.status='failed';$record.failure=$_.Exception.Message;$pendingFailure=$_}
