@@ -12,6 +12,10 @@ local M = {}
 local STORAGE_KEY = "mir_library"
 local SCHEMA = 1
 local ROOT = "mir_research_browser"
+-- A name is shared global GUI namespace, so it cannot establish ownership.
+-- The tag is set when this slice creates the root; callbacks also prove the
+-- full parent chain back to the current player's screen before changing state.
+local ROOT_TAG = "more-infinite-research.library-root.v1"
 local PREFIX = "mir_library_"
 local SHORTCUT = "mir-research-browser"
 local MAX_QUERY = 160
@@ -112,22 +116,47 @@ local function player_index(value)
   return value
 end
 
--- Preserve the old browser's personal records as plain, bounded data.  MIR5
--- only understands the deliberately small view below; filters and preferences
--- outside it remain available for a later fidelity slice instead of being
--- discarded during a configuration change.
+-- Preserve the old browser's personal records as a bounded convenience copy.
+-- The published bucket remains untouched and is the authoritative full-fidelity
+-- record. Snapshot metadata makes any bounded copy explicit rather than
+-- silently presenting it as a complete migration.
 local function legacy_copy(value, depth, budget, seen)
   local kind = type(value)
   if kind == "nil" or kind == "boolean" then return value end
-  if kind == "number" then return finite_number(value) and value or nil end
-  if kind == "string" then return string.sub(value, 1, LEGACY_SNAPSHOT_MAX_STRING) end
-  if kind ~= "table" or depth >= LEGACY_SNAPSHOT_MAX_DEPTH or budget.left <= 0 then return nil end
-  if seen[value] then return nil end
+  if kind == "number" then
+    if finite_number(value) then return value end
+    budget.truncated, budget.invalid = true, true
+    return nil
+  end
+  if kind == "string" then
+    if #value <= LEGACY_SNAPSHOT_MAX_STRING then return value end
+    budget.truncated, budget.string_limited = true, true
+    return string.sub(value, 1, LEGACY_SNAPSHOT_MAX_STRING)
+  end
+  if kind ~= "table" then
+    budget.truncated, budget.unsupported = true, true
+    return nil
+  end
+  if depth >= LEGACY_SNAPSHOT_MAX_DEPTH then
+    budget.truncated, budget.depth_limited = true, true
+    return nil
+  end
+  if budget.left <= 0 then
+    budget.truncated, budget.entry_limited = true, true
+    return nil
+  end
+  if seen[value] then
+    budget.truncated, budget.cyclic = true, true
+    return nil
+  end
   seen[value] = true
 
   local copy = {}
   for key, child in pairs(value) do
-    if budget.left <= 0 then break end
+    if budget.left <= 0 then
+      budget.truncated, budget.entry_limited = true, true
+      break
+    end
     local copied_key = legacy_copy(key, depth + 1, budget, seen)
     if copied_key ~= nil then
       budget.left = budget.left - 1
@@ -140,7 +169,18 @@ local function legacy_copy(value, depth, budget, seen)
 end
 
 local function legacy_snapshot(value)
-  return legacy_copy(value, 0, {left = LEGACY_SNAPSHOT_MAX_ENTRIES}, {})
+  local budget = {left = LEGACY_SNAPSHOT_MAX_ENTRIES}
+  local copied = legacy_copy(value, 0, budget, {})
+  return copied, {
+    complete = budget.truncated ~= true,
+    truncated = budget.truncated == true,
+    entry_limited = budget.entry_limited == true,
+    depth_limited = budget.depth_limited == true,
+    string_limited = budget.string_limited == true,
+    cyclic = budget.cyclic == true,
+    unsupported = budget.unsupported == true,
+    invalid = budget.invalid == true
+  }
 end
 
 local function legacy_browser_state()
@@ -159,10 +199,56 @@ local function legacy_view_as_private(value)
   })
 end
 
-local function legacy_marker(frame)
-  if not valid(frame) then return nil end
+local function named_root(player)
+  local gui = player and player.gui
+  local screen = gui and gui.screen
+  return screen and screen[ROOT] or nil
+end
+
+local function root_is_on_screen(player, frame)
+  if not valid(frame) then return false end
+  local gui = player and player.gui
+  local screen = gui and gui.screen
+  if not valid(screen) then return false end
+  local ok, parent = pcall(function() return frame.parent end)
+  return ok and parent == screen
+end
+
+local function root_has_tag(frame)
+  local ok, tags = pcall(function() return frame.tags end)
+  return ok and type(tags) == "table" and tags[ROOT_TAG] == true
+end
+
+local function owned_root(player)
+  local frame = named_root(player)
+  if not root_is_on_screen(player, frame) or not root_has_tag(frame) then return nil end
+  return frame
+end
+
+-- Event payload names are globally shared. Check every ancestor, ending in
+-- this player's tagged root, before accepting a GUI callback.
+local function owns_element(player, element, names)
+  if not valid(element) or type(names) ~= "table" then return false end
+  local current = element
+  for index = 1, #names do
+    if not valid(current) or current.name ~= names[index] then return false end
+    if index < #names then
+      local ok, parent = pcall(function() return current.parent end)
+      if not ok then return false end
+      current = parent
+    end
+  end
+  return current == owned_root(player)
+end
+
+local function legacy_marker(player, frame)
+  if not root_is_on_screen(player, frame) then return nil end
   local ok, marker = pcall(function() return frame[LEGACY_ROOT_MARKER] end)
-  return ok and valid(marker) and marker or nil
+  if not ok or not valid(marker) then return nil end
+  local parent_ok, parent = pcall(function() return marker.parent end)
+  if not parent_ok or parent ~= frame then return nil end
+  local type_ok, marker_type = pcall(function() return marker.type end)
+  return type_ok and marker_type == "tabbed-pane" and marker or nil
 end
 
 local function model_view(view)
@@ -196,10 +282,6 @@ local function selected_detail(player, view, context)
   return library_model.detail(player.force, catalogue.declared(), model_view(view), {}, context)
 end
 
-local function screen_root(player)
-  return player.gui and player.gui.screen and player.gui.screen[ROOT] or nil
-end
-
 local function set_shortcut(player, toggled)
   if type(player.set_shortcut_toggled) == "function" then
     player.set_shortcut_toggled(SHORTCUT, toggled == true)
@@ -214,20 +296,23 @@ local function remember_location(view, frame)
 end
 
 local function destroy_frame(player, view)
-  local frame = screen_root(player)
-  if valid(frame) then
-    remember_location(view, frame)
-    frame.destroy()
-  end
+  local frame = owned_root(player)
+  if not valid(frame) then return false end
+  remember_location(view, frame)
+  frame.destroy()
   set_shortcut(player, false)
+  return true
 end
 
 -- A same-named frame alone is not enough to claim it.  The historical browser
 -- always created this tabbed-pane child, while the MIR5 root uses its own
 -- mir_library_filters and mir_library_content children.
 local function rebuild_owned_legacy_root(player, view)
-  local frame = screen_root(player)
-  if not legacy_marker(frame) then return false end
+  local frame = named_root(player)
+  -- This is migration-only evidence for the published untagged browser, never
+  -- ordinary open/close ownership. The authoritative legacy storage bucket is
+  -- also required by the caller before this branch is reached.
+  if not legacy_marker(player, frame) then return false end
   remember_location(view, frame)
   frame.destroy()
   set_shortcut(player, false)
@@ -320,7 +405,10 @@ end
 local function create_frame(player, view)
   local screen = player.gui and player.gui.screen
   if not valid(screen) then return nil end
-  local frame = add(screen, {type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"}})
+  local frame = add(screen, {
+    type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"},
+    tags = {[ROOT_TAG] = true}
+  })
   if view.location then frame.location = view.location end
 
   local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "horizontal"})
@@ -335,8 +423,13 @@ end
 -- query edits preserve the existing text field, native focus and caret.
 local function render(player, view, context, preserve_query)
   context = context or context_for(player.force)
-  local frame = screen_root(player)
-  if not valid(frame) then frame = create_frame(player, view) end
+  local frame = owned_root(player)
+  if not valid(frame) then
+    -- A foreign same-named root is a collision, not a frame this module may
+    -- reuse or replace. In particular it must not cause player preferences.
+    if valid(named_root(player)) then return nil end
+    frame = create_frame(player, view)
+  end
   if not valid(frame) then return nil end
 
   local filters = frame[PREFIX .. "filters"]
@@ -361,6 +454,8 @@ end
 
 function M.open(player, options)
   if not valid(player) or type(player.index) ~= "number" then return nil end
+  local existing = named_root(player)
+  if valid(existing) and existing ~= owned_root(player) then return nil end
   local view = view_for(player.index)
   options = type(options) == "table" and options or {}
   if options.query ~= nil then view.query = text(options.query) end
@@ -372,6 +467,7 @@ end
 
 function M.close(player)
   if not valid(player) or type(player.index) ~= "number" then return end
+  if not valid(owned_root(player)) then return end
   local view = view_for(player.index)
   destroy_frame(player, view)
 end
@@ -380,14 +476,20 @@ function M.on_lua_shortcut(event)
   if not event or event.prototype_name ~= SHORTCUT then return end
   local player = player_for(event.player_index)
   if not player then return end
-  if valid(screen_root(player)) then M.close(player) else M.open(player) end
+  local existing = named_root(player)
+  if valid(existing) then
+    if existing == owned_root(player) then M.close(player) end
+    return
+  end
+  M.open(player)
 end
 
 function M.on_gui_text_changed(event)
   local element = event and event.element
-  if not valid(element) or element.name ~= PREFIX .. "query" then return end
-  local player = player_for(event.player_index)
-  if not player then return end
+  local player = player_for(event and event.player_index)
+  if not player or not owns_element(player, element, {
+    PREFIX .. "query", PREFIX .. "filters", ROOT
+  }) then return end
   local view = view_for(player.index)
   view.query = text(element.text)
   view.scroll = 1
@@ -397,14 +499,21 @@ end
 function M.on_gui_selection_state_changed(event)
   local element = event and event.element
   if not valid(element) then return end
-  local player = player_for(event.player_index)
+  local player = player_for(event and event.player_index)
   if not player then return end
-  local view = view_for(player.index)
   if element.name == PREFIX .. "family" then
+    if not owns_element(player, element, {
+      PREFIX .. "family", PREFIX .. "filters", ROOT
+    }) then return end
+    local view = view_for(player.index)
     view.family = element.selected_index == 2 and "mir" or "all"
     view.scroll = 1
     render(player, view)
   elseif element.name == PREFIX .. "results" then
+    if not owns_element(player, element, {
+      PREFIX .. "results", PREFIX .. "content", ROOT
+    }) then return end
+    local view = view_for(player.index)
     local context = context_for(player.force)
     local rows = rows_for(player, view, context)
     local index = element.selected_index
@@ -420,13 +529,19 @@ end
 function M.on_gui_click(event)
   local element = event and event.element
   if not valid(element) then return end
-  local player = player_for(event.player_index)
+  local player = player_for(event and event.player_index)
   if not player then return end
   if element.name == PREFIX .. "close" then
+    if not owns_element(player, element, {
+      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "content", ROOT
+    }) then return end
     M.close(player)
     return
   end
   if element.name ~= PREFIX .. "open_native" then return end
+  if not owns_element(player, element, {
+    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "content", ROOT
+  }) then return end
   local view = view_for(player.index)
   local selected = technology_id(view.selected)
   if selected == nil then return end
@@ -440,9 +555,8 @@ end
 
 function M.on_gui_location_changed(event)
   local element = event and event.element
-  if not valid(element) or element.name ~= ROOT then return end
-  local player = player_for(event.player_index)
-  if not player then return end
+  local player = player_for(event and event.player_index)
+  if not player or not owns_element(player, element, {ROOT}) then return end
   local view = view_for(player.index)
   local remembered = location(element.location)
   if remembered then view.location = remembered end
@@ -450,9 +564,9 @@ end
 
 function M.on_gui_closed(event)
   local element = event and event.element
-  if not valid(element) or element.name ~= ROOT then return end
-  local player = player_for(event.player_index)
-  if player then M.close(player) end
+  local player = player_for(event and event.player_index)
+  if not player or not owns_element(player, element, {ROOT}) then return end
+  M.close(player)
 end
 
 function M.on_player_removed(event)
@@ -467,10 +581,13 @@ function M.on_init()
 end
 
 -- Published 4.7 stored the browser at storage.mir.research_browser and used
--- view schema 3.  Copy every historic per-player record into a private
--- preservation envelope, migrate only the fields this first Library slice
--- supports, and leave the published bucket untouched.  Existing MIR5 views
--- win so a repeated configuration change cannot overwrite a newer choice.
+-- view schema 3.  Copy a bounded convenience snapshot into a private
+-- preservation envelope, whose provenance points back to the untouched
+-- published bucket for full fidelity. Migrate only the fields this first
+-- Library slice supports. Existing MIR5 views win so a repeated configuration
+-- change cannot overwrite a newer choice. This explicit configuration event
+-- visits every saved player record (O(P)); it deliberately does not truncate
+-- migration candidates.
 function M.on_configuration_changed()
   local legacy = legacy_browser_state()
   local legacy_players = legacy and legacy.players
@@ -491,17 +608,22 @@ function M.on_configuration_changed()
     preserved = {
       version = LEGACY_SNAPSHOT_VERSION,
       source = "storage.mir.research_browser",
-      players = {}
+      authoritative_source = "storage.mir.research_browser",
+      players = {},
+      snapshot_status = {}
     }
     state.legacy_browser = preserved
   elseif type(preserved.players) ~= "table" then
     preserved.players = {}
   end
+  if type(preserved.snapshot_status) ~= "table" then preserved.snapshot_status = {} end
 
   for _, candidate in ipairs(candidates) do
     local index, historical_view = candidate.index, candidate.view
     if preserved.players[index] == nil then
-      preserved.players[index] = legacy_snapshot(historical_view)
+      local snapshot, status = legacy_snapshot(historical_view)
+      preserved.players[index] = snapshot
+      preserved.snapshot_status[index] = status
     end
     if type(state.players[index]) ~= "table" then
       state.players[index] = legacy_view_as_private(historical_view)

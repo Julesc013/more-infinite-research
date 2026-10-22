@@ -76,7 +76,7 @@ class LibraryTests(unittest.TestCase):
           end
 
           function gui_container(parent)
-            local value = {valid = true, _parent = parent, _children = {}}
+            local value = {valid = true, parent = parent, _parent = parent, _children = {}}
             value.add = function(spec)
               local element = gui_container(value)
               for key, field in pairs(spec) do element[key] = field end
@@ -199,6 +199,43 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1] == nil)
         ''')
 
+    def test_foreign_same_named_root_and_children_never_create_preferences_or_receive_callbacks(self):
+        self.lua.execute('''
+          boot()
+          local foreign = player.gui.screen.add{type = "frame", name = "mir_research_browser"}
+          local filters = foreign.add{type = "flow", name = "mir_library_filters"}
+          local query = filters.add{type = "textfield", name = "mir_library_query", text = "foreign text"}
+          local family = filters.add{type = "drop-down", name = "mir_library_family", selected_index = 2}
+          local content = foreign.add{type = "flow", name = "mir_library_content"}
+          local results = content.add{type = "list-box", name = "mir_library_results", selected_index = 1}
+          local actions = content.add{type = "flow", name = "mir_library_actions"}
+          local close = actions.add{type = "button", name = "mir_library_close"}
+          local open_native = actions.add{type = "button", name = "mir_library_open_native"}
+          foreign.location = {x = 17, y = 29}
+
+          -- Ordinary entry points see the collision, leave it alone, and do
+          -- not allocate a private player preference merely to reject it.
+          assert(library.open(player) == nil)
+          library.close(player)
+          library.on_lua_shortcut({prototype_name = "mir-research-browser", player_index = 1})
+          assert(next(storage) == nil and foreign.valid)
+          assert(player.gui.screen["mir_research_browser"] == foreign and player.shortcut_toggled == nil)
+
+          -- Every routed GUI callback must prove the tagged root and all of
+          -- its ancestors, rather than accepting a globally shared name.
+          query.text = "attempted mutation"
+          library.on_gui_text_changed({player_index = 1, element = query})
+          library.on_gui_selection_state_changed({player_index = 1, element = family})
+          library.on_gui_selection_state_changed({player_index = 1, element = results})
+          library.on_gui_click({player_index = 1, element = close})
+          library.on_gui_click({player_index = 1, element = open_native})
+          library.on_gui_location_changed({player_index = 1, element = foreign})
+          library.on_gui_closed({player_index = 1, element = foreign})
+          assert(next(storage) == nil and foreign.valid)
+          assert(query.text == "attempted mutation" and family.selected_index == 2)
+          assert(player.gui.screen["mir_research_browser"] == foreign and player.opened_technology == nil)
+        ''')
+
     def test_cap_provider_is_configured_without_force_extension_or_periodic_work(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = nil
@@ -298,6 +335,8 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir.research_browser.players[1] == historical)
           local preserved = state.legacy_browser
           assert(preserved.version == 1 and preserved.source == "storage.mir.research_browser")
+          assert(preserved.authoritative_source == "storage.mir.research_browser")
+          assert(preserved.snapshot_status[1].complete and not preserved.snapshot_status[1].truncated)
           local saved = preserved.players[1]
           assert(saved.mode == 3 and saved.status == 2 and saved.page == 7)
           assert(saved.tab == "settings" and saved.settings_scope == "options")
@@ -309,6 +348,24 @@ class LibraryTests(unittest.TestCase):
           local root = player.gui.screen["mir_research_browser"]
           assert(root and root ~= old and root["mir_library_filters"] and root["mir_library_content"])
           assert(player.shortcut_toggled == true)
+        ''')
+
+    def test_configuration_marks_a_bounded_legacy_snapshot_without_mutating_its_authoritative_bucket(self):
+        self.lua.execute(r'''
+          boot()
+          local historical = {schema = 3, search = "old", family = "all"}
+          for index = 1, 600 do historical["retained-" .. index] = index end
+          storage.mir = {research_browser = {players = {[1] = historical}}}
+
+          library.on_configuration_changed()
+
+          local preserved = storage.mir_library.legacy_browser
+          local status = preserved.snapshot_status[1]
+          assert(preserved.authoritative_source == "storage.mir.research_browser")
+          assert(not status.complete and status.truncated and status.entry_limited)
+          -- The exact historical record remains the full-fidelity authority.
+          assert(storage.mir.research_browser.players[1] == historical)
+          assert(historical["retained-600"] == 600)
         ''')
 
     def test_configuration_preserves_newer_private_view_and_does_not_claim_same_named_foreign_root(self):

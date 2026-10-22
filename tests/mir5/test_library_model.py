@@ -66,6 +66,25 @@ class LibraryModelTests(unittest.TestCase):
           assert(view.hidden["recipe-prod-research_gears-1"])
         ''')
 
+    def test_hidden_input_budget_counts_visited_entries_including_rejected_values(self):
+        self.lua.execute('''
+          local visits = 0
+          local hostile = setmetatable({}, {
+            __pairs = function()
+              local index = 0
+              return function()
+                index, visits = index + 1, visits + 1
+                if visits > 129 then error("hidden input was scanned past its visit budget") end
+                if index <= 200 then return "invalid-hidden-" .. index, false end
+              end
+            end
+          })
+          local normalized = model.normalize({hidden = hostile})
+          -- `pairs` makes one final iterator call to observe termination;
+          -- exactly 128 hostile entries were inspected.
+          assert(next(normalized.hidden) == nil and visits == 129)
+        ''')
+
     def test_default_mir_view_does_not_enumerate_foreign_catalogue(self):
         self.lua.execute('''
           local id = "recipe-prod-research_gears-1"

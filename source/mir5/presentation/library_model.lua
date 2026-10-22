@@ -44,17 +44,21 @@ local function matches(value, search)
 end
 
 local function copy_hidden(value)
-  local result, count = {}, 0
+  local result, visited = {}, 0
   if type(value) ~= "table" then return result end
-  for index = 1, math.min(#value, MAX_HIDDEN) do
+  -- Bound inputs by entries inspected, rather than only accepted strings.
+  -- A hostile map full of invalid keys must not force an unbounded scan.
+  for index = 1, #value do
+    if visited >= MAX_HIDDEN then return result end
+    visited = visited + 1
     local id = bounded_string(value[index], MAX_SEARCH)
-    if id and not result[id] then result[id], count = true, count + 1 end
+    if id then result[id] = true end
   end
-  if count >= MAX_HIDDEN then return result end
   for id, hidden in pairs(value) do
-    if count >= MAX_HIDDEN then break end
-    if hidden == true and type(id) == "string" and #id <= MAX_SEARCH and not result[id] then
-      result[id], count = true, count + 1
+    if visited >= MAX_HIDDEN then break end
+    visited = visited + 1
+    if hidden == true and type(id) == "string" and #id <= MAX_SEARCH then
+      result[id] = true
     end
   end
   return result
@@ -157,6 +161,9 @@ local function queue_facts(force)
   local queue = native_read(force, "research_queue")
   if queue == nil then return counts, first, current end
   local index = 0
+  -- Runtime queues are native player state. Preserve every duplicate and its
+  -- native ordering rather than presenting a bounded partial queue; this is
+  -- intentionally O(Q) during an explicit Library render/detail request.
   for _, technology in ipairs(queue) do
     index = index + 1
     local id = technology_name(technology)
