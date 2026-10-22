@@ -1,5 +1,5 @@
-local setting = data.raw["int-setting"] and data.raw["int-setting"]["mir-max-level-worker-robots-speed"]
-if not setting or setting.default_value ~= 0 then
+local setting = settings.startup["mir-max-level-worker-robots-speed"]
+if not setting or setting.value ~= 0 then
   error("[mir5-worker-speed-cap-relaxed] unlimited startup sentinel differs")
 end
 -- Keep the fixture's unrelated current research identity during the upgrade.

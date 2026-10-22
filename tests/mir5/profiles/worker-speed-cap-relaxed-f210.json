@@ -2,6 +2,6 @@
   "mods": [
     {"name": "base", "version": "2.1.23", "enabled": true},
     {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
-    {"name": "mir-fixture-mir5-worker-speed-cap", "version": "0.2.0", "enabled": true}
+    {"name": "mir-fixture-mir5-worker-speed-cap", "version": "0.2.1", "enabled": true}
   ]
 }

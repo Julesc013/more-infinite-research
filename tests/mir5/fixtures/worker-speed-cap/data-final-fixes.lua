@@ -25,9 +25,9 @@ for _, candidate in ipairs(candidates) do
 end
 if not selected then error("[mir5-worker-speed-cap] no admitted native worker-speed tail") end
 
-local setting = data.raw["int-setting"] and data.raw["int-setting"]["mir-max-level-worker-robots-speed"]
-if not setting or setting.default_value ~= 7 then
-  error("[mir5-worker-speed-cap] finite worker cap default differs")
+local setting = settings.startup["mir-max-level-worker-robots-speed"]
+if not setting or setting.value ~= 7 then
+  error("[mir5-worker-speed-cap] finite worker startup cap differs")
 end
 -- An unrelated fixture-owned technology remains unresearched after recursively
 -- preparing all native worker prerequisites. Its start raises a real event.

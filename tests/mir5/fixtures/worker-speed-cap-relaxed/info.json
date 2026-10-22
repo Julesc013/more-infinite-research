@@ -1,6 +1,6 @@
 {
   "name": "mir-fixture-mir5-worker-speed-cap",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "title": "MIR 5 worker-speed cap relaxation fixture",
   "author": "MIR maintainers",
   "description": "Private continuation fixture for native worker-speed cap relaxation.",
