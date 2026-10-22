@@ -11,6 +11,8 @@ param(
   [string[]]$ConsumerMarkers=@(),
   [switch]$CreateOnly,
   [switch]$MIRAbsent,
+  [string]$InputSavePath='',
+  [string]$ExpectedInputSaveSha256='',
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
@@ -67,6 +69,13 @@ $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $library=(Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
+$inputSave=$null
+if($InputSavePath -or $ExpectedInputSaveSha256){
+  Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent -and $InputSavePath -and $ExpectedInputSaveSha256 -cmatch '^[a-fA-F0-9]{64}$') 'an input save requires a full fixture run and exact hash'
+  $inputSave=(Resolve-Path -LiteralPath $InputSavePath).Path
+  Assert-Fixture ((Test-Path -LiteralPath $inputSave -PathType Leaf) -and [IO.Path]::GetExtension($inputSave) -ceq '.zip') 'input save is not a ZIP file'
+  Assert-Fixture ((Get-FixtureSha $inputSave) -ceq $ExpectedInputSaveSha256.ToUpperInvariant()) 'input save hash differs'
+}
 $identityModule=New-Module -Name MIR5FixtureIdentity -ArgumentList (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1') -ScriptBlock {
   param($Path)
   . $Path
@@ -108,6 +117,7 @@ $record=[ordered]@{
   profile=@{path=$profile;sha256=Get-FixtureSha $profile};fixtures=$fixtureInputs
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
   observation=if($CreateOnly){'native-create-runtime-load-only'}else{'native-fixture-production-and-two-cold-reloads'}
+  input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
   release_qualification=$false
 }
 try{
@@ -121,10 +131,13 @@ try{
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
-  $seed=Join-Path $writeData 'saves/seed.zip'
-  $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
-  $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
-  Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
+  $seed=$inputSave
+  if(-not $seed){
+    $seed=Join-Path $writeData 'saves/seed.zip'
+    $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
+    $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
+    Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
+  }
   $record.seed_sha256=Get-FixtureSha $seed
   if(-not $CreateOnly){
   $server=Join-Path $resources.root 'server-settings.json'
@@ -171,6 +184,10 @@ try{
 }finally{
   try{
     if($null -ne $activation -and -not $activation.closed){$record.library_control_restoration=Complete-MIRLibraryActivation -Activation $activation}
+    if($inputSave){
+      $record.input_save_byte_identical=(Get-FixtureSha $inputSave) -ceq $ExpectedInputSaveSha256.ToUpperInvariant()
+      Assert-Fixture $record.input_save_byte_identical 'native fixture changed the supplied historical save'
+    }
   }catch{
     $record.library_control_restoration_failure=$_.Exception.Message
     if($null -eq $failure){$record.status='failed';$record.failure=$_.Exception.Message;$failure=$_}

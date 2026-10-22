@@ -1,0 +1,63 @@
+{
+  "format": 1,
+  "kind": "mir5-k2so-f210-comparison-inputs",
+  "status": "prepared-input-selection-not-native-qualified",
+  "purpose": "Stable high-cost F210 K2/K2SO environment selection for future no-MIR, published MIR 4.7, and private MIR5 direct-library comparisons.",
+  "comparison_selection": {
+    "path": "tests/mir5/profiles/k2so-f210-2123.json",
+    "selection_shape": "five Factorio built-ins and seven exact external K2/K2SO archives; no MIR or assertion observer row",
+    "settings_mode": "Defaults"
+  },
+  "source_profile": {
+    "path": "fixtures/run-profiles/k2-214-imersite-f210-470-2123.json",
+    "sha256": "DC6EE665BDE9D734CF325F1C91902914CE6D6EB79038C1F6A4D7A52425E2F788",
+    "engine_version": "2.1.23",
+    "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "runtime_api_sha256": "7660B692F1C199682DE4318250DE81B07B38266A935D1C37859DCB6A70E1D373",
+    "authority": ".mir/fixtures.yml k2-213-imersite-continuation current_input_profile"
+  },
+  "omitted_source_rows": [
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.21000",
+      "reason": "The comparison runner selects this row per arm: absent, the accepted published 4.7 archive, or a private MIR5 archive."
+    },
+    {
+      "name": "mir-fixture-assert-k2-213-imersite-continuation",
+      "version": "0.1.10",
+      "reason": "This MIR assertion observer belongs to the accepted MIR4 qualification profile and cannot remain enabled in a valid no-MIR arm."
+    }
+  ],
+  "archive_verification": {
+    "method": "Direct SHA-256 comparison of each named archive in C:\\Projects\\Factorio\\testmods\\2.1 with the source profile pin; no archive was copied, extracted, modified, or executed.",
+    "verified": true,
+    "external_archives": [
+      {"name": "flib", "version": "0.17.2", "file": "flib_0.17.2.zip", "sha256": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D"},
+      {"name": "k2so-assets", "version": "1.0.7", "file": "k2so-assets_1.0.7.zip", "sha256": "C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017"},
+      {"name": "Krastorio2", "version": "2.1.4", "file": "Krastorio2_2.1.4.zip", "sha256": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E"},
+      {"name": "Krastorio2-spaced-out", "version": "2.0.19", "file": "Krastorio2-spaced-out_2.0.19.zip", "sha256": "8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B"},
+      {"name": "Krastorio2Assets", "version": "2.1.0", "file": "Krastorio2Assets_2.1.0.zip", "sha256": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29"},
+      {"name": "Krastorio2MenuSimulations", "version": "2.1.0", "file": "Krastorio2MenuSimulations_2.1.0.zip", "sha256": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7"},
+      {"name": "xy-k2so-enhancements-nulls-fork", "version": "0.8.3", "file": "xy-k2so-enhancements-nulls-fork_0.8.3.zip", "sha256": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE"}
+    ]
+  },
+  "published_mir_4_7": {
+    "archive": "more-infinite-research_4.7.21000.zip",
+    "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "source_version": "4.7.0",
+    "factorio_version": "2.1",
+    "accepted_archive_hash": true
+  },
+  "not_yet_verified": [
+    "Inherited K2/K2SO startup-setting behavior for this no-fixture comparison selection.",
+    "Shared-cache behavior and an engine-prepared credential-free Factorio 2.1.23 player-data seed.",
+    "Responsive-menu endpoint behavior, display/foreground availability, and owned-window OCR response.",
+    "MIR5 archive selection, data-stage loading, gameplay, save/reload, memory, timing, or performance comparison."
+  ],
+  "claims": {
+    "native_execution": false,
+    "native_qualification": false,
+    "performance_measurement": false,
+    "release_qualification": false
+  }
+}
