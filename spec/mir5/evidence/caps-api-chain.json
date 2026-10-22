@@ -7,6 +7,8 @@
   "player": {
     "archive": "build/mir5/caps-api-r03/packages/more-infinite-research_5.0.21000.zip",
     "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+    "source_commit": "deb16bbe3934502e6520d3a6e308db1db614dd5d",
+    "all_61_archive_members_equal_committed_source_bytes": true,
     "package_record": "build/mir5/caps-api-r03/player.json",
     "package_record_sha256": "62E1573CF75650D1217F2986D7CC168311BCA2175EDE6DAA6753CEF904C1C46C"
   },
