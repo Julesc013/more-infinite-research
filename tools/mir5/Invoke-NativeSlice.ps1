@@ -116,18 +116,32 @@ function Invoke-NativeSliceStage {
   if (Test-Path -LiteralPath $liveLog) { Remove-Item -LiteralPath $liveLog -Force }
   $arguments = @('--config', $config, '--no-log-rotation', '--disable-audio', '--mod-directory', $activation.library) + $StageArguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  $capturedLog = Join-Path $run ($Stage + '.factorio.log')
+  $stdoutLog = Join-Path $run ($Stage + '.stdout.log')
+  $stderrLog = Join-Path $run ($Stage + '.stderr.log')
   $start = [Diagnostics.ProcessStartInfo]::new()
   $start.FileName = $engine
   $start.UseShellExecute = $false
   $start.CreateNoWindow = $true
   $start.WindowStyle = [Diagnostics.ProcessWindowStyle]::Hidden
+  $start.RedirectStandardOutput = $true
+  $start.RedirectStandardError = $true
   $start.Environment['SteamAppId'] = '427520'
   $start.Environment['SteamGameId'] = '427520'
   foreach ($argument in $arguments) { [void]$start.ArgumentList.Add($argument) }
-  $process = [Diagnostics.Process]::Start($start)
+  $process = $null
+  $stdoutTask = $null
+  $stderrTask = $null
+  $stdoutText = ''
+  $stderrText = ''
   $completionObserved = $false
   $exitCode = $null
   try {
+    $process = [Diagnostics.Process]::Start($start)
+    # Begin draining both pipes before polling.  Waiting to read either stream
+    # after Factorio exits can deadlock a verbose failed create/load stage.
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
     $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
     while ([DateTime]::UtcNow -lt $deadline) {
       if ($null -ne $Completion -and (Test-Path -LiteralPath $liveLog -PathType Leaf)) {
@@ -137,26 +151,38 @@ function Invoke-NativeSliceStage {
       if ($process.HasExited) {
         $exitCode = $process.ExitCode
         if ($null -eq $Completion) { break }
-        throw "native engine exited before completing $Stage with code $exitCode"
+        throw "native engine exited before completing $Stage with code $exitCode; diagnostics: $stdoutLog ; $stderrLog ; $capturedLog"
       }
       Start-Sleep -Milliseconds 150
     }
-    if ($null -eq $Completion -and -not $process.HasExited) { throw "native engine timed out during $Stage" }
-    if ($null -ne $Completion -and -not $completionObserved) { throw "native engine did not complete $Stage within $TimeoutSeconds seconds" }
-    if ($null -eq $Completion -and $exitCode -ne 0) { throw "native engine failed during $Stage with code $exitCode" }
+    if ($null -eq $Completion -and -not $process.HasExited) { throw "native engine timed out during $Stage; diagnostics: $stdoutLog ; $stderrLog ; $capturedLog" }
+    if ($null -ne $Completion -and -not $completionObserved) { throw "native engine did not complete $Stage within $TimeoutSeconds seconds; diagnostics: $stdoutLog ; $stderrLog ; $capturedLog" }
+    if ($null -eq $Completion -and $exitCode -ne 0) { throw "native engine failed during $Stage with code $exitCode; diagnostics: $stdoutLog ; $stderrLog ; $capturedLog" }
   } finally {
-    if (-not $process.HasExited) {
-      try { $process.Kill($true) } catch { $process.Kill() }
+    if ($null -ne $process) {
+      if (-not $process.HasExited) {
+        try { $process.Kill($true) } catch { $process.Kill() }
+      }
+      $process.WaitForExit()
+      if ($null -eq $exitCode -and $process.HasExited) { $exitCode = $process.ExitCode }
+      try {
+        if ($null -ne $stdoutTask) { $stdoutText = $stdoutTask.GetAwaiter().GetResult() }
+        if ($null -ne $stderrTask) { $stderrText = $stderrTask.GetAwaiter().GetResult() }
+        [IO.File]::WriteAllText($stdoutLog, $stdoutText, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($stderrLog, $stderrText, [Text.UTF8Encoding]::new($false))
+      } finally {
+        # Failure paths must retain every native diagnostic that exists before
+        # the outer activation restores the library controls.
+        if (Test-Path -LiteralPath $liveLog -PathType Leaf) {
+          Copy-Item -LiteralPath $liveLog -Destination $capturedLog -Force
+        }
+        $process.Dispose()
+      }
     }
-    $process.WaitForExit()
-    if ($null -eq $exitCode -and $process.HasExited) { $exitCode = $process.ExitCode }
-    $process.Dispose()
   }
-  Assert-NativeSlice (Test-Path -LiteralPath $liveLog -PathType Leaf) "native engine produced no log for $Stage"
-  $capturedLog = Join-Path $run ($Stage + '.factorio.log')
-  Copy-Item -LiteralPath $liveLog -Destination $capturedLog -Force
+  Assert-NativeSlice (Test-Path -LiteralPath $capturedLog -PathType Leaf) "native engine produced no captured Factorio log for $Stage"
   $loaded = Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $capturedLog -LatestInvocation
-  return [pscustomobject]@{ stage = $Stage; log = $capturedLog; log_sha256 = Get-NativeSliceSha256 $capturedLog; exit_code = $exitCode; completion_observed = $completionObserved; loaded = $loaded }
+  return [pscustomobject]@{ stage = $Stage; log = $capturedLog; log_sha256 = Get-NativeSliceSha256 $capturedLog; stdout_log = $stdoutLog; stderr_log = $stderrLog; exit_code = $exitCode; completion_observed = $completionObserved; loaded = $loaded }
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
