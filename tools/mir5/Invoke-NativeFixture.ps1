@@ -21,12 +21,6 @@ function Assert-Fixture([bool]$Condition,[string]$Message) {
 function Get-FixtureSha([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
-function Read-FixtureLog([string]$Path) {
-  if(-not(Test-Path -LiteralPath $Path -PathType Leaf)){return ''}
-  $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
-  $reader=[IO.StreamReader]::new($stream)
-  try{$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
-}
 function Assert-FixtureLog([string]$Text) {
   Assert-Fixture (-not [regex]::IsMatch($Text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')) 'fatal native diagnostic'
 }
@@ -112,8 +106,11 @@ try{
   $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $live=Join-Path $writeData 'factorio-current.log'
   $completion={
-    $text=Read-FixtureLog $live
-    Assert-FixtureLog $text
+    if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
+    $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+    $reader=[IO.StreamReader]::new($stream)
+    try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
+    if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
   }.GetNewClosure()
   $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
