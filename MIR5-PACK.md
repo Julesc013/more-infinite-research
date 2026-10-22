@@ -6,7 +6,7 @@ Prepared 22 October 2026. **Proposed contracts, rendered diagrams and checked ad
 
 Open [the architecture explainer](docs/mir5/architecture.md), then [the offline visual atlas](docs/mir5/diagrams/index.html). The atlas shows twelve permanent diagrams with editable Mermaid. The separate [cutover visual](tools/mir5/adoption/diagrams/index.html) covers the thirteenth, temporary diagram. SVG/PNG and Mermaid files accompany every graph.
 
-The focused [specification index](spec/mir5/README.md) routes implementation tasks. Read [the revision audit](tools/mir5/adoption/REVISION.md) for changes to the uploaded pack and [the first bounded batch](docs/mir5/first_batch.md) for implementation order.
+The focused [specification index](spec/mir5/README.md) routes implementation tasks. Read [the revision audit](tools/mir5/adoption/REVISION.md) for changes to the uploaded pack and [the first bounded batch](docs/mir5/first-batch.md) for implementation order.
 
 ## Extract-merge without losing local work
 

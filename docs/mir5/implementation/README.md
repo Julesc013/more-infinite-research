@@ -3,7 +3,7 @@ title: "Implementation draft: reading order and boundaries"
 status: draft
 applies_to: "MIR replacement development; explanatory pseudocode, not executable product"
 audience: developer
-doc_type: implementation-draft
+doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-10-22
 supersedes: []
@@ -22,7 +22,7 @@ source_of_truth_for:
 |---|---|
 | [Blueprint](blueprint.md) | Pseudocode from settings declaration to prototype publication, API use, runtime and migration. |
 | [Review](review.md) | What is already specified, what remains unresolved, and narrowly proposed refinements. |
-| [Opposing tests](opposing_tests.md) | Independent expected properties and examples of defects the tests must detect. |
+| [Opposing tests](opposing-tests.md) | Independent expected properties and examples of defects the tests must detect. |
 
 The authority remains [the specification index](../../../spec/mir5/README.md). The reviewed baseline is `MIR5_REPO_SPEC_DOCS_DIAGRAMS_2026-10-22.zip`, with the exact digest in the accompanying delivery manifest. API signatures follow its **1.0.0-draft.2**, not earlier messages in the discussion.
 

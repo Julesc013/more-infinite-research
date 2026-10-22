@@ -1583,65 +1583,65 @@ docs:
     source_of_truth_for: []
   - path: docs/mir5/api.md
     title: "MIR API guide"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-api-guide
   - path: docs/mir5/architecture.md
     title: "How MIR fits together"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for:
       - mir-architecture-explainer
   - path: docs/mir5/cutover.md
     title: "Staging, adoption and mechanical cutover"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-cutover-guide
   - path: docs/mir5/decisions.md
     title: "Source reconciliation for this proposal"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-decisions-guide
   - path: docs/mir5/design.md
     title: "Synthesized design and decisions"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-design-guide
   - path: docs/mir5/development.md
     title: "Development guide"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-development-guide
   - path: docs/mir5/diagrams/README.md
     title: "Diagram sources and rendered atlas"
-    status: proposed
+    status: draft
     audience: developer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-diagram-assets
-  - path: docs/mir5/first_batch.md
+  - path: docs/mir5/first-batch.md
     title: "First implementation batch — bounded assignment"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: how-to
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-first-batch-guide
@@ -1649,15 +1649,15 @@ docs:
     title: "High-level implementation pseudocode"
     status: draft
     audience: developer
-    doc_type: implementation-draft
+    doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for:
       - mir-implementation-draft-blueprint
-  - path: docs/mir5/implementation/opposing_tests.md
+  - path: docs/mir5/implementation/opposing-tests.md
     title: "Proposed opposing tests for the implementation draft"
     status: draft
     audience: developer
-    doc_type: implementation-draft
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-implementation-draft-opposing-tests
@@ -1665,7 +1665,7 @@ docs:
     title: "Implementation draft: reading order and boundaries"
     status: draft
     audience: developer
-    doc_type: implementation-draft
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-implementation-draft-README
@@ -1673,7 +1673,7 @@ docs:
     title: "Implementation review: close decisions, do not expand architecture"
     status: draft
     audience: developer
-    doc_type: implementation-draft
+    doc_type: explanation
     owner: mir-maintainers
     source_of_truth_for:
       - mir-implementation-draft-review
@@ -1687,17 +1687,17 @@ docs:
       - mir-replacement-execution-progress
   - path: docs/mir5/README.md
     title: "MIR documentation"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-readme-guide
   - path: docs/mir5/support.md
     title: "Support and upgrade boundaries"
-    status: proposed
+    status: draft
     audience: developer
-    doc_type: guide
+    doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:
       - mir-replacement-support-guide

@@ -1,9 +1,9 @@
 ---
 title: "Staging, adoption and mechanical cutover"
-status: proposed
+status: draft
 applies_to: "MIR replacement development"
 audience: developer
-doc_type: guide
+doc_type: how-to
 owner: mir-maintainers
 last_reviewed: 2026-10-22
 supersedes: []

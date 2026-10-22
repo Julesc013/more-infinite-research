@@ -1,6 +1,6 @@
 ---
 title: "Diagram sources and rendered atlas"
-status: proposed
+status: draft
 applies_to: "MIR replacement development"
 audience: developer
 doc_type: reference

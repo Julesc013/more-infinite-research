@@ -5,7 +5,7 @@
  
 +## Replacement-development routing
 +
-+For the new implementation only, `spec/mir5/README.md` is the proposed contract to adopt; `docs/mir5/first_batch.md` bounds the first task. New player source is `source/mir5/`, later mechanically promoted to `source/`. No parallel `mod/`/`src/` root. The public name is MIR API; the Generator constructs authored native prototypes rather than recreating the retired compiler.
++For the new implementation only, `spec/mir5/README.md` is the proposed contract to adopt; `docs/mir5/first-batch.md` bounds the first task. New player source is `source/mir5/`, later mechanically promoted to `source/`. No parallel `mod/`/`src/` root. The public name is MIR API; the Generator constructs authored native prototypes rather than recreating the retired compiler.
 +
 +Once this proposal is accepted, its module/architecture rules supersede MIR 4-specific compiler, stream-manifest and proof-framework instructions **for the new subtree only**. Do not bulk-read old required-reading lists for an unrelated replacement task. Existing development permissions, safety/resource/library custody, release/signing protections, historical identities and useful behavior remain binding until explicitly transferred. The archive is not release or deletion authority.
 +
@@ -15,7 +15,7 @@
 --- a/README.md
 +++ b/README.md
 @@ -1,2 +1,4 @@
-+> **Replacement development:** the proposed current design is indexed at [spec/mir5/README.md](spec/mir5/README.md), with the [synthesis](docs/mir5/design.md) and [bounded first task](docs/mir5/first_batch.md). The new package is not yet qualified. Material below retains historical product/recovery information and is not permission to reintroduce the old compiler. Root content is transferred/reconciled before final replacement, not silently discarded.
++> **Replacement development:** the proposed current design is indexed at [spec/mir5/README.md](spec/mir5/README.md), with the [synthesis](docs/mir5/design.md) and [bounded first task](docs/mir5/first-batch.md). The new package is not yet qualified. Material below retains historical product/recovery information and is not permission to reintroduce the old compiler. Root content is transferred/reconciled before final replacement, not silently discarded.
 +
  # More Infinite Research
  

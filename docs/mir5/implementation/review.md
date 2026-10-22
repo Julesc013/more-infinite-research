@@ -3,7 +3,7 @@ title: "Implementation review: close decisions, do not expand architecture"
 status: draft
 applies_to: "MIR replacement development; explanatory pseudocode, not executable product"
 audience: developer
-doc_type: implementation-draft
+doc_type: explanation
 owner: mir-maintainers
 last_reviewed: 2026-10-22
 supersedes: []
@@ -24,7 +24,7 @@ This review uses the current archive, not every conflicting proposal in the conv
 
 | Area | Existing authority | Exact outstanding decision/evidence |
 |---|---|---|
-| Gear research | `docs/mir5/first_batch.md`; `GEN-01`, `SET-01` | Actual prototype IDs, published defaults, profile precedence, cost/bonus units, targets and disable behavior. The `research_gears` source key is not a complete prototype identity. |
+| Gear research | `docs/mir5/first-batch.md`; `GEN-01`, `SET-01` | Actual prototype IDs, published defaults, profile precedence, cost/bonus units, targets and disable behavior. The `research_gears` source key is not a complete prototype identity. |
 | Availability/preservation | `GEN-07`, `MIG-01` | Per-family, per-configuration decision for disablement, missing upstream targets, native-owner takeover and removed integrations. No generic hidden/no-effect carrier can be presumed safe. |
 | Settings resolution | `SET-01` through `SET-04` | Which value wins when raw settings and an imported profile both specify a key, including an explicit value equal to the default. Preserve inherit, absent, zero, unlimited and false distinctly. |
 | Stage placement | `API-02`, `COMP-02` | Exact entrypoint, prerequisite availability and field read/write order for each real family and override. Do not move all work to final-fixes by default. |
