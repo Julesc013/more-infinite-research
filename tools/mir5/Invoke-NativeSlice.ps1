@@ -208,7 +208,9 @@ function Invoke-NativeSliceStage {
   Assert-NativeSlice (Test-Path -LiteralPath $capturedLog -PathType Leaf) "native engine produced no captured Factorio log for $Stage"
   foreach ($diagnostic in @($capturedLog, $stdoutLog, $stderrLog)) {
     $fatal = Get-NativeSliceFatalDiagnostic ([IO.File]::ReadAllText($diagnostic))
-    Assert-NativeSlice ($null -eq $fatal -or -not $fatal.Success) "native engine emitted a fatal diagnostic during ${Stage}: $($fatal.Value)"
+    if ($null -ne $fatal -and $fatal.Success) {
+      throw "native engine emitted a fatal diagnostic during ${Stage}: $($fatal.Value)"
+    }
   }
   if ($null -ne $Completion) {
     Assert-NativeSlice ($completionObserved -and $controlledKillAfterCompletion) "native completion must be terminated by the harness while the process remains alive"
