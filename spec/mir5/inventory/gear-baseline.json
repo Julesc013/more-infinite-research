@@ -1,0 +1,388 @@
+{
+  "format": 1,
+  "kind": "mir5-source-recovered-gear-baseline",
+  "status": "source-recovered-not-native-qualified",
+  "scope": {
+    "subject": "released MIR 4.7.0 research_gears contract",
+    "target": "vanilla Factorio 2.1.23",
+    "technology_id": "recipe-prod-research_gears-1",
+    "stream_key": "research_gears",
+    "manifest_id": "streams.recipe-prod-research_gears-1"
+  },
+  "published_baseline": {
+    "release_tag": "v4.7.0",
+    "source_version": "4.7.0",
+    "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+    "archive_root": "more-infinite-research_4.7.21000",
+    "package_version": "4.7.21000",
+    "factorio_version": "2.1",
+    "base_dependency": "base >= 2.1.23",
+    "manifest_entry": "more-infinite-research_4.7.21000/prototypes/mir/streams/generated_stream_manifest.json"
+  },
+  "published_byte_verification": {
+    "method": "SHA-256 of each archive entry equals SHA-256 of git cat-file blob v4.7.0:<source path>; no extraction or engine execution.",
+    "verified_entries": [
+      {
+        "source": "source/prototypes/streams/productivity.lua",
+        "archive_entry": "prototypes/streams/productivity.lua",
+        "sha256": "ea66b64c03943a99b877847fd6e3903a099c83ab0333a441a29957c1c2142853"
+      },
+      {
+        "source": "source/prototypes/mir/settings/defaults.lua",
+        "archive_entry": "prototypes/mir/settings/defaults.lua",
+        "sha256": "7537e3792a07de60c4591972925c65d208808c2329c432891fece2528467ac63"
+      },
+      {
+        "source": "source/prototypes/mir/settings/catalog.lua",
+        "archive_entry": "prototypes/mir/settings/catalog.lua",
+        "sha256": "82e2457b3a0550b196cb741f93911f98586995e36c46754750cdaea9a2d1410d"
+      },
+      {
+        "source": "source/prototypes/mir/settings/effective.lua",
+        "archive_entry": "prototypes/mir/settings/effective.lua",
+        "sha256": "b4b552defbfb2934e810377cb08ccd0fc7166030a7076fc83bd11b06ea9ba660"
+      },
+      {
+        "source": "source/prototypes/mir/settings/profile_codec.lua",
+        "archive_entry": "prototypes/mir/settings/profile_codec.lua",
+        "sha256": "54e9610324ae701fdf4cee657fabaf34e9b76d8973276449c42f80a0ba3dfdca"
+      },
+      {
+        "source": "source/prototypes/mir/planner/costs.lua",
+        "archive_entry": "prototypes/mir/planner/costs.lua",
+        "sha256": "3ae63c5d3b7cbe94ff26d5e1b65d049d4f90c0018550e47b0c166d822506c281"
+      },
+      {
+        "source": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+        "archive_entry": "prototypes/mir/planner/stream_compiler/qualify.lua",
+        "sha256": "685b9010626bdf852f71e03c2d6b5c418fb17c37308e93f0bfd7db8497f25363"
+      },
+      {
+        "source": "source/prototypes/mir/planner/stream_compiler/diagnostics.lua",
+        "archive_entry": "prototypes/mir/planner/stream_compiler/diagnostics.lua",
+        "sha256": "da32d686307595aff44d81c15013e0218dd613d38a9c49df881148376afb51e9"
+      },
+      {
+        "source": "source/prototypes/mir/planner/prerequisites.lua",
+        "archive_entry": "prototypes/mir/planner/prerequisites.lua",
+        "sha256": "87b7fc420faa3ddd70325a05e5386af8182cc8cbebd69714d029772996c10102"
+      },
+      {
+        "source": "source/prototypes/mir/capabilities/science_integration/science_selector.lua",
+        "archive_entry": "prototypes/mir/capabilities/science_integration/science_selector.lua",
+        "sha256": "8425e1e6fa44efb99084bfb951558647f6d4736ffb44e877c5a6c58ed6b264e4"
+      },
+      {
+        "source": "source/prototypes/mir/presentation/icon_builder.lua",
+        "archive_entry": "prototypes/mir/presentation/icon_builder.lua",
+        "sha256": "9b2788bec9b6c9e290c8a8d038bf3e6f3d86dbdb39be1d5c237dcb94db01099a"
+      },
+      {
+        "source": "source/prototypes/mir/domain/streams/descriptor.lua",
+        "archive_entry": "prototypes/mir/domain/streams/descriptor.lua",
+        "sha256": "176d19f7f005521cdb354eb939e04dd4630dd6c96bc0ad8e6afdc40ee3db9d51"
+      },
+      {
+        "source": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+        "archive_entry": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "54356d6836b140c1249c8d2d7277f0079805902a2916d9f6348c7aaa995d35c5"
+      },
+      {
+        "source": "source/locale/en/more-infinite-research.cfg",
+        "archive_entry": "locale/en/more-infinite-research.cfg",
+        "sha256": "562cbf3044b05d65504efc11bfab3a781b1bfcad288e30943335ee1d6351d379"
+      }
+    ]
+  },
+  "expected_emitted_technology": {
+    "type": "technology",
+    "name": "recipe-prod-research_gears-1",
+    "level": 1,
+    "upgrade": true,
+    "max_level": "infinite",
+    "effects": [
+      {
+        "type": "change-recipe-productivity",
+        "recipe": "iron-gear-wheel",
+        "change": 0.1
+      }
+    ],
+    "unit": {
+      "count": null,
+      "count_formula": "8000*2^(L-1)",
+      "ingredients": [
+        ["automation-science-pack", 1],
+        ["logistic-science-pack", 1],
+        ["chemical-science-pack", 1],
+        ["production-science-pack", 1]
+      ],
+      "time": 60
+    },
+    "prerequisites": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "chemical-science-pack",
+      "production-science-pack"
+    ],
+    "presentation": {
+      "localised_name": [
+        "technology-name.more-infinite-research.research_gears",
+        ["item-name.iron-gear-wheel"]
+      ],
+      "english_name": "Iron gear wheel productivity",
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "english_description": "Increases recipe productivity for the selected recipes. Factorio's maximum productivity cap still applies; additional infinite levels may have no practical effect once a recipe reaches its cap.",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-gear-wheel.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [50, 50],
+          "floating": true
+        }
+      ],
+      "order": null,
+      "order_contract": "omitted: the stream has no order and the qualifier does not supply one; Lua omits an order key whose value is nil"
+    },
+    "vanilla_2_1_23_assumptions": {
+      "recipe": "iron-gear-wheel",
+      "recipe_allows_productivity": true,
+      "default_science_policy": "configured",
+      "default_lab_policy": "reduce",
+      "lab_status": "full",
+      "science_pack_selection": "the four listed packs are present and accepted by the vanilla lab"
+    }
+  },
+  "settings": {
+    "setting_type": "startup",
+    "stream_setting_target_requirements": {
+      "requires_features": ["recipe_productivity"],
+      "required_effect_types": []
+    },
+    "stream_settings": [
+      {
+        "id": "ips-enable-research_gears",
+        "type": "bool-setting",
+        "default_value": true,
+        "minimum_value": null,
+        "maximum_value": null,
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-0"
+      },
+      {
+        "id": "ips-cost-base-research_gears",
+        "type": "int-setting",
+        "default_value": 8000,
+        "minimum_value": 1,
+        "maximum_value": 2147483647,
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-1"
+      },
+      {
+        "id": "ips-cost-linear-increment-research_gears",
+        "type": "int-setting",
+        "default_value": 0,
+        "minimum_value": 0,
+        "maximum_value": 2147483647,
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-2"
+      },
+      {
+        "id": "ips-cost-growth-research_gears",
+        "type": "double-setting",
+        "default_value": 2,
+        "minimum_value": 1,
+        "maximum_value": null,
+        "validated_input_maximum": 1000,
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-3"
+      },
+      {
+        "id": "ips-max-level-research_gears",
+        "type": "int-setting",
+        "default_value": 0,
+        "minimum_value": 0,
+        "maximum_value": 2147483647,
+        "sentinel": {
+          "value": 0,
+          "meaning": "infinite"
+        },
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-4"
+      },
+      {
+        "id": "ips-research-time-research_gears",
+        "type": "int-setting",
+        "default_value": 60,
+        "minimum_value": 0,
+        "maximum_value": 2147483647,
+        "sentinel": {
+          "value": 0,
+          "meaning": "fall back to the stream default of 60 seconds"
+        },
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-5"
+      },
+      {
+        "id": "ips-effect-per-level-research_gears",
+        "type": "double-setting",
+        "default_value": 10,
+        "minimum_value": 0.01,
+        "maximum_value": 1000000,
+        "unit": "percent",
+        "emitted_field": "change",
+        "default_emitted_value": 0.1,
+        "order": "b-100-iron-gear-wheel-productivity-stream-research_gears-6"
+      }
+    ],
+    "relevant_global_settings": [
+      {
+        "id": "mir-science-pack-ingredient-policy",
+        "type": "string-setting",
+        "default_value": "configured",
+        "allowed_values": ["configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"]
+      },
+      {
+        "id": "mir-lab-incompatibility-policy",
+        "type": "string-setting",
+        "default_value": "reduce",
+        "allowed_values": ["reduce", "skip", "engine-default"]
+      },
+      {
+        "id": "ips-require-space-gate",
+        "type": "bool-setting",
+        "default_value": false,
+        "effect_when_true": "append the selected end-game science prerequisite"
+      }
+    ],
+    "profile_import": {
+      "id": "mir-settings-profile-import",
+      "type": "string-setting",
+      "default_value": "",
+      "allow_blank": true,
+      "order": "a-7-010",
+      "codec": "MIRSET1: canonical-json-deflate-base64, or canonical JSON",
+      "schema": 1,
+      "kind": "mir-settings-profile",
+      "precedence": "A decoded profile's valid value for a registered non-import startup setting wins. A blank, invalid, unknown, or invalid-valued profile entry falls back to the raw startup setting. The import setting cannot override itself."
+    }
+  },
+  "cap_contract": {
+    "default": {
+      "requested_setting_value": 0,
+      "effective_cap": "infinite",
+      "prototype_max_level": "infinite",
+      "runtime": "unbounded",
+      "presentation": "native-infinite"
+    },
+    "finite_setting_on_f210": {
+      "prototype": {
+        "mode": "lossless-infinite-prototype",
+        "max_level": "infinite"
+      },
+      "runtime": {
+        "mode": "absolute-cap-controller",
+        "queue": "remove-only-levels-above-effective-cap",
+        "completion": "retain-completed-levels-and-bonuses",
+        "restoration": "restore-only-mir-disabled-technologies"
+      },
+      "presentation": {
+        "mode": "finite-runtime-cap",
+        "show_levels_info": false,
+        "visible_when_disabled": true,
+        "completed_state": "visible-and-completed",
+        "description": "exact-effective-cap"
+      }
+    }
+  },
+  "source_references": [
+    {
+      "path": "source/prototypes/streams/productivity.lua",
+      "line": 78,
+      "purpose": "research_gears selects iron-gear-wheel and its icon item"
+    },
+    {
+      "path": "source/prototypes/mir/settings/defaults.lua",
+      "lines": [3, 10],
+      "purpose": "shared defaults: enabled, cost, growth, max-level and time"
+    },
+    {
+      "path": "source/prototypes/mir/domain/streams/descriptor.lua",
+      "lines": [158, 177, 267],
+      "purpose": "recipe-productivity effect descriptor uses change=0.10 / percent and defines the settings sort name"
+    },
+    {
+      "path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "lines": [67, 148, 149, 230, 247],
+      "purpose": "technology identity, emitted fields and no supplied order"
+    },
+    {
+      "path": "source/prototypes/mir/planner/costs.lua",
+      "lines": [47, 61, 77, 95, 106],
+      "purpose": "effective setting inputs, cost model, time and cap sentinels"
+    },
+    {
+      "path": "source/prototypes/mir/domain/research_cost/formula.lua",
+      "lines": [7, 24],
+      "purpose": "formula kind and exact string construction"
+    },
+    {
+      "path": "source/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "lines": [289, 364],
+      "purpose": "default four-pack selection and unit ingredient tuples"
+    },
+    {
+      "path": "source/prototypes/mir/planner/prerequisites.lua",
+      "lines": [59, 94],
+      "purpose": "direct science-unlocker prerequisite construction"
+    },
+    {
+      "path": "source/prototypes/mir/presentation/icon_builder.lua",
+      "lines": [10, 55, 271, 284],
+      "purpose": "item icon fallback, recipe-productivity overlay and layered presentation"
+    },
+    {
+      "path": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+      "lines": [7, 56],
+      "purpose": "F210 modern overlays, recipe-productivity and scripted-tech capability"
+    },
+    {
+      "path": "source/prototypes/mir/planner/stream_compiler/diagnostics.lua",
+      "lines": [59, 77],
+      "purpose": "localized name and description tuples"
+    },
+    {
+      "path": "source/locale/en/more-infinite-research.cfg",
+      "lines": [23, 82],
+      "purpose": "resolved English presentation strings"
+    },
+    {
+      "path": "source/prototypes/mir/settings/catalog.lua",
+      "lines": [18, 274, 334, 370],
+      "purpose": "setting identities, declarations and profile import prototype"
+    },
+    {
+      "path": "source/prototypes/mir/settings/stage_builder.lua",
+      "lines": [42, 73, 138, 196],
+      "purpose": "startup decoration and generated setting order"
+    },
+    {
+      "path": "source/prototypes/mir/settings/effective.lua",
+      "lines": [23, 61],
+      "purpose": "profile precedence and raw-setting fallback"
+    },
+    {
+      "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "lines": [46, 173, 258],
+      "purpose": "zero cap sentinel and F210 runtime cap policy"
+    }
+  ],
+  "native_evidence": {
+    "captured_final_prototype_dump": null,
+    "captured_f210_vanilla_run": null,
+    "bounded_search": "No released-4.7 vanilla final-prototype capture was identified while searching the repository evidence, build, validation, fixture, documentation and release roots for recipe-prod-research_gears-1.",
+    "remaining_required_proof": "Materialize the exact 4.7.21000 package against vanilla 2.1.23, capture data.raw.technology['recipe-prod-research_gears-1'] after data-final-fixes, and compare every expected field above before treating this record as native-qualified."
+  }
+}

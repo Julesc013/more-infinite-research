@@ -63,8 +63,10 @@ class PackTests(unittest.TestCase):
         self.assertNotRegex(text,r'(?:href|src)=["\']https?://')
         self.assertEqual(len(re.findall(r'<section id=',text)),12)
 
-    def test_no_installable_player_is_claimed(self):
-        self.assertFalse((ROOT/'source/mir5/info.json').exists())
-        self.assertIn('no installable MIR implementation',(ROOT/'source/mir5/README.md').read_text())
+    def test_private_slice_does_not_claim_release_qualification(self):
+        info=json.loads((ROOT/'source/mir5/info.json').read_text())
+        self.assertEqual(info['name'],'more-infinite-research')
+        self.assertIn('Incomplete',info['description'])
+        self.assertIn('disposable test worlds',(ROOT/'source/mir5/README.md').read_text())
 
 if __name__=='__main__':unittest.main()

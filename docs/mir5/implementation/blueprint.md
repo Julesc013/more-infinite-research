@@ -3,7 +3,7 @@ title: "High-level implementation pseudocode"
 status: draft
 applies_to: "MIR replacement development; explanatory pseudocode, not executable product"
 audience: developer
-doc_type: implementation-draft
+doc_type: explanation
 owner: mir-maintainers
 last_reviewed: 2026-10-22
 supersedes: []
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 **Status:** explanatory draft against the supplied specification and API `1.0.0-draft.2`. These procedures are not runnable Lua. Helper names express a responsibility; they are not permission to create one file per procedure or build an operation registry.
 
-Read [the review](review.md) for unresolved decisions and proposals. Read [the opposing tests](opposing_tests.md) before implementing. All actual historical IDs, cost rules, settings precedence, stage placement and migration values must come from recovery, not from this notation.
+Read [the review](review.md) for unresolved decisions and proposals. Read [the opposing tests](opposing-tests.md) before implementing. All actual historical IDs, cost rules, settings precedence, stage placement and migration values must come from recovery, not from this notation.
 
 ## 1. The two flows and their boundary
 

@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation navigation
 
-Current-page navigation generated from Markdown front matter as of 2026-10-22.
+Current-page navigation generated from Markdown front matter as of 2026-10-23.
 
 ## developer
 
@@ -218,6 +218,7 @@ Current-page navigation generated from Markdown front matter as of 2026-10-22.
 - [MIR 4 R0 Bootstrap](../../architecture/mir4-r0-bootstrap.md)
 - [MIR 4.1.0 Local Delivery Index](../../LATEST-RELEASE.md)
 - [MIR 4.2 Playtest Findings](../../releases/mir42-playtest-findings.md)
+- [MIR 5 release progress and continuation](../../mir5/progress.md)
 - [More Infinite Research 4 documentation](../../README.md)
 - [Offline Family Rule Synthesis](../../reference/offline-rule-synthesis.md)
 - [Project Continuity](../../PROJECT-CONTINUITY.md)

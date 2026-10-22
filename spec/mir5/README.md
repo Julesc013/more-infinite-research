@@ -1,11 +1,11 @@
 ---
 title: "MIR specification index"
-status: proposed
+status: current
 applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -16,7 +16,7 @@ source_of_truth_for:
 
 ## Status and authority
 
-This specification set is a proposed synthesis for the replacement implementation. On maintainer adoption, its normative requirements govern new product work. It does not declare that any implementation or native acceptance is complete.
+The maintainer adopted this specification set for replacement development on 2026-10-23 through the MIR 5.0.0 implementation-and-release goal. Its normative requirements govern the new implementation even where a focused page retains the original proposal metadata. Implementation and native acceptance remain incomplete; the explanatory pseudocode is subordinate to these contracts.
 
 Use this order to resolve conflicts: explicit current maintainer decisions and preserved player obligations; actual target-engine constraints; this specification; implementation and independent tests; explanatory documentation and agent task packets. Engine facts constrain feasibility, not product priority. When obligations conflict with an engine restriction, expose the conflict and obtain a documented decision. Never erase a user obligation by editing a test or an architectural slogan.
 

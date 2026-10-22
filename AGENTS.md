@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## MIR 5 replacement development
+
+The maintainer adopted the MIR 5 replacement programme on 2026-10-23 and authorized implementation, integration, qualification, promotion, tagging and publication once the existing acceptance conditions pass. Develop on `dev` through reviewed units. The release goal remains open until MIR 5.0.0 is actually published and verified.
+
+For new implementation work, read `spec/mir5/README.md` and the relevant focused contract; `docs/mir5/first-batch.md` bounds the first slice. `source/mir5/` is the selected new player-source subtree until the reviewed version-neutral cutover. MIR 4 production source remains read-only evidence during development. The MIR 5 Generator/API, native-definition and ownership contracts supersede the MIR 4 compiler/stream-manifest requirements for this subtree. Do not import the old compiler or construct a parallel product framework.
+
+The current goal supersedes the first-batch instruction to stop after one slice: complete, integrate and validate that bounded unit, then continue the next available unit. Existing custody, historical identities, resource and archive-library rules, exact evidence, release controls and useful delivered behavior remain binding. Progress and continuation commands are recorded in `docs/mir5/progress.md`.
+
 ## Project
 
 More Infinite Research 4 is a proof-governed Factorio research product line. MIR 4.0.0 combines stable F210/F200 player targets, separately distributed developer previews, and executable package-excluded shadow architecture.

@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-gear-native",
+  "version": "0.1.0",
+  "title": "MIR 5 private gear native fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world proof for the MIR 5 gear slice.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

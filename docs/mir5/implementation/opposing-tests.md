@@ -3,7 +3,7 @@ title: "Proposed opposing tests for the implementation draft"
 status: draft
 applies_to: "MIR replacement development; explanatory pseudocode, not executable product"
 audience: developer
-doc_type: implementation-draft
+doc_type: reference
 owner: mir-maintainers
 last_reviewed: 2026-10-22
 supersedes: []
