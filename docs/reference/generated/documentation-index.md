@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 467 pages as of 2026-10-22.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 468 pages as of 2026-10-23.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -226,6 +226,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/mir5/implementation/opposing_tests.md | Proposed opposing tests for the implementation draft | draft | developer | implementation-draft | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/README.md | Implementation draft: reading order and boundaries | draft | developer | implementation-draft | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/review.md | Implementation review: close decisions, do not expand architecture | draft | developer | implementation-draft | mir-maintainers | 2026-10-22 |
+| docs/mir5/progress.md | MIR 5 release progress and continuation | current | maintainer | reference | mir-maintainers | 2026-10-23 |
 | docs/mir5/README.md | MIR documentation | proposed | developer | guide | mir-maintainers | 2026-10-22 |
 | docs/mir5/support.md | Support and upgrade boundaries | proposed | developer | guide | mir-maintainers | 2026-10-22 |
 | docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |

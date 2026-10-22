@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation reference matrix
 
-Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-10-22.
+Generated from source-of-truth identifiers in Markdown front matter plus the immutable versioned-release-note custody sidecar as of 2026-10-23.
 
 | Authority ID | Document | Status |
 | --- | --- | --- |
@@ -182,6 +182,7 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir-replacement-decisions-guide | [Source reconciliation for this proposal](../../mir5/decisions.md) | proposed |
 | mir-replacement-design-guide | [Synthesized design and decisions](../../mir5/design.md) | proposed |
 | mir-replacement-development-guide | [Development guide](../../mir5/development.md) | proposed |
+| mir-replacement-execution-progress | [MIR 5 release progress and continuation](../../mir5/progress.md) | current |
 | mir-replacement-first-batch-guide | [First implementation batch — bounded assignment](../../mir5/first_batch.md) | proposed |
 | mir-replacement-readme-guide | [MIR documentation](../../mir5/README.md) | proposed |
 | mir-replacement-support-guide | [Support and upgrade boundaries](../../mir5/support.md) | proposed |

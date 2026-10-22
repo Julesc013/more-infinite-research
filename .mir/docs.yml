@@ -1677,6 +1677,14 @@ docs:
     owner: mir-maintainers
     source_of_truth_for:
       - mir-implementation-draft-review
+  - path: docs/mir5/progress.md
+    title: "MIR 5 release progress and continuation"
+    status: current
+    audience: maintainer
+    doc_type: reference
+    owner: mir-maintainers
+    source_of_truth_for:
+      - mir-replacement-execution-progress
   - path: docs/mir5/README.md
     title: "MIR documentation"
     status: proposed

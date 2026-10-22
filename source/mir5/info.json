@@ -1,0 +1,9 @@
+{
+  "name": "more-infinite-research",
+  "version": "5.0.21000",
+  "title": "More Infinite Research — private gear slice",
+  "author": "Julesc013",
+  "description": "Incomplete MIR 5 development slice for disposable test worlds only.",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23"]
+}
