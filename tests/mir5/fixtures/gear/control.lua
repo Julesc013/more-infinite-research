@@ -87,7 +87,7 @@ local function observe_native_counts(profile)
   local counts = {}
   for level = 1, 3 do
     technology.level = level
-    counts[level] = technology.prototype.research_unit_count
+    counts[level] = technology.research_unit_count
   end
   if counts[1] ~= profile.level_one_count or counts[2] <= counts[1] or counts[3] <= counts[2] then
     fail("native research count progression differs")
@@ -155,7 +155,14 @@ script.on_init(function()
   local technology = force.technologies[technology_name]
   if not technology or technology.level ~= 1 or technology.researched then fail("fresh gear technology state differs") end
   local profile = profile_for(technology)
-  if technology.prototype.research_unit_count ~= profile.level_one_count then
+  local prototype_count = technology.prototype.research_unit_count
+  local force_count = technology.research_unit_count
+  log("[MIR5_GEAR_RUNTIME_COUNT] level=" .. tostring(technology.level)
+    .. ";force_research_unit_count=" .. tostring(force_count)
+    .. ";prototype_research_unit_count=" .. tostring(prototype_count)
+    .. ";force_formula=" .. tostring(technology.research_unit_count_formula)
+    .. ";prototype_formula=" .. tostring(technology.prototype.research_unit_count_formula))
+  if force_count ~= profile.level_one_count then
     fail("native level-one research count differs")
   end
   if not close(force.recipes[recipe_name].productivity_bonus, 0) then fail("unresearched gear recipe has productivity") end
@@ -169,7 +176,7 @@ script.on_init(function()
     researched_output = 0,
     completed_level = 0,
     next_level = 1,
-    level_one_count = technology.prototype.research_unit_count,
+    level_one_count = force_count,
     level_two_count = counts[2],
     level_three_count = counts[3],
     deadline_tick = game.tick + 18000
