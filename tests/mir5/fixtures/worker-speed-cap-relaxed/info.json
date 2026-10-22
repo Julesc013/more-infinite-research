@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-worker-speed-cap-relaxed",
+  "version": "0.2.0",
+  "title": "MIR 5 worker-speed cap relaxation fixture",
+  "author": "MIR maintainers",
+  "description": "Private continuation fixture for native worker-speed cap relaxation.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

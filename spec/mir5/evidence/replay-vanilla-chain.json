@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "kind": "authored-private-replay-custody-index-not-runner-receipt",
+  "release_qualification": false,
+  "published_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+  "published_archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+  "private_composed_archive_sha256": "17997B5CF05C897EDE0070681A5192CBEB473B16A97AC42F71A308DF0512B9FC",
+  "native_receipt": "spec/mir5/evidence/replay-vanilla-native.json",
+  "native_receipt_sha256": "9D404BA6610FCCA9A4F219AA1A888AF40D29DDC6E03A27F6F365CCD5A4FD947E",
+  "comparison_receipt": "spec/mir5/evidence/replay-vanilla-comparison.json",
+  "comparison_receipt_sha256": "AAA25092FD4C3B2342BF991977CFDD22C991534120C300E1535D9258BCC6504C",
+  "observed": "Complete native data and settings JSON output equals the published capture, preserving array order and distinguishing booleans from numbers. The governed replay dump exited naturally with code zero and the library published archive was restored and hash-verified.",
+  "limitations": [
+    "Vanilla F210 on exact Factorio 2.1.23 only, not the required large-profile comparison.",
+    "A data-stage dump is not a responsive-menu measurement, gameplay, save, runtime, first Library open or release result.",
+    "The same-name/version composed archive is a private diagnostic reference and is never a player release."
+  ]
+}

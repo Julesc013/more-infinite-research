@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "kind": "authored-representative-science-regression-custody-index-not-runner-receipt",
+  "community_id": "SCI-UNLOCK-01",
+  "community_disposition": "open-original-full-profile-unknown",
+  "release_qualification": false,
+  "receipt": "spec/mir5/evidence/science-ambiguity-native.json",
+  "receipt_sha256": "80801D1B1F316BFD3348623B57EC8FFF1D5C1612A7500C70404AA0FB75A6A0D9",
+  "engine_version": "2.1.23",
+  "engine_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "player_archive_sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+  "player_source_commit": "deb16bbe3934502e6520d3a6e308db1db614dd5d",
+  "fixture_archive_sha256": "641F5D4EB0A9A4F4F3BF15B4B7DCA95D591B5C6454A4E86D1E69ACB81C5787BE",
+  "observed": [
+    "Native map creation and control load exited naturally with code zero.",
+    "Two distinct fixture technologies unlock the original automation science recipe, and an alternate recipe produces the same pack.",
+    "The original native automation science research-trigger seed and unlock remain intact.",
+    "The MIR gear technology exists with this ambiguous unlock topology.",
+    "A public data-API declaration using the actual space-science item and prerequisite is published intact.",
+    "Direct-library controls were restored."
+  ],
+  "limitations": [
+    "Representative data-stage construction regression; no original community mod-list/settings/save was supplied.",
+    "This is not a gameplay, science acquisition, lab, historical engine, multiplayer or full-product compatibility result.",
+    "The original incident remains open; no later frozen source may inherit this receipt without exact consumed-input analysis."
+  ]
+}

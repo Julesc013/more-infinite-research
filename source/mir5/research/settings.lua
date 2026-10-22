@@ -10,6 +10,16 @@ local fields = {
   {key = "research_time", name = "ips-research-time-", type = "int-setting", default_value = 60, minimum_value = 0, maximum_value = 2147483647},
   {key = "effect_percent", name = "ips-effect-per-level-", type = "double-setting", default_value = 10, minimum_value = 0.01, maximum_value = 1000000}
 }
+local native_fields = {
+  {
+    key = "worker_robots_speed_max_level",
+    name = "mir-max-level-worker-robots-speed",
+    type = "int-setting",
+    default_value = 0,
+    minimum_value = 0,
+    maximum_value = 2147483647
+  }
+}
 
 local function valid(spec, value)
   if spec.type == "bool-setting" then return type(value) == "boolean" end
@@ -33,6 +43,16 @@ function M.prototypes()
       order = "b-100-iron-gear-wheel-productivity-stream-research_gears-" .. (index - 1),
       localised_name = {"mod-setting-name." .. spec.name .. "stream", {"technology-name.more-infinite-research.research_gears"}},
       localised_description = {"mod-setting-description." .. spec.name .. "stream", {"technology-name.more-infinite-research.research_gears"}}
+    }
+  end
+  for _, spec in ipairs(native_fields) do
+    out[#out + 1] = {
+      type = spec.type, name = spec.name, setting_type = "startup",
+      default_value = spec.default_value, minimum_value = spec.minimum_value,
+      maximum_value = spec.maximum_value,
+      order = "c-200-worker-robots-speed-cap",
+      localised_name = {"mod-setting-name." .. spec.name},
+      localised_description = {"mod-setting-description." .. spec.name}
     }
   end
   return out
@@ -73,6 +93,16 @@ function M.resolve(startup, codec, report)
     if value == nil then value = spec.default_value end
     if imported and setting and imported[name] ~= nil and valid(spec, imported[name]) then value = imported[name] end
     assert(valid(spec, value), "MIR invalid effective setting: " .. name)
+    values[spec.key] = value
+  end
+  for _, spec in ipairs(native_fields) do
+    local setting = startup[spec.name]
+    local value = setting and setting.value
+    if value == nil then value = spec.default_value end
+    if imported and setting and imported[spec.name] ~= nil and valid(spec, imported[spec.name]) then
+      value = imported[spec.name]
+    end
+    assert(valid(spec, value), "MIR invalid effective setting: " .. spec.name)
     values[spec.key] = value
   end
   if values.research_time == 0 then values.research_time = 60 end

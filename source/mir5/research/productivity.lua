@@ -1,4 +1,5 @@
 local M = {}
+local catalogue = require("research.catalogue")
 
 local function number_text(value)
   assert(type(value) == "number" and value == value and value < math.huge and value >= 0,
@@ -22,7 +23,7 @@ end
 
 function M.gears(values)
   return {
-    type = "technology", name = "recipe-prod-research_gears-1",
+    type = "technology", name = catalogue.gear_id(),
     icons = {
       {icon = "__base__/graphics/icons/iron-gear-wheel.png", icon_size = 64},
       {icon = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",

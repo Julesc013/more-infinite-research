@@ -77,6 +77,10 @@ Existing MIR 4.7 linked worktrees and unique material are preserved for their ac
 
 ## Next executable work
 
+The following unit is staged on `feat/mir5-library-ownership-r01`, based on PR #759's frozen head while its selected repository checks finish. It adds the private Library view/shortcut, explicit bootstrap, preserved historical personal-view data, and narrowly admitted native worker-speed caps with stale-ownership rejection. New source is not in the previously accepted archive. Host controls pass; current-package native worker relaxation and real Library-object observations remain pending. Full Library fidelity, rendered/client interaction and multiplayer remain separate gates.
+
+The representative science opponent passed native create/control load with the frozen cap/API player archive; [its scope chain](../../spec/mir5/evidence/science-ambiguity-chain.json) keeps `SCI-UNLOCK-01` open because the original full profile is unknown. The private vanilla replay also exited naturally, and [complete native data/settings comparison](../../spec/mir5/evidence/replay-vanilla-chain.json) equals published 4.7. Neither result is a menu/performance or full-product claim. The K2SO no-MIR dump was refused before launch with its declared 1024 MiB process budget (`[mir441-resource-admission-memory]`), retained at `build/mir5/k2so-no-mir-native-r01-failure.json`; no native sample was produced. The ordinary responsive-menu comparison also needs an actual credential-free 2.1.23 player-data seed. A bounded scan found no matching seed in retained build inputs; the user's credential-bearing player data was not copied or edited.
+
 1. Integrate PR #759 after its selected checks, preserving the accepted cap/API and gear-upgrade evidence and all failed observations.
 2. Complete the same-output replay and its matched large-profile responsive-menu comparison before mass porting; a vanilla diagnostic is not that acceptance endpoint.
 3. Continue difficult native ownership/continuation, scripted effects, Library and a second historical research family, using the recovered exact contracts.

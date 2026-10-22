@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-worker-speed-cap",
+  "version": "0.1.0",
+  "title": "MIR 5 native worker-speed cap fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world proof for admitted native worker robot speed caps.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
