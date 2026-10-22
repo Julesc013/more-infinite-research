@@ -160,6 +160,15 @@ function Invoke-NativeSliceStage {
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+# LibraryActivation is intentionally reusable and receives its immutable-input
+# primitives from its caller.  Keep the native slice on that minimal generic
+# contract rather than importing any MIR 4 compiler or runner surface.
+$mirCompatIdentityModule = New-Module -Name MIR5NativeSliceInputIdentity -ArgumentList (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1') -ScriptBlock {
+  param($Path)
+  . $Path
+  Export-ModuleMember -Function Get-MIRImmutableInputSha256,Get-MIRImmutableInputFileIdentity,Assert-MIRCheckoutHardLinkBoundary
+}
+Import-Module $mirCompatIdentityModule -Force
 . (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
 $library = (Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $engine = (Resolve-Path -LiteralPath $FactorioBin).Path
@@ -214,6 +223,10 @@ $hashes[[IO.Path]::GetFileName($installedFixture)] = $fixture.sha256
 
 $record = [ordered]@{
   kind = 'MIR5GearNativeSliceV1'; status = 'prepared'; profile = $expected; run = $run
+  source_commit = [string](& git -C $repo rev-parse HEAD)
+  harness_sha256 = Get-NativeSliceSha256 $PSCommandPath
+  library_activation_sha256 = Get-NativeSliceSha256 (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
+  immutable_input_helpers_sha256 = Get-NativeSliceSha256 (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1')
   engine = [ordered]@{ path = $engine; sha256 = Get-NativeSliceSha256 $engine; base_version = $base.version }
   player_archive = [ordered]@{ input = $player.path; installed = $installedPlayer; sha256 = $player.sha256; name = $player.info.name; version = $player.info.version }
   fixture_archive = [ordered]@{ input = $fixture.path; installed = $installedFixture; sha256 = $fixture.sha256; name = $fixture.info.name; version = $fixture.info.version }
