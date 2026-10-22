@@ -5,10 +5,12 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$ProfilePath,
   [Parameter(Mandatory)][string[]]$FixtureSources,
-  [Parameter(Mandatory)][string]$ExpectedMIRArchiveSha256,
+  [string]$ExpectedMIRArchiveSha256='',
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string[]]$ConsumerMarkers=@(),
+  [switch]$CreateOnly,
+  [switch]$MIRAbsent,
   [ValidateRange(30,600)][int]$TimeoutSeconds=180,
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=512,
   [ValidateRange(0,60)][int]$AdmissionWaitSeconds=30,
@@ -76,9 +78,14 @@ $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $rows=@((Get-Content -LiteralPath $profile -Raw | ConvertFrom-Json -AsHashtable).mods)
 $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $library -EngineDataDirectory $engineData)
 $mirRows=@($rows | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.enabled})
-Assert-Fixture ($mirRows.Count -eq 1 -and $ExpectedMIRArchiveSha256 -match '^[a-fA-F0-9]{64}$') 'one pinned MIR selection is required'
-$mir=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -ceq $mirRows[0].version})
-Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
+$mir=@()
+if($MIRAbsent){
+  Assert-Fixture ($CreateOnly -and $mirRows.Count -eq 0 -and $ExpectedMIRArchiveSha256 -ceq '') 'MIR absence requires a create-only profile without MIR or its hash'
+}else{
+  Assert-Fixture ($mirRows.Count -eq 1 -and $ExpectedMIRArchiveSha256 -match '^[a-fA-F0-9]{64}$') 'one pinned MIR selection is required'
+  $mir=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -ceq $mirRows[0].version})
+  Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
+}
 $fixtureInputs=@()
 foreach($source in $FixtureSources){
   $source=(Resolve-Path -LiteralPath $source).Path
@@ -99,7 +106,8 @@ $record=[ordered]@{
   governor_sha256=Get-FixtureSha (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
   engine=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
   profile=@{path=$profile;sha256=Get-FixtureSha $profile};fixtures=$fixtureInputs
-  mir_archive=@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}
+  mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
+  observation=if($CreateOnly){'native-create-runtime-load-only'}else{'native-fixture-production-and-two-cold-reloads'}
   release_qualification=$false
 }
 try{
@@ -117,8 +125,21 @@ try{
   $record.create=Invoke-FixtureStage 'create' @('--create',$seed)
   $record.create.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.create.log)) 'init'
   Assert-Fixture (Test-Path -LiteralPath $seed -PathType Leaf) 'seed save absent'
+  $record.seed_sha256=Get-FixtureSha $seed
+  if(-not $CreateOnly){
   $server=Join-Path $resources.root 'server-settings.json'
-  [IO.File]::WriteAllText($server,(@{name='MIR private native fixture';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false;autosave_interval=0} | ConvertTo-Json),[Text.UTF8Encoding]::new($false))
+  $serverTemplate=Join-Path $engineData 'server-settings.example.json'
+  $serverSettings=Get-Content -LiteralPath $serverTemplate -Raw | ConvertFrom-Json -AsHashtable
+  $serverSettings.name='MIR private native fixture'
+  $serverSettings.description=''
+  $serverSettings.visibility=@{public=$false;lan=$false}
+  $serverSettings.username='';$serverSettings.password='';$serverSettings.token='';$serverSettings.game_password=''
+  $serverSettings.require_user_verification=$false
+  $serverSettings.auto_pause=$false
+  $serverSettings.autosave_interval=0
+  $serverSettings.max_players=1
+  [IO.File]::WriteAllText($server,($serverSettings | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+  $record.server_settings=@{template=$serverTemplate;template_sha256=Get-FixtureSha $serverTemplate;path=$server;sha256=Get-FixtureSha $server}
   $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $live=Join-Path $writeData 'factorio-current.log'
   $completion={
@@ -142,6 +163,9 @@ try{
     $record.reloads+=@{ordinal=$ordinal;stage=$stage;result=$result;save_sha256=$saveHash;save_byte_identical=$true}
   }
   $record.status='passed-private-native-fixture'
+  }else{
+    $record.status='passed-private-native-runtime-load-only'
+  }
 }catch{
   $record.status='failed';$record.failure=$_.Exception.Message;$record.resource_admission=$_.Exception.Data['mir441_resource_admission'];$failure=$_
 }finally{
