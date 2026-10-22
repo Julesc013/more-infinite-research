@@ -1,0 +1,201 @@
+{
+  "format": 1,
+  "kind": "continuity-recovery-subjects-not-complete-inventory",
+  "baseline": {
+    "product": "4.7.0",
+    "source": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "release_id": 420193454
+  },
+  "inventory_complete": false,
+  "native_tests_run": false,
+  "request_ledger_rule": "Reuse or migrate the original ledger once; do not create new request IDs here.",
+  "subjects": [
+    {
+      "id": "CONT-01",
+      "category": "research",
+      "subject": "All generated IDs, effects and native patches",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "host_output",
+        "native_effect",
+        "prototype_diff"
+      ]
+    },
+    {
+      "id": "CONT-02",
+      "category": "progression",
+      "subject": "Finite stages, continuation offsets and native owners",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "staged",
+        "owner",
+        "costs"
+      ]
+    },
+    {
+      "id": "CONT-03",
+      "category": "settings",
+      "subject": "All existing types/defaults/bounds/sentinels and profile precedence",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "settings",
+        "import_export"
+      ]
+    },
+    {
+      "id": "CONT-04",
+      "category": "broad_binding",
+      "subject": "Delivered product-based target collection and exclusions",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "coverage",
+        "unrelated_growth"
+      ]
+    },
+    {
+      "id": "CONT-05",
+      "category": "science",
+      "subject": "Cryogenic/rocket/resource/alternative science and accepting labs",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "science_positive",
+        "science_negative"
+      ]
+    },
+    {
+      "id": "CONT-06",
+      "category": "overrides",
+      "subject": "Productivity/efficiency/speed/quality/pollution/recycling/modules/pipeline behavior",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "overrides",
+        "economics"
+      ]
+    },
+    {
+      "id": "CONT-07",
+      "category": "caps",
+      "subject": "Earned-above-cap, queue/progress and foreign disablement",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "caps",
+        "cap_reload"
+      ]
+    },
+    {
+      "id": "CONT-08",
+      "category": "spoilage",
+      "subject": "Global scope and independently applied contribution baseline",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "runtime_scope",
+        "external_write"
+      ]
+    },
+    {
+      "id": "CONT-09",
+      "category": "agriculture_repair",
+      "subject": "Planted-object and repair rate/lifecycle behavior",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "runtime_events",
+        "stress_rate"
+      ]
+    },
+    {
+      "id": "CONT-10",
+      "category": "library",
+      "subject": "Search/filter/details/settings/navigation/translations/personal views",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "library",
+        "two_clients"
+      ]
+    },
+    {
+      "id": "CONT-11",
+      "category": "state",
+      "subject": "Persistent roots, hidden carriers and migration filenames",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "upgrade",
+        "two_reload"
+      ]
+    },
+    {
+      "id": "CONT-12",
+      "category": "integrations",
+      "subject": "Useful existing bundled integration outcomes by actual profile",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "compatibility",
+        "production"
+      ]
+    },
+    {
+      "id": "CONT-13",
+      "category": "targets",
+      "subject": "All nine target editions and their actual delivered subsets",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "targets",
+        "package"
+      ]
+    },
+    {
+      "id": "CONT-14",
+      "category": "interfaces",
+      "subject": "Real public API/MEP/remote consumers versus unconsumed previews",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "api_consumers",
+        "legacy_interface"
+      ]
+    },
+    {
+      "id": "CONT-15",
+      "category": "requests",
+      "subject": "Original community ledger and bug IDs; no parallel request authority",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "ledger_reconciliation"
+      ]
+    },
+    {
+      "id": "CONT-16",
+      "category": "assets_docs",
+      "subject": "Licenses/locales/icons/catalogue/support/changelog content",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "assets",
+        "root_transfer"
+      ]
+    },
+    {
+      "id": "CONT-17",
+      "category": "evidence",
+      "subject": "Unique receipts/saves/logs and published/working artifact custody",
+      "status": "unreconciled",
+      "resolved_records": [],
+      "test_subjects": [
+        "custody"
+      ]
+    }
+  ]
+}

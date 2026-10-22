@@ -1,0 +1,39 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart LR
+  accTitle: One name, four distinct determinism contracts
+  accDescr: Determinism controls semantic output and state transitions. It does not promise equal timing, correctness, order independence, safe third-party code or identical save archive bytes.
+  subgraph group_I["COMPLETE INPUTS"]
+    b["Source/asset bytes + target<br/>+ pinned packaging recipe"]:::data
+    g["Definition/settings bytes + stage/order<br/>+ current relevant prototypes"]:::data
+    r["Game/MIR state + ordered events<br/>+ tick + authorized RNG state"]:::data
+    m["Original save + migration history<br/>+ old/new closure"]:::data
+  end
+  subgraph group_F["MIR-CONTROLLED TRANSFORM"]
+    bf["Package"]:::process
+    gf["Generator"]:::generator
+    rf["Runtime transition"]:::process
+    mf["Migration"]:::process
+  end
+  subgraph group_O["REQUIRED OUTPUT"]
+    bo["Equal member bytes<br/>ZIP bytes if container is pinned"]:::success
+    go["Equal native prototypes<br/>and explicit outcome class"]:::success
+    ro["Equal game-affecting operations<br/>and next MIR state"]:::success
+    mo["Equal supported transformed state"]:::success
+  end
+  b --> bf
+  bf --> bo
+  g --> gf
+  gf --> go
+  r --> rf
+  rf --> ro
+  m --> mf
+  mf --> mo
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

@@ -1,0 +1,246 @@
+{
+  "format": 1,
+  "kind": "acceptance-requirements-not-executed-tests",
+  "cases": [
+    {
+      "id": "GEN-OWN",
+      "requirement": "GEN-03",
+      "assertion": "Input/output nested-table mutation cannot alter the other owner.",
+      "runner_kind": "host",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "GEN-PREFLIGHT",
+      "requirement": "GEN-04",
+      "assertion": "Invalid reference or duplicate identity causes no MIR preflight writes.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "GEN-NATIVE",
+      "requirement": "GEN-01",
+      "assertion": "An actual inherited research has intended settings, progression and physical effect.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "SET-PARITY",
+      "requirement": "SET-01",
+      "assertion": "Defaults, sentinels, profile round trips and meaningful boundaries retain behavior.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "COMP-COLLECT",
+      "requirement": "COMP-02",
+      "assertion": "One approved broad collector retains effect coverage without per-family world scans.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "COMP-SCIENCE",
+      "requirement": "COMP-03",
+      "assertion": "Trigger/resource/independent science sources work; false outputs and unseeded cycles fail.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "CAP-STATE",
+      "requirement": "SET-03",
+      "assertion": "Cap below earned levels retains benefits; uncapping does not override foreign disablement.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "MIG-SAVE",
+      "requirement": "MIG-03",
+      "assertion": "Complete predecessor state survives upgrade and two independent cold reloads.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "RUN-LIFECYCLE",
+      "requirement": "RUN-01",
+      "assertion": "Handler reconstruction works on genuine joining/rejoining clients after host restart.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "RUN-SCOPE",
+      "requirement": "RUN-03",
+      "assertion": "Global and foreign-write runtime contribution semantics remain correct.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "UI-FIRSTUSE",
+      "requirement": "RUN-04",
+      "assertion": "First Library open/search has no deferred compiler stall; client views remain separate.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "API-REQUIRED",
+      "requirement": "API-04",
+      "assertion": "Required external consumer works without private imports and uses immediate late-stage call.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "API-OPTIONAL",
+      "requirement": "API-04",
+      "assertion": "Optional consumer loads without MIR and behaves correctly with its capability.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "API-BOUNDARY",
+      "requirement": "API-03",
+      "assertion": "Duplicate, unsupported and malformed input are bounded; runtime queries do not mutate.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "PERF-SHAPE",
+      "requirement": "PERF-05",
+      "assertion": "Unrelated inputs leave exact-path work constant; actual output and broad work scale as declared.",
+      "runner_kind": "host",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "PERF-NATIVE",
+      "requirement": "PERF-04",
+      "assertion": "Full-equivalent candidate has accepted repeated menu, memory, save/runtime and Library results.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "PKG-PARITY",
+      "requirement": "TGT-03",
+      "assertion": "Staged and canonical player member paths/bytes match for all applicable targets.",
+      "runner_kind": "package/native-smoke",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "REQUEST-CUSTODY",
+      "requirement": "REPO-03",
+      "assertion": "Original IDs and decisions migrate once, with local-only evidence preserved.",
+      "runner_kind": "review",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-BUILD",
+      "requirement": "DET-08",
+      "assertion": "Repeated packages with identical declared build inputs have equal members; ZIP identity is conditional on the pinned container recipe.",
+      "runner_kind": "package",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-GENERATOR",
+      "requirement": "DET-01",
+      "assertion": "Equal complete ordered inputs have equal native outputs and failure classes, without calling shared RNG.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-ORDER",
+      "requirement": "DET-02",
+      "assertion": "Insertion permutations do not change set-semantics results; authored sequence and conflict rules remain explicit.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-RUNTIME",
+      "requirement": "DET-05",
+      "assertion": "Save/reload and joining clients reconstruct handlers/state with deterministic tick-count scheduling, including backlog and force changes.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-MIGRATION",
+      "requirement": "MIG-04",
+      "assertion": "Same save and migration history produce the same transformation; idempotent reconciliation and exactly-once migration are tested separately.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-NUMERIC",
+      "requirement": "DET-03",
+      "assertion": "Nonfinite values are rejected; zero/inherit/unlimited and formula evaluation/accumulation order preserve inherited semantics.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "DET-PRESENTATION",
+      "requirement": "DET-04",
+      "assertion": "Changing language, display ordering or translation callback order does not alter force research/effect semantics.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "GEN-FAMILY",
+      "requirement": "GEN-06",
+      "assertion": "Local forward prerequisites are accepted; duplicate or cyclic family is rejected before MIR writes; no deferred global registry.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "API-MAJOR",
+      "requirement": "API-05",
+      "assertion": "Two independently named external consumers call the versioned public module, including after MIR final-fixes, without private imports.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "API-RESEARCH-STATE",
+      "requirement": "API-06",
+      "assertion": "Runtime query preserves native level semantics and returns bounded missing-state results without modifying game or storage.",
+      "runner_kind": "native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "SET-LIFETIME",
+      "requirement": "SET-04",
+      "assertion": "Settings prototypes, effective startup values and per-user UI settings respect the stage and ownership boundary.",
+      "runner_kind": "host/native",
+      "status": "not_run",
+      "implementation_command": null
+    },
+    {
+      "id": "TEST-REUSE",
+      "requirement": "VER-06",
+      "assertion": "Reused receipts retain original inputs; changed save/settings/mod bytes invalidate affected coverage.",
+      "runner_kind": "review",
+      "status": "not_run",
+      "implementation_command": null
+    }
+  ]
+}

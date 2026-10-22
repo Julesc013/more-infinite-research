@@ -1,0 +1,1994 @@
+{
+  "format": 1,
+  "purpose": "developer-only-diagram-source-not-runtime-input",
+  "renderer": "Graphviz; Mermaid exported from identical graph records",
+  "diagrams": [
+    {
+      "id": "01_overview",
+      "title": "The whole mod: three engine lifetimes",
+      "question": "Where does each part run?",
+      "summary": "Settings define configuration; data-stage code creates native prototypes; runtime handles only non-native behavior, caps and presentation. There is no runtime Generator.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "architecture.md",
+        "generator.md",
+        "runtime.md"
+      ],
+      "groups": [
+        {
+          "id": "SET",
+          "label": "SETTINGS STAGE"
+        },
+        {
+          "id": "DATA",
+          "label": "PROTOTYPE STAGE"
+        },
+        {
+          "id": "RUN",
+          "label": "SAVE / RUNTIME STAGE"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s1",
+          "label": "Lightweight identity and defaults",
+          "group": "SET",
+          "role": "data"
+        },
+        {
+          "id": "s2",
+          "label": "Declare native setting prototypes",
+          "group": "SET",
+          "role": "process"
+        },
+        {
+          "id": "s3",
+          "label": "Factorio reads configured values",
+          "group": "SET",
+          "role": "engine"
+        },
+        {
+          "id": "d1",
+          "label": "Authored research + known compatibility",
+          "group": "DATA",
+          "role": "data"
+        },
+        {
+          "id": "d2",
+          "label": "Resolve effective startup values",
+          "group": "DATA",
+          "role": "process"
+        },
+        {
+          "id": "d3",
+          "label": "GENERATOR\nBuild owned tables; local preflight",
+          "group": "DATA",
+          "role": "generator"
+        },
+        {
+          "id": "d4",
+          "label": "Optional overrides\nCaps / modules / recycling",
+          "group": "DATA",
+          "role": "optional"
+        },
+        {
+          "id": "d5",
+          "label": "Native prototypes\nFactorio validates final result",
+          "group": "DATA",
+          "role": "engine"
+        },
+        {
+          "id": "r1",
+          "label": "Native research and effects\nManaged by Factorio",
+          "group": "RUN",
+          "role": "engine"
+        },
+        {
+          "id": "r2",
+          "label": "Save migrations and cap/state rules",
+          "group": "RUN",
+          "role": "process"
+        },
+        {
+          "id": "r3",
+          "label": "Scripted effects\nRelevant events / fixed tick work",
+          "group": "RUN",
+          "role": "optional"
+        },
+        {
+          "id": "r4",
+          "label": "Research Library + read-only API\nRequested views and queries",
+          "group": "RUN",
+          "role": "api"
+        },
+        {
+          "id": "patch",
+          "label": "Known native-owner patch\nExact preconditions; preserve other fields",
+          "group": "DATA",
+          "role": "process"
+        },
+        {
+          "id": "api",
+          "label": "External data API\nImmediate bounded call",
+          "group": "DATA",
+          "role": "api"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s1",
+          "to": "s2",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "s2",
+          "to": "s3",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "s3",
+          "to": "d2",
+          "label": "startup values",
+          "style": "solid"
+        },
+        {
+          "from": "d1",
+          "to": "d2",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d2",
+          "to": "d3",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d3",
+          "to": "d5",
+          "label": "new research",
+          "style": "solid"
+        },
+        {
+          "from": "d4",
+          "to": "d5",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d5",
+          "to": "r1",
+          "label": "native prototypes only",
+          "style": "solid"
+        },
+        {
+          "from": "r1",
+          "to": "r2",
+          "label": "load / configuration hooks",
+          "style": "solid"
+        },
+        {
+          "from": "r2",
+          "to": "r3",
+          "label": "initialize or reconcile",
+          "style": "solid"
+        },
+        {
+          "from": "r1",
+          "to": "r4",
+          "label": "native state",
+          "style": "solid"
+        },
+        {
+          "from": "r3",
+          "to": "r4",
+          "label": "bounded observations",
+          "style": "dashed"
+        },
+        {
+          "from": "d2",
+          "to": "d4",
+          "label": "enabled override values",
+          "style": "solid"
+        },
+        {
+          "from": "d1",
+          "to": "patch",
+          "label": "approved owner path",
+          "style": "solid"
+        },
+        {
+          "from": "patch",
+          "to": "d5",
+          "label": "declared fields only",
+          "style": "solid"
+        },
+        {
+          "from": "api",
+          "to": "d3",
+          "label": "native-shaped family",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "02_startup_lifecycle",
+      "title": "Factorio startup: all mods, ordered rounds",
+      "question": "Why can MIR not run a finalizer after every extension?",
+      "summary": "Every round runs across active mods in dependency order. A dependent extension can run after MIR final-fixes; data API operations therefore happen when called.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "architecture.md",
+        "api.md",
+        "runtime.md"
+      ],
+      "groups": [
+        {
+          "id": "A",
+          "label": "GAME STARTUP"
+        },
+        {
+          "id": "B",
+          "label": "AFTER THE MENU"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Engine + ordered active mod bytes",
+          "group": "A",
+          "role": "data"
+        },
+        {
+          "id": "s",
+          "label": "settings.lua \u2192 settings-updates.lua\n\u2192 settings-final-fixes.lua\nALL MODS in each round",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "v",
+          "label": "Setting prototypes finalized\nConfigured startup values loaded",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "d",
+          "label": "data.lua\nALL MODS",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "u",
+          "label": "data-updates.lua\nALL MODS",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "f",
+          "label": "data-final-fixes.lua\nALL MODS",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "g",
+          "label": "MIR or caller invokes Generator\nOnly at its declared suitable round",
+          "group": "A",
+          "role": "generator"
+        },
+        {
+          "id": "n",
+          "label": "Validate prototypes and assets\nDiscard startup Lua state \u2192 menu",
+          "group": "A",
+          "role": "engine"
+        },
+        {
+          "id": "m",
+          "label": "Create or load a save",
+          "group": "B",
+          "role": "engine"
+        },
+        {
+          "id": "c",
+          "label": "Parse control.lua and run\napplicable save lifecycle hooks",
+          "group": "B",
+          "role": "process"
+        },
+        {
+          "id": "r",
+          "label": "Gameplay events and native simulation",
+          "group": "B",
+          "role": "engine"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a",
+          "to": "s",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "s",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "v",
+          "to": "d",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d",
+          "to": "u",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "u",
+          "to": "f",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d",
+          "to": "g",
+          "label": "as needed",
+          "style": "dashed"
+        },
+        {
+          "from": "u",
+          "to": "g",
+          "label": "as needed",
+          "style": "dashed"
+        },
+        {
+          "from": "f",
+          "to": "g",
+          "label": "as needed",
+          "style": "dashed"
+        },
+        {
+          "from": "f",
+          "to": "n",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "n",
+          "to": "m",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "m",
+          "to": "c",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "c",
+          "to": "r",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "03_generator_decisions",
+      "title": "Generator: decide, build, preflight, publish",
+      "question": "When can a technology be omitted?",
+      "summary": "Released identities never enter a generic skip branch. The data stage cannot ask whether a particular save researched them; continuity policy must already be authored. This depicts creation; named native-owner patches are a separate checked path.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "generator.md",
+        "compatibility.md",
+        "migrations.md"
+      ],
+      "groups": [
+        {
+          "id": "IN",
+          "label": "AUTHORED INPUT"
+        },
+        {
+          "id": "GEN",
+          "label": "LOCAL FAMILY CONSTRUCTION"
+        },
+        {
+          "id": "OUT",
+          "label": "EXPLICIT OUTCOME"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Selected family + effective values\n+ current relevant prototypes",
+          "group": "IN",
+          "role": "data"
+        },
+        {
+          "id": "b",
+          "label": "Applicable and enabled?",
+          "group": "IN",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "h",
+          "label": "Released identity obligation?",
+          "group": "IN",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "p",
+          "label": "Use accepted preserve/disable policy\nNo save inspection in data stage",
+          "group": "IN",
+          "role": "data"
+        },
+        {
+          "id": "o",
+          "label": "Omit NEW optional contribution\nExpected absence reason",
+          "group": "OUT",
+          "role": "optional"
+        },
+        {
+          "id": "u",
+          "label": "No accepted continuity policy\nBlock affected upgrade claim",
+          "group": "OUT",
+          "role": "error"
+        },
+        {
+          "id": "c",
+          "label": "Build detached native tables\nExisting cost/effect semantics",
+          "group": "GEN",
+          "role": "generator"
+        },
+        {
+          "id": "l",
+          "label": "Local name map\nIncludes family forward references",
+          "group": "GEN",
+          "role": "process"
+        },
+        {
+          "id": "v",
+          "label": "All consumed values, references,\nIDs and local cycles valid?",
+          "group": "GEN",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "e",
+          "label": "Contract error before MIR writes\nNo swallow-and-continue",
+          "group": "OUT",
+          "role": "error"
+        },
+        {
+          "id": "w",
+          "label": "Publish the preflighted new family once",
+          "group": "GEN",
+          "role": "generator"
+        },
+        {
+          "id": "f",
+          "label": "Factorio final validation\nLater mods may still change prototypes",
+          "group": "OUT",
+          "role": "engine"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "c",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "h",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "h",
+          "to": "o",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "h",
+          "to": "p",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "c",
+          "label": "qualified policy",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "u",
+          "label": "not qualified",
+          "style": "solid"
+        },
+        {
+          "from": "c",
+          "to": "l",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "l",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "v",
+          "to": "e",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "v",
+          "to": "w",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "w",
+          "to": "f",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "04_settings_and_values",
+      "title": "Settings are not the Generator",
+      "question": "What gets declared, resolved and consumed?",
+      "summary": "Preserve historical IDs and default/profile/user precedence. Startup configuration drives prototypes; per-user presentation must not silently change force-wide research.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "settings.md",
+        "runtime.md"
+      ],
+      "groups": [
+        {
+          "id": "D",
+          "label": "DECLARATIONS"
+        },
+        {
+          "id": "V",
+          "label": "VALUES"
+        },
+        {
+          "id": "C",
+          "label": "CONSUMERS"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "i",
+          "label": "Small identity/default catalogue\nNo prototype-world import",
+          "group": "D",
+          "role": "data"
+        },
+        {
+          "id": "s",
+          "label": "Native startup / runtime / user\nsetting prototypes",
+          "group": "D",
+          "role": "process"
+        },
+        {
+          "id": "e",
+          "label": "Extension-owned settings\nDeclared by the extension",
+          "group": "D",
+          "role": "api"
+        },
+        {
+          "id": "r",
+          "label": "Factorio reads stored settings",
+          "group": "V",
+          "role": "engine"
+        },
+        {
+          "id": "p",
+          "label": "Restricted profile-import decoding\nPreserve actual precedence and units",
+          "group": "V",
+          "role": "process"
+        },
+        {
+          "id": "x",
+          "label": "Effective startup values",
+          "group": "V",
+          "role": "data"
+        },
+        {
+          "id": "y",
+          "label": "Runtime-global / per-user values",
+          "group": "V",
+          "role": "data"
+        },
+        {
+          "id": "g",
+          "label": "Generator\nCosts, effects, progression",
+          "group": "C",
+          "role": "generator"
+        },
+        {
+          "id": "o",
+          "label": "Optional overrides\nReturn before scans when default",
+          "group": "C",
+          "role": "optional"
+        },
+        {
+          "id": "k",
+          "label": "Cap/runtime reconciliation\nDisable cleanup if previously applied",
+          "group": "C",
+          "role": "process"
+        },
+        {
+          "id": "b",
+          "label": "Library view preferences\nPresentation only",
+          "group": "C",
+          "role": "api"
+        }
+      ],
+      "edges": [
+        {
+          "from": "i",
+          "to": "s",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "s",
+          "to": "r",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "e",
+          "to": "r",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "r",
+          "to": "p",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "x",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "r",
+          "to": "y",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "g",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "o",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "k",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "y",
+          "to": "k",
+          "label": "only relevant global settings",
+          "style": "solid"
+        },
+        {
+          "from": "y",
+          "to": "b",
+          "label": "per-user view",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "05_ownership_and_cross_stage",
+      "title": "Ownership: what survives each boundary?",
+      "question": "Why not keep a global Generator registry for runtime?",
+      "summary": "Only engine-recognized prototype data crosses startup. Runtime observes native state, authored compact metadata and deliberately supported transport\u2014not arbitrary Lua upvalues.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "generator.md",
+        "runtime.md",
+        "api.md"
+      ],
+      "groups": [
+        {
+          "id": "D",
+          "label": "DATA STAGE"
+        },
+        {
+          "id": "E",
+          "label": "ENGINE BOUNDARY"
+        },
+        {
+          "id": "R",
+          "label": "RUNTIME"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Reusable authored template\nRead-only by convention and tests",
+          "group": "D",
+          "role": "data"
+        },
+        {
+          "id": "b",
+          "label": "Detached output\nOne owned nested native structure",
+          "group": "D",
+          "role": "generator"
+        },
+        {
+          "id": "c",
+          "label": "data:extend / narrow checked patch",
+          "group": "D",
+          "role": "process"
+        },
+        {
+          "id": "x",
+          "label": "No input/output table aliases",
+          "group": "D",
+          "role": "error"
+        },
+        {
+          "id": "p",
+          "label": "Final native prototype representation",
+          "group": "E",
+          "role": "engine"
+        },
+        {
+          "id": "z",
+          "label": "Startup tables, closures and caches\nDISCARDED",
+          "group": "E",
+          "role": "error"
+        },
+        {
+          "id": "t",
+          "label": "Actual force technologies\nNative modifiers and settings",
+          "group": "R",
+          "role": "engine"
+        },
+        {
+          "id": "m",
+          "label": "Compact authored identity metadata",
+          "group": "R",
+          "role": "data"
+        },
+        {
+          "id": "o",
+          "label": "Optional supported mod-data transport\nOnly for a real consumer",
+          "group": "R",
+          "role": "optional"
+        },
+        {
+          "id": "s",
+          "label": "Owned MIR persistent state\nExplicit version / migration",
+          "group": "R",
+          "role": "data"
+        },
+        {
+          "id": "v",
+          "label": "Library, effects and API queries",
+          "group": "R",
+          "role": "api"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "b",
+          "label": "isolation requirement",
+          "style": "dashed"
+        },
+        {
+          "from": "b",
+          "to": "c",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "c",
+          "to": "p",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "a",
+          "to": "z",
+          "label": "not runtime state",
+          "style": "dashed"
+        },
+        {
+          "from": "p",
+          "to": "t",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "o",
+          "label": "capability-gated",
+          "style": "dashed"
+        },
+        {
+          "from": "t",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "m",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "o",
+          "to": "v",
+          "label": "if needed",
+          "style": "dashed"
+        },
+        {
+          "from": "s",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "06_api_call_order",
+      "title": "Public API: immediate calls, independent consumers",
+      "question": "How does a third-party extension actually create research?",
+      "summary": "The helper performs local preflight and publication in the caller\u2019s data-stage round. Runtime uses a separate remote interface; it cannot create prototypes.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "api.md",
+        "generator.md",
+        "runtime.md"
+      ],
+      "groups": [
+        {
+          "id": "D",
+          "label": "PROTOTYPE-STAGE EXAMPLE"
+        },
+        {
+          "id": "R",
+          "label": "RUNTIME EXAMPLE"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "m",
+          "label": "MIR data-final-fixes runs",
+          "group": "D",
+          "role": "process"
+        },
+        {
+          "id": "e",
+          "label": "Dependent extension final-fixes runs\nMIR may already have finished",
+          "group": "D",
+          "role": "api"
+        },
+        {
+          "id": "v",
+          "label": "Require public api.v1.data\nCheck version + capability",
+          "group": "D",
+          "role": "api"
+        },
+        {
+          "id": "p",
+          "label": "add_technologies(native family)\nLocal map, validate all, own copies",
+          "group": "D",
+          "role": "generator"
+        },
+        {
+          "id": "w",
+          "label": "Immediate native publication\nNo pending queue / later MIR pass",
+          "group": "D",
+          "role": "engine"
+        },
+        {
+          "id": "n",
+          "label": "Engine validates completed data stage",
+          "group": "D",
+          "role": "engine"
+        },
+        {
+          "id": "r",
+          "label": "MIR control parsing registers\nmore-infinite-research.api.v1",
+          "group": "R",
+          "role": "api"
+        },
+        {
+          "id": "h",
+          "label": "Consumer event with game available\nCheck remote interface / capability",
+          "group": "R",
+          "role": "api"
+        },
+        {
+          "id": "q",
+          "label": "get_research(force, technology)",
+          "group": "R",
+          "role": "process"
+        },
+        {
+          "id": "s",
+          "label": "Bounded read-only native snapshot\nNo Generator, no state initialization",
+          "group": "R",
+          "role": "engine"
+        }
+      ],
+      "edges": [
+        {
+          "from": "m",
+          "to": "e",
+          "label": "declared dependency order",
+          "style": "solid"
+        },
+        {
+          "from": "e",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "v",
+          "to": "p",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "w",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "w",
+          "to": "n",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "r",
+          "to": "h",
+          "label": "later callback",
+          "style": "solid"
+        },
+        {
+          "from": "h",
+          "to": "q",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "q",
+          "to": "s",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "n",
+          "to": "r",
+          "label": "after menu / save startup",
+          "style": "dashed"
+        }
+      ]
+    },
+    {
+      "id": "07_runtime_lifecycle",
+      "title": "Save startup and multiplayer are different paths",
+      "question": "Why does an on_load bug desynchronize clients?",
+      "summary": "This is the Lua-hook view. Engine save reconstruction and JSON mappings are not drawn as a substitute implementation. Joining clients do not rerun host migrations/configuration changes.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "runtime.md",
+        "migrations.md",
+        "determinism.md"
+      ],
+      "groups": [
+        {
+          "id": "H",
+          "label": "HOST / LOCAL SAVE LOAD"
+        },
+        {
+          "id": "J",
+          "label": "JOINING CLIENT"
+        },
+        {
+          "id": "P",
+          "label": "PLAY"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "c",
+          "label": "Parse control.lua\nImport modules and declare handlers",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "n",
+          "label": "New runtime mod to this save?",
+          "group": "H",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "i",
+          "label": "on_init\nCreate required owned state",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "m",
+          "label": "Applicable migrations",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "m2",
+          "label": "Applicable migrations",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "l",
+          "label": "on_load\nReconnect locals / subscriptions only",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "q",
+          "label": "Configuration changed?",
+          "group": "H",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "x",
+          "label": "on_configuration_changed\nReconcile state / remove old contributions",
+          "group": "H",
+          "role": "process"
+        },
+        {
+          "id": "j",
+          "label": "Client parses control.lua",
+          "group": "J",
+          "role": "process"
+        },
+        {
+          "id": "jl",
+          "label": "Client on_load\nSame conditional registration\nNo persistent writes / no game access",
+          "group": "J",
+          "role": "process"
+        },
+        {
+          "id": "e",
+          "label": "Native simulation + relevant events",
+          "group": "P",
+          "role": "engine"
+        },
+        {
+          "id": "b",
+          "label": "Scripted periodic work if necessary\nTick/work-count budget, not wall time",
+          "group": "P",
+          "role": "optional"
+        },
+        {
+          "id": "u",
+          "label": "Library and read-only queries on demand",
+          "group": "P",
+          "role": "api"
+        }
+      ],
+      "edges": [
+        {
+          "from": "c",
+          "to": "n",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "n",
+          "to": "i",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "i",
+          "to": "m",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "n",
+          "to": "m2",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "m2",
+          "to": "l",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "m",
+          "to": "q",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "l",
+          "to": "q",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "q",
+          "to": "x",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "q",
+          "to": "e",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "e",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "j",
+          "to": "jl",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "jl",
+          "to": "e",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "e",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "e",
+          "to": "u",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "08_save_upgrade",
+      "title": "Continuity: preserve meaning, not only names",
+      "question": "What proves that the replacement is safe for existing worlds?",
+      "summary": "Use a complete relevant catalogue and an immutable original save. Compare actual earned effects, invested progress, queues, settings and unrelated state across two independent reloads.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "migrations.md",
+        "verification.md",
+        "settings.md"
+      ],
+      "groups": [
+        {
+          "id": "B",
+          "label": "BASELINE"
+        },
+        {
+          "id": "U",
+          "label": "UPGRADE"
+        },
+        {
+          "id": "V",
+          "label": "VERIFICATION"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "r",
+          "label": "Pin old package + engine/mod/settings\nRecover accepted expected behavior",
+          "group": "B",
+          "role": "data"
+        },
+        {
+          "id": "s",
+          "label": "Preserve original save and\napplied migration-name history",
+          "group": "B",
+          "role": "data"
+        },
+        {
+          "id": "g",
+          "label": "Complete relevant catalogue?",
+          "group": "U",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "d",
+          "label": "Partial experiment\nDisposable fixture worlds ONLY",
+          "group": "U",
+          "role": "error"
+        },
+        {
+          "id": "p",
+          "label": "Preserve prototype IDs and semantics\nApply qualified state migrations",
+          "group": "U",
+          "role": "process"
+        },
+        {
+          "id": "o",
+          "label": "Observe earliest accessible state\nThen post-reconciliation state",
+          "group": "U",
+          "role": "process"
+        },
+        {
+          "id": "c",
+          "label": "Compare levels, earned effects, costs,\nqueues, progress and foreign sentinels",
+          "group": "V",
+          "role": "process"
+        },
+        {
+          "id": "w",
+          "label": "Save candidate copy",
+          "group": "V",
+          "role": "engine"
+        },
+        {
+          "id": "a",
+          "label": "Cold reload 1 \u2192 compare",
+          "group": "V",
+          "role": "engine"
+        },
+        {
+          "id": "b",
+          "label": "Cold reload 2 \u2192 compare",
+          "group": "V",
+          "role": "engine"
+        },
+        {
+          "id": "j",
+          "label": "Actual client join/rejoin if affected",
+          "group": "V",
+          "role": "api"
+        },
+        {
+          "id": "v",
+          "label": "Qualified exact upgrade path\nNot universal save-safety proof",
+          "group": "V",
+          "role": "success"
+        }
+      ],
+      "edges": [
+        {
+          "from": "r",
+          "to": "g",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "s",
+          "to": "g",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "g",
+          "to": "d",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "g",
+          "to": "p",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "o",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "o",
+          "to": "c",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "c",
+          "to": "w",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "w",
+          "to": "a",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "a",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "j",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "j",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "09_determinism",
+      "title": "One name, four distinct determinism contracts",
+      "question": "What does same input actually mean?",
+      "summary": "Determinism controls semantic output and state transitions. It does not promise equal timing, correctness, order independence, safe third-party code or identical save archive bytes.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "LR",
+      "transition_only": false,
+      "contracts": [
+        "determinism.md"
+      ],
+      "groups": [
+        {
+          "id": "I",
+          "label": "COMPLETE INPUTS"
+        },
+        {
+          "id": "F",
+          "label": "MIR-CONTROLLED TRANSFORM"
+        },
+        {
+          "id": "O",
+          "label": "REQUIRED OUTPUT"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "b",
+          "label": "Source/asset bytes + target\n+ pinned packaging recipe",
+          "group": "I",
+          "role": "data"
+        },
+        {
+          "id": "g",
+          "label": "Definition/settings bytes + stage/order\n+ current relevant prototypes",
+          "group": "I",
+          "role": "data"
+        },
+        {
+          "id": "r",
+          "label": "Game/MIR state + ordered events\n+ tick + authorized RNG state",
+          "group": "I",
+          "role": "data"
+        },
+        {
+          "id": "m",
+          "label": "Original save + migration history\n+ old/new closure",
+          "group": "I",
+          "role": "data"
+        },
+        {
+          "id": "bf",
+          "label": "Package",
+          "group": "F",
+          "role": "process"
+        },
+        {
+          "id": "gf",
+          "label": "Generator",
+          "group": "F",
+          "role": "generator"
+        },
+        {
+          "id": "rf",
+          "label": "Runtime transition",
+          "group": "F",
+          "role": "process"
+        },
+        {
+          "id": "mf",
+          "label": "Migration",
+          "group": "F",
+          "role": "process"
+        },
+        {
+          "id": "bo",
+          "label": "Equal member bytes\nZIP bytes if container is pinned",
+          "group": "O",
+          "role": "success"
+        },
+        {
+          "id": "go",
+          "label": "Equal native prototypes\nand explicit outcome class",
+          "group": "O",
+          "role": "success"
+        },
+        {
+          "id": "ro",
+          "label": "Equal game-affecting operations\nand next MIR state",
+          "group": "O",
+          "role": "success"
+        },
+        {
+          "id": "mo",
+          "label": "Equal supported transformed state",
+          "group": "O",
+          "role": "success"
+        }
+      ],
+      "edges": [
+        {
+          "from": "b",
+          "to": "bf",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "bf",
+          "to": "bo",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "g",
+          "to": "gf",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "gf",
+          "to": "go",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "r",
+          "to": "rf",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "rf",
+          "to": "ro",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "m",
+          "to": "mf",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "mf",
+          "to": "mo",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "10_test_ladder",
+      "title": "Verification: cheap first, exact native evidence later",
+      "question": "How do we catch mistakes without rerunning everything?",
+      "summary": "Select affected tests from real consumed inputs. A cached result retains its original identity; changed or uncertain shared inputs widen coverage. Product cases are still not run.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "verification.md",
+        "performance.md",
+        "repository.md"
+      ],
+      "groups": [
+        {
+          "id": "A",
+          "label": "CHANGE CONTRACT"
+        },
+        {
+          "id": "T",
+          "label": "CHECK LADDER"
+        },
+        {
+          "id": "R",
+          "label": "RESULT"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "c",
+          "label": "Observable outcome + permitted files\nIndependent expected behavior",
+          "group": "A",
+          "role": "data"
+        },
+        {
+          "id": "i",
+          "label": "Affected input/dependency selection\nUncertainty widens coverage",
+          "group": "A",
+          "role": "process"
+        },
+        {
+          "id": "t0",
+          "label": "0 \u2014 syntax, imports, IDs, package, links",
+          "group": "T",
+          "role": "process"
+        },
+        {
+          "id": "t1",
+          "label": "1 \u2014 pure behavior / ownership\nproperties / targeted mutations",
+          "group": "T",
+          "role": "process"
+        },
+        {
+          "id": "t2",
+          "label": "2 \u2014 native affected research\nactual physical effect",
+          "group": "T",
+          "role": "engine"
+        },
+        {
+          "id": "t3",
+          "label": "3 \u2014 saves / combined mods / API\nreal clients and lifecycle",
+          "group": "T",
+          "role": "engine"
+        },
+        {
+          "id": "t4",
+          "label": "4 \u2014 frozen full-product candidate\nperformance and stress",
+          "group": "T",
+          "role": "engine"
+        },
+        {
+          "id": "f",
+          "label": "Failure: retain reproducer\nFix implementation or review contract\nNever silently lower oracle",
+          "group": "R",
+          "role": "error"
+        },
+        {
+          "id": "p",
+          "label": "Exact scoped evidence\nNot universal perfection",
+          "group": "R",
+          "role": "success"
+        }
+      ],
+      "edges": [
+        {
+          "from": "c",
+          "to": "i",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "i",
+          "to": "t0",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "t0",
+          "to": "t1",
+          "label": "when affected",
+          "style": "solid"
+        },
+        {
+          "from": "t1",
+          "to": "t2",
+          "label": "gameplay change",
+          "style": "solid"
+        },
+        {
+          "from": "t2",
+          "to": "t3",
+          "label": "continuity / interoperability",
+          "style": "solid"
+        },
+        {
+          "from": "t3",
+          "to": "t4",
+          "label": "coherent release candidate",
+          "style": "solid"
+        },
+        {
+          "from": "t0",
+          "to": "f",
+          "label": "fail",
+          "style": "dashed"
+        },
+        {
+          "from": "t1",
+          "to": "f",
+          "label": "fail",
+          "style": "dashed"
+        },
+        {
+          "from": "t2",
+          "to": "f",
+          "label": "fail",
+          "style": "dashed"
+        },
+        {
+          "from": "t3",
+          "to": "f",
+          "label": "fail",
+          "style": "dashed"
+        },
+        {
+          "from": "t4",
+          "to": "f",
+          "label": "fail",
+          "style": "dashed"
+        },
+        {
+          "from": "t4",
+          "to": "p",
+          "label": "required scope passes",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "11_repository_boundaries",
+      "title": "Repository cutaway: one owner for each responsibility",
+      "question": "Which files enter the game?",
+      "summary": "The final structure is version-neutral. Specs, diagrams, SDKs, tests and evidence are developer inputs only; necessary historical migration names and IDs are live compatibility obligations.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "repository.md",
+        "architecture.md",
+        "targets.md"
+      ],
+      "groups": [
+        {
+          "id": "DEV",
+          "label": "DEVELOPER-ONLY"
+        },
+        {
+          "id": "SRC",
+          "label": "PLAYER SOURCE"
+        },
+        {
+          "id": "PKG",
+          "label": "DELIVERY"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "s",
+          "label": "spec/\nNormative requirements",
+          "group": "DEV",
+          "role": "data"
+        },
+        {
+          "id": "d",
+          "label": "docs/\nExplanations and diagrams",
+          "group": "DEV",
+          "role": "data"
+        },
+        {
+          "id": "k",
+          "label": "sdk/\nExamples / annotations / conformance",
+          "group": "DEV",
+          "role": "api"
+        },
+        {
+          "id": "t",
+          "label": "tests/ + tools/\nIndependent verification",
+          "group": "DEV",
+          "role": "process"
+        },
+        {
+          "id": "h",
+          "label": "Pinned historical evidence\nSmall current references only",
+          "group": "DEV",
+          "role": "data"
+        },
+        {
+          "id": "a",
+          "label": "Optional AIDE assistance\nNo product authority",
+          "group": "DEV",
+          "role": "optional"
+        },
+        {
+          "id": "c",
+          "label": "source/\nResearch / compatibility / overrides\nruntime / api/v1 / migrations / assets",
+          "group": "SRC",
+          "role": "generator"
+        },
+        {
+          "id": "x",
+          "label": "targets/\nActual engine differences",
+          "group": "DEV",
+          "role": "data"
+        },
+        {
+          "id": "b",
+          "label": "Allowlisted package builder",
+          "group": "PKG",
+          "role": "process"
+        },
+        {
+          "id": "z",
+          "label": "Native player ZIP\nNo spec/docs/SDK/evidence/tools",
+          "group": "PKG",
+          "role": "engine"
+        }
+      ],
+      "edges": [
+        {
+          "from": "s",
+          "to": "c",
+          "label": "constrains",
+          "style": "dashed"
+        },
+        {
+          "from": "s",
+          "to": "d",
+          "label": "explained by",
+          "style": "dashed"
+        },
+        {
+          "from": "c",
+          "to": "k",
+          "label": "public interface",
+          "style": "dashed"
+        },
+        {
+          "from": "h",
+          "to": "t",
+          "label": "regression inputs",
+          "style": "solid"
+        },
+        {
+          "from": "a",
+          "to": "t",
+          "label": "may invoke",
+          "style": "dashed"
+        },
+        {
+          "from": "c",
+          "to": "t",
+          "label": "tested by",
+          "style": "dashed"
+        },
+        {
+          "from": "c",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "z",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    },
+    {
+      "id": "12_performance_and_footprint",
+      "title": "Performance: remove work, preserve output",
+      "question": "What do we measure before claiming a speedup?",
+      "summary": "A one-technology demo is not a full-product speed comparison. Match engine, upstream bytes, settings, output and endpoints; distinguish elapsed time from deterministic work counters.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": false,
+      "contracts": [
+        "performance.md",
+        "determinism.md",
+        "verification.md"
+      ],
+      "groups": [
+        {
+          "id": "P",
+          "label": "PLAYER PATH"
+        },
+        {
+          "id": "M",
+          "label": "MEASUREMENTS"
+        },
+        {
+          "id": "E",
+          "label": "EVIDENCE"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "Absent adapters\nCheck before loading bodies",
+          "group": "P",
+          "role": "optional"
+        },
+        {
+          "id": "g",
+          "label": "Exact definitions\nOne local build / preflight / publication",
+          "group": "P",
+          "role": "generator"
+        },
+        {
+          "id": "c",
+          "label": "Approved broad behavior\nOne shared bounded pass if required",
+          "group": "P",
+          "role": "process"
+        },
+        {
+          "id": "r",
+          "label": "Native effects: no MIR tick loop\nScripted work: relevant events / ticks",
+          "group": "P",
+          "role": "engine"
+        },
+        {
+          "id": "d",
+          "label": "Disk: allowlisted members\nRAM: no world copies / duplicate catalogues",
+          "group": "M",
+          "role": "process"
+        },
+        {
+          "id": "w",
+          "label": "Diagnostic work counters\nUnrelated-input growth test",
+          "group": "M",
+          "role": "process"
+        },
+        {
+          "id": "t",
+          "label": "Ordinary package timings\nmenu / save / Library / simulation",
+          "group": "M",
+          "role": "process"
+        },
+        {
+          "id": "b",
+          "label": "Matched baseline / MIR 4.7\nprivate equivalent replay / replacement",
+          "group": "E",
+          "role": "data"
+        },
+        {
+          "id": "v",
+          "label": "Predeclared repeated comparisons\nEqual intended behavior + no material regression",
+          "group": "E",
+          "role": "success"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a",
+          "to": "d",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "g",
+          "to": "d",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "g",
+          "to": "w",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "c",
+          "to": "w",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "r",
+          "to": "t",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "d",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "w",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "t",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    }
+  ]
+}

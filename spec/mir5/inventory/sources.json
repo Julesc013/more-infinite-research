@@ -1,0 +1,144 @@
+{
+  "format": 1,
+  "prepared_date": "2026-10-22",
+  "authority": "Proposed synthesis. No live repository mutation or native Factorio execution.",
+  "attachment_inputs": [
+    {
+      "id": "A1",
+      "filename": "Pasted text(20261022-104204)(1).txt",
+      "title": "Rebuild and Continuity Plan",
+      "sha256": "960efeebf36214859bc5763b6c01c8be0c2d0140efd82d4d61e26cb56510f660",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    },
+    {
+      "id": "A2",
+      "filename": "Pasted text (2)(4)(1).txt",
+      "title": "Unified API, Repository Architecture and Development Tooling",
+      "sha256": "fc193c9588259fb6d6d64643434ce187cfef1da76613de2d556683b983047c85",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    },
+    {
+      "id": "A3",
+      "filename": "Pasted text (3)(3)(1).txt",
+      "title": "Final Architecture Review",
+      "sha256": "c3be4b6508c6a678c12027d8c3d79191187987ff3b8590c55ffb6e02ae95718d",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    },
+    {
+      "id": "A4",
+      "filename": "Pasted text (4)(3)(1).txt",
+      "title": "Generator and Engineering Quality Contract",
+      "sha256": "880eecfeefc10db62e973ba66831c7441ca56ee38dd0b8688a0f6b0352fac34f",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    },
+    {
+      "id": "A5",
+      "filename": "MIR5_REPLACEMENT_CONTRACT_2026-10-22(1).md",
+      "title": "Replacement contract",
+      "sha256": "db1369af904a392a1eb60641c18515af6aff485fe5dc8abca41cde86edcb9191",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    },
+    {
+      "id": "A6",
+      "filename": "MIR5_CODEX_FIRST_BATCH_2026-10-22(1).txt",
+      "title": "First implementation batch",
+      "sha256": "8d2e1754d4606e6dae8860849ef2ad915d79ccb7c9a52ebdcd6b9db39daebe02",
+      "evidence_class": "supplied_proposal_not_independent_implementation_proof",
+      "verification_in_this_revision": "inherited_reference_only_original_attachment_not_uploaded_here"
+    }
+  ],
+  "live_observations": [
+    {
+      "id": "R1",
+      "kind": "dev_ref",
+      "sha": "0a53f8202f6a62f37df3206c4b33dc3ea336dc47",
+      "verification_in_this_revision": "rechecked"
+    },
+    {
+      "id": "R2",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/0a53f8202f6a62f37df3206c4b33dc3ea336dc47/AGENTS.md",
+      "git_blob": "37e97f8f70fe18df70f1fd0f736776d2cee05ab2",
+      "finding": "Explicit source/ root, existing dev/release and preservation safeguards.",
+      "verification_in_this_revision": "rechecked"
+    },
+    {
+      "id": "R3",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/0a53f8202f6a62f37df3206c4b33dc3ea336dc47/docs/EXTENSION-PROTOCOL.md",
+      "git_blob": "77a11d11145b37c5eeca78094bfe38b4171dd5e5",
+      "finding": "MEP data-only preview, no admitted player emission.",
+      "verification_in_this_revision": "inherited_not_rechecked"
+    },
+    {
+      "id": "R4",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/0a53f8202f6a62f37df3206c4b33dc3ea336dc47/README.md",
+      "git_blob": "53949515eb2f28dee94b653bd77f4553321d9217",
+      "finding": "Large current file includes old version instructions; route/transfer rather than silent overwrite.",
+      "verification_in_this_revision": "inherited_not_rechecked"
+    },
+    {
+      "id": "R5",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/0a53f8202f6a62f37df3206c4b33dc3ea336dc47/docs/maintainer/documentation-governance.md",
+      "finding": "Frontmatter and one logical line per prose paragraph; generated docs projection not hand-edited.",
+      "verification_in_this_revision": "inherited_not_rechecked"
+    },
+    {
+      "id": "R6",
+      "url": "https://github.com/Julesc013/more-infinite-research/blob/0a53f8202f6a62f37df3206c4b33dc3ea336dc47/.mir/README.md",
+      "finding": "Transitional/historical namespace, not blanket authority.",
+      "verification_in_this_revision": "inherited_not_rechecked"
+    }
+  ],
+  "external_engine_sources": {
+    "observed_on": "2026-10-22",
+    "served_version": "2.1.23",
+    "qualification": "Official latest-page observation only; native execution not run. Exact-version URL fetches unavailable.",
+    "urls": [
+      "https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html",
+      "https://lua-api.factorio.com/latest/auxiliary/libraries.html",
+      "https://lua-api.factorio.com/latest/auxiliary/migrations.html",
+      "https://lua-api.factorio.com/latest/classes/LuaRemote.html"
+    ]
+  },
+  "limits": [
+    "No complete emitted-technology or settings audit.",
+    "No API implementation or native conformance run.",
+    "No verified replacement speedup.",
+    "Only layout utility and document consistency are executable within this pack."
+  ],
+  "prior_external_engine_observation": {
+    "served_version": "2.1.14",
+    "qualification": "General verification only; not exact 2.1.23 native evidence",
+    "urls": [
+      "https://lua-api.factorio.com/latest/auxiliary/data-lifecycle.html",
+      "https://lua-api.factorio.com/latest/auxiliary/mod-structure.html",
+      "https://lua-api.factorio.com/latest/auxiliary/migrations.html",
+      "https://lua-api.factorio.com/latest/auxiliary/libraries.html",
+      "https://lua-api.factorio.com/latest/prototypes/TechnologyPrototype.html",
+      "https://lua-api.factorio.com/latest/types/TechnologyUnit.html",
+      "https://lua-api.factorio.com/latest/prototypes/ModData.html",
+      "https://lua-api.factorio.com/latest/classes/LuaRemote.html",
+      "https://lua-api.factorio.com/latest/classes/LuaBootstrap.html",
+      "https://lua-api.factorio.com/latest/classes/LuaTechnology.html"
+    ]
+  },
+  "revision_inputs": [
+    {
+      "filename": "MIR5_SPEC_DOCS_AND_CUTOVER_2026-10-22(1).zip",
+      "sha256": "239545f6b6f07dbe641f0a7e11ec624501a159f178aeb4036c285b444ec25155",
+      "bytes": 74718,
+      "evidence_class": "user_supplied_material_inspected_here"
+    },
+    {
+      "filename": "Pasted text(20261022-113515).txt",
+      "sha256": "dedcda914e3aec01bf637aa915ae75a9ae1ad457104cd170b93f56f5e7ece350",
+      "bytes": 54380,
+      "evidence_class": "user_supplied_material_inspected_here"
+    }
+  ],
+  "revision": "deterministic-visual-contract-2"
+}

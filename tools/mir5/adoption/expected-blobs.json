@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "observed_commit": "0a53f8202f6a62f37df3206c4b33dc3ea336dc47",
+  "files": {
+    "AGENTS.md": "37e97f8f70fe18df70f1fd0f736776d2cee05ab2",
+    "README.md": "53949515eb2f28dee94b653bd77f4553321d9217"
+  },
+  "policy": "Refuse changed preimages. This identity check is not authority to apply or publish."
+}

@@ -1,0 +1,41 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Settings are not the Generator
+  accDescr: Preserve historical IDs and default/profile/user precedence. Startup configuration drives prototypes; per-user presentation must not silently change force-wide research.
+  subgraph group_D["DECLARATIONS"]
+    i["Small identity/default catalogue<br/>No prototype-world import"]:::data
+    s["Native startup / runtime / user<br/>setting prototypes"]:::process
+    e["Extension-owned settings<br/>Declared by the extension"]:::api
+  end
+  subgraph group_V["VALUES"]
+    r["Factorio reads stored settings"]:::engine
+    p["Restricted profile-import decoding<br/>Preserve actual precedence and units"]:::process
+    x["Effective startup values"]:::data
+    y["Runtime-global / per-user values"]:::data
+  end
+  subgraph group_C["CONSUMERS"]
+    g["Generator<br/>Costs, effects, progression"]:::generator
+    o["Optional overrides<br/>Return before scans when default"]:::optional
+    k["Cap/runtime reconciliation<br/>Disable cleanup if previously applied"]:::process
+    b["Library view preferences<br/>Presentation only"]:::api
+  end
+  i --> s
+  s --> r
+  e --> r
+  r --> p
+  p --> x
+  r --> y
+  x --> g
+  x --> o
+  x --> k
+  y -->|"only relevant global settings"| k
+  y -->|"per-user view"| b
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

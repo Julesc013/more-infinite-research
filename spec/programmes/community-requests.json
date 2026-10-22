@@ -54,6 +54,12 @@
       "schema": 1,
       "sources": [
         {
+          "id": "P-SCI-2026-10-23",
+          "title": "User-supplied Crash after update community thread",
+          "observed_on": "2026-10-23",
+          "basis": "Pasted thread retained in SCI-UNLOCK-01 reported_evidence; original thread URL unavailable; workaround URL is related context only, not fetched or independently verified."
+        },
+        {
           "title": "User-supplied Reddit discussion",
           "url": "https://www.reddit.com/r/factorio/comments/1w7yekg/",
           "basis": "Pasted conversation, not a fresh complete thread capture. Relative comment ages are not treated as absolute dates.",
@@ -367,7 +373,7 @@
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 83,
+  "request_count": 84,
   "requests": [
     {
       "id": "UI-01",
@@ -3897,6 +3903,76 @@
       "feature_group": "startup-asset-availability",
       "status": "requested-not-qualified",
       "qualification": []
+    },
+    {
+      "id": "SCI-UNLOCK-01",
+      "title": "Recurring approved science binding startup crashes after MIR 4 updates",
+      "requesters": [
+        "mmeshok",
+        "Driku",
+        "Tarradax",
+        "Julesc013"
+      ],
+      "decision": "retain-open-for-mir5-regression-and-community-continuity",
+      "mechanism": "Investigate approved science availability, dependency and multiple-unlock resolution using exact affected prototypes",
+      "proposed_scope": "MIR 4 failure evidence retained through MIR 5 science integration, migration and regression maintenance",
+      "rationale": "Players still report automation-science-pack ambiguity after claimed fixes; prior space-science dependency failure and downgrade success must remain linked, not treated as proof that this recurrence is resolved.",
+      "implementation": "Capture the affected engine, MIR archive, complete dependency-valid mod/settings closure, log and prototypes; minimize the reproduction, determine valid unlock semantics, then implement and qualify the correction without deleting existing research or invoking the former solver.",
+      "acceptance": [
+        "Reproduce and retain both unresolved-approved-pack-dependencies:space-science-pack and ambiguous-approved-pack-unlock:automation-science-pack as distinct regression subjects; do not assume one cause.",
+        "Exercise enabled-at-start recipes, multiple legitimate unlocks, unavailable packs and dependency changes against independent expected behavior.",
+        "Qualify the corrected current player package on the exact affected profile and supported target; preserve technology identities, earned progress, reachable science and prerequisites through upgrade and reload.",
+        "Carry this ID and all prior MIR 4 bug, crash, evidence and technology-tuning request IDs into MIR 5 CONT-15 reconciliation; unresolved requests remain open and retained evidence stays discoverable.",
+        "Close only with named exact-source/package/engine/mod/settings evidence; release comments, disabled-mod anecdotes and static tests alone do not establish a fix."
+      ],
+      "source_ids": [
+        "P-SCI-2026-10-23"
+      ],
+      "feature_group": "science-integration-regressions",
+      "status": "requested-not-qualified",
+      "qualification": [],
+      "reported_evidence": {
+        "basis": "Maintainer-pasted community thread titled Crash after update, received 2026-10-23; relative comment ages retained as relative, not converted to dates. Original thread URL was not supplied.",
+        "related_workaround_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6ad33b18698cbdddab2f4493",
+        "initial_report": "mmeshok: Factorio 2.1.22 experimental; updating all mods after a month caused space-science-pack unresolved-approved-pack-dependencies. Resetting settings and reinstalling MIR did not help; downgrading to 4.3.21000 reportedly helped.",
+        "fix_history": "Julesc013 first anticipated 4.5.1, then stated Tarradax workaround was included in 4.5.2. Driku reported automation-science-pack ambiguous-approved-pack-unlock in 4.5.21002 and again after a later update of unspecified version despite another maintainer fix claim.",
+        "latest_signature": "MIR approved science binding is unresolved: automation-science-pack (ambiguous-approved-pack-unlock:automation-science-pack). No research was removed and the former solver will not be invoked.",
+        "stack_locations": [
+          "data-final-fixes.lua:2",
+          "prototypes/mir/capabilities/science_integration/science_packs.lua:35",
+          "prototypes/mir/pipeline/commands.lua:241,255,259",
+          "prototypes/mir/pipeline/compiler_context.lua:49,53"
+        ],
+        "initial_stack_context": [
+          "science_packs.lua source_for:27",
+          "lab_compatibility.lua pack_is_admitted:14 and :193",
+          "planner/science.lua:63",
+          "stream_compiler/qualify.lua:124",
+          "stream_compiler/compile.lua:43",
+          "compiler_orchestrator/context_construction.lua:81"
+        ],
+        "player_isolation_attempts": [
+          "Discovery Tree (discovery_tree), both enabled and disabled",
+          "Research productivity",
+          "Parallel research",
+          "More Toolbelt & Axe Research",
+          "Labcore Space Age Better",
+          "Gleba Lab",
+          "Fish Productivity",
+          "Combat Research",
+          "Outer Rim (player noted Science Spread dependency)",
+          "Krastorio 2"
+        ],
+        "isolation_result": "Driku reports continued crashes after these removal attempts. Krastorio Spaced Out was raised as a question, not an established cause. Individual removals do not establish a minimal reproducer or rule out dependency interactions.",
+        "missing": [
+          "Exact version/hash of latest failing MIR package",
+          "Exact engine for Driku recurrence",
+          "Full mod versions, settings and dependency closure",
+          "Complete original log, save and captured final prototypes",
+          "Confirmed minimal reproduction"
+        ],
+        "disposition": "Open intake only; no implementation or native qualification performed."
+      }
     }
   ]
 }
