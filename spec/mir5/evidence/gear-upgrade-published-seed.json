@@ -1,0 +1,327 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-runtime-load-only",
+  "case": "gear-upgrade",
+  "source_head": "dd51f3a14518427aa4e87bcfef3236d13ac6f845",
+  "source_dirty": true,
+  "harness_sha256": "9D4DD73C2F5325DD86ECCF6E121A16B770C54B87AD31891D03BEA33B68FDC53A",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\gear-upgrade-f210.json",
+    "sha256": "96CCAF199C606EF7E3B1A8BB4D4A79E566208E794A4B3C32E3A5371346A80A15"
+  },
+  "fixtures": [
+    {
+      "sha256": "D3A63215434FE1F4BE6A21E6D5E8E0D46EC085A1633DF83DA1293EB836538A5A",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.1.0.zip",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\gear-upgrade"
+    }
+  ],
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip",
+    "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1"
+  },
+  "observation": "native-create-runtime-load-only",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 60,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.093,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-22T23:19:44.5693510+00:00",
+    "deadline_at": "2026-10-22T23:20:44.5693510+00:00",
+    "admission": {
+      "observed_at": "2026-10-22T23:19:44.6189339+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 4999471104,
+        "committed_bytes": 17038229504,
+        "commit_limit_bytes": 20996300800
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65798701056,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65798701056,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 7.546884,
+        "peak_working_set_bytes": 254980096,
+        "peak_sampled_private_bytes": 256028672,
+        "admission": {
+          "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4925632512,
+            "committed_bytes": 17084764160,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.153,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:19:49.8420853+00:00",
+          "deadline_at": "2026-10-22T23:20:49.8420853+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4925632512,
+              "committed_bytes": 17084764160,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65798586368,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65798586368,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.153,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:19:49.8420853+00:00",
+        "deadline_at": "2026-10-22T23:20:49.8420853+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4925632512,
+            "committed_bytes": 17084764160,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\create.factorio.log",
+    "log_sha256": "06393842C00CB7C9EA882B8B82504F984EE3BEAB5F17F4C9CA888198296BA1C9",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-gear-upgrade@0.1.0",
+      "more-infinite-research@4.7.21000"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "96CCAF199C606EF7E3B1A8BB4D4A79E566208E794A4B3C32E3A5371346A80A15",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "4.7.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00910000001EAD77",
+        "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+        "bytes": 1461799
+      },
+      {
+        "name": "mir-fixture-mir5-gear-upgrade",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:02720000001E59DD",
+        "sha256": "D3A63215434FE1F4BE6A21E6D5E8E0D46EC085A1633DF83DA1293EB836538A5A",
+        "bytes": 3857
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 7.546884,
+        "peak_working_set_bytes": 254980096,
+        "peak_sampled_private_bytes": 256028672,
+        "admission": {
+          "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4925632512,
+            "committed_bytes": 17084764160,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.153,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:19:49.8420853+00:00",
+          "deadline_at": "2026-10-22T23:20:49.8420853+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4925632512,
+              "committed_bytes": 17084764160,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65798586368,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65798586368,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.153,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:19:49.8420853+00:00",
+        "deadline_at": "2026-10-22T23:20:49.8420853+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:19:49.9947241+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4925632512,
+            "committed_bytes": 17084764160,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65798586368,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    }
+  ]
+}

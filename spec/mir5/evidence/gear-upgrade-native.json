@@ -1,0 +1,849 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-fixture",
+  "case": "gear-upgrade",
+  "source_head": "806d6dec396cc8315195e624e17b9dfbc2a7fba3",
+  "source_dirty": true,
+  "harness_sha256": "9D4DD73C2F5325DD86ECCF6E121A16B770C54B87AD31891D03BEA33B68FDC53A",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "sha256": "F7D07B8BB51EFB44230756484B5C204BFB7E5BBFF0A55F4A013C23846A4FA959",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\gear-upgrade-candidate-f210.json"
+  },
+  "fixtures": [
+    {
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.1.0.zip",
+      "sha256": "D3A63215434FE1F4BE6A21E6D5E8E0D46EC085A1633DF83DA1293EB836538A5A",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\gear-upgrade"
+    }
+  ],
+  "mir_archive": {
+    "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": {
+    "sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\write-data\\saves\\seed.zip"
+  },
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 60,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.085,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-22T23:28:26.5255629+00:00",
+    "deadline_at": "2026-10-22T23:29:26.5255629+00:00",
+    "admission": {
+      "observed_at": "2026-10-22T23:28:26.5709345+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 4899860480,
+        "committed_bytes": 17116573696,
+        "commit_limit_bytes": 20996300800
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65792245760,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65792245760,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "seed_sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+  "server_settings": {
+    "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\server-settings.json",
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A"
+  },
+  "production": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 4.788012,
+        "peak_working_set_bytes": 230961152,
+        "peak_sampled_private_bytes": 218202112,
+        "admission": {
+          "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4826902528,
+            "committed_bytes": 17181335552,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-production",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.207,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:28:31.0903712+00:00",
+          "deadline_at": "2026-10-22T23:29:31.0903712+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4826902528,
+              "committed_bytes": 17181335552,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65792180224,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65792180224,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-production",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.207,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:28:31.0903712+00:00",
+        "deadline_at": "2026-10-22T23:29:31.0903712+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4826902528,
+            "committed_bytes": 17181335552,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\production.factorio.log",
+    "log_sha256": "6E6AD84F27C723110E52D83F8BE28AD6E87C2487C02259738BF9869FBF8A24D6",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-gear-upgrade@0.1.0",
+      "more-infinite-research@5.0.21000"
+    ],
+    "consumers": {}
+  },
+  "initial": {
+    "stage": "initial",
+    "case": "gear-upgrade",
+    "status": "passed",
+    "witnesses": {
+      "seeded_mir_version": "4.7.21000",
+      "next_level": 3,
+      "productivity_bonus": 0.2,
+      "native_max_level": 4294967295,
+      "cap": 2,
+      "player_enabled": false,
+      "player_visible_when_disabled": true,
+      "automation_researched": true,
+      "foreign_enabled": false,
+      "foreign_visible_when_disabled": false,
+      "public_api_read_only": true,
+      "on_load_read_only": false,
+      "qualification": "native-runner-readback-required"
+    }
+  },
+  "reloads": [
+    {
+      "save_byte_identical": true,
+      "stage": {
+        "process": {
+          "index": 2,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 3.61434,
+            "peak_working_set_bytes": 222339072,
+            "peak_sampled_private_bytes": 211533824,
+            "admission": {
+              "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4834390016,
+                "committed_bytes": 17171144704,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65790177280,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65790177280,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            },
+            "admission_wait": {
+              "phase": "fixture-reload-1",
+              "admission_wait_seconds": 60,
+              "status": "admitted-without-wait",
+              "attempt_count": 2,
+              "refusal_count": 0,
+              "elapsed_seconds": 0.139,
+              "first_refusal": null,
+              "last_refusal": null,
+              "last_error": null,
+              "started_at": "2026-10-22T23:28:37.3634490+00:00",
+              "deadline_at": "2026-10-22T23:29:37.3634490+00:00",
+              "admission": {
+                "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+                "memory": {
+                  "total_bytes": 17047683072,
+                  "free_bytes": 4834390016,
+                  "committed_bytes": 17171144704,
+                  "commit_limit_bytes": 20996300800
+                },
+                "work_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 65790177280,
+                  "total_bytes": 472446398464
+                },
+                "system_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 65790177280,
+                  "total_bytes": 472446398464
+                }
+              }
+            }
+          },
+          "admission_wait": {
+            "phase": "fixture-reload-1",
+            "admission_wait_seconds": 60,
+            "status": "admitted-without-wait",
+            "attempt_count": 2,
+            "refusal_count": 0,
+            "elapsed_seconds": 0.139,
+            "first_refusal": null,
+            "last_refusal": null,
+            "last_error": null,
+            "started_at": "2026-10-22T23:28:37.3634490+00:00",
+            "deadline_at": "2026-10-22T23:29:37.3634490+00:00",
+            "admission": {
+              "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4834390016,
+                "committed_bytes": 17171144704,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65790177280,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65790177280,
+                "total_bytes": 472446398464
+              }
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\reload-1.factorio.log",
+        "log_sha256": "5DB52FD9C6A236D6F156A2E3E94B38EA84DD76BE89D50D76C5553D804A14BE23",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-gear-upgrade@0.1.0",
+          "more-infinite-research@5.0.21000"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "stage": "reload",
+        "case": "gear-upgrade",
+        "status": "passed",
+        "witnesses": {
+          "seeded_mir_version": "4.7.21000",
+          "next_level": 3,
+          "productivity_bonus": 0.2,
+          "native_max_level": 4294967295,
+          "cap": 2,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "automation_researched": true,
+          "foreign_enabled": false,
+          "foreign_visible_when_disabled": false,
+          "public_api_read_only": true,
+          "on_load_read_only": true,
+          "qualification": "native-runner-readback-required"
+        }
+      },
+      "save_sha256": "27CBB1DBC2B952240C0325EC77AC79E4F18A81EF928F8A1AC79343594F31AF3E",
+      "ordinal": 1
+    },
+    {
+      "save_byte_identical": true,
+      "stage": {
+        "process": {
+          "index": 3,
+          "status": "passed",
+          "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.resources.jsonl",
+          "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.stdout.txt",
+          "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 3.688656,
+            "peak_working_set_bytes": 266518528,
+            "peak_sampled_private_bytes": 256978944,
+            "admission": {
+              "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4871335936,
+                "committed_bytes": 17138806784,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65791406080,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65791406080,
+                "total_bytes": 472446398464
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            },
+            "admission_wait": {
+              "phase": "fixture-reload-2",
+              "admission_wait_seconds": 60,
+              "status": "admitted-without-wait",
+              "attempt_count": 2,
+              "refusal_count": 0,
+              "elapsed_seconds": 0.133,
+              "first_refusal": null,
+              "last_refusal": null,
+              "last_error": null,
+              "started_at": "2026-10-22T23:28:42.3640212+00:00",
+              "deadline_at": "2026-10-22T23:29:42.3640212+00:00",
+              "admission": {
+                "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+                "memory": {
+                  "total_bytes": 17047683072,
+                  "free_bytes": 4871335936,
+                  "committed_bytes": 17138806784,
+                  "commit_limit_bytes": 20996300800
+                },
+                "work_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 65791406080,
+                  "total_bytes": 472446398464
+                },
+                "system_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 65791406080,
+                  "total_bytes": 472446398464
+                }
+              }
+            }
+          },
+          "admission_wait": {
+            "phase": "fixture-reload-2",
+            "admission_wait_seconds": 60,
+            "status": "admitted-without-wait",
+            "attempt_count": 2,
+            "refusal_count": 0,
+            "elapsed_seconds": 0.133,
+            "first_refusal": null,
+            "last_refusal": null,
+            "last_error": null,
+            "started_at": "2026-10-22T23:28:42.3640212+00:00",
+            "deadline_at": "2026-10-22T23:29:42.3640212+00:00",
+            "admission": {
+              "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+              "memory": {
+                "total_bytes": 17047683072,
+                "free_bytes": 4871335936,
+                "committed_bytes": 17138806784,
+                "commit_limit_bytes": 20996300800
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 65791406080,
+                "total_bytes": 472446398464
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 65791406080,
+                "total_bytes": 472446398464
+              }
+            }
+          }
+        },
+        "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\reload-2.factorio.log",
+        "log_sha256": "8EAA1C889BC70386DAD5C6C5074C1EC2C23360B5E85C7B1837BCE4CD66D7B9CD",
+        "loaded_selection": [
+          "base@2.1.23",
+          "mir-fixture-mir5-gear-upgrade@0.1.0",
+          "more-infinite-research@5.0.21000"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "stage": "reload",
+        "case": "gear-upgrade",
+        "status": "passed",
+        "witnesses": {
+          "seeded_mir_version": "4.7.21000",
+          "next_level": 3,
+          "productivity_bonus": 0.2,
+          "native_max_level": 4294967295,
+          "cap": 2,
+          "player_enabled": false,
+          "player_visible_when_disabled": true,
+          "automation_researched": true,
+          "foreign_enabled": false,
+          "foreign_visible_when_disabled": false,
+          "public_api_read_only": true,
+          "on_load_read_only": true,
+          "qualification": "native-runner-readback-required"
+        }
+      },
+      "save_sha256": "27CBB1DBC2B952240C0325EC77AC79E4F18A81EF928F8A1AC79343594F31AF3E",
+      "ordinal": 2
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "F7D07B8BB51EFB44230756484B5C204BFB7E5BBFF0A55F4A013C23846A4FA959",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+        "bytes": 85876
+      },
+      {
+        "name": "mir-fixture-mir5-gear-upgrade",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:02720000001E59DD",
+        "sha256": "D3A63215434FE1F4BE6A21E6D5E8E0D46EC085A1633DF83DA1293EB836538A5A",
+        "bytes": 3857
+      }
+    ]
+  },
+  "input_save_byte_identical": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 4.788012,
+        "peak_working_set_bytes": 230961152,
+        "peak_sampled_private_bytes": 218202112,
+        "admission": {
+          "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4826902528,
+            "committed_bytes": 17181335552,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-production",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.207,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:28:31.0903712+00:00",
+          "deadline_at": "2026-10-22T23:29:31.0903712+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4826902528,
+              "committed_bytes": 17181335552,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65792180224,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65792180224,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-production",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.207,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:28:31.0903712+00:00",
+        "deadline_at": "2026-10-22T23:29:31.0903712+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:28:31.2969974+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4826902528,
+            "committed_bytes": 17181335552,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65792180224,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.61434,
+        "peak_working_set_bytes": 222339072,
+        "peak_sampled_private_bytes": 211533824,
+        "admission": {
+          "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4834390016,
+            "committed_bytes": 17171144704,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65790177280,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65790177280,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-reload-1",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.139,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:28:37.3634490+00:00",
+          "deadline_at": "2026-10-22T23:29:37.3634490+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4834390016,
+              "committed_bytes": 17171144704,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65790177280,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65790177280,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-reload-1",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.139,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:28:37.3634490+00:00",
+        "deadline_at": "2026-10-22T23:29:37.3634490+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:28:37.5018568+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4834390016,
+            "committed_bytes": 17171144704,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65790177280,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65790177280,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-candidate-r02\\process-3.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.688656,
+        "peak_working_set_bytes": 266518528,
+        "peak_sampled_private_bytes": 256978944,
+        "admission": {
+          "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4871335936,
+            "committed_bytes": 17138806784,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65791406080,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65791406080,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-reload-2",
+          "admission_wait_seconds": 60,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.133,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-22T23:28:42.3640212+00:00",
+          "deadline_at": "2026-10-22T23:29:42.3640212+00:00",
+          "admission": {
+            "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 4871335936,
+              "committed_bytes": 17138806784,
+              "commit_limit_bytes": 20996300800
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 65791406080,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 65791406080,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-reload-2",
+        "admission_wait_seconds": 60,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.133,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-22T23:28:42.3640212+00:00",
+        "deadline_at": "2026-10-22T23:29:42.3640212+00:00",
+        "admission": {
+          "observed_at": "2026-10-22T23:28:42.4967815+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 4871335936,
+            "committed_bytes": 17138806784,
+            "commit_limit_bytes": 20996300800
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65791406080,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65791406080,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    }
+  ]
+}
