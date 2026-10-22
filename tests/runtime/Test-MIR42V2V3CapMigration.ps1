@@ -9,6 +9,7 @@ param(
   [string]$OutputRoot='build/tmp/m42mig',
   [string]$CandidateZip='',
   [string]$SourceMaterializationPath='',
+  [AllowEmptyString()][ValidatePattern('^(?:|4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?))$')][string]$SourceVersion='',
   [string]$PredecessorCandidateZip='',
   [ValidateRange(0,8192)][int]$ExpectedPeakMemoryMiB=0,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB=120
@@ -46,6 +47,29 @@ function Assert-Migration([bool]$Condition,[string]$Message){
   if(-not $Condition){throw "[mir42-v2-v3-cap-migration] $Message"}
 }
 function Get-MigrationSha([string]$Path){(Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash}
+
+function Resolve-MIR42CurrentCandidateSourceVersion {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$ReceiptPath,
+    [AllowEmptyString()][string]$RequestedSourceVersion=''
+  )
+  if(-not [string]::IsNullOrWhiteSpace($RequestedSourceVersion)){return $RequestedSourceVersion}
+  if([string]::IsNullOrWhiteSpace($ReceiptPath) -or -not (Test-Path -LiteralPath $ReceiptPath -PathType Leaf)){
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt is required when SourceVersion is omitted.'
+  }
+  try{
+    $receipt=Get-Content -LiteralPath $ReceiptPath -Raw -ErrorAction Stop|ConvertFrom-Json -Depth 30 -DateKind String -ErrorAction Stop
+    $receiptSourceVersion=[string]$receipt.source_version
+  }catch{
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt is unreadable.'
+  }
+  if($receiptSourceVersion -notmatch '^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$'){
+    throw '[mir42-current-candidate-source-version-receipt] source materialization receipt has no valid source_version.'
+  }
+  return $receiptSourceVersion
+}
+
 function Assert-Exact([string]$Name,$Actual,$Expected){
   if($null -eq $Actual -and $null -eq $Expected){return}
   if($null -eq $Actual -or $null -eq $Expected -or $Actual -cne $Expected){
@@ -141,7 +165,8 @@ $running=@(Get-Process -Name factorio -ErrorAction SilentlyContinue)
 Assert-Migration ($running.Count -eq 0) 'requires one Factorio process tree; an engine is already running.'
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB
 $predecessorInput=Read-MIR421PinnedV2Candidate -RepoRoot $repo -Archive $PredecessorCandidateZip
-$currentInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath
+$effectiveSourceVersion=Resolve-MIR42CurrentCandidateSourceVersion -ReceiptPath $SourceMaterializationPath -RequestedSourceVersion $SourceVersion
+$currentInput=Read-MIRNativeProbeF210CurrentCandidate -Repository $repo -Archive $CandidateZip -ReceiptPath $SourceMaterializationPath -SourceVersion $effectiveSourceVersion
 $predecessorCandidate=[string]$predecessorInput.path
 $predecessorCommitTree=[string]$predecessorInput.source_tree
 $currentCandidate=[string]$currentInput.path
@@ -203,11 +228,17 @@ param([string]$Repository,[string]$Engine,[string]$Manifest,[string]$Receipt)
 $ErrorActionPreference='Stop'
 $env:SteamAppId='427520';$env:SteamGameId='427520'
 . (Join-Path $Repository 'tools/mir/application/release/F210QualificationPolicy.ps1')
-$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmissionV3 -RepoRoot $Repository -HarnessId 'runtime.maximum-level-v2-v3-migration-f210' -FactorioBin $Engine -SteamManifest $Manifest
+$arguments=@{RepoRoot=$Repository;HarnessId='runtime.maximum-level-v2-v3-migration-f210';FactorioBin=$Engine}
+if(-not [string]::IsNullOrWhiteSpace($Manifest)){$arguments.SteamManifest=$Manifest}
+$record=Resolve-MIR4F210CurrentEngineCapHarnessAdmission @arguments
 [IO.File]::WriteAllText($Receipt,(($record|ConvertTo-Json -Depth 50)+"`n"),[Text.UTF8Encoding]::new($false))
 '@
   [IO.File]::WriteAllText($driver,$driverText,[Text.UTF8Encoding]::new($false))
-  $null=Invoke-MIRNativeProbeProcess -Context $resources -FilePath (Get-Command pwsh).Source -TimeoutSeconds 30 -Arguments @('-NoProfile','-File',$driver,'-Repository',$repo,'-Engine',$FactorioBin,'-Manifest',$SteamManifest,'-Receipt',$receipt)
+  $driverArguments=[Collections.Generic.List[string]]::new()
+  foreach($value in @('-NoProfile','-File',$driver,'-Repository',$repo,'-Engine',$FactorioBin)){$driverArguments.Add($value)}
+  if(-not [string]::IsNullOrWhiteSpace($SteamManifest)){$driverArguments.Add('-Manifest');$driverArguments.Add($SteamManifest)}
+  $driverArguments.Add('-Receipt');$driverArguments.Add($receipt)
+  $null=Invoke-MIRNativeProbeProcess -Context $resources -FilePath (Get-Command pwsh).Source -TimeoutSeconds 30 -Arguments $driverArguments.ToArray()
   Assert-Migration (Test-Path -LiteralPath $receipt -PathType Leaf) 'governed engine resolution receipt is absent.'
   Get-Content -LiteralPath $receipt -Raw|ConvertFrom-Json -Depth 50 -DateKind String
 }
@@ -221,7 +252,7 @@ function New-Stage([string]$Name,[string]$Candidate,[string]$FixtureVersion,[int
   New-Item -ItemType Directory -Force -Path $userdata,(Join-Path $userdata 'saves')|Out-Null
   $isPredecessor=$Candidate -ceq $predecessorCandidate
   $hash=if($isPredecessor){$predecessorInput.archive_sha256}else{$currentInput.receipt.archive_sha256}
-  $version=if($isPredecessor){'4.2.21000'}else{'4.2.21001'}
+  $version=if($isPredecessor){'4.2.21000'}else{[string]$currentInput.receipt.distribution_version}
   $candidateName=[IO.Path]::GetFileName($Candidate);$installed=Join-Path $library $candidateName
   Assert-MIRLibraryPath $installed
   Assert-Exact 'installed candidate hash' (Get-MigrationSha $installed) ([string]$hash)
@@ -344,7 +375,7 @@ $result=[ordered]@{
   schema=1
   kind='MIR42F210V2ToV3MaximumLevelMigrationQualificationV1'
   status='passed-current-f210-v2-to-v3-cap-migration-only'
-  scope='Pinned origin/dev F210 V2 package verified against the exact f7f9bab binding set, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into a supplied current 4.2.21001 F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.'
+  scope=('Pinned origin/dev F210 V2 package verified against the exact f7f9bab binding set, seeded at V2 cap=0, changed to V2 cap=3 to distinguish owned from pre-disabled state, then upgraded into the supplied '+[string]$currentInput.receipt.distribution_version+' F210 V3 candidate; authentic V2 runtime ownership, V3 migration/enforcement, cap=0 owner-only restoration, and research continuity.')
   target=[ordered]@{
     factorio_line='2.1'
     factorio_version=[string]$engineResolution.engine.version

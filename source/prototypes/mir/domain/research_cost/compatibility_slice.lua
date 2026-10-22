@@ -219,7 +219,7 @@ function M.build(values)
     or values.compiler_result.dimensions.execution ~= "APPLIED" then
     error("Research-cost compatibility support requires final APPLIED CompilerResult authority.", 2)
   end
-  local environment = values.compiler_input.runtime_environment
+  local environment = compiler_input.runtime_environment(values.compiler_input)
   if type(environment) ~= "table" or environment.factorio_line ~= values.current_target then
     error("Research-cost compatibility support target differs from CompilerInput environment.", 2)
   end

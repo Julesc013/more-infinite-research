@@ -5,7 +5,7 @@ applies_to: "3.2.0+"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-07-24
+last_reviewed: 2026-10-21
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -22,13 +22,12 @@ MIR uses explicit, fingerprinted records at capture, compilation, application, a
 
 ```text
 Factorio capture and proposal adapters
-  -> CompilationSnapshot schema 2
   -> PolicySnapshot schema 1
   -> RuntimeEnvironmentIdentity schema 2
-  -> CompilerInput schema 2
+  -> ActiveCompilerInput schema 1
   -> sanitation + graph-qualified TechnologyCatalog schema 3
-  -> compiler.compile(CompilationSnapshot, PolicySnapshot)
-  -> TransformationPlan schema 2
+  -> compiler.compile(ActiveCompilerInput, PolicySnapshot)
+  -> TransformationPlan schema 3
   -> shared technology operation executor
   -> MutationJournal schema 2
   -> CompilerResult schema 3 (planned -> final)
@@ -37,15 +36,21 @@ external release harness
   -> QualificationEnvironmentIdentity schema 1
 ```
 
-The capture adapter owns every read of `data.raw`, startup settings, loaded mods, target APIs, recipe/index services, and active provider discovery. It normalizes recipes, technologies, items, entities, labs, and science packs into immutable fact domains. Each domain has its own fingerprint. Relationship, owner, graph, effect-target, provider, stream, and base-continuation inputs have independent fingerprints, and the top snapshot fingerprint binds those identities as a Merkle-style root.
+The capture adapter owns every read of `data.raw`, startup settings, loaded mods, target APIs, recipe/index services, and active provider discovery. Ordinary compilation retains the decision inputs actually consumed by its planners. An explicit generic export additionally normalizes recipes, technologies, items, entities, labs, and science packs into immutable fact domains. Each domain has its own fingerprint. Relationship, owner, graph, effect-target, provider, stream, and base-continuation inputs have independent fingerprints, and the generic snapshot fingerprint binds those identities as a Merkle-style root.
 
-The qualification snapshot structurally shares unchanged fact domains and indexes with the input snapshot. Only stream and base-continuation qualification material is replaced. Compact snapshots contain fingerprints, sharing metadata, and metrics; a full deep projection is explicit diagnostic work, never the normal public artifact path.
+For a generic export, the schema-2 qualification snapshot structurally shares unchanged fact domains and indexes with its input snapshot. Only stream and base-continuation qualification material is replaced. The generic path retains schema-2 CompilerInput and TransformationPlan admission and export contracts. Compact snapshots contain fingerprints, sharing metadata, and metrics; a full deep projection is explicit diagnostic work, never the normal public artifact path.
 
 `PolicySnapshot` freezes effective settings, compatibility and stream policy, promotion authority, total hard-gate authority, effect contracts, quality profiles, transformation policy, weapon-overlap mode, compiler execution mode, and review policy. `CompilerInput` binds those snapshots to the exact runtime environment and input-sanitation fingerprint. Finalization reads this captured policy only; unrelated live-policy mutation cannot change the result.
 
 Execution modes are explicit. `SAFE` and `PREVIEW` retain review-required proposals without aborting startup. `STRICT_CI` and `RELEASE` fail unless their captured policy explicitly authorizes the review state. `REVIEWED` applies its captured reviewed-mode rule. `PREVIEW` additionally publishes full internal diagnostic artifacts. Unknown mode names fail closed. The pipeline entry point forwards its `execution_mode` option into the context, so validation and release adapters can select strict modes without changing package policy; ordinary startup omits the option and remains `SAFE`.
 
-`planner/compiler.lua` accepts only `CompilationSnapshot` and `PolicySnapshot`. It does not read Factorio globals, settings, loaded mods, clocks, logging, telemetry, or `CompilerContext`. It validates every proposal's exact total gate vector, rejects or retains review-required alternatives, validates provider-claim identity, and returns one mandatory `TransformationPlan` made only of exact create and patch envelopes. There is no optional operation path and no public per-operation mutation API.
+`planner/compiler.lua` accepts an exact owned `ActiveCompilerInput` or an admitted generic `CompilationSnapshot`, together with `PolicySnapshot`. It does not read Factorio globals, settings, loaded mods, clocks, logging, telemetry, or `CompilerContext`. It validates every proposal's exact total gate vector, rejects or retains review-required alternatives, validates provider-claim identity, and returns one mandatory `TransformationPlan` made only of exact create and patch envelopes. There is no optional operation path and no public per-operation mutation API.
+
+Ordinary startup owns complete consumed inputs through `CompilerInput` without constructing generic snapshots. The GenerationPlan owner admits the retained plan immediately before each planner consumer; the domain carrier does not acquire planner authority. Generic exports are captured before emission when the default/manual Context requests them. An active-only Context refuses late export rather than capturing a different prototype world. Supported exports detach the nested CompilationPlan input as well as top-level state. Active plans use schema 3 with an explicit input identity; imported generic schema-2 plans retain their original snapshot-bound payload and complete validation.
+
+Active provider inputs have one private full copy and fingerprint shared by initial and qualified compiler inputs. Admission rejects metatables before and after copying because Factorio deepcopy retains them. Ordinary compiler values expose no provider handle; both production consumers receive detached claim/review fields, and `provider_inputs_snapshot` expands the complete input only for explicit inspection. Diagnostic fields remain covered by the full identity. The controlled comparison preserves exact emitted technologies, create/native-patch checks and generic exports; it does not establish native loading-time improvement.
+
+An active-only plan binds a versioned `RecipeNormalizedInput` component: the complete normalized recipe facts, names and schema, plus the index schema and derivation revision. All seven discovery indexes are still built; their deterministic derived maps need no second canonical encoding merely to identify the active input. If a custom `__pairs` iterator yields duplicate recipe keys, the owner additionally binds the complete built index because its discovery maps retain all yielded rows. A derivation change must advance that revision. This component belongs to the Context's recipe source/index epochs and returns detached values; it grants no untrusted import authority. Generic exports retain the established full recipe-index `facts` digest and unchanged snapshot validation.
 
 The current pipeline retains a compatibility finalization pass before the pure compiler to normalize legacy stream proposals, perform sanitation, and prove the combined graph. That pass does not emit prototypes. The pure compiler consumes the resulting qualification snapshot and is the sole source of executable technology operations. This compatibility seam is explicit in the runtime data flow and may be narrowed without changing the snapshot, plan, operation, or journal contracts.
 
@@ -61,7 +66,24 @@ The schema-3 `TechnologyCatalog` becomes final only after sanitation and graph p
 
 `CompilerResult` schema 3 has two immutable phases. The planned result binds the compiler input, catalogs, plans, qualifications, operation membership, and independent execution, safety, review, promotion, and release dimensions. Finalization creates a new final result; it never mutates the planned record. The final record binds the planned-result fingerprint, realized output, journal, graph parity, sanitation parity, planned/executed/skipped/failed operation counts, and `APPLIED` or `FAILED` execution status. Any skipped mandatory operation or terminal-count mismatch fails execution. The scalar status is derived from those dimensions and cannot conceal a blocker.
 
-Every materializing stream, base continuation, and native-owner patch becomes one schema-2 `TransformationOperation`. Each operation binds its candidate and selected alternative, subject, action, exact expected-before snapshot, exact expected-after projection, allowed delta, qualification, authority, payload, and evidence. The schema-2 plan binds canonical operation order and membership fingerprints. The shared technology executor applies that exact plan and records realized before/after state in its plan-bound schema-2 `MutationJournal`. Missing, duplicate, undeclared, fingerprint-mismatched, precondition-mismatched, postcondition-mismatched, failed, and out-of-plan operations fail closed.
+Every materializing stream, base continuation, and native-owner patch becomes one schema-2 `TransformationOperation`. Each operation binds its candidate and selected alternative, subject, action, exact expected-before snapshot, exact expected-after projection, allowed delta, qualification, authority, payload, and evidence. The active schema-3 or generic schema-2 plan binds canonical operation order and membership fingerprints. The shared technology executor applies that exact plan and records realized before/after state in its plan-bound schema-2 `MutationJournal`. Missing, duplicate, undeclared, fingerprint-mismatched, precondition-mismatched, postcondition-mismatched, failed, and out-of-plan operations fail closed.
+
+## K2 staged research continuity
+
+The F210 Imersite transition uses JSON renames before the existing productivity-family adoption handler reconciles saved state. The two hidden carrier identities preserve the released infinite chain and an already staged continuation independently:
+
+| Saved technology | Temporary carrier |
+| --- | --- |
+| `recipe-prod-research_material_imersite-1` | `mir-k2-imersite-staged-state-1` |
+| `recipe-prod-research_material_imersite-4` | `mir-k2-imersite-continuation-state-4` |
+
+Both carriers pass through the existing TechnologyDesign and emitter checks and have stable manifest rows. They are excluded from player research coverage, Library entries and cap bindings. Only F210 packages contain the JSON migration, carrier planner and runtime reconciler; the shared compiler uses the pure identity descriptor on other targets without activating the migration.
+
+Reconciliation runs before maximum-level control, preserves completed levels and queued fractional investment, and reads the applied queue back before clearing carrier effects. Its saved record binds the source version and force, supports a retry after an incomplete handoff, and avoids replacing a subsequently changed player queue. Actual technology setters update their effects; reconciliation performs no force-wide effect reset and adds no load hook or tick subscription.
+
+Carrier cost and time come from the existing configured Imersite authorities. Unchanged custom settings retain that source unit. Factorio can normalize fractional progress before Lua when cost or time settings change during the same upgrade; the runtime record cannot reconstruct a fraction already discarded by that earlier engine step. Native upgrade qualification must include the complete research/effect state and both cold reloads on the actual destination ZIP.
+
+This JSON-carrier implementation remains an unqualified development candidate. The item-aware native upgrade retained tested Imersite levels, powder bonuses, queues and fractional work, but an independent scripted running-speed offset was already lost at the earliest read-only Lua observation. The unchanged published predecessor retained that offset during a configuration-only control. The preservation assertion remains failing; this candidate must not be promoted as a passed migration or included in accepted release bytes while that boundary is unresolved.
 
 ## Public artifact and telemetry boundary
 

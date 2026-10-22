@@ -111,6 +111,96 @@ function Assert-MIR42SealSource {
   return [pscustomobject][ordered]@{commit=[string]$Source.commit;tree=[string]$Source.tree;package_source_sha256=$packageSource}
 }
 
+# Current-source individual runs are assembled from receipts produced by more
+# than one tooling revision.  Bind each producer to its commit tree and exact
+# Git object bytes; do not make the current reader's checkout masquerade as
+# the program that produced an older receipt.
+function Get-MIR42SealGitPathSha256 {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)][string]$Commit,
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$Code
+  )
+  if ($Commit -notmatch '^[a-f0-9]{40}$' -or [IO.Path]::IsPathRooted($Path) -or
+      [string]::IsNullOrWhiteSpace($Path) -or $Path -match '(^|[\\/])\.\.([\\/]|$)') {
+    throw "[$Code-path]"
+  }
+  $start = [Diagnostics.ProcessStartInfo]::new()
+  $start.FileName = 'git';$start.UseShellExecute = $false;$start.RedirectStandardOutput = $true;$start.RedirectStandardError = $true
+  foreach ($argument in @('-C',$RepoRoot,'show',($Commit + ':' + $Path))) { $null = $start.ArgumentList.Add($argument) }
+  $process = [Diagnostics.Process]::new();$process.StartInfo = $start
+  if (-not $process.Start()) { throw "[$Code-read]" }
+  $bytes = [IO.MemoryStream]::new()
+  try {
+    $process.StandardOutput.BaseStream.CopyTo($bytes)
+    $stderr = $process.StandardError.ReadToEnd()
+    $process.WaitForExit()
+    if ($process.ExitCode -ne 0) { throw "[$Code-read] $stderr" }
+    $digest = [Security.Cryptography.SHA256]::HashData($bytes.ToArray())
+    return ([Convert]::ToHexString($digest)).ToUpperInvariant()
+  } finally {
+    $bytes.Dispose();$process.Dispose()
+  }
+}
+
+function Assert-MIR42IndividualEvidenceProducer {
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$CandidateSource,
+    [Parameter(Mandatory)]$Producer,
+    [Parameter(Mandatory)][string]$Kind,
+    [Parameter(Mandatory)][string]$Code
+  )
+  $expected = if ($Kind -ceq 'upgrade') { @('source','runner','harness') } elseif ($Kind -ceq 'fresh') { @('source','runner') } else { throw "[$Code-kind]" }
+  Assert-MIR42SealPropertyNames -Value $Producer -Expected $expected -Code "$Code-shape"
+  Assert-MIR42SealPropertyNames -Value $Producer.source -Expected @('commit','tree','package_source_sha256') -Code "$Code-source-shape"
+  foreach ($field in @('commit','tree','package_source_sha256')) {
+    $pattern = if ($field -ceq 'package_source_sha256') { '^[A-F0-9]{64}$' } else { '^[a-f0-9]{40}$' }
+    if ([string]$Producer.source.$field -notmatch $pattern) {
+      throw "[$Code-source-$field]"
+    }
+  }
+  $producerCommit = (& git -C $RepoRoot rev-parse "$([string]$Producer.source.commit)^{commit}").Trim()
+  $producerTree = (& git -C $RepoRoot rev-parse "$([string]$Producer.source.commit)^{tree}").Trim()
+  if ($LASTEXITCODE -ne 0 -or $producerCommit -cne [string]$Producer.source.commit -or $producerTree -cne [string]$Producer.source.tree) {
+    throw "[$Code-source-tree]"
+  }
+  & git -C $RepoRoot merge-base --is-ancestor ([string]$CandidateSource.commit) $producerCommit
+  if ($LASTEXITCODE -ne 0) { throw "[$Code-source-ancestry]" }
+  $roots = @(Get-MIR4CanonicalPackageSourceRoots)
+  $packageChanges = @(& git -C $RepoRoot diff --name-status --find-renames "$([string]$CandidateSource.commit)..$producerCommit" -- @roots)
+  if ($LASTEXITCODE -ne 0 -or $packageChanges.Count -ne 0 -or [string]$Producer.source.package_source_sha256 -cne [string]$CandidateSource.package_source_sha256) {
+    throw "[$Code-package-source]"
+  }
+  $expectedPaths = if ($Kind -ceq 'upgrade') { @{runner='tests/runtime/Test-MIRUpgrade.ps1';harness='tests/runtime/Test-MIRUpgrade.ps1'} } else { @{runner='tools/commands/release/Invoke-MIR42FourTargetEngineRun.ps1'} }
+  foreach ($field in $expectedPaths.Keys) {
+    Assert-MIR42SealPropertyNames -Value $Producer.$field -Expected @('path','sha256') -Code "$Code-$field-shape"
+    if ([string]$Producer.$field.path -cne [string]$expectedPaths[$field] -or [string]$Producer.$field.sha256 -notmatch '^[A-F0-9]{64}$' -or
+        (Get-MIR42SealGitPathSha256 -RepoRoot $RepoRoot -Commit $producerCommit -Path ([string]$Producer.$field.path) -Code "$Code-$field") -cne [string]$Producer.$field.sha256) {
+      throw "[$Code-$field-binding]"
+    }
+  }
+  $bound = [ordered]@{source=$Producer.source;runner=$Producer.runner}
+  if ($Kind -ceq 'upgrade') { $bound.harness = $Producer.harness }
+  return [pscustomobject]$bound
+}
+
+function Assert-MIR42IndividualReceiptProducerBinding {
+  param(
+    [Parameter(Mandatory)]$Receipt,
+    [Parameter(Mandatory)]$CandidateSource,
+    $Producer = $null
+  )
+  $expectedCommit = if ($null -ne $Producer) { [string]$Producer.source.commit } else { [string]$CandidateSource.commit }
+  if ([string]$Receipt.git_commit -cne $expectedCommit) {
+    throw '[mir42-individual-engine-run-receipt-binding]'
+  }
+  if ($null -ne $Producer -and [string]$Receipt.harness_sha256 -cne [string]$Producer.harness.sha256) {
+    throw '[mir42-individual-engine-run-receipt-producer-binding]'
+  }
+}
+
 function Assert-MIR42SealExternalPathSeparatedFromRepository {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$Code)
   $full = [IO.Path]::GetFullPath($Path)
@@ -273,7 +363,7 @@ function Get-MIR42EngineEvidenceBindingContract {
   if ($PublishedMaintenance) {
     if ($scope -cne 'nine-target') { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $version = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $mir42SealRepoRoot -Manifest $Candidate.identity.record
-    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
+    if ([string]$version.source_version -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) { throw '[mir42-engine-evidence-maintenance-candidate-scope]' }
     $contract | Add-Member -NotePropertyName maintenance_source_version -NotePropertyValue ([string]$version.source_version)
     $contract.evidence_kind = 'MIR42NineTargetMaintenanceEvidenceReconciliationV1'
     $contract.evidence_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-EVIDENCE-RECONCILED-PRIVATE-UNQUALIFIED"
@@ -289,6 +379,13 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   param([Parameter(Mandatory)]$Candidate,[switch]$PublishedMaintenance)
   if (-not $PublishedMaintenance) { throw '[mir42-individual-engine-run-maintenance-required]' }
   $contract = Get-MIR42EngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
+  if ([string]$contract.maintenance_source_version -ceq '4.7.0') {
+    $contract.engine_run_kind = 'MIR42NineTargetCurrentIndividualEngineRunV2'
+    $contract.engine_run_status = 'nine-target-current-individual-real-engine-probes-passed-private-unqualified'
+    $contract.binder_kind = 'MIR42NineTargetCurrentIndividualRealEngineEvidenceBinderV2'
+    $contract.binder_status = 'MIR-4.7.0-NINE-TARGET-CURRENT-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED'
+    return $contract
+  }
   if ([string]$contract.maintenance_source_version -cnotin @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2')) {
     throw '[mir42-individual-engine-run-source-version]'
   }
@@ -297,6 +394,11 @@ function Get-MIR42IndividualEngineEvidenceBindingContract {
   $contract.binder_kind = 'MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
   $contract.binder_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-EVIDENCE-BOUND-PRIVATE-UNQUALIFIED"
   return $contract
+}
+
+function Test-MIR42CandidateToolingEquivalenceSourceVersion {
+  param([Parameter(Mandatory)][string]$SourceVersion)
+  return $SourceVersion -cin @('4.6.0','4.7.0')
 }
 
 function Assert-MIR42EngineEvidenceMaintenanceCustody {
@@ -315,8 +417,13 @@ function Get-MIR42JoinedCampaignInputContract {
   }
   if ($PublishedMaintenance) {
     if ($IndividualNativeInput) {
-      $contract.campaign_kind = 'MIR42NineTargetMaintenanceIndividualRealEngineCandidateCampaignV1'
-      $contract.campaign_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED"
+      if ([string]$contract.engine_run_kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2') {
+        $contract.campaign_kind = 'MIR42NineTargetCurrentIndividualRealEngineCandidateCampaignV2'
+        $contract.campaign_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-CURRENT-INDIVIDUAL-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED"
+      } else {
+        $contract.campaign_kind = 'MIR42NineTargetMaintenanceIndividualRealEngineCandidateCampaignV1'
+        $contract.campaign_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-INDIVIDUAL-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED"
+      }
     } else {
       $contract.campaign_kind = 'MIR42NineTargetMaintenanceRealEngineCandidateCampaignV1'
       $contract.campaign_status = "MIR-$($contract.maintenance_source_version)-NINE-TARGET-MAINTENANCE-REAL-ENGINE-CAMPAIGN-PASSED-PRIVATE-UNSEALED"
@@ -992,12 +1099,15 @@ function Get-MIR42ExactFourTargetCandidate {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][string]$CandidateManifestPath,
-    [switch]$AllowPackageEquivalentToolingDescendant
+    [switch]$AllowPackageEquivalentToolingDescendant,
+    [switch]$AllowCurrentCandidateToolingDescendant
   )
   $candidateInput = Read-MIR42SealRecord -Path $CandidateManifestPath -Code 'mir42-seal-candidate'
   $candidate = $candidateInput.record
   $versionContract = Get-MIR42SealCandidateConstructionVersionContract -RepoRoot $RepoRoot -Manifest $candidate
-  if ($AllowPackageEquivalentToolingDescendant -and [string]$versionContract.source_version -cne '4.6.0') {
+  $allowPackageEquivalentToolingDescendant = [bool]$AllowPackageEquivalentToolingDescendant -or
+    ([bool]$AllowCurrentCandidateToolingDescendant -and (Test-MIR42CandidateToolingEquivalenceSourceVersion -SourceVersion ([string]$versionContract.source_version)))
+  if ($allowPackageEquivalentToolingDescendant -and [string]$versionContract.source_version -cnotin @('4.6.0','4.7.0')) {
     throw '[mir42-seal-candidate-tooling-equivalence-version]'
   }
   if ($candidate.PSObject.Properties.Name -notcontains 'target_authority') { throw '[mir42-seal-candidate-target-authority-missing]' }
@@ -1020,7 +1130,7 @@ function Get-MIR42ExactFourTargetCandidate {
     tree = [string]$candidate.source.tree
     package_source_sha256 = [string]$candidate.package_source_sha256
   }
-  $source = Assert-MIR42SealSource -RepoRoot $RepoRoot -Source $candidateSource -Code 'mir42-seal-candidate' -AllowPackageEquivalentToolingDescendant:$AllowPackageEquivalentToolingDescendant
+  $source = Assert-MIR42SealSource -RepoRoot $RepoRoot -Source $candidateSource -Code 'mir42-seal-candidate' -AllowPackageEquivalentToolingDescendant:$allowPackageEquivalentToolingDescendant
   $root = Split-Path -Parent $candidateInput.path
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($target in @($candidate.targets)) {
@@ -1109,7 +1219,7 @@ function Get-MIR42ExactFourTargetCandidate {
           [string]$targetRecord.sha256 -cne [string]$expected.target_record_file_sha256) {
         throw "[mir42-seal-candidate-historical-target-record-binding] $([string]$target.target)"
       }
-      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) {
+      if ([string]$versionContract.source_version -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) {
         $historicalReceipt = Get-MIR42HistoricalMaterializerReceiptCustody -Root $root -Target ([string]$target.target) -Row $row
       }
     }
@@ -1245,7 +1355,7 @@ function Get-MIR42ExactQualificationReceipt {
 }
 
 function Assert-MIR42FreshEngineLoads {
-  param([Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Execution)
+  param([Parameter(Mandatory)]$Target,[Parameter(Mandatory)]$CandidateTarget,[Parameter(Mandatory)]$Execution,[switch]$CurrentIndividual)
   $targetId = [string]$Target.target
   $expectedFactorioVersion = [string]$Execution.version
   if ($expectedFactorioVersion -cnotmatch '^[0-9]+[.][0-9]+[.][0-9]+(?:[.][0-9]+)?$') { throw "[mir42-seal-real-engine-version-shape] $targetId" }
@@ -1256,7 +1366,9 @@ function Assert-MIR42FreshEngineLoads {
     throw "[mir42-seal-real-engine-fresh-load-set] $targetId"
   }
   foreach ($fresh in $freshLoads) {
-    Assert-MIR42SealPropertyNames -Value $fresh -Expected @('scenario','receipt','log','stdout','stderr') -Code 'mir42-seal-real-engine-fresh-load-shape'
+    $freshProperties = @('scenario','receipt','log','stdout','stderr')
+    if ($CurrentIndividual) { $freshProperties += 'producer' }
+    Assert-MIR42SealPropertyNames -Value $fresh -Expected $freshProperties -Code 'mir42-seal-real-engine-fresh-load-shape'
     foreach ($field in @('receipt','log','stdout','stderr')) {
       Assert-MIR42SealPropertyNames -Value $fresh.$field -Expected @('path','sha256') -Code "mir42-seal-real-engine-fresh-load-$field-shape"
       $null = Resolve-MIR42SealImmutableFile -Path ([string]$fresh.$field.path) -Sha256 ([string]$fresh.$field.sha256) -Code "mir42-seal-real-engine-fresh-load-$field"
@@ -1267,7 +1379,7 @@ function Assert-MIR42FreshEngineLoads {
       $required = @('exact-engine','exact-candidate','fresh-save-created','exact-mod-loaded','map-created','healthy-log')
       if ([int]$summary.schema -ne 1 -or [string]$summary.kind -cne 'MIR42HistoricalFreshLoadV1' -or
           [string]$summary.status -cne 'passed' -or [string]$summary.target -cne $targetId -or
-          [string]$summary.source_commit -cne [string]$CandidateTarget.source.commit -or
+          [string]$summary.source_commit -cne [string]$(if ($CurrentIndividual) { $fresh.producer.source.commit } else { $CandidateTarget.source.commit }) -or
           [string]$summary.factorio_line -cne ([string]$Target.target_id -replace '^factorio-', '') -or
           [string]$summary.engine.path -cne [string]$Execution.executable_path -or
           [string]$summary.engine.sha256 -cne [string]$Execution.executable_sha256 -or
@@ -1282,12 +1394,32 @@ function Assert-MIR42FreshEngineLoads {
         throw "[mir42-seal-real-engine-fresh-load-binding] $targetId/$([string]$fresh.scenario)"
       }
       $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.save.path) -Sha256 ([string]$summary.save.sha256) -Code 'mir42-seal-historical-fresh-save'
-      $null = Resolve-MIR42SealImmutableFile -Path ([string]$summary.candidate.path) -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+      $recordedCandidatePath = [string]$summary.candidate.path
+      if ($CurrentIndividual) {
+        # A V2 producer and immutable summary bind the historical selected
+        # candidate. Custody restores its library member after the run, so an
+        # ambient later file, directory, or absence cannot authenticate or
+        # refute that historical input.
+        $canonicalCandidatePath = [string]$CandidateTarget.archive_path
+        if ([IO.Path]::GetFileName($recordedCandidatePath) -cne [IO.Path]::GetFileName($canonicalCandidatePath)) {
+          throw "[mir42-seal-historical-fresh-candidate-name] $targetId/$([string]$fresh.scenario)"
+        }
+        $null = Resolve-MIR42SealImmutableFile -Path $canonicalCandidatePath -Sha256 ([string]$Target.archive.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+      } elseif (Test-Path -LiteralPath $recordedCandidatePath) {
+        if (-not (Test-Path -LiteralPath $recordedCandidatePath -PathType Leaf)) {
+          throw "[mir42-seal-historical-fresh-candidate-type] $targetId/$([string]$fresh.scenario)"
+        }
+        # A retained selected-library copy, when present, remains the receipt's
+        # primary evidence and must bind by its recorded digest.
+        $null = Resolve-MIR42SealImmutableFile -Path $recordedCandidatePath -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+      } else {
+        $null = Resolve-MIR42SealImmutableFile -Path $recordedCandidatePath -Sha256 ([string]$summary.candidate.sha256) -Code 'mir42-seal-historical-fresh-candidate'
+      }
     } else {
       $scenarioRows = @($summary.scenarios)
       if ([int]$summary.schema -ne 2 -or
         [string]$summary.status -cne 'passed' -or
-        [string]$summary.git_commit -cne [string]$CandidateTarget.source.commit -or
+        [string]$summary.git_commit -cne [string]$(if ($CurrentIndividual) { $fresh.producer.source.commit } else { $CandidateTarget.source.commit }) -or
         [string]$summary.validation_package_sha256 -cne [string]$Target.archive.sha256 -or
         [string]$summary.validation_package_content_sha256 -cne [string]$Target.archive.content_sha256 -or
         [string]$summary.factorio_binary_version -cne $expectedFactorioVersion -or
@@ -1303,7 +1435,8 @@ function Assert-MIR42FreshEngineLoads {
     $logText = Get-Content -Raw -LiteralPath ([string]$fresh.log.path)
     $logModVersion = [string]$Target.distribution_version
     if ($targetId -in $script:MIR42SealHistoricalTargets) {
-      if ($logModVersion -notmatch '^4[.](2|3|4|5)[.]([0-9]+)$') { throw "[mir42-seal-historical-distribution-version] $targetId" }
+      $historicalVersionPattern = if ($CurrentIndividual) { '^4[.](2|3|4|5|6|7)[.]([0-9]+)$' } else { '^4[.](2|3|4|5)[.]([0-9]+)$' }
+      if ($logModVersion -notmatch $historicalVersionPattern) { throw "[mir42-seal-historical-distribution-version] $targetId" }
       $logModVersion = '4.' + $Matches[1] + '.' + [int]$Matches[2]
     }
     if (-not $logText.Contains("Loading mod more-infinite-research $logModVersion ") -or
@@ -1589,7 +1722,7 @@ function Get-MIR42BoundEngineRun {
   $runPath = Resolve-MIR42SealImmutableFile -Path ([string]$Reference.path) -Sha256 ([string]$Reference.sha256) -Code 'mir42-seal-engine-run-reference'
   $run = Read-MIR42SealRecord -Path $runPath -Code 'mir42-seal-engine-run'
   if ([string]$run.record.record_sha256 -cne [string]$Reference.record_sha256) { throw '[mir42-seal-engine-run-reference-binding]' }
-  if ([string]$run.record.kind -ceq 'MIR42NineTargetMaintenanceIndividualEngineRunV1') {
+  if ([string]$run.record.kind -cin @('MIR42NineTargetMaintenanceIndividualEngineRunV1','MIR42NineTargetCurrentIndividualEngineRunV2')) {
     if ($null -eq $PublishedMaintenanceInputs) { throw '[mir42-individual-engine-run-maintenance-required]' }
     return Get-MIR42BoundIndividualEngineRun -Reference $Reference -Candidate $Candidate -PublishedMaintenanceInputs $PublishedMaintenanceInputs
   }
@@ -1673,7 +1806,12 @@ function Get-MIR42BoundEngineRun {
 }
 
 function Assert-MIR42IndividualNativeCandidateSelection {
-  param([Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)][string]$ReceiptPath,[Parameter(Mandatory)]$CandidateTarget)
+  param(
+    [Parameter(Mandatory)]$Receipt,
+    [Parameter(Mandatory)][string]$ReceiptPath,
+    [Parameter(Mandatory)]$CandidateTarget,
+    [switch]$CurrentIndividual
+  )
   if ($Receipt -isnot [Collections.IDictionary] -or -not $Receipt.Contains('library_activation') -or
       $Receipt.library_activation -isnot [Collections.IDictionary]) {
     throw '[mir42-individual-engine-run-library-activation]'
@@ -1693,33 +1831,67 @@ function Assert-MIR42IndividualNativeCandidateSelection {
   foreach ($field in @('name','version','path','builtin','identity','sha256','bytes')) {
     if (-not $native.Contains($field)) { throw '[mir42-individual-engine-run-native-candidate-selection]' }
   }
+  $expectedName = 'more-infinite-research_' + [string]$CandidateTarget.distribution_version + '.zip'
   if ($native.builtin -isnot [bool] -or [bool]$native.builtin -or [string]$native.version -cne [string]$CandidateTarget.distribution_version -or
-      [string]$native.sha256 -cne [string]$CandidateTarget.archive_sha256 -or [int64]$native.bytes -le 0) {
+      [string]$native.sha256 -cne [string]$CandidateTarget.archive_sha256 -or [int64]$native.bytes -le 0 -or
+      [IO.Path]::GetFileName([string]$native.path) -cne $expectedName) {
     throw '[mir42-individual-engine-run-native-candidate-selection]'
   }
-  $nativePath = Resolve-MIR42SealImmutableFile -Path ([string]$native.path) -Sha256 ([string]$native.sha256) -Code 'mir42-individual-engine-run-native-candidate'
-  if ([int64](Get-Item -LiteralPath $nativePath).Length -ne [int64]$native.bytes -or
-      [IO.Path]::GetFileName($nativePath) -cne ('more-infinite-research_' + [string]$CandidateTarget.distribution_version + '.zip')) {
-    throw '[mir42-individual-engine-run-native-candidate-selection]'
-  }
+  # The receipt's selected-library path is execution evidence. Check its
+  # containment and authority relationship even when custody has restored and
+  # removed that transient selected file after a current V2 run.
   $receiptRoot = (Split-Path -Parent $ReceiptPath).TrimEnd('\','/')
-  $nativeFull = [IO.Path]::GetFullPath($nativePath)
+  $recordedNativePath = [IO.Path]::GetFullPath([string]$native.path)
   $rootPrefix = $receiptRoot + [IO.Path]::DirectorySeparatorChar
-  if ($nativeFull.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-individual-engine-run-native-candidate-run-root]' }
-  $candidatePath = Resolve-MIR42SealImmutableFile -Path ([string]$CandidateTarget.archive_path) -Sha256 ([string]$CandidateTarget.archive_sha256) -Code 'mir42-individual-engine-run-candidate-authority'
-  if ($nativeFull.Equals($candidatePath, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-individual-engine-run-native-candidate-authority-path]' }
-  if (-not (Get-Command Get-MIRImmutableInputFileIdentity -ErrorAction SilentlyContinue)) {
-    . (Join-Path $mir42SealRepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+  if ($recordedNativePath.StartsWith($rootPrefix, [StringComparison]::OrdinalIgnoreCase)) { throw '[mir42-individual-engine-run-native-candidate-run-root]' }
+  if ($CurrentIndividual) {
+    # The V2 producer and immutable receipt bind the candidate at actor time.
+    # Direct-library custody restores the selected member later, so its live
+    # path, bytes, type, or file identity are not historical execution proof.
+    # Preserve the recorded path and nonempty identity as provenance while
+    # reading the exact captured bytes through the canonical target archive.
+    if ([string]::IsNullOrWhiteSpace([string]$native.identity)) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    $candidatePath = Resolve-MIR42SealImmutableFile -Path ([string]$CandidateTarget.archive_path) -Sha256 ([string]$CandidateTarget.archive_sha256) -Code 'mir42-individual-engine-run-candidate-authority'
+    if ([IO.Path]::GetFileName($candidatePath) -cne $expectedName -or
+        [int64](Get-Item -LiteralPath $candidatePath).Length -ne [int64]$native.bytes) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    if ($recordedNativePath.Equals($candidatePath, [StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir42-individual-engine-run-native-candidate-authority-path]'
+    }
+    return [pscustomobject][ordered]@{path=$recordedNativePath;canonical_path=$candidatePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
   }
-  $nativeIdentity = Get-MIRImmutableInputFileIdentity -Path $nativePath
-  $candidateIdentity = Get-MIRImmutableInputFileIdentity -Path $candidatePath
-  if ([string]$native.identity -cne [string]$nativeIdentity) { throw '[mir42-individual-engine-run-native-candidate-identity]' }
-  if ($nativeIdentity -ceq $candidateIdentity) {
-    throw '[mir42-individual-engine-run-native-candidate-authority-link]'
+  if (Test-Path -LiteralPath $recordedNativePath) {
+    if (-not (Test-Path -LiteralPath $recordedNativePath -PathType Leaf)) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    # A retained selected copy is primary evidence. Its bytes, identity, and
+    # separation from the canonical authority must all still authenticate.
+    $nativePath = Resolve-MIR42SealImmutableFile -Path $recordedNativePath -Sha256 ([string]$native.sha256) -Code 'mir42-individual-engine-run-native-candidate'
+    if ([int64](Get-Item -LiteralPath $nativePath).Length -ne [int64]$native.bytes -or
+        [IO.Path]::GetFileName($nativePath) -cne $expectedName) {
+      throw '[mir42-individual-engine-run-native-candidate-selection]'
+    }
+    $candidatePath = Resolve-MIR42SealImmutableFile -Path ([string]$CandidateTarget.archive_path) -Sha256 ([string]$CandidateTarget.archive_sha256) -Code 'mir42-individual-engine-run-candidate-authority'
+    if ([IO.Path]::GetFileName($candidatePath) -cne $expectedName -or
+        $recordedNativePath.Equals($candidatePath, [StringComparison]::OrdinalIgnoreCase)) {
+      throw '[mir42-individual-engine-run-native-candidate-authority-path]'
+    }
+    if (-not (Get-Command Get-MIRImmutableInputFileIdentity -ErrorAction SilentlyContinue)) {
+      . (Join-Path $mir42SealRepoRoot 'tools/lib/validation/ImmutableInputStaging.ps1')
+    }
+    $nativeIdentity = Get-MIRImmutableInputFileIdentity -Path $nativePath
+    $candidateIdentity = Get-MIRImmutableInputFileIdentity -Path $candidatePath
+    if ([string]$native.identity -cne [string]$nativeIdentity) { throw '[mir42-individual-engine-run-native-candidate-identity]' }
+    if ($nativeIdentity -ceq $candidateIdentity) { throw '[mir42-individual-engine-run-native-candidate-authority-link]' }
+    return [pscustomobject][ordered]@{path=$recordedNativePath;canonical_path=$candidatePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
   }
-  return [pscustomobject][ordered]@{path=$nativePath;sha256=[string]$native.sha256;bytes=[int64]$native.bytes;identity=[string]$native.identity}
+  # Legacy V1 has no producer-bound restored-custody contract.
+  $null = Resolve-MIR42SealImmutableFile -Path $recordedNativePath -Sha256 ([string]$native.sha256) -Code 'mir42-individual-engine-run-native-candidate'
+  throw '[mir42-individual-engine-run-native-candidate-missing]'
 }
-
 function Assert-MIR42IndividualResourceLedgers {
   param([Parameter(Mandatory)]$Receipt,[Parameter(Mandatory)][string]$ReceiptPath)
   if ($Receipt -isnot [Collections.IDictionary] -or -not $Receipt.Contains('resource_ledgers') -or $Receipt.resource_ledgers -isnot [array] -or
@@ -1769,7 +1941,8 @@ function Assert-MIR42IndividualUpgradeReceipt {
     [Parameter(Mandatory)]$PublishedMaintenanceInputs,
     [Parameter(Mandatory)]$Engine,
     [Parameter(Mandatory)][int]$HarnessExitCode,
-    [Parameter(Mandatory)]$Candidate
+    [Parameter(Mandatory)]$Candidate,
+    $Producer = $null
   )
   Assert-MIR42SealPropertyNames -Value $ReceiptReference -Expected @('path','sha256') -Code 'mir42-individual-engine-run-receipt-shape'
   Assert-MIR42SealPropertyNames -Value $Engine -Expected @('path','sha256','version') -Code 'mir42-individual-engine-run-engine-shape'
@@ -1795,11 +1968,11 @@ function Assert-MIR42IndividualUpgradeReceipt {
   catch { throw '[mir42-individual-engine-run-receipt-json]' }
   finally { if ($null -ne $receiptVersionDocument) { $receiptVersionDocument.Dispose() } }
   if ([int]$receipt.schema -ne 3 -or [string]$receipt.status -cne 'passed' -or
-      [string]$receipt.git_commit -cne [string]$Candidate.source.commit -or
       [string]$receipt.factorio_binary_sha256 -cne [string]$Engine.sha256 -or
       [int]$receipt.factorio_processes -lt 4) {
     throw '[mir42-individual-engine-run-receipt-binding]'
   }
+  Assert-MIR42IndividualReceiptProducerBinding -Receipt $receipt -CandidateSource $Candidate.source -Producer $Producer
   $enginePath = Resolve-MIR42SealImmutableFile -Path ([string]$Engine.path) -Sha256 ([string]$Engine.sha256) -Code 'mir42-individual-engine-run-engine'
   $productVersion = [string](Get-Item -LiteralPath $enginePath).VersionInfo.ProductVersion
   if ($productVersion -match '^([0-9]+[.][0-9]+[.][0-9]+)') { $productVersion = [string]$Matches[1] }
@@ -1816,6 +1989,8 @@ function Assert-MIR42IndividualUpgradeReceipt {
     throw '[mir42-individual-engine-run-engine-version]'
   }
   $candidateSourceVersion = (Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance).maintenance_source_version
+  $currentIndividual = [string]$candidateSourceVersion -ceq '4.7.0'
+  if ($currentIndividual -and $null -eq $Producer) { throw '[mir42-individual-engine-run-current-producer-required]' }
   # The seal is release evidence, so it always binds the complete Full
   # preservation oracle. Classic remains available for private
   # characterization but cannot select a reduced snapshot field here.
@@ -1827,7 +2002,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
   $snapshots = if ($receipt.Contains($snapshotField)) { @($receipt[$snapshotField]) } else { @() }
   $upgradeRow = [pscustomobject]@{
     target = [string]$CandidateTarget.target
-    predecessor_source_version = if ($candidateSourceVersion -ceq '4.5.2') { '4.5.1' } elseif ($candidateSourceVersion -ceq '4.5.0') { '4.4.2' } elseif ($candidateSourceVersion -ceq '4.4.2') { '4.4.1' } elseif ($candidateSourceVersion -cin @('4.3.1','4.4.0')) { '4.3.0' } else { '4.2.2' }
+    predecessor_source_version = if ($candidateSourceVersion -ceq '4.7.0') { '4.6.0' } elseif ($candidateSourceVersion -ceq '4.6.0') { '4.5.2' } elseif ($candidateSourceVersion -ceq '4.5.2') { '4.5.1' } elseif ($candidateSourceVersion -ceq '4.5.0') { '4.4.2' } elseif ($candidateSourceVersion -ceq '4.4.2') { '4.4.1' } elseif ($candidateSourceVersion -cin @('4.3.1','4.4.0')) { '4.3.0' } else { '4.2.2' }
     receipt = [pscustomobject]@{path=$receiptPath;sha256=[string]$ReceiptReference.sha256}
     snapshots = @($snapshots | ForEach-Object { [pscustomobject]@{stage=[string]$_.stage;path=[string]$_.path;sha256=[string]$_.sha256} })
   }
@@ -1852,7 +2027,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
       (ConvertTo-MIR4BootstrapCanonicalJson -Value $receipt.published_maintenance_predecessor) -cne (ConvertTo-MIR4BootstrapCanonicalJson -Value $selectedCustody)) {
     throw '[mir42-individual-engine-run-predecessor-binding]'
   }
-  $nativeCandidateArchive = Assert-MIR42IndividualNativeCandidateSelection -Receipt $receipt -ReceiptPath $receiptPath -CandidateTarget $CandidateTarget
+  $nativeCandidateArchive = Assert-MIR42IndividualNativeCandidateSelection -Receipt $receipt -ReceiptPath $receiptPath -CandidateTarget $CandidateTarget -CurrentIndividual:$currentIndividual
   Assert-MIR42IndividualResourceLedgers -Receipt $receipt -ReceiptPath $receiptPath
   $root = Split-Path -Parent $receiptPath
   $logs = @(
@@ -1865,7 +2040,7 @@ function Assert-MIR42IndividualUpgradeReceipt {
       [pscustomobject][ordered]@{phase=$phase;path=$path;sha256=$sha}
     }
   )
-  return [pscustomobject][ordered]@{
+  $result = [pscustomobject][ordered]@{
     receipt_path = $receiptPath
     receipt_sha256 = [string]$ReceiptReference.sha256
     factorio_processes = [int]$receipt.factorio_processes
@@ -1885,6 +2060,8 @@ function Assert-MIR42IndividualUpgradeReceipt {
       published_maintenance_predecessor = $PublishedInput
     }
   }
+  if ($null -ne $Producer) { $result.execution | Add-Member -NotePropertyName producer -NotePropertyValue $Producer }
+  return $result
 }
 
 function Get-MIR42BoundIndividualEngineRun {
@@ -1895,9 +2072,10 @@ function Get-MIR42BoundIndividualEngineRun {
   $record = $input.record
   if ([string]$record.record_sha256 -cne [string]$Reference.record_sha256) { throw '[mir42-individual-engine-run-reference-binding]' }
   $contract = Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $Candidate -PublishedMaintenance
+  $currentIndividual = [string]$contract.engine_run_kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2'
   $expectedProperties = @('schema','kind','status','source','candidate_manifest','predecessor_authority','public_v410_checksum_asset','runner','harness','historical_target_authorities','published_maintenance_predecessor','individual_upgrade_receipts','fresh_loads','factorio_processes','release_qualification','publication_authorized','record_sha256')
   Assert-MIR42SealPropertyNames -Value $record -Expected $expectedProperties -Code 'mir42-individual-engine-run-shape'
-  if ([int]$record.schema -ne 1 -or [string]$record.kind -cne [string]$contract.engine_run_kind -or
+  if ([int]$record.schema -ne $(if ($currentIndividual) { 2 } else { 1 }) -or [string]$record.kind -cne [string]$contract.engine_run_kind -or
       [string]$record.status -cne [string]$contract.engine_run_status -or
       [string]$record.source.commit -cne [string]$Candidate.source.commit -or
       [string]$record.source.tree -cne [string]$Candidate.source.tree -or
@@ -1950,18 +2128,30 @@ function Get-MIR42BoundIndividualEngineRun {
     $receiptRows = @($record.individual_upgrade_receipts | Where-Object { [string]$_.target -ceq $target })
     $publishedRows = @($PublishedMaintenanceInputs.targets | Where-Object { [string]$_.target -ceq $target })
     if ($receiptRows.Count -ne 1 -or $publishedRows.Count -ne 1) { throw "[mir42-individual-engine-run-receipt-cardinality] $target" }
-    Assert-MIR42SealPropertyNames -Value $receiptRows[0] -Expected @('target','engine','receipt','harness_exit_code') -Code 'mir42-individual-engine-run-receipt-row-shape'
-    $proof = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $receiptRows[0].receipt -CandidateTarget $candidateTarget -PublishedInput $publishedRows[0] -PublishedMaintenanceInputs $PublishedMaintenanceInputs -Engine $receiptRows[0].engine -HarnessExitCode ([int]$receiptRows[0].harness_exit_code) -Candidate $Candidate
+    $receiptProperties = @('target','engine','receipt','harness_exit_code')
+    if ($currentIndividual) { $receiptProperties += 'producer' }
+    Assert-MIR42SealPropertyNames -Value $receiptRows[0] -Expected $receiptProperties -Code 'mir42-individual-engine-run-receipt-row-shape'
+    $receiptProducer = if ($currentIndividual) {
+      Assert-MIR42IndividualEvidenceProducer -RepoRoot $mir42SealRepoRoot -CandidateSource $Candidate.source -Producer $receiptRows[0].producer -Kind 'upgrade' -Code 'mir42-individual-engine-run-receipt-producer'
+    } else { $null }
+    $proof = Assert-MIR42IndividualUpgradeReceipt -ReceiptReference $receiptRows[0].receipt -CandidateTarget $candidateTarget -PublishedInput $publishedRows[0] -PublishedMaintenanceInputs $PublishedMaintenanceInputs -Engine $receiptRows[0].engine -HarnessExitCode ([int]$receiptRows[0].harness_exit_code) -Candidate $Candidate -Producer $receiptProducer
     $execution = $proof.execution
     $freshRows = @($record.fresh_loads | Where-Object { [string]$_.target -ceq $target })
     $execution.fresh_loads = @(
       foreach ($fresh in $freshRows) {
-        Assert-MIR42SealPropertyNames -Value $fresh -Expected @('target','scenario','receipt','log','stdout','stderr') -Code 'mir42-individual-engine-run-fresh-row-shape'
+        $freshProperties = @('target','scenario','receipt','log','stdout','stderr')
+        if ($currentIndividual) { $freshProperties += 'producer' }
+        Assert-MIR42SealPropertyNames -Value $fresh -Expected $freshProperties -Code 'mir42-individual-engine-run-fresh-row-shape'
         foreach ($field in @('receipt','log','stdout','stderr')) {
           Assert-MIR42SealPropertyNames -Value $fresh.$field -Expected @('path','sha256') -Code "mir42-individual-engine-run-fresh-$field-shape"
           $null = Resolve-MIR42SealImmutableFile -Path ([string]$fresh.$field.path) -Sha256 ([string]$fresh.$field.sha256) -Code "mir42-individual-engine-run-fresh-$field"
         }
-        [pscustomobject][ordered]@{scenario=[string]$fresh.scenario;receipt=$fresh.receipt;log=$fresh.log;stdout=$fresh.stdout;stderr=$fresh.stderr}
+        $freshProducer = if ($currentIndividual) {
+          Assert-MIR42IndividualEvidenceProducer -RepoRoot $mir42SealRepoRoot -CandidateSource $Candidate.source -Producer $fresh.producer -Kind 'fresh' -Code 'mir42-individual-engine-run-fresh-producer'
+        } else { $null }
+        $freshExecution = [ordered]@{scenario=[string]$fresh.scenario;receipt=$fresh.receipt;log=$fresh.log;stdout=$fresh.stdout;stderr=$fresh.stderr}
+        if ($currentIndividual) { $freshExecution.producer = $freshProducer }
+        [pscustomobject]$freshExecution
       }
     )
     if ($target -in $script:MIR42SealHistoricalTargets) {
@@ -1969,12 +2159,20 @@ function Get-MIR42BoundIndividualEngineRun {
       if ($historical.Count -ne 1) { throw "[mir42-individual-engine-run-historical-cardinality] $target" }
       $execution | Add-Member -NotePropertyName historical_terminal_authority -NotePropertyValue $historical[0].authority
     }
+    $freshArchivePath = if ($currentIndividual) {
+      [string]$proof.native_candidate_archive.canonical_path
+    } else {
+      [string]$proof.native_candidate_archive.path
+    }
     $freshTarget = [pscustomobject]@{
       target=$target
       target_id=(Get-MIR42ReleaseTargetIdentity -RepoRoot $mir42SealRepoRoot -Target $target -SourceVersion $contract.maintenance_source_version).target_id
       distribution_version=[string]$candidateTarget.distribution_version
       archive=[pscustomobject]@{
-        path=[string]$proof.native_candidate_archive.path
+        # The execution path is retained separately. Only a current restored
+        # custody path may use the authenticated canonical archive for fresh
+        # readback; legacy records retain their selected-path surface.
+        path=$freshArchivePath
         sha256=[string]$candidateTarget.archive_sha256
         content_sha256=[string]$candidateTarget.content_sha256
       }
@@ -1983,7 +2181,7 @@ function Get-MIR42BoundIndividualEngineRun {
       target=$target;distribution_version=[string]$candidateTarget.distribution_version;archive_sha256=[string]$candidateTarget.archive_sha256
       content_sha256=[string]$candidateTarget.content_sha256;archive_path=[string]$candidateTarget.archive_path;source=$Candidate.source
     }
-    Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidateTarget -Execution $execution
+    Assert-MIR42FreshEngineLoads -Target $freshTarget -CandidateTarget $freshCandidateTarget -Execution $execution -CurrentIndividual:$currentIndividual
     $processTotal += [int]$proof.factorio_processes + $freshRows.Count
     $results.Add([pscustomobject][ordered]@{
       target = $target;status='passed';archive=$proof.native_candidate_archive;engine_execution=$execution
@@ -1991,7 +2189,7 @@ function Get-MIR42BoundIndividualEngineRun {
   }
   if ([int]$record.factorio_processes -ne $processTotal) { throw '[mir42-individual-engine-run-process-count]' }
   $constructed = [pscustomobject][ordered]@{
-    schema=1;kind=[string]$record.kind;status=[string]$record.status;source=$record.source;candidate_manifest=$record.candidate_manifest
+    schema=[int]$record.schema;kind=[string]$record.kind;status=[string]$record.status;source=$record.source;candidate_manifest=$record.candidate_manifest
     predecessor_authority=$record.predecessor_authority;public_v410_checksum_asset=$record.public_v410_checksum_asset;runner=$record.runner;harness=$record.harness
     targets=@($results.ToArray());factorio_processes=$processTotal;release_qualification='not-performed';publication_authorized=$false
     historical_target_authorities=$record.historical_target_authorities;published_maintenance_predecessor=$record.published_maintenance_predecessor;record_sha256=[string]$record.record_sha256
@@ -2014,11 +2212,12 @@ function New-MIR42FourTargetRealEngineEvidenceBinder {
   if ($null -ne $PublishedMaintenanceArchiveBindings -and [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
     throw '[mir42-engine-evidence-maintenance-archive-bindings-scope]'
   }
-  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
+    -AllowCurrentCandidateToolingDescendant:$true
   $scope = Get-MIR42SealCandidateScope -Candidate $candidate -Code 'mir42-engine-evidence-candidate'
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
   $engineInput = Read-MIR42SealRecord -Path $EngineRunPath -Code 'mir42-engine-evidence-engine-run'
-  $individualNativeInput = [string]$engineInput.record.kind -ceq 'MIR42NineTargetMaintenanceIndividualEngineRunV1'
+  $individualNativeInput = [string]$engineInput.record.kind -cin @('MIR42NineTargetMaintenanceIndividualEngineRunV1','MIR42NineTargetCurrentIndividualEngineRunV2')
   $contract = if ($individualNativeInput) {
     Get-MIR42IndividualEngineEvidenceBindingContract -Candidate $candidate -PublishedMaintenance:$maintenanceRequested
   } else {
@@ -2182,11 +2381,12 @@ function New-MIR42NineTargetJoinedRealEngineCampaign {
   if ($null -ne $PublishedMaintenanceArchiveBindings -and [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)) {
     throw '[mir42-joined-campaign-maintenance-archive-bindings-scope]'
   }
-  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
+    -AllowCurrentCandidateToolingDescendant:$true
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-joined-campaign-candidate'
   $maintenanceRequested = -not [string]::IsNullOrWhiteSpace($PublishedMaintenancePredecessorManifestPath)
   $binder = Read-MIR42SealRecord -Path $EngineEvidencePath -Code 'mir42-joined-campaign-engine-evidence'
-  $individualNativeInput = [string]$binder.record.kind -ceq 'MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1'
+  $individualNativeInput = [string]$binder.record.kind -cin @('MIR42NineTargetMaintenanceIndividualRealEngineEvidenceBinderV1','MIR42NineTargetCurrentIndividualRealEngineEvidenceBinderV2')
   $contract = Get-MIR42JoinedCampaignInputContract -Candidate $candidate -PublishedMaintenance:$maintenanceRequested -IndividualNativeInput:$individualNativeInput
   $maintenanceInputs = $null
   if ($maintenanceRequested) {
@@ -2273,7 +2473,7 @@ function Get-MIR42RealEngineCandidateCampaign {
   $scope = Get-MIR42SealCandidateScope -Candidate $Candidate -Code 'mir42-seal-real-engine-candidate'
   $campaign = Read-MIR42SealRecord -Path $Path -Code 'mir42-seal-real-engine'
   $record = $campaign.record
-  $individualNativeInput = [string]$record.kind -ceq 'MIR42NineTargetMaintenanceIndividualRealEngineCandidateCampaignV1'
+  $individualNativeInput = [string]$record.kind -cin @('MIR42NineTargetMaintenanceIndividualRealEngineCandidateCampaignV1','MIR42NineTargetCurrentIndividualRealEngineCandidateCampaignV2')
   $contract = Get-MIR42JoinedCampaignInputContract -Candidate $Candidate -PublishedMaintenance:($null -ne $PublishedMaintenanceInputs) -IndividualNativeInput:$individualNativeInput
   $campaignProperties = @('schema','kind','status','source','candidate_manifest','evidence_reconciliation','engine_run','runner','targets','factorio_processes','release_qualification','release_acceptance','technical_seal','publication_authorized','record_sha256')
   if ($null -ne $PublishedMaintenanceInputs) { $campaignProperties += 'published_maintenance_predecessor' }
@@ -2304,6 +2504,8 @@ function Get-MIR42RealEngineCandidateCampaign {
 function Assert-MIR42RealEngineCampaignExecution {
   param([Parameter(Mandatory)][string]$RepoRoot,[Parameter(Mandatory)]$Campaign,[Parameter(Mandatory)]$Candidate,[Parameter(Mandatory)]$EngineRun,$PublishedMaintenanceInputs = $null)
   $record = $Campaign.record
+  $currentIndividual = $null -ne $EngineRun.record.PSObject.Properties['kind'] -and
+    [string]$EngineRun.record.kind -ceq 'MIR42NineTargetCurrentIndividualEngineRunV2'
   if ([int]$record.factorio_processes -ne [int]$engineRun.record.factorio_processes) { throw '[mir42-seal-real-engine-process-count-binding]' }
   if ($null -ne $PublishedMaintenanceInputs) { Assert-MIR42MaintenanceCampaignCustody -Record $record -PublishedInputs $PublishedMaintenanceInputs }
   foreach ($target in @($record.targets)) {
@@ -2313,6 +2515,7 @@ function Assert-MIR42RealEngineCampaignExecution {
       throw "[mir42-seal-real-engine-run-binding] $([string]$target.target)"
     }
     $executionProperties = @('executable_path','executable_sha256','version','predecessor','harness_receipt','harness_exit_code','logs','fresh_loads','fresh_exact_load','predecessor_upgrade','reload_count')
+    if ($currentIndividual) { $executionProperties += 'producer' }
     if ([string]$target.target -in $script:MIR42SealHistoricalTargets) { $executionProperties += 'historical_terminal_authority' }
     if ($null -ne $PublishedMaintenanceInputs) { $executionProperties += 'published_maintenance_predecessor' }
     Assert-MIR42SealPropertyNames -Value $target.engine_execution -Expected $executionProperties -Code 'mir42-seal-real-engine-target-shape'
@@ -2342,7 +2545,7 @@ function Assert-MIR42RealEngineCampaignExecution {
         @($logs | Where-Object { [string]$_.sha256 -notmatch '^[A-F0-9]{64}$' }).Count -ne 0 -or
         -not [bool]$target.engine_execution.fresh_exact_load -or
         -not [bool]$target.engine_execution.predecessor_upgrade -or [int]$target.engine_execution.reload_count -lt 2 -or
-        [string]$harness.status -cne 'passed' -or [string]$harness.git_commit -cne [string]$Candidate.source.commit -or
+        [string]$harness.status -cne 'passed' -or [string]$harness.git_commit -cne [string]$(if ($currentIndividual) { $target.engine_execution.producer.source.commit } else { $Candidate.source.commit }) -or
         [string]$harness.factorio_binary_sha256 -cne [string]$target.engine_execution.executable_sha256 -or
         [string]$harness.factorio_binary_version -cne [string]$target.engine_execution.version -or
         [string]$harness.from.sha256 -cne [string]$target.engine_execution.predecessor.sha256 -or
@@ -2370,7 +2573,11 @@ function Assert-MIR42RealEngineCampaignExecution {
       if ($null -eq $publishedInput) { Assert-MIR42ExactEngineAuthority -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution }
       Assert-MIR42GovernedPredecessor -RepoRoot $RepoRoot -Target $target -Execution $target.engine_execution -AuthorityReference $engineRun.record.predecessor_authority -RunAsset $engineRun.record.public_v410_checksum_asset -PublishedMaintenanceInput $publishedInput
     }
-    Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $Candidate -Execution $target.engine_execution
+    # Legacy records retain the full candidate source field. Current V2 rows
+    # need their own archive_path if their custody-restored selected copy is
+    # absent, so they bind the matched target rather than the whole candidate.
+    $freshCandidateTarget = if ($currentIndividual) { $candidateTarget } else { $Candidate }
+    Assert-MIR42FreshEngineLoads -Target $target -CandidateTarget $freshCandidateTarget -Execution $target.engine_execution -CurrentIndividual:$currentIndividual
   }
   Assert-MIR42JoinedAcceptanceCoverage -RepoRoot $RepoRoot -Receipt $Campaign -Candidate $Candidate
 }
@@ -3210,7 +3417,8 @@ function Get-MIR42TechnicalSealReadinessForScope {
   $blockers = [Collections.Generic.List[string]]::new()
   $state = [ordered]@{candidate=$null;programme=$null;qualification=$null;campaign=$null;independent=$null;t16_acl_contract=$null;t16_trust_root=$null;signing=$null;freeze=$null;reviewer=$null}
   try {
-    $state.candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath
+    $state.candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $CandidateManifestPath `
+      -AllowCurrentCandidateToolingDescendant:$true
     Assert-MIR42SealTargetSet -Rows @($state.candidate.targets) -Code ("mir42-" + $RequiredScope + '-seal-candidate') -Scope $RequiredScope
     if ($maintenanceRequested) { $contract = Get-MIR42TechnicalSealInputContract -Candidate $state.candidate -PublishedMaintenance }
     $checks.candidate = $true
@@ -3380,7 +3588,8 @@ function New-MIR42NineTargetRealEngineEvidenceBinder {
     [string]$PublishedMaintenancePredecessorManifestPath = '',
     [System.Collections.IDictionary]$PublishedMaintenanceArchiveBindings = $null
   )
-  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath
+  $candidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $RepoRoot -CandidateManifestPath $CandidateManifestPath `
+    -AllowCurrentCandidateToolingDescendant:$true
   Assert-MIR42SealTargetSet -Rows @($candidate.targets) -Scope 'nine-target' -Code 'mir42-nine-target-engine-evidence-candidate'
   New-MIR42FourTargetRealEngineEvidenceBinder @PSBoundParameters
 }

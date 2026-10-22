@@ -644,13 +644,17 @@ fixtures:
     planned_exact_real_campaign: local-2-1-krastorio-spaced-out-213-imersite-continuation
     input_profile: fixtures/run-profiles/k2-213-imersite-f210.json
     maintenance_input_profile: fixtures/run-profiles/k2-213-imersite-f210-422.json
-    current_input_profile: fixtures/run-profiles/k2-213-imersite-f210-460.json
-    current_fixture_version: "0.1.6"
-    current_candidate_version: "4.6.21000"
+    current_input_profile: fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
+    current_fixture_version: "0.1.10"
+    current_candidate_version: "4.7.21000"
+    current_engine_version: "2.1.23"
     input_profiles:
       - fixtures/run-profiles/k2-213-imersite-f210-440.json
       - fixtures/run-profiles/k2-213-imersite-f210-460.json
-    candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000", "4.6.21000"]
+      - fixtures/run-profiles/k2-213-imersite-f210-470.json
+      - fixtures/run-profiles/k2-214-imersite-f210-470.json
+      - fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
+    candidate_versions: ["4.2.21001", "4.2.21002", "4.4.21000", "4.6.21000", "4.7.21000"]
     exact_version_envelope:
       base: "2.1.21"
       Krastorio2: "2.1.3"
@@ -706,6 +710,47 @@ fixtures:
       - selected-queue-and-completed-work-through-two-distinct-native-reloads
       - direct-master-library-with-no-dependency-staging-and-restored-controls
       - no-natural-acquisition-production-throughput-or-broader-profile-claim
+
+  k2-214-imersite-current-predecessor-upgrade:
+    requires_features: []
+    path: fixtures/assert-upgrade-k2-imersite-4-6-21000-to-4-7-21000
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    input_profile: fixtures/run-profiles/k2-214-imersite-f210-470.json
+    current_input_profile: fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
+    current_fixture_version: "0.1.4701"
+    current_candidate_version: "4.7.21000"
+    current_engine_version: "2.1.23"
+    input_profiles:
+      - fixtures/run-profiles/k2-214-imersite-f210-470.json
+      - fixtures/run-profiles/k2-214-imersite-f210-470-2123.json
+    shipped: false
+    qualification_status: unqualified
+    validates:
+      - exact-published-460-f210-predecessor-identity-and-current-470-candidate-binding
+      - exact-2122-k2-214-k2so-2019-profile-hashes-and-direct-library-selection
+      - distinct-current-2123-staged-fixture-with-retained-2122-source-and-receipt-identities
+      - published-460-infinite-imersite-predecessor-at-completed-levels-zero-two-three-and-seven
+      - below-split-levels-remain-on-finite-legacy-stage-without-invented-credit
+      - completed-finite-stage-levels-transfer-total-powder-bonus-and-the-next-level-queue-progress
+      - independent-native-crystal-owner-and-all-unrelated-technology-effect-and-setting-state
+      - exact-v7-science-retirement-on-25-independently-reviewed-mir-owned-identities
+      - explicit-untouched-control-and-unseeded-force-preservation-around-staged-and-declared-science-deltas
+      - two-distinct-cold-reloads-with-full-state-comparisons
+      - no-native-acceptance-until-exact-predecessor-candidate-upgrade-and-two-reloads-pass
+      - exact-test-owned-running-speed-contribution-restored-by-its-owner-before-mir-configuration
+
+  k2-470-owned-speed-sentinel:
+    requires_features: []
+    path: fixtures/aaa-mir47-owned-speed-sentinel
+    harness: tests/runtime/Test-MIRK2OwnedSpeedSentinelControls.ps1
+    shipped: false
+    qualification_status: host-controls-passed-native-pending
+    validates:
+      - exact-current-k2-upgrade-fixture-only-internal-admission
+      - source-owned-contribution-capture-and-one-time-configuration-restoration
+      - strict-source-total-and-unrelated-state-oracles-remain-unchanged
+      - full-source-fixture-exporter-lexical-binding-and-real-remote-interface-shape
+      - no-product-recovery-of-opaque-third-party-contributions
 
   f200-bob-angel-maintenance-upgrade-423:
     requires_features: []
@@ -2003,11 +2048,11 @@ fixtures:
     harness: tests/runtime/Test-MIR42CapOwnershipMultiforce.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.21"
-      factorio_file_version: "2.1.21.87673"
-      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
+      factorio_version: "2.1.22"
+      factorio_file_version: "2.1.22.87719"
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json
       engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
-      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+      mod_lock: exact-f210-2.1.22-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
     validates:
       - canonical-schema-3-copper-binding-and-transport
       - strict-runtime-and-browser-refusal-of-late-forged-schema-3-policy-identities
@@ -2061,12 +2106,12 @@ fixtures:
     harness: tests/runtime/Test-MIR42V2V3CapMigration.ps1
     exact_target:
       factorio_line: "2.1"
-      factorio_version: "2.1.21"
-      factorio_file_version: "2.1.21.87673"
+      factorio_version: "2.1.22"
+      factorio_file_version: "2.1.22.87719"
       predecessor_commit: f7f9bab7bb1d1a63c98b5e21178fbaed418a3f6e
-      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV3.json
+      engine_selection_authority: .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json
       engine_admission: admitted-exact-engine-api-prototype-data-and-official-mod-capsule-cap-harness-only
-      mod_lock: exact-f210-2.1.21-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
+      mod_lock: exact-f210-2.1.22-official-base-elevated-rails-quality-recycler-space-age-canonical-info-lock
     validates:
       - authentic-pinned-F210-V2-package-reconstruction-and-runtime-state-seeding
       - recognized-V2-owned-enable-and-visibility-records-migrate-to-V3
@@ -2648,3 +2693,30 @@ fixtures:
       - exact-4-1-candidate-normal-mod-directory-load
 
 # MIR441-DIRECT-UPGRADE-FIXTURES-END
+
+  trigger-output-science-f210-470-representative:
+    requires_features: []
+    path: fixtures/assert-trigger-output-science-f210-470
+    harness: tests/runtime/Test-MIRUpgrade.ps1
+    shipped: false
+    qualification_status: host-controls-passed-native-pending
+    explicit_opt_in: true
+    validates:
+      - target-only-space-age-send-item-to-orbit-trigger-output-input
+      - exact-disabled-same-name-recipe-and-positive-satellite-product
+      - selected-trigger-output-science-reaches-emitted-ice-and-platform-productivity-research
+      - ordinary-cryogenic-craft-item-and-unlock-input-remains-exact
+      - complete-state-comparison-with-only-the-explicit-space-science-definition-delta
+      - candidate-save-and-two-cold-loads
+
+  trigger-output-science-published-460-representative-old-input:
+    requires_features: []
+    path: fixtures/assert-trigger-output-science-source-failure-f210-460
+    harness: tests/tooling/Test-MIRUpgradeManifest.ps1
+    shipped: false
+    qualification_status: input-only-shape-host-controls-passed-old-source-native-failure-unbound
+    explicit_opt_in: true
+    validates:
+      - explicit-published-460-altered-input-shape-only
+      - no-source-save-or-migration-claim
+      - actual-old-source-startup-failure-requires-separate-native-scenario-binding

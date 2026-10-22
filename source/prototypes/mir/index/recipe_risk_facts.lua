@@ -192,17 +192,51 @@ local function build_index(source, indexes)
   return index, hard_count, review_count
 end
 
-local function build()
+local function materialization()
   local context = compiler_context.current()
-  local cached = context:state_view("recipe_risk_index")
-  if cached then return cached end
+  return context:state_view("recipe_risk_materialization", function()
+    -- Risk rows are demand-materialized. Ordinary callers need an exact
+    -- selected RecipeFact, not a complete generic RecipeFacts export.
+    local names = recipe_facts.all_names()
+    table.sort(names)
+    -- Reuse the Context service boundary for complete external inspection.
+    -- Capture the owner function, not a mutable caller-supplied exporter.
+    local complete = M.fingerprint
+    context:set_service("recipe_risk.materialize_export", function() complete() end)
+    return {
+      schema = 1, record_type = "RecipeRiskMaterialization", complete = false,
+      relationships = relationships.view("input"),
+      index = {schema = SCHEMA, names = names, facts = {}}
+    }
+  end)
+end
+
+local function materialize_row(state, recipe_name)
+  local row = state.index.facts[recipe_name]
+  if row then return row end
+  local fact = recipe_facts.view(recipe_name)
+  if not fact then return nil end
   telemetry.start_phase("recipe_risk_facts")
-  local index, hard_count, review_count = build_index(recipe_facts.index_view(), relationships.view("input"))
-  telemetry.count("recipe_risk_facts", #index.names)
-  telemetry.count("recipe_hard_risk_count", hard_count)
-  telemetry.count("recipe_review_risk_count", review_count)
+  row = build_row(recipe_name, fact, state.relationships)
+  state.index.facts[recipe_name] = row
+  telemetry.count("recipe_risk_facts", 1)
+  telemetry.count("recipe_hard_risk_count", #row.hard_flags > 0 and 1 or 0)
+  telemetry.count("recipe_review_risk_count", #row.review_flags > 0 and 1 or 0)
   telemetry.finish_phase("recipe_risk_facts")
-  return context:set_state("recipe_risk_index", index)
+  return row
+end
+
+local function build()
+  local state = materialization()
+  if not state.complete then
+    for _, name in ipairs(state.index.names) do materialize_row(state, name) end
+    state.index.risk_index_fingerprint = fingerprint.of({
+      schema = state.index.schema, names = state.index.names, facts = state.index.facts
+    })
+    compiler_context.current():set_state("recipe_risk_index", state.index)
+    state.complete = true
+  end
+  return state.index
 end
 
 function M.index_facts(recipe_index, relationship_index)
@@ -215,7 +249,37 @@ function M.index_facts(recipe_index, relationship_index)
 end
 
 function M.view(recipe_name)
-  return build().facts[recipe_name]
+  return materialize_row(materialization(), recipe_name)
+end
+
+-- Ordinary compilation needs a source identity, not the complete diagnostic
+-- output inventory. Bind every classifier input: normalized recipe facts,
+-- item placeability, the declared review patterns and hard-rule revision.
+-- This identity grants no admission; each selected row still runs build_row.
+function M.source_fingerprint()
+  local state = materialization()
+  if not state.source_fingerprint then
+    local placeable = {}
+    for name, item in pairs(state.relationships.items) do
+      if item.place_result then placeable[name] = item.place_result end
+    end
+    local source = {
+      schema = 1, record_type = "RecipeRiskInputs", hard_rule_revision = 1,
+      placeable_items = placeable,
+      review_patterns = REVIEW_PATTERNS
+    }
+    -- Explicit generic snapshot/export requests retain the established full
+    -- index digest. The active compiler binds the complete normalized input
+    -- contract instead, so it need not serialize derived index maps merely to
+    -- name its ordinary source inputs.
+    if compiler_context.current():legacy_compiler_export_requested() then
+      source.recipe_facts = recipe_facts.fingerprint()
+    else
+      source.recipe_input = recipe_facts.active_input_identity()
+    end
+    state.source_fingerprint = fingerprint.of(source)
+  end
+  return state.source_fingerprint
 end
 
 function M.get(recipe_name)

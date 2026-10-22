@@ -26,6 +26,11 @@ param(
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$SelectedFreshTarget,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][ValidateSet('package-zip-base','package-zip-space-age')][string]$SelectedFreshScenario,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshEngine,
+  # Current F210 FreshLeaf callers bind this exact executable identity themselves.
+  # These remain optional for every preserved leaf and become required only for the
+  # current 4.7/F210 branch below.
+  [Parameter(ParameterSetName='FreshLeaf')][string]$SelectedFreshEngineVersion = '',
+  [Parameter(ParameterSetName='FreshLeaf')][string]$SelectedFreshEngineSha256 = '',
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshPredecessor,
   [Parameter(Mandatory,ParameterSetName='FreshLeaf')][string]$SelectedFreshLibraryDirectory
 )
@@ -41,6 +46,7 @@ $libraryArchiveBindings=[Collections.Generic.List[object]]::new()
 . (Join-Path $RepoRoot 'tools/lib/validation/FactorioProcess.ps1')
 . (Join-Path $RepoRoot 'tools/lib/validation/NativeProbeResources.ps1')
 . (Join-Path $RepoRoot 'tools/lib/compatibility/FactorioRunner.ps1')
+. (Join-Path $RepoRoot 'tools/mir/application/release/readiness/MIR42TechnicalSeal.ps1')
 
 $script:MIR42ModernEngineTargets = @('f210','f200','f110','f100')
 $script:MIR42HistoricalEngineTargets = @('f017','f016','f015','f014','f013')
@@ -107,9 +113,70 @@ function Get-MIR42EngineCandidateVersionContract {
   }
 }
 
+function Assert-MIR42SelectedFreshCurrentF210Engine {
+  param(
+    [Parameter(Mandatory)][ValidateSet('f210')][string]$Target,
+    [Parameter(Mandatory)][ValidateSet('4.7.0')][string]$CandidateSourceVersion,
+    [Parameter(Mandatory)][string]$EngineProductVersion,
+    [Parameter(Mandatory)][string]$EngineFileVersion,
+    [Parameter(Mandatory)][string]$EngineSha256,
+    [Parameter(Mandatory)][string]$SelectedEngineVersion,
+    [Parameter(Mandatory)][string]$SelectedEngineSha256,
+    [Parameter(Mandatory)][string]$CandidateArchive
+  )
+  if ([string]::IsNullOrWhiteSpace($SelectedEngineVersion) -or
+      [string]::IsNullOrWhiteSpace($SelectedEngineSha256)) {
+    throw '[mir42-f210-fresh-current-engine-input-required]'
+  }
+  if ($SelectedEngineSha256 -notmatch '^[A-Fa-f0-9]{64}$' -or
+      $EngineSha256 -notmatch '^[A-Fa-f0-9]{64}$') {
+    throw '[mir42-f210-fresh-current-engine-hash]'
+  }
+  # Read the selected immutable package rather than an ambient channel policy.
+  # Current FreshLeaf is intentionally limited to the declared F210 2.1.23 floor.
+  $archive = [IO.Compression.ZipFile]::OpenRead($CandidateArchive)
+  try {
+    $entries = @($archive.Entries | Where-Object { $_.FullName -match '^[^/]+/info[.]json$' })
+    if ($entries.Count -ne 1) { throw '[mir42-f210-fresh-current-package-info]' }
+    $reader = [IO.StreamReader]::new($entries[0].Open())
+    try { $info = $reader.ReadToEnd() | ConvertFrom-Json -Depth 20 -DateKind String }
+    finally { $reader.Dispose() }
+  } finally { $archive.Dispose() }
+  $baseRequirements = @(
+    foreach ($dependency in @($info.dependencies)) {
+      $text = [string]$dependency
+      if ($text -match '^base\s+>=\s+([0-9]+[.][0-9]+[.][0-9]+)$') { [string]$Matches[1] }
+    }
+  )
+  if ([string]$info.factorio_version -cne '2.1' -or $baseRequirements.Count -ne 1 -or
+      [string]$baseRequirements[0] -cne '2.1.23') {
+    throw '[mir42-f210-fresh-current-package-minimum]'
+  }
+  $minimum = [string]$baseRequirements[0]
+  if ($SelectedEngineVersion -notmatch ('^' + [regex]::Escape($minimum) + '[.][0-9]+$') -or
+      $EngineFileVersion -cne $SelectedEngineVersion) {
+    throw '[mir42-f210-fresh-current-engine-version]'
+  }
+  if ($EngineProductVersion -cne $minimum) {
+    throw '[mir42-f210-fresh-current-engine-product-version]'
+  }
+  if ($EngineSha256.ToUpperInvariant() -cne $SelectedEngineSha256.ToUpperInvariant()) {
+    throw '[mir42-f210-fresh-current-engine-hash]'
+  }
+  return [pscustomobject][ordered]@{
+    target = $Target
+    source_version = $CandidateSourceVersion
+    factorio_family = [string]$info.factorio_version
+    declared_minimum = $minimum
+    product_version = $EngineProductVersion
+    file_version = $EngineFileVersion
+    sha256 = $EngineSha256.ToUpperInvariant()
+  }
+}
+
 function Get-MIR42EngineMaintenanceSelection {
   param([Parameter(Mandatory)][string]$CandidateSourceVersion,[string]$RequestedPredecessorSourceVersion='')
-  if ($CandidateSourceVersion -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) {
+  if ($CandidateSourceVersion -cnotin @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) {
     throw '[mir42-engine-maintenance-predecessor-candidate-scope]'
   }
   $direct = Get-MIR42PublishedMaintenancePredecessorContract -CandidateSourceVersion $CandidateSourceVersion
@@ -124,6 +191,7 @@ function Get-MIR42EngineMaintenanceSelection {
     '4.5.0' { @('4.2.2',[string]$direct.source_version) }
     '4.5.2' { @('4.5.1','4.4.2') }
     '4.6.0' { @('4.5.2') }
+    '4.7.0' { @('4.6.0') }
     default { @([string]$direct.source_version) }
   }
   if ($requested -cnotin $permitted) { throw '[mir42-engine-maintenance-predecessor-selection]' }
@@ -138,6 +206,7 @@ function Get-MIR42EngineMaintenanceSelection {
     '4.4.2' { if ($CandidateSourceVersion -cin @('4.5.0','4.5.2')) { '4.5.0' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.5.1' { if ($CandidateSourceVersion -ceq '4.5.2') { '4.5.2' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.5.2' { if ($CandidateSourceVersion -ceq '4.6.0') { '4.6.0' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
+    '4.6.0' { if ($CandidateSourceVersion -ceq '4.7.0') { '4.7.0' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     '4.4.1' { if ($CandidateSourceVersion -ceq '4.4.2') { '4.4.2' } else { throw '[mir42-engine-maintenance-predecessor-selection]' } }
     default { throw '[mir42-engine-maintenance-predecessor-selection]' }
   }
@@ -147,14 +216,14 @@ function Get-MIR42EngineMaintenanceSelection {
 function Get-MIR42EngineMaintenanceHarnessArguments {
   param(
     [Parameter(Mandatory)][ValidateSet('f210','f200','f110','f100','f017','f016','f015','f014','f013')][string]$Target,
-    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion,
+    [Parameter(Mandatory)][ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$SourceVersion,
     [Parameter(Mandatory)][string]$CandidateManifestPath,
     [string]$SourceMaterializationPath = '',
     [Parameter(Mandatory)][string]$PublishedPredecessorManifestPath
   )
   $modern = $Target -cin @('f210','f200','f110','f100')
-  $currentMaterialization = ($modern -and $SourceVersion -cin @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')) -or
-    (-not $modern -and $SourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0'))
+  $currentMaterialization = ($modern -and $SourceVersion -cin @('4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')) -or
+    (-not $modern -and $SourceVersion -cin @('4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0'))
   $arguments = @('-SelectedTarget',$Target,
     '-PublishedMaintenancePredecessorManifestPath',$PublishedPredecessorManifestPath)
   if ($currentMaterialization) {
@@ -175,7 +244,7 @@ function Get-MIR42HistoricalEngineDescriptor {
   param(
     [Parameter(Mandatory)][string]$RepoRoot,
     [Parameter(Mandatory)][ValidateSet('f017','f016','f015','f014','f013')][string]$Target,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion = '4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$SourceVersion = '4.2.0',
     [string]$EnginePath = ''
   )
   $expected = $script:MIR42HistoricalTerminalInputs[$Target]
@@ -443,7 +512,7 @@ function Invoke-MIR42HistoricalFreshLoad {
     [Parameter(Mandatory)][string]$CandidateSha256,
     [Parameter(Mandatory)][string]$LibraryDirectory,
     [Parameter(Mandatory)][string]$Version,
-    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0')][string]$SourceVersion='4.2.0',
+    [ValidateSet('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0')][string]$SourceVersion='4.2.0',
     [Parameter(Mandatory)][string]$FreshRoot,
     [Parameter(Mandatory)][string]$SourceCommit,
     [Parameter(Mandatory)][int]$DeadlineSeconds
@@ -512,12 +581,12 @@ function Invoke-MIR42ModernFreshLoad {
     'f110' { '1.1' }
     'f100' { '1.0' }
   }
-  $versionMatch = [regex]::Match($Version,('^4[.](?<source_minor>2|3|4|5)[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
+  $versionMatch = [regex]::Match($Version,('^4[.](?<source_minor>2|3|4|5|6|7)[.]' + [regex]::Escape($Target.Substring(1)) + '(?<source_patch>[0-9]{2})$'))
   $sourceVersion = if ($versionMatch.Success) {
     '4.' + $versionMatch.Groups['source_minor'].Value + '.' + [string]([int]$versionMatch.Groups['source_patch'].Value)
   } else { '' }
   if ($FactorioLine -cne $expectedLine -or -not $versionMatch.Success -or
-      $sourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0') -or
+      $sourceVersion -cnotin @('4.2.0','4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.2','4.5.0','4.5.2','4.6.0','4.7.0') -or
       $Version -cne [string](New-MIR4DistributionIdentityProjection -DistributionTargetCode $Target.Substring(1) -SourceMinor ([int]$versionMatch.Groups['source_minor'].Value) -SourcePatch ([int]$versionMatch.Groups['source_patch'].Value)).distribution_version -or
       -not $FactorioBinaryVersion.StartsWith($FactorioLine + '.',[StringComparison]::Ordinal) -or
       ($Scenario -ceq 'package-zip-space-age' -and $Target -cne 'f210')) {
@@ -699,8 +768,18 @@ if ([string]$manifest.package_authority_sha256 -cne [string]$packageAuthority.re
 $head = (& git -C $repo rev-parse HEAD).Trim()
 $tree = (& git -C $repo rev-parse 'HEAD^{tree}').Trim()
 $dirty = @(& git -C $repo status --porcelain --untracked-files=no)
-if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0 -or
-    $head -cne [string]$manifest.source.commit -or $tree -cne [string]$manifest.source.tree) {
+if ($LASTEXITCODE -ne 0 -or $dirty.Count -ne 0) {
+  throw '[mir42-engine-candidate-source-snapshot-mismatch]'
+}
+if ($sourceVersion -cin @('4.6.0','4.7.0')) {
+  $exactCandidate = Get-MIR42ExactFourTargetCandidate -RepoRoot $repo -CandidateManifestPath $manifestPath `
+    -AllowPackageEquivalentToolingDescendant
+  if ([string]$exactCandidate.source_version -cne $sourceVersion -or
+      [string]$exactCandidate.source.commit -cne [string]$manifest.source.commit -or
+      [string]$exactCandidate.source.tree -cne [string]$manifest.source.tree) {
+    throw '[mir42-engine-candidate-reader-binding]'
+  }
+} elseif ($head -cne [string]$manifest.source.commit -or $tree -cne [string]$manifest.source.tree) {
   throw '[mir42-engine-candidate-source-snapshot-mismatch]'
 }
 $candidateRoot = [IO.Path]::GetFullPath((Split-Path -Parent $manifestPath))
@@ -717,13 +796,14 @@ if($running.Count){throw '[mir42-engine-factorio-already-running]'}
 $freshLeafMode = $PSCmdlet.ParameterSetName -ceq 'FreshLeaf'
 if ($freshLeafMode) {
   # Fresh leaves are individual current-package observations.  Keep this
-  # narrower than the aggregate maintenance selector: only the retained
-  # 4.5.0/4.4.2 pair and the current 4.5.2 predecessor pairs have an
-  # individual-fresh contract.  The existing reader below still authenticates
-  # the selected publication, manifest, release metadata and archive bytes.
+  # narrower than the aggregate maintenance selector: only retained individual
+  # predecessor pairs have a fresh-load contract. The existing reader below
+  # still authenticates the selected publication, manifest, release metadata
+  # and archive bytes.
   $freshLeafPredecessors = switch -CaseSensitive ($sourceVersion) {
     '4.5.0' { @('4.4.2') }
     '4.5.2' { @('4.5.1','4.4.2') }
+    '4.7.0' { @('4.6.0') }
     default { @() }
   }
   if ($PublishedMaintenancePredecessorSourceVersion -cnotin $freshLeafPredecessors) {
@@ -878,6 +958,7 @@ foreach ($target in $targets) {
   $row = $selected[$target]
   $row['source_version'] = $sourceVersion
   $isHistoricalTarget = $target -in $script:MIR42HistoricalEngineTargets
+  $isSelectedFreshCurrentF210 = $freshLeafMode -and $sourceVersion -ceq '4.7.0' -and $target -ceq 'f210'
   $lock = if ($isHistoricalTarget) { $null } else { @($inputAuthority.targets | Where-Object { [string]$_.target -ceq $target })[0] }
   $row.engine = Assert-MIR42EngineRunFile -Path $row.engine -Label "mir42-$target-engine"
   $row.predecessor = Assert-MIR42EngineRunFile -Path $row.predecessor -Label "mir42-$target-predecessor"
@@ -936,6 +1017,10 @@ foreach ($target in $targets) {
       }
     }
     $row.engine_version = [string]$historical.engine.version
+  } elseif ($isSelectedFreshCurrentF210) {
+    # The exact selected-current engine is authenticated below after the F210
+    # candidate archive has been bound and its declared package floor inspected.
+    $row.engine_version=$row.engine_file_version
   } elseif ($null -ne $maintenanceInputs) {
     Assert-MIR421NativeEngineIdentity -RepoRoot $repo -Target $target -Observed ([pscustomobject]@{
       product_version=$row.engine_product_version;file_version=$row.engine_file_version;sha256=$row.engine_sha256
@@ -992,6 +1077,11 @@ foreach ($target in $targets) {
     throw "[mir42-$target-candidate-content]"
   }
   $row.candidate_sha256 = [string]$candidate.asset.sha256
+  if ($isSelectedFreshCurrentF210) {
+    $null = Assert-MIR42SelectedFreshCurrentF210Engine -Target $target -CandidateSourceVersion $sourceVersion `
+      -EngineProductVersion $row.engine_product_version -EngineFileVersion $row.engine_file_version -EngineSha256 $row.engine_sha256 `
+      -SelectedEngineVersion $SelectedFreshEngineVersion -SelectedEngineSha256 $SelectedFreshEngineSha256 -CandidateArchive $row.candidate
+  }
 }
 $pwsh = Assert-MIR42EngineRunFile -Path (Get-Command pwsh).Source -Label 'mir42-pwsh'
 $harness = Assert-MIR42EngineRunFile -Path (Join-Path $repo 'tests/runtime/Test-MIRUpgrade.ps1') -Label 'mir42-upgrade-harness'

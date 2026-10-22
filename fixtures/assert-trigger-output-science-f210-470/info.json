@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-assert-trigger-output-science-f210-470",
+  "version": "0.1.4700",
+  "title": "MIR test-only trigger-output science representative",
+  "author": "MIR tests",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research >= 4.6.21000"
+  ]
+}

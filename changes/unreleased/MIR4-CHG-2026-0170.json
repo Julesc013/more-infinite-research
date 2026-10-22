@@ -1,0 +1,101 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0170",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Restore complete published 4.6 history when rendering MIR 4.7 target changelogs.",
+  "details": [
+    "Keep each target's exact signed 4.6 entry and earlier authored history, then render one target-specific 4.7 leading entry through the shared package writer and authenticate the same declared minimum in historical targets.",
+    "Name the concrete current compiler, journal, recipe and relationship changes only for the four modern targets; historical target entries retain presentation history and their declared engine floors without claiming modern behavior.",
+    "This presentation correction changes no player runtime, research, setting, save, migration, compatibility acceptance or support claim."
+  ],
+  "semantic_domains": [
+    "presentation",
+    "release"
+  ],
+  "audiences": [
+    "players",
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a target-specific 4.7 changelog entry; gameplay behavior is unchanged by this presentation repair."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a target-specific 4.7 changelog entry; gameplay behavior is unchanged by this presentation repair."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a target-specific 4.7 changelog entry; gameplay behavior is unchanged by this presentation repair."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a target-specific 4.7 changelog entry; gameplay behavior is unchanged by this presentation repair."
+    },
+    {
+      "target": "F017",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a presentation-only 4.7 entry; it does not claim modern compiler behavior."
+    },
+    {
+      "target": "F016",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a presentation-only 4.7 entry; it does not claim modern compiler behavior."
+    },
+    {
+      "target": "F015",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a presentation-only 4.7 entry; it does not claim modern compiler behavior."
+    },
+    {
+      "target": "F014",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a presentation-only 4.7 entry; it does not claim modern compiler behavior."
+    },
+    {
+      "target": "F013",
+      "disposition": "affected",
+      "reason": "Renders restored signed 4.6 history and a presentation-only 4.7 entry; it does not claim modern compiler behavior."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "none",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "tools/mir/application/package/TargetMaterializer.ps1: shared 4.7 target-entry writer"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/release/Test-MIR42VersionContract.ps1: exact signed 4.6 history and target-specific 4.7 entry controls"
+    },
+    {
+      "kind": "finding",
+      "value": "dist/4.6.0/SHA256SUMS.txt: signed published target archive identities"
+    }
+  ]
+}

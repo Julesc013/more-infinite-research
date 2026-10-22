@@ -959,6 +959,7 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   $compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
   $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
   $angelsRepairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
+  $k2StateIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR47-K2-STAGED-STATE-CARRIERS'})
   $retiredPredecessorSources=@(
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
     'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
@@ -977,12 +978,27 @@ function Assert-MIR4ComposablePackageSourceV3Succession {
   )
   $predecessorPaths=@($Predecessor.bindings|ForEach-Object{[string]$_.predecessor_source_path}|Sort-Object -Unique)
   $currentPaths=@($Current.bindings|ForEach-Object{[string]$_.source_path}|Sort-Object -Unique)
-  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne375-or$currentPaths.Count-ne375-or
-     $migrated.Count-ne354-or$introduced.Count-ne21-or$compilerTransitionIntroduced.Count-ne1-or$angelsRepairIntroduced.Count-ne1-or
+  if($predecessorPaths.Count-ne359-or@($Current.bindings).Count-ne379-or$currentPaths.Count-ne379-or
+     $migrated.Count-ne354-or$introduced.Count-ne25-or$compilerTransitionIntroduced.Count-ne1-or$angelsRepairIntroduced.Count-ne1-or$k2StateIntroduced.Count-ne4-or
      $approvedBindingsIntroduced.Count-ne2-or$historicalIntroduced.Count-ne12-or$repairIntroduced.Count-ne1-or
      $progressionIntroduced.Count-ne1-or$progressionPlannerIntroduced.Count-ne1-or$browserIntroduced.Count-ne2-or
      @($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-ne0){
     throw '[mir4-package-presentation-v7-source-succession]'
+  }
+  $k2StatePaths=@(
+    @{path='prototypes/mir/domain/research/k2_imersite_staged_state.lua';layer='capability';semantic='target-overlay';scope='f210|f200|f110|f100'},
+    @{path='prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua';layer='compatibility';semantic='target-overlay';scope='f210'},
+    @{path='prototypes/mir/runtime/k2_imersite_staged_state_migration.lua';layer='compatibility';semantic='target-overlay';scope='f210'},
+    @{path='migrations/more-infinite-research_4.7.0.json';layer='compatibility';semantic='migration';scope='f210'}
+  )
+  foreach($expected in $k2StatePaths){
+    $rows=@($k2StateIntroduced|Where-Object{[string]$_.source_path-ceq('source/'+$expected.path)})
+    if($rows.Count-ne1-or[string]$rows[0].output_path-cne$expected.path-or
+       [string]$rows[0].layer-cne$expected.layer-or[string]$rows[0].semantic_class-cne$expected.semantic-or
+       [string]$rows[0].transform-cne'copy-exact-bytes'-or
+       (@($rows[0].target_scope)-join'|')-cne$expected.scope){
+      throw '[mir4-package-presentation-v7-source-succession]'
+    }
   }
   foreach($source in $retiredPredecessorSources){if($source-cnotin$predecessorPaths){throw '[mir4-package-presentation-v7-source-succession]'}}
   foreach($source in $retiredCurrentSources){if($source-cin$currentPaths){throw '[mir4-package-presentation-v7-source-succession]'}}

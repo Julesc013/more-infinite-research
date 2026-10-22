@@ -7,6 +7,7 @@ local generated_registry = require("prototypes.mir.domain.facts.generated_techno
 local mod_data = require("prototypes.mir.emit.mod_data")
 local recipe_facts = require("prototypes.mir.index.recipe_facts")
 local target_line = require("prototypes.mir.platform.factorio.target_line")
+local k2_imersite_state_alias = require("prototypes.mir.domain.research.k2_imersite_staged_state")
 local adoption = require("prototypes.mir.emit.transactions.productivity_family_adoption")
 local compiler_context = require("prototypes.mir.pipeline.compiler_context")
 local public_artifacts = require("prototypes.mir.report.public_compiler_artifacts")
@@ -29,17 +30,30 @@ local CATEGORIES = {
   "unclassified"
 }
 
+local function private_state_alias(technology_name)
+  if k2_imersite_state_alias == nil then return false end
+  local holder = k2_imersite_state_alias.holder_for_technology(technology_name)
+  local entry = generated_registry.get(technology_name)
+  return holder ~= nil and entry ~= nil
+    and entry.kind == k2_imersite_state_alias.registry_kind
+    and entry.key == holder.stream_key
+end
+
 local function owner_index()
   local by_recipe = {}
   local counts = {technologies = 0, effects = 0, graph_edges = 0, technology_passes = 1}
   for technology_name, technology in pairs(data_raw.prototypes("technology")) do
-    counts.technologies = counts.technologies + 1
-    counts.graph_edges = counts.graph_edges + #(technology.prerequisites or {})
-    for _, effect in ipairs(technology.effects or {}) do
-      counts.effects = counts.effects + 1
-      if effect.type == "change-recipe-productivity" and effect.recipe then
-        by_recipe[effect.recipe] = by_recipe[effect.recipe] or {}
-        table.insert(by_recipe[effect.recipe], technology_name)
+    -- The two exact JSON carriers temporarily mirror a predecessor effect.
+    -- They are neither coverage owners nor player-visible technologies.
+    if not private_state_alias(technology_name) then
+      counts.technologies = counts.technologies + 1
+      counts.graph_edges = counts.graph_edges + #(technology.prerequisites or {})
+      for _, effect in ipairs(technology.effects or {}) do
+        counts.effects = counts.effects + 1
+        if effect.type == "change-recipe-productivity" and effect.recipe then
+          by_recipe[effect.recipe] = by_recipe[effect.recipe] or {}
+          table.insert(by_recipe[effect.recipe], technology_name)
+        end
       end
     end
   end
@@ -129,7 +143,7 @@ function M.build(context, options)
   context = context or compiler_context.current()
   options = options or {}
   local include_rows = options.include_rows ~= false
-  local facts = recipe_facts.index_view()
+  local recipe_names = recipe_facts.all_names()
   local owners_by_recipe, prototype_counts = owner_index()
   local attached, decisions, candidate_count = family_indexes()
   local adopted = adopted_index()
@@ -137,8 +151,7 @@ function M.build(context, options)
   for _, category in ipairs(CATEGORIES) do counts[category] = 0 end
   local visible, eligible, dangling, duplicate = 0, 0, 0, 0
 
-  for _, recipe_name in ipairs(facts.names) do
-    local fact = facts.facts[recipe_name]
+  recipe_facts.for_each_coverage(function(recipe_name, fact)
     local owners = owners_by_recipe[recipe_name] or {}
     if not fact.hidden then visible = visible + 1 end
     local skip_category = base_skip(fact)
@@ -160,17 +173,17 @@ function M.build(context, options)
         owners = deepcopy(owners)
       })
     end
-  end
+  end)
 
   for recipe_name, _ in pairs(owners_by_recipe) do
-    if not facts.facts[recipe_name] then dangling = dangling + 1 end
+    if not recipe_facts.has_name(recipe_name) then dangling = dangling + 1 end
   end
 
   local summary = {
-    total_recipes = #facts.names,
+    total_recipes = #recipe_names,
     visible_recipes = visible,
     productivity_eligible_recipes = eligible,
-    accounted_recipes = #facts.names,
+    accounted_recipes = #recipe_names,
     category_counts = counts,
     dangling_effects = dangling,
     duplicate_owners = duplicate,

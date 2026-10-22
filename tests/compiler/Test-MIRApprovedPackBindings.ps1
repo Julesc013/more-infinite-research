@@ -14,4 +14,26 @@ if($LASTEXITCODE -ne 0){throw "Approved pack binding controls failed: $($result 
 $record=$result[-1] | ConvertFrom-Json
 if($record.status -cne 'MIR-APPROVED-PACK-BINDINGS-PASSED' -or $record.assertions -lt 220 -or $record.factorio_processes -ne 0){throw 'Incomplete approved pack binding controls.'}
 if($record.emission_control.assertions -lt 7 -or $record.emission_control.catalogue_rows -lt 100 -or $record.emission_control.stubbed_module_boundaries.Count -ne 0){throw 'Incomplete common-emitter preservation controls.'}
+if($record.clockless_emission_control.assertions -ne ($record.emission_control.assertions + 2) -or $record.clockless_emission_control.catalogue_rows -ne $record.emission_control.catalogue_rows -or $record.clockless_emission_control.operations -ne $record.emission_control.operations -or $record.clockless_emission_control.stubbed_module_boundaries.Count -ne 0){throw 'Incomplete clockless common-emitter controls.'}
+if([int]$record.emission_control.recipe_source_owner_assertions -lt 29 -or
+    [int]$record.clockless_emission_control.recipe_source_owner_assertions -ne [int]$record.emission_control.recipe_source_owner_assertions){
+  throw 'Incomplete recipe-source ownership and export-boundary controls.'
+}
+$registry=$record.registered_stream_control
+foreach($target in @('f200','f210')){
+  if($null -eq $registry -or $null -eq $registry.$target -or
+      $registry.$target.scope -cne 'real-adapter-catalogue-not-native-emission' -or
+      [int]$registry.$target.registered -lt 100 -or
+      [int]$registry.$target.registered -ne [int]$registry.$target.declared){
+    throw "Incomplete actual target catalogue count control: $target"
+  }
+}
+$exports=$record.command_export_control
+if($null -eq $exports -or [string]::IsNullOrWhiteSpace([string]$exports.run_all_default.input_fingerprint) -or
+    [string]::IsNullOrWhiteSpace([string]$exports.run_all_default.snapshot_fingerprint) -or
+    [string]::IsNullOrWhiteSpace([string]$exports.manual_new_context.input_fingerprint) -or
+    [string]::IsNullOrWhiteSpace([string]$exports.manual_new_context.snapshot_fingerprint) -or
+    [string]::IsNullOrWhiteSpace([string]$exports.run_all_active_only.input_fingerprint)){
+  throw 'Incomplete command export-boundary controls.'
+}
 $record | ConvertTo-Json -Depth 8

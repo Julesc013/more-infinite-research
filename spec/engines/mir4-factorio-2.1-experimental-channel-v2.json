@@ -1,0 +1,171 @@
+{
+  "schema": 2,
+  "kind": "MIR4Factorio21ExperimentalChannelV2",
+  "status": "active-until-first-official-2.1-stable",
+  "target": "f210",
+  "selection": {
+    "factorio_line": "2.1",
+    "channel": "latest-experimental",
+    "source": "official-steam-current-installation",
+    "patch_pinned": false,
+    "minimum_version": "2.1.18",
+    "rule": "select-latest-installed-official-2.1-experimental",
+    "stable_transition": "stop-and-reopen-policy-when-official-2.1-stable-appears"
+  },
+  "execution_evidence": {
+    "exact_version_required": true,
+    "binary_sha256_required": true,
+    "api_document_sha256_required": true,
+    "cross_version_reuse": false
+  },
+  "change_review": {
+    "trigger": "version-binary-or-api-identity-change",
+    "workflow": ".github/workflows/assurance-scheduled.yml#factorio-2-1-channel-review",
+    "required_tasks": [
+      "capture-exact-engine-identity",
+      "diff-release-notes",
+      "diff-runtime-api",
+      "diff-prototype-api",
+      "review-removals-and-deprecations",
+      "review-implementation-opportunities",
+      "review-functionality-opportunities",
+      "review-fixture-and-test-impact",
+      "review-runtime-upgrade-and-performance-impact",
+      "review-documentation-locale-and-ui-impact",
+      "review-minimum-mod-compatibility",
+      "check-official-stable-transition"
+    ]
+  },
+  "current_review": {
+    "status": "reviewed-current-observation",
+    "reviewed_at": "2026-10-19",
+    "previous_version": "2.1.21",
+    "version": "2.1.22",
+    "file_version": "2.1.22.87719",
+    "binary_sha256": "D8C745FD4E8C901BF0FC250C4D0FF75B454987857C1AEAADF8E775F0E65A9E4B",
+    "runtime_api": {
+      "application_version": "2.1.22",
+      "sha256": "B13B3F44B88546DFEB74D360666F565F065BB1A801EE63BCC2069A5F05A30C68",
+      "surface_count": 386
+    },
+    "prototype_api": {
+      "application_version": "2.1.22",
+      "sha256": "ED2F4C342841761FFD3CB46020B20C0B1672A6AD92E6E445E0824BA3B4EC7708",
+      "surface_count": 985
+    },
+    "changelog_sha256": "AEBD052755219BEC7C9644C94801D782F46620DDB2865D2906D28A5256C72077",
+    "steam": {
+      "app_id": "427520",
+      "branch": "experimental",
+      "build_id": "25956922",
+      "state_flags": "4",
+      "app_manifest_sha256": "DC46C3B23799E96666BD0F3ADF206EF30403E012AFCD15E5D64B661BE7908618"
+    },
+    "official_mods": {
+      "base": {
+        "name": "base",
+        "version": "2.1.22",
+        "info_path": "data/base/info.json",
+        "raw_sha256": "E4E2C8B15C448DC3DFD21D01E864DC721EDE133E84AF456CAACAB31C2EA542E8",
+        "canonical_sha256": "10C6C4F8BE56F269AC7E4CBE49D875E19BFCCC745D8A45112A6ED267BBBF2E6D"
+      },
+      "elevated_rails": {
+        "name": "elevated-rails",
+        "version": "2.1.22",
+        "info_path": "data/elevated-rails/info.json",
+        "raw_sha256": "BE925D023851ED71D2129CACCDAC6AA0ECBF897E74F268C02018CD9F5516A38E",
+        "canonical_sha256": "B2CDCE0BCFBB377D8BA252652F6BCE5F92A9C29BE8A31502714325F01FA4E737"
+      },
+      "quality": {
+        "name": "quality",
+        "version": "2.1.22",
+        "info_path": "data/quality/info.json",
+        "raw_sha256": "045153FF5F4C536C5E080612B674C5194B4CEE890497356BD6986DC014571622",
+        "canonical_sha256": "D73F9FF5C78632DCA6A1934C0F1A6D0C30F2776FDCCD76F748BB03FEC07ED526"
+      },
+      "recycler": {
+        "name": "recycler",
+        "version": "2.1.22",
+        "info_path": "data/recycler/info.json",
+        "raw_sha256": "09E210425D0DA4D56C38B2B3E79B84BB69F6D78AF83D82A011B91D34ACBEBEA2",
+        "canonical_sha256": "A519C1201603CA230528D04BE6FB204D4D46E83E4881573B42DB1332DAD7C14A"
+      },
+      "space_age": {
+        "name": "space-age",
+        "version": "2.1.22",
+        "info_path": "data/space-age/info.json",
+        "raw_sha256": "6EE7D7E9C201B751770836D072697FE1D5703B1313DA0D10CA534EC410884942",
+        "canonical_sha256": "EBDBF96E27DD03D5159E5FE4DAA8FAF0D8D87E22EBABF9CB0080CCE17FFCCF74"
+      }
+    },
+    "review_tasks": [
+      {
+        "id": "capture-exact-engine-identity",
+        "status": "complete",
+        "disposition": "Read-only intake records the stable installed Steam experimental 2.1.22.87719 binary, manifest, APIs, changelog and official-mod identities. No Factorio process or admission command ran."
+      },
+      {
+        "id": "diff-release-notes",
+        "status": "complete",
+        "disposition": "Reviewed 2.1.22 FluidBox and energy temperature, FluidID filter and scripting changes. No native scenario passed."
+      },
+      {
+        "id": "diff-runtime-api",
+        "status": "complete",
+        "disposition": "MIR has no FluidID, FluidFilter, set_fluid_filter or get_fluid_filter consumer. No runtime qualification was executed."
+      },
+      {
+        "id": "diff-prototype-api",
+        "status": "complete",
+        "disposition": "Recipe temperature constraints remain separately consumed; no changed FluidBox or energy prototype is emitted by this review."
+      },
+      {
+        "id": "review-removals-and-deprecations",
+        "status": "complete",
+        "disposition": "No current source consumer reads removed FluidBox temperature bounds, old FluidFilter tables or local-effect receiver fields."
+      },
+      {
+        "id": "review-implementation-opportunities",
+        "status": "complete",
+        "disposition": "FluidID filters, selection events, local effects and richer display fields remain unadmitted future opportunities."
+      },
+      {
+        "id": "review-functionality-opportunities",
+        "status": "complete",
+        "disposition": "No product behavior is selected from the 2.1.22 additions."
+      },
+      {
+        "id": "review-fixture-and-test-impact",
+        "status": "complete",
+        "disposition": "Gunmetal and Invar is the named direct-library fixture migration target. It is not run or qualified here."
+      },
+      {
+        "id": "review-runtime-upgrade-and-performance-impact",
+        "status": "complete",
+        "disposition": "No exact 2.1.22 runtime, upgrade, reload, multiplayer, client or performance case ran; prior receipts retain their own engine identities."
+      },
+      {
+        "id": "review-documentation-locale-and-ui-impact",
+        "status": "complete",
+        "disposition": "No consumed 2.1.22 API requires a locale or widget change; this review makes no graphical or client claim."
+      },
+      {
+        "id": "review-minimum-mod-compatibility",
+        "status": "complete",
+        "disposition": "The F210 support floor and package dependencies remain 2.1.18. The observed engine is 2.1.22; F200 and historical floors remain independent."
+      },
+      {
+        "id": "check-official-stable-transition",
+        "status": "complete",
+        "disposition": "The installed Steam manifest records BetaKey experimental, build 25956922 and StateFlags 4. No official 2.1 stable transition is inferred."
+      }
+    ],
+    "findings": [
+      "Exact 2.1.22 identities are observed read-only; engine admission and all native qualification boundaries remain closed.",
+      "No current MIR consumer requires a FluidID, FluidBox temperature, local-effect or selection-event implementation.",
+      "Recipe ingredient temperature facts remain preserved by existing data-stage consumers.",
+      "The observed 2.1.22 execution identity does not raise the F210 2.1.18 support floor or alter F200 or historical target metadata."
+    ],
+    "observed_at": "2026-10-19T12:39:29.3637648+00:00"
+  }
+}

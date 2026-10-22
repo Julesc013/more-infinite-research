@@ -1,0 +1,10 @@
+{
+  "name": "aaa-mir47-owned-speed-sentinel",
+  "version": "0.1.4700",
+  "title": "MIR private owned speed-sentinel companion",
+  "author": "MIR local validation",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.22"
+  ]
+}

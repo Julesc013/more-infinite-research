@@ -26,6 +26,7 @@ $progressionPlannerIntroduced=@($introduced|Where-Object{[string]$_.provenance.i
 $compilerTransitionIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR4-CHG-2026-0163'})
 $approvedBindingsIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR440-APPROVED-SCIENCE-BINDINGS'})
 $angelsRepairIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR450-ANGELS-DISABLED-SILVER'})
+$k2StateIntroduced=@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR47-K2-STAGED-STATE-CARRIERS'})
 $retiredPredecessorSources=@(
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/pack_production_reachability.lua',
   'src/mod/families/modern/prototypes/mir/capabilities/science_integration/production_route_policy.lua',
@@ -56,9 +57,9 @@ $sharedPlanShape=($sharedPlan.Count-eq1-and[string]$sharedPlan[0].layer-ceq'capa
 $successionChecks=@(
   ([string]$record.predecessor.record_sha256-ceq[string]$v6.record_sha256),
   ([string]$manifest.predecessor_record_sha256-ceq[string]$v6.source_manifest.record_sha256),
-  (@($manifest.bindings).Count-eq375),($currentPaths.Count-eq375),
+  (@($manifest.bindings).Count-eq379),($currentPaths.Count-eq379),
   ($migrated.Count-eq354),(@($migrated.provenance.predecessor_source_path|Sort-Object -Unique -CaseSensitive).Count-eq354),
-  ($introduced.Count-eq21),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),($angelsRepairIntroduced.Count-eq1),
+  ($introduced.Count-eq25),($compilerTransitionIntroduced.Count-eq1),($approvedBindingsIntroduced.Count-eq2),($angelsRepairIntroduced.Count-eq1),($k2StateIntroduced.Count-eq4),
   ($historicalIntroduced.Count-eq12),($repairIntroduced.Count-eq1),($progressionIntroduced.Count-eq1),($progressionPlannerIntroduced.Count-eq1),
   (@($introduced|Where-Object{[string]$_.provenance.introduction_id-ceq'MIR42-SCIENCE-ROUTE-FEASIBILITY'}).Count-eq0),
   (($missingPredecessors-join'|')-ceq(($retiredPredecessorSources|Sort-Object -Unique)-join'|')),
@@ -95,6 +96,10 @@ foreach($source in @('source/prototypes/mir/capabilities/science_integration/lab
 Assert-MIR4ComposablePackageSourceV3Succession -Current $manifest -Predecessor $predecessorManifest|Out-Null
 
 foreach($forgery in @(
+  @{id='k2-runtime-cross-target';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/runtime/k2_imersite_staged_state_migration.lua').target_scope=@('f210','f200')}},
+  @{id='k2-descriptor-missing-target';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/domain/research/k2_imersite_staged_state.lua').target_scope=@('f210')}},
+  @{id='k2-json-substitution';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/migrations/more-infinite-research_4.7.0.json').output_path='migrations/forged.json'}},
+  @{id='k2-planner-wrong-layer';mutate={param($r)($r.bindings|Where-Object source_path -CEQ 'source/prototypes/mir/planner/stream_compiler/k2_imersite_migration_alias.lua').layer='shared'}},
   @{id='substituted-predecessor';mutate={param($r)$r.bindings[0].provenance.predecessor_source_path='src/mod/forged/predecessor.lua'}},
   @{id='missing-predecessor';mutate={param($r)$r.bindings=@($r.bindings|Select-Object -Skip 1)}},
   @{id='duplicated-predecessor';mutate={param($r)$r.bindings[1]=($r.bindings[0]|ConvertTo-Json -Depth 20|ConvertFrom-Json -Depth 20)}},

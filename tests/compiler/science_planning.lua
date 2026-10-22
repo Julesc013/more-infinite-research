@@ -129,7 +129,7 @@ check('V301',k2.policy_id=='K2SciencePhasePolicyV1' and k2.applicability.Krastor
 check('V302',not k2.applies({base='2.1.20',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'})
   and not k2.applies({base='2.1.20',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'}),'V3 does not admit adjacent K2 or K2SO versions')
 check('V303',not k2.applies({base='2.1.14',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}) and not k2.applies({base='2.1.19',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
-  and not k2.applies({base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
+  and not k2.applies({base='2.1.23',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'})
   and not k2.applies({Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}),'V3 rejects adjacent or missing base versions')
 local v3_original={
  {name='automation-science-pack',amount=2},
@@ -160,6 +160,69 @@ check('V502',names(v5_normalized)==names(v3_normalized) and #v5_decision.removed
 check('V503',not k2.applies({base='2.1.21',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'})
   and not k2.applies({base='2.1.21',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'}),
   'Current engine admission does not widen the named overhaul releases')
+local active_mods_v6={base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}
+local v6_normalized,v6_decision=k2.normalize(v3_original,active_mods_v6)
+check('V601',v6_decision.policy_id=='K2SciencePhasePolicyV6' and v6_decision.applicable
+  and v6_decision.exact_versions.base=='2.1.22' and k2.imersite_continuation_applies(active_mods_v6),
+  '2.1.22 science and Imersite assembly select the same successor contract')
+check('V602',names(v6_normalized)==names(v3_normalized) and v6_normalized[1].amount==3
+  and v6_normalized[2].amount==7 and table.concat(v6_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and #v3_original==3 and v3_original[1].amount==2,
+  '2.1.22 retains science amounts, ordering, required late triggers and input isolation')
+for _, tuple in ipairs({
+  {base='2.1.23',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'},
+  {base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.13'},
+  {base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.14'},
+  {Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.13'}
+}) do
+  local unchanged,refused=k2.normalize(v3_original,tuple)
+  check('V603',not k2.imersite_continuation_applies(tuple) and not refused.applicable
+    and names(unchanged)==names(v3_original),'Unobserved engines/mods cannot select either successor consumer')
+end
+local active_mods_v7={base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'}
+local v7_normalized,v7_decision=k2.normalize(v3_original,active_mods_v7)
+check('V701',v7_decision.policy_id=='K2SciencePhasePolicyV7' and v7_decision.applicable
+  and v7_decision.exact_versions.Krastorio2=='2.1.4'
+  and v7_decision.exact_versions['Krastorio2-spaced-out']=='2.0.19'
+  and k2.imersite_continuation_applies(active_mods_v7),
+  'The upstream 2.1.22 compatibility releases share one science and continuation admission')
+check('V702',names(v7_normalized)==names(v6_normalized) and v7_normalized[1].amount==3
+  and v7_normalized[2].amount==7
+  and table.concat(v7_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and #v3_original==3 and v3_original[1].amount==2,
+  'The compatible upstream releases retain phase retirement, late triggers, amounts and input isolation')
+for _, tuple in ipairs({
+  {base='2.1.22',Krastorio2='2.1.5',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.22',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.20'},
+  {base='2.1.22',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.19'}
+}) do
+  local unchanged,refused=k2.normalize(v3_original,tuple)
+  check('V703',not k2.imersite_continuation_applies(tuple) and not refused.applicable
+    and names(unchanged)==names(v3_original),'Mixed or unobserved upstream contracts remain unadmitted')
+end
+local active_mods_v8={base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'}
+local v8_normalized,v8_decision=k2.normalize(v3_original,active_mods_v8)
+check('V801',v8_decision.policy_id=='K2SciencePhasePolicyV8' and v8_decision.applicable
+  and v8_decision.exact_versions.base=='2.1.23'
+  and v8_decision.exact_versions.Krastorio2=='2.1.4'
+  and v8_decision.exact_versions['Krastorio2-spaced-out']=='2.0.19'
+  and k2.imersite_continuation_applies(active_mods_v8),
+  'The exact 2.1.23 K2/K2SO tuple selects the separately admitted successor')
+check('V802',names(v8_normalized)==names(v7_normalized) and v8_normalized[1].amount==3
+  and v8_normalized[2].amount==7
+  and table.concat(v8_decision.required_any_packs,',')=='kr-matter-tech-card,space-science-pack'
+  and #v3_original==3 and v3_original[1].amount==2,
+  'The exact 2.1.23 successor preserves phase retirement, late triggers, amounts and input isolation')
+for _, tuple in ipairs({
+  {base='2.1.24',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.23',Krastorio2='2.1.5',['Krastorio2-spaced-out']='2.0.19'},
+  {base='2.1.23',Krastorio2='2.1.4',['Krastorio2-spaced-out']='2.0.20'},
+  {base='2.1.23',Krastorio2='2.1.3',['Krastorio2-spaced-out']='2.0.19'}
+}) do
+  local unchanged,refused=k2.normalize(v3_original,tuple)
+  check('V803',not k2.imersite_continuation_applies(tuple) and not refused.applicable
+    and names(unchanged)==names(v3_original),'The 2.1.23 successor does not widen engine or overhaul admission')
+end
 roles={{role='exclude',pack='automation-science-pack'}}
 local spec={science_packs={'automation-science-pack','utility-science-pack'}}
 local selected=selector.pick_science_for_stream(spec,'audit_stream')
@@ -508,7 +571,10 @@ do
   ingredients_for_stream=function() return {{'automation-science-pack',1}},'full' end,
   phase_diagnostic_fields=function() return nil end
  })
- stub('prototypes.mir.platform.factorio.target_line',{feature_enabled=function(name) return name~='productivity_family_adoption' end})
+ stub('prototypes.mir.platform.factorio.target_line',{feature_enabled=function(name)
+  -- This probe models F200 formula costs, not historical numeric costs.
+  return name~='productivity_family_adoption' and name~='legacy_numeric_research_cost'
+ end})
  stub('prototypes.mir.settings.effect_scaling',{scale_stream_effects=function(_,_,effects) return effects end})
  stub('prototypes.mir.domain.research_cost.classification',{anchor_level=function() return 1 end})
  stub('prototypes.mir.planner.stream_compiler.discover',{expand_dynamic_items=function(spec) return spec end})

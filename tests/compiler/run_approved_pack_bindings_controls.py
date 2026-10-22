@@ -8,6 +8,52 @@ import sys
 from pathlib import Path
 
 
+# Match the relevant Factorio lualib/util.lua deepcopy behavior before any MIR
+# module loads. The product fallback does not preserve aliases, cycles, or
+# metatables; this bootstrap is self-validating so the host control cannot
+# silently exercise a weaker ownership boundary.
+FACTORIO_DEEPCOPY_BOOTSTRAP = r'''
+function table.deepcopy(object)
+  local lookup_table = {}
+  local function _copy(value)
+    if type(value) ~= "table" then
+      return value
+    elseif lookup_table[value] then
+      return lookup_table[value]
+    end
+    local new_table = {}
+    lookup_table[value] = new_table
+    for index, nested in pairs(value) do
+      new_table[_copy(index)] = _copy(nested)
+    end
+    return setmetatable(new_table, getmetatable(value))
+  end
+  return _copy(object)
+end
+_G.util = _G.util or {}
+_G.util.table = _G.util.table or {}
+_G.util.table.deepcopy = table.deepcopy
+_G.util.copy = table.deepcopy
+
+local deepcopy_meta = {marker = "approved-pack-factorio-deepcopy"}
+local deepcopy_alias = setmetatable({value = "alias"}, deepcopy_meta)
+local deepcopy_input = {first = deepcopy_alias, second = deepcopy_alias}
+deepcopy_input.self = deepcopy_input
+local deepcopy_copy = table.deepcopy(deepcopy_input)
+if deepcopy_copy == deepcopy_input or deepcopy_copy.self ~= deepcopy_copy
+  or deepcopy_copy.first == deepcopy_alias or deepcopy_copy.first ~= deepcopy_copy.second
+  or getmetatable(deepcopy_copy.first) ~= deepcopy_meta then
+  error("Factorio-compatible table.deepcopy bootstrap failed")
+end
+'''
+
+
+def fresh_lua_runtime(lua52):
+    runtime = lua52.LuaRuntime(unpack_returned_tuples=True)
+    runtime.execute(FACTORIO_DEEPCOPY_BOOTSTRAP)
+    return runtime
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--repo-root', required=True)
@@ -17,7 +63,122 @@ def main() -> None:
     sys.path.insert(0, str(Path(args.lua_runtime_dir).resolve()))
     from lupa import lua52
 
-    lua = lua52.LuaRuntime(unpack_returned_tuples=True)
+    # These are catalogue rows, including unavailable/disabled declarations,
+    # not the number of technologies emitted in a particular mod profile.
+    # Exercise both real adapters so a new declaration cannot silently leave
+    # the profile consumed by native assertion fixtures behind.
+    registered_stream_control = {}
+    for target, base_version in (('f200', '2.0.77'), ('f210', '2.1.22')):
+        registry_runtime = fresh_lua_runtime(lua52)
+        registry_runtime.globals().source_root = (repo / 'source').as_posix()
+        registry_runtime.globals().adapter_root = (repo / 'source/adapters' / target).as_posix()
+        registry_runtime.globals().controlled_base_version = base_version
+        observed = registry_runtime.execute('''
+          package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path
+          data = {raw = {}, extend = function() error('No catalogue-control mutation admission') end}
+          mods = {base = controlled_base_version}; settings = {startup = {}}
+          feature_flags = {}; log = function() end
+          local registry = require('prototypes.mir.streams.registry')
+          local profile = require('prototypes.mir.platform.factorio.target_profiles').current()
+          local count = 0
+          for _ in pairs(registry.view()) do count = count + 1 end
+          assert(count == profile.expected_stream_count,
+            'Declared stream count differs from actual target catalogue: expected '
+              .. tostring(profile.expected_stream_count) .. ', got ' .. tostring(count))
+          return {declared = profile.expected_stream_count, registered = count}
+        ''')
+        registered_stream_control[target] = {
+            'declared': int(observed['declared']), 'registered': int(observed['registered']),
+            'scope': 'real-adapter-catalogue-not-native-emission'}
+
+    def plain(value):
+        if hasattr(value, 'items'):
+            return {str(key): plain(item) for key, item in value.items()}
+        if hasattr(value, '__len__') and not isinstance(value, (str, bytes, dict)):
+            try:
+                return [plain(value[index]) for index in range(1, len(value) + 1)]
+            except Exception:
+                pass
+        return value
+
+    def approved_family_preamble() -> str:
+        text = (repo / 'tests/compiler/approved_family_emission.lua').read_text(encoding='utf-8')
+        anchor = '-- MIR-COMMAND-EXPORT-PREAMBLE-END'
+        if text.count(anchor) != 1:
+            raise RuntimeError('approved-family command preamble requires exactly one explicit boundary')
+        position = text.index(anchor)
+        return text[:position]
+
+    def command_export_source(shape: str) -> str:
+        common = r'''
+local commands = require("prototypes.mir.pipeline.commands")
+local compiler_input = require("prototypes.mir.domain.compiler.compiler_input")
+local function assert_generic_export(exported)
+  assert(exported.schema == 4 and exported.state.compilation_snapshot
+    and exported.state.qualification_snapshot and exported.state.compiler_input
+    and exported.state.qualified_compiler_input,
+    "requested Context export retains complete generic compiler state")
+  local state_input = exported.state.compiler_input
+  local plan_input = exported.state.compilation_plan and exported.state.compilation_plan.compiler_input
+  assert(state_input and plan_input and not compiler_input.is_active(state_input)
+    and not compiler_input.is_active(plan_input),
+    "requested Context export contains no detached active CompilerInput handle")
+  compiler_input.verify_untrusted(state_input)
+  compiler_input.verify_untrusted(plan_input)
+  assert(state_input.input_fingerprint == plan_input.input_fingerprint,
+    "exported compilation plan binds its matching generic CompilerInput")
+  local original = state_input.input_fingerprint
+  plan_input.input_fingerprint = original .. "-outside-writer"
+  assert(state_input.input_fingerprint == original,
+    "returned Context snapshot keeps nested CompilerInput copies isolated")
+  plan_input.input_fingerprint = original
+  return {input_fingerprint = original,
+    snapshot_fingerprint = exported.state.compilation_snapshot.snapshot_fingerprint,
+    plan_input_fingerprint = plan_input.input_fingerprint}
+end
+'''
+        if shape == 'run_all_default':
+            body = r'''
+local exported = commands.run_all()
+local result = assert_generic_export(exported)
+result.shape = "run_all_default"
+return result
+'''
+        elif shape == 'run_all_active_only':
+            body = r'''
+local context = commands.run_all({return_snapshot = false})
+assert(not context:legacy_compiler_export_requested(),
+  "run_all(false) creates the explicit active-only data-stage Context")
+local active = context:state_view("compiler_input")
+assert(compiler_input.is_active(active), "active-only Context retains the owned active input")
+local late_ok, late_error = pcall(function() return context:snapshot() end)
+assert(not late_ok and string.find(tostring(late_error), "cannot export legacy snapshots"),
+  "active-only Context refuses a late partial generic export")
+return {shape = "run_all_active_only", input_fingerprint = active.input_fingerprint}
+'''
+        elif shape == 'manual_new_context':
+            body = r'''
+local context = commands.new_context()
+assert(context:legacy_compiler_export_requested(),
+  "manual new_context preserves the historical export-capable default")
+for _, id in ipairs(commands.order()) do commands.run(id, context) end
+local exported = context:snapshot()
+local result = assert_generic_export(exported)
+result.shape = "manual_new_context"
+return result
+'''
+        else:
+            raise ValueError(shape)
+        return approved_family_preamble() + common + body
+
+    def run_command_export(shape: str):
+        runtime = fresh_lua_runtime(lua52)
+        runtime.globals().source_root = (repo / 'source').as_posix()
+        runtime.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
+        runtime.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
+        return plain(runtime.execute(command_export_source(shape)))
+
+    lua = fresh_lua_runtime(lua52)
     lua.globals().repo_source = (repo / 'source').as_posix()
     lua.execute('''
       package.path = repo_source .. '/?.lua;' .. package.path
@@ -43,17 +204,37 @@ def main() -> None:
     assertions = lua.execute(fixture.read_text(encoding='utf-8'))
     # Separate runtime: actual F200 adapters/catalogue/planner/common emitter;
     # none of the facade fixture's module substitutions apply here.
-    emitted = lua52.LuaRuntime(unpack_returned_tuples=True)
+    emitted = fresh_lua_runtime(lua52)
     emitted.globals().source_root = (repo / 'source').as_posix()
     emitted.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
     emitted.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
     emission_fixture = repo / 'tests/compiler/approved_family_emission.lua'
     emission = emitted.execute(emission_fixture.read_text(encoding='utf-8'))
+    # Exercise the complete actual catalogue/planner/emitter path in a fresh
+    # runtime with no host os table; the
+    # fixture checks unavailable timing instead of inventing a zero duration.
+    clockless = fresh_lua_runtime(lua52)
+    clockless.globals().source_root = (repo / 'source').as_posix()
+    clockless.globals().adapter_root = (repo / 'source/adapters/f200').as_posix()
+    clockless.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path; os = nil")
+    clockless_emission = clockless.execute(emission_fixture.read_text(encoding='utf-8'))
+    assert int(clockless_emission['assertions']) == int(emission['assertions']) + 2
+    assert int(clockless_emission['rows']) == int(emission['rows'])
+    assert int(clockless_emission['operations']) == int(emission['operations'])
+    assert int(emission['recipe_source_owner_assertions']) >= 29
+    assert int(clockless_emission['recipe_source_owner_assertions']) == int(emission['recipe_source_owner_assertions'])
+    command_export_control = {
+        shape: run_command_export(shape) for shape in (
+            'run_all_default', 'run_all_active_only', 'manual_new_context')
+    }
     stubbed_modules = {'prototypes.mir.platform.factorio.target_profiles',
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
                        'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
-    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path(__file__).resolve().relative_to(repo)]
+    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo),
+                    Path('tests/compiler/recipe_source_owner_contract.lua'), Path(__file__).resolve().relative_to(repo),
+                    Path('.mir/targets.json'),
+                    Path('source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua')]
     for name, _ in lua.globals().package.loaded.items():
         if str(name).startswith('prototypes.') and name not in stubbed_modules:
             path = Path('source') / (str(name).replace('.', '/') + '.lua')
@@ -73,7 +254,15 @@ def main() -> None:
                       'emission_control': {'assertions': int(emission['assertions']),
                                            'catalogue_rows': int(emission['rows']),
                                            'operations': int(emission['operations']),
+                                           'recipe_source_owner_assertions': int(emission['recipe_source_owner_assertions']),
                                            'stubbed_module_boundaries': [], 'target': 'f200'},
+                      'clockless_emission_control': {'assertions': int(clockless_emission['assertions']),
+                                                    'catalogue_rows': int(clockless_emission['rows']),
+                                                    'operations': int(clockless_emission['operations']),
+                                                    'recipe_source_owner_assertions': int(clockless_emission['recipe_source_owner_assertions']),
+                                                    'stubbed_module_boundaries': [], 'target': 'f200'},
+                      'command_export_control': command_export_control,
+                      'registered_stream_control': registered_stream_control,
                       'sources': {p.as_posix(): hashlib.sha256((repo / p).read_bytes()).hexdigest()
                                   for p in module_paths}}, sort_keys=True))
 

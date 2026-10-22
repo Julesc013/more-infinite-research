@@ -590,6 +590,100 @@ Context.with_active(Context.new(), function()
   check(science.pack_production_status("space-science-pack") == "initial",
     "An actual approved direct recipe takes precedence over retained launch policy")
 end)
+
+-- Space Age supplies space science from a trigger item launch and represents
+-- the matching disabled recipe without an unlock-recipe effect.  The finite
+-- binding accepts only this complete typed relation.  The downstream trigger
+-- chain models the same shape as cryogenic science without naming it.
+local function trigger_output_world(change)
+  local value = world(0, false)
+  local source, downstream = "trigger-output-science", "trigger-output-descendant"
+  for _, name in ipairs({source, downstream}) do
+    value.tool[name] = {type = "tool", name = name}
+    value.lab.lab.inputs[#value.lab.lab.inputs + 1] = name
+    value.recipe[name] = {type = "recipe", name = name, enabled = false,
+      results = {{type = "item", name = name, amount = 1}}}
+  end
+  value.item["trigger-output-payload"] = {type = "item", name = "trigger-output-payload",
+    rocket_launch_products = {{type = "item", name = source, amount = 1}}}
+  value.technology[source] = {type = "technology", name = source, prerequisites = {roles[4]},
+    research_trigger = {type = "send-item-to-orbit", item = "trigger-output-payload"}}
+  value.technology[downstream] = {type = "technology", name = downstream, prerequisites = {source},
+    unit = {count = 1, time = 1, ingredients = {{source, 1}}},
+    effects = {{type = "unlock-recipe", recipe = downstream}}}
+  if change then change(value, source, downstream) end
+  return value, source, downstream
+end
+
+local trigger_raw, trigger_pack, trigger_descendant = trigger_output_world()
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local status, gate = science.pack_production_status(trigger_pack)
+  local source = science.production_route_for_pack(trigger_pack)
+  check(status == "research" and gate == trigger_pack
+      and source.source_kind == "declared-trigger-output" and source.acquisition_proof == false,
+    "A positive typed trigger output binds its matching disabled named recipe without acquisition discovery")
+  check(science.pack_production_status(trigger_descendant) == "research"
+      and science.prereq_tech_for_science_pack(trigger_descendant) == trigger_descendant,
+    "The trigger-output source establishes the representative downstream cryogenic-style science chain")
+end)
+
+trigger_raw, trigger_pack, trigger_descendant = trigger_output_world()
+local active_trigger_context = Context.new({legacy_compiler_export_requested = false})
+Context.with_active(active_trigger_context, function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local status, gate = science.pack_production_status(trigger_pack)
+  local source = science.production_route_for_pack(trigger_pack)
+  check(not active_trigger_context:legacy_compiler_export_requested()
+      and status == "research" and gate == trigger_pack
+      and source.source_kind == "declared-trigger-output"
+      and science.pack_production_status(trigger_descendant) == "research"
+      and science.prereq_tech_for_science_pack(trigger_descendant) == trigger_descendant,
+    "The active-only context keeps the trigger-output binding and its required downstream prerequisite semantics")
+end)
+
+for _, change in ipairs({
+  function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].name = "wrong-science" end,
+  function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].type = "fluid" end,
+  function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].amount = 0 end,
+  function(raw) raw.item["trigger-output-payload"].rocket_launch_products[1].probability = 0 end,
+  function(raw) raw.technology["trigger-output-science"].enabled = false end,
+  function(raw, source)
+    raw.technology["disabled-trigger-output-owner"] = {type = "technology", name = "disabled-trigger-output-owner",
+      enabled = false, effects = {{type = "unlock-recipe", recipe = source}}}
+  end
+}) do
+  trigger_raw, trigger_pack = trigger_output_world(change)
+  Context.with_active(Context.new(), function()
+    local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+    local ok, reason = pcall(science.pack_production_status, trigger_pack)
+    check(not ok and tostring(reason):find("ambiguous-approved-pack-unlock:" .. trigger_pack, 1, true),
+      "A mismatched, non-item, zero, disabled, or separately owned trigger recipe cannot admit a disabled recipe")
+  end)
+end
+
+trigger_raw, trigger_pack = trigger_output_world(function(raw, source)
+  raw.technology[roles[4]].unit.ingredients = {{source, 1}}
+end)
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local ok, status = pcall(science.pack_production_status, trigger_pack)
+  check(not ok and tostring(status):find("unresolved-approved-pack-dependencies:" .. trigger_pack, 1, true),
+    "A cross-pack trigger reference remains an unseeded finite reference")
+end)
+
+trigger_raw, trigger_pack = trigger_output_world(function(raw, source)
+  raw.recipe["valid-trigger-output-alternative"] = {type = "recipe", name = "valid-trigger-output-alternative", enabled = true,
+    results = {{type = "item", name = source, amount = 1}}}
+  raw.technology[roles[4]].unit.ingredients = {{source, 1}}
+end)
+Context.with_active(Context.new(), function()
+  local science = require("prototypes.mir.capabilities.science_integration.science_packs")
+  local source = science.production_route_for_pack(trigger_pack)
+  check(science.pack_production_status(trigger_pack) == "research"
+      and source.recipe_name == trigger_pack and source.source_kind == "declared-trigger-output",
+    "A valid direct alternative supplies the finite seed for the trigger source without route discovery")
+end)
 -- Factorio 0.15 stores its satellite-qualified space-science result on the
 -- rocket entity, rather than on the satellite item. It is a retained policy
 -- exclusion only: exact output and payload tuple are required, while all
@@ -1410,5 +1504,83 @@ do
   end
   check(work[128].rules - work[64].rules == 3 * 64,
     "Additional science owners add three rules each rather than competing route combinations")
+end
+
+-- A disabled/replaced named recipe must not veto an independently valid
+-- direct producer. In particular, automation science may itself be moved
+-- behind a trigger unlock by an overhaul, so it cannot require its own pack.
+for _, pack in ipairs({roles[1], "promethium-science-pack", "electromagnetic-science-pack"}) do
+  for _, failure in ipairs({"no-owner", "disabled-owner", "broken-owner", "missing-recipe"}) do
+    local raw = world(0, false)
+    raw.tool[pack] = {type = "tool", name = pack}
+    if pack ~= roles[1] then raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack end
+    raw.recipe[pack] = {type = "recipe", name = pack, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    raw.technology[pack] = {type = "technology", name = pack,
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1}, effects = {}}
+    if failure ~= "no-owner" then
+      raw.technology[pack].effects = {{type = "unlock-recipe", recipe = pack}}
+      if failure == "disabled-owner" then raw.technology[pack].enabled = false end
+      if failure == "broken-owner" then raw.technology[pack].prerequisites = {"missing-upstream-tech"} end
+      if failure == "missing-recipe" then raw.recipe[pack] = nil end
+    end
+    local alternate = "replacement-" .. pack
+    raw.recipe[alternate] = {type = "recipe", name = alternate, enabled = false,
+      results = {{type = "item", name = pack, amount = 1}}}
+    raw.technology["replacement-seed"] = {type = "technology", name = "replacement-seed",
+      research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+      effects = {{type = "unlock-recipe", recipe = alternate}}}
+    raw.technology["circular-replacement"] = {type = "technology", name = "circular-replacement",
+      unit = {count = 1, ingredients = {{pack, 1}}},
+      effects = {{type = "unlock-recipe", recipe = alternate}}}
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(pack)
+      local source = science_packs.production_route_for_pack(pack)
+      check(status == "research" and gate == "replacement-seed" and source.recipe_name == alternate,
+        "A " .. failure .. " named source cannot veto a valid direct replacement for " .. pack)
+      check(#source.unlockers == 1 and source.unlockers[1] == "replacement-seed",
+        "The replacement keeps its independently established seed, never its circular alternate")
+    end)
+    raw.technology["replacement-seed"].enabled = false
+    Context.with_active(Context.new(), function()
+      local ok, status = pcall(science_packs.pack_production_status, pack)
+      check(not ok or (status ~= "initial" and status ~= "research"),
+        "A missing named source and an unseeded replacement cannot invent pack availability")
+    end)
+  end
+end
+do
+  local work = {}
+  for _, count in ipairs({64, 128}) do
+    local raw = world(count, true)
+    raw.technology[roles[1]].effects = {}
+    for index = 1, count do
+      local owner = raw.technology["later-automation-alternative-" .. index]
+      owner.prerequisites, owner.unit = {}, nil
+      owner.research_trigger = {type = "craft-item", item = "iron-plate", count = 1}
+      owner.effects[2] = deepcopy(owner.effects[1])
+    end
+    Context.with_active(Context.new(), function()
+      local status, gate = science_packs.pack_production_status(roles[1])
+      check(status == "research" and gate == "later-automation-alternative-1",
+        "Replacement recipes use deterministic ordering and deduplicated unlock effects")
+      work[count] = science_packs.binding_snapshot().work
+      check(work[count].dependency_notifications <= work[count].dependency_edges
+          and work[count].factory_acquisition_calls == 0,
+        "Replacement producers reuse bounded reference propagation without factory discovery")
+    end)
+  end
+  check(work[128].rules - work[64].rules == 3 * 64,
+    "Replacement recipes add three rules each rather than enumerating producer combinations")
+  local raw = world(1, false)
+  raw.technology[roles[1]].effects = {}
+  raw.recipe["later-automation-alternative-1"].enabled = true
+  Context.with_active(Context.new(), function()
+    local status = science_packs.pack_production_status(roles[1])
+    local source = science_packs.production_route_for_pack(roles[1])
+    check(status == "initial" and #source.unlockers == 0
+        and source.recipe_name == "later-automation-alternative-1",
+      "An actual initial replacement remains initial despite a disabled named recipe")
+  end)
 end
 return checks

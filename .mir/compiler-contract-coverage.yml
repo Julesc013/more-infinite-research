@@ -93,11 +93,13 @@
     "CompilationSnapshot": 2,
     "PolicySnapshot": 1,
     "CompilerInput": 2,
+    "ActiveCompilerInput": 1,
     "CompilerResult": 3,
     "RuntimeEnvironmentIdentity": 2,
     "QualificationEnvironmentIdentity": 1,
+    "CompilerOrchestratorSnapshot": 2,
     "TransformationOperation": 2,
-    "TransformationPlan": 2,
+    "TransformationPlan": 3,
     "MutationJournal": 2
   },
   "compiler_execution_modes": ["SAFE", "PREVIEW", "REVIEWED", "STRICT_CI", "RELEASE"],
@@ -115,7 +117,7 @@
     "more-infinite-research.research-cost-compatibility-public"
   ],
   "context_owned_state": [
-    "recipe-index", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
+    "recipe-index", "recipe-active-input-identity", "recipe-risk-index", "relationship-indexes", "mod-progression-cache",
     "technology-researchability-index", "pack-production-reachability-cache",
     "recipe-unlock-science-cache", "lab-input-index", "active-compatibility-packs",
     "compatibility-policy-authority", "family-resolution", "technology-candidate-catalog",

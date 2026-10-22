@@ -1,0 +1,105 @@
+{
+  "schema": 3,
+  "kind": "MIR4ChangeFragmentV3",
+  "change_id": "MIR4-CHG-2026-0168",
+  "status": "draft",
+  "change_type": "fixed",
+  "summary": "Bind approved trigger-output science sources without treating disabled recipes as production proof.",
+  "details": [
+    "Recognize a named disabled science recipe only when its same-named enabled technology uses a send-item-to-orbit trigger whose exact item has a positive typed rocket-launch product for that pack and the recipe has no unlock-recipe effect.",
+    "Keep the trigger technology prerequisites as required approved-reference dependencies. Explicit owners remain on the existing direct-owner path; mismatched, zero, disabled, cyclic, unseeded, and separately owned alternatives remain unresolved.",
+    "This corrects the representative trigger/output source relation exercised by the logical downstream cryogenic-science reproducer. It does not assert the installed Space Age source shape, rocket acquisition, factory feasibility, a current-engine native qualification, or a performance result."
+  ],
+  "semantic_domains": [
+    "compiler",
+    "compatibility"
+  ],
+  "audiences": [
+    "players",
+    "contributors",
+    "maintainers"
+  ],
+  "target_dispositions": [
+    {
+      "target": "F210",
+      "disposition": "affected",
+      "reason": "Uses the shared approved science-source binding; current 2.1 engine qualification remains separate."
+    },
+    {
+      "target": "F200",
+      "disposition": "affected",
+      "reason": "Uses the shared approved science-source binding; target-specific native acceptance remains separate."
+    },
+    {
+      "target": "F110",
+      "disposition": "affected",
+      "reason": "Uses the shared approved science-source binding; target-specific native acceptance remains separate."
+    },
+    {
+      "target": "F100",
+      "disposition": "affected",
+      "reason": "Uses the shared approved science-source binding; target-specific native acceptance remains separate."
+    },
+    {
+      "target": "F017",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapter does not consume the current shared science compiler modules."
+    },
+    {
+      "target": "F016",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapter does not consume the current shared science compiler modules."
+    },
+    {
+      "target": "F015",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapter does not consume the current shared science compiler modules."
+    },
+    {
+      "target": "F014",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapter does not consume the current shared science compiler modules."
+    },
+    {
+      "target": "F013",
+      "disposition": "unaffected",
+      "reason": "Historical capability adapter does not consume the current shared science compiler modules."
+    }
+  ],
+  "package_visibility": "player-package",
+  "impacts": {
+    "save": "none",
+    "settings": "none",
+    "migration": "none",
+    "compatibility": "affected",
+    "public_contract": "compatible",
+    "support_claim": "none"
+  },
+  "security_visibility": "public-at-merge",
+  "release_surfaces": {
+    "source_changelog": "include",
+    "target_changelog": "include",
+    "github": "include",
+    "mod_portal": "include",
+    "technical": "include",
+    "manifest": "include"
+  },
+  "references": [
+    {
+      "kind": "finding",
+      "value": "source/prototypes/mir/capabilities/science_integration/pack_bindings.lua: fail-closed trigger/output source relation"
+    },
+    {
+      "kind": "finding",
+      "value": "tests/compiler/approved_pack_bindings.lua: positive, invalid-output, explicit-owner, unseeded-cycle and valid-alternative controls"
+    },
+    {
+      "kind": "finding",
+      "value": "build/tmp/mir47-cryogenic-science-pack-binding-r01/old-source-descendant-reproducer-r02.json: logical downstream old-source reproducer"
+    },
+    {
+      "kind": "document",
+      "value": "docs/compatibility/claim-levels.md"
+    }
+  ]
+}
