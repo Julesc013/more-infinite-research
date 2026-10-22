@@ -161,16 +161,30 @@ Generated from source-of-truth identifiers in Markdown front matter plus the imm
 | mir-3.2.5-scope-cut-decision | [ADR 0028: MIR 3.2.5 convergence release](../../adr/0028-3-2-5-convergence-release.md) | current |
 | mir-3.2.9-release-notes | [MIR 3.2.9 Release Notes](../../releases/notes/release-notes-3.2.9.md) | current |
 | mir-approved-delta-v1 | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
+| mir-architecture-explainer | [How MIR fits together](../../mir5/architecture.md) | proposed |
 | mir-c31-obligation-cancellation | [ADR 0028: MIR 3.2.5 convergence release](../../adr/0028-3-2-5-convergence-release.md) | current |
 | mir-control-plane-v5 | [MIR Control Plane v5](../../architecture/control-plane-v5.md) | current |
+| mir-diagram-assets | [Diagram sources and rendered atlas](../../mir5/diagrams/README.md) | proposed |
 | mir-dual-plane-repository | [ADR 0029: Dual-Plane Repository](../../adr/0029-dual-plane-repository.md) | current |
 | mir-extension-protocol | [MIR Extension Protocol](../../EXTENSION-PROTOCOL.md) | current |
 | mir-extension-protocol-v1-decision | [ADR 0030: Host-Neutral MIR Extension Protocol v1](../../adr/0030-host-neutral-extension-protocol.md) | current |
+| mir-implementation-draft-blueprint | [High-level implementation pseudocode](../../mir5/implementation/blueprint.md) | draft |
+| mir-implementation-draft-opposing-tests | [Proposed opposing tests for the implementation draft](../../mir5/implementation/opposing_tests.md) | draft |
+| mir-implementation-draft-README | [Implementation draft: reading order and boundaries](../../mir5/implementation/README.md) | draft |
+| mir-implementation-draft-review | [Implementation review: close decisions, do not expand architecture](../../mir5/implementation/review.md) | draft |
 | mir-local-artifact-lane-authorization-v1 | [ADR 0006: MIR 4 Local Artifact and Approved Delta Authorities](../../architecture/decisions/0006-mir4-local-artifact-and-approved-delta-authorities.md) | current |
 | mir-logical-repository-paths | [ADR 0029: Dual-Plane Repository](../../adr/0029-dual-plane-repository.md) | current |
 | mir-lower-wave-0.17-to-0.6-release-synthesis | [MIR Lower-Wave 0.17 To 0.6 Release Synthesis](../../releases/lower-wave-0.17-to-0.6-synthesis.md) | current |
 | mir-published-lines-development-copy-pack | [MIR Published Lines Development Copy Pack](../../releases/lower-wave-development-copy-pack.md) | current |
 | mir-release-archive-index | [Release Archive](../../releases/archive/README.md) | current |
+| mir-replacement-api-guide | [MIR API guide](../../mir5/api.md) | proposed |
+| mir-replacement-cutover-guide | [Staging, adoption and mechanical cutover](../../mir5/cutover.md) | proposed |
+| mir-replacement-decisions-guide | [Source reconciliation for this proposal](../../mir5/decisions.md) | proposed |
+| mir-replacement-design-guide | [Synthesized design and decisions](../../mir5/design.md) | proposed |
+| mir-replacement-development-guide | [Development guide](../../mir5/development.md) | proposed |
+| mir-replacement-first-batch-guide | [First implementation batch — bounded assignment](../../mir5/first_batch.md) | proposed |
+| mir-replacement-readme-guide | [MIR documentation](../../mir5/README.md) | proposed |
+| mir-replacement-support-guide | [Support and upgrade boundaries](../../mir5/support.md) | proposed |
 | mir-universal-mod-portal-copy | [More Infinite Research Mod Portal Page](../../releases/mod-portal-page.md) | current |
 | mir3-eol-mir4-entry-gate-reconciliation | [ADR 0004: MIR 3 EOL and MIR 4 Entry Gate](../../architecture/decisions/0004-mir3-eol-mir4-entry-gate.md) | current |
 | mir3-post-terminal-emergency-hotfix-policy | [MIR 3 Post-Terminal Emergency Hotfix](../../releases/mir3-post-terminal-emergency-hotfix.md) | current |

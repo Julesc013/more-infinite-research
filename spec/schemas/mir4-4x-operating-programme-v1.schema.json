@@ -493,7 +493,8 @@
                     "RIC-08",
                     "PLAT-UI-01",
                     "SIF-01",
-                    "DLC-01"
+                    "DLC-01",
+                    "SCI-UNLOCK-01"
                   ]
                 }
               },
