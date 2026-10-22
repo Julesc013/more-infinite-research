@@ -29,3 +29,12 @@ local setting = data.raw["int-setting"] and data.raw["int-setting"]["mir-max-lev
 if not setting or setting.default_value ~= 7 then
   error("[mir5-worker-speed-cap] finite worker cap default differs")
 end
+-- An unrelated fixture-owned technology remains unresearched after recursively
+-- preparing all native worker prerequisites. Its start raises a real event.
+data:extend({{
+  type = "technology", name = "mir5-worker-speed-cap-probe",
+  icon = "__base__/graphics/technology/automation-1.png", icon_size = 256,
+  prerequisites = {"automation-science-pack"},
+  unit = {count = 100, time = 1, ingredients = {{"automation-science-pack", 1}}},
+  effects = {}
+}})

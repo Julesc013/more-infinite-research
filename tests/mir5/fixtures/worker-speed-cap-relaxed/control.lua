@@ -70,12 +70,14 @@ local function observe(state)
 end
 
 script.on_configuration_changed(function()
-  local force = game.forces.player
-  local owner = owner_for(force)
+  -- Read the finite fixture's saved witness, not the already changed native
+  -- state. Otherwise a lost level/bonus during configuration could self-pass.
+  local prior = storage["mir5_native_worker_speed_cap"]
+  if not prior or not prior.saved then fail("finite saved witness is absent") end
   storage[KEY] = {
-    owner = owner.name,
-    next_level = owner.level,
-    modifier = force.worker_robots_speed_modifier,
+    owner = prior.owner,
+    next_level = prior.next_level,
+    modifier = prior.modifier_after,
     deadline = game.tick + 1200,
     phase = "await-relax"
   }

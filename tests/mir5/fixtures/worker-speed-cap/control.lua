@@ -35,10 +35,10 @@ local function prepare_prerequisites(technology)
 end
 
 local function start_unrelated_research(force)
-  local probe = force.technologies.automation
-  if not probe then fail("native automation probe is absent") end
+  local probe = force.technologies["mir5-worker-speed-cap-probe"]
+  if not probe then fail("native fixture research probe is absent") end
   prepare_prerequisites(probe)
-  if not force.add_research(probe) then fail("could not start native automation probe") end
+  if not force.add_research(probe) then fail("could not start native fixture research probe") end
 end
 
 local function marker(stage, state)
@@ -90,8 +90,8 @@ script.on_init(function()
   force.enable_all_prototypes()
   local owner = owner_for(force)
   local initial_level = owner.level
-  local modifier_before = force.worker_robots_speed_modifier
   prepare_prerequisites(owner)
+  local modifier_before = force.worker_robots_speed_modifier
   -- These two direct native setters observe earned infinite levels. They do
   -- not claim lab work or science consumption; the assertions below read the
   -- engine's actual level and force modifier after each completion.
