@@ -1,0 +1,40 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Factorio startup: all mods, ordered rounds
+  accDescr: Every round runs across active mods in dependency order. A dependent extension can run after MIR final-fixes; data API operations therefore happen when called.
+  subgraph group_A["GAME STARTUP"]
+    a["Engine + ordered active mod bytes"]:::data
+    s["settings.lua → settings-updates.lua<br/>→ settings-final-fixes.lua<br/>ALL MODS in each round"]:::engine
+    v["Setting prototypes finalized<br/>Configured startup values loaded"]:::engine
+    d["data.lua<br/>ALL MODS"]:::engine
+    u["data-updates.lua<br/>ALL MODS"]:::engine
+    f["data-final-fixes.lua<br/>ALL MODS"]:::engine
+    g["MIR or caller invokes Generator<br/>Only at its declared suitable round"]:::generator
+    n["Validate prototypes and assets<br/>Discard startup Lua state → menu"]:::engine
+  end
+  subgraph group_B["AFTER THE MENU"]
+    m["Create or load a save"]:::engine
+    c["Parse control.lua and run<br/>applicable save lifecycle hooks"]:::process
+    r["Gameplay events and native simulation"]:::engine
+  end
+  a --> s
+  s --> v
+  v --> d
+  d --> u
+  u --> f
+  d -.->|"as needed"| g
+  u -.->|"as needed"| g
+  f -.->|"as needed"| g
+  f --> n
+  n --> m
+  m --> c
+  c --> r
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

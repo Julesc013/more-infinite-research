@@ -1,0 +1,36 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Public API: immediate calls, independent consumers
+  accDescr: The helper performs local preflight and publication in the caller’s data-stage round. Runtime uses a separate remote interface; it cannot create prototypes.
+  subgraph group_D["PROTOTYPE-STAGE EXAMPLE"]
+    m["MIR data-final-fixes runs"]:::process
+    e["Dependent extension final-fixes runs<br/>MIR may already have finished"]:::api
+    v["Require public api.v1.data<br/>Check version + capability"]:::api
+    p["add_technologies(native family)<br/>Local map, validate all, own copies"]:::generator
+    w["Immediate native publication<br/>No pending queue / later MIR pass"]:::engine
+    n["Engine validates completed data stage"]:::engine
+  end
+  subgraph group_R["RUNTIME EXAMPLE"]
+    r["MIR control parsing registers<br/>more-infinite-research.api.v1"]:::api
+    h["Consumer event with game available<br/>Check remote interface / capability"]:::api
+    q["get_research(force, technology)"]:::process
+    s["Bounded read-only native snapshot<br/>No Generator, no state initialization"]:::engine
+  end
+  m -->|"declared dependency order"| e
+  e --> v
+  v --> p
+  p --> w
+  w --> n
+  r -->|"later callback"| h
+  h --> q
+  q --> s
+  n -.->|"after menu / save startup"| r
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

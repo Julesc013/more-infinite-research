@@ -1,0 +1,41 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Ownership: what survives each boundary?
+  accDescr: Only engine-recognized prototype data crosses startup. Runtime observes native state, authored compact metadata and deliberately supported transport—not arbitrary Lua upvalues.
+  subgraph group_D["DATA STAGE"]
+    a["Reusable authored template<br/>Read-only by convention and tests"]:::data
+    b["Detached output<br/>One owned nested native structure"]:::generator
+    c["data:extend / narrow checked patch"]:::process
+    x["No input/output table aliases"]:::error
+  end
+  subgraph group_E["ENGINE BOUNDARY"]
+    p["Final native prototype representation"]:::engine
+    z["Startup tables, closures and caches<br/>DISCARDED"]:::error
+  end
+  subgraph group_R["RUNTIME"]
+    t["Actual force technologies<br/>Native modifiers and settings"]:::engine
+    m["Compact authored identity metadata"]:::data
+    o["Optional supported mod-data transport<br/>Only for a real consumer"]:::optional
+    s["Owned MIR persistent state<br/>Explicit version / migration"]:::data
+    v["Library, effects and API queries"]:::api
+  end
+  a --> b
+  x -.->|"isolation requirement"| b
+  b --> c
+  c --> p
+  a -.->|"not runtime state"| z
+  p --> t
+  p -.->|"capability-gated"| o
+  t --> v
+  m --> v
+  o -.->|"if needed"| v
+  s --> v
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

@@ -1,0 +1,49 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: The whole mod: three engine lifetimes
+  accDescr: Settings define configuration; data-stage code creates native prototypes; runtime handles only non-native behavior, caps and presentation. There is no runtime Generator.
+  subgraph group_SET["SETTINGS STAGE"]
+    s1["Lightweight identity and defaults"]:::data
+    s2["Declare native setting prototypes"]:::process
+    s3["Factorio reads configured values"]:::engine
+  end
+  subgraph group_DATA["PROTOTYPE STAGE"]
+    d1["Authored research + known compatibility"]:::data
+    d2["Resolve effective startup values"]:::process
+    d3["GENERATOR<br/>Build owned tables; local preflight"]:::generator
+    d4["Optional overrides<br/>Caps / modules / recycling"]:::optional
+    d5["Native prototypes<br/>Factorio validates final result"]:::engine
+    patch["Known native-owner patch<br/>Exact preconditions; preserve other fields"]:::process
+    api["External data API<br/>Immediate bounded call"]:::api
+  end
+  subgraph group_RUN["SAVE / RUNTIME STAGE"]
+    r1["Native research and effects<br/>Managed by Factorio"]:::engine
+    r2["Save migrations and cap/state rules"]:::process
+    r3["Scripted effects<br/>Relevant events / fixed tick work"]:::optional
+    r4["Research Library + read-only API<br/>Requested views and queries"]:::api
+  end
+  s1 --> s2
+  s2 --> s3
+  s3 -->|"startup values"| d2
+  d1 --> d2
+  d2 --> d3
+  d3 -->|"new research"| d5
+  d4 --> d5
+  d5 -->|"native prototypes only"| r1
+  r1 -->|"load / configuration hooks"| r2
+  r2 -->|"initialize or reconcile"| r3
+  r1 -->|"native state"| r4
+  r3 -.->|"bounded observations"| r4
+  d2 -->|"enabled override values"| d4
+  d1 -->|"approved owner path"| patch
+  patch -->|"declared fields only"| d5
+  api -->|"native-shaped family"| d3
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

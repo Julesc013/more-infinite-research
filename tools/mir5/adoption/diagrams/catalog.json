@@ -1,0 +1,154 @@
+{
+  "format": 1,
+  "purpose": "developer-only-diagram-source-not-runtime-input",
+  "renderer": "Graphviz; Mermaid exported from identical graph records",
+  "diagrams": [
+    {
+      "id": "13_cutover",
+      "title": "Temporary staging has a defined end",
+      "question": "How do all staging roots disappear without losing work?",
+      "summary": "This transition-only diagram and the one-use adoption tools retire. The exporter never deletes or changes the original checkout; actual cutover is a separate reviewed change.",
+      "status": "proposed architecture; not native-verified",
+      "direction": "TB",
+      "transition_only": true,
+      "contracts": [
+        "repository.md",
+        "targets.md",
+        "migrations.md"
+      ],
+      "groups": [
+        {
+          "id": "S",
+          "label": "STAGED DEVELOPMENT"
+        },
+        {
+          "id": "R",
+          "label": "REVIEWED EXPORT"
+        },
+        {
+          "id": "C",
+          "label": "CANONICAL PRODUCT"
+        }
+      ],
+      "nodes": [
+        {
+          "id": "a",
+          "label": "source / spec / docs / tests / tools\n/ targets / sdk \u2014 each with mir5/",
+          "group": "S",
+          "role": "data"
+        },
+        {
+          "id": "b",
+          "label": "Pin old refs and unique local work\nRecover features, IDs, requests and evidence",
+          "group": "S",
+          "role": "process"
+        },
+        {
+          "id": "i",
+          "label": "Inventory EVERY tracked path\nKeep / move / retire / unresolved",
+          "group": "R",
+          "role": "process"
+        },
+        {
+          "id": "u",
+          "label": "Unresolved, stale, dirty or collision?",
+          "group": "R",
+          "role": "decision",
+          "shape": "diamond"
+        },
+        {
+          "id": "f",
+          "label": "REFUSE: preserve source unchanged",
+          "group": "R",
+          "role": "error"
+        },
+        {
+          "id": "x",
+          "label": "Export to NEW outside directory\nRewrite supported links; no source mutation",
+          "group": "R",
+          "role": "process"
+        },
+        {
+          "id": "p",
+          "label": "Drop only approved mir5 component\nRetain api/v1 and migration identities",
+          "group": "C",
+          "role": "process"
+        },
+        {
+          "id": "v",
+          "label": "Compare player member paths/bytes\nFinal-layout tests + applicable native smoke",
+          "group": "C",
+          "role": "engine"
+        },
+        {
+          "id": "m",
+          "label": "Reviewed dev \u2192 main promotion\nMIR 3 remains on legacy",
+          "group": "C",
+          "role": "success"
+        },
+        {
+          "id": "d",
+          "label": "Retire obsolete MIR 4 architecture\nand one-use transition guidance\nHistory stays in pinned refs/artifacts",
+          "group": "C",
+          "role": "success"
+        }
+      ],
+      "edges": [
+        {
+          "from": "a",
+          "to": "b",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "b",
+          "to": "i",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "i",
+          "to": "u",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "u",
+          "to": "f",
+          "label": "yes",
+          "style": "solid"
+        },
+        {
+          "from": "u",
+          "to": "x",
+          "label": "no",
+          "style": "solid"
+        },
+        {
+          "from": "x",
+          "to": "p",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "p",
+          "to": "v",
+          "label": "",
+          "style": "solid"
+        },
+        {
+          "from": "v",
+          "to": "m",
+          "label": "accepted",
+          "style": "solid"
+        },
+        {
+          "from": "m",
+          "to": "d",
+          "label": "",
+          "style": "solid"
+        }
+      ]
+    }
+  ]
+}
