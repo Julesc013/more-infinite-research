@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-science-ambiguity",
+  "version": "0.1.0",
+  "title": "MIR science unlock ambiguity fixture",
+  "author": "MIR maintainers",
+  "description": "Representative unresolved science ambiguity fixture; not native-qualified.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research >= 4.7.21000"
+  ]
+}

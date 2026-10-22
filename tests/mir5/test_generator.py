@@ -47,6 +47,7 @@ class GeneratorTests(unittest.TestCase):
         self.lua.execute('''
           local a, b = build(), build()
           assert(a.name == "recipe-prod-research_gears-1" and a.max_level == "infinite" and a.upgrade)
+          assert(a.order == "p[research_gears]")
           assert(a.unit.count_formula == "8000*2^(L-1)" and a.unit.time == 60)
           assert(#a.unit.ingredients == 4 and #a.prerequisites == 4)
           local expected = {"automation", "logistic", "chemical", "production"}

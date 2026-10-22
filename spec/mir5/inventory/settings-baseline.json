@@ -1,0 +1,1110 @@
+{
+  "format": 1,
+  "kind": "mir5-published-settings-source-characterization",
+  "status": "source-characterized-effective-and-native-capture-pending",
+  "scope": {
+    "pinned_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "subject": "MIR 4.7.0 global and non-family startup-setting surface",
+    "family_settings_not_duplicated": true,
+    "catalog_reference": "spec/mir5/inventory/catalog-baseline.json",
+    "native_execution_claimed": false,
+    "MIR4_compiler_imported": false
+  },
+  "family_setting_reference": {
+    "catalog_reference": "spec/mir5/inventory/catalog-baseline.json#stream_settings_contract",
+    "not_repeated": "The 76 stream families times seven setting templates are represented by the catalog prefix rules and per-family defaults; this record contains only global/non-family settings.",
+    "stream_prefix_rules": [
+      "ips-enable-<stream_key>",
+      "ips-cost-base-<stream_key>",
+      "ips-cost-linear-increment-<stream_key>",
+      "ips-cost-growth-<stream_key>",
+      "ips-max-level-<stream_key>",
+      "ips-research-time-<stream_key>",
+      "ips-effect-per-level-<stream_key>"
+    ],
+    "base_prefix_rules": [
+      "mir-enable-<base_key>",
+      "mir-cost-base-<base_key>",
+      "mir-cost-linear-increment-<base_key>",
+      "mir-cost-growth-<base_key>",
+      "mir-max-level-<base_key>",
+      "mir-research-time-<base_key>",
+      "mir-effect-per-level-<base_key>"
+    ]
+  },
+  "global_settings": [
+    {
+      "name": "mir-compiler-profile",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "full",
+      "allowed_values": [
+        "full",
+        "classic"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": true,
+      "profile_export": false,
+      "profile_import": false,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/compiler_profile.lua",
+        "lines": [
+          1,
+          35
+        ]
+      },
+      "source_semantics": "Retained serialized compatibility selector. On modern lines both accepted values execute the Full compatibility alias; on 0.x the getter returns full. It does not select an old compiler or authorize a second solver.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "ips-require-space-gate",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          131,
+          139
+        ]
+      },
+      "source_semantics": "When true, prerequisite planning appends the selected end-game science gate; realized prerequisite capture is required.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-science-pack-ingredient-policy",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "configured",
+      "allowed_values": [
+        "configured",
+        "space",
+        "space-and-promethium",
+        "space-age-progression",
+        "official-progression",
+        "mod-progression",
+        "all-official",
+        "all"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          140,
+          149
+        ]
+      },
+      "source_semantics": "Source selection policy; it is applied before lab compatibility and prerequisite realization.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-lab-incompatibility-policy",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "reduce",
+      "allowed_values": [
+        "reduce",
+        "skip",
+        "engine-default"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          150,
+          159
+        ]
+      },
+      "source_semantics": "Controls the source lab-compatibility decision; admitted packs/labs remain capture-required.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prefer-this-mod-for-competing-techs",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": true,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          160,
+          168
+        ]
+      },
+      "source_semantics": "Controls source owner-conflict preference for compatible competing extensions; it is not a native-owner admission by itself.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-adjust-vanilla-weapon-speed-techs",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "only-when-dedicated-tech-enabled",
+      "allowed_values": [
+        "off",
+        "only-when-dedicated-tech-enabled",
+        "always"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          169,
+          178
+        ]
+      },
+      "source_semantics": "Source target profile supplies the default. The pinned profile values shown for 2.1 through 0.15 use only-when-dedicated-tech-enabled; exact registered setting capture remains required.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-max-level-worker-robots-speed",
+      "type": "int-setting",
+      "setting_type": "startup",
+      "default_value": 0,
+      "allowed_values": null,
+      "minimum_value": 0,
+      "maximum_value": 2147483647,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "scripted_techs"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          179,
+          190
+        ]
+      },
+      "source_semantics": "0 is an unbounded/infinite cap sentinel. A finite value can bind only to the exact approved native worker-robot-speed tail (worker-robots-speed-7<-6 or 6<-5, infinite, sole 0.65 effect); absent that exact tail, no native-owner cap input is produced.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-use-installed-space-age-icons",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "technology_constant_overlays"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          191,
+          200
+        ]
+      },
+      "source_semantics": "Controls source presentation selection only.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-pipeline-extent-multiplier",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "100",
+      "allowed_values": [
+        "1000",
+        "750",
+        "500",
+        "400",
+        "300",
+        "250",
+        "200",
+        "150",
+        "125",
+        "100",
+        "75",
+        "50",
+        "25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "pipeline_extent"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          201,
+          211
+        ]
+      },
+      "source_semantics": "Registered values are percentage strings. The source accepts profile numeric values in [0.1,100000] and parses a number as value/100; invalid/nonpositive input falls back to 1.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-automatic-productivity-action",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "apply",
+      "allowed_values": [
+        "disabled",
+        "preview",
+        "apply"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "recipe_productivity"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+        "lines": [
+          91,
+          110
+        ]
+      },
+      "source_semantics": "Direct automatic-productivity control. Together with create-research and require-reviewed-data it is the retained MIR4 control authority described by the source; it is not an MIR5 import.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-automatic-create-research",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "recipe_productivity"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+        "lines": [
+          111,
+          126
+        ]
+      },
+      "source_semantics": "Direct automatic-productivity control; false attaches only to existing research according to the source contract.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-automatic-require-reviewed-data",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": true,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "recipe_productivity"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+        "lines": [
+          127,
+          142
+        ]
+      },
+      "source_semantics": "Direct automatic-productivity control; true retains reviewed-provider gating for generation.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-automatic-compiler-mode",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "safe-attach",
+      "allowed_values": [
+        "off",
+        "report",
+        "safe-attach",
+        "exact-pack",
+        "safe-generate"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": true,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "recipe_productivity"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+        "lines": [
+          143,
+          159
+        ]
+      },
+      "source_semantics": "Hidden pre-3.1.5 compatibility bridge. It expands to the independent controls only while all three replacement controls are at their defaults; otherwise controls-v2 wins. It is not a current compiler/solver selector.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-productivity-cap",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "percent-100000",
+        "percent-25000",
+        "percent-10000",
+        "percent-5000",
+        "percent-2500",
+        "percent-1000",
+        "percent-750",
+        "percent-500",
+        "percent-400",
+        "engine-default",
+        "percent-250",
+        "percent-200",
+        "percent-150",
+        "percent-125",
+        "percent-100",
+        "percent-75",
+        "percent-50",
+        "percent-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit productivity-effect cap; engine-default yields nil/source engine behavior. Numeric profile range is [0, 100000]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-efficiency-cap",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "saving-9999",
+        "saving-999",
+        "saving-99",
+        "saving-95",
+        "saving-90",
+        "engine-default",
+        "saving-75",
+        "saving-50",
+        "saving-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit efficiency modifier cap; engine-default yields nil/source engine behavior. Numeric profile range is [-99.99, 0]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-pollution-cap",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "saving-9999",
+        "saving-999",
+        "saving-99",
+        "saving-95",
+        "saving-90",
+        "engine-default",
+        "saving-75",
+        "saving-50",
+        "saving-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit pollution modifier cap; engine-default yields nil/source engine behavior. Numeric profile range is [-99.99, 0]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-speed-floor",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "saving-9999",
+        "saving-999",
+        "saving-99",
+        "saving-95",
+        "saving-90",
+        "engine-default",
+        "saving-75",
+        "saving-50",
+        "saving-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit lower speed modifier cap; engine-default yields nil/source engine behavior. Numeric profile range is [-99.99, 0]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-speed-cap",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "engine-default",
+        "bonus-25000",
+        "bonus-10000",
+        "bonus-5000",
+        "bonus-2500",
+        "bonus-1000",
+        "bonus-750",
+        "bonus-500",
+        "bonus-400",
+        "bonus-300",
+        "bonus-250",
+        "bonus-200",
+        "bonus-150",
+        "bonus-125",
+        "bonus-100",
+        "bonus-75",
+        "bonus-50",
+        "bonus-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit upper speed modifier cap; profile input also accepts bonus-100000. Numeric profile range is [0, 100000]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-quality-cap",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "engine-default",
+        "bonus-25000",
+        "bonus-10000",
+        "bonus-5000",
+        "bonus-2500",
+        "bonus-1000",
+        "bonus-750",
+        "bonus-500",
+        "bonus-400",
+        "bonus-300",
+        "bonus-250",
+        "bonus-200",
+        "bonus-150",
+        "bonus-125",
+        "bonus-100",
+        "bonus-75",
+        "bonus-50",
+        "bonus-25"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          102,
+          250
+        ]
+      },
+      "source_semantics": "Selects an explicit upper quality modifier cap; profile input also accepts bonus-100000. Numeric profile range is [0, 100000]; numeric values are divided by 100 in source.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-recycling-return-chance",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "engine-default",
+      "allowed_values": [
+        "engine-default",
+        "match-productivity-cap",
+        "percent-20",
+        "percent-15",
+        "percent-12-5",
+        "percent-10",
+        "percent-7-5",
+        "percent-5",
+        "percent-2-5",
+        "percent-1",
+        "percent-0-5",
+        "percent-0-1"
+      ],
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/prototype_limits.lua",
+        "lines": [
+          4,
+          39
+        ]
+      },
+      "source_semantics": "engine-default yields nil. match-productivity-cap evaluates min(0.25,1/(1+max(0,productivity_cap))); numeric profile range [0,25] divides by 100; profile also accepts percent-25.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-productivity-cap-self-recycling-only",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          239,
+          249
+        ]
+      },
+      "source_semantics": "Source boolean scope control for prototype productivity cap behavior.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-unrestricted-modules",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "module_permissions"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          250,
+          260
+        ]
+      },
+      "source_semantics": "Source boolean control for module permission restrictions.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-prototype-positive-power-floor",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "prototype_limits"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          261,
+          271
+        ]
+      },
+      "source_semantics": "Source boolean for positive-power floor behavior.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-settings-profile-import",
+      "type": "string-setting",
+      "setting_type": "startup",
+      "default_value": "",
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": false,
+      "profile_import": false,
+      "requires_features": [
+        "settings_profiles"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          272,
+          283
+        ]
+      },
+      "source_semantics": "Blank allowed. Imports MIRSET1 canonical-json-deflate-base64 or canonical JSON. A valid recognized non-import setting overrides its raw startup value; unknown/invalid/unavailable values and invalid profiles fall back to raw settings.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-enable-passive-repair",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "scripted_techs"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          284,
+          294
+        ]
+      },
+      "source_semantics": "Default-off source runtime capability switch; the bundled passive-repair runtime component is selected only for F200/F210 in source package composition.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-debug-generation-report",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          295,
+          304
+        ]
+      },
+      "source_semantics": "Enables source generation-report diagnostics.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-debug-recipe-matches",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          304,
+          313
+        ]
+      },
+      "source_semantics": "Enables source recipe-match diagnostics.",
+      "effective_value_and_registered_prototype": "capture-required"
+    },
+    {
+      "name": "mir-debug-scripted-effects",
+      "type": "bool-setting",
+      "setting_type": "startup",
+      "default_value": false,
+      "allowed_values": null,
+      "minimum_value": null,
+      "maximum_value": null,
+      "hidden": false,
+      "profile_export": true,
+      "profile_import": true,
+      "requires_features": [
+        "scripted_techs"
+      ],
+      "source": {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          313,
+          323
+        ]
+      },
+      "source_semantics": "Enables source scripted-effect diagnostics.",
+      "effective_value_and_registered_prototype": "capture-required"
+    }
+  ],
+  "hidden_compatibility_ids": [
+    {
+      "name": "mir-compiler-profile",
+      "retention": "stable serialized startup setting",
+      "allowed_values": [
+        "full",
+        "classic"
+      ],
+      "effective_semantics": "both normalize to full on modern lines; 0.x getter returns full",
+      "authority": "compatibility alias only; never an old compiler or solver selector",
+      "source": {
+        "path": "source/prototypes/mir/settings/compiler_profile.lua",
+        "lines": [
+          1,
+          35
+        ]
+      }
+    },
+    {
+      "name": "mir-automatic-compiler-mode",
+      "retention": "pre-3.1.5 profile bridge",
+      "allowed_values": [
+        "off",
+        "report",
+        "safe-attach",
+        "exact-pack",
+        "safe-generate"
+      ],
+      "effective_semantics": "maps to direct controls only if action/create/review controls are all default",
+      "authority": "compatibility bridge only; controls-v2 otherwise has authority",
+      "source": {
+        "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+        "lines": [
+          143,
+          196
+        ]
+      }
+    }
+  ],
+  "effective_settings_and_profile_semantics": {
+    "source": [
+      {
+        "path": "source/prototypes/mir/settings/effective.lua",
+        "lines": [
+          20,
+          108
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/settings/profile_codec.lua",
+        "lines": [
+          5,
+          10,
+          119,
+          154,
+          197,
+          249
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          493,
+          578
+        ]
+      }
+    ],
+    "precedence": "A valid decoded profile value wins only for a registered, existing, non-import setting. Otherwise the raw startup value remains effective.",
+    "validation": "Type, numeric bound and dropdown-value validation is source-defined; imported numeric dropdown values are permitted only where the catalog declares import numeric bounds.",
+    "capture_status": "effective profile and engine-registered startup settings are capture-required"
+  },
+  "cap_and_native_owner_sentinels": {
+    "source": [
+      {
+        "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+        "lines": [
+          14,
+          27,
+          46,
+          58,
+          102,
+          138,
+          146,
+          177
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/planner/base_continuations/plan.lua",
+        "lines": [
+          125,
+          141,
+          146,
+          171,
+          174,
+          203,
+          268,
+          284
+        ]
+      }
+    ],
+    "max_level_zero": "0 (and source nil where accepted) resolves to infinite/unbounded.",
+    "finite_cap_modern": "With scripted_techs, finite caps use a lossless infinite prototype plus an absolute runtime cap controller; without it, source uses a finite prototype cap.",
+    "native_worker_robot_speed": "The dedicated global cap has no effect unless an exact approved native tail is observed. Its owner/adoption result is native-capture-required.",
+    "base_extension_zero_sentinels": {
+      "mir-max-level-<base_key>": "0 resolves to infinite; finite behavior follows scripted_techs capability.",
+      "mir-cost-base-<base_key>": "0 selects vanilla-chain base inheritance.",
+      "mir-cost-growth-<base_key>": "0 selects vanilla-chain growth inheritance.",
+      "mir-research-time-<base_key>": "0 selects vanilla base technology unit time (or 60 fallback).",
+      "mir-cost-linear-increment-<base_key>": "0 remains a zero additive increment."
+    }
+  },
+  "platform_availability": {
+    "selection_rule": {
+      "path": "source/prototypes/mir/platform/factorio/target_line.lua",
+      "lines": [
+        69,
+        82
+      ],
+      "meaning": "A setting is source-registered only when every declared feature requirement is true."
+    },
+    "modern_f210_f200": {
+      "lines": [
+        "2.1",
+        "2.0"
+      ],
+      "features_true": [
+        "recipe_productivity",
+        "scripted_techs",
+        "settings_profiles",
+        "pipeline_extent",
+        "prototype_limits",
+        "module_permissions",
+        "technology_constant_overlays"
+      ],
+      "global_setting_surface": "all 28 source rows are candidates for registration; final engine registration is capture-required."
+    },
+    "reduced_f110_f100": {
+      "lines": [
+        "1.1",
+        "1.0"
+      ],
+      "features_false": [
+        "recipe_productivity",
+        "scripted_techs",
+        "settings_profiles",
+        "pipeline_extent",
+        "prototype_limits",
+        "module_permissions",
+        "technology_constant_overlays"
+      ],
+      "source_registered_candidates": [
+        "mir-compiler-profile",
+        "ips-require-space-gate",
+        "mir-science-pack-ingredient-policy",
+        "mir-lab-incompatibility-policy",
+        "mir-prefer-this-mod-for-competing-techs",
+        "mir-adjust-vanilla-weapon-speed-techs",
+        "mir-debug-generation-report",
+        "mir-debug-recipe-matches"
+      ],
+      "feature-gated_rows_omitted": "the remaining 20 global rows are source-omitted by target requirements."
+    },
+    "historical_f017_f016_f015_f014_f013": {
+      "features_false": [
+        "recipe_productivity",
+        "scripted_techs",
+        "settings_profiles",
+        "pipeline_extent",
+        "prototype_limits",
+        "module_permissions",
+        "technology_constant_overlays"
+      ],
+      "source_profile_refs": [
+        "source/adapters/historical/f017/target_profiles.lua:24-85",
+        "source/adapters/historical/legacy-reduced/target_profiles.lua.template:21-97"
+      ],
+      "candidate_surface": "same ungated eight-row source candidate set as reduced f110/f100. The source package manifest declares settings.lua only for f210/f200/f110/f100, while historical targets are f100-derived private materializations; actual historic archive/engine startup-setting availability is capture-required and no native registration is claimed here."
+    }
+  },
+  "source_references": [
+    {
+      "path": "source/prototypes/mir/settings/catalog.lua",
+      "lines": [
+        118,
+        331
+      ],
+      "purpose": "global declarations and target gating"
+    },
+    {
+      "path": "source/prototypes/mir/settings/automatic_compiler_contract.lua",
+      "lines": [
+        6,
+        24,
+        91,
+        196
+      ],
+      "purpose": "direct controls and hidden historic bridge"
+    },
+    {
+      "path": "source/prototypes/mir/settings/compiler_profile.lua",
+      "lines": [
+        1,
+        35
+      ],
+      "purpose": "hidden full/classic compatibility alias"
+    },
+    {
+      "path": "source/prototypes/mir/settings/prototype_limits.lua",
+      "lines": [
+        4,
+        299
+      ],
+      "purpose": "prototype-limit dropdowns and numeric conversion"
+    },
+    {
+      "path": "source/prototypes/mir/settings/effective.lua",
+      "lines": [
+        20,
+        108
+      ],
+      "purpose": "effective import precedence"
+    },
+    {
+      "path": "source/prototypes/mir/settings/profile_codec.lua",
+      "lines": [
+        5,
+        10,
+        119,
+        249
+      ],
+      "purpose": "profile schema/codec"
+    },
+    {
+      "path": "source/prototypes/mir/settings/cost_contract.lua",
+      "lines": [
+        3,
+        48
+      ],
+      "purpose": "base and stream family cost prefix/bounds"
+    },
+    {
+      "path": "source/prototypes/mir/settings/defaults.lua",
+      "lines": [
+        3,
+        210
+      ],
+      "purpose": "stream/base inherited default and sentinel sources"
+    },
+    {
+      "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
+      "lines": [
+        14,
+        308
+      ],
+      "purpose": "native-owner and cap semantics"
+    },
+    {
+      "path": "source/package-source.json",
+      "lines": [
+        1796,
+        1816,
+        1838,
+        1858
+      ],
+      "purpose": "settings source target scope f210/f200/f110/f100"
+    }
+  ],
+  "required_capture": [
+    "exact target setting prototype inventory including hidden flag",
+    "effective profile precedence against registered startup settings",
+    "native worker-robot-speed owner/tail disposition",
+    "historical materialized archive membership and engine startup-setting support"
+  ]
+}
