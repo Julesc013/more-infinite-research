@@ -86,6 +86,21 @@ function Write-NativeSliceJson {
   [IO.File]::WriteAllText($Path, ($Value | ConvertTo-Json -Depth 32), [Text.UTF8Encoding]::new($false))
 }
 
+function Read-NativeSliceLiveLog {
+  param([Parameter(Mandatory)][string]$Path)
+  $stream = [IO.File]::Open($Path, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::ReadWrite)
+  try {
+    $reader = [IO.StreamReader]::new($stream)
+    try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+  } finally { $stream.Dispose() }
+}
+
+function Get-NativeSliceFatalDiagnostic {
+  param([AllowNull()][string]$Text)
+  if ([string]::IsNullOrEmpty($Text)) { return $null }
+  return [regex]::Match($Text, '(?im)^\s*\d+[.]\d+\s+Error\b.*$|^Error while running event\b.*$|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')
+}
+
 function Get-NativeSliceResult {
   param([Parameter(Mandatory)][string]$LogPath, [Parameter(Mandatory)][string]$Stage)
   $text = [IO.File]::ReadAllText($LogPath)
@@ -136,6 +151,7 @@ function Invoke-NativeSliceStage {
   $stdoutText = ''
   $stderrText = ''
   $completionObserved = $false
+  $controlledKillAfterCompletion = $false
   $exitCode = $null
   try {
     $process = [Diagnostics.Process]::Start($start)
@@ -145,14 +161,21 @@ function Invoke-NativeSliceStage {
     $stderrTask = $process.StandardError.ReadToEndAsync()
     $deadline = [DateTime]::UtcNow.AddSeconds($TimeoutSeconds)
     while ([DateTime]::UtcNow -lt $deadline) {
-      if ($null -ne $Completion -and (Test-Path -LiteralPath $liveLog -PathType Leaf)) {
-        try { $completionObserved = [bool](& $Completion ([IO.File]::ReadAllText($liveLog))) } catch [IO.IOException] { $completionObserved = $false }
-        if ($completionObserved) { break }
-      }
       if ($process.HasExited) {
         $exitCode = $process.ExitCode
         if ($null -eq $Completion) { break }
         throw "native engine exited before completing $Stage with code $exitCode; diagnostics: $stdoutLog ; $stderrLog ; $capturedLog"
+      }
+      if (Test-Path -LiteralPath $liveLog -PathType Leaf) {
+        try { $liveText = Read-NativeSliceLiveLog $liveLog } catch [IO.IOException] { $liveText = $null }
+        $fatal = Get-NativeSliceFatalDiagnostic $liveText
+        if ($null -ne $fatal -and $fatal.Success) {
+          throw "native engine emitted a fatal diagnostic during ${Stage}: $($fatal.Value); diagnostics: $stdoutLog ; $stderrLog ; $capturedLog"
+        }
+        if ($null -ne $Completion -and $null -ne $liveText) {
+          $completionObserved = [bool](& $Completion $liveText)
+          if ($completionObserved) { break }
+        }
       }
       Start-Sleep -Milliseconds 150
     }
@@ -162,6 +185,7 @@ function Invoke-NativeSliceStage {
   } finally {
     if ($null -ne $process) {
       if (-not $process.HasExited) {
+        if ($null -ne $Completion -and $completionObserved) { $controlledKillAfterCompletion = $true }
         try { $process.Kill($true) } catch { $process.Kill() }
       }
       $process.WaitForExit()
@@ -182,8 +206,15 @@ function Invoke-NativeSliceStage {
     }
   }
   Assert-NativeSlice (Test-Path -LiteralPath $capturedLog -PathType Leaf) "native engine produced no captured Factorio log for $Stage"
+  foreach ($diagnostic in @($capturedLog, $stdoutLog, $stderrLog)) {
+    $fatal = Get-NativeSliceFatalDiagnostic ([IO.File]::ReadAllText($diagnostic))
+    Assert-NativeSlice ($null -eq $fatal -or -not $fatal.Success) "native engine emitted a fatal diagnostic during ${Stage}: $($fatal.Value)"
+  }
+  if ($null -ne $Completion) {
+    Assert-NativeSlice ($completionObserved -and $controlledKillAfterCompletion) "native completion must be terminated by the harness while the process remains alive"
+  }
   $loaded = Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $capturedLog -LatestInvocation
-  return [pscustomobject]@{ stage = $Stage; log = $capturedLog; log_sha256 = Get-NativeSliceSha256 $capturedLog; stdout_log = $stdoutLog; stderr_log = $stderrLog; exit_code = $exitCode; completion_observed = $completionObserved; loaded = $loaded }
+  return [pscustomobject]@{ stage = $Stage; log = $capturedLog; log_sha256 = Get-NativeSliceSha256 $capturedLog; stdout_log = $stdoutLog; stderr_log = $stderrLog; exit_code = $exitCode; completion_observed = $completionObserved; controlled_kill_after_completion = $controlledKillAfterCompletion; loaded = $loaded }
 }
 
 $repo = (Resolve-Path -LiteralPath $RepoRoot).Path

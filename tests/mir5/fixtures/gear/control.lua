@@ -236,6 +236,7 @@ script.on_event(defines.events.on_tick, function()
     end
     return
   end
+  if state.saved and state.phase == "saved" then return end
   if game.tick > state.deadline_tick then fail("native gear crafting did not finish within 18000 ticks") end
   if not drain_crafting(state) then return end
   if state.phase == "baseline" then
