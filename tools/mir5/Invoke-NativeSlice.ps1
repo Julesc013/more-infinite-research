@@ -104,6 +104,7 @@ function Assert-NativeSliceResult {
   Assert-NativeSlice ($Result.level_one_count -eq $Expected.level_one_count) "$Stage level-one count differs"
   Assert-NativeSlice ($Result.level_two_count -gt $Result.level_one_count -and $Result.level_three_count -gt $Result.level_two_count) "$Stage native count progression differs"
   Assert-NativeSlice ($Result.baseline_output -eq 100 -and $Result.researched_output -eq $Expected.researched_output) "$Stage physical gear production differs"
+  Assert-NativeSlice ($Result.baseline_plates_inserted -eq 200 -and $Result.researched_plates_inserted -eq 200) "$Stage physical gear input witness differs"
 }
 
 function Invoke-NativeSliceStage {

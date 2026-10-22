@@ -3,6 +3,7 @@ local recipe_name = "iron-gear-wheel"
 local save_name = "mir5-gear-native-complete"
 local loaded_generation = nil
 local reload_logged = false
+local plates_per_phase = 200
 
 local function fail(message)
   error("[mir5-gear-native] " .. message)
@@ -62,6 +63,10 @@ local function json(state, stage)
     .. ",\"level_three_count\":" .. state.level_three_count
     .. ",\"baseline_output\":" .. state.baseline_output
     .. ",\"researched_output\":" .. state.researched_output
+    .. ",\"baseline_plates_inserted\":" .. state.baseline_plates_inserted
+    .. ",\"researched_plates_inserted\":" .. state.researched_plates_inserted
+    .. ",\"baseline_refills\":" .. state.baseline_refills
+    .. ",\"researched_refills\":" .. state.researched_refills
     .. "}"
 end
 
@@ -76,6 +81,9 @@ local function assert_reloaded(state)
   end
   if state.baseline_output ~= 100 or state.researched_output ~= state.profile.physical_output then
     fail("saved physical crafting witness differs")
+  end
+  if state.baseline_plates_inserted ~= plates_per_phase or state.researched_plates_inserted ~= plates_per_phase then
+    fail("saved physical crafting plate witness differs")
   end
 end
 
@@ -103,6 +111,24 @@ local function machine_for(force)
   return entity
 end
 
+local function refill_crafting(state)
+  local entity = state.machine
+  if not entity or not entity.valid then fail("native gear assembler disappeared while refilling") end
+  if state.phase_plates_remaining <= 0 then return end
+  entity.energy = 1000000000
+  local input = entity.get_inventory(defines.inventory.crafter_input)
+  if not input then fail("native gear assembler input inventory is absent") end
+  local inserted = input.insert{name = "iron-plate", count = state.phase_plates_remaining}
+  if inserted < 0 or inserted > state.phase_plates_remaining then
+    fail("native gear assembler reported an invalid plate insertion " .. tostring(inserted))
+  end
+  if inserted > 0 then
+    state.phase_plates_remaining = state.phase_plates_remaining - inserted
+    state.phase_plates_inserted = state.phase_plates_inserted + inserted
+    state.phase_refills = state.phase_refills + 1
+  end
+end
+
 local function begin_crafting(state, phase)
   local entity = state.machine
   if not entity or not entity.valid then fail("native gear assembler disappeared") end
@@ -112,10 +138,12 @@ local function begin_crafting(state, phase)
   if not input or not output or not output.is_empty() or not input.is_empty() then
     fail("native gear assembler inventories were not clean")
   end
-  local inserted = input.insert{name = "iron-plate", count = 200}
-  if inserted ~= 200 then fail("could not supply 200 iron plates; inserted " .. tostring(inserted)) end
   state.phase = phase
   state.phase_output = 0
+  state.phase_plates_remaining = plates_per_phase
+  state.phase_plates_inserted = 0
+  state.phase_refills = 0
+  refill_crafting(state)
 end
 
 local function drain_crafting(state)
@@ -124,12 +152,14 @@ local function drain_crafting(state)
   entity.energy = 1000000000
   local input = entity.get_inventory(defines.inventory.crafter_input)
   local output = entity.get_inventory(defines.inventory.crafter_output)
+  refill_crafting(state)
   local count = output.get_item_count(recipe_name)
   if count > 0 then
     if output.remove{name = recipe_name, count = count} ~= count then fail("could not drain native gear output") end
     state.phase_output = state.phase_output + count
   end
-  if input.get_item_count("iron-plate") ~= 0 or entity.crafting_progress ~= 0 then return false end
+  if state.phase_plates_remaining ~= 0 or input.get_item_count("iron-plate") ~= 0 or entity.crafting_progress ~= 0 then return false end
+  if state.phase_plates_inserted ~= plates_per_phase then fail("native gear assembler did not receive every required plate") end
   return true
 end
 
@@ -151,6 +181,7 @@ script.on_init(function()
     fail("fixture loaded with an unexpected private MIR 5 or Factorio closure")
   end
   local force = game.forces.player
+  game.speed = 16
   force.enable_all_prototypes()
   local technology = force.technologies[technology_name]
   if not technology or technology.level ~= 1 or technology.researched then fail("fresh gear technology state differs") end
@@ -174,6 +205,10 @@ script.on_init(function()
     phase_output = 0,
     baseline_output = 0,
     researched_output = 0,
+    baseline_plates_inserted = 0,
+    researched_plates_inserted = 0,
+    baseline_refills = 0,
+    researched_refills = 0,
     completed_level = 0,
     next_level = 1,
     level_one_count = force_count,
@@ -206,6 +241,8 @@ script.on_event(defines.events.on_tick, function()
   if state.phase == "baseline" then
     if state.phase_output ~= 100 then fail("100 baseline crafts did not produce exactly 100 gears") end
     state.baseline_output = state.phase_output
+    state.baseline_plates_inserted = state.phase_plates_inserted
+    state.baseline_refills = state.phase_refills
     complete_research(state)
     begin_crafting(state, "researched")
   elseif state.phase == "researched" then
@@ -213,6 +250,8 @@ script.on_event(defines.events.on_tick, function()
       fail("researched native gear crafts did not produce expected productivity output")
     end
     state.researched_output = state.phase_output
+    state.researched_plates_inserted = state.phase_plates_inserted
+    state.researched_refills = state.phase_refills
     assert_reloaded(state)
     log("[MIR5_GEAR_NATIVE] RESULT " .. json(state, "initial"))
     state.saved = true
