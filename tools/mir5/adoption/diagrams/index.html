@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MIR architecture atlas</title><style>
+:root{--ink:#16324d;--muted:#52657a;--line:#dce4ec}*{box-sizing:border-box}body{margin:0;background:#edf2f7;color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}header{background:#102b46;color:#fff;padding:52px max(28px,calc((100vw - 1180px)/2)) 38px}header p{max-width:850px;color:#dce8f4}h1{font-size:38px;line-height:1.18;margin:8px 0 18px;letter-spacing:-.8px}.kicker{font-size:12px;letter-spacing:2px;font-weight:700;color:#acd9d1}.badge{display:inline-block;padding:5px 11px;border:1px solid #7790a6;border-radius:20px;font-size:12px}main{max-width:1240px;margin:30px auto;padding:0 24px}nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:8px;margin:24px 0 32px}nav a{padding:10px 14px;background:white;border:1px solid var(--line);border-radius:8px;color:var(--ink);text-decoration:none;font-size:13px}nav a:hover{border-color:#16856f}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:30px;margin:0 0 26px;box-shadow:0 5px 20px #16324d08;scroll-margin-top:16px}.eyebrow{font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:#176d61;font-weight:750}h2{font-size:25px;line-height:1.3;margin:8px 0 12px}p{max-width:1000px}.figure{overflow:auto;margin:20px 0;padding:8px;border:1px solid #e6ecf2;border-radius:8px}.figure svg{display:block;margin:auto;max-width:100%;height:auto}.foot{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:13px}details{margin-top:14px;color:var(--muted)}summary{cursor:pointer;font-size:13px}pre{overflow:auto;background:#f4f7fa;padding:20px;border-radius:7px;font:12px/1.5 ui-monospace,Consolas,monospace}.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:12px}.legend span{border:1px solid var(--line);border-radius:5px;padding:4px 9px;background:white}.note{padding:16px 20px;border-left:4px solid #16856f;background:#e6f3ef;font-size:14px}footer{font-size:12px;color:var(--muted);padding:18px 0 40px}@media print{body{background:white}header{background:white;color:#16324d;padding:20px}header p{color:#52657a}nav,details{display:none}main{padding:0}.card{box-shadow:none;break-before:page;break-inside:avoid;border:0;padding:12px}.figure{overflow:visible;border:0}.figure svg{max-height:230mm}h1{font-size:28px}}@media(max-width:700px){header{padding:30px 20px}h1{font-size:29px}main{padding:0 12px}.card{padding:18px}.figure svg{min-width:650px}}
+</style></head><body><header><div class="kicker">MORE INFINITE RESEARCH / ARCHITECTURE ATLAS</div><h1>Explicit research.<br>Deterministic construction.<br>Native execution.</h1><p>Start with the whole-mod view, then trace one boundary at a time. The Generator creates native research during prototype loading. It does not run during gameplay, infer arbitrary research or manage saved worlds.</p><span class="badge">DESIGN REVISION 2 · NOT AN IMPLEMENTED MOD</span></header><main><div class="note">These diagrams explain the proposed contracts. They do not prove Factorio behavior, save safety or a speedup. Every image and its editable Mermaid text comes from the same developer-only graph record. This page is self-contained and needs no network or JavaScript.</div><nav><a href="#13_cutover">13 · Temporary staging has a defined end</a></nav><div class="legend"><span>Blue: engine / native state</span><span>Green: Generator / accepted result</span><span>Amber: optional work</span><span>Purple: API / presentation</span><span>Red: rejection / forbidden boundary</span></div><section id="13_cutover" class="card"><div class="eyebrow">13 / How do all staging roots disappear without losing work?</div><h2>Temporary staging has a defined end</h2><p>This transition-only diagram and the one-use adoption tools retire. The exporter never deletes or changes the original checkout; actual cutover is a separate reviewed change.</p><div class="figure"><svg width="615pt" height="964pt"
+ viewBox="0.00 0.00 615.20 964.20" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="13_cutover_graph0" class="graph" transform="scale(1 1) rotate(0) translate(21.6 942.6)">
+<title>MIR</title>
+<polygon fill="white" stroke="transparent" points="-21.6,21.6 -21.6,-942.6 593.6,-942.6 593.6,21.6 -21.6,21.6"/>
+<text text-anchor="middle" x="286" y="-901" font-family="DejaVu Sans" font-size="20.00" fill="#15324f">Temporary staging has a defined end</text>
+<text text-anchor="middle" x="286" y="-879" font-family="DejaVu Sans" font-size="20.00" fill="#15324f">PROPOSED DESIGN &#160;/ &#160;NOT NATIVE&#45;VERIFIED</text>
+<g id="13_cutover_clust1" class="cluster">
+<title>cluster_S</title>
+<path fill="#f7f9fc" stroke="#ccd7e2" d="M141,-683C141,-683 431,-683 431,-683 437,-683 443,-689 443,-695 443,-695 443,-849 443,-849 443,-855 437,-861 431,-861 431,-861 141,-861 141,-861 135,-861 129,-855 129,-849 129,-849 129,-695 129,-695 129,-689 135,-683 141,-683"/>
+<text text-anchor="middle" x="286" y="-847.4" font-family="DejaVu Sans" font-size="12.00" fill="#53687e">STAGED DEVELOPMENT</text>
+</g>
+<g id="13_cutover_clust2" class="cluster">
+<title>cluster_R</title>
+<path fill="#f7f9fc" stroke="#ccd7e2" d="M20,-382C20,-382 552,-382 552,-382 558,-382 564,-388 564,-394 564,-394 564,-654 564,-654 564,-660 558,-666 552,-666 552,-666 20,-666 20,-666 14,-666 8,-660 8,-654 8,-654 8,-394 8,-394 8,-388 14,-382 20,-382"/>
+<text text-anchor="middle" x="286" y="-652.4" font-family="DejaVu Sans" font-size="12.00" fill="#53687e">REVIEWED EXPORT</text>
+</g>
+<g id="13_cutover_clust3" class="cluster">
+<title>cluster_C</title>
+<path fill="#f7f9fc" stroke="#ccd7e2" d="M270,-8C270,-8 552,-8 552,-8 558,-8 564,-14 564,-20 564,-20 564,-353 564,-353 564,-359 558,-365 552,-365 552,-365 270,-365 270,-365 264,-365 258,-359 258,-353 258,-353 258,-20 258,-20 258,-14 264,-8 270,-8"/>
+<text text-anchor="middle" x="411" y="-351.4" font-family="DejaVu Sans" font-size="12.00" fill="#53687e">CANONICAL PRODUCT</text>
+</g>
+<!-- a -->
+<g id="13_cutover_node1" class="node">
+<title>a</title>
+<path fill="#eef4fd" stroke="#5b7ca7" stroke-width="1.25" d="M380,-822C380,-822 192,-822 192,-822 186,-822 180,-816 180,-810 180,-810 180,-792 180,-792 180,-786 186,-780 192,-780 192,-780 380,-780 380,-780 386,-780 392,-786 392,-792 392,-792 392,-810 392,-810 392,-816 386,-822 380,-822"/>
+<text text-anchor="middle" x="286" y="-804.2" font-family="DejaVu Sans" font-size="11.00" fill="#17365a">source / spec / docs / tests / tools</text>
+<text text-anchor="middle" x="286" y="-792.2" font-family="DejaVu Sans" font-size="11.00" fill="#17365a">/ targets / sdk — each with mir5/</text>
+</g>
+<!-- b -->
+<g id="13_cutover_node2" class="node">
+<title>b</title>
+<path fill="#ffffff" stroke="#52657d" stroke-width="1.25" d="M412.5,-743C412.5,-743 159.5,-743 159.5,-743 153.5,-743 147.5,-737 147.5,-731 147.5,-731 147.5,-713 147.5,-713 147.5,-707 153.5,-701 159.5,-701 159.5,-701 412.5,-701 412.5,-701 418.5,-701 424.5,-707 424.5,-713 424.5,-713 424.5,-731 424.5,-731 424.5,-737 418.5,-743 412.5,-743"/>
+<text text-anchor="middle" x="286" y="-725.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Pin old refs and unique local work</text>
+<text text-anchor="middle" x="286" y="-713.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Recover features, IDs, requests and evidence</text>
+</g>
+<!-- a&#45;&gt;b -->
+<g id="13_cutover_edge1" class="edge">
+<title>a&#45;&gt;b</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M286,-779.77C286,-770.84 286,-760.2 286,-750.56"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="288.52,-750.3 286,-743.1 283.48,-750.3 288.52,-750.3"/>
+</g>
+<!-- i -->
+<g id="13_cutover_node3" class="node">
+<title>i</title>
+<path fill="#ffffff" stroke="#52657d" stroke-width="1.25" d="M377.5,-627C377.5,-627 194.5,-627 194.5,-627 188.5,-627 182.5,-621 182.5,-615 182.5,-615 182.5,-597 182.5,-597 182.5,-591 188.5,-585 194.5,-585 194.5,-585 377.5,-585 377.5,-585 383.5,-585 389.5,-591 389.5,-597 389.5,-597 389.5,-615 389.5,-615 389.5,-621 383.5,-627 377.5,-627"/>
+<text text-anchor="middle" x="286" y="-609.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Inventory EVERY tracked path</text>
+<text text-anchor="middle" x="286" y="-597.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Keep / move / retire / unresolved</text>
+</g>
+<!-- b&#45;&gt;i -->
+<g id="13_cutover_edge2" class="edge">
+<title>b&#45;&gt;i</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M286,-700.88C286,-682.52 286,-655.2 286,-634.76"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="288.52,-634.5 286,-627.3 283.48,-634.5 288.52,-634.5"/>
+</g>
+<!-- u -->
+<g id="13_cutover_node4" class="node">
+<title>u</title>
+<path fill="#f5f1e8" stroke="#9f8965" stroke-width="1.25" d="M274.11,-546.4C274.11,-546.4 74.89,-519.6 74.89,-519.6 68.95,-518.8 68.95,-517.2 74.89,-516.4 74.89,-516.4 274.11,-489.6 274.11,-489.6 280.05,-488.8 291.95,-488.8 297.89,-489.6 297.89,-489.6 497.11,-516.4 497.11,-516.4 503.05,-517.2 503.05,-518.8 497.11,-519.6 497.11,-519.6 297.89,-546.4 297.89,-546.4 291.95,-547.2 280.05,-547.2 274.11,-546.4"/>
+<text text-anchor="middle" x="286" y="-515.2" font-family="DejaVu Sans" font-size="11.00" fill="#584a34">Unresolved, stale, dirty or collision?</text>
+</g>
+<!-- i&#45;&gt;u -->
+<g id="13_cutover_edge3" class="edge">
+<title>i&#45;&gt;u</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M286,-584.62C286,-575.91 286,-565.47 286,-555.51"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="288.52,-555.22 286,-548.02 283.48,-555.22 288.52,-555.22"/>
+</g>
+<!-- f -->
+<g id="13_cutover_node5" class="node">
+<title>f</title>
+<path fill="#fceeef" stroke="#b95762" stroke-width="1.25" d="M241.5,-439C241.5,-439 38.5,-439 38.5,-439 32.5,-439 26.5,-433 26.5,-427 26.5,-427 26.5,-415 26.5,-415 26.5,-409 32.5,-403 38.5,-403 38.5,-403 241.5,-403 241.5,-403 247.5,-403 253.5,-409 253.5,-415 253.5,-415 253.5,-427 253.5,-427 253.5,-433 247.5,-439 241.5,-439"/>
+<text text-anchor="middle" x="140" y="-418.2" font-family="DejaVu Sans" font-size="11.00" fill="#7a2a37">REFUSE: preserve source unchanged</text>
+</g>
+<!-- u&#45;&gt;f -->
+<g id="13_cutover_edge4" class="edge">
+<title>u&#45;&gt;f</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M248.78,-492.78C225.3,-477.51 195.27,-457.96 172.71,-443.28"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="173.97,-441.09 166.56,-439.28 171.22,-445.32 173.97,-441.09"/>
+<text text-anchor="middle" x="221" y="-462.8" font-family="DejaVu Sans" font-size="9.00" fill="#44576e">yes</text>
+</g>
+<!-- x -->
+<g id="13_cutover_node6" class="node">
+<title>x</title>
+<path fill="#ffffff" stroke="#52657d" stroke-width="1.25" d="M533.5,-442C533.5,-442 288.5,-442 288.5,-442 282.5,-442 276.5,-436 276.5,-430 276.5,-430 276.5,-412 276.5,-412 276.5,-406 282.5,-400 288.5,-400 288.5,-400 533.5,-400 533.5,-400 539.5,-400 545.5,-406 545.5,-412 545.5,-412 545.5,-430 545.5,-430 545.5,-436 539.5,-442 533.5,-442"/>
+<text text-anchor="middle" x="411" y="-424.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Export to NEW outside directory</text>
+<text text-anchor="middle" x="411" y="-412.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Rewrite supported links; no source mutation</text>
+</g>
+<!-- u&#45;&gt;x -->
+<g id="13_cutover_edge5" class="edge">
+<title>u&#45;&gt;x</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M318.52,-492.29C336.97,-478.26 360,-460.76 378.46,-446.73"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="380.33,-448.48 384.54,-442.11 377.28,-444.46 380.33,-448.48"/>
+<text text-anchor="middle" x="365" y="-462.8" font-family="DejaVu Sans" font-size="9.00" fill="#44576e">no</text>
+</g>
+<!-- p -->
+<g id="13_cutover_node7" class="node">
+<title>p</title>
+<path fill="#ffffff" stroke="#52657d" stroke-width="1.25" d="M515,-326C515,-326 307,-326 307,-326 301,-326 295,-320 295,-314 295,-314 295,-296 295,-296 295,-290 301,-284 307,-284 307,-284 515,-284 515,-284 521,-284 527,-290 527,-296 527,-296 527,-314 527,-314 527,-320 521,-326 515,-326"/>
+<text text-anchor="middle" x="411" y="-308.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Drop only approved mir5 component</text>
+<text text-anchor="middle" x="411" y="-296.2" font-family="DejaVu Sans" font-size="11.00" fill="#182b45">Retain api/v1 and migration identities</text>
+</g>
+<!-- x&#45;&gt;p -->
+<g id="13_cutover_edge6" class="edge">
+<title>x&#45;&gt;p</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M411,-399.88C411,-381.52 411,-354.2 411,-333.76"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="413.52,-333.5 411,-326.3 408.48,-333.5 413.52,-333.5"/>
+</g>
+<!-- v -->
+<g id="13_cutover_node8" class="node">
+<title>v</title>
+<path fill="#eaf3fc" stroke="#3974a9" stroke-width="1.25" d="M533.5,-247C533.5,-247 288.5,-247 288.5,-247 282.5,-247 276.5,-241 276.5,-235 276.5,-235 276.5,-217 276.5,-217 276.5,-211 282.5,-205 288.5,-205 288.5,-205 533.5,-205 533.5,-205 539.5,-205 545.5,-211 545.5,-217 545.5,-217 545.5,-235 545.5,-235 545.5,-241 539.5,-247 533.5,-247"/>
+<text text-anchor="middle" x="411" y="-229.2" font-family="DejaVu Sans" font-size="11.00" fill="#163f64">Compare player member paths/bytes</text>
+<text text-anchor="middle" x="411" y="-217.2" font-family="DejaVu Sans" font-size="11.00" fill="#163f64">Final&#45;layout tests + applicable native smoke</text>
+</g>
+<!-- p&#45;&gt;v -->
+<g id="13_cutover_edge7" class="edge">
+<title>p&#45;&gt;v</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M411,-283.77C411,-274.84 411,-264.2 411,-254.56"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="413.52,-254.3 411,-247.1 408.48,-254.3 413.52,-254.3"/>
+</g>
+<!-- m -->
+<g id="13_cutover_node9" class="node">
+<title>m</title>
+<path fill="#e5f3ea" stroke="#4e8a63" stroke-width="1.25" d="M501.5,-159C501.5,-159 320.5,-159 320.5,-159 314.5,-159 308.5,-153 308.5,-147 308.5,-147 308.5,-129 308.5,-129 308.5,-123 314.5,-117 320.5,-117 320.5,-117 501.5,-117 501.5,-117 507.5,-117 513.5,-123 513.5,-129 513.5,-129 513.5,-147 513.5,-147 513.5,-153 507.5,-159 501.5,-159"/>
+<text text-anchor="middle" x="411" y="-141.2" font-family="DejaVu Sans" font-size="11.00" fill="#2d563a">Reviewed dev → main promotion</text>
+<text text-anchor="middle" x="411" y="-129.2" font-family="DejaVu Sans" font-size="11.00" fill="#2d563a">MIR 3 remains on legacy</text>
+</g>
+<!-- v&#45;&gt;m -->
+<g id="13_cutover_edge8" class="edge">
+<title>v&#45;&gt;m</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M411,-204.62C411,-193.27 411,-178.97 411,-166.63"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="413.52,-166.43 411,-159.23 408.48,-166.43 413.52,-166.43"/>
+<text text-anchor="middle" x="432.5" y="-179.8" font-family="DejaVu Sans" font-size="9.00" fill="#44576e">accepted</text>
+</g>
+<!-- d -->
+<g id="13_cutover_node10" class="node">
+<title>d</title>
+<path fill="#e5f3ea" stroke="#4e8a63" stroke-width="1.25" d="M512,-80C512,-80 310,-80 310,-80 304,-80 298,-74 298,-68 298,-68 298,-38 298,-38 298,-32 304,-26 310,-26 310,-26 512,-26 512,-26 518,-26 524,-32 524,-38 524,-38 524,-68 524,-68 524,-74 518,-80 512,-80"/>
+<text text-anchor="middle" x="411" y="-62.2" font-family="DejaVu Sans" font-size="11.00" fill="#2d563a">Retire obsolete MIR 4 architecture</text>
+<text text-anchor="middle" x="411" y="-50.2" font-family="DejaVu Sans" font-size="11.00" fill="#2d563a">and one&#45;use transition guidance</text>
+<text text-anchor="middle" x="411" y="-38.2" font-family="DejaVu Sans" font-size="11.00" fill="#2d563a">History stays in pinned refs/artifacts</text>
+</g>
+<!-- m&#45;&gt;d -->
+<g id="13_cutover_edge9" class="edge">
+<title>m&#45;&gt;d</title>
+<path fill="none" stroke="#667b92" stroke-width="1.1" d="M411,-116.91C411,-108.11 411,-97.56 411,-87.62"/>
+<polygon fill="#667b92" stroke="#667b92" stroke-width="1.1" points="413.52,-87.39 411,-80.19 408.48,-87.39 413.52,-87.39"/>
+</g>
+</g>
+</svg>
+</div><div class="foot">Contracts: repository.md, targets.md, migrations.md. Proposed design; product acceptance remains unexecuted.</div><details><summary>Editable Mermaid source</summary><pre>%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Temporary staging has a defined end
+  accDescr: This transition-only diagram and the one-use adoption tools retire. The exporter never deletes or changes the original checkout; actual cutover is a separate reviewed change.
+  subgraph group_S[&quot;STAGED DEVELOPMENT&quot;]
+    a[&quot;source / spec / docs / tests / tools&lt;br/&gt;/ targets / sdk — each with mir5/&quot;]:::data
+    b[&quot;Pin old refs and unique local work&lt;br/&gt;Recover features, IDs, requests and evidence&quot;]:::process
+  end
+  subgraph group_R[&quot;REVIEWED EXPORT&quot;]
+    i[&quot;Inventory EVERY tracked path&lt;br/&gt;Keep / move / retire / unresolved&quot;]:::process
+    u{&quot;Unresolved, stale, dirty or collision?&quot;}:::decision
+    f[&quot;REFUSE: preserve source unchanged&quot;]:::error
+    x[&quot;Export to NEW outside directory&lt;br/&gt;Rewrite supported links; no source mutation&quot;]:::process
+  end
+  subgraph group_C[&quot;CANONICAL PRODUCT&quot;]
+    p[&quot;Drop only approved mir5 component&lt;br/&gt;Retain api/v1 and migration identities&quot;]:::process
+    v[&quot;Compare player member paths/bytes&lt;br/&gt;Final-layout tests + applicable native smoke&quot;]:::engine
+    m[&quot;Reviewed dev → main promotion&lt;br/&gt;MIR 3 remains on legacy&quot;]:::success
+    d[&quot;Retire obsolete MIR 4 architecture&lt;br/&gt;and one-use transition guidance&lt;br/&gt;History stays in pinned refs/artifacts&quot;]:::success
+  end
+  a --&gt; b
+  b --&gt; i
+  i --&gt; u
+  u --&gt;|&quot;yes&quot;| f
+  u --&gt;|&quot;no&quot;| x
+  x --&gt; p
+  p --&gt; v
+  v --&gt;|&quot;accepted&quot;| m
+  m --&gt; d
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px
+</pre></details></section><footer>Normative authority remains the focused specification files. Timing is measured separately from semantic determinism. Graphviz renders the included SVG/PNG; Mermaid sources are generated for editing and supported by the documented flowchart subset, but a Mermaid renderer was not executed for this pack.</footer></main></body></html>

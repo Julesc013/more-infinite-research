@@ -1,0 +1,42 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Continuity: preserve meaning, not only names
+  accDescr: Use a complete relevant catalogue and an immutable original save. Compare actual earned effects, invested progress, queues, settings and unrelated state across two independent reloads.
+  subgraph group_B["BASELINE"]
+    r["Pin old package + engine/mod/settings<br/>Recover accepted expected behavior"]:::data
+    s["Preserve original save and<br/>applied migration-name history"]:::data
+  end
+  subgraph group_U["UPGRADE"]
+    g{"Complete relevant catalogue?"}:::decision
+    d["Partial experiment<br/>Disposable fixture worlds ONLY"]:::error
+    p["Preserve prototype IDs and semantics<br/>Apply qualified state migrations"]:::process
+    o["Observe earliest accessible state<br/>Then post-reconciliation state"]:::process
+  end
+  subgraph group_V["VERIFICATION"]
+    c["Compare levels, earned effects, costs,<br/>queues, progress and foreign sentinels"]:::process
+    w["Save candidate copy"]:::engine
+    a["Cold reload 1 → compare"]:::engine
+    b["Cold reload 2 → compare"]:::engine
+    j["Actual client join/rejoin if affected"]:::api
+    v["Qualified exact upgrade path<br/>Not universal save-safety proof"]:::success
+  end
+  r --> g
+  s --> g
+  g -->|"no"| d
+  g -->|"yes"| p
+  p --> o
+  o --> c
+  c --> w
+  w --> a
+  a --> b
+  b --> j
+  j --> v
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

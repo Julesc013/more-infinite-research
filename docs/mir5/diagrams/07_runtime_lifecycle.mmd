@@ -1,0 +1,46 @@
+%% Generated from the diagram catalogue; design, not an execution trace.
+flowchart TB
+  accTitle: Save startup and multiplayer are different paths
+  accDescr: This is the Lua-hook view. Engine save reconstruction and JSON mappings are not drawn as a substitute implementation. Joining clients do not rerun host migrations/configuration changes.
+  subgraph group_H["HOST / LOCAL SAVE LOAD"]
+    c["Parse control.lua<br/>Import modules and declare handlers"]:::process
+    n{"New runtime mod to this save?"}:::decision
+    i["on_init<br/>Create required owned state"]:::process
+    m["Applicable migrations"]:::process
+    m2["Applicable migrations"]:::process
+    l["on_load<br/>Reconnect locals / subscriptions only"]:::process
+    q{"Configuration changed?"}:::decision
+    x["on_configuration_changed<br/>Reconcile state / remove old contributions"]:::process
+  end
+  subgraph group_J["JOINING CLIENT"]
+    j["Client parses control.lua"]:::process
+    jl["Client on_load<br/>Same conditional registration<br/>No persistent writes / no game access"]:::process
+  end
+  subgraph group_P["PLAY"]
+    e["Native simulation + relevant events"]:::engine
+    b["Scripted periodic work if necessary<br/>Tick/work-count budget, not wall time"]:::optional
+    u["Library and read-only queries on demand"]:::api
+  end
+  c --> n
+  n -->|"yes"| i
+  i --> m
+  n -->|"no"| m2
+  m2 --> l
+  m --> q
+  l --> q
+  q -->|"yes"| x
+  q -->|"no"| e
+  x --> e
+  j --> jl
+  jl --> e
+  e --> b
+  e --> u
+  classDef process fill:#FFFFFF,stroke:#52657D,color:#182B45,stroke-width:1.3px
+  classDef data fill:#EEF4FD,stroke:#5B7CA7,color:#17365A,stroke-width:1.3px
+  classDef engine fill:#EAF3FC,stroke:#3974A9,color:#163F64,stroke-width:1.3px
+  classDef generator fill:#E1F3EE,stroke:#16856F,color:#0C5649,stroke-width:1.3px
+  classDef optional fill:#FFF4DF,stroke:#B2822B,color:#73541B,stroke-width:1.3px
+  classDef api fill:#F0EAFB,stroke:#8063B0,color:#4E3977,stroke-width:1.3px
+  classDef error fill:#FCEEEF,stroke:#B95762,color:#7A2A37,stroke-width:1.3px
+  classDef success fill:#E5F3EA,stroke:#4E8A63,color:#2D563A,stroke-width:1.3px
+  classDef decision fill:#F5F1E8,stroke:#9F8965,color:#584A34,stroke-width:1.3px

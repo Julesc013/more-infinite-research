@@ -1,0 +1,89 @@
+{
+  "format": 1,
+  "revision": "deterministic-visual-contract-2",
+  "prepared_date": "2026-10-22",
+  "scope": "specification-documents-diagrams-and-adoption-tooling-only",
+  "input_archive_sha256": "239545f6b6f07dbe641f0a7e11ec624501a159f178aeb4036c285b444ec25155",
+  "original_pack_members": 39,
+  "original_cutover_suite": {
+    "run_here": true,
+    "passed": 32
+  },
+  "revised_unit_suite": {
+    "passed": 60,
+    "failed": 0,
+    "skipped": 0,
+    "native_factorio_tests": 0
+  },
+  "document_checks": {
+    "markdown": 32,
+    "json": 11,
+    "python": 8,
+    "local_links": 65,
+    "normative_requirement_ids": 69
+  },
+  "diagrams": {
+    "total": 13,
+    "permanent": 12,
+    "transition_only": 1,
+    "formats": [
+      "mmd",
+      "svg",
+      "png"
+    ],
+    "offline_html_atlases": 2,
+    "renderer": "Graphviz dot 2.42.4",
+    "render_repeat": {
+      "status": "pass",
+      "files_reproduced_byte_identically": 41,
+      "scope": "same-Graphviz-and-font-environment",
+      "mermaid_renderer_executed": false
+    },
+    "browser": {
+      "browser": "144.0.7559.96",
+      "method": "set_content; direct file URL blocked by container browser policy",
+      "sections": 12,
+      "svg": 12,
+      "page_errors": [],
+      "network_requests": [],
+      "desktop_body_overflow": false,
+      "mobile_body_overflow": false,
+      "mobile_scrollable_figures": 12
+    }
+  },
+  "cutover_rehearsal": {
+    "status": "pass",
+    "kind": "synthetic-full-pack-repository-not-live-MIR",
+    "tracked_inputs": 105,
+    "exported_files": 78,
+    "retired_files": 27,
+    "rewritten_links": 17,
+    "non_markdown_retained_byte_checks": 52,
+    "synthetic_player_members_checked": 3,
+    "source_unchanged": true,
+    "staging_directories_remaining": 0,
+    "current_text_staging_prefixes_remaining": 0
+  },
+  "product_acceptance": {
+    "cases_defined": 30,
+    "cases_executed": 0,
+    "all_status": "not_run",
+    "continuity_inventory": "17 unreconciled subject groups; not a recovered technology/settings catalogue"
+  },
+  "native_limits": [
+    "No MIR Generator or public API implementation",
+    "No Factorio execution, save migration, multiplayer or performance qualification",
+    "No native Windows/macOS test; path/CRLF hazards are Linux fixture tests",
+    "Mermaid renderer not executed; Graphviz renders the same declared graph records",
+    "Direct browser file URL was blocked by container policy; offline HTML tested with set_content",
+    "No live repository writes"
+  ],
+  "host": {
+    "system": "Linux",
+    "python": "3.13.5"
+  },
+  "reproduce": [
+    "python tools/mir5/check_pack.py",
+    "python -m unittest discover -s tests/mir5 -p \"test_*.py\" -v"
+  ]
+}

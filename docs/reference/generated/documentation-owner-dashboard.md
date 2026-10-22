@@ -18,4 +18,4 @@ Generated from Markdown front matter as of 2026-10-22.
 
 | Owner | Total | Current | Draft | Historical or retired |
 | --- | ---: | ---: | ---: | ---: |
-| mir-maintainers | 453 | 305 | 20 | 128 |
+| mir-maintainers | 467 | 305 | 24 | 138 |
