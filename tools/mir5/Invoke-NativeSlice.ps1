@@ -250,6 +250,7 @@ $hashes[[IO.Path]::GetFileName($installedFixture)] = $fixture.sha256
 $record = [ordered]@{
   kind = 'MIR5GearNativeSliceV1'; status = 'prepared'; profile = $expected; run = $run
   source_commit = [string](& git -C $repo rev-parse HEAD)
+  source_dirty = (@(& git -C $repo status --porcelain=v1).Count -gt 0)
   harness_sha256 = Get-NativeSliceSha256 $PSCommandPath
   library_activation_sha256 = Get-NativeSliceSha256 (Join-Path $repo 'tools/lib/compatibility/LibraryActivation.ps1')
   immutable_input_helpers_sha256 = Get-NativeSliceSha256 (Join-Path $repo 'tools/lib/validation/ImmutableInputStaging.ps1')

@@ -12,6 +12,18 @@ local function close(actual, expected)
   return type(actual) == "number" and math.abs(actual - expected) <= 0.000000001
 end
 
+local function describe_effects(effects)
+  local rows = {}
+  for index, row in ipairs(effects or {}) do
+    rows[#rows + 1] = "#" .. index
+      .. ":type=" .. tostring(row.type)
+      .. ",recipe=" .. tostring(row.recipe)
+      .. ",change=" .. tostring(row.change)
+      .. ",modifier=" .. tostring(row.modifier)
+  end
+  return table.concat(rows, "|")
+end
+
 local function profile_for(technology)
   local change = nil
   local count = 0
@@ -24,6 +36,11 @@ local function profile_for(technology)
   if count ~= 1 then fail("runtime gear productivity owner cardinality differs") end
   local time = technology.prototype.research_unit_energy
   local version = script.active_mods["mir-fixture-mir5-gear-native"]
+  log("[MIR5_GEAR_RUNTIME_PROFILE] fixture_version=" .. tostring(version)
+    .. ";research_unit_energy=" .. tostring(time)
+    .. ";matching_effect_count=" .. tostring(count)
+    .. ";matching_change=" .. tostring(change)
+    .. ";effects=" .. describe_effects(technology.prototype.effects))
   if version == "0.1.0" and close(change, 0.10) and close(time, 60) then
     return {name = "default", change = 0.10, level_one_count = 8000, physical_output = 110}
   end
