@@ -64,7 +64,7 @@ class LifecycleTests(unittest.TestCase):
             }
           end
 
-          function boot(forces, raw_cap, profile, saved_storage)
+          function boot(forces, raw_cap, profile, saved_storage, retained_handlers)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile)}
             decoded_profiles = 0
@@ -80,7 +80,8 @@ class LifecycleTests(unittest.TestCase):
             logs = {}
             log = function(message) logs[#logs + 1] = message end
             game = {forces = forces}
-            handlers = {events = {}}
+            handlers = retained_handlers or {events = {}}
+            handlers.events = handlers.events or {}
             script = {
               on_init = function(handler) handlers.init = handler end,
               on_configuration_changed = function(handler) handlers.configuration = handler end,
@@ -153,33 +154,49 @@ class LifecycleTests(unittest.TestCase):
           assert(not second.enabled and second.visible_when_disabled and second.level == 11)
           assert(storage.mir_caps.schema == 1 and storage.mir_caps.owned_disabled[2][name].disabled)
           local saved_storage = storage
-          boot({[1] = f1, [2] = f2}, 0, "", saved_storage)
-          assert(handlers.events[defines.events.on_research_started] == nil)
+          local retained_handlers = handlers
+          boot({[1] = f1, [2] = f2}, 0, "", saved_storage, retained_handlers)
+          for id = 1, 6 do
+            assert(handlers.events[id] == nil, "unlimited parse retained cap handler " .. id)
+          end
           handlers.configuration()
           assert(second.enabled and not second.visible_when_disabled and storage.mir_caps == nil)
+          handlers.init()
+          assert(storage.mir_caps == nil, "unlimited callbacks allocated cap storage")
         ''')
 
-    def test_research_events_cancel_only_an_unqueued_admitted_overcap_current(self):
+    def test_research_events_remove_queued_current_and_reject_unresolved_current(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"
           local gear = technology(name, 11, true)
-          local f = force(4, {[name] = gear}, {}, gear, .65)
+          local unrelated_first = technology("unrelated-first", 1, true)
+          local unrelated_second = technology("unrelated-second", 1, true)
+          local f = force(4, {[name] = gear},
+            {gear, unrelated_first, unrelated_second}, gear, .65)
           gear.force = f
+          unrelated_first.force = f
+          unrelated_second.force = f
           boot({[4] = f}, 10)
           handlers.events[defines.events.on_research_started]({research = gear})
-          assert(f.cancelled == 1 and f.current_research == nil and f.research_progress == nil)
+          assert(f.cancelled == 0, "lifecycle used cancellation for a queued current research")
+          assert(#f.research_queue == 2 and f.research_queue[1] == unrelated_first
+            and f.research_queue[2] == unrelated_second, "unrelated queue order changed")
+          assert(f.current_research == unrelated_first and f.research_progress == 0,
+            "removed current research transferred progress")
           assert(not gear.enabled and gear.level == 11 and gear.researched == false)
-          f.current_research = gear; f.research_progress = .55
-          handlers.events[defines.events.on_research_finished]({research = gear})
-          assert(f.cancelled == 2 and f.current_research == nil and f.research_progress == nil)
-          f.current_research = gear; f.research_progress = .75
-          handlers.events[defines.events.on_research_cancelled]({force = f, research = {[name] = 1}})
-          assert(f.cancelled == 3 and f.current_research == nil and f.research_progress == nil)
-          local unrelated = technology("unrelated", 11, true)
-          unrelated.force = f
-          f.current_research = unrelated; f.research_progress = .3
-          handlers.events[defines.events.on_research_started]({research = unrelated})
-          assert(f.cancelled == 3 and f.current_research == unrelated and f.research_progress == .3)
+
+          local unresolved = technology(name, 11, true)
+          local unresolved_other = technology("unrelated-unresolved", 1, true)
+          local f_unresolved = force(5, {[name] = unresolved}, {unresolved_other}, unresolved, .75)
+          unresolved.force = f_unresolved
+          unresolved_other.force = f_unresolved
+          local ok, message = pcall(handlers.events[defines.events.on_research_started],
+            {research = unresolved})
+          assert(not ok and tostring(message):find("unsupported native research queue state", 1, true))
+          assert(f_unresolved.cancelled == 0 and f_unresolved.current_research == unresolved
+            and f_unresolved.research_progress == .75 and #f_unresolved.research_queue == 1
+            and f_unresolved.research_queue[1] == unresolved_other,
+            "unresolved current research was speculatively cancelled or rewritten")
         ''')
 
     def test_foreign_disable_and_force_lifecycle_cleanup_remain_owned(self):
@@ -221,6 +238,8 @@ class LifecycleTests(unittest.TestCase):
         control = (ROOT / "source/mir5/control.lua").read_text()
         self.assertNotIn("on_tick", source)
         self.assertNotIn("generator", source.lower())
+        self.assertNotIn("cancel_current_research", source)
+        self.assertNotIn("documented exception", source)
         self.assertNotIn("require(", source[source.index("function M.on_init"):])
         self.assertIn('remote.add_interface', control)
 

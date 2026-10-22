@@ -18,7 +18,7 @@ class RuntimeApiTests(unittest.TestCase):
               [2] = {valid = true, technologies = {
                 ["worker-robots-speed-6"] = {
                   researched = false, level = 11, enabled = false, saved_progress = .42,
-                  prototype = {max_level = "infinite"}
+                  prototype = {max_level = 4294967295}
                 },
                 finite = {
                   researched = true, level = 3, enabled = true,
@@ -45,7 +45,7 @@ class RuntimeApiTests(unittest.TestCase):
           local status, code = api.get_research(2, "worker-robots-speed-6")
           assert(code == nil and status.name == "worker-robots-speed-6" and status.force_index == 2)
           assert(status.researched == false and status.level == 11 and status.enabled == false)
-          assert(status.saved_progress == .42 and status.max_level == "infinite")
+          assert(status.saved_progress == .42 and status.max_level == 4294967295)
           status.enabled = true; status.level = 99; status.saved_progress = 0
           local technology = game.forces[2].technologies["worker-robots-speed-6"]
           assert(not technology.enabled and technology.level == 11 and technology.saved_progress == .42)
@@ -72,6 +72,23 @@ class RuntimeApiTests(unittest.TestCase):
         self.assertNotIn("remote.add_interface", text)
         self.assertNotIn("require(", text)
         self.assertNotIn("storage", text)
+
+    def test_native_custom_table_rejection_is_a_missing_force_result(self):
+        self.lua.execute('''
+          game = installed_game()
+          local original = game.forces
+          game.forces = setmetatable({}, {__index = function(_, index)
+            if index > 255 then error("native force index outside allocated range") end
+            return original[index]
+          end})
+          for _, index in ipairs({256, 2147483647, 4294967295}) do
+            local value, code = api.get_research(index, "finite")
+            assert(value == nil and code == "force_not_found")
+          end
+          local value, code = api.get_research(4294967296, "finite")
+          assert(value == nil and code == "invalid_force")
+          assert(api.get_research(2, "finite").researched)
+        ''')
 
 
 if __name__ == "__main__":

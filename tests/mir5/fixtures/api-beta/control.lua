@@ -1,4 +1,4 @@
-if not mods["more-infinite-research"] then return end
+if not script.active_mods["more-infinite-research"] then return end
 
 local interface = "more-infinite-research.api.v1"
 local technology_name = "mir-api-fixture-beta-cable-1"

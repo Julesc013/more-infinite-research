@@ -48,22 +48,12 @@ local function valid_force(force)
   return force and force.valid ~= false and type(force.index) == "number"
 end
 
-local function current_is_over_cap(force, name, limits)
-  local limit = limits[name]
-  local technology = force.current_research
-  if limit == nil or limit == 0 or not technology or technology.name ~= name then return false end
-  local current = force.technologies and force.technologies[name]
-  return current and type(current.level) == "number" and current.level > limit
-end
-
 local function reconcile_force(force, limits, owned_disabled)
   if not valid_force(force) then return end
   local _, result = caps.reconcile(force, limits, owned_disabled)
-  -- Queue assignment normally removes an over-cap current entry.  An unqueued
-  -- current entry is the documented exception: use the native cancellation
-  -- operation only after independently rechecking the admitted cap.
-  if result.unresolved_current and current_is_over_cap(force, result.unresolved_current, limits) then
-    force.cancel_current_research()
+  if result.unresolved_current then
+    error("MIR unsupported native research queue state for over-cap current research: "
+      .. result.unresolved_current, 2)
   end
 end
 
@@ -152,17 +142,20 @@ end
 function M.on_load()
 end
 
+local function register_cap_events(active)
+  script.on_event(defines.events.on_force_created, active and M.on_force_created or nil)
+  script.on_event(defines.events.on_force_reset, active and M.on_force_reset or nil)
+  script.on_event(defines.events.on_forces_merged, active and M.on_forces_merged or nil)
+  script.on_event(defines.events.on_research_finished, active and M.on_research_finished or nil)
+  script.on_event(defines.events.on_research_started, active and M.on_research_started or nil)
+  script.on_event(defines.events.on_research_cancelled, active and M.on_research_cancelled or nil)
+end
+
 function M.register()
   script.on_init(M.on_init)
   script.on_configuration_changed(M.on_configuration_changed)
   script.on_load(M.on_load)
-  if not CAPS_ACTIVE then return end
-  script.on_event(defines.events.on_force_created, M.on_force_created)
-  script.on_event(defines.events.on_force_reset, M.on_force_reset)
-  script.on_event(defines.events.on_forces_merged, M.on_forces_merged)
-  script.on_event(defines.events.on_research_finished, M.on_research_finished)
-  script.on_event(defines.events.on_research_started, M.on_research_started)
-  script.on_event(defines.events.on_research_cancelled, M.on_research_cancelled)
+  register_cap_events(CAPS_ACTIVE)
 end
 
 return M

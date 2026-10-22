@@ -26,14 +26,20 @@ function M.get_capabilities()
 end
 
 function M.get_research(force_index, technology_name)
-  if not positive_integer(force_index) then return nil, "invalid_force" end
+  if not positive_integer(force_index) or force_index > 4294967295 then
+    return nil, "invalid_force"
+  end
   if type(technology_name) ~= "string" or technology_name == "" then
     return nil, "invalid_technology"
   end
 
   local forces = available_forces()
   if forces == nil then return nil, "game_unavailable" end
-  local force = forces[force_index]
+  -- LuaCustomTable can reject an unused numeric index even when it fits the
+  -- documented uint32 key type. An absent force is an API result, not a native
+  -- indexing exception propagated into another mod's event handler.
+  local ok, force = pcall(function() return forces[force_index] end)
+  if not ok then return nil, "force_not_found" end
   if force == nil or force.valid == false then return nil, "force_not_found" end
   local technologies = force.technologies
   local technology = technologies and technologies[technology_name] or nil
