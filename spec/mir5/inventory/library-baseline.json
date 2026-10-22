@@ -1,0 +1,371 @@
+{
+  "format": 1,
+  "kind": "mir5-published-research-library-baseline",
+  "status": "source-characterized-plus-published-f210-shortcut-data-capture",
+  "scope": {
+    "subject": "Delivered MIR 4.7.0 Research Library behavior needed for a bounded MIR5 continuity design.",
+    "target": "F210",
+    "published_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "native_runtime_qualification": false,
+    "not_claimed": [
+      "MIR5 implementation or architecture",
+      "native GUI/menu behavior",
+      "save-upgrade behavior",
+      "player-package or release qualification"
+    ]
+  },
+  "published_baseline": {
+    "release_tag": "v4.7.0",
+    "archive_name": "more-infinite-research_4.7.21000.zip",
+    "archive_root": "more-infinite-research_4.7.21000",
+    "archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+    "package_dependency": "base >= 2.1.23"
+  },
+  "published_byte_verification": {
+    "method": "SHA-256 of the stated archived entry equals git v4.7.0:<source path>; this is source-to-package custody evidence only.",
+    "entries": [
+      {
+        "source": "source/prototypes/mir/runtime/research_browser.lua",
+        "archive_entry": "prototypes/mir/runtime/research_browser.lua",
+        "sha256": "FF0F10494B38753BD17609CA5FE8ABBFD8BF967D54C23F24CEFFECB4FCCF56C0"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/research_browser_core.lua",
+        "archive_entry": "prototypes/mir/runtime/research_browser_core.lua",
+        "sha256": "DDE3318580A3C24177BC3A924556126C29CB97087F18A0940958B9FBE7DF77F4"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/research_browser_actions.lua",
+        "archive_entry": "prototypes/mir/runtime/research_browser_actions.lua",
+        "sha256": "4AF3C0407D57C7CAA8E8B891D2DFF6D7EFF634A1EC70929832B6FE70DF2E81F1"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+        "archive_entry": "prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+        "sha256": "D93D291FAE13F4D781B6806592080AF4CB42C4960612FC279203D3A365773DDE"
+      },
+      {
+        "source": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+        "archive_entry": "prototypes/mir/runtime/research_browser_mir_provider.lua",
+        "sha256": "7493EDA611B8D5B0693E5F95CC1C2D92472968DD42CC9B155750EC180EF2A971"
+      },
+      {
+        "source": "source/prototypes/mir/platform/factorio/browser_host.lua",
+        "archive_entry": "prototypes/mir/platform/factorio/browser_host.lua",
+        "sha256": "5BC0F04E1505123C04B08CB2D24C1F7AE1B66C1C44E8523F7BD4846E9358C544"
+      },
+      {
+        "source": "source/prototypes/mir/stage/data.lua",
+        "archive_entry": "prototypes/mir/stage/data.lua",
+        "sha256": "8EF544E1E7D7D3EC95BEB83F748B36E4FB90192CBBC6155D44DCF024F362361D"
+      },
+      {
+        "source": "source/prototypes/mir/platform/factorio/target_profiles.lua",
+        "archive_entry": "prototypes/mir/platform/factorio/target_profiles.lua",
+        "sha256": "54356D6836B140C1249C8D2D7277F0079805902A2916D9F6348C7AAA995D35C5"
+      },
+      {
+        "source": "source/locale/en/more-infinite-research.cfg",
+        "archive_entry": "locale/en/more-infinite-research.cfg",
+        "sha256": "562CBF3044B05D65504EFC11BFAB3A781B1BFCAD288E30943335EE1D6351D379"
+      }
+    ]
+  },
+  "published_f210_data_stage_evidence": {
+    "receipt": "build/tmp/mir5-baseline-470-f210-r07/result.json",
+    "receipt_status": "completed-data-stage-observation-only",
+    "engine": {
+      "factorio_version": "2.1",
+      "base_version": "2.1.23",
+      "executable_sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+    },
+    "data_raw_dump": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "8FED49837245AA6EB9D6BAE6011439AD5F7AA8846329E2D8F262E5CEEDA4E865"
+    },
+    "loaded_selection": [
+      "base@2.1.23",
+      "more-infinite-research@4.7.21000"
+    ],
+    "established": {
+      "shortcut": {
+        "type": "shortcut",
+        "name": "mir-research-browser",
+        "action": "lua",
+        "toggleable": true,
+        "order": "z[more-infinite-research]-a[research-browser]",
+        "icon": "__base__/graphics/icons/lab.png",
+        "icon_size": 64,
+        "small_icon": "__base__/graphics/icons/lab.png",
+        "small_icon_size": 64,
+        "localised_name": [
+          "mir-browser.shortcut-name"
+        ],
+        "localised_description": [
+          "mir-browser.shortcut-description"
+        ]
+      }
+    },
+    "does_not_establish": [
+      "control-stage registration",
+      "GUI render/actions",
+      "translation callbacks",
+      "saved state",
+      "native navigation",
+      "runtime setting writes"
+    ]
+  },
+  "availability_and_prototype_inputs": {
+    "feature_gate": "research_library; F210 target profile enables it and selects storage runtime state.",
+    "stage_emission": "stage/data.lua emits only the Lua shortcut for this library. It uses the Space Age research-productivity icon at 256 when that provider is present, otherwise the base lab icon at 64.",
+    "custom_inputs": "No Research Library custom-input declaration was found in its shipped stage source; entry is the Lua shortcut, remote interface, and /mir-research command.",
+    "locale_and_assets": {
+      "english_section": "[mir-browser] in locale/en/more-infinite-research.cfg",
+      "other_locales": "The package contains locale counterparts; this record pins English as the source reference.",
+      "browser_specific_raster_assets": "none identified; native technology/recipe sprites and utility sprites are addressed by built-in names."
+    }
+  },
+  "entrypoints_and_native_navigation": {
+    "identities": {
+      "gui_root": "mir_research_browser",
+      "element_prefix": "mir_browser_",
+      "shortcut": "mir-research-browser",
+      "view_schema": 3
+    },
+    "entrypoints": [
+      {
+        "kind": "lua_shortcut",
+        "behavior": "opens or closes the screen and toggles the shortcut state"
+      },
+      {
+        "kind": "remote",
+        "name": "more-infinite-research-browser.open",
+        "bounded_options": [
+          "mode 1..3",
+          "research/settings search truncated to 160",
+          "research|settings|queue|availability|help tab",
+          "settings scope",
+          "status 1..4",
+          "family",
+          "progression|native|name sort",
+          "known selected technology",
+          "bounded hidden list",
+          "page"
+        ]
+      },
+      {
+        "kind": "command",
+        "name": "/mir-research",
+        "behavior": "opens the same browser"
+      }
+    ],
+    "native_navigation": [
+      "open-vanilla closes the browser and calls player.open_technology_gui for the selected technology.",
+      "recipe rows call the F210 browser host, which resolves prototypes.recipe[name] and calls player.open_factoriopedia_gui(recipe)."
+    ],
+    "research_queue_boundary": "The visible GUI tells the player to use the native queue for enqueue/up/down. The separately shipped research_browser_actions helper can validate and write a complete native queue with readback/rollback protection, but the delivered browser click handler does not invoke it."
+  },
+  "query_and_details": {
+    "filters": [
+      "family all|mir|external|streams",
+      "status all|ready|locked|queued",
+      "finite/infinite",
+      "sort progression|native|name asc|name desc",
+      "normal/personal-hidden/availability visibility"
+    ],
+    "search": "ASCII case-folded, separator-normalized matching over stable id/family and available localized/discovered recipe/material text; source caps text input at 160. Name fallback is stable id until localized index material is ready.",
+    "refresh": "Typed search is due at tick +6 and served by a three-tick subscription. The provider reports light rows; detail is selected separately. A core development query is paged at 20, while the player list is continuous.",
+    "details": "Shows native technology identity/icon/cost/science/prerequisites/status plus MIR plan/cap/current-force enrichment, production sample, settings-controller information, affected recipes and availability explanations. Detail expansion bounds are depth 8 and 256 nodes; plain DTO strings are capped at 1024.",
+    "scroll_and_focus": "No explicit result-list scroll position is saved or restored. Settings, queue and help use ordinary scroll panes. The explicit focus/select-all operation is report text; the search field is not explicitly focused by source."
+  },
+  "personal_view_state": {
+    "storage_path": "storage.mir.research_browser on F210, through runtime_state.bucket(\"research_browser\").",
+    "default_schema_3": {
+      "mode": 1,
+      "status": 1,
+      "page": 1,
+      "search": "",
+      "tab": "research",
+      "setting_selection": null,
+      "settings_scope": "research",
+      "effect_page": 1,
+      "family": "mir",
+      "sort": "progression",
+      "stable_sort": "progression",
+      "settings_search": "",
+      "visibility": 1
+    },
+    "legacy_normalization": "The source maps unschemed 4.2 family=all and sort=name-asc to family=mir and sort=progression, then normalizes schema, status, visibility, sort, tab and settings scope.",
+    "migration_carry_forward": [
+      "schema",
+      "selected technology",
+      "mode/status/family/sort/stable_sort/tab/page/effect page",
+      "search/settings search/settings scope",
+      "personal hidden entries",
+      "window geometry/location",
+      "report option checkboxes"
+    ],
+    "rebuild_or_discard_after_catalogue_change": [
+      "list/detail/layout tokens",
+      "family names",
+      "result/queue/recipe/setting key arrays",
+      "catalogue-derived selection if unavailable",
+      "ephemeral report status/destination"
+    ],
+    "state_bucket_companions": [
+      "players",
+      "pending_force_refresh",
+      "pending_search_refresh",
+      "translations",
+      "translation_locale_generations"
+    ]
+  },
+  "translation_cache_lifetimes": {
+    "persistent_shape": "Per-player plain-data cache: locale and generation, catalogue generation/token, values/search values/search byte count, pending maps, retry queue/count, queue/cursor, outstanding requests, resolved fields, refresh counter and priority token. It keeps no LuaObjects.",
+    "limits": {
+      "outstanding": 16,
+      "request_work_per_dispatch": 16,
+      "completed_before_refresh": 8,
+      "retry_limit": 2,
+      "stale_ticks": 1800,
+      "discovery_subjects": 128,
+      "search_bytes": 16777216
+    },
+    "lifetime": "Each issued id survives close and catalogue/locale invalidation until callback or expiry. Maintenance runs every 61 ticks only while work is outstanding. Close stops dispatch but retains outstanding work; stale or old-generation callbacks release their slot without publishing. Locale/config invalidation increments generation and resets unissued catalogue work. The factorio catalogue force cache is module-memory only and forgets by force."
+  },
+  "actions_and_settings": {
+    "ui_actions": [
+      "select research, tabs, family/status/mode/sort/visibility and personal hidden entries",
+      "settings selection and scope",
+      "layout smaller/larger/reset",
+      "debug refresh",
+      "report selection/focus and export",
+      "open native technology GUI and Factoriopedia recipe page"
+    ],
+    "settings_boundary": "Settings tab displays effective startup settings and profile provenance without writing startup values. Checkbox handling may write boolean runtime-player settings or admin runtime-global settings, only for this mod; it rejects startup writes and requires admin for global writes.",
+    "file_outputs": [
+      "Report: more-infinite-research/reports/browser-<player index>-<tick>.txt via helpers.write_file.",
+      "Feature-gated settings-profile export: more-infinite-research/settings/browser-profile.txt; this writes an export, not settings mutation."
+    ]
+  },
+  "events_and_lifecycles": {
+    "gui_and_input": [
+      "on_gui_selected_tab_changed",
+      "on_gui_location_changed",
+      "on_gui_click",
+      "on_gui_selection_state_changed",
+      "on_gui_text_changed",
+      "on_gui_confirmed",
+      "on_gui_checked_state_changed",
+      "on_gui_closed",
+      "on_lua_shortcut",
+      "on_string_translated"
+    ],
+    "player_and_display": [
+      "on_player_created",
+      "on_player_removed",
+      "optional on_player_locale_changed",
+      "on_player_changed_force",
+      "display resolution and scale changes"
+    ],
+    "research": [
+      "on_research_started",
+      "on_research_cancelled",
+      "optional on_research_moved",
+      "outer scripted-tech dispatch to browser research finished/reversed/queued and force reset/merge handlers"
+    ],
+    "subscriptions": {
+      "force_refresh": "every tick while pending",
+      "search": "every 3 ticks while pending",
+      "translations": "every 61 ticks while pending"
+    },
+    "lifecycle": "on_init removes the old mir_browser_open top button and resets shortcut toggles. Configuration change clears force/search pending work, invalidates locale/catalogue generations, removes dead-player caches and preserves translations. on_load only rebinds nth-tick subscriptions from already-saved structures."
+  },
+  "dependencies": {
+    "factorio_provider": "Reads force technology/prototype data, with static force cache invalidated by forget_force; uses F210 prototypes, production statistics, Factoriopedia, helpers.write_file and storage.",
+    "MIR_public_data": [
+      "more-infinite-research-generation-plan schema 1",
+      "more-infinite-research-maximum-level-policy",
+      "settings catalog/profile codec/startup settings",
+      "maximum_level_control.runtime_settings_bindings"
+    ],
+    "provider_limits": {
+      "catalogue_rows": 30000,
+      "effect_detail_depth": 8,
+      "effect_detail_nodes": 256,
+      "plain_string": 1024
+    }
+  },
+  "native_evidence_still_required": [
+    "shortcut opens/closes the actual F210 screen and preserves shortcut toggle semantics",
+    "filter/search/list/detail rendering, deferred refresh and localized translation callback behavior",
+    "native technology and Factoriopedia navigation",
+    "runtime setting permissions and file export behavior",
+    "F210 save/reload and an upgrade migration retaining the identified personal-state fields"
+  ],
+  "source_references": [
+    {
+      "path": "source/prototypes/mir/runtime/research_browser.lua",
+      "lines": [
+        1,
+        1843
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/runtime/research_browser_core.lua",
+      "lines": [
+        1,
+        1099
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/runtime/research_browser_actions.lua",
+      "lines": [
+        1,
+        95
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/runtime/research_browser_factorio_catalogue.lua",
+      "lines": [
+        1,
+        181
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+      "lines": [
+        1,
+        722
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/platform/factorio/browser_host.lua",
+      "lines": [
+        1,
+        28
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/platform/factorio/runtime_state.lua",
+      "lines": [
+        1,
+        19
+      ]
+    },
+    {
+      "path": "source/prototypes/mir/stage/data.lua",
+      "lines": [
+        1,
+        31
+      ]
+    },
+    {
+      "path": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+      "lines": [
+        1,
+        587
+      ]
+    }
+  ]
+}

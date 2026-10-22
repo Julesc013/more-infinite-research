@@ -9,6 +9,7 @@ param(
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string[]]$ConsumerMarkers=@(),
+  [ValidateSet('load','configuration')][string]$ProductionConsumerStage='load',
   [switch]$CreateOnly,
   [switch]$MIRAbsent,
   [string]$InputSavePath='',
@@ -51,6 +52,9 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
   $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio')+$StageArguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
+  # Completed host parsing/interop allocations need not occupy commit while a
+  # later native stage waits for admission. Keep every governor limit intact.
+  [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
   $native=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $engine -Arguments $arguments -TimeoutSeconds $TimeoutSeconds -CompletionPredicate $Completion -AdmissionWaitSeconds $AdmissionWaitSeconds -AdmissionPhase ('fixture-'+$Name)
   $log=Join-Path $resources.root ($Name+'.factorio.log')
   Assert-Fixture (Test-Path -LiteralPath $live -PathType Leaf) "$Name native log absent"
@@ -121,6 +125,9 @@ $record=[ordered]@{
   release_qualification=$false
 }
 try{
+  # Compile the governor's native memory reader before releasing temporary
+  # host allocations; its first Add-Type call otherwise occurs inside wait.
+  $null=Get-MIR441PhysicalMemorySnapshot
   [GC]::Collect(); [GC]::WaitForPendingFinalizers(); [GC]::Collect()
   $record.initial_admission_wait=Wait-MIRDirectLibraryStartupAdmission -Policy ([pscustomobject]@{minimum_free_ram_gib=4}) -WorkRoot $OutputRoot -EstimatedPeakBytes 128MB -ExpectedPeakMemoryBytes ([int64]$ExpectedPeakMemoryMiB*1MB) -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase 'fixture-initial'
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 128 -UseExactOutputRoot
@@ -164,7 +171,7 @@ try{
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
   }.GetNewClosure()
   $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
-  $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) 'load'
+  $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()

@@ -101,6 +101,7 @@ end
 local function start_unrelated_research(force)
   local probe = force.technologies.automation
   if not probe then fail("force has no automation probe technology") end
+  prepare_prerequisites(probe)
   if not force.add_research(probe) then fail("could not start native probe research") end
 end
 

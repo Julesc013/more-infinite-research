@@ -3,6 +3,9 @@
 # Exact native MIR 5 runner receipts retain their original CRLF hash identity.
 spec/mir5/evidence/gear-default.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 spec/mir5/evidence/gear-tuned.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+spec/mir5/evidence/caps-api-native.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+spec/mir5/evidence/caps-api-seed-source.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+spec/mir5/evidence/api-beta-absence.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 spec/mir5/inventory/*.json text eol=lf
 
 # This fixture is an exact raw-hash copy of the published 4.2.0 manifest.

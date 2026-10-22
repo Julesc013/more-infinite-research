@@ -176,6 +176,12 @@ class ReplayTests(unittest.TestCase):
             output = root / "output"
             self.assertEqual(receipt["status"], "generated-offline-diagnostic-not-native-evidence")
             self.assertTrue(receipt["profile_specific"])
+            published_archive = root / "external" / "more-infinite-research_4.7.21000.zip"
+            self.assertEqual(receipt["published_mir"], {
+                "name": "more-infinite-research",
+                "version": "4.7.21000",
+                "sha256": _sha(published_archive),
+            })
             self.assertEqual(receipt["comparison"], {
                 "data_additions": 2, "data_patches": 2,
                 "settings_additions": 1, "settings_patches": 1,
@@ -269,6 +275,13 @@ class ReplayTests(unittest.TestCase):
             replay.lua_value(float("inf"))
         with self.assertRaisesRegex(replay.ReplayError, "cannot contain JSON null"):
             replay.lua_value([None])
+
+    def test_preserves_boolean_number_differences_while_accepting_equal_json_numbers(self):
+        self.assertEqual(
+            replay._changed_fields({"enabled": True, "nested": [True]}, {"enabled": 1, "nested": [1]}),
+            [(("enabled",), 1), (("nested",), [1])],
+        )
+        self.assertEqual(replay._changed_fields({"count": 1}, {"count": 1.0}), [])
 
     def test_rejects_mismatched_capture_hash_before_creating_output(self):
         with tempfile.TemporaryDirectory() as temporary:

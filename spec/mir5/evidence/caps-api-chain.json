@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "kind": "authored-private-scenario-custody-index-not-runner-receipt",
+  "scope": "F210 native gear caps and two independently installed draft API consumers",
+  "release_qualification": false,
+  "engine": "Factorio 2.1.23, FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+  "player": {
+    "archive": "build/mir5/caps-api-r03/packages/more-infinite-research_5.0.21000.zip",
+    "sha256": "6F6817697CDA52C2D8B9576BD308E546FDCFBD9FFD795B63BADC9043592AC3C8",
+    "package_record": "build/mir5/caps-api-r03/player.json",
+    "package_record_sha256": "62E1573CF75650D1217F2986D7CC168311BCA2175EDE6DAA6753CEF904C1C46C"
+  },
+  "seed": {
+    "receipt": "spec/mir5/evidence/caps-api-seed-source.json",
+    "receipt_sha256": "88647E1DEA26B57D956C0263D7500A25A92BBBDE68F2131506903D5232DCDEE0",
+    "whole_run_status": "failed",
+    "accepted_stage": "create: natural exit zero, both native consumer init witnesses, actual seed ZIP",
+    "later_failure": "Resource governor interrupted the following server stage; this is not a passed whole run.",
+    "save": "build/tmp/mir5-caps-api-native-r08/write-data/saves/seed.zip",
+    "sha256": "661F1FA005AE770A74A9C410A7687B9912B569A75E760D70CCA27AB76B50F0F4",
+    "fixture_transition": "Cap fixture 0.1.0 to 0.1.1 prepares the unrelated probe's native prerequisites before starting it. Player archive and both consumer archives are unchanged."
+  },
+  "completed_scenario": {
+    "receipt": "spec/mir5/evidence/caps-api-native.json",
+    "receipt_sha256": "7D5AA2008DB5C80720BF7B6D86901C12C75118ADA46C8B44629BDA608F4C0F51",
+    "status": "passed-private-native-fixture",
+    "cap_fixture_sha256": "9C183408F75DCF30F90E0579078AE91E0AE6956558BC06B08B317ACFFA7F8282",
+    "alpha_sha256": "71ABA82B2B159CCA2B467CBDF5B31F09B4F6A14AA2CE9673ED76EBCF2FF58864",
+    "beta_sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3",
+    "observed": {
+      "lab_completed_levels": 2,
+      "each_required_science_pack_consumed": 2,
+      "native_productivity_bonus": 0.2,
+      "next_level": 3,
+      "cap": 2,
+      "queue_entries_before": 3,
+      "queue_entries_after": 1,
+      "current_progress_retained": true,
+      "foreign_disable_preserved": true,
+      "force_reset_observed": true,
+      "force_merge_observed": true,
+      "both_consumer_configuration_markers": true,
+      "two_cold_reloads_with_both_consumer_markers": true,
+      "completed_save_byte_identical": true,
+      "input_seed_byte_identical": true
+    },
+    "completed_save_sha256": "008AEB4501D7B5C0148B7E194FD3A9A6C3F923DDD97A549AFB80BF2D48E7F777"
+  },
+  "optional_absence": {
+    "receipt": "spec/mir5/evidence/api-beta-absence.json",
+    "receipt_sha256": "5E195E7346139084ED98921BF4413C7DC10342697D8BE18089E2D659669FC072",
+    "status": "passed-private-native-runtime-load-only",
+    "selection": ["base@2.1.23", "mir-fixture-mir5-api-beta@0.1.0"],
+    "observation": "Natural-zero native map creation and control load with MIR absent; no gameplay, save continuity or absent-technology dump claim."
+  },
+  "limitations": [
+    "Private slice only; not the complete MIR 5 product or frozen release source.",
+    "Alpha's native crafting-speed effect is completed and observed. Beta's native recipe-productivity declaration and queries are checked, but beta research is not completed in this fixture.",
+    "Finite-to-unlimited restoration is host-tested; its native configuration transition remains pending.",
+    "This seed is MIR 5, not a historical MIR 4 save. Historical upgrades, K2/native owners and multiplayer remain separate requirements.",
+    "The runner receipts record dirty source checkouts and exact archive/harness hashes; release qualification must use the final frozen source and packages."
+  ]
+}

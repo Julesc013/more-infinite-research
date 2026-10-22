@@ -166,11 +166,13 @@ def _read_capture(location: Path, expected_mir: bool) -> dict[str, Any]:
     verified_external.append(_external_record(harness, "capture harness"))
 
     mir = result.get("mir_archive")
+    verified_mir: dict[str, Any] | None = None
     if expected_mir:
         mir = _expect_mapping(mir, "published MIR archive")
         if mir.get("name") != "more-infinite-research" or not isinstance(mir.get("version"), str) or not mir["version"].startswith("4.7."):
             raise ReplayError("published capture must select an exact MIR 4.7 archive")
-        verified_external.append(_external_record(mir, "published MIR archive"))
+        verified_mir = _external_record(mir, "published MIR archive")
+        verified_external.append(verified_mir)
     elif mir is not None:
         raise ReplayError("no-MIR capture unexpectedly selected MIR")
 
@@ -217,6 +219,7 @@ def _read_capture(location: Path, expected_mir: bool) -> dict[str, Any]:
         "selection": selection_mods,
         "selected": selected,
         "loaded": loaded_without_mir,
+        "mir_archive": verified_mir,
         "files": [
             {"path": "result.json", "sha256": _sha256(result_path), "bytes": result_path.stat().st_size},
             selection_file,
@@ -257,6 +260,31 @@ def _validate_new_prototype(prototype_type: str, name: str, prototype: Mapping[s
         raise ReplayError(f"{label} cannot emit {prototype_type}.{name}: captured type/name do not match its data.raw key")
 
 
+def _same_json_value(before: Any, after: Any) -> bool:
+    """Compare decoded JSON by native Lua value semantics.
+
+    Python considers ``True == 1`` (and nested containers containing those
+    values) even though the generated Lua must preserve boolean versus number.
+    JSON integer/float spelling both maps to a native Lua number, so equal
+    finite numeric values intentionally remain equal here.
+    """
+    if isinstance(before, Mapping) or isinstance(after, Mapping):
+        if not isinstance(before, Mapping) or not isinstance(after, Mapping):
+            return False
+        return (set(before) == set(after)
+                and all(_same_json_value(before[key], after[key]) for key in before))
+    if isinstance(before, list) or isinstance(after, list):
+        if not isinstance(before, list) or not isinstance(after, list) or len(before) != len(after):
+            return False
+        return all(_same_json_value(left, right) for left, right in zip(before, after))
+    if isinstance(before, bool) or isinstance(after, bool):
+        return type(before) is type(after) and before is after
+    if (isinstance(before, (int, float)) and not isinstance(before, bool)
+            and isinstance(after, (int, float)) and not isinstance(after, bool)):
+        return before == after
+    return type(before) is type(after) and before == after
+
+
 def _changed_fields(before: Any, after: Any, path: tuple[str, ...] = ()) -> list[tuple[tuple[str, ...], Any]]:
     """Return only declared changed fields. Lists are native ordered tuples."""
     if isinstance(before, Mapping) and isinstance(after, Mapping):
@@ -269,7 +297,7 @@ def _changed_fields(before: Any, after: Any, path: tuple[str, ...] = ()) -> list
             else:
                 changes.extend(_changed_fields(before[key], after[key], path + (key,)))
         return changes
-    if before == after:
+    if _same_json_value(before, after):
         return []
     return [(path, after)]
 
@@ -455,6 +483,12 @@ def build_replay(no_mir_capture: Path, published_capture: Path, output_root: Pat
             "published_mir": {
                 "name": published["result"]["mir_archive"]["name"],
                 "version": published["result"]["mir_archive"]["version"],
+                # This is the hash read from the archive and checked against
+                # the published native-capture receipt above.  The composer
+                # binds its supplied source archive to this exact custody
+                # input, rather than accepting another archive with 4.7's
+                # filename and metadata alone.
+                "sha256": published["mir_archive"]["sha256"],
             },
             "comparison": {
                 "data_additions": len(data_diff["additions"]),
