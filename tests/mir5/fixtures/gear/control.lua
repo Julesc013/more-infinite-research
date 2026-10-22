@@ -41,10 +41,10 @@ local function profile_for(technology)
     .. ";matching_effect_count=" .. tostring(count)
     .. ";matching_change=" .. tostring(change)
     .. ";effects=" .. describe_effects(technology.prototype.effects))
-  if version == "0.1.0" and close(change, 0.10) and close(time, 60) then
+  if version == "0.1.0" and close(change, 0.10) and close(time, 3600) then
     return {name = "default", change = 0.10, level_one_count = 8000, physical_output = 110}
   end
-  if version == "0.2.0" and close(change, 0.20) and close(time, 30) then
+  if version == "0.2.0" and close(change, 0.20) and close(time, 1800) then
     return {name = "tuned", change = 0.20, level_one_count = 100, physical_output = 120}
   end
   fail("runtime gear setting profile is neither default nor approved tuned")
@@ -113,7 +113,7 @@ local function begin_crafting(state, phase)
     fail("native gear assembler inventories were not clean")
   end
   local inserted = input.insert{name = "iron-plate", count = 200}
-  if inserted ~= 200 then fail("could not supply 200 iron plates") end
+  if inserted ~= 200 then fail("could not supply 200 iron plates; inserted " .. tostring(inserted)) end
   state.phase = phase
   state.phase_output = 0
 end
