@@ -45,6 +45,12 @@ The frozen player archive in `build/mir5/gear-r01/packages/` has SHA256 `3c832f5
 
 The external F210 library's wrongly named 4.7.21000 archive (SHA256 `01fdf91912237fa3814fd33292c192b595ae42b35b726fff4163c0c4ab84202e`) is preserved at `build/mir5/published-baseline/library-prior/more-infinite-research_4.7.21000.zip`. The library now contains the hash-verified published asset `708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1`. The governed prototype capture runner has been prepared; initial capture attempts were refused before engine launch by physical RAM or commit headroom. No native baseline result is inferred from those refusals and no governor threshold was changed.
 
+[PR #759](https://github.com/Julesc013/more-infinite-research/pull/759) contains the next unit. Its dedicated Windows CI job passed all 43 host/package controls (run `39866095503`). Current documentation/adoption validation also passes after fixing Windows UTF-8 reads; generated Mermaid, SVG, PNG and atlas bytes remained unchanged. The [source catalogue recovery](../../spec/mir5/inventory/catalog-baseline.json) records 61 top-level productivity declarations, 15 direct declarations and six base extensions, with explicit incomplete inventory and capture-required boundaries.
+
+The combined native candidate is `build/mir5/caps-api-r01/packages/more-infinite-research_5.0.21000.zip`, SHA256 `32718aee4f93ec97021dcaf1e25f5d1f9d9a4bf1958f959804f3123236bb00ec`; its selected fixture definitions are `tests/mir5/profiles/caps-api-f210.json`. Its initial governed attempt was refused before launch for memory headroom. Required remaining observations include actual lab completion, repeated queue filtering/current progress, cap and foreign disablement state, force reset/merge, both public consumers and two reloads. Optional MIR absence requires its own native selection. The cap fixture preserves the documented numeric runtime infinite maximum (`4294967295`) rather than inventing a string adapter.
+
+The completed first feature branch is retained locally because the accepted initial native receipts reference its unique intermediate source commits after GitHub's squash merge and automatic remote branch deletion. Its tree matches the accepted `dev` integration; no unique source/evidence was discarded.
+
 Existing MIR 4.7 linked worktrees and unique material are preserved for their active or historical evidence custody. No worktree, save, archive or published object was deleted for this transition.
 
 ## Next executable work

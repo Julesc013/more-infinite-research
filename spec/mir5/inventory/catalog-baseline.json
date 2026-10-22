@@ -1,0 +1,2204 @@
+{
+  "format": 1,
+  "kind": "mir5-published-catalog-source-characterization",
+  "status": "source-characterized-realization-capture-pending",
+  "inventory_complete": false,
+  "coverage_boundary": "Top-level direct-effects/productivity declaration surfaces and six base extensions. Optional adapter additions, hidden migration carriers, broad target realization, all global settings and scripted/UI runtime contracts require their separate recovery and native evidence.",
+  "scope": {
+    "subject": "published MIR 4.7.0 catalog surfaces for MIR5 continuity planning",
+    "pinned_source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "generation_framework_included": false,
+    "player_imports_included": false,
+    "native_execution_claimed": false,
+    "emitted_technology_claimed": false
+  },
+  "community_request_ledger": {
+    "reference_only": true,
+    "new_ids_created": false,
+    "ledger_path": "spec/programmes/community-requests.json",
+    "referenced_existing_ids": [
+      "CRAFT-01",
+      "MACHINE-03"
+    ],
+    "continuity_subject_reference": "CONT-15",
+    "interpretation": "These references preserve existing request-ledger custody only. They do not mark either request adopted, qualified, emitted, or resolved."
+  },
+  "identity_contract": {
+    "stable_technology_id_format": "recipe-prod-<stream_key>-1",
+    "source": {
+      "path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "lines": [
+        67,
+        68
+      ]
+    },
+    "realized_identity": "capture-required"
+  },
+  "stream_settings_contract": {
+    "source": [
+      {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "lines": [
+          3,
+          10
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/settings/catalog.lua",
+        "lines": [
+          334,
+          375
+        ]
+      },
+      {
+        "path": "source/prototypes/mir/settings/effect_contracts.lua",
+        "lines": [
+          97,
+          119
+        ]
+      }
+    ],
+    "per_stream_setting_identities": [
+      "ips-enable-<stream_key>",
+      "ips-cost-base-<stream_key>",
+      "ips-cost-linear-increment-<stream_key>",
+      "ips-cost-growth-<stream_key>",
+      "ips-max-level-<stream_key>",
+      "ips-research-time-<stream_key>",
+      "ips-effect-per-level-<stream_key>"
+    ],
+    "shared_inherited_defaults": {
+      "enabled": true,
+      "base_cost": 8000,
+      "linear_increment": 0,
+      "growth_factor": 2,
+      "max_level": 0,
+      "research_time": 60
+    },
+    "zero_sentinel": {
+      "setting": "max_level",
+      "value": 0,
+      "source_meaning": "infinite (also nil)"
+    },
+    "realized_settings_prototypes": "capture-required"
+  },
+  "direct_families": [
+    {
+      "stream_key": "research_spoilage_preservation",
+      "stable_technology_id": "recipe-prod-research_spoilage_preservation-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 10
+      },
+      "classification": "scripted-runtime-multiplier",
+      "source_declared_effects": [
+        {
+          "type": "nothing",
+          "runtime_multiplier_delta": 0.01
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 50000,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 120
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 1,
+          "canonical_anchor": 0.01,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "space-science-pack",
+          "agricultural-science-pack",
+          "cryogenic-science-pack"
+        ],
+        "required_mods": [
+          "space-age"
+        ],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_agricultural_growth_speed",
+      "stable_technology_id": "recipe-prod-research_agricultural_growth_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 50
+      },
+      "classification": "scripted-runtime-multiplier",
+      "source_declared_effects": [
+        {
+          "type": "nothing",
+          "runtime_multiplier_delta": 0.01
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 40000,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 90
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 1,
+          "canonical_anchor": 0.01,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack"
+        ],
+        "required_mods": [
+          "space-age"
+        ],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_inventory_capacity",
+      "stable_technology_id": "recipe-prod-research_inventory_capacity-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 83
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "character-inventory-slots-bonus",
+          "modifier": 1
+        },
+        {
+          "type": "character-logistic-trash-slots",
+          "modifier": 1
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 1,
+          "canonical_anchor": 1,
+          "unit": "native"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "utility-science-pack",
+          "military-science-pack",
+          "agricultural-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_robot_battery",
+      "stable_technology_id": "recipe-prod-research_robot_battery-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 94
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "worker-robot-battery",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "skip-if-native-effect:worker-robots-battery-6/worker-robot-battery/0.70/infinite",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 1.2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": null,
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_lab_productivity",
+      "stable_technology_id": "recipe-prod-research_lab_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 106
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "skip-if-native-effect:research-productivity/infinite OR laboratory-productivity-4/laboratory-productivity/0.10/infinite",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 1000,
+          "linear_increment": 0,
+          "growth_factor": 1.2,
+          "max_level": 0,
+          "research_time": 120
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "military-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "utility-science-pack",
+          "space-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_cargo_bay_unloading_distance",
+      "stable_technology_id": "recipe-prod-research_cargo_bay_unloading_distance-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 136
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "max-cargo-bay-unloading-distance",
+          "modifier": 10
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 100000,
+          "linear_increment": 0,
+          "growth_factor": 3,
+          "max_level": 0,
+          "research_time": 120
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 10,
+          "unit": "native"
+        }
+      },
+      "realization": {
+        "declared_science_packs": "all-official",
+        "required_mods": [
+          "space-age"
+        ],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_cargo_landing_pad_count",
+      "stable_technology_id": "recipe-prod-research_cargo_landing_pad_count-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 156
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "cargo-landing-pad-count",
+          "modifier": 1
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 1000000,
+          "linear_increment": 0,
+          "growth_factor": 10,
+          "max_level": 0,
+          "research_time": 240
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 1,
+          "canonical_anchor": 1,
+          "unit": "native"
+        }
+      },
+      "realization": {
+        "declared_science_packs": "all-official",
+        "required_mods": [
+          "space-age"
+        ],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_rocket_shooting_speed",
+      "stable_technology_id": "recipe-prod-research_rocket_shooting_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 176
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "rocket",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "adopt-exact-native-effect-owner",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 60,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_cannon_shooting_speed",
+      "stable_technology_id": "recipe-prod-research_cannon_shooting_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 189
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "cannon-shell",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "adopt-exact-native-effect-owner",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 60,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_flamethrower_shooting_speed",
+      "stable_technology_id": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 207
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "flamethrower",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "adopt-exact-native-effect-owner",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 60,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "space-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_electric_shooting_speed",
+      "stable_technology_id": "recipe-prod-research_electric_shooting_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 225
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "tesla",
+          "modifier": 0.1
+        },
+        {
+          "type": "gun-speed",
+          "ammo_category": "electric",
+          "modifier": 0.1
+        }
+      ],
+      "source_declared_adoption_policy": "adopt-exact-native-effect-owner",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 60,
+          "linear_increment": 0,
+          "growth_factor": 1.5,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 0.1,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "military-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_character_mining_speed",
+      "stable_technology_id": "recipe-prod-research_character_mining_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 249
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "character-mining-speed",
+          "modifier": 0.05
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 5,
+          "canonical_anchor": 0.05,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "utility-science-pack",
+          "military-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_character_crafting_speed",
+      "stable_technology_id": "recipe-prod-research_character_crafting_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 260
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "character-crafting-speed",
+          "modifier": 0.05
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 5,
+          "canonical_anchor": 0.05,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "utility-science-pack",
+          "military-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_character_walking_speed",
+      "stable_technology_id": "recipe-prod-research_character_walking_speed-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 275
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "character-running-speed",
+          "modifier": 0.05
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 5,
+          "canonical_anchor": 0.05,
+          "unit": "percent"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "utility-science-pack",
+          "military-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_character_reach",
+      "stable_technology_id": "recipe-prod-research_character_reach-1",
+      "source": {
+        "path": "source/prototypes/streams/direct-effects.lua",
+        "line": 286
+      },
+      "classification": "direct-effect-candidate",
+      "source_declared_effects": [
+        {
+          "type": "character-reach-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-build-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-resource-reach-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-item-drop-distance",
+          "modifier": 10
+        }
+      ],
+      "source_declared_adoption_policy": "none",
+      "settings": {
+        "identity_prefix": "ips-",
+        "defaults": {
+          "enabled": true,
+          "base_cost": 8000,
+          "linear_increment": 0,
+          "growth_factor": 2,
+          "max_level": 0,
+          "research_time": 60
+        },
+        "effect_setting": {
+          "setting_name_suffix": "effect-per-level",
+          "display_default": 10,
+          "canonical_anchor": 10,
+          "unit": "native"
+        }
+      },
+      "realization": {
+        "declared_science_packs": [
+          "utility-science-pack",
+          "military-science-pack",
+          "agricultural-science-pack",
+          "cryogenic-science-pack"
+        ],
+        "required_mods": [],
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    }
+  ],
+  "productivity_families": [
+    {
+      "stream_key": "research_copper",
+      "stable_technology_id": "recipe-prod-research_copper-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 57
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_iron",
+      "stable_technology_id": "recipe-prod-research_iron-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 62
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_steel",
+      "stable_technology_id": "recipe-prod-research_steel-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 67
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": {
+        "owner": "steel-plate-productivity",
+        "products": [
+          "steel-plate"
+        ]
+      },
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_gears",
+      "stable_technology_id": "recipe-prod-research_gears-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 78
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_iron_sticks",
+      "stable_technology_id": "recipe-prod-research_iron_sticks-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 79
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_copper_cable",
+      "stable_technology_id": "recipe-prod-research_copper_cable-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 80
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_electronic_circuit",
+      "stable_technology_id": "recipe-prod-research_electronic_circuit-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 82
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_advanced_circuit",
+      "stable_technology_id": "recipe-prod-research_advanced_circuit-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 83
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_processing_unit",
+      "stable_technology_id": "recipe-prod-research_processing_unit-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 84
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": {
+        "owner": "processing-unit-productivity",
+        "products": [
+          "processing-unit"
+        ]
+      },
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_plastic",
+      "stable_technology_id": "recipe-prod-research_plastic-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 95
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": {
+        "owner": "plastic-bar-productivity",
+        "products": [
+          "plastic-bar"
+        ]
+      },
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_sulfur",
+      "stable_technology_id": "recipe-prod-research_sulfur-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 104
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_batteries",
+      "stable_technology_id": "recipe-prod-research_batteries-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 105
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_explosives",
+      "stable_technology_id": "recipe-prod-research_explosives-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 106
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_engine",
+      "stable_technology_id": "recipe-prod-research_engine-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 108
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_electric_engine",
+      "stable_technology_id": "recipe-prod-research_electric_engine-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 109
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_flying_robot_frame",
+      "stable_technology_id": "recipe-prod-research_flying_robot_frame-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 110
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_low_density_structure",
+      "stable_technology_id": "recipe-prod-research_low_density_structure-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 112
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": {
+        "owner": "low-density-structure-productivity",
+        "products": [
+          "low-density-structure"
+        ]
+      },
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_rocket_fuel",
+      "stable_technology_id": "recipe-prod-research_rocket_fuel-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 125
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": {
+        "owner": "rocket-fuel-productivity",
+        "products": [
+          "rocket-fuel"
+        ]
+      },
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_thruster_fuel_productivity",
+      "stable_technology_id": "recipe-prod-research_thruster_fuel_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 135
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_thruster_oxidizer_productivity",
+      "stable_technology_id": "recipe-prod-research_thruster_oxidizer_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 151
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_oil_processing_productivity",
+      "stable_technology_id": "recipe-prod-research_oil_processing_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 167
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_oil_cracking_productivity",
+      "stable_technology_id": "recipe-prod-research_oil_cracking_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 183
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_lubricant_productivity",
+      "stable_technology_id": "recipe-prod-research_lubricant_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 196
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_sulfuric_acid_productivity",
+      "stable_technology_id": "recipe-prod-research_sulfuric_acid_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 207
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_air_scrubbing_clean_filter",
+      "stable_technology_id": "recipe-prod-research_air_scrubbing_clean_filter-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 222
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_ash_separation",
+      "stable_technology_id": "recipe-prod-research_ash_separation-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 257
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_tungsten",
+      "stable_technology_id": "recipe-prod-research_tungsten-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 290
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_lithium",
+      "stable_technology_id": "recipe-prod-research_lithium-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 299
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_holmium",
+      "stable_technology_id": "recipe-prod-research_holmium-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 309
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_supercapacitor",
+      "stable_technology_id": "recipe-prod-research_supercapacitor-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 317
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_superconductor",
+      "stable_technology_id": "recipe-prod-research_superconductor-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 325
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_quantum_processor",
+      "stable_technology_id": "recipe-prod-research_quantum_processor-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 333
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_carbon",
+      "stable_technology_id": "recipe-prod-research_carbon-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 341
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_carbon_fiber",
+      "stable_technology_id": "recipe-prod-research_carbon_fiber-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 356
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_ice",
+      "stable_technology_id": "recipe-prod-research_ice-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 364
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_bioflux",
+      "stable_technology_id": "recipe-prod-research_bioflux-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 377
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_bacteria_cultivation",
+      "stable_technology_id": "recipe-prod-research_bacteria_cultivation-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 385
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_breeding",
+      "stable_technology_id": "recipe-prod-research_breeding-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 396
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_nutrients",
+      "stable_technology_id": "recipe-prod-research_nutrients-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 415
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_capture_robot_rockets",
+      "stable_technology_id": "recipe-prod-research_capture_robot_rockets-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 438
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_grenades",
+      "stable_technology_id": "recipe-prod-research_grenades-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 461
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_walls",
+      "stable_technology_id": "recipe-prod-research_walls-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 466
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_landfill",
+      "stable_technology_id": "recipe-prod-research_landfill-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 471
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_platform",
+      "stable_technology_id": "recipe-prod-research_platform-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 479
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_artificial_soil",
+      "stable_technology_id": "recipe-prod-research_artificial_soil-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 501
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_molten_metals",
+      "stable_technology_id": "recipe-prod-research_molten_metals-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 512
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_rails",
+      "stable_technology_id": "recipe-prod-research_rails-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 523
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_concrete",
+      "stable_technology_id": "recipe-prod-research_concrete-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 532
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_furnace",
+      "stable_technology_id": "recipe-prod-research_furnace-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 540
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_mining_drill",
+      "stable_technology_id": "recipe-prod-research_mining_drill-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 547
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_electric_energy",
+      "stable_technology_id": "recipe-prod-research_electric_energy-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 559
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_bullets",
+      "stable_technology_id": "recipe-prod-research_bullets-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 566
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_heavy_ammo",
+      "stable_technology_id": "recipe-prod-research_heavy_ammo-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 581
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_rockets",
+      "stable_technology_id": "recipe-prod-research_rockets-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 594
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_armor_components",
+      "stable_technology_id": "recipe-prod-research_armor_components-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 604
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_modules",
+      "stable_technology_id": "recipe-prod-research_modules-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 615
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_belts",
+      "stable_technology_id": "recipe-prod-research_belts-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 622
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_inserters",
+      "stable_technology_id": "recipe-prod-research_inserters-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 691
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_auto_assembling_machine",
+      "stable_technology_id": "recipe-prod-research_auto_assembling_machine-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 704
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_auto_lab",
+      "stable_technology_id": "recipe-prod-research_auto_lab-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 715
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    },
+    {
+      "stream_key": "research_science_pack_productivity",
+      "stable_technology_id": "recipe-prod-research_science_pack_productivity-1",
+      "source": {
+        "path": "source/prototypes/streams/productivity.lua",
+        "line": 726
+      },
+      "classification": "recipe-productivity-candidate",
+      "source_declared_native_owner_binding": null,
+      "realization": {
+        "admitted_recipe_targets": "capture-required",
+        "emitted_effects": "capture-required",
+        "resolved_science_packs": "capture-required",
+        "resolved_prerequisites": "capture-required"
+      }
+    }
+  ],
+  "source_declared_productivity_owner_binding_policy": {
+    "source": {
+      "path": "source/prototypes/streams/productivity.lua",
+      "lines": [
+        31,
+        50
+      ]
+    },
+    "binding_count": 5,
+    "binding_preconditions": [
+      "require existing recipe-productivity effects",
+      "preserve owner by default"
+    ],
+    "realized_owner_state": "capture-required"
+  },
+  "base_extensions": [
+    {
+      "technology_key": "braking-force",
+      "manifest_id": "base-continuation/braking-force",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 124
+      },
+      "setting_identities": [
+        "mir-enable-braking-force",
+        "mir-cost-base-braking-force",
+        "mir-cost-linear-increment-braking-force",
+        "mir-cost-growth-braking-force",
+        "mir-max-level-braking-force",
+        "mir-research-time-braking-force",
+        "mir-effect-per-level-braking-force"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 115,
+        "linear_increment": 0,
+        "growth_factor": 1.333333333333,
+        "max_level": 0,
+        "research_time": 60,
+        "effect_per_level": {
+          "display_default": 15,
+          "unit": "percent"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    },
+    {
+      "technology_key": "research-speed",
+      "manifest_id": "base-continuation/research-speed",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 137
+      },
+      "setting_identities": [
+        "mir-enable-research-speed",
+        "mir-cost-base-research-speed",
+        "mir-cost-linear-increment-research-speed",
+        "mir-cost-growth-research-speed",
+        "mir-max-level-research-speed",
+        "mir-research-time-research-speed",
+        "mir-effect-per-level-research-speed"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 60,
+        "linear_increment": 0,
+        "growth_factor": 1.5,
+        "max_level": 0,
+        "research_time": 120,
+        "effect_per_level": {
+          "display_default": 60,
+          "unit": "percent"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    },
+    {
+      "technology_key": "worker-robots-storage",
+      "manifest_id": "base-continuation/worker-robots-storage",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 148
+      },
+      "setting_identities": [
+        "mir-enable-worker-robots-storage",
+        "mir-cost-base-worker-robots-storage",
+        "mir-cost-linear-increment-worker-robots-storage",
+        "mir-cost-growth-worker-robots-storage",
+        "mir-max-level-worker-robots-storage",
+        "mir-research-time-worker-robots-storage",
+        "mir-effect-per-level-worker-robots-storage"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 200,
+        "linear_increment": 0,
+        "growth_factor": 1.5,
+        "max_level": 0,
+        "research_time": 60,
+        "effect_per_level": {
+          "display_default": 1,
+          "unit": "native"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    },
+    {
+      "technology_key": "inserter-capacity-bonus",
+      "manifest_id": "base-continuation/inserter-capacity-bonus",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 161
+      },
+      "setting_identities": [
+        "mir-enable-inserter-capacity-bonus",
+        "mir-cost-base-inserter-capacity-bonus",
+        "mir-cost-linear-increment-inserter-capacity-bonus",
+        "mir-cost-growth-inserter-capacity-bonus",
+        "mir-max-level-inserter-capacity-bonus",
+        "mir-research-time-inserter-capacity-bonus",
+        "mir-effect-per-level-inserter-capacity-bonus"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 200,
+        "linear_increment": 0,
+        "growth_factor": 3.333333333333,
+        "max_level": 0,
+        "research_time": 60,
+        "effect_per_level": {
+          "display_default": 4,
+          "unit": "native"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    },
+    {
+      "technology_key": "weapon-shooting-speed",
+      "manifest_id": "base-continuation/weapon-shooting-speed",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 183
+      },
+      "setting_identities": [
+        "mir-enable-weapon-shooting-speed",
+        "mir-cost-base-weapon-shooting-speed",
+        "mir-cost-linear-increment-weapon-shooting-speed",
+        "mir-cost-growth-weapon-shooting-speed",
+        "mir-max-level-weapon-shooting-speed",
+        "mir-research-time-weapon-shooting-speed",
+        "mir-effect-per-level-weapon-shooting-speed"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 60,
+        "linear_increment": 0,
+        "growth_factor": 1.5,
+        "max_level": 0,
+        "research_time": 120,
+        "effect_per_level": {
+          "display_default": 40,
+          "unit": "percent"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    },
+    {
+      "technology_key": "laser-shooting-speed",
+      "manifest_id": "base-continuation/laser-shooting-speed",
+      "source": {
+        "path": "source/prototypes/mir/settings/defaults.lua",
+        "line": 197
+      },
+      "setting_identities": [
+        "mir-enable-laser-shooting-speed",
+        "mir-cost-base-laser-shooting-speed",
+        "mir-cost-linear-increment-laser-shooting-speed",
+        "mir-cost-growth-laser-shooting-speed",
+        "mir-max-level-laser-shooting-speed",
+        "mir-research-time-laser-shooting-speed",
+        "mir-effect-per-level-laser-shooting-speed"
+      ],
+      "inherited_defaults": {
+        "enabled": true,
+        "base_cost": 60,
+        "linear_increment": 0,
+        "growth_factor": 1.5,
+        "max_level": 0,
+        "research_time": 120,
+        "effect_per_level": {
+          "display_default": 50,
+          "unit": "percent"
+        }
+      },
+      "zero_sentinels": {
+        "max_level": "infinite (0 or nil in source defaults)",
+        "research_time": "effective default/fallback requires realization capture"
+      },
+      "realization": {
+        "continued_native_technology": "capture-required",
+        "resolved_science_and_prerequisites": "capture-required"
+      }
+    }
+  ],
+  "platform_candidate_surfaces": [
+    {
+      "platform": "F210 / Factorio 2.1",
+      "source": {
+        "path": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+        "lines": [
+          7,
+          110
+        ]
+      },
+      "source_features": [
+        "recipe_productivity",
+        "scripted_techs",
+        "productivity_family_adoption"
+      ],
+      "source_supported_direct_effect_types_include": [
+        "character-crafting-speed",
+        "cargo-landing-pad-count",
+        "max-cargo-bay-unloading-distance"
+      ],
+      "direct_family_candidate_count": {
+        "base_only": 11,
+        "with_space_age": 15
+      },
+      "candidate_only_not_emitted_count": true,
+      "realization": "capture-required"
+    },
+    {
+      "platform": "F200 / Factorio 2.0",
+      "source": {
+        "path": "source/adapters/f200/prototypes/mir/platform/factorio/target_profiles.lua",
+        "lines": [
+          112,
+          204
+        ]
+      },
+      "source_features": [
+        "recipe_productivity",
+        "scripted_techs"
+      ],
+      "source_supported_direct_effect_types_exclude": [
+        "cargo-landing-pad-count",
+        "max-cargo-bay-unloading-distance"
+      ],
+      "direct_family_candidate_count": {
+        "base_only": 11,
+        "with_space_age": 13
+      },
+      "candidate_only_not_emitted_count": true,
+      "realization": "capture-required"
+    },
+    {
+      "platforms": [
+        "F110 / Factorio 1.1",
+        "F100 / Factorio 1.0",
+        "F017 / Factorio 0.17",
+        "F016 / Factorio 0.16",
+        "F015 / Factorio 0.15"
+      ],
+      "source": {
+        "path": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
+        "lines": [
+          206,
+          577
+        ]
+      },
+      "source_features": {
+        "recipe_productivity": false,
+        "scripted_techs": false
+      },
+      "direct_family_candidate_count": 11,
+      "candidate_only_not_emitted_count": true,
+      "realization": "capture-required"
+    },
+    {
+      "platforms": [
+        "F014 / Factorio 0.14",
+        "F013 / Factorio 0.13"
+      ],
+      "source": {
+        "path": "source/adapters/historical/legacy-reduced/target_profiles.lua.template",
+        "line": 1,
+        "lines": [
+          57,
+          86
+        ]
+      },
+      "direct_family_candidate_count": 9,
+      "candidate_only_not_emitted_count": true,
+      "realization": "capture-required"
+    }
+  ],
+  "required_realization_capture": [
+    "loaded mod selection and target profile",
+    "startup setting prototypes and effective values",
+    "data.raw technology records after final fixes",
+    "admitted recipe targets and native owner overlap disposition",
+    "selected science ingredients, compatible lab decision, and prerequisites",
+    "runtime scripted-effect behavior where the source declares type=nothing"
+  ],
+  "source_references": [
+    {
+      "path": "source/prototypes/streams/direct-effects.lua",
+      "lines": [
+        9,
+        301
+      ],
+      "purpose": "15 direct families, declared effects, science and adoption switches"
+    },
+    {
+      "path": "source/prototypes/streams/productivity.lua",
+      "lines": [
+        31,
+        735
+      ],
+      "purpose": "61 vanilla productivity family descriptors and five declared native-owner bindings"
+    },
+    {
+      "path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
+      "lines": [
+        67,
+        148
+      ],
+      "purpose": "stable ID format and realization-dependent qualification"
+    },
+    {
+      "path": "source/prototypes/mir/capabilities/science_integration/science_selector.lua",
+      "lines": [
+        289,
+        364
+      ],
+      "purpose": "science selection is resolved after source declarations"
+    },
+    {
+      "path": "source/prototypes/mir/planner/prerequisites.lua",
+      "lines": [
+        59,
+        94
+      ],
+      "purpose": "prerequisites are generated from selected science"
+    },
+    {
+      "path": "source/prototypes/mir/settings/defaults.lua",
+      "lines": [
+        3,
+        210
+      ],
+      "purpose": "shared, stream and base-extension defaults"
+    },
+    {
+      "path": "source/prototypes/mir/settings/catalog.lua",
+      "lines": [
+        334,
+        429
+      ],
+      "purpose": "stream and base-extension setting identity construction"
+    },
+    {
+      "path": "source/prototypes/mir/settings/effect_contracts.lua",
+      "lines": [
+        11,
+        135
+      ],
+      "purpose": "effect-setting identities and base anchors"
+    }
+  ]
+}

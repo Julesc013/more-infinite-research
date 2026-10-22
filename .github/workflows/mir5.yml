@@ -9,9 +9,11 @@ on:
       - ".github/workflows/mir5.yml"
       - "source/mir5/**"
       - "tests/mir5/**"
-      - "tools/mir5/package.py"
-      - "tools/mir5/adoption/pack_members.json"
-      - "tools/mir5/adoption/base_members.json"
+      - "tools/mir5/**"
+      - "spec/mir5/**"
+      - "docs/mir5/**"
+      - "sdk/mir5/**"
+      - "targets/mir5/**"
   workflow_dispatch:
 
 permissions:
@@ -58,7 +60,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $python = (Get-Command python -ErrorAction Stop).Source
           function Invoke-HostControl([string[]] $Arguments) {
-            & $python @Arguments
+            & $python -B @Arguments
             if ($LASTEXITCODE -ne 0) { throw "MIR 5 host control failed: $($Arguments -join ' ')" }
           }
           Invoke-HostControl @('tests/mir5/test_generator.py', '--lua-runtime-dir', $env:MIR5_LUA_RUNTIME)
@@ -68,3 +70,4 @@ jobs:
           Invoke-HostControl @('tests/mir5/test_lifecycle.py', '--lua-runtime-dir', $env:MIR5_LUA_RUNTIME)
           Invoke-HostControl @('tests/mir5/test_package.py')
           Invoke-HostControl @('tests/mir5/test_pack.py')
+          Invoke-HostControl @('tools/mir5/check_pack.py')
