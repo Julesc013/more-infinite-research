@@ -20,6 +20,8 @@ local ROOT_TAG = "more-infinite-research.library-root.v1"
 local PREFIX = "mir_library_"
 local SHORTCUT = "mir-research-browser"
 local MAX_QUERY = 160
+local MAX_HIDDEN = 128
+local MAX_PAGE = 30000
 local LEGACY_NAMESPACE = "mir"
 local LEGACY_BROWSER_KEY = "research_browser"
 local LEGACY_ROOT_MARKER = "mir_browser_tabs"
@@ -83,6 +85,78 @@ local function technology_id(value)
   return value
 end
 
+local function whole_option(value, minimum, maximum)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+    and value == math.floor(value) and value >= minimum and value <= maximum and value or nil
+end
+
+local function status_option(value)
+  return whole_option(value, 1, 4)
+end
+
+local function sort_option(value)
+  if value == "progression" or value == "native" or value == "name-asc" or value == "name-desc" then
+    return value
+  end
+  return nil
+end
+
+local SORT_INDEX = {
+  ["progression"] = 1,
+  ["native"] = 2,
+  ["name-asc"] = 3,
+  ["name-desc"] = 4
+}
+
+local function sort_from_index(value)
+  if value == 1 then return "progression" end
+  if value == 2 then return "native" end
+  if value == 3 then return "name-asc" end
+  if value == 4 then return "name-desc" end
+  return "progression"
+end
+
+local function known_technology(player, id)
+  if not valid(player) or id == nil then return nil end
+  local ok, technology = pcall(function()
+    local force = player.force
+    local technologies = force and force.technologies
+    return technologies and technologies[id] or nil
+  end)
+  return ok and valid(technology) and technology or nil
+end
+
+-- The published remote browser accepted only a dense, known-technology list.
+-- Validate it before changing the saved view so malformed callers cannot hide
+-- arbitrary names or turn a bounded selection into an unbounded native scan.
+local function hidden_option(player, values)
+  if type(values) ~= "table" then return nil end
+  local entries, count, valid_input = {}, 0, true
+  local scanned = pcall(function()
+    for index, id in pairs(values) do
+      if not whole_option(index, 1, MAX_HIDDEN) or technology_id(id) == nil or entries[index] ~= nil then
+        valid_input = false
+        return
+      end
+      count = count + 1
+      if count > MAX_HIDDEN then
+        valid_input = false
+        return
+      end
+      entries[index] = id
+    end
+  end)
+  if not scanned or not valid_input then return nil end
+
+  local hidden, seen = {}, {}
+  for index = 1, count do
+    local id = entries[index]
+    if id == nil or seen[id] or known_technology(player, id) == nil then return nil end
+    seen[id], hidden[id] = true, true
+  end
+  return hidden
+end
+
 local function location(value)
   if type(value) ~= "table" then return nil end
   if not finite_number(value.x) or not finite_number(value.y) then return nil end
@@ -96,6 +170,10 @@ local function local_view(raw)
     query = text(raw.query),
     family = raw.family == "all" and "all" or "mir",
     status = raw.status,
+    page = raw.page,
+    sort = raw.sort,
+    stable_sort = raw.stable_sort,
+    hidden = raw.hidden,
     selected = technology_id(raw.selected),
     location = location(raw.location),
     scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
@@ -106,12 +184,20 @@ local function local_view(raw)
     search = value.query,
     family = value.family,
     status = value.status,
+    page = value.page,
+    sort = value.sort,
+    stable_sort = value.stable_sort,
+    hidden = value.hidden,
     selected = value.selected
   })
   if type(normalized) == "table" then
     value.query = text(normalized.search or value.query)
     value.family = normalized.family == "mir" and "mir" or "all"
     value.status = type(normalized.status) == "number" and normalized.status or 1
+    value.page = type(normalized.page) == "number" and normalized.page or 1
+    value.sort = type(normalized.sort) == "string" and normalized.sort or "progression"
+    value.stable_sort = type(normalized.stable_sort) == "string" and normalized.stable_sort or "progression"
+    value.hidden = type(normalized.hidden) == "table" and normalized.hidden or {}
     value.selected = type(normalized.selected) == "string" and normalized.selected or nil
   end
   return value
@@ -321,6 +407,10 @@ local function legacy_view_as_private(value)
     query = value.search,
     family = value.family,
     status = value.status,
+    page = value.page,
+    sort = value.sort,
+    stable_sort = value.stable_sort,
+    hidden = value.hidden,
     selected = value.selected,
     location = value.location,
     scroll = value.scroll
@@ -384,6 +474,10 @@ local function model_view(view)
     search = view.query,
     family = view.family,
     status = view.status,
+    page = view.page,
+    sort = view.sort,
+    stable_sort = view.stable_sort,
+    hidden = view.hidden,
     selected = view.selected
   })
 end
@@ -688,6 +782,11 @@ local function create_frame(player, view)
   add(filters, {type = "drop-down", name = PREFIX .. "family", items = {{"mir-browser.scope-all"}, {"mir-browser.scope-mir"}}, selected_index = view.family == "mir" and 2 or 1})
   add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
   add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status})
+  add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "sort", items = {
+    {"mir-browser.order-progression"}, {"mir-browser.order-native"},
+    {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
+  }, selected_index = SORT_INDEX[view.sort] or 1})
   add(frame, {type = "flow", name = PREFIX .. "content", direction = "vertical"})
   return frame
 end
@@ -713,6 +812,8 @@ local function render(player, view, context, preserve_query)
   if valid(family) then family.selected_index = view.family == "mir" and 2 or 1 end
   local status = valid(filters) and filters[PREFIX .. "status"] or nil
   if valid(status) then status.selected_index = view.status end
+  local sort = valid(filters) and filters[PREFIX .. "sort"] or nil
+  if valid(sort) then sort.selected_index = SORT_INDEX[view.sort] or 1 end
   local translations = open_translation_cache(player, view)
   update_content(frame, player, view, context, translated_labels(translations))
   set_shortcut(player, true)
@@ -736,10 +837,37 @@ function M.open(player, options)
   if valid(existing) and existing ~= owned_root(player) then return nil end
   local view = view_for(player.index)
   options = type(options) == "table" and options or {}
-  if options.query ~= nil then view.query = text(options.query) end
-  if options.family == "all" or options.family == "mir" then view.family = options.family end
+  local reset_page = false
+  if type(options.query) == "string" then
+    view.query, reset_page = text(options.query), true
+  end
+  if options.family == "all" or options.family == "mir" then
+    view.family, reset_page = options.family, true
+  end
+  local status = status_option(options.status)
+  if status then view.status, reset_page = status, true end
+  local sort = sort_option(options.sort)
+  if sort then
+    view.sort, reset_page = sort, true
+    if sort == "progression" or sort == "native" then view.stable_sort = sort end
+  end
   local selected = technology_id(options.selected)
-  if selected then view.selected = selected end
+  if selected and known_technology(player, selected) then
+    view.selected, reset_page = selected, true
+  end
+  if options.hidden ~= nil then
+    local hidden = hidden_option(player, options.hidden)
+    if hidden then view.hidden, reset_page = hidden, true end
+  end
+  local page = whole_option(options.page, 1, MAX_PAGE)
+  if page then
+    -- The current list remains continuous, as the shipped browser's own GUI
+    -- did.  Retaining a valid page preserves remote and saved-view semantics.
+    view.page = page
+  elseif reset_page then
+    view.page = 1
+  end
+  if reset_page then view.scroll = 1 end
   return render(player, view)
 end
 
@@ -770,6 +898,7 @@ function M.on_gui_text_changed(event)
   }) then return end
   local view = view_for(player.index)
   view.query = text(element.text)
+  view.page = 1
   view.scroll = 1
   render(player, view, nil, true)
 end
@@ -785,6 +914,7 @@ function M.on_gui_selection_state_changed(event)
     }) then return end
     local view = view_for(player.index)
     view.family = element.selected_index == 2 and "mir" or "all"
+    view.page = 1
     view.scroll = 1
     render(player, view)
   elseif element.name == PREFIX .. "status" then
@@ -794,6 +924,18 @@ function M.on_gui_selection_state_changed(event)
     local view = view_for(player.index)
     local status = element.selected_index
     view.status = type(status) == "number" and status >= 1 and status <= 4 and math.floor(status) == status and status or 1
+    view.page = 1
+    view.scroll = 1
+    render(player, view)
+  elseif element.name == PREFIX .. "sort" then
+    if not owns_element(player, element, {
+      PREFIX .. "sort", PREFIX .. "filters", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local sort = sort_from_index(element.selected_index)
+    view.sort = sort
+    if sort == "progression" or sort == "native" then view.stable_sort = sort end
+    view.page = 1
     view.scroll = 1
     render(player, view)
   elseif element.name == PREFIX .. "results" then

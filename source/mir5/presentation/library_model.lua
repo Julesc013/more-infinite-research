@@ -80,7 +80,10 @@ function M.normalize(view)
   local status = tonumber(view.status)
   if not finite_integer(status) or status < 1 or status > 4 then status = 1 end
   local page = tonumber(view.page)
-  if not finite_integer(page) or page < 1 then page = 1 end
+  -- Pages are retained for the published browser bridge even though this
+  -- first Library list is continuous.  Keep the historical catalogue ceiling
+  -- so an unbounded remote value cannot become durable player state.
+  if not finite_integer(page) or page < 1 or page > MAX_NATIVE_ROWS then page = 1 end
   local search = bounded_string(view.search, MAX_SEARCH) or ""
   local settings_search = bounded_string(view.settings_search, MAX_SEARCH) or ""
   local selected = bounded_string(view.selected, MAX_SEARCH)
@@ -312,7 +315,8 @@ local function ordered(left, right, sort)
   if sort == "name-asc" or sort == "name-desc" then
     local left_name, right_name = ascii_casefold(left.name), ascii_casefold(right.name)
     if left_name ~= right_name then
-      return sort == "name-asc" and left_name < right_name or left_name > right_name
+      if sort == "name-asc" then return left_name < right_name end
+      return left_name > right_name
     end
   elseif sort == "native" then
     if left.native_order ~= right.native_order then return left.native_order < right.native_order end

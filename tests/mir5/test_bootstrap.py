@@ -212,12 +212,19 @@ class BootstrapTests(unittest.TestCase):
           local cap_map = library_calls.provider(player.force)
           assert(cap_map[known_technology.name] == 2 and lifecycle_calls.cap_force == player.force)
           assert(browser.open(77, {}) == false and library_calls.open == nil)
-          assert(browser.open(1, {search = "gear", family = "mir", selected = known_technology.name}))
+          local hidden = {known_technology.name}
+          assert(browser.open(1, {search = "gear", family = "mir", selected = known_technology.name,
+            status = 4, sort = "name-desc", page = 7, hidden = hidden}))
           assert(library_calls.open.player == player and library_calls.open.options.query == "gear")
           assert(library_calls.open.options.family == "mir"
-            and library_calls.open.options.selected == known_technology.name)
-          assert(browser.open(1, {selected = "unknown", family = "external"}))
-          assert(library_calls.open.options.family == nil and library_calls.open.options.selected == nil)
+            and library_calls.open.options.selected == known_technology.name
+            and library_calls.open.options.status == 4 and library_calls.open.options.sort == "name-desc"
+            and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
+          assert(browser.open(1, {selected = "unknown", family = "external", status = 5,
+            sort = "invalid", page = 30001, hidden = "not-a-list"}))
+          assert(library_calls.open.options.family == nil and library_calls.open.options.selected == nil
+            and library_calls.open.options.status == nil and library_calls.open.options.sort == nil
+            and library_calls.open.options.page == nil and library_calls.open.options.hidden == nil)
           local original_force = player.force
           player.force = setmetatable({}, {__index = function(_, key)
             error("oversized remote selection touched native force: " .. tostring(key))

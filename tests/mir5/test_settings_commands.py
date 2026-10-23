@@ -63,11 +63,11 @@ class SettingsCommandsTests(unittest.TestCase):
         self.assertEqual(row["player_index"], 1)
         self.assertTrue(row["data"].endswith("\n"))
         self.assertEqual(profile["settings"]["ips-cost-base-research_gears"], 17)
-        self.assertEqual(len(profile["settings"]), 9)
+        self.assertEqual(len(profile["settings"]), 10)
         self.assertEqual(profile["metadata"], {
             "export_mode": "full", "exported_by": "Alice", "factorio_version": "2.1.23",
             "import_setting": "mir-settings-profile-import", "mir_version": "5.0.21000"})
-        self.assertIn("9 settings, full", self.lua.globals().messages[1])
+        self.assertIn("10 settings, full", self.lua.globals().messages[1])
 
     def test_compact_option_filename_sanitization_and_server_metadata(self):
         row, profile = self.export("  --compact ../my profile  ", player=False)
@@ -87,7 +87,7 @@ class SettingsCommandsTests(unittest.TestCase):
         row, profile = self.export("compactly.txt")
         self.assertEqual(row["path"], "more-infinite-research/settings/compactly.txt")
         self.assertEqual(profile["metadata"]["export_mode"], "full")
-        self.assertEqual(len(profile["settings"]), 9)
+        self.assertEqual(len(profile["settings"]), 10)
 
     def test_missing_file_api_and_codec_failure_do_not_report_success(self):
         self.lua.execute('''
