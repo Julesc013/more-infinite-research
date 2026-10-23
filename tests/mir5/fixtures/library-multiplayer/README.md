@@ -1,7 +1,8 @@
 # Library multiplayer fixture protocol
 
 Start this fresh F200 world, then connect exactly two real clients whose actual
-`LuaPlayer.locale` events report `en` and `de`. Wait for the `rejoin-ready`
+`LuaPlayer.locale` values report `en` and `de`. Initial unchanged locales do
+not require a locale-change event. Wait for the `rejoin-ready`
 marker, disconnect and reconnect both clients, then wait for `restart-ready`
 and the requested `mir5-library-multiplayer-restart` save. Restart the host
 from that save, reconnect both clients again, and wait for `completed` plus

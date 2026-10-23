@@ -126,7 +126,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               game=game,storage=storage,remote=remote,
               helpers={table_to_json=function(value)markers[#markers+1]=value;return "{}" end},
               log=function(value)assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
-                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] "))end,
+                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
+                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] "))end,
             }
             environment._G=environment;setmetatable(environment,{__index=function(_,name)return _G[name]end})
             local chunk,message=loadfile(path,"t",environment);assert(chunk,message)
@@ -142,13 +143,17 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             en.connected=true
             ok,result=call(callbacks.events[2],{player_index=1});if not ok then return {ok=false,message=result} end
-            ok,result=call(callbacks.events[3],{player_index=1});if not ok then return {ok=false,message=result} end
+            if opponent~="unchanged-locales" then
+              ok,result=call(callbacks.events[3],{player_index=1});if not ok then return {ok=false,message=result} end
+            end
             if opponent=="absent-second-client" then
               ok,result=call(callbacks.events[1]);return {ok=ok,message=result,phase=storage[key].phase,markers=markers,saves=saves}
             end
             de.connected=true
             ok,result=call(callbacks.events[2],{player_index=2});if not ok then return {ok=false,message=result} end
-            ok,result=call(callbacks.events[3],{player_index=2});if not ok then return {ok=false,message=result} end
+            if opponent~="unchanged-locales" then
+              ok,result=call(callbacks.events[3],{player_index=2});if not ok then return {ok=false,message=result} end
+            end
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="awaiting-rejoin" then return {ok=false,message="initial client phase did not await an actual rejoin"} end
             en.connected,de.connected=false,false
@@ -225,7 +230,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
 
         expected = {
             "fake-connected": "actually connected client",
-            "locale": "actual en/de locale events",
+            "locale": "actual en/de locales",
             "view-crosspollution": "native browser root is absent",
             "gameplay-mutation": "mutated native research, queue, or recipe effects",
             "native-witness-overwritten": "stored native witness was overwritten",
@@ -236,6 +241,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertIn("[mir5-library-multiplayer]", result["message"])
                 self.assertIn(message, result["message"])
+
+    def test_initial_native_locales_need_no_synthetic_locale_change_event(self):
+        result = self.run_case("unchanged-locales")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((result["phase"], result["join_events"]), ("completed", 6))
 
     def test_fixture_uses_only_public_browser_and_native_gui_witnesses(self):
         source = CONTROL.read_text(encoding="utf-8")

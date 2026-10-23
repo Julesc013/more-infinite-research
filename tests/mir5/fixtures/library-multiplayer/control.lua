@@ -210,9 +210,21 @@ local function pair(state, expected_joins)
       local player = game.get_player(index)
       if valid(player) and player.connected == true then
         connected = connected + 1
-        if record.locale == nil or player.locale ~= record.locale then return nil end
+        -- A client's initial locale need not change after joining. Read the
+        -- actual native value; locale-change events are supplementary rather
+        -- than a fabricated prerequisite for an unchanged English locale.
+        if player.locale ~= record.locale then
+          record.locale = player.locale
+          log("[MIR5_LIBRARY_MULTIPLAYER_LOCALE] " .. player.name .. " " .. tostring(record.locale))
+        end
+        if record.locale ~= "en" and record.locale ~= "de" then
+          fail("two connected clients must have actual en/de locales: " .. player.name .. "=" .. tostring(record.locale))
+        end
         if record.locale ~= nil then
-          if by_locale[record.locale] ~= nil then fail("client locales are not distinct") end
+          if by_locale[record.locale] ~= nil then
+            if game.tick - record.join_tick <= 180 then return nil end
+            fail("client locales are not distinct: " .. player.name .. "=" .. record.locale)
+          end
           by_locale[record.locale] = player
         end
       end
@@ -220,7 +232,7 @@ local function pair(state, expected_joins)
   end
   if connected < 2 then return nil end
   if connected ~= 2 or by_locale.en == nil or by_locale.de == nil then
-    fail("two connected clients must have actual en/de locale events")
+    fail("two connected clients must have actual en/de locales")
   end
   if by_locale.en.index == by_locale.de.index or by_locale.en.force.index ~= state.force_index
       or by_locale.de.force.index ~= state.force_index then
@@ -313,8 +325,11 @@ script.on_event(defines.events.on_player_joined_game, function(event)
     state.clients[player.index] = record
   end
   record.joins = record.joins + 1
+  record.join_tick = game.tick
+  record.locale = player.locale
   state.join_events = state.join_events + 1
   log("[MIR5_LIBRARY_MULTIPLAYER_JOIN] " .. player.name .. " " .. tostring(record.joins))
+  log("[MIR5_LIBRARY_MULTIPLAYER_LOCALE] " .. player.name .. " " .. tostring(record.locale))
 end)
 
 script.on_event(defines.events.on_player_locale_changed, function(event)

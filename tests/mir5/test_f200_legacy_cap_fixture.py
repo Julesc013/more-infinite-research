@@ -100,7 +100,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             function lab.get_inventory(index)assert(index==1);return input end
             local function tech(name, force)
               return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-                prototype={max_level=4294967295},prerequisites={},research_unit_count=1,research_unit_energy=60,
+                prototype={max_level=4294967295,visible_when_disabled=false},prerequisites={},research_unit_count=1,research_unit_energy=60,
                 research_unit_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1}}}
             end
             local function force(name,index)
@@ -153,6 +153,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               return invoke(control,"finished",{research=player.technologies[GEAR]})
             end
             local source,message=load_control(source_path,"4.7.20002","0.1.0",startup(2));if not source then return {ok=false,message=message}end
+            -- The independently observed published on_init owns visibility
+            -- before the dependent fixture's init, even below the cap.
+            player.technologies[GEAR].visible_when_disabled=true
             local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result}end
             ok,result=complete_player(source,2,.01);if not ok then return {ok=false,message=result}end
             ok,result=tick(source);if not ok then return {ok=false,message=result}end

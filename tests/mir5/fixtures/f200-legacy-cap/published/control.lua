@@ -124,7 +124,7 @@ end
 
 local function assert_source_start(state)
   local player = status(game.forces.player)
-  assert_status(player, {level = 1, researched = false, enabled = true, visible = false,
+  assert_status(player, {level = 1, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = 0, saved_progress = 0}, "published pre-lab player")
   if state.actual_lab_completions ~= 0 then fail("source started with completed labs") end
 end
@@ -184,10 +184,12 @@ script.on_init(function()
   player.enable_all_prototypes()
   local gear = technology(player, GEAR)
   assert_acceleration(gear)
-  -- Observe the native initial presentation.  This fixture never writes either
-  -- player gear presentation property; the published controller earns both.
+  -- The published controller already owns visibility at on_init whenever a
+  -- positive cap is selected. The immutable prototype still supplies false;
+  -- this fixture never writes either player gear presentation property.
+  if gear.prototype.visible_when_disabled ~= false then fail("published native prototype visibility changed") end
   local before = status(player)
-  assert_status(before, {level = 1, researched = false, enabled = true, visible = false,
+  assert_status(before, {level = 1, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = 0, saved_progress = 0}, "published initial player")
   prerequisites(gear)
 

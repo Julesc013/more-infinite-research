@@ -33,6 +33,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_legacy_caps.py';lua=$true},
   [ordered]@{path='tests/mir5/test_legacy_caps_lifecycle.py';lua=$true},
   [ordered]@{path='tests/mir5/test_f200_legacy_cap_fixture.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_f200_legacy_worker_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_k2_imersite_migration.py';lua=$true},
   [ordered]@{path='tests/mir5/test_api.py';lua=$true},
   [ordered]@{path='tests/mir5/test_runtime_api.py';lua=$true},
