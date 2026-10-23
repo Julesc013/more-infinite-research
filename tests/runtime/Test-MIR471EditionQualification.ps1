@@ -12,6 +12,7 @@ param(
   [Parameter(Mandatory)][string]$LibraryDirectory,
   [Parameter(Mandatory)][string]$FactorioBin,
   [string]$OutputRoot='build/tmp/mir471-editions',
+  [string]$ResumeSourceRun='',
   [switch]$CandidateOnly
 )
 $ErrorActionPreference='Stop'
@@ -25,7 +26,8 @@ $engineData=Join-Path (Split-Path (Split-Path (Split-Path $FactorioBin))) 'data'
 $engineInfo=Get-Content (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json
 $engineHash=(Get-FileHash -LiteralPath $FactorioBin).Hash
 foreach($pair in @(@($CandidateZip,$CandidateSha256),@($PublishedZip,$PublishedSha256))){if((Get-FileHash -LiteralPath $pair[0]).Hash-cne$pair[1]){throw 'Exact package bytes differ'}}
-$resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB 1400 -MaxNewOutputMiB 100
+$nativePeakMiB=if([version]$line-lt[version]'2.0'){768}else{1400}
+$resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $nativePeakMiB -MaxNewOutputMiB 100
 $root=$resources.root;[IO.Directory]::CreateDirectory($root)|Out-Null
 $userdata=Join-Path $root 'u';[IO.Directory]::CreateDirectory((Join-Path $userdata 'saves'))|Out-Null
 $config=Join-Path $root 'config.ini'
@@ -36,13 +38,10 @@ $fixtureName='mir-fixture-471-edition-parity'
 $fixtures=@{}
 foreach($role in @('source','candidate')){
   $directory=Join-Path $root ('fixture-'+$role);[IO.Directory]::CreateDirectory($directory)|Out-Null
-  $version=if($role-ceq'source'){'0.1.0'}else{'0.1.1'}
-  @{name=$fixtureName;version=$version;title='MIR 4.7.1 focused edition acceptance';author='MIR maintainers';factorio_version=$line;dependencies=@("base >= $($engineInfo.version)","more-infinite-research >= $from")}|ConvertTo-Json -Depth 5|Set-Content (Join-Path $directory 'info.json')
+  $version=if($role-ceq'source'){'0.3.0'}else{'0.3.1'}
+  [ordered]@{name=$fixtureName;version=$version;title='MIR 4.7.1 focused edition acceptance';author='MIR maintainers';factorio_version=$line;dependencies=@("base >= $($engineInfo.version)","more-infinite-research >= $from")}|ConvertTo-Json -Depth 5|Set-Content (Join-Path $directory 'info.json')
   $observer=Get-Content (Join-Path $RepoRoot 'fixtures/assert-mir471-edition-parity/data-final-fixes.lua') -Raw
-  if($role-ceq'candidate'){
-    $ownership=Get-Content (Join-Path $RepoRoot 'tests/compiler/startup_ownership.lua') -Raw
-    $observer+="`nlocal saved_raw = data.raw`nlocal function ownership_controls()`n"+$ownership+"`nend`nlocal assertions = ownership_controls()`ndata.raw = saved_raw`nassert(assertions == 7)`nlog('[MIR471_OWNERSHIP] assertions=7')`n"
-  }
+  Copy-Item -LiteralPath (Join-Path $RepoRoot 'source/prototypes/mir/core/fingerprint.lua') -Destination (Join-Path $directory 'mir471_fingerprint.lua')
   [IO.File]::WriteAllText((Join-Path $directory 'data-final-fixes.lua'),$observer,[Text.UTF8Encoding]::new($false))
   if($Target-ceq'f200'){
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-20000-to-4-1-20000/settings.lua') -Destination (Join-Path $directory 'settings.lua')
@@ -108,23 +107,33 @@ function Run([string]$Phase,[string[]]$EngineArguments,[string]$Save=''){
   if($rows.Count-ne3){throw 'Native prototype projection did not execute'}
   $projection=($rows|ForEach-Object {$_.Groups[1].Value+'='+$_.Groups[2].Value})-join'|'
   $script:projections[$Phase]=$projection
-  if($Phase-cne'source'-and-not$text.Contains('[MIR471_OWNERSHIP] assertions=7')){throw 'Native ownership controls did not execute'}
   if($Phase-cne'source'-and-not$CandidateOnly-and$projection-cne$script:projections['source']){throw 'Default technology, recipe or lab projection changed'}
   foreach($stage in @('source','upgrade','reload')){$snapshot=Join-Path $userdata ('script-output/mir-upgrade-full-state-'+$stage+'.json');if(Test-Path $snapshot){Copy-Item $snapshot (Join-Path $root ($Phase+'-'+$stage+'-state.json'))}}
 }
 try{
   if($CandidateOnly){Activate 'candidate';Run 'candidate' @('--create',(Join-Path $root 'candidate.zip'))}
   else{
-    Activate 'source';$source=Join-Path $root 'source.zip';Run 'source' @('--create',$source)
-    $null=Complete-MIRLibraryActivation -Activation $script:activation
+    if($ResumeSourceRun){
+      $prior=Resolve-MIR441RecoveryScratchPath -Path $ResumeSourceRun
+      if((Get-FileHash (Join-Path $prior 'fixture-source/control.lua')).Hash-cne(Get-FileHash (Join-Path $fixtures.source.directory 'control.lua')).Hash){throw 'Resume fixture differs'}
+      $text=Get-Content (Join-Path $prior 'source.log') -Raw
+      if(-not$text.Contains($from+' upgrade source proof complete')){throw 'Resume source proof is absent'}
+      $rows=[regex]::Matches($text,'\[MIR471_PROJECTION\] ([a-z]+)=([^\r\n]+)');if($rows.Count-ne3){throw 'Resume source projection is absent'}
+      $projections['source']=($rows|ForEach-Object {$_.Groups[1].Value+'='+$_.Groups[2].Value})-join'|'
+      $source=Join-Path $prior 'source.zip';Copy-Item (Join-Path $prior 'source.log') (Join-Path $root 'source.log')
+      foreach($snapshot in Get-ChildItem $prior -Filter 'source-*-state.json' -File){Copy-Item $snapshot.FullName (Join-Path $root $snapshot.Name)}
+    }else{
+      Activate 'source';$source=Join-Path $root 'source.zip';Run 'source' @('--create',$source)
+      $null=Complete-MIRLibraryActivation -Activation $script:activation
+    }
     Activate 'candidate'
     $saveName=if($Target-ceq'f200'){'mir-'+$to.Replace('.','')+'-upgraded.zip'}else{'mir471-upgraded.zip'}
     $upgraded=Join-Path $userdata ('saves/'+$saveName)
-    $serverArgs=if($Target-ceq'f013'){@('--no-auto-pause')}else{@('--server-settings',$server)}
+    [string[]]$serverArgs=if($Target-ceq'f013'){@('--no-auto-pause')}else{@('--server-settings',$server)}
     Run 'upgrade' ($serverArgs+@('--start-server',$source)) $upgraded
     foreach($reload in 1..2){Run ('reload-'+$reload) ($serverArgs+@('--start-server',$upgraded)) $upgraded}
   }
   $terminal=Complete-MIRLibraryActivation -Activation $script:activation
-  Write-MIRNativeProbeResult -Context $resources -Record @{status='passed';target=$Target;candidate_sha256=$CandidateSha256;published_sha256=$PublishedSha256;engine_version=$engineInfo.version;engine_sha256=$engineHash;source_commit=(&git -C $RepoRoot rev-parse HEAD).Trim();projections=$projections;native_ownership_assertions=7;two_cold_reloads=(-not$CandidateOnly);library_restored=$terminal;runs=@($resources.runs)}
-  Write-Host "[ok] $Target native parity, ownership and continuity: $root"
+  Write-MIRNativeProbeResult -Context $resources -Record @{status='passed';target=$Target;candidate_sha256=$CandidateSha256;published_sha256=$PublishedSha256;engine_version=$engineInfo.version;engine_sha256=$engineHash;source_commit=(&git -C $RepoRoot rev-parse HEAD).Trim();projections=$projections;ownership_control_scope='separate actual-packaged-adapter Lua host evidence';two_cold_reloads=(-not$CandidateOnly);library_restored=$terminal;runs=@($resources.runs)}
+  Write-Host "[ok] $Target native parity and continuity: $root"
 }finally{if($null-ne$script:activation-and-not$script:activation.closed){$null=Complete-MIRLibraryActivation -Activation $script:activation}}
