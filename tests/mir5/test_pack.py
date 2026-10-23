@@ -113,6 +113,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/k2_base.lua",
                 "compatibility/modern_catalogue/bob_angel.lua",
                 "compatibility/bob_angel_profile.lua",
+                "compatibility/atan_profile.lua",
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/k2so.lua",
             },

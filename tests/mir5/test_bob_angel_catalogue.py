@@ -90,7 +90,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         for kind, rows in self.inputs["raw"].items():
             for name, row in rows.items():
                 self.assertTrue(catalogue._same(row, actual[kind][name]), f"foreign {kind}/{name} changed")
-        self.assertEqual(lua.globals().publications, 2)  # private metadata, one complete technology publication
+        self.assertEqual(lua.globals().publications, 2)  # shortcut, one complete technology publication
         declared = _plain(lua.execute('return require("research.catalogue").declared()'))
         self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
 

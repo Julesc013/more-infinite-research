@@ -1,0 +1,47 @@
+{
+  "candidate_run": {
+    "custody": "build/mir5/black-glass/incoming/39982388297/black-glass-bob-angel-candidate-39982388297-1",
+    "id": 39982388297,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39982388297"
+  },
+  "claims": {
+    "actual_effects": false,
+    "complete_data_settings_equality": true,
+    "final_release": false,
+    "historical_save_upgrade": false,
+    "multiplayer": false,
+    "native_prototype_loading": true,
+    "performance": false
+  },
+  "engine": {
+    "base_version": "2.0.77",
+    "factorio_version": "2.0",
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "kind": "MIR5BobAngelF200NativeReferenceChainV1",
+  "limitations": [
+    "Five material tail prototypes deliberately retain unbounded identities; useful caps and configured limits require native historical-save qualification.",
+    "Two Base oil identities remain disabled for continuity after adding this overhaul; Base-to-overhaul native save preservation is pending.",
+    "Exact 13-archive no-BobTech F200 profile only; no BobTech, F210 or arbitrary-overhaul claim."
+  ],
+  "player_sha256": "a88572ede462d33a720872628690ae3279d92474569651b66862618a2f0cc186",
+  "references": {
+    "inventory": "spec/mir5/inventory/bob-angel-f200-472.json",
+    "no_mir_run": 39974658753,
+    "published_472_run": 39975413692,
+    "reviewed_intent": "spec/mir5/inventory/bob-angel-f200-intent-r01.json"
+  },
+  "result": {
+    "foreign_prototypes": "unchanged",
+    "published_technologies": 65,
+    "reviewed_differences": 7,
+    "settings": 875,
+    "technologies": 67,
+    "unexplained_differences": 0
+  },
+  "schema": 1,
+  "source": "3d980ba8aa490e15130ffda1385a3bdf9bfb415d",
+  "status": "complete-data-settings-comparison-passed",
+  "worker_control_source": "cf1a95cd52a1b94cace13a87532172b9456be986"
+}

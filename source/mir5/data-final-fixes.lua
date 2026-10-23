@@ -31,6 +31,12 @@ local modern, modern_selection, native_owner_patches
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods)
+  if mods["atan-air-scrubbing"] or mods["atan-ash"] then
+    local definitions = require("compatibility.atan_productivity").select(mods, data.raw)
+    for _, definition in ipairs(definitions) do
+      modern_selection.definitions[#modern_selection.definitions + 1] = definition
+    end
+  end
   if modern_selection.bob_angel then
     gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
     gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")

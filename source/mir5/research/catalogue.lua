@@ -89,6 +89,14 @@ local function static_rows()
     rows[#rows + 1] = generated_row("recipe-prod-" .. definition.key .. "-1", definition.family,
       definition.order, locale_key(definition.localised_name), first_recipe(definition))
   end
+  if active_mods["atan-air-scrubbing"] or active_mods["atan-ash"] then
+    if require("compatibility.atan_profile").select(active_mods, require("platform.target")) then
+      for _, definition in ipairs(require("research.atan_productivity").runtime_rows) do
+        rows[#rows + 1] = generated_row("recipe-prod-" .. definition.family .. "-1", definition.family,
+          "p[" .. definition.family .. "]", nil, definition.recipe)
+      end
+    end
+  end
   if space_age_active then
     rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
       "p[research_agricultural_growth_speed]", "technology-name.more-infinite-research.research_agricultural_growth_speed")
