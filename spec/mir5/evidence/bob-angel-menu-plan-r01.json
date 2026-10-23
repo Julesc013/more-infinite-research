@@ -21,6 +21,13 @@
   },
   "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
   "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+  "native_preparation": {
+    "run": 40038355586,
+    "artifact": "black-glass-bob-angel-menu-comparison-40038355586-1",
+    "manifest_sha256": "74E88CF317CB5150D99EEA99D232ECA06F6CE8E089DF456C92258C65D8D9F129",
+    "members": 50,
+    "scope": "Fresh control/published/replay native captures and complete replay equality passed. Timing did not start because the menu preflight rejected its empty diagnostics list. Reuse only after every artifact member and every consumed current external input is reverified."
+  },
   "endpoint": "Process start to observed response to a harmless ordinary main-menu action",
   "arms": ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
   "design": {
@@ -40,7 +47,7 @@
     "improvement_rule": "Use paired block differences against the same control, report direct and incremental differences, sample spread and uncertainty. A nonpositive or unresolved baseline increment supports no percentage claim."
   },
   "preconditions": [
-    "Fresh exact-input published/control captures and a native complete data/settings replay equality check precede timings.",
+    "The identified fresh exact-input published/control/replay captures and complete data/settings equality precede timings; reuse their original execution identity after exact external-input verification.",
     "Existing archive library only, no dependency copies or engine updates, exclusive native custody and unchanged resource admission.",
     "No other heavy jobs during timed launches; one shared cache policy and the same ordinary configuration and credential-free engine-created player data for all arms."
   ],

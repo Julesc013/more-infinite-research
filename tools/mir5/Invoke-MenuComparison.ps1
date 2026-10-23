@@ -73,7 +73,7 @@ function Get-MIR5MenuComparisonPolicy {
 }
 
 function Add-MIR5MenuComparisonPolicyRequirements {
-  param([Parameter(Mandatory)][Collections.Generic.List[object]]$Missing,[Parameter(Mandatory)]$Policy)
+  param([Parameter(Mandatory)][AllowEmptyCollection()][Collections.Generic.List[object]]$Missing,[Parameter(Mandatory)]$Policy)
   $requirements = @(
     @('AaAbsoluteToleranceSeconds', [double]$Policy.same_version_aa_pilot.absolute_tolerance_seconds, 'positive-seconds-required'),
     @('AaRelativeTolerancePercent', [double]$Policy.same_version_aa_pilot.relative_tolerance_percent, 'positive-percent-required'),
