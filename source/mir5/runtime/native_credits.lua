@@ -237,7 +237,9 @@ local function disable_exact_carriers(force)
 end
 
 local function reconcile_all()
-  if not game or type(game.forces) ~= "table" then return end
+  -- Factorio exposes this collection as LuaCustomTable userdata, not a plain
+  -- Lua table. Its supported pairs iterator is the force lifecycle boundary.
+  if not game or not game.forces then return end
   -- This iterates only Factorio's force lifecycle collection.  Technology and
   -- prototype access stays direct and descriptor-named in inspect_with_mask.
   for _, force in pairs(game.forces) do reconcile_force(force) end

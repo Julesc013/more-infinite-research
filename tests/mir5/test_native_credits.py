@@ -257,6 +257,28 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           assert(not ok and tostring(message):find("unsupported native credit record", 1, true))
         ''')
 
+    def test_native_force_collection_userdata_is_iterated_at_configuration_boundaries(self):
+        self.lua.globals().native_forces = object()
+        self.lua.execute(r'''
+          local force = make_force(1)
+          local original_pairs = pairs
+          assert(type(native_forces) == "userdata")
+          pairs = function(value)
+            if value == native_forces then return original_pairs({[1]=force}) end
+            return original_pairs(value)
+          end
+          game.forces = native_forces
+          native_credits.on_init()
+          local fish = "fish-breeding"
+          assert(ledger(force, fish).included == true)
+          local descriptor = descriptor_for(fish)
+          force.technologies[descriptor.main_id].level = 2
+          set_included(force, fish, false)
+          native_credits.on_configuration_changed()
+          assert(ledger(force, fish).offset == 1)
+          assert(force.technologies[descriptor.positive_id].level == 2)
+        ''')
+
     def test_on_load_is_read_only_and_source_stays_descriptor_bounded(self):
         self.lua.execute(r'''
           local force = make_force(1)
