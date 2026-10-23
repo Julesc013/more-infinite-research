@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-cryogenic-native",
+  "version": "0.1.0",
+  "title": "MIR 5 private cryogenic native-unit fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable data-stage reproducer for the explicit cryogenic native-unit binding; it does not qualify laboratory gameplay.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "elevated-rails = 2.1.23",
+    "quality = 2.1.23",
+    "recycler = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
