@@ -113,6 +113,7 @@ local function configure_partial(state)
     state.phase = "published-ready"
     return
   end
+  if current_name(force) ~= nil then fail("published completion retained active research") end
   if target.queue_api then
     local probe = technology(force, target.queue_probe)
     unlock_prerequisites(probe)
@@ -243,7 +244,14 @@ script.on_event(defines.events.on_research_finished, function(event)
     state.source_direct_finished = state.source_direct_finished + 1
     if state.source_direct_finished ~= 1 then fail("published direct completed more than once") end
     assert_source_direct(state)
-    configure_partial(state)
+    if target.successor_mode == "lab" then
+      -- The historical queue clears its just-finished entry after the event.
+      -- Do not attempt to replace that entry from inside on_research_finished.
+      freeze_source_lab(state)
+      state.phase = "published-partial-pending"
+    else
+      configure_partial(state)
+    end
   elseif state.phase == "mir5-successor" then
     state.successor_direct_finished = state.successor_direct_finished + 1
     if state.successor_direct_finished ~= 1 then fail("MIR5 successor completed more than once") end
@@ -260,6 +268,12 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = global[KEY]
   if not state then fail("historical transition fixture state is absent") end
+  if target.stage == "published" and state.phase == "published-partial-pending" then
+    if game.tick > state.deadline then fail("published research queue did not settle") end
+    if current_name(game.forces.player) ~= nil then return end
+    configure_partial(state)
+    return
+  end
   if state.phase == "published-direct" or state.phase == "mir5-successor" then
     energize(state.source_lab)
     energize(state.successor_lab)

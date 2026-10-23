@@ -201,11 +201,12 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}
           messages,saves={},{}
           log=function(value)table.insert(messages,value)end
-          function install_target(stage, queue)
-            fixture_target={id=queue and "f017" or "f013",stage=stage,mir_version=stage == "published" and "4.7.01702" or "5.0.01700",
+          function install_target(stage, queue, old_lab)
+            local id=queue and "f017" or (old_lab and "f015" or "f013")
+            fixture_target={id=id,stage=stage,mir_version=stage == "published" and (queue and "4.7.01702" or (old_lab and "4.7.01502" or "4.7.01302")) or (queue and "5.0.01700" or (old_lab and "5.0.01500" or "5.0.01300")),
               direct="recipe-prod-research_character_mining_speed-1",direct_effect=.05,
               direct_science=queue and {"military-science-pack","utility-science-pack"} or {"alien-science-pack"},
-              successor_mode=queue and "lab" or "preservation-only",partial_progress=.42,
+              successor_mode=(queue or old_lab) and "lab" or "preservation-only",partial_progress=(queue or old_lab) and .42 or nil,
               queue_api=queue,queue_probe=queue and "braking-force-1" or nil}
             package.loaded.target=nil;package.loaded["target-literal"]=nil
             package.preload["target-literal"]=function()return fixture_target end
@@ -242,8 +243,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               server_save=function(name)table.insert(saves,name)end}
             return force,direct,braking
           end
-          function execute_transition(queue)
-            callbacks={events={}};install_target("published",queue);local force,direct,braking=mock_world(queue);global={}
+          function execute_transition(queue, old_lab)
+            callbacks={events={}};install_target("published",queue,old_lab);local force,direct,braking=mock_world(queue);global={}
             if queue then
               local readonly,message=pcall(function()force.current_research=direct end)
               assert(not readonly and tostring(message):find("read only",1,true),"modern mock accepted a current_research write")
@@ -252,33 +253,38 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             assert(force.current_research == direct)
             if queue then assert(#force.research_queue == 1 and force.research_queue[1] == direct) end
             force.manual_mining_speed_modifier=fixture_target.direct_effect
-            if queue then direct.level=2 else direct.researched=true;force.current_research=nil end
+            if queue or old_lab then direct.level=2 else direct.researched=true;force.current_research=nil end
             local source=global.mir5_historical_transition.source_lab
             for _,name in ipairs(fixture_target.direct_science) do source.get_inventory().insert{name=name,count=-1} end
             callbacks.events[defines.events.on_research_finished]({research=direct})
-            if queue then
+            if queue or old_lab then
+              assert(global.mir5_historical_transition.phase == "published-partial-pending" and force.current_research == direct)
+              callbacks.events[defines.events.on_tick]()
+              assert(global.mir5_historical_transition.phase == "published-partial-pending")
+              if queue then force.research_queue={} else force.current_research=nil end
+              callbacks.events[defines.events.on_tick]()
               assert(force.current_research == direct and math.abs(force.research_progress-.42)<.000001)
-              assert(#force.research_queue == 2 and force.research_queue[2] == braking)
+              if queue then assert(#force.research_queue == 2 and force.research_queue[2] == braking) end
             else assert(force.current_research == nil and direct.researched) end
             callbacks.events[defines.events.on_tick]()
             assert(saves[#saves] == "mir5-native-complete")
             local before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
-            callbacks={events={}};install_target("mir5",queue);assert(loadfile(control,"t",_ENV))();callbacks.configuration({})
-            if queue then
+            callbacks={events={}};install_target("mir5",queue,old_lab);assert(loadfile(control,"t",_ENV))();callbacks.configuration({})
+            if queue or old_lab then
               assert(global.mir5_historical_transition.phase == "mir5-successor" and force.current_research == direct)
               direct.level=3;force.manual_mining_speed_modifier=2*fixture_target.direct_effect
-              force.research_queue={braking}
+              if queue then force.research_queue={braking} else force.current_research=nil end
               callbacks.events[defines.events.on_research_finished]({research=direct})
-              assert(force.current_research == braking and #force.research_queue == 1)
+              if queue then assert(force.current_research == braking and #force.research_queue == 1) else assert(force.current_research == nil) end
             else assert(global.mir5_historical_transition.phase == "mir5-complete" and direct.researched and force.current_research == nil) end
             callbacks.events[defines.events.on_tick]();assert(saves[#saves] == "mir5-native-complete")
             before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
             return table.concat(messages,"\n")
           end
         ''')
-        for queue in (False, True):
-            with self.subTest(queue_api=queue):
-                witness = self.lua.eval("execute_transition")(queue)
+        for queue, old_lab in ((False, False), (False, True), (True, False)):
+            with self.subTest(queue_api=queue, old_lab=old_lab):
+                witness = self.lua.eval("execute_transition")(queue, old_lab)
                 self.assertIn('"transition_stage":"published"', witness)
                 self.assertIn('"transition_stage":"mir5"', witness)
                 self.assertIn('"stage":"reload"', witness)
