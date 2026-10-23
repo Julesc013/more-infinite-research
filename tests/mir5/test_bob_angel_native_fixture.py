@@ -239,7 +239,8 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                   local e,t=x.technologies[a.e],x.technologies[a.t];e.level,e.researched,e.prototype.max_level=3,true,3;t.level,t.researched,t.prototype.max_level=151,false,4294967295
                   local native_effect=effect==.03 and 0.029999999329447746 or (effect==.01 and 0.009999999776482582 or effect)
                   for _,q in ipairs({e,t})do for _,z in ipairs(q.prototype.effects)do z.change=native_effect end end
-                  if x==player then e.enabled,e.visible_when_disabled=(cap>=3),(cap<3) else e.enabled,e.visible_when_disabled=false,(cap<3) end
+                  -- Exact published native control proves the upstream reset enables both forces.
+                  e.enabled,e.visible_when_disabled=(cap>=3),(cap<3)
                   t.enabled,t.visible_when_disabled=false,true
                 end
                 x.reset_technology_effects()
@@ -255,7 +256,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
             end end
             if #seeded.foreign_pre_external.queue~=#seeded.foreign.queue or seeded.foreign_pre_external.current~=seeded.foreign.current or seeded.foreign_pre_external.progress~=seeded.foreign.progress then return {ok=false,message="source foreign external transition changed queue or progress"}end
             ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
-            shift(.02,150);if opponent=="lost-boundary"then player.technologies[f[1].t].level=150 elseif opponent=="foreign-upgrade-state"then foreign.technologies[f[1].e].enabled=true end
+            shift(.02,150);if opponent=="lost-boundary"then player.technologies[f[1].t].level=150 elseif opponent=="foreign-upgrade-state"then foreign.technologies[f[1].e].enabled=false end
             c,m=load(destination_path,"5.0.20000","0.2.0");if not c then return {ok=false,message=m}end;ok,v=call(c,"changed");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
             shift(.03,2);if opponent=="foreign-queue"then foreign.research_progress=.41 end
             local s3={["mir-settings-profile-import"]={value=""}};for _,a in ipairs(f)do local k=a.e:match("recipe%-prod%-(research_material_.+)%-1");s3["ips-effect-per-level-"..k]={value=3};s3["ips-max-level-"..k]={value=2}end
@@ -475,7 +476,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                         self.assertIn("[mir5-bob-angel-continuity-source]",result["message"])
                         self.assertIn("foreign external pre-write state differs",result["message"])
                     elif opponent == "foreign-upgrade-state":
-                        self.assertIn("actual=early={level=3,researched=true,enabled=true,visible_when_disabled=false,max_level=3}",result["message"])
+                        self.assertIn("actual=early={level=3,researched=true,enabled=false,visible_when_disabled=false,max_level=3}",result["message"])
                         self.assertIn("tail={level=151,researched=false,enabled=false,visible_when_disabled=true,max_level=4294967295}",result["message"])
                         self.assertIn("MIR_private_ownership=unavailable_to_external_fixture",result["message"])
 

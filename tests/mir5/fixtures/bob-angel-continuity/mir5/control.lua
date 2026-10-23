@@ -274,10 +274,14 @@ local function assert_upgrade_transition(state)
   recipe_bonuses(player, 3)
   local foreign = game.forces[state.foreign_index]
   if not foreign or foreign.valid == false then fail("published foreign force is absent") end
+  -- Published reset-control run 39991831062 proves AngelsRefining enables
+  -- every prototype-enabled row before MIR configuration handling. MIR must
+  -- preserve earned effects/queue and cap the tail, not invent a lost right.
   for _, family in ipairs(FAMILIES) do
     local early, tail = assert_current_prototype(foreign, family)
     if early.level ~= 3 or early.researched ~= true or tail.level ~= PRESERVED_TAIL_NEXT_LEVEL or tail.researched ~= false
-        or early.enabled ~= false or tail.enabled ~= false or tail.visible_when_disabled ~= true then
+        or early.enabled ~= true or early.visible_when_disabled ~= false
+        or tail.enabled ~= false or tail.visible_when_disabled ~= true then
       fail("MIR5 changed foreign finite boundary state for " .. family.key .. "; "
         .. foreign_upgrade_diagnostic(foreign, family))
     end
@@ -305,7 +309,9 @@ local function marker(stage, state)
     witness.seeded_boundary_levels=false
     witness.science_consumed=CONSUMPTION
     witness.native_recipe_bonus=0.08
-    witness.foreign_disabled_and_queued_preserved=true
+    witness.foreign_queue_and_effects_preserved=true
+    witness.prior_foreign_disable_erased_by_upstream=true
+    witness.foreign_disable_preservation_qualified=false
   else
     witness.real_lab_completed_levels=0
     witness.seeded_boundary_levels=true
@@ -313,7 +319,9 @@ local function marker(stage, state)
     witness.preserved_infinite_next_level=PRESERVED_TAIL_NEXT_LEVEL
     witness.no_fabricated_150_completion_claim=true
     witness.native_recipe_bonus=3
-    witness.foreign_disabled_and_queued_preserved=true
+    witness.foreign_queue_and_effects_preserved=true
+    witness.prior_foreign_disable_erased_by_upstream=true
+    witness.foreign_disable_preservation_qualified=false
     witness.foreign_external_disable_transition=true
   end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=CASE, stage=stage, status="passed", witnesses=witness}))

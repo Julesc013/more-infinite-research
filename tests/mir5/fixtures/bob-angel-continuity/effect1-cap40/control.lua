@@ -71,7 +71,7 @@ local function check_rows(force, player, label)
         fail(label .. " owned cap visibility differs")
       end
     else
-      if early.enabled ~= false or tail.enabled ~= false
+      if early.enabled ~= true or tail.enabled ~= false
           or early.visible_when_disabled ~= false or tail.visible_when_disabled ~= true then
         fail(label .. " foreign disabled presentation differs")
       end
@@ -103,7 +103,8 @@ local function marker(stage, state)
     case=CASE, stage=stage, status="passed",
     witnesses={effect_percent=1, useful_level_headroom=300, user_cap=40, effective_cap=40,
       saved_finite_tail_level=150, preserved_infinite_next_level=TAIL_NEXT_LEVEL, native_recipe_bonus=BONUS,
-      player_owned_visibility=true, foreign_disabled_effect_and_queue_preserved=true,
+      player_owned_visibility=true, foreign_queue_and_effects_preserved=true, prior_foreign_disable_erased_by_upstream=true,
+      foreign_disable_preservation_qualified=false,
       on_load_read_only=stage == "reload", qualification="native-runner-readback-required"},
   }))
 end

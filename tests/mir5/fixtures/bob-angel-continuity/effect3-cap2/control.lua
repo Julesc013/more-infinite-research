@@ -103,7 +103,8 @@ local function marker(stage, state)
     case=CASE, stage=stage, status="passed",
     witnesses={effect_percent=3, useful_level_headroom=100, user_cap=2, effective_cap=2,
       saved_finite_tail_level=150, preserved_infinite_next_level=TAIL_NEXT_LEVEL, native_recipe_bonus=BONUS,
-      player_owned_visibility=true, foreign_disabled_effect_and_queue_preserved=true,
+      player_owned_visibility=true, foreign_queue_and_effects_preserved=true, prior_foreign_disable_erased_by_upstream=true,
+      foreign_disable_preservation_qualified=false,
       on_load_read_only=stage == "reload", qualification="native-runner-readback-required"},
   }))
 end
