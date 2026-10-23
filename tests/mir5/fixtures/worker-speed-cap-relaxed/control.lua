@@ -60,7 +60,12 @@ local function observe(state)
     fail("unlimited transition changed earned worker speed bonus")
   end
   if not foreign_owner or foreign_owner.enabled or foreign_owner.visible_when_disabled then
-    fail("unlimited transition changed foreign native disablement")
+    fail("unlimited transition changed foreign native disablement: " .. helpers.table_to_json({
+      exists = foreign_owner ~= nil,
+      enabled = foreign_owner and foreign_owner.enabled,
+      visible_when_disabled = foreign_owner and foreign_owner.visible_when_disabled,
+      level = foreign_owner and foreign_owner.level
+    }))
   end
   state.owner = owner.name
   state.owner_enabled = owner.enabled
