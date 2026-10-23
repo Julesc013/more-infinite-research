@@ -262,9 +262,10 @@ local function run_rejoin(state, english, german)
   assert_native(state, english.force)
   screenshot(state, "rejoin", english)
   screenshot(state, "rejoin", german)
-  state.phase = "awaiting-host-restart"
-  game.server_save(RESTART_SAVE)
-  marker("restart-ready", state)
+  -- Screenshots render asynchronously on each client. Saving in this tick
+  -- can replace the GUI with the native save overlay before rendering it.
+  state.phase = "capturing-rejoin"
+  state.capture_after_tick = game.tick + 60
 end
 
 local function run_restart(state, english, german)
@@ -275,9 +276,8 @@ local function run_restart(state, english, german)
   assert_native(state, english.force)
   screenshot(state, "restart", english)
   screenshot(state, "restart", german)
-  state.phase = "completed"
-  marker("completed", state)
-  game.server_save(FINAL_SAVE)
+  state.phase = "capturing-restart"
+  state.capture_after_tick = game.tick + 60
 end
 
 local function closure()
@@ -358,5 +358,15 @@ script.on_event(defines.events.on_tick, function()
   elseif state.phase == "awaiting-host-restart" then
     local english, german = pair(state, 3)
     if english and german then run_restart(state, english, german) end
+  elseif state.phase == "capturing-rejoin" and game.tick >= state.capture_after_tick then
+    state.phase = "awaiting-host-restart"
+    state.capture_after_tick = nil
+    game.server_save(RESTART_SAVE)
+    marker("restart-ready", state)
+  elseif state.phase == "capturing-restart" and game.tick >= state.capture_after_tick then
+    state.phase = "completed"
+    state.capture_after_tick = nil
+    marker("completed", state)
+    game.server_save(FINAL_SAVE)
   end
 end)

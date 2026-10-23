@@ -78,7 +78,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               screenshots[#screenshots+1]={by_player=spec.by_player,player_matches=spec.player==players[spec.by_player],show_gui=spec.show_gui,
                 force_render=spec.force_render,path=spec.path,resolution={spec.resolution[1],spec.resolution[2]}}
             end
-            game.server_save=function(name) saves[#saves+1]=name end
+            local last_screenshot_tick=nil
+            local take_screenshot=game.take_screenshot
+            game.take_screenshot=function(spec) last_screenshot_tick=game.tick;take_screenshot(spec) end
+            game.server_save=function(name)
+              assert(last_screenshot_tick~=nil and game.tick-last_screenshot_tick>=60,"save overlapped pending GUI captures")
+              saves[#saves+1]=name
+            end
             local function element(kind,name)
               return {valid=true,type=kind,name=name}
             end
@@ -162,6 +168,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[2],{player_index=1});if not ok then return {ok=false,message=result} end
             ok,result=call(callbacks.events[2],{player_index=2});if not ok then return {ok=false,message=result} end
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if storage[key].phase~="capturing-rejoin" or #saves~=0 then return {ok=false,message="rejoin capture did not defer the save"} end
+            game.tick=game.tick+59
+            ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if #saves~=0 then return {ok=false,message="rejoin saved before render grace"} end
+            game.tick=game.tick+1
+            ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="awaiting-host-restart" then return {ok=false,message="rejoin phase did not request host restart"} end
             local before_load={phase=storage[key].phase,joins=storage[key].join_events,screenshots=storage[key].screenshot_calls,
               first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
@@ -175,6 +187,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             en.connected,de.connected=true,true
             ok,result=call(callbacks.events[2],{player_index=1});if not ok then return {ok=false,message=result} end
             ok,result=call(callbacks.events[2],{player_index=2});if not ok then return {ok=false,message=result} end
+            ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if storage[key].phase~="capturing-restart" or #saves~=1 then return {ok=false,message="restart capture did not defer the save"} end
+            game.tick=game.tick+60
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements}

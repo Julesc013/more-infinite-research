@@ -132,7 +132,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                game=game,storage=storage,settings=settings_values,helpers={table_to_json=function(row)assert(row.status=="passed");return "{}"end},
+                game=game,storage=storage,settings=settings_values,helpers={table_to_json=function(row)assert(row.status=="passed");assert(row.stage=="initial" or row.stage=="reload");return "{}"end},
                 log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)

@@ -226,7 +226,7 @@ script.on_event(defines.events.on_tick, function()
   if state.phase == "await-successor-observation" then
     state.successor_player = copy_status(assert_completed(state))
     state.phase = "completed"
-    marker("actual3labs", state)
+    marker("initial", state)
     game.server_save(SAVE)
   end
 end)

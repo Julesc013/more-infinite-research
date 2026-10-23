@@ -318,7 +318,7 @@ script.on_event(defines.events.on_tick, function()
     state.milestone = "actual2labs"
     state.phase = "completed"
     state.player_cap = copy_status(assert_published_cap(state))
-    marker("actual2labs", state)
+    marker("initial", state)
     game.server_save(SAVE)
   end
 end)
