@@ -37,6 +37,11 @@ end
 local BASE = require("compatibility.modern_catalogue.base")
 
 local SCIENCE = {
+  science_automation_logistic = {"automation-science-pack", "logistic-science-pack"},
+  science_automation_logistic_chemical = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack"},
+  science_automation_logistic_chemical_agricultural = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "agricultural-science-pack"},
+  science_automation_logistic_military = {"automation-science-pack", "logistic-science-pack", "military-science-pack"},
+  science_military = {"military-science-pack"},
   science_automation_logistic_chemical_production = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
   science_automation_logistic_chemical_production_military = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack"},
   science_utility_military = {"utility-science-pack", "military-science-pack"},
@@ -444,6 +449,26 @@ local function apply_k2_base(definitions)
   return delta
 end
 
+function M.is_bob_angel(active_mods)
+  if type(active_mods) ~= "table" or not active_mods.bobplates or not active_mods.angelssmelting then return false end
+  return require("compatibility.bob_angel_profile").applies(active_mods)
+end
+
+local function apply_bob_angel(definitions)
+  local delta = require("compatibility.modern_catalogue.bob_angel")
+  for _, definition in ipairs(delta.additions) do definitions[#definitions + 1] = copy(definition) end
+  for _, definition in ipairs(definitions) do
+    for field, value in pairs(delta.definition_overrides[definition.key] or {}) do definition[field] = copy(value) end
+    local science = delta.science[definition.science]
+    assert(science, "MIR Bob/Angel has no authored ordinary science for " .. tostring(definition.science))
+    definition.science = science
+    if (science == "science_military" or science == "science_automation_logistic_military")
+      and not delta.native_military_gates[definition.key] then
+      table.insert(definition.prerequisites, 1, "angels-water-treatment")
+    end
+  end
+end
+
 function M.science_names(key)
   local vector = SCIENCE[key]
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -493,9 +518,11 @@ function M.select(active_mods)
     k2so = apply_k2so(definitions)
     profile = "k2so-f210"
   end
+  local bob_angel = M.is_bob_angel(active_mods)
+  if bob_angel then apply_bob_angel(definitions); profile = "bob-angel-f200" end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false}
+    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel}
 end
 
 -- Settings preserve their historical names across target selection. Space Age
@@ -512,6 +539,10 @@ end
 
 function M.continuations(active_mods)
   local rows = copy(CONTINUATIONS)
+  if M.is_bob_angel(active_mods) then
+    local science = require("compatibility.modern_catalogue.bob_angel").science
+    for _, row in ipairs(rows) do row.science = assert(science[row.science]) end
+  end
   local overrides = {}
   if active_space_age(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do

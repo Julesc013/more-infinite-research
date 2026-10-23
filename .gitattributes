@@ -5,6 +5,9 @@ spec/mir5/evidence/*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-
 # Preserve the raw-hash portable extraction, including its authored CRLF.
 tests/mir5/fixtures/historical-direct-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tests/mir5/fixtures/historical-continuation-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+tests/mir5/profiles/bob-angel-f200-2077.json text eol=lf
+tests/mir5/profiles/atan-base-f200-2077.json text eol=lf
+tests/mir5/profiles/atan-space-age-f200-2077.json text eol=lf
 spec/mir5/inventory/*.json text eol=lf
 
 # This fixture is an exact raw-hash copy of the published 4.2.0 manifest.

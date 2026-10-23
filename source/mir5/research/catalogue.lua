@@ -109,6 +109,17 @@ local function static_rows()
         "description.productivity-bonus", definition.routes[1].recipe)
     end
   end
+  if selected.bob_angel then
+    for _, definition in ipairs(require("research.bob_angel_materials")) do
+      for _, stage in ipairs({definition.early, definition.continuation}) do
+        local row = generated_row(stage.id, definition.key, stage.order,
+          "description.productivity-bonus", definition.routes[1].recipe)
+        row.progression = stage.first_level or 1
+        row.productivity_ceiling = definition.productivity_ceiling
+        rows[#rows + 1] = row
+      end
+    end
+  end
   if space_age_active then
     for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do
       rows[#rows + 1] = {id=owner.id, family=owner.family, progression=1, native_order="", setting="ips-enable-" .. owner.family,

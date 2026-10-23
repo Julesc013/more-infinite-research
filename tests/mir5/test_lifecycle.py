@@ -123,6 +123,57 @@ class LifecycleTests(unittest.TestCase):
           end
         ''')
 
+    def test_bob_angel_stages_share_useful_caps_without_losing_earned_levels(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          local active = {
+            base="2.0.77", angelsbioprocessing="2.0.3", angelsbioprocessinggraphics="2.0.0",
+            angelspetrochem="2.0.3", angelspetrochemgraphics="2.0.1",
+            angelsrefining="2.0.4", angelsrefininggraphics="2.0.0",
+            angelssmelting="2.0.5", angelssmeltinggraphics="2.0.0",
+            bobelectronics="2.1.1", boblibrary="2.1.0", bobores="2.1.2",
+            bobplates="2.1.1", bobrevamp="2.1.1",
+          }
+          local family = "research_material_aluminium"
+          local early_id, late_id = "recipe-prod-" .. family .. "-1", "recipe-prod-" .. family .. "-4"
+          for _, scenario in ipairs({{2,0,150}, {3,0,100}, {1,0,300}, {2,2,2}, {2,40,40}}) do
+            local early, late = technology(early_id, 3, true), technology(late_id, 401, true)
+            early.researched, early.prototype.max_level = true, 3
+            local sentinel = technology("foreign-earned", 72, false)
+            local player = force(1, {[early_id]=early, [late_id]=late, [sentinel.name]=sentinel})
+            boot({player}, 0, nil, nil, nil, 0, active, nil, {
+              ["ips-effect-per-level-" .. family]=scenario[1], ["ips-max-level-" .. family]=scenario[2],
+            })
+            local limits = require("runtime.lifecycle").cap_limits(player)
+            assert(limits[early_id] == scenario[3] and limits[late_id] == scenario[3])
+            local declared = require("research.catalogue").declared()
+            local material_count = 0
+            for _, row in ipairs(declared) do
+              if row.productivity_ceiling then
+                material_count = material_count + 1
+                assert(row.productivity_ceiling == 3 and row.ownership_kind == "authored_generated")
+                assert(row.cap_setting == "ips-max-level-" .. row.family)
+              end
+            end
+            assert(material_count == 10)
+            handlers.init()
+            assert(late.level == 401 and not late.researched and not late.enabled)
+            assert(sentinel.level == 72 and not sentinel.enabled)
+            assert(early.researched and early.level == 3)
+            -- A new control stage with a higher useful limit restores only
+            -- MIR's owned disablement, retaining the already earned 400 levels.
+            local state = storage
+            boot({player}, 0, nil, state, nil, 0, active, nil, {
+              ["ips-effect-per-level-" .. family]=0.5,
+            })
+            handlers.configuration({})
+            assert(late.enabled and late.level == 401 and not sentinel.enabled)
+          end
+          assert(package.loaded["compatibility.bob_angel_materials"] == nil)
+          assert(package.loaded["research.generator"] == nil)
+        ''')
+
     def test_unlimited_control_registers_no_cap_handlers_or_storage(self):
         self.lua.execute('''
           boot({}, 0)

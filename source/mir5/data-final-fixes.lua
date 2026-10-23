@@ -31,6 +31,10 @@ local modern, modern_selection, native_owner_patches
 if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods)
+  if modern_selection.bob_angel then
+    gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
+    gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")
+  end
   -- Check every selected narrow patch before any intended technology write.
   modern.preflight_recipe_patches(modern_selection, data.raw)
   native_owner_patches = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
@@ -57,6 +61,11 @@ require("research.product_target_extension").extend(technologies, values, {raw=d
 
 if modern_catalogue.is_k2so(mods) then
   local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
+if modern_selection and modern_selection.bob_angel then
+  local materials = require("compatibility.bob_angel_materials").technologies(values, data.raw, mods)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 

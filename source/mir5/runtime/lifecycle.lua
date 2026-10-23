@@ -63,6 +63,15 @@ for index = 1, #DECLARATIONS do
   local row = {id = declaration.id, family = declaration.family, cap_setting = declaration.cap_setting,
     ownership_kind = declaration.ownership_kind, source = binding.source, operation = binding.operation,
     enabled = values.enabled, limit = values.max_level, declaration = declaration}
+  if declaration.productivity_ceiling ~= nil then
+    local ceiling, percent = declaration.productivity_ceiling, values.effect_percent
+    if type(ceiling) ~= "number" or not (ceiling > 0 and ceiling < math.huge)
+      or type(percent) ~= "number" or not (percent > 0 and percent < math.huge) then
+      error("MIR caps invalid authored productivity ceiling: " .. declaration.id, 2)
+    end
+    local useful = math.ceil(ceiling * 100 / percent)
+    row.limit = row.limit > 0 and math.min(row.limit, useful) or useful
+  end
   ORDERED_DECLARATIONS[#ORDERED_DECLARATIONS + 1] = row
   DECLARATION_BY_ID[row.id] = row
   if row.enabled and row.limit > 0 then CAPS_ACTIVE = true end

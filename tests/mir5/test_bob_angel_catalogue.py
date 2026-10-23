@@ -1,0 +1,120 @@
+"""Complete Bob/Angel default publication against independent native references."""
+import argparse
+from copy import deepcopy
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools/mir5"))
+import recover_modern_catalogue as catalogue
+from test_k2_base_catalogue import _lua_value, _plain
+
+
+def sha256(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+
+
+class BobAngelCatalogueTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.inputs = json.loads((ROOT / "tests/mir5/fixtures/bob-angel-f200-catalogue-inputs.json").read_text())
+        for name in ("published_oracle", "reviewed_intent"):
+            record = cls.inputs[name]
+            if sha256(ROOT / record["path"]) != record["sha256"]:
+                raise AssertionError(f"independent Bob/Angel {name} changed")
+        source = cls.inputs["source"]
+        if (ROOT / source["path"]).is_file():
+            if sha256(ROOT / source["path"]) != source["sha256"]:
+                raise AssertionError("local native Bob/Angel input changed")
+            native = json.loads((ROOT / source["path"]).read_text())
+            # Every portable field is an actual native field. The subset is
+            # developer custody, never the player catalogue or test output.
+            for kind, rows in cls.inputs["raw"].items():
+                for name, fields in rows.items():
+                    for field, value in fields.items():
+                        if native.get(kind, {}).get(name, {}).get(field) != value:
+                            raise AssertionError(f"native input drifted: {kind}/{name}/{field}")
+        profile = catalogue._inventory_profile(json.loads(
+            (ROOT / cls.inputs["published_oracle"]["path"]).read_text()), "bob-angel-f200")
+        cls.expected_data = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "data"), "data")
+        cls.expected_settings = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "settings"), "settings")
+        reviewed = catalogue._reviewed_differences(ROOT / cls.inputs["reviewed_intent"]["path"], "bob-angel-f200")
+        if len(reviewed) != 7:
+            raise AssertionError("Bob/Angel intent requires exactly five nontruncating tails and two retained Base identities")
+        catalogue._apply_reviewed(cls.expected_data, reviewed, "data")
+        cls.mods = {row["name"]: row["version"] for row in json.loads(
+            (ROOT / "tests/mir5/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
+
+    def stage(self):
+        lua = LuaRuntime(unpack_returned_tuples=True)
+        lua.globals().player_root = (ROOT / "source/mir5").as_posix()
+        lua.globals().mods = _lua_value(lua, self.mods)
+        lua.globals().captured_raw = _lua_value(lua, deepcopy(self.inputs["raw"]))
+        lua.execute(r'''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"; package.cpath = ""
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+          target.distribution_version, target.cargo_research = "5.0.20000", false
+          target.recipe_probability, target.receiver_limits, target.productivity_ignores_stats = "probability", false, true
+          settings = {startup={}}; helpers={}; log=function()end
+          emitted={}; publications=0; data={raw=captured_raw}
+          function data:extend(rows)
+            publications=publications+1
+            for _,row in ipairs(rows)do
+              self.raw[row.type]=self.raw[row.type] or {}
+              assert(self.raw[row.type][row.name]==nil,"duplicate "..row.name)
+              self.raw[row.type][row.name]=row
+              emitted[row.type]=emitted[row.type] or {};emitted[row.type][row.name]=row
+            end
+          end
+          assert(loadfile(player_root.."/data.lua"))()
+          assert(loadfile(player_root.."/data-final-fixes.lua"))()
+        ''')
+        return lua
+
+    def test_complete_native_definitions_and_foreign_inputs(self):
+        lua = self.stage()
+        emitted = _plain(lua.globals().emitted)
+        expected = deepcopy(self.expected_data)
+        self.assertEqual(len(expected["technology"]), 67)
+        self.assertEqual(set(emitted["technology"]), set(expected["technology"]))
+        for name, row in expected["technology"].items():
+            found = emitted["technology"][name]
+            self.assertTrue(catalogue._same(row, found), f"{name}: {catalogue._changed_paths(row, found)}")
+        # Neither the ordinary adapter nor material emission may mutate the
+        # source recipe/technology/item/lab tables used for this construction.
+        actual = _plain(lua.globals().data.raw)
+        for kind, rows in self.inputs["raw"].items():
+            for name, row in rows.items():
+                self.assertTrue(catalogue._same(row, actual[kind][name]), f"foreign {kind}/{name} changed")
+        self.assertEqual(lua.globals().publications, 2)  # private metadata, one complete technology publication
+        declared = _plain(lua.execute('return require("research.catalogue").declared()'))
+        self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
+
+    def test_all_875_settings_preserve_published_fields(self):
+        lua = self.stage()
+        rows = _plain(lua.execute('return require("research.settings").prototypes()'))
+        actual = {}
+        for row in rows:
+            actual.setdefault(row["type"], {})[row["name"]] = row
+        expected = self.expected_settings
+        self.assertEqual(sum(len(rows) for rows in expected.values()), 875)
+        self.assertEqual(set(actual), set(expected))
+        for kind, rows in expected.items():
+            self.assertEqual(set(actual[kind]), set(rows))
+            for name, row in rows.items():
+                self.assertTrue(catalogue._same(row, actual[kind][name]),
+                                f"{kind}/{name}: {catalogue._changed_paths(row, actual[kind][name])}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    args = parser.parse_args()
+    sys.path.insert(0, str(args.lua_runtime_dir.resolve(strict=True)))
+    from lupa.lua52 import LuaRuntime
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(BobAngelCatalogueTests))
+    sys.exit(0 if result.wasSuccessful() else 1)
