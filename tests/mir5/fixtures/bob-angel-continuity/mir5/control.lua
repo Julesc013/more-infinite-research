@@ -84,7 +84,9 @@ end
 local function assert_fixture_acceleration(force)
   for _, family in ipairs(FAMILIES) do
     for _, value in ipairs({assert_current_prototype(force, family)}) do
-      if value.research_unit_count ~= 1 or not close(value.prototype.research_unit_energy, 1) then
+      -- Factorio exposes native research energy in ticks: one authored second
+      -- is 60 here, as independently witnessed by the K2 F200 lab fixture.
+      if value.research_unit_count ~= 1 or value.research_unit_energy ~= 60 then
         fail("fixture did not produce one-unit, one-second research for " .. value.name)
       end
     end

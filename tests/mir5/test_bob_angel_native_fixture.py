@@ -115,7 +115,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                 for _,stage in ipairs({{family.early,1,3},{family.tail,4,4294967295}}) do
                   local effects={};for i,recipe in ipairs(family.recipes) do effects[i]={type="change-recipe-productivity",recipe=recipe,change=runtime_effect} end
                   force.technologies[stage[1]]={name=stage[1],level=stage[2],researched=false,enabled=true,visible_when_disabled=false,force=force,
-                    research_unit_count=1,prototype={max_level=stage[3],effects=effects,research_unit_energy=1},
+                    research_unit_count=1,research_unit_energy=60,prototype={max_level=stage[3],effects=effects,research_unit_energy=60},
                     prerequisites={{name="external-a",research_recursive=function()end},{name="external-b",research_recursive=function()end}}}
                 end
               end
