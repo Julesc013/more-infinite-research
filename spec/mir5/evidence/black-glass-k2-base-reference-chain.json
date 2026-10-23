@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR5BlackGlassK2BaseReferenceChainV1",
-  "status": "published-references-failed-corrected-mir5-complete-intended-output-equal",
+  "status": "mir5-complete-intended-output-and-seven-native-lab-completions-two-reloads-passed",
   "host": "BLACKGLASS-WIN1",
   "control_source": "3945b662481fdb66bec3210e48de21e52f6139cf",
   "tested_source": "b26d45025c8e012951169724ecdf56ae632644e7",
@@ -137,6 +137,81 @@
           "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
         }
       }
+    },
+    {
+      "run_id": "39974903162",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39974903162",
+      "tested_source": "98f139f62db7dd1b143b37723f587141ce4060d0",
+      "control_source": "2f5ac6b67a10c91d48a7fd6209cbff5c151d9ad1",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-precision-adverse.json",
+          "bytes": 8145,
+          "sha256": "C34E16EE582F660319C65AA479BD0582E363DD4AA4FDBC1659A9CB105A3AE27C"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39974903162/black-glass-k2-gameplay-39974903162-1/artifact-manifest.json",
+          "bytes": 3459,
+          "sha256": "4FEEA79269FFCECCD90902F7555B0B51DD5E14BA5E36472D1E064DC2CFE25E1D"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39974903162/black-glass-k2-gameplay-39974903162-1",
+        "compressed_native_stdout": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-precision-adverse.log.gz",
+          "bytes": 2123,
+          "sha256": "7BA86BF43A6629AFA20BFBA568BBDEADB0E1464FE9A6EC476358E1B209B4F66D"
+        }
+      }
+    },
+    {
+      "run_id": "39975776031",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39975776031",
+      "tested_source": "bdde9419f662977b0f3fee51bdbe47dad0fa40ad",
+      "control_source": "c94ebab9e6f11b7f13caf0686991abb63b8a053a",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-queue-api-adverse.json",
+          "bytes": 8145,
+          "sha256": "21F776ED3ADB922C3E9067AE03C8C91E5DD1F6BA61364C4269B89D169CAF8BCE"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39975776031/black-glass-k2-gameplay-39975776031-1/artifact-manifest.json",
+          "bytes": 3459,
+          "sha256": "99851B011B2D25AB161E3AAC165F05062DD1506FAD214B88A0DADFFAA9774A7F"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39975776031/black-glass-k2-gameplay-39975776031-1",
+        "compressed_native_stdout": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-queue-api-adverse.log.gz",
+          "bytes": 2069,
+          "sha256": "2DC14B4A5988A2CD4DB127B0BF9B6E593DA8E7C70DDDA26CAC7E8BC20CB82788"
+        }
+      }
+    },
+    {
+      "run_id": "39976300516",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39976300516",
+      "tested_source": "d72a54b1df4810b158c3fe070ba55972c4acf542",
+      "control_source": "c94ebab9e6f11b7f13caf0686991abb63b8a053a",
+      "status": "passed-private-native-fixture",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-gameplay-native.json",
+          "bytes": 48836,
+          "sha256": "751BEF47E40B5A3D92C16F8F9129896CA99BE6D4734C4BE3294441F0AEE518D6"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1/artifact-manifest.json",
+          "bytes": 6063,
+          "sha256": "0D5B308024EA07A83523D981FA7E9DF324AF98D45BFBB8E65E08637A0F2E1199"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1",
+        "fixture_source_members": {
+          "path": "build/mir5/black-glass/incoming/39976300516/black-glass-k2-gameplay-39976300516-1/gameplay-fixture-members.json",
+          "bytes": 1895,
+          "sha256": "AD0C7A95EDB14BCFC39DFCECA1515C5E839F3D9884B22B728EE6D52102498DDE"
+        }
+      }
     }
   ],
   "failure_class": "SCI-UNLOCK-01; published MIR4 approved automation science binding unresolved",
@@ -148,16 +223,18 @@
     "migration": false,
     "performance": false,
     "release_qualification": false,
-    "mir5_complete_intended_native_data_settings": true
+    "mir5_complete_intended_native_data_settings": true,
+    "native_lab_effects_and_two_cold_reloads": true
   },
   "limits": [
-    "Native data-stage only; no native output dump exists for the failed published arm",
+    "Reference/prototype arms are data-stage only; no native output dump exists for the failed published arms",
     "All original artifact member hashes verified after private download; source receipts unchanged",
     "Published4.7 F200 archive hash7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
     "Original failed arm remains adverse evidence; no expectations recovered from a failed capture",
     "Black Glass has F210 2.1.14 standalone and 2.1.17 Steam; neither qualifies the required 2.1.23 target",
-    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. Corrected-package comparison remains pending.",
-    "Corrected db0504 candidate matches the independently frozen complete data/settings output; this does not qualify physical effects, gameplay, saves, multiplayer, performance or release."
+    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. The corrected comparison is recorded separately.",
+    "Corrected db0504 candidate matches the independently frozen complete data/settings output; this does not qualify physical effects, gameplay, saves, multiplayer, performance or release.",
+    "Seven actual lab completions verify native force and three gear recipe bonuses with two cold reloads; no physical crafting, predecessor upgrade, multiplayer or final-candidate release claim. Numeric gear effect native readback is 0.10000000149011612; exact raw defaults remain 0.1."
   ],
   "frozen_corrected_expectation": {
     "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected-r02.json",
