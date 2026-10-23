@@ -211,6 +211,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                   for _,z in ipairs(e.prototype.effects)do x.recipes[z.recipe].productivity_bonus=x.recipes[z.recipe].productivity_bonus+ec*z.change end
                   for _,z in ipairs(t.prototype.effects)do x.recipes[z.recipe].productivity_bonus=x.recipes[z.recipe].productivity_bonus+tc*z.change end
                 end
+                if opponent=="prewrite-disabled" and x.index==2 then x.technologies[f[1].e].enabled=false end
               end
               return x
             end
@@ -243,8 +244,16 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
               end
             end
             local c,m=load(source_path,"4.7.20002","0.1.0");if not c then return {ok=false,message=m}end
-            local ok,v=call(c,"init");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
-            shift(.02,150);if opponent=="lost-boundary"then player.technologies[f[1].t].level=150 end
+            local ok,v=call(c,"init");if not ok then return {ok=false,message=v}end
+            local seeded=storage.mir5_bob_angel_continuity
+            if type(seeded.foreign_pre_external)~="table" or type(seeded.foreign)~="table" then return {ok=false,message="source did not save foreign external transition"}end
+            for _,a in ipairs(f)do for _,n in ipairs({a.e,a.t})do
+              local before,after=seeded.foreign_pre_external.technologies[n],seeded.foreign.technologies[n]
+              if not before or not after or before.enabled~=true or before.visible_when_disabled~=false or after.enabled~=false or after.visible_when_disabled~=false then return {ok=false,message="source foreign external transition differs for "..n}end
+            end end
+            if #seeded.foreign_pre_external.queue~=#seeded.foreign.queue or seeded.foreign_pre_external.current~=seeded.foreign.current or seeded.foreign_pre_external.progress~=seeded.foreign.progress then return {ok=false,message="source foreign external transition changed queue or progress"}end
+            ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
+            shift(.02,150);if opponent=="lost-boundary"then player.technologies[f[1].t].level=150 elseif opponent=="foreign-upgrade-state"then foreign.technologies[f[1].e].enabled=true end
             c,m=load(destination_path,"5.0.20000","0.2.0");if not c then return {ok=false,message=m}end;ok,v=call(c,"changed");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
             shift(.03,2);if opponent=="foreign-queue"then foreign.research_progress=.41 end
             local s3={["mir-settings-profile-import"]={value=""}};for _,a in ipairs(f)do local k=a.e:match("recipe%-prod%-(research_material_.+)%-1");s3["ips-effect-per-level-"..k]={value=3};s3["ips-max-level-"..k]={value=2}end
@@ -313,7 +322,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
 
 
     def test_published_boundary_upgrade_and_saved_cap_transitions_execute(self):
-        for opponent in (None, "lost-boundary", "foreign-queue"):
+        for opponent in (None, "lost-boundary", "foreign-queue", "prewrite-disabled", "foreign-upgrade-state"):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent=opponent
                 result=self.lua.eval("run_ba_transition(published_control_path,mir5_control_path,effect3_control_path,effect1_control_path,opponent)")
@@ -326,6 +335,13 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                 else:
                     self.assertFalse(result["ok"])
                     self.assertIn("[mir5-bob-angel-continuity",result["message"])
+                    if opponent == "prewrite-disabled":
+                        self.assertIn("[mir5-bob-angel-continuity-source]",result["message"])
+                        self.assertIn("foreign external pre-write state differs",result["message"])
+                    elif opponent == "foreign-upgrade-state":
+                        self.assertIn("actual=early={level=3,researched=true,enabled=true,visible_when_disabled=false,max_level=3}",result["message"])
+                        self.assertIn("tail={level=151,researched=false,enabled=false,visible_when_disabled=true,max_level=4294967295}",result["message"])
+                        self.assertIn("ownership={recipe-prod-research_material_aluminium-1=none;recipe-prod-research_material_aluminium-4=none}",result["message"])
 
     def test_relaxed_setting_values_and_saved_boundary_markers_are_explicit(self):
         for directory,effect,cap,useful in (("effect3-cap2",3,2,100),("effect1-cap40",1,40,300)):
@@ -349,8 +365,13 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
         mir5=(FIXTURE/"mir5/control.lua").read_text(encoding="utf-8")
         self.assertIn("historical_lab_completed_levels=0",source)
         self.assertIn("no_fabricated_150_completion_claim=true",source)
+        self.assertIn("assert_external_prewrite",source)
+        self.assertIn("assert_external_disable_transition",source)
+        self.assertIn("foreign_pre_external",source)
         self.assertIn("PRESERVED_TAIL_NEXT_LEVEL = 151",mir5)
         self.assertIn("real_lab_completed_levels=state.completed",mir5)
+        self.assertIn("foreign_upgrade_diagnostic",mir5)
+        self.assertIn("ownership_diagnostic",mir5)
         for path in FIXTURE.rglob("*.lua"):
             self.lua.globals().lua_path=path.as_posix()
             self.lua.execute("local chunk,message=loadfile(lua_path);assert(chunk,message)")

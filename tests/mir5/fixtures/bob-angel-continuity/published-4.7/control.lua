@@ -110,6 +110,47 @@ local function assert_snapshot(force, expected, bonus, foreign)
   end
 end
 
+-- The source controller must have finished every callback-triggering native
+-- operation before this fixture writes the foreign disable.  Recording both
+-- sides makes the saved false state an observed external transition, rather
+-- than an indistinguishable repeat of a pre-existing cap write.
+local function assert_external_prewrite(force)
+  local snapshot = force_snapshot(force, TOTAL_BONUS)
+  for _, family in ipairs(FAMILIES) do
+    for _, name in ipairs({family.early, family.tail}) do
+      local value = snapshot.technologies[name]
+      if not value or value.enabled ~= true or value.visible_when_disabled ~= false then
+        fail("foreign external pre-write state differs for " .. name)
+      end
+    end
+  end
+  return snapshot
+end
+
+local function assert_external_disable_transition(before, after)
+  for name, saved in pairs(before.technologies) do
+    local current = after.technologies[name]
+    if not current or saved.level ~= current.level or saved.researched ~= current.researched
+        or saved.max_level ~= current.max_level or saved.enabled ~= true
+        or saved.visible_when_disabled ~= false or current.enabled ~= false
+        or current.visible_when_disabled ~= false then
+      fail("foreign external disable transition differs for " .. name)
+    end
+  end
+  for name, value in pairs(before.bonuses) do
+    if not close(after.bonuses[name], value) then
+      fail("foreign external disable changed recipe effect for " .. name)
+    end
+  end
+  if #after.queue ~= #before.queue or after.current ~= before.current
+      or not close(after.progress, before.progress) then
+    fail("foreign external disable changed queue or progress")
+  end
+  for index, name in ipairs(before.queue) do
+    if after.queue[index] ~= name then fail("foreign external disable changed queue identity") end
+  end
+end
+
 local function marker(stage, state)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     case=CASE, stage=stage, status="passed",
@@ -118,6 +159,7 @@ local function marker(stage, state)
       seeded_boundary_levels=true, historical_lab_completed_levels=0,
       no_fabricated_150_completion_claim=true, native_recipe_bonus=TOTAL_BONUS,
       foreign_disabled=true, foreign_queue=state.foreign.current, foreign_progress=state.foreign.progress,
+      foreign_external_disable_transition=true, foreign_prewrite_enabled=true,
       on_load_read_only=stage == "reload", qualification="native-runner-readback-required",
     },
   }))
@@ -139,23 +181,25 @@ script.on_init(function()
   local foreign = game.create_force("mir5-bob-angel-continuity-foreign")
   foreign.enable_all_prototypes()
   seed_boundary(foreign)
+  for _, prerequisite in pairs(technology(foreign, PROBE).prerequisites) do prerequisite.research_recursive() end
+  if foreign.add_research(PROBE) ~= true then fail("could not queue foreign probe research") end
+  foreign.research_progress = 0.42
+  local foreign_pre_external = assert_external_prewrite(foreign)
   for _, family in ipairs(FAMILIES) do
     for _, name in ipairs({family.early, family.tail}) do
       local value = technology(foreign, name)
       value.enabled, value.visible_when_disabled = false, false
     end
   end
-  for _, prerequisite in pairs(technology(foreign, PROBE).prerequisites) do prerequisite.research_recursive() end
-  if foreign.add_research(PROBE) ~= true then fail("could not queue foreign probe research") end
-  foreign.research_progress = 0.42
   local foreign_state = force_snapshot(foreign, TOTAL_BONUS)
+  assert_external_disable_transition(foreign_pre_external, foreign_state)
   if foreign_state.current ~= PROBE or #foreign_state.queue ~= 1 or foreign_state.queue[1] ~= PROBE
       or not close(foreign_state.progress, 0.42) then
     fail("foreign queue boundary seed differs")
   end
 
   storage[KEY] = {phase="published-boundary-seeded", source_mir=script.active_mods["more-infinite-research"],
-    player=player_state, foreign=foreign_state, foreign_index=foreign.index}
+    player=player_state, foreign_pre_external=foreign_pre_external, foreign=foreign_state, foreign_index=foreign.index}
 end)
 
 script.on_load(function()

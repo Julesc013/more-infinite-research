@@ -56,6 +56,73 @@ local function progress(force)
   return type(force.research_progress) == "number" and force.research_progress or 0
 end
 
+local function scalar(value)
+  if value == nil then return "nil" end
+  return tostring(value)
+end
+
+local function row_diagnostic(label, value)
+  if not value then return label .. "=absent" end
+  return label .. "={level=" .. scalar(value.level)
+    .. ",researched=" .. scalar(value.researched)
+    .. ",enabled=" .. scalar(value.enabled)
+    .. ",visible_when_disabled=" .. scalar(value.visible_when_disabled)
+    .. ",max_level=" .. scalar(value.prototype and value.prototype.max_level) .. "}"
+end
+
+local function ownership_diagnostic(force, family)
+  local caps = type(storage) == "table" and storage.mir_caps or nil
+  local owned = type(caps) == "table" and caps.owned_disabled or nil
+  local rows = type(owned) == "table" and owned[force.index] or nil
+  local function row(name)
+    local value = type(rows) == "table" and rows[name] or nil
+    if value == nil then return name .. "=none" end
+    if type(value) ~= "table" then return name .. "=" .. type(value) end
+    return name .. "={disabled=" .. scalar(value.disabled)
+      .. ",visible_when_disabled=" .. scalar(value.visible_when_disabled) .. "}"
+  end
+  return "ownership={" .. row(family.early) .. ";" .. row(family.tail) .. "}"
+end
+
+local function foreign_upgrade_diagnostic(force, family)
+  local early, tail = technology(force, family.early), technology(force, family.tail)
+  return "actual=" .. row_diagnostic("early", early) .. ";" .. row_diagnostic("tail", tail)
+    .. ";" .. ownership_diagnostic(force, family)
+end
+
+local function assert_external_seed_witness(state)
+  local before, after = state and state.foreign_pre_external, state and state.foreign
+  if type(before) ~= "table" or type(after) ~= "table"
+      or type(before.technologies) ~= "table" or type(after.technologies) ~= "table"
+      or type(before.bonuses) ~= "table" or type(after.bonuses) ~= "table"
+      or type(before.queue) ~= "table" or type(after.queue) ~= "table" then
+    fail("published external disable witness is absent")
+  end
+  for _, family in ipairs(FAMILIES) do
+    for _, name in ipairs({family.early, family.tail}) do
+      local old, current = before.technologies[name], after.technologies[name]
+      if not old or not current or old.level ~= current.level or old.researched ~= current.researched
+          or old.max_level ~= current.max_level or old.enabled ~= true
+          or old.visible_when_disabled ~= false or current.enabled ~= false
+          or current.visible_when_disabled ~= false then
+        fail("published external disable witness differs for " .. name)
+      end
+    end
+  end
+  for name, value in pairs(before.bonuses) do
+    if not close(after.bonuses[name], value) then
+      fail("published external disable witness changed recipe effect for " .. name)
+    end
+  end
+  if #before.queue ~= #after.queue or before.current ~= after.current
+      or not close(before.progress, after.progress) then
+    fail("published external disable witness changed queue or progress")
+  end
+  for index, name in ipairs(before.queue) do
+    if after.queue[index] ~= name then fail("published external disable witness changed queue identity") end
+  end
+end
+
 local function check_closure()
   for name, version in pairs(REQUIRED) do
     if script.active_mods[name] ~= version then fail("unexpected Bob/Angel closure member: " .. name) end
@@ -208,6 +275,7 @@ local function assert_upgrade_transition(state)
   if state.source_mir ~= "4.7.20002" or state.phase ~= "published-boundary-saved" then
     fail("published 4.7.2 boundary witness is absent")
   end
+  assert_external_seed_witness(state)
   local player = game.forces.player
   for _, family in ipairs(FAMILIES) do
     local early, tail = assert_current_prototype(player, family)
@@ -224,7 +292,8 @@ local function assert_upgrade_transition(state)
     local early, tail = assert_current_prototype(foreign, family)
     if early.level ~= 3 or early.researched ~= true or tail.level ~= PRESERVED_TAIL_NEXT_LEVEL or tail.researched ~= false
         or early.enabled ~= false or tail.enabled ~= false or tail.visible_when_disabled ~= true then
-      fail("MIR5 changed foreign finite boundary state for " .. family.key)
+      fail("MIR5 changed foreign finite boundary state for " .. family.key .. "; "
+        .. foreign_upgrade_diagnostic(foreign, family))
     end
   end
   -- `data-final-fixes.lua` has validated the default generated rows already;
@@ -259,6 +328,7 @@ local function marker(stage, state)
     witness.no_fabricated_150_completion_claim=true
     witness.native_recipe_bonus=3
     witness.foreign_disabled_and_queued_preserved=true
+    witness.foreign_external_disable_transition=true
   end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({case=CASE, stage=stage, status="passed", witnesses=witness}))
 end
