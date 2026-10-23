@@ -246,4 +246,80 @@ function M.runtime_effects_include(actual, expected)
   return runtime_includes_effects(actual, expected)
 end
 
+-- Edit only detached MIR effects for the flat, named foreign-owner bindings.
+-- Kept foreign coverage excludes future MIR increments without removing IDs.
+function M.retain_foreign_coverage(technologies, raw, active_mods, selected_target, prefer_mir)
+  local contract = M.select(active_mods, selected_target)
+  if contract == nil then return end
+  local owned, effect_indexes, excluded = {}, {}, {}
+  for _, row in ipairs(technologies) do owned[row.name] = row end
+  local function effect_index(row)
+    local found = {}
+    for _, effect in ipairs(row.effects or {}) do
+      if effect.type == "change-recipe-productivity" then found[effect.recipe] = effect.change end
+    end
+    return found
+  end
+  local function replacement_index(name)
+    if effect_indexes[name] == nil then
+      local row = owned[name]
+      effect_indexes[name] = row and effect_index(row) or false
+    end
+    return effect_indexes[name]
+  end
+  for _, item in ipairs(contract.bindings) do
+    local foreign = raw.technology and raw.technology[item.id]
+    local previous = false
+    for _, name in ipairs(foreign and foreign.prerequisites or {}) do
+      if name == item.predecessor then previous = true end
+    end
+    if foreign and foreign.type == "technology" and foreign.name == item.id
+        and foreign.enabled ~= false and foreign.max_level == "infinite"
+        and (foreign.level == nil or foreign.level == item.first_level) and previous then
+      local replace = prefer_mir == true and runtime_exact_effects(foreign.effects, item.effects)
+      if replace then
+        for _, replacement in ipairs(item.replacements) do
+          local row, index = owned[replacement.id], replacement_index(replacement.id)
+          if not row or row.enabled == false or row.level ~= replacement.first_level
+              or row.max_level ~= "infinite" then
+            replace = false
+            break
+          end
+          for _, effect in ipairs(replacement.effects) do
+            if not index or not close(index[effect.recipe], effect.change) then replace = false; break end
+          end
+          if not replace then break end
+        end
+      end
+      if not replace then
+        local foreign_effects = effect_index(foreign)
+        for _, replacement in ipairs(item.replacements) do
+          if owned[replacement.id] then
+            for _, effect in ipairs(replacement.effects) do
+              local value = foreign_effects[effect.recipe]
+              if type(value) == "number" and value > 0 and value < math.huge then
+                excluded[replacement.id] = excluded[replacement.id] or {}
+                excluded[replacement.id][effect.recipe] = true
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  for _, row in ipairs(technologies) do
+    local recipes = excluded[row.name]
+    if recipes then
+      local effects = {}
+      for _, effect in ipairs(row.effects or {}) do
+        if effect.type ~= "change-recipe-productivity" or not recipes[effect.recipe] then
+          effects[#effects + 1] = effect
+        end
+      end
+      row.effects = effects
+      if #effects == 0 then row.enabled = false end
+    end
+  end
+end
+
 return M

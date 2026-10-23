@@ -664,10 +664,78 @@ class CompetingProductivityTests(unittest.TestCase):
           assert(owned("advanced-circuit-productivity").disabled == true)
         ''')
 
+    def test_data_preference_preserves_ids_and_matches_captured_remaining_recipe_effects(self):
+        facts = json.loads(FIXED_FACTS_PATH.read_text(encoding="utf-8"))
+        def lua(value):
+            if isinstance(value, dict):
+                return self.lua.table_from({key: lua(item) for key, item in value.items()})
+            if isinstance(value, list):
+                return self.lua.table_from([lua(item) for item in value])
+            return value
+        def effects(row):
+            return [dict(row["effects"][i]) for i in range(1, len(row["effects"]) + 1)]
+        adapter = self.lua.eval('require("compatibility.competing_productivity")')
+        for provider in facts["providers"]:
+            with self.subTest(provider=provider["key"]):
+                archive_name = provider["archive"][:-4]
+                mod, version = archive_name.rsplit("_", 1)
+                active = lua({"base": "2.0.77", "space-age": "2.0.77", mod: version})
+                rows = provider["arms"]["published"]["mir_rows"]
+                raw = lua({"technology": provider["arms"]["upstream"]["provider_rows"]})
+                self.lua.eval('function(raw) setmetatable(raw.technology, {__pairs=function() error("foreign scan") end}) end')(raw)
+                owned = lua(list(rows.values()))
+                adapter.retain_foreign_coverage(owned, raw, active, lua({"id":"f200", "factorio_version":"2.0"}), False)
+                for index in range(1, len(owned) + 1):
+                    row = owned[index]
+                    original = rows[row["name"]]
+                    expected = provider["foreign_remaining_mir_rows"][row["name"]]
+                    self.assertEqual([] if expected is None else expected["effects"], effects(row))
+                    self.assertEqual(original["level"], row["level"])
+                    self.assertEqual(original["unit"]["count_formula"], row["unit"]["count_formula"])
+                    self.assertEqual(original["max_level"], row["max_level"])
+                    if not effects(row):
+                        self.assertFalse(row["enabled"])
+                for name, original in provider["arms"]["upstream"]["provider_rows"].items():
+                    self.assertEqual(original["effects"], effects(raw["technology"][name]))
+                preferred = lua(list(rows.values()))
+                adapter.retain_foreign_coverage(preferred, raw, active, lua({"id":"f200", "factorio_version":"2.0"}), True)
+                for index in range(1, len(preferred) + 1):
+                    self.assertEqual(rows[preferred[index]["name"]]["effects"], effects(preferred[index]))
+
+    def test_data_incomplete_or_tuned_replacement_keeps_foreign_overlap_exclusive(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local active = {base="2.0.77", ["space-age"]="2.0.77", ["plates-n-circuit-productivity"]="0.0.2"}
+          local function attempt(change, foreign_change, disabled)
+            local native={type="technology", name="basic-plate-productivity", max_level="infinite",
+              prerequisites={"advanced-material-processing"}, enabled=not disabled,
+              effects={{type="change-recipe-productivity",recipe="iron-plate",change=foreign_change},
+                {type="change-recipe-productivity",recipe="copper-plate",change=foreign_change}}}
+            local row={type="technology",name="recipe-prod-research_iron-1",level=1,max_level="infinite",
+              effects={{type="change-recipe-productivity",recipe="iron-plate",change=change},
+                {type="change-recipe-productivity",recipe="casting-iron",change=change}}, sentinel=17}
+            local raw={technology={ [native.name]=native }}
+            binding.retain_foreign_coverage({row},raw,active,f200_target(),true)
+            assert(native.effects[1].change == foreign_change and native.enabled == not disabled)
+            assert(row.sentinel == 17)
+            return row
+          end
+          -- Copper's absent MIR replacement prevents retiring the joint
+          -- foreign row, so only iron casting remains eligible for MIR.
+          local row=attempt(.1,.1,false)
+          assert(#row.effects==1 and row.effects[1].recipe=="casting-iron")
+          row=attempt(.2,.1,false)
+          assert(#row.effects==1 and row.effects[1].recipe=="casting-iron" and row.effects[1].change==.2)
+          row=attempt(.1,.2,false)
+          assert(#row.effects==1 and row.effects[1].recipe=="casting-iron")
+          row=attempt(.1,.1,true)
+          assert(#row.effects==2, "disabled foreign research cannot block future MIR coverage")
+        ''')
+
     def test_source_stays_fixed_and_non_scanning(self):
         compatibility = (PLAYER / "compatibility/competing_productivity.lua").read_text(encoding="utf-8")
         runtime = (PLAYER / "runtime/competing_productivity.lua").read_text(encoding="utf-8")
-        self.assertNotIn("pairs(technologies)", compatibility)
+        self.assertNotRegex(compatibility, r"\bpairs\s*\(\s*technologies\s*\)")
         self.assertNotIn("local function copy", compatibility)
         self.assertNotIn("pairs(force.technologies)", runtime)
         self.assertNotIn("research.catalogue", runtime)

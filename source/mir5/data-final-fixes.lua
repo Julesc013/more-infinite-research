@@ -80,6 +80,14 @@ end
 require("research.science").apply_family(technologies, nil, {
   options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
 })
+if require("platform.target").id == "f200" and type(mods) == "table"
+    and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
+      or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]) then
+  require("compatibility.competing_productivity").retain_foreign_coverage(
+    technologies, data.raw, mods, require("platform.target"),
+    values.options["mir-prefer-this-mod-for-competing-techs"])
+end
+
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)

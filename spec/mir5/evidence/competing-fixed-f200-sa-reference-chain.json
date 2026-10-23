@@ -82,6 +82,6 @@
   "source": "9e450aed8114c4b1e28a46af4e26863ee0dc0f7c",
   "facts": {
     "path": "tests/mir5/fixtures/competing-fixed-f200-sa-captured-facts.json",
-    "sha256": "2FDB51B2A4D0828B1AB0BFF4FF4089BC7F7CDFE065BB4C9B3021BDB875965290"
+    "sha256": "5832D7B55CDE46132CB9677BCE2C009AF67A713525179C5CD1365B6F5C484889"
   }
 }
