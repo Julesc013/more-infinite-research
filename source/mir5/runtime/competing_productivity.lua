@@ -1,8 +1,10 @@
--- Runtime ownership for the fixed Expanded Productivity Research F200 overlap.
+-- Runtime ownership for the fixed competing-productivity F200 overlaps.
 --
--- Foreign EPR technology rows remain native and retain earned effects.  When
--- the exact provider and matching MIR effects are active, this module only
--- uses the shared absolute-cap reconciler to retire future foreign levels.
+-- Foreign rows remain native and retain earned effects. Exact EPR tails use
+-- the shared absolute-cap reconciler. The five non-suffixed fixed-provider
+-- rows have no pre-tail level to cap, so this module records and disables only
+-- an unqueued, unearned initial level; it never removes a current or partial
+-- research entry.
 local caps = require("runtime.caps")
 local binding = require("compatibility.competing_productivity")
 local target = require("platform.target")
@@ -18,8 +20,11 @@ local active_mods = script and script.active_mods or mods or {}
 local ACTIVE = binding.active(active_mods, target)
 local CONTRACT = binding.select(active_mods, target)
 local ALL_BINDINGS = binding.bindings()
-local BINDING_BY_ID = {}
+local BINDING_BY_ID, CONTRACT_BINDING_BY_ID = {}, {}
 for _, item in ipairs(ALL_BINDINGS) do BINDING_BY_ID[item.id] = item end
+if CONTRACT then
+  for _, item in ipairs(CONTRACT.bindings) do CONTRACT_BINDING_BY_ID[item.id] = item end
+end
 local options = type(effective) == "table" and effective.options or nil
 local PREFER_MIR = type(options) == "table" and options[PREFERENCE_SETTING]
 if ACTIVE and type(PREFER_MIR) ~= "boolean" then
@@ -58,6 +63,20 @@ local function drop_owned(owned_disabled, force_index, name)
   if next(owned) == nil then owned_disabled[force_index] = nil end
 end
 
+local function ensure_owned_record(owned_disabled, force_index, name)
+  local owned = owned_disabled[force_index]
+  if type(owned) ~= "table" then
+    owned = {}
+    owned_disabled[force_index] = owned
+  end
+  local record = owned[name]
+  if type(record) ~= "table" then
+    record = {}
+    owned[name] = record
+  end
+  return record
+end
+
 local function runtime_foreign_admitted(technology, item)
   local prototype = technology and technology.prototype
   local prerequisites = prototype and prototype.prerequisites
@@ -74,7 +93,7 @@ local function runtime_replacements_admitted(force, item)
     local technology = technologies and technologies[replacement.id]
     local prototype = technology and technology.prototype
     if not technology or technology.valid == false or not prototype or prototype.enabled ~= true
-        or prototype.max_level ~= UINT32_MAX
+        or prototype.level ~= replacement.first_level or prototype.max_level ~= UINT32_MAX
         or not binding.runtime_effects_include(prototype.effects, replacement.effects) then
       return false
     end
@@ -82,44 +101,92 @@ local function runtime_replacements_admitted(force, item)
   return true
 end
 
-local function reconcile_item(force, current, item, limits)
+local function queued_names(force)
+  local names = {}
+  local current = force.current_research
+  if current and type(current.name) == "string" then names[current.name] = true end
+  local queue = force.research_queue
+  if type(queue) == "table" then
+    for _, value in ipairs(queue) do
+      if value and type(value.name) == "string" then names[value.name] = true end
+    end
+  end
+  return names
+end
+
+local function can_retire_initial(technology, item, queued)
+  return item.initial_retirement == true and technology.enabled == true
+    and technology.level == item.first_level and technology.researched ~= true
+    and (technology.saved_progress == nil or technology.saved_progress == 0)
+    and queued[item.id] ~= true
+end
+
+local function retire_initial(force, current, item)
+  local technology = force.technologies[item.id]
+  if technology == nil or technology.enabled ~= true then return end
+  local record = ensure_owned_record(current.owned_disabled, force.index, item.id)
+  if technology.visible_when_disabled ~= true then
+    if record.visible_when_disabled == nil then
+      record.visible_when_disabled = technology.visible_when_disabled == true
+    end
+    technology.visible_when_disabled = true
+  end
+  record.disabled = true
+  technology.enabled = false
+end
+
+local function reconcile_item(force, current, item, limits, initial, queued)
   local technology = force.technologies[item.id]
   if not runtime_foreign_admitted(technology, item) then
     -- A changed provider identity/effect makes historic ownership unknowable.
     -- Forget only MIR's right; never turn it into an enablement write.
     drop_owned(current.owned_disabled, force.index, item.id)
-  else
-    limits[item.id] = PREFER_MIR == true and runtime_replacements_admitted(force, item)
-      and item.first_level - 1 or 0
+    return
+  end
+  if PREFER_MIR ~= true or not runtime_replacements_admitted(force, item) then
+    -- A false preference or incomplete/MIR-mismatching coverage releases an
+    -- already-proved MIR right, but never allocates one for a foreign row.
+    limits[item.id] = 0
+    return
+  end
+  if item.initial_retirement ~= true then
+    limits[item.id] = item.first_level - 1
+    return
+  end
+  if technology.enabled ~= true then
+    -- A foreign disablement has no MIR record and stays wholly foreign. An
+    -- existing MIR record is retained until a valid false-preference release.
+    return
+  end
+  if can_retire_initial(technology, item, queued) then
+    initial[#initial + 1] = item
+  elseif technology.level ~= item.first_level or technology.researched == true then
+    -- The first native level is already earned. Keep that credit, then use the
+    -- common cap path to retire only subsequent levels.
+    limits[item.id] = item.first_level
   end
 end
 
 local function reconcile_force(force, target_name)
   if not valid_force(force) then return end
-  local current = existing_state()
   local selected_item = target_name and BINDING_BY_ID[target_name] or nil
-  if target_name ~= nil and selected_item == nil then return end
-  if not CONTRACT then
-    if not current then return end
-    if selected_item then
-      drop_owned(current.owned_disabled, force.index, selected_item.id)
-    else
-      for _, item in ipairs(ALL_BINDINGS) do drop_owned(current.owned_disabled, force.index, item.id) end
-    end
-    discard_empty_state(current)
-    return
-  end
+  if target_name ~= nil and (selected_item == nil or CONTRACT_BINDING_BY_ID[target_name] == nil) then return end
+  if not CONTRACT then return end
 
-  -- A false preference or a mismatching MIR target can only restore a right
-  -- after the exact foreign EPR tail itself is still known. Do not allocate
-  -- storage for a fresh unlimited/no-preference profile.
+  local current = existing_state()
+  -- A false preference or an invalid replacement can only restore a right
+  -- after the exact foreign tail itself is still known. Do not allocate state
+  -- for a fresh no-preference profile.
   if not current and PREFER_MIR ~= true then return end
   current = current or ensure_state()
-  local limits = {}
+  local limits, initial = {}, {}
+  local queued = queued_names(force)
   if selected_item then
-    reconcile_item(force, current, selected_item, limits)
+    reconcile_item(force, current, selected_item, limits, initial, queued)
   else
-    for _, item in ipairs(CONTRACT.bindings) do reconcile_item(force, current, item, limits) end
+    for _, item in ipairs(CONTRACT.bindings) do
+      reconcile_item(force, current, item, limits, initial, queued)
+    end
   end
   if next(limits) ~= nil then
     local _, result = caps.reconcile(force, limits, current.owned_disabled)
@@ -128,6 +195,7 @@ local function reconcile_force(force, target_name)
         .. result.unresolved_current, 2)
     end
   end
+  for _, item in ipairs(initial) do retire_initial(force, current, item) end
   discard_empty_state(current)
 end
 
@@ -136,15 +204,29 @@ local function force_for_index(index)
   return ok and force or nil
 end
 
-local function reconcile_all(clean_stale)
-  local current = existing_state()
-  if not CONTRACT and not current then return end
-  if not game or not game.forces then return end
-  if clean_stale and current then
-    for index in pairs(current.owned_disabled) do
-      if not valid_force(force_for_index(index)) then current.owned_disabled[index] = nil end
+local function discard_unselected_rights(current)
+  for index, owned in pairs(current.owned_disabled) do
+    if not valid_force(force_for_index(index)) then
+      current.owned_disabled[index] = nil
+    elseif type(owned) == "table" then
+      for name in pairs(owned) do
+        if CONTRACT_BINDING_BY_ID[name] == nil then owned[name] = nil end
+      end
+      if next(owned) == nil then current.owned_disabled[index] = nil end
     end
   end
+end
+
+local function reconcile_all(clean_stale)
+  local current = existing_state()
+  if not CONTRACT then
+    -- A provider removal, unsupported version, or unqualified EPR/fixed mix
+    -- cannot safely carry our old right into another provider identity.
+    if current then storage[STORAGE_KEY] = nil end
+    return
+  end
+  if not game or not game.forces then return end
+  if clean_stale and current then discard_unselected_rights(current) end
   for _, force in pairs(game.forces) do reconcile_force(force) end
   discard_empty_state(existing_state())
 end
