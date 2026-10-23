@@ -34,7 +34,11 @@ class FixtureControlHostStageTests(unittest.TestCase):
               },
               defines = {events = {on_tick = 1}},
               remote = remote_probe,
-              helpers = {table_to_json = function() return "{}" end},
+              helpers = {table_to_json = function(value)
+                assert(value.stage == "init" and value.case == "module-permissions"
+                  and value.status == "passed")
+                return "{}"
+              end},
               log = function() end,
               require = function() error("control parse imported a module") end
             }

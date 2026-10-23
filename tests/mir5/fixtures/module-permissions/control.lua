@@ -53,7 +53,7 @@ script.on_init(function()
   exact_dictionary(parameter.allowed_module_categories, {speed = true}, "parameter recipe native categories")
 
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
-    stage = "create",
+    stage = "init",
     case = CASE,
     status = "passed",
     witnesses = {
