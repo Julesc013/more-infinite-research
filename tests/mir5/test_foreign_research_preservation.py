@@ -250,6 +250,23 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             rows_by_version.append((science["name"], prerequisite["name"], research["effects"][1]["modifier"]))
         self.assertEqual(rows_by_version[0], rows_by_version[1])
 
+    def test_representative_pack_has_a_producer_and_a_single_accepting_lab(self):
+        source = SOURCE / "data-updates.lua"
+        self.assertEqual(source.read_bytes(), (DESTINATION / "data-updates.lua").read_bytes())
+        self.lua.globals().source_updates_path = source.as_posix()
+        self.lua.execute('''
+          local pack = "mir5-foreign-astral-insight-pack"
+          local produced
+          data = {raw={lab={lab={inputs={"automation-science-pack","chemical-science-pack","utility-science-pack"}}}},
+            extend=function(_, rows) assert(#rows == 1); produced=rows[1] end}
+          assert(dofile(source_updates_path) == nil)
+          assert(produced.type == "recipe" and produced.name == pack and produced.enabled == true)
+          assert(produced.ingredients[1].name == "iron-plate" and produced.ingredients[1].amount == 1)
+          assert(produced.results[1].type == "item" and produced.results[1].name == pack
+            and produced.results[1].amount == 1)
+          assert(#data.raw.lab.lab.inputs == 4 and data.raw.lab.lab.inputs[4] == pack)
+        ''')
+
     def test_source_configuration_transition_and_reload_preserve_foreign_and_mir_effects(self):
         self.lua.globals().source_control_path = (SOURCE / "control.lua").as_posix()
         self.lua.globals().destination_control_path = (DESTINATION / "control.lua").as_posix()
