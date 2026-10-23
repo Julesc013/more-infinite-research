@@ -125,7 +125,7 @@ local function start_research(force, name)
   if target.queue_api then
     if not force.add_research(value) then fail("could not queue real lab research " .. name) end
   else
-    force.current_research = value
+    force.current_research = name
   end
   if force.current_research == nil then fail("could not start real lab research " .. name) end
 end

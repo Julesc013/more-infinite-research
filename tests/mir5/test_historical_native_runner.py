@@ -165,6 +165,18 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 end,
               }
               local force = {manual_mining_speed_modifier=0, stack_inserter_capacity_bonus=0, technologies={}}
+              local current_research
+              setmetatable(force, {
+                __index=function(_, key)
+                  if key == "current_research" then return current_research end
+                end,
+                __newindex=function(self, key, value)
+                  if key == "current_research" then
+                    assert(value == nil or type(value) == "string", "old native research setter requires a name")
+                    current_research = value and self.technologies[value] or nil
+                  else rawset(self, key, value) end
+                end,
+              })
               local direct = {name="recipe-prod-research_character_mining_speed-1", force=force,
                 prerequisites={}, enabled=true, researched=false}
               local continuation = {name="inserter-capacity-bonus-8", force=force, prerequisites={}, enabled=true,
@@ -486,7 +498,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn("defines.inventory.lab_input", source)
         self.assertNotIn("game.active_mods.base", source)
         self.assertIn('local target = require("target")', source)
-        self.assertIn("force.current_research = value", source)
+        self.assertIn("force.current_research = name", source)
         self.assertIn("defines.events.on_research_finished", source)
         self.assertIn("game.server_save(\"mir5-native-complete\")", source)
         self.assertIn("script.on_load", source)
