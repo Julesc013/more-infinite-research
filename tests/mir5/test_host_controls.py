@@ -190,8 +190,9 @@ class HostControlsTests(unittest.TestCase):
         self.assertEqual(mir5["classification"]["tests"], ["static.mir5-host-controls"])
         self.assertFalse(mir5["classification"]["escalated"])
         self.assertIn("static.mir5-host-controls", mir5["selected_tests"])
-        self.assertEqual(mir5["initial_plan"]["profile"], "mir4-development")
-        self.assertFalse(mir5["initial_plan"]["use_affected_selection"])
+        self.assertEqual(mir5["initial_plan"]["profile"], "auto")
+        self.assertTrue(mir5["initial_plan"]["use_affected_selection"])
+        self.assertTrue(mir5["initial_plan"]["selection_rows_covered_by_auto"])
 
         docs = routes["routes"]["docs"]
         self.assertEqual(docs["classification"]["tests"], ["docs.check"])
