@@ -22,6 +22,7 @@ local SHORTCUT = "mir-research-browser"
 local MAX_QUERY = 160
 local MAX_HIDDEN = 128
 local MAX_PAGE = 30000
+local MAX_FAMILY_DESCRIPTORS = 128
 local LEGACY_NAMESPACE = "mir"
 local LEGACY_BROWSER_KEY = "research_browser"
 local LEGACY_ROOT_MARKER = "mir_browser_tabs"
@@ -108,6 +109,82 @@ local SORT_INDEX = {
   ["name-desc"] = 4
 }
 
+-- The published browser offered its aggregate choices plus actual authored
+-- family descriptors.  These values come only from the compact declaration
+-- catalogue; a force's native technologies never create GUI selectors.
+local function family_values()
+  local values, known = {"mir", "all", "external"}, {mir = true, all = true, external = true}
+  local ok, declared = pcall(catalogue.declared)
+  if not ok or type(declared) ~= "table" or #declared > MAX_FAMILY_DESCRIPTORS then return values, known end
+  local extras = {}
+  for index = 1, #declared do
+    local row = declared[index]
+    local family = type(row) == "table" and technology_id(row.family) or nil
+    if family and not known[family] then
+      if #extras >= MAX_FAMILY_DESCRIPTORS then
+        return {"mir", "all", "external"}, {mir = true, all = true, external = true}
+      end
+      known[family] = true
+      extras[#extras + 1] = family
+    end
+  end
+  table.sort(extras)
+  for _, family in ipairs(extras) do values[#values + 1] = family end
+  return values, known
+end
+
+local function family_option(value)
+  local _, known = family_values()
+  return type(value) == "string" and known[value] and value or nil
+end
+
+local function family_from_index(value)
+  local values = family_values()
+  return whole_option(value, 1, #values) and values[value] or nil
+end
+
+local function family_caption(family, native_names)
+  if family == "mir" then return {"mir-browser.scope-mir"} end
+  if family == "all" then return {"mir-browser.scope-all"} end
+  if family == "external" then return {"mir-browser.scope-native"} end
+  -- Authored technology names can require localized parameters. Use the
+  -- engine's complete name rather than invoking its locale key without them.
+  if native_names[family] ~= nil then return native_names[family] end
+  return family:gsub("^research_", ""):gsub("[-_]", " "):gsub("^%l", string.upper)
+end
+
+local function family_items(values, player)
+  local native_names = {}
+  for _, row in ipairs(catalogue.declared()) do
+    local family = type(row) == "table" and technology_id(row.family) or nil
+    if family and native_names[family] == nil then
+      local ok, name = pcall(function()
+        local technology = player.force.technologies[row.id]
+        return technology and technology.localised_name or nil
+      end)
+      if ok then native_names[family] = name end
+    end
+  end
+  local items = {}
+  for index, family in ipairs(values) do items[index] = family_caption(family, native_names) end
+  return items
+end
+
+local function family_index(values, family)
+  for index, candidate in ipairs(values) do
+    if candidate == family then return index end
+  end
+  return nil
+end
+
+-- Availability was the published third visibility state.  That surface has
+-- not yet been reconstructed, so this host deliberately persists and renders
+-- only normal and personal-hidden views.  The full historical record remains
+-- in the migration snapshot for the later availability unit.
+local function visibility_option(value)
+  return whole_option(value, 1, 2)
+end
+
 local function sort_from_index(value)
   if value == 1 then return "progression" end
   if value == 2 then return "native" end
@@ -168,12 +245,13 @@ local function local_view(raw)
   local value = {
     schema = SCHEMA,
     query = text(raw.query),
-    family = raw.family == "all" and "all" or "mir",
+    family = raw.family ~= nil and raw.family or "mir",
     mode = raw.mode,
     status = raw.status,
     page = raw.page,
     sort = raw.sort,
     stable_sort = raw.stable_sort,
+    visibility = raw.visibility,
     hidden = raw.hidden,
     selected = technology_id(raw.selected),
     location = location(raw.location),
@@ -189,17 +267,19 @@ local function local_view(raw)
     page = value.page,
     sort = value.sort,
     stable_sort = value.stable_sort,
+    visibility = value.visibility,
     hidden = value.hidden,
     selected = value.selected
   })
   if type(normalized) == "table" then
     value.query = text(normalized.search or value.query)
-    value.family = normalized.family == "mir" and "mir" or "all"
+    value.family = family_option(normalized.family) or "mir"
     value.mode = whole_option(normalized.mode, 1, 3) or 1
     value.status = type(normalized.status) == "number" and normalized.status or 1
     value.page = type(normalized.page) == "number" and normalized.page or 1
     value.sort = type(normalized.sort) == "string" and normalized.sort or "progression"
     value.stable_sort = type(normalized.stable_sort) == "string" and normalized.stable_sort or "progression"
+    value.visibility = visibility_option(normalized.visibility) or 1
     value.hidden = type(normalized.hidden) == "table" and normalized.hidden or {}
     value.selected = type(normalized.selected) == "string" and normalized.selected or nil
   end
@@ -286,12 +366,15 @@ local function same_translation_scope(left, right)
     and left.force_index == right.force_index and left.generation == right.generation
 end
 
--- Default MIR views translate authored identities only. An explicit all-family
--- view additionally scans the caller's current native force, once per
--- family/scope change, and keeps a bounded deterministic request order.
+-- Authored-only family views translate only declared technologies that exist
+-- in this force. All/external views scan the caller's current native force
+-- once per family/scope change and keep a bounded deterministic request order.
 local function ordered_translation_ids(player, family)
   local ok, declared = pcall(catalogue.declared)
   if not ok or type(declared) ~= "table" then return nil end
+  local force = player and player.force
+  local technologies = force and force.technologies
+  if technologies == nil then return nil end
   local ids, seen = {}, {}
   local function add_id(id)
     if type(id) ~= "string" or id == "" or #id > translation_queue.label_limit then return false end
@@ -301,15 +384,24 @@ local function ordered_translation_ids(player, family)
     ids[#ids + 1] = id
     return true
   end
-
-  for _, row in ipairs(declared) do
-    if type(row) ~= "table" or not add_id(row.id) then return nil end
+  local function technology_exists(id)
+    local found, technology = pcall(function() return technologies[id] end)
+    return found and valid(technology)
   end
-  if family ~= "all" then return ids end
 
-  local force = player and player.force
-  local technologies = force and force.technologies
-  if technologies == nil then return nil end
+  local declarations = {}
+  for _, row in ipairs(declared) do
+    if type(row) ~= "table" or type(row.id) ~= "string" or row.id == ""
+        or #row.id > translation_queue.label_limit then return nil end
+    declarations[row.id] = row
+    local declared_family = technology_id(row.family) or "mir"
+    local include_declared = family == "all"
+      or family == "mir" and declared_family ~= "external"
+      or family == declared_family
+    if include_declared and technology_exists(row.id) and not add_id(row.id) then return nil end
+  end
+  if family ~= "all" and family ~= "external" then return ids end
+
   local native, overflow = {}, false
   local scanned_ok = pcall(function()
     for id, technology in pairs(technologies) do
@@ -327,7 +419,11 @@ local function ordered_translation_ids(player, family)
   if not scanned_ok or overflow then return nil end
   table.sort(native)
   for _, id in ipairs(native) do
-    if not add_id(id) then return nil end
+    local declaration = declarations[id]
+    local declared_family = declaration and technology_id(declaration.family) or "mir"
+    if family ~= "external" or declaration == nil or declared_family == "external" then
+      if not add_id(id) then return nil end
+    end
   end
   return ids
 end
@@ -414,6 +510,7 @@ local function legacy_view_as_private(value)
     page = value.page,
     sort = value.sort,
     stable_sort = value.stable_sort,
+    visibility = value.visibility,
     hidden = value.hidden,
     selected = value.selected,
     location = value.location,
@@ -482,6 +579,7 @@ local function model_view(view)
     page = view.page,
     sort = view.sort,
     stable_sort = view.stable_sort,
+    visibility = view.visibility,
     hidden = view.hidden,
     selected = view.selected
   })
@@ -534,7 +632,7 @@ end
 local function open_translation_cache(player, view)
   local index = player and player.index
   if not whole_number(index, 1) then return nil end
-  local family = type(view) == "table" and view.family == "all" and "all" or "mir"
+  local family = type(view) == "table" and family_option(view.family) or "mir"
   local retained = translation_caches[index]
   local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
     and retained.scope.force_index == (player.force and player.force.index)
@@ -784,7 +882,13 @@ local function create_frame(player, view)
   local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "horizontal"})
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
   add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
-  add(filters, {type = "drop-down", name = PREFIX .. "family", items = {{"mir-browser.scope-all"}, {"mir-browser.scope-mir"}}, selected_index = view.family == "mir" and 2 or 1})
+  local families = family_values()
+  add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
+    selected_index = family_index(families, view.family) or 1})
+  add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
+    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}
+  }, selected_index = view.visibility})
   add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
   add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
     {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
@@ -818,7 +922,17 @@ local function render(player, view, context, preserve_query)
   local query = valid(filters) and filters[PREFIX .. "query"] or nil
   if valid(query) and not preserve_query then query.text = view.query end
   local family = valid(filters) and filters[PREFIX .. "family"] or nil
-  if valid(family) then family.selected_index = view.family == "mir" and 2 or 1 end
+  local families = family_values()
+  local selected_family = family_index(families, view.family)
+  if selected_family == nil then
+    view.family, selected_family = "mir", family_index(families, "mir") or 1
+  end
+  if valid(family) then
+    family.items = family_items(families, player)
+    family.selected_index = selected_family
+  end
+  local visibility = valid(filters) and filters[PREFIX .. "visibility"] or nil
+  if valid(visibility) then visibility.selected_index = view.visibility end
   local mode = valid(filters) and filters[PREFIX .. "mode"] or nil
   if valid(mode) then mode.selected_index = view.mode end
   local status = valid(filters) and filters[PREFIX .. "status"] or nil
@@ -852,13 +966,16 @@ function M.open(player, options)
   if type(options.query) == "string" then
     view.query, reset_page = text(options.query), true
   end
-  if options.family == "all" or options.family == "mir" then
-    view.family, reset_page = options.family, true
+  local family = family_option(options.family)
+  if family then
+    view.family, reset_page = family, true
   end
   local mode = whole_option(options.mode, 1, 3)
   if mode then view.mode, reset_page = mode, true end
   local status = status_option(options.status)
   if status then view.status, reset_page = status, true end
+  local visibility = visibility_option(options.visibility)
+  if visibility then view.visibility, reset_page = visibility, true end
   local sort = sort_option(options.sort)
   if sort then
     view.sort, reset_page = sort, true
@@ -926,9 +1043,20 @@ function M.on_gui_selection_state_changed(event)
       PREFIX .. "family", PREFIX .. "filters", ROOT
     }) then return end
     local view = view_for(player.index)
-    view.family = element.selected_index == 2 and "mir" or "all"
+    local family = family_from_index(element.selected_index)
+    if family == nil then return end
+    view.family = family
     view.page = 1
     view.scroll = 1
+    render(player, view)
+  elseif element.name == PREFIX .. "visibility" then
+    if not owns_element(player, element, {
+      PREFIX .. "visibility", PREFIX .. "filters", ROOT
+    }) then return end
+    local visibility = visibility_option(element.selected_index)
+    if visibility == nil then return end
+    local view = view_for(player.index)
+    view.visibility, view.page, view.scroll = visibility, 1, 1
     render(player, view)
   elseif element.name == PREFIX .. "mode" then
     if not owns_element(player, element, {

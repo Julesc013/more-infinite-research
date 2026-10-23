@@ -12,7 +12,19 @@ if values.enabled == true then
 else
   gear = productivity.gears(values)
 end
-generator.install({gear}, data)
+local technologies = {gear}
+
+-- The two scripted streams have no base fallback. Require both their exact
+-- bindings and authoring body only after Space Age is active.
+if type(mods) == "table" and mods["space-age"] ~= nil
+    and values.agricultural_growth_speed ~= nil and values.spoilage_preservation ~= nil then
+  local bindings = require("compatibility.space_age_scripted_effects").select(mods, data.raw)
+  local scripted = require("research.scripted_effects").technologies(values, bindings)
+  technologies[#technologies + 1] = scripted[1]
+  technologies[#technologies + 1] = scripted[2]
+end
+
+generator.install(technologies, data)
 
 -- The published experimental override is unavailable by default.  Keeping its
 -- require in this strict branch means disabled data stages never load or inspect it.

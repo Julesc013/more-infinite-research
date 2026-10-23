@@ -11,7 +11,9 @@ local STORAGE_KEY = "mir_caps"
 local SCHEMA = 1
 local GEAR_TECHNOLOGY = require("research.catalogue").gear_id()
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
-local active_mods = script and script.active_mods or {}
+local AGRICULTURE_TECHNOLOGY = "recipe-prod-research_agricultural_growth_speed-1"
+local SPOILAGE_TECHNOLOGY = "recipe-prod-research_spoilage_preservation-1"
+local active_mods = script and script.active_mods or mods or {}
 local worker_modifiers
 if active_mods.Krastorio2 and active_mods["Krastorio2-spaced-out"]
     and active_mods.Krastorio2Assets and active_mods["k2so-assets"] and active_mods["space-age"] then
@@ -30,7 +32,16 @@ local effective_values = require("runtime.configuration")
 local GEAR_ENABLED = effective_values.enabled ~= false
 local GEAR_LIMIT = effective_values.max_level
 local WORKER_ROBOT_SPEED_LIMIT = effective_values.worker_robots_speed_max_level
+local SPACE_AGE_ACTIVE = type(active_mods) == "table" and active_mods["space-age"] ~= nil
+local agriculture_values = SPACE_AGE_ACTIVE and effective_values.agricultural_growth_speed or nil
+local spoilage_values = SPACE_AGE_ACTIVE and effective_values.spoilage_preservation or nil
+local AGRICULTURE_ENABLED = agriculture_values ~= nil and agriculture_values.enabled == true
+local SPOILAGE_ENABLED = spoilage_values ~= nil and spoilage_values.enabled == true
+local AGRICULTURE_LIMIT = agriculture_values and agriculture_values.max_level or 0
+local SPOILAGE_LIMIT = spoilage_values and spoilage_values.max_level or 0
 local CAPS_ACTIVE = (GEAR_ENABLED and GEAR_LIMIT > 0) or WORKER_ROBOT_SPEED_LIMIT > 0
+  or (AGRICULTURE_ENABLED and AGRICULTURE_LIMIT > 0)
+  or (SPOILAGE_ENABLED and SPOILAGE_LIMIT > 0)
 
 local function existing_state()
   local value = storage[STORAGE_KEY]
@@ -81,6 +92,8 @@ end
 local function limits_for(force, include_worker, selected_owner, owner_resolved)
   local limits = {}
   if GEAR_ENABLED then limits[GEAR_TECHNOLOGY] = GEAR_LIMIT end
+  if AGRICULTURE_ENABLED then limits[AGRICULTURE_TECHNOLOGY] = AGRICULTURE_LIMIT end
+  if SPOILAGE_ENABLED then limits[SPOILAGE_TECHNOLOGY] = SPOILAGE_LIMIT end
   if not valid_force(force) or (WORKER_ROBOT_SPEED_LIMIT == 0 and not include_worker) then
     return limits
   end
@@ -143,11 +156,27 @@ local function discard_disabled_gear_ownership(force, owned_disabled)
   return owned
 end
 
+-- Each scripted stream has an independently named cap row. Disabling one
+-- feature removes only MIR's restoration right for that technology; it never
+-- re-enables a native technology or changes its earned levels/effects.
+local function discard_disabled_scripted_ownership(force, owned_disabled)
+  local owned = owned_disabled[force.index]
+  if type(owned) ~= "table" then return owned end
+  if not AGRICULTURE_ENABLED then owned[AGRICULTURE_TECHNOLOGY] = nil end
+  if not SPOILAGE_ENABLED then owned[SPOILAGE_TECHNOLOGY] = nil end
+  if next(owned) == nil then
+    owned_disabled[force.index] = nil
+    return nil
+  end
+  return owned
+end
+
 local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
   if type(owned_disabled) == "table" then
     owned = discard_disabled_gear_ownership(force, owned_disabled)
+    owned = discard_disabled_scripted_ownership(force, owned_disabled)
   end
   local include_worker = WORKER_ROBOT_SPEED_LIMIT > 0 or has_worker_ownership(owned)
   local owner = selected_owner
@@ -203,6 +232,26 @@ local function legacy_candidates(worker_name)
       -- The candidate is a decoder key for published 4.7 F210 storage. It
       -- deliberately retains the old generated-binding operation rather than
       -- nominating MIR5's current runtime-settings provenance.
+      operation = "emit",
+      admitted = true
+    }
+  end
+  if AGRICULTURE_ENABLED then
+    candidates[#candidates + 1] = {
+      name = AGRICULTURE_TECHNOLOGY,
+      setting = "ips-max-level-research_agricultural_growth_speed",
+      source = "generated-stream",
+      -- The direct stream was emitted by the same published V3 generated
+      -- binding as gear. Do not substitute MIR5 runtime provenance here.
+      operation = "emit",
+      admitted = true
+    }
+  end
+  if SPOILAGE_ENABLED then
+    candidates[#candidates + 1] = {
+      name = SPOILAGE_TECHNOLOGY,
+      setting = "ips-max-level-research_spoilage_preservation",
+      source = "generated-stream",
       operation = "emit",
       admitted = true
     }
@@ -264,6 +313,7 @@ local function import_legacy_caps_on_configuration()
   for _, force in pairs(game.forces) do
     if valid_force(force) then
       local owned = discard_disabled_gear_ownership(force, current.owned_disabled)
+      owned = discard_disabled_scripted_ownership(force, current.owned_disabled)
       -- Revalidate the native tail even if the new worker cap is unlimited;
       -- importing its historical restoration right still depends on that
       -- exact current owner.
@@ -331,6 +381,14 @@ function M.on_forces_merged(event)
 end
 
 function M.on_research_finished(event)
+  reconcile_event(event)
+end
+
+function M.on_research_reversed(event)
+  reconcile_event(event)
+end
+
+function M.on_technology_effects_reset(event)
   reconcile_event(event)
 end
 

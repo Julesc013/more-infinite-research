@@ -19,6 +19,24 @@ local GEAR = {
   operation = "emit"
 }
 
+-- The direct-effect continuations used the same generated-stream emitter as
+-- gear in the published F210 V3 maximum-level binding. These are distinct
+-- historic identities; accepting a family prefix or a present prototype here
+-- would turn a one-shot import into a new ownership claim.
+local AGRICULTURE = {
+  name = "recipe-prod-research_agricultural_growth_speed-1",
+  setting = "ips-max-level-research_agricultural_growth_speed",
+  source = "generated-stream",
+  operation = "emit"
+}
+
+local SPOILAGE = {
+  name = "recipe-prod-research_spoilage_preservation-1",
+  setting = "ips-max-level-research_spoilage_preservation",
+  source = "generated-stream",
+  operation = "emit"
+}
+
 local WORKER = {
   setting = "mir-max-level-worker-robots-speed",
   source = "native-owner",
@@ -61,6 +79,14 @@ local function admitted_candidate(candidate)
     return candidate.setting == GEAR.setting and candidate.source == GEAR.source
       and candidate.operation == GEAR.operation
   end
+  if candidate.name == AGRICULTURE.name then
+    return candidate.setting == AGRICULTURE.setting and candidate.source == AGRICULTURE.source
+      and candidate.operation == AGRICULTURE.operation
+  end
+  if candidate.name == SPOILAGE.name then
+    return candidate.setting == SPOILAGE.setting and candidate.source == SPOILAGE.source
+      and candidate.operation == SPOILAGE.operation
+  end
   if candidate.name == "worker-robots-speed-6" or candidate.name == "worker-robots-speed-7" then
     -- `admitted` is the caller's result of the current native-owner selector;
     -- this decoder must not inspect prototypes or infer worker ownership.
@@ -76,19 +102,21 @@ local function candidate_list(candidates)
   end
   local entries, count = {}, 0
   -- This bounded iteration deliberately validates the caller boundary without
-  -- ever traversing historical saved maps. Stop on the third entry.
+  -- ever traversing historical saved maps. The four named admissions are
+  -- gear, the two direct continuations, and the current worker tail.
   for index, candidate in pairs(candidates) do
     count = count + 1
-    if count > 2 then error("MIR legacy caps accepts at most two candidates", 3) end
-    if (index ~= 1 and index ~= 2) or entries[index] ~= nil then
+    if count > 4 then error("MIR legacy caps accepts at most four candidates", 3) end
+    if type(index) ~= "number" or index ~= math.floor(index)
+        or index < 1 or index > 4 or entries[index] ~= nil then
       error("MIR legacy caps candidates must be a dense array", 3)
     end
     entries[index] = candidate
   end
-  if entries[2] ~= nil and entries[1] == nil then
-    error("MIR legacy caps candidates must be a dense array", 3)
+  for index = 1, count do
+    if entries[index] == nil then error("MIR legacy caps candidates must be a dense array", 3) end
   end
-  return entries, entries[2] ~= nil and 2 or entries[1] ~= nil and 1 or 0
+  return entries, count
 end
 
 local function policy_matches(policy, candidate)
@@ -155,7 +183,7 @@ end
 -- Decode restoration rights for one current force.
 --
 -- `legacy_bucket` is exactly the historical `storage.mir.maximum_level_control`
--- bucket. `candidates` is a dense list of at most two current admissions,
+-- bucket. `candidates` is a dense list of at most four current admissions,
 -- each shaped `{name, setting, source, operation, admitted=true}`. For worker
 -- candidates `admitted` must come from the caller's current native-tail
 -- validation. `current_owned` is the MIR5 map for this force; existing rows

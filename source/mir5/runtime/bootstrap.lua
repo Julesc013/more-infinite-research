@@ -6,12 +6,20 @@
 -- callbacks.
 local lifecycle = require("runtime.lifecycle")
 local library = require("runtime.library")
+local catalogue = require("research.catalogue")
 local runtime_api = require("api.v1.runtime")
 local settings_profile = require("runtime.settings_profile")
 local settings_commands = require("runtime.settings_commands")
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
+local spoilage_contribution = require("runtime.spoilage_contribution")
 local repair_config = {enabled = effective.passive_repair_enabled == true}
+-- The Space Age lifecycle body is absent from base-only control stages.
+local scripted_effects
+local active_mods = script and script.active_mods or mods or {}
+if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
+  scripted_effects = require("runtime.scripted_effects")
+end
 
 local M = {}
 
@@ -23,6 +31,10 @@ local on_repair_tick
 local translation_scheduled
 local translation_maintenance_callback
 local reconcile_translations
+local browser_families = {all = true, external = true, mir = true}
+for _, declaration in ipairs(catalogue.declared()) do
+  browser_families[declaration.family] = true
+end
 
 -- Keep the shipped unversioned bucket in place, including saved LuaEntity
 -- references. Neither a closed Library nor a disabled fresh feature allocates
@@ -106,11 +118,17 @@ local function browser_options(player, options)
   if type(options) ~= "table" then return nil end
   local result = {}
   if type(options.search) == "string" then result.query = options.search end
-  if options.family == "all" or options.family == "mir" then result.family = options.family end
+  if type(options.family) == "string" and browser_families[options.family] == true then
+    result.family = options.family
+  end
   if options.mode == 1 or options.mode == 2 or options.mode == 3 then result.mode = options.mode end
   if type(options.status) == "number" and options.status == math.floor(options.status)
       and options.status >= 1 and options.status <= 4 then
     result.status = options.status
+  end
+  if type(options.visibility) == "number" and options.visibility == math.floor(options.visibility)
+      and (options.visibility == 1 or options.visibility == 2) then
+    result.visibility = options.visibility
   end
   if options.sort == "progression" or options.sort == "native"
       or options.sort == "name-asc" or options.sort == "name-desc" then
@@ -176,6 +194,7 @@ end
 
 local function on_init()
   lifecycle.on_init()
+  if scripted_effects then scripted_effects.on_init() end
   library.on_init()
   reconcile_repair()
   reconcile_translations()
@@ -183,6 +202,22 @@ end
 
 local function on_configuration_changed(event)
   lifecycle.on_configuration_changed(event)
+  if scripted_effects then
+    scripted_effects.on_configuration_changed(event)
+  else
+    -- The active Space Age body is deliberately unavailable in a base-only
+    -- stage.  Retire an existing global contribution only when its native
+    -- property can still be read and restored safely; this branch never
+    -- allocates storage or runs on load.
+    local namespace = storage.mir
+    if type(namespace) == "table" and namespace.spoilage_preservation ~= nil then
+      local next_state, facts = spoilage_contribution.try_retire(game,
+        namespace.spoilage_preservation, "space-age-removed")
+      if not facts.unavailable_native_property then
+        namespace.spoilage_preservation = next_state
+      end
+    end
+  end
   library.on_configuration_changed(event)
   reconcile_repair()
   reconcile_translations()
@@ -190,6 +225,7 @@ end
 
 local function on_load()
   lifecycle.on_load()
+  if scripted_effects then scripted_effects.on_load() end
   library.on_load()
   -- No save writes or game access on load. Each joining client reconstructs
   -- the same conditional subscription from the retained queue.
@@ -254,6 +290,40 @@ local function on_library_player_joined(event)
   reconcile_translations()
 end
 
+local function on_research_finished(event)
+  if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
+  if scripted_effects then scripted_effects.on_research_finished(event) end
+end
+
+local function on_research_reversed(event)
+  if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
+  if scripted_effects then scripted_effects.on_research_reversed(event) end
+end
+
+local function on_technology_effects_reset(event)
+  if lifecycle.caps_active() then lifecycle.on_technology_effects_reset(event) end
+  if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
+end
+
+local function on_tower_planted_seed(event)
+  if scripted_effects then scripted_effects.on_tower_planted_seed(event) end
+end
+
+local function on_force_created(event)
+  if lifecycle.caps_active() then lifecycle.on_force_created(event) end
+  if scripted_effects then scripted_effects.on_force_created(event) end
+end
+
+local function on_force_reset(event)
+  if lifecycle.caps_active() then lifecycle.on_force_reset(event) end
+  if scripted_effects then scripted_effects.on_force_reset(event) end
+end
+
+local function on_forces_merged(event)
+  if lifecycle.caps_active() then lifecycle.on_forces_merged(event) end
+  if scripted_effects then scripted_effects.on_forces_merged(event) end
+end
+
 function M.register()
   library.set_cap_provider(lifecycle.cap_limits)
 
@@ -282,13 +352,12 @@ function M.register()
     script.on_event(events.on_entity_damaged, repair_config.enabled and on_entity_damaged or nil,
       repair_config.enabled and {{filter = "type", type = "wall"}, {filter = "type", type = "gate", mode = "or"}} or nil)
   end
-  if lifecycle.caps_active() then
-    if events.on_force_created then script.on_event(events.on_force_created, lifecycle.on_force_created) end
-    if events.on_force_reset then script.on_event(events.on_force_reset, lifecycle.on_force_reset) end
-    if events.on_forces_merged then script.on_event(events.on_forces_merged, lifecycle.on_forces_merged) end
-    if events.on_research_finished then script.on_event(events.on_research_finished, lifecycle.on_research_finished) end
-    if events.on_research_started then script.on_event(events.on_research_started, lifecycle.on_research_started) end
-    if events.on_research_cancelled then script.on_event(events.on_research_cancelled, lifecycle.on_research_cancelled) end
+  local force_lifecycle_active = lifecycle.caps_active()
+    or (scripted_effects and scripted_effects.events_active())
+  if force_lifecycle_active then
+    if events.on_force_created then script.on_event(events.on_force_created, on_force_created) end
+    if events.on_force_reset then script.on_event(events.on_force_reset, on_force_reset) end
+    if events.on_forces_merged then script.on_event(events.on_forces_merged, on_forces_merged) end
   else
     -- A settings/profile transition may reuse the control registration from a
     -- finite save. Remove those exact native callbacks when all cap families
@@ -296,9 +365,33 @@ function M.register()
     if events.on_force_created then script.on_event(events.on_force_created, nil) end
     if events.on_force_reset then script.on_event(events.on_force_reset, nil) end
     if events.on_forces_merged then script.on_event(events.on_forces_merged, nil) end
-    if events.on_research_finished then script.on_event(events.on_research_finished, nil) end
-    if events.on_research_started then script.on_event(events.on_research_started, nil) end
-    if events.on_research_cancelled then script.on_event(events.on_research_cancelled, nil) end
+  end
+  -- Research queue admission belongs solely to bounded cap ownership.  The
+  -- direct scripted effects need the force callbacks above, but do not own
+  -- start/cancel handling when every cap is unlimited.
+  if events.on_research_started then
+    script.on_event(events.on_research_started,
+      lifecycle.caps_active() and lifecycle.on_research_started or nil)
+  end
+  if events.on_research_cancelled then
+    script.on_event(events.on_research_cancelled,
+      lifecycle.caps_active() and lifecycle.on_research_cancelled or nil)
+  end
+  if events.on_research_finished then
+    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    script.on_event(events.on_research_finished, active and on_research_finished or nil)
+  end
+  if events.on_research_reversed then
+    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    script.on_event(events.on_research_reversed, active and on_research_reversed or nil)
+  end
+  if events.on_technology_effects_reset then
+    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
+  end
+  if events.on_tower_planted_seed then
+    local active = scripted_effects and scripted_effects.agriculture_events_active()
+    script.on_event(events.on_tower_planted_seed, active and on_tower_planted_seed or nil)
   end
   if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
   if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, on_library_text_changed) end

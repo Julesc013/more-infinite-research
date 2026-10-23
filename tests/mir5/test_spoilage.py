@@ -15,6 +15,7 @@ class SpoilageTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           spoilage = require("runtime.spoilage")
+          contribution = require("runtime.spoilage_contribution")
 
           function close(left, right)
             return math.abs(left - right) < .0000001
@@ -117,6 +118,33 @@ class SpoilageTests(unittest.TestCase):
           assert(difficulty.spoil_time_modifier == 17 and difficulty.writes == writes)
         ''')
 
+    def test_unavailable_removal_property_retains_state_for_real_active_readdition(self):
+        self.lua.execute('''
+          local active_game, active_difficulty = mock_game(4, {alpha = force("alpha", 2)})
+          local state = spoilage.reconcile(active_game, {enabled = true, per_level_percent = 10}, nil)
+          assert(close(active_difficulty.spoil_time_modifier, 4.4))
+
+          local unavailable = setmetatable({}, {
+            __index = function(_, key)
+              if key == "spoil_time_modifier" then error("Space Age native property is absent") end
+            end,
+            __newindex = function(_, key)
+              error("unavailable native property was written: " .. tostring(key))
+            end
+          })
+          local retained, removed = contribution.try_retire(
+            {difficulty_settings = unavailable}, state, "space-age-removed")
+          assert(retained == state and removed.unavailable_native_property and not removed.restored)
+
+          -- Re-addition uses the actual active reconcile path. A changed
+          -- native value is rebased, not overwritten from stale state.
+          local readded_game, readded_difficulty = mock_game(7, {alpha = force("alpha", 2)})
+          local reapplied, facts = spoilage.reconcile(readded_game,
+            {enabled = true, per_level_percent = 10}, retained)
+          assert(facts.active and facts.external_write_ambiguous)
+          assert(close(reapplied.baseline, 7 / 1.1) and close(readded_difficulty.spoil_time_modifier, 7))
+        ''')
+
     def test_known_published_bucket_shape_has_no_schema_and_remains_usable(self):
         self.lua.execute('''
           local game, difficulty = mock_game(2.42, {alpha = force("alpha", 3)})
@@ -135,11 +163,16 @@ class SpoilageTests(unittest.TestCase):
 
     def test_source_has_no_registration_settings_storage_or_retired_runtime_imports(self):
         source = (ROOT / "source/mir5/runtime/spoilage.lua").read_text(encoding="utf-8")
-        self.assertNotIn("require(", source)
+        self.assertEqual(source.count("require("), 1)
+        self.assertIn('require("runtime.spoilage_contribution")', source)
         self.assertNotIn("script.on_", source)
         self.assertNotIn("storage.", source)
         self.assertNotIn("prototypes.mir", source)
         self.assertNotIn("Generator", source)
+        contribution = (ROOT / "source/mir5/runtime/spoilage_contribution.lua").read_text(encoding="utf-8")
+        self.assertNotIn("require(", contribution)
+        self.assertNotIn("script.on_", contribution)
+        self.assertNotIn("storage.", contribution)
 
 
 if __name__ == "__main__":

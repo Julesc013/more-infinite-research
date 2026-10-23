@@ -65,9 +65,13 @@ class LifecycleTests(unittest.TestCase):
             }
           end
 
-          function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods)
+          function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods,
+              agriculture_cap)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
+            if agriculture_cap ~= nil then
+              settings.startup["ips-max-level-research_agricultural_growth_speed"] = {value = agriculture_cap}
+            end
             decoded_profiles = 0
             helpers = {
               json_to_table = function(_) decoded_profiles = decoded_profiles + 1
@@ -80,7 +84,8 @@ class LifecycleTests(unittest.TestCase):
             }
             logs = {}
             log = function(message) logs[#logs + 1] = message end
-            game = {forces = forces}
+            game = {forces = forces, difficulty_settings = {spoil_time_modifier = 1}}
+            mods = active_mods or {}
             handlers = retained_handlers or {events = {}}
             handlers.events = handlers.events or {}
             script = {
@@ -96,7 +101,8 @@ class LifecycleTests(unittest.TestCase):
             }
             defines = {events = {
               on_force_created = 1, on_force_reset = 2, on_forces_merged = 3,
-              on_research_finished = 4, on_research_started = 5, on_research_cancelled = 6
+              on_research_finished = 4, on_research_started = 5, on_research_cancelled = 6,
+              on_research_reversed = 7, on_technology_effects_reset = 8
             }}
             remote = {interfaces = {}, removed = false}
             remote.add_interface = function(name, functions) remote.interfaces[name] = functions end
@@ -119,12 +125,30 @@ class LifecycleTests(unittest.TestCase):
           assert(type(handlers.init) == "function" and type(handlers.configuration) == "function"
             and type(handlers.load) == "function")
           for id = 1, 6 do assert(handlers.events[id] == nil) end
-          assert(handlers.events[7] == nil and remote.removed == false and next(storage) == nil)
+          assert(handlers.events[7] == nil and handlers.events[8] == nil
+            and remote.removed == false and next(storage) == nil)
           handlers.init(); handlers.configuration()
           assert(next(storage) == nil, "unlimited settings allocated cap storage")
           local before = next(storage)
           handlers.load()
           assert(before == next(storage), "on_load initialized or changed storage")
+        ''')
+
+    def test_space_age_caps_have_independent_named_ownership(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_agricultural_growth_speed-1"
+          local native = technology(name, 3, true)
+          local f = force(33, {[name] = native}, {}, nil, nil)
+          boot({[33] = f}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, 2)
+          handlers.init()
+          assert(not native.enabled and native.visible_when_disabled)
+          assert(storage.mir_caps.owned_disabled[33][name].disabled == true)
+          local saved = storage
+
+          boot({[33] = f}, 0, "", saved, nil, 0, {['space-age'] = '2.1.23'}, 0)
+          handlers.configuration()
+          assert(native.enabled and not native.visible_when_disabled and storage.mir_caps == nil,
+            "unlimited agricultural setting did not restore only its own cap transition")
         ''')
 
     def test_foreign_interface_collision_fails_without_removing_it(self):
@@ -181,6 +205,8 @@ class LifecycleTests(unittest.TestCase):
           for id = 1, 6 do
             assert(handlers.events[id] == nil, "unlimited parse retained cap handler " .. id)
           end
+          assert(handlers.events[7] == nil and handlers.events[8] == nil,
+            "unlimited parse retained cap reversal handler")
           handlers.configuration()
           assert(second.enabled and not second.visible_when_disabled and storage.mir_caps == nil)
           handlers.init()
@@ -219,6 +245,48 @@ class LifecycleTests(unittest.TestCase):
             and f_unresolved.research_progress == .75 and #f_unresolved.research_queue == 1
             and f_unresolved.research_queue[1] == unresolved_other,
             "unresolved current research was speculatively cancelled or rewritten")
+        ''')
+
+    def test_reversal_and_effect_reset_restore_only_mir_owned_cap_disablement(self):
+        self.lua.execute('''
+          local gear_name = "recipe-prod-research_gears-1"
+          local worker_name = "worker-robots-speed-6"
+          local gear = technology(gear_name, 3, true)
+          local foreign = technology(gear_name, 3, false)
+          local worker = technology(worker_name, 3, true)
+          worker.prototype = {
+            max_level = 4294967295,
+            effects = {{type = "worker-robot-speed", modifier = .65}}
+          }
+          worker.prerequisites = {["worker-robots-speed-5"] = {name = "worker-robots-speed-5"}}
+          local gear_force = force(30, {[gear_name] = gear}, {}, nil, nil)
+          local worker_force = force(31, {[worker_name] = worker}, {}, nil, nil)
+          local foreign_force = force(32, {[gear_name] = foreign}, {}, nil, nil)
+          gear.force, worker.force, foreign.force = gear_force, worker_force, foreign_force
+          boot({[30] = gear_force, [31] = worker_force, [32] = foreign_force}, 2, "", nil, nil, 2)
+          assert(type(handlers.events[defines.events.on_research_reversed]) == "function")
+          assert(type(handlers.events[defines.events.on_technology_effects_reset]) == "function")
+          handlers.init()
+          assert(not gear.enabled and gear.visible_when_disabled)
+          assert(not worker.enabled and worker.visible_when_disabled)
+          assert(not foreign.enabled and foreign.visible_when_disabled)
+          assert(storage.mir_caps.owned_disabled[32][gear_name].disabled == nil,
+            "foreign disablement was claimed by MIR")
+
+          gear.level = 2
+          handlers.events[defines.events.on_research_reversed]({research = gear})
+          assert(gear.enabled and not gear.visible_when_disabled,
+            "research reversal did not restore MIR-owned gear disablement below its cap")
+
+          foreign.level = 2
+          handlers.events[defines.events.on_research_reversed]({research = foreign})
+          assert(not foreign.enabled,
+            "research reversal re-enabled a foreign-disabled gear technology")
+
+          worker.level = 2
+          handlers.events[defines.events.on_technology_effects_reset]({force = worker_force})
+          assert(worker.enabled and not worker.visible_when_disabled,
+            "effects reset did not restore MIR-owned worker disablement below its cap")
         ''')
 
     def test_foreign_disable_and_force_lifecycle_cleanup_remain_owned(self):

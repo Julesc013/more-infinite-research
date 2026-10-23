@@ -6,17 +6,36 @@ local M = {}
 
 M.import_setting_name = "mir-settings-profile-import"
 
-local gear_key = "research_gears"
 local fields = {
-  {key = "enabled", name = "ips-enable-", type = "bool-setting", default_value = true},
-  {key = "base_cost", name = "ips-cost-base-", type = "int-setting", default_value = 8000, minimum_value = 1, maximum_value = 2147483647},
-  {key = "linear_increment", name = "ips-cost-linear-increment-", type = "int-setting", default_value = 0, minimum_value = 0, maximum_value = 2147483647},
+  {key = "enabled", name = "ips-enable-", type = "bool-setting"},
+  {key = "base_cost", name = "ips-cost-base-", type = "int-setting", minimum_value = 1, maximum_value = 2147483647},
+  {key = "linear_increment", name = "ips-cost-linear-increment-", type = "int-setting", minimum_value = 0, maximum_value = 2147483647},
   -- Factorio's prototype has no maximum. MIRSET1 rejects values above 1000.
-  {key = "growth_factor", name = "ips-cost-growth-", type = "double-setting", default_value = 2, minimum_value = 1, profile_maximum_value = 1000},
-  {key = "max_level", name = "ips-max-level-", type = "int-setting", default_value = 0, minimum_value = 0, maximum_value = 2147483647},
-  {key = "research_time", name = "ips-research-time-", type = "int-setting", default_value = 60, minimum_value = 0, maximum_value = 2147483647},
-  {key = "effect_percent", name = "ips-effect-per-level-", type = "double-setting", default_value = 10, minimum_value = 0.01, maximum_value = 1000000}
+  {key = "growth_factor", name = "ips-cost-growth-", type = "double-setting", minimum_value = 1, profile_maximum_value = 1000},
+  {key = "max_level", name = "ips-max-level-", type = "int-setting", minimum_value = 0, maximum_value = 2147483647},
+  {key = "research_time", name = "ips-research-time-", type = "int-setting", minimum_value = 0, maximum_value = 2147483647},
+  {key = "effect_percent", name = "ips-effect-per-level-", type = "double-setting", minimum_value = 0.01, maximum_value = 1000000}
 }
+
+local streams = {{
+  key = "research_gears", value_key = "gear",
+  technology_locale = "technology-name.more-infinite-research.research_gears",
+  order_prefix = "b-100-iron-gear-wheel-productivity-stream-research_gears-",
+  defaults = {enabled = true, base_cost = 8000, linear_increment = 0,
+    growth_factor = 2, max_level = 0, research_time = 60, effect_percent = 10}
+}}
+
+-- The selected module contains the two non-base setting descriptors. A
+-- base-only data/control stage does not construct or import those rows.
+-- Settings is shared by data and control stages. Data exposes `mods`; the
+-- control-stage authority is `script.active_mods`. Keep the inactive module
+-- unrequired in both environments.
+local active_mods = script and script.active_mods or mods or {}
+local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
+if space_age_active then
+  local scripted = require("research.settings.space_age_scripted")
+  for _, stream in ipairs(scripted.streams) do streams[#streams + 1] = stream end
+end
 
 local native_fields = {
   {key = "worker_robots_speed_max_level", name = "mir-max-level-worker-robots-speed", type = "int-setting", default_value = 0, minimum_value = 0, maximum_value = 2147483647},
@@ -31,11 +50,16 @@ local function copy_spec(spec)
 end
 
 local declarations, declaration_by_name = {}, {}
-for _, field in ipairs(fields) do
-  local spec = copy_spec(field)
-  spec.name = spec.name .. gear_key
-  declarations[#declarations + 1] = spec
-  declaration_by_name[spec.name] = spec
+for _, stream in ipairs(streams) do
+  for index, field in ipairs(fields) do
+    local spec = copy_spec(field)
+    spec.name = spec.name .. stream.key
+    spec.default_value = stream.defaults[spec.key]
+    spec.stream = stream
+    spec.field_index = index
+    declarations[#declarations + 1] = spec
+    declaration_by_name[spec.name] = spec
+  end
 end
 for _, field in ipairs(native_fields) do
   local spec = copy_spec(field)
@@ -65,13 +89,20 @@ function M.prototypes()
     localised_name = {"mod-setting-name.mir-settings-profile-import"},
     localised_description = {"mod-setting-description.mir-settings-profile-import"}
   }}
-  for index, spec in ipairs(declarations) do
+  for _, spec in ipairs(declarations) do
     local name, description, order
-    if index <= #fields then
-      local locale_key = fields[index].name .. "stream"
-      name = {"mod-setting-name." .. locale_key, {"technology-name.more-infinite-research.research_gears"}}
-      description = {"mod-setting-description." .. locale_key, {"technology-name.more-infinite-research.research_gears"}}
-      order = "b-100-iron-gear-wheel-productivity-stream-research_gears-" .. (index - 1)
+    if spec.stream then
+      local locale_key = fields[spec.field_index].name .. "stream"
+      name = {"mod-setting-name." .. locale_key, {spec.stream.technology_locale}}
+      local generic_description = {"mod-setting-description." .. locale_key, {spec.stream.technology_locale}}
+      if spec.stream.description_note then
+        description = {"", generic_description, "\n\n", {spec.stream.description_note}}
+      elseif spec.stream.enable_note and spec.field_index == 1 then
+        description = {"", generic_description, "\n\n", {spec.stream.enable_note}}
+      else
+        description = generic_description
+      end
+      order = spec.stream.order_prefix .. (spec.field_index - 1)
     else
       name = {"mod-setting-name." .. spec.name}
       description = {"mod-setting-description." .. spec.name}
@@ -161,9 +192,21 @@ end
 function M.resolve(startup, helpers, report)
   local effective = M.effective_values(startup, helpers, report)
   local values = {}
-  for _, spec in ipairs(declarations) do values[spec.key] = effective[spec.name] end
-  -- Consumer normalization only: export retains a literal configured zero.
-  if values.research_time == 0 then values.research_time = 60 end
+  for _, stream in ipairs(streams) do
+    local stream_values = {}
+    for _, field in ipairs(fields) do
+      local value = effective[field.name .. stream.key]
+      -- Consumer normalization only: export retains a literal configured zero.
+      if field.key == "research_time" and value == 0 then value = stream.defaults.research_time end
+      stream_values[field.key] = value
+    end
+    if stream.key == "research_gears" then
+      for key, value in pairs(stream_values) do values[key] = value end
+    else
+      values[stream.value_key] = stream_values
+    end
+  end
+  for _, spec in ipairs(native_fields) do values[spec.key] = effective[spec.name] end
   return values
 end
 

@@ -121,6 +121,28 @@ class LegacyCapsTests(unittest.TestCase):
           assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
         ''')
 
+    def test_imports_only_the_exact_published_direct_stream_tuples(self):
+        self.lua.execute('''
+          local candidates = {
+            candidate("recipe-prod-research_agricultural_growth_speed-1",
+              "ips-max-level-research_agricultural_growth_speed", "generated-stream", "emit"),
+            candidate("recipe-prod-research_spoilage_preservation-1",
+              "ips-max-level-research_spoilage_preservation", "generated-stream", "emit")
+          }
+          for index, direct in ipairs(candidates) do
+            local f = native_force(50 + index, {[direct.name] = native_technology()})
+            local old = old_bucket(50 + index, direct, 2, "mir32-1234abcd")
+            local rows, facts = legacy.import_for_force(old, f, {direct}, nil)
+            assert(rows[direct.name].disabled and rows[direct.name].visible_when_disabled == false)
+            assert(facts.decisions[1].outcome == "owned_disable_imported")
+
+            local foreign = candidate(direct.name, direct.setting, "native-owner", "emit")
+            rows, facts = legacy.import_for_force(old, f, {foreign}, nil)
+            assert(rows[direct.name] == nil and facts.imported == 0)
+            assert(facts.decisions[1].outcome == "candidate_not_admitted")
+          end
+        ''')
+
     def test_visibility_only_preserves_a_foreign_disable_and_current_rows_win(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
@@ -193,10 +215,14 @@ class LegacyCapsTests(unittest.TestCase):
           assert(facts.decisions[1].outcome == "visibility_imported_enablement_reenabled")
         ''')
 
-    def test_uses_only_two_declared_candidates_and_does_not_enumerate_legacy_maps(self):
+    def test_uses_only_four_declared_candidates_and_does_not_enumerate_legacy_maps(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
             "generated-stream", "emit")
+          local agriculture = candidate("recipe-prod-research_agricultural_growth_speed-1",
+            "ips-max-level-research_agricultural_growth_speed", "generated-stream", "emit")
+          local spoilage = candidate("recipe-prod-research_spoilage_preservation-1",
+            "ips-max-level-research_spoilage_preservation", "generated-stream", "emit")
           local worker = candidate("worker-robots-speed-7", "mir-max-level-worker-robots-speed",
             "native-owner", "native-owner-cap")
           local reads = 0
@@ -209,11 +235,13 @@ class LegacyCapsTests(unittest.TestCase):
             error("unexpected legacy field " .. tostring(key))
           end, __pairs = function() error("legacy maps must not be enumerated") end})
           local f = native_force(8, {})
-          local rows, facts = legacy.import_for_force(old, f, {gear, worker}, nil)
-          assert(next(rows) == nil and facts.candidates_checked == 2 and #facts.decisions == 2)
+          local rows, facts = legacy.import_for_force(old, f, {gear, agriculture, spoilage, worker}, nil)
+          assert(next(rows) == nil and facts.candidates_checked == 4 and #facts.decisions == 4)
           assert(reads <= 4)
-          local ok = pcall(function() legacy.import_for_force(old, f, {gear, worker, gear}, nil) end)
-          assert(not ok, "third candidate was accepted")
+          local ok = pcall(function()
+            legacy.import_for_force(old, f, {gear, agriculture, spoilage, worker, gear}, nil)
+          end)
+          assert(not ok, "fifth candidate was accepted")
         ''')
 
     def test_source_has_no_old_runtime_import_or_mutating_assignment(self):

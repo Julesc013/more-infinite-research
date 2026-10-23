@@ -228,6 +228,157 @@ class GeneratorTests(unittest.TestCase):
           assert(capped.effects[1].change == .1 and capped.unit.count_formula == a.unit.count_formula)
         ''')
 
+    def test_scripted_effect_rows_match_the_captured_space_age_contract(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          package.loaded["research.settings.space_age_scripted"] = nil
+          local space_config = require("research.settings")
+          local startup = {}
+          for _, spec in ipairs(space_config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["ips-research-time-research_agricultural_growth_speed"].value = 0
+          startup["ips-enable-research_spoilage_preservation"].value = false
+          local values = space_config.resolve(startup)
+          assert(values.agricultural_growth_speed.base_cost == 40000
+            and values.agricultural_growth_speed.growth_factor == 1.5
+            and values.agricultural_growth_speed.research_time == 90
+            and values.agricultural_growth_speed.effect_percent == 1)
+          assert(values.spoilage_preservation.base_cost == 50000
+            and values.spoilage_preservation.research_time == 120
+            and values.spoilage_preservation.enabled == false)
+
+          local names = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "space-science-pack", "agricultural-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack"}
+          local science = {}
+          for _, name in ipairs(names) do science[name] = {} end
+          local raw = {technology = science, tool = science, item = {spoilage = {}}}
+          local bindings = require("compatibility.space_age_scripted_effects").select(mods, raw)
+          local direct = require("research.scripted_effects").technologies(values, bindings)
+          local agriculture, spoilage = direct[1], direct[2]
+          assert(agriculture.name == "recipe-prod-research_agricultural_growth_speed-1"
+            and agriculture.level == 1 and agriculture.upgrade and agriculture.max_level == "infinite")
+          assert(agriculture.enabled == nil and agriculture.order == "p[research_agricultural_growth_speed]")
+          assert(agriculture.unit.count_formula == "40000*1.5^(L-1)" and agriculture.unit.time == 90)
+          assert(agriculture.icons[1].icon == "__space-age__/graphics/technology/agriculture.png"
+            and agriculture.icons[1].icon_size == 256)
+          assert(#agriculture.prerequisites == 7 and #agriculture.unit.ingredients == 7)
+          assert(agriculture.prerequisites[5] == "agricultural-science-pack"
+            and agriculture.prerequisites[6] == "electromagnetic-science-pack")
+          assert(agriculture.effects[1].type == "nothing"
+            and agriculture.effects[1].effect_description[1]
+              == "modifier-description.more-infinite-research.agricultural_growth_speed"
+            and agriculture.effects[1].effect_description[2] == "1")
+          assert(spoilage.name == "recipe-prod-research_spoilage_preservation-1"
+            and spoilage.enabled == false and spoilage.level == 1)
+          assert(spoilage.unit.count_formula == "50000*1.5^(L-1)" and spoilage.unit.time == 120)
+          assert(spoilage.icons[1].icon == "__space-age__/graphics/icons/spoilage.png"
+            and spoilage.prerequisites[5] == "space-science-pack"
+            and spoilage.prerequisites[6] == "agricultural-science-pack")
+          assert(spoilage.effects[1].type == "nothing"
+            and spoilage.effects[1].effect_description[2] == "1")
+
+          local expected = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
+            "cryogenic-science-pack"}
+          for index, name in ipairs(expected) do
+            assert(agriculture.prerequisites[index] == name
+              and agriculture.unit.ingredients[index][1] == name
+              and agriculture.unit.ingredients[index][2] == 1)
+          end
+        ''')
+
+    def test_base_stage_leaves_scripted_effect_modules_and_settings_unloaded(self):
+        self.lua.execute('''
+          assert(config.spec("ips-enable-research_agricultural_growth_speed") == nil)
+          assert(config.spec("ips-enable-research_spoilage_preservation") == nil)
+          assert(package.loaded["research.settings.space_age_scripted"] == nil)
+          assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
+          assert(package.loaded["research.scripted_effects"] == nil)
+
+          local startup, environment = defaults(), world()
+          settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
+          package.preload["compatibility.space_age_scripted_effects"] = function()
+            error("base data stage loaded a Space Age binding")
+          end
+          package.preload["research.scripted_effects"] = function()
+            error("base data stage loaded a Space Age technology body")
+          end
+          local ok, message = pcall(dofile, data_final_path)
+          package.preload["compatibility.space_age_scripted_effects"] = nil
+          package.preload["research.scripted_effects"] = nil
+          assert(ok, message)
+          assert(environment.writes == 1 and #environment.emitted == 1)
+          assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
+          assert(package.loaded["research.scripted_effects"] == nil)
+        ''')
+
+    def test_space_age_data_stage_installs_the_two_authored_effect_rows_once(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          package.loaded["research.settings.space_age_scripted"] = nil
+          local space_config = require("research.settings")
+          local startup = {}
+          for _, spec in ipairs(space_config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          local names = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "space-science-pack", "agricultural-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack"}
+          local science = {}
+          for _, name in ipairs(names) do science[name] = {} end
+          local environment = {raw = {technology = science, tool = science, item = {spoilage = {}},
+            recipe = {['casting-iron-gear-wheel'] = {}, ['iron-gear-wheel'] = {}}}, writes = 0,
+            extend = function(self, rows) self.writes = self.writes + 1; self.emitted = rows end}
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil)
+          assert(environment.writes == 1 and #environment.emitted == 3)
+          assert(environment.emitted[1].name == "recipe-prod-research_gears-1")
+          assert(environment.emitted[2].name == "recipe-prod-research_agricultural_growth_speed-1")
+          assert(environment.emitted[3].name == "recipe-prod-research_spoilage_preservation-1")
+        ''')
+
+    def test_k2so_scripted_binding_keeps_the_captured_spoilage_subset_and_lazy_profiles(self):
+        self.lua.execute('''
+          local selector = require("compatibility.space_age_scripted_effects")
+          local space_age = "compatibility.space_age_scripted_effects.space_age"
+          local k2so_body = "compatibility.space_age_scripted_effects.k2so"
+          local names = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "space-science-pack", "agricultural-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack"}
+          local science = {}
+          for _, name in ipairs(names) do science[name] = {} end
+          local raw = {technology = science, tool = science, item = {spoilage = {}}}
+          local k2 = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0',
+            ['k2so-assets'] = '1.0.7'}
+
+          package.loaded[space_age], package.loaded[k2so_body] = nil, nil
+          package.preload[space_age] = function() error("inactive Space Age profile was loaded") end
+          local bindings = selector.select(k2, raw)
+          assert(package.loaded[space_age] == nil, "K2SO selection loaded the inactive Space Age body")
+          assert(#bindings.agriculture.prerequisites == 7 and #bindings.spoilage.prerequisites == 4)
+          local expected = {"production-science-pack", "space-science-pack",
+            "agricultural-science-pack", "cryogenic-science-pack"}
+          for index, name in ipairs(expected) do
+            assert(bindings.spoilage.prerequisites[index] == name
+              and bindings.spoilage.ingredients[index][1] == name
+              and bindings.spoilage.ingredients[index][2] == 1)
+          end
+          package.preload[space_age] = nil
+
+          local partial = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4'}
+          assert(not pcall(selector.select, partial, raw), "partial K2SO selected a fallback profile")
+
+          -- Incidental asset-only dependencies do not activate an overhaul
+          -- or load its binding body in an otherwise ordinary Space Age game.
+          package.loaded[k2so_body] = nil
+          package.preload[k2so_body] = function() error("inactive K2SO profile was loaded") end
+          local ordinary = selector.select({['space-age'] = '2.1.23',
+            Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}, raw)
+          assert(#ordinary.spoilage.prerequisites == 7 and package.loaded[k2so_body] == nil)
+          package.preload[k2so_body] = nil
+        ''')
+
     def test_valid_family_forward_reference_and_one_write(self):
         self.lua.execute('''
           local a, b = build(), build(); a.name = "alpha-1"; b.name = "beta-1"

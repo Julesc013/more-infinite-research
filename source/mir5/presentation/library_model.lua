@@ -99,7 +99,10 @@ function M.normalize(view)
     tab = accepted(view.tab, {"research", "settings", "queue", "availability", "help"}, "research"),
     settings_scope = accepted(view.settings_scope, {"research", "options"}, "research"),
     effect_page = finite_integer(effect_page) and math.max(1, math.floor(effect_page)) or 1,
-    family = accepted(view.family, {"mir", "external", "all", "streams", "native"}, "mir"),
+    -- Family descriptors are authored catalogue metadata.  This pure query
+    -- layer preserves any bounded identifier; the runtime host decides which
+    -- descriptors are currently published by its bounded declaration list.
+    family = bounded_string(view.family, MAX_SEARCH) or "mir",
     sort = accepted(view.sort, {"progression", "native", "name-asc", "name-desc"}, "progression"),
     stable_sort = accepted(view.stable_sort, {"progression", "native"}, "progression"),
     settings_search = searchable(settings_search),
@@ -280,11 +283,11 @@ local function row_for(force, declaration, id, technology, queue_count, queue_in
 end
 
 local function wants_native_catalogue(family)
-  return family == "all" or family == "external" or family == "native"
+  return family == "all" or family == "external"
 end
 
 local function family_matches(row, family)
-  if family == "all" or family == "native" then return true end
+  if family == "all" then return true end
   if family == "mir" then return row.family ~= "external" end
   return row.family == family
 end
@@ -328,8 +331,9 @@ local function ordered(left, right, sort)
   return left.id < right.id
 end
 
--- Default `mir` builds rows only from authored declarations. Explicit native,
--- external, or all views may enumerate the native catalogue exactly once.
+-- Default `mir` and explicit authored descriptors build from declarations
+-- only. Explicit external or all views may enumerate the native catalogue
+-- exactly once.
 function M.rows(force, catalogue, view, translations, context)
   local normalized = M.normalize(view)
   local declared, by_id = declarations(catalogue)
@@ -365,9 +369,15 @@ function M.rows(force, catalogue, view, translations, context)
   end
   for _, candidate in ipairs(candidates) do
     local id, technology = candidate.id, candidate.technology
-    local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
-    row.hidden = normalized.hidden[id] == true
-    if row_matches(row, normalized) then selected[#selected + 1] = row end
+    -- The Library lists research that exists for this force.  A declared
+    -- technology can be unavailable on the current platform; that is not a
+    -- synthetic "missing" row or an availability state.  Detail still
+    -- reports technology_not_found for a direct selection.
+    if technology ~= nil then
+      local row = row_for(force, by_id[id], id, technology, queue_count, queue_index, current, translations, context)
+      row.hidden = normalized.hidden[id] == true
+      if row_matches(row, normalized) then selected[#selected + 1] = row end
+    end
   end
   table.sort(selected, function(left, right) return ordered(left, right, normalized.sort) end)
   return selected
