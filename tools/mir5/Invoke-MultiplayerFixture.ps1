@@ -51,7 +51,25 @@ try {
   $settings.max_players=2;$settings.auto_pause=$false;$settings.autosave_interval=0
   $serverSettings=Join-Path $resources.root 'server-settings.json'
   [IO.File]::WriteAllText($serverSettings,($settings|ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
-  $clients=@();$port=34199
+  # Let Windows allocate available loopback ports. Fixed ports can be in its
+  # excluded ranges (the first native run failed with WSAEACCES/10013).
+  $udpProbes=@();$tcpProbe=$null
+  try {
+    foreach($index in 0..2){
+      $probe=[Net.Sockets.UdpClient]::new([Net.Sockets.AddressFamily]::InterNetwork)
+      $probe.Client.Bind([Net.IPEndPoint]::new([Net.IPAddress]::Loopback,0))
+      $udpProbes+=,$probe
+    }
+    $udpPorts=@($udpProbes|ForEach-Object {[int]$_.Client.LocalEndPoint.Port})
+    $tcpProbe=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,0);$tcpProbe.Start()
+    $rconPort=[int]$tcpProbe.LocalEndpoint.Port
+  } finally {
+    foreach($probe in $udpProbes){$probe.Dispose()}
+    if($null -ne $tcpProbe){$tcpProbe.Stop()}
+  }
+  $serverPort=$udpPorts[0];$clientIndex=1
+  $record.loopback_ports=[ordered]@{udp=$udpPorts;rcon_tcp=$rconPort;selection='OS-assigned temporary loopback bindings, released before native start'}
+  $clients=@()
   $rconPassword=[guid]::NewGuid().ToString('D')
   foreach($locale in @('en','de')){
     $write=Join-Path $resources.root ('client-'+$locale)
@@ -64,7 +82,7 @@ try {
     # Isolated disposable identities contain no online token or personal data.
     $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version='2.0.77';build_version=84539;build_mode='full';platform='win64'}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
-    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$port};$port++
+    $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
   }
   $hashes=@{};foreach($entry in $selection.archive_sha256.GetEnumerator()){$hashes[$entry.Key]=$entry.Value}
   $hashes[[IO.Path]::GetFileName([string]$prepared.mir_archive.path)]=$ExpectedMIRArchiveSha256.ToUpperInvariant()
@@ -72,10 +90,10 @@ try {
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   # Validate the entire fixed launch set before starting the governed tree.
-  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$seed,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port','34198','--rcon-bind','127.0.0.1:34201','--rcon-password',$rconPassword)
-  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect','127.0.0.1:34198','--port',[string]$client.port)}
+  Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$seed,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort,'--rcon-bind',('127.0.0.1:'+ $rconPort),'--rcon-password',$rconPassword)
+  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)}
   $screenshots=@(foreach($client in $clients){foreach($stage in @('initial','rejoin','restart')){Join-Path $client.write_data ('script-output/mir5-library-multiplayer/'+$stage+'-*.png')}})
-  $spec=[ordered]@{engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=34198;clients=$clients;expected_screenshots=$screenshots;rcon_port=34201;rcon_password=$rconPassword}
+  $spec=[ordered]@{engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
   $specPath=Join-Path $resources.root 'session-spec.json'
   [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash

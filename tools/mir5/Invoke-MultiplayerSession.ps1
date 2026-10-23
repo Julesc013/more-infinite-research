@@ -360,9 +360,10 @@ Assert-Session ($seedHash -ceq ([string]$spec.seed_sha256).ToUpperInvariant()) '
 $serverConfig = Resolve-BuildInput ([string]$spec.server_config) 'Leaf' 'server config'
 $serverSettings = Resolve-BuildInput ([string]$spec.server_settings) 'Leaf' 'server settings'
 $serverWriteData = Resolve-BuildInput ([string]$spec.server_write_data) 'Container' 'server write-data'
-Assert-Session ([int]$spec.port -eq 34198) 'server port must be loopback 34198'
+$serverPort=[int]$spec.port
+Assert-Session ($serverPort -ge 1024 -and $serverPort -le 65535) 'server port must be an OS-assigned loopback user port'
 $rconPort = [int]$spec.rcon_port
-Assert-Session ($rconPort -eq 34201) 'RCON port must be loopback 34201'
+Assert-Session ($rconPort -ge 1024 -and $rconPort -le 65535) 'RCON port must be an OS-assigned loopback user port'
 $rconPassword = [string]$spec.rcon_password
 Assert-Session ($rconPassword -cmatch '^[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}$') 'RCON password must be a temporary GUID'
 $settings = Get-Content -LiteralPath $serverSettings -Raw | ConvertFrom-Json -AsHashtable
@@ -382,7 +383,7 @@ foreach ($client in $clients) {
   $client.write_data = Resolve-BuildInput ([string]$client.write_data) 'Container' ("client $($client.name) write-data")
   Assert-Session (-not $configs.Contains([string]$client.config) -and -not $writeData.Contains([string]$client.write_data)) 'client configs and write-data must be distinct'
   $null = $configs.Add([string]$client.config); $null = $writeData.Add([string]$client.write_data)
-  Assert-Session ([int]$client.port -in @(34199,34200) -and -not $ports.Contains([int]$client.port)) 'client ports must be distinct 34199/34200'
+  Assert-Session ([int]$client.port -ge 1024 -and [int]$client.port -le 65535 -and [int]$client.port -ne $serverPort -and -not $ports.Contains([int]$client.port)) 'client loopback user ports must be distinct from each other and server'
   $null = $ports.Add([int]$client.port)
 }
 Assert-Session (($clients.locale | Sort-Object) -join ',' -ceq 'de,en') 'two client locales must be en and de'
@@ -421,11 +422,11 @@ $deadline = [DateTime]::UtcNow.AddSeconds(900)
 $server = $null; $activeClients = @()
 $baseServer = @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--rcon-bind',('127.0.0.1:' + [string]$rconPort),'--rcon-password',$rconPassword)
 function Start-Server([string]$Name, [string]$Save) {
-  Start-Native $Name ($baseServer + @('--start-server',$Save,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port','34198'))
+  Start-Native $Name ($baseServer + @('--start-server',$Save,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort))
 }
 function Start-Clients([string]$Phase) {
   @($clients | ForEach-Object {
-    Start-Native ("client-$Phase-$($_.locale)") @('--config',$_.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect','127.0.0.1:34198','--port',[string]$_.port)
+    Start-Native ("client-$Phase-$($_.locale)") @('--config',$_.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$_.port)
   })
 }
 
