@@ -1645,6 +1645,9 @@ do
   raw.technology["cryogenic-science-pack"] = {type = "technology", name = "cryogenic-science-pack",
     unit = {count = 1, ingredients = {{"foreign-native-pack", 1}}},
     effects = {{type = "unlock-recipe", recipe = "cryogenic-science-pack"}}}
+  raw.recipe["late-cryogenic-recycling"] = {type = "recipe", name = "late-cryogenic-recycling", enabled = true,
+    ingredients = {{"cryogenic-science-pack", 1}},
+    results = {{type = "item", name = "cryogenic-science-pack", amount = 1}}}
   local before = fingerprint.of(raw)
   Context.with_active(Context.new(), function()
     local index = science_packs.binding_snapshot()
@@ -1653,7 +1656,7 @@ do
       "Strict diagnostics retain the reported cryogenic unresolved-dependency result")
     local status, gate = science_packs.pack_production_status("cryogenic-science-pack")
     check(status == "research" and gate == "cryogenic-science-pack",
-      "Startup retains the valid native cryogenic recipe and its exact unlock owner")
+      "An optional cyclic producer cannot veto the native cryogenic recipe and its exact unlock owner")
     local selected = science_packs.best_lab_compatible_ingredients(
       {{roles[1], 2}, {"cryogenic-science-pack", 3}}, "cryogenic-startup-reference", {"cryogenic-science-pack"})
     check(selected and #selected == 2 and selected[1][2] == 2 and selected[2][2] == 3,
