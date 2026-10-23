@@ -48,7 +48,10 @@ foreach($role in @('source','candidate')){
   if($CryogenicReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-final-fixes.lua') -Raw)}
   Copy-Item -LiteralPath (Join-Path $RepoRoot 'source/prototypes/mir/core/fingerprint.lua') -Destination (Join-Path $directory 'mir471_fingerprint.lua')
   [IO.File]::WriteAllText((Join-Path $directory 'data-final-fixes.lua'),$observer,[Text.UTF8Encoding]::new($false))
-  if($CryogenicReproducer){foreach($file in @('data-updates.lua','settings-updates.lua')){Copy-Item (Join-Path $RepoRoot ('fixtures/assert-startup-cryogenic-472/'+$file)) (Join-Path $directory $file)}}
+  if($CryogenicReproducer){
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-updates.lua') -Destination (Join-Path $directory 'data-updates.lua')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/settings-updates.lua') -Destination (Join-Path $directory 'settings-updates.lua')
+  }
   if($Target-ceq'f210'-and-not$CandidateOnly){
     Copy-Item (Join-Path $RepoRoot 'fixtures/assert-upgrade-4-0-21000-to-4-1-21000/*') $directory
     $control=Get-Content (Join-Path $directory 'control.lua') -Raw
