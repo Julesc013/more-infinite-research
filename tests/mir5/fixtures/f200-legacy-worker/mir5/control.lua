@@ -258,9 +258,28 @@ local function marker(stage, state)
       foreign_queue_progress = state.foreign_queue.progress,
       science_consumed_units = state.destination_science_accounting.consumed_units,
       science_remaining_ticks = state.destination_science_accounting.remaining_ticks,
+      science_processing_ticks = state.destination_processing_ticks,
+      science_elapsed_ticks = state.destination_elapsed_ticks,
       science_units_after = state.destination_science_units_after,
       on_load_read_only = stage == "reload",
     },
+  }))
+end
+
+local function finish_diagnostic(state, accounting)
+  local observed = {}
+  local inventory = lab(state)
+  for _, item in ipairs(SCIENCE) do
+    observed[item] = science_units(inventory, item, "successor native worker finish")
+  end
+  log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({
+    stage = "finish-before-assertion", case = MIR5_CASE,
+    research_start_tick = state.destination_research_start_tick,
+    research_finished_tick = game.tick,
+    raw_elapsed_ticks = game.tick - state.destination_research_start_tick,
+    processing_ticks = state.destination_processing_ticks,
+    expected_processing_ticks = type(accounting) == "table" and accounting.remaining_ticks or false,
+    science_units_observed = observed,
   }))
 end
 
@@ -302,6 +321,7 @@ script.on_configuration_changed(function()
   state.destination_science_accounting = expected_science_consumption(game.forces.player,
     technology(game.forces.player, WORKER), state.lab, 0.27)
   state.destination_research_start_tick = game.tick
+  state.destination_processing_ticks = 0
   state.destination_elapsed_ticks = nil
 end)
 
@@ -311,8 +331,9 @@ script.on_event(defines.events.on_research_finished, function(event)
       or event.research.force ~= game.forces.player or event.research.name ~= WORKER then return end
   local accounting = state.destination_science_accounting
   local elapsed = game.tick - state.destination_research_start_tick
-  if type(accounting) ~= "table" or elapsed ~= accounting.remaining_ticks then
-    fail("successor real native worker lab tick duration differs")
+  finish_diagnostic(state, accounting)
+  if type(accounting) ~= "table" or state.destination_processing_ticks ~= accounting.remaining_ticks then
+    fail("successor real native worker lab processing ticks differ")
   end
   state.destination_elapsed_ticks = elapsed
   state.destination_lab_completions = state.destination_lab_completions + 1
@@ -351,6 +372,9 @@ script.on_event(defines.events.on_tick, function()
   end
   if game.tick > state.deadline_tick then fail("successor lab did not complete one native worker level") end
   lab(state)
+  if state.phase == "await-successor-lab" then
+    state.destination_processing_ticks = state.destination_processing_ticks + 1
+  end
   if state.phase == "await-successor-observation" then
     state.successor_player = copy_status(assert_completed(state))
     state.phase = "completed"

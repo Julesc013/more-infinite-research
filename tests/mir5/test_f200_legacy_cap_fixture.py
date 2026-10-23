@@ -88,7 +88,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
           end
 
           function legacy_cap_flow(source_path, destination_path, opponent, destination_mir, destination_fixture)
-            local callbacks,markers,saves={events={}},0,0
+            local callbacks,markers,diagnostics,saves={events={}},0,0,0
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local function inventory()
@@ -174,8 +174,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)assert(row.status=="passed");assert(row.stage=="initial" or row.stage=="reload");return "{}"end},
-                log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
+                game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
+                  if row.status=="passed" then assert(row.stage=="initial" or row.stage=="reload")
+                  else
+                    assert(row.stage=="finish-before-assertion");assert(type(row.research_start_tick)=="number")
+                    assert(type(row.research_finished_tick)=="number");assert(type(row.raw_elapsed_ticks)=="number")
+                    assert(type(row.processing_ticks)=="number");assert(type(row.expected_processing_ticks)=="number")
+                    assert(type(row.science_units_observed)=="table")
+                  end
+                  return "{}"
+                end},log=function(row)
+                  if row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ") then markers=markers+1
+                  else assert(row:match("^%[MIR5_NATIVE_FIXTURE%] DIAGNOSTIC "));diagnostics=diagnostics+1 end
+                end}
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
               return ok and c or nil,tostring(result)
@@ -221,9 +232,10 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
             local consumed_units=state.destination_science_accounting.consumed_units
-            local elapsed_ticks=state.destination_science_accounting.remaining_ticks
-            if opponent=="wrong-tick-span" then elapsed_ticks=elapsed_ticks-1 end
-            game.tick=game.tick+elapsed_ticks
+            local processing_ticks=state.destination_science_accounting.remaining_ticks
+            if opponent=="wrong-tick-span" then processing_ticks=processing_ticks-1 end
+            if opponent=="raw-elapsed-offset" then game.tick=game.tick+1 end
+            for _=1,processing_ticks do ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
             if opponent=="consumption-overshoot" then consumed_units=consumed_units+1/60 end
             ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
@@ -234,8 +246,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
               science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
               consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
-              elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
-              markers=markers,saves=saves}
+              processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
+              markers=markers,diagnostics=diagnostics,saves=saves}
           end
         ''')
 
@@ -337,11 +349,20 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertAlmostEqual(22 - 44 / 60, result["science_after"], places=6)
         self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
         self.assertEqual(44, result["remaining_ticks"])
+        self.assertEqual(44, result["processing_ticks"])
         self.assertEqual(44, result["elapsed_ticks"])
         self.assertAlmostEqual(.27, result["current_progress"], places=6)
         self.assertEqual(.42, result["foreign_progress"])
         self.assertFalse(result["foreign_enabled"])
-        self.assertEqual((6, 2), (result["markers"], result["saves"]))
+        self.assertEqual((6, 1, 2), (result["markers"], result["diagnostics"], result["saves"]))
+
+    def test_exact_processing_ticks_accept_a_distinct_raw_event_elapsed(self):
+        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
+                                                   str(FIXTURE / "mir5" / "control.lua"), "raw-elapsed-offset")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((44, 44, 45),
+                         (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
+        self.assertEqual(1, result["diagnostics"])
 
     def test_published_relaxation_uses_the_same_tick_accounting_without_claiming_mir5_runtime(self):
         result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
@@ -360,7 +381,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "lab-count": "published positive-cap source witness is absent",
             "duplicate-lab": "successor did not finish exactly one further lab level",
             "lost-investment": "successor saved research investment did not become current research",
-            "wrong-tick-span": "successor real lab tick duration differs",
+            "wrong-tick-span": "successor real lab processing ticks differ",
             "consumption-overshoot": "successor real lab consumption differs for automation-science-pack: observed_units=",
         }
         for opponent, phrase in opponents.items():
