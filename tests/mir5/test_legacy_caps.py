@@ -28,6 +28,14 @@ class LegacyCapsTests(unittest.TestCase):
               cap_setting = "ips-max-level-research_spoilage_preservation",
               legacy_binding = {source = "generated-stream", operation = "emit"}}
           })
+          F200_ALLOWLIST = legacy.allowlist({
+            {id = "recipe-prod-research_gears-1", cap_setting = "ips-max-level-research_gears",
+              legacy_binding = {source = "generated-stream", operation = "runtime-settings-transport",
+                target = "f200", policy_transport = "settings-derived-v3",
+                ownership_kind = "settings-derived-v3"}}
+          }, "f200")
+          F200_WORKER_ALLOWLIST = legacy.allowlist({}, "f200")
+          F210_WORKER_ALLOWLIST = legacy.allowlist({}, "f210")
           local raw_import_for_force = legacy.import_for_force
           function legacy.import_for_force(bucket, force, candidates, current, allowlist)
             return raw_import_for_force(bucket, force, candidates, current, allowlist or direct_allowlist)
@@ -43,32 +51,46 @@ class LegacyCapsTests(unittest.TestCase):
               candidate.operation}, "\\0")
           end
 
-          function policy_for(candidate, cap, fingerprint)
+          function policy_for(candidate, cap, fingerprint, kind)
+            kind = kind or "transported-v3"
             return {technology = candidate.name, setting = candidate.setting,
               source = candidate.source, operation = candidate.operation,
-              policy_transport = "transported-v3", ownership_kind = "transported-v3",
+              policy_transport = kind, ownership_kind = kind,
               legacy = false, selected = cap, binding_fingerprint = fingerprint}
           end
 
-          function visibility_for(index, candidate, value)
+          function visibility_for(index, candidate, value, kind)
+            kind = kind or "transported-v3"
             return {policy_version = 3, force_index = index, ownership_key = cap_key(candidate),
-              ownership_kind = "transported-v3", value = value}
+              ownership_kind = kind, value = value}
           end
 
-          function disabled_for(index, candidate, cap, fingerprint)
+          function disabled_for(index, candidate, cap, fingerprint, kind)
+            kind = kind or "transported-v3"
             return {policy_version = 3, force_index = index, cap = cap,
               binding_fingerprint = fingerprint, ownership_key = cap_key(candidate),
-              ownership_kind = "transported-v3", enabled_before_cap = true}
+              ownership_kind = kind, enabled_before_cap = true}
           end
 
-          function old_bucket(index, candidate, cap, fingerprint, disable)
+          function old_bucket(index, candidate, cap, fingerprint, disable, kind)
             local row = {policy_version = 3,
-              managed_technologies = {[candidate.name] = policy_for(candidate, cap, fingerprint)},
-              visibility_by_cap = {[index] = {[candidate.name] = visibility_for(index, candidate, false)}},
+              managed_technologies = {[candidate.name] = policy_for(candidate, cap, fingerprint, kind)},
+              visibility_by_cap = {[index] = {[candidate.name] = visibility_for(index, candidate, false, kind)}},
               disabled_by_cap = {[index] = {}}, unowned_disabled_by_cap = {[index] = {}}
             }
             if disable ~= false then
-              row.disabled_by_cap[index][candidate.name] = disabled_for(index, candidate, cap, fingerprint)
+              row.disabled_by_cap[index][candidate.name] = disabled_for(index, candidate, cap, fingerprint, kind)
+            end
+            if kind == "settings-derived-v3" then
+              -- Accepted F3943E...1010B7 maximum_level_control.lua:109-133,
+              -- 414-421, 668-675, 862-878: map-key identity, absent digest.
+              local policy = row.managed_technologies[candidate.name]
+              policy.technology, policy.binding_fingerprint = nil, nil
+              policy.native_finite_stage = false
+              local key = table.concat({"nil", candidate.setting, candidate.source, candidate.operation}, "\\0")
+              row.visibility_by_cap[index][candidate.name].ownership_key = key
+              local disabled = row.disabled_by_cap[index][candidate.name]
+              if disabled then disabled.ownership_key, disabled.binding_fingerprint = key, nil end
             end
             return row
           end
@@ -110,19 +132,85 @@ class LegacyCapsTests(unittest.TestCase):
             and technology.level == 11 and technology.researched and technology.saved_progress == .42)
         ''')
 
-    def test_rejects_the_former_runtime_settings_transport_tuple_for_published_gear_state(self):
+    def test_imports_only_the_published_f200_settings_derived_gear_tuple(self):
         self.lua.execute('''
-          -- The archive-backed `emit` tuple is exact. Do not admit the prior
-          -- synthetic runtime-settings-transport tuple as an alternate key.
-          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "emit")
-          local f = native_force(41, {[gear.name] = native_technology()})
-          local old = old_bucket(41, gear, 2, "mir32-1a2b3c4d")
-          local former = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+          -- Published F200 4.7.20002 `maximum_level_control.lua:109-146`
+          -- used the settings-derived V3 runtime-settings transport.  This
+          -- remains separate from the emitted F210 binding tested above.
+          local f200 = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
             "generated-stream", "runtime-settings-transport")
-          local rows, facts = legacy.import_for_force(old, f, {former}, nil)
-          assert(rows[gear.name] == nil and facts.imported == 0)
-          assert(facts.decisions[1].outcome == "candidate_not_admitted")
+          local f = native_force(41, {[f200.name] = native_technology()})
+          local old = old_bucket(41, f200, 2, "mir32-1a2b3c4d", nil, "settings-derived-v3")
+          local rows, facts = legacy.import_for_force(old, f, {f200}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name].disabled and rows[f200.name].visible_when_disabled == false)
+          assert(facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- F210's archive-backed `emit` admission cannot accept the F200
+          -- policy form merely because the name and setting happen to match.
+          local f210 = candidate(f200.name, f200.setting, "generated-stream", "emit")
+          rows, facts = legacy.import_for_force(old, f, {f210}, nil, direct_allowlist)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+
+          local wrong_operation = candidate(f200.name, f200.setting, "generated-stream", "emit")
+          rows, facts = legacy.import_for_force(old, f, {wrong_operation}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+          local wrong_source = candidate(f200.name, f200.setting, "native-owner", "runtime-settings-transport")
+          rows, facts = legacy.import_for_force(old, f, {wrong_source}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+          local wrong_setting = candidate(f200.name, "ips-max-level-research_iron", "generated-stream", "runtime-settings-transport")
+          rows, facts = legacy.import_for_force(old, f, {wrong_setting}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+
+          local zero_cap = old_bucket(41, f200, 0, "mir32-1a2b3c4d", nil, "settings-derived-v3")
+          rows, facts = legacy.import_for_force(zero_cap, f, {f200}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          local wrong_kind = old_bucket(41, f200, 2, "mir32-1a2b3c4d", nil, "transported-v3")
+          rows, facts = legacy.import_for_force(wrong_kind, f, {f200}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          local wrong_old_cap = old_bucket(41, f200, 2, "mir32-1a2b3c4d", nil, "settings-derived-v3")
+          wrong_old_cap.disabled_by_cap[41][f200.name].cap = 3
+          rows, facts = legacy.import_for_force(wrong_old_cap, f, {f200}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name].disabled == nil
+            and facts.decisions[1].outcome == "visibility_imported_disable_unproven")
+          local invented_fingerprint = old_bucket(41, f200, 2, nil, nil, "settings-derived-v3")
+          invented_fingerprint.managed_technologies[f200.name].binding_fingerprint = "mir32-1a2b3c4d"
+          rows, facts = legacy.import_for_force(invented_fingerprint, f, {f200}, nil, F200_ALLOWLIST)
+          assert(rows[f200.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+        ''')
+
+    def test_f200_shape_rejects_invented_identity_stale_records_and_foreign_writes(self):
+        self.lua.execute('''
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "runtime-settings-transport")
+          local cases = {
+            {function(p,v,d,b,t) p.technology=gear.name end, "none"},
+            {function(p,v,d,b,t) p.binding_fingerprint="mir32-1234abcd" end, "none"},
+            {function(p,v,d,b,t) p.native_finite_stage=nil end, "none"},
+            {function(p,v,d,b,t) p.native_finite_stage="false" end, "none"},
+            {function(p,v,d,b,t) p.source="native-owner" end, "none"},
+            {function(p,v,d,b,t) p.operation="emit" end, "none"},
+            {function(p,v,d,b,t) p.setting="ips-max-level-research_iron" end, "none"},
+            {function(p,v,d,b,t) v.ownership_key=cap_key(gear) end, "none"},
+            {function(p,v,d,b,t) v.force_index=42 end, "none"},
+            {function(p,v,d,b,t) t.visible_when_disabled=false end, "none"},
+            {function(p,v,d,b,t) d.binding_fingerprint="mir32-1234abcd" end, "visibility"},
+            {function(p,v,d,b,t) d.ownership_key=cap_key(gear) end, "visibility"},
+            {function(p,v,d,b,t) d.force_index=42 end, "visibility"},
+            {function(p,v,d,b,t) d.enabled_before_cap=false end, "visibility"},
+            {function(p,v,d,b,t) d.migrated_from_policy_version=2 end, "visibility"},
+            {function(p,v,d,b,t) b.unowned_disabled_by_cap[41][gear.name]=true end, "visibility"},
+            {function(p,v,d,b,t) t.enabled=true end, "visibility"}
+          }
+          for index, opponent in ipairs(cases) do
+            local old=old_bucket(41,gear,2,nil,nil,"settings-derived-v3")
+            local t=native_technology()
+            opponent[1](old.managed_technologies[gear.name],old.visibility_by_cap[41][gear.name],
+              old.disabled_by_cap[41][gear.name],old,t)
+            local rows=legacy.import_for_force(old,native_force(41,{[gear.name]=t}),{gear},nil,F200_ALLOWLIST)
+            if opponent[2]=="none" then assert(rows[gear.name]==nil,"F200 opponent admitted: "..index)
+            else assert(rows[gear.name] and rows[gear.name].disabled==nil
+              and rows[gear.name].visible_when_disabled==false,"F200 foreign disable claimed: "..index) end
+          end
         ''')
 
     def test_imports_worker_only_when_the_revalidated_candidate_is_supplied(self):
@@ -137,6 +225,47 @@ class LegacyCapsTests(unittest.TestCase):
           worker.admitted = false
           rows, facts = legacy.import_for_force(old, f, {worker}, nil)
           assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+        ''')
+
+    def test_imports_only_the_published_f200_settings_derived_worker_tuple(self):
+        self.lua.execute('''
+          -- Published F200 4.7.20002 maximum_level_control's native worker
+          -- tail used this settings-derived V3 tuple.  The caller's package
+          -- target, never this saved bucket, selects that authority.
+          local worker = candidate("worker-robots-speed-6", "mir-max-level-worker-robots-speed",
+            "native-owner", "native-owner-cap")
+          local f = native_force(61, {[worker.name] = native_technology()})
+          local old = old_bucket(61, worker, 2, "mir32-5e6f7a8b", nil, "settings-derived-v3")
+          local rows, facts = legacy.import_for_force(old, f, {worker}, nil, F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name].disabled and rows[worker.name].visible_when_disabled == false)
+          assert(facts.decisions[1].outcome == "owned_disable_imported")
+
+          -- The same persisted policy cannot select F200 authority in a
+          -- different package.  F210 keeps only the transported V3 worker
+          -- form even though the current native candidate is otherwise exact.
+          rows, facts = legacy.import_for_force(old, f, {worker}, nil, F210_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+
+          local wrong_operation = candidate(worker.name, worker.setting, "native-owner", "emit")
+          rows, facts = legacy.import_for_force(old, f, {wrong_operation}, nil, F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+          local wrong_source = candidate(worker.name, worker.setting, "generated-stream", "native-owner-cap")
+          rows, facts = legacy.import_for_force(old, f, {wrong_source}, nil, F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+          local unknown_tail = candidate("worker-robots-speed-8", worker.setting,
+            "native-owner", "native-owner-cap")
+          rows, facts = legacy.import_for_force(old, f, {unknown_tail}, nil, F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "candidate_not_admitted")
+
+          local wrong_kind = old_bucket(61, worker, 2, "mir32-5e6f7a8b", nil, "transported-v3")
+          rows, facts = legacy.import_for_force(wrong_kind, f, {worker}, nil, F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+          local wrong_fingerprint = old_bucket(61, worker, 2, "mir32-5E6f7a8b", nil,
+            "settings-derived-v3")
+          wrong_fingerprint.managed_technologies[worker.name].binding_fingerprint = "mir32-5E6f7a8b"
+          rows, facts = legacy.import_for_force(wrong_fingerprint, f, {worker}, nil,
+            F200_WORKER_ALLOWLIST)
+          assert(rows[worker.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
         ''')
 
     def test_imports_only_the_exact_published_direct_stream_tuples(self):

@@ -52,6 +52,7 @@ local function continuation_prerequisites(definition)
 end
 
 local function icons(definition)
+  if definition.icons then return copy(definition.icons) end
   return {
     {icon = definition.icon, icon_size = definition.icon_size or 256},
     {icon = definition.overlay, icon_size = OVERLAY_SIZE, scale = 0.5, shift = {50, 50}, floating = true}
@@ -103,7 +104,7 @@ function M.technology(definition, values)
       time = stream.research_time, ingredients = catalogue.science_ingredients(definition.science)
     }
   }
-  if stream.enabled == false then output.enabled = false end
+  if stream.enabled == false or definition.available == false then output.enabled = false end
   return output
 end
 

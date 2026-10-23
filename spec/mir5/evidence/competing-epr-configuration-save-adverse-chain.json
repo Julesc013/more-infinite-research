@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "source": "9e450aed8114c4b1e28a46af4e26863ee0dc0f7c",
+  "run": {
+    "id": 40008637113,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40008637113",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/40008637113/black-glass-competing-epr-gameplay-40008637113-1",
+  "manifest_members_verified": 109,
+  "source_receipt": {
+    "gzip": "spec/mir5/evidence/competing-epr-configuration-save-adverse-published.json.gz",
+    "uncompressed_sha256": "570859F201B8C8F6338CABD11DBD5A0CA1835E43C8A9DEE6E58407FC3C8AF3A4"
+  },
+  "failed_upgrade_receipt": {
+    "gzip": "spec/mir5/evidence/competing-epr-configuration-save-adverse-upgrade.json.gz",
+    "uncompressed_sha256": "5F83F81F7C0422EA758A86BE6C8EC7537CFE66BAE156E406ECAB66259B93FFAC"
+  },
+  "failed_upgrade_log": {
+    "gzip": "spec/mir5/evidence/competing-epr-configuration-save-adverse-upgrade.log.gz",
+    "uncompressed_sha256": "6D5E42B52F250E1F73101FD1B94AC24394D23E7555AC8206BF15139FCFE2A447"
+  },
+  "configuration_observation": {
+    "stage": "initial",
+    "case": "f200-competing-epr-continuity",
+    "status": "passed",
+    "qualification": "native-runner-readback-required",
+    "witnesses": {
+      "source_mir": "4.7.20002",
+      "destination_mir": "5.0.20000",
+      "source_actual_lab_completions": 2,
+      "tail": "epr_iron-gear-wheel-productivity-5",
+      "tail_next_level": 7,
+      "productivity_bonus": 0.6000000238418579,
+      "tail_saved_progress": 0.27,
+      "current_research_progress": 0.42000000000000004,
+      "player_disabled": true,
+      "player_visible_when_disabled": true,
+      "braking_saved_progress": 0,
+      "player_queue": [
+        "braking-force-1"
+      ],
+      "foreign_disabled": true,
+      "retained_epr_tail_count": 30,
+      "lab_frozen": true,
+      "on_load_read_only": false
+    }
+  },
+  "diagnosis": [
+    "Published EPR source completed two real tail labs, saved and passed both cold reloads.",
+    "MIR5 configuration observation passed: all30 foreign tails retained, earned gear bonus0.6 and next level7 preserved, EPR investment0.27 paused, braking current0.42 retained, owned player disablement and all foreign disablement preserved.",
+    "The fixture requested game.server_save before hosting became active. No output save was created and the unchanged harness correctly timed out.",
+    "Both successor fixtures now emit their initial marker and request the save from the next native tick after rechecking the same real force state. The save and two-reload acceptance gates are unchanged.",
+    "No complete MIR5 save/reload or false-preference release pass is claimed from this failed run."
+  ],
+  "release_qualification": false
+}

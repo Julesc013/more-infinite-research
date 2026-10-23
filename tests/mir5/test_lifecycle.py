@@ -67,7 +67,7 @@ class LifecycleTests(unittest.TestCase):
           end
 
           function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods,
-              agriculture_cap, extra_caps)
+              agriculture_cap, extra_caps, recipe_caps)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
             if agriculture_cap ~= nil then
@@ -87,6 +87,14 @@ class LifecycleTests(unittest.TestCase):
             logs = {}
             log = function(message) logs[#logs + 1] = message end
             game = {forces = forces, difficulty_settings = {spoil_time_modifier = 1}}
+            -- Factorio exposes `prototypes` only in game-available calls.
+            -- A false test value models control parsing before that surface
+            -- exists; an omitted value models an empty native collection.
+            if recipe_caps == false then
+              prototypes = nil
+            else
+              prototypes = {recipe = recipe_caps or {}}
+            end
             mods = active_mods or {}
             handlers = retained_handlers or {events = {}}
             handlers.events = handlers.events or {}
@@ -121,6 +129,149 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["research.catalogue"] = nil
             control = require("control")
           end
+        ''')
+
+    def test_bob_angel_stages_use_named_effective_recipe_caps_without_losing_earned_levels(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          local active = {
+            base="2.0.77", angelsbioprocessing="2.0.3", angelsbioprocessinggraphics="2.0.0",
+            angelspetrochem="2.0.3", angelspetrochemgraphics="2.0.1",
+            angelsrefining="2.0.4", angelsrefininggraphics="2.0.0",
+            angelssmelting="2.0.5", angelssmeltinggraphics="2.0.0",
+            bobelectronics="2.1.1", boblibrary="2.1.0", bobores="2.1.2",
+            bobplates="2.1.1", bobrevamp="2.1.1",
+          }
+          local family = "research_material_aluminium"
+          local early_id, late_id = "recipe-prod-" .. family .. "-1", "recipe-prod-" .. family .. "-4"
+          local named_routes = {
+            research_material_aluminium = {"angels-plate-aluminium", "angels-plate-aluminium-2"},
+            research_material_copper_tungsten = {"bob-copper-tungsten-alloy"},
+            research_material_gold = {"angels-plate-gold", "angels-plate-gold-2", "angels-wire-gold-2"},
+            research_material_tin = {"angels-plate-tin", "angels-plate-tin-2"},
+            research_material_titanium = {"angels-plate-titanium", "angels-plate-titanium-2"},
+          }
+          local function native_recipe_caps(first, second)
+            local values = {}
+            for _, routes in pairs(named_routes) do
+              for _, name in ipairs(routes) do values[name] = {maximum_productivity=3} end
+            end
+            values["angels-plate-aluminium"] = {maximum_productivity=first}
+            values["angels-plate-aluminium-2"] = {maximum_productivity=second}
+            local reads = 0
+            return setmetatable({}, {
+              __index=function(_, name) reads = reads + 1; return values[name] end,
+              __pairs=function() error("lifecycle scanned recipe prototypes") end,
+            }), function() return reads end
+          end
+          -- Each native cap table is deliberately non-enumerable. Lifecycle
+          -- may read declared recipe names but must not scan the foreign
+          -- recipe catalogue or reconstruct recycling policy.
+          local scenarios = {
+            -- The selected 125% global prototype cap wins over the authored
+            -- default: ceil(1.25 / .02) = 63.
+            {percent=2, user=0, expected=63, earned=64, first=1.25, second=1.25},
+            -- A technology remains useful until every effect is capped. The
+            -- first named route has 400% and the second 200%, so its cap is
+            -- max(ceil(4/.02), ceil(2/.02)) = 200 rather than 100.
+            {percent=2, user=0, expected=200, earned=201, first=4, second=2},
+            -- Explicit user caps remain an upper bound after native caps.
+            {percent=2, user=2, expected=2, earned=3, first=4, second=2},
+            {percent=2, user=40, expected=40, earned=41, first=4, second=2},
+          }
+          for _, scenario in ipairs(scenarios) do
+            local early, late = technology(early_id, 3, true), technology(late_id, scenario.earned, true)
+            early.researched, early.prototype.max_level = true, 3
+            local sentinel = technology("foreign-earned", 72, false)
+            local player = force(1, {[early_id]=early, [late_id]=late, [sentinel.name]=sentinel})
+            local recipe_caps, recipe_reads = native_recipe_caps(scenario.first, scenario.second)
+            boot({player}, 0, nil, nil, nil, 0, active, nil, {
+              ["ips-effect-per-level-" .. family]=scenario.percent,
+              ["ips-max-level-" .. family]=scenario.user,
+            }, recipe_caps)
+            local limits = require("runtime.lifecycle").cap_limits(player)
+            assert(limits[early_id] == scenario.expected and limits[late_id] == scenario.expected)
+            assert(recipe_reads() == 2, "lifecycle did not cache the named native recipe caps")
+            local declared = require("research.catalogue").declared()
+            local material_count = 0
+            local seen_families = {}
+            for _, row in ipairs(declared) do
+              if row.productivity_ceiling then
+                material_count = material_count + 1
+                assert(row.productivity_ceiling == 3 and row.ownership_kind == "authored_generated")
+                assert(row.cap_setting == "ips-max-level-" .. row.family)
+                assert(type(row.productivity_recipes) == "table" and #row.productivity_recipes > 0)
+                local expected = named_routes[row.family]
+                assert(expected and #expected == #row.productivity_recipes)
+                for index, name in ipairs(expected) do assert(row.productivity_recipes[index] == name) end
+                seen_families[row.family] = (seen_families[row.family] or 0) + 1
+              end
+            end
+            assert(material_count == 10)
+            for key in pairs(named_routes) do assert(seen_families[key] == 2) end
+            for _, row in ipairs(declared) do
+              if row.id == early_id then
+                assert(row.productivity_recipes[1] == "angels-plate-aluminium"
+                  and row.productivity_recipes[2] == "angels-plate-aluminium-2"
+                  and row.productivity_recipes[3] == nil)
+              end
+            end
+            handlers.init()
+            assert(recipe_reads() == 2, "reconciliation re-read immutable native recipe caps")
+            assert(late.level == scenario.earned and not late.researched and not late.enabled)
+            assert(sentinel.level == 72 and not sentinel.enabled)
+            assert(early.researched and early.level == 3)
+            -- A new control stage with a higher useful limit restores only
+            -- MIR's owned disablement, retaining the already earned level.
+            local state = storage
+            boot({player}, 0, nil, state, nil, 0, active, nil, {
+              ["ips-effect-per-level-" .. family]=0.5,
+            }, recipe_caps)
+            handlers.configuration({})
+            assert(late.enabled and late.level == scenario.earned and not sentinel.enabled)
+          end
+          assert(package.loaded["compatibility.bob_angel_materials"] == nil)
+          assert(package.loaded["research.generator"] == nil)
+        ''')
+
+    def test_bob_angel_cap_lookup_requires_native_recipe_prototypes_only_for_that_profile(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          local active = {
+            base="2.0.77", angelsbioprocessing="2.0.3", angelsbioprocessinggraphics="2.0.0",
+            angelspetrochem="2.0.3", angelspetrochemgraphics="2.0.1",
+            angelsrefining="2.0.4", angelsrefininggraphics="2.0.0",
+            angelssmelting="2.0.5", angelssmeltinggraphics="2.0.0",
+            bobelectronics="2.1.1", boblibrary="2.1.0", bobores="2.1.2",
+            bobplates="2.1.1", bobrevamp="2.1.1",
+          }
+          local family = "research_material_aluminium"
+          local id = "recipe-prod-" .. family .. "-1"
+          local material = technology(id, 1, true)
+          local material_force = force(1, {[id]=material})
+          -- Handler registration happens while loading control and must not
+          -- inspect a native collection that is available only in callbacks.
+          boot({material_force}, 0, nil, nil, nil, 0, active, nil, {
+            ["ips-effect-per-level-" .. family]=2,
+          }, false)
+          local lifecycle = require("runtime.lifecycle")
+          assert(lifecycle.caps_active())
+          local ok, message = pcall(function() return lifecycle.cap_limits(material_force) end)
+          assert(not ok and string.find(message, "missing Factorio 2.0 recipe prototypes", 1, true))
+
+          -- An ordinary finite profile still reconciles a cap without ever
+          -- touching `prototypes`: only qualified BA rows need this runtime
+          -- native capability.
+          local gear = technology("recipe-prod-research_gears-1", 6, true)
+          local ordinary_force = force(2, {[gear.name]=gear})
+          boot({ordinary_force}, 5)
+          prototypes = setmetatable({}, {__index=function() error("ordinary profile read prototypes") end})
+          local limits = require("runtime.lifecycle").cap_limits(ordinary_force)
+          assert(limits[gear.name] == 5)
+          handlers.init()
+          assert(gear.enabled == false and gear.level == 6)
         ''')
 
     def test_unlimited_control_registers_no_cap_handlers_or_storage(self):
@@ -632,6 +783,9 @@ class LifecycleTests(unittest.TestCase):
         bootstrap = (ROOT / "source/mir5/runtime/bootstrap.lua").read_text(encoding="utf-8")
         self.assertNotIn("on_tick", source)
         self.assertNotIn("generator", source.lower())
+        self.assertNotIn("recycling_scope", source)
+        self.assertNotIn("productivity_cap_scope", source)
+        self.assertNotIn("game.recipe_prototypes", source)
         self.assertNotIn("cancel_current_research", source)
         self.assertNotIn("documented exception", source)
         self.assertNotIn("require(", source[source.index("function M.on_init"):])

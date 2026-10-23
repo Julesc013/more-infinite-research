@@ -4523,9 +4523,9 @@
     {
       "path": "tools/lib/validation/PackageIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "4238B224BAF1AE7CFBA44D1354C0B41645FCF87121AF41EE7DB532D5C4C30626",
+      "sha256": "A36BA29E799C57A986934F0F054F1378FECC9C09614209FA761D9B0501CDA549",
       "hash_mode": "canonical-text-v1",
-      "lines": 466,
+      "lines": 482,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:26648dcac6f8c0e32f93e6e539bde22e1b95f537fb091e2608fca919a6291914"
+  "digest": "sha256:c80360f58f2b4625f7db2fcc282efeee07e46de337ef690338a4b059d56a7f0e"
 }

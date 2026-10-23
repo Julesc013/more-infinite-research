@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelAdverseNativeChainV1",
+  "run": {
+    "id": 39989676402,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39989676402"
+  },
+  "source": "c6a99e7a4a646096eca96069aa71955aa694bc1d",
+  "custody": "build/mir5/black-glass/incoming/39989676402/black-glass-bob-angel-prototype-caps-39989676402-1",
+  "cases": {
+    "prototype-cap125": {
+      "receipt": "spec/mir5/evidence/bob-angel-prototype-cap125-queue-api-adverse-prototype-cap125-native.json",
+      "status": "failed"
+    }
+  },
+  "release_qualification": false,
+  "diagnosis": [
+    "Fixture writes removed F200 LuaForce.research_queue_enabled and aborts on_init before lab work. Existing successful K2 fixture already documents this removed property.",
+    "Removed all three writes and changed the force mock to reject this property rather than silently accepting it. No native cap pass claimed by this adverse run."
+  ]
+}

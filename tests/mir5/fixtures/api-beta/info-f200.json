@@ -1,0 +1,11 @@
+{
+  "name": "mir-fixture-mir5-api-beta",
+  "version": "0.1.0",
+  "title": "MIR 5 API beta consumer fixture",
+  "author": "MIR maintainers",
+  "description": "Private optional late data-stage consumer for the MIR 5 API.",
+  "factorio_version": "2.0",
+  "icon": "graphics/icon.png",
+  "icon_size": 64,
+  "dependencies": ["base >= 2.0.77", "? more-infinite-research >= 5.0.20000"]
+}

@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingEPRF200ReferenceChainV1",
+  "status": "verified-reference-and-prepared-native-continuity-fixture",
+  "reference_run": {
+    "id": 39999658774,
+    "custody": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "raw_reference_receipt": {
+    "path": "spec/mir5/evidence/competing-epr-reference-rawreceipt.json.gz",
+    "sha256": "0BE88D1FD08DD03FDD5EB7B20F158B2FDEF850EB64BB2AB5F9F6CEA922F0C3BC",
+    "uncompressed_sha256": "8D5591E9DD68738D47BCDF2833597A0A7AD6BDC4111E7D9CEDB776D5851B5EB2"
+  },
+  "facts": {
+    "path": "tests/mir5/fixtures/competing-epr-f200-captured-facts.json",
+    "sha256": "BDAFAC1885C5BB43242F0D2BE37BC08DC466C69785404C32039AB8B9F7D84899",
+    "selected_tail": "epr_iron-gear-wheel-productivity-5",
+    "selected_tail_first_level": 5,
+    "selected_tail_predecessor": "epr_iron-gear-wheel-productivity-4",
+    "selected_tail_effect": {
+      "type": "change-recipe-productivity",
+      "recipe": "iron-gear-wheel",
+      "change": 0.1
+    }
+  },
+  "profiles": [
+    {
+      "path": "tests/mir5/profiles/competing-epr-published-4.7-f200-2077.json",
+      "sha256": "744A5D83B11A9B7082A43D7FAEE5E89707F4DCE7F2760C39E86F262BB7D84E0E"
+    },
+    {
+      "path": "tests/mir5/profiles/competing-epr-mir5-prefer-mir-f200-2077.json",
+      "sha256": "5AA99A40CD42DFD7D41E24D0FA37B1028E07C03EED8640CAB987A0F477D7F1DA"
+    },
+    {
+      "path": "tests/mir5/profiles/competing-epr-mir5-prefer-foreign-f200-2077.json",
+      "sha256": "D48254A82F5264B620307458900A6EA58C7C01B234A0A62A46C247E55E53DA3D"
+    }
+  ],
+  "prepared_save_chain": [
+    {
+      "stage": "published-4.7",
+      "preference": false,
+      "fixture_version": "0.1.0",
+      "requires": [
+        "two real sequential EPR gear-tail lab completions (levels 5 and 6; next 7)",
+        "frozen lab",
+        "EPR current saved progress .27",
+        "braking-force-1 saved progress .42",
+        "foreign pre-disabled EPR tail"
+      ]
+    },
+    {
+      "stage": "mir5-prefer-mir",
+      "preference": true,
+      "fixture_version": "0.2.0",
+      "requires": [
+        "only matching player EPR future tail disabled",
+        "earned level/effect and partial work retained",
+        "EPR removed from current queue; braking is retained",
+        "foreign EPR state unchanged"
+      ]
+    },
+    {
+      "stage": "mir5-prefer-foreign",
+      "preference": false,
+      "fixture_version": "0.3.0",
+      "requires": [
+        "only MIR-owned player disablement released",
+        "foreign pre-disabled EPR tail remains disabled",
+        "no queue or progress invention"
+      ]
+    }
+  ],
+  "claims": {
+    "data_stage_reference_verified": true,
+    "fixture_prepared": true,
+    "native_save_chain_passed": false,
+    "gameplay_passed": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "The continuity fixture must be launched by the private native runner and read back through two cold reloads at every stage.",
+    "The fixture intentionally fails if Factorio queue/current progress differs from the stated native preservation contract."
+  ]
+}

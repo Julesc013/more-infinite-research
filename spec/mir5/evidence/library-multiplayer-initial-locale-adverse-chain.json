@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 39997187344,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39997187344",
+    "conclusion": "failure"
+  },
+  "source": "21e42962360d7942ad44b7cd5ba126936a2bd568",
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-initial-locale-adverse-native.json.gz",
+    "uncompressed_sha256": "9EA73D79FC6087B0CB1C56E16305DF537FA312D9F3A68F06739649548452790B"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-initial-locale-adverse-server.log.gz",
+      "uncompressed_sha256": "17ABC2FB1676BB899BE176F3EE53011B0A163208CE7F460E1F413DE2CF32DAB8"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-initial-locale-adverse-english.log.gz",
+      "uncompressed_sha256": "82FE917432A48D0914BED60485C02063915F837740332EA1ABC25E7A976ABED3"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-initial-locale-adverse-german.log.gz",
+      "uncompressed_sha256": "018AA6B21F5092E2FB0D534241A6D67D68B3D840CEB0EFE7ABF6EB765327AF26"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-initial-locale-adverse-actor.log.gz",
+      "uncompressed_sha256": "36D066327CF8D40DB344E9D766189E69DD4822575730BDE69973DB753EF0DB24"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/39997187344/black-glass-library-multiplayer-39997187344-1",
+  "manifest_members_verified": 203,
+  "diagnosis": [
+    "Both real graphical clients joined successfully; the serial startup fix removed the shared-settings race.",
+    "The fixture then waited for locale-change events that need not occur for unchanged initial locales; no GUI/session pass is claimed.",
+    "The revised fixture reads actual native LuaPlayer.locale after real joins and still requires distinct en/de clients, views, screenshots, rejoin and host restart.",
+    "The exact 2.0.77 runtime API JSON (594B4EC98CC5FBEE322D7380DB49A388AB38B0D69C06F00EAD877CFFBB37F578) distinguishes active locale from its change event."
+  ],
+  "release_qualification": false
+}

@@ -7,12 +7,13 @@ local M = {}
 
 local POLICY_VERSION = 3
 local TRANSPORTED_KIND = "transported-v3"
+local SETTINGS_DERIVED_KIND = "settings-derived-v3"
 local MAX_STRING_BYTES = 512
 local MAX_CANDIDATES = 128
 
--- This historical K2 tail has no recovered full modern catalogue binding.
--- It remains an exact, independent predecessor contract until that source is
--- qualified; do not make it a generic native-owner fallback.
+-- Exact native worker tails retained by the authored Base/Space Age and K2
+-- bindings. Current native effect/predecessor admission still happens before
+-- these predecessor restoration rights can be considered.
 local WORKER = {
   names = {"worker-robots-speed-6", "worker-robots-speed-7"},
   setting = "mir-max-level-worker-robots-speed",
@@ -49,11 +50,34 @@ local function exact_key(candidate)
     candidate.operation}, "\0")
 end
 
+-- F200's published 4.7.20002 controller could not use the finalizer transport:
+-- its named generated streams and base continuations stored this exact
+-- settings-derived tuple instead.  It is deliberately an authored target
+-- binding, not a broad acceptance of an older policy shape.
+local function binding_authority(binding, target_id)
+  local source = type(binding) == "table" and binding.source or nil
+  local operation = type(binding) == "table" and binding.operation or nil
+  local transport = type(binding) == "table" and binding.policy_transport or TRANSPORTED_KIND
+  local ownership = type(binding) == "table" and binding.ownership_kind or TRANSPORTED_KIND
+  if transport == TRANSPORTED_KIND and ownership == TRANSPORTED_KIND then
+    return {policy_transport = transport, ownership_kind = ownership}
+  end
+  if target_id == "f200" and binding and binding.target == "f200" and transport == SETTINGS_DERIVED_KIND
+      and ownership == SETTINGS_DERIVED_KIND and operation == "runtime-settings-transport"
+      and (source == "generated-stream" or source == "base-continuation") then
+    return {policy_transport = transport, ownership_kind = ownership}
+  end
+  return nil
+end
+
 -- Build once at control parse time from the current authored declarations.
 -- The returned map admits only exact published V3 tuple identities; candidate
 -- rows never establish authority by merely asserting their own fields.
-function M.allowlist(declarations)
+function M.allowlist(declarations, target_id)
   if type(declarations) ~= "table" then error("MIR legacy caps declarations must be a table", 2) end
+  if target_id ~= nil and type(target_id) ~= "string" then
+    error("MIR legacy caps target must be a string or nil", 2)
+  end
   local allowed, count = {}, 0
   for index = 1, #declarations do
     local declaration = declarations[index]
@@ -62,29 +86,39 @@ function M.allowlist(declarations)
     local setting = type(declaration) == "table" and declaration.cap_setting or nil
     local source = type(binding) == "table" and binding.source or nil
     local operation = type(binding) == "table" and binding.operation or nil
+    local authority = binding_authority(binding, target_id)
     if not (bounded_string(name) and bounded_string(setting) and bounded_string(source)
-        and bounded_string(operation)) then
+        and bounded_string(operation) and authority ~= nil) then
       error("MIR legacy caps declaration lacks an exact binding", 2)
     end
     local key = table.concat({name, setting, source, operation}, "\0")
     if allowed[key] then error("MIR legacy caps declarations duplicate a binding", 2) end
-    allowed[key] = true
+    allowed[key] = authority
     count = count + 1
     if count > MAX_CANDIDATES then error("MIR legacy caps declarations exceed bound", 2) end
   end
   for index = 1, #WORKER.names do
     local key = table.concat({WORKER.names[index], WORKER.setting, WORKER.source, WORKER.operation}, "\0")
     if allowed[key] then error("MIR legacy caps worker binding collides", 2) end
-    allowed[key] = true
+    -- Published F200 4.7.20002 used this exact settings-derived runtime
+    -- binding for the verified native worker-speed tail. Other targets retain
+    -- their transported provenance; a legacy bucket never selects this path.
+    allowed[key] = target_id == "f200"
+      and {policy_transport = SETTINGS_DERIVED_KIND, ownership_kind = SETTINGS_DERIVED_KIND}
+      or {policy_transport = TRANSPORTED_KIND, ownership_kind = TRANSPORTED_KIND}
   end
   return allowed
 end
 
 local function admitted_candidate(candidate, allowed)
-  return type(candidate) == "table" and candidate.admitted == true
+  if not (type(candidate) == "table" and candidate.admitted == true
     and bounded_string(candidate.name) and bounded_string(candidate.setting)
     and bounded_string(candidate.source) and bounded_string(candidate.operation)
-    and type(allowed) == "table" and allowed[exact_key(candidate)] == true
+    and type(allowed) == "table") then return nil end
+  local authority = allowed[exact_key(candidate)]
+  if type(authority) ~= "table" or authority.policy_transport == nil
+      or authority.ownership_kind == nil then return nil end
+  return authority
 end
 
 local function candidate_list(candidates)
@@ -109,39 +143,57 @@ local function candidate_list(candidates)
   return entries, count
 end
 
-local function policy_matches(policy, candidate)
+local function policy_matches(policy, candidate, authority)
   if type(policy) ~= "table" then return false end
-  return policy.technology == candidate.name
-    and policy.setting == candidate.setting
+  local identity_matches
+  if authority.policy_transport == SETTINGS_DERIVED_KIND then
+    -- The exact F200 producer never stored technology or a binding digest.
+    -- Its name is the managed map key, independently selected by the caller.
+    identity_matches = policy.technology == nil and policy.binding_fingerprint == nil
+      and type(policy.native_finite_stage) == "boolean"
+  else
+    identity_matches = policy.technology == candidate.name
+      and mir32_fingerprint(policy.binding_fingerprint)
+  end
+  return identity_matches and policy.setting == candidate.setting
     and policy.source == candidate.source
     and policy.operation == candidate.operation
-    and policy.policy_transport == TRANSPORTED_KIND
-    and policy.ownership_kind == TRANSPORTED_KIND
+    and policy.policy_transport == authority.policy_transport
+    and policy.ownership_kind == authority.ownership_kind
     and policy.legacy == false
     and policy.blocked_reason == nil
     and positive_integer(policy.selected)
-    and mir32_fingerprint(policy.binding_fingerprint)
 end
 
-local function visibility_matches(record, force_index, candidate)
+local function persisted_key(candidate, authority)
+  if authority.policy_transport == SETTINGS_DERIVED_KIND then
+    -- Historical ownership_key used tostring(policy.technology), hence the
+    -- literal "nil" for this producer. Never accept this key on F210.
+    return table.concat({"nil", candidate.setting, candidate.source, candidate.operation}, "\0")
+  end
+  return exact_key(candidate)
+end
+
+local function visibility_matches(record, force_index, candidate, authority)
   return type(record) == "table"
     and record.policy_version == POLICY_VERSION
     and record.force_index == force_index
-    and record.ownership_key == exact_key(candidate)
-    and record.ownership_kind == TRANSPORTED_KIND
+    and record.ownership_key == persisted_key(candidate, authority)
+    and record.ownership_kind == authority.ownership_kind
     and type(record.value) == "boolean"
 end
 
-local function disable_matches(record, policy, force_index, candidate)
+local function disable_matches(record, policy, force_index, candidate, authority)
   return type(record) == "table"
     and record.policy_version == POLICY_VERSION
     and record.force_index == force_index
     and positive_integer(record.cap)
     and record.cap == policy.selected
     and record.binding_fingerprint == policy.binding_fingerprint
-    and mir32_fingerprint(record.binding_fingerprint)
-    and record.ownership_key == exact_key(candidate)
-    and record.ownership_kind == TRANSPORTED_KIND
+    and ((authority.policy_transport == SETTINGS_DERIVED_KIND and record.binding_fingerprint == nil)
+      or (authority.policy_transport == TRANSPORTED_KIND and mir32_fingerprint(record.binding_fingerprint)))
+    and record.ownership_key == persisted_key(candidate, authority)
+    and record.ownership_kind == authority.ownership_kind
     and record.enabled_before_cap == true
     -- Do not bridge rights that were themselves reconstructed from V2 state.
     and record.migrated_from_policy_version == nil
@@ -214,7 +266,8 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
 
   for index = 1, count do
     local candidate = entries[index]
-    if not admitted_candidate(candidate, allowed) then
+    local authority = admitted_candidate(candidate, allowed)
+    if authority == nil then
       set_decision(facts, index, candidate, "candidate_not_admitted")
     elseif current_owned and current_owned[candidate.name] ~= nil then
       set_decision(facts, index, candidate, "current_mir5_ownership_retained")
@@ -224,13 +277,13 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
       local visibility_record = type(visibility) == "table" and visibility[candidate.name] or nil
       local unowned_record = type(unowned) == "table" and unowned[candidate.name] or nil
       local technology = native_technology(force, candidate.name)
-      if not policy_matches(policy, candidate) then
+      if not policy_matches(policy, candidate, authority) then
         set_decision(facts, index, candidate, "policy_mismatch")
-      elseif not visibility_matches(visibility_record, force_index, candidate) then
+      elseif not visibility_matches(visibility_record, force_index, candidate, authority) then
         set_decision(facts, index, candidate, "visibility_record_mismatch")
       elseif not current_visibility_owned_state(technology) then
         set_decision(facts, index, candidate, "visibility_state_changed")
-      elseif disable_matches(disabled_record, policy, force_index, candidate)
+      elseif disable_matches(disabled_record, policy, force_index, candidate, authority)
           and unowned_record == nil and current_disable_owned_state(technology) then
         rows[candidate.name] = {disabled = true, visible_when_disabled = visibility_record.value}
         facts.imported = facts.imported + 1
@@ -244,7 +297,7 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned, all
         facts.imported = facts.imported + 1
         if unowned_record ~= nil then
           set_decision(facts, index, candidate, "visibility_imported_unowned_disable_excluded")
-        elseif disable_matches(disabled_record, policy, force_index, candidate) then
+        elseif disable_matches(disabled_record, policy, force_index, candidate, authority) then
           set_decision(facts, index, candidate, "visibility_imported_enablement_reenabled")
         elseif disabled_record == nil then
           set_decision(facts, index, candidate, "visibility_only_imported")

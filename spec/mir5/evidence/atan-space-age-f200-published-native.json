@@ -1,0 +1,464 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "c7f43ad4ffbebecc6d2a64cbbe7e1ae9fccefdf6",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "9A7E36050CD42BE983666BE684B7BE3BFB7D2A1B2039C029F33184F19C7A4DCB",
+    "direct_library_startup_measurement_sha256": "699D0F24C822BA31F212061E11787E5DB1792CA0C164D82219CE0852A6E1F6E1",
+    "native_probe_resources_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+    "library_activation_sha256": "5359CBC03A883F480A80083DE05A0A5B97BB68B919161344F418886A3D6F49E6"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "base_version": "2.0.77",
+    "factorio_version": "2.0"
+  },
+  "profile_input": {
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\atan-space-age-f200-2077.json",
+    "sha256": "E674737FC131568C1E340D670F6BA87A122848F8227B6DD0A211806430CDB55E"
+  },
+  "mir_archive": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "name": "more-infinite-research",
+    "version": "4.7.20002",
+    "factorio_version": "2.0",
+    "root": "more-infinite-research_4.7.20002"
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.414,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T15:44:01.9298079+00:00",
+    "deadline_at": "2026-10-23T15:44:31.9298079+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T15:44:02.3193594+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20305895424,
+        "committed_bytes": 18849824768,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386231808,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386231808,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "C5AF59916B49996E77B8AF1FDBFF0978396AAC2C1786AE081BF48DDB6C690990",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "quality",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "space-age",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "atan-air-scrubbing",
+        "version": "0.2.8",
+        "enabled": true
+      },
+      {
+        "name": "atan-ash",
+        "version": "2.2.1",
+        "enabled": true
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "4.7.20002",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+      "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\elevated-rails\\info.json",
+      "sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089"
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\quality\\info.json",
+      "sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD"
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\space-age\\info.json",
+      "sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A"
+    },
+    {
+      "name": "atan-air-scrubbing",
+      "version": "0.2.8",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-air-scrubbing_0.2.8.zip",
+      "sha256": "FC1425EBEA1B2BD5BDD6DADB7BD594423DEBE8180D4781B25C92EA593D5D9AEF"
+    },
+    {
+      "name": "atan-ash",
+      "version": "2.2.1",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-ash_2.2.1.zip",
+      "sha256": "B46B85FC39D16331EA031F5F6459C5E99E8011097E782F958C08CE8AC9EEAE6C"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.20002",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 4.310989,
+    "peak_working_set_bytes": 551399424,
+    "peak_sampled_private_bytes": 549593088,
+    "admission": {
+      "observed_at": "2026-10-23T15:44:06.6118346+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20242366464,
+        "committed_bytes": 18880561152,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386186752,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386186752,
+        "total_bytes": 599395090432
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 30,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.181,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-10-23T15:44:06.4311950+00:00",
+      "deadline_at": "2026-10-23T15:44:36.4311950+00:00",
+      "admission": {
+        "observed_at": "2026-10-23T15:44:06.6118346+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 20242366464,
+          "committed_bytes": 18880561152,
+          "commit_limit_bytes": 44388642816
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 205386186752,
+          "total_bytes": 599395090432
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 205386186752,
+          "total_bytes": 599395090432
+        }
+      }
+    }
+  },
+  "loaded_selection": [
+    "atan-air-scrubbing@0.2.8",
+    "atan-ash@2.2.1",
+    "base@2.0.77",
+    "elevated-rails@2.0.77",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@4.7.20002",
+    "quality@2.0.77",
+    "space-age@2.0.77"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 28001626,
+      "sha256": "BB3447A2337981150C6C5A7954B030883AB2F03438958F661272086242C2E0C8"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 1026605,
+      "sha256": "2257257E414E639A2FEEFB3B4B76FFEAFF873AC1BCB9B20000C711ABE504C3A7"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "C5AF59916B49996E77B8AF1FDBFF0978396AAC2C1786AE081BF48DDB6C690990",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\elevated-rails\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00010000001F9527",
+        "sha256": "310A4C06D65F08199A76780388BA93C333BB752B1258415EA4D5211D9A681089",
+        "bytes": 286
+      },
+      {
+        "name": "quality",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\quality\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00010000001F9695",
+        "sha256": "2C2578FD84CC2E920C944C90047EAA5A1F6984A1CE07C246FC1906D90C5505AD",
+        "bytes": 267
+      },
+      {
+        "name": "space-age",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\space-age\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00010000001F9772",
+        "sha256": "F8957FC975949BB647B64CA246A4DE7F981232C4AB47C4DB4F60CCEA6AEF5E1A",
+        "bytes": 483
+      },
+      {
+        "name": "atan-air-scrubbing",
+        "version": "0.2.8",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-air-scrubbing_0.2.8.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000800000001A31A",
+        "sha256": "FC1425EBEA1B2BD5BDD6DADB7BD594423DEBE8180D4781B25C92EA593D5D9AEF",
+        "bytes": 6478555
+      },
+      {
+        "name": "atan-ash",
+        "version": "2.2.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-ash_2.2.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000800000001A31B",
+        "sha256": "B46B85FC39D16331EA031F5F6459C5E99E8011097E782F958C08CE8AC9EEAE6C",
+        "bytes": 94526
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "4.7.20002",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000A0000000217CC",
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+        "bytes": 1449338
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39980729195-1\\capture\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39980729195-1\\capture\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39980729195-1\\capture\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 4.310989,
+        "peak_working_set_bytes": 551399424,
+        "peak_sampled_private_bytes": 549593088,
+        "admission": {
+          "observed_at": "2026-10-23T15:44:06.6118346+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20242366464,
+            "committed_bytes": 18880561152,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386186752,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386186752,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.181,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:44:06.4311950+00:00",
+          "deadline_at": "2026-10-23T15:44:36.4311950+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:44:06.6118346+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20242366464,
+              "committed_bytes": 18880561152,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386186752,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386186752,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "prototype-capture-engine",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.181,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:44:06.4311950+00:00",
+        "deadline_at": "2026-10-23T15:44:36.4311950+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:44:06.6118346+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20242366464,
+            "committed_bytes": 18880561152,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386186752,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386186752,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    }
+  ]
+}
