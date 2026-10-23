@@ -23,6 +23,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_atan_productivity.py';lua=$true},
   [ordered]@{path='tests/mir5/test_atan_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_full_catalogue_upgrade_fixture.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_fixed_provider_removal_control_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_automatic_families.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_productivity.py';lua=$true},
   [ordered]@{path='tests/mir5/test_native_credit_definitions.py';lua=$true},
