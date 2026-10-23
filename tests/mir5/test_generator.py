@@ -14,6 +14,9 @@ MODERN_ORACLE = json.loads(
 SCIENCE_SOURCE_ORACLE = json.loads(
     (ROOT / "tests/mir5/fixtures/science-source-native-oracle.json").read_text(encoding="utf-8")
 )
+K2SO_MATERIAL_FACTS = json.loads(
+    (ROOT / "spec/mir5/inventory/k2so-material-facts.json").read_text(encoding="utf-8")
+)
 
 # Exact data-raw rows retained from the accepted published 4.7 F210 captures:
 # vanilla inventory, Space Age capture, and K2SO capture respectively. Keeping
@@ -23,6 +26,128 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
   "space_age": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
   "k2so": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-enriched-iron","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-iron-ore","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}}
 }''')
+
+
+# These are the only permitted additions to the published 4.7.2 K2SO
+# 75-technology capture. They restore the three finite A05 -1 identities
+# whose exact reviewed-forward tuple was omitted by 4.7.2, while preserving
+# every captured row as its own full expected value. Fields below come from
+# the historical material declarations; routes, owner unlocks, and icons are
+# independently bound to the hash-recorded current no-MIR raw facts.
+K2SO_MATERIAL_ADDITION_PROVENANCE = {
+    "reason": (
+        "restore the three A05-delivered finite material -1 identities absent from "
+        "the captured 4.7.2 K2SO output because its reviewed-forward tuple lock withheld them"
+    ),
+    "historical_declarations": "source/prototypes/streams/productivity.lua:753-783,1120-1135",
+    "native_facts": "spec/mir5/inventory/k2so-material-facts.json",
+    "a05_receipt": (
+        "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/"
+        "k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
+    ),
+}
+
+
+def _current_k2so_material_facts():
+    """Return only named raw rows independently captured for the three additions."""
+    current = K2SO_MATERIAL_FACTS["current_no_mir_native"]
+    recipe_rows = {}
+    for row in current["recipes"]:
+        name = row["recipe"]
+        if (row["enabled"] is not False or row["allow_productivity"] is not True
+                or row["ignored_by_productivity"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["shared_probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["independent_probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["extra_count_fraction"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }):
+            raise AssertionError(f"invalid captured K2SO material recipe facts: {name}")
+        recipe_rows[name] = {
+            "enabled": row["enabled"],
+            "allow_productivity": row["allow_productivity"],
+            "ingredients": row["ingredients"],
+            "results": row["products"],
+        }
+    owner_rows = {}
+    for row in current["owners"]:
+        if len(row["relevant_effects"]) != 1:
+            raise AssertionError(f"invalid captured K2SO material owner facts: {row['technology']}")
+        owner_rows[row["technology"]] = {"effects": row["relevant_effects"]}
+    icons = {}
+    for row in current["items"]:
+        if row["icon_size"] != {"present": False, "value": None}:
+            raise AssertionError(f"unexpected native item icon_size: {row['item']}")
+        icons[row["item"]] = row["icon"]
+    return {"recipe": recipe_rows, "technology": owner_rows, "icons": icons}
+
+
+K2SO_MATERIAL_NATIVE = _current_k2so_material_facts()
+
+
+def _intended_k2so_material_row(name, item, routes, science, owners):
+    return {
+        "type": "technology",
+        "name": name,
+        "icons": [
+            {"icon": K2SO_MATERIAL_NATIVE["icons"][item], "icon_size": 64},
+            {"icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+             "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": True},
+        ],
+        "localised_name": ["", ["description.productivity-bonus"], ": ", [f"item-name.{item}"]],
+        "localised_description": ["technology-description.more-infinite-research.recipe_productivity"],
+        "level": 1,
+        "upgrade": True,
+        "max_level": 3,
+        "order": f"p[research_material_{item.removeprefix('kr-').replace('-', '_')}]",
+        "prerequisites": [*science, *owners],
+        "effects": [
+            {"type": "change-recipe-productivity", "recipe": route, "change": 0.02}
+            for route in routes
+        ],
+        "unit": {
+            "count_formula": "200*2^(L-1)",
+            "time": 30,
+            "ingredients": [[pack, 1] for pack in science],
+        },
+    }
+
+
+K2SO_INTENDED_MATERIAL_ROWS = {
+    "recipe-prod-research_material_rare_metals-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_rare_metals-1", "kr-rare-metals",
+        ["kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack"],
+        ["kr-rare-metal-processing", "kr-enriched-ores"],
+    ),
+    "recipe-prod-research_material_silicon-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_silicon-1", "kr-silicon", ["kr-silicon"],
+        ["automation-science-pack", "logistic-science-pack"], ["kr-silicon-processing"],
+    ),
+    "recipe-prod-research_material_glass-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_glass-1", "kr-glass", ["kr-glass"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack"],
+        ["kr-stone-processing"],
+    ),
+}
 
 
 def lua_table(lua, value):
@@ -182,6 +307,13 @@ class GeneratorTests(unittest.TestCase):
             local sources = source_worlds[profile].raw
             for name, row in pairs(sources.recipe) do recipes[name] = source_copy(row) end
             for name, row in pairs(sources.technology) do technologies[name] = source_copy(row) end
+            -- The K2SO host fixture is a named subset from the current
+            -- no-MIR capture. It supplies only the four recipes and four
+            -- owner effects that the restored material rows bind directly.
+            if modern_catalogue.is_k2so(active_mods) then
+              for name, row in pairs(k2so_material_native.recipe) do recipes[name] = source_copy(row) end
+              for name, row in pairs(k2so_material_native.technology) do technologies[name] = source_copy(row) end
+            end
             local lab_inputs = {}
             for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
             table.sort(lab_inputs)
@@ -219,6 +351,7 @@ class GeneratorTests(unittest.TestCase):
         ''')
         self.lua.globals().data_final_path = (ROOT / "source/mir5/data-final-fixes.lua").as_posix()
         self.lua.globals().source_worlds = lua_table(self.lua, SCIENCE_SOURCE_ORACLE["profiles"])
+        self.lua.globals().k2so_material_native = lua_table(self.lua, K2SO_MATERIAL_NATIVE)
 
     def test_published_default_and_detachment(self):
         self.lua.execute('''
@@ -565,6 +698,75 @@ class GeneratorTests(unittest.TestCase):
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
 
+    def test_k2so_material_rows_receive_common_all_official_science_and_lab_disablement(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["mir-science-pack-ingredient-policy"].value = "all-official"
+          startup["mir-lab-incompatibility-policy"].value = "skip"
+          local environment = full_world(mods)
+          environment.raw.lab = {restricted = {inputs = {"automation-science-pack"}}}
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local wanted = {
+            ["recipe-prod-research_material_rare_metals-1"] = true,
+            ["recipe-prod-research_material_silicon-1"] = true,
+            ["recipe-prod-research_material_glass-1"] = true,
+          }
+          local seen = 0
+          for _, row in ipairs(environment.emitted) do
+            if wanted[row.name] then
+              -- The selected K2 phase retains its own exact early vector
+              -- under all-official policy. The restricted lab must still
+              -- pass through the common skip disposition rather than leave
+              -- this appended row enabled.
+              assert(row.enabled == false and #row.unit.ingredients > 0,
+                row.name .. " bypassed common science/lab policy")
+              seen = seen + 1
+            end
+          end
+          assert(seen == 3)
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
+    def test_k2so_material_native_stage_keeps_three_levels_while_runtime_caps_remain_named(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["ips-max-level-research_material_rare_metals"].value = 1
+          startup["ips-max-level-research_material_silicon"].value = 2
+          startup["ips-max-level-research_material_glass"].value = 3
+          local environment = full_world(mods)
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local generated = {}; for _, row in ipairs(environment.emitted) do generated[row.name] = row end
+          for _, id in ipairs({"recipe-prod-research_material_rare_metals-1",
+              "recipe-prod-research_material_silicon-1", "recipe-prod-research_material_glass-1"}) do
+            assert(generated[id] and generated[id].max_level == 3, id .. " truncated native earned levels")
+          end
+
+          package.loaded["research.catalogue"] = nil
+          local declared, count = require("research.catalogue").declared(), 0
+          for _, row in ipairs(declared) do
+            if row.id == "recipe-prod-research_material_rare_metals-1"
+              or row.id == "recipe-prod-research_material_silicon-1"
+              or row.id == "recipe-prod-research_material_glass-1" then
+              assert(row.ownership_kind == "authored_generated" and row.cap_setting == "ips-max-level-" .. row.family)
+              count = count + 1
+            end
+          end
+          assert(count == 3, "runtime caps catalogue lost or duplicated a material identity")
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
     def test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement(self):
         self.lua.execute('''
           local function outputs(value, enabled)
@@ -700,7 +902,7 @@ class GeneratorTests(unittest.TestCase):
           assert(values.streams.research_material_imersite__continuation == values.streams.research_material_imersite)
           package.loaded["research.catalogue"] = nil
           local declared = require("research.catalogue").declared()
-          assert(#declared == 77)
+          assert(#declared == 80)
           local declared_ids, holder_ids = {}, { ["mir-k2-imersite-staged-state-1"] = true, ["mir-k2-imersite-continuation-state-4"] = true }
           for _, row in ipairs(declared) do
             assert(values.streams[row.family] ~= nil, "catalogue family has no resolved value: " .. row.family)
@@ -710,6 +912,22 @@ class GeneratorTests(unittest.TestCase):
           end
           assert(declared_ids["recipe-prod-research_material_imersite-1"].cap_setting == "ips-max-level-research_material_imersite")
           assert(declared_ids["recipe-prod-research_material_imersite-4"].family == "research_material_imersite__continuation")
+          local expected_material_rows = {
+            ["recipe-prod-research_material_rare_metals-1"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
+            ["recipe-prod-research_material_silicon-1"] = {family="research_material_silicon", recipe="kr-silicon"},
+            ["recipe-prod-research_material_glass-1"] = {family="research_material_glass", recipe="kr-glass"},
+          }
+          local material_count = 0
+          for id, expected in pairs(expected_material_rows) do
+            local row = declared_ids[id]
+            assert(row and row.family == expected.family and row.recipe == expected.recipe
+              and row.ownership_kind == "authored_generated"
+              and row.setting == "ips-enable-" .. expected.family
+              and row.cap_setting == "ips-max-level-" .. expected.family
+              and row.legacy_binding.source == "generated-stream" and row.legacy_binding.operation == "emit", id)
+            material_count = material_count + 1
+          end
+          assert(material_count == 3, "K2SO runtime catalogue material identity/count")
           local rows = modern.technologies(selected, values)
           assert(#rows == 72)
           local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
@@ -740,10 +958,18 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 75)
-          local final_ids = {}; for _, row in ipairs(environment.emitted) do final_ids[row.name] = row end
+          assert(environment.writes == 1 and #environment.emitted == 78)
+          local final_ids, final_count = {}, 0
+          for _, row in ipairs(environment.emitted) do
+            assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
+            final_ids[row.name], final_count = row, final_count + 1
+          end
+          assert(final_count == 78)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
+          assert(final_ids["recipe-prod-research_material_rare_metals-1"]
+            and final_ids["recipe-prod-research_material_silicon-1"]
+            and final_ids["recipe-prod-research_material_glass-1"])
 
           startup["ips-cost-base-research_material_imersite"].value = 300
           startup["ips-cost-linear-increment-research_material_imersite"].value = 10
@@ -990,6 +1216,7 @@ class GeneratorTests(unittest.TestCase):
         cases = (
             ("base-f210", {}),
             ("space-age-f210", {"space-age": "2.1.23"}),
+            ("k2so-f210", K2SO_MODS),
         )
         for profile, active_mods in cases:
             self.lua.globals().published_mods = lua_table(self.lua, active_mods)
@@ -1003,7 +1230,19 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.globals().published_emitted.values()
             }
-            self.assertEqual(actual, expected_profiles[profile], profile)
+            expected = dict(expected_profiles[profile])
+            if profile == "k2so-f210":
+                self.assertEqual(
+                    set(expected).intersection(K2SO_INTENDED_MATERIAL_ROWS), set(),
+                    K2SO_MATERIAL_ADDITION_PROVENANCE["reason"],
+                )
+                expected.update(K2SO_INTENDED_MATERIAL_ROWS)
+                emitted = list(self.lua.globals().published_emitted.values())
+                self.assertEqual(
+                    len(emitted), len(actual),
+                    "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
+                )
+            self.assertEqual(actual, expected, profile)
             expected_patches = patch_profiles[profile]
             self.assertEqual(
                 set(self.lua.globals().published_raw.recipe.keys())

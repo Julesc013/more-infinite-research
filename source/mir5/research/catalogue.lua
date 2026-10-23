@@ -101,6 +101,10 @@ local function static_rows()
   end
   if selected.k2_imersite then
     for _, row in ipairs(imersite_rows()) do rows[#rows +1] = row end
+    for _, definition in ipairs(require("research.k2_materials")) do
+      rows[#rows + 1] = generated_row(definition.name, definition.key, definition.order,
+        "description.productivity-bonus", definition.routes[1].recipe)
+    end
   end
   if space_age_active then
     for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do

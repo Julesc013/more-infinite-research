@@ -53,6 +53,11 @@ end
 -- foreign research. Existing named routes and weights retain precedence.
 require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods})
 
+if modern_catalogue.is_k2so(mods) then
+  local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {
