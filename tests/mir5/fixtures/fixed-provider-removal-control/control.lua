@@ -171,18 +171,18 @@ local function assert_earned_source(state,label)
   assert_native_queue(player,PLAYER_CURRENT,PLAYER_TAIL,.27,label..' player')
   assert_frozen(state)
 end
-local function assert_true(state)
+local function assert_true(state, now_foreign)
   assert_source_witness(state)
   assert_frozen(state)
   local player=game.forces.player
   if state.mir_actual_labs~=2 then fail('preferred MIR actual lab witness differs') end
-  assert_status(player,MIR_BIOFLUX,{level=2,researched=false,enabled=true,visible=false,maximum=UINT32_MAX,saved=0},'preferred MIR bioflux')
+  assert_status(player,MIR_BIOFLUX,{level=2,researched=false,enabled=not now_foreign,visible=false,maximum=UINT32_MAX,saved=0},'preferred MIR bioflux')
   assert_status(player,MIR_BREEDING,{level=2,researched=false,enabled=true,visible=false,maximum=UINT32_MAX,saved=0},'preferred MIR breeding')
   assert_bonus(player,'bioflux',state.bioflux_base+.2,'preferred MIR bioflux')
   assert_bonus(player,'fish-breeding',state.fish_base+.2,'preferred MIR fish')
   assert_bonus(player,'biter-egg',state.biter_base+.1,'preferred MIR biter egg')
   assert_bonus(player,'pentapod-egg',state.pentapod_base+.1,'preferred MIR pentapod egg')
-  assert_credit(player,1,1,'preferred MIR')
+  assert_credit(player,now_foreign and 2 or 1,1,'preferred MIR')
   assert_native_queue(player,PLAYER_CURRENT,PLAYER_TAIL,.27,'preferred player')
   assert_status(game.forces[state.foreign_force_index],MIR_BIOFLUX,{level=1,researched=false,enabled=false,visible=false,maximum=UINT32_MAX,saved=0},'pre-disabled foreign MIR bioflux')
   assert_status(game.forces[state.foreign_force_index],FOREIGN_DISABLED,{level=1,researched=false,enabled=false,visible=true,maximum=UINT32_MAX,saved=0},'pre-disabled foreign provider')
@@ -307,7 +307,7 @@ script.on_configuration_changed(function()
   elseif active['more-infinite-research']=='5.0.20000' and active[FIXTURE]=='0.3.0' then
     require_mode('5.0.20000','0.3.0',false,true,'foreign successor')
     if type(state)~='table' or state.phase~='true-completed' then fail('foreign source witness differs') end
-    assert_true(state);state.phase='await-false-breeding';state.deadline_tick=game.tick+DEADLINE;prepend_mir(state,MIR_BREEDING,'foreign MIR breeding')
+    assert_true(state,true);state.phase='await-false-breeding';state.deadline_tick=game.tick+DEADLINE;prepend_mir(state,MIR_BREEDING,'foreign MIR breeding')
   elseif active['more-infinite-research']=='5.0.20000' and active[FIXTURE]=='0.4.0' then
     require_mode('5.0.20000','0.4.0',false,false,'provider removal')
     if type(state)~='table' or state.phase~='false-completed' then fail('provider removal source witness differs') end
