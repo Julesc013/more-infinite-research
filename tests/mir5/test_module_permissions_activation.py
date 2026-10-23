@@ -16,6 +16,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           config = require("research.settings")
+          mods = {base = "2.1.23"}
 
           function defaults()
             local out = {}
@@ -72,7 +73,16 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           local installs = 0
           package.loaded["research.productivity"] = nil
           package.loaded["research.generator"] = nil
+          package.loaded["compatibility.gear_bindings"] = nil
           package.loaded["overrides.module_permissions"] = nil
+          -- Isolate the independent research path: its named recipe preflight
+          -- is covered by the Generator tests, not this inactive override test.
+          package.preload["compatibility.gear_bindings"] = function()
+            return {select = function(active_mods, prototypes)
+              assert(active_mods == mods and prototypes == raw)
+              return {icon = "stub", recipes = {"stub"}}
+            end}
+          end
           package.preload["research.productivity"] = function()
             return {gears = function(values)
               assert(values.unrestricted_modules == false)
