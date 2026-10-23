@@ -290,15 +290,12 @@ script.on_init(function()
   lab.energy = 100000000
 
   local sequence = plan()
-  local queue = {}
-  for index, name in ipairs(sequence) do queue[index] = technology(force, name) end
-  if force.add_research(queue[1]) ~= true then fail("could not start real material research") end
-  force.research_queue = queue
-  if #force.research_queue ~= #sequence or not force.current_research or force.current_research.name ~= sequence[1] then
-    fail("native material queue did not retain the full twenty-level batch")
+  if force.add_research(technology(force, sequence[1])) ~= true then fail("could not start real material research") end
+  if #force.research_queue ~= 1 or not force.current_research or force.current_research.name ~= sequence[1] then
+    fail("native material queue did not accept the first research")
   end
   storage[KEY] = {phase="fresh-lab-running", source_mir=script.active_mods["more-infinite-research"],
-    plan=sequence, completed=0, events=0, queue_count=#queue, deadline=game.tick + DEADLINE_TICKS,
+    plan=sequence, completed=0, events=0, queue_count=1, deadline=game.tick + DEADLINE_TICKS,
     lab=lab, baseline=baseline, foreign_index=foreign.index, foreign=foreign_snapshot}
 end)
 
@@ -342,6 +339,16 @@ script.on_event(defines.events.on_tick, function()
       state.phase = "fresh-lab-complete"
       marker("initial", state)
       game.server_save(SAVE)
+    elseif game.forces.player.current_research == nil then
+      -- Native queue admission drops a tail whose finite prerequisite has
+      -- not completed yet. Advance the fixed fixture sequence only after
+      -- the preceding actual lab completion; never grant that prerequisite.
+      local force, name = game.forces.player, state.plan[state.completed + 1]
+      if #force.research_queue ~= 0 or force.add_research(technology(force, name)) ~= true
+        or not force.current_research or force.current_research.name ~= name or #force.research_queue ~= 1 then
+        fail("native material queue refused the next lab research")
+      end
+      state.queue_count = state.queue_count + 1
     end
     return
   end

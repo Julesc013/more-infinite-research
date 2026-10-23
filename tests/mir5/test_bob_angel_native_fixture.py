@@ -108,6 +108,9 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
               function force.add_research(value)
                 if type(value)=="string" then value=force.technologies[value] end
                 if not value or force.current_research then return false end
+                for _,family in ipairs(families) do
+                  if value.name==family.tail and force.technologies[family.early].researched~=true then return false end
+                end
                 force.research_queue={value};force.current_research=value;return true
               end
               for _,family in ipairs(families) do
@@ -154,6 +157,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
             local state=storage.mir5_bob_angel_continuity
             for i,name in ipairs(state.plan) do
               local tech=player.technologies[name]
+              assert(player.current_research==tech and #player.research_queue==1,"fixture bypassed native sequential admission")
               if tech.prototype.max_level==3 then
                 if tech.level<3 then tech.level=tech.level+1;tech.researched=false else tech.researched=true end
               else tech.level=tech.level+1;tech.researched=false end
@@ -163,6 +167,9 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
               local event_tech=(opponent=="out-of-order" and i==1) and player.technologies[state.plan[4]] or tech
               ok,result=pcall(callbacks.events[2],{research=event_tech});if not ok then return {ok=false,message=tostring(result)} end
               table.remove(player.research_queue,1);player.current_research=player.research_queue[1]
+              if i<#state.plan then
+                ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)} end
+              end
             end
             if opponent=="lost-bonus" then player.recipes["angels-plate-aluminium"].productivity_bonus=player.recipes["angels-plate-aluminium"].productivity_bonus-.02
             elseif opponent=="not-advanced" then local t=player.technologies[state.plan[1]];t.level=2;t.researched=false
