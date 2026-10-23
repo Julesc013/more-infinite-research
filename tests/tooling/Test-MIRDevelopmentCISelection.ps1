@@ -106,6 +106,8 @@ Assert-MIRDevelopmentCISelection -Condition ($historicalIds -contains 'static.pa
 
 $actualCatalog=Get-Content -Raw -LiteralPath (Join-Path $repo 'validation/tests.yml')|ConvertFrom-Json
 $actualAssurance=Get-Content -Raw -LiteralPath (Join-Path $repo '.mir/assurance.json')|ConvertFrom-Json
+. (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
+$actualPackageSourceFiles=@(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
 $developmentLuaConsumers=@(
   'static.recipe-productivity-permissions',
   'static.approved-pack-bindings',
@@ -126,18 +128,40 @@ foreach($consumerId in $developmentLuaConsumers) {
 Assert-MIRDevelopmentCISelection -Condition ((@($actualAssurance.profiles.'mir440-approved-bindings'|ForEach-Object {[string]$_}) -join ',') -ceq
   'static.approved-pack-bindings,static.approved-lab-bindings') -Message 'The focused approved-bindings profile must not be broadened by development CI admission.'
 $actualLuaSelectionExpectations=[ordered]@{
-  'source/prototypes/mir/pipeline/recipe_productivity_permissions.lua'=@('static.recipe-productivity-permissions','static.approved-pack-bindings','static.provider-metrics-lazy')
-  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'=@('static.approved-pack-bindings','static.provider-metrics-lazy')
-  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua'=@('static.approved-pack-bindings','static.approved-lab-bindings','static.provider-metrics-lazy')
+  'source/prototypes/mir/pipeline/recipe_productivity_permissions.lua'=@('static.recipe-productivity-permissions','static.approved-pack-bindings')
+  'source/prototypes/mir/capabilities/science_integration/pack_bindings.lua'=@('static.approved-pack-bindings')
+  'source/prototypes/mir/capabilities/science_integration/lab_bindings.lua'=@('static.approved-pack-bindings','static.approved-lab-bindings')
   'source/prototypes/mir/families/resolver.lua'=@('static.approved-pack-bindings','static.provider-metrics-lazy')
-  'source/prototypes/mir/settings/catalog.lua'=@('static.approved-pack-bindings','static.settings-catalogue-lifecycle','static.provider-metrics-lazy')
+  'source/prototypes/mir/settings/catalog.lua'=@('static.approved-pack-bindings','static.settings-catalogue-lifecycle')
 }
 foreach($entry in $actualLuaSelectionExpectations.GetEnumerator()) {
   $luaClassification=Get-MIRAssuranceClassification -Paths @([string]$entry.Key) -Config $actualAssurance
-  $luaRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $luaClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
+  $luaRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $luaClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development' -PackageSourceFiles $actualPackageSourceFiles)
   $selectedLuaIds=@($luaRows.id|Where-Object {$_ -in $developmentLuaConsumers}|Sort-Object -Unique)
   $expectedLuaIds=@($entry.Value|Sort-Object -Unique)
   Assert-MIRDevelopmentCISelection -Condition (($selectedLuaIds -join ',') -ceq ($expectedLuaIds -join ',')) -Message "Development selection lost or broadened Lua consumer coverage for $($entry.Key)"
+}
+$oldMIR4SourceRows=@(
+  'static.architecture',
+  'static.approved-pack-bindings',
+  'static.provider-metrics-lazy',
+  'static.mir4-editable-source-materializer-m41-f2c',
+  'static.mir4-development-contracts'
+)
+foreach($id in $oldMIR4SourceRows){
+  $row=@($actualCatalog.tests|Where-Object id -ceq $id)
+  Assert-MIRDevelopmentCISelection -Condition ($row.Count-eq1-and'source:source/**'-notin@($row[0].inputs)) -Message "MIR4 selection row retained a broad source input: $id"
+}
+$mir5Path='source/mir5/runtime/caps.lua'
+$mir5Classification=Get-MIRAssuranceClassification -Paths @($mir5Path) -Config $actualAssurance
+$mir5Rows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $mir5Classification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development' -PackageSourceFiles $actualPackageSourceFiles)
+Assert-MIRDevelopmentCISelection -Condition ('static.mir5-host-controls'-in@($mir5Rows.id)) -Message 'MIR5 host source lost its dedicated control lane.'
+Assert-MIRDevelopmentCISelection -Condition (@($mir5Rows.id|Where-Object{$_-in$oldMIR4SourceRows}).Count-eq0) -Message 'An unconsumed MIR5 source change selected an MIR4 preview check.'
+$mir4EditablePath='source/prototypes/mir/core/fingerprint.lua'
+$mir4EditableClassification=Get-MIRAssuranceClassification -Paths @($mir4EditablePath) -Config $actualAssurance
+$mir4EditableRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $mir4EditableClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development' -PackageSourceFiles $actualPackageSourceFiles)
+foreach($id in $oldMIR4SourceRows){
+  Assert-MIRDevelopmentCISelection -Condition ($id-in@($mir4EditableRows.id)) -Message "A declared MIR4 package input lost its consumer: $id"
 }
 $unrelatedLuaClassification=Get-MIRAssuranceClassification -Paths @('docs/maintainer/fixture-workflow.md') -Config $actualAssurance
 $unrelatedLuaRows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $unrelatedLuaClassification -Catalog $actualCatalog -Assurance $actualAssurance -Profile 'mir4-development')
