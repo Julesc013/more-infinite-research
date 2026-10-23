@@ -866,8 +866,16 @@ local function build_reference_bindings(shared, labs)
       reverse[dependency] = reverse[dependency] or {}
       reverse[dependency][#reverse[dependency] + 1] = name
     end
-    pending[name] = count
-    if count == 0 then queue[#queue + 1] = name end
+    local technology = name:match("^technology:(.*)$")
+    local pack = name:match("^pack:(.*)$")
+    local lab = name:match("^lab:(.*)$")
+    local rejected = (technology and result.technologies[technology])
+      or (pack and result.packs[pack] and result.packs[pack].status == "not-admitted")
+      or (lab and result.unavailable_labs[lab])
+    -- Explicit negative results are not unknown terminals. Their dependents
+    -- must retain the strict result even when the graph itself is acyclic.
+    pending[name] = count + (rejected and 1 or 0)
+    if pending[name] == 0 then queue[#queue + 1] = name end
   end
   local cursor = 1
   while cursor <= #queue do

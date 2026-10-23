@@ -1671,5 +1671,24 @@ do
       "An absent direct science source still fails explicitly")
   end)
   check(fingerprint.of(raw) == before, "Reference-only qualification never mutates native prototypes")
+  local original_world = deepcopy(raw)
+  for _, failure in ipairs({"direct", "prerequisite"}) do
+    data.raw = deepcopy(original_world)
+    data.raw.lab.lab.inputs = deepcopy(roles)
+    data.raw.lab["foreign-only-lab"] = {name = "foreign-only-lab", inputs = {"foreign-native-pack"}}
+    local invalid = {type = "technology", name = "invalid-research-vector",
+      unit = {count = 1, ingredients = {{roles[1], 1}, {"foreign-native-pack", 1}}}}
+    if failure == "direct" then
+      data.raw.technology["cryogenic-science-pack"].unit = invalid.unit
+    else
+      data.raw.technology[invalid.name] = invalid
+      data.raw.technology["cryogenic-science-pack"].prerequisites = {invalid.name}
+    end
+    Context.with_active(Context.new(), function()
+      local ok, status = pcall(science_packs.pack_production_status, "cryogenic-science-pack")
+      check(not ok or (status ~= "research" and status ~= "initial"),
+        "A known invalid " .. failure .. " research vector cannot become an unknown reference terminal")
+    end)
+  end
 end
 return checks
