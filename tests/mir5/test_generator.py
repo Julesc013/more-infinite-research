@@ -6,6 +6,12 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import (
+    captured_public_productivity_recipes,
+    native_credit_carrier_rows,
+    split_public_and_native_credit_rows,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 
 MODERN_ORACLE = json.loads(
@@ -26,98 +32,6 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
   "space_age": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
   "k2so": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-enriched-iron","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-iron-ore","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}}
 }''')
-
-
-# These twelve recipe-level pairs are the only authored native-credit carriers.
-# The public rows remain the immutable published output oracle below; this
-# separate expectation proves the private, hidden addition field-for-field.
-NATIVE_CREDIT_DESCRIPTORS = (
-    ("research_copper", "recipe-prod-research_copper-1", "copper-plate"),
-    ("research_iron", "recipe-prod-research_iron-1", "iron-plate"),
-    ("research_breeding", "recipe-prod-research_breeding-1", "fish-breeding"),
-    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "advanced-oil-processing"),
-    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "basic-oil-processing"),
-    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "coal-liquefaction"),
-    ("research_bullets", "recipe-prod-research_bullets-1", "firearm-magazine"),
-    ("research_grenades", "recipe-prod-research_grenades-1", "grenade"),
-    ("research_lubricant_productivity", "recipe-prod-research_lubricant_productivity-1", "lubricant"),
-    ("research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"),
-    ("research_concrete", "recipe-prod-research_concrete-1", "stone-brick"),
-    ("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"),
-)
-NATIVE_CREDIT_DEFAULT_SCALAR = 0.1
-
-
-def native_credit_carrier_rows(public_rows, captured_recipes):
-    """Build the independent expected hidden rows from exact public routes.
-
-    A pair is admitted only when its exact public MIR row is present and the
-    captured no-MIR input contains that recipe.  The public effect must retain
-    its captured default scalar; this prevents a private carrier from hiding a
-    public route or tuning drift.
-    """
-    expected = {}
-    for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
-        main = public_rows.get(main_id)
-        if main is None or recipe not in captured_recipes:
-            continue
-        effects = [
-            effect for effect in main["effects"]
-            if effect == {
-                "type": "change-recipe-productivity",
-                "recipe": recipe,
-                "change": NATIVE_CREDIT_DEFAULT_SCALAR,
-            }
-        ]
-        if len(effects) != 1:
-            raise AssertionError(
-                f"native credit lacks one captured default route: {main_id}:{recipe}"
-            )
-        for direction, change in (("positive", NATIVE_CREDIT_DEFAULT_SCALAR),
-                                  ("negative", -NATIVE_CREDIT_DEFAULT_SCALAR)):
-            name = f"mir-native-credit-{family}-{recipe}-{direction}"
-            expected[name] = {
-                "type": "technology",
-                "name": name,
-                "icon": "__base__/graphics/technology/automation.png",
-                "icon_size": 256,
-                "level": 1,
-                "upgrade": True,
-                "hidden": True,
-                "enabled": False,
-                "visible_when_disabled": False,
-                "max_level": "infinite",
-                "order": f"zz[mir-native-credit]-{name}",
-                "effects": [{
-                    "type": "change-recipe-productivity",
-                    "recipe": recipe,
-                    "change": change,
-                }],
-                "unit": {
-                    "count": 1,
-                    "time": 1,
-                    "ingredients": [["automation-science-pack", 1]],
-                },
-            }
-    return expected
-
-
-def captured_public_productivity_recipes(public_rows):
-    """Return the exact named productivity routes preserved by a capture."""
-    return {
-        effect["recipe"]
-        for row in public_rows.values()
-        for effect in row.get("effects", [])
-        if effect.get("type") == "change-recipe-productivity"
-    }
-
-
-def split_public_and_native_credit_rows(rows):
-    public, credit = {}, {}
-    for name, row in rows.items():
-        destination = credit if name.startswith("mir-native-credit-") else public
-        destination[name] = row
-    return public, credit
 
 
 # These are the only permitted additions to the published 4.7.2 K2SO
