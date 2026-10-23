@@ -4067,9 +4067,9 @@
     {
       "path": "tools/lib/mir4/PlatformPreview.ps1",
       "classification": "canonical-internal",
-      "sha256": "F59CC9326D7D1574DF3E1B1D2F40DDCBB51634DE88E653B2B81856F06543238C",
+      "sha256": "805299551D6DFDDFB736325D57F86685E21A2062F71F38015EBF26148BD655E9",
       "hash_mode": "canonical-text-v1",
-      "lines": 924,
+      "lines": 929,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c80360f58f2b4625f7db2fcc282efeee07e46de337ef690338a4b059d56a7f0e"
+  "digest": "sha256:126beae5f5a176804f6a0c07be9efe2604283dbafb9de881003cc6fa06a351e5"
 }
