@@ -15,6 +15,10 @@ param(
   # uses the compatible historical server/reload path below.
   [string]$HistoricalTarget='',
   [string]$HistoricalFixtureMetadataPath='',
+  # A distinct predecessor -> MIR5 fixture protocol. It deliberately shares
+  # the historical engine runner but not the fresh historical-native identity.
+  [ValidateSet('','published','mir5')][string]$HistoricalTransitionStage='',
+  [string]$HistoricalTransitionFixtureMetadataPath='',
   [switch]$CreateOnly,
   [switch]$MIRAbsent,
   [string]$InputSavePath='',
@@ -169,6 +173,94 @@ function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirecto
     Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical fixture dependencies differ'
   } finally {$zip.Dispose()}
 }
+function Get-HistoricalTransitionFixtureTarget([string]$Target,[string]$MetadataPath,[string]$Stage) {
+  $allowed=@('f013','f014','f015','f016','f017','f100','f110')
+  Assert-Fixture ($Target -in $allowed) 'historical transition target is unsupported'
+  Assert-Fixture ($Stage -in @('published','mir5')) 'historical transition stage is unsupported'
+  $metadata=(Resolve-Path -LiteralPath $MetadataPath).Path
+  $value=Get-Content -LiteralPath $metadata -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ($value.kind -ceq 'MIR5HistoricalTransitionFixtureV1' -and $value.schema -eq 1) 'historical transition fixture metadata differs'
+  Assert-Fixture ([string]$value.name -ceq 'mir-fixture-mir5-historical-transition' -and [string]$value.version -ceq '0.1.0') 'historical transition fixture identity differs'
+  $selected=$value.targets[$Target]
+  Assert-Fixture ($null -ne $selected) 'historical transition fixture lacks selected target'
+  foreach($field in @('factorio_version','minimum_base','published_mir_version','mir_version','published_archive_sha256','direct','direct_effect','successor_mode')){
+    Assert-Fixture ($selected.ContainsKey($field) -and -not [string]::IsNullOrWhiteSpace([string]$selected[$field])) "historical transition target lacks $field"
+  }
+  Assert-Fixture ($Target -cmatch '^f(?:013|014|015|016|017|100|110)$') 'historical transition target literal identity differs'
+  Assert-Fixture ([string]$selected.factorio_version -cmatch '^(?:0[.]1[3-7]|1[.][01])$') 'historical transition factorio version differs'
+  $edition=$Target.Substring(1)
+  Assert-Fixture ([string]$selected.published_mir_version -ceq ('4.7.'+$edition+'02') -and [string]$selected.mir_version -ceq ('5.0.'+$edition+'00')) 'historical transition MIR versions differ'
+  Assert-Fixture ([string]$selected.published_archive_sha256 -cmatch '^[A-Fa-f0-9]{64}$') 'historical transition published archive hash differs'
+  Assert-Fixture ([string]$selected.direct -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition direct is not a literal-safe identifier'
+  $directScience=@($selected.direct_science)
+  Assert-Fixture ($directScience.Count -gt 0) 'historical transition target lacks direct science'
+  foreach($name in $directScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition direct science is not a literal-safe identifier'}
+  Assert-Fixture ([double]$selected.direct_effect -gt 0 -and [double]$selected.direct_effect -le 1) 'historical transition direct effect differs'
+  $expectedMode=if($Target -in @('f013','f014')){'preservation-only'}else{'lab'}
+  Assert-Fixture ([string]$selected.successor_mode -ceq $expectedMode) 'historical transition successor mode differs'
+  $queue=[bool]($selected.ContainsKey('queue_api') -and $selected.queue_api)
+  if($expectedMode -ceq 'lab'){
+    Assert-Fixture ($selected.ContainsKey('partial_progress') -and [double]$selected['partial_progress'] -gt 0 -and [double]$selected['partial_progress'] -lt 1) 'historical transition partial progress differs'
+  }else{
+    Assert-Fixture (-not $selected.ContainsKey('partial_progress') -and -not $queue -and -not $selected.ContainsKey('queue_probe')) 'preservation-only historical transition declares successor state'
+  }
+  if($queue){
+    Assert-Fixture ($selected.ContainsKey('queue_probe') -and [string]$selected['queue_probe'] -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical transition queue probe is not a literal-safe identifier'
+  }elseif($selected.ContainsKey('queue_probe')){throw '[mir5-native-fixture] historical transition non-queue target declares a queue probe'}
+  $version=if($Stage -ceq 'published'){[string]$selected.published_mir_version}else{[string]$selected.mir_version}
+  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;stage=$Stage;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=$version;definition=$selected}
+}
+function ConvertTo-HistoricalTransitionFixtureTargetLiteral($Fixture) {
+  $value=$Fixture.definition
+  $lines=[Collections.Generic.List[string]]::new()
+  $lines.Add('return {')
+  $lines.Add(('  id="{0}",' -f [string]$Fixture.target))
+  foreach($field in @('stage','mir_version')){$lines.Add(('  {0}="{1}",' -f $field,[string]$Fixture.$field))}
+  $lines.Add(('  direct="{0}",' -f [string]$value.direct))
+  $lines.Add(('  direct_effect={0},' -f ([double]$value.direct_effect).ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
+  $lines.Add(('  successor_mode="{0}",' -f [string]$value.successor_mode))
+  if([string]$value.successor_mode -ceq 'lab'){$lines.Add(('  partial_progress={0},' -f ([double]$value.partial_progress).ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))}
+  $science=@($value.direct_science|ForEach-Object {'"'+[string]$_+'"'})
+  $lines.Add(('  direct_science={0},' -f ('{'+($science -join ',')+'}')))
+  if($value.ContainsKey('queue_api') -and [bool]$value.queue_api){
+    $lines.Add('  queue_api=true,')
+    $lines.Add(('  queue_probe="{0}",' -f [string]$value.queue_probe))
+  }
+  $lines.Add('}')
+  ($lines -join "`n")+"`n"
+}
+function Assert-HistoricalTransitionFixtureArchive([string]$Archive,[string]$SourceDirectory,$Fixture) {
+  Assert-Fixture (Test-Path -LiteralPath $Archive -PathType Leaf) "historical transition fixture archive is absent: $Archive"
+  $source=(Resolve-Path -LiteralPath $SourceDirectory).Path
+  $root=$Fixture.name+'_'+$Fixture.version
+  $expectedInfo=[ordered]@{
+    name=$Fixture.name;version=$Fixture.version;factorio_version=$Fixture.factorio_version
+    dependencies=@(('base >= '+$Fixture.minimum_base),('more-infinite-research = '+$Fixture.mir_version))
+  }
+  $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
+  try {
+    $files=@($zip.Entries|Where-Object {-not $_.FullName.EndsWith('/')})
+    $expected=@(@('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua','target-literal.lua','info.json')|ForEach-Object {$root+'/'+$_}|Sort-Object)
+    Assert-Fixture ($files.Count -eq $expected.Count -and ((@($files.FullName|Sort-Object) -join "`n") -ceq ($expected -join "`n"))) 'historical transition fixture archive membership differs'
+    foreach($name in @('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua')){
+      $entry=$zip.GetEntry($root+'/'+$name);$path=Join-Path $source $name
+      Assert-Fixture ($null -ne $entry -and $entry.Length -eq (Get-Item -LiteralPath $path).Length) "historical transition fixture member differs: $name"
+      $stream=$entry.Open();try{$hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
+      Assert-Fixture ($hash -ceq (Get-FixtureSha $path)) "historical transition fixture source hash differs: $name"
+    }
+    $literal=ConvertTo-HistoricalTransitionFixtureTargetLiteral $Fixture
+    $literalBytes=[Text.UTF8Encoding]::new($false).GetBytes($literal)
+    $literalEntry=$zip.GetEntry($root+'/target-literal.lua')
+    Assert-Fixture ($null -ne $literalEntry -and $literalEntry.Length -eq $literalBytes.Length) 'historical transition fixture target literal length differs'
+    $literalStream=$literalEntry.Open();try{$literalHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($literalStream))}finally{$literalStream.Dispose()}
+    $expectedLiteralHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($literalBytes))
+    Assert-Fixture ($literalHash -ceq $expectedLiteralHash) 'historical transition fixture target literal hash differs'
+    $infoEntry=$zip.GetEntry($root+'/info.json');Assert-Fixture ($null -ne $infoEntry -and $infoEntry.Length -le 64KB) 'historical transition fixture info is absent'
+    $reader=[IO.StreamReader]::new($infoEntry.Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
+    Assert-Fixture ([string]$info.name -ceq $expectedInfo.name -and [string]$info.version -ceq $expectedInfo.version -and [string]$info.factorio_version -ceq $expectedInfo.factorio_version) 'historical transition fixture info identity differs'
+    Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical transition fixture dependencies differ'
+  } finally {$zip.Dispose()}
+}
 function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[string]$FactorioVersion) {
   Assert-Fixture ($FactorioVersion -in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')) 'historical server target differs'
   $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw | ConvertFrom-Json -AsHashtable
@@ -218,17 +310,34 @@ $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $activeModsObserverName=$ActiveModsObserver.Trim()
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $historical=-not [string]::IsNullOrWhiteSpace($HistoricalTarget)
+$historicalTransition=-not [string]::IsNullOrWhiteSpace($HistoricalTransitionStage)
 $historicalFixture=$null
-if($historical){
+if($historicalTransition){
+  Assert-Fixture $historical 'historical transition requires a historical target'
+  Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent) 'historical transition requires an installed MIR predecessor or successor'
+  Assert-Fixture ($CaseName -ceq 'historical-transition' -and $ConsumerMarkers.Count -eq 0) 'historical transition uses its own marker without modern consumers'
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($activeModsObserverName)) 'historical transition does not select a modern active-mod observer'
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath)) 'historical transition must not use fresh historical metadata'
+  Assert-Fixture ($FixtureSources.Count -eq 1 -and -not [string]::IsNullOrWhiteSpace($HistoricalTransitionFixtureMetadataPath)) 'historical transition requires one source and its metadata'
+  if($HistoricalTransitionStage -ceq 'published'){
+    Assert-Fixture (-not $InputSavePath -and -not $ExpectedInputSaveSha256) 'published historical transition must create a fresh predecessor save'
+  }else{
+    Assert-Fixture ($InputSavePath -and $ExpectedInputSaveSha256 -cmatch '^[a-fA-F0-9]{64}$') 'MIR5 historical transition requires an immutable predecessor save hash'
+  }
+  $historicalFixture=Get-HistoricalTransitionFixtureTarget -Target $HistoricalTarget -MetadataPath $HistoricalTransitionFixtureMetadataPath -Stage $HistoricalTransitionStage
+  $base=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ([string]$base.version -ceq $historicalFixture.minimum_base) 'historical transition engine base differs from target metadata'
+}elseif($historical){
   Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent -and -not $InputSavePath -and -not $ExpectedInputSaveSha256) 'historical fixtures require a fresh full run'
   Assert-Fixture ($CaseName -ceq 'historical-native' -and $ConsumerMarkers.Count -eq 0) 'historical fixtures use their own marker without modern consumers'
   Assert-Fixture ([string]::IsNullOrWhiteSpace($activeModsObserverName)) 'historical fixtures do not select a modern active-mod observer'
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalTransitionFixtureMetadataPath)) 'fresh historical fixture must not use transition metadata'
   Assert-Fixture ($FixtureSources.Count -eq 1 -and -not [string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath)) 'historical fixtures require one source and its metadata'
   $historicalFixture=Get-HistoricalFixtureTarget -Target $HistoricalTarget -MetadataPath $HistoricalFixtureMetadataPath
   $base=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json -AsHashtable
   Assert-Fixture ([string]$base.version -ceq $historicalFixture.minimum_base) 'historical fixture engine base differs from target metadata'
 }else{
-  Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath)) 'modern fixture runs do not accept historical metadata'
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath) -and [string]::IsNullOrWhiteSpace($HistoricalTransitionFixtureMetadataPath)) 'modern fixture runs do not accept historical metadata'
 }
 $inputSave=$null
 if($InputSavePath -or $ExpectedInputSaveSha256){
@@ -255,13 +364,23 @@ if($MIRAbsent){
   Assert-Fixture ($mirRows.Count -eq 1 -and $ExpectedMIRArchiveSha256 -match '^[a-fA-F0-9]{64}$') 'one pinned MIR selection is required'
   $mir=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -ceq $mirRows[0].version})
   Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
+  if($historicalTransition){
+    Assert-Fixture ([string]$mirRows[0].version -ceq [string]$historicalFixture.mir_version) 'historical transition profile MIR version differs'
+    if($HistoricalTransitionStage -ceq 'published'){
+      Assert-Fixture ($ExpectedMIRArchiveSha256.ToUpperInvariant() -ceq [string]$historicalFixture.definition.published_archive_sha256) 'historical transition published archive hash differs'
+    }
+  }
 }
 $fixtureInputs=@();$fixtureBindings=@()
 if($historical){
   $source=(Resolve-Path -LiteralPath $FixtureSources[0]).Path
   Assert-Fixture ((Split-Path -Parent $historicalFixture.path) -ceq $source) 'historical fixture metadata is not beside its source'
   $archive=Join-Path $library ($historicalFixture.name+'_'+$historicalFixture.version+'.zip')
-  Assert-HistoricalFixtureArchive -Archive $archive -SourceDirectory $source -Fixture $historicalFixture
+  if($historicalTransition){
+    Assert-HistoricalTransitionFixtureArchive -Archive $archive -SourceDirectory $source -Fixture $historicalFixture
+  }else{
+    Assert-HistoricalFixtureArchive -Archive $archive -SourceDirectory $source -Fixture $historicalFixture
+  }
   Assert-Fixture (@($rows | Where-Object {$_.enabled -and $_.name -ceq $historicalFixture.name -and $_.version -ceq $historicalFixture.version}).Count -eq 1) 'historical fixture is not selected exactly once'
   $archiveSha=Get-FixtureSha $archive
   $fixtureInputs+=@{source=$source;archive=$archive;sha256=$archiveSha}
@@ -291,6 +410,7 @@ $record=[ordered]@{
   engine=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
   profile=@{path=$profile;sha256=Get-FixtureSha $profile};fixtures=$fixtureInputs
   historical_target=if($historical){@{id=$historicalFixture.target;metadata_path=$historicalFixture.path;metadata_sha256=$historicalFixture.sha256;factorio_version=$historicalFixture.factorio_version;minimum_base=$historicalFixture.minimum_base;mir_version=$historicalFixture.mir_version}}else{$null}
+  historical_transition=if($historicalTransition){@{stage=$HistoricalTransitionStage;published_archive_sha256=[string]$historicalFixture.definition.published_archive_sha256;predecessor_mir_version=[string]$historicalFixture.definition.published_mir_version;successor_mir_version=[string]$historicalFixture.definition.mir_version}}else{$null}
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
   observation=if($CreateOnly){'native-create-runtime-load-only'}else{'native-fixture-production-and-two-cold-reloads'}
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
@@ -371,6 +491,7 @@ try{
   }
   $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
+  if($historicalTransition){Assert-Fixture ([string]$record.initial.transition_stage -ceq $HistoricalTransitionStage) 'historical transition predecessor or successor witness differs'}
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()
   foreach($ordinal in 1..2){
@@ -383,11 +504,14 @@ try{
         $reader=[IO.StreamReader]::new($stream)
         try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
         if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native historical reload diagnostic'}
-        return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"historical-native","stage":"reload"')
+        $reloadCase=if($historicalTransition){'historical-transition'}else{'historical-native'}
+        $reloadTransition=if($historicalTransition){',"transition_stage":"'+$HistoricalTransitionStage+'"'}else{''}
+        return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"'+$reloadCase+'","stage":"reload"'+$reloadTransition)
       }.GetNewClosure()
     }
     $stage=Invoke-FixtureStage ('reload-'+$ordinal) $reloadArguments $reloadCompletion
     $result=Read-FixtureResult ([IO.File]::ReadAllText($stage.log)) 'reload'
+    if($historicalTransition){Assert-Fixture ([string]$result.transition_stage -ceq $HistoricalTransitionStage) 'historical transition reload witness differs'}
     $stage.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($stage.log)) 'load'
     Assert-Fixture ((Get-FixtureSha $complete) -ceq $saveHash) 'cold reload changed completed save bytes'
     $record.reloads+=@{ordinal=$ordinal;stage=$stage;result=$result;save_sha256=$saveHash;save_byte_identical=$true}

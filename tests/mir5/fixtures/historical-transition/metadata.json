@@ -1,0 +1,115 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalTransitionFixtureV1",
+  "name": "mir-fixture-mir5-historical-transition",
+  "version": "0.1.0",
+  "targets": {
+    "f013": {
+      "factorio_version": "0.13",
+      "minimum_base": "0.13.20",
+      "published_mir_version": "4.7.01302",
+      "mir_version": "5.0.01300",
+      "published_archive_sha256": "69D02F628F1278B5D161B61E39DB4E3D1A5978E31D01638E2AE23E28594637C8",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "alien-science-pack"
+      ],
+      "successor_mode": "preservation-only"
+    },
+    "f014": {
+      "factorio_version": "0.14",
+      "minimum_base": "0.14.23",
+      "published_mir_version": "4.7.01402",
+      "mir_version": "5.0.01400",
+      "published_archive_sha256": "D34B6281A3815CD52AD91CABD1E1669650F2A2A761D9109DEDC07268D78D2CDE",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.05,
+      "direct_science": [
+        "alien-science-pack"
+      ],
+      "successor_mode": "preservation-only"
+    },
+    "f015": {
+      "factorio_version": "0.15",
+      "minimum_base": "0.15.40",
+      "published_mir_version": "4.7.01502",
+      "mir_version": "5.0.01500",
+      "published_archive_sha256": "758AA85BF41A10188DEA914AC456F672BAC7D3430E646CBDB6D761BE5ECC7B8A",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.1,
+      "direct_science": [
+        "high-tech-science-pack",
+        "military-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "successor_mode": "lab"
+    },
+    "f016": {
+      "factorio_version": "0.16",
+      "minimum_base": "0.16.51",
+      "published_mir_version": "4.7.01602",
+      "mir_version": "5.0.01600",
+      "published_archive_sha256": "00053C78EE854EB8AE0CB5318F7A41E3C81E62F29FEB6E6DCE317635743520DB",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.1,
+      "direct_science": [
+        "high-tech-science-pack",
+        "military-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "successor_mode": "lab"
+    },
+    "f017": {
+      "factorio_version": "0.17",
+      "minimum_base": "0.17.79",
+      "published_mir_version": "4.7.01702",
+      "mir_version": "5.0.01700",
+      "published_archive_sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.1,
+      "direct_science": [
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    },
+    "f100": {
+      "factorio_version": "1.0",
+      "minimum_base": "1.0.0",
+      "published_mir_version": "4.7.10002",
+      "mir_version": "5.0.10000",
+      "published_archive_sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.1,
+      "direct_science": [
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    },
+    "f110": {
+      "factorio_version": "1.1",
+      "minimum_base": "1.1.110",
+      "published_mir_version": "4.7.11002",
+      "mir_version": "5.0.11000",
+      "published_archive_sha256": "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91",
+      "direct": "recipe-prod-research_character_mining_speed-1",
+      "direct_effect": 0.1,
+      "direct_science": [
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "partial_progress": 0.42,
+      "queue_api": true,
+      "queue_probe": "braking-force-1",
+      "successor_mode": "lab"
+    }
+  }
+}
