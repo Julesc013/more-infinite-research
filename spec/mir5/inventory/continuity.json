@@ -7,7 +7,7 @@
     "release_id": 420193454
   },
   "inventory_complete": false,
-  "native_tests_run": false,
+  "native_tests_run": true,
   "request_ledger_rule": "Reuse or migrate the original ledger once; do not create new request IDs here.",
   "subjects": [
     {
@@ -71,6 +71,11 @@
           ],
           "evidence": "spec/mir5/evidence/k2so-material-native-chain.json",
           "scope": "The finite public stages and named hidden-carrier handoff exist; the observed material labs do not establish predecessor migration."
+        },
+        {
+          "id": "bob-angel-physical-prototype-caps",
+          "evidence": "spec/mir5/evidence/bob-angel-physical-caps-chain.json",
+          "scope": "Two cap stages each complete five actual material labs and1000 native alloy crafts; output and native bar prove125% limiting and128% after relaxation, save/two reloads. This is not other-owner or final-package coverage."
         }
       ],
       "test_subjects": [
@@ -222,6 +227,11 @@
           ],
           "evidence": "spec/mir5/evidence/atan-f200-native-chain.json",
           "scope": "ATAN output and module permission loading have named evidence; neither establishes all override interactions."
+        },
+        {
+          "id": "atan-base-space-age-native-labs",
+          "evidence": "spec/mir5/evidence/atan-gameplay-chain.json",
+          "scope": "Exact F200 Base/Space Age shared filter and ash actual labs, queue state and two cold reloads; no physical output/F210 claim."
         }
       ],
       "test_subjects": [
@@ -256,6 +266,11 @@
           ],
           "evidence": "spec/mir5/evidence/f200-published-science-control-chain.json",
           "scope": "The narrow F200 stored-shape import accounts for processing ticks independently of raw elapsed ticks."
+        },
+        {
+          "id": "complete-f200-catalogue-saved-states",
+          "evidence": "spec/mir5/evidence/full-catalogue-upgrade-chain.json",
+          "scope": "All recovered54 Base/67 level-backed SA public states and five native owners preserve declared effects/current42%/paused27% through published4.7.2 upgrade and two reloads. Actual gear labs are separate from seeded states; scripted identities are not seeded."
         }
       ],
       "test_subjects": [
@@ -355,6 +370,11 @@
             "source/mir5/presentation/library_model.lua"
           ],
           "scope": "Historical provider reads skip/excluded compiler generation-plan rows and hides entries whose technologies exist. MIR5 keeps existing disabled-ID views and technology_not_found for absent detail. Internal compiler ledgers have no authority to require another compiler; useful omission behavior still needs disposition."
+        },
+        {
+          "id": "current-rendered-client-carrier-regression",
+          "evidence": "spec/mir5/evidence/library-multiplayer-current-chain.json",
+          "scope": "Current native-credit/lifecycle player bytes pass real2client join/rejoin/host restart, with220 members and six reviewed PNGs. Missing hidden-carrier icon caught by real rendering was corrected; numeric latency/stress remain open."
         }
       ],
       "test_subjects": [
