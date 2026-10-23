@@ -39,15 +39,27 @@ if target.id == "f013" or target.id == "f014" then
     "historical transition direct numeric cost or time differs")
 else
   assert(formula_targets[target.id], "historical transition target cost family differs")
-  assert(unit.count_formula == "1*(8000*2^(L-1))" and unit.time == 60,
+  local formulas = {published = "8000*2^(L-1)", mir5 = "1*(8000*2^(L-1))"}
+  local expected_formula = formulas[target.stage]
+  assert(expected_formula ~= nil and unit.count_formula == expected_formula and unit.time == 60,
     "historical transition direct formula cost or time differs")
 end
 assert(type(unit.ingredients) == "table" and #unit.ingredients == #target.direct_science,
   "historical transition direct science count differs")
-for index, name in ipairs(target.direct_science) do
-  local ingredient = unit.ingredients[index]
-  assert(type(ingredient) == "table" and ingredient[1] == name and ingredient[2] == 1,
+local expected_science, actual_science = {}, {}
+for _, name in ipairs(target.direct_science) do
+  expected_science[name] = (expected_science[name] or 0) + 1
+end
+for _, ingredient in ipairs(unit.ingredients) do
+  assert(type(ingredient) == "table" and type(ingredient[1]) == "string" and ingredient[2] == 1,
     "historical transition direct science differs")
+  actual_science[ingredient[1]] = (actual_science[ingredient[1]] or 0) + 1
+end
+for name, count in pairs(expected_science) do
+  assert(actual_science[name] == count, "historical transition direct science differs")
+end
+for name, count in pairs(actual_science) do
+  assert(expected_science[name] == count, "historical transition direct science differs")
 end
 assert(type(technology.effects) == "table" and #technology.effects == 1
   and technology.effects[1].type == "character-mining-speed"

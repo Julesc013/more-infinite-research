@@ -203,7 +203,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           log=function(value)table.insert(messages,value)end
           function install_target(stage, queue)
             fixture_target={id=queue and "f017" or "f013",stage=stage,mir_version=stage == "published" and "4.7.01702" or "5.0.01700",
-              direct="recipe-prod-research_character_mining_speed-1",direct_effect=queue and .1 or .05,
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=.05,
               direct_science=queue and {"military-science-pack","utility-science-pack"} or {"alien-science-pack"},
               successor_mode=queue and "lab" or "preservation-only",partial_progress=.42,
               queue_api=queue,queue_probe=queue and "braking-force-1" or nil}
@@ -278,38 +278,39 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         ''')
 
     def test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration(self):
+        # This retained oracle characterizes earlier 4.2.2-era native inputs;
+        # it is deliberately not the default 4.7.2 source contract below.
         self.assertEqual(self.direct_oracle["kind"], "MIR5HistoricalDirectNativeCharacterizationV1")
         self.assertEqual(self.direct_oracle["status"], "historical-characterization-not-mir5-native-qualification")
         expected_costs = {
-            "f013": (8000, None),
-            "f014": (8000, None),
-            "f015": (None, "1*(8000*2^(L-1))"),
-            "f016": (None, "1*(8000*2^(L-1))"),
-            "f017": (None, "1*(8000*2^(L-1))"),
-            "f100": (None, "1*(8000*2^(L-1))"),
-            "f110": (None, "1*(8000*2^(L-1))"),
+            "f013": (8000, None, None),
+            "f014": (8000, None, None),
+            "f015": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f016": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f017": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f100": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f110": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
         }
-        observed_costs = {}
-        for capture in self.direct_oracle["captures"]:
-            row = next(row for row in capture["technologies"]
-                       if row["id"] == "recipe-prod-research_character_mining_speed-1")
-            definition = row["definition"]
-            observed_costs[capture["target"]] = (
-                definition["unit_count"] if "unit_count_formula" not in definition else None,
-                definition.get("unit_count_formula"),
-            )
-        self.assertEqual(expected_costs, observed_costs)
+        published_f017 = self.metadata["published_4_7_2_f017_preflight"]
+        self.assertEqual(published_f017, {
+            "kind": "published-4.7.2-native-data-stage-observation",
+            "native_run": 40024011863,
+            "unit_count_formula": "8000*2^(L-1)",
+            "unit_time": 60,
+            "direct_effect": .05,
+            "direct_science": ["utility-science-pack", "military-science-pack"],
+        })
 
         self.lua.globals().fixture = FIXTURE.as_posix()
         self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.execute(r'''
           package.path=fixture .. "/?.lua"
-          function data_final_row(id, expected_effect, actual_effect, science, count, count_formula)
+          function data_final_row(id, stage, expected_effect, actual_effect, expected_science, actual_science, count, count_formula)
             package.loaded.target=nil;package.loaded["target-literal"]=nil
-            package.preload["target-literal"]=function()return {id=id,stage="published",mir_version="4.7." .. id:sub(2) .. "02",
+            package.preload["target-literal"]=function()return {id=id,stage=stage,mir_version="4.7." .. id:sub(2) .. "02",
               direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode=(id == "f013" and "preservation-only" or "lab"),partial_progress=.42,
-              direct_science=science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
-            local ingredients={};for index,name in ipairs(science) do ingredients[index]={name,1} end
+              direct_science=expected_science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
+            local ingredients={};for index,name in ipairs(actual_science) do ingredients[index]={name,1} end
             local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
               unit={count=count,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
             data={raw={technology={[row.name]=row}}}
@@ -318,32 +319,50 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             return ok,tostring(message),row,diagnostics[1]
           end
         ''')
-        for target, (count, formula) in expected_costs.items():
+        for target, (count, published_formula, mir5_formula) in expected_costs.items():
             fact = self.metadata["targets"][target]
-            with self.subTest(target=target):
-                observed_count = count if count is not None else 16000
-                good = self.lua.eval("data_final_row")(target, fact["direct_effect"], fact["direct_effect"],
-                                                        self.lua.table_from(fact["direct_science"]), observed_count, formula)
-                self.assertTrue(good[0])
-                self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["count_formula"], good[2]["unit"]["time"]),
-                                 (1, None, 1))
-                self.assertIn(f"target={target}", good[3])
-                self.assertIn(f"count={observed_count}", good[3])
-                self.assertIn(f"count_formula={formula if formula is not None else 'nil'}", good[3])
-                self.assertIn("time=60", good[3])
-                self.assertIn("science=" + ",".join(f"{name}:1" for name in fact["direct_science"]), good[3])
-                self.assertIn(f"effects=character-mining-speed:modifier={fact['direct_effect']}:recipe=nil:change=nil", good[3])
+            for stage, formula in (("published", published_formula), ("mir5", mir5_formula)):
+                with self.subTest(target=target, stage=stage):
+                    observed_count = count if count is not None else 16000
+                    good = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                            self.lua.table_from(fact["direct_science"]), self.lua.table_from(fact["direct_science"]),
+                                                            observed_count, formula)
+                    self.assertTrue(good[0])
+                    self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["count_formula"], good[2]["unit"]["time"]),
+                                     (1, None, 1))
+                    self.assertIn(f"target={target}", good[3])
+                    self.assertIn(f"count={observed_count}", good[3])
+                    self.assertIn(f"count_formula={formula if formula is not None else 'nil'}", good[3])
+                    self.assertIn("time=60", good[3])
+                    self.assertIn("science=" + ",".join(f"{name}:1" for name in fact["direct_science"]), good[3])
+                    self.assertIn(f"effects=character-mining-speed:modifier={fact['direct_effect']}:recipe=nil:change=nil", good[3])
 
-                wrong_formula = "1*(8000*2^(L-1))" if formula is None else "1*(8000*1.5^(L-1))"
-                bad_formula = self.lua.eval("data_final_row")(target, fact["direct_effect"], fact["direct_effect"],
-                                                               self.lua.table_from(fact["direct_science"]), observed_count, wrong_formula)
-                self.assertFalse(bad_formula[0])
-                self.assertIn("cost or time differs", bad_formula[1])
-                self.assertEqual((bad_formula[2]["unit"]["count"], bad_formula[2]["unit"]["count_formula"], bad_formula[2]["unit"]["time"]),
-                                 (observed_count, wrong_formula, 60))
-                self.assertIn(f"count_formula={wrong_formula}", bad_formula[3])
+                    alternate = mir5_formula if stage == "published" else published_formula
+                    wrong_formula = alternate if alternate != formula else "8000*1.5^(L-1)"
+                    bad_formula = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                   self.lua.table_from(fact["direct_science"]), self.lua.table_from(fact["direct_science"]),
+                                                                   observed_count, wrong_formula)
+                    self.assertFalse(bad_formula[0])
+                    self.assertIn("cost or time differs", bad_formula[1])
+                    self.assertEqual((bad_formula[2]["unit"]["count"], bad_formula[2]["unit"]["count_formula"], bad_formula[2]["unit"]["time"]),
+                                     (observed_count, wrong_formula, 60))
+                    self.assertIn(f"count_formula={wrong_formula}", bad_formula[3])
 
-        unknown = self.lua.eval("data_final_row")("f999", .1, .1,
+                    reordered = list(reversed(fact["direct_science"]))
+                    same_science = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                      self.lua.table_from(fact["direct_science"]), self.lua.table_from(reordered),
+                                                                      observed_count, formula)
+                    self.assertTrue(same_science[0])
+                    repeated = [fact["direct_science"][0]] * len(fact["direct_science"])
+                    bad_science = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                     self.lua.table_from(fact["direct_science"]), self.lua.table_from(repeated),
+                                                                     observed_count, formula)
+                    self.assertEqual(len(fact["direct_science"]) == 1, bad_science[0])
+                    if len(fact["direct_science"]) != 1:
+                        self.assertIn("science differs", bad_science[1])
+
+        unknown = self.lua.eval("data_final_row")("f999", "published", .05, .05,
+                                                   self.lua.table_from(("military-science-pack", "utility-science-pack")),
                                                    self.lua.table_from(("military-science-pack", "utility-science-pack")), 8000,
                                                    expected_costs["f015"][1])
         self.assertFalse(unknown[0])
@@ -368,13 +387,13 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             return ok,tostring(message),row
           end
         ''')
-        bad = self.lua.eval("data_final_effect_row")("f017", .1, .05,
-                                                       self.lua.table_from(("military-science-pack", "utility-science-pack")),
-                                                       "1*(8000*2^(L-1))")
+        bad = self.lua.eval("data_final_effect_row")("f017", .05, .1,
+                                                       self.lua.table_from(("utility-science-pack", "military-science-pack")),
+                                                       "8000*2^(L-1)")
         self.assertFalse(bad[0])
         self.assertIn("effect differs", bad[1])
         self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["count_formula"], bad[2]["unit"]["time"]),
-                         (8000, "1*(8000*2^(L-1))", 60))
+                         (8000, "8000*2^(L-1)", 60))
 
 
 def main():
