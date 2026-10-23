@@ -282,8 +282,10 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
               if index==1 then return input elseif index==2 then return output elseif index==3 then return modules end
             end
             local route={name="bob-copper-tungsten-alloy",category="angels-sintering-4",energy=8,maximum_productivity=cap,
-              ingredients={{type="item",name="bob-powdered-tungsten",amount=15},{type="item",name="angels-powder-copper",amount=10}},
+              ingredients={{type="item",name="angels-powder-copper",amount=10},{type="item",name="bob-powdered-tungsten",amount=15}},
               products={{type="item",name="bob-copper-tungsten-alloy",amount=25}}}
+            if opponent=="duplicate-input" then route.ingredients[2]=route.ingredients[1] end
+            if opponent=="wrong-input-amount" then route.ingredients[2].amount=14 end
             local env={defines={inventory={crafter_input=1,crafter_output=2,crafter_modules=3}},
               prototypes={recipe={["bob-copper-tungsten-alloy"]=route},entity={["mir5-ba-cap-production-oven"]={name="mir5-ba-cap-production-oven",crafting_categories={["angels-sintering-4"]=true}}}}}
             env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
@@ -448,6 +450,10 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
         bar_lost = batch(helper, 4, 1.27999995, 1279, 1280, 56975, 57000, "bar-lost")
         self.assertFalse(bar_lost["ok"])
         self.assertIn("native productivity-progress mass balance differs", bar_lost["message"])
+        for opponent in ("duplicate-input", "wrong-input-amount"):
+            rejected = batch(helper, 4, 1.28, 1279, 1280, 56975, 57000, opponent)
+            self.assertFalse(rejected["ok"])
+            self.assertIn("native solid inputs differs", rejected["message"])
 
     def test_cap125_to_cap400_real_tail_flow_rejects_missing_cap_or_foreign_transitions(self):
         flow = self.lua.eval("cap_fixture_flow")

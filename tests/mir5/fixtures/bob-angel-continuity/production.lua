@@ -27,12 +27,16 @@ end
 
 local function exact_entries(entries, expected, label)
   if type(entries) ~= "table" or #entries ~= #expected then fail(label .. " count differs") end
-  for index, wanted in ipairs(expected) do
-    local actual = entries[index]
-    if type(actual) ~= "table" or actual.type ~= "item" or actual.name ~= wanted.name
-        or actual.amount ~= wanted.amount then
-      fail(label .. " differs at " .. tostring(index))
+  -- Native recipe ingredients are presented in engine order, independently of
+  -- the authored data-stage array order. Match the exact named multiset.
+  local wanted, seen = {}, {}
+  for _, item in ipairs(expected) do wanted[item.name] = item.amount end
+  for index, actual in ipairs(entries) do
+    if type(actual) ~= "table" or actual.type ~= "item" or wanted[actual.name] == nil
+        or seen[actual.name] or actual.amount ~= wanted[actual.name] then
+      fail(label .. " differs at " .. tostring(index) .. ": " .. tostring(actual and actual.name))
     end
+    seen[actual.name] = true
   end
 end
 
