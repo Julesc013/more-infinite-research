@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "authored-private-native-adverse-observation-index-not-runner-receipt",
+  "release_qualification": false,
+  "worker_attempts": [
+    {
+      "receipt": "spec/mir5/evidence/worker-speed-attempt-01.json",
+      "sha256": "B8F763F8845EA1E0D7E447E2A24C879EB7BED3750AE07899865BA982F5204240",
+      "runner_status": "failed",
+      "runner_failure": "[mir441-process-exit] 1",
+      "disposition": "Fixture used settings-stage prototypes in data stage; corrected to effective settings.startup and fixture patched to 0.1.1.",
+      "native_pass": false
+    },
+    {
+      "receipt": "spec/mir5/evidence/worker-speed-attempt-02.json",
+      "sha256": "B09B9238BB1CA8F7B743F522840DC51EC9ECA4F86AD6459A3E113743D39E135D",
+      "runner_status": "failed",
+      "runner_failure": "[mir441-resource-admission-memory]",
+      "disposition": "Corrected fixture passed data loading and engine initialization, then the governor interrupted creation for physical-memory reserve before a gameplay witness.",
+      "native_pass": false
+    }
+  ],
+  "prelaunch_refusals": [
+    {
+      "case": "k2so-no-mir",
+      "expected_peak_memory_mib": 1024,
+      "failure": "[mir441-resource-admission-memory]",
+      "runner_receipt_present": false,
+      "local_authored_failure": "build/mir5/k2so-no-mir-native-r01-failure.json"
+    },
+    {
+      "case": "library-native",
+      "expected_peak_memory_mib": 512,
+      "failure": "[mir441-resource-admission-memory]",
+      "runner_receipt_present": false,
+      "player_archive_sha256": "5F5899EEF3C82AE3646E683FFA393DE2DE38333A94CF6F34709CF85A8F300D72",
+      "input_save_sha256": "61CDFD701161DFF1E5BC687938C814F4F2BF205083F1A339271A8EB5B0C80D7F"
+    }
+  ],
+  "disposition": "No native pass from these attempts. Required RAM/commit reserves remain unchanged. Await actual headroom change before another native batch; implementation and host validation continue."
+}

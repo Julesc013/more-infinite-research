@@ -1,0 +1,188 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "worker-speed-cap",
+  "source_head": "df74cca0ea0ca88ed3fe634f371c3fac63ecc17a",
+  "source_dirty": true,
+  "harness_sha256": "9D4DD73C2F5325DD86ECCF6E121A16B770C54B87AD31891D03BEA33B68FDC53A",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "sha256": "4FBF0B127D264C57971707E1BEF81B77706F49AD7388351679DE9BA8E56DB5EE",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-f210.json"
+  },
+  "fixtures": [
+    {
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.1.1.zip",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap",
+      "sha256": "B6CCD5FC4519AAA73E319CFE614E5835481F55F7C576C1B2F890D14FA67D08FC"
+    }
+  ],
+  "mir_archive": {
+    "sha256": "4E6645CC46F6BCE026691E7ACAB43184FCC9C7CCA42036BEE52E338A2FACF25E",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 60,
+    "status": "admitted-after-wait",
+    "attempt_count": 19,
+    "refusal_count": 18,
+    "elapsed_seconds": 9.599,
+    "first_refusal": {
+      "observed_at": "2026-10-22T23:55:21.9825827+00:00",
+      "error": "[mir441-resource-admission-memory]",
+      "snapshot": {
+        "observed_at": "2026-10-22T23:55:21.9821993+00:00",
+        "memory": {
+          "total_bytes": 17047683072,
+          "free_bytes": 4621316096,
+          "committed_bytes": 17352314880,
+          "commit_limit_bytes": 20996300800
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 65733378048,
+          "total_bytes": 472446398464
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 65733378048,
+          "total_bytes": 472446398464
+        }
+      }
+    },
+    "last_refusal": {
+      "observed_at": "2026-10-22T23:55:30.9671296+00:00",
+      "error": "[mir441-resource-admission-memory]",
+      "snapshot": {
+        "observed_at": "2026-10-22T23:55:30.9669382+00:00",
+        "memory": {
+          "total_bytes": 17047683072,
+          "free_bytes": 4677226496,
+          "committed_bytes": 17280946176,
+          "commit_limit_bytes": 20996300800
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 65733156864,
+          "total_bytes": 472446398464
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 65733156864,
+          "total_bytes": 472446398464
+        }
+      }
+    },
+    "last_error": "[mir441-resource-admission-memory]",
+    "started_at": "2026-10-22T23:55:21.8895446+00:00",
+    "deadline_at": "2026-10-22T23:56:21.8895446+00:00",
+    "admission": {
+      "observed_at": "2026-10-22T23:55:31.4803222+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 4791529472,
+        "committed_bytes": 17176178688,
+        "commit_limit_bytes": 20996300800
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65733156864,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65733156864,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "failure": "[mir441-resource-admission-memory]",
+  "resource_admission": {
+    "snapshot": {
+      "observed_at": "2026-10-22T23:55:54.5919836+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 4323512320,
+        "committed_bytes": 17819602944,
+        "commit_limit_bytes": 20996300800
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65732300800,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65732300800,
+        "total_bytes": 472446398464
+      }
+    },
+    "limits": {
+      "physical_bytes": 4294967296,
+      "commit_bytes": 3409536614,
+      "system_bytes": 21474836480,
+      "work_bytes": 21474836480
+    },
+    "estimated_peak_bytes": 33554432,
+    "expected_peak_memory_bytes": 67108864
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "4FBF0B127D264C57971707E1BEF81B77706F49AD7388351679DE9BA8E56DB5EE",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "4E6645CC46F6BCE026691E7ACAB43184FCC9C7CCA42036BEE52E338A2FACF25E",
+        "bytes": 151444
+      },
+      {
+        "name": "mir-fixture-mir5-worker-speed-cap",
+        "version": "0.1.1",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.1.1.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:01FD0000000DC1ED",
+        "sha256": "B6CCD5FC4519AAA73E319CFE614E5835481F55F7C576C1B2F890D14FA67D08FC",
+        "bytes": 3853
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "interrupted",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-worker-speed-native-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-worker-speed-native-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-worker-speed-native-r02\\process-1.stderr.txt",
+      "error": "[mir441-resource-admission-memory]"
+    }
+  ]
+}
