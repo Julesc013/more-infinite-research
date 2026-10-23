@@ -460,6 +460,9 @@ script.on_load(function()
 end)
 
 script.on_configuration_changed(function()
+  -- Loading the predecessor runs on_load before this configuration change.
+  -- That saved phase is an input witness, not a cold reload of the successor.
+  loaded_snapshot, reload_logged = nil, false
   local state = storage[KEY]
   if script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.2.0" then
     require_mode("5.0.20000", "0.2.0", true, "preferred successor")
