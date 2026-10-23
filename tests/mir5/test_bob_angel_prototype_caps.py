@@ -129,6 +129,9 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
               end
               value.technologies["mir5-ba-continuity-queue-probe"]={name="mir5-ba-continuity-queue-probe",level=1,researched=false,enabled=true,visible_when_disabled=false,force=value,prototype={max_level=1,effects={}},prerequisites={{name="external",research_recursive=function()end}}}
               function value.reset_technology_effects()
+                for _,technology in pairs(value.technologies)do
+                  technology.enabled,technology.visible_when_disabled=true,false
+                end
                 for _,recipe in pairs(value.recipes)do recipe.productivity_bonus=0 end
                 for _,family in ipairs(F)do
                   local early=value.technologies["recipe-prod-"..family[1].."-1"];local tail=value.technologies["recipe-prod-"..family[1].."-4"]

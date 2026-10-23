@@ -455,6 +455,34 @@ class FixtureControlHostStageTests(unittest.TestCase):
         )
         self.assertIsNone(reads_mods)
 
+    def test_beta_native_float_readback_keeps_exact_recipe_and_rejects_effect_drift(self):
+        run = self.lua.eval(r'''function(path, change)
+          local ok,message,callbacks,_,env=parse_consumer_control(path,true,"2.0.77","5.0.20000",true)
+          assert(ok,message)
+          local name="mir-api-fixture-beta-cable-1"
+          local native={level=1,enabled=true,researched=false,
+            prototype={effects={{type="change-recipe-productivity",recipe="copper-cable",change=change}}}}
+          local force={index=1,valid=true,manual_crafting_speed_modifier=0,technologies={[name]=native}}
+          rawset(env,"game",{tick=1,forces={player=force}})
+          rawset(env,"helpers",{table_to_json=function()return "{}"end})
+          rawset(env,"remote",{interfaces={["more-infinite-research.api.v1"]=true},call=function(_,method,index,id)
+            if method=="get_version"then return {major=1,minor=0}end
+            if method=="get_capabilities"then return {research_query=true}end
+            assert(method=="get_research")
+            if index~=1 then return nil,"force_not_found"end
+            if id~=name then return nil,"technology_not_found"end
+            return {name=name,force_index=1,level=1,max_level=1,enabled=true,researched=false}
+          end})
+          local passed,result=pcall(callbacks.on_init)
+          assert(native.researched==false and native.level==1 and force.manual_crafting_speed_modifier==0)
+          return passed,tostring(result)
+        end''')
+        passed, message = run(self.control("api-beta"), 0.009999999776482582)
+        self.assertTrue(passed, message)
+        passed, message = run(self.control("api-beta"), 0.02)
+        self.assertFalse(passed)
+        self.assertIn("native cable productivity effect differs", message)
+
     def test_beta_production_accepts_f200_closure_and_rejects_an_unsupported_target(self):
         self.lua.globals().fixture_control = self.control("api-beta-production")
         passed, message, callbacks, forbidden, _ = self.lua.eval(

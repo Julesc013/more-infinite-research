@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR5AdverseNativeChainV1",
+  "run": {
+    "id": 39990862844,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39990862844"
+  },
+  "source": "2c9aa35106cbc872f970eb9909f7d7bfd6104066",
+  "custody": "build/mir5/black-glass/incoming/39990862844/black-glass-api-consumers-39990862844-1",
+  "receipt_gzip": "spec/mir5/evidence/api-consumers-f200-float-adverse-native.json.gz",
+  "uncompressed_receipt_sha256": "EEC4B66B9CD83F37F231BF1C45F6FCBD244B5E95476A891DFB6AF458E6F89C8C",
+  "status": "failed",
+  "release_qualification": false,
+  "diagnosis": "F200 returns beta effect .01 as a native float32; corrected readback comparison preserves exact data declaration and rejects .02."
+}

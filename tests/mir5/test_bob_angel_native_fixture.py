@@ -16,6 +16,7 @@ ORACLE = ROOT / "spec/mir5/inventory/bob-angel-f200-472.json"
 BASE_PROFILE = ROOT / "tests/mir5/profiles/bob-angel-f200-2077.json"
 PROFILE_PATHS = {
     "published": ROOT / "tests/mir5/profiles/bob-angel-continuity-published-4.7-f200.json",
+    "published_reset": ROOT / "tests/mir5/profiles/bob-angel-published-reset-control-f200.json",
     "mir5": ROOT / "tests/mir5/profiles/bob-angel-continuity-f200.json",
     "effect3": ROOT / "tests/mir5/profiles/bob-angel-continuity-effect3-cap2-f200.json",
     "effect1": ROOT / "tests/mir5/profiles/bob-angel-continuity-effect1-cap40-f200.json",
@@ -77,6 +78,7 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
         self.lua.globals().data_fixes = (FIXTURE / "mir5/data-final-fixes.lua").as_posix()
         self.lua.globals().mir5_control = (FIXTURE / "mir5/control.lua").as_posix()
         self.lua.globals().published_control_path = (FIXTURE / "published-4.7/control.lua").as_posix()
+        self.lua.globals().published_reset_control_path = (FIXTURE / "published-config-control/control.lua").as_posix()
         self.lua.globals().mir5_control_path = (FIXTURE / "mir5/control.lua").as_posix()
         self.lua.globals().effect3_control_path = (FIXTURE / "effect3-cap2/control.lua").as_posix()
         self.lua.globals().effect1_control_path = (FIXTURE / "effect1-cap40/control.lua").as_posix()
@@ -262,12 +264,139 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
             c,m=load(cap40_path,"5.0.20000","0.4.0",s1);if not c then return {ok=false,message=m}end;ok,v=call(c,"changed");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end;ok,v=call(c,"load");if not ok then return {ok=false,message=v}end;ok,v=call(c,"tick");if not ok then return {ok=false,message=v}end
             return {ok=true,message="",phase=storage.mir5_bob_angel_continuity.phase,markers=markers,saves=saves,tail=player.technologies[f[1].t].level,bonus=player.recipes[f[1].r[1]].productivity_bonus,enabled=player.technologies[f[1].t].enabled}
           end
+
+          function run_ba_published_reset_control(path, opponent)
+            local families={
+              {early="recipe-prod-research_material_aluminium-1",tail="recipe-prod-research_material_aluminium-4",recipes={"angels-plate-aluminium","angels-plate-aluminium-2"}},
+              {early="recipe-prod-research_material_copper_tungsten-1",tail="recipe-prod-research_material_copper_tungsten-4",recipes={"bob-copper-tungsten-alloy"}},
+              {early="recipe-prod-research_material_gold-1",tail="recipe-prod-research_material_gold-4",recipes={"angels-plate-gold","angels-plate-gold-2","angels-wire-gold-2"}},
+              {early="recipe-prod-research_material_tin-1",tail="recipe-prod-research_material_tin-4",recipes={"angels-plate-tin","angels-plate-tin-2"}},
+              {early="recipe-prod-research_material_titanium-1",tail="recipe-prod-research_material_titanium-4",recipes={"angels-plate-titanium","angels-plate-titanium-2"}},
+            }
+            local function readonly(values, label)
+              return setmetatable({}, {
+                __index=function(_, key) return values[key] end,
+                __newindex=function(_, key) error("fixture observer wrote " .. label .. "." .. tostring(key)) end,
+              })
+            end
+            local function new_force(name, index, enabled)
+              local force={name=name,index=index,valid=true,technologies={},recipes={},research_queue={},research_progress=0}
+              local technology_values, recipe_values={},{}
+              for _,family in ipairs(families) do
+                for _,recipe in ipairs(family.recipes) do
+                  recipe_values[recipe]={productivity_bonus=3}
+                  force.recipes[recipe]=readonly(recipe_values[recipe], "recipe." .. recipe)
+                end
+                for _,entry in ipairs({{family.early,3},{family.tail,150}}) do
+                  local effects={}
+                  for effect_index,recipe in ipairs(family.recipes) do
+                    effects[effect_index]={type="change-recipe-productivity",recipe=recipe,change=0.019999999552965164}
+                  end
+                  technology_values[entry[1]]={
+                    name=entry[1], level=entry[2], researched=true, enabled=enabled, visible_when_disabled=false,
+                    prototype={max_level=entry[1]==family.early and 3 or 150,effects=effects},
+                  }
+                  force.technologies[entry[1]]=readonly(technology_values[entry[1]], "technology." .. entry[1])
+                end
+              end
+              local probe_values={name="mir5-ba-continuity-queue-probe",level=1,researched=false,enabled=true,visible_when_disabled=false,prototype={max_level=1,effects={}}}
+              local probe=readonly(probe_values, "technology.mir5-ba-continuity-queue-probe")
+              force.technologies[probe_values.name]=probe
+              force.research_queue={probe}
+              force.current_research=probe
+              force.research_progress=.42
+              return force,technology_values,recipe_values
+            end
+            local function stored_status(value)
+              return {level=value.level,researched=value.researched,enabled=value.enabled,
+                visible_when_disabled=value.visible_when_disabled,max_level=value.prototype.max_level}
+            end
+            local function snapshot(force)
+              local technologies,bonuses={},{}
+              for _,family in ipairs(families) do
+                technologies[family.early]=stored_status(force.technologies[family.early])
+                technologies[family.tail]=stored_status(force.technologies[family.tail])
+                for _,recipe in ipairs(family.recipes) do bonuses[recipe]=force.recipes[recipe].productivity_bonus end
+              end
+              return {technologies=technologies,bonuses=bonuses,queue={force.research_queue[1].name},
+                current=force.current_research.name,progress=force.research_progress}
+            end
+            local function same_snapshot(left, right)
+              for _,family in ipairs(families) do
+                for _,name in ipairs({family.early,family.tail}) do
+                  local a,b=left.technologies[name],right.technologies[name]
+                  if not a or not b or a.level~=b.level or a.researched~=b.researched or a.enabled~=b.enabled
+                      or a.visible_when_disabled~=b.visible_when_disabled or a.max_level~=b.max_level then return false end
+                end
+                for _,recipe in ipairs(family.recipes) do if left.bonuses[recipe]~=right.bonuses[recipe] then return false end end
+              end
+              return #left.queue==#right.queue and left.queue[1]==right.queue[1]
+                and left.current==right.current and left.progress==right.progress
+            end
+
+            local player,player_values,player_recipes=new_force("player",1,true)
+            local foreign,foreign_values,foreign_recipes=new_force("foreign",2,false)
+            local game={forces={player=player,[1]=player,foreign=foreign,[2]=foreign}}
+            local saves,markers=0,0
+            function game.server_save(name) assert(name=="mir5-native-complete");saves=saves+1 end
+            local storage={mir5_bob_angel_continuity={
+              phase="published-boundary-saved",source_mir="4.7.20002",player=snapshot(player),
+              foreign=snapshot(foreign),foreign_index=2,
+            }}
+            if opponent=="source-state-loss" then
+              storage.mir5_bob_angel_continuity.foreign.technologies[families[1].early].enabled=true
+            end
+            if opponent=="wrong-source-phase" then
+              storage.mir5_bob_angel_continuity.phase="published-boundary-seeded"
+            end
+            local callbacks={events={}}
+            local mods={base="2.0.77",angelsbioprocessing="2.0.3",angelsbioprocessinggraphics="2.0.0",angelspetrochem="2.0.3",angelspetrochemgraphics="2.0.1",angelsrefining="2.0.4",angelsrefininggraphics="2.0.0",angelssmelting="2.0.5",angelssmeltinggraphics="2.0.0",bobelectronics="2.1.1",boblibrary="2.1.0",bobores="2.1.2",bobplates="2.1.1",bobrevamp="2.1.1",["more-infinite-research"]="4.7.20002",["mir-fixture-mir5-bob-angel-continuity"]="0.1.1"}
+            local environment={
+              script={active_mods=mods,on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_event=function(e,f)callbacks.events[e]=f end},
+              defines={events={on_tick=1}},game=game,storage=storage,
+              helpers={table_to_json=function(value)assert(value.case=="bob-angel-continuity-published-reset-control" and value.status=="passed");return "{}" end},
+              log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end,
+            }
+            environment._G=environment;setmetatable(environment,{__index=function(_,key)return _G[key]end})
+            local chunk,message=loadfile(path,"t",environment);assert(chunk,message)
+            local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)} end
+            local init_ok,init_message=pcall(callbacks.init)
+            if init_ok or not tostring(init_message):find("must start from its 0.1.0 predecessor save",1,true) then
+              return {ok=false,message="reset-control accepted a fresh initialization"}
+            end
+
+            -- This is the independent upstream Angels configuration callback.
+            -- It is intentionally outside the fixture observer and occurs first.
+            if opponent~="missing-reset" then
+              for _,values in pairs({player_values,foreign_values}) do
+                for _,family in ipairs(families) do
+                  values[family.early].enabled,values[family.early].visible_when_disabled=true,false
+                  values[family.tail].enabled,values[family.tail].visible_when_disabled=true,false
+                end
+              end
+            end
+            if opponent=="effect-loss" then foreign_recipes[families[1].recipes[1]].productivity_bonus=2.98 end
+            if opponent=="queue-loss" then foreign.research_progress=.41 end
+            if opponent=="state-loss" then foreign_values[families[1].tail].level=149 end
+            local before_observer=snapshot(foreign)
+            local event={mod_changes={["mir-fixture-mir5-bob-angel-continuity"]={old_version="0.1.0",new_version="0.1.1"}}}
+            if opponent=="wrong-transition" then event.mod_changes["mir-fixture-mir5-bob-angel-continuity"].old_version="0.0.9" end
+            ok,result=pcall(callbacks.changed,event);if not ok then return {ok=false,message=tostring(result)} end
+            if not same_snapshot(before_observer,snapshot(foreign)) then return {ok=false,message="reset-control observer mutated foreign native state"} end
+            ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)} end
+            ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)} end
+            ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)} end
+            ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)} end
+            ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)} end
+            return {ok=true,message="",phase=storage.mir5_bob_angel_continuity.phase,markers=markers,saves=saves,
+              player=snapshot(player),foreign=snapshot(foreign)}
+          end
         ''')
 
     def test_profiles_pin_source_destination_and_relaxation_archives(self):
         base = json.loads(BASE_PROFILE.read_text(encoding="utf-8"))
-        expected = {"published": ("4.7.20002", "0.1.0"), "mir5": ("5.0.20000", "0.2.0"), "effect3": ("5.0.20000", "0.3.0"), "effect1": ("5.0.20000", "0.4.0")}
-        directories = {"published": "published-4.7", "mir5": "mir5", "effect3": "effect3-cap2", "effect1": "effect1-cap40"}
+        expected = {"published": ("4.7.20002", "0.1.0"), "published_reset": ("4.7.20002", "0.1.1"), "mir5": ("5.0.20000", "0.2.0"), "effect3": ("5.0.20000", "0.3.0"), "effect1": ("5.0.20000", "0.4.0")}
+        directories = {"published": "published-4.7", "published_reset": "published-config-control", "mir5": "mir5", "effect3": "effect3-cap2", "effect1": "effect1-cap40"}
         for key,path in PROFILE_PATHS.items():
             profile=json.loads(path.read_text(encoding="utf-8"))
             self.assertEqual(profile["target"],"f200")
@@ -281,6 +410,13 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
             info=json.loads((FIXTURE/directories[key]/"info.json").read_text(encoding="utf-8"))
             self.assertEqual((info["name"],info["version"]),(FIXTURE_NAME,expected[key][1]))
             self.assertEqual(info["dependencies"][-1],f"more-infinite-research = {expected[key][0]}")
+            if key == "published_reset":
+                self.assertEqual(info["dependencies"],[
+                    "base >= 2.0.77",
+                    "angelsrefining = 2.0.4",
+                    "bobplates = 2.1.1",
+                    "more-infinite-research = 4.7.20002",
+                ])
 
     def test_default_preflight_is_atomic_and_accelerates_only_count_time(self):
         input_rows={row["name"]:lua_value(self.lua,deepcopy(row)) for row in self.candidate_rows}
@@ -341,7 +477,44 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
                     elif opponent == "foreign-upgrade-state":
                         self.assertIn("actual=early={level=3,researched=true,enabled=true,visible_when_disabled=false,max_level=3}",result["message"])
                         self.assertIn("tail={level=151,researched=false,enabled=false,visible_when_disabled=true,max_level=4294967295}",result["message"])
-                        self.assertIn("ownership={recipe-prod-research_material_aluminium-1=none;recipe-prod-research_material_aluminium-4=none}",result["message"])
+                        self.assertIn("MIR_private_ownership=unavailable_to_external_fixture",result["message"])
+
+    def test_published_reset_control_observes_upstream_reenable_without_mutating_native_state(self):
+        expected_errors = {
+            "missing-reset": "upstream angelsrefining did not re-enable",
+            "effect-loss": "native recipe effect changed",
+            "queue-loss": "queue or progress changed",
+            "state-loss": "published earned boundary differs",
+            "source-state-loss": "published foreign external-disable source state differs",
+            "wrong-source-phase": "requires the published 0.1.0 boundary save",
+            "wrong-transition": "requires the published 0.1.0 to 0.1.1 fixture update",
+        }
+        for opponent in (None, *expected_errors):
+            with self.subTest(opponent=opponent):
+                self.lua.globals().opponent = opponent
+                result = self.lua.eval("run_ba_published_reset_control(published_reset_control_path,opponent)")
+                if opponent is not None:
+                    self.assertFalse(result["ok"])
+                    self.assertIn("[mir5-bob-angel-published-reset-control]", result["message"])
+                    self.assertIn(expected_errors[opponent], result["message"])
+                    continue
+
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual((result["phase"], result["markers"], result["saves"]),
+                                 ("published-reset-control-saved", 3, 1))
+                for label in ("player", "foreign"):
+                    snapshot = plain(result[label])
+                    self.assertEqual(snapshot["queue"], ["mir5-ba-continuity-queue-probe"])
+                    self.assertEqual(snapshot["current"], "mir5-ba-continuity-queue-probe")
+                    self.assertAlmostEqual(snapshot["progress"], 0.42)
+                    for name, status in snapshot["technologies"].items():
+                        expected_level = 3 if name.endswith("-1") else 150
+                        self.assertEqual(
+                            (status["level"], status["researched"], status["enabled"], status["visible_when_disabled"]),
+                            (expected_level, True, True, False),
+                        )
+                    for bonus in snapshot["bonuses"].values():
+                        self.assertAlmostEqual(bonus, 3)
 
     def test_relaxed_setting_values_and_saved_boundary_markers_are_explicit(self):
         for directory,effect,cap,useful in (("effect3-cap2",3,2,100),("effect1-cap40",1,40,300)):
@@ -371,7 +544,14 @@ class BobAngelNativeFixtureTests(unittest.TestCase):
         self.assertIn("PRESERVED_TAIL_NEXT_LEVEL = 151",mir5)
         self.assertIn("real_lab_completed_levels=state.completed",mir5)
         self.assertIn("foreign_upgrade_diagnostic",mir5)
-        self.assertIn("ownership_diagnostic",mir5)
+        self.assertNotIn("storage.mir_caps",mir5)
+        published_reset=(FIXTURE/"published-config-control/control.lua").read_text(encoding="utf-8")
+        self.assertIn("published-boundary-saved",published_reset)
+        self.assertIn("all_ten_native_material_technologies_reenabled=true",published_reset)
+        self.assertIn("requires the published 0.1.0 to 0.1.1 fixture update",published_reset)
+        self.assertIn("upstream angelsrefining did not re-enable",published_reset)
+        for field in ("level", "researched", "enabled", "visible_when_disabled", "productivity_bonus"):
+            self.assertNotIn(f".{field} =",published_reset)
         for path in FIXTURE.rglob("*.lua"):
             self.lua.globals().lua_path=path.as_posix()
             self.lua.execute("local chunk,message=loadfile(lua_path);assert(chunk,message)")

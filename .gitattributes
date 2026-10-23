@@ -249,3 +249,5 @@ tests/mir5/profiles/bob-angel-prototype-cap125-f200.json text eol=lf
 tests/mir5/profiles/bob-angel-prototype-cap400-f200.json text eol=lf
 
 tests/mir5/profiles/api-consumers-f200-2077.json text eol=lf
+
+tests/mir5/profiles/bob-angel-published-reset-control-f200.json text eol=lf

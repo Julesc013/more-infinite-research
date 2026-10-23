@@ -70,24 +70,10 @@ local function row_diagnostic(label, value)
     .. ",max_level=" .. scalar(value.prototype and value.prototype.max_level) .. "}"
 end
 
-local function ownership_diagnostic(force, family)
-  local caps = type(storage) == "table" and storage.mir_caps or nil
-  local owned = type(caps) == "table" and caps.owned_disabled or nil
-  local rows = type(owned) == "table" and owned[force.index] or nil
-  local function row(name)
-    local value = type(rows) == "table" and rows[name] or nil
-    if value == nil then return name .. "=none" end
-    if type(value) ~= "table" then return name .. "=" .. type(value) end
-    return name .. "={disabled=" .. scalar(value.disabled)
-      .. ",visible_when_disabled=" .. scalar(value.visible_when_disabled) .. "}"
-  end
-  return "ownership={" .. row(family.early) .. ";" .. row(family.tail) .. "}"
-end
-
 local function foreign_upgrade_diagnostic(force, family)
   local early, tail = technology(force, family.early), technology(force, family.tail)
   return "actual=" .. row_diagnostic("early", early) .. ";" .. row_diagnostic("tail", tail)
-    .. ";" .. ownership_diagnostic(force, family)
+    .. ";MIR_private_ownership=unavailable_to_external_fixture"
 end
 
 local function assert_external_seed_witness(state)

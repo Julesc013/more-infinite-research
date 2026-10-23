@@ -173,10 +173,15 @@ local function seed_material_boundary(force, player)
     local early, tail = technology(force, family.early), technology(force, family.tail)
     early.level, early.researched = 3, true
     tail.level, tail.researched = START_NEXT_LEVEL, false
+  end
+  force.reset_technology_effects()
+  -- Effect reset may restore native enablement. The disposable foreign
+  -- writer establishes its disable only after every seeding/reset operation.
+  for _, family in ipairs(FAMILIES) do
+    local early, tail = technology(force, family.early), technology(force, family.tail)
     early.enabled, early.visible_when_disabled = player, false
     tail.enabled, tail.visible_when_disabled = player, false
   end
-  force.reset_technology_effects()
   check_rows(force, START_NEXT_LEVEL, player, player and "player seed" or "foreign seed")
   local bonus = recipe_bonuses(force, START_BONUS, START_BONUS, player and "player seed" or "foreign seed")
   return bonus
