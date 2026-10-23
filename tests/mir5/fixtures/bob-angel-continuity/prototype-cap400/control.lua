@@ -1,5 +1,5 @@
 -- Native F200 recipe-cap relaxation fixture. It begins with the completed
--- 125-percent save, checks MIR restored only its owned cap disablement, then
+-- 125-percent save, checks MIR restored its owned cap disablement, then
 -- completes one additional real level for every named material continuation.
 local KEY = "mir5_bob_angel_continuity"
 local SAVE = "mir5-native-complete"
@@ -108,9 +108,9 @@ local function check_rows(force, expected_tail, player, label)
           or tail.enabled ~= true or tail.visible_when_disabled ~= false then
         fail(label .. " MIR-owned state was not restored for " .. family.key)
       end
-    elseif early.enabled ~= false or tail.enabled ~= false
+    elseif early.enabled ~= true or tail.enabled ~= true
         or early.visible_when_disabled ~= false or tail.visible_when_disabled ~= false then
-      fail(label .. " foreign disabled state differs for " .. family.key)
+      fail(label .. " independently observed upstream re-enable state differs for " .. family.key)
     end
   end
 end
@@ -141,7 +141,15 @@ local function snapshot(force)
 end
 local function assert_snapshot(force, expected, label)
   for name, saved in pairs(expected.technologies) do
-    if not same_status(status(technology(force, name)), saved) then fail(label .. " state changed for " .. name) end
+    -- Published reset-control run39991831062 independently demonstrates
+    -- AngelsRefining re-enables these rows before MIR's configuration callback.
+    -- Keep the original saved witness; compare only that documented transition.
+    local after_upstream = {level=saved.level, researched=saved.researched,
+      max_level=saved.max_level, enabled=true, visible_when_disabled=false}
+    if saved.enabled ~= false or saved.visible_when_disabled ~= false
+        or not same_status(status(technology(force, name)), after_upstream) then
+      fail(label .. " upstream transition changed earned state for " .. name)
+    end
   end
   for name, saved in pairs(expected.bonuses) do
     if not close(force.recipes[name].productivity_bonus, saved) then fail(label .. " bonus changed for " .. name) end
@@ -167,12 +175,13 @@ local function marker(stage, state)
       self_recycling_scope=false, prototype_maximum_productivity=CAP,
       effect_percent=2, useful_level_headroom=200,
       inherited_cap125_tail_next_level=RESTORED_NEXT_LEVEL,
-      restored_only_mir_owned_player_tail=true, retained_foreign_disabled_state=true,
+      restored_mir_owned_player_tail=true, prior_foreign_disable_erased_by_upstream=true,
+      foreign_disable_preservation_qualified=false,
       lab_completed_tail_levels=state.completed, tail_next_level_after_lab=FINISHED_NEXT_LEVEL,
       native_recipe_productivity_bonus=state.player_bonus,
       raw_completed_bonus_formula=RAW_COMPLETED_BONUS,
       native_recipe_bonus_is_observed_separately_from_prototype_cap=true,
-      foreign_disabled_effect_and_queue_preserved=true,
+      foreign_queue_and_effects_preserved=true,
       sequential_native_queue_entries=state.queue_count, on_load_read_only=stage == "reload",
       qualification="native-runner-readback-required",
     },
@@ -211,8 +220,9 @@ script.on_configuration_changed(function()
   local foreign = game.forces[state.foreign_index]
   if not foreign or foreign.valid == false then fail("cap125 foreign force is absent") end
   -- MIR's configuration handler runs before this dependent fixture. It may
-  -- restore the player tail it disabled at 125%; it must not re-enable the
-  -- independently disabled foreign identities.
+  -- restore the player tail it disabled at125%. The independent published
+  -- control establishes AngelsRefining already re-enabled the foreign rows;
+  -- their saved disable cannot establish a present MIR restoration right.
   check_rows(player, RESTORED_NEXT_LEVEL, true, "restored player")
   local restored_bonus = recipe_bonuses(player, MIN_SOURCE_PLAYER_BONUS, 1.26, "restored player")
   if not close(restored_bonus, state.player_bonus) then

@@ -198,6 +198,13 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
             ok,message=callback(one,"tick");if not ok then return {ok=false,message=message}end
             if opponent=="foreign"then foreign.research_progress=.41 end
             for _,family in ipairs(F)do for _,name in ipairs(family[2])do prototypes.recipe[name]={maximum_productivity=4}end end
+            if opponent~="upstream-reset-missing"then
+              for _,family in ipairs(F)do
+                local early=foreign.technologies["recipe-prod-"..family[1].."-1"]
+                local tail=foreign.technologies["recipe-prod-"..family[1].."-4"]
+                early.enabled,tail.enabled=true,true
+              end
+            end
             if opponent~="skip400"then for _,family in ipairs(F)do local tail=player.technologies["recipe-prod-"..family[1].."-4"];tail.enabled,tail.visible_when_disabled=true,false end end
             local two,message=load_control(path400,"0.6.0","percent-400",false);if not two then return {ok=false,message=message}end
             ok,message=callback(two,"changed");if not ok then return {ok=false,message=message}end
@@ -279,13 +286,13 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
         self.assertEqual(65, normal["tail"])
         self.assertTrue(normal["enabled"])
         self.assertFalse(normal["visible"])
-        self.assertFalse(normal["foreign"])
+        self.assertTrue(normal["foreign"])
         self.assertAlmostEqual(.42, normal["progress"])
         self.assertTrue(normal["read_only"])
         self.assertEqual((4, 2), (normal["markers"], normal["saves"]))
         self.assertGreaterEqual(normal["bonus"], 1.25)
         self.assertLessEqual(normal["bonus"], 1.28)
-        for opponent, prefix in (("skip125", "[mir5-bob-angel-prototype-cap125]"), ("skip400", "[mir5-bob-angel-prototype-cap400]"), ("foreign", "[mir5-bob-angel-prototype-cap400]")):
+        for opponent, prefix in (("skip125", "[mir5-bob-angel-prototype-cap125]"), ("skip400", "[mir5-bob-angel-prototype-cap400]"), ("foreign", "[mir5-bob-angel-prototype-cap400]"), ("upstream-reset-missing", "[mir5-bob-angel-prototype-cap400]")):
             with self.subTest(opponent=opponent):
                 failed = flow(str(FIXTURE / "prototype-cap125/control.lua"), str(FIXTURE / "prototype-cap400/control.lua"), opponent)
                 self.assertFalse(failed["ok"])
