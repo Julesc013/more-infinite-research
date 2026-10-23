@@ -8,6 +8,7 @@
     "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
   },
   "settings_mode": "Defaults",
+  "archive_sha256": {},
   "mods": [
     {
       "name": "base",
