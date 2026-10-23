@@ -127,7 +127,7 @@ def _loaded_without_mir(value: Any, label: str) -> list[str]:
         value = [value]
     if not isinstance(value, list) or not all(isinstance(entry, str) and entry for entry in value):
         raise CatalogueError(f"{label} is invalid")
-    return [entry for entry in value if not entry.startswith("more-infinite-research@")] 
+    return [entry for entry in value if not entry.startswith("more-infinite-research@")]
 
 
 def read_capture(root: Path, *, require_mir: bool | None) -> dict[str, Any]:
