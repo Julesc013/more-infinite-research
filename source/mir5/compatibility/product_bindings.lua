@@ -95,7 +95,6 @@ local M = {
       {family = "research_sulfuric_acid_productivity", selector = "recipe_patterns acid-neutralisation/acid-neutralization", disposition = "omitted: a fluid-only binding would widen the published recipe allowlist"},
       {family = "research_oil_processing_productivity", selector = "recipe_patterns", disposition = "omitted: no typed product declaration"},
       {family = "research_oil_cracking_productivity", selector = "recipe_patterns", disposition = "omitted: no typed product declaration"},
-      {family = "research_modules", selector = "module_tiers/module_tier_min", disposition = "omitted: module classification is not a product binding"},
       {family = "research_furnace", selector = "item_patterns:^foundry$", disposition = "literal products retained; pattern-only route unrepresented"},
       {family = "research_mining_drill", selector = "item_patterns", disposition = "literal products retained; pattern routes unrepresented"},
       {family = "research_bullets", selector = "item_patterns", disposition = "literal products retained; pattern routes unrepresented"},
@@ -135,5 +134,30 @@ local M = {
     },
   },
 }
+
+-- Module tiers are a native item-class contract. Index that class once when
+-- the authored module family exists, then share the ordinary product pass.
+-- No recipe-name convention, technology discovery or module-effect guess.
+function M.module_tier_bindings(modules)
+  local groups = {}
+  for index, weight in ipairs({1, 0.5, 0.2, 0.1}) do
+    groups[index] = {family="research_modules", weight=weight, products={}}
+  end
+  local visited = 0
+  for name, prototype in pairs(modules or {}) do
+    visited = visited + 1
+    local tier = type(prototype) == "table" and prototype.tier
+    if type(name) == "string" and name ~= "" and type(tier) == "number"
+      and tier > 0 and tier < math.huge and tier % 1 == 0 then
+      local products = groups[math.min(4, tier)].products
+      products[#products + 1] = {type="item", name=name}
+    end
+  end
+  local out = {}
+  for _, group in ipairs(groups) do
+    if #group.products > 0 then out[#out + 1] = group end
+  end
+  return out, visited
+end
 
 return M

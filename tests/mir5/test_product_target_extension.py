@@ -247,6 +247,54 @@ class ProductTargetExtensionTests(unittest.TestCase):
         ''')
 
 
+    def test_native_module_tiers_extend_all_producers_in_one_shared_recipe_pass(self):
+        self.lua.execute(r'''
+          local row = generated("research_modules", {productivity("known-module", .33)})
+          local recipes = {}
+          local modules = {}
+          for tier=1,5 do
+            local name="custom-module-" .. tier
+            modules[name]={tier=tier,foreign="preserve"}
+            recipes["producer-" .. tier]=recipe({}, {product("item",name)})
+          end
+          modules.zero={tier=0}; modules.invalid={tier="2"}
+          recipes.ignored=recipe({}, {product("item","custom-module-5",{ignored_by_productivity=1})})
+          recipes.homonym=recipe({}, {product("fluid","custom-module-1")})
+          local raw=raw_with_recipes(recipes); raw.module=modules
+          local before=frozen_copy(raw.module)
+          local result=extension.extend({row}, {streams={research_modules={effect_percent=20}}}, {raw=raw,mods={}})
+          assert(effect_rows(row.effects) == "change-recipe-productivity:known-module:0.33000,"
+            .. "change-recipe-productivity:producer-1:0.20000,"
+            .. "change-recipe-productivity:producer-2:0.10000,"
+            .. "change-recipe-productivity:producer-3:0.04000,"
+            .. "change-recipe-productivity:producer-4:0.02000,"
+            .. "change-recipe-productivity:producer-5:0.02000")
+          assert(result.extended_effects == 5 and result.families == 1)
+          assert(result.work.recipes == 7 and result.work.products == 7 and result.work.modules == 7)
+          assert(frozen_copy(raw.module) == before)
+        ''')
+
+    def test_module_class_is_lazy_and_insertion_order_does_not_change_tier_priority(self):
+        self.lua.execute(r'''
+          local raw=raw_with_recipes({})
+          raw.module=setmetatable({}, {__pairs=function() error("unselected module class traversal") end})
+          extension.extend({generated("research_gears", {productivity("known",.1)})},
+            values(10,20,10), {raw=raw,mods={}})
+          local function output(reverse)
+            local module={}
+            if reverse then module.higher={tier=4}; module.lower={tier=1}
+            else module.lower={tier=1}; module.higher={tier=4} end
+            local source=raw_with_recipes({mixed=recipe({}, {product("item","higher"),product("item","lower")})})
+            source.module=module
+            local row=generated("research_modules", {productivity("known",.1)})
+            extension.extend({row}, {streams={research_modules={effect_percent=10}}}, {raw=source,mods={}})
+            return effect_rows(row.effects)
+          end
+          assert(output(false)==output(true))
+          assert(output(false)=="change-recipe-productivity:known:0.10000,change-recipe-productivity:mixed:0.10000")
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)

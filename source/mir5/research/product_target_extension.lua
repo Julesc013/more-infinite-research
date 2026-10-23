@@ -40,11 +40,18 @@ function M.extend(technologies, values, context)
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
+  local module_count = 0
+  if selected.research_modules then
+    local module_rules
+    module_rules, module_count = bindings.module_tier_bindings(context.raw.module)
+    admit(module_rules)
+  end
   if #rules == 0 then return report end
 
   local collector = require("compatibility.product_targets")
   local result = collector.collect(context.raw.recipe, collector.prepare(rules))
   report.work = result.work
+  report.work.modules = module_count
   for family, rows in pairs(result.by_family) do
     local technology = selected[family]
     local effects, seen = technology.effects, {}
