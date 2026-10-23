@@ -64,7 +64,7 @@ $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("mir-package-identity-"
 try {
   $lfRoot = Join-Path $testRoot "lf"
   $crlfRoot = Join-Path $testRoot "crlf"
-  foreach ($relative in @("README.md", "settings.lua")) {
+  foreach ($relative in @("source/README.md", "source/settings.lua")) {
     Write-MIRTestText -Path (Join-Path $lfRoot $relative) -Text "one`ntwo`n"
     Write-MIRTestText -Path (Join-Path $crlfRoot $relative) -Text "one`r`ntwo`r`n"
   }
@@ -115,7 +115,7 @@ try {
     throw "Test ZIPs unexpectedly have identical byte hashes."
   }
 
-  Write-MIRTestText -Path (Join-Path $crlfRoot "README.md") -Text "one`r`nchanged`r`n"
+  Write-MIRTestText -Path (Join-Path $crlfRoot "source/README.md") -Text "one`r`nchanged`r`n"
   if ($lfPackage -eq (Get-MIRPackageSourceFingerprint -RepoRoot $crlfRoot)) {
     throw "Package-source fingerprint ignored a semantic text change."
   }

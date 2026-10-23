@@ -9,6 +9,8 @@ param(
   [Parameter(Mandatory)][string]$LibraryDirectory,
   [string]$FactorioBin='C:\Program Files\Steam\steamapps\common\Factorio\bin\x64\factorio.exe',
   [string]$OutputRoot='build/tmp/mir471-native',
+  [string]$ResumeSourceRun='',
+  [string]$ResumeUpgradeRun='',
   [ValidateSet('All','Base','Continuity','Representative')][string]$Selection='All'
 )
 $ErrorActionPreference='Stop'
@@ -31,7 +33,7 @@ $userdata=Join-Path $root 'u'
 $config=Join-Path $root 'config.ini'
 [IO.File]::WriteAllText($config,"[path]`nread-data=$($engineData.Replace('\','/'))`nwrite-data=$($userdata.Replace('\','/'))`n[other]`ncheck-updates=false`nenable-new-mods=false`n",[Text.UTF8Encoding]::new($false))
 $server=Join-Path $root 'server.json'
-@{name='MIR471 focused qualification';visibility=@{public=$false;lan=$false};auto_pause=$false}|ConvertTo-Json -Depth 4|Set-Content -LiteralPath $server
+@{name='MIR471 focused qualification';description='Private ephemeral upgrade validation server';visibility=@{public=$false;lan=$false};require_user_verification=$false;auto_pause=$false}|ConvertTo-Json -Depth 4|Set-Content -LiteralPath $server
 $activation=$null
 $results=[Collections.Generic.List[object]]::new()
 function Install-OwnedInput([string]$Path,[string]$Hash){
@@ -59,8 +61,13 @@ function Run([string[]]$EngineArguments,[string]$Marker='',[string]$Save=''){
   # Save/reload completion remains the existing fixture's native full-state oracle.
   $predicate=if($Marker){ {
     if(-not(Test-Path -LiteralPath $log)-or-not(Test-Path -LiteralPath $Save)){return $false}
-    $text=Get-MIRLibraryLatestInvocationText -Text (Get-Content -LiteralPath $log -Raw)
-    return $text.Contains($Marker)-and$text.Contains('Hosting game')-and($text.Contains('Saving finished')-or$Marker.Contains('reload proof'))
+    try{$all=[string](Get-Content -LiteralPath $log -Raw -ErrorAction Stop)}catch [IO.IOException]{return $false}
+    $starts=[regex]::Matches($all,'(?m)^[ \t]*[0-9]+\.[0-9]+ [0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}; Factorio ')
+    if($starts.Count-eq0){return $false}
+    $text=$all.Substring($starts[$starts.Count-1].Index)
+    return $text.Contains($Marker)-and$text.Contains('Hosting game')-and
+      ($text-match '\[mir-fixture\] complete (?:Space Age|research) state retained technologies=')-and
+      ($text.Contains('Saving finished')-or$Marker.Contains('reload proof'))
   }.GetNewClosure() }else{$null}
   $run=Invoke-MIRNativeProbeProcess -Context $resources -FilePath $FactorioBin -Arguments $arguments -TimeoutSeconds 120 -FactorioSteamIdentity -CompletionPredicate $predicate
   if($Marker-and-not$run.result.completion_predicate_observed){throw "Missing native save/reload marker $Marker"}
@@ -100,16 +107,38 @@ try{
     $null=Complete-MIRLibraryActivation $script:activation
   }
   if($Selection-in@('All','Continuity')){
-    Activate '4.7.21000' $true $fixture
-    $save=Join-Path $root 'source.zip';$text=Run @('--create',$save)
-    if(-not$text.Contains('4.7.21000 upgrade source proof complete')){throw 'Source fixture did not seed research'}
-    Copy-Item (Join-Path $userdata 'script-output/mir-upgrade-full-state-source.json') (Join-Path $root 'source-state.json')
-    $null=Complete-MIRLibraryActivation $script:activation
+    if($ResumeSourceRun){
+      $prior=Resolve-MIR441RecoveryScratchPath -Path $ResumeSourceRun
+      $priorState=[Text.Json.JsonDocument]::Parse([IO.File]::ReadAllText((Join-Path $prior 'source-state.json')))
+      try{
+        $state=$priorState.RootElement;$active=$state.GetProperty('active_mods')
+        if($state.GetProperty('from_version').GetString()-cne'4.7.21000'-or$state.GetProperty('to_version').GetString()-cne'4.7.21001'-or$state.GetProperty('stage').GetString()-cne'source'-or
+          $active.GetProperty('base').GetString()-cne'2.1.23'-or$active.GetProperty('more-infinite-research').GetString()-cne'4.7.21000'){throw 'Resume source identity differs'}
+      }finally{$priorState.Dispose();$priorState=$null;$state=$null;$active=$null}
+      if((Get-FileHash (Join-Path $prior 'upgrade-fixture/control.lua')).Hash-cne(Get-FileHash (Join-Path $fixture 'control.lua')).Hash){throw 'Resume fixture bytes differ'}
+      $save=Join-Path $prior 'source.zip'
+      Copy-Item (Join-Path $prior 'source-state.json') (Join-Path $root 'source-state.json')
+    }else{
+      Activate '4.7.21000' $true $fixture
+      $save=Join-Path $root 'source.zip';$text=Run @('--create',$save)
+      if(-not$text.Contains('4.7.21000 upgrade source proof complete')){throw 'Source fixture did not seed research'}
+      Copy-Item (Join-Path $userdata 'script-output/mir-upgrade-full-state-source.json') (Join-Path $root 'source-state.json')
+      $null=Complete-MIRLibraryActivation $script:activation
+    }
     Activate '4.7.21001' $true $fixture
-    $upgraded=Join-Path $userdata 'saves/mir-4721001-upgraded.zip'
-    $text=Run @('--server-settings',$server,'--start-server',$save) '4.7.21000 to 4.7.21001 upgrade proof complete' $upgraded
-    Assert-MIR42CompleteCatalogueUpgradeMarker -Text $text
-    Copy-Item (Join-Path $userdata 'script-output/mir-upgrade-full-state-upgrade.json') (Join-Path $root 'upgrade-state.json')
+    if($ResumeUpgradeRun){
+      $priorUpgrade=Resolve-MIR441RecoveryScratchPath -Path $ResumeUpgradeRun
+      $priorLog=Get-MIRLibraryLatestInvocationText -Text (Get-Content (Join-Path $priorUpgrade 'u/factorio-current.log') -Raw)
+      if(-not$priorLog.Contains('4.7.21000 to 4.7.21001 upgrade proof complete')-or-not$priorLog.Contains('Saving finished')){throw 'Interrupted upgrade did not finish its save'}
+      Assert-MIR42CompleteCatalogueUpgradeMarker -Text $priorLog
+      $upgraded=Join-Path $priorUpgrade 'u/saves/mir-4721001-upgraded.zip'
+      Copy-Item (Join-Path $priorUpgrade 'u/script-output/mir-upgrade-full-state-upgrade.json') (Join-Path $root 'upgrade-state.json')
+    }else{
+      $upgraded=Join-Path $userdata 'saves/mir-4721001-upgraded.zip'
+      $text=Run @('--server-settings',$server,'--start-server',$save) '4.7.21000 to 4.7.21001 upgrade proof complete' $upgraded
+      Assert-MIR42CompleteCatalogueUpgradeMarker -Text $text
+      Copy-Item (Join-Path $userdata 'script-output/mir-upgrade-full-state-upgrade.json') (Join-Path $root 'upgrade-state.json')
+    }
     foreach($reload in 1..2){
       $text=Run @('--server-settings',$server,'--start-server',$upgraded) '4.7.21001 upgraded save reload proof complete' $upgraded
       Assert-MIR42CompleteCatalogueUpgradeMarker -Text $text
