@@ -185,21 +185,55 @@ function Resolve-MIR4CanonicalPackageSourcePath {
   return $current
 }
 
+function Add-MIR4CanonicalPackageSourceInputFile {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory)][string]$RepoRoot,
+    [Parameter(Mandatory)]$Files,
+    [Parameter(Mandatory)][string]$RelativePath,
+    [Parameter(Mandatory)][string]$Code
+  )
+
+  $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $portable = $RelativePath.Replace('\','/')
+  if ([string]::IsNullOrWhiteSpace($portable) -or [IO.Path]::IsPathRooted($portable) -or $portable -match '(^|/)\.\.(/|$)') {
+    throw "[$Code-path] $RelativePath"
+  }
+  $root = $repo.TrimEnd([IO.Path]::DirectorySeparatorChar,[IO.Path]::AltDirectorySeparatorChar) + [IO.Path]::DirectorySeparatorChar
+  $path = [IO.Path]::GetFullPath((Join-Path $repo $portable))
+  if (-not $path.StartsWith($root,[StringComparison]::OrdinalIgnoreCase) -or
+      -not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    throw "[$Code-missing] $portable"
+  }
+  [void]$Files.Add($portable)
+}
+
 function Get-MIR4CanonicalPackageSourceFiles {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $files = @()
-  foreach ($relativeRoot in Get-MIR4CanonicalPackageSourceRoots) {
-    $path = Join-Path $repo $relativeRoot
-    if (-not (Test-Path -LiteralPath $path -PathType Container)) { throw "[mir4-package-source-root] $relativeRoot" }
-    $files += @(
-      Get-ChildItem -LiteralPath $path -Recurse -File |
-        ForEach-Object { [IO.Path]::GetRelativePath($repo, $_.FullName).Replace('\','/') }
-    )
+  $files = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+  $authority = Get-MIR4CanonicalPackageAuthority -RepoRoot $repo
+  Add-MIR4CanonicalPackageSourceInputFile -RepoRoot $repo -Files $files -RelativePath 'targets/package-authority.json' -Code 'mir4-package-source-authority'
+  foreach ($bindingName in @('source_manifest','target_registry','support_policy')) {
+    Add-MIR4CanonicalPackageSourceInputFile -RepoRoot $repo -Files $files -RelativePath ([string]$authority.$bindingName.path) -Code 'mir4-package-source-authority'
   }
-  return @($files | Sort-Object -Unique -CaseSensitive)
+  Add-MIR4CanonicalPackageSourceInputFile -RepoRoot $repo -Files $files -RelativePath ([string]$authority.versioning_authority.path) -Code 'mir4-package-source-authority'
+
+  $manifest = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV3' -Schema 'spec/schemas/mir4-composable-package-source-v3.schema.json' -Code 'mir4-package-source-manifest'
+  if ([string]$manifest.record_sha256 -cne [string]$authority.source_manifest.record_sha256) { throw '[mir4-package-source-manifest-authority]' }
+  $registry = Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$authority.target_registry.path) -Kind 'MIR4TargetRegistryV2' -Schema 'spec/schemas/mir4-target-registry-v2.schema.json' -Code 'mir4-package-source-registry'
+  if ([string]$registry.record_sha256 -cne [string]$authority.target_registry.record_sha256) { throw '[mir4-package-source-registry-authority]' }
+  foreach ($target in @($registry.targets)) {
+    Add-MIR4CanonicalPackageSourceInputFile -RepoRoot $repo -Files $files -RelativePath ([string]$target.composition) -Code 'mir4-package-source-composition'
+  }
+  foreach ($binding in @($manifest.bindings)) {
+    $sourcePath = [string]$binding.source_path
+    if (-not $sourcePath.StartsWith('source/',[StringComparison]::Ordinal)) { throw "[mir4-package-source-binding-boundary] $sourcePath" }
+    Add-MIR4CanonicalPackageSourceInputFile -RepoRoot $repo -Files $files -RelativePath $sourcePath -Code 'mir4-package-source-binding'
+  }
+  return @($files | Sort-Object -CaseSensitive)
 }
 
 function Get-MIR4CanonicalPackageSourceFingerprint {
@@ -219,8 +253,8 @@ function Get-MIR4CanonicalPackageSourceFingerprint {
 function Test-MIR4CanonicalPackageSourceGitDirty {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
-  $roots = @(Get-MIR4CanonicalPackageSourceRoots)
-  $status = @(& git -C $RepoRoot status --porcelain -- @roots 2>$null)
+  $files = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $RepoRoot)
+  $status = @(& git -C $RepoRoot status --porcelain -- @files 2>$null)
   if ($LASTEXITCODE -ne 0) { throw '[mir4-package-source-git-status]' }
   return $status.Count -gt 0
 }

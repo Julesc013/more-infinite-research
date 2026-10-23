@@ -6,9 +6,16 @@ function ConvertTo-MIR4DevelopmentRelativePath {
 }
 
 function Test-MIR4DevelopmentCatalogInputMatch {
-  param([Parameter(Mandatory)][string]$Path,[Parameter(Mandatory)][string]$CatalogInput)
+  param(
+    [Parameter(Mandatory)][string]$Path,
+    [Parameter(Mandatory)][string]$CatalogInput,
+    [AllowEmptyCollection()][string[]]$PackageSourceFiles=@()
+  )
   $pattern=$CatalogInput.Trim().Replace('\','/')
   if($pattern.StartsWith('source:')) { $pattern=$pattern.Substring(7) }
+  if($pattern -ceq 'package-source') {
+    return $Path.Replace('\','/') -in @($PackageSourceFiles|ForEach-Object {([string]$_).Replace('\','/')})
+  }
   # Symbolic inputs are covered by their assurance class, not filename matching.
   if([string]::IsNullOrWhiteSpace($pattern) -or $pattern -notmatch '/') { return $false }
   $escaped=[regex]::Escape($pattern).Replace('\*\*','.*').Replace('\*','[^/]*')
@@ -59,7 +66,8 @@ function Get-MIR4DevelopmentStaticProfileRows {
 function Select-MIR4DevelopmentAffectedStaticRows {
   param(
     [Parameter(Mandatory)]$Classification,
-    [Parameter(Mandatory)]$Catalog,[Parameter(Mandatory)]$Assurance,[Parameter(Mandatory)][string]$Profile
+    [Parameter(Mandatory)]$Catalog,[Parameter(Mandatory)]$Assurance,[Parameter(Mandatory)][string]$Profile,
+    [AllowEmptyCollection()][string[]]$PackageSourceFiles=@()
   )
   $profileRows=@(Get-MIR4DevelopmentStaticProfileRows -Catalog $Catalog -Assurance $Assurance -Profile $Profile)
   if([bool]$Classification.escalated) { return @($profileRows|Sort-Object {[string]$_.id}) }
@@ -68,7 +76,7 @@ function Select-MIR4DevelopmentAffectedStaticRows {
   foreach($row in $profileRows) {
     foreach($input in @($row.inputs)) {
       foreach($path in @($Classification.paths)) {
-        if(Test-MIR4DevelopmentCatalogInputMatch -Path $path -CatalogInput ([string]$input)) { $selected[[string]$row.id]=$true;break }
+        if(Test-MIR4DevelopmentCatalogInputMatch -Path $path -CatalogInput ([string]$input) -PackageSourceFiles $PackageSourceFiles) { $selected[[string]$row.id]=$true;break }
       }
     }
   }
@@ -109,20 +117,21 @@ function Get-MIR4DevelopmentCISelection {
   if($Mode -eq 'hosted-development-affected') { Assert-MIR4DevelopmentHostedCheckoutClean -RepoRoot $repo }
   . (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1')
   $packageSourceSha256=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+  $packageSourceFiles=@(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
   if($packageSourceSha256 -cnotmatch '^[A-F0-9]{64}$') { throw '[mir4-development-static-package-source-identity]' }
   $inputHashes=Get-MIR4DevelopmentSelectorInputHashes -RepoRoot $repo
   $baselineValue=$Baseline.Trim().ToLowerInvariant();$baselineState='resolved';$classification=$null;$rows=@()
   if($Mode -eq 'hosted-development-affected') {
     if([string]::IsNullOrWhiteSpace($baselineValue)) {
       $baselineState='unavailable';$classification=[ordered]@{paths=@();classes=@('unknown');tests=@();unknown_paths=@('baseline-unavailable');escalated=$true}
-      $rows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $epoch.current_profile)
+      $rows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $epoch.current_profile -PackageSourceFiles $packageSourceFiles)
     } else {
       if($baselineValue -cnotmatch '^[0-9a-f]{40}$') { throw '[mir4-development-baseline-shape]' }
       & git -C $repo cat-file -e ($baselineValue+'^{commit}');if($LASTEXITCODE -ne 0) { throw '[mir4-development-baseline-unavailable]' }
       $paths=@(& git -C $repo diff --name-only ($baselineValue+'...'+$sourceCommit) --|ForEach-Object {ConvertTo-MIR4DevelopmentRelativePath -Path ([string]$_)}|Sort-Object -Unique)
       if($LASTEXITCODE -ne 0) { throw '[mir4-development-baseline-diff]' }
       $classification=Get-MIRAssuranceClassification -Paths $paths -Config $assurance
-      $rows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $epoch.current_profile)
+      $rows=@(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $epoch.current_profile -PackageSourceFiles $packageSourceFiles)
     }
   } else {
     $baselineState='local-profile';$classification=[ordered]@{paths=@();classes=@();tests=@();unknown_paths=@();escalated=$false}
