@@ -17,6 +17,8 @@ PROFILES = tuple(ROOT / "tests/mir5/profiles" / name for name in (
     "competing-fixed-mir5-prefer-mir-f200-sa-2077.json",
     "competing-fixed-mir5-prefer-foreign-f200-sa-2077.json",
     "competing-fixed-mir5-prefer-mir-again-f200-sa-2077.json",
+    "competing-fixed-mir5-prefer-foreign-providers-removed-f200-sa-2077.json",
+    "competing-fixed-mir5-prefer-foreign-providers-readded-f200-sa-2077.json",
 ))
 FIXTURE_NAME = "mir-fixture-mir5-competing-fixed-gameplay"
 FOREIGN_DATA = FIXTURE / "foreign-data.lua"
@@ -80,25 +82,31 @@ function fixed_data(path, foreign_data_path, rows)
   local chunk,message=loadfile(update,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result),raw=raw} end
   chunk,message=loadfile(path,"t",env);assert(chunk,message);ok,result=pcall(chunk);return {ok=ok,message=tostring(result),raw=raw}
 end
-function fixed_mir_data(path, foreign_data_path, bioflux_data_path, fixture, preference, mir_rows, foreign_rows)
+function fixed_mir_data(path, foreign_data_path, bioflux_data_path, fixture, preference, mir_rows, foreign_rows, providers_present)
   local raw={technology=foreign_rows,["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=preference}}}
   for name,row in pairs(mir_rows) do raw.technology[name]=row end
-  local env={mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["plates-n-circuit-productivity"]="0.0.2",Science_packs_productivity="0.0.1",["bioflux-productivity"]="0.1.0",["fish-productivity"]="1.0.0",["mir-fixture-mir5-competing-fixed-gameplay"]=fixture},data={raw=raw}}
+  local mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-competing-fixed-gameplay"]=fixture}
+  if providers_present~=false then mods["plates-n-circuit-productivity"]="0.0.2";mods.Science_packs_productivity="0.0.1";mods["bioflux-productivity"]="0.1.0";mods["fish-productivity"]="1.0.0" end
+  local env={mods=mods,data={raw=raw}}
   env.require=fixture_require(env, foreign_data_path, bioflux_data_path);env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local update=path:gsub("data%-final%-fixes%.lua$","settings-updates.lua")
   local chunk,message=loadfile(update,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result),raw=raw}end
   chunk,message=loadfile(path,"t",env);assert(chunk,message);ok,result=pcall(chunk);return {ok=ok,message=tostring(result),raw=raw}
 end
-function fixed_setting(path, mir)
+function fixed_setting(path, mir, providers_present)
   local raw={["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=false}}}
-  local env={mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]=mir,["plates-n-circuit-productivity"]="0.0.2",Science_packs_productivity="0.0.1",["bioflux-productivity"]="0.1.0",["fish-productivity"]="1.0.0"},data={raw=raw}}
+  local mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]=mir}
+  if providers_present~=false then mods["plates-n-circuit-productivity"]="0.0.2";mods.Science_packs_productivity="0.0.1";mods["bioflux-productivity"]="0.1.0";mods["fish-productivity"]="1.0.0" end
+  local env={mods=mods,data={raw=raw}}
   env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
   return {ok=ok,message=tostring(result),value=raw["bool-setting"]["mir-prefer-this-mod-for-competing-techs"].default_value}
 end
-function fixed_parse(path, mir, fixture)
+function fixed_parse(path, mir, fixture, providers_present)
   local callbacks,reads={events={}},{ }
-  local env={script={active_mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]=mir,["plates-n-circuit-productivity"]="0.0.2",Science_packs_productivity="0.0.1",["bioflux-productivity"]="0.1.0",["fish-productivity"]="1.0.0",["mir-fixture-mir5-competing-fixed-gameplay"]=fixture},on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
+  local mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-competing-fixed-gameplay"]=fixture}
+  if providers_present~=false then mods["plates-n-circuit-productivity"]="0.0.2";mods.Science_packs_productivity="0.0.1";mods["bioflux-productivity"]="0.1.0";mods["fish-productivity"]="1.0.0" end
+  local env={script={active_mods=mods,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
   env._G=env;setmetatable(env,{__index=function(_,key)if key=="game" or key=="storage" or key=="settings" then reads[key]=(reads[key]or 0)+1 end;return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
 end
@@ -207,6 +215,77 @@ function fixed_successor(path, fixture, stage, opponent)
   for _=1,2 do ok,result=pcall(c.load); if not ok then return {ok=false,message=tostring(result)} end; ok,result=pcall(c.events[1]); if not ok then return {ok=false,message=tostring(result)} end end
   return {ok=true,message="",phase=state.phase,markers=markers,saves=saves,breed_level=player.technologies[breeding].level,fish=player.recipes["fish-breeding"].productivity_bonus,biter=player.recipes["biter-egg"].productivity_bonus,pentapod=player.recipes["pentapod-egg"].productivity_bonus,full_labs=state.full_mir_actual_lab_completions,full_level=player.technologies[full_bioflux].level,full_enabled=player.technologies[full_bioflux].enabled,full_bonus=player.recipes["bioflux"].productivity_bonus,progress=player.research_progress}
 end
+
+function fixed_provider_removal_readdition(path, opponent)
+  local ids={"basic-plate-productivity","electric-circuit-productivity","advanced-circuit-productivity","automation-science-productivity-4","logistic-science-productivity-4","military-science-productivity-4","chemical-science-productivity-4","production-science-productivity-4","utility-science-productivity-4","space-science-productivity-4","metallurgic-science-productivity-4","electromagnetic-science-productivity-4","agricultural-science-productivity-4","cryogenic-science-productivity-4","promethium-science-productivity-4","bioflux-productivity","fish-breeding-productivity"}
+  local breeding,full_bioflux="recipe-prod-research_breeding-1","recipe-prod-research_bioflux-1"
+  local function inventory() local value={}; function value.get_item_count(_) return 0 end; function value.insert(stack) return stack.count end; function value.clear() end; return value end
+  local lab={valid=true,active=false,energy=0}; function lab.get_inventory(_) return inventory() end
+  local function queue(force, entries)
+    rawset(force,"_queue",entries or {}); local current=entries and entries[1] or nil; rawset(force,"current_research",current)
+    if current then rawset(force,"research_progress",current.saved_progress or 0); current.saved_progress=0 else rawset(force,"research_progress",0) end
+  end
+  local function research(force, id, level)
+    return {name=id,valid=true,force=force,level=level or 1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+      prototype={max_level=4294967295},prerequisites={},research_unit_count=1,research_unit_energy=60,
+      research_unit_ingredients={{name="automation-science-pack",amount=1}}}
+  end
+  local function force(name,index)
+    local value={name=name,index=index,valid=true,technologies={},recipes={},_queue={},research_progress=0}
+    setmetatable(value,{__index=function(item,key) if key=="research_queue" then return rawget(item,"_queue") end end,
+      __newindex=function(item,key,row) if key=="research_queue" then queue(item,row) else rawset(item,key,row) end end})
+    for _,recipe in ipairs({"automation-science-pack","copper-plate","iron-plate","bioflux","fish-breeding","biter-egg","pentapod-egg"}) do value.recipes[recipe]={productivity_bonus=0} end
+    value.technologies[breeding]=research(value,breeding,1); value.technologies[full_bioflux]=research(value,full_bioflux,1)
+    value.technologies["braking-force-1"]=research(value,"braking-force-1",1)
+    return value
+  end
+  local player,foreign,detached=force("player",1),force("mir5-competing-fixed-foreign",2),force("mir5-competing-fixed-detached",3)
+  local orphan_electric=research(player,"electric-circuit-productivity",1)
+  local probe=player.technologies["braking-force-1"]
+  probe.saved_progress=.42; player.research_queue={orphan_electric,probe}; player.research_progress=.27
+  player.technologies[full_bioflux].level=2; player.technologies[breeding].level=3
+  player.recipes.bioflux.productivity_bonus=.1; player.recipes["fish-breeding"].productivity_bonus=.1; player.recipes["biter-egg"].productivity_bonus=.2; player.recipes["pentapod-egg"].productivity_bonus=.2
+  local foreign_probe=foreign.technologies["braking-force-1"]; foreign_probe.saved_progress=.42; foreign.research_queue={foreign_probe}; foreign.research_progress=.42
+  foreign.technologies[full_bioflux].enabled=false
+  local state={phase="prefer-mir-again-completed",source_mir="4.7.20002",fixture_version="0.1.0",actual_lab_completions=4,milestone="four-native-fixed-provider-labs",prerequisite_seeding="completed-before-native-labs",foreign_force_index=2,detached_force_index=3,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},foreign_current_saved_progress=0,player_queue={current="electric-circuit-productivity",queue={"electric-circuit-productivity","braking-force-1"},progress=.27},lab=lab,full_mir_bioflux_introduced=true,foreign_full_mir_bioflux_initialized=true,full_mir_actual_lab_completions=1,true_bioflux_effects={bioflux=.2},true_breeding_effects={["fish-breeding"]=.2,["biter-egg"]=.1,["pentapod-egg"]=.1},false_breeding_effects={["fish-breeding"]=.2,["biter-egg"]=.2,["pentapod-egg"]=.2}}
+  local saves,markers=0,0; local game={tick=1,forces={player=player,[1]=player,[2]=foreign,[3]=detached,["mir5-competing-fixed-foreign"]=foreign,["mir5-competing-fixed-detached"]=detached}}
+  function game.server_save(name) assert(name=="mir5-native-complete"); saves=saves+1 end
+  local c={events={}}; local active={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-competing-fixed-gameplay"]="0.5.0"}
+  local setting={value=false}
+  local env={script={active_mods=active,on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},game=game,storage={mir5_competing_fixed_gameplay=state},settings={startup={['mir-prefer-this-mod-for-competing-techs']=setting}},helpers={table_to_json=function(v) assert(v.status=="passed" and (v.stage=="initial" or v.stage=="reload")); return "{}" end},log=function(v) assert(v:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ")); markers=markers+1 end}
+  env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end});local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)} end
+  if opponent=="removed-provider-still-present" then active["fish-productivity"]="1.0.0"
+  elseif opponent=="lost-provider-absent-queue" then player.research_progress=.26
+  elseif opponent=="lost-provider-absent-fish" then player.recipes["fish-breeding"].productivity_bonus=.09 end
+  c.load();ok,result=pcall(c.changed);if not ok then return {ok=false,message=tostring(result)} end
+  local function tick() local tick_ok,tick_result=pcall(c.events[1]);if not tick_ok then return false,tostring(tick_result) end;return true,"" end
+  local function reloads()
+    for _=1,2 do local load_ok,load_result=pcall(c.load);if not load_ok then return false,tostring(load_result) end;local tick_ok,tick_result=tick();if not tick_ok then return false,tick_result end end
+    return true,""
+  end
+  local value=player.current_research
+  if value==nil or value.name~=full_bioflux then return {ok=false,message="provider-absent fixture did not queue MIR bioflux"} end
+  value.level=value.level+1; player.recipes.bioflux.productivity_bonus=player.recipes.bioflux.productivity_bonus+.1; player.research_queue={orphan_electric,probe}
+  ok,result=pcall(c.events[2],{research=value});if not ok then return {ok=false,message=tostring(result)} end
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  ok,result=reloads();if not ok then return {ok=false,message=result} end
+  for _,id in ipairs(ids) do
+    local first=id:match("%-4$") and 4 or 1
+    player.technologies[id]=player.technologies[id] or research(player,id,first)
+    foreign.technologies[id]=research(foreign,id,first);foreign.technologies[id].enabled=false;foreign.technologies[id].visible_when_disabled=true
+    detached.technologies[id]=research(detached,id,first)
+  end
+  player.technologies["electric-circuit-productivity"]=orphan_electric
+  player.technologies[full_bioflux].enabled=false
+  player.recipes["fish-breeding"].productivity_bonus=.2
+  active["mir-fixture-mir5-competing-fixed-gameplay"]="0.6.0";active["plates-n-circuit-productivity"]="0.0.2";active.Science_packs_productivity="0.0.1";active["bioflux-productivity"]="0.1.0";active["fish-productivity"]="1.0.0"
+  if opponent=="readded-foreign-enabled" then foreign.technologies["bioflux-productivity"].enabled=true end
+  if opponent=="readded-bioflux-lost" then player.recipes.bioflux.productivity_bonus=.19 end
+  c.load();ok,result=pcall(c.changed);if not ok then return {ok=false,message=tostring(result)} end
+  ok,result=tick();if not ok then return {ok=false,message=result} end
+  ok,result=reloads();if not ok then return {ok=false,message=result} end
+  return {ok=true,message="",phase=state.phase,markers=markers,saves=saves,full_labs=state.full_mir_actual_lab_completions,full_level=player.technologies[full_bioflux].level,full_enabled=player.technologies[full_bioflux].enabled,bioflux=player.recipes.bioflux.productivity_bonus,fish=player.recipes["fish-breeding"].productivity_bonus,biter=player.recipes["biter-egg"].productivity_bonus,pentapod=player.recipes["pentapod-egg"].productivity_bonus,progress=player.research_progress}
+end
 ''')
 
     def selected_rows(self):
@@ -225,18 +304,31 @@ end
         }
 
     def test_profiles_define_one_complete_four_provider_chain(self):
-        versions = (("4.7.20002", "0.1.0"), ("5.0.20000", "0.2.0"), ("5.0.20000", "0.3.0"), ("5.0.20000", "0.4.0"))
-        for path, (mir, fixture) in zip(PROFILES, versions):
+        versions = (("4.7.20002", "0.1.0", True), ("5.0.20000", "0.2.0", True),
+                    ("5.0.20000", "0.3.0", True), ("5.0.20000", "0.4.0", True),
+                    ("5.0.20000", "0.5.0", False), ("5.0.20000", "0.6.0", True))
+        for path, (mir, fixture, providers_present) in zip(PROFILES, versions):
             profile = json.loads(path.read_text(encoding="utf-8")); mods = {item["name"]: item["version"] for item in profile["mods"]}
             self.assertEqual(("f200", "2.0", "2.0.77"), (profile["target"], profile["factorio_line"], profile["engine"]["version"]))
             self.assertEqual((mir, fixture), (mods["more-infinite-research"], mods[FIXTURE_NAME]))
-            self.assertEqual({"0.0.2", "0.0.1", "0.1.0", "1.0.0"}, {mods["plates-n-circuit-productivity"], mods["Science_packs_productivity"], mods["bioflux-productivity"], mods["fish-productivity"]})
-            self.assertEqual(5, len(profile["archive_sha256"]))
-        for stage, (_, fixture) in zip(("published", "mir5-prefer-mir", "mir5-prefer-foreign", "mir5-prefer-mir-again"), versions):
+            if providers_present:
+                self.assertEqual({"0.0.2", "0.0.1", "0.1.0", "1.0.0"}, {mods["plates-n-circuit-productivity"], mods["Science_packs_productivity"], mods["bioflux-productivity"], mods["fish-productivity"]})
+                self.assertEqual(5, len(profile["archive_sha256"]))
+            else:
+                self.assertTrue({"plates-n-circuit-productivity", "Science_packs_productivity", "bioflux-productivity", "fish-productivity"}.isdisjoint(mods))
+                self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip"}, set(profile["archive_sha256"]))
+        stages = ("published", "mir5-prefer-mir", "mir5-prefer-foreign", "mir5-prefer-mir-again",
+                  "mir5-prefer-foreign-providers-removed", "mir5-prefer-foreign-providers-readded")
+        for stage, (_, fixture, _) in zip(stages, versions):
             info = json.loads((FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
             self.assertEqual((FIXTURE_NAME, fixture, "2.0"), (info["name"], info["version"], info["factorio_version"]))
-        for stage, mir, expected in (("published", "4.7.20002", False), ("mir5-prefer-mir", "5.0.20000", True), ("mir5-prefer-foreign", "5.0.20000", False), ("mir5-prefer-mir-again", "5.0.20000", True)):
-            setting = self.lua.eval("fixed_setting")(str(FIXTURE / stage / "settings-updates.lua"), mir)
+        for stage, mir, expected, providers_present in (("published", "4.7.20002", False, True),
+                                                         ("mir5-prefer-mir", "5.0.20000", True, True),
+                                                         ("mir5-prefer-foreign", "5.0.20000", False, True),
+                                                         ("mir5-prefer-mir-again", "5.0.20000", True, True),
+                                                         ("mir5-prefer-foreign-providers-removed", "5.0.20000", False, False),
+                                                         ("mir5-prefer-foreign-providers-readded", "5.0.20000", False, True)):
+            setting = self.lua.eval("fixed_setting")(str(FIXTURE / stage / "settings-updates.lua"), mir, providers_present)
             self.assertTrue(setting["ok"], setting["message"])
             self.assertEqual(expected, setting["value"])
 
@@ -286,29 +378,33 @@ end
         full = deepcopy(self.providers["fish"]["arms"]["published"]["mir_rows"]["recipe-prod-research_breeding-1"])
         bioflux = deepcopy(self.providers["bioflux"]["arms"]["published"]["mir_rows"]["recipe-prod-research_bioflux-1"])
         false = deepcopy(self.providers["fish"]["foreign_remaining_mir_rows"]["recipe-prod-research_breeding-1"])
-        cases = (("mir5-prefer-mir", "0.2.0", True, full, ["biter-egg", "fish-breeding", "pentapod-egg"], None, (None, "1", 1)),
-                 ("mir5-prefer-foreign", "0.3.0", False, false, ["biter-egg", "pentapod-egg"], False, (None, "8000*2^(L-1)", 60)),
-                 ("mir5-prefer-mir-again", "0.4.0", True, full, ["biter-egg", "fish-breeding", "pentapod-egg"], None, (None, "8000*2^(L-1)", 60)))
-        for stage, fixture, preference, row, effects, expected_enabled, bioflux_cost in cases:
+        cases = (("mir5-prefer-mir", "0.2.0", True, True, full, ["biter-egg", "fish-breeding", "pentapod-egg"], None, (None, "1", 1)),
+                 ("mir5-prefer-foreign", "0.3.0", False, True, false, ["biter-egg", "pentapod-egg"], False, (None, "8000*2^(L-1)", 60)),
+                 ("mir5-prefer-mir-again", "0.4.0", True, True, full, ["biter-egg", "fish-breeding", "pentapod-egg"], None, (None, "8000*2^(L-1)", 60)),
+                 ("mir5-prefer-foreign-providers-removed", "0.5.0", False, False, full, ["biter-egg", "fish-breeding", "pentapod-egg"], None, (None, "1", 1)),
+                 ("mir5-prefer-foreign-providers-readded", "0.6.0", False, True, false, ["biter-egg", "pentapod-egg"], False, (None, "8000*2^(L-1)", 60)))
+        for stage, fixture, preference, providers_present, row, effects, expected_enabled, bioflux_cost in cases:
             mir_rows = self.selected_mir_rows()
             bioflux_row = mir_rows["recipe-prod-research_bioflux-1"]
             if expected_enabled is False:
                 bioflux_row["enabled"] = False
             mir_rows["recipe-prod-research_breeding-1"] = row
-            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / stage / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), fixture, preference, lua_value(self.lua, mir_rows), lua_value(self.lua, self.selected_rows()))
+            foreign_rows = self.selected_rows() if providers_present else {}
+            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / stage / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), fixture, preference, lua_value(self.lua, mir_rows), lua_value(self.lua, foreign_rows), providers_present)
             self.assertTrue(result["ok"], result["message"])
             technologies = plain(result["raw"])["technology"]
             actual = technologies["recipe-prod-research_breeding-1"]
-            expected_breeding_cost = (None, "8000*2^(L-1)", 60) if stage == "mir5-prefer-mir-again" else (None, "1", 1)
+            expected_breeding_cost = (None, "8000*2^(L-1)", 60) if stage in ("mir5-prefer-mir-again", "mir5-prefer-foreign-providers-removed") else (None, "1", 1)
             self.assertEqual(expected_breeding_cost, (actual["unit"].get("count"), actual["unit"]["count_formula"], actual["unit"]["time"]))
             self.assertEqual(effects, [effect["recipe"] for effect in actual["effects"]])
             full_actual = technologies["recipe-prod-research_bioflux-1"]
             self.assertEqual(expected_enabled, full_actual.get("enabled"))
             self.assertEqual(bioflux_cost, (full_actual["unit"].get("count"), full_actual["unit"]["count_formula"], full_actual["unit"]["time"]))
             self.assertEqual(bioflux["effects"], full_actual["effects"])
-            foreign_costs = {(foreign["unit"].get("count"), foreign["unit"]["count_formula"], foreign["unit"]["time"])
-                             for name, foreign in technologies.items() if name in self.selected_rows()}
-            self.assertEqual({(None, "1", 1)}, foreign_costs)
+            if providers_present:
+                foreign_costs = {(foreign["unit"].get("count"), foreign["unit"]["count_formula"], foreign["unit"]["time"])
+                                 for name, foreign in technologies.items() if name in self.selected_rows()}
+                self.assertEqual({(None, "1", 1)}, foreign_costs)
         bad = deepcopy(false); bad["effects"].append({"type": "change-recipe-productivity", "recipe": "fish-breeding", "change": .1})
         result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), str(FULL_BIOFLUX_DATA), "0.3.0", False, lua_value(self.lua, {"recipe-prod-research_breeding-1": bad, "recipe-prod-research_bioflux-1": bioflux}), lua_value(self.lua, self.selected_rows()))
         self.assertFalse(result["ok"])
@@ -323,8 +419,8 @@ end
         self.assertIn("bioflux-productivity effects changed", result["message"])
 
     def test_controls_keep_parse_and_on_load_read_only(self):
-        for stage, mir, fixture in (("published", "4.7.20002", "0.1.0"), ("mir5-prefer-mir", "5.0.20000", "0.2.0"), ("mir5-prefer-foreign", "5.0.20000", "0.3.0"), ("mir5-prefer-mir-again", "5.0.20000", "0.4.0")):
-            result = self.lua.eval("fixed_parse")(str(FIXTURE / "control.lua"), mir, fixture)
+        for stage, mir, fixture, providers_present in (("published", "4.7.20002", "0.1.0", True), ("mir5-prefer-mir", "5.0.20000", "0.2.0", True), ("mir5-prefer-foreign", "5.0.20000", "0.3.0", True), ("mir5-prefer-mir-again", "5.0.20000", "0.4.0", True), ("mir5-prefer-foreign-providers-removed", "5.0.20000", "0.5.0", False), ("mir5-prefer-foreign-providers-readded", "5.0.20000", "0.6.0", True)):
+            result = self.lua.eval("fixed_parse")(str(FIXTURE / "control.lua"), mir, fixture, providers_present)
             self.assertTrue(result["ok"], result["message"]); self.assertEqual({}, plain(result["reads"])); self.assertIsNotNone(result["callbacks"]["load"]); self.assertIsNotNone(result["callbacks"]["events"][1])
             body = (FIXTURE / "control.lua").read_text(encoding="utf-8").split("script.on_load(function()", 1)[1].split("script.on_configuration_changed", 1)[0]
             self.assertNotIn("game.", body); self.assertNotIn("research_queue_enabled", body); self.assertNotRegex(body, r"storage\s*\[.*?\]\s*=")
@@ -370,6 +466,24 @@ end
             ("mir5-prefer-mir-again", "0.4.0", "again", "lost-earned-full", "re-preference transition earned productivity changed: bioflux"),
         ):
             result = run(str(FIXTURE / "control.lua"), fixture, mode, opponent)
+            self.assertFalse(result["ok"])
+            self.assertIn(expected, result["message"])
+
+    def test_provider_removal_and_readdition_preserve_only_observed_mir5_state(self):
+        run = self.lua.eval("fixed_provider_removal_readdition")
+        result = run(str(FIXTURE / "control.lua"), "")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(("providers-readded-foreign-completed", 6, 2, 2, 3, False, .2, .2, .2, .2, .27),
+                         (result["phase"], result["markers"], result["saves"], result["full_labs"], result["full_level"],
+                          result["full_enabled"], result["bioflux"], result["fish"], result["biter"], result["pentapod"], result["progress"]))
+        for opponent, expected in (
+            ("removed-provider-still-present", "provider-absent successor unexpectedly retains a fixed provider"),
+            ("lost-provider-absent-queue", "provider removal player queue/progress differs"),
+            ("lost-provider-absent-fish", "provider removal pre-lab breeding productivity changed: fish-breeding"),
+            ("readded-foreign-enabled", "foreign presentation changed: bioflux-productivity"),
+            ("readded-bioflux-lost", "readded foreign retained bioflux productivity changed: bioflux"),
+        ):
+            result = run(str(FIXTURE / "control.lua"), opponent)
             self.assertFalse(result["ok"])
             self.assertIn(expected, result["message"])
 

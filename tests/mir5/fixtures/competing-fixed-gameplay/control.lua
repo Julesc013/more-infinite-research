@@ -47,14 +47,21 @@ local function tech(force, name)
   if value == nil or value.valid == false or value.name ~= name then fail("technology is absent: " .. tostring(name)) end
   return value
 end
-local function require_mode(mir, fixture, preference, label)
+local function require_mode(mir, fixture, preference, label, providers_present)
   local active = script.active_mods
   if active.base ~= "2.0.77" or active["space-age"] ~= "2.0.77"
-      or active["plates-n-circuit-productivity"] ~= "0.0.2"
-      or active.Science_packs_productivity ~= "0.0.1"
-      or active["bioflux-productivity"] ~= "0.1.0" or active["fish-productivity"] ~= "1.0.0"
       or active["more-infinite-research"] ~= mir or active[FIXTURE] ~= fixture then
     fail(label .. " fixture closure differs")
+  end
+  local providers = active["plates-n-circuit-productivity"] ~= nil
+    or active.Science_packs_productivity ~= nil or active["bioflux-productivity"] ~= nil
+    or active["fish-productivity"] ~= nil
+  if providers_present == false then
+    if providers then fail(label .. " unexpectedly retains a fixed provider") end
+  elseif active["plates-n-circuit-productivity"] ~= "0.0.2"
+      or active.Science_packs_productivity ~= "0.0.1"
+      or active["bioflux-productivity"] ~= "0.1.0" or active["fish-productivity"] ~= "1.0.0" then
+    fail(label .. " fixture provider closure differs")
   end
   local setting = settings.startup["mir-prefer-this-mod-for-competing-techs"]
   if setting == nil or setting.value ~= preference then fail(label .. " preference setting differs") end
@@ -209,14 +216,16 @@ local function freeze(state)
   if input == nil then fail("source lab input is absent") end
   input.clear()
 end
-local function assert_frozen(state)
+local function assert_frozen(state, providers_present)
   local lab = state.lab
   if lab == nil or lab.valid == false or lab.active ~= false or lab.energy ~= 0 then fail("source lab was not frozen") end
   local input = lab.get_inventory(defines.inventory.lab_input)
   if input == nil then fail("source lab input is absent") end
-  for _, target in ipairs(TARGETS) do
-    for _, ingredient in ipairs(tech(game.forces.player, target.id).research_unit_ingredients) do
-      if input.get_item_count(ingredient.name) ~= 0 then fail("source lab retained science: " .. ingredient.name) end
+  if providers_present ~= false then
+    for _, target in ipairs(TARGETS) do
+      for _, ingredient in ipairs(tech(game.forces.player, target.id).research_unit_ingredients) do
+        if input.get_item_count(ingredient.name) ~= 0 then fail("source lab retained science: " .. ingredient.name) end
+      end
     end
   end
 end
@@ -258,6 +267,30 @@ local function assert_detached(state)
     maximum=UINT32_MAX, saved_progress=0.27}, "detached partial initial")
   if detached.current_research ~= nil or #(detached.research_queue or {}) ~= 0 or not close(detached.research_progress, 0) then
     fail("detached partial initial gained a queue")
+  end
+end
+local function assert_provider_rows_absent(force, label)
+  for _, name in ipairs(ALL) do
+    if force.technologies[name] ~= nil then fail(label .. " retained removed provider row: " .. name) end
+  end
+end
+local function assert_foreign_without_providers(state)
+  local foreign = game.forces[state.foreign_force_index]
+  if foreign == nil or foreign.valid == false or foreign.name ~= FOREIGN then fail("foreign force is absent") end
+  assert_provider_rows_absent(foreign, "foreign")
+  assert_status(foreign, MIR_BIOFLUX, {level=1, researched=false, enabled=false, visible=false,
+    maximum=UINT32_MAX, saved_progress=0}, "foreign fully covered MIR bioflux after provider removal")
+  assert_queue(foreign, state.foreign_queue, "foreign after provider removal")
+  if not close(tech(foreign, PROBE).saved_progress, state.foreign_current_saved_progress) then
+    fail("foreign current raw progress changed after provider removal")
+  end
+end
+local function assert_detached_without_providers(state)
+  local detached = game.forces[state.detached_force_index]
+  if detached == nil or detached.valid == false or detached.name ~= DETACHED then fail("detached force is absent") end
+  assert_provider_rows_absent(detached, "detached")
+  if detached.current_research ~= nil or #(detached.research_queue or {}) ~= 0 or not close(detached.research_progress, 0) then
+    fail("detached provider removal changed its empty queue")
   end
 end
 local function assert_source_witness(state)
@@ -374,6 +407,56 @@ local function assert_repreferred_breeding(state)
   assert_breeding(tech(player, MIR_BREEDING), 3, "re-preferred", false)
   assert_selected_effects(player, state.false_breeding_effects, MIR_BREEDING_FULL, "re-preferred breeding")
 end
+local function assert_provider_absent_before_lab(state)
+  assert_source_witness(state)
+  assert_frozen(state, false)
+  local player = game.forces.player
+  assert_provider_rows_absent(player, "player")
+  assert_queue(player, state.player_queue, "provider removal player")
+  assert_foreign_without_providers(state)
+  assert_detached_without_providers(state)
+  assert_full_bioflux_completion(state, "provider removal")
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, true, false, true, "provider removal pre-lab")
+  assert_selected_effects(player, {bioflux=0.1}, MIR_BIOFLUX_EFFECTS, "provider removal pre-lab bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "provider removal pre-lab", false)
+  assert_selected_effects(player, { ["fish-breeding"]=0.1, ["biter-egg"]=0.2, ["pentapod-egg"]=0.2 },
+    MIR_BREEDING_FULL, "provider removal pre-lab breeding")
+end
+local function assert_provider_absent_completed(state)
+  assert_source_witness(state)
+  assert_frozen(state, false)
+  local player = game.forces.player
+  assert_provider_rows_absent(player, "player")
+  assert_queue(player, state.player_queue, "provider removal player")
+  assert_foreign_without_providers(state)
+  assert_detached_without_providers(state)
+  if state.full_mir_actual_lab_completions ~= 2 then
+    fail("provider removal fully covered MIR bioflux actual lab witness differs")
+  end
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 3, true, false, true, "provider removal completed")
+  assert_selected_effects(player, state.provider_absent_bioflux_effects, MIR_BIOFLUX_EFFECTS,
+    "provider removal completed bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "provider removal completed", false)
+  assert_selected_effects(player, { ["fish-breeding"]=0.1, ["biter-egg"]=0.2, ["pentapod-egg"]=0.2 },
+    MIR_BREEDING_FULL, "provider removal completed breeding")
+end
+local function assert_readded_foreign(state)
+  assert_source_witness(state)
+  assert_frozen(state)
+  assert_foreign(state)
+  local player = game.forces.player
+  assert_all(player, true, false, "readded foreign player")
+  assert_queue(player, state.player_queue, "readded foreign player")
+  if state.full_mir_actual_lab_completions ~= 2 then
+    fail("readded foreign fully covered MIR bioflux actual lab witness differs")
+  end
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 3, false, false, false, "readded foreign")
+  assert_selected_effects(player, state.provider_absent_bioflux_effects, MIR_BIOFLUX_EFFECTS,
+    "readded foreign retained bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "readded foreign", true)
+  assert_selected_effects(player, state.false_breeding_effects, MIR_BREEDING_FULL,
+    "readded foreign retained breeding")
+end
 local function assert_breeding_earned_before_false(state)
   assert_source_witness(state)
   assert_frozen(state)
@@ -407,8 +490,13 @@ local function assert_breeding_earned_before_false(state)
 end
 local function prepend_research(state, name, label)
   local player = game.forces.player
-  local queued, probe = tech(player, "electric-circuit-productivity"), tech(player, PROBE)
+  local queued = player.current_research
+  local queue = player.research_queue or {}
+  local probe = queue[2]
   assert_queue(player, state.player_queue, label .. " before remaining MIR research")
+  if queued == nil or queued.name ~= "electric-circuit-productivity" or probe == nil or probe.name ~= PROBE then
+    fail(label .. " queued partial research identity differs")
+  end
   queued.saved_progress = player.research_progress
   player.research_queue = {tech(player, name), queued, probe}
   assert_queue(player, {current=name, queue={name, "electric-circuit-productivity", PROBE}, progress=0},
@@ -420,6 +508,20 @@ local function prepend_research(state, name, label)
 end
 local function marker(stage, state)
   local player = game.forces.player
+  local providers_present = script.active_mods["plates-n-circuit-productivity"] ~= nil
+  local function optional_level(force, name)
+    local value = force.technologies[name]
+    return value and value.level or "absent"
+  end
+  local function optional_saved_progress(force, name)
+    local value = force.technologies[name]
+    return value and value.saved_progress or "absent"
+  end
+  local function optional_disabled(force, name)
+    local value = force.technologies[name]
+    if value == nil then return "absent" end
+    return value.enabled == false
+  end
   local full = {status="absent-published-predecessor"}
   local foreign_full = {status="absent-published-predecessor"}
   if state.full_mir_bioflux_introduced == true then
@@ -436,19 +538,21 @@ local function marker(stage, state)
     witnesses={source_mir=state.source_mir, destination_mir=script.active_mods["more-infinite-research"],
       actual_lab_completions=state.actual_lab_completions, milestone=state.milestone,
       fully_covered_mir_bioflux=full,
-      science_tail_next_level=tech(player, "automation-science-productivity-4").level,
-      plate_next_level=tech(player, "basic-plate-productivity").level,
-      bioflux_next_level=tech(player, "bioflux-productivity").level,
-      fish_next_level=tech(player, "fish-breeding-productivity").level,
+      fixed_providers_present=providers_present,
+      science_tail_next_level=optional_level(player, "automation-science-productivity-4"),
+      plate_next_level=optional_level(player, "basic-plate-productivity"),
+      bioflux_next_level=optional_level(player, "bioflux-productivity"),
+      fish_next_level=optional_level(player, "fish-breeding-productivity"),
       remaining_mir_breeding_next_level=tech(player, MIR_BREEDING).level,
       remaining_mir_biter_egg_bonus=player.recipes["biter-egg"].productivity_bonus,
       remaining_mir_pentapod_egg_bonus=player.recipes["pentapod-egg"].productivity_bonus,
       remaining_mir_fish_bonus=player.recipes["fish-breeding"].productivity_bonus,
       queued_initial_current=queue_snapshot(player).current, current_progress=queue_snapshot(player).progress,
-      detached_initial_saved_progress=tech(game.forces[state.detached_force_index], "basic-plate-productivity").saved_progress,
-      foreign_still_disabled=tech(game.forces[state.foreign_force_index], "basic-plate-productivity").enabled == false,
+      detached_initial_saved_progress=optional_saved_progress(game.forces[state.detached_force_index], "basic-plate-productivity"),
+      foreign_still_disabled=optional_disabled(game.forces[state.foreign_force_index], "basic-plate-productivity"),
       foreign_full_mir_bioflux=foreign_full,
-      false_preference_future_effect_coverage=(state.phase == "prefer-foreign-breeding-completed")
+      false_preference_future_effect_coverage=(state.phase == "prefer-foreign-breeding-completed"
+          or state.phase == "providers-readded-foreign-completed")
         and "prepared-breeding-row-native-readback-required" or "not-applicable",
       lab_frozen=true, on_load_read_only=stage == "reload"},
   }))
@@ -524,9 +628,11 @@ end)
 script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]
   if type(state) ~= "table" or event.research == nil or event.research.force ~= game.forces.player then return end
-  if state.phase == "await-preferred-bioflux-lab" and event.research.name == MIR_BIOFLUX then
+  if (state.phase == "await-preferred-bioflux-lab" or state.phase == "await-provider-absent-bioflux-lab")
+      and event.research.name == MIR_BIOFLUX then
     state.full_mir_actual_lab_completions = (state.full_mir_actual_lab_completions or 0) + 1
-    state.phase = "await-preferred-bioflux-restore"
+    state.phase = state.phase == "await-preferred-bioflux-lab"
+      and "await-preferred-bioflux-restore" or "await-provider-absent-bioflux-restore"
     return
   end
   if (state.phase == "await-preferred-breeding-lab" or state.phase == "await-released-breeding-lab")
@@ -546,7 +652,8 @@ end)
 script.on_load(function()
   local state = storage[KEY]
   if type(state) == "table" and (state.phase == "source-completed" or state.phase == "prefer-mir-breeding-completed"
-      or state.phase == "prefer-foreign-breeding-completed" or state.phase == "prefer-mir-again-completed") then
+      or state.phase == "prefer-foreign-breeding-completed" or state.phase == "prefer-mir-again-completed"
+      or state.phase == "providers-removed-bioflux-completed" or state.phase == "providers-readded-foreign-completed") then
     loaded_snapshot = {phase=state.phase, labs=state.actual_lab_completions, queue=copy_queue(state.player_queue)}
   else loaded_snapshot = nil end
   reload_logged, pending_save = false, false
@@ -592,6 +699,27 @@ script.on_configuration_changed(function()
     assert_breeding_earned_after_false(state)
     state.phase = "prefer-mir-again-completed"
     pending_save = true
+  elseif script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.5.0" then
+    require_mode("5.0.20000", "0.5.0", false, "provider-absent successor", false)
+    if type(state) ~= "table" or state.phase ~= "prefer-mir-again-completed" then
+      fail("provider-absent successor source witness differs")
+    end
+    assert_provider_absent_before_lab(state)
+    local bioflux = tech(game.forces.player, MIR_BIOFLUX)
+    prerequisites(bioflux)
+    assert_full_bioflux(bioflux, 2, true, false, true, "provider removal pre-lab")
+    state.provider_absent_bioflux_before = selected_effects(game.forces.player, MIR_BIOFLUX_EFFECTS)
+    state.phase = "await-provider-absent-bioflux-lab"
+    state.deadline_tick = game.tick + DEADLINE
+    prepend_research(state, MIR_BIOFLUX, "provider removal fully covered bioflux")
+  elseif script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.6.0" then
+    require_mode("5.0.20000", "0.6.0", false, "provider-readded foreign successor")
+    if type(state) ~= "table" or state.phase ~= "providers-removed-bioflux-completed" then
+      fail("provider-readded foreign source witness differs")
+    end
+    assert_readded_foreign(state)
+    state.phase = "providers-readded-foreign-completed"
+    pending_save = true
   end
 end)
 
@@ -604,6 +732,7 @@ script.on_event(defines.events.on_tick, function()
   if type(state) ~= "table" then return end
   if pending_save then
     if state.phase == "prefer-mir-again-completed" then assert_repreferred_breeding(state)
+    elseif state.phase == "providers-readded-foreign-completed" then assert_readded_foreign(state)
     else fail("unexpected pending native save phase") end
     marker("initial", state)
     game.server_save(SAVE)
@@ -615,6 +744,8 @@ script.on_event(defines.events.on_tick, function()
     elseif loaded_snapshot.phase == "prefer-mir-breeding-completed" then assert_true_breeding(state)
     elseif loaded_snapshot.phase == "prefer-foreign-breeding-completed" then assert_false_breeding(state)
     elseif loaded_snapshot.phase == "prefer-mir-again-completed" then assert_repreferred_breeding(state)
+    elseif loaded_snapshot.phase == "providers-removed-bioflux-completed" then assert_provider_absent_completed(state)
+    elseif loaded_snapshot.phase == "providers-readded-foreign-completed" then assert_readded_foreign(state)
     else fail("cold reload phase differs") end
     if loaded_snapshot.labs ~= state.actual_lab_completions then fail("cold reload changed native lab count") end
     assert_queue(game.forces.player, loaded_snapshot.queue, "cold reload player")
@@ -623,7 +754,8 @@ script.on_event(defines.events.on_tick, function()
     return
   end
   if state.phase == "source-completed" or state.phase == "prefer-mir-breeding-completed"
-      or state.phase == "prefer-foreign-breeding-completed" or state.phase == "prefer-mir-again-completed" then return end
+      or state.phase == "prefer-foreign-breeding-completed" or state.phase == "prefer-mir-again-completed"
+      or state.phase == "providers-removed-bioflux-completed" or state.phase == "providers-readded-foreign-completed" then return end
   if game.tick > state.deadline_tick then fail("fixture did not complete its bounded native lab work") end
   local player = game.forces.player
   if state.phase == "await-next" then
@@ -669,6 +801,15 @@ script.on_event(defines.events.on_tick, function()
       marker("initial", state)
       game.server_save(SAVE)
     end
+  elseif state.phase == "await-provider-absent-bioflux-restore" then
+    if player.current_research and player.current_research.name == "electric-circuit-productivity" then
+      freeze(state)
+      state.provider_absent_bioflux_effects = advanced_effects(state.provider_absent_bioflux_before, MIR_BIOFLUX_EFFECTS)
+      state.phase = "providers-removed-bioflux-completed"
+      assert_provider_absent_completed(state)
+      marker("initial", state)
+      game.server_save(SAVE)
+    end
   elseif state.phase == "await-freeze" then
     for _, target in ipairs(TARGETS) do
       assert_status(player, target.id, {level=target.first + 1, researched=false, enabled=true, visible=false,
@@ -688,7 +829,8 @@ script.on_event(defines.events.on_tick, function()
     marker("initial", state)
     game.server_save(SAVE)
   elseif state.phase == "await-lab" or state.phase == "await-preferred-bioflux-lab"
-      or state.phase == "await-preferred-breeding-lab" or state.phase == "await-released-breeding-lab" then
+      or state.phase == "await-preferred-breeding-lab" or state.phase == "await-released-breeding-lab"
+      or state.phase == "await-provider-absent-bioflux-lab" then
     state.lab.energy = 1000000000
   end
 end)
