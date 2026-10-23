@@ -11,6 +11,13 @@ local GROWTH_TICKS = 18000
 local EXTERNAL_SPOILAGE_BASELINE = 2
 local EFFECT_PERCENT = 1
 local SPOILAGE_ITEM_TICKS = 600
+local INITIAL_SCIENCE_PACK_COUNT = 16
+-- The data-stage prototype declares this immutable one-hour base timer. A
+-- stack's absolute spoil deadline is scaled by the current global modifier.
+local AGRICULTURAL_SCIENCE_PACK_PROTOTYPE_TICKS = 216000
+local COMPLETED_RESEARCH_COUNT = 5
+local AGRICULTURAL_SCIENCE_PACK_MINIMUM_CONSUMED = COMPLETED_RESEARCH_COUNT + 1
+local AGRICULTURAL_SCIENCE_PACK_MAXIMUM_CONSUMED = COMPLETED_RESEARCH_COUNT * 2
 local DEADLINE_TICKS = 18000
 local loaded, reported
 
@@ -52,12 +59,93 @@ local function assert_no_pending_research(force)
   end
 end
 
+local function named_stack(inventory, name)
+  for slot = 1, #inventory do
+    local stack = inventory[slot]
+    if stack and stack.valid_for_read and stack.name == name then return stack end
+  end
+end
+
+local function consumption_summary(consumed)
+  local rows = {}
+  for _, name in ipairs(SCIENCE) do
+    rows[#rows + 1] = name .. "=" .. tostring(consumed[name])
+  end
+  return table.concat(rows, ",")
+end
+
 local function assert_lab_consumption(state)
   local inventory = state.lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("real lab input inventory is absent") end
+
+  local observed = {completion_tick = game.tick, consumed = {}}
   for _, name in ipairs(SCIENCE) do
-    if 16 - inventory.get_item_count(name) ~= 5 then
-      fail("science consumption differs for " .. name)
+    observed.consumed[name] = INITIAL_SCIENCE_PACK_COUNT - inventory.get_item_count(name)
+  end
+
+  for _, name in ipairs(SCIENCE) do
+    if name ~= "agricultural-science-pack" and observed.consumed[name] ~= COMPLETED_RESEARCH_COUNT then
+      fail("science consumption differs for " .. name
+        .. ": actual=" .. tostring(observed.consumed[name])
+        .. " expected=" .. tostring(COMPLETED_RESEARCH_COUNT)
+        .. " completion_tick=" .. tostring(game.tick)
+        .. " all_consumed=" .. consumption_summary(observed.consumed))
+    end
+  end
+
+  local agriculture_stack = named_stack(inventory, "agricultural-science-pack")
+  if not agriculture_stack or type(agriculture_stack.spoil_tick) ~= "number" then
+    fail("agricultural science input is absent after completed research: completion_tick=" .. tostring(game.tick)
+      .. " consumed=" .. consumption_summary(observed.consumed))
+  end
+  observed.agricultural_science_lab_fill_tick = state.agricultural_science_lab_fill_tick
+  observed.agricultural_science_initial_spoil_tick = state.agricultural_science_initial_spoil_tick
+  observed.agricultural_science_initial_runtime_ticks = state.agricultural_science_initial_runtime_ticks
+  observed.agricultural_science_remaining_ticks = agriculture_stack.spoil_tick - game.tick
+  observed.agricultural_science_remaining_input = inventory.get_item_count("agricultural-science-pack")
+  observed.agricultural_science_completion_spoil_tick = agriculture_stack.spoil_tick
+  observed.agricultural_science_completion_modifier = game.difficulty_settings.spoil_time_modifier
+
+  local consumed = observed.consumed["agricultural-science-pack"]
+  if consumed < AGRICULTURAL_SCIENCE_PACK_MINIMUM_CONSUMED
+      or consumed > AGRICULTURAL_SCIENCE_PACK_MAXIMUM_CONSUMED then
+    fail("fresh agricultural science consumption is outside the native bounded witness: actual="
+      .. tostring(consumed)
+      .. " expected=" .. tostring(AGRICULTURAL_SCIENCE_PACK_MINIMUM_CONSUMED)
+      .. ".." .. tostring(AGRICULTURAL_SCIENCE_PACK_MAXIMUM_CONSUMED)
+      .. " initial_spoil_tick=" .. tostring(state.agricultural_science_initial_spoil_tick)
+      .. " remaining_ticks=" .. tostring(observed.agricultural_science_remaining_ticks)
+      .. " completion_tick=" .. tostring(game.tick)
+      .. " all_consumed=" .. consumption_summary(observed.consumed))
+  end
+
+  if not state.lab_observation then
+    -- The five research points draw one durability each. The ordinary lab has
+    -- the native 100% drain rate. The completed event must follow insertion,
+    -- so each agricultural pack is no longer fully fresh and five whole packs
+    -- cannot supply five full durability points. A pack still above half
+    -- freshness can require at most two physical packs per point.
+    if observed.completion_tick <= state.agricultural_science_lab_fill_tick then
+      fail("agricultural science completed without elapsed freshness time: fill_tick="
+        .. tostring(state.agricultural_science_lab_fill_tick)
+        .. " completion_tick=" .. tostring(observed.completion_tick))
+    end
+    if observed.agricultural_science_remaining_ticks
+        <= state.agricultural_science_initial_runtime_ticks / 2 then
+      fail("agricultural science was not still fresher than one half at completion: remaining_ticks="
+        .. tostring(observed.agricultural_science_remaining_ticks)
+        .. " initial_runtime_ticks=" .. tostring(state.agricultural_science_initial_runtime_ticks)
+        .. " completion_tick=" .. tostring(game.tick))
+    end
+    state.lab_observation = observed
+  else
+    for _, name in ipairs(SCIENCE) do
+      if state.lab_observation.consumed[name] ~= observed.consumed[name] then
+        fail("lab input changed after research completed for " .. name
+          .. ": initial=" .. tostring(state.lab_observation.consumed[name])
+          .. " current=" .. tostring(observed.consumed[name])
+          .. " completion_tick=" .. tostring(game.tick))
+      end
     end
   end
 end
@@ -148,7 +236,15 @@ local function marker(stage, state)
         spoilage_preservation = state.spoilage_finished
       },
       required_science_pack_names = SCIENCE,
-      each_required_science_pack_consumed = 5,
+      nonspoiling_required_science_pack_consumed_each = COMPLETED_RESEARCH_COUNT,
+      agricultural_science_pack_freshness_witness = {
+        prototype_spoil_ticks = AGRICULTURAL_SCIENCE_PACK_PROTOTYPE_TICKS,
+        initial_runtime_modifier = EXTERNAL_SPOILAGE_BASELINE,
+        initial_input_count = INITIAL_SCIENCE_PACK_COUNT,
+        physical_consumption_minimum = AGRICULTURAL_SCIENCE_PACK_MINIMUM_CONSUMED,
+        physical_consumption_maximum = AGRICULTURAL_SCIENCE_PACK_MAXIMUM_CONSUMED,
+        observed = state.lab_observation
+      },
       all_official_policy = true,
       named_space_gate = true,
       cap_disabled_after_completed_levels = {
@@ -304,7 +400,19 @@ script.on_init(function()
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("real lab input inventory is absent") end
   for _, name in ipairs(SCIENCE) do
-    if inventory.insert{name = name, count = 16} ~= 16 then fail("lab rejected " .. name) end
+    if inventory.insert{name = name, count = INITIAL_SCIENCE_PACK_COUNT} ~= INITIAL_SCIENCE_PACK_COUNT then
+      fail("lab rejected " .. name)
+    end
+  end
+  local agriculture_stack = named_stack(inventory, "agricultural-science-pack")
+  local agricultural_science_initial_runtime_ticks =
+    AGRICULTURAL_SCIENCE_PACK_PROTOTYPE_TICKS * EXTERNAL_SPOILAGE_BASELINE
+  if not agriculture_stack or type(agriculture_stack.spoil_tick) ~= "number"
+      or agriculture_stack.spoil_tick - game.tick ~= agricultural_science_initial_runtime_ticks then
+    fail("new agricultural science input did not retain its native scaled spoil contract: actual="
+      .. tostring(agriculture_stack and agriculture_stack.spoil_tick - game.tick)
+      .. " expected=" .. tostring(agricultural_science_initial_runtime_ticks)
+      .. " modifier=" .. tostring(game.difficulty_settings.spoil_time_modifier))
   end
   lab.energy = 100000000
 
@@ -314,6 +422,9 @@ script.on_init(function()
     spoilage_finished = 0,
     foreign_index = foreign.index,
     lab = lab,
+    agricultural_science_lab_fill_tick = game.tick,
+    agricultural_science_initial_spoil_tick = agriculture_stack.spoil_tick,
+    agricultural_science_initial_runtime_ticks = agricultural_science_initial_runtime_ticks,
     deadline = game.tick + DEADLINE_TICKS
   }
   start_research(force, AGRICULTURE)

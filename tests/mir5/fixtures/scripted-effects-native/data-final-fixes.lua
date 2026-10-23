@@ -43,6 +43,12 @@ for name, technology in pairs({
   assert(contains(technology.prerequisites, "promethium-science-pack"))
 end
 
+-- The all-official vector intentionally includes the one native science pack
+-- with a freshness clock. The runtime assertion keeps that real behavior;
+-- only the separate yumako clock below is shortened for this fixture.
+local agricultural_science = assert(data.raw.item["agricultural-science-pack"])
+assert(agricultural_science.spoil_ticks == 216000 and agricultural_science.spoil_result == "spoilage")
+
 -- Fixture-only fast clock. This keeps the test finite without claiming
 -- ordinary item or spoilage tuning qualification.
 local yumako = assert(data.raw.capsule.yumako)
