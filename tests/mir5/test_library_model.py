@@ -40,30 +40,39 @@ class LibraryModelTests(unittest.TestCase):
           end
         ''')
 
-    def test_catalogue_is_current_gear_metadata_and_detached(self):
+    def test_catalogue_is_complete_base_metadata_and_detached(self):
         self.lua.execute('''
           local first, second = catalogue.declared(), catalogue.declared()
-          assert(#first == 1 and first[1].id == "recipe-prod-research_gears-1")
-          assert(first[1].family == "mir" and first[1].recipe == "iron-gear-wheel")
-          assert(first[1].cap_setting == "ips-max-level-research_gears")
-          assert(#first[1].settings == 7 and first[1].settings[1] == "ips-enable-research_gears")
-          first[1].settings[1] = "foreign"; first[1].id = "foreign"
-          assert(second[1].id == "recipe-prod-research_gears-1"
-            and second[1].settings[1] == "ips-enable-research_gears")
+          local first_by_id, second_by_id = {}, {}
+          local families = {}
+          for _, row in ipairs(first) do first_by_id[row.id], families[row.family] = row, true end
+          for _, row in ipairs(second) do second_by_id[row.id] = row end
+          local gear = first_by_id["recipe-prod-research_gears-1"]
+          assert(#first == 53 and gear and gear.family == "research_gears" and gear.recipe == "iron-gear-wheel")
+          assert(families.research_gears and families["braking-force"])
+          assert(first_by_id["braking-force-8"].cap_setting == "mir-max-level-braking-force")
+          assert(not families.research_agricultural_growth_speed and not families.research_spoilage_preservation)
+          assert(gear.cap_setting == "ips-max-level-research_gears")
+          assert(#gear.settings == 7 and gear.settings[1] == "ips-enable-research_gears")
+          gear.settings[1] = "foreign"; gear.id = "foreign"
+          assert(second_by_id["recipe-prod-research_gears-1"]
+            and second_by_id["recipe-prod-research_gears-1"].settings[1] == "ips-enable-research_gears")
         ''')
 
     def test_normalize_preserves_schema_three_defaults_and_copies_view(self):
         self.lua.execute('''
           local hidden = {["recipe-prod-research_gears-1"] = true}
           local view = model.normalize({mode = 9, status = 0, page = 0,
-            search = "  Iron_Gear-Wheel  ", family = "unknown", sort = "other",
+            search = "  Iron_Gear-Wheel  ", family = "research_gears", sort = "other",
             hidden = hidden, selected = "recipe-prod-research_gears-1"})
           assert(view.schema == 3 and view.mode == 1 and view.status == 1 and view.page == 1)
-          assert(view.family == "mir" and view.sort == "progression" and view.stable_sort == "progression")
+          assert(view.family == "research_gears" and view.sort == "progression" and view.stable_sort == "progression")
           assert(view.search == "iron gear wheel" and view.tab == "research" and view.settings_scope == "research")
           assert(view.hidden["recipe-prod-research_gears-1"] and view.selected == "recipe-prod-research_gears-1")
           hidden["recipe-prod-research_gears-1"] = false
           assert(view.hidden["recipe-prod-research_gears-1"])
+          assert(model.normalize({family = "unlisted-authored-family"}).family == "unlisted-authored-family")
+          assert(model.normalize({family = string.rep("x", 161)}).family == "mir")
         ''')
 
     def test_normalize_keeps_bounded_historical_page_and_sort_state(self):
@@ -126,15 +135,50 @@ class LibraryModelTests(unittest.TestCase):
           local force = {
             technologies = technologies, research_queue = {gear, unrelated, gear}, current_research = gear
           }
-          local rows = model.rows(force, catalogue.declared(), {}, {[id] = "Iron Gear Wheel Productivity"})
+          local rows = model.rows(force, {{id = id, family = "research_gears"}}, {}, {[id] = "Iron Gear Wheel Productivity"})
           assert(#rows == 1)
           local row = rows[1]
-          assert(row.id == id and row.name == "Iron Gear Wheel Productivity" and row.family == "mir")
+          assert(row.id == id and row.name == "Iron Gear Wheel Productivity" and row.family == "research_gears")
           assert(row.current_level == 10 and row.completed_count == nil)
           assert(row.cap == nil and row.cap_state == "unavailable" and row.finite == false and row.status == "queued")
           assert(row.queued_count == 2 and row.queue_index == 1 and row.current and row.ready)
           assert(#row.prerequisites == 1 and row.prerequisites[1] == "automation")
           assert(unrelated.order == "a[foreign]" and gear.level == 10)
+        ''')
+
+    def test_authored_family_descriptor_filters_declared_rows_without_native_discovery(self):
+        self.lua.execute('''
+          local id = "recipe-prod-research_gears-1"
+          local gear = technology(id, {level = 3})
+          local force = {technologies = setmetatable({[id] = gear}, {
+            __pairs = function() error("authored family enumerated native catalogue") end
+          }), research_queue = {}}
+          local declared = {{id = id, family = "research_gears", progression = 1}}
+          local rows = model.rows(force, declared, {family = "research_gears"}, {})
+          assert(#rows == 1 and rows[1].id == id and rows[1].family == "research_gears")
+          assert(#model.rows(force, declared, {family = "unknown-family"}, {}) == 0)
+        ''')
+
+    def test_absent_declared_technology_is_not_a_library_row_or_availability_placeholder(self):
+        self.lua.execute('''
+          local present_id = "recipe-prod-research_gears-1"
+          local absent_id = "agricultural-growth-speed"
+          local present = technology(present_id, {level = 3})
+          local force = {technologies = {[present_id] = present}, research_queue = {}}
+          local declared = {
+            {id = present_id, family = "research_gears", progression = 1},
+            {id = absent_id, family = "research_agricultural_growth_speed", progression = 2}
+          }
+          local normal = model.rows(force, declared, {family = "mir"}, {})
+          local absent_family = model.rows(force, declared, {
+            family = "research_agricultural_growth_speed",
+            hidden = {[absent_id] = true},
+            visibility = 2
+          }, {})
+          assert(#normal == 1 and normal[1].id == present_id)
+          assert(#absent_family == 0)
+          local detail, reason = model.detail(force, declared, {selected = absent_id}, {})
+          assert(detail == nil and reason == "technology_not_found")
         ''')
 
     def test_explicit_external_and_all_views_scan_once_and_sort_deterministically(self):
@@ -188,10 +232,11 @@ class LibraryModelTests(unittest.TestCase):
           local gear = technology(id, {level = 3})
           local force = {technologies = {[id] = gear}, research_queue = {}}
           local translated = {[id] = "Iron Gear Wheel Productivity"}
-          assert(#model.rows(force, catalogue.declared(), {search = "iron_gear", mode = 3, status = 2}, translated) == 1)
-          assert(#model.rows(force, catalogue.declared(), {mode = 2}, translated) == 0)
-          assert(#model.rows(force, catalogue.declared(), {hidden = {[id] = true}}, translated) == 0)
-          local hidden = model.rows(force, catalogue.declared(), {
+          local declared = {{id = id, family = "research_gears"}}
+          assert(#model.rows(force, declared, {search = "iron_gear", mode = 3, status = 2}, translated) == 1)
+          assert(#model.rows(force, declared, {mode = 2}, translated) == 0)
+          assert(#model.rows(force, declared, {hidden = {[id] = true}}, translated) == 0)
+          local hidden = model.rows(force, declared, {
             hidden = {[id] = true}, visibility = 2
           }, translated)
           assert(#hidden == 1 and hidden[1].hidden and hidden[1].status == "ready")
@@ -249,10 +294,11 @@ class LibraryModelTests(unittest.TestCase):
             assert(actual_force == force)
             return {[id] = 10}
           end}
-          local rows = model.rows(force, catalogue.declared(), {}, {[id] = "Gears"}, context)
+          local declared = {{id = id, family = "research_gears"}}
+          local rows = model.rows(force, declared, {}, {[id] = "Gears"}, context)
           assert(#rows == 1 and rows[1].current_level == 6 and rows[1].queued_count == 1)
           assert(rows[1].completed_count == nil and rows[1].cap == 10 and rows[1].cap_state == "finite")
-          local detail = assert(model.detail(force, catalogue.declared(), {selected = id}, {}, context))
+          local detail = assert(model.detail(force, declared, {selected = id}, {}, context))
           assert(detail.cost.ingredients[1].name == "automation-science-pack")
           assert(detail.effects[1].recipe == "iron-gear-wheel" and detail.effects[1].change == .1)
           assert(#reads == 0, table.concat(reads, ", "))
@@ -263,7 +309,10 @@ class LibraryModelTests(unittest.TestCase):
         catalogue = (ROOT / "source/mir5/research/catalogue.lua").read_text(encoding="utf-8")
         self.assertNotIn("require(", source)
         self.assertNotIn("Generator", source)
-        self.assertNotIn("require(", catalogue)
+        self.assertIn('require("compatibility.modern_catalogue")', catalogue)
+        for forbidden in ('require("research.generator")', 'require("research.modern")',
+                          'require("research.settings")', "data.raw", "game.", "storage."):
+            self.assertNotIn(forbidden, catalogue)
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ Historical source is evidence, not the current implementation design. Known hist
 | Test selection, acceptance or release | [Verification](verification.md) |
 | Branches, documentation, source cleanup | [Repository](repository.md) |
 
-[inventory/continuity.json](inventory/continuity.json) contains **unreconciled subjects**, not an exported technology catalogue or completed 83-request reconciliation. [inventory/sources.json](inventory/sources.json) distinguishes supplied proposals, live repository observations and external engine documentation. Do not load either file in Factorio.
+[inventory/continuity.json](inventory/continuity.json) contains **unreconciled subjects**, not an exported technology catalogue or completed community-request reconciliation. [inventory/sources.json](inventory/sources.json) distinguishes supplied proposals, live repository observations and external engine documentation. Do not load either file in Factorio.
 
 ## Terminology
 

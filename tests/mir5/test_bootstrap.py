@@ -20,11 +20,13 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
-          function install_modules(caps_enabled, repair_enabled)
+          function install_modules(caps_enabled, repair_enabled, scripted_active)
             CAP_ACTIVE = caps_enabled == true
             REPAIR_ACTIVE = repair_enabled == true
+            SCRIPTED_ACTIVE = scripted_active == true
             lifecycle_calls = {}
             library_calls = {}
+            scripted_calls = {}
             library_pending = false
             package.preload["research.settings"] = function()
               return {resolve = function() return {passive_repair_enabled = REPAIR_ACTIVE} end}
@@ -57,8 +59,26 @@ class BootstrapTests(unittest.TestCase):
                 on_force_reset = function(event) lifecycle_calls.force_reset = event end,
                 on_forces_merged = function(event) lifecycle_calls.forces_merged = event end,
                 on_research_finished = function(event) lifecycle_calls.research_finished = event end,
+                on_research_reversed = function(event) lifecycle_calls.research_reversed = event end,
+                on_technology_effects_reset = function(event) lifecycle_calls.effects_reset = event end,
                 on_research_started = function(event) lifecycle_calls.research_started = event end,
                 on_research_cancelled = function(event) lifecycle_calls.research_cancelled = event end
+              }
+            end
+            package.preload["runtime.scripted_effects"] = function()
+              return {
+                events_active = function() return SCRIPTED_ACTIVE end,
+                agriculture_events_active = function() return SCRIPTED_ACTIVE end,
+                on_init = function() scripted_calls.init = (scripted_calls.init or 0) + 1 end,
+                on_configuration_changed = function(event) scripted_calls.configuration = event end,
+                on_load = function() scripted_calls.load = (scripted_calls.load or 0) + 1 end,
+                on_research_finished = function(event) scripted_calls.research_finished = event end,
+                on_research_reversed = function(event) scripted_calls.research_reversed = event end,
+                on_technology_effects_reset = function(event) scripted_calls.effects_reset = event end,
+                on_tower_planted_seed = function(event) scripted_calls.tower = event end,
+                on_force_created = function(event) scripted_calls.force_created = event end,
+                on_force_reset = function(event) scripted_calls.force_reset = event end,
+                on_forces_merged = function(event) scripted_calls.forces_merged = event end
               }
             end
             package.preload["runtime.library"] = function()
@@ -96,7 +116,7 @@ class BootstrapTests(unittest.TestCase):
             end
           end
 
-          function install_runtime(foreign_interfaces)
+          function install_runtime(foreign_interfaces, active_mods)
             handlers = {events = {}, filters = {}, nth = {}, nth_calls = 0}
             settings = {startup = {}}
             storage = {}
@@ -109,6 +129,7 @@ class BootstrapTests(unittest.TestCase):
               commands.registered[name] = {help = help, callback = callback}
             end
             script = {
+              active_mods = active_mods or {},
               on_init = function(callback) handlers.init = callback end,
               on_configuration_changed = function(callback) handlers.configuration = callback end,
               on_load = function(callback) handlers.load = callback end,
@@ -128,7 +149,8 @@ class BootstrapTests(unittest.TestCase):
               on_gui_location_changed = 11, on_gui_closed = 12, on_player_removed = 13,
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
-              on_player_joined_game = 18
+              on_player_joined_game = 18, on_research_reversed = 19,
+              on_technology_effects_reset = 20
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -141,6 +163,7 @@ class BootstrapTests(unittest.TestCase):
             package.loaded["runtime.bootstrap"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
+            package.loaded["runtime.scripted_effects"] = nil
             package.loaded["runtime.library"] = nil
             package.loaded["api.v1.runtime"] = nil
             package.loaded["runtime.settings_profile"] = nil
@@ -177,6 +200,7 @@ class BootstrapTests(unittest.TestCase):
           assert(lifecycle_calls.load == 1 and library_calls.load == 1)
 
           for id = 1, 6 do assert(type(handlers.events[id]) == "function") end
+          assert(type(handlers.events[19]) == "function" and type(handlers.events[20]) == "function")
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
@@ -193,12 +217,16 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[16]({player_index = 1})
           handlers.events[17]({player_index = 1})
           handlers.events[18]({player_index = 1})
+          handlers.events[19]({research = known_technology})
+          handlers.events[20]({force = player.force})
           assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1)
           assert(library_calls.selection.player_index == 1 and library_calls.click.player_index == 1)
           assert(library_calls.location.player_index == 1 and library_calls.closed.player_index == 1
             and library_calls.removed.player_index == 1)
           assert(library_calls.translated.result == "Gear" and library_calls.locale.player_index == 1
             and library_calls.force.player_index == 1 and library_calls.joined.player_index == 1)
+          assert(lifecycle_calls.research_reversed.research == known_technology
+            and lifecycle_calls.effects_reset.force == player.force)
 
           library_pending = true
           handlers.events[15]({player_index = 1, id = 2, translated = false, result = "unused"})
@@ -221,6 +249,11 @@ class BootstrapTests(unittest.TestCase):
             and library_calls.open.options.status == 4 and library_calls.open.options.mode == 3
             and library_calls.open.options.sort == "name-desc"
             and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
+          assert(browser.open(1, {family = "research_gears", visibility = 2}))
+          assert(library_calls.open.options.family == "research_gears"
+            and library_calls.open.options.visibility == 2)
+          assert(browser.open(1, {visibility = 3}))
+          assert(library_calls.open.options.visibility == nil)
           assert(browser.open(1, {page = 30000}))
           assert(library_calls.open.options.page == 30000)
           assert(browser.open(1, {page = 0}))
@@ -235,7 +268,7 @@ class BootstrapTests(unittest.TestCase):
             assert(browser.open(1, {mode = invalid_mode}))
             assert(library_calls.open.options.mode == nil)
           end
-          assert(browser.open(1, {selected = "unknown", family = "external", status = 5,
+          assert(browser.open(1, {selected = "unknown", family = "not-a-family", status = 5,
             sort = "invalid", page = 30001, hidden = "not-a-list"}))
           assert(library_calls.open.options.family == nil and library_calls.open.options.selected == nil
             and library_calls.open.options.status == nil and library_calls.open.options.sort == nil
@@ -255,8 +288,149 @@ class BootstrapTests(unittest.TestCase):
         self.lua.execute('''
           install_modules(false); install_runtime(); load_control()
           for id = 1, 6 do assert(handlers.events[id] == nil) end
+          assert(handlers.events[19] == nil and handlers.events[20] == nil)
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
+        ''')
+
+    def test_unlimited_scripted_effects_register_and_route_force_lifecycle_events(self):
+        self.lua.execute('''
+          scripted_calls = {}
+          install_modules(false, false, true)
+          install_runtime(nil, {['space-age'] = '2.1.23'})
+          load_control()
+          for id = 1, 4 do
+            assert(type(handlers.events[id]) == "function", "missing event " .. tostring(id))
+          end
+          assert(type(handlers.events[19]) == "function" and type(handlers.events[20]) == "function")
+          assert(handlers.events[5] == nil and handlers.events[6] == nil)
+          local created, reset, destination = {name = "created"}, {name = "reset"}, {name = "destination"}
+          handlers.events[1]({force = created})
+          handlers.events[2]({force = reset})
+          handlers.events[3]({source_index = 31, destination = destination})
+          handlers.events[19]({research = {name = "scripted"}})
+          handlers.events[20]({force = destination})
+          assert(scripted_calls.force_created.force == created
+            and scripted_calls.force_reset.force == reset
+            and scripted_calls.forces_merged.source_index == 31
+            and scripted_calls.forces_merged.destination == destination)
+          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
+            and lifecycle_calls.forces_merged == nil and lifecycle_calls.research_reversed == nil
+            and lifecycle_calls.effects_reset == nil,
+            "unlimited cap lifecycle received a scripted-only force callback")
+          assert(scripted_calls.research_reversed.research.name == "scripted"
+            and scripted_calls.effects_reset.force == destination)
+        ''')
+
+    def test_base_configuration_retires_a_persisted_spoilage_contribution_without_loading_space_age_body(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime(); load_control()
+          local raw = {spoil_time_modifier = 2.2}
+          local difficulty = setmetatable({writes = 0}, {
+            __index = function(_, key) return raw[key] end,
+            __newindex = function(self, key, value)
+              if key == "spoil_time_modifier" then
+                raw[key] = value
+                rawset(self, "writes", self.writes + 1)
+              else
+                rawset(self, key, value)
+              end
+            end
+          })
+          game.difficulty_settings = difficulty
+          storage.mir = {unrelated = "retain", spoilage_preservation = {
+            baseline = 2, effective_level = 2, applied_multiplier = 1.1, last_applied_value = 2.2
+          }}
+          assert(package.loaded["runtime.scripted_effects"] == nil,
+            "base-only control loaded the active Space Age body")
+          handlers.configuration({mod_changes = {['space-age'] = {old_version = '2.1.23'}}})
+          assert(difficulty.spoil_time_modifier == 2 and difficulty.writes == 1)
+          assert(storage.mir.spoilage_preservation == nil and storage.mir.unrelated == "retain")
+          handlers.configuration({mod_changes = {}})
+          assert(difficulty.writes == 1, "removal cleanup was not idempotent")
+
+          local writes_before_malformed = difficulty.writes
+          storage.mir.spoilage_preservation = {baseline = 0, applied_multiplier = 1.1,
+            last_applied_value = 2.2}
+          handlers.configuration({mod_changes = {}})
+          assert(storage.mir.spoilage_preservation == nil and difficulty.writes == writes_before_malformed,
+            "malformed removal state wrote a native property or remained durable")
+
+          raw.spoil_time_modifier = 9
+          storage.mir.spoilage_preservation = {baseline = 2, effective_level = 2,
+            applied_multiplier = 1.1, last_applied_value = 2.2}
+          local writes_before_foreign = difficulty.writes
+          handlers.configuration({mod_changes = {}})
+          assert(difficulty.spoil_time_modifier == 9 and difficulty.writes == writes_before_foreign
+            and storage.mir.spoilage_preservation == nil,
+            "base removal overwrote a foreign shared-modifier value")
+        ''')
+
+    def test_base_removal_retains_state_when_the_spoilage_property_is_unavailable(self):
+        self.lua.execute('''
+          install_modules(false); install_runtime(); load_control()
+          local preserved = {baseline = 2, effective_level = 2,
+            applied_multiplier = 1.1, last_applied_value = 2.2}
+          local difficulty = setmetatable({}, {
+            __index = function(_, key)
+              if key == "spoil_time_modifier" then error("Space Age property is unavailable") end
+            end,
+            __newindex = function(_, key)
+              error("Space Age property must not be written: " .. tostring(key))
+            end
+          })
+          game.difficulty_settings = difficulty
+          storage.mir = {spoilage_preservation = preserved}
+          assert(package.loaded["runtime.scripted_effects"] == nil,
+            "base-only removal loaded the active Space Age body")
+          handlers.configuration({mod_changes = {['space-age'] = {old_version = '2.1.23'}}})
+          assert(storage.mir.spoilage_preservation == preserved,
+            "unavailable native property discarded a contribution needed for re-addition")
+        ''')
+
+    def test_catalogue_declares_full_base_and_space_age_cap_identities_with_detached_metadata(self):
+        self.lua.execute('''
+          script, mods = {active_mods = {}}, {}
+          package.loaded["research.catalogue"] = nil
+          local catalogue = require("research.catalogue")
+          local first, second = catalogue.declared(), catalogue.declared()
+          assert(#first == 53 and #second == 53)
+          local seen, continuations = {}, 0
+          for _, row in ipairs(first) do
+            assert(type(row.id) == "string" and seen[row.id] == nil)
+            seen[row.id] = true
+            assert(row.ownership_kind == "authored_generated"
+              and type(row.family) == "string" and type(row.cap_setting) == "string")
+            assert(type(row.legacy_binding) == "table")
+            if row.legacy_binding.source == "base-continuation" then
+              continuations = continuations + 1
+              assert(row.legacy_binding.operation == "emit_base_extension")
+            else
+              assert(row.legacy_binding.source == "generated-stream"
+                and row.legacy_binding.operation == "emit")
+            end
+          end
+          assert(continuations == 6 and seen["recipe-prod-research_gears-1"])
+          first[1].settings[1] = "foreign"
+          assert(second[1].settings[1] == "ips-enable-research_gears")
+
+          script.active_mods, mods = {['space-age'] = '2.1.23'}, {['space-age'] = '2.1.23'}
+          package.loaded["research.catalogue"] = nil
+          local space_age = require("research.catalogue").declared()
+          local generated, native = 0, 0
+          for _, row in ipairs(space_age) do
+            if row.ownership_kind == "authored_generated" then
+              generated = generated + 1
+            else
+              native = native + 1
+              assert(row.ownership_kind == "nativeowner" and row.native_owner_identity == row.id)
+              assert(row.legacy_binding.source == "native-owner"
+                and row.legacy_binding.operation == "preserve_native_owner")
+              assert(row.native_admission.effect_type == "change-recipe-productivity"
+                and #row.native_admission.recipes > 0)
+            end
+          end
+          assert(#space_age == 76 and generated == 71 and native == 5)
         ''')
 
     def test_interface_collisions_are_rejected_without_replacement(self):

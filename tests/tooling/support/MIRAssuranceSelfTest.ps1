@@ -2166,7 +2166,7 @@ function Invoke-MIRAssuranceSelfTest {
   Remove-Item -LiteralPath $importArtifactRoot -Recurse -Force
 
   $newRunningCase = {
-    param([Parameter(Mandatory)][string]$Label)
+    param([Parameter(Mandatory)][string]$Label, $CaseContext = $Context)
     $key = Get-MIRAssuranceTextHash -Text "$Label-$([guid]::NewGuid().ToString('N'))"
     $caseFingerprint = [ordered]@{
       schema=$evidenceSchema
@@ -2176,7 +2176,7 @@ function Invoke-MIRAssuranceSelfTest {
       fingerprint_sha256=$key
       definition_sha256=(Get-MIRAssuranceTextHash -Text "running-definition-$Label")
     }
-    $marker = Write-MIRAssuranceRunningEvidence -Fingerprint $caseFingerprint -Context $Context
+    $marker = Write-MIRAssuranceRunningEvidence -Fingerprint $caseFingerprint -Context $CaseContext
     return [pscustomobject]@{
       fingerprint=$caseFingerprint
       marker=$marker
@@ -2222,7 +2222,36 @@ function Invoke-MIRAssuranceSelfTest {
   & $writeRunningCase $reusedPid
   & $assertRemovedAndRun $reusedPid "A reused PID with a different process start time was incorrectly adoptable."
 
-  # 4. A trusted, unexpired marker from another CI job is adopted without inspecting its remote PID.
+  # 4. A current CI job retains its own live lease.
+  $ciEnvironmentNames = @('GITHUB_ACTIONS','GITHUB_EVENT_NAME','GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT','GITHUB_JOB','GITHUB_WORKFLOW','GITHUB_REF','MIR_HOST_IDENTITY')
+  $ciEnvironmentBefore = @{}
+  foreach ($name in $ciEnvironmentNames) { $ciEnvironmentBefore[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+  $currentCiJob = $null
+  try {
+    $env:GITHUB_ACTIONS = 'true'
+    $env:GITHUB_EVENT_NAME = 'workflow_dispatch'
+    $env:GITHUB_RUN_ID = "self-test-$([guid]::NewGuid().ToString('N'))"
+    $env:GITHUB_RUN_ATTEMPT = '1'
+    $env:GITHUB_JOB = 'lease-current-ci-job'
+    $env:GITHUB_WORKFLOW = 'MIR assurance self-test'
+    $env:GITHUB_REF = 'refs/heads/self-test'
+    $env:MIR_HOST_IDENTITY = "self-test-ci-host-$([guid]::NewGuid().ToString('N'))"
+    $ciContext = $Context.PSObject.Copy()
+    $ciContext.trust_class = Get-MIRAssuranceCurrentTrustClass
+    $currentCiJob = & $newRunningCase -Label 'current-ci-job' -CaseContext $ciContext
+    $currentCiDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $currentCiJob.fingerprint -Context $ciContext -TestId $currentCiJob.fingerprint.test_id
+    if ($currentCiDecision.disposition -ne 'WAIT' -or -not (Test-Path -LiteralPath $currentCiJob.paths.running -PathType Leaf)) {
+      throw 'A current CI job did not retain its live running lease.'
+    }
+  } finally {
+    foreach ($name in $ciEnvironmentNames) {
+      if ($null -eq $ciEnvironmentBefore[$name]) { Remove-Item -LiteralPath ("Env:$name") -ErrorAction SilentlyContinue }
+      else { Set-Item -LiteralPath ("Env:$name") -Value $ciEnvironmentBefore[$name] }
+    }
+  }
+
+  # 5. A foreign CI-job marker restored from a completed snapshot cannot be
+  # adopted. Preserve its exact identity in custody before scheduling this worker.
   $remoteJob = & $newRunningCase "remote-job"
   $remoteRunId = "remote-$([guid]::NewGuid().ToString('N'))"
   $remoteJob.marker.lease_scope = "ci-job"
@@ -2235,10 +2264,45 @@ function Invoke-MIRAssuranceSelfTest {
   $remoteJob.marker.producer.run_attempt = "1"
   $remoteJob.marker.producer.job = "remote-worker"
   & $writeRunningCase $remoteJob
+  $remoteMarkerSha256 = Get-MIRAssuranceSha256 -Path $remoteJob.paths.running
   $remoteDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $remoteJob.fingerprint -Context $Context -TestId $remoteJob.fingerprint.test_id
-  if ($remoteDecision.disposition -ne "WAIT") { throw "Trusted unexpired remote-job evidence was not adoptable." }
+  $remoteCustody = @(Get-ChildItem -LiteralPath (Join-Path $remoteJob.paths.root 'lease-custody') -File -ErrorAction SilentlyContinue)
+  if ($remoteDecision.disposition -ne 'RUN' -or
+      (Test-Path -LiteralPath $remoteJob.paths.running -PathType Leaf) -or
+      $remoteCustody.Count -ne 1) {
+    throw 'A foreign CI-job marker restored from a snapshot was incorrectly adoptable.'
+  }
+  $remoteCustodyRecord = Get-Content -Raw -LiteralPath $remoteCustody[0].FullName | ConvertFrom-Json -DateKind String
+  if ([int]$remoteCustodyRecord.schema -ne 1 -or
+      [string]$remoteCustodyRecord.kind -ne 'mir-assurance-orphaned-running-lease-v1' -or
+      [string]$remoteCustodyRecord.reason -ne 'ci-job-lease-not-live-in-current-worker' -or
+      [string]$remoteCustodyRecord.marker_sha256 -ne $remoteMarkerSha256 -or
+      [string]$remoteCustodyRecord.marker.workflow_run_id -ne $remoteRunId) {
+    throw 'Orphaned CI-job lease custody did not retain its exact observed identity.'
+  }
 
-  # 5. An expired remote-job marker is removed and scheduled again.
+  # A stale lease must not delete a valid immutable pass in the same restored
+  # identity. The pass remains reusable after lease custody is recorded.
+  $orphanedPassIdentity = & $newSyntheticIdentity 'orphaned-running-preserves-pass'
+  $orphanedPass = & $newSyntheticAttempt -Identity $orphanedPassIdentity -Status passed -Label 'trusted-pass'
+  $orphanedPassMarker = Write-MIRAssuranceRunningEvidence -Fingerprint $orphanedPassIdentity -Context $Context
+  $orphanedPassMarker.lease_scope = 'ci-job'
+  $orphanedPassMarker.host_identity = 'orphaned-ci-host'
+  $orphanedPassMarker.workflow_run_id = "remote-$([guid]::NewGuid().ToString('N'))"
+  $orphanedPassMarker.workflow_run_attempt = '1'
+  $orphanedPassMarker.workflow_job = 'orphaned-worker'
+  $orphanedPassMarker.producer.run_id = [string]$orphanedPassMarker.workflow_run_id
+  $orphanedPassMarker.producer.run_attempt = [string]$orphanedPassMarker.workflow_run_attempt
+  $orphanedPassMarker.producer.job = [string]$orphanedPassMarker.workflow_job
+  $orphanedPassPaths = Get-MIRAssuranceEvidencePaths -TestId $orphanedPassIdentity.test_id -InputKey $orphanedPassIdentity.input_key
+  Write-MIRAssuranceAtomicJson -Value $orphanedPassMarker -Path $orphanedPassPaths.running
+  if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $orphanedPassIdentity -Context $Context) -or
+      -not (Test-Path -LiteralPath $orphanedPassPaths.passed -PathType Leaf) -or
+      $null -eq (Get-MIRAssuranceReusableEvidence -Fingerprint $orphanedPassIdentity -Context $Context)) {
+    throw 'Orphaned CI-job lease handling discarded a valid immutable passing capsule.'
+  }
+
+  # 6. An expired remote-job marker is removed and scheduled again.
   $expiredRemote = & $newRunningCase "expired-remote"
   $expiredRunId = "remote-$([guid]::NewGuid().ToString('N'))"
   $expiredRemote.marker.lease_scope = "ci-job"
@@ -2253,17 +2317,20 @@ function Invoke-MIRAssuranceSelfTest {
   & $writeRunningCase $expiredRemote
   & $assertRemovedAndRun $expiredRemote "Expired remote-job evidence was incorrectly adoptable."
 
-  # 6. A marker from another trust class is rejected even when its lease is unexpired.
+  # 7. A marker from another trust class is rejected even when its lease is unexpired.
   $untrustedLease = & $newRunningCase "untrusted-producer"
   $untrustedLease.marker.producer.trust_class = "different-trust-class"
   & $writeRunningCase $untrustedLease
   & $assertRemovedAndRun $untrustedLease "Running evidence from a different trust class was incorrectly adoptable."
 
-  # 7. An explicit rerun bypasses an otherwise valid marker.
+  # 8. An explicit rerun bypasses an otherwise valid marker.
   $explicitRerun = & $newRunningCase "explicit-rerun"
   $originalRerunTests = @($Context.rerun_tests)
   try {
     $Context.rerun_tests = @($explicitRerun.fingerprint.test_id)
+    if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $explicitRerun.fingerprint -Context $Context)) {
+      throw "Explicit rerun did not bypass the matching running marker."
+    }
     $rerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $explicitRerun.fingerprint -Context $Context -TestId $explicitRerun.fingerprint.test_id
     if ($rerunDecision.disposition -ne "RUN" -or $rerunDecision.reason -ne "explicit-rerun") {
       throw "Explicit rerun did not bypass running evidence."
@@ -2272,11 +2339,14 @@ function Invoke-MIRAssuranceSelfTest {
     $Context.rerun_tests = $originalRerunTests
   }
 
-  # 8. Reuse-disabled execution bypasses an otherwise valid marker.
+  # 9. Reuse-disabled execution bypasses an otherwise valid marker.
   $reuseDisabled = & $newRunningCase "reuse-disabled"
   $originalReuseEnabled = [bool]$Context.reuse_enabled
   try {
     $Context.reuse_enabled = $false
+    if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $reuseDisabled.fingerprint -Context $Context)) {
+      throw "Reuse-disabled execution did not bypass the matching running marker."
+    }
     $noReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $reuseDisabled.fingerprint -Context $Context -TestId $reuseDisabled.fingerprint.test_id
     if ($noReuseDecision.disposition -ne "RUN" -or $noReuseDecision.reason -ne "reuse-disabled") {
       throw "Reuse-disabled execution did not bypass running evidence."
@@ -2289,7 +2359,9 @@ function Invoke-MIRAssuranceSelfTest {
     $liveProcess,
     $deadProcess,
     $reusedPid,
+    $currentCiJob,
     $remoteJob,
+    $orphanedPass,
     $expiredRemote,
     $untrustedLease,
     $explicitRerun,

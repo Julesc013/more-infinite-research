@@ -60,7 +60,12 @@ local function observe(state)
     fail("unlimited transition changed earned worker speed bonus")
   end
   if not foreign_owner or foreign_owner.enabled or foreign_owner.visible_when_disabled then
-    fail("unlimited transition changed foreign native disablement")
+    fail("unlimited transition changed foreign native disablement: " .. helpers.table_to_json({
+      exists = foreign_owner ~= nil,
+      enabled = foreign_owner and foreign_owner.enabled,
+      visible_when_disabled = foreign_owner and foreign_owner.visible_when_disabled,
+      level = foreign_owner and foreign_owner.level
+    }))
   end
   state.owner = owner.name
   state.owner_enabled = owner.enabled
@@ -74,6 +79,9 @@ script.on_configuration_changed(function()
   -- state. Otherwise a lost level/bonus during configuration could self-pass.
   local prior = storage["mir5_native_worker_speed_cap"]
   if not prior or not prior.saved then fail("finite saved witness is absent") end
+  if prior.original_owner_enabled ~= true or prior.original_owner_visible ~= false then
+    fail("source did not establish the original owner presentation")
+  end
   storage[KEY] = {
     owner = prior.owner,
     next_level = prior.next_level,

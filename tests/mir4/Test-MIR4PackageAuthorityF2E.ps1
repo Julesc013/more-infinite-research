@@ -21,6 +21,30 @@ if([string]$currentAuthority.record_sha256-cne[string]$verification.package_auth
    -not[bool]$currentAuthority.legacy_root_projection.historical_reconstruction_only-or
    -not[bool]$currentAuthority.legacy_root_projection.silent_reactivation_blocked-or
    -not[bool]$verification.reader.silent_fallback_blocked){throw '[mir4-f2e-current-authority-successor]'}
+$manifest=Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$currentAuthority.source_manifest.path) -Kind 'MIR4ComposablePackageSourceV3' -Schema 'spec/schemas/mir4-composable-package-source-v3.schema.json' -Code 'mir4-f2e-source-inputs'
+$registry=Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath ([string]$currentAuthority.target_registry.path) -Kind 'MIR4TargetRegistryV2' -Schema 'spec/schemas/mir4-target-registry-v2.schema.json' -Code 'mir4-f2e-source-inputs'
+  $expectedCanonicalInputs=@(
+    'targets/package-authority.json'
+    [string]$currentAuthority.source_manifest.path
+    [string]$currentAuthority.target_registry.path
+    [string]$currentAuthority.support_policy.path
+    [string]$currentAuthority.versioning_authority.path
+    $registry.targets|ForEach-Object{[string]$_.composition}
+    $manifest.bindings|ForEach-Object{[string]$_.source_path}
+  )|Sort-Object -Unique -CaseSensitive
+$canonicalInputs=@(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
+$genericInputs=@(Get-MIRPackageSourceFiles -RepoRoot $repo)
+$genericFingerprint=Get-MIRPackageSourceFingerprint -RepoRoot $repo
+$canonicalFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
+if(($canonicalInputs-join"`n")-cne($expectedCanonicalInputs-join"`n")-or
+   ($genericInputs-join"`n")-ceq($canonicalInputs-join"`n")-or
+   ([string]$currentAuthority.versioning_authority.path) -in $genericInputs -or
+   'source/.mir-root.json' -notin $genericInputs -or
+   $genericFingerprint -cne $canonicalFingerprint -or
+   'source/prototypes/mir/core/fingerprint.lua'-notin$canonicalInputs-or
+   'targets/f210/composition.json'-notin$canonicalInputs-or
+   @($canonicalInputs|Where-Object{$_-like'source/mir5/*'}).Count-ne0-or
+   'source/.mir-root.json'-in$canonicalInputs){throw '[mir4-f2e-canonical-source-input-closure]'}
 if((@($receipt.verification.targets.target)-join'|')-cne'f210|f200|f110|f100'-or
    (@($verification.targets.target)-join'|')-cne'f210|f200|f110|f100'){throw '[mir4-f2e-target-order]'}
 $superseded=@($receipt.superseded_pre_cutover_bindings)

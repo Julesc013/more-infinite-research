@@ -109,7 +109,7 @@ end
 -- result for event owners that want diagnostics. `unresolved_current` exposes
 -- an over-cap current technology that the supplied queue did not remove;
 -- callers must not guess a different native cancellation API from this module.
-function M.reconcile(force, limits, owned_disabled)
+function M.reconcile(force, limits, owned_disabled, targets)
   local caps = checked_limits(limits)
   if type(owned_disabled) ~= "table" then
     error("MIR caps owned_disabled must be a table", 2)
@@ -119,10 +119,25 @@ function M.reconcile(force, limits, owned_disabled)
   end
   if force.index == nil then error("MIR caps force must have an index", 2) end
 
-  local queue_changed, removed_current, unresolved_current = filter_queue(force, caps)
+  local selected = caps
+  if targets ~= nil then
+    if type(targets) ~= "table" then error("MIR caps targets must be a table or nil", 2) end
+    selected = {}
+    for name, value in pairs(targets) do
+      if type(name) ~= "string" or value ~= true or caps[name] == nil then
+        error("MIR caps targets must name supplied limits", 2)
+      end
+      selected[name] = caps[name]
+    end
+  end
+
+  -- Research callbacks pass one admitted family.  Filter only that sparse
+  -- selection too: rewriting another family's queue entry here would turn a
+  -- named research event into a broad reconciliation.
+  local queue_changed, removed_current, unresolved_current = filter_queue(force, selected)
   local owned = owned_disabled[force.index]
 
-  for name, limit in pairs(caps) do
+  for name, limit in pairs(selected) do
     local technology = force.technologies[name]
     local level = valid_level(technology)
     if technology and limit > 0 and level and level > limit then

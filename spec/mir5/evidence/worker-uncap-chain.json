@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "authored-private-native-worker-uncap-custody-index-not-runner-receipt",
+  "scope": "F210 Space Age/K2SO completed worker cap saves to unlimited setting",
+  "release_qualification": false,
+  "player_archive_sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+  "player_source_commit": "d2be4a08bc4ce683a94eadb82e76667b7251ed7f",
+  "fixture_record": {
+    "path": "build/mir5/worker-uncap-r01/packages/fixture.json",
+    "sha256": "DC3C0AC9E00C8455C2A495FA3FF11C6DDEAEA70B34AF06F28AC18954DBEF2E94"
+  },
+  "source_scope_chain": "spec/mir5/evidence/worker-caps-chain.json",
+  "scenarios": [
+    {
+      "profile": "k2so",
+      "receipt": "spec/mir5/evidence/worker-uncap-k2so-native.json",
+      "receipt_sha256": "9CADFA269B0261406A23F09BBCA3B5B6AA0C62F0E59A0127899B9407F3EC0CE8",
+      "source_save_sha256": "5808D77E184A813FB75D62D2C4AB5C3F4DAC4C480B7469F81F9E21FBAED5E8EF",
+      "source_save_byte_identical": true,
+      "runner_source_head": "96fc26168751b0c177e1a4216ec222f473c3ae50",
+      "runner_source_dirty": false,
+      "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+      "profile_input": {
+        "sha256": "F2A01D37B79ECC23A7CA6E7A6BA840BC6549FD5DD3AFBF87B801B8501B1F22D2",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-caps-relaxed-k2so-f210.json"
+      },
+      "observed": {
+        "profile": "k2so",
+        "native_owner": "worker-robots-speed-7",
+        "native_effect_modifier": 0.6,
+        "source_lab_completed_levels": 2,
+        "cap": 0,
+        "next_level": 9,
+        "earned_native_effect_and_independent_offset_preserved": true,
+        "before_bonus_with_independent_offset": 3.173,
+        "after_bonus": 4.373,
+        "owned_enabled_and_visibility_restored": true,
+        "foreign_disable_preserved": true,
+        "detached_public_queries": true,
+        "fixture_preserves_source_cost_acceleration": true,
+        "on_load_read_only": false
+      },
+      "completed_save_sha256": "F811CF0B0D04573B8D8056070BE49BF8D2C95466CB3505277345F1CD0451725B",
+      "two_cold_reloads_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "profile": "space-age",
+      "receipt": "spec/mir5/evidence/worker-uncap-space-age-native.json",
+      "receipt_sha256": "263131C90CAEB9F363C49F081F52EFBAA371F8E61C2B798154636FA84D2183B5",
+      "source_save_sha256": "46C9A3FB8113D686F8D3A9A7981983D4AD885552F08614FDEBCBF5C47CB68260",
+      "source_save_byte_identical": true,
+      "runner_source_head": "96fc26168751b0c177e1a4216ec222f473c3ae50",
+      "runner_source_dirty": false,
+      "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+      "profile_input": {
+        "sha256": "C77B488429008FEF7342A788C197F5BD14391667FEC20DB49733D33A4F8794B5",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-caps-relaxed-space-age-f210.json"
+      },
+      "observed": {
+        "profile": "space-age",
+        "native_owner": "worker-robots-speed-7",
+        "native_effect_modifier": 0.65,
+        "source_lab_completed_levels": 2,
+        "cap": 0,
+        "next_level": 9,
+        "earned_native_effect_and_independent_offset_preserved": true,
+        "before_bonus_with_independent_offset": 3.173,
+        "after_bonus": 4.473,
+        "owned_enabled_and_visibility_restored": true,
+        "foreign_disable_preserved": true,
+        "detached_public_queries": true,
+        "fixture_preserves_source_cost_acceleration": true,
+        "on_load_read_only": false
+      },
+      "completed_save_sha256": "36E8D1EF9BD5188A75CA849A967FE2B397975689CE6023BB095E0F2C86FD09FC",
+      "two_cold_reloads_byte_identical": true,
+      "controls_restored": true
+    }
+  ],
+  "limitations": [
+    "Disposable partial-catalogue saves, not historical MIR4/production upgrades.",
+    "Fixture-only setting range clamps cap eight to zero; production setting constraints stay unchanged.",
+    "Source cost/time acceleration is retained byte-for-byte by the successor.",
+    "Native queries/bonuses/enablement/visibility only; no physical robot travel, real clients, multiplayer or performance qualification."
+  ]
+}

@@ -295,7 +295,7 @@ class LibraryTests(unittest.TestCase):
           assert(#player.translation_requests == 1)
 
           local family = root["mir_library_filters"]["mir_library_family"]
-          family.selected_index = 1
+          family.selected_index = 2
           library.on_gui_selection_state_changed({player_index = 1, element = family})
           -- The first request remains a stale issued window; the all-family
           -- cache requests its current MIR row and actual foreign native row.
@@ -717,8 +717,100 @@ class LibraryTests(unittest.TestCase):
           assert(view.status == 4 and view.page == 1)
         ''')
 
+    def test_real_model_host_preserves_hidden_visibility_and_full_family_callbacks(self):
+        self.lua.execute('''
+          package.preload["research.catalogue"] = function()
+            return {declared = function()
+              return {
+                {id = "recipe-prod-research_gears-1", family = "research_gears", progression = 1,
+                  native_order = "p[research_gears]"},
+                {id = "agricultural-growth-speed", family = "research_agricultural_growth_speed", progression = 2,
+                  native_order = "p[agricultural-growth-speed]"},
+                {id = "spoilage-preservation", family = "research_spoilage_preservation", progression = 3,
+                  native_order = "p[spoilage-preservation]"}
+              }
+            end}
+          end
+          package.preload["presentation.library_model"] = nil
+          package.loaded["research.catalogue"], package.loaded["presentation.library_model"] = nil, nil
+          boot()
+          local native_queue, native_current = player.force.research_queue, player.force.current_research
+
+          gear.localised_name = {"technology-name.more-infinite-research.research_gears", "Iron gear wheel"}
+          -- The actual model receives authored descriptor metadata. Its gear
+          -- selector is declaration-only: the foreign force row must not
+          -- leak into it or cause a native catalogue traversal.
+          library.open(player, {family = "research_gears", page = 7})
+          local view = storage.mir_library.players[1]
+          local root = player.gui.screen["mir_research_browser"]
+          local filters, content = root["mir_library_filters"], root["mir_library_content"]
+          local family, visibility = filters["mir_library_family"], filters["mir_library_visibility"]
+          assert(view.family == "research_gears" and view.visibility == 1 and view.page == 7)
+          assert(family.selected_index == 5 and visibility.selected_index == 1)
+          assert(family.items[5] == gear.localised_name,
+            "authored family caption dropped the complete native localization parameters")
+          assert(#player.translation_requests == 1)
+          assert(#content["mir_library_results"].items == 1
+            and content["mir_library_results"].items[1] == gear.name)
+
+          library.close(player); library.on_load(); library.open(player)
+          root = player.gui.screen["mir_research_browser"]
+          filters, content = root["mir_library_filters"], root["mir_library_content"]
+          family, visibility = filters["mir_library_family"], filters["mir_library_visibility"]
+          assert(storage.mir_library.players[1].family == "research_gears"
+            and filters["mir_library_family"].selected_index == 5
+            and #content["mir_library_results"].items == 1
+            and content["mir_library_results"].items[1] == gear.name)
+
+          -- External is the published native scope. It is the only selector
+          -- here that includes the actual foreign technology.
+          family = filters["mir_library_family"]
+          family.selected_index = 3
+          library.on_gui_selection_state_changed({player_index = 1, element = family})
+          view = storage.mir_library.players[1]
+          assert(view.family == "external" and view.page == 1
+            and #content["mir_library_results"].items == 1
+            and content["mir_library_results"].items[1] == foreign.name)
+
+          -- Remote-style input stays strict and cannot replace a persisted
+          -- hidden-only selection or its explicitly retained page.
+          library.open(player, {hidden = {foreign.name}, visibility = 2, page = 7})
+          for _, invalid in ipairs({0, 3, 1.5, "2", 0/0}) do
+            library.open(player, {visibility = invalid})
+            view = storage.mir_library.players[1]
+            assert(view.visibility == 2 and view.page == 7)
+          end
+          library.open(player, {family = "unknown-family"})
+          view = storage.mir_library.players[1]
+          assert(view.family == "external" and view.visibility == 2 and view.page == 7)
+          local foreign_root = player.gui.screen.add{type = "frame", name = "foreign-visibility-frame"}
+          local foreign_filters = foreign_root.add{type = "flow", name = "mir_library_filters"}
+          local spoof = foreign_filters.add{type = "drop-down", name = "mir_library_visibility", selected_index = 1}
+          library.on_gui_selection_state_changed({player_index = 1, element = spoof})
+          view = storage.mir_library.players[1]
+          assert(view.visibility == 2 and view.page == 7, "foreign GUI changed hidden visibility")
+          visibility.selected_index = 3
+          library.on_gui_selection_state_changed({player_index = 1, element = visibility})
+          view = storage.mir_library.players[1]
+          assert(view.visibility == 2 and view.page == 7, "invalid owned visibility was accepted")
+          family.selected_index = 7
+          library.on_gui_selection_state_changed({player_index = 1, element = family})
+          view = storage.mir_library.players[1]
+          assert(view.family == "external" and view.page == 7, "invalid owned family was accepted")
+
+          visibility.selected_index = 1
+          library.on_gui_selection_state_changed({player_index = 1, element = visibility})
+          view = storage.mir_library.players[1]
+          assert(view.visibility == 1 and view.page == 1 and view.scroll == 1)
+          assert(#content["mir_library_results"].items == 0)
+          assert(player.force.research_queue == native_queue and player.force.current_research == native_current
+            and player.force.research_progress == .5 and gear.level == 3 and gear.enabled == false)
+        ''')
+
     def test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields(self):
         self.lua.execute(r'''
+          package.preload["research.catalogue"], package.preload["presentation.library_model"] = nil, nil
+          package.loaded["research.catalogue"], package.loaded["presentation.library_model"] = nil, nil
           boot()
           -- Independent captured schema-3 shape from the published 4.7 browser.
           -- These values are deliberately not derived from MIR5 migration code.
@@ -743,7 +835,7 @@ class LibraryTests(unittest.TestCase):
           local state = storage.mir_library
           local view = state.players[1]
           assert(view.query == "historical gear" and view.family == "all" and view.status == 2 and view.mode == 3)
-          assert(view.selected == gear.name and view.scroll == 6 and view.page == 7)
+          assert(view.selected == gear.name and view.scroll == 6 and view.page == 7 and view.visibility == 2)
           assert(view.sort == "name-asc" and view.stable_sort == "native"
             and view.hidden["foreign-research"])
           -- The currently open published frame location wins over its stale

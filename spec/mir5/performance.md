@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: specification
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-23
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -26,15 +26,17 @@ No repeated per-family global scan, repeated world serialization, future-level e
 
 `PERF-02` — Inactive adapter bodies are not loaded. Native effects add no recurring Lua handlers. Default/inactive global overrides exit before enumeration. No hidden Library refresh or runtime reconstruction of the old compiler.
 
-## Empirical decision before mass porting
+## Empirical validation and catalogue authoring
 
 Use one existing dependency-valid large profile to compare exact published 4.7, a private direct replay of the same intended native output/patches, the real replacement and no MIR where dependency-valid. The replay is an empirical reference, not a mathematical optimum or player-side modpack compiler. Include all relevant settings/effects/runtime when comparing the corresponding endpoint.
 
-If an incomplete one-technology package wins, it establishes only that slice's construction behavior. It is not a full-product speed claim. If same-output replay does not reduce the suspected cost, revise the hypothesis before porting every family.
+If an incomplete one-technology package wins, it establishes only that slice's construction behavior. It is not a full-product speed claim. If same-output replay does not reduce the suspected cost, revise the optimization hypothesis before claiming an improvement.
+
+On 2026-10-23 the maintainer directed batched implementation of the complete known base-game/Space Age catalogue instead of continuing one technology at a time. This permits that authored parity work to advance while the responsive-menu resource prerequisite is resolved on Aero, superseding the former pre-port sequencing gate. The complete same-output comparison, final performance objective and functional/save acceptance remain required before freeze/publication; this does not admit production snapshots or the old compiler into the replacement.
 
 ## Measurement
 
-`PERF-03` — Match each arm on the same computer, engine binary/API/official mods, upstream archives, startup values, graphics/cache policy and observer. Black Glass and Aero each run their own complete comparisons; never subtract one machine's baseline from another's candidate.
+`PERF-03` — Match each arm on the same computer, engine binary/API/official mods, upstream archives, startup values, graphics/cache policy and observer. Run the complete comparison on Aero; never subtract one machine's baseline from another's candidate. On 2026-10-23 the maintainer withdrew Black Glass from testing because it would not be available, authorizing completion without it. This explicitly supersedes the former requirement for separate complete Black Glass and Aero comparisons. Report the actual tested machine and the absence of independent second-machine qualification; the endpoint, matched workload, controls, uncertainty, improvement objective and other release conditions remain unchanged.
 
 Measure process start to observed response to a harmless main-menu action. Window creation, initialization logs, headless map creation/save, simulation `--benchmark`, save load and first Library open are different endpoints. Report all game startup seconds separately from the incremental MIR effect.
 

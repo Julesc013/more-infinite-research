@@ -54,6 +54,13 @@
       "schema": 1,
       "sources": [
         {
+          "id": "P-SCI-OWNER-2026-10-23",
+          "title": "Maintainer-supplied Tr1ckY_Fate Error loading mod report",
+          "url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6adaf0f625d5abdc6c80cdf0",
+          "observed_on": "2026-10-23",
+          "basis": "Pasted error trace received while discussing continuing MIR 4.7 failures; reported relative age was 10 minutes. The matching public thread was subsequently read on 2026-10-23. It supplies no exact engine, MIR archive/hash, provider or mod/settings closure. SCI-RESEARCH-01 retains the distinct research-owner admission signature without attributing an unverified cause."
+        },
+        {
           "id": "P-SCI-2026-10-23",
           "title": "User-supplied Crash after update community thread",
           "observed_on": "2026-10-23",
@@ -373,7 +380,7 @@
     },
     "document_authority": "Proposed brief accepted as task scope; technical assertions require exact independent evidence."
   },
-  "request_count": 84,
+  "request_count": 85,
   "requests": [
     {
       "id": "UI-01",
@@ -3972,6 +3979,60 @@
           "Confirmed minimal reproduction"
         ],
         "disposition": "Open intake only; no implementation or native qualification performed."
+      }
+    },
+    {
+      "id": "SCI-RESEARCH-01",
+      "title": "Foreign Space-Lab-Research-61 binding aborts native effect-owner qualification",
+      "requesters": ["Tr1ckY_Fate", "Julesc013"],
+      "decision": "retain-open-for-mir5-regression-and-save-continuity",
+      "mechanism": "Investigate foreign researchability admission during native effect-owner qualification; distinct from pack-unlock ambiguity",
+      "proposed_scope": "MIR 4.7-era startup failure and MIR 5 native-owner/science integration regression",
+      "rationale": "The reported trace rejects a named foreign research binding while qualifying native effect identity. Removing the old compiler path does not by itself prove useful coverage or preservation of the foreign research and earned effects.",
+      "implementation": "Recover the actual technology provider and exact affected package/engine/mod/settings closure, retain its definitions and earned state, reproduce the rejection, then qualify the bounded MIR5 binding/ownership path without deleting foreign research or granting duplicate effects.",
+      "acceptance": [
+        "Retain the exact Space-Lab-Research-61 unresolved approved research signature and its distinct native_effect_coverage stack; do not equate it with SCI-UNLOCK-01's pack failures.",
+        "Identify actual effects, prerequisites, science, enablement and provider semantics before changing admission or selecting an owner; never infer a valid owner solely from its name or aggregate bonus.",
+        "Qualify startup with the exact affected valid profile and independent unrelated-foreign-research opponents; preserve native definitions and applicable MIR coverage without a whole-world production discovery engine.",
+        "Use protected disposable/historical save copies to preserve the foreign identity, completed/next levels, earned effects, active progress and queue through upgrade, save and two cold reloads; production saves require complete applicable catalogue parity.",
+        "Keep this regression open until named exact-source/package/engine/archive/settings evidence passes. A synthetic fixture, architecture change, source check or release comment alone cannot close the original report."
+      ],
+      "source_ids": ["P-SCI-OWNER-2026-10-23"],
+      "feature_group": "science-and-native-owner-regressions",
+      "status": "requested-not-qualified",
+      "qualification": [],
+      "reported_evidence": {
+        "basis": "Maintainer pasted Error loading mod by Tr1ckY_Fate on 2026-10-23; relative age 10 minutes retained without converting to an event timestamp. Maintainer described continuing 4.7 errors; the pasted trace does not itself state an exact MIR or engine version.",
+        "verified_thread_url": "https://mods.factorio.com/mod/more-infinite-research/discussion/6adaf0f625d5abdc6c80cdf0",
+        "signature": "MIR approved research binding is unresolved: Space-Lab-Research-61. Refusing to discard established research or enter production discovery.",
+        "entry_point": "more-infinite-research/data-final-fixes.lua:2",
+        "stack_context": [
+          "prototypes/mir/capabilities/science_integration/science_packs.lua:59 researchability_reason; :125",
+          "prototypes/mir/policy/native_effect_coverage.lua:69 technology_effect_identity_qualification_reason",
+          "prototypes/mir/policy/native_effect_coverage.lua:86 technology_has_effect_identity",
+          "prototypes/mir/policy/native_effect_coverage.lua:118 identity_owner_names",
+          "prototypes/mir/policy/native_effect_coverage.lua:195 resolve_direct_effect_ownership",
+          "prototypes/mir/planner/stream_compiler/qualify.lua:92",
+          "prototypes/mir/planner/stream_compiler/compile.lua:64",
+          "prototypes/mir/pipeline/compiler_orchestrator/context_construction.lua:82",
+          "prototypes/mir/pipeline/compiler_context.lua:49,53",
+          "prototypes/mir/pipeline/commands.lua:74,238,241,247,254,255,259"
+        ],
+        "missing": [
+          "Complete native log",
+          "Exact MIR version/archive hash and engine binary",
+          "Full mod versions/settings and technology-provider archive",
+          "Final captured Space-Lab-Research-61 prototype and related source/unlock/lab facts",
+          "Protected save and confirmed minimal reproducer"
+        ],
+        "source_correspondence": {
+          "basis": "Read-only local published-source correspondence, not proof of the reporter's loaded bytes",
+          "published_archive_sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+          "member": "prototypes/mir/capabilities/science_integration/science_packs.lua",
+          "member_sha256": "4DD512409652282179AE7E89DD9FBDF87EBA2C9EC6A6FC6D19B725D3A44F915A"
+        },
+        "local_provider_search": "Read-only scan of 579 F210 archive-library ZIPs, 20524 Lua members and 26869 textual members found no Space-Lab-Research spelling variant or verified provider. No archives were extracted, copied or changed.",
+        "disposition": "Open report intake; matching thread and published guard source identified, but no verified provider, root cause, corrected native execution or save qualification yet."
       }
     }
   ]

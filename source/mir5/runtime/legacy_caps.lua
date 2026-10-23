@@ -8,18 +8,13 @@ local M = {}
 local POLICY_VERSION = 3
 local TRANSPORTED_KIND = "transported-v3"
 local MAX_STRING_BYTES = 512
+local MAX_CANDIDATES = 128
 
-local GEAR = {
-  name = "recipe-prod-research_gears-1",
-  setting = "ips-max-level-research_gears",
-  source = "generated-stream",
-  -- This is the released F210 V3 binding operation, not MIR5's current
-  -- settings-transport provenance. See the accepted 4.7.21000 archive,
-  -- `prototypes/mir/domain/technology/maximum_level_binding.lua:264-277`.
-  operation = "emit"
-}
-
+-- This historical K2 tail has no recovered full modern catalogue binding.
+-- It remains an exact, independent predecessor contract until that source is
+-- qualified; do not make it a generic native-owner fallback.
 local WORKER = {
+  names = {"worker-robots-speed-6", "worker-robots-speed-7"},
   setting = "mir-max-level-worker-robots-speed",
   source = "native-owner",
   operation = "native-owner-cap"
@@ -54,20 +49,42 @@ local function exact_key(candidate)
     candidate.operation}, "\0")
 end
 
-local function admitted_candidate(candidate)
-  if type(candidate) ~= "table" or candidate.admitted ~= true
-      or not bounded_string(candidate.name) then return false end
-  if candidate.name == GEAR.name then
-    return candidate.setting == GEAR.setting and candidate.source == GEAR.source
-      and candidate.operation == GEAR.operation
+-- Build once at control parse time from the current authored declarations.
+-- The returned map admits only exact published V3 tuple identities; candidate
+-- rows never establish authority by merely asserting their own fields.
+function M.allowlist(declarations)
+  if type(declarations) ~= "table" then error("MIR legacy caps declarations must be a table", 2) end
+  local allowed, count = {}, 0
+  for index = 1, #declarations do
+    local declaration = declarations[index]
+    local binding = type(declaration) == "table" and declaration.legacy_binding or nil
+    local name = type(declaration) == "table" and declaration.id or nil
+    local setting = type(declaration) == "table" and declaration.cap_setting or nil
+    local source = type(binding) == "table" and binding.source or nil
+    local operation = type(binding) == "table" and binding.operation or nil
+    if not (bounded_string(name) and bounded_string(setting) and bounded_string(source)
+        and bounded_string(operation)) then
+      error("MIR legacy caps declaration lacks an exact binding", 2)
+    end
+    local key = table.concat({name, setting, source, operation}, "\0")
+    if allowed[key] then error("MIR legacy caps declarations duplicate a binding", 2) end
+    allowed[key] = true
+    count = count + 1
+    if count > MAX_CANDIDATES then error("MIR legacy caps declarations exceed bound", 2) end
   end
-  if candidate.name == "worker-robots-speed-6" or candidate.name == "worker-robots-speed-7" then
-    -- `admitted` is the caller's result of the current native-owner selector;
-    -- this decoder must not inspect prototypes or infer worker ownership.
-    return candidate.setting == WORKER.setting and candidate.source == WORKER.source
-      and candidate.operation == WORKER.operation
+  for index = 1, #WORKER.names do
+    local key = table.concat({WORKER.names[index], WORKER.setting, WORKER.source, WORKER.operation}, "\0")
+    if allowed[key] then error("MIR legacy caps worker binding collides", 2) end
+    allowed[key] = true
   end
-  return false
+  return allowed
+end
+
+local function admitted_candidate(candidate, allowed)
+  return type(candidate) == "table" and candidate.admitted == true
+    and bounded_string(candidate.name) and bounded_string(candidate.setting)
+    and bounded_string(candidate.source) and bounded_string(candidate.operation)
+    and type(allowed) == "table" and allowed[exact_key(candidate)] == true
 end
 
 local function candidate_list(candidates)
@@ -75,20 +92,21 @@ local function candidate_list(candidates)
     error("MIR legacy caps candidates must be a table", 3)
   end
   local entries, count = {}, 0
-  -- This bounded iteration deliberately validates the caller boundary without
-  -- ever traversing historical saved maps. Stop on the third entry.
+  -- This bounded iteration validates the parse-time authored admission list
+  -- without ever traversing historical saved maps.
   for index, candidate in pairs(candidates) do
     count = count + 1
-    if count > 2 then error("MIR legacy caps accepts at most two candidates", 3) end
-    if (index ~= 1 and index ~= 2) or entries[index] ~= nil then
+    if count > MAX_CANDIDATES then error("MIR legacy caps candidates exceed bound", 3) end
+    if type(index) ~= "number" or index ~= math.floor(index)
+        or index < 1 or index > MAX_CANDIDATES or entries[index] ~= nil then
       error("MIR legacy caps candidates must be a dense array", 3)
     end
     entries[index] = candidate
   end
-  if entries[2] ~= nil and entries[1] == nil then
-    error("MIR legacy caps candidates must be a dense array", 3)
+  for index = 1, count do
+    if entries[index] == nil then error("MIR legacy caps candidates must be a dense array", 3) end
   end
-  return entries, entries[2] ~= nil and 2 or entries[1] ~= nil and 1 or 0
+  return entries, count
 end
 
 local function policy_matches(policy, candidate)
@@ -155,13 +173,13 @@ end
 -- Decode restoration rights for one current force.
 --
 -- `legacy_bucket` is exactly the historical `storage.mir.maximum_level_control`
--- bucket. `candidates` is a dense list of at most two current admissions,
+-- bucket. `candidates` is a dense list from the parse-time authored allowlist,
 -- each shaped `{name, setting, source, operation, admitted=true}`. For worker
--- candidates `admitted` must come from the caller's current native-tail
--- validation. `current_owned` is the MIR5 map for this force; existing rows
--- always win. The returned name-keyed rows are new plain tables suitable for
--- the caller to merge into that map.
-function M.import_for_force(legacy_bucket, force, candidates, current_owned)
+-- candidates `admitted` comes from its current native-tail validation.
+-- `current_owned` is the MIR5 map for this force; existing rows always win.
+-- The returned name-keyed rows are new plain tables suitable for the caller to
+-- merge into that map.
+function M.import_for_force(legacy_bucket, force, candidates, current_owned, allowed)
   local entries, count = candidate_list(candidates)
   if current_owned ~= nil and type(current_owned) ~= "table" then
     error("MIR legacy caps current ownership must be a table or nil", 2)
@@ -196,7 +214,7 @@ function M.import_for_force(legacy_bucket, force, candidates, current_owned)
 
   for index = 1, count do
     local candidate = entries[index]
-    if not admitted_candidate(candidate) then
+    if not admitted_candidate(candidate, allowed) then
       set_decision(facts, index, candidate, "candidate_not_admitted")
     elseif current_owned and current_owned[candidate.name] ~= nil then
       set_decision(facts, index, candidate, "current_mir5_ownership_retained")

@@ -1,42 +1,103 @@
--- Declared MIR identities for the first Library slice. This is metadata only:
--- native technology and force state are read by presentation.library_model.
+-- Authored MIR identities for the Library and runtime cap admission. This
+-- declaration list never discovers a technology: each row names one emitted
+-- technology or one exact admitted native owner.
+local modern_catalogue = require("compatibility.modern_catalogue")
+
 local M = {}
 local GEAR_ID = "recipe-prod-research_gears-1"
+local AGRICULTURE_ID = "recipe-prod-research_agricultural_growth_speed-1"
+local SPOILAGE_ID = "recipe-prod-research_spoilage_preservation-1"
 
-function M.gear_id()
-  return GEAR_ID
+function M.gear_id() return GEAR_ID end
+
+local active_mods = script and script.active_mods or mods or {}
+local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
+-- Only ordinary vanilla/Space Age rows have recovered full bindings. The
+-- already captured K2SO families remain independently authored elsewhere.
+local ordinary_profile = type(active_mods) == "table" and active_mods.Krastorio2 == nil
+
+local function copy(value, seen)
+  if type(value) ~= "table" then return value end
+  seen = seen or {}
+  if seen[value] then error("MIR catalogue declaration contains a cycle", 3) end
+  seen[value] = true
+  local out = {}
+  for key, item in pairs(value) do out[key] = copy(item, seen) end
+  seen[value] = nil
+  return out
 end
 
-local GEAR_SETTINGS = {
-  "ips-enable-research_gears",
-  "ips-cost-base-research_gears",
-  "ips-cost-linear-increment-research_gears",
-  "ips-cost-growth-research_gears",
-  "ips-max-level-research_gears",
-  "ips-research-time-research_gears",
-  "ips-effect-per-level-research_gears"
-}
-
-local function copy_settings()
-  local result = {}
-  for index = 1, #GEAR_SETTINGS do result[index] = GEAR_SETTINGS[index] end
-  return result
+local function stream_settings(family)
+  return {"ips-enable-" .. family, "ips-cost-base-" .. family, "ips-cost-linear-increment-" .. family,
+    "ips-cost-growth-" .. family, "ips-max-level-" .. family, "ips-research-time-" .. family,
+    "ips-effect-per-level-" .. family}
+end
+local function continuation_settings(key)
+  return {"mir-enable-" .. key, "mir-cost-base-" .. key, "mir-cost-linear-increment-" .. key,
+    "mir-cost-growth-" .. key, "mir-max-level-" .. key, "mir-research-time-" .. key,
+    "mir-effect-per-level-" .. key}
+end
+local function locale_key(value)
+  if type(value) == "string" then return value end
+  return type(value) == "table" and value[1] or nil
+end
+local function first_recipe(definition)
+  local effect = definition.effects and definition.effects[1]
+  return effect and effect.recipe or nil
+end
+local function generated_row(id, family, order, locale, recipe)
+  return {id=id, family=family, progression=1, native_order=order, setting="ips-enable-" .. family,
+    cap_setting="ips-max-level-" .. family, settings=stream_settings(family), recipe=recipe, locale_key=locale,
+    ownership_kind="authored_generated", legacy_binding={source="generated-stream", operation="emit"}}
 end
 
--- A fresh table prevents a presentation caller from retaining or changing
--- declaration state. Add future authored identities here, not a world scan.
+local function static_rows()
+  local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
+    "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
+  if not ordinary_profile then
+    if space_age_active then
+      rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
+        "p[research_agricultural_growth_speed]", "technology-name.more-infinite-research.research_agricultural_growth_speed")
+      rows[#rows + 1] = generated_row(SPOILAGE_ID, "research_spoilage_preservation",
+        "p[research_spoilage_preservation]", "technology-name.more-infinite-research.research_spoilage_preservation")
+    end
+    return rows
+  end
+  local selected = modern_catalogue.select(active_mods)
+  for index = 1, #selected.definitions do
+    local definition = selected.definitions[index]
+    rows[#rows + 1] = generated_row("recipe-prod-" .. definition.key .. "-1", definition.family,
+      definition.order, locale_key(definition.localised_name), first_recipe(definition))
+  end
+  if space_age_active then
+    rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
+      "p[research_agricultural_growth_speed]", "technology-name.more-infinite-research.research_agricultural_growth_speed")
+    rows[#rows + 1] = generated_row(SPOILAGE_ID, "research_spoilage_preservation",
+      "p[research_spoilage_preservation]", "technology-name.more-infinite-research.research_spoilage_preservation")
+  end
+  for _, continuation in ipairs(selected.continuations) do
+    rows[#rows + 1] = {id=continuation.id, family=continuation.family, progression=continuation.level,
+      native_order="", setting="mir-enable-" .. continuation.setting_key,
+      cap_setting="mir-max-level-" .. continuation.setting_key, settings=continuation_settings(continuation.setting_key),
+      locale_key=locale_key(continuation.localised_name), ownership_kind="authored_generated",
+      legacy_binding={source=continuation.source, operation=continuation.operation}}
+  end
+  if space_age_active then
+    for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do
+      rows[#rows + 1] = {id=owner.id, family=owner.family, progression=1, native_order="", setting="ips-enable-" .. owner.family,
+        cap_setting=owner.setting, settings=stream_settings(owner.family), ownership_kind="nativeowner",
+        native_owner_identity=owner.id, native_admission=copy(owner.admission),
+        legacy_binding={source="native-owner", operation="preserve_native_owner"}}
+    end
+  end
+  return rows
+end
+
 function M.declared()
-  return {{
-    id = GEAR_ID,
-    family = "mir",
-    progression = 1,
-    native_order = "p[research_gears]",
-    setting = "ips-enable-research_gears",
-    settings = copy_settings(),
-    cap_setting = "ips-max-level-research_gears",
-    recipe = "iron-gear-wheel",
-    locale_key = "technology-name.more-infinite-research.research_gears"
-  }}
+  local rows = static_rows()
+  local out = {}
+  for index = 1, #rows do out[index] = copy(rows[index]) end
+  return out
 end
 
 return M

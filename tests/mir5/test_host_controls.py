@@ -100,6 +100,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_lifecycle.py",
             "tests/mir5/test_native_owners.py",
             "tests/mir5/test_module_permissions_override.py",
+            "tests/mir5/test_prototype_limits.py",
             "tests/mir5/test_module_permissions_activation.py",
             "tests/mir5/test_bootstrap.py",
             "tests/mir5/test_library.py",
@@ -108,6 +109,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_passive_repair.py",
             "tests/mir5/test_agriculture.py",
             "tests/mir5/test_spoilage.py",
+            "tests/mir5/test_scripted_effects_lifecycle.py",
             "tests/mir5/test_settings_profile.py",
             "tests/mir5/test_settings_commands.py",
             "tests/mir5/test_properties.py",
@@ -115,12 +117,13 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_package.py",
             "tests/mir5/test_compose_replay.py",
             "tests/mir5/test_compare_captures.py",
+            "tests/mir5/test_recover_modern_catalogue.py",
             "tests/mir5/test_menu_comparison.py",
             "tests/mir5/test_pack.py",
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 31)
+        self.assertEqual(len(paths), 34)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
@@ -134,12 +137,13 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/mir5/test_passive_repair.py", paths)
         self.assertIn("tests/mir5/test_agriculture.py", paths)
         self.assertIn("tests/mir5/test_spoilage.py", paths)
+        self.assertIn("tests/mir5/test_scripted_effects_lifecycle.py", paths)
         self.assertIn("tests/mir5/test_settings_profile.py", paths)
         self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:24]))
-        self.assertTrue(all(not row["lua"] for row in controls[24:]))
+        self.assertTrue(all(row["lua"] for row in controls[:26]))
+        self.assertTrue(all(not row["lua"] for row in controls[26:]))
 
     def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
         result = selections()
@@ -186,8 +190,9 @@ class HostControlsTests(unittest.TestCase):
         self.assertEqual(mir5["classification"]["tests"], ["static.mir5-host-controls"])
         self.assertFalse(mir5["classification"]["escalated"])
         self.assertIn("static.mir5-host-controls", mir5["selected_tests"])
-        self.assertEqual(mir5["initial_plan"]["profile"], "mir4-development")
-        self.assertFalse(mir5["initial_plan"]["use_affected_selection"])
+        self.assertEqual(mir5["initial_plan"]["profile"], "auto")
+        self.assertTrue(mir5["initial_plan"]["use_affected_selection"])
+        self.assertTrue(mir5["initial_plan"]["selection_rows_covered_by_auto"])
 
         docs = routes["routes"]["docs"]
         self.assertEqual(docs["classification"]["tests"], ["docs.check"])

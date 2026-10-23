@@ -24,7 +24,8 @@ local expected_effective = {
   ["ips-research-time-research_gears"] = 1,
   ["ips-effect-per-level-research_gears"] = 10,
   ["mir-max-level-worker-robots-speed"] = 0,
-  ["mir-enable-passive-repair"] = true
+  ["mir-enable-passive-repair"] = true,
+  ["mir-unrestricted-modules"] = false
 }
 
 local expected_compact = {

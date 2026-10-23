@@ -52,6 +52,8 @@ local function marker(stage, state)
       initial_level = state.initial_level,
       next_level = state.next_level,
       completed_levels = 2,
+      original_owner_enabled = state.original_owner_enabled,
+      original_owner_visible = state.original_owner_visible,
       modifier_before = state.modifier_before,
       modifier_after = state.modifier_after,
       modifier_delta = state.modifier_delta,
@@ -91,6 +93,10 @@ script.on_init(function()
   local owner = owner_for(force)
   local initial_level = owner.level
   prepare_prerequisites(owner)
+  -- Establish the presentation value whose later restoration this fixture
+  -- observes; the upstream prototype default is not a restoration witness.
+  owner.enabled, owner.visible_when_disabled = true, false
+  local original_owner_enabled, original_owner_visible = owner.enabled, owner.visible_when_disabled
   local modifier_before = force.worker_robots_speed_modifier
   -- These two direct native setters observe earned infinite levels. They do
   -- not claim lab work or science consumption; the assertions below read the
@@ -109,20 +115,37 @@ script.on_init(function()
   local foreign = game.create_force("mir5-native-worker-speed-foreign")
   foreign.enable_all_prototypes()
   local foreign_owner = owner_for(foreign)
-  foreign_owner.level = owner.level
+  -- Infinite level writes raise research events immediately. Establish the
+  -- foreign disable before crossing the cap so MIR never owns enablement.
   foreign_owner.enabled = false
   foreign_owner.visible_when_disabled = false
+  foreign_owner.level = owner.level
   start_unrelated_research(foreign)
 
   storage[KEY] = {
     owner = owner.name,
     initial_level = initial_level,
+    original_owner_enabled = original_owner_enabled,
+    original_owner_visible = original_owner_visible,
     next_level = owner.level,
     modifier_before = modifier_before,
     modifier_after = modifier_after,
     modifier_delta = modifier_after - modifier_before,
     deadline = game.tick + 1200,
     phase = "await-cap"
+  }
+end)
+
+script.on_configuration_changed(function()
+  local prior = storage["mir5_native_worker_speed_precap"]
+  if not prior or not prior.saved or prior.original_owner_enabled ~= true
+      or prior.original_owner_visible ~= false then fail("uncapped saved baseline is absent") end
+  storage[KEY] = {
+    owner = prior.owner, initial_level = prior.initial_level, next_level = prior.next_level,
+    original_owner_enabled = prior.original_owner_enabled,
+    original_owner_visible = prior.original_owner_visible,
+    modifier_before = prior.modifier_before, modifier_after = prior.modifier_after,
+    modifier_delta = prior.modifier_delta, deadline = game.tick + 1200, phase = "await-cap"
   }
 end)
 

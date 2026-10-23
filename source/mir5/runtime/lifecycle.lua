@@ -4,14 +4,15 @@
 local caps = require("runtime.caps")
 local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
+local cap_admission = require("runtime.cap_admission")
+local catalogue = require("research.catalogue")
 
 local M = {}
 
 local STORAGE_KEY = "mir_caps"
 local SCHEMA = 1
-local GEAR_TECHNOLOGY = require("research.catalogue").gear_id()
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
-local active_mods = script and script.active_mods or {}
+local active_mods = script and script.active_mods or mods or {}
 local worker_modifiers
 if active_mods.Krastorio2 and active_mods["Krastorio2-spaced-out"]
     and active_mods.Krastorio2Assets and active_mods["k2so-assets"] and active_mods["space-age"] then
@@ -27,10 +28,50 @@ end
 -- setting/profile resolution for this control instance rather than work on
 -- every research event.
 local effective_values = require("runtime.configuration")
-local GEAR_ENABLED = effective_values.enabled ~= false
-local GEAR_LIMIT = effective_values.max_level
 local WORKER_ROBOT_SPEED_LIMIT = effective_values.worker_robots_speed_max_level
-local CAPS_ACTIVE = (GEAR_ENABLED and GEAR_LIMIT > 0) or WORKER_ROBOT_SPEED_LIMIT > 0
+
+local function nonnegative_integer(value)
+  return type(value) == "number" and value == value and value >= 0
+    and value < math.huge and value == math.floor(value)
+end
+
+-- Resolve the authored catalogue and immutable startup values once while
+-- control is parsed. Event paths use these compact maps; they never ask the
+-- catalogue to rebuild or scan a family list.
+local DECLARATIONS = catalogue.declared()
+local STREAM_VALUES = effective_values.streams
+if type(STREAM_VALUES) ~= "table" then error("MIR caps missing resolved stream values", 2) end
+local STATIC_LIMITS, DECLARATION_BY_ID, NATIVE_OWNER_BY_ID, ORDERED_DECLARATIONS = {}, {}, {}, {}
+local CAPS_ACTIVE = WORKER_ROBOT_SPEED_LIMIT > 0
+for index = 1, #DECLARATIONS do
+  local declaration = DECLARATIONS[index]
+  local binding = type(declaration) == "table" and declaration.legacy_binding or nil
+  if type(declaration) ~= "table" or type(declaration.id) ~= "string" or declaration.id == ""
+      or type(declaration.family) ~= "string" or declaration.family == ""
+      or type(declaration.cap_setting) ~= "string" or declaration.cap_setting == ""
+      or type(binding) ~= "table" or type(binding.source) ~= "string"
+      or type(binding.operation) ~= "string"
+      or (declaration.ownership_kind ~= "authored_generated" and declaration.ownership_kind ~= "nativeowner")
+      or DECLARATION_BY_ID[declaration.id] ~= nil then
+    error("MIR caps invalid authored declaration", 2)
+  end
+  local values = STREAM_VALUES[declaration.family]
+  if type(values) ~= "table" or type(values.enabled) ~= "boolean"
+      or not nonnegative_integer(values.max_level) then
+    error("MIR caps missing resolved family values: " .. declaration.family, 2)
+  end
+  local row = {id = declaration.id, family = declaration.family, cap_setting = declaration.cap_setting,
+    ownership_kind = declaration.ownership_kind, source = binding.source, operation = binding.operation,
+    enabled = values.enabled, limit = values.max_level, declaration = declaration}
+  ORDERED_DECLARATIONS[#ORDERED_DECLARATIONS + 1] = row
+  DECLARATION_BY_ID[row.id] = row
+  if row.enabled and row.limit > 0 then CAPS_ACTIVE = true end
+  if row.ownership_kind == "nativeowner" then NATIVE_OWNER_BY_ID[row.id] = row
+  elseif row.enabled then
+    STATIC_LIMITS[row.id] = row.limit
+  end
+end
+local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS)
 
 local function existing_state()
   local value = storage[STORAGE_KEY]
@@ -60,10 +101,6 @@ local function valid_force(force)
   return force and force.valid ~= false and type(force.index) == "number"
 end
 
--- The native owner selector reads exactly the two admitted tail candidates
--- for this force. It does not enumerate technologies or retain a foreign
--- prototype reference. An unlimited setting is still included when an exact
--- owner exists so a previous MIR-owned disable can be restored on config.
 local function has_worker_ownership(owned)
   return type(owned) == "table"
     and (type(owned[WORKER_TAIL_NAMES[1]]) == "table"
@@ -78,47 +115,87 @@ local function worker_owner(force)
   end, worker_modifiers)
 end
 
-local function limits_for(force, include_worker, selected_owner, owner_resolved)
-  local limits = {}
-  if GEAR_ENABLED then limits[GEAR_TECHNOLOGY] = GEAR_LIMIT end
-  if not valid_force(force) or (WORKER_ROBOT_SPEED_LIMIT == 0 and not include_worker) then
-    return limits
+local function copy_limits(limits)
+  local result = {}
+  for name, value in pairs(limits) do result[name] = value end
+  return result
+end
+
+local function native_owner_admitted(force, row)
+  return valid_force(force) and cap_admission.admits_native_owner(function(name)
+    return force.technologies and force.technologies[name] or nil
+  end, row.declaration)
+end
+
+local function full_limits_for(force, include_worker, selected_owner, owner_resolved)
+  local limits, admitted = copy_limits(STATIC_LIMITS), {}
+  for name in pairs(STATIC_LIMITS) do admitted[name] = true end
+  if valid_force(force) then
+    for name, row in pairs(NATIVE_OWNER_BY_ID) do
+      if row.enabled and native_owner_admitted(force, row) then
+        limits[name], admitted[name] = row.limit, true
+      end
+    end
+    if WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker then
+      local owner = selected_owner
+      if not owner_resolved then owner = worker_owner(force) end
+      if owner then limits[owner], admitted[owner] = WORKER_ROBOT_SPEED_LIMIT, true end
+      return limits, admitted, owner
+    end
   end
-  local owner = selected_owner
-  if not owner_resolved then owner = worker_owner(force) end
-  if owner then limits[owner] = WORKER_ROBOT_SPEED_LIMIT end
-  return limits
+  return limits, admitted, selected_owner
+end
+
+local function event_limits_for(force, name, include_worker)
+  local row = DECLARATION_BY_ID[name]
+  if row and row.enabled then
+    if row.ownership_kind == "authored_generated" then return {[name] = row.limit}, {[name] = true}, nil end
+    if native_owner_admitted(force, row) then return {[name] = row.limit}, {[name] = true}, nil end
+  end
+  if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+    local owner = worker_owner(force)
+    if owner == name and (WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker) then
+      return {[name] = WORKER_ROBOT_SPEED_LIMIT}, {[name] = true}, owner
+    end
+  end
+  return nil, nil, nil
 end
 
 -- Return a new plain snapshot for presentation callers. It is intentionally
 -- separate from the native force and does not expose storage or settings.
 function M.cap_limits(force)
-  -- Presentation is caller-driven, not a recurring event path. Include an
-  -- admitted unlimited native owner here so the Library can explain its 0
-  -- sentinel without reading lifecycle state itself.
-  return limits_for(force, true, nil, false)
+  -- Presentation is caller-driven. Include an admitted unlimited native owner
+  -- so the Library can explain the zero sentinel without touching storage.
+  return full_limits_for(force, true, nil, false)
 end
 
 function M.caps_active()
   return CAPS_ACTIVE
 end
 
--- A cap record binds to its admitted tail name. If upstream replaces that
--- tail with malformed data or the higher-priority tail, discard the old
--- enablement right before reconciliation. This intentionally fails closed:
--- MIR cannot prove that a later same-named replacement is the object it once
--- disabled, so it must never re-enable it on a later unlimited setting.
-local function discard_unbound_worker_ownership(force, owned_disabled, owner)
+-- A cap record binds to a current authored identity. If a feature is disabled,
+-- an owner no longer matches its exact effect contract, or a worker tail is
+-- superseded, discard only MIR's future restoration right. This fails closed:
+-- no uncertain ownership is converted into an enablement write.
+local function discard_unbound_ownership(force, owned_disabled, admitted, owner, workers_only)
   local owned = owned_disabled[force.index]
-  if not has_worker_ownership(owned) then return owned end
-  for _, name in ipairs(WORKER_TAIL_NAMES) do
-    local row = owned[name]
-    if type(row) == "table" then
-      -- Earlier private MIR5 rows could only represent the 0.65 variant.
-      -- Historical MIR4 imports are stamped with their admitted variant below.
-      local modifier = row.worker_effect_modifier
-      if modifier == nil then modifier = 0.65 end
-      if name ~= owner or modifier ~= worker_modifier(name) then owned[name] = nil end
+  if type(owned) ~= "table" then return owned end
+  for name, row in pairs(owned) do
+    if not workers_only or name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+      if admitted[name] ~= true then
+        owned[name] = nil
+      elseif name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+        local row = owned[name]
+        if type(row) == "table" then
+          -- Earlier private MIR5 rows could only represent the 0.65 variant.
+          -- Historical MIR4 imports are stamped with their admitted variant.
+          local modifier = row.worker_effect_modifier
+          if modifier == nil then modifier = 0.65 end
+          if name ~= owner or modifier ~= worker_modifier(name) then owned[name] = nil end
+        else
+          owned[name] = nil
+        end
+      end
     end
   end
   if next(owned) == nil then
@@ -128,41 +205,39 @@ local function discard_unbound_worker_ownership(force, owned_disabled, owner)
   return owned
 end
 
--- A disabled gear feature has no authority to restore prior cap writes. Drop
--- any rows we previously owned without touching the native technology, so an
--- administrator's explicit disablement cannot re-enable it during a profile
--- or configuration transition.
-local function discard_disabled_gear_ownership(force, owned_disabled)
-  local owned = owned_disabled[force.index]
-  if GEAR_ENABLED or type(owned) ~= "table" then return owned end
-  owned[GEAR_TECHNOLOGY] = nil
-  if next(owned) == nil then
-    owned_disabled[force.index] = nil
-    return nil
-  end
-  return owned
-end
-
-local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved)
+local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved, target_name)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
+  local include_worker = has_worker_ownership(owned)
+  local limits, admitted, owner
+  if target_name then
+    limits, admitted, owner = event_limits_for(force, target_name, include_worker)
+    if limits == nil then
+      if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil then owned[target_name] = nil end
+      return
+    end
+  else
+    limits, admitted, owner = full_limits_for(force, include_worker, selected_owner, owner_resolved)
+  end
   if type(owned_disabled) == "table" then
-    owned = discard_disabled_gear_ownership(force, owned_disabled)
+    if target_name then
+      local row = owned_disabled[force.index]
+      if type(row) == "table" and row[target_name] ~= nil and admitted[target_name] ~= true then row[target_name] = nil end
+      if target_name == WORKER_TAIL_NAMES[1] or target_name == WORKER_TAIL_NAMES[2] then
+        discard_unbound_ownership(force, owned_disabled, admitted, owner, true)
+      end
+    else
+      owned = discard_unbound_ownership(force, owned_disabled, admitted, owner)
+    end
   end
-  local include_worker = WORKER_ROBOT_SPEED_LIMIT > 0 or has_worker_ownership(owned)
-  local owner = selected_owner
-  if include_worker and not owner_resolved then owner = worker_owner(force) end
-  if type(owned_disabled) == "table" and has_worker_ownership(owned) then
-    owned = discard_unbound_worker_ownership(force, owned_disabled, owner)
-  end
-  local _, result = caps.reconcile(force,
-    limits_for(force, include_worker, owner, include_worker), owned_disabled)
+  local targets = target_name and {[target_name] = true} or nil
+  local _, result = caps.reconcile(force, limits, owned_disabled, targets)
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
   end
   local owned = owned_disabled[force.index]
-  local row = owner and owned and owned[owner]
+  local row = owner and owned_disabled[force.index] and owned_disabled[force.index][owner]
   if type(row) == "table" and row.worker_effect_modifier == nil then
     row.worker_effect_modifier = worker_modifier(owner)
   end
@@ -193,19 +268,21 @@ local function reconcile_all(clean_stale_forces, selected_owners)
   discard_empty_state(current)
 end
 
-local function legacy_candidates(worker_name)
+local function legacy_candidates(force, worker_name)
   local candidates = {}
-  if GEAR_ENABLED then
-    candidates[#candidates + 1] = {
-      name = GEAR_TECHNOLOGY,
-      setting = "ips-max-level-research_gears",
-      source = "generated-stream",
-      -- The candidate is a decoder key for published 4.7 F210 storage. It
-      -- deliberately retains the old generated-binding operation rather than
-      -- nominating MIR5's current runtime-settings provenance.
-      operation = "emit",
-      admitted = true
-    }
+  for index = 1, #ORDERED_DECLARATIONS do
+    local row = ORDERED_DECLARATIONS[index]
+    local admitted = row.enabled and (row.ownership_kind == "authored_generated"
+      or native_owner_admitted(force, row))
+    if admitted then
+      candidates[#candidates + 1] = {
+        name = row.id,
+        setting = row.cap_setting,
+        source = row.source,
+        operation = row.operation,
+        admitted = true
+      }
+    end
   end
   if worker_name then
     candidates[#candidates + 1] = {
@@ -263,14 +340,15 @@ local function import_legacy_caps_on_configuration()
   if not game or not game.forces then return selected_owners end
   for _, force in pairs(game.forces) do
     if valid_force(force) then
-      local owned = discard_disabled_gear_ownership(force, current.owned_disabled)
       -- Revalidate the native tail even if the new worker cap is unlimited;
       -- importing its historical restoration right still depends on that
       -- exact current owner.
       local owner = worker_owner(force)
       selected_owners[force.index] = owner
+      local _, admitted = full_limits_for(force, true, owner, true)
+      local owned = discard_unbound_ownership(force, current.owned_disabled, admitted, owner)
       local rows = legacy_caps.import_for_force(legacy_bucket, force,
-        legacy_candidates(owner), owned)
+        legacy_candidates(force, owner), owned, LEGACY_ALLOWLIST)
       merge_legacy_rows(current.owned_disabled, force.index, rows)
     end
   end
@@ -285,7 +363,7 @@ local function event_force(event)
   return nil
 end
 
-local function reconcile_event(event)
+local function reconcile_event(event, research_only)
   local force = event_force(event)
   if not force then return end
   -- These callbacks are registered only while finite caps are active. Keep
@@ -293,7 +371,10 @@ local function reconcile_event(event)
   -- save, while still restoring a retained owned or legacy-marker state.
   local current = CAPS_ACTIVE and ensure_state() or existing_state()
   if not current then return end
-  reconcile_force(force, current.owned_disabled)
+  local research = event and event.research
+  local name = research_only and research and research.name or nil
+  if research_only and type(name) ~= "string" then return end
+  reconcile_force(force, current.owned_disabled, nil, false, name)
   discard_empty_state(current)
 end
 
@@ -331,15 +412,23 @@ function M.on_forces_merged(event)
 end
 
 function M.on_research_finished(event)
+  reconcile_event(event, true)
+end
+
+function M.on_research_reversed(event)
+  reconcile_event(event, true)
+end
+
+function M.on_technology_effects_reset(event)
   reconcile_event(event)
 end
 
 function M.on_research_started(event)
-  reconcile_event(event)
+  reconcile_event(event, true)
 end
 
 function M.on_research_cancelled(event)
-  reconcile_event(event)
+  reconcile_event(event, true)
 end
 
 -- There are no local bindings to reconstruct. The parse-time bootstrap owns

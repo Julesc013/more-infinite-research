@@ -1,0 +1,54 @@
+{
+  "kind": "MIR5UntimedFreshMenuSeedPreparationV1",
+  "native": null,
+  "error": "[mir441-resource-admission-memory]",
+  "seed": null,
+  "seed_validation_error": "",
+  "pre_actor": null,
+  "host_preparation": {
+    "host_policy": "no-profile-host-and-pre-context-GC",
+    "memory_before_gc": {
+      "observed_at": "2026-10-23T04:42:09.7421897+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 6320852992,
+        "committed_bytes": 14143631360,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65690787840,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65690787840,
+        "total_bytes": 472446398464
+      }
+    },
+    "memory_after_gc": {
+      "observed_at": "2026-10-23T04:42:09.7994718+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 6105698304,
+        "committed_bytes": 14144720896,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 65690787840,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 65690787840,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "claims": {
+    "performance": false,
+    "release": false
+  },
+  "controls_restored": false
+}

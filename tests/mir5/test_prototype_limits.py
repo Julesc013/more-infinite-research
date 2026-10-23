@@ -1,0 +1,215 @@
+"""Opposing Lua 5.2 controls for the optional prototype-limit group."""
+import argparse
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+class PrototypeLimitsTests(unittest.TestCase):
+    def setUp(self):
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.globals().player_root = (ROOT / "source/mir5").as_posix()
+        self.lua.execute('''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+          package.cpath = ""
+          limits = require("overrides.prototype_limits")
+          scope = require("overrides.recycling_scope")
+          function options(cap, scoped, chance)
+            return {["mir-prototype-productivity-cap"] = cap,
+              ["mir-productivity-cap-self-recycling-only"] = scoped,
+              ["mir-recycling-return-chance"] = chance}
+          end
+          function manufacture(product, input)
+            return {ingredients = {{input or "ore", 1}}, results = {{product or "component", 1}}}
+          end
+          function reclaim(fields, input, extra)
+            local result = {name = "component"}
+            for key, value in pairs(fields) do result[key] = value end
+            local recipe = {ingredients = {{"component", input or 1}}, results = {result}}
+            for key, value in pairs(extra or {}) do recipe[key] = value end
+            return recipe
+          end
+        ''')
+
+    def test_defaults_never_read_raw_or_import_scope(self):
+        self.lua.execute('''
+          package.loaded["overrides.recycling_scope"] = nil
+          local raw = setmetatable({}, {__index = function() error("inactive read") end,
+            __pairs = function() error("inactive traversal") end})
+          local result = limits.apply(raw, {})
+          assert(result.indexed_recipes == 0 and result.productivity == 0)
+          assert(package.loaded["overrides.recycling_scope"] == nil)
+        ''')
+
+    def test_receiver_ranges_detach_and_preserve_foreign_fields(self):
+        self.lua.execute('''
+          local shared = {speed_limits = {low = -0.6, high = 2, foreign = 7},
+            consumption_limits = {low = -0.2}, bonus = {native = true}}
+          local assembler, lab = {effect_receiver = shared}, {effect_receiver = shared}
+          local raw = {["assembling-machine"] = {a = assembler}, lab = {l = lab},
+            unrelated = setmetatable({}, {__pairs = function() error("unrelated enumeration") end})}
+          local changed = limits.apply(raw, {["mir-prototype-speed-cap"] = "bonus-400",
+            ["mir-prototype-efficiency-cap"] = "saving-9999",
+            ["mir-prototype-speed-floor"] = "saving-999",
+            ["mir-prototype-quality-cap"] = "bonus-250"})
+          assert(changed.receivers == 8)
+          assert(assembler.effect_receiver ~= shared and lab.effect_receiver ~= shared)
+          assert(assembler.effect_receiver ~= lab.effect_receiver)
+          assert(shared.speed_limits.high == 2 and shared.speed_limits.low == -0.6)
+          local receiver = assembler.effect_receiver
+          assert(receiver.speed_limits.low == -0.999 and receiver.speed_limits.high == 4)
+          assert(receiver.speed_limits.foreign == 7 and receiver.bonus.native)
+          assert(receiver.consumption_limits.low == -0.9999 and receiver.consumption_limits.high == 1000)
+          assert(receiver.quality_limits.low == 0 and receiver.quality_limits.high == 2.5)
+        ''')
+
+    def test_global_cap_preserves_recycling_parameter_and_other_fields(self):
+        self.lua.execute('''
+          local raw = {recipe = {a = {foreign = 1}, b = {category = "recycling", maximum_productivity = 2},
+            c = {categories = {"crafting", "recycling"}, maximum_productivity = 1},
+            d = {parameter = true}, e = {category = "recycling", categories = {"crafting"}}}}
+          local result = limits.apply(raw, options("percent-400", true))
+          assert(result.productivity == 2 and result.indexed_recipes == 5)
+          assert(raw.recipe.a.maximum_productivity == 3 and raw.recipe.a.foreign == 1)
+          assert(raw.recipe.b.maximum_productivity == 2 and raw.recipe.c.maximum_productivity == 1)
+          assert(raw.recipe.d.maximum_productivity == nil and raw.recipe.e.maximum_productivity == 3)
+          result = limits.apply(raw, options("percent-250", true))
+          assert(result.indexed_recipes == 0 and result.productivity == 2)
+          assert(raw.recipe.a.maximum_productivity == 2.5 and raw.recipe.e.maximum_productivity == 2.5)
+        ''')
+
+    def test_foreign_receiver_cycles_aliases_and_scalar_ranges(self):
+        self.lua.execute('''
+          local foreign = {}; foreign.self = foreign
+          local shared = {first=foreign,second=foreign,speed_limits="foreign-scalar"}
+          local machine = {effect_receiver=shared}
+          local facts = limits.apply({lab={machine}}, {["mir-prototype-speed-cap"]="bonus-200"})
+          assert(facts.receivers == 1)
+          local out = machine.effect_receiver
+          assert(out ~= shared and out.first ~= foreign and out.first == out.second)
+          assert(out.first.self == out.first and foreign.self == foreign)
+          assert(shared.speed_limits == "foreign-scalar")
+          assert(out.speed_limits.low == -0.8 and out.speed_limits.high == 2)
+        ''')
+
+    def test_return_bounds_exclusions_probabilities_and_native_caps(self):
+        self.lua.execute('''
+          local cases = {
+            {10, {amount=8,probability=0.5,ignored_by_productivity=2}, 2},
+            {4, {amount=4,probability=0.25,ignored_by_productivity=1}, 4},
+            {4, {amount=2,amount_min=10,amount_max=99}, 1},
+            {8, {amount_min=4,amount_max=2}, 1},
+            {2, {amount=2,probability=0.5,ignored_by_stats=1}, 2},
+            {2, {amount=2,probability=0.5,ignored_by_stats=1,ignored_by_productivity=0}, 1},
+            {2, {amount=2,probability=0.5,ignored_by_productivity=9}, math.huge},
+            {2, {amount=2,probability=0}, math.huge},
+            {1, {amount=1,probability=0.0000001}, 9999999},
+            {1, {amount=1,probability=1e-309}},
+            {2, {amount=2,independent_probability=0,probability=1}, math.huge},
+            {4, {amount=4,independent_probability=0.5,shared_probability={min=0.2,max=0.7},ignored_by_productivity=1}, 4},
+            {1, {amount=1}, 0},
+            {2, {amount=1,extra_count_fraction=0}, 1},
+            {2, {amount=1,extra_count_fraction=0.5}},
+            {2, {amount=1,extra_count_fraction="invalid"}},
+            {2, {amount=1,ignored_by_productivity=-1}},
+            {2, {amount=1,independent_probability="invalid"}},
+            {2, {amount=1,shared_probability={min=-1,max=0}}},
+            {2, {amount=1,shared_probability=0.5}},
+            {2, {amount=math.huge}},
+            {2, {amount=1,probability=0/0}},
+            {1, {amount=2,ignored_by_productivity=2}}
+          }
+          for index, case in ipairs(cases) do
+            local recipes = {make = manufacture(), back = reclaim(case[2], case[1])}
+            local classifier = scope.build(recipes, 3, true)
+            local actual = classifier.maximum_safe_productivity("back")
+            assert(actual == case[3] or actual and case[3] and math.abs(actual-case[3]) < 0.000001,
+              "wrong bound " .. index .. ": " .. tostring(actual))
+            assert(classifier.approve("make") == (case[3] ~= nil), "admission " .. index)
+            limits.apply({recipe = recipes}, options("percent-10000", true))
+            assert(recipes.make.maximum_productivity == (case[3] and 100 or 3), "forward " .. index)
+            assert(recipes.back.maximum_productivity == math.min(3, case[3] or 3), "return " .. index)
+          end
+          local recipes = {make = manufacture(), back = reclaim({amount=1,probability=0.5}, 1,
+            {category="recycling", maximum_productivity=3})}
+          assert(not scope.build(recipes, 3, true).approve("make"))
+          recipes.back.maximum_productivity = 1
+          assert(scope.build(recipes, 3, true).approve("make"))
+          limits.apply({recipe=recipes}, options("percent-10000", true))
+          assert(recipes.back.maximum_productivity == 1 and recipes.make.maximum_productivity == 100)
+          recipes.back.maximum_productivity = nil
+          assert(not scope.build(recipes, 4, true).approve("make"))
+        ''')
+
+    def test_cycles_byproducts_ambiguity_and_variants_withhold_increase(self):
+        self.lua.execute('''
+          local function baseline()
+            return {make = manufacture(), back = reclaim({amount=1,probability=0.25})}
+          end
+          local recipes = baseline()
+          assert(scope.build(recipes,3,true).approve("make"))
+          recipes.to_intermediate = manufacture("intermediate", "component")
+          recipes.to_ore = manufacture("ore", "intermediate")
+          assert(not scope.build(recipes,3,true).approve("make"))
+          recipes = baseline(); recipes.back.results[2] = {"byproduct",1}
+          assert(not scope.build(recipes,3,true).approve("make"))
+          recipes = baseline(); recipes.other = reclaim({amount=1,probability=0.1})
+          assert(not scope.build(recipes,3,true).approve("make"))
+          recipes = baseline(); recipes.make.ingredients = {{"component",1}}
+          assert(not scope.build(recipes,3,true).approve("make"))
+          recipes = baseline(); recipes.make.results[1] = {type="fluid",name="component",amount=1}
+          assert(not scope.build(recipes,3,true).approve("make"))
+          recipes = baseline(); recipes.make.normal = manufacture(); recipes.make.expensive = manufacture()
+          assert(not scope.build(recipes,3,true).approve("make"))
+        ''')
+
+    def test_recycling_changes_only_generated_item_rolls_and_keeps_native_caps(self):
+        self.lua.execute('''
+          local original = {name="component", amount=8, probability=0.25, foreign=9}
+          local generated = {category="recycling",hidden=true,unlock_results=false,
+            maximum_productivity=0.5,ingredients={{"component",1}},results={original,
+              {type="fluid",name="water",amount=1,probability=0.5},
+              {name="shared",amount=1,shared_probability={min=0,max=0.5}}}}
+          local visible = {category="recycling",ingredients={{"component",1}},results={{name="component",amount=1}}}
+          local facts = limits.apply({recipe={generated=generated,visible=visible}},
+            options("percent-400",false,"match-productivity-cap"))
+          assert(facts.recycling_products == 1 and original.independent_probability == 0.2)
+          assert(original.probability == nil and original.amount == 8 and original.foreign == 9)
+          assert(generated.maximum_productivity == 0.5 and visible.maximum_productivity == nil)
+          assert(generated.results[2].probability == 0.5 and generated.results[3].independent_probability == nil)
+          assert(visible.results[1].independent_probability == nil)
+        ''')
+
+    def test_power_floor_touches_only_explicit_zero_watts(self):
+        self.lua.execute('''
+          local group = {a={energy_usage="0kW"},b={energy_usage=" -0.0 MW "},c={energy_usage=0},
+            d={energy_usage="1W"},e={energy_usage="0J"},f={},g={energy_usage="bad"},h={energy_usage=-1}}
+          local facts = limits.apply({foreign=group}, {["mir-prototype-positive-power-floor"]=true})
+          assert(facts.positive_power == 3)
+          assert(group.a.energy_usage == "1W" and group.b.energy_usage == "1W" and group.c.energy_usage == "1W")
+          assert(group.d.energy_usage == "1W" and group.e.energy_usage == "0J" and group.f.energy_usage == nil)
+          assert(group.g.energy_usage == "bad" and group.h.energy_usage == -1)
+        ''')
+
+    def test_scope_indexes_recipes_once_and_preserves_modern_exclusion_default(self):
+        self.lua.execute('''
+          local recipes = {make=manufacture(),back=reclaim({amount=2,probability=0.5,ignored_by_stats=1},2)}
+          for i=1,1000 do recipes["unrelated"..i] = manufacture("product"..i,"input"..i) end
+          local classifier = scope.build(recipes,3,true)
+          assert(classifier.visited == 1002 and classifier.maximum_safe_productivity("back") == 2)
+          for i=1,250 do assert(classifier.approve("make")) end
+          assert(classifier.visited == 1002)
+          assert(scope.build(recipes,3,false).maximum_safe_productivity("back") == 1)
+        ''')
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    args = parser.parse_args()
+    sys.path.insert(0, str(args.lua_runtime_dir.resolve(strict=True)))
+    from lupa.lua52 import LuaRuntime
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(PrototypeLimitsTests))
+    sys.exit(0 if result.wasSuccessful() else 1)

@@ -15,6 +15,8 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           gear_name = "recipe-prod-research_gears-1"
+          agriculture_name = "recipe-prod-research_agricultural_growth_speed-1"
+          spoilage_name = "recipe-prod-research_spoilage_preservation-1"
           function technology(name)
             return {name = name, level = 3, researched = false, enabled = false,
               visible_when_disabled = true}
@@ -40,13 +42,25 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
               disabled_by_cap = {}, visibility_by_cap = {}, unique = {keep = true}}
             for _, name in ipairs(names) do
               local gear = name == gear_name
+              local direct = name == agriculture_name or name == spoilage_name
+              local continuation = name == "braking-force-8"
+              local native_owner = name == "low-density-structure-productivity"
               local setting = gear and "ips-max-level-research_gears"
+                or direct and "ips-max-level-" .. (name == agriculture_name
+                  and "research_agricultural_growth_speed" or "research_spoilage_preservation")
+                or continuation and "mir-max-level-braking-force"
+                or native_owner and "ips-max-level-research_low_density_structure"
                 or "mir-max-level-worker-robots-speed"
-              local source = gear and "generated-stream" or "native-owner"
+              local source = (gear or direct) and "generated-stream"
+                or continuation and "base-continuation"
+                or "native-owner"
               -- Only the predecessor-storage decoder uses this tuple. The
               -- published F210 V3 generated binding recorded `emit`; MIR5's
               -- live cap provenance is intentionally not represented here.
-              local operation = gear and "emit" or "native-owner-cap"
+              local operation = (gear or direct) and "emit"
+                or continuation and "emit_base_extension"
+                or native_owner and "preserve_native_owner"
+                or "native-owner-cap"
               local key = table.concat({name, setting, source, operation}, "\\0")
               old.managed_technologies[name] = {technology = name, setting = setting,
                 source = source, operation = operation, policy_transport = "transported-v3",
@@ -70,9 +84,24 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             storage = {mir = {maximum_level_control = old, unrelated = {keep = true}},
               mir_caps = current}
             game = {forces = forces}
+            mods = options.active_mods or {}
+            package.loaded["research.catalogue"] = nil
+            local streams = {}
+            for _, row in ipairs(require("research.catalogue").declared()) do
+              local value = {enabled = options.enabled ~= false, max_level = options.limit or 0}
+              if row.family == "research_agricultural_growth_speed" and options.agriculture then
+                value = options.agriculture
+              elseif row.family == "research_spoilage_preservation" and options.spoilage then
+                value = options.spoilage
+              end
+              streams[row.family] = value
+            end
             package.loaded["runtime.configuration"] = {
               enabled = options.enabled ~= false, max_level = options.limit or 0,
-              worker_robots_speed_max_level = options.worker_limit or 0}
+              worker_robots_speed_max_level = options.worker_limit or 0,
+              streams = streams,
+              agricultural_growth_speed = options.agriculture,
+              spoilage_preservation = options.spoilage}
             package.loaded["runtime.lifecycle"] = nil
             lifecycle = require("runtime.lifecycle")
           end
@@ -232,6 +261,69 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           lifecycle.on_configuration_changed()
           assert(not item.enabled and item.visible_when_disabled)
           assert(current.owned_disabled[1] == nil and current.legacy_caps_checked)
+        ''')
+
+    def test_scripted_families_import_their_exact_rights_and_a_disabled_family_cannot_reclaim_them(self):
+        self.lua.execute('''
+          local agriculture, spoilage = technology(agriculture_name), technology(spoilage_name)
+          local old = legacy({agriculture_name, spoilage_name}, {1})
+          boot({[1] = force(1, {[agriculture_name] = agriculture, [spoilage_name] = spoilage})}, old,
+            nil, {active_mods = {['space-age'] = '2.1.23'},
+              agriculture = {enabled = true, max_level = 2},
+              spoilage = {enabled = true, max_level = 2}})
+          lifecycle.on_configuration_changed()
+          local owned = storage.mir_caps.owned_disabled[1]
+          assert(owned[agriculture_name].disabled and owned[spoilage_name].disabled)
+          assert(not agriculture.enabled and agriculture.visible_when_disabled)
+          assert(not spoilage.enabled and spoilage.visible_when_disabled)
+
+          local saved = storage.mir_caps
+          boot({[1] = force(1, {[agriculture_name] = agriculture, [spoilage_name] = spoilage})}, old,
+            saved, {active_mods = {['space-age'] = '2.1.23'},
+              agriculture = {enabled = true, max_level = 0},
+              spoilage = {enabled = true, max_level = 0}})
+          lifecycle.on_configuration_changed()
+          assert(agriculture.enabled and spoilage.enabled)
+          assert(not agriculture.visible_when_disabled and not spoilage.visible_when_disabled)
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil)
+
+          agriculture.enabled, agriculture.visible_when_disabled = false, true
+          local disabled_old = legacy({agriculture_name}, {1})
+          boot({[1] = force(1, {[agriculture_name] = agriculture})}, disabled_old, nil,
+            {active_mods = {['space-age'] = '2.1.23'},
+              agriculture = {enabled = false, max_level = 2},
+              spoilage = {enabled = true, max_level = 0}})
+          lifecycle.on_configuration_changed()
+          assert(not agriculture.enabled and agriculture.visible_when_disabled,
+            "disabled scripted feature gained a predecessor enablement right")
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil)
+        ''')
+
+    def test_complete_catalogue_imports_a_continuation_and_exact_space_age_owner(self):
+        self.lua.execute('''
+          local continuation = technology("braking-force-8")
+          local owner = technology("low-density-structure-productivity")
+          owner.prototype = {max_level = 4294967295, effects = {
+            {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1},
+            {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .1}
+          }}
+          local f = force(51, {[continuation.name] = continuation, [owner.name] = owner})
+          local old = legacy({continuation.name, owner.name}, {51})
+          boot({[51] = f}, old, nil, {active_mods = {['space-age'] = '2.1.23'}, limit = 2})
+          lifecycle.on_configuration_changed()
+          local owned = storage.mir_caps.owned_disabled[51]
+          assert(owned and owned[continuation.name] and owned[owner.name]
+            and owned[continuation.name].disabled and owned[owner.name].disabled,
+            "exact full-catalogue predecessors did not import")
+          assert(not continuation.enabled and not owner.enabled
+            and continuation.visible_when_disabled and owner.visible_when_disabled)
+
+          local saved = storage.mir_caps
+          boot({[51] = f}, old, saved, {active_mods = {['space-age'] = '2.1.23'}, limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(continuation.enabled and owner.enabled
+            and not continuation.visible_when_disabled and not owner.visible_when_disabled,
+            "unlimited current settings did not restore the imported exact rights")
         ''')
 
     def test_init_does_not_import_predecessor_rights(self):
