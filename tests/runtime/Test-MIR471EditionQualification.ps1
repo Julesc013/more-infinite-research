@@ -42,7 +42,8 @@ $fixtureName='mir-fixture-471-edition-parity'
 $fixtures=@{}
 foreach($role in @('source','candidate')){
   $directory=Join-Path $root ('fixture-'+$role);[IO.Directory]::CreateDirectory($directory)|Out-Null
-  $version=if($SourceVersion-ceq'4.7.1'-and-not$CryogenicReproducer){if($role-ceq'source'){'0.3.0'}else{'0.3.1'}}else{'0.'+($(if($CryogenicReproducer){2470}else{470})+$patch)+'.'+$(if($role-ceq'source'){0}elseif($CryogenicReproducer){2}else{1})}
+  $fixtureEpoch=if($CryogenicReproducer){2470}elseif($Target-ceq'f210'-and$CandidateOnly){570}else{470}
+  $version=if($SourceVersion-ceq'4.7.1'-and-not$CryogenicReproducer){if($role-ceq'source'){'0.3.0'}else{'0.3.1'}}else{'0.'+($fixtureEpoch+$patch)+'.'+$(if($role-ceq'source'){0}elseif($CryogenicReproducer){2}else{1})}
   [ordered]@{name=$fixtureName;version=$version;title='MIR 4.7.1 focused edition acceptance';author='MIR maintainers';factorio_version=$line;dependencies=@("base >= $($engineInfo.version)","more-infinite-research >= $from")}|ConvertTo-Json -Depth 5|Set-Content (Join-Path $directory 'info.json')
   $observer=Get-Content (Join-Path $RepoRoot 'fixtures/assert-mir471-edition-parity/data-final-fixes.lua') -Raw
   if($CryogenicReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-final-fixes.lua') -Raw)}
