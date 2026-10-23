@@ -169,7 +169,15 @@ local function complete_beta_research_with_native_setter(state)
   end
   assert_beta_effect(technology)
   public_status(force, true)
-  assert_productivity(force, state.machine, expected_productivity, "researched")
+  -- The force recipe reflects the setter immediately. The existing assembler
+  -- refreshes its cached bonus during the next native production update.
+  -- Require its bonus together with physical output in the completion/reload
+  -- oracle, rather than treating this same-callback cache as that endpoint.
+  assert_no_modules(state.machine)
+  local recipe = force.recipes[recipe_name]
+  if recipe == nil or not close(recipe.productivity_bonus, expected_productivity) then
+    fail("researched native recipe productivity bonus differs")
+  end
   state.research_completed_by_native_setter = true
 end
 

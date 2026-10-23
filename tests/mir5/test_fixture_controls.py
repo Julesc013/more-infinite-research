@@ -90,7 +90,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
             return forbidden.reads.mods
           end
 
-          function run_beta_production_final_tick(path, phase_output, observed_output)
+          function run_beta_production_final_tick(path, phase_output, observed_output, machine_bonus)
             local callbacks = {}
             local saves = 0
             local logged = 0
@@ -111,7 +111,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
             }
             local machine = {
               valid = true,
-              productivity_bonus = 0.01,
+              productivity_bonus = machine_bonus or 0.01,
               crafting_progress = 0,
               get_inventory = function(index)
                 if index == 1 then return input end
@@ -184,6 +184,56 @@ class FixtureControlHostStageTests(unittest.TestCase):
               marker_count = logged
             }
           end
+
+          function run_module_permissions_init(path, omit_quality)
+            local callbacks = {}
+            local logged = 0
+            local effects = {
+              speed = true, productivity = true, consumption = true,
+              pollution = true, quality = true
+            }
+            if omit_quality then effects.quality = nil end
+            local categories = {
+              speed = true, quality = true,
+              ["mir5-module-permissions-fixture"] = true
+            }
+            local environment = {
+              script = {
+                active_mods = {
+                  base = "2.1.23",
+                  ["more-infinite-research"] = "5.0.21000",
+                  ["mir-fixture-mir5-module-permissions"] = "0.1.0"
+                },
+                on_init = function(callback) callbacks.on_init = callback end
+              },
+              prototypes = {
+                module_category = categories,
+                recipe = {
+                  ["mir5-module-permissions-recipe"] = {
+                    allowed_effects = effects, allowed_module_categories = categories
+                  },
+                  ["mir5-module-permissions-parameter-recipe"] = {
+                    allowed_effects = {}, allowed_module_categories = {speed = true}
+                  }
+                },
+                entity = {
+                  ["mir5-module-permissions-receiver"] = {
+                    allowed_effects = effects, allowed_module_categories = categories
+                  }
+                }
+              },
+              helpers = {table_to_json = function() return "{}" end},
+              log = function() logged = logged + 1 end
+            }
+            environment._G = environment
+            setmetatable(environment, {__index = function(_, key) return _G[key] end})
+            local chunk, message = loadfile(path, "t", environment)
+            assert(chunk ~= nil, message)
+            assert(pcall(chunk))
+            assert(type(callbacks.on_init) == "function")
+            local ok, result = pcall(callbacks.on_init)
+            return ok, result, logged
+          end
         """)
 
     def control(self, fixture):
@@ -248,6 +298,31 @@ class FixtureControlHostStageTests(unittest.TestCase):
         self.assertEqual(complete.researched_output, 202)
         self.assertEqual(complete.server_saves, 1)
         self.assertEqual(complete.marker_count, 1)
+
+    def test_beta_production_rejects_wrong_assembler_bonus_at_completed_output(self):
+        self.lua.globals().fixture_control = self.control("api-beta-production")
+        passed, message, state = self.lua.eval(
+            "run_beta_production_final_tick(fixture_control, 202, 0, 0)"
+        )
+        self.assertFalse(passed)
+        self.assertIn("native assembler productivity bonus differs", str(message))
+        self.assertEqual(state.server_saves, 0)
+        self.assertEqual(state.marker_count, 0)
+
+    def test_module_permissions_create_only_callback_accepts_complete_public_maps_and_rejects_a_wrong_permission(self):
+        self.lua.globals().fixture_control = self.control("module-permissions")
+        ok, message, markers = self.lua.eval(
+            "run_module_permissions_init(fixture_control, false)"
+        )
+        self.assertTrue(ok, message)
+        self.assertEqual(markers, 1)
+
+        wrong_ok, wrong_message, wrong_markers = self.lua.eval(
+            "run_module_permissions_init(fixture_control, true)"
+        )
+        self.assertFalse(wrong_ok)
+        self.assertIn("ordinary recipe native effects is missing quality", str(wrong_message))
+        self.assertEqual(wrong_markers, 0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
