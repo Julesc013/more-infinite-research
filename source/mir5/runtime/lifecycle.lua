@@ -205,6 +205,61 @@ local function authored_generated_admitted(force, row)
   return ok and enabled == true
 end
 
+-- A retained generated identity can be deliberately disabled by the data
+-- policy while its completed native effects remain in the save.  Its immutable
+-- prototype default, rather than ForceTechnology.enabled, identifies that
+-- state: the latter is also how a finite cap or another mod disables research.
+local function authored_generated_prototype_disabled(force, row)
+  if not valid_force(force) then return nil end
+  local ok, technology = pcall(function()
+    local technology = force.technologies and force.technologies[row.id] or nil
+    if technology and technology.prototype and technology.prototype.enabled == false then
+      return technology
+    end
+    return nil
+  end)
+  return ok and technology or nil
+end
+
+local function retained_authored_prototype_disablement(force, name)
+  local row = DECLARATION_BY_ID[name]
+  if not row or row.ownership_kind ~= "authored_generated" then return false end
+  return authored_generated_prototype_disabled(force, row) ~= nil
+end
+
+-- This runs only during initialization/configuration, over the compact
+-- authored declaration list. It does not enumerate a force's technologies.
+-- A record exists only after this runtime changed an enabled technology to
+-- disabled, so later cap relaxation can restore neither a data-stage default
+-- nor foreign pre-disablement.
+local function reconcile_authored_prototype_disablement(force, owned_disabled)
+  if not valid_force(force) then return false end
+  for index = 1, #ORDERED_DECLARATIONS do
+    local row = ORDERED_DECLARATIONS[index]
+    if row.ownership_kind == "authored_generated" then
+      local technology = authored_generated_prototype_disabled(force, row)
+      if technology and technology.enabled == true then
+        -- The caller probes with nil before allocating durable storage for an
+        -- otherwise unlimited save.
+        if type(owned_disabled) ~= "table" then return true end
+        local owned = owned_disabled[force.index]
+        if type(owned) ~= "table" then
+          owned = {}
+          owned_disabled[force.index] = owned
+        end
+        local record = owned[row.id]
+        if type(record) ~= "table" then
+          record = {}
+          owned[row.id] = record
+        end
+        record.disabled = true
+        technology.enabled = false
+      end
+    end
+  end
+  return false
+end
+
 local function full_limits_for(force, include_worker, selected_owner, owner_resolved)
   local limits, admitted = {}, {}
   if valid_force(force) then
@@ -265,7 +320,10 @@ local function discard_unbound_ownership(force, owned_disabled, admitted, owner,
   if type(owned) ~= "table" then return owned end
   for name, row in pairs(owned) do
     if not workers_only or name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
-      if admitted[name] ~= true then
+      -- A disabled authored prototype keeps a record that this runtime
+      -- actually wrote. It must remain disabled until that prototype is
+      -- admitted again, when caps.reconcile can restore only this proven right.
+      if admitted[name] ~= true and not retained_authored_prototype_disablement(force, name) then
         owned[name] = nil
       elseif name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
         local row = owned[name]
@@ -296,7 +354,8 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if target_name then
     limits, admitted, owner = event_limits_for(force, target_name, include_worker)
     if limits == nil then
-      if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil then
+      if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil
+          and not retained_authored_prototype_disablement(force, target_name) then
         owned[target_name] = nil
         if next(owned) == nil then owned_disabled[force.index] = nil end
       end
@@ -308,7 +367,8 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if type(owned_disabled) == "table" then
     if target_name then
       local row = owned_disabled[force.index]
-      if type(row) == "table" and row[target_name] ~= nil and admitted[target_name] ~= true then
+      if type(row) == "table" and row[target_name] ~= nil and admitted[target_name] ~= true
+          and not retained_authored_prototype_disablement(force, target_name) then
         row[target_name] = nil
         if next(row) == nil then owned_disabled[force.index] = nil end
       end
@@ -341,20 +401,28 @@ end
 local function reconcile_all(clean_stale_forces, selected_owners)
   if not game or not game.forces then return end
   -- Unlimited startup settings need no state unless a previous finite setting
-  -- left an ownership transition that has to be restored exactly once.
+  -- left an ownership transition that has to be restored exactly once, or an
+  -- authored disabled prototype is currently force-enabled and needs this
+  -- module's one recorded disablement.
   local current = CAPS_ACTIVE and ensure_state() or existing_state()
-  if not current then return end
-  local owned_disabled = current.owned_disabled
-  if clean_stale_forces then
+  local owned_disabled = current and current.owned_disabled or nil
+  if current and clean_stale_forces then
     for index in pairs(owned_disabled) do
       if not valid_force(force_for_index(index)) then owned_disabled[index] = nil end
     end
   end
   for _, force in pairs(game.forces) do
+    if current == nil and reconcile_authored_prototype_disablement(force, nil) then
+      current = ensure_state()
+      owned_disabled = current.owned_disabled
+    end
+    if current then
+      reconcile_authored_prototype_disablement(force, owned_disabled)
+    end
     local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
-    reconcile_force(force, owned_disabled, owner, selected_owners ~= nil)
+    if current then reconcile_force(force, owned_disabled, owner, selected_owners ~= nil) end
   end
-  discard_empty_state(current)
+  if current then discard_empty_state(current) end
 end
 
 local function legacy_candidates(force, worker_name)
