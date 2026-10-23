@@ -38,7 +38,7 @@ def raw_fixture(space_age=False):
     return {
         "technology": {
             AIR: {
-                "name": AIR, "enabled": True, "max_level": "infinite",
+                "name": AIR, "max_level": "infinite",
                 "effects": [
                     {"type": "change-recipe-productivity", "recipe": "atan-pollution-filter", "change": 0.05},
                     *([{ "type": "change-recipe-productivity", "recipe": "atan-spore-filter", "change": 0.05}]
@@ -47,7 +47,7 @@ def raw_fixture(space_age=False):
                 "unit": {"count_formula": "8000*2^(L-1)", "time": 60},
             },
             ASH: {
-                "name": ASH, "enabled": True, "max_level": "infinite",
+                "name": ASH, "max_level": "infinite",
                 "effects": [{"type": "change-recipe-productivity", "recipe": "atan-ash-seperation", "change": 0.05}],
                 "unit": {"count_formula": "8000*2^(L-1)", "time": 90},
             },
@@ -99,6 +99,7 @@ class AtanGameplayFixtureTests(unittest.TestCase):
 
     def test_guard_rejects_wrong_workload_or_shared_owner_effect_vector(self):
         cases = (
+            ("base", lambda raw: raw["technology"][AIR].update({"enabled": False}), "workload changed"),
             ("base", lambda raw: raw["technology"][AIR]["unit"].update({"time": 61}), "workload changed"),
             ("base", lambda raw: raw["technology"][AIR]["effects"].append(
                 {"type": "change-recipe-productivity", "recipe": "atan-spore-filter", "change": 0.05}), "effect vector changed"),
@@ -111,6 +112,12 @@ class AtanGameplayFixtureTests(unittest.TestCase):
                 ok, message, _ = self.run_fixture(variant, mutate)
                 self.assertFalse(ok)
                 self.assertIn(expected, str(message))
+
+    def test_captured_missing_enabled_and_explicit_true_share_native_default(self):
+        facts = json.loads((ROOT / "tests/mir5/fixtures/atan-f200-captured-facts.json").read_text(encoding="utf-8"))
+        self.assertTrue(all("enabled" not in row for row in facts["published_rows"]))
+        ok, message, _ = self.run_fixture(mutate=lambda raw: raw["technology"][AIR].update({"enabled": True}))
+        self.assertTrue(ok, message)
 
     def test_profiles_are_exact_f200_closures_and_fixture_dependencies_are_private(self):
         base = json.loads(PROFILES["base"].read_text(encoding="utf-8"))

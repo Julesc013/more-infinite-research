@@ -36,7 +36,9 @@ local function accelerate(name, expected_effects, expected_time)
   if type(technology) ~= "table" or type(technology.unit) ~= "table" then
     fail("MIR ATAN technology is absent: " .. name)
   end
-  if technology.enabled ~= true or technology.max_level ~= "infinite"
+  -- The captured published rows omit enabled; Factorio defaults that absence
+  -- to true. An explicit foreign disablement must still fail this workload.
+  if (technology.enabled ~= nil and technology.enabled ~= true) or technology.max_level ~= "infinite"
       or technology.unit.count ~= nil or technology.unit.count_formula ~= "8000*2^(L-1)"
       or technology.unit.time ~= expected_time then
     fail("MIR ATAN workload changed: " .. name)
