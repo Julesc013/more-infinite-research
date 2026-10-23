@@ -612,6 +612,16 @@ class LibraryTests(unittest.TestCase):
           local rows = root["mir_library_content"]["mir_library_results"]
           assert(#rows.items == 2 and rows.items[1] == gear.name and rows.items[2] == foreign.name)
 
+          -- The historical page value survives reopening, but it was never a
+          -- player-list paginator: the continuous list retains both rows.
+          library.close(player)
+          library.open(player)
+          view = storage.mir_library.players[1]
+          root = player.gui.screen["mir_research_browser"]
+          rows = root["mir_library_content"]["mir_library_results"]
+          assert(view.page == 7 and #rows.items == 2
+            and rows.items[1] == gear.name and rows.items[2] == foreign.name)
+
           -- The valid dense remote list changes actual rendering and an
           -- explicit valid page wins over the normal filter page reset.
           library.open(player, {hidden = {foreign.name}, page = 7})
