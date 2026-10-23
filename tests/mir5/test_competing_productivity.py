@@ -13,6 +13,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 PLAYER = ROOT / "source/mir5"
 FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-epr-f200-captured-facts.json"
+FIXED_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-fixed-f200-sa-captured-facts.json"
 
 # Captured from verified F200 2.0.77 upstream/published EPR 1.3.8 run
 # 39999658774, under build/mir5/black-glass/incoming/39999658774.
@@ -51,6 +52,57 @@ EXPECTED = (
     ("epr_utility-science-pack-productivity-4", 4, ("utility-science-pack",), (("recipe-prod-research_science_pack_productivity-1", ("utility-science-pack",)),)),
 )
 
+# The four fixed F200 Space Age providers were captured independently from
+# their upstream, prefer-MIR, and prefer-foreign arms in run 40009033780.
+# This is authored test expectation, not a projection of the candidate.
+FIXED_EXPECTED = (
+    ("basic-plate-productivity", 1, "advanced-material-processing", ("copper-plate", "iron-plate"),
+     (("recipe-prod-research_copper-1", ("copper-plate",)), ("recipe-prod-research_iron-1", ("iron-plate",))), True),
+    ("electric-circuit-productivity", 1, "automation-2", ("electronic-circuit",),
+     (("recipe-prod-research_electronic_circuit-1", ("electronic-circuit",)),), True),
+    ("advanced-circuit-productivity", 1, "chemical-science-pack", ("advanced-circuit",),
+     (("recipe-prod-research_advanced_circuit-1", ("advanced-circuit",)),), True),
+    ("automation-science-productivity-4", 4, "automation-science-productivity-3", ("automation-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("automation-science-pack",)),), False),
+    ("logistic-science-productivity-4", 4, "logistic-science-productivity-3", ("logistic-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("logistic-science-pack",)),), False),
+    ("military-science-productivity-4", 4, "military-science-productivity-3", ("military-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("military-science-pack",)),), False),
+    ("chemical-science-productivity-4", 4, "chemical-science-productivity-3", ("chemical-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("chemical-science-pack",)),), False),
+    ("production-science-productivity-4", 4, "production-science-productivity-3", ("production-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("production-science-pack",)),), False),
+    ("utility-science-productivity-4", 4, "utility-science-productivity-3", ("utility-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("utility-science-pack",)),), False),
+    ("space-science-productivity-4", 4, "space-science-productivity-3", ("space-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("space-science-pack",)),), False),
+    ("metallurgic-science-productivity-4", 4, "metallurgic-science-productivity-3", ("metallurgic-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("metallurgic-science-pack",)),), False),
+    ("electromagnetic-science-productivity-4", 4, "electromagnetic-science-productivity-3", ("electromagnetic-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("electromagnetic-science-pack",)),), False),
+    ("agricultural-science-productivity-4", 4, "agricultural-science-productivity-3", ("agricultural-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("agricultural-science-pack",)),), False),
+    ("cryogenic-science-productivity-4", 4, "cryogenic-science-productivity-3", ("cryogenic-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("cryogenic-science-pack",)),), False),
+    ("promethium-science-productivity-4", 4, "promethium-science-productivity-3", ("promethium-science-pack",),
+     (("recipe-prod-research_science_pack_productivity-1", ("promethium-science-pack",)),), False),
+    ("bioflux-productivity", 1, "bioflux", ("bioflux",),
+     (("recipe-prod-research_bioflux-1", ("bioflux",)),), True),
+    ("fish-breeding-productivity", 1, "fish-breeding", ("fish-breeding",),
+     (("recipe-prod-research_breeding-1", ("fish-breeding",)),), True),
+)
+
+FIXED_ARCHIVES = {
+    "plates": ("plates-n-circuit-productivity_0.0.2.zip",
+               "E7CC206A847C24E213A0E51568C5A4B00D399F21FF4E84A3A124347D0FF7119F"),
+    "science-packs": ("Science_packs_productivity_0.0.1.zip",
+                      "5E77A37884000B0DEBCD690F3489C4E69EA80DA4A924498940C34FD718AF92EC"),
+    "bioflux": ("bioflux-productivity_0.1.0.zip",
+                "84B3A23218E596A4585AD405F8586E18DCA9C8B493EA77CE8EE90584C180F1AE"),
+    "fish": ("fish-productivity_1.0.0.zip",
+             "1B19C53C06A0BF0E9FE40C38C8755F3917B6BEECEBD3355439BD65980C45C1FB"),
+}
+
 
 def plain(value, seen=None):
     if not hasattr(value, "items"):
@@ -76,6 +128,11 @@ class CompetingProductivityTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           function exact_active() return {base="2.0.77", ExpandedProductivityResearch="1.3.8"} end
+          function fixed_active()
+            return {base="2.0.77", ["space-age"]="2.0.77",
+              ["plates-n-circuit-productivity"]="0.0.2", Science_packs_productivity="0.0.1",
+              ["bioflux-productivity"]="0.1.0", ["fish-productivity"]="1.0.0"}
+          end
           function f200_target() return {id="f200", factorio_version="2.0"} end
           function add_effects(out, effects)
             for _, effect in ipairs(effects) do out[#out + 1] = {type=effect.type or "change-recipe-productivity", recipe=effect.recipe, change=effect.change} end
@@ -95,7 +152,7 @@ class CompetingProductivityTests(unittest.TestCase):
                 if not target then
                   target = {name=replacement.id, valid=true, force=force, level=1, researched=false,
                     enabled=true, visible_when_disabled=false,
-                    prototype={enabled=true, max_level=4294967295, effects={}}}
+                    prototype={enabled=true, level=1, max_level=4294967295, effects={}}}
                   force.technologies[replacement.id] = target
                 end
                 add_effects(target.prototype.effects, replacement.effects)
@@ -103,10 +160,10 @@ class CompetingProductivityTests(unittest.TestCase):
             end
             return force
           end
-          function install_competing(preference, force)
+          function install_competing(preference, force, selected_mods)
             local target = require("platform.target")
             target.id, target.factorio_version = "f200", "2.0"
-            script = {active_mods=exact_active()}
+            script = {active_mods=selected_mods or exact_active()}
             storage = storage or {}
             game = {forces={[force.index]=force, player=force}}
             package.loaded["runtime.configuration"] = nil
@@ -120,6 +177,9 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def contract(self):
         return self.lua.execute('return require("compatibility.competing_productivity").select(exact_active(), f200_target())')
+
+    def fixed_contract(self):
+        return self.lua.execute('return require("compatibility.competing_productivity").select(fixed_active(), f200_target())')
 
     def captured_facts(self):
         return json.loads(FACTS_PATH.read_text(encoding="utf-8"))
@@ -369,6 +429,20 @@ class CompetingProductivityTests(unittest.TestCase):
             "on_forces_merged", "on_research_finished", "on_research_started", "on_research_cancelled",
             "on_research_reversed", "on_technology_effects_reset"}) do assert(calls[name] == 1, name) end
 
+          -- The same named callback composition loads for a fixed F200 Space
+          -- Age provider; its row ID is irrelevant to bootstrap dispatch.
+          local prior_init = calls.on_init
+          handlers = {events={}}
+          remote={interfaces={},add_interface=function(name, value) remote.interfaces[name]=value end}
+          script = {active_mods={["fish-productivity"]="1.0.0"}, on_init=function(f) handlers.init=f end,
+            on_configuration_changed=function(f) handlers.configuration=f end, on_load=function(f) handlers.load=f end,
+            on_event=function(id, f) handlers.events[id]=f end, on_nth_tick=function() end}
+          package.loaded["runtime.bootstrap"] = nil
+          local fixed_provider = require("runtime.bootstrap")
+          fixed_provider.register()
+          handlers.init()
+          assert(calls.on_init == prior_init + 1)
+
           -- Removing the provider may erase its rows before another profile
           -- adds a new foreign EPR technology. The private right is stale;
           -- clearing it must not re-enable or reveal the newly foreign row.
@@ -399,10 +473,200 @@ class CompetingProductivityTests(unittest.TestCase):
           assert(not ok and tostring(message):match("unsupported competing productivity storage"))
         ''')
 
+    def test_fixed_f200_space_age_inventory_and_selection_are_explicit(self):
+        facts = json.loads(FIXED_FACTS_PATH.read_text(encoding="utf-8"))
+        self.assertEqual(1, facts["schema"])
+        self.assertEqual("MIR5FixedCompetingF200SANativeReferenceFactsV1", facts["kind"])
+        self.assertEqual(40009033780, facts["run"])
+        expected_by_provider = {
+            "plates": FIXED_EXPECTED[:3],
+            "science-packs": FIXED_EXPECTED[3:15],
+            "bioflux": FIXED_EXPECTED[15:16],
+            "fish": FIXED_EXPECTED[16:],
+        }
+        self.assertEqual(set(expected_by_provider), {provider["key"] for provider in facts["providers"]})
+        self.assertEqual(17, sum(len(rows) for rows in expected_by_provider.values()))
+
+        for provider in facts["providers"]:
+            self.assertEqual(FIXED_ARCHIVES[provider["key"]],
+                             (provider["archive"], provider["archive_sha256"]))
+            rows = expected_by_provider[provider["key"]]
+            upstream = provider["arms"]["upstream"]["provider_rows"]
+            published = provider["arms"]["published"]
+            foreign = provider["arms"]["foreign"]
+            self.assertEqual({row[0] for row in rows}, set(provider["published_removed_ids"]))
+            self.assertEqual([], provider["foreign_changed_provider_ids"])
+            self.assertTrue({row[0] for row in rows}.issubset(upstream))
+            self.assertTrue(set(upstream).issubset(foreign["provider_rows"]))
+            self.assertEqual({name for name, row in published["provider_rows"].items() if row is None},
+                             {row[0] for row in rows})
+            for name, first_level, predecessor, recipes, replacements, initial in rows:
+                row = upstream[name]
+                self.assertIn(predecessor, row["prerequisites"])
+                self.assertEqual(recipes, tuple(effect["recipe"] for effect in row["effects"]))
+                self.assertTrue(all(effect["change"] == 0.1 for effect in row["effects"]))
+                self.assertNotIn("level", row)
+                self.assertEqual(row, foreign["provider_rows"][name])
+                if initial:
+                    self.assertNotRegex(name, r"-\d+$")
+                    self.assertEqual(1, first_level)
+                else:
+                    self.assertTrue(name.endswith("-4"))
+                    self.assertEqual(f"{name[:-1]}3", predecessor)
+                    self.assertEqual(4, first_level)
+                for replacement, required_recipes in replacements:
+                    self.assertIn(replacement, published["mir_rows"])
+                    effects = published["mir_rows"][replacement]["effects"]
+                    actual_recipes = {effect["recipe"] for effect in effects
+                                      if effect["type"] == "change-recipe-productivity"}
+                    self.assertTrue(set(required_recipes).issubset(actual_recipes))
+
+        contract = plain(self.fixed_contract())
+        actual = tuple(
+            (item["id"], item["first_level"], item["predecessor"],
+             tuple(effect["recipe"] for effect in item["effects"]),
+             tuple((replacement["id"], tuple(effect["recipe"] for effect in replacement["effects"]))
+                   for replacement in item["replacements"]), item["initial_retirement"])
+            for item in contract["bindings"]
+        )
+        self.assertEqual(FIXED_EXPECTED, actual)
+        self.assertEqual(
+            ("plates-n-circuit-productivity", "Science_packs_productivity", "bioflux-productivity", "fish-productivity"),
+            tuple(provider["name"] for provider in contract["providers"]),
+        )
+
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local target = f200_target()
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ["plates-n-circuit-productivity"]="0.0.3"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["plates-n-circuit-productivity"]="0.0.2"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ExpandedProductivityResearch="1.3.8", ["fish-productivity"]="1.0.0"}, target) == nil)
+          assert(binding.select(fixed_active(), {id="f210", factorio_version="2.1"}) == nil)
+        ''')
+
+    def test_fixed_f200_space_age_runtime_preserves_foreign_rows_and_partial_work(self):
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local active = fixed_active()
+          local contract = binding.select(active, f200_target())
+          local function owned(name)
+            local state = storage.mir_competing_productivity
+            return state and state.owned_disabled[71] and state.owned_disabled[71][name] or nil
+          end
+
+          -- All four exact fixed providers compose. Initial identities are
+          -- retired only when untouched; level-four tails retain levels 1--3.
+          local force = force_from_contract(contract)
+          storage = {}
+          local runtime = install_competing(true, force, active)
+          runtime.on_init()
+          for _, item in ipairs(contract.bindings) do
+            local technology = force.technologies[item.id]
+            assert(technology.enabled == false and technology.visible_when_disabled == true, item.id)
+            assert(owned(item.id).disabled == true, item.id)
+            assert(technology.level == item.first_level and technology.researched == false, item.id)
+          end
+          runtime = install_competing(false, force, active)
+          runtime.on_configuration_changed()
+          for _, item in ipairs(contract.bindings) do
+            local technology = force.technologies[item.id]
+            assert(technology.enabled == true and technology.visible_when_disabled == false, item.id)
+          end
+          assert(storage.mir_competing_productivity == nil)
+
+          -- A foreign pre-disable gets no MIR record, so relaxation cannot
+          -- re-enable or reveal it.
+          force = force_from_contract(contract)
+          force.technologies["bioflux-productivity"].enabled = false
+          force.technologies["bioflux-productivity"].visible_when_disabled = false
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          assert(force.technologies["bioflux-productivity"].enabled == false)
+          assert(force.technologies["bioflux-productivity"].visible_when_disabled == false)
+          assert(owned("bioflux-productivity") == nil)
+          runtime = install_competing(false, force, active)
+          runtime.on_configuration_changed()
+          assert(force.technologies["bioflux-productivity"].enabled == false)
+          assert(force.technologies["bioflux-productivity"].visible_when_disabled == false)
+
+          -- Partial MIR coverage and a changed native prerequisite both leave
+          -- the matching foreign initial identity untouched.
+          force = force_from_contract(contract)
+          force.technologies["recipe-prod-research_copper-1"].prototype.effects[1].change = .2
+          force.technologies["recipe-prod-research_electronic_circuit-1"].prototype.level = 2
+          force.technologies["fish-breeding-productivity"].prototype.prerequisites["fish-breeding"] = nil
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          assert(force.technologies["basic-plate-productivity"].enabled == true)
+          assert(force.technologies["electric-circuit-productivity"].enabled == true)
+          assert(force.technologies["fish-breeding-productivity"].enabled == true)
+          assert(owned("basic-plate-productivity") == nil and owned("electric-circuit-productivity") == nil
+            and owned("fish-breeding-productivity") == nil)
+
+          -- If a previously admitted MIR replacement changes, release only
+          -- our recorded disablement and leave the provider's row future-open.
+          force = force_from_contract(contract)
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          force.technologies["recipe-prod-research_copper-1"].prototype.effects[1].change = .2
+          runtime.on_configuration_changed()
+          assert(force.technologies["basic-plate-productivity"].enabled == true)
+          assert(force.technologies["basic-plate-productivity"].visible_when_disabled == false)
+          assert(owned("basic-plate-productivity") == nil)
+
+          -- A queued initial research has live fractional work. It remains
+          -- wholly foreign until it is no longer current or queued.
+          force = force_from_contract(contract)
+          local queued = force.technologies["electric-circuit-productivity"]
+          force.current_research, force.research_queue, force.research_progress = queued, {queued}, .27
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          assert(queued.enabled == true and queued.visible_when_disabled == false)
+          assert(#force.research_queue == 1 and force.research_queue[1] == queued)
+          assert(force.current_research == queued and force.research_progress == .27)
+          assert(owned("electric-circuit-productivity") == nil)
+
+          -- Detached partial work remains foreign even without a queue entry.
+          -- Only a known empty native saved-progress slot permits retirement.
+          for _, saved in ipairs({.27, -.1, "invalid", false}) do
+            force = force_from_contract(contract)
+            local paused = force.technologies["electric-circuit-productivity"]
+            paused.saved_progress = saved
+            storage = {}
+            runtime = install_competing(true, force, active)
+            runtime.on_init()
+            assert(paused.enabled == true and paused.visible_when_disabled == false)
+            assert(paused.saved_progress == saved and owned(paused.name) == nil)
+          end
+          force = force_from_contract(contract)
+          force.technologies["electric-circuit-productivity"].saved_progress = 0
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          assert(force.technologies["electric-circuit-productivity"].enabled == false)
+
+          -- A completed initial level is foreign credit. The cap path retires
+          -- only the next level and never rewrites the earned level flag.
+          force = force_from_contract(contract)
+          local earned = force.technologies["advanced-circuit-productivity"]
+          earned.level, earned.researched = 2, false
+          storage = {}
+          runtime = install_competing(true, force, active)
+          runtime.on_init()
+          assert(earned.level == 2 and earned.researched == false)
+          assert(earned.enabled == false and earned.visible_when_disabled == true)
+          assert(owned("advanced-circuit-productivity").disabled == true)
+        ''')
+
     def test_source_stays_fixed_and_non_scanning(self):
         compatibility = (PLAYER / "compatibility/competing_productivity.lua").read_text(encoding="utf-8")
         runtime = (PLAYER / "runtime/competing_productivity.lua").read_text(encoding="utf-8")
-        self.assertNotIn("pairs(technologies)", compatibility)
         self.assertNotIn("pairs(technologies)", compatibility)
         self.assertNotIn("local function copy", compatibility)
         self.assertNotIn("pairs(force.technologies)", runtime)

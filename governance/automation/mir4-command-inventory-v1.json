@@ -3475,9 +3475,9 @@
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "6E437C95F0D06CDBE0F0CDFC9AEABC3BE67CB0F1ACDE27A21750BBC22CE5224F",
+      "sha256": "6EF8A86B0436E1C5CDBC7C57ECBD54980F56B808B14FBDC4EE133D6A55BC11E8",
       "hash_mode": "canonical-text-v1",
-      "lines": 306,
+      "lines": 228,
       "package_visible": false
     },
     {
@@ -4523,9 +4523,9 @@
     {
       "path": "tools/lib/validation/PackageIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "A36BA29E799C57A986934F0F054F1378FECC9C09614209FA761D9B0501CDA549",
+      "sha256": "1E8834DAAAED4014933C33B8E1CFF94B1EFB1DFC1BB046ED44D6E1F13976E2FB",
       "hash_mode": "canonical-text-v1",
-      "lines": 482,
+      "lines": 463,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:c80360f58f2b4625f7db2fcc282efeee07e46de337ef690338a4b059d56a7f0e"
+  "digest": "sha256:fccccbb39157554eb2afd4370afe563e145c6103b6319fa149f1b4afaee15dc1"
 }

@@ -1,0 +1,2 @@
+-- Historical transition acceleration happens only after data-final-fixes.lua
+-- has asserted the published direct row.  No startup setting is created.

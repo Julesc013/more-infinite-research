@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingEPRNativePreferenceContinuityChainV1",
+  "source": "700c4769452f3f49793411cffd3aa18664317f11",
+  "run": {
+    "id": 40011654058,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40011654058",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/40011654058/black-glass-competing-epr-gameplay-40011654058-1",
+  "manifest_members_verified": 86,
+  "cases": {
+    "published": {
+      "receipt": {
+        "gzip": "spec/mir5/evidence/competing-epr-qualified-published-native.json.gz",
+        "uncompressed_sha256": "233DE6FE5A9A2BBDF87AC29D0B26E6FF49132C6B5C7E0E7F4EB5038C513F8772"
+      },
+      "source_head": "700c4769452f3f49793411cffd3aa18664317f11",
+      "player": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "fixture_version": "0.1.0",
+        "actual_lab_completions": 2,
+        "prerequisite_seeding": "completed-before-native-tail-labs",
+        "tail": "epr_iron-gear-wheel-productivity-5",
+        "tail_next_level": 7,
+        "productivity_bonus": 0.6000000238418579,
+        "tail_saved_progress": 0,
+        "current_research_progress": 0.27,
+        "braking_saved_progress": 0.42000000000000004,
+        "player_queue": [
+          "epr_iron-gear-wheel-productivity-5",
+          "braking-force-1"
+        ],
+        "foreign_disabled": true,
+        "retained_epr_tail_count": 30,
+        "lab_frozen": true,
+        "on_load_read_only": false
+      },
+      "input_save": null,
+      "two_cold_reloads_byte_identical": true
+    },
+    "prefer-mir": {
+      "receipt": {
+        "gzip": "spec/mir5/evidence/competing-epr-qualified-prefer-mir-native.json.gz",
+        "uncompressed_sha256": "E3ECC9F79D7A30137F183B204A75D375447254EA07C9AC74670A43748BE0D207"
+      },
+      "source_head": "700c4769452f3f49793411cffd3aa18664317f11",
+      "player": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "sha256": "D59767E521BD4EE89A6BF3BEF8517FEFF10DE4EA9EF28F5081950FB7996328E6"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "destination_mir": "5.0.20000",
+        "source_actual_lab_completions": 2,
+        "tail": "epr_iron-gear-wheel-productivity-5",
+        "tail_next_level": 7,
+        "productivity_bonus": 0.6000000238418579,
+        "tail_saved_progress": 0.27,
+        "current_research_progress": 0.42000000000000004,
+        "player_disabled": true,
+        "player_visible_when_disabled": true,
+        "braking_saved_progress": 0,
+        "player_queue": [
+          "braking-force-1"
+        ],
+        "foreign_disabled": true,
+        "retained_epr_tail_count": 30,
+        "lab_frozen": true,
+        "on_load_read_only": false
+      },
+      "input_save": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011654058-1\\gameplay\\published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "AB54724FFDA4246BB80E0D951E4DC24FBE951E2242E3ADDD7605DF196DB29DD1"
+      },
+      "two_cold_reloads_byte_identical": true
+    },
+    "prefer-foreign": {
+      "receipt": {
+        "gzip": "spec/mir5/evidence/competing-epr-qualified-prefer-foreign-native.json.gz",
+        "uncompressed_sha256": "5A1853BE6388DA9496F5CE694CE9A652CE27551542EB14AD44851A885F642B70"
+      },
+      "source_head": "700c4769452f3f49793411cffd3aa18664317f11",
+      "player": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "sha256": "D59767E521BD4EE89A6BF3BEF8517FEFF10DE4EA9EF28F5081950FB7996328E6"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "destination_mir": "5.0.20000",
+        "source_actual_lab_completions": 2,
+        "tail": "epr_iron-gear-wheel-productivity-5",
+        "tail_next_level": 7,
+        "productivity_bonus": 0.6000000238418579,
+        "tail_saved_progress": 0.27,
+        "current_research_progress": 0.42000000000000004,
+        "player_reenabled": true,
+        "player_visible_when_disabled": false,
+        "braking_saved_progress": 0,
+        "player_queue": [
+          "braking-force-1"
+        ],
+        "foreign_still_disabled": true,
+        "retained_epr_tail_count": 30,
+        "lab_frozen": true,
+        "on_load_read_only": false
+      },
+      "input_save": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011654058-1\\gameplay\\prefer-mir\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "01124AC98339A89DEC578C25F4ACC439CA22D2D5F6CBFB0B79D9500165C29D5B"
+      },
+      "two_cold_reloads_byte_identical": true
+    }
+  },
+  "scope": [
+    "F2002.0.77 Base with exact EPR1.3.8; published4.7.20002 false-preference source completes two real EPR labs.",
+    "MIR5 true preference retains all30 identities and earned effects, retires owned future EPR research and preserves paused0.27/current0.42 investment and all foreign disablement.",
+    "MIR5 false preference restores only its own disablement/visibility right, preserves earned/foreign state and does not invent a research queue.",
+    "Every stage saves and passes two independent cold reloads; original predecessor inputs remain byte-identical."
+  ],
+  "limitations": [
+    "Private non-final source/package; no other provider/engine, physical crafting, multiplayer or performance acceptance from this chain."
+  ],
+  "release_qualification": false
+}

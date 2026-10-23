@@ -17,6 +17,8 @@ FIXTURE = ROOT / "tests/mir5/fixtures/f200-legacy-cap"
 ORACLE = ROOT / "spec/mir5/inventory/modern-f200-470.json"
 PUBLISHED_PROFILE = ROOT / "tests/mir5/profiles/f200-legacy-cap-published-4.7-2077.json"
 MIR5_PROFILE = ROOT / "tests/mir5/profiles/f200-legacy-cap-mir5-2077.json"
+PUBLISHED_RELAXED_PROFILE = ROOT / "tests/mir5/profiles/f200-legacy-cap-published-relaxed-control-4.7-2077.json"
+PUBLISHED_CONTROL_INFO = FIXTURE / "published-control-info.json"
 NAME = "mir-fixture-mir5-f200-legacy-cap"
 GEAR = "recipe-prod-research_gears-1"
 SCIENCE = ("automation-science-pack", "logistic-science-pack",
@@ -85,8 +87,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
           end
 
-          function legacy_cap_flow(source_path, destination_path, opponent)
-            local callbacks,markers,saves={events={}},0,0
+          function legacy_cap_flow(source_path, destination_path, opponent, destination_mir, destination_fixture)
+            local callbacks,markers,diagnostics,saves={events={}},0,0,0
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local function inventory()
@@ -129,23 +131,29 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 assert(quality and quality.name=="normal");return 1
               end}
             end
-            local input=inventory()
-            local lab={valid=true,energy=0}
+            local input=inventory();local modules=setmetatable({},{__len=function()return 0 end})
+            local lab={valid=true,energy=0,quality={name="normal"},prototype={get_researching_speed=function(quality)
+              assert(quality and quality.name=="normal");return 1
+            end}}
             function lab.get_inventory(index)assert(index==1);return input end
+            function lab.get_module_inventory()return modules end
             local function tech(name, force)
               return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
                 prototype={max_level=4294967295,visible_when_disabled=false},prerequisites={},research_unit_count=1,research_unit_energy=60,
                 research_unit_ingredients={{name="automation-science-pack",amount=1},{name="logistic-science-pack",amount=1},{name="chemical-science-pack",amount=1},{name="production-science-pack",amount=1}}}
             end
             local function force(name,index)
-              local value={name=name,index=index,valid=true,technologies={},recipes={['iron-gear-wheel']={productivity_bonus=0}},research_queue={},research_progress=0}
+              local value={name=name,index=index,valid=true,technologies={},recipes={['iron-gear-wheel']={productivity_bonus=0}},research_queue={},research_progress=0,
+                laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
               value.technologies[GEAR]=tech(GEAR,value);value.technologies["braking-force-1"]=tech("braking-force-1",value)
               function value.enable_all_prototypes()end
               function value.reset_technology_effects() value.recipes['iron-gear-wheel'].productivity_bonus=0 end
               function value.add_research(research)
                 if type(research)=="string"then research=value.technologies[research]end
                 if research==nil or value.current_research~=nil then return false end
-                value.current_research=research;value.research_queue={research};return true
+                local transferred=research.saved_progress or 0
+                if opponent=="lost-investment" and value.name=="player" and transferred>0 then transferred=.26 end
+                value.current_research=research;value.research_queue={research};value.research_progress=transferred;research.saved_progress=0;return true
               end
               return value
             end
@@ -166,8 +174,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)assert(row.status=="passed");assert(row.stage=="initial" or row.stage=="reload");return "{}"end},
-                log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
+                game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)
+                  if row.status=="passed" then assert(row.stage=="initial" or row.stage=="reload")
+                  else
+                    assert(row.stage=="finish-before-assertion");assert(type(row.research_start_tick)=="number")
+                    assert(type(row.research_finished_tick)=="number");assert(type(row.raw_elapsed_ticks)=="number")
+                    assert(type(row.processing_ticks)=="number");assert(type(row.expected_processing_ticks)=="number")
+                    assert(type(row.science_units_observed)=="table")
+                  end
+                  return "{}"
+                end},log=function(row)
+                  if row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ") then markers=markers+1
+                  else assert(row:match("^%[MIR5_NATIVE_FIXTURE%] DIAGNOSTIC "));diagnostics=diagnostics+1 end
+                end}
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
               return ok and c or nil,tostring(result)
@@ -181,7 +200,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               game.tick=game.tick+1;return invoke(control,"tick")
             end
             local function complete_player(control, level, bonus, consumed_units)
-              player.current_research=nil;player.research_queue={};player.technologies[GEAR].level=level
+              player.current_research=nil;player.research_queue={};player.research_progress=0;player.technologies[GEAR].level=level
               player.technologies[GEAR].researched=false;player.recipes['iron-gear-wheel'].productivity_bonus=bonus
               for _,science_name in ipairs(science)do input.consume(science_name,consumed_units or 1) end
               return invoke(control,"finished",{research=player.technologies[GEAR]})
@@ -207,11 +226,18 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
             -- This is the candidate lifecycle result under test, not a fixture write.
             if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true end
-            local destination,message=load_control(destination_path,"5.0.20000","0.2.0",startup(40));if not destination then return {ok=false,message=message}end
+            local destination_mir=destination_mir or "5.0.20000";local destination_fixture=destination_fixture or "0.2.0"
+            local destination,message=load_control(destination_path,destination_mir,destination_fixture,startup(40));if not destination then return {ok=false,message=message}end
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
-            ok,result=complete_player(destination,4,.03,opponent=="wrong-consumed-fraction" and .72 or .73);if not ok then return {ok=false,message=result}end
+            local consumed_units=state.destination_science_accounting.consumed_units
+            local processing_ticks=state.destination_science_accounting.remaining_ticks
+            if opponent=="wrong-tick-span" then processing_ticks=processing_ticks-1 end
+            if opponent=="raw-elapsed-offset" then game.tick=game.tick+1 end
+            for _=1,processing_ticks do ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
+            if opponent=="consumption-overshoot" then consumed_units=consumed_units+1/60 end
+            ok,result=complete_player(destination,4,.03,consumed_units);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
@@ -219,17 +245,19 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               player_level=player.technologies[GEAR].level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
               science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
-              remaining_invest=state.destination_remaining_invest,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
-              markers=markers,saves=saves}
+              consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
+              processing_ticks=state.destination_processing_ticks,elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
+              markers=markers,diagnostics=diagnostics,saves=saves}
           end
         ''')
 
     def row(self):
         return lua_value(self.lua, deepcopy(self.oracle_row))
 
-    def test_profiles_use_base_f200_observer_and_two_explicit_fixture_versions(self):
+    def test_profiles_use_base_f200_observer_and_explicit_fixture_versions(self):
         for path, mir, version in ((PUBLISHED_PROFILE, "4.7.20002", "0.1.0"),
-                                   (MIR5_PROFILE, "5.0.20000", "0.2.0")):
+                                   (MIR5_PROFILE, "5.0.20000", "0.2.0"),
+                                   (PUBLISHED_RELAXED_PROFILE, "4.7.20002", "0.3.0")):
             with self.subTest(profile=path.name):
                 profile = json.loads(path.read_text(encoding="utf-8"))
                 self.assertEqual(("f200", "2.0.77"), (profile["target"], profile["engine"]["version"]))
@@ -238,19 +266,27 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                 self.assertEqual(mir, profile["mods"][2]["version"])
                 self.assertEqual(version, profile["mods"][3]["version"])
                 self.assertNotIn("space-age", [item["name"] for item in profile["mods"]])
-                info = json.loads((FIXTURE / ("published" if version == "0.1.0" else "mir5") / "info.json").read_text())
+                info_path = FIXTURE / "published/info.json" if version == "0.1.0" else (PUBLISHED_CONTROL_INFO if version == "0.3.0" else FIXTURE / "mir5/info.json")
+                info = json.loads(info_path.read_text())
                 self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
+                if version == "0.3.0":
+                    self.assertEqual("F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+                                     profile["archive_sha256"]["more-infinite-research_4.7.20002.zip"])
 
     def test_independent_base_oracle_preflight_precedes_the_only_count_time_mutation(self):
         for directory, mir in (("published", "4.7.20002"), ("mir5", "5.0.20000")):
             with self.subTest(directory=directory):
-                result = self.lua.eval("legacy_cap_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, self.row())
+                row = self.row()
+                if directory == "published":
+                    row["visible_when_disabled"] = True
+                result = self.lua.eval("legacy_cap_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, row)
                 self.assertTrue(result["ok"], result["message"])
                 unit = result["row"]["unit"]
                 self.assertIsNone(unit["count"])
                 self.assertEqual(("1", 1), (unit["count_formula"], unit["time"]))
                 self.assertEqual(.01, result["row"]["effects"][1]["change"])
         bad = self.row()
+        bad["visible_when_disabled"] = True
         bad["effects"][1]["change"] = .02
         result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", bad)
         self.assertFalse(result["ok"])
@@ -258,6 +294,25 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertIsNone(result["row"]["unit"]["count"])
         self.assertEqual("8000*2^(L-1)", result["row"]["unit"]["count_formula"])
         self.assertEqual(60, result["row"]["unit"]["time"])
+        wrong_published = self.row()
+        result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", wrong_published)
+        self.assertFalse(result["ok"])
+        self.assertIn("cap presentation changed", result["message"])
+        wrong_mir5 = self.row()
+        wrong_mir5["visible_when_disabled"] = True
+        result = self.lua.eval("legacy_cap_data")(str(FIXTURE / "mir5" / "data-final-fixes.lua"), "5.0.20000", wrong_mir5)
+        self.assertFalse(result["ok"])
+        self.assertIn("fresh presentation changed", result["message"])
+
+    def test_published_relaxation_uses_the_published_visibility_preflight_and_canonical_successor_control(self):
+        published = (FIXTURE / "published/data-final-fixes.lua").read_text(encoding="utf-8")
+        mir5 = (FIXTURE / "mir5/data-final-fixes.lua").read_text(encoding="utf-8")
+        control = (FIXTURE / "mir5/control.lua").read_text(encoding="utf-8")
+        self.assertIn("technology.visible_when_disabled == true", published)
+        self.assertIn("cap presentation changed", published)
+        self.assertIn("technology.visible_when_disabled == nil", mir5)
+        self.assertIn("PUBLISHED_RELAXED_CASE", control)
+        self.assertIn('mir == "4.7.20002" and fixture == "0.3.0"', control)
 
     def test_controls_parse_without_game_or_storage_access_and_never_write_source_player_presentation(self):
         for directory, mir, version in (("published", "4.7.20002", "0.1.0"), ("mir5", "5.0.20000", "0.2.0")):
@@ -291,11 +346,31 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertTrue(result["player_enabled"])
         self.assertTrue(result["player_visible"])
         self.assertAlmostEqual(22, result["science_before"], places=6)
-        self.assertAlmostEqual(21.27, result["science_after"], places=6)
-        self.assertAlmostEqual(.73, result["remaining_invest"], places=6)
+        self.assertAlmostEqual(22 - 44 / 60, result["science_after"], places=6)
+        self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
+        self.assertEqual(44, result["remaining_ticks"])
+        self.assertEqual(44, result["processing_ticks"])
+        self.assertEqual(44, result["elapsed_ticks"])
+        self.assertAlmostEqual(.27, result["current_progress"], places=6)
         self.assertEqual(.42, result["foreign_progress"])
         self.assertFalse(result["foreign_enabled"])
-        self.assertEqual((6, 2), (result["markers"], result["saves"]))
+        self.assertEqual((6, 1, 2), (result["markers"], result["diagnostics"], result["saves"]))
+
+    def test_exact_processing_ticks_accept_a_distinct_raw_event_elapsed(self):
+        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
+                                                   str(FIXTURE / "mir5" / "control.lua"), "raw-elapsed-offset")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((44, 44, 45),
+                         (result["remaining_ticks"], result["processing_ticks"], result["elapsed_ticks"]))
+        self.assertEqual(1, result["diagnostics"])
+
+    def test_published_relaxation_uses_the_same_tick_accounting_without_claiming_mir5_runtime(self):
+        result = self.lua.eval("legacy_cap_flow")(str(FIXTURE / "published" / "control.lua"),
+                                                   str(FIXTURE / "mir5" / "control.lua"), "",
+                                                   "4.7.20002", "0.3.0")
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual((2, 1, 44), (result["source_labs"], result["destination_labs"], result["remaining_ticks"]))
+        self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
 
     def test_source_and_successor_continuity_opponents_fail(self):
         opponents = {
@@ -305,7 +380,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "saved-progress": "MIR5 restored player saved progress differs",
             "lab-count": "published positive-cap source witness is absent",
             "duplicate-lab": "successor did not finish exactly one further lab level",
-            "wrong-consumed-fraction": "successor real lab consumption differs for automation-science-pack: observed_units=",
+            "lost-investment": "successor saved research investment did not become current research",
+            "wrong-tick-span": "successor real lab processing ticks differ",
+            "consumption-overshoot": "successor real lab consumption differs for automation-science-pack: observed_units=",
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
@@ -313,9 +390,10 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                                                            str(FIXTURE / "mir5" / "control.lua"), opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
-                if opponent == "wrong-consumed-fraction":
-                    self.assertIn("expected_units=21.27", result["message"])
-                    self.assertIn("remaining_invest=0.73", result["message"])
+                if opponent == "consumption-overshoot":
+                    self.assertIn("expected_units=21.266", result["message"])
+                    self.assertIn("consumed_units=0.733", result["message"])
+                    self.assertIn("remaining_ticks=44", result["message"])
 
 
 if __name__ == "__main__":

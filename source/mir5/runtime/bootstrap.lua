@@ -23,7 +23,11 @@ end
 -- A bounded foreign-owner adapter is needed only while its named provider is
 -- present. It owns no module discovery and is imported before callbacks.
 local competing_productivity
-if type(active_mods) == "table" and active_mods.ExpandedProductivityResearch ~= nil
+if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~= nil
+    or active_mods["plates-n-circuit-productivity"] ~= nil
+    or active_mods.Science_packs_productivity ~= nil
+    or active_mods["bioflux-productivity"] ~= nil
+    or active_mods["fish-productivity"] ~= nil)
     and require("platform.target").id == "f200" then
   competing_productivity = require("runtime.competing_productivity")
 end

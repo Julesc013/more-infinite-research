@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200PublishedScienceTimingAdverseV1",
+  "source": "6e7f05a718cdcf688780d78eb1a0b67b55144571",
+  "run": 40015687731,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40015687731",
+  "manifest_members_verified": 109,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/f200-published-science-timing-adverse-native.json.gz",
+    "uncompressed_sha256": "EC3E954C372E47BD7DD5766488326225EB4953764E94C94744C9FC819BF4D8D9"
+  },
+  "finding": "The published-only successor reaches a real completion at tick164, but the fixture rejects raw game.tick difference as the processing duration. No consumption-model acceptance is claimed.",
+  "correction": "Count actual awaiting-lab on_tick calls, compare exactly to predicted processing ticks, retain raw elapsed separately and log observed inventory/start/finish before assertions.",
+  "native_pass": false,
+  "release_qualification": false
+}
