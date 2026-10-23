@@ -2264,6 +2264,9 @@ function Invoke-MIRAssuranceSelfTest {
   $originalRerunTests = @($Context.rerun_tests)
   try {
     $Context.rerun_tests = @($explicitRerun.fingerprint.test_id)
+    if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $explicitRerun.fingerprint -Context $Context)) {
+      throw "Explicit rerun did not bypass the matching running marker."
+    }
     $rerunDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $explicitRerun.fingerprint -Context $Context -TestId $explicitRerun.fingerprint.test_id
     if ($rerunDecision.disposition -ne "RUN" -or $rerunDecision.reason -ne "explicit-rerun") {
       throw "Explicit rerun did not bypass running evidence."
@@ -2277,6 +2280,9 @@ function Invoke-MIRAssuranceSelfTest {
   $originalReuseEnabled = [bool]$Context.reuse_enabled
   try {
     $Context.reuse_enabled = $false
+    if ($null -ne (Get-MIRAssuranceRunningEvidence -Fingerprint $reuseDisabled.fingerprint -Context $Context)) {
+      throw "Reuse-disabled execution did not bypass the matching running marker."
+    }
     $noReuseDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $reuseDisabled.fingerprint -Context $Context -TestId $reuseDisabled.fingerprint.test_id
     if ($noReuseDecision.disposition -ne "RUN" -or $noReuseDecision.reason -ne "reuse-disabled") {
       throw "Reuse-disabled execution did not bypass running evidence."

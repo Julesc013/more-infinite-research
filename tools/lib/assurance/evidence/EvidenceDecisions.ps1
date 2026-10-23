@@ -81,6 +81,15 @@ function Get-MIRAssuranceRunningEvidence {
     [Parameter(Mandatory)]$Fingerprint,
     $Context = $null
   )
+  # A caller that explicitly requests fresh execution must not be held by a
+  # restored running marker.  The marker remains available to ordinary
+  # matching workers; this request will overwrite it only when it begins its
+  # own exact attempt.
+  if ($null -ne $Context -and (
+      -not [bool]$Context.reuse_enabled -or
+      @($Context.rerun_tests | Where-Object { [string]$_ -eq [string]$Fingerprint.test_id }).Count -gt 0)) {
+    return $null
+  }
   $paths = Get-MIRAssuranceEvidencePaths -TestId $Fingerprint.test_id -InputKey $Fingerprint.input_key
   if (-not (Test-Path -LiteralPath $paths.running -PathType Leaf)) { return $null }
   try { $running = Get-Content -Raw -LiteralPath $paths.running | ConvertFrom-Json }
