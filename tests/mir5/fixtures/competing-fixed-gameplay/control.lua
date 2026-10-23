@@ -23,6 +23,11 @@ local TARGETS = {
 local MIR_BREEDING = "recipe-prod-research_breeding-1"
 local MIR_BREEDING_FULL = {"biter-egg", "fish-breeding", "pentapod-egg"}
 local MIR_BREEDING_FALSE = {"biter-egg", "pentapod-egg"}
+-- This exact row is completely covered by the foreign bioflux provider.  In
+-- contrast to breeding, false preference retains its completed effect vector
+-- and disables its future levels.
+local MIR_BIOFLUX = "recipe-prod-research_bioflux-1"
+local MIR_BIOFLUX_EFFECTS = {"bioflux"}
 local ALL = {
   "basic-plate-productivity", "electric-circuit-productivity", "advanced-circuit-productivity",
   "automation-science-productivity-4", "logistic-science-productivity-4", "military-science-productivity-4",
@@ -164,13 +169,26 @@ local function assert_accelerated(value, label)
     fail(label .. " did not retain one-unit one-second research")
   end
 end
-local function assert_breeding(value, level, label)
+local function assert_breeding(value, level, label, accelerated)
   if value.level ~= level or value.researched ~= false or value.enabled ~= true
       or value.visible_when_disabled ~= false or value.prototype.max_level ~= UINT32_MAX
       or not close(value.saved_progress, 0) then
     fail(label .. " remaining MIR breeding state differs")
   end
-  assert_accelerated(value, label .. " remaining MIR breeding")
+  if accelerated then assert_accelerated(value, label .. " remaining MIR breeding") end
+end
+local function assert_full_bioflux(value, level, enabled, visible, accelerated, label)
+  if value.level ~= level or value.researched ~= false or value.enabled ~= enabled
+      or value.visible_when_disabled ~= visible or value.prototype.max_level ~= UINT32_MAX
+      or not close(value.saved_progress, 0) then
+    fail(label .. " fully covered MIR bioflux state differs")
+  end
+  if accelerated then assert_accelerated(value, label .. " fully covered MIR bioflux") end
+end
+local function assert_full_bioflux_completion(state, label)
+  if state.full_mir_actual_lab_completions ~= 1 then
+    fail(label .. " fully covered MIR bioflux actual lab witness differs")
+  end
 end
 local function fill(lab, value)
   local input = lab.get_inventory(defines.inventory.lab_input)
@@ -216,6 +234,18 @@ local function assert_foreign(state)
   local foreign = game.forces[state.foreign_force_index]
   if foreign == nil or foreign.valid == false or foreign.name ~= FOREIGN then fail("foreign force is absent") end
   assert_all(foreign, false, true, "foreign")
+  if state.foreign_full_mir_bioflux_initialized == true then
+    -- This matching main MIR row was disabled before MIR5's false-to-true
+    -- transition. It must not acquire the player force's restoration right.
+    assert_status(foreign, MIR_BIOFLUX, {level=1, researched=false, enabled=false, visible=false,
+      maximum=UINT32_MAX, saved_progress=0}, "foreign fully covered MIR bioflux")
+  elseif state.foreign_full_mir_bioflux_initialized == false then
+    if foreign.technologies[MIR_BIOFLUX] ~= nil then
+      fail("published foreign fully covered MIR bioflux unexpectedly exists")
+    end
+  else
+    fail("foreign fully covered MIR bioflux initialization witness is absent")
+  end
   assert_queue(foreign, state.foreign_queue, "foreign")
   if not close(tech(foreign, PROBE).saved_progress, state.foreign_current_saved_progress) then
     fail("foreign current raw progress changed")
@@ -240,6 +270,9 @@ end
 local function assert_source(state)
   assert_source_witness(state)
   local player = game.forces.player
+  if state.full_mir_bioflux_introduced ~= false or player.technologies[MIR_BIOFLUX] ~= nil then
+    fail("published player fully covered MIR bioflux unexpectedly exists")
+  end
   for _, target in ipairs(TARGETS) do
     assert_status(player, target.id, {level=target.first + 1, researched=false, enabled=true, visible=false,
       maximum=UINT32_MAX, saved_progress=0}, "published earned")
@@ -256,10 +289,12 @@ local function assert_source(state)
   assert_foreign(state)
   assert_detached(state)
 end
-local function selected_source_effects(state, selected)
+local function selected_source_effects(state, ...)
   local expected = copy_effects(state.player_effects)
-  for recipe, amount in pairs(selected or {}) do
-    if expected[recipe] ~= nil then expected[recipe] = amount end
+  for _, selected in ipairs({...}) do
+    for recipe, amount in pairs(selected or {}) do
+      if expected[recipe] ~= nil then expected[recipe] = amount end
+    end
   end
   return expected
 end
@@ -296,15 +331,21 @@ local function assert_released(state, expected_effects)
   assert_queue(player, state.player_queue, "released player")
 end
 local function assert_true_breeding(state)
-  assert_preferred(state, selected_source_effects(state, state.true_breeding_effects))
+  assert_preferred(state, selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
   local player = game.forces.player
-  assert_breeding(tech(player, MIR_BREEDING), 2, "preferred")
+  assert_full_bioflux_completion(state, "preferred")
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, true, false, true, "preferred")
+  assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS, "preferred bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 2, "preferred", true)
   assert_selected_effects(player, state.true_breeding_effects, MIR_BREEDING_FULL, "preferred breeding")
 end
 local function assert_false_breeding(state)
-  assert_released(state, selected_source_effects(state, state.true_breeding_effects))
+  assert_released(state, selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
   local player = game.forces.player
-  assert_breeding(tech(player, MIR_BREEDING), 3, "released")
+  assert_full_bioflux_completion(state, "released")
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, false, false, false, "released")
+  assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS, "released bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "released", true)
   assert_selected_effects(player, state.false_breeding_effects, MIR_BREEDING_FULL, "released breeding")
 end
 local function assert_breeding_earned_after_false(state)
@@ -313,16 +354,24 @@ local function assert_breeding_earned_after_false(state)
   assert_foreign(state)
   assert_detached(state)
   local player = game.forces.player
-  assert_earned_source(state, "re-preference transition", selected_source_effects(state, state.true_breeding_effects))
-  assert_breeding(tech(player, MIR_BREEDING), 3, "re-preference transition")
+  assert_full_bioflux_completion(state, "re-preference transition")
+  assert_earned_source(state, "re-preference transition", selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
+  assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS,
+    "re-preference transition retained released bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "re-preference transition", false)
   assert_selected_effects(player, state.false_breeding_effects, MIR_BREEDING_FULL,
     "re-preference transition retained released breeding")
   assert_queue(player, state.player_queue, "re-preference transition player")
 end
 local function assert_repreferred_breeding(state)
-  assert_preferred(state, selected_source_effects(state, state.true_breeding_effects))
+  assert_preferred(state, selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
   local player = game.forces.player
-  assert_breeding(tech(player, MIR_BREEDING), 3, "re-preferred")
+  assert_full_bioflux_completion(state, "re-preferred")
+  -- This enablement is the runtime's recorded disablement right from the false
+  -- stage.  A pre-disabled foreign row must never receive this transition.
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, true, false, false, "re-preferred")
+  assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS, "re-preferred bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 3, "re-preferred", false)
   assert_selected_effects(player, state.false_breeding_effects, MIR_BREEDING_FULL, "re-preferred breeding")
 end
 local function assert_breeding_earned_before_false(state)
@@ -346,31 +395,47 @@ local function assert_breeding_earned_before_false(state)
       effects=prototype and prototype.effects}
   end
   log("[MIR5_NATIVE_FIXTURE] CREDIT_TRANSITION " .. helpers.table_to_json(credit))
-  assert_earned_source(state, "false transition", selected_source_effects(state, state.true_breeding_effects))
-  assert_breeding(tech(player, MIR_BREEDING), 2, "false transition")
+  assert_full_bioflux_completion(state, "false transition")
+  assert_earned_source(state, "false transition", selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
+  assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, false, false, false, "false transition")
+  assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS,
+    "false transition retained preferred bioflux")
+  assert_breeding(tech(player, MIR_BREEDING), 2, "false transition", true)
   assert_selected_effects(player, state.true_breeding_effects, MIR_BREEDING_FULL,
     "false transition retained preferred breeding")
   assert_queue(player, state.player_queue, "false transition player")
 end
-local function prepend_breeding(state, label)
+local function prepend_research(state, name, label)
   local player = game.forces.player
   local queued, probe = tech(player, "electric-circuit-productivity"), tech(player, PROBE)
-  assert_queue(player, state.player_queue, label .. " before breeding")
+  assert_queue(player, state.player_queue, label .. " before remaining MIR research")
   queued.saved_progress = player.research_progress
-  player.research_queue = {tech(player, MIR_BREEDING), queued, probe}
-  assert_queue(player, {current=MIR_BREEDING, queue={MIR_BREEDING, "electric-circuit-productivity", PROBE}, progress=0},
-    label .. " breeding queue")
+  player.research_queue = {tech(player, name), queued, probe}
+  assert_queue(player, {current=name, queue={name, "electric-circuit-productivity", PROBE}, progress=0},
+    label .. " remaining MIR queue")
   if not close(queued.saved_progress, 0.27) or not close(probe.saved_progress, 0.42) then
     fail(label .. " did not retain queued partial work")
   end
-  fill(state.lab, tech(player, MIR_BREEDING))
+  fill(state.lab, tech(player, name))
 end
 local function marker(stage, state)
   local player = game.forces.player
+  local full = {status="absent-published-predecessor"}
+  local foreign_full = {status="absent-published-predecessor"}
+  if state.full_mir_bioflux_introduced == true then
+    local value = tech(player, MIR_BIOFLUX)
+    full = {status="present", actual_lab_completions=state.full_mir_actual_lab_completions,
+      next_level=value.level, enabled=value.enabled, productivity_bonus=player.recipes["bioflux"].productivity_bonus}
+  end
+  if state.foreign_full_mir_bioflux_initialized == true then
+    foreign_full = {status="present-pre-disabled",
+      enabled=tech(game.forces[state.foreign_force_index], MIR_BIOFLUX).enabled}
+  end
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     stage=stage, case=CASE, status="passed", qualification="native-runner-readback-required",
     witnesses={source_mir=state.source_mir, destination_mir=script.active_mods["more-infinite-research"],
       actual_lab_completions=state.actual_lab_completions, milestone=state.milestone,
+      fully_covered_mir_bioflux=full,
       science_tail_next_level=tech(player, "automation-science-productivity-4").level,
       plate_next_level=tech(player, "basic-plate-productivity").level,
       bioflux_next_level=tech(player, "bioflux-productivity").level,
@@ -382,7 +447,8 @@ local function marker(stage, state)
       queued_initial_current=queue_snapshot(player).current, current_progress=queue_snapshot(player).progress,
       detached_initial_saved_progress=tech(game.forces[state.detached_force_index], "basic-plate-productivity").saved_progress,
       foreign_still_disabled=tech(game.forces[state.foreign_force_index], "basic-plate-productivity").enabled == false,
-       false_preference_future_effect_coverage=(state.phase == "prefer-foreign-breeding-completed")
+      foreign_full_mir_bioflux=foreign_full,
+      false_preference_future_effect_coverage=(state.phase == "prefer-foreign-breeding-completed")
         and "prepared-breeding-row-native-readback-required" or "not-applicable",
       lab_frozen=true, on_load_read_only=stage == "reload"},
   }))
@@ -394,6 +460,9 @@ script.on_init(function()
   game.speed = 16
   local player = game.forces.player
   player.enable_all_prototypes()
+  if player.technologies[MIR_BIOFLUX] ~= nil then
+    fail("published player fully covered MIR bioflux unexpectedly exists")
+  end
   for _, target in ipairs(TARGETS) do
     local value = tech(player, target.id)
     prerequisites(value)
@@ -420,6 +489,9 @@ script.on_init(function()
     prerequisites(value)
     value.enabled, value.visible_when_disabled = false, true
   end
+  if foreign.technologies[MIR_BIOFLUX] ~= nil then
+    fail("published foreign fully covered MIR bioflux unexpectedly exists")
+  end
   local foreign_probe = tech(foreign, PROBE)
   prerequisites(foreign_probe)
   if foreign_probe.researched then fail("foreign braking probe was researched by prerequisites") end
@@ -441,7 +513,8 @@ script.on_init(function()
     fixture_version=script.active_mods[FIXTURE], actual_lab_completions=0,
     prerequisite_seeding="completed-before-native-labs", player_start_effects=copy_effects(starting_effects),
     foreign_force_index=foreign.index, detached_force_index=detached.index, foreign_queue=foreign_queue,
-    foreign_current_saved_progress=foreign_probe.saved_progress, lab=lab, deadline_tick=game.tick + DEADLINE}
+    foreign_current_saved_progress=foreign_probe.saved_progress, lab=lab, deadline_tick=game.tick + DEADLINE,
+    full_mir_bioflux_introduced=false, foreign_full_mir_bioflux_initialized=false}
   storage[KEY] = state
   fill(lab, tech(player, TARGETS[1].id))
   if player.add_research(tech(player, TARGETS[1].id)) ~= true then fail("could not queue first native fixed-provider research") end
@@ -451,6 +524,11 @@ end)
 script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]
   if type(state) ~= "table" or event.research == nil or event.research.force ~= game.forces.player then return end
+  if state.phase == "await-preferred-bioflux-lab" and event.research.name == MIR_BIOFLUX then
+    state.full_mir_actual_lab_completions = (state.full_mir_actual_lab_completions or 0) + 1
+    state.phase = "await-preferred-bioflux-restore"
+    return
+  end
   if (state.phase == "await-preferred-breeding-lab" or state.phase == "await-released-breeding-lab")
       and event.research.name == MIR_BREEDING then
     state.phase = state.phase == "await-preferred-breeding-lab"
@@ -481,22 +559,33 @@ script.on_configuration_changed(function()
   local state = storage[KEY]
   if script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.2.0" then
     require_mode("5.0.20000", "0.2.0", true, "preferred successor")
+    if type(state) ~= "table" or state.full_mir_bioflux_introduced ~= false
+        or state.foreign_full_mir_bioflux_initialized ~= false then
+      fail("preferred successor full MIR bioflux predecessor witness differs")
+    end
+    local foreign_full = tech(game.forces[state.foreign_force_index], MIR_BIOFLUX)
+    if foreign_full.researched or foreign_full.level ~= 1 or foreign_full.enabled ~= true
+        or foreign_full.visible_when_disabled ~= false then
+      fail("preferred successor full MIR bioflux introduction differs")
+    end
+    foreign_full.enabled, foreign_full.visible_when_disabled = false, false
+    state.full_mir_bioflux_introduced, state.foreign_full_mir_bioflux_initialized = true, true
     assert_preferred(state)
-    local breeding = tech(game.forces.player, MIR_BREEDING)
-    prerequisites(breeding)
-    assert_breeding(breeding, 1, "preferred pre-lab")
-    state.true_breeding_before = selected_effects(game.forces.player, MIR_BREEDING_FULL)
-    state.phase = "await-preferred-breeding-lab"
+    local bioflux = tech(game.forces.player, MIR_BIOFLUX)
+    prerequisites(bioflux)
+    assert_full_bioflux(bioflux, 1, true, false, true, "preferred pre-lab")
+    state.true_bioflux_before = selected_effects(game.forces.player, MIR_BIOFLUX_EFFECTS)
+    state.phase = "await-preferred-bioflux-lab"
     state.deadline_tick = game.tick + DEADLINE
-    prepend_breeding(state, "preferred")
+    prepend_research(state, MIR_BIOFLUX, "preferred fully covered bioflux")
   elseif script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.3.0" then
     require_mode("5.0.20000", "0.3.0", false, "released successor")
     if type(state) ~= "table" or state.phase ~= "prefer-mir-breeding-completed" then fail("released successor source witness differs") end
     assert_breeding_earned_before_false(state)
-    assert_released(state, selected_source_effects(state, state.true_breeding_effects))
+    assert_released(state, selected_source_effects(state, state.true_bioflux_effects, state.true_breeding_effects))
     state.phase = "await-released-breeding-lab"
     state.deadline_tick = game.tick + DEADLINE
-    prepend_breeding(state, "released")
+    prepend_research(state, MIR_BREEDING, "released")
   elseif script.active_mods["more-infinite-research"] == "5.0.20000" and script.active_mods[FIXTURE] == "0.4.0" then
     require_mode("5.0.20000", "0.4.0", true, "re-preferred successor")
     if type(state) ~= "table" or state.phase ~= "prefer-foreign-breeding-completed" then fail("re-preferred source witness differs") end
@@ -505,6 +594,10 @@ script.on_configuration_changed(function()
     pending_save = true
   end
 end)
+
+-- (Configuration stages above are intentionally ordered as true, false, true
+-- again.  The first true stage performs the fully covered row before the
+-- existing partial breeding row, so one shared queue carries both witnesses.)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
@@ -539,6 +632,24 @@ script.on_event(defines.events.on_tick, function()
       fill(state.lab, tech(player, target.id))
       if player.add_research(tech(player, target.id)) ~= true then fail("could not queue next native fixed-provider research") end
       state.phase = "await-lab"
+    end
+  elseif state.phase == "await-preferred-bioflux-restore" then
+    if player.current_research and player.current_research.name == "electric-circuit-productivity" then
+      -- The completed full row has returned the queued partial research.  Stop
+      -- the lab before inspecting that hand-off, then refill it only for the
+      -- following partial-coverage breeding lab.
+      freeze(state)
+      state.true_bioflux_effects = advanced_effects(state.true_bioflux_before, MIR_BIOFLUX_EFFECTS)
+      assert_preferred(state, selected_source_effects(state, state.true_bioflux_effects))
+      assert_full_bioflux(tech(player, MIR_BIOFLUX), 2, true, false, true, "preferred completed")
+      assert_selected_effects(player, state.true_bioflux_effects, MIR_BIOFLUX_EFFECTS,
+        "preferred completed bioflux")
+      local breeding = tech(player, MIR_BREEDING)
+      prerequisites(breeding)
+      assert_breeding(breeding, 1, "preferred pre-lab", true)
+      state.true_breeding_before = selected_effects(player, MIR_BREEDING_FULL)
+      state.phase = "await-preferred-breeding-lab"
+      prepend_research(state, MIR_BREEDING, "preferred partial breeding")
     end
   elseif state.phase == "await-preferred-breeding-restore" then
     if player.current_research and player.current_research.name == "electric-circuit-productivity" then
@@ -576,8 +687,8 @@ script.on_event(defines.events.on_tick, function()
     assert_source(state)
     marker("initial", state)
     game.server_save(SAVE)
-  elseif state.phase == "await-lab" or state.phase == "await-preferred-breeding-lab"
-      or state.phase == "await-released-breeding-lab" then
+  elseif state.phase == "await-lab" or state.phase == "await-preferred-bioflux-lab"
+      or state.phase == "await-preferred-breeding-lab" or state.phase == "await-released-breeding-lab" then
     state.lab.energy = 1000000000
   end
 end)

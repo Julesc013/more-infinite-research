@@ -1,5 +1,6 @@
 -- Capture all foreign rows before validating the true-preference MIR breeding row.
 require("foreign-data")
+local bioflux = require("full-bioflux-data")
 local NAME = "recipe-prod-research_breeding-1"
 local INGREDIENTS = {
   {"automation-science-pack", 1}, {"logistic-science-pack", 1},
@@ -38,4 +39,6 @@ for index, expected in ipairs(INGREDIENTS) do
   assert(type(item) == "table" and item[1] == expected[1] and item[2] == expected[2] and item[3] == nil,
     "captured preferred MIR breeding science changed at " .. tostring(index))
 end
-unit.count, unit.count_formula, unit.time = nil, "1", 1
+-- The final stage observes restoration only.  Do not alter any research cost.
+bioflux.assert_row(assert(data.raw.technology[bioflux.name],
+  "captured re-preferred MIR bioflux row is absent"), nil, "captured re-preferred MIR bioflux")
