@@ -9,7 +9,7 @@
     "nightly",
     "governance"
   ],
-  "workflow_count": 22,
+  "workflow_count": 23,
   "workflows": [
     {
       "file": ".github/workflows/action-transport-smoke.yml",
@@ -172,6 +172,14 @@
       "sha256": "E86FED992B7E0C94F10B6508A276A2390D4D322CB61AF6D7D468DA244A0EFC8E"
     },
     {
+      "file": ".github/workflows/mir5.yml",
+      "name": "MIR 5 host controls",
+      "purpose": "ci",
+      "surface": "public",
+      "invocation": "canonical-host-tests",
+      "sha256": "13D5174E7B43878B6897CE98C2EF2C92B30F808512BB5B31385C6E97275328C0"
+    },
+    {
       "file": ".github/workflows/release-candidate.yml",
       "name": "Release Candidate Gate",
       "purpose": "release",
@@ -190,7 +198,7 @@
   ],
   "summary": {
     "purposes": {
-      "ci": 2,
+      "ci": 3,
       "qualification": 8,
       "release": 10,
       "nightly": 1,
@@ -211,5 +219,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2dc1c84bfd0fbe75f45fd99f558c7c54842907afc496184232aaa5d51ecd22d1"
+  "digest": "sha256:8e0e249b8ab26885968b70ac2ffcfc4007eb746f9b2804b5b4b919b79daf5af0"
 }

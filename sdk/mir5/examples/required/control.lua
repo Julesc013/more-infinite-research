@@ -1,4 +1,5 @@
--- Query only when game state exists. Never import MIR private runtime modules.
+-- The hard dependency makes MIR active. Query only once game state exists;
+-- this runtime consumer never imports a MIR module.
 script.on_init(function()
   local interface = remote.interfaces["more-infinite-research.api.v1"]
   assert(interface and interface.get_research, "Missing candidate MIR query API")

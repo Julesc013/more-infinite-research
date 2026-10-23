@@ -5,5 +5,7 @@
   "author": "MIR maintainers",
   "description": "Private required data-stage consumer for the MIR 5 API.",
   "factorio_version": "2.1",
+  "icon": "graphics/icon.png",
+  "icon_size": 64,
   "dependencies": ["base >= 2.1.23", "more-infinite-research >= 5.0.21000"]
 }

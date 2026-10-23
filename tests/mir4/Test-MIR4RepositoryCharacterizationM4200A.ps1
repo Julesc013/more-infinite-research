@@ -18,6 +18,13 @@ Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path '.vscode/setti
 foreach ($unknown in @('.vscode/unreviewed.json','.vscode/settings.json.backup')) {
   Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path $unknown) -ceq 'unknown') 'mir4-characterization-unreviewed-editor-path' $unknown
 }
+Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path 'MIR5-PACK.md') -ceq 'normative-authority') 'mir4-characterization-mir5-pack-guide'
+foreach ($mir5SdkSource in @('sdk/mir5/README.md','sdk/mir5/examples/optional/data-final-fixes.lua','sdk/mir5/examples/required/control.lua')) {
+  Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path $mir5SdkSource) -ceq 'executable-source') 'mir4-characterization-mir5-sdk-source' $mir5SdkSource
+}
+foreach ($unknown in @('MIR5-PACK.md.backup','sdk/mir50/unreviewed.lua','sdk/unreviewed.lua')) {
+  Assert-MIR4CharacterizationV1 ((Get-MIR4RepositoryPathClass -Path $unknown) -ceq 'unknown') 'mir4-characterization-mir5-unreviewed-path' $unknown
+}
 
 $authority=Get-MIR4RepositoryCharacterizationAuthorityV1 -RepoRoot $repo
 Assert-MIR4CharacterizationV1 (@($authority.writers).Count -eq 1) 'mir4-characterization-single-writer'
@@ -48,6 +55,7 @@ Assert-MIR4CharacterizationV1 (@($manifest.transition_gate.PSObject.Properties|W
 $package=Get-Content -Raw -LiteralPath (Join-Path $repo "$output/package-membership.json")|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 (@($package.files|Where-Object{[string]$_.path -ceq 'README.md'}).Count -eq 0) 'mir4-characterization-readme-membership'
 Assert-MIR4CharacterizationV1 (-not [bool]$package.root_readme.package_visible -and [string]$package.root_readme.disposition -ceq 'repository-documentation-package-excluded-m41-05b-complete') 'mir4-characterization-readme-disposition'
+Assert-MIR4CharacterizationV1 (@($package.files|Where-Object{[string]$_.path -ceq 'MIR5-PACK.md' -or ([string]$_.path).StartsWith('sdk/mir5/',[StringComparison]::Ordinal)}).Count -eq 0) 'mir4-characterization-mir5-package-membership'
 
 $bridge=Get-Content -Raw -LiteralPath (Join-Path $repo "$output/bridge-expiry.json")|ConvertFrom-Json -Depth 100
 Assert-MIR4CharacterizationV1 (@($bridge.bridges|Where-Object{[bool]$_.deletion_authorized}).Count -eq 0) 'mir4-characterization-bridge-deletion'

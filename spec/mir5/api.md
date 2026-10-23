@@ -32,6 +32,8 @@ This file specifies **MIR API 1.0.0-draft.2**, not a released API. The new nativ
 
 An extension that unconditionally requires MIR must declare a required Factorio dependency. An optional dependency needs an actual `mods[...]` guard and an explicit absent-MIR behavior. Dependencies determine ordering; MIR's final-fixes file is not globally last.
 
+The `mods` guard belongs to settings/data stages. A runtime optional consumer checks `script.active_mods[...]`; the data-stage `mods` global is unavailable there. Runtime examples must parse without reading `game` or saved state.
+
 `API-02` — Data calls execute their declared operation **immediately in the caller's stage**. No central contribution queue waiting for a MIR finalizer that may already have run. Forward references needed by a batch must have an explicit local contract; ordinary callers invoke the helper after its dependencies exist. Later mods may still mutate the result.
 
 Use fully qualified internal imports for modules reachable from external callers where needed, and test loading from two differently named extension mods. Do not assume one private registry instance or a shared mutable module cache across callers makes registration reliable.
@@ -67,7 +69,7 @@ Runtime `ResearchStatus` exposes native semantics explicitly:
 
 ```text
 name: string
-force_index: integer
+force_index: positive uint32
 researched: boolean
 level: integer                 # native current level, NOT universally completed count
 enabled: boolean
@@ -76,6 +78,8 @@ max_level: number|"infinite"    # normalize only with a tested target adapter
 ```
 
 Do not compute completed levels as `level - 1` for every finite or staged technology. Do not expose a derived total unless its family-specific semantics are defined. Missing/invalid force and missing technology are distinct results. Snapshot queries do not promise live subscription or ownership attribution from aggregate engine values.
+
+`get_research` rejects nonpositive, fractional, nonfinite or out-of-uint32 force IDs as `invalid_force`. On F210, an unused uint32 key can make the native forces table throw instead of returning nil; the public query contains that lookup and returns `force_not_found`. It preserves the runtime native infinite maximum (`4294967295` on 2.1.23), rather than changing it to the data-stage string.
 
 Programming errors in explicit data calls fail with a stable prefix and contextual code, such as `MIR_API:invalid_definition`, `duplicate_identity`, `missing_target`, `unsupported_capability`, `unsupported_engine` or `ownership_conflict`. Optional integration absence is handled by the caller before mutation. Runtime queries return an unavailable/error result for expected missing state; they must not initialize storage, change research or throw merely because a requested optional technology is absent. Do not promise an `unsupported_api_version` error if the caller has not actually negotiated a version.
 

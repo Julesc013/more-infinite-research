@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate this documentation/diagram/tool pack, not MIR gameplay. Python 3.10+."""
+"""Validate MIR 5 documentation/adoption inputs and static asset shapes, never gameplay."""
 from pathlib import Path
 import importlib.util
 import json
@@ -16,7 +16,7 @@ c=module('mir_pack_layout',Path(__file__).with_name('cutover.py'))
 r=module('mir_pack_diagrams',Path(__file__).with_name('render_diagrams.py'))
 
 def main():
-    errors=[];counts={'markdown':0,'json':0,'python':0,'links':0,'diagrams':0,'svg':0,'png':0};truths=set();requirements=set()
+    errors=[];counts={'markdown':0,'json':0,'python':0,'links':0,'diagrams':0,'svg':0,'diagram_png':0,'native_asset_png':0};truths=set();requirements=set()
     selected=[ROOT/'MIR5-PACK.md']
     for directory in c.ROOTS:
         selected += [p for p in (ROOT/directory/'mir5').rglob('*') if p.is_file() and '__pycache__' not in p.parts]
@@ -52,31 +52,35 @@ def main():
                     return href
                 c.markdown_links(text,verify)
             elif p.suffix=='.svg':
-                text=p.read_text();ET.fromstring(text)
+                text=p.read_text(encoding='utf-8');ET.fromstring(text)
                 if re.search(r'<script\b',text,re.I):raise ValueError('SVG script not permitted')
                 counts['svg']+=1
             elif p.suffix=='.png':
                 b=p.read_bytes()
                 if b[:8]!=b'\x89PNG\r\n\x1a\n':raise ValueError('Invalid PNG signature')
                 w,h=struct.unpack('>II',b[16:24])
-                if not (100<w<16000 and 100<h<16000):raise ValueError('Implausible PNG dimensions')
-                counts['png']+=1
+                if rel.startswith(('docs/mir5/diagrams/','tools/mir5/adoption/diagrams/')):
+                    if not (100<w<16000 and 100<h<16000):raise ValueError('Implausible diagram PNG dimensions')
+                    counts['diagram_png']+=1
+                else:
+                    if not (0<w<=4096 and 0<h<=4096):raise ValueError('Implausible native asset PNG dimensions')
+                    counts['native_asset_png']+=1
             elif p.suffix=='.html':
-                text=p.read_text()
+                text=p.read_text(encoding='utf-8')
                 if re.search(r'<script\b|(?:src|href)=["\']https?://',text,re.I):raise ValueError('Atlas must be offline and script-free')
         except Exception as e:errors.append(f'{rel}: {e}')
     for base in ('docs/mir5/diagrams','tools/mir5/adoption/diagrams'):
         directory=ROOT/base
         try:
-            ds=r.validate_catalog(json.loads((directory/'catalog.json').read_text()))
+            ds=r.validate_catalog(json.loads((directory/'catalog.json').read_text(encoding='utf-8')))
             for d in ds:
-                if (directory/(d['id']+'.mmd')).read_text()!=r.mermaid_source(d):raise ValueError('Stale Mermaid '+d['id'])
+                if (directory/(d['id']+'.mmd')).read_text(encoding='utf-8')!=r.mermaid_source(d):raise ValueError('Stale Mermaid '+d['id'])
                 for suffix in ('.svg','.png'):
                     if not (directory/(d['id']+suffix)).is_file():raise ValueError('Missing render '+d['id']+suffix)
-            if (directory/'index.html').read_text()!=r.atlas(ds,directory):raise ValueError('Stale atlas')
+            if (directory/'index.html').read_text(encoding='utf-8')!=r.atlas(ds,directory):raise ValueError('Stale atlas')
             counts['diagrams']+=len(ds)
         except Exception as e:errors.append(base+': '+str(e))
-    cases=json.loads((ROOT/'tests/mir5/cases.json').read_text())['cases']
+    cases=json.loads((ROOT/'tests/mir5/cases.json').read_text(encoding='utf-8'))['cases']
     ids=[x['id'] for x in cases]
     if len(set(ids))!=len(ids):errors.append('Duplicate acceptance case ID')
     for case in cases:
@@ -84,12 +88,23 @@ def main():
         if case['requirement'] not in requirements:errors.append('Unknown requirement '+case['requirement'])
     members=ROOT/'tools/mir5/adoption/pack_members.json'
     if members.exists():
-        names=json.loads(members.read_text())['files']
-        actual={p.relative_to(ROOT).as_posix() for p in selected}
-        if set(names)!=actual or len(names)!=len(set(names)):errors.append('Pack membership differs from enumerated payload')
+        try:
+            incoming=json.loads(members.read_text(encoding='utf-8'),object_pairs_hook=c.strict_object,parse_constant=c.reject_constant)
+            if not isinstance(incoming,dict) or incoming.get('format')!=1 or incoming.get('purpose')!='incoming-pack-membership-only':
+                raise ValueError('Expected incoming-pack-membership-only format 1')
+            names=incoming.get('files')
+            if not isinstance(names,list) or not names:raise ValueError('Incoming membership must be a nonempty list')
+            if len(names)!=len(set(names)):raise ValueError('Incoming membership contains duplicate paths')
+            for name in names:
+                if not isinstance(name,str):raise ValueError('Incoming membership path must be text')
+                c.path_name(name)
+                path=ROOT/name
+                if not path.is_file():raise ValueError('Missing incoming member '+name)
+                c.no_links(path)
+        except Exception as e:errors.append('Incoming pack membership: '+str(e))
     if errors:
         print('\n'.join(errors),file=sys.stderr);return 1
-    print(json.dumps({'status':'pass','scope':'document-diagram-tool-pack-not-native-product','checked':counts,
+    print(json.dumps({'status':'pass','scope':'documentation-adoption-and-static-assets-not-gameplay','checked':counts,
        'normative_requirement_ids':len(requirements),'product_acceptance_cases':len(cases),'native_tests_run':False,
-       'mermaid_renderer_executed':False,'rendered_via':'Graphviz from the same graph records'},indent=2));return 0
+       'mermaid_renderer_executed':False,'native_gameplay_claimed':False},indent=2));return 0
 if __name__=='__main__':raise SystemExit(main())

@@ -1,0 +1,265 @@
+{
+  "format": 1,
+  "kind": "mir5-api-transition-baseline",
+  "status": "source-and-package-recovered-not-independent-consumer-qualified",
+  "scope": {
+    "subject": "Published MIR 4.7 F210 public runtime interfaces and package-excluded MIR4/MEP developer SDK inputs",
+    "purpose": "Bound a later MIR5 transition audit; this record neither implements an adapter nor declares compatibility.",
+    "excluded": [
+      "engine execution",
+      "player-package mutation",
+      "external consumer discovery",
+      "full archive extraction"
+    ]
+  },
+  "pinned_baseline": {
+    "release_tag": "v4.7.0",
+    "source_commit": "84bd157ad7b63b7d171fac2311bf30de70429c11",
+    "archive": "dist/4.7.0/more-infinite-research_4.7.21000.zip",
+    "archive_sha256": "708a529f1f6d649e0a732216cd8d8fefe68f2c6c2df2b40da030c2c4c51558d1",
+    "archive_root": "more-infinite-research_4.7.21000",
+    "inspection": "Read the ZIP central directory, info.json, and the two registered runtime modules only; compared the archive hash with the published-baseline record."
+  },
+  "published_player_runtime_interfaces": [
+    {
+      "name": "more-infinite-research-settings",
+      "source": "source/prototypes/mir/runtime/settings_profile.lua:139-166",
+      "archive_entry_sha256": "03dfcac8505d043a3bcc35473f0d31206318ad45ce664104f2adb0ce9b9ffdb4",
+      "registration_gate": "source/prototypes/mir/stage/control.lua:15-17; settings_profiles feature enabled",
+      "methods": {
+        "export_string": {
+          "input": "options table; only compact == true changes the generated profile",
+          "success": "encoded profile string",
+          "failure": "nil, error",
+          "preserved_metadata_fields": [
+            "mir_version",
+            "factorio_version",
+            "import_setting"
+          ]
+        },
+        "validate_string": {
+          "input": "profile text",
+          "valid_response_fields": [
+            "valid",
+            "recognized",
+            "invalid",
+            "unknown",
+            "import_setting"
+          ],
+          "invalid_response_fields": [
+            "valid",
+            "error"
+          ]
+        }
+      },
+      "stability": "Player-shipped runtime surface, but the pinned source has no interface-version or stability declaration."
+    },
+    {
+      "name": "more-infinite-research-browser",
+      "source": "source/prototypes/mir/runtime/research_browser.lua:1708-1762",
+      "archive_entry_sha256": "ff0f10494b38753bd17609ca5fe8abbfd8bf967d54c23f24ceffecb4fccf56c0",
+      "registration_gate": "research_library feature enabled",
+      "methods": {
+        "open": {
+          "input": "player_index, optional options table",
+          "recognized_option_fields": [
+            "mode",
+            "search",
+            "tab",
+            "settings_scope",
+            "status",
+            "family",
+            "sort",
+            "selected",
+            "hidden",
+            "page"
+          ],
+          "result": "boolean: whether the player browser root is open after rendering",
+          "side_effect": "updates the target player's stored browser view and renders its GUI"
+        }
+      },
+      "stability": "Player-shipped runtime surface, but the pinned source has no interface-version or stability declaration."
+    }
+  ],
+  "developer_sdk_and_mep": {
+    "location": "sdk/preview/mir4/ (excluded from the published player ZIP: no sdk/, preview/, or api/ members)",
+    "api_v1": {
+      "metadata_source": "sdk/preview/mir4/api-v1/package-metadata.json",
+      "identity": {
+        "kind": "MIR4ApiSdkV1PackageMetadata",
+        "name": "mir4-api-sdk-v1-preview",
+        "version": "4.0.0-preview",
+        "schema": 1
+      },
+      "maturity": "developer-preview",
+      "bindings": [
+        "lua",
+        "powershell",
+        "python",
+        "typescript"
+      ],
+      "operations": [
+        "parse",
+        "validate",
+        "canonicalize",
+        "digest",
+        "capability-negotiation",
+        "availability-decoding",
+        "bounded-pagination",
+        "snapshot-comparison",
+        "diagnostic-rendering",
+        "extension-validation",
+        "manifest-verification",
+        "archive-verification"
+      ],
+      "lua_entrypoints_source": "sdk/preview/mir4/api-v1/lua/mir4_api_v1.lua:12-69",
+      "lua_entrypoints": [
+        "parse",
+        "canonicalize",
+        "digest",
+        "validate",
+        "negotiate_capabilities",
+        "decode_availability",
+        "bounded_page",
+        "compare_snapshots",
+        "render_diagnostic",
+        "validate_extension",
+        "verify_manifest",
+        "verify_archive"
+      ],
+      "response_required_fields": [
+        "kind",
+        "schema",
+        "surface",
+        "target",
+        "versions",
+        "capabilities",
+        "availability",
+        "page",
+        "items",
+        "canonicalization",
+        "extensions",
+        "source_identity",
+        "package_visible",
+        "mutation_authorized",
+        "public_support_claim",
+        "digest"
+      ],
+      "status_fields": {
+        "package_visible": false,
+        "publication_authorized": false,
+        "mutation_authority": false,
+        "public_support_authority": false
+      },
+      "compatibility_source": "sdk/preview/mir4/api-v1/compatibility.json",
+      "compatibility": "V1 may change before 1.0; V0 is an explicit read-only migration input and its emission is forbidden."
+    },
+    "mep_v1": {
+      "metadata_source": "sdk/preview/mir4/mep-v1/package-metadata.json",
+      "identity": {
+        "kind": "MIR4MepV1PackageMetadata",
+        "name": "mir4-mep-v1-preview",
+        "version": "4.0.0-preview",
+        "schema": 1
+      },
+      "maturity": "developer-preview",
+      "lua_entrypoints_source": "sdk/preview/mir4/mep-v1/lua/mir4_mep_v1.lua:17-73",
+      "lua_entrypoints": [
+        "validate",
+        "build",
+        "discover_mod_data"
+      ],
+      "envelope_required_fields": [
+        "kind",
+        "schema",
+        "extension_id",
+        "extension_version",
+        "namespace",
+        "targets",
+        "fragments",
+        "canonicalization",
+        "digest"
+      ],
+      "status_fields": {
+        "package_visible": false,
+        "player_mutation_authorized": false,
+        "prototype_write_authorized": false,
+        "publication_authorized": false,
+        "release_authority": false
+      },
+      "v0_status": "Superseded compatibility input only; removal remains gated on accepted independent-consumer migration and an explicit later-release decision."
+    }
+  },
+  "known_repository_references": {
+    "query_scope": "Exact-name text search of pinned source/ and tests/ only; generated outputs, package copies, and unrelated fixture trees were not treated as consumers.",
+    "browser_remote_callers": [
+      {
+        "path": "tests/runtime/research_browser.lua",
+        "lines": [
+          174,
+          199,
+          219,
+          288,
+          610
+        ],
+        "classification": "MIR-owned runtime test"
+      },
+      {
+        "path": "tests/runtime/research_browser_native_discovery.lua",
+        "lines": [
+          19
+        ],
+        "classification": "MIR-owned runtime test"
+      }
+    ],
+    "settings_remote_callers": [],
+    "sdk_and_mep_references": [
+      {
+        "path": "sdk/preview/mir4/conformance-v1/Invoke-MIR4SdkV1Conformance.ps1",
+        "classification": "MIR-owned conformance runner"
+      },
+      {
+        "path": "sdk/preview/mir4/reference-extension-v1/extension.json",
+        "classification": "synthetic data-only preview reference extension"
+      },
+      {
+        "path": "fixtures/mir4-mep-v1/",
+        "classification": "MIR-owned envelope fixtures"
+      }
+    ],
+    "finding": "The pinned checkout supplies self-tests, conformance material, and a synthetic reference extension. It contains no identified independent third-party runtime caller or independently shipped SDK/MEP consumer."
+  },
+  "package_dependency_rows": {
+    "official_published_archive_info_json": {
+      "name": "more-infinite-research",
+      "version": "4.7.21000",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.23",
+        "(?) bobelectronics",
+        "(?) bobtech",
+        "(?) elevated-rails",
+        "(?) angelssmelting",
+        "? recycler >= 2.1.18",
+        "(?) quality",
+        "(?) Krastorio2",
+        "(?) Krastorio2-spaced-out",
+        "(?) pypostprocessing",
+        "(?) space-exploration",
+        "? space-age >= 2.1.18"
+      ]
+    },
+    "preserved_unaccepted_library_prior": {
+      "path": "build/mir5/published-baseline/library-prior/more-infinite-research_4.7.21000.zip",
+      "sha256": "01fdf91912237fa3814fd33292c192b595ae42b35b726fff4163c0c4ab84202e",
+      "difference": "Its info.json declares base >= 2.1.18, so it is not the 708a published baseline."
+    },
+    "interpretation": "Factorio dependency rows establish mod presence/version selection only. They do not enumerate remote-interface calls, SDK consumers, data-envelope fields, or external compatibility obligations."
+  },
+  "external_unknowns_and_transition_obligations": [
+    "No repository or archive inspection can identify mods outside this checkout that call either runtime interface.",
+    "No accepted independent SDK/MEP consumer migration record was found; the preview policy expressly keeps V0 removal gated on that evidence and a later release decision.",
+    "A MIR5 transition must audit real consumers against the named methods, option/response fields, registration gates, and preview data shapes before declaring compatibility, deprecation, or removal.",
+    "This record does not establish that the conditional runtime interfaces registered or worked in a Factorio process."
+  ]
+}

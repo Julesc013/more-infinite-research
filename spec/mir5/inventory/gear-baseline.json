@@ -1,7 +1,7 @@
 {
   "format": 1,
   "kind": "mir5-source-recovered-gear-baseline",
-  "status": "source-recovered-not-native-qualified",
+  "status": "source-recovered-with-native-data-observation-not-gameplay-qualified",
   "scope": {
     "subject": "released MIR 4.7.0 research_gears contract",
     "target": "vanilla Factorio 2.1.23",
@@ -113,10 +113,22 @@
       "count": null,
       "count_formula": "8000*2^(L-1)",
       "ingredients": [
-        ["automation-science-pack", 1],
-        ["logistic-science-pack", 1],
-        ["chemical-science-pack", 1],
-        ["production-science-pack", 1]
+        [
+          "automation-science-pack",
+          1
+        ],
+        [
+          "logistic-science-pack",
+          1
+        ],
+        [
+          "chemical-science-pack",
+          1
+        ],
+        [
+          "production-science-pack",
+          1
+        ]
       ],
       "time": 60
     },
@@ -129,7 +141,9 @@
     "presentation": {
       "localised_name": [
         "technology-name.more-infinite-research.research_gears",
-        ["item-name.iron-gear-wheel"]
+        [
+          "item-name.iron-gear-wheel"
+        ]
       ],
       "english_name": "Iron gear wheel productivity",
       "localised_description": [
@@ -145,12 +159,15 @@
           "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
           "icon_size": 128,
           "scale": 0.5,
-          "shift": [50, 50],
+          "shift": [
+            50,
+            50
+          ],
           "floating": true
         }
       ],
-      "order": null,
-      "order_contract": "omitted: the stream has no order and the qualifier does not supply one; Lua omits an order key whose value is nil"
+      "order": "p[research_gears]",
+      "order_contract": "Native published capture confirms the final emitter supplies p[research_gears]."
     },
     "vanilla_2_1_23_assumptions": {
       "recipe": "iron-gear-wheel",
@@ -164,7 +181,9 @@
   "settings": {
     "setting_type": "startup",
     "stream_setting_target_requirements": {
-      "requires_features": ["recipe_productivity"],
+      "requires_features": [
+        "recipe_productivity"
+      ],
       "required_effect_types": []
     },
     "stream_settings": [
@@ -242,13 +261,26 @@
         "id": "mir-science-pack-ingredient-policy",
         "type": "string-setting",
         "default_value": "configured",
-        "allowed_values": ["configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"]
+        "allowed_values": [
+          "configured",
+          "space",
+          "space-and-promethium",
+          "space-age-progression",
+          "official-progression",
+          "mod-progression",
+          "all-official",
+          "all"
+        ]
       },
       {
         "id": "mir-lab-incompatibility-policy",
         "type": "string-setting",
         "default_value": "reduce",
-        "allowed_values": ["reduce", "skip", "engine-default"]
+        "allowed_values": [
+          "reduce",
+          "skip",
+          "engine-default"
+        ]
       },
       {
         "id": "ips-require-space-gate",
@@ -305,84 +337,151 @@
     },
     {
       "path": "source/prototypes/mir/settings/defaults.lua",
-      "lines": [3, 10],
+      "lines": [
+        3,
+        10
+      ],
       "purpose": "shared defaults: enabled, cost, growth, max-level and time"
     },
     {
       "path": "source/prototypes/mir/domain/streams/descriptor.lua",
-      "lines": [158, 177, 267],
+      "lines": [
+        158,
+        177,
+        267
+      ],
       "purpose": "recipe-productivity effect descriptor uses change=0.10 / percent and defines the settings sort name"
     },
     {
       "path": "source/prototypes/mir/planner/stream_compiler/qualify.lua",
-      "lines": [67, 148, 149, 230, 247],
+      "lines": [
+        67,
+        148,
+        149,
+        230,
+        247
+      ],
       "purpose": "technology identity, emitted fields and no supplied order"
     },
     {
       "path": "source/prototypes/mir/planner/costs.lua",
-      "lines": [47, 61, 77, 95, 106],
+      "lines": [
+        47,
+        61,
+        77,
+        95,
+        106
+      ],
       "purpose": "effective setting inputs, cost model, time and cap sentinels"
     },
     {
       "path": "source/prototypes/mir/domain/research_cost/formula.lua",
-      "lines": [7, 24],
+      "lines": [
+        7,
+        24
+      ],
       "purpose": "formula kind and exact string construction"
     },
     {
       "path": "source/prototypes/mir/capabilities/science_integration/science_selector.lua",
-      "lines": [289, 364],
+      "lines": [
+        289,
+        364
+      ],
       "purpose": "default four-pack selection and unit ingredient tuples"
     },
     {
       "path": "source/prototypes/mir/planner/prerequisites.lua",
-      "lines": [59, 94],
+      "lines": [
+        59,
+        94
+      ],
       "purpose": "direct science-unlocker prerequisite construction"
     },
     {
       "path": "source/prototypes/mir/presentation/icon_builder.lua",
-      "lines": [10, 55, 271, 284],
+      "lines": [
+        10,
+        55,
+        271,
+        284
+      ],
       "purpose": "item icon fallback, recipe-productivity overlay and layered presentation"
     },
     {
       "path": "source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua",
-      "lines": [7, 56],
+      "lines": [
+        7,
+        56
+      ],
       "purpose": "F210 modern overlays, recipe-productivity and scripted-tech capability"
     },
     {
       "path": "source/prototypes/mir/planner/stream_compiler/diagnostics.lua",
-      "lines": [59, 77],
+      "lines": [
+        59,
+        77
+      ],
       "purpose": "localized name and description tuples"
     },
     {
       "path": "source/locale/en/more-infinite-research.cfg",
-      "lines": [23, 82],
+      "lines": [
+        23,
+        82
+      ],
       "purpose": "resolved English presentation strings"
     },
     {
       "path": "source/prototypes/mir/settings/catalog.lua",
-      "lines": [18, 274, 334, 370],
+      "lines": [
+        18,
+        274,
+        334,
+        370
+      ],
       "purpose": "setting identities, declarations and profile import prototype"
     },
     {
       "path": "source/prototypes/mir/settings/stage_builder.lua",
-      "lines": [42, 73, 138, 196],
+      "lines": [
+        42,
+        73,
+        138,
+        196
+      ],
       "purpose": "startup decoration and generated setting order"
     },
     {
       "path": "source/prototypes/mir/settings/effective.lua",
-      "lines": [23, 61],
+      "lines": [
+        23,
+        61
+      ],
       "purpose": "profile precedence and raw-setting fallback"
     },
     {
       "path": "source/prototypes/mir/domain/technology/maximum_level_binding.lua",
-      "lines": [46, 173, 258],
+      "lines": [
+        46,
+        173,
+        258
+      ],
       "purpose": "zero cap sentinel and F210 runtime cap policy"
     }
   ],
   "native_evidence": {
-    "captured_final_prototype_dump": null,
-    "captured_f210_vanilla_run": null,
-    "bounded_search": "No released-4.7 vanilla final-prototype capture was identified while searching the repository evidence, build, validation, fixture, documentation and release roots for recipe-prod-research_gears-1.",
-    "remaining_required_proof": "Materialize the exact 4.7.21000 package against vanilla 2.1.23, capture data.raw.technology['recipe-prod-research_gears-1'] after data-final-fixes, and compare every expected field above before treating this record as native-qualified."
+    "capture_record": "spec/mir5/inventory/vanilla-f210-470.json",
+    "captured_final_prototype_dump": {
+      "path": "build/tmp/mir5-baseline-470-f210-r07/write-data/script-output/data-raw-dump.json",
+      "sha256": "8FED49837245AA6EB9D6BAE6011439AD5F7AA8846329E2D8F262E5CEEDA4E865"
+    },
+    "captured_f210_vanilla_run": {
+      "path": "build/tmp/mir5-baseline-470-f210-r07/result.json",
+      "sha256": "C12D7AD8E23FD56930D505B3144D8683395277BCBA6C7EB2428E390A19B452BF",
+      "scope": "native-data-stage-observation-only"
+    },
+    "source_recovery_correction": "The actual published row contains order p[research_gears], supplied by the final technology design/emitter. The earlier qualifier-only omission inference was incorrect. Native level follows the -1 name suffix; the published raw level key is MIR metadata, not a TechnologyPrototype schema input.",
+    "remaining_required_proof": "Recheck the current MIR5 package native prototype, physical effect, historical upgrades and final accepted source; this baseline observation does not qualify those results."
   }
 }

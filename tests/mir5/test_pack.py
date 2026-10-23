@@ -1,72 +1,126 @@
-"""Graph/contract packaging tests. These do not test the MIR implementation."""
-import copy
+"""Tier 0 boundaries for the current MIR 5 player source tree."""
 import importlib.util
 import json
 from pathlib import Path
 import re
 import unittest
-ROOT=Path(__file__).resolve().parents[2]
-s=importlib.util.spec_from_file_location('render_under_test',ROOT/'tools/mir5/render_diagrams.py')
-r=importlib.util.module_from_spec(s);s.loader.exec_module(r)
+
+
+ROOT = Path(__file__).resolve().parents[2]
+PLAYER = ROOT / "source/mir5"
+IMPORT = re.compile(r"require\s*\(\s*[\"']([^\"']+)[\"']\s*\)")
+PACKAGE_PREFIX = "__more-infinite-research__/"
+
+
+def load_module(name, relative):
+    specification = importlib.util.spec_from_file_location(name, ROOT / relative)
+    module = importlib.util.module_from_spec(specification)
+    specification.loader.exec_module(module)
+    return module
+
+
+package = load_module("mir5_package_under_test", "tools/mir5/package.py")
+
+
+def imports(path):
+    return IMPORT.findall(path.read_text(encoding="utf-8"))
+
+
+def local_module(target):
+    if target.startswith(PACKAGE_PREFIX):
+        target = target[len(PACKAGE_PREFIX):].replace("/", ".")
+    return PLAYER / (target.replace(".", "/") + ".lua")
+
+
+def local_closure(roots):
+    pending = list(roots)
+    seen = set()
+    while pending:
+        path = pending.pop()
+        if path in seen:
+            continue
+        seen.add(path)
+        for target in imports(path):
+            candidate = local_module(target)
+            if not candidate.is_file():
+                raise AssertionError(f"player import is outside the MIR 5 root: {target}")
+            pending.append(candidate)
+    return seen
+
 
 class PackTests(unittest.TestCase):
-    def setUp(self):
-        self.data=json.loads((ROOT/'docs/mir5/diagrams/catalog.json').read_text())
+    def test_frozen_import_custody_metadata_remains_well_formed(self):
+        current = json.loads((ROOT / "tools/mir5/adoption/pack_members.json").read_text(encoding="utf-8"))
+        frozen = json.loads((ROOT / "tools/mir5/adoption/base_members.json").read_text(encoding="utf-8"))
+        self.assertEqual(current["format"], 1)
+        self.assertEqual(frozen["format"], 1)
+        self.assertEqual(frozen["purpose"], "preimages-of-user-uploaded-pack-not-live-repo-authority")
+        self.assertEqual(len(current["files"]), len(set(current["files"])))
+        self.assertTrue(all((ROOT / path).is_file() for path in current["files"]))
+        self.assertIn("tools/mir5/adoption/base_members.json", current["files"])
+        self.assertIn("tools/mir5/adoption/pack_members.json", current["files"])
+        self.assertGreater(len(frozen["files"]), 0)
+        for path, digest in frozen["files"].items():
+            self.assertRegex(path, r"^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+")
+            self.assertRegex(digest, r"^[0-9a-f]{64}$")
 
-    def test_permanent_graphs_have_unique_nodes_and_valid_edges(self):
-        self.assertEqual(len(r.validate_catalog(self.data)),12)
+    def test_player_package_admits_only_native_files_and_all_locale_assets(self):
+        _, members = package.members(PLAYER)
+        admitted = {path for path, _ in members}
+        expected = {"info.json"}
+        expected.update(
+            name for name in {"LICENSE", "LICENSE.txt", "changelog.txt"}
+            if (PLAYER / name).is_file()
+        )
+        expected.update(path.relative_to(PLAYER).as_posix() for path in PLAYER.rglob("*.lua"))
+        expected.update(path.relative_to(PLAYER).as_posix() for path in (PLAYER / "locale").rglob("*.cfg"))
+        graphics = PLAYER / "graphics"
+        if graphics.is_dir():
+            expected.update(
+                path.relative_to(PLAYER).as_posix()
+                for path in graphics.rglob("*")
+                if path.is_file() and path.suffix.lower() in {".png", ".jpg", ".ogg"}
+            )
+        self.assertEqual(admitted, expected)
+        self.assertIn("locale/en/more-infinite-research.cfg", admitted)
+        self.assertNotIn("README.md", admitted)
+        standalone = {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
+        self.assertTrue(
+            all(path in standalone or path.endswith((".lua", ".cfg", ".png", ".jpg", ".ogg")) for path in admitted)
+        )
 
-    def test_duplicate_node_rejected(self):
-        self.data['diagrams'][0]['nodes'].append(copy.deepcopy(self.data['diagrams'][0]['nodes'][0]))
-        with self.assertRaises(r.DiagramError):r.validate_catalog(self.data)
+    def test_settings_stage_closure_is_data_only(self):
+        closure = local_closure([PLAYER / "settings.lua"])
+        self.assertEqual(
+            {path.relative_to(PLAYER).as_posix() for path in closure},
+            {"settings.lua", "research/settings.lua"},
+        )
+        self.assertNotIn(PLAYER / "research/generator.lua", closure)
+        self.assertFalse(any("runtime" in path.parts or "api" in path.parts for path in closure))
 
-    def test_unknown_endpoint_rejected(self):
-        self.data['diagrams'][0]['edges'][0]['to']='not_defined'
-        with self.assertRaises(r.DiagramError):r.validate_catalog(self.data)
+    def test_runtime_closure_never_imports_the_generator(self):
+        closure = local_closure([PLAYER / "control.lua", PLAYER / "api/v1/runtime.lua"])
+        relative = {path.relative_to(PLAYER).as_posix() for path in closure}
+        self.assertIn("runtime/lifecycle.lua", relative)
+        self.assertIn("runtime/caps.lua", relative)
+        self.assertNotIn("research/generator.lua", relative)
+        self.assertNotIn("api/v1/data.lua", relative)
 
-    def test_unsafe_diagram_path_rejected(self):
-        self.data['diagrams'][0]['id']='../escape'
-        with self.assertRaises(r.DiagramError):r.validate_catalog(self.data)
+    def test_player_imports_cannot_route_to_mir4(self):
+        for path in PLAYER.rglob("*.lua"):
+            for target in imports(path):
+                lowered = target.lower()
+                self.assertNotIn("mir4", lowered, f"{path}: {target}")
+                self.assertNotRegex(lowered, r"(?:^|[./])(?:src|prototypes)(?:[./]|$)", f"{path}: {target}")
+                self.assertTrue(local_module(target).is_file(), f"{path}: {target}")
 
-    def test_mermaid_files_match_single_source(self):
-        for d in self.data['diagrams']:
-            self.assertEqual((ROOT/'docs/mir5/diagrams'/f'{d["id"]}.mmd').read_text(),r.mermaid_source(d))
+    def test_player_identity_is_private_and_not_a_native_claim(self):
+        info = json.loads((PLAYER / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual(info["name"], "more-infinite-research")
+        self.assertEqual(info["factorio_version"], "2.1")
+        self.assertIn("Incomplete", info["description"])
+        self.assertIn("disposable test worlds", (PLAYER / "README.md").read_text(encoding="utf-8"))
 
-    def test_dot_generation_is_deterministic(self):
-        for d in self.data['diagrams']:self.assertEqual(r.dot_source(d),r.dot_source(copy.deepcopy(d)))
 
-    def test_permanent_diagrams_have_no_staging_prefix(self):
-        for d in self.data['diagrams']:
-            self.assertNotRegex(json.dumps(d),r'(?:source|spec|docs|tools|sdk|tests|targets)/mir5/')
-            self.assertFalse(d['transition_only'])
-
-    def test_transition_diagram_is_separate(self):
-        data=json.loads((ROOT/'tools/mir5/adoption/diagrams/catalog.json').read_text())
-        self.assertEqual(len(data['diagrams']),1)
-        self.assertTrue(data['diagrams'][0]['transition_only'])
-
-    def test_product_cases_remain_unexecuted(self):
-        for row in json.loads((ROOT/'tests/mir5/cases.json').read_text())['cases']:
-            self.assertEqual(row['status'],'not_run');self.assertIsNone(row['implementation_command'])
-
-    def test_api_examples_share_versioned_names(self):
-        for p in (ROOT/'sdk/mir5/examples').rglob('*.lua'):
-            text=p.read_text()
-            self.assertNotIn('__more-infinite-research__/api/data',text)
-            self.assertNotIn('remote.call("more-infinite-research",',text)
-        text=(ROOT/'sdk/mir5/examples/required/data-final-fixes.lua').read_text()
-        self.assertIn('__more-infinite-research__.api.v1.data',text)
-
-    def test_atlas_has_no_network_dependency(self):
-        text=(ROOT/'docs/mir5/diagrams/index.html').read_text()
-        self.assertNotRegex(text,r'<script\b')
-        self.assertNotRegex(text,r'(?:href|src)=["\']https?://')
-        self.assertEqual(len(re.findall(r'<section id=',text)),12)
-
-    def test_private_slice_does_not_claim_release_qualification(self):
-        info=json.loads((ROOT/'source/mir5/info.json').read_text())
-        self.assertEqual(info['name'],'more-infinite-research')
-        self.assertIn('Incomplete',info['description'])
-        self.assertIn('disposable test worlds',(ROOT/'source/mir5/README.md').read_text())
-
-if __name__=='__main__':unittest.main()
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

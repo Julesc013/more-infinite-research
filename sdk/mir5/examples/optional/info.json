@@ -1,12 +1,12 @@
 {
   "name": "mir-api-example-optional",
   "version": "0.0.0",
-  "title": "MIR API optional test example",
+  "title": "MIR API v1 optional draft example",
   "author": "MIR maintainers",
   "factorio_version": "2.1",
   "dependencies": [
     "base >= 2.1.23",
-    "? more-infinite-research >= 5.0.0"
+    "? more-infinite-research >= 5.0.21000"
   ],
-  "description": "Candidate API test fixture. Not native-qualified and not for production saves."
+  "description": "Draft optional public API example for the current 2.1 slice. Not native-qualified or for production saves."
 }
