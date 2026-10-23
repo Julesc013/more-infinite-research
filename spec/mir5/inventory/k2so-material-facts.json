@@ -1,0 +1,706 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2SOMaterialFactsV1",
+  "scope": "Provenance-bound facts for the three A05 K2SO material families. This is an inventory, not a native qualification or a generated-prototype oracle.",
+  "evidence_boundary": {
+    "a05_native_rows": "unavailable-in-preserved-checkout",
+    "rule": "A05 closure markers and historical source/candidate-manifest records are retained as markers only. They are not substituted for unavailable data-stage prototype fields."
+  },
+  "a05": {
+    "closure_receipt": {
+      "path": "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/k2-materials/MIR4-A05-K2-Materials-ClosureV1.json",
+      "bytes": 24573,
+      "sha256": "0269EC4BA2955A032BD9604F95284A9461CB1449423A586E2F8FBFBD785B789B",
+      "kind": "MIR4A05K2MaterialsClosureV1",
+      "recorded_at": "2026-09-10T21:48:47.0654939Z",
+      "record_sha256": "8771A2E9FD3001AF9E239C6EB286C2DF8BABCA96788010CA2378CA15C69226AE",
+      "status": "bounded-claims-passed"
+    },
+    "engine": {
+      "version": "2.1.17",
+      "executable_sha256": "710B0278D3049564B122DAFB3CD3D0338D0BDE1CEC3B7417AE1FC3FB37AB85A8"
+    },
+    "cases": {
+      "locked_2_0_13": {
+        "k2so_version": "2.0.13",
+        "k2so_archive_sha256": "A2EEB2E5A6119C4117BD3653979D40D305D17539E184BFA6F4ED53EF12A5F242",
+        "xy_enabled": true
+      },
+      "current_2_0_17": {
+        "k2so_version": "2.0.17",
+        "k2so_archive_sha256": "0D48E22858FB4D1259413B65FFA7E5A0C5B5C2439A4918D58BDACC9411FA9284",
+        "xy_enabled": false
+      }
+    },
+    "referenced_artifacts": {
+      "runtime_result": {
+        "path": "build/mir4/a05-k2-materials/k2-materials-runtime-reviewed-forward-rerun/result.json",
+        "bytes": 17945,
+        "raw_sha256": "9D9E4A437E74ED07F05C6A87029EE51160967FC1EAE79187EC91AAB57AF4CFC9",
+        "present_in_checkout": false
+      },
+      "candidate": {
+        "path": "build/mir4/a05-k2-materials/candidate/f210/A05-K2-MATERIALS-0392EF8C/more-infinite-research_4.2.21000.zip",
+        "bytes": 1106383,
+        "raw_sha256": "A6D5D264BE0153310BBE1E61ACDAAFE6407AA4D654B13B5251E680A0D3CADDF8",
+        "present_in_checkout": false
+      }
+    },
+    "historical_source_authorities": [
+      {
+        "path": "src/mod/families/modern/prototypes/mir/streams/generated_stream_manifest.json",
+        "canonical_sha256": "308206E0E04E5CE638B7C1E09B3614C427134590669A15D21FB23DD6B803D782"
+      },
+      {
+        "path": "src/mod/families/modern/prototypes/streams/productivity.lua",
+        "canonical_sha256": "5F05D4CCF160E55512E6DC675A928CC69451FA78EB4DCC356C49BB732B027B62"
+      }
+    ],
+    "native_row_inventory": {
+      "searched_root": "build/mir4/a05-k2-materials",
+      "technology_names": [
+        "recipe-prod-research_material_rare_metals-1",
+        "recipe-prod-research_material_silicon-1",
+        "recipe-prod-research_material_glass-1"
+      ],
+      "result": "No A05 captured data-stage technology row survives under the preserved A05 root. Remaining named files are candidate generated_stream_manifest.json files and are not native rows."
+    },
+    "families": [
+      {
+        "request": "K2_02",
+        "family": "rare_metals",
+        "technology": "recipe-prod-research_material_rare_metals-1",
+        "current_recipes": [
+          "kr-rare-metals",
+          "kr-rare-metals-from-enriched-rare-metals"
+        ],
+        "a05_closure_markers": {
+          "admitted_routes": [
+            "kr-rare-metals",
+            "kr-rare-metals-from-enriched-rare-metals"
+          ],
+          "technology": "recipe-prod-research_material_rare_metals-1",
+          "effect_per_tier": 0.02,
+          "finite_tiers": 3,
+          "science": [
+            "automation-science-pack",
+            "chemical-science-pack",
+            "logistic-science-pack"
+          ]
+        },
+        "a05_native_prototype": {
+          "available": false,
+          "reason": "The A05 closure receipt records bounded outcomes, but its referenced runtime result and candidate ZIP are absent from this checkout. The retained A05 candidate files that name these identities are generated stream manifests, not captured data-stage technology prototypes.",
+          "unavailable_fields": [
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "icons"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_name"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_description"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.cost"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.science_ingredients"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "prerequisites"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "max_level"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "effects"
+            }
+          ]
+        }
+      },
+      {
+        "request": "K2_04",
+        "family": "silicon",
+        "technology": "recipe-prod-research_material_silicon-1",
+        "current_recipes": [
+          "kr-silicon"
+        ],
+        "a05_closure_markers": {
+          "admitted_routes": [
+            "kr-silicon"
+          ],
+          "technology": "recipe-prod-research_material_silicon-1",
+          "effect_per_tier": 0.02,
+          "finite_tiers": 3,
+          "science": [
+            "automation-science-pack",
+            "logistic-science-pack"
+          ]
+        },
+        "a05_native_prototype": {
+          "available": false,
+          "reason": "The A05 closure receipt records bounded outcomes, but its referenced runtime result and candidate ZIP are absent from this checkout. The retained A05 candidate files that name these identities are generated stream manifests, not captured data-stage technology prototypes.",
+          "unavailable_fields": [
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "icons"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_name"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_description"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.cost"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.science_ingredients"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "prerequisites"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "max_level"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "effects"
+            }
+          ]
+        }
+      },
+      {
+        "request": "K2_05",
+        "family": "glass",
+        "technology": "recipe-prod-research_material_glass-1",
+        "current_recipes": [
+          "kr-glass"
+        ],
+        "a05_closure_markers": {
+          "admitted_routes": [
+            "kr-glass"
+          ],
+          "technology": "recipe-prod-research_material_glass-1",
+          "effect_per_tier": 0.02,
+          "finite_tiers": 3,
+          "science": [
+            "automation-science-pack",
+            "chemical-science-pack",
+            "logistic-science-pack"
+          ]
+        },
+        "a05_native_prototype": {
+          "available": false,
+          "reason": "The A05 closure receipt records bounded outcomes, but its referenced runtime result and candidate ZIP are absent from this checkout. The retained A05 candidate files that name these identities are generated stream manifests, not captured data-stage technology prototypes.",
+          "unavailable_fields": [
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "icons"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_name"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "localised_description"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.cost"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "unit.science_ingredients"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "prerequisites"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "max_level"
+            },
+            {
+              "available": false,
+              "reason": "No preserved A05 data-stage prototype row is available; this field is not reconstructed from historical source or candidate manifests.",
+              "field": "effects"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "current_no_mir_native": {
+    "capture_receipt": {
+      "path": "spec/mir5/evidence/k2so-no-mir-native.json",
+      "bytes": 16280,
+      "sha256": "A19BF235D2A9FCD49C7C4F9AAE6E641050ACEA872E77ED274179C8C84324379B",
+      "kind": "MIR5PrototypeCaptureV1",
+      "status": "completed-data-stage-observation-only",
+      "endpoint_class": "factorio-data-stage-dump-only",
+      "claims": {
+        "gameplay": false,
+        "menu": false,
+        "save": false,
+        "release_qualification": false
+      },
+      "source_head": "a2027439618456313a0f2374e6cf030989097fda"
+    },
+    "engine": {
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+      "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+      "base_version": "2.1.23",
+      "factorio_version": "2.1"
+    },
+    "profile": {
+      "path": "tests/mir5/profiles/k2so-observed-f210-2123.json",
+      "bytes": 2396,
+      "sha256": "34EAA33D1B0871AEB3BFA7F561660F3988ABE58C3CA008147AAFFAD7E7B24FBA",
+      "selection": "mir5-k2so-f210-observed-comparison-selection",
+      "target": "f210",
+      "factorio_line": "2.1",
+      "settings_mode": "Defaults",
+      "mods": [
+        {
+          "name": "base",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "elevated-rails",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "quality",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "recycler",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "space-age",
+          "version": "2.1.23",
+          "enabled": true
+        },
+        {
+          "name": "flib",
+          "version": "0.17.2",
+          "enabled": true
+        },
+        {
+          "name": "k2so-assets",
+          "version": "1.0.7",
+          "enabled": true
+        },
+        {
+          "name": "Krastorio2",
+          "version": "2.1.4",
+          "enabled": true
+        },
+        {
+          "name": "Krastorio2-spaced-out",
+          "version": "2.0.19",
+          "enabled": true
+        },
+        {
+          "name": "Krastorio2Assets",
+          "version": "2.1.0",
+          "enabled": true
+        },
+        {
+          "name": "Krastorio2MenuSimulations",
+          "version": "2.1.0",
+          "enabled": true
+        },
+        {
+          "name": "xy-k2so-enhancements-nulls-fork",
+          "version": "0.8.3",
+          "enabled": true
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "version": "0.1.0",
+          "enabled": true
+        }
+      ]
+    },
+    "data_raw_dump": {
+      "path": "build/tmp/mir5-k2so-no-mir-native-r03/write-data/script-output/data-raw-dump.json",
+      "bytes": 34070013,
+      "sha256": "FC3ED041D804A07B948572CB2D1F4ED6BB8FAD387E06E13504B56273A4F544F2",
+      "capture_relative_path": "write-data/script-output/data-raw-dump.json",
+      "capture_recorded_bytes": 34070013,
+      "capture_recorded_sha256": "FC3ED041D804A07B948572CB2D1F4ED6BB8FAD387E06E13504B56273A4F544F2"
+    },
+    "recipes": [
+      {
+        "recipe": "kr-rare-metals",
+        "enabled": false,
+        "allow_productivity": true,
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "kr-rare-metal-ore",
+            "amount": 2
+          }
+        ],
+        "products": [
+          {
+            "type": "item",
+            "name": "kr-rare-metals",
+            "amount": 1
+          }
+        ],
+        "ignored_by_productivity": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "shared_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "independent_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "extra_count_fraction": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        }
+      },
+      {
+        "recipe": "kr-rare-metals-from-enriched-rare-metals",
+        "enabled": false,
+        "allow_productivity": true,
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "kr-enriched-rare-metals",
+            "amount": 1
+          }
+        ],
+        "products": [
+          {
+            "type": "item",
+            "name": "kr-rare-metals",
+            "amount": 1
+          }
+        ],
+        "ignored_by_productivity": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "shared_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "independent_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "extra_count_fraction": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        }
+      },
+      {
+        "recipe": "kr-silicon",
+        "enabled": false,
+        "allow_productivity": true,
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "kr-quartz",
+            "amount": 18
+          }
+        ],
+        "products": [
+          {
+            "type": "item",
+            "name": "kr-silicon",
+            "amount": 9
+          }
+        ],
+        "ignored_by_productivity": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "shared_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "independent_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "extra_count_fraction": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        }
+      },
+      {
+        "recipe": "kr-glass",
+        "enabled": false,
+        "allow_productivity": true,
+        "ingredients": [
+          {
+            "type": "item",
+            "name": "kr-sand",
+            "amount": 16
+          }
+        ],
+        "products": [
+          {
+            "type": "item",
+            "name": "kr-glass",
+            "amount": 8
+          }
+        ],
+        "ignored_by_productivity": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "shared_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "independent_probability": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        },
+        "extra_count_fraction": {
+          "present_on_recipe": false,
+          "present_on_ingredients": [
+            false
+          ],
+          "present_on_products": [
+            false
+          ]
+        }
+      }
+    ],
+    "owners": [
+      {
+        "technology": "kr-rare-metal-processing",
+        "recipe": "kr-rare-metals",
+        "relevant_effects": [
+          {
+            "type": "unlock-recipe",
+            "recipe": "kr-rare-metals"
+          }
+        ]
+      },
+      {
+        "technology": "kr-enriched-ores",
+        "recipe": "kr-rare-metals-from-enriched-rare-metals",
+        "relevant_effects": [
+          {
+            "type": "unlock-recipe",
+            "recipe": "kr-rare-metals-from-enriched-rare-metals"
+          }
+        ]
+      },
+      {
+        "technology": "kr-silicon-processing",
+        "recipe": "kr-silicon",
+        "relevant_effects": [
+          {
+            "type": "unlock-recipe",
+            "recipe": "kr-silicon"
+          }
+        ]
+      },
+      {
+        "technology": "kr-stone-processing",
+        "recipe": "kr-glass",
+        "relevant_effects": [
+          {
+            "type": "unlock-recipe",
+            "recipe": "kr-glass"
+          }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "item": "kr-rare-metals",
+        "icon": "__Krastorio2Assets__/icons/items/rare-metals.png",
+        "icon_size": {
+          "present": false,
+          "value": null
+        }
+      },
+      {
+        "item": "kr-silicon",
+        "icon": "__Krastorio2Assets__/icons/items/silicon.png",
+        "icon_size": {
+          "present": false,
+          "value": null
+        }
+      },
+      {
+        "item": "kr-glass",
+        "icon": "__Krastorio2Assets__/icons/items/glass.png",
+        "icon_size": {
+          "present": false,
+          "value": null
+        }
+      }
+    ]
+  }
+}

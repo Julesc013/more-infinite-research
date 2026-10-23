@@ -73,6 +73,8 @@ class LibraryModelTests(unittest.TestCase):
           assert(view.hidden["recipe-prod-research_gears-1"])
           assert(model.normalize({family = "unlisted-authored-family"}).family == "unlisted-authored-family")
           assert(model.normalize({family = string.rep("x", 161)}).family == "mir")
+          local availability = model.normalize({tab = "availability", visibility = 3})
+          assert(availability.tab == "research" and availability.visibility == 3)
         ''')
 
     def test_normalize_keeps_bounded_historical_page_and_sort_state(self):
@@ -259,6 +261,22 @@ class LibraryModelTests(unittest.TestCase):
           assert(#detail.cost.ingredients == 16 and not detail.ingredients_complete and detail.cost.count_formula == "100*L")
           detail.effects[1].recipe = "mutated"; detail.cost.ingredients[1].name = "mutated"
           assert(effects[1].recipe == "recipe-1" and ingredients[1].name == "pack-1")
+        ''')
+
+    def test_selected_detail_keeps_named_native_modifier_fields_without_catalogue_scan(self):
+        self.lua.execute('''
+          local id = "weapon-shooting-speed-7"
+          local weapon = technology(id, {effects = {
+            {type = "gun-speed", ammo_category = "bullet", modifier = .2},
+            {type = "worker-robot-storage", modifier = 1}
+          }})
+          local force = {technologies = setmetatable({[id] = weapon}, {
+            __pairs = function() error("detail scanned native catalogue") end
+          }), research_queue = {}}
+          local detail = assert(model.detail(force, {{id = id, family = "weapon-shooting-speed"}}, {selected = id}, {}))
+          assert(detail.effects[1].type == "gun-speed" and detail.effects[1].modifier == .2
+            and detail.effects[1].ammo_category == "bullet")
+          assert(detail.effects[2].type == "worker-robot-storage" and detail.effects[2].modifier == 1)
         ''')
 
     def test_native_style_proxies_reject_unsupported_member_reads(self):

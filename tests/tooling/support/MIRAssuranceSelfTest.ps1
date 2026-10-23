@@ -2243,6 +2243,28 @@ function Invoke-MIRAssuranceSelfTest {
     if ($currentCiDecision.disposition -ne 'WAIT' -or -not (Test-Path -LiteralPath $currentCiJob.paths.running -PathType Leaf)) {
       throw 'A current CI job did not retain its live running lease.'
     }
+
+    # A restored marker can carry the same workflow and matrix job identity on
+    # a reused runner host after its original PowerShell process exited. It is
+    # not an adoptable worker: retain custody and run this exact local job.
+    $sameCiDead = & $newRunningCase -Label 'same-ci-job-dead-process' -CaseContext $ciContext
+    $sameCiDead.marker.lease_scope = 'ci-job'
+    $sameCiDead.marker.host_identity = Get-MIRAssuranceHostIdentity
+    $sameCiDead.marker.process_id = [int]::MaxValue
+    & $writeRunningCase $sameCiDead
+    $sameCiDeadMarkerSha256 = Get-MIRAssuranceSha256 -Path $sameCiDead.paths.running
+    $sameCiDeadDecision = Get-MIRAssuranceEvidenceDecision -Fingerprint $sameCiDead.fingerprint -Context $ciContext -TestId $sameCiDead.fingerprint.test_id
+    $sameCiDeadCustody = @(Get-ChildItem -LiteralPath (Join-Path $sameCiDead.paths.root 'lease-custody') -File -ErrorAction SilentlyContinue)
+    if ($sameCiDeadDecision.disposition -ne 'RUN' -or
+        (Test-Path -LiteralPath $sameCiDead.paths.running -PathType Leaf) -or
+        $sameCiDeadCustody.Count -ne 1) {
+      throw 'A same-job dead CI process lease was incorrectly adoptable.'
+    }
+    $sameCiDeadRecord = Get-Content -Raw -LiteralPath $sameCiDeadCustody[0].FullName | ConvertFrom-Json -DateKind String
+    if ([string]$sameCiDeadRecord.reason -ne 'ci-job-process-not-live-in-current-worker' -or
+        [string]$sameCiDeadRecord.marker_sha256 -ne $sameCiDeadMarkerSha256) {
+      throw 'Same-job dead CI lease custody did not retain the exact marker.'
+    }
   } finally {
     foreach ($name in $ciEnvironmentNames) {
       if ($null -eq $ciEnvironmentBefore[$name]) { Remove-Item -LiteralPath ("Env:$name") -ErrorAction SilentlyContinue }

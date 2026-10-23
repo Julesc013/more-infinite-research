@@ -96,6 +96,13 @@ class PropertyTests(unittest.TestCase):
           package.preload["__more-infinite-research__/research/generator"] = function()
             return generator
           end
+          package.preload["platform.target"] = function()
+            return {
+              id="f210", factorio_version="2.1", minimum_base="2.1.23",
+              distribution_version="5.0.21000", reduced=false,
+              research_levels=true, recipe_productivity=true,
+            }
+          end
         ''')
         api = lua.execute(DATA_API_SOURCE)
         lua.globals().api = api

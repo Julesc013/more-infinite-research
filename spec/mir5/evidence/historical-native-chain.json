@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalNativeBehaviorChainV1",
+  "status": "seven-exact-engine-private-scenarios-pass",
+  "player_source_commit": "9caa8105bfeff25c63af221126fd91af8367477c",
+  "fixture_source_commit": "c5011a574b6c247e922a367829e253b93f1bdb09",
+  "profiles": [
+    {
+      "target": "f013",
+      "engine_version": "0.13.20",
+      "engine_sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856",
+      "player_sha256": "EAF501941AF1F0D35821046C8C3E02082E2E883DC2A77259B9300CB622A47DFD",
+      "fixture_sha256": "F37E6283376AE4B2EFB80F2C2AE9682A39ED12ED8AADD88DCF852852BBBA1D72",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f013-native.json",
+        "sha256": "4C2CB422601B7C250C0D566EEC04B284322AF3AF4D7CD8BFA036ABACDB7909DD"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f013-r08",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f013",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "D1DDD09A478068BECFC35F159B7C0AEC84DE2A00F960F2028F3359D37D1E3625",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f014",
+      "engine_version": "0.14.23",
+      "engine_sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F",
+      "player_sha256": "C6120A762F5BA397BF207C2EFE86640651FE43993A91FC9D13C54FC69471F8E8",
+      "fixture_sha256": "0C6118B06409A7365E92687782CEFEB2DFD7E3B0FE45B7161A0528392CD47E2A",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f014-native.json",
+        "sha256": "B2C50D8B3F70F2BBC3C53087304A37813A03AF77013DF4AFBBA568E251A6AC7C"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f014-r01",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f014",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "23902DC86C0BA064F45715909ED5FB816279BE1285D7BD2107163100825A6DC9",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f015",
+      "engine_version": "0.15.40",
+      "engine_sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6",
+      "player_sha256": "30DE0C18F409FE9E75BABCBD51B00C08423F3B5808174E0D428F24071ED62581",
+      "fixture_sha256": "324D1D7601612DDAB293134E57587CCBFEB925838A9A2FF02ED04929EE32821C",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f015-native.json",
+        "sha256": "FCCFDE8F84AF8B3C5376BC00C72E661C3DEA5C2CBC478803476DE747B1DB4879"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f015-r02",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f015",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "D379684FAF5C032CA73AF0FF5C0E55D5B1683D4FB4B17F2A738B7DB9DCD13361",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f016",
+      "engine_version": "0.16.51",
+      "engine_sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966",
+      "player_sha256": "92A384FCB1FFA62C1C4E50DD464333F2C5A1EB16B87CF279BA87D79DE792B713",
+      "fixture_sha256": "3A50A14C8E2E5460198B54CBDBA79DB54EEB004B2125D1ACDF3C6E2DF9BC389C",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f016-native.json",
+        "sha256": "A4EB1EC90A5BD6FC157BF92C4A997612F9D5F304C4119FB5D5116E6A35477136"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f016-r01",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f016",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "7864C76BE3DA34F14644D995CB6E139C8D35BF392FE541288E32BF3457FB8DD3",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f017",
+      "engine_version": "0.17.79",
+      "engine_sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+      "player_sha256": "715CBD814B1FC06A662D35AF2A00AC1BD208A8669609F4D2758EB55CC0C92270",
+      "fixture_sha256": "D9902449FC2B83D5BD181D13CEF2C3A79438E11E17E105BF6BF72EE55ECDBF60",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f017-native.json",
+        "sha256": "0AFFEC98114291C3FA19B23F5923AA57A88275CADB6C258B06637AC3A4222B29"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f017-r01",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f017",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "FB591211BD6FB06643C5DD126B1A7C2D6172AA4EA9C458B52A87312BDDA05551",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f100",
+      "engine_version": "1.0.0",
+      "engine_sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+      "player_sha256": "A6FAE6A41060BEC0E9554E99A63083DE663D6699B4D4C95D1DEADFCEABAA2973",
+      "fixture_sha256": "CEAF9F9BA2FE8C9F536D84970A5A6E82E88801161AF1A502D4521AA7815FB823",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f100-native.json",
+        "sha256": "0F93539F6C547DE795020121EF511B472EED4B2F02C1E6DBCB67927AA2B53613"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f100-r01",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f100",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "C740567D54D88FEA1F035455FF7CE744D500F5BB58B9B607E09A922F1B11BCB6",
+      "save_byte_identical": true,
+      "controls_restored": true
+    },
+    {
+      "target": "f110",
+      "engine_version": "1.1.110",
+      "engine_sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+      "player_sha256": "5509627F1FD35B9FF563752CA61E34177120F14DBA749BC67A68CD65AC72DEDB",
+      "fixture_sha256": "FA5F7D65100DAEF01B3BD206F0475CF4D94DF94F71BFBD053E55D4BAC60EC527",
+      "native_record": {
+        "path": "spec/mir5/evidence/historical-f110-native.json",
+        "sha256": "BF57DF3BA04039A2C1E45C92A1C389C76A66D57EB53BC5CF0FDE8735C08AE3C3"
+      },
+      "raw_custody": "build/tmp/mir5-historical-native-f110-r01",
+      "initial": {
+        "case": "historical-native",
+        "stage": "initial",
+        "status": "passed",
+        "target": "f110",
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "two_cold_reload_witness": false,
+        "on_load_read_only": false
+      },
+      "reloads": 2,
+      "save_sha256": "D6B57FB795D1BE5CF19F55E4A5C1C6AB6A6F34582594CB26FB7F36780CF97555",
+      "save_byte_identical": true,
+      "controls_restored": true
+    }
+  ],
+  "limits": [
+    "F013/F014 retain their published numeric continuation as an unchanged finite witness; only the direct mining research is physically completed.",
+    "F015 through F110 physically complete direct mining and inserter continuation research.",
+    "These are frozen historical packages, not qualification of the final complete MIR5 candidate.",
+    "No historical predecessor upgrade, full catalogue parity, rendered UI, joined multiplayer or performance result is established.",
+    "F013 records unrelated dirty fixture-development work in its original receipt; archive, fixture and harness bytes remain individually pinned."
+  ],
+  "native_execution": true,
+  "release_qualification": false
+}

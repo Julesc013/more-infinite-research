@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "kind": "mir5-atan-f200-native-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "atan-air-scrubbing",
+      "version": "0.2.8",
+      "enabled": true
+    },
+    {
+      "name": "atan-ash",
+      "version": "2.2.1",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "atan-air-scrubbing_0.2.8.zip": "FC1425EBEA1B2BD5BDD6DADB7BD594423DEBE8180D4781B25C92EA593D5D9AEF",
+    "atan-ash_2.2.1.zip": "B46B85FC39D16331EA031F5F6459C5E99E8011097E782F958C08CE8AC9EEAE6C",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Independent final-data reference for exact ATAN filter and ash route/owner/science bindings; no MIR5 gameplay or support qualification"
+}

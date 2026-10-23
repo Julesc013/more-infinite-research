@@ -1,0 +1,464 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "db0504b049342878ac6cf5f83eaca59917505886",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "9A7E36050CD42BE983666BE684B7BE3BFB7D2A1B2039C029F33184F19C7A4DCB",
+    "direct_library_startup_measurement_sha256": "699D0F24C822BA31F212061E11787E5DB1792CA0C164D82219CE0852A6E1F6E1",
+    "native_probe_resources_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+    "library_activation_sha256": "5359CBC03A883F480A80083DE05A0A5B97BB68B919161344F418886A3D6F49E6"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "base_version": "2.0.77",
+    "factorio_version": "2.0"
+  },
+  "profile_input": {
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\k2-base-f200-2077.json",
+    "sha256": "A9293B7B7C4F5EAE968814C38FEDF05D6B11ECFBFF3AF4A1DFF3C9204A606702"
+  },
+  "mir_archive": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E",
+    "name": "more-infinite-research",
+    "version": "5.0.20000",
+    "factorio_version": "2.0",
+    "root": "more-infinite-research_5.0.20000"
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.424,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T14:48:41.9083413+00:00",
+    "deadline_at": "2026-10-23T14:49:11.9083413+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T14:48:42.3048855+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20450504704,
+        "committed_bytes": 18721587200,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205402992640,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205402992640,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "03A56C0762A8285FDB3A8622ADBCDF579015B013EA7331F0C1B3F43F6A8685EF",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.0.19",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.0.5",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2",
+        "enabled": true
+      },
+      {
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0",
+        "enabled": true
+      },
+      {
+        "name": "flib",
+        "version": "0.16.5",
+        "enabled": true
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+      "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "Krastorio2",
+      "version": "2.0.19",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2_2.0.19.zip",
+      "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32"
+    },
+    {
+      "name": "Krastorio2Assets",
+      "version": "2.0.5",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2Assets_2.0.5.zip",
+      "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B"
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "version": "2.0.2",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2MenuSimulations_2.0.2.zip",
+      "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B"
+    },
+    {
+      "name": "ChangeInserterDropLane",
+      "version": "1.2.0",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\ChangeInserterDropLane_1.2.0.zip",
+      "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74"
+    },
+    {
+      "name": "flib",
+      "version": "0.16.5",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\flib_0.16.5.zip",
+      "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+      "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 3.320807,
+    "peak_working_set_bytes": 326402048,
+    "peak_sampled_private_bytes": 317362176,
+    "admission": {
+      "observed_at": "2026-10-23T14:48:47.3865657+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20358709248,
+        "committed_bytes": 18774343680,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205402988544,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205402988544,
+        "total_bytes": 599395090432
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 30,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.169,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-10-23T14:48:47.2180909+00:00",
+      "deadline_at": "2026-10-23T14:49:17.2180909+00:00",
+      "admission": {
+        "observed_at": "2026-10-23T14:48:47.3865657+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 20358709248,
+          "committed_bytes": 18774343680,
+          "commit_limit_bytes": 44388642816
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 205402988544,
+          "total_bytes": 599395090432
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 205402988544,
+          "total_bytes": 599395090432
+        }
+      }
+    }
+  },
+  "loaded_selection": [
+    "base@2.0.77",
+    "ChangeInserterDropLane@1.2.0",
+    "flib@0.16.5",
+    "Krastorio2@2.0.19",
+    "Krastorio2Assets@2.0.5",
+    "Krastorio2MenuSimulations@2.0.2",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.20000"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 17019611,
+      "sha256": "5FB22A0A51B3040F7F47E4605C709695F740275A6B75C90F1174F635EBA866B5"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 739991,
+      "sha256": "F64E3ACF18907818CF0D854E3310BF7269D5F8D3222B50BD5594D7AD1B6F9A9E"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "03A56C0762A8285FDB3A8622ADBCDF579015B013EA7331F0C1B3F43F6A8685EF",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.0.19",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2_2.0.19.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED3",
+        "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+        "bytes": 778318
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.0.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2Assets_2.0.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002F00000001EED0",
+        "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+        "bytes": 158227416
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2MenuSimulations_2.0.2.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED1",
+        "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+        "bytes": 3112390
+      },
+      {
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\ChangeInserterDropLane_1.2.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:019F00000001BD72",
+        "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+        "bytes": 305568
+      },
+      {
+        "name": "flib",
+        "version": "0.16.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\flib_0.16.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:003200000001EE9D",
+        "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+        "bytes": 453091
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000D0000000217BA",
+        "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E",
+        "bytes": 353516
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39972744631-1\\capture\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39972744631-1\\capture\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39972744631-1\\capture\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 3.320807,
+        "peak_working_set_bytes": 326402048,
+        "peak_sampled_private_bytes": 317362176,
+        "admission": {
+          "observed_at": "2026-10-23T14:48:47.3865657+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20358709248,
+            "committed_bytes": 18774343680,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205402988544,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205402988544,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.169,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T14:48:47.2180909+00:00",
+          "deadline_at": "2026-10-23T14:49:17.2180909+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T14:48:47.3865657+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20358709248,
+              "committed_bytes": 18774343680,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205402988544,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205402988544,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "prototype-capture-engine",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.169,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T14:48:47.2180909+00:00",
+        "deadline_at": "2026-10-23T14:49:17.2180909+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T14:48:47.3865657+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20358709248,
+            "committed_bytes": 18774343680,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205402988544,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205402988544,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    }
+  ]
+}

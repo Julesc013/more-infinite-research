@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIR5StructuralTargetHostControlsV1",
+  "status": "sixteen-collector-thirteen-extension-thirty-one-generator-controls-pass",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/automatic_productivity.lua",
+      "sha256": "96DF31C2CA79BA54C55011AD0078360EE32EE89E0D87BF6FC3F9D40285A74575"
+    },
+    {
+      "path": "source/mir5/compatibility/product_bindings.lua",
+      "sha256": "A6A0020B7A0BFA9EA17A3A5967220F6636571294EAD60A9125D9C2C4EF1DBAF1"
+    },
+    {
+      "path": "source/mir5/compatibility/product_targets.lua",
+      "sha256": "39DDFB0B1E6F05F276F3FC1D5C854C09A8F8E771C003F69ABCCC2FB14C77F14F"
+    },
+    {
+      "path": "source/mir5/compatibility/modern_catalogue/k2so.lua",
+      "sha256": "4C63E7069F5E8567CF270933539FA908E056AD200CE86F3F01305ED0F6F5EC2D"
+    },
+    {
+      "path": "source/mir5/research/modern.lua",
+      "sha256": "88663211DDEC188BF3C059B50FD8EFCA45710690698ED9A9C38B3AFA0C7A818D"
+    },
+    {
+      "path": "source/mir5/research/product_target_extension.lua",
+      "sha256": "88FEB4B8EA46E7F1EB6B7E7230CB849595B7A12F2006DA52292CE595FBEA77BE"
+    },
+    {
+      "path": "tests/mir5/test_product_targets.py",
+      "sha256": "E8D592C44F37071C706490181383764271937C123740F8F3A890FA0338AEFAFD"
+    },
+    {
+      "path": "tests/mir5/test_product_target_extension.py",
+      "sha256": "94D5F984586D9A25C74FBD0848B2020FF719ACF7D36822D98408AEA900D180A5"
+    },
+    {
+      "path": "tests/mir5/test_generator.py",
+      "sha256": "E69906610D5702A34F6EA97DEF3AE999EB492F86FFFF219B43EA7E5C96E44DF3"
+    }
+  ],
+  "semantics": "Shared item expansion indexes only the seven named belt/inserter entity classes. Structural fallback retains explicit productivity denials and declaration precedence. Apply/preview/disabled and legacy defaults bridge govern both new matches and the eight captured K2 structural targets. The three known K2 card products activate only for the admitted K2SO profile and selected existing family.",
+  "captured_native_input_probe": [
+    {
+      "profile": "base-f210",
+      "differences": [],
+      "work": {
+        "ingredients": 523,
+        "recipe_pattern_tests": 576,
+        "products": 219,
+        "items": 252,
+        "entities": 19,
+        "owners": 0,
+        "matches": 104,
+        "pattern_tests": 9547,
+        "recipes": 217
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "differences": [],
+      "work": {
+        "recipes": 662,
+        "owners": 2,
+        "matches": 757,
+        "entities": 24,
+        "pattern_tests": 13625,
+        "recipe_pattern_tests": 1622,
+        "items": 342,
+        "products": 1092,
+        "ingredients": 1173
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "differences": [],
+      "work": {
+        "pattern_tests": 23623,
+        "items": 592,
+        "recipes": 1883,
+        "matches": 986,
+        "products": 2166,
+        "ingredients": 2948,
+        "entities": 37,
+        "owners": 2,
+        "recipe_pattern_tests": 3356
+      }
+    },
+    {
+      "profile": "base-f200",
+      "differences": [],
+      "work": {
+        "products": 219,
+        "items": 251,
+        "owners": 0,
+        "recipe_pattern_tests": 576,
+        "ingredients": 523,
+        "recipes": 217,
+        "entities": 19,
+        "matches": 104,
+        "pattern_tests": 9509
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "differences": [],
+      "work": {
+        "recipes": 659,
+        "items": 340,
+        "recipe_pattern_tests": 1619,
+        "pattern_tests": 13545,
+        "products": 1084,
+        "matches": 753,
+        "owners": 2,
+        "entities": 24,
+        "ingredients": 1167
+      }
+    }
+  ],
+  "scope": "All recovered collector selectors replayed against five independent native-input references, with zero target or weight differences for each represented published family. Probe work counters are host all-rule observations, not timed production measurements or a new engine run.",
+  "limits": [
+    "Native mod-added target effects, nondefault action settings, physical production and saves remain pending.",
+    "Native-owner expansion, competing-owner policies and missing mod material/integration families remain open; CONT-04 is not closed.",
+    "No release or performance qualification is claimed."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

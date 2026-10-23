@@ -5,6 +5,8 @@
 -- its callbacks explicitly; this file never registers handlers or creates a
 -- recurring subscription by itself.
 local catalogue = require("research.catalogue")
+local settings_catalog = require("research.settings")
+local profile_codec = require("research.settings_profile")
 local library_model = require("presentation.library_model")
 local translation_queue = require("runtime.library_translations")
 
@@ -23,6 +25,7 @@ local MAX_QUERY = 160
 local MAX_HIDDEN = 128
 local MAX_PAGE = 30000
 local MAX_FAMILY_DESCRIPTORS = 128
+local MAX_SETTING_DESCRIPTORS = 2048
 local LEGACY_NAMESPACE = "mir"
 local LEGACY_BROWSER_KEY = "research_browser"
 local LEGACY_ROOT_MARKER = "mir_browser_tabs"
@@ -33,6 +36,8 @@ local LEGACY_SNAPSHOT_MAX_STRING = 4096
 local cap_provider = nil
 local TRANSLATION_SCHEMA = 1
 local TRANSLATION_MAINTENANCE_TICKS = 61
+local TABS = {"research", "queue", "settings", "help"}
+local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 
 -- Derived translated labels and catalogue order remain local to a currently
 -- open view. The small issued-request ledger lives in the Library state so a
@@ -177,12 +182,11 @@ local function family_index(values, family)
   return nil
 end
 
--- Availability was the published third visibility state.  That surface has
--- not yet been reconstructed, so this host deliberately persists and renders
--- only normal and personal-hidden views.  The full historical record remains
--- in the migration snapshot for the later availability unit.
+-- Personal hiding remains a view-local filter.  The published third choice
+-- showed its terminal availability explanation within Research, rather than
+-- constructing a speculative omitted-technology catalogue.
 local function visibility_option(value)
-  return whole_option(value, 1, 2)
+  return whole_option(value, 1, 3)
 end
 
 local function sort_from_index(value)
@@ -254,6 +258,10 @@ local function local_view(raw)
     visibility = raw.visibility,
     hidden = raw.hidden,
     selected = technology_id(raw.selected),
+    tab = raw.tab,
+    settings_scope = raw.settings_scope,
+    settings_query = text(raw.settings_query),
+    setting_selected = technology_id(raw.setting_selected),
     location = location(raw.location),
     scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
   }
@@ -283,6 +291,8 @@ local function local_view(raw)
     value.hidden = type(normalized.hidden) == "table" and normalized.hidden or {}
     value.selected = type(normalized.selected) == "string" and normalized.selected or nil
   end
+  value.tab = TAB_INDEX[value.tab] and value.tab or "research"
+  value.settings_scope = value.settings_scope == "options" and "options" or "research"
   return value
 end
 
@@ -513,6 +523,10 @@ local function legacy_view_as_private(value)
     visibility = value.visibility,
     hidden = value.hidden,
     selected = value.selected,
+    tab = value.tab,
+    settings_scope = value.settings_scope,
+    settings_query = value.settings_search,
+    setting_selected = value.setting_selection,
     location = value.location,
     scroll = value.scroll
   })
@@ -824,7 +838,17 @@ local function detail_lines(parent, row, detail)
     end
   end
   if type(detail) == "table" and detail.cost ~= nil then
-    add(parent, {type = "label", name = PREFIX .. "detail_cost", caption = {"mir-browser.research-cost", tostring(type(detail.cost) == "table" and (detail.cost.count or detail.cost[1] or "?") or detail.cost), tostring(type(detail.cost) == "table" and (detail.cost.time or detail.cost.energy or detail.cost[2] or "?") or "?")}})
+    add(parent, {type = "label", name = PREFIX .. "detail_cost", caption = {"mir-browser.research-cost", tostring(type(detail.cost) == "table" and (detail.cost.count or detail.cost[1] or "?") or detail.cost), tostring(type(detail.cost) == "table" and (detail.cost.energy or detail.cost.time or detail.cost[2] or "?") or "?")}})
+    if type(detail.cost) == "table" and type(detail.cost.ingredients) == "table"
+        and #detail.cost.ingredients > 0 then
+      add(parent, {type = "label", name = PREFIX .. "detail_science", caption = {"mir-browser.science"}})
+      for index, ingredient in ipairs(detail.cost.ingredients) do
+        if type(ingredient) == "table" then
+          add(parent, {type = "label", name = PREFIX .. "science_" .. index,
+            caption = {"mir-browser.science-ingredient", tostring(ingredient.name or "?"), tostring(ingredient.amount or "?")}})
+        end
+      end
+    end
   end
   if type(detail) == "table" and type(detail.prerequisites) == "table" and #detail.prerequisites > 0 then
     add(parent, {type = "label", name = PREFIX .. "detail_prerequisites", caption = {"mir-browser.prerequisites"}})
@@ -836,16 +860,28 @@ local function detail_lines(parent, row, detail)
     add(parent, {type = "label", name = PREFIX .. "detail_benefits", caption = {"mir-browser.benefits"}})
     for index, effect in ipairs(detail.effects) do
       local effect_type = type(effect) == "table" and effect.type or effect
-      local change = type(effect) == "table" and effect.change or nil
+      local change = type(effect) == "table" and (effect.change or effect.modifier) or nil
       local text_value = tostring(effect_type or "")
-      if change ~= nil then text_value = text_value .. " " .. tostring(change) end
+      if effect_type == "change-recipe-productivity" and type(change) == "number" then
+        text_value = {"mir-browser.productivity-increment", tostring(change * 100)}
+      elseif change ~= nil then
+        text_value = text_value .. " " .. tostring(change)
+        if type(effect) == "table" and effect.ammo_category then text_value = text_value .. " " .. effect.ammo_category end
+        if type(effect) == "table" and effect.turret_id then text_value = text_value .. " " .. effect.turret_id end
+      elseif type(effect) == "table" and effect.recipe then
+        text_value = text_value .. " " .. effect.recipe
+      end
       add(parent, {type = "label", name = PREFIX .. "effect_" .. index, caption = text_value})
     end
   end
 end
 
-local function update_content(frame, player, view, context, translations)
-  local content = frame[PREFIX .. "content"]
+local function tab_content(frame, tab)
+  local tabs = frame and frame[PREFIX .. "tabs"]
+  return valid(tabs) and tabs[PREFIX .. tab .. "_content"] or nil
+end
+
+local function update_research_content(content, player, view, context, translations)
   if not valid(content) then return end
   content.clear()
 
@@ -870,6 +906,210 @@ local function update_content(frame, player, view, context, translations)
   add(actions, {type = "button", name = PREFIX .. "close", caption = {"mir-browser.close"}})
 end
 
+local function setting_value(startup, name, fallback)
+  local ok, value = pcall(function()
+    local entry = startup and startup[name]
+    return entry and entry.value
+  end)
+  if ok and value ~= nil then return value end
+  return fallback
+end
+
+local function setting_display(name, value)
+  if type(value) == "boolean" then return {"mir-browser.setting-" .. (value and "on" or "off")} end
+  if type(value) == "number" and value == 0 and type(name) == "string"
+      and name:find("%-max%-level%-", 1) then
+    return {"mir-browser.setting-unlimited"}
+  end
+  return tostring(value)
+end
+
+local function setting_catalogue()
+  local ok, names = pcall(settings_catalog.registered_names)
+  if not ok or type(names) ~= "table" or #names > MAX_SETTING_DESCRIPTORS then return nil end
+
+  local prototypes, by_name = {}, {}
+  local prototypes_ok, all_prototypes = pcall(settings_catalog.prototypes)
+  if prototypes_ok and type(all_prototypes) == "table" then
+    for _, prototype in ipairs(all_prototypes) do
+      if type(prototype) == "table" and type(prototype.name) == "string" then
+        prototypes[prototype.name] = prototype
+      end
+    end
+  end
+
+  local startup = settings and settings.startup or nil
+  local effective_ok, effective = pcall(settings_catalog.effective_values, startup, helpers)
+  if not effective_ok or type(effective) ~= "table" then return nil end
+
+  local imported = nil
+  local import_name = settings_catalog.import_setting_name
+  local imported_text = setting_value(startup, import_name, "")
+  if type(imported_text) == "string" and imported_text ~= "" then
+    local decoded_ok, profile = pcall(profile_codec.decode, imported_text, helpers)
+    if decoded_ok and type(profile) == "table" and type(profile.settings) == "table" then imported = profile.settings end
+  end
+
+  local groups, ordered = {}, {}
+  for index, name in ipairs(names) do
+    if type(name) ~= "string" or name == "" or by_name[name] then return nil end
+    by_name[name] = true
+    local spec = settings_catalog.spec(name)
+    if type(spec) ~= "table" then return nil end
+    local stream = type(spec.stream) == "table" and spec.stream or nil
+    local scope = stream and "research" or "options"
+    local key = stream and type(stream.key) == "string" and stream.key or name
+    local group = groups[key]
+    if group == nil then
+      local title = stream and stream.technology_locale or nil
+      if type(title) == "string" then title = {title} end
+      group = {key = key, scope = scope, title = title or (prototypes[name] and prototypes[name].localised_name) or name,
+        fields = {}, search = key .. " " .. name}
+      groups[key], ordered[#ordered + 1] = group, group
+    end
+    local default = spec.default_value
+    local direct = setting_value(startup, name, default)
+    local source = "direct"
+    if imported and startup and startup[name] and imported[name] ~= nil then
+      local accepted = settings_catalog.validate_value(name, imported[name])
+      if accepted then source = "mirset1" end
+    end
+    group.fields[#group.fields + 1] = {
+      name = name,
+      caption = (prototypes[name] and prototypes[name].localised_name) or name,
+      description = prototypes[name] and prototypes[name].localised_description or nil,
+      effective = effective[name], direct = direct, default = default, source = source,
+      order = spec.field_index or index
+    }
+    group.search = group.search .. " " .. name
+  end
+  if import_name and not by_name[import_name] and prototypes[import_name] then
+    local group = {key = import_name, scope = "options", title = prototypes[import_name].localised_name or import_name,
+      search = import_name, fields = {{name = import_name, caption = prototypes[import_name].localised_name or import_name,
+        description = prototypes[import_name].localised_description, effective = setting_value(startup, import_name, ""),
+        direct = setting_value(startup, import_name, ""), default = prototypes[import_name].default_value, source = "direct", order = 1}}}
+    groups[import_name], ordered[#ordered + 1] = group, group
+  end
+  for _, group in ipairs(ordered) do
+    table.sort(group.fields, function(left, right)
+      if left.order ~= right.order then return left.order < right.order end
+      return left.name < right.name
+    end)
+  end
+  table.sort(ordered, function(left, right) return left.key < right.key end)
+  return ordered
+end
+
+local function setting_search_matches(group, query)
+  if query == "" then return true end
+  local haystack = group.search:lower():gsub("[-_]", " ")
+  return haystack:find(query:lower():gsub("[-_]", " "), 1, true) ~= nil
+end
+
+local function update_settings_content(content, view, preserve_query)
+  if not valid(content) then return end
+  local toolbar = content[PREFIX .. "settings_toolbar"]
+  if not valid(toolbar) then
+    toolbar = add(content, {type = "flow", name = PREFIX .. "settings_toolbar", direction = "horizontal"})
+    add(toolbar, {type = "button", name = PREFIX .. "settings_research", caption = {"mir-browser.settings-scope-research"}})
+    add(toolbar, {type = "button", name = PREFIX .. "settings_options", caption = {"mir-browser.settings-scope-options"}})
+  end
+  local query = content[PREFIX .. "settings_query"]
+  if not valid(query) then
+    query = add(content, {type = "textfield", name = PREFIX .. "settings_query", text = view.settings_query})
+  elseif not preserve_query then
+    query.text = view.settings_query
+  end
+  local dynamic = content[PREFIX .. "settings_dynamic"]
+  if not valid(dynamic) then dynamic = add(content, {type = "flow", name = PREFIX .. "settings_dynamic", direction = "vertical"}) end
+  dynamic.clear()
+
+  local groups = setting_catalogue()
+  if groups == nil then
+    add(dynamic, {type = "label", name = PREFIX .. "settings_unavailable", caption = {"mir-browser.detail-unavailable", "settings"}})
+    return
+  end
+  local visible, items = {}, {}
+  for _, group in ipairs(groups) do
+    if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query) then
+      visible[#visible + 1], items[#items + 1] = group, group.title
+    end
+  end
+  local selected_index = 0
+  for index, group in ipairs(visible) do if group.key == view.setting_selected then selected_index = index; break end end
+  if selected_index == 0 and #visible > 0 then selected_index, view.setting_selected = 1, visible[1].key end
+  local list = add(dynamic, {type = "list-box", name = PREFIX .. "settings_list", items = items, selected_index = selected_index})
+  add(dynamic, {type = "label", name = PREFIX .. "settings_count", caption = {"mir-browser.settings-count", #visible}})
+  local detail = add(dynamic, {type = "flow", name = PREFIX .. "settings_detail", direction = "vertical"})
+  local selected = visible[selected_index]
+  if selected == nil then
+    add(detail, {type = "label", name = PREFIX .. "settings_empty", caption = {"mir-browser.settings-empty"}})
+    return
+  end
+  add(detail, {type = "label", name = PREFIX .. "settings_title", caption = selected.title})
+  add(detail, {type = "label", name = PREFIX .. "settings_scope", caption = {"mir-browser.scope-startup"}})
+  add(detail, {type = "label", name = PREFIX .. "settings_effective", caption = {"mir-browser.effective-values"}})
+  for index, field in ipairs(selected.fields) do
+    local name = PREFIX .. "setting_" .. index
+    add(detail, {type = "label", name = name .. "_name", caption = field.caption, tooltip = field.description})
+    add(detail, {type = "label", name = name .. "_value", caption = setting_display(field.name, field.effective),
+      tooltip = {"mir-browser.setting-provenance", setting_display(field.name, field.direct),
+        setting_display(field.name, field.default), {"mir-browser.source-" .. field.source}}})
+  end
+  add(detail, {type = "label", name = PREFIX .. "settings_source", caption = {"mir-browser.configuration-source"}})
+end
+
+local function queue_name(entry)
+  if type(entry) == "string" then return technology_id(entry) end
+  local ok, name = pcall(function() return entry and entry.name end)
+  return ok and technology_id(name) or nil
+end
+
+local function queue_entries(force)
+  local ok, queue = pcall(function() return force and force.research_queue end)
+  if not ok or queue == nil then return {} end
+  local result = {}
+  local complete = pcall(function()
+    for index, entry in ipairs(queue) do
+      if index > MAX_PAGE then error("MIR Library queue limit") end
+      local id = queue_name(entry)
+      if id then result[#result + 1] = id end
+    end
+  end)
+  return complete and result or {}
+end
+
+local function update_queue_content(content, player, view)
+  if not valid(content) then return end
+  content.clear()
+  add(content, {type = "label", name = PREFIX .. "queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
+  add(content, {type = "button", name = PREFIX .. "queue_open_native", caption = {"mir-browser.open-research"}})
+  local ids, items = queue_entries(player.force), {}
+  for index, id in ipairs(ids) do
+    local technology = known_technology(player, id)
+    items[index] = technology and technology.localised_name or id
+  end
+  local selected_index = 0
+  for index, id in ipairs(ids) do if id == view.selected then selected_index = index; break end end
+  add(content, {type = "list-box", name = PREFIX .. "queue_list", items = items, selected_index = selected_index})
+  if #items == 0 then add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}}) end
+end
+
+local function update_availability_content(content)
+  if not valid(content) then return end
+  content.clear()
+  -- MIR5 names every delivered current-profile technology before data stage.
+  -- There is no compiler/discovery omission ledger to infer or present here.
+  add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+end
+
+local function update_help_content(content)
+  if not valid(content) then return end
+  content.clear()
+  add(content, {type = "label", name = PREFIX .. "help_summary", caption = {"mir-browser.help-summary"}})
+  add(content, {type = "label", name = PREFIX .. "help_queue", caption = {"mir-browser.native-queue-guidance"}})
+end
+
 local function create_frame(player, view)
   local screen = player.gui and player.gui.screen
   if not valid(screen) then return nil end
@@ -887,7 +1127,7 @@ local function create_frame(player, view)
     selected_index = family_index(families, view.family) or 1})
   add(filters, {type = "label", name = PREFIX .. "visibility_label", caption = {"mir-browser.visibility"}})
   add(filters, {type = "drop-down", name = PREFIX .. "visibility", items = {
-    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}
+    {"mir-browser.visibility-normal"}, {"mir-browser.visibility-hidden"}, {"mir-browser.not-added"}
   }, selected_index = view.visibility})
   add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
   add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
@@ -900,7 +1140,14 @@ local function create_frame(player, view)
     {"mir-browser.order-progression"}, {"mir-browser.order-native"},
     {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
   }, selected_index = SORT_INDEX[view.sort] or 1})
-  add(frame, {type = "flow", name = PREFIX .. "content", direction = "vertical"})
+  local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
+  for _, tab_name in ipairs(TABS) do
+    local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
+      caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
+    local content = add(tabs, {type = "flow", name = PREFIX .. tab_name .. "_content", direction = "vertical"})
+    tabs.add_tab(tab, content)
+  end
+  tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
   return frame
 end
 
@@ -919,6 +1166,7 @@ local function render(player, view, context, preserve_query)
   if not valid(frame) then return nil end
 
   local filters = frame[PREFIX .. "filters"]
+  if valid(filters) then filters.visible = view.tab == "research" end
   local query = valid(filters) and filters[PREFIX .. "query"] or nil
   if valid(query) and not preserve_query then query.text = view.query end
   local family = valid(filters) and filters[PREFIX .. "family"] or nil
@@ -939,10 +1187,32 @@ local function render(player, view, context, preserve_query)
   if valid(status) then status.selected_index = view.status end
   local sort = valid(filters) and filters[PREFIX .. "sort"] or nil
   if valid(sort) then sort.selected_index = SORT_INDEX[view.sort] or 1 end
-  local translations = open_translation_cache(player, view)
-  update_content(frame, player, view, context, translated_labels(translations))
+  local tabs = frame[PREFIX .. "tabs"]
+  if valid(tabs) then tabs.selected_tab_index = TAB_INDEX[view.tab] or 1 end
+  local content = tab_content(frame, view.tab)
+  if view.tab == "research" and view.visibility == 3 then
+    -- MIR5 has no compiler or discovery omission ledger. Retain the published
+    -- availability route without inventing rows, effect explanations, or a
+    -- native catalogue traversal.
+    discard_translation_cache(player.index)
+    update_availability_content(content)
+  elseif view.tab == "research" then
+    local translations = open_translation_cache(player, view)
+    update_research_content(content, player, view, context, translated_labels(translations))
+    dispatch_translations(player, translations)
+  else
+    -- A closed Research tab must not retain a local catalogue or spend more
+    -- translation work. Issued IDs stay in the small durable ledger.
+    discard_translation_cache(player.index)
+    if view.tab == "settings" then
+      update_settings_content(content, view, preserve_query)
+    elseif view.tab == "queue" then
+      update_queue_content(content, player, view)
+    else
+      update_help_content(content)
+    end
+  end
   set_shortcut(player, true)
-  dispatch_translations(player, translations)
   return frame
 end
 
@@ -963,6 +1233,17 @@ function M.open(player, options)
   local view = view_for(player.index)
   options = type(options) == "table" and options or {}
   local reset_page = false
+  if options.tab == "availability" then
+    view.tab, view.visibility, reset_page = "research", 3, true
+  elseif TAB_INDEX[options.tab] then
+    view.tab = options.tab
+  end
+  if options.settings_scope == "research" or options.settings_scope == "options" then
+    view.settings_scope, view.setting_selected = options.settings_scope, nil
+  end
+  if type(options.settings_search) == "string" then
+    view.settings_query, view.setting_selected = text(options.settings_search), nil
+  end
   if type(options.query) == "string" then
     view.query, reset_page = text(options.query), true
   end
@@ -1023,14 +1304,32 @@ end
 function M.on_gui_text_changed(event)
   local element = event and event.element
   local player = player_for(event and event.player_index)
-  if not player or not owns_element(player, element, {
-    PREFIX .. "query", PREFIX .. "filters", ROOT
-  }) then return end
+  if not player then return end
+  if element.name == PREFIX .. "query" then
+    if not owns_element(player, element, {PREFIX .. "query", PREFIX .. "filters", ROOT}) then return end
+    local view = view_for(player.index)
+    view.query, view.page, view.scroll = text(element.text), 1, 1
+    render(player, view, nil, true)
+  elseif element.name == PREFIX .. "settings_query" then
+    if not owns_element(player, element, {
+      PREFIX .. "settings_query", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    view.settings_query, view.setting_selected = text(element.text), nil
+    render(player, view, nil, true)
+  end
+end
+
+function M.on_gui_selected_tab_changed(event)
+  local element = event and event.element
+  local player = player_for(event and event.player_index)
+  if not player or not owns_element(player, element, {PREFIX .. "tabs", ROOT}) then return end
+  local tab = TABS[whole_option(element.selected_tab_index, 1, #TABS) or 0]
+  if tab == nil then return end
   local view = view_for(player.index)
-  view.query = text(element.text)
-  view.page = 1
-  view.scroll = 1
-  render(player, view, nil, true)
+  if view.tab == tab then return end
+  view.tab = tab
+  render(player, view)
 end
 
 function M.on_gui_selection_state_changed(event)
@@ -1090,7 +1389,7 @@ function M.on_gui_selection_state_changed(event)
     render(player, view)
   elseif element.name == PREFIX .. "results" then
     if not owns_element(player, element, {
-      PREFIX .. "results", PREFIX .. "content", ROOT
+      PREFIX .. "results", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
@@ -1102,6 +1401,32 @@ function M.on_gui_selection_state_changed(event)
       view.scroll = index
       render(player, view, context)
     end
+  elseif element.name == PREFIX .. "settings_list" then
+    if not owns_element(player, element, {
+      PREFIX .. "settings_list", PREFIX .. "settings_dynamic", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local groups = setting_catalogue()
+    if groups == nil then return end
+    local view = view_for(player.index)
+    local visible = {}
+    for _, group in ipairs(groups) do
+      if group.scope == view.settings_scope and setting_search_matches(group, view.settings_query) then
+        visible[#visible + 1] = group
+      end
+    end
+    local group = visible[element.selected_index]
+    if group == nil then return end
+    view.setting_selected = group.key
+    render(player, view)
+  elseif element.name == PREFIX .. "queue_list" then
+    if not owns_element(player, element, {
+      PREFIX .. "queue_list", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local id = queue_entries(player.force)[element.selected_index]
+    if id == nil or known_technology(player, id) == nil then return end
+    local view = view_for(player.index)
+    view.selected, view.tab, view.page, view.scroll = id, "research", 1, 1
+    render(player, view)
   end
 end
 
@@ -1112,14 +1437,33 @@ function M.on_gui_click(event)
   if not player then return end
   if element.name == PREFIX .. "close" then
     if not owns_element(player, element, {
-      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "content", ROOT
+      PREFIX .. "close", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
     }) then return end
     M.close(player)
     return
   end
+  if element.name == PREFIX .. "settings_research" or element.name == PREFIX .. "settings_options" then
+    if not owns_element(player, element, {
+      element.name, PREFIX .. "settings_toolbar", PREFIX .. "settings_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    view.settings_scope = element.name == PREFIX .. "settings_options" and "options" or "research"
+    view.setting_selected = nil
+    render(player, view)
+    return
+  end
+  if element.name == PREFIX .. "queue_open_native" then
+    if not owns_element(player, element, {
+      PREFIX .. "queue_open_native", PREFIX .. "queue_content", PREFIX .. "tabs", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    if destroy_frame(player, view) then discard_translation_cache(player.index) end
+    if type(player.open_technology_gui) == "function" then player.open_technology_gui(nil) end
+    return
+  end
   if element.name ~= PREFIX .. "open_native" then return end
   if not owns_element(player, element, {
-    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "content", ROOT
+    PREFIX .. "open_native", PREFIX .. "actions", PREFIX .. "research_content", PREFIX .. "tabs", ROOT
   }) then return end
   local view = view_for(player.index)
   local selected = technology_id(view.selected)

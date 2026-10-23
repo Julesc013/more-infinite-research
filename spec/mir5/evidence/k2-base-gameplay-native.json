@@ -1,0 +1,1201 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "passed-private-native-fixture",
+  "case": "k2-base-continuations",
+  "source_head": "d72a54b1df4810b158c3fe070ba55972c4acf542",
+  "source_dirty": false,
+  "harness_sha256": "C3C7FD214E7400D038C2513D93CA53D5E6B4674AD609293C5224809504C8D36C",
+  "native_probe_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "profile": {
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\k2-base-continuations-f200.json",
+    "sha256": "3FEDB5E5C32CF5E6300A78EFC0C4E220E02E9B038101F95F33AE855A34B39867"
+  },
+  "fixtures": [
+    {
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-k2-base-continuations_0.1.0.zip",
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\fixture-sources\\k2-base-continuations",
+      "sha256": "5CD131A05750195F4F73282C90B08159C717030630C77B2889BF92FE8886A9C9"
+    },
+    {
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\fixture-sources\\active-mods-observer",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    }
+  ],
+  "historical_target": null,
+  "mir_archive": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.067,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T15:13:11.5097015+00:00",
+    "deadline_at": "2026-10-23T15:13:41.5097015+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T15:13:11.5501881+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20467994624,
+        "committed_bytes": 18700570624,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386670080,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205386670080,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\fixture-sources\\active-mods-observer",
+    "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 2.93755,
+        "peak_working_set_bytes": 284266496,
+        "peak_sampled_private_bytes": 276643840,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20411486208,
+            "committed_bytes": 18721001472,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.163,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:15.8798635+00:00",
+          "deadline_at": "2026-10-23T15:13:45.8798635+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20411486208,
+              "committed_bytes": 18721001472,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386145792,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386145792,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.163,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:15.8798635+00:00",
+        "deadline_at": "2026-10-23T15:13:45.8798635+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20411486208,
+            "committed_bytes": 18721001472,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    "log": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\create.factorio.log",
+    "log_sha256": "019A46A68E19D7F4DC0B951C910E0960DDF1DABD0F86871AFF4878CC50ABFC53",
+    "loaded_selection": [
+      "base@2.0.77",
+      "ChangeInserterDropLane@1.2.0",
+      "flib@0.16.5",
+      "Krastorio2@2.0.19",
+      "Krastorio2Assets@2.0.5",
+      "Krastorio2MenuSimulations@2.0.2",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-k2-base-continuations@0.1.0",
+      "more-infinite-research@5.0.20000"
+    ],
+    "consumers": {}
+  },
+  "seed_sha256": "689A9912547DDC23880E075A3FA3C47B27C88B49D728009CEDB17692086E8066",
+  "server_settings": {
+    "template": "D:\\Games\\Factorio\\2.0\\data\\server-settings.example.json",
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\server-settings.json",
+    "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A"
+  },
+  "production": {
+    "process": {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.513983,
+        "peak_working_set_bytes": 275431424,
+        "peak_sampled_private_bytes": 263221248,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20405506048,
+            "committed_bytes": 18727100416,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-production",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.14,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:20.0182490+00:00",
+          "deadline_at": "2026-10-23T15:13:50.0182490+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20405506048,
+              "committed_bytes": 18727100416,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205385375744,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205385375744,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-production",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.14,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:20.0182490+00:00",
+        "deadline_at": "2026-10-23T15:13:50.0182490+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20405506048,
+            "committed_bytes": 18727100416,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    "log": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\production.factorio.log",
+    "log_sha256": "5D6F17B665EFB431093A16B725F1AB12830FCEF237A7CEE3335D70B36F7DA0E6",
+    "loaded_selection": [
+      "base@2.0.77",
+      "ChangeInserterDropLane@1.2.0",
+      "flib@0.16.5",
+      "Krastorio2@2.0.19",
+      "Krastorio2Assets@2.0.5",
+      "Krastorio2MenuSimulations@2.0.2",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-k2-base-continuations@0.1.0",
+      "more-infinite-research@5.0.20000"
+    ],
+    "consumers": {}
+  },
+  "initial": {
+    "case": "k2-base-continuations",
+    "stage": "initial",
+    "status": "passed",
+    "witnesses": {
+      "profile": "f200-k2-base",
+      "technology_ids": [
+        "braking-force-8",
+        "inserter-capacity-bonus-8",
+        "laser-shooting-speed-8",
+        "research-speed-7",
+        "weapon-shooting-speed-7",
+        "worker-robots-storage-4",
+        "recipe-prod-research_gears-1"
+      ],
+      "one_lab": "kr-advanced-lab",
+      "queued_native_researches": 7,
+      "research_finished_events": 7,
+      "completed_levels": 7,
+      "science_consumed": {
+        "automation-science-pack": 7,
+        "logistic-science-pack": 7,
+        "chemical-science-pack": 7,
+        "production-science-pack": 5,
+        "utility-science-pack": 6,
+        "military-science-pack": 3
+      },
+      "foreign_force_preserved": true,
+      "native_gear_effect_change": 0.10000000149011612,
+      "fixture_accelerates_count_formula_and_time": true,
+      "default_rows_preflighted_before_mutation": true,
+      "on_load_read_only": false,
+      "gameplay_scope": "disposable-f200-k2-base-continuations-and-gears"
+    }
+  },
+  "reloads": [
+    {
+      "stage": {
+        "process": {
+          "index": 3,
+          "status": "passed",
+          "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.resources.jsonl",
+          "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.stdout.txt",
+          "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 1.756593,
+            "peak_working_set_bytes": 161808384,
+            "peak_sampled_private_bytes": 153165824,
+            "admission": {
+              "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+              "memory": {
+                "total_bytes": 34045980672,
+                "free_bytes": 20417470464,
+                "committed_bytes": 18734567424,
+                "commit_limit_bytes": 44388642816
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 205383770112,
+                "total_bytes": 599395090432
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 205383770112,
+                "total_bytes": 599395090432
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            },
+            "admission_wait": {
+              "phase": "fixture-reload-1",
+              "admission_wait_seconds": 30,
+              "status": "admitted-without-wait",
+              "attempt_count": 2,
+              "refusal_count": 0,
+              "elapsed_seconds": 0.137,
+              "first_refusal": null,
+              "last_refusal": null,
+              "last_error": null,
+              "started_at": "2026-10-23T15:13:23.5336828+00:00",
+              "deadline_at": "2026-10-23T15:13:53.5336828+00:00",
+              "admission": {
+                "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+                "memory": {
+                  "total_bytes": 34045980672,
+                  "free_bytes": 20417470464,
+                  "committed_bytes": 18734567424,
+                  "commit_limit_bytes": 44388642816
+                },
+                "work_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 205383770112,
+                  "total_bytes": 599395090432
+                },
+                "system_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 205383770112,
+                  "total_bytes": 599395090432
+                }
+              }
+            }
+          },
+          "admission_wait": {
+            "phase": "fixture-reload-1",
+            "admission_wait_seconds": 30,
+            "status": "admitted-without-wait",
+            "attempt_count": 2,
+            "refusal_count": 0,
+            "elapsed_seconds": 0.137,
+            "first_refusal": null,
+            "last_refusal": null,
+            "last_error": null,
+            "started_at": "2026-10-23T15:13:23.5336828+00:00",
+            "deadline_at": "2026-10-23T15:13:53.5336828+00:00",
+            "admission": {
+              "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+              "memory": {
+                "total_bytes": 34045980672,
+                "free_bytes": 20417470464,
+                "committed_bytes": 18734567424,
+                "commit_limit_bytes": 44388642816
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 205383770112,
+                "total_bytes": 599395090432
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 205383770112,
+                "total_bytes": 599395090432
+              }
+            }
+          }
+        },
+        "log": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\reload-1.factorio.log",
+        "log_sha256": "3CF3A122B1DE1278241FE2F60FBE3309444D904B3F2B0682028CD0815FED5647",
+        "loaded_selection": [
+          "base@2.0.77",
+          "ChangeInserterDropLane@1.2.0",
+          "flib@0.16.5",
+          "Krastorio2@2.0.19",
+          "Krastorio2Assets@2.0.5",
+          "Krastorio2MenuSimulations@2.0.2",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "mir-fixture-mir5-k2-base-continuations@0.1.0",
+          "more-infinite-research@5.0.20000"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "case": "k2-base-continuations",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "profile": "f200-k2-base",
+          "technology_ids": [
+            "braking-force-8",
+            "inserter-capacity-bonus-8",
+            "laser-shooting-speed-8",
+            "research-speed-7",
+            "weapon-shooting-speed-7",
+            "worker-robots-storage-4",
+            "recipe-prod-research_gears-1"
+          ],
+          "one_lab": "kr-advanced-lab",
+          "queued_native_researches": 7,
+          "research_finished_events": 7,
+          "completed_levels": 7,
+          "science_consumed": {
+            "automation-science-pack": 7,
+            "logistic-science-pack": 7,
+            "chemical-science-pack": 7,
+            "production-science-pack": 5,
+            "utility-science-pack": 6,
+            "military-science-pack": 3
+          },
+          "foreign_force_preserved": true,
+          "native_gear_effect_change": 0.10000000149011612,
+          "fixture_accelerates_count_formula_and_time": true,
+          "default_rows_preflighted_before_mutation": true,
+          "on_load_read_only": true,
+          "gameplay_scope": "disposable-f200-k2-base-continuations-and-gears"
+        }
+      },
+      "save_byte_identical": true,
+      "save_sha256": "9E589452333A6E43E74F2AEDE3E9173E64CCC8A73793F0F3FA60E43BC8FD6C84",
+      "ordinal": 1
+    },
+    {
+      "stage": {
+        "process": {
+          "index": 4,
+          "status": "passed",
+          "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.resources.jsonl",
+          "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.stdout.txt",
+          "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.stderr.txt",
+          "result": {
+            "status": "passed",
+            "exit_code": 0,
+            "timed_out": false,
+            "passed": true,
+            "completion_predicate_observed": false,
+            "duration_seconds": 1.747221,
+            "peak_working_set_bytes": 159109120,
+            "peak_sampled_private_bytes": 150372352,
+            "admission": {
+              "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+              "memory": {
+                "total_bytes": 34045980672,
+                "free_bytes": 20424257536,
+                "committed_bytes": 18725875712,
+                "commit_limit_bytes": 44388642816
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 205384732672,
+                "total_bytes": 599395090432
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 205384732672,
+                "total_bytes": 599395090432
+              }
+            },
+            "duration_measurement": {
+              "scope": "direct-native-executable-start-to-exit",
+              "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+              "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+            },
+            "admission_wait": {
+              "phase": "fixture-reload-2",
+              "admission_wait_seconds": 30,
+              "status": "admitted-without-wait",
+              "attempt_count": 2,
+              "refusal_count": 0,
+              "elapsed_seconds": 0.138,
+              "first_refusal": null,
+              "last_refusal": null,
+              "last_error": null,
+              "started_at": "2026-10-23T15:13:26.2815702+00:00",
+              "deadline_at": "2026-10-23T15:13:56.2815702+00:00",
+              "admission": {
+                "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+                "memory": {
+                  "total_bytes": 34045980672,
+                  "free_bytes": 20424257536,
+                  "committed_bytes": 18725875712,
+                  "commit_limit_bytes": 44388642816
+                },
+                "work_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 205384732672,
+                  "total_bytes": 599395090432
+                },
+                "system_volume": {
+                  "name": "C:\\",
+                  "free_bytes": 205384732672,
+                  "total_bytes": 599395090432
+                }
+              }
+            }
+          },
+          "admission_wait": {
+            "phase": "fixture-reload-2",
+            "admission_wait_seconds": 30,
+            "status": "admitted-without-wait",
+            "attempt_count": 2,
+            "refusal_count": 0,
+            "elapsed_seconds": 0.138,
+            "first_refusal": null,
+            "last_refusal": null,
+            "last_error": null,
+            "started_at": "2026-10-23T15:13:26.2815702+00:00",
+            "deadline_at": "2026-10-23T15:13:56.2815702+00:00",
+            "admission": {
+              "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+              "memory": {
+                "total_bytes": 34045980672,
+                "free_bytes": 20424257536,
+                "committed_bytes": 18725875712,
+                "commit_limit_bytes": 44388642816
+              },
+              "work_volume": {
+                "name": "C:\\",
+                "free_bytes": 205384732672,
+                "total_bytes": 599395090432
+              },
+              "system_volume": {
+                "name": "C:\\",
+                "free_bytes": 205384732672,
+                "total_bytes": 599395090432
+              }
+            }
+          }
+        },
+        "log": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\reload-2.factorio.log",
+        "log_sha256": "6971980B13EFB39B6ED26BECF43FF745C0668646EA52FACB8BCFD39B3F07EC12",
+        "loaded_selection": [
+          "base@2.0.77",
+          "ChangeInserterDropLane@1.2.0",
+          "flib@0.16.5",
+          "Krastorio2@2.0.19",
+          "Krastorio2Assets@2.0.5",
+          "Krastorio2MenuSimulations@2.0.2",
+          "mir-fixture-mir5-active-mods-observer@0.1.0",
+          "mir-fixture-mir5-k2-base-continuations@0.1.0",
+          "more-infinite-research@5.0.20000"
+        ],
+        "consumers": {}
+      },
+      "result": {
+        "case": "k2-base-continuations",
+        "stage": "reload",
+        "status": "passed",
+        "witnesses": {
+          "profile": "f200-k2-base",
+          "technology_ids": [
+            "braking-force-8",
+            "inserter-capacity-bonus-8",
+            "laser-shooting-speed-8",
+            "research-speed-7",
+            "weapon-shooting-speed-7",
+            "worker-robots-storage-4",
+            "recipe-prod-research_gears-1"
+          ],
+          "one_lab": "kr-advanced-lab",
+          "queued_native_researches": 7,
+          "research_finished_events": 7,
+          "completed_levels": 7,
+          "science_consumed": {
+            "automation-science-pack": 7,
+            "logistic-science-pack": 7,
+            "chemical-science-pack": 7,
+            "production-science-pack": 5,
+            "utility-science-pack": 6,
+            "military-science-pack": 3
+          },
+          "foreign_force_preserved": true,
+          "native_gear_effect_change": 0.10000000149011612,
+          "fixture_accelerates_count_formula_and_time": true,
+          "default_rows_preflighted_before_mutation": true,
+          "on_load_read_only": true,
+          "gameplay_scope": "disposable-f200-k2-base-continuations-and-gears"
+        }
+      },
+      "save_byte_identical": true,
+      "save_sha256": "9E589452333A6E43E74F2AEDE3E9173E64CCC8A73793F0F3FA60E43BC8FD6C84",
+      "ordinal": 2
+    }
+  ],
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "3FEDB5E5C32CF5E6300A78EFC0C4E220E02E9B038101F95F33AE855A34B39867",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.0.19",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2_2.0.19.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED3",
+        "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+        "bytes": 778318
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.0.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2Assets_2.0.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002F00000001EED0",
+        "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+        "bytes": 158227416
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2MenuSimulations_2.0.2.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED1",
+        "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+        "bytes": 3112390
+      },
+      {
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\ChangeInserterDropLane_1.2.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:019F00000001BD72",
+        "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+        "bytes": 305568
+      },
+      {
+        "name": "flib",
+        "version": "0.16.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\flib_0.16.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:003200000001EE9D",
+        "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+        "bytes": 453091
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000D0000000217BA",
+        "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E",
+        "bytes": 353516
+      },
+      {
+        "name": "mir-fixture-mir5-k2-base-continuations",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-k2-base-continuations_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000A0000000217D9",
+        "sha256": "5CD131A05750195F4F73282C90B08159C717030630C77B2889BF92FE8886A9C9",
+        "bytes": 7100
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 2.93755,
+        "peak_working_set_bytes": 284266496,
+        "peak_sampled_private_bytes": 276643840,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20411486208,
+            "committed_bytes": 18721001472,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-create",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.163,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:15.8798635+00:00",
+          "deadline_at": "2026-10-23T15:13:45.8798635+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20411486208,
+              "committed_bytes": 18721001472,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386145792,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205386145792,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-create",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.163,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:15.8798635+00:00",
+        "deadline_at": "2026-10-23T15:13:45.8798635+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:16.0419651+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20411486208,
+            "committed_bytes": 18721001472,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205386145792,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-2.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": -1,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": true,
+        "duration_seconds": 2.513983,
+        "peak_working_set_bytes": 275431424,
+        "peak_sampled_private_bytes": 263221248,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20405506048,
+            "committed_bytes": 18727100416,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-production",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.14,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:20.0182490+00:00",
+          "deadline_at": "2026-10-23T15:13:50.0182490+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20405506048,
+              "committed_bytes": 18727100416,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205385375744,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205385375744,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-production",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.14,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:20.0182490+00:00",
+        "deadline_at": "2026-10-23T15:13:50.0182490+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:20.1583674+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20405506048,
+            "committed_bytes": 18727100416,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205385375744,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    {
+      "index": 3,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-3.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 1.756593,
+        "peak_working_set_bytes": 161808384,
+        "peak_sampled_private_bytes": 153165824,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20417470464,
+            "committed_bytes": 18734567424,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205383770112,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205383770112,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-reload-1",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.137,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:23.5336828+00:00",
+          "deadline_at": "2026-10-23T15:13:53.5336828+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20417470464,
+              "committed_bytes": 18734567424,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205383770112,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205383770112,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-reload-1",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.137,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:23.5336828+00:00",
+        "deadline_at": "2026-10-23T15:13:53.5336828+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:23.6705237+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20417470464,
+            "committed_bytes": 18734567424,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205383770112,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205383770112,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    },
+    {
+      "index": 4,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39976300516-1\\gameplay\\process-4.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 1.747221,
+        "peak_working_set_bytes": 159109120,
+        "peak_sampled_private_bytes": 150372352,
+        "admission": {
+          "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20424257536,
+            "committed_bytes": 18725875712,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205384732672,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205384732672,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "fixture-reload-2",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.138,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T15:13:26.2815702+00:00",
+          "deadline_at": "2026-10-23T15:13:56.2815702+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20424257536,
+              "committed_bytes": 18725875712,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 205384732672,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 205384732672,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "fixture-reload-2",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.138,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T15:13:26.2815702+00:00",
+        "deadline_at": "2026-10-23T15:13:56.2815702+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T15:13:26.4193888+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20424257536,
+            "committed_bytes": 18725875712,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 205384732672,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 205384732672,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    }
+  ]
+}

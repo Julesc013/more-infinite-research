@@ -216,6 +216,25 @@ function Get-MIRAssuranceRunningEvidence {
           -Reason 'ci-job-host-identity-mismatch'
         return $null
       }
+      $liveProcess = $false
+      try {
+        if ([int]$running.process_id -gt 0) {
+          $expectedProcessStart = ConvertTo-MIRAssuranceDateTimeOffset -Value $running.process_started_at
+          $process = Get-Process -Id ([int]$running.process_id) -ErrorAction SilentlyContinue
+          if ($null -ne $process) {
+            $actualProcessStart = [DateTimeOffset]$process.StartTime.ToUniversalTime()
+            $liveProcess = $actualProcessStart.UtcTicks -eq $expectedProcessStart.UtcTicks
+          }
+        }
+      } catch { $liveProcess = $false }
+      if (-not $liveProcess) {
+        $null = Write-MIRAssuranceOrphanedRunningLeaseCustody `
+          -Paths $paths `
+          -Running $running `
+          -CurrentProducer $currentProducer `
+          -Reason 'ci-job-process-not-live-in-current-worker'
+        return $null
+      }
     }
     default {
       Remove-Item -LiteralPath $paths.running -Force

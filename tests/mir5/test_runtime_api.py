@@ -10,8 +10,10 @@ ROOT = Path(__file__).resolve().parents[2]
 class RuntimeApiTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.globals().player_root = (ROOT / "source/mir5").as_posix()
         self.lua.globals().runtime_source = (ROOT / "source/mir5/api/v1/runtime.lua").as_posix()
         self.lua.execute('''
+          package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           api = assert(loadfile(runtime_source))()
           function installed_game()
             return {forces = {
@@ -70,7 +72,8 @@ class RuntimeApiTests(unittest.TestCase):
     def test_runtime_source_has_no_registration_or_data_dependencies(self):
         text = (ROOT / "source/mir5/api/v1/runtime.lua").read_text()
         self.assertNotIn("remote.add_interface", text)
-        self.assertNotIn("require(", text)
+        self.assertIn('require("platform.target")', text)
+        self.assertNotIn("research.generator", text)
         self.assertNotIn("storage", text)
 
     def test_native_custom_table_rejection_is_a_missing_force_result(self):

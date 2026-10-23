@@ -1433,4 +1433,21 @@ add(
   false,
   nil)
 
+-- K2SO historically exposed these six carried material settings. They remain
+-- declared even though only Imersite has an emitted K2SO research identity.
+local K2SO_VISIBLE = {
+  research_material_black_paving = true,
+  research_material_glass = true,
+  research_material_imersite = true,
+  research_material_rare_metals = true,
+  research_material_silicon = true,
+  research_material_white_paving = true,
+}
+for _, stream in ipairs(M.streams) do
+  if K2SO_VISIBLE[stream.key] then
+    stream.k2so_visible = true
+    if stream.key == "research_material_imersite" then stream.k2so_defaults = {max_level = 0} end
+  end
+end
+
 return M

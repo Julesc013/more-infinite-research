@@ -93,8 +93,9 @@ local function path_cap(path)
   return math.max(0, cap)
 end
 
--- `inherit_stats` is the qualified modern engine product default. Older
--- adapters must explicitly supply false when they acquire this capability.
+-- `inherit_stats` describes the selected native product default. Both
+-- Factorio 2.0.77 and 2.1.23 inherit ignored_by_stats; callers with different
+-- actual product semantics supply false explicitly.
 function M.build(recipes, fallback, inherit_stats)
   local facts, paths, graph, caps = {}, {}, {}, {}
   local visited = 0

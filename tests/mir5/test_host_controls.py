@@ -49,6 +49,7 @@ def development_routes() -> dict[str, dict]:
       $assurance = Get-Content -Raw -LiteralPath .mir/assurance.json | ConvertFrom-Json -Depth 100
       $profile = 'mir4-development'
       $local = Get-MIR4DevelopmentCISelection -RepoRoot $repo -Mode local-current-profile
+      $packageSourceFiles = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
       $paths = [ordered]@{
         mir5 = 'source/mir5/control.lua'
         docs = 'docs/mir5/README.md'
@@ -58,7 +59,7 @@ def development_routes() -> dict[str, dict]:
       $routes = [ordered]@{}
       foreach ($entry in $paths.GetEnumerator()) {
         $classification = Get-MIRAssuranceClassification -Paths @([string]$entry.Value) -Config $assurance
-        $rows = @(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $profile)
+        $rows = @(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $profile -PackageSourceFiles $packageSourceFiles)
         $selection = [ordered]@{
           baseline = ('a' * 40)
           baseline_state = 'resolved'
@@ -89,18 +90,34 @@ class HostControlsTests(unittest.TestCase):
         paths = [row["path"] for row in controls]
         self.assertEqual(paths, [
             "tests/mir5/test_generator.py",
+            "tests/mir5/test_historical_direct.py",
+            "tests/mir5/test_historical_continuations.py",
+            "tests/mir5/test_historical_native_runner.py",
+            "tests/mir5/test_modern_targets.py",
+            "tests/mir5/test_k2_base_catalogue.py",
+            "tests/mir5/test_k2_base_native_fixture.py",
+            "tests/mir5/test_science.py",
+            "tests/mir5/test_cryogenic_native_fixture.py",
+            "tests/mir5/test_material_catalogue.py",
+            "tests/mir5/test_material_native_fixture.py",
+            "tests/mir5/test_product_targets.py",
+            "tests/mir5/test_product_target_extension.py",
+            "tests/mir5/test_target_adapters.py",
             "tests/mir5/test_caps.py",
             "tests/mir5/test_legacy_caps.py",
             "tests/mir5/test_legacy_caps_lifecycle.py",
+            "tests/mir5/test_k2_imersite_migration.py",
             "tests/mir5/test_api.py",
             "tests/mir5/test_runtime_api.py",
             "tests/mir5/test_sdk.py",
             "tests/mir5/test_fixture_controls.py",
+            "tests/mir5/test_foreign_research_preservation.py",
             "tests/mir5/test_capture_controls.py",
             "tests/mir5/test_lifecycle.py",
             "tests/mir5/test_native_owners.py",
             "tests/mir5/test_module_permissions_override.py",
             "tests/mir5/test_prototype_limits.py",
+            "tests/mir5/test_recipe_schema_repairs.py",
             "tests/mir5/test_module_permissions_activation.py",
             "tests/mir5/test_bootstrap.py",
             "tests/mir5/test_library.py",
@@ -123,7 +140,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 34)
+        self.assertEqual(len(paths), 50)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
@@ -142,8 +159,8 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:26]))
-        self.assertTrue(all(not row["lua"] for row in controls[26:]))
+        self.assertTrue(all(row["lua"] for row in controls[:42]))
+        self.assertTrue(all(not row["lua"] for row in controls[42:]))
 
     def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
         result = selections()
@@ -189,7 +206,7 @@ class HostControlsTests(unittest.TestCase):
         mir5 = routes["routes"]["mir5"]
         self.assertEqual(mir5["classification"]["tests"], ["static.mir5-host-controls"])
         self.assertFalse(mir5["classification"]["escalated"])
-        self.assertIn("static.mir5-host-controls", mir5["selected_tests"])
+        self.assertEqual(mir5["selected_tests"], ["static.mir5-host-controls"])
         self.assertEqual(mir5["initial_plan"]["profile"], "auto")
         self.assertTrue(mir5["initial_plan"]["use_affected_selection"])
         self.assertTrue(mir5["initial_plan"]["selection_rows_covered_by_auto"])

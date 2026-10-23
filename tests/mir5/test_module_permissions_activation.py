@@ -61,6 +61,9 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end
             local lab = {module_slots = 1, foreign = "receiver",
               allowed_effects = {"speed"}, allowed_module_categories = {"narrow"}}
+            lab.inputs = {}
+            for name in pairs(packs) do lab.inputs[#lab.inputs + 1] = name end
+            table.sort(lab.inputs)
             return {
               raw = {
                 technology = technologies,
@@ -115,7 +118,13 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end}
           end
           package.preload["compatibility.modern_catalogue"] = function()
-            return {select = function(active_mods)
+            return {is_k2_base = function(active_mods)
+              assert(active_mods == mods)
+              return false
+            end, is_k2so = function(active_mods)
+              assert(active_mods == mods)
+              return false
+            end, select = function(active_mods)
               assert(active_mods == mods)
               return {definitions = {}, continuations = {}, recipe_patches = {}}
             end}
@@ -125,7 +134,15 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               preflight_recipe_patches = function(selection, prototypes)
                 assert(selection.recipe_patches[1] == nil and prototypes == raw)
               end,
+              preflight_native_owner_patches = function(selection, prototypes)
+                assert(selection.native_owners == nil and prototypes == raw)
+                return {}
+              end,
               technologies = function(selection) assert(#selection.definitions == 0); return {} end,
+              apply_weapon_speed_overlap = function(selection, generated)
+                assert(#selection.definitions == 0 and #generated == 0)
+              end,
+              apply_native_owner_patches = function(patches) assert(#patches == 0) end,
               apply_recipe_patches = function(selection, prototypes)
                 assert(selection.recipe_patches[1] == nil and prototypes == raw)
               end
@@ -156,7 +173,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           run_final_fixes()
 
           local gear = data.emitted[1]
-          assert(data.writes == 1 and gear.name == "recipe-prod-research_gears-1")
+          assert(data.writes == 1 and gear.name == "recipe-prod-research_gears-1" and gear.enabled ~= false)
           assert(gear.unit.count_formula == "8000*2^(L-1)" and gear.effects[1].change == .1)
           local recipe, lab = data.raw.recipe.target, data.raw.lab.lab
           assert(recipe.foreign == "recipe" and recipe.allow_speed and recipe.allow_productivity)

@@ -96,7 +96,7 @@ function M.normalize(view)
     status = status,
     page = page,
     search = searchable(search),
-    tab = accepted(view.tab, {"research", "settings", "queue", "availability", "help"}, "research"),
+    tab = accepted(view.tab, {"research", "settings", "queue", "help"}, "research"),
     settings_scope = accepted(view.settings_scope, {"research", "options"}, "research"),
     effect_page = finite_integer(effect_page) and math.max(1, math.floor(effect_page)) or 1,
     -- Family descriptors are authored catalogue metadata.  This pure query
@@ -399,6 +399,15 @@ local function copy_effects(technology)
         copied.change = native_read(effect, "change")
       elseif kind == "unlock-recipe" then
         copied.recipe = bounded_string(native_read(effect, "recipe"), MAX_SEARCH)
+      else
+        -- Most native modifier variants expose their signed numeric payload
+        -- through `modifier`; retain only that scalar and the few bounded
+        -- category identifiers needed to make a selected detail useful.  The
+        -- reads are individually protected because TechnologyModifier
+        -- variants intentionally do not share every property.
+        copied.modifier = native_read(effect, "modifier")
+        copied.ammo_category = bounded_string(native_read(effect, "ammo_category"), MAX_SEARCH)
+        copied.turret_id = bounded_string(native_read(effect, "turret_id"), MAX_SEARCH)
       end
       result[#result + 1] = copied
     end

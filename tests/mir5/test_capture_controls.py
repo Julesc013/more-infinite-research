@@ -99,15 +99,18 @@ class CaptureControlTests(unittest.TestCase):
             "execute_active_mods_fixture(fixture_path, fixture_mods, fixture_has_mods)"
         )
 
-    def test_fixture_metadata_is_a_2_1_asset_only_mod(self):
-        info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
-        self.assertEqual(info["name"], "mir-fixture-mir5-active-mods-observer")
-        self.assertEqual(info["version"], "0.1.0")
-        self.assertEqual(info["factorio_version"], "2.1")
-        self.assertEqual(info["dependencies"], ["base >= 2.1.23"])
+    def test_fixture_has_only_the_shared_observer_and_exact_target_metadata(self):
+        for member, family, minimum in (("info.json", "2.1", "2.1.23"),
+                                        ("info-f200.json", "2.0", "2.0.77")):
+            with self.subTest(member=member):
+                info = json.loads((FIXTURE / member).read_text(encoding="utf-8"))
+                self.assertEqual(info["name"], "mir-fixture-mir5-active-mods-observer")
+                self.assertEqual(info["version"], "0.1.0")
+                self.assertEqual(info["factorio_version"], family)
+                self.assertEqual(info["dependencies"], [f"base >= {minimum}"])
         self.assertEqual(
             sorted(path.name for path in FIXTURE.iterdir()),
-            ["data-final-fixes.lua", "info.json"],
+            ["data-final-fixes.lua", "info-f200.json", "info.json"],
         )
 
     def test_fixture_reports_the_actual_mod_table_in_sorted_order_once(self):

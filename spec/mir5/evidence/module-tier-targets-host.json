@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "kind": "MIR5ModuleTierTargetHostControlsV1",
+  "status": "seven-extension-and-thirty-generator-controls-pass",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/product_bindings.lua",
+      "sha256": "D040C47DA862F59D9F154D58292B3F1CCA247D6E9CB77578CAFABACC5DBAFEFD"
+    },
+    {
+      "path": "source/mir5/research/product_target_extension.lua",
+      "sha256": "0BB30DB5FE37398A165E640A1217250E2053AF30B1C04A7E637AF8FA1A33148B"
+    },
+    {
+      "path": "tests/mir5/test_product_target_extension.py",
+      "sha256": "D9F7D8626EA6B5D036FB62861362F9AB0F39465835A4C625270FF76C45809CB1"
+    }
+  ],
+  "captured_native_input_probe": [
+    {
+      "profile": "base-f210",
+      "differences": [],
+      "work": {
+        "recipes": 217,
+        "matches": 76,
+        "ingredients": 523,
+        "products": 219
+      }
+    },
+    {
+      "profile": "space-age-f210",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "products": 1092,
+        "matches": 651,
+        "recipes": 662,
+        "ingredients": 1173
+      }
+    },
+    {
+      "profile": "k2so-f210",
+      "differences": [
+        {
+          "family": "research_belts",
+          "missing": [
+            "kr-advanced-loader",
+            "kr-express-loader",
+            "kr-fast-loader",
+            "kr-loader",
+            "kr-superior-loader",
+            "kr-superior-splitter",
+            "kr-superior-transport-belt",
+            "kr-superior-underground-belt"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_heavy_ammo",
+          "missing": [
+            "kr-antimatter-artillery-shell",
+            "kr-nuclear-artillery-shell"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_inserters",
+          "missing": [
+            "kr-superior-inserter",
+            "kr-superior-long-inserter"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_mining_drill",
+          "missing": [
+            "kr-quarry-drill"
+          ],
+          "extra": [],
+          "weights": []
+        },
+        {
+          "family": "research_science_pack_productivity",
+          "missing": [
+            "kr-advanced-tech-card",
+            "kr-advanced-tech-card-cooling",
+            "kr-matter-tech-card",
+            "kr-matter-tech-card-cooling",
+            "kr-singularity-tech-card",
+            "kr-singularity-tech-card-cooling"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "recipes": 1883,
+        "matches": 830,
+        "ingredients": 2948,
+        "products": 2166
+      }
+    },
+    {
+      "profile": "base-f200",
+      "differences": [],
+      "work": {
+        "recipes": 217,
+        "matches": 76,
+        "products": 219,
+        "ingredients": 523
+      }
+    },
+    {
+      "profile": "space-age-f200",
+      "differences": [
+        {
+          "family": "research_lithium",
+          "missing": [
+            "lithium"
+          ],
+          "extra": [],
+          "weights": []
+        }
+      ],
+      "work": {
+        "products": 1084,
+        "matches": 649,
+        "ingredients": 1167,
+        "recipes": 659
+      }
+    }
+  ],
+  "scope": "Host replay of actual captured recipe/module classes, with existing named targets retained; not a new native execution.",
+  "limits": [
+    "Native module producer effect/production/save qualification remains pending.",
+    "Pattern, structural place-result, native-owner expansion and undeclared material families remain open."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

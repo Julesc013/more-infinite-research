@@ -11,6 +11,10 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot,
   [string[]]$ConsumerMarkers=@(),
   [ValidateSet('load','configuration')][string]$ProductionConsumerStage='load',
+  # Empty retains the F200/F210 runner byte path.  A selected reduced target
+  # uses the compatible historical server/reload path below.
+  [string]$HistoricalTarget='',
+  [string]$HistoricalFixtureMetadataPath='',
   [switch]$CreateOnly,
   [switch]$MIRAbsent,
   [string]$InputSavePath='',
@@ -37,6 +41,23 @@ function Read-FixtureResult([string]$Text,[string]$Stage) {
   Assert-Fixture ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "missing unique passed $Stage witness for $CaseName"
   $rows[0]
 }
+function Test-HistoricalFixtureSaveComplete([string]$Path) {
+  # Early engines do not print the later "Saving finished" message. A closed,
+  # readable save with its native level member is their completion boundary;
+  # the two actual native reloads below establish loadability separately.
+  $stream=$null;$zip=$null
+  try {
+    $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::None)
+    $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Read)
+    $root=[IO.Path]::GetFileNameWithoutExtension($Path)
+    foreach($name in @('level.dat','level-init.dat')){
+      $entry=$zip.GetEntry($root+'/'+$name)
+      if($null -ne $entry -and $entry.Length -gt 0){return $true}
+    }
+    return $false
+  } catch { return $false }
+  finally {if($null -ne $zip){$zip.Dispose()};if($null -ne $stream){$stream.Dispose()}}
+}
 function Read-ConsumerResults([string]$Text,[string]$Stage) {
   $results=[ordered]@{}
   foreach($marker in $ConsumerMarkers){
@@ -61,10 +82,118 @@ function Get-FixtureActiveModsObserver([string]$Name,[object[]]$ProfileRows,[obj
   Assert-Fixture ([string]$source.sha256 -cmatch '^[a-fA-F0-9]{64}$') 'ActiveModsObserver verified archive hash is invalid'
   [ordered]@{name=[string]$source.name;version=[string]$source.version;source=[string]$source.source;archive=[string]$source.archive;sha256=[string]$source.sha256}
 }
+function Get-HistoricalFixtureTarget([string]$Target,[string]$MetadataPath) {
+  $allowed=@('f013','f014','f015','f016','f017','f100','f110')
+  Assert-Fixture ($Target -in $allowed) 'historical target is unsupported'
+  $metadata=(Resolve-Path -LiteralPath $MetadataPath).Path
+  $value=Get-Content -LiteralPath $metadata -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ($value.kind -ceq 'MIR5HistoricalNativeFixtureV1' -and $value.schema -eq 1) 'historical fixture metadata differs'
+  Assert-Fixture ([string]$value.name -ceq 'mir-fixture-mir5-historical-native' -and [string]$value.version -ceq '0.1.0') 'historical fixture identity differs'
+  $selected=$value.targets[$Target]
+  Assert-Fixture ($null -ne $selected) 'historical fixture lacks selected target'
+  foreach($field in @('factorio_version','minimum_base','mir_version','direct','direct_effect','continuation','continuation_mode')){
+    Assert-Fixture ($selected.ContainsKey($field) -and -not [string]::IsNullOrWhiteSpace([string]$selected[$field])) "historical fixture target lacks $field"
+  }
+  Assert-Fixture ($Target -cmatch '^f(?:013|014|015|016|017|100|110)$') 'historical target literal identity differs'
+  foreach($field in @('direct','continuation')){
+    Assert-Fixture ([string]$selected[$field] -cmatch '^[a-z0-9][a-z0-9_-]*$') "historical target $field is not a literal-safe identifier"
+  }
+  $directScience=@($selected.direct_science)
+  Assert-Fixture ($directScience.Count -gt 0) 'historical target lacks direct science'
+  foreach($name in $directScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical direct science is not a literal-safe identifier'}
+  Assert-Fixture ([double]$selected.direct_effect -gt 0 -and [double]$selected.direct_effect -le 1) 'historical target direct effect differs'
+  Assert-Fixture ([string]$selected.continuation_mode -in @('numeric-witness','lab')) 'historical continuation mode differs'
+  if([string]$selected.continuation_mode -ceq 'numeric-witness'){
+    foreach($field in @('continuation_count','continuation_energy_ticks')){
+      Assert-Fixture ($selected.ContainsKey($field) -and [double]$selected[$field] -gt 0 -and [double]$selected[$field] -eq [math]::Floor([double]$selected[$field])) "historical numeric continuation lacks $field"
+    }
+  }else{
+    $continuationScience=@($selected.continuation_science)
+    Assert-Fixture ($continuationScience.Count -gt 0) 'historical lab continuation lacks science'
+    foreach($name in $continuationScience){Assert-Fixture ([string]$name -cmatch '^[a-z0-9][a-z0-9_-]*$') 'historical continuation science is not a literal-safe identifier'}
+  }
+  [pscustomobject][ordered]@{path=$metadata;sha256=Get-FixtureSha $metadata;name=[string]$value.name;version=[string]$value.version;target=$Target;factorio_version=[string]$selected.factorio_version;minimum_base=[string]$selected.minimum_base;mir_version=[string]$selected.mir_version;definition=$selected}
+}
+function ConvertTo-HistoricalFixtureTargetLiteral($Fixture) {
+  $value=$Fixture.definition
+  $lines=[Collections.Generic.List[string]]::new()
+  $lines.Add('return {')
+  $lines.Add(('  id="{0}",' -f $Fixture.target))
+  foreach($field in @('mir_version','direct','continuation','continuation_mode')){
+    $lines.Add(('  {0}="{1}",' -f $field,[string]$value[$field]))
+  }
+  $effect=[double]$value.direct_effect
+  $lines.Add(('  direct_effect={0},' -f $effect.ToString('0.################',[Globalization.CultureInfo]::InvariantCulture)))
+  if($value.ContainsKey('queue_api') -and [bool]$value.queue_api){$lines.Add('  queue_api=true,')}
+  $directScience=@($value.direct_science|ForEach-Object {'"'+[string]$_+'"'})
+  $lines.Add(('  direct_science={0},' -f ('{'+($directScience -join ',')+'}')))
+  if([string]$value.continuation_mode -ceq 'numeric-witness'){
+    $lines.Add(('  continuation_count={0},' -f [int64]$value.continuation_count))
+    $lines.Add(('  continuation_energy_ticks={0},' -f [int64]$value.continuation_energy_ticks))
+  }else{
+    $continuationScience=@($value.continuation_science|ForEach-Object {'"'+[string]$_+'"'})
+    $lines.Add(('  continuation_science={0},' -f ('{'+($continuationScience -join ',')+'}')))
+  }
+  $lines.Add('}')
+  ($lines -join "`n")+"`n"
+}
+function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirectory,$Fixture) {
+  Assert-Fixture (Test-Path -LiteralPath $Archive -PathType Leaf) "historical fixture archive is absent: $Archive"
+  $source=(Resolve-Path -LiteralPath $SourceDirectory).Path
+  $root=$Fixture.name+'_'+$Fixture.version
+  $expectedInfo=[ordered]@{
+    name=$Fixture.name;version=$Fixture.version;factorio_version=$Fixture.factorio_version
+    dependencies=@(('base >= '+$Fixture.minimum_base),('more-infinite-research = '+$Fixture.mir_version))
+  }
+  $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
+  try {
+    $files=@($zip.Entries|Where-Object {-not $_.FullName.EndsWith('/')})
+    $expected=@(@('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua','target-literal.lua','info.json')|ForEach-Object {$root+'/'+$_}|Sort-Object)
+    Assert-Fixture ($files.Count -eq $expected.Count -and ((@($files.FullName|Sort-Object) -join "`n") -ceq ($expected -join "`n"))) 'historical fixture archive membership differs'
+    foreach($name in @('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua')){
+      $entry=$zip.GetEntry($root+'/'+$name);$path=Join-Path $source $name
+      Assert-Fixture ($null -ne $entry -and $entry.Length -eq (Get-Item -LiteralPath $path).Length) "historical fixture member differs: $name"
+      $stream=$entry.Open();try{$hash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream))}finally{$stream.Dispose()}
+      Assert-Fixture ($hash -ceq (Get-FixtureSha $path)) "historical fixture source hash differs: $name"
+    }
+    $literal=ConvertTo-HistoricalFixtureTargetLiteral $Fixture
+    $literalBytes=[Text.UTF8Encoding]::new($false).GetBytes($literal)
+    $literalEntry=$zip.GetEntry($root+'/target-literal.lua')
+    Assert-Fixture ($null -ne $literalEntry -and $literalEntry.Length -eq $literalBytes.Length) 'historical fixture target literal length differs'
+    $literalStream=$literalEntry.Open();try{$literalHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($literalStream))}finally{$literalStream.Dispose()}
+    $expectedLiteralHash=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($literalBytes))
+    Assert-Fixture ($literalHash -ceq $expectedLiteralHash) 'historical fixture target literal hash differs'
+    $infoEntry=$zip.GetEntry($root+'/info.json');Assert-Fixture ($null -ne $infoEntry -and $infoEntry.Length -le 64KB) 'historical fixture info is absent'
+    $reader=[IO.StreamReader]::new($infoEntry.Open());try{$info=$reader.ReadToEnd()|ConvertFrom-Json -AsHashtable}finally{$reader.Dispose()}
+    Assert-Fixture ([string]$info.name -ceq $expectedInfo.name -and [string]$info.version -ceq $expectedInfo.version -and [string]$info.factorio_version -ceq $expectedInfo.factorio_version) 'historical fixture info identity differs'
+    Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical fixture dependencies differ'
+  } finally {$zip.Dispose()}
+}
+function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[string]$FactorioVersion) {
+  Assert-Fixture ($FactorioVersion -in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')) 'historical server target differs'
+  $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw | ConvertFrom-Json -AsHashtable
+  $settings.name='MIR private historical fixture'
+  $settings.description=''
+  $settings.visibility=if($FactorioVersion -ceq '0.13'){'hidden'}else{@{public=$false;lan=$false}}
+  foreach($field in @('username','password','token')){$settings[$field]=''}
+  foreach($field in @('verify_user_identity','require_user_verification')){
+    if($settings.ContainsKey($field)){$settings[$field]=$false}
+  }
+  $settings.auto_pause=$false
+  [IO.File]::WriteAllText($Path,($settings|ConvertTo-Json -Depth 10)+"`n",[Text.UTF8Encoding]::new($false))
+  $arguments=@('--server-settings',$Path)
+  # F013 uses a CLI switch rather than the later auto_pause JSON field. Its
+  # binary has no --bind option; hidden visibility keeps it unadvertised.
+  if($FactorioVersion -ceq '0.13'){$arguments+='--no-auto-pause'}
+  else{$arguments+=@('--bind','127.0.0.1')}
+  [pscustomobject][ordered]@{path=$Path;sha256=Get-FixtureSha $Path;visibility=$settings.visibility;auto_pause=$false;arguments=$arguments}
+}
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {
   $live=Join-Path $writeData 'factorio-current.log'
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
-  $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio')+$StageArguments
+  $arguments=@('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation')
+  if(-not $historical -or $historicalFixture.factorio_version -notin @('0.13','0.14')){$arguments+='--disable-audio'}
+  $arguments+=$StageArguments
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
   # Completed host parsing/interop allocations need not occupy commit while a
   # later native stage waits for admission. Keep every governor limit intact.
@@ -88,6 +217,19 @@ $library=(Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
 $activeModsObserverName=$ActiveModsObserver.Trim()
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
+$historical=-not [string]::IsNullOrWhiteSpace($HistoricalTarget)
+$historicalFixture=$null
+if($historical){
+  Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent -and -not $InputSavePath -and -not $ExpectedInputSaveSha256) 'historical fixtures require a fresh full run'
+  Assert-Fixture ($CaseName -ceq 'historical-native' -and $ConsumerMarkers.Count -eq 0) 'historical fixtures use their own marker without modern consumers'
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($activeModsObserverName)) 'historical fixtures do not select a modern active-mod observer'
+  Assert-Fixture ($FixtureSources.Count -eq 1 -and -not [string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath)) 'historical fixtures require one source and its metadata'
+  $historicalFixture=Get-HistoricalFixtureTarget -Target $HistoricalTarget -MetadataPath $HistoricalFixtureMetadataPath
+  $base=Get-Content -LiteralPath (Join-Path $engineData 'base/info.json') -Raw|ConvertFrom-Json -AsHashtable
+  Assert-Fixture ([string]$base.version -ceq $historicalFixture.minimum_base) 'historical fixture engine base differs from target metadata'
+}else{
+  Assert-Fixture ([string]::IsNullOrWhiteSpace($HistoricalFixtureMetadataPath)) 'modern fixture runs do not accept historical metadata'
+}
 $inputSave=$null
 if($InputSavePath -or $ExpectedInputSaveSha256){
   Assert-Fixture (-not $CreateOnly -and -not $MIRAbsent -and $InputSavePath -and $ExpectedInputSaveSha256 -cmatch '^[a-fA-F0-9]{64}$') 'an input save requires a full fixture run and exact hash'
@@ -115,15 +257,26 @@ if($MIRAbsent){
   Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
 }
 $fixtureInputs=@();$fixtureBindings=@()
-foreach($source in $FixtureSources){
-  $source=(Resolve-Path -LiteralPath $source).Path
-  $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw | ConvertFrom-Json
-  $archive=Join-Path $library ($info.name+'_'+$info.version+'.zip')
-  Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $source
-  Assert-Fixture (@($rows | Where-Object {$_.enabled -and $_.name -ceq $info.name -and $_.version -ceq $info.version}).Count -eq 1) 'fixture is not selected exactly once'
+if($historical){
+  $source=(Resolve-Path -LiteralPath $FixtureSources[0]).Path
+  Assert-Fixture ((Split-Path -Parent $historicalFixture.path) -ceq $source) 'historical fixture metadata is not beside its source'
+  $archive=Join-Path $library ($historicalFixture.name+'_'+$historicalFixture.version+'.zip')
+  Assert-HistoricalFixtureArchive -Archive $archive -SourceDirectory $source -Fixture $historicalFixture
+  Assert-Fixture (@($rows | Where-Object {$_.enabled -and $_.name -ceq $historicalFixture.name -and $_.version -ceq $historicalFixture.version}).Count -eq 1) 'historical fixture is not selected exactly once'
   $archiveSha=Get-FixtureSha $archive
   $fixtureInputs+=@{source=$source;archive=$archive;sha256=$archiveSha}
-  $fixtureBindings+=@{name=[string]$info.name;version=[string]$info.version;source=$source;archive=$archive;sha256=$archiveSha}
+  $fixtureBindings+=@{name=$historicalFixture.name;version=$historicalFixture.version;source=$source;archive=$archive;sha256=$archiveSha}
+}else{
+  foreach($source in $FixtureSources){
+    $source=(Resolve-Path -LiteralPath $source).Path
+    $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw | ConvertFrom-Json
+    $archive=Join-Path $library ($info.name+'_'+$info.version+'.zip')
+    Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $source
+    Assert-Fixture (@($rows | Where-Object {$_.enabled -and $_.name -ceq $info.name -and $_.version -ceq $info.version}).Count -eq 1) 'fixture is not selected exactly once'
+    $archiveSha=Get-FixtureSha $archive
+    $fixtureInputs+=@{source=$source;archive=$archive;sha256=$archiveSha}
+    $fixtureBindings+=@{name=[string]$info.name;version=[string]$info.version;source=$source;archive=$archive;sha256=$archiveSha}
+  }
 }
 $activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
@@ -137,6 +290,7 @@ $record=[ordered]@{
   governor_sha256=Get-FixtureSha (Join-Path $repo 'tools/mir/application/release/readiness/ResourceGovernor.ps1')
   engine=Get-MIRDirectLibraryStartupEngineIdentity -FactorioBin $engine -EngineDataDirectory $engineData
   profile=@{path=$profile;sha256=Get-FixtureSha $profile};fixtures=$fixtureInputs
+  historical_target=if($historical){@{id=$historicalFixture.target;metadata_path=$historicalFixture.path;metadata_sha256=$historicalFixture.sha256;factorio_version=$historicalFixture.factorio_version;minimum_base=$historicalFixture.minimum_base;mir_version=$historicalFixture.mir_version}}else{$null}
   mir_archive=if($MIRAbsent){$null}else{@{path=$mir[0].path;sha256=$ExpectedMIRArchiveSha256.ToUpperInvariant()}}
   observation=if($CreateOnly){'native-create-runtime-load-only'}else{'native-fixture-production-and-two-cold-reloads'}
   input_save=if($inputSave){@{path=$inputSave;sha256=$ExpectedInputSaveSha256.ToUpperInvariant()}}else{$null}
@@ -152,7 +306,14 @@ try{
   $writeData=Join-Path $resources.root 'write-data'
   [IO.Directory]::CreateDirectory((Join-Path $writeData 'saves')) | Out-Null
   $config=Join-Path $resources.root 'config.ini'
-  New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
+  if($historical){
+    # Older engines use the retained direct-library minimal form.  Do not
+    # inherit modern option keys into F013--F110.
+    $historicalConfig=@('[path]',"read-data=$($engineData.Replace('\','/'))","write-data=$($writeData.Replace('\','/'))",'', '[other]','check-updates=false','enable-new-mods=false') -join "`n"
+    [IO.File]::WriteAllText($config,$historicalConfig+"`n",[Text.UTF8Encoding]::new($false))
+  }else{
+    New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
+  }
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
@@ -173,36 +334,59 @@ try{
   }
   $record.seed_sha256=Get-FixtureSha $seed
   if(-not $CreateOnly){
-  $server=Join-Path $resources.root 'server-settings.json'
-  $serverTemplate=Join-Path $engineData 'server-settings.example.json'
-  $serverSettings=Get-Content -LiteralPath $serverTemplate -Raw | ConvertFrom-Json -AsHashtable
-  $serverSettings.name='MIR private native fixture'
-  $serverSettings.description=''
-  $serverSettings.visibility=@{public=$false;lan=$false}
-  $serverSettings.username='';$serverSettings.password='';$serverSettings.token='';$serverSettings.game_password=''
-  $serverSettings.require_user_verification=$false
-  $serverSettings.auto_pause=$false
-  $serverSettings.autosave_interval=0
-  $serverSettings.max_players=1
-  [IO.File]::WriteAllText($server,($serverSettings | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
-  $record.server_settings=@{template=$serverTemplate;template_sha256=Get-FixtureSha $serverTemplate;path=$server;sha256=Get-FixtureSha $server}
   $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $live=Join-Path $writeData 'factorio-current.log'
+  $historicalSaveComplete=${function:Test-HistoricalFixtureSaveComplete}
   $completion={
     if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
     $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
     $reader=[IO.StreamReader]::new($stream)
     try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
     if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
-    return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
+    if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
+    if($historical){return & $historicalSaveComplete $complete}
+    return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()
-  $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
+  if($historical){
+    $serverSettings=New-HistoricalFixtureServerSettings (Join-Path $resources.root 'server-settings.json') $engineData $historicalFixture.factorio_version
+    $record.historical_server_settings=$serverSettings
+    $historicalServerArguments=@($serverSettings.arguments)
+    $record.production=Invoke-FixtureStage 'production' ($historicalServerArguments+@('--start-server',$seed)) $completion
+    $record.historical_server_mode='start-server-two-cold-reloads'
+  }else{
+    $server=Join-Path $resources.root 'server-settings.json'
+    $serverTemplate=Join-Path $engineData 'server-settings.example.json'
+    $serverSettings=Get-Content -LiteralPath $serverTemplate -Raw | ConvertFrom-Json -AsHashtable
+    $serverSettings.name='MIR private native fixture'
+    $serverSettings.description=''
+    $serverSettings.visibility=@{public=$false;lan=$false}
+    $serverSettings.username='';$serverSettings.password='';$serverSettings.token='';$serverSettings.game_password=''
+    $serverSettings.require_user_verification=$false
+    $serverSettings.auto_pause=$false
+    $serverSettings.autosave_interval=0
+    $serverSettings.max_players=1
+    [IO.File]::WriteAllText($server,($serverSettings | ConvertTo-Json -Depth 10),[Text.UTF8Encoding]::new($false))
+    $record.server_settings=@{template=$serverTemplate;template_sha256=Get-FixtureSha $serverTemplate;path=$server;sha256=Get-FixtureSha $server}
+    $record.production=Invoke-FixtureStage 'production' @('--server-settings',$server,'--bind','127.0.0.1','--start-server',$seed) $completion
+  }
   $record.production.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($record.production.log)) $ProductionConsumerStage
   $record.initial=Read-FixtureResult ([IO.File]::ReadAllText($record.production.log)) 'initial'
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()
   foreach($ordinal in 1..2){
-    $stage=Invoke-FixtureStage ('reload-'+$ordinal) @('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')
+    $reloadArguments=if($historical){$historicalServerArguments+@('--start-server',$complete)}else{@('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')}
+    $reloadCompletion=$null
+    if($historical){
+      $reloadCompletion={
+        if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
+        $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
+        $reader=[IO.StreamReader]::new($stream)
+        try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
+        if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native historical reload diagnostic'}
+        return $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT {"case":"historical-native","stage":"reload"')
+      }.GetNewClosure()
+    }
+    $stage=Invoke-FixtureStage ('reload-'+$ordinal) $reloadArguments $reloadCompletion
     $result=Read-FixtureResult ([IO.File]::ReadAllText($stage.log)) 'reload'
     $stage.consumers=Read-ConsumerResults ([IO.File]::ReadAllText($stage.log)) 'load'
     Assert-Fixture ((Get-FixtureSha $complete) -ceq $saveHash) 'cold reload changed completed save bytes'

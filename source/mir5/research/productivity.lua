@@ -1,26 +1,13 @@
 local M = {}
 local catalogue = require("research.catalogue")
+local cost = require("research.cost")
 local BASE_ICON = "__base__/graphics/icons/iron-gear-wheel.png"
 local DEFAULT_RECIPES = {"iron-gear-wheel"}
-
-local function number_text(value)
-  assert(type(value) == "number" and value == value and value < math.huge and value >= 0,
-    "MIR invalid research cost value")
-  if value == math.floor(value) then return tostring(math.floor(value)) end
-  return string.format("%.15g", value)
-end
 
 -- The published gear model scales the linear term with the exponential term.
 -- This is its native formula, not an expression evaluator.
 function M.cost(base, increment, growth)
-  assert(base >= 1 and increment >= 0 and growth >= 1 and growth <= 1000, "MIR invalid research cost bounds")
-  local b, d, g = number_text(base), number_text(increment), number_text(growth)
-  if growth == 1 then
-    if increment == 0 then return b end
-    return b .. "+" .. d .. "*(L-1)"
-  end
-  if increment == 0 then return b .. "*" .. g .. "^(L-1)" end
-  return "(" .. b .. "+" .. d .. "*(L-1))*" .. g .. "^(L-1)"
+  return cost.cost(base, increment, growth)
 end
 
 local function copy_binding(binding)
