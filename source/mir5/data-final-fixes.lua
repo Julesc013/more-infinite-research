@@ -82,7 +82,8 @@ require("research.science").apply_family(technologies, nil, {
 })
 if require("platform.target").id == "f200" and type(mods) == "table"
     and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
-      or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]) then
+      or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]
+      or mods["crafting-efficiency-2"] or mods.ProductivityResearch) then
   require("compatibility.competing_productivity").retain_foreign_coverage(
     technologies, data.raw, mods, require("platform.target"),
     values.options["mir-prefer-this-mod-for-competing-techs"])

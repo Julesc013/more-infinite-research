@@ -9,6 +9,9 @@ local PROVIDER = "ExpandedProductivityResearch"
 local PROVIDER_VERSION = "1.3.8"
 local BASE_VERSION = "2.0.77"
 local EFFECT = 0.1
+-- An explicit false keeps a captured no-prerequisite identity distinct from a
+-- missing authored field. It admits only a native/data row with no entries.
+local NO_PREDECESSOR = false
 
 local function effects(recipes)
   local out = {}
@@ -20,7 +23,7 @@ local function replacement(id, recipes)
   return {id = id, first_level = 1, effects = effects(recipes)}
 end
 
-local function binding(id, first_level, predecessor, recipes, replacements, initial_retirement)
+local function binding(id, first_level, predecessor, recipes, replacements, initial_retirement, retire_if_unearned)
   return {
     id = id,
     first_level = first_level,
@@ -28,6 +31,9 @@ local function binding(id, first_level, predecessor, recipes, replacements, init
     effects = effects(recipes),
     replacements = replacements,
     initial_retirement = initial_retirement == true,
+    -- Some captured infinite tails begin at native level one but have an
+    -- explicit earlier predecessor. They can retire only before any work.
+    retire_if_unearned = retire_if_unearned == true,
   }
 end
 
@@ -96,6 +102,85 @@ local EPR_BINDINGS = {
     {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}),
 }
 
+-- Exact F200 Space Age rows from the independent dynamic-provider capture.
+-- These remain flat literals: no runtime identifier or recipe discovery occurs.
+local CRAFTING_EFFICIENCY_BINDINGS = {
+  binding("ce-advanced-circuit-16", 1, "ce-advanced-circuit-11", {"advanced-circuit"}, {replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"})}, false, true),
+  binding("ce-advanced-oil-processing-11", 1, "ce-advanced-oil-processing-7", {"advanced-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"advanced-oil-processing"})}, false, true),
+  binding("ce-agricultural-science-pack-30", 1, "ce-agricultural-science-pack-16", {"agricultural-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"agricultural-science-pack"})}, false, true),
+  binding("ce-automation-science-pack-42", 1, "ce-automation-science-pack-28", {"automation-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"automation-science-pack"})}, false, true),
+  binding("ce-basic-oil-processing-16", 1, "ce-basic-oil-processing-11", {"basic-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"basic-oil-processing"})}, false, true),
+  binding("ce-battery-16", 1, "ce-battery-11", {"battery"}, {replacement("recipe-prod-research_batteries-1", {"battery"})}, false, true),
+  binding("ce-chemical-science-pack-30", 1, "ce-chemical-science-pack-16", {"chemical-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"chemical-science-pack"})}, false, true),
+  binding("ce-coal-liquefaction-8", 1, "ce-coal-liquefaction-4", {"coal-liquefaction"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"coal-liquefaction"})}, false, true),
+  binding("ce-copper-cable-19", 1, "ce-copper-cable-14", {"copper-cable", "casting-copper-cable"}, {replacement("recipe-prod-research_copper_cable-1", {"copper-cable", "casting-copper-cable"})}, false, true),
+  binding("ce-cryogenic-science-pack-15", 1, "ce-cryogenic-science-pack-1", {"cryogenic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"cryogenic-science-pack"})}, false, true),
+  binding("ce-electric-engine-unit-11", 1, "ce-electric-engine-unit-7", {"electric-engine-unit"}, {replacement("recipe-prod-research_electric_engine-1", {"electric-engine-unit"})}, false, true),
+  binding("ce-electromagnetic-science-pack-30", 1, "ce-electromagnetic-science-pack-16", {"electromagnetic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"electromagnetic-science-pack"})}, false, true),
+  binding("ce-electronic-circuit-19", 1, "ce-electronic-circuit-14", {"electronic-circuit"}, {replacement("recipe-prod-research_electronic_circuit-1", {"electronic-circuit"})}, false, true),
+  binding("ce-engine-unit-19", 1, "ce-engine-unit-14", {"engine-unit"}, {replacement("recipe-prod-research_engine-1", {"engine-unit"})}, false, true),
+  binding("ce-firearm-magazine-17", 1, "ce-firearm-magazine-13", {"firearm-magazine"}, {replacement("recipe-prod-research_bullets-1", {"firearm-magazine"})}, false, true),
+  binding("ce-flying-robot-frame-11", 1, "ce-flying-robot-frame-7", {"flying-robot-frame"}, {replacement("recipe-prod-research_flying_robot_frame-1", {"flying-robot-frame"})}, false, true),
+  binding("ce-grenade-14", 1, "ce-grenade-10", {"grenade"}, {replacement("recipe-prod-research_grenades-1", {"grenade"})}, false, true),
+  binding("ce-iron-gear-wheel-19", 1, "ce-iron-gear-wheel-14", {"iron-gear-wheel", "casting-iron-gear-wheel"}, {replacement("recipe-prod-research_gears-1", {"iron-gear-wheel", "casting-iron-gear-wheel"})}, false, true),
+  binding("ce-iron-stick-19", 1, "ce-iron-stick-14", {"iron-stick", "casting-iron-stick"}, {replacement("recipe-prod-research_iron_sticks-1", {"iron-stick", "casting-iron-stick"})}, false, true),
+  binding("ce-logistic-science-pack-36", 1, "ce-logistic-science-pack-22", {"logistic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"logistic-science-pack"})}, false, true),
+  binding("ce-lubricant-8", 1, "ce-lubricant-4", {"lubricant"}, {replacement("recipe-prod-research_lubricant_productivity-1", {"lubricant"})}, false, true),
+  binding("ce-metallurgic-science-pack-30", 1, "ce-metallurgic-science-pack-16", {"metallurgic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"metallurgic-science-pack"})}, false, true),
+  binding("ce-military-science-pack-30", 1, "ce-military-science-pack-16", {"military-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"military-science-pack"})}, false, true),
+  binding("ce-production-science-pack-24", 1, "ce-production-science-pack-10", {"production-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"production-science-pack"})}, false, true),
+  binding("ce-promethium-science-pack-15", 1, "ce-promethium-science-pack-1", {"promethium-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"promethium-science-pack"})}, false, true),
+  binding("ce-space-science-pack-15", 1, "ce-space-science-pack-1", {"space-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"space-science-pack"})}, false, true),
+  binding("ce-sulfur-16", 1, "ce-sulfur-11", {"sulfur", "biosulfur"}, {replacement("recipe-prod-research_sulfur-1", {"sulfur", "biosulfur"})}, false, true),
+  binding("ce-utility-science-pack-15", 1, "ce-utility-science-pack-1", {"utility-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}, false, true),
+}
+
+local PRODUCTIVITY_RESEARCH_BINDINGS = {
+  binding("sem-prfe_advanced-circuit-productivity-1", 1, "advanced-circuit", {"advanced-circuit"}, {replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"})}, true),
+  binding("sem-prfe_advanced-oil-processing-productivity-1", 1, "advanced-oil-processing", {"advanced-oil-processing", "coal-liquefaction", "simple-coal-liquefaction"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"advanced-oil-processing", "coal-liquefaction", "simple-coal-liquefaction"})}, true),
+  binding("sem-prfe_agricultural-science-pack-productivity-1", 1, "agricultural-science-pack", {"agricultural-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"agricultural-science-pack"})}, true),
+  binding("sem-prfe_artificial-jellynut-soil-productivity-1", 1, "artificial-soil", {"artificial-jellynut-soil"}, {replacement("recipe-prod-research_artificial_soil-1", {"artificial-jellynut-soil"})}, true),
+  binding("sem-prfe_artificial-yumako-soil-productivity-1", 1, "artificial-soil", {"artificial-yumako-soil"}, {replacement("recipe-prod-research_artificial_soil-1", {"artificial-yumako-soil"})}, true),
+  binding("sem-prfe_automation-science-pack-productivity-1", 1, "automation-science-pack", {"automation-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"automation-science-pack"})}, true),
+  binding("sem-prfe_battery-productivity-1", 1, "battery", {"battery"}, {replacement("recipe-prod-research_batteries-1", {"battery"})}, true),
+  binding("sem-prfe_bioflux-productivity-1", 1, "bioflux", {"bioflux"}, {replacement("recipe-prod-research_bioflux-1", {"bioflux"})}, true),
+  binding("sem-prfe_carbon-fiber-productivity-1", 1, "carbon-fiber", {"carbon-fiber"}, {replacement("recipe-prod-research_carbon_fiber-1", {"carbon-fiber"})}, true),
+  binding("sem-prfe_chemical-science-pack-productivity-1", 1, "chemical-science-pack", {"chemical-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"chemical-science-pack"})}, true),
+  binding("sem-prfe_copper-cable-productivity-1", 1, "electronics", {"copper-cable", "casting-copper-cable"}, {replacement("recipe-prod-research_copper_cable-1", {"copper-cable", "casting-copper-cable"})}, true),
+  binding("sem-prfe_copper-plate-productivity-1", 1, NO_PREDECESSOR, {"copper-plate", "casting-copper"}, {replacement("recipe-prod-research_copper-1", {"copper-plate", "casting-copper"})}, true),
+  binding("sem-prfe_cryogenic-science-pack-productivity-1", 1, "cryogenic-science-pack", {"cryogenic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"cryogenic-science-pack"})}, true),
+  binding("sem-prfe_electric-engine-unit-productivity-1", 1, "electric-engine", {"electric-engine-unit"}, {replacement("recipe-prod-research_electric_engine-1", {"electric-engine-unit"})}, true),
+  binding("sem-prfe_electromagnetic-science-pack-productivity-1", 1, "electromagnetic-science-pack", {"electromagnetic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"electromagnetic-science-pack"})}, true),
+  binding("sem-prfe_electronic-circuit-productivity-1", 1, "electronics", {"electronic-circuit"}, {replacement("recipe-prod-research_electronic_circuit-1", {"electronic-circuit"})}, true),
+  binding("sem-prfe_engine-unit-productivity-1", 1, "engine", {"engine-unit"}, {replacement("recipe-prod-research_engine-1", {"engine-unit"})}, true),
+  binding("sem-prfe_explosives-productivity-1", 1, "explosives", {"explosives"}, {replacement("recipe-prod-research_explosives-1", {"explosives"})}, true),
+  binding("sem-prfe_flying-robot-frame-productivity-1", 1, "robotics", {"flying-robot-frame"}, {replacement("recipe-prod-research_flying_robot_frame-1", {"flying-robot-frame"})}, true),
+  binding("sem-prfe_holmium-plate-productivity-1", 1, "holmium-processing", {"holmium-plate"}, {replacement("recipe-prod-research_holmium-1", {"holmium-plate"})}, true),
+  binding("sem-prfe_iron-gear-wheel-productivity-1", 1, NO_PREDECESSOR, {"iron-gear-wheel", "casting-iron-gear-wheel"}, {replacement("recipe-prod-research_gears-1", {"iron-gear-wheel", "casting-iron-gear-wheel"})}, true),
+  binding("sem-prfe_iron-plate-productivity-1", 1, NO_PREDECESSOR, {"iron-plate", "casting-iron"}, {replacement("recipe-prod-research_iron-1", {"iron-plate", "casting-iron"})}, true),
+  binding("sem-prfe_iron-stick-productivity-1", 1, "railway", {"iron-stick", "casting-iron-stick"}, {replacement("recipe-prod-research_iron_sticks-1", {"iron-stick", "casting-iron-stick"})}, true),
+  binding("sem-prfe_lithium-plate-productivity-1", 1, "lithium-processing", {"lithium-plate"}, {replacement("recipe-prod-research_lithium-1", {"lithium-plate"})}, true),
+  binding("sem-prfe_logistic-science-pack-productivity-1", 1, "logistic-science-pack", {"logistic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"logistic-science-pack"})}, true),
+  binding("sem-prfe_lubricant-productivity-1", 1, "lubricant", {"lubricant", "biolubricant"}, {replacement("recipe-prod-research_lubricant_productivity-1", {"lubricant", "biolubricant"})}, true),
+  binding("sem-prfe_metallurgic-science-pack-productivity-1", 1, "metallurgic-science-pack", {"metallurgic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"metallurgic-science-pack"})}, true),
+  binding("sem-prfe_military-science-pack-productivity-1", 1, "military-science-pack", {"military-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"military-science-pack"})}, true),
+  binding("sem-prfe_pentapod-egg-productivity-1", 1, "biochamber", {"pentapod-egg"}, {replacement("recipe-prod-research_breeding-1", {"pentapod-egg"})}, true),
+  binding("sem-prfe_production-science-pack-productivity-1", 1, "production-science-pack", {"production-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"production-science-pack"})}, true),
+  binding("sem-prfe_promethium-science-pack-productivity-1", 1, "promethium-science-pack", {"promethium-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"promethium-science-pack"})}, true),
+  binding("sem-prfe_quantum-processor-productivity-1", 1, "quantum-processor", {"quantum-processor"}, {replacement("recipe-prod-research_quantum_processor-1", {"quantum-processor"})}, true),
+  binding("sem-prfe_space-science-pack-productivity-1", 1, "space-science-pack", {"space-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"space-science-pack"})}, true),
+  binding("sem-prfe_stone-brick-productivity-1", 1, NO_PREDECESSOR, {"stone-brick"}, {replacement("recipe-prod-research_concrete-1", {"stone-brick"})}, true),
+  binding("sem-prfe_sulfur-productivity-1", 1, "sulfur-processing", {"sulfur", "biosulfur"}, {replacement("recipe-prod-research_sulfur-1", {"sulfur", "biosulfur"})}, true),
+  binding("sem-prfe_sulfuric-acid-productivity-1", 1, "sulfur-processing", {"sulfuric-acid"}, {replacement("recipe-prod-research_sulfuric_acid_productivity-1", {"sulfuric-acid"})}, true),
+  binding("sem-prfe_supercapacitor-productivity-1", 1, "electromagnetic-plant", {"supercapacitor"}, {replacement("recipe-prod-research_supercapacitor-1", {"supercapacitor"})}, true),
+  binding("sem-prfe_superconductor-productivity-1", 1, "electromagnetic-plant", {"superconductor"}, {replacement("recipe-prod-research_superconductor-1", {"superconductor"})}, true),
+  binding("sem-prfe_thruster-fuel-productivity-1", 1, "space-platform-thruster", {"thruster-fuel", "advanced-thruster-fuel"}, {replacement("recipe-prod-research_thruster_fuel_productivity-1", {"thruster-fuel", "advanced-thruster-fuel"})}, true),
+  binding("sem-prfe_thruster-oxidizer-productivity-1", 1, "space-platform-thruster", {"thruster-oxidizer", "advanced-thruster-oxidizer"}, {replacement("recipe-prod-research_thruster_oxidizer_productivity-1", {"thruster-oxidizer", "advanced-thruster-oxidizer"})}, true),
+  binding("sem-prfe_tungsten-carbide-productivity-1", 1, "tungsten-carbide", {"tungsten-carbide"}, {replacement("recipe-prod-research_tungsten-1", {"tungsten-carbide"})}, true),
+  binding("sem-prfe_tungsten-plate-productivity-1", 1, "tungsten-steel", {"tungsten-plate"}, {replacement("recipe-prod-research_tungsten-1", {"tungsten-plate"})}, true),
+  binding("sem-prfe_utility-science-pack-productivity-1", 1, "utility-science-pack", {"utility-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}, true),
+}
+
 -- The four F200 Space Age providers below are deliberately flat authored
 -- groups. They have disjoint foreign identities and recipe effects, so exact
 -- simultaneous groups compose without any arbitrary priority. EPR plus a
@@ -140,8 +225,18 @@ local FISH_BINDINGS = {
   }, true),
 }
 
+-- These two exact providers were independently observed to have no default
+-- replacement removals. They remain non-admissions, and their presence keeps
+-- an otherwise selected dynamic profile out of an unqualified co-owner mix.
+local UNQUALIFIED_DYNAMIC_PROVIDERS = {
+  "ProductivityResearchForEveryone",
+  "ProductivityResearchForEveryoneFG",
+}
+
 local PROFILES = {
   {key = "epr-base-f200", provider = PROVIDER, version = PROVIDER_VERSION, bindings = EPR_BINDINGS},
+  {key = "crafting-efficiency-f200-space-age", provider = "crafting-efficiency-2", version = "0.2.20", space_age = true, dynamic = true, bindings = CRAFTING_EFFICIENCY_BINDINGS},
+  {key = "productivity-research-f200-space-age", provider = "ProductivityResearch", version = "1.3.2", space_age = true, dynamic = true, bindings = PRODUCTIVITY_RESEARCH_BINDINGS},
   {key = "plates-f200-space-age", provider = "plates-n-circuit-productivity", version = "0.0.2", space_age = true, bindings = PLATES_BINDINGS},
   {key = "science-packs-f200-space-age", provider = "Science_packs_productivity", version = "0.0.1", space_age = true, bindings = SCIENCE_PACK_BINDINGS},
   {key = "bioflux-f200-space-age", provider = "bioflux-productivity", version = "0.1.0", space_age = true, bindings = BIOFLUX_BINDINGS},
@@ -158,18 +253,30 @@ local function selected_profiles(active_mods, target)
       or target.id ~= "f200" or target.factorio_version ~= "2.0" or active_mods.base ~= BASE_VERSION then
     return nil
   end
-  local epr, fixed = nil, {}
+  local epr, fixed, dynamic = nil, {}, {}
   for _, profile in ipairs(PROFILES) do
     local actual = active_mods[profile.provider]
     if actual ~= nil then
       if actual ~= profile.version then return nil end
-      if profile.space_age == true then
+      if profile.dynamic == true then
+        if active_mods["space-age"] ~= BASE_VERSION then return nil end
+        dynamic[#dynamic + 1] = profile
+      elseif profile.space_age == true then
         if active_mods["space-age"] ~= BASE_VERSION then return nil end
         fixed[#fixed + 1] = profile
       else
         epr = profile
       end
     end
+  end
+  if #dynamic ~= 0 then
+    -- Each dynamic provider has only an individual captured profile. A mixed
+    -- dynamic or fixed/EPR closure has no named native contract yet.
+    if #dynamic ~= 1 or epr ~= nil or #fixed ~= 0 then return nil end
+    for _, provider in ipairs(UNQUALIFIED_DYNAMIC_PROVIDERS) do
+      if active_mods[provider] ~= nil then return nil end
+    end
+    return dynamic
   end
   if epr ~= nil then
     if #fixed ~= 0 then return nil end
@@ -246,6 +353,20 @@ function M.runtime_effects_include(actual, expected)
   return runtime_includes_effects(actual, expected)
 end
 
+local function data_predecessor_matches(foreign, item)
+  local prerequisites = foreign.prerequisites
+  if item.predecessor == NO_PREDECESSOR then
+    -- Data raw omits an empty prerequisite array. A present non-empty array
+    -- is a changed native identity and cannot receive this narrow binding.
+    return prerequisites == nil or (type(prerequisites) == "table" and next(prerequisites) == nil)
+  end
+  if type(prerequisites) ~= "table" then return false end
+  for _, name in ipairs(prerequisites) do
+    if name == item.predecessor then return true end
+  end
+  return false
+end
+
 -- Edit only detached MIR effects for the flat, named foreign-owner bindings.
 -- Kept foreign coverage excludes future MIR increments without removing IDs.
 function M.retain_foreign_coverage(technologies, raw, active_mods, selected_target, prefer_mir)
@@ -269,13 +390,10 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
   end
   for _, item in ipairs(contract.bindings) do
     local foreign = raw.technology and raw.technology[item.id]
-    local previous = false
-    for _, name in ipairs(foreign and foreign.prerequisites or {}) do
-      if name == item.predecessor then previous = true end
-    end
     if foreign and foreign.type == "technology" and foreign.name == item.id
         and foreign.enabled ~= false and foreign.max_level == "infinite"
-        and (foreign.level == nil or foreign.level == item.first_level) and previous then
+        and (foreign.level == nil or foreign.level == item.first_level)
+        and data_predecessor_matches(foreign, item) then
       local replace = prefer_mir == true and runtime_exact_effects(foreign.effects, item.effects)
       if replace then
         for _, replacement in ipairs(item.replacements) do

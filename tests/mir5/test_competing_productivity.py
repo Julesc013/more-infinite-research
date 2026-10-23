@@ -4,6 +4,7 @@ These replay independently captured named EPR tails and MIR counterpart effects.
 They do not establish a Factorio save or gameplay result.
 """
 import argparse
+import gzip
 import hashlib
 import json
 from pathlib import Path
@@ -14,6 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 PLAYER = ROOT / "source/mir5"
 FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-epr-f200-captured-facts.json"
 FIXED_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-fixed-f200-sa-captured-facts.json"
+DYNAMIC_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json"
+DYNAMIC_CHAIN_PATH = ROOT / "spec/mir5/evidence/competing-dynamic-f200-sa-reference-chain.json"
 
 # Captured from verified F200 2.0.77 upstream/published EPR 1.3.8 run
 # 39999658774, under build/mir5/black-glass/incoming/39999658774.
@@ -133,6 +136,9 @@ class CompetingProductivityTests(unittest.TestCase):
               ["plates-n-circuit-productivity"]="0.0.2", Science_packs_productivity="0.0.1",
               ["bioflux-productivity"]="0.1.0", ["fish-productivity"]="1.0.0"}
           end
+          function dynamic_active(name, version)
+            return {base="2.0.77", ["space-age"]="2.0.77", [name]=version}
+          end
           function f200_target() return {id="f200", factorio_version="2.0"} end
           function add_effects(out, effects)
             for _, effect in ipairs(effects) do out[#out + 1] = {type=effect.type or "change-recipe-productivity", recipe=effect.recipe, change=effect.change} end
@@ -144,8 +150,10 @@ class CompetingProductivityTests(unittest.TestCase):
                 name=item.id, valid=true, force=force, level=item.first_level, researched=false,
                 enabled=true, visible_when_disabled=false,
                 prototype={enabled=true, level=item.first_level, max_level=4294967295, effects={},
-                  prerequisites={[item.predecessor]={name=item.predecessor}}}
-              }
+                  prerequisites={}}}
+              if item.predecessor ~= false then
+                force.technologies[item.id].prototype.prerequisites[item.predecessor] = {name=item.predecessor}
+              end
               add_effects(force.technologies[item.id].prototype.effects, item.effects)
               for _, replacement in ipairs(item.replacements) do
                 local target = force.technologies[replacement.id]
@@ -180,6 +188,15 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def fixed_contract(self):
         return self.lua.execute('return require("compatibility.competing_productivity").select(fixed_active(), f200_target())')
+
+    def dynamic_contract(self, provider):
+        return self.lua.execute(
+            'return require("compatibility.competing_productivity").select(dynamic_active(...), f200_target())',
+            provider["name"], provider["version"],
+        )
+
+    def dynamic_facts(self):
+        return json.loads(DYNAMIC_FACTS_PATH.read_text(encoding="utf-8"))
 
     def captured_facts(self):
         return json.loads(FACTS_PATH.read_text(encoding="utf-8"))
@@ -732,6 +749,349 @@ class CompetingProductivityTests(unittest.TestCase):
           assert(#row.effects==2, "disabled foreign research cannot block future MIR coverage")
         ''')
 
+
+    def test_dynamic_f200_space_age_bindings_are_exact_and_negative_profiles_stay_unadmitted(self):
+        facts = self.dynamic_facts()
+        self.assertEqual(1, facts["schema"])
+        self.assertEqual("MIR5DynamicCompetingF200SAReferenceFactsV1", facts["kind"])
+        self.assertEqual(40018079589, facts["run"])
+        self.assertEqual("2.0.77", facts["engine"]["version"])
+        self.assertEqual("4.7.20002", facts["published_mir"]["version"])
+        self.assertEqual(119, facts["manifest_members_verified"])
+        self.assertEqual(71, facts["binding_count"])
+        self.assertFalse(facts["release_qualification"])
+        chain = json.loads(DYNAMIC_CHAIN_PATH.read_text(encoding="utf-8"))
+        self.assertEqual("MIR5DynamicCompetingF200SAReferenceChainV1", chain["kind"])
+        self.assertEqual(facts["run"], chain["run"]["id"])
+        self.assertEqual(hashlib.sha256(DYNAMIC_FACTS_PATH.read_bytes()).hexdigest().upper(),
+                         chain["facts"]["sha256"])
+        for provider in chain["providers"]:
+            for arm in provider["arms"].values():
+                receipt = ROOT / arm["gzip"]
+                self.assertTrue(receipt.is_file())
+                self.assertEqual(arm["gzip_sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest().upper())
+                self.assertEqual(arm["uncompressed_sha256"],
+                                 hashlib.sha256(gzip.decompress(receipt.read_bytes())).hexdigest().upper())
+        self.assertEqual(
+            (("crafting-efficiency", "crafting-efficiency-2", "0.2.20", 28, True),
+             ("productivity-research", "ProductivityResearch", "1.3.2", 43, True),
+             ("prfe", "ProductivityResearchForEveryone", "1.0.8", 0, False),
+             ("prfe-fg", "ProductivityResearchForEveryoneFG", "1.2.0", 0, False)),
+            tuple((provider["key"], provider["name"], provider["version"],
+                   len(provider["bindings"]), provider["default_preference_admission"])
+                  for provider in facts["providers"]),
+        )
+
+        binding = self.lua.eval('require("compatibility.competing_productivity")')
+        for provider in facts["providers"]:
+            with self.subTest(provider=provider["key"]):
+                contract = self.dynamic_contract(provider)
+                if not provider["default_preference_admission"]:
+                    self.assertIsNone(contract)
+                    continue
+                actual = tuple(
+                    (item["id"], item["first_level"], item["predecessor"],
+                     tuple((effect["recipe"], effect["change"]) for effect in item["effects"]),
+                     tuple((replacement["id"],
+                            tuple((effect["recipe"], effect["change"])
+                                  for effect in replacement["effects"]))
+                           for replacement in item["replacements"]),
+                     item["initial_retirement"], item["retire_if_unearned"])
+                    for item in plain(contract)["bindings"]
+                )
+                expected = tuple(
+                    (item["id"], item["first_level"], item["predecessor"],
+                     tuple((effect["recipe"], effect["change"]) for effect in item["effects"]),
+                     tuple((replacement["id"],
+                            tuple((effect["recipe"], effect["change"])
+                                  for effect in replacement["effects"]))
+                           for replacement in item["replacements"]),
+                     item["initial_retirement"], item["retire_if_unearned"])
+                    for item in provider["bindings"]
+                )
+                self.assertEqual(expected, actual)
+                self.assertEqual((provider["name"],),
+                                 tuple(row["name"] for row in plain(contract)["providers"]))
+                self.assertEqual(provider["published_removed_ids"],
+                                 [item["id"] for item in provider["bindings"]])
+                for item in provider["bindings"]:
+                    self.assertEqual("omitted-default-one", item["level_source"])
+                    self.assertEqual(1, item["first_level"])
+                    self.assertEqual("infinite", item["foreign_row"]["max_level"])
+                    self.assertEqual(item["effects"], [
+                        {"recipe": effect["recipe"], "change": effect["change"]}
+                        for effect in item["foreign_row"]["effects"]
+                    ])
+                    if item["predecessor"] is False:
+                        self.assertNotIn("prerequisites", item["foreign_row"])
+                    else:
+                        self.assertIn(item["predecessor"], item["foreign_row"]["prerequisites"])
+                    for replacement in item["replacements"]:
+                        reference = item["reference_rows"][replacement["id"]]
+                        available = {(effect["recipe"], effect["change"])
+                                     for effect in reference["effects"]
+                                     if effect["type"] == "change-recipe-productivity"}
+                        self.assertTrue({(effect["recipe"], effect["change"])
+                                         for effect in replacement["effects"]}.issubset(available))
+
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local target = f200_target()
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ProductivityResearch="1.3.2"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ProductivityResearchForEveryone="1.0.8"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ["fish-productivity"]="1.0.0"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ProductivityResearch="1.3.2", ExpandedProductivityResearch="1.3.8"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["crafting-efficiency-2"]="0.2.20"}, target) == nil)
+          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.21"}, target) == nil)
+          assert(binding.select(dynamic_active("ProductivityResearch", "1.3.2"),
+            {id="f210", factorio_version="2.1"}) == nil)
+          assert(binding.select(dynamic_active("ProductivityResearchForEveryone", "1.0.8"), target) == nil)
+          assert(binding.select(dynamic_active("ProductivityResearchForEveryoneFG", "1.2.0"), target) == nil)
+        ''')
+
+    def test_dynamic_capture_facts_match_each_selected_row_when_raw_captures_are_available(self):
+        facts = self.dynamic_facts()
+        paths = [ROOT / arm["raw_path"] for provider in facts["providers"]
+                 for arm in provider["arms"].values()]
+        if not all(path.is_file() for path in paths):
+            self.skipTest("optional dynamic raw captures are absent")
+
+        def compact(row):
+            return {key: row[key] for key in ("type", "name", "max_level", "level", "prerequisites", "effects")
+                    if key in row}
+
+        for provider in facts["providers"]:
+            with self.subTest(provider=provider["key"]):
+                raw = {}
+                for arm_name, arm in provider["arms"].items():
+                    path = ROOT / arm["raw_path"]
+                    self.assertEqual(arm["raw_sha256"], hashlib.sha256(path.read_bytes()).hexdigest().upper())
+                    raw[arm_name] = json.loads(path.read_text(encoding="utf-8"))["technology"]
+                if not provider["bindings"]:
+                    self.assertTrue(set(raw["upstream"]).issubset(raw["published"]))
+                    self.assertEqual(raw["published"], raw["foreign"])
+                    continue
+                self.assertEqual(provider["published_removed_ids"], [item["id"] for item in provider["bindings"]])
+                for item in provider["bindings"]:
+                    self.assertEqual(item["foreign_row"], compact(raw["upstream"][item["id"]]))
+                    self.assertEqual(item["foreign_row"], compact(raw["foreign"][item["id"]]))
+                    self.assertNotIn(item["id"], raw["published"])
+                    for name, expected in item["reference_rows"].items():
+                        self.assertEqual(expected, compact(raw["published"][name]))
+                    for name, expected in item["foreign_reference_rows"].items():
+                        actual = raw["foreign"].get(name)
+                        self.assertEqual(expected, None if actual is None else compact(actual))
+
+    def test_dynamic_data_preference_uses_exact_effect_coverage_and_empty_prerequisites_only(self):
+        facts = self.dynamic_facts()
+
+        def lua(value):
+            if isinstance(value, dict):
+                return self.lua.table_from({key: lua(item) for key, item in value.items()})
+            if isinstance(value, list):
+                return self.lua.table_from([lua(item) for item in value])
+            return value
+
+        def productivity_effects(row):
+            return [dict(row["effects"][index]) for index in range(1, len(row["effects"]) + 1)
+                    if row["effects"][index]["type"] == "change-recipe-productivity"]
+
+        adapter = self.lua.eval('require("compatibility.competing_productivity")')
+        for provider in facts["providers"][:2]:
+            with self.subTest(provider=provider["key"]):
+                rows = {}
+                for item in provider["bindings"]:
+                    rows.update(item["reference_rows"])
+                active = lua({"base": "2.0.77", "space-age": "2.0.77",
+                              provider["name"]: provider["version"]})
+                raw = lua({"technology": {item["id"]: item["foreign_row"] for item in provider["bindings"]}})
+                self.lua.eval('function(raw) setmetatable(raw.technology, {__pairs=function() error("foreign scan") end}) end')(raw)
+                retained = lua(list(rows.values()))
+                adapter.retain_foreign_coverage(retained, raw, active, lua({"id": "f200", "factorio_version": "2.0"}), False)
+                actual = {retained[index]["name"]: retained[index] for index in range(1, len(retained) + 1)}
+                expected_foreign = {}
+                for item in provider["bindings"]:
+                    expected_foreign.update(item["foreign_reference_rows"])
+                for name, original in rows.items():
+                    output = actual[name]
+                    expected = expected_foreign[name]
+                    if expected is None:
+                        self.assertEqual([], productivity_effects(output))
+                        self.assertFalse(output["enabled"])
+                    else:
+                        self.assertEqual(
+                            [effect for effect in expected["effects"] if effect["type"] == "change-recipe-productivity"],
+                            productivity_effects(output),
+                        )
+                    self.assertEqual(original["level"], output["level"])
+                    self.assertEqual(original["max_level"], output["max_level"])
+                preferred = lua(list(rows.values()))
+                adapter.retain_foreign_coverage(preferred, raw, active, lua({"id": "f200", "factorio_version": "2.0"}), True)
+                for index in range(1, len(preferred) + 1):
+                    self.assertEqual(rows[preferred[index]["name"]]["effects"],
+                                     [dict(preferred[index]["effects"][i])
+                                      for i in range(1, len(preferred[index]["effects"]) + 1)])
+
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local active = dynamic_active("ProductivityResearch", "1.3.2")
+          local target = f200_target()
+          local foreign={type="technology",name="sem-prfe_copper-plate-productivity-1",enabled=true,max_level="infinite",
+            effects={{type="change-recipe-productivity",recipe="copper-plate",change=.1},
+              {type="change-recipe-productivity",recipe="casting-copper",change=.1}}}
+          local row={type="technology",name="recipe-prod-research_copper-1",level=1,max_level="infinite",enabled=true,
+            effects={{type="change-recipe-productivity",recipe="copper-plate",change=.1},
+              {type="change-recipe-productivity",recipe="casting-copper",change=.1}}}
+          binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,true)
+          assert(#row.effects == 2, "preference true retains exact complete MIR coverage")
+          binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false)
+          assert(#row.effects == 0 and row.enabled == false, "captured omitted prerequisite is empty")
+          foreign.prerequisites={"unrelated-prerequisite"}
+          row.enabled=true; row.effects={{type="change-recipe-productivity",recipe="copper-plate",change=.1},
+            {type="change-recipe-productivity",recipe="casting-copper",change=.1}}
+          binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false)
+          assert(#row.effects == 2 and row.enabled == true, "non-empty prerequisite changed identity")
+        ''')
+
+    def test_dynamic_runtime_requires_exact_identity_and_preserves_partial_or_foreign_state(self):
+        facts = self.dynamic_facts()
+        ce, pr = facts["providers"][:2]
+        self.lua.execute(r'''
+          local binding = require("compatibility.competing_productivity")
+          local ce_contract = binding.select(dynamic_active("crafting-efficiency-2", "0.2.20"), f200_target())
+          local force = force_from_contract(ce_contract)
+          storage = {}
+          local runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          for _, item in ipairs(ce_contract.bindings) do
+            local value = force.technologies[item.id]
+            assert(value.enabled == false and value.visible_when_disabled == true, item.id)
+            assert(value.level == item.first_level and value.researched == false, item.id)
+          end
+          assert(storage.mir_competing_productivity.owned_disabled[force.index][ce_contract.bindings[1].id].disabled == true)
+          runtime = install_competing(false, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_configuration_changed()
+          for _, item in ipairs(ce_contract.bindings) do
+            local value = force.technologies[item.id]
+            assert(value.enabled == true and value.visible_when_disabled == false, item.id)
+          end
+          assert(storage.mir_competing_productivity == nil)
+
+          -- CE has native level one despite its named nonadjacent predecessor.
+          -- Do not claim an untouched tail where investment, a live queue, or a
+          -- foreign disabled presentation says otherwise.
+          force = force_from_contract(ce_contract)
+          local paused = ce_contract.bindings[1]
+          force.technologies[paused.id].saved_progress = .27
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          assert(force.technologies[paused.id].enabled == true
+            and force.technologies[paused.id].visible_when_disabled == false
+            and force.technologies[paused.id].saved_progress == .27)
+          assert(storage.mir_competing_productivity.owned_disabled[force.index][paused.id] == nil)
+
+          force = force_from_contract(ce_contract)
+          local queued = ce_contract.bindings[2]
+          force.current_research = force.technologies[queued.id]
+          force.research_queue = {force.current_research}
+          force.research_progress = .42
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          assert(force.technologies[queued.id].enabled == true and force.current_research == force.technologies[queued.id]
+            and #force.research_queue == 1 and force.research_progress == .42)
+
+          force = force_from_contract(ce_contract)
+          local foreign = ce_contract.bindings[3]
+          force.technologies[foreign.id].enabled = false
+          force.technologies[foreign.id].visible_when_disabled = false
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          assert(force.technologies[foreign.id].enabled == false
+            and force.technologies[foreign.id].visible_when_disabled == false
+            and storage.mir_competing_productivity.owned_disabled[force.index][foreign.id] == nil)
+
+          -- The direct level-one path does not overwrite an unusual earned
+          -- state. A later native level receives cap one and loses only its
+          -- future access, keeping the earned level itself intact.
+          force = force_from_contract(ce_contract)
+          local level_one_earned = ce_contract.bindings[4]
+          force.technologies[level_one_earned.id].researched = true
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          assert(force.technologies[level_one_earned.id].enabled == true
+            and force.technologies[level_one_earned.id].researched == true
+            and storage.mir_competing_productivity.owned_disabled[force.index][level_one_earned.id] == nil)
+
+          force = force_from_contract(ce_contract)
+          local level_two = ce_contract.bindings[5]
+          force.technologies[level_two.id].level = 2
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          assert(force.technologies[level_two.id].level == 2 and force.technologies[level_two.id].researched == false
+            and force.technologies[level_two.id].enabled == false
+            and force.technologies[level_two.id].visible_when_disabled == true)
+
+          -- Bad level, missing predecessor, a .2 provider effect, or incomplete
+          -- MIR coverage never grants a MIR disablement right.
+          force = force_from_contract(ce_contract)
+          force.technologies[ce_contract.bindings[1].id].prototype.level = 2
+          force.technologies[ce_contract.bindings[2].id].prototype.prerequisites[ce_contract.bindings[2].predecessor] = nil
+          force.technologies[ce_contract.bindings[3].id].prototype.effects[1].change = .2
+          force.technologies[ce_contract.bindings[4].replacements[1].id] = nil
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
+          runtime.on_init()
+          for index=1,4 do
+            local item, value = ce_contract.bindings[index], force.technologies[ce_contract.bindings[index].id]
+            assert(value.enabled == true and value.visible_when_disabled == false, item.id)
+            local bucket = storage.mir_competing_productivity and storage.mir_competing_productivity.owned_disabled[force.index]
+            assert(bucket == nil or bucket[item.id] == nil, item.id)
+          end
+
+          local pr_contract = binding.select(dynamic_active("ProductivityResearch", "1.3.2"), f200_target())
+          force = force_from_contract(pr_contract)
+          local empty = nil
+          for _, item in ipairs(pr_contract.bindings) do if item.predecessor == false then empty = item; break end end
+          assert(empty ~= nil)
+          local paused = pr_contract.bindings[1]
+          local current = pr_contract.bindings[2]
+          local predisabled = pr_contract.bindings[3]
+          force.technologies[paused.id].saved_progress = .27
+          force.current_research = force.technologies[current.id]
+          force.research_queue = {force.current_research}
+          force.research_progress = .42
+          force.technologies[predisabled.id].enabled = false
+          force.technologies[predisabled.id].visible_when_disabled = false
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("ProductivityResearch", "1.3.2"))
+          runtime.on_init()
+          assert(force.technologies[paused.id].enabled == true and force.technologies[paused.id].saved_progress == .27)
+          assert(force.current_research == force.technologies[current.id] and #force.research_queue == 1
+            and force.research_progress == .42)
+          assert(force.technologies[current.id].enabled == true)
+          assert(force.technologies[predisabled.id].enabled == false
+            and force.technologies[predisabled.id].visible_when_disabled == false)
+          assert(force.technologies[empty.id].enabled == false, "empty native prerequisite table is admitted")
+
+          force = force_from_contract(pr_contract)
+          empty = (function() for _, item in ipairs(pr_contract.bindings) do if item.predecessor == false then return item end end end)()
+          force.technologies[empty.id].prototype.prerequisites={unrelated={name="unrelated"}}
+          storage = {}
+          runtime = install_competing(true, force, dynamic_active("ProductivityResearch", "1.3.2"))
+          runtime.on_init()
+          assert(force.technologies[empty.id].enabled == true and force.technologies[empty.id].visible_when_disabled == false)
+        ''')
+
     def test_source_stays_fixed_and_non_scanning(self):
         compatibility = (PLAYER / "compatibility/competing_productivity.lua").read_text(encoding="utf-8")
         runtime = (PLAYER / "runtime/competing_productivity.lua").read_text(encoding="utf-8")
@@ -740,6 +1100,13 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertNotIn("pairs(force.technologies)", runtime)
         self.assertNotIn("research.catalogue", runtime)
         self.assertNotIn("prototypes.", runtime)
+        self.assertIn('mods["crafting-efficiency-2"]', (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
+        self.assertIn("mods.ProductivityResearch", (PLAYER / "data-final-fixes.lua").read_text(encoding="utf-8"))
+        bootstrap = (PLAYER / "runtime/bootstrap.lua").read_text(encoding="utf-8")
+        self.assertIn('active_mods["crafting-efficiency-2"]', bootstrap)
+        self.assertIn("active_mods.ProductivityResearch", bootstrap)
+        self.assertNotIn("ProductivityResearchForEveryone", bootstrap)
+        self.assertNotIn("ProductivityResearchForEveryoneFG", bootstrap)
         self.assertNotIn("require(", runtime[runtime.index("function M.on_init"):])
         self.assertNotRegex(runtime, r"\.level\s*=(?!=)")
         self.assertNotRegex(runtime, r"\.researched\s*=(?!=)")

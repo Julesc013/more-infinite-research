@@ -80,10 +80,19 @@ end
 local function runtime_foreign_admitted(technology, item)
   local prototype = technology and technology.prototype
   local prerequisites = prototype and prototype.prerequisites
-  local predecessor = prerequisites and prerequisites[item.predecessor]
+  local predecessor = item.predecessor ~= false and prerequisites and prerequisites[item.predecessor]
+  local empty_prerequisites = item.predecessor == false and prerequisites ~= nil
+  if empty_prerequisites then
+    for _ in pairs(prerequisites) do
+      empty_prerequisites = false
+      break
+    end
+  end
   return technology and technology.valid ~= false and technology.name == item.id
     and prototype and prototype.enabled == true and prototype.level == item.first_level
-    and prototype.max_level == UINT32_MAX and predecessor and predecessor.name == item.predecessor
+    and prototype.max_level == UINT32_MAX
+    and ((item.predecessor == false and empty_prerequisites)
+      or (item.predecessor ~= false and predecessor and predecessor.name == item.predecessor))
     and binding.runtime_effects_match(prototype.effects, item.effects)
 end
 
@@ -114,14 +123,14 @@ local function queued_names(force)
   return names
 end
 
-local function can_retire_initial(technology, item, queued)
-  return item.initial_retirement == true and technology.enabled == true
+local function can_retire_unearned(technology, item, queued)
+  return (item.initial_retirement == true or item.retire_if_unearned == true) and technology.enabled == true
     and technology.level == item.first_level and technology.researched ~= true
     and (technology.saved_progress == nil or technology.saved_progress == 0)
     and queued[item.id] ~= true
 end
 
-local function retire_initial(force, current, item)
+local function retire_unearned(force, current, item)
   local technology = force.technologies[item.id]
   if technology == nil or technology.enabled ~= true then return end
   local record = ensure_owned_record(current.owned_disabled, force.index, item.id)
@@ -135,7 +144,7 @@ local function retire_initial(force, current, item)
   technology.enabled = false
 end
 
-local function reconcile_item(force, current, item, limits, initial, queued)
+local function reconcile_item(force, current, item, limits, unearned, queued)
   local technology = force.technologies[item.id]
   if not runtime_foreign_admitted(technology, item) then
     -- A changed provider identity/effect makes historic ownership unknowable.
@@ -149,7 +158,7 @@ local function reconcile_item(force, current, item, limits, initial, queued)
     limits[item.id] = 0
     return
   end
-  if item.initial_retirement ~= true then
+  if item.initial_retirement ~= true and item.retire_if_unearned ~= true then
     limits[item.id] = item.first_level - 1
     return
   end
@@ -158,8 +167,8 @@ local function reconcile_item(force, current, item, limits, initial, queued)
     -- existing MIR record is retained until a valid false-preference release.
     return
   end
-  if can_retire_initial(technology, item, queued) then
-    initial[#initial + 1] = item
+  if can_retire_unearned(technology, item, queued) then
+    unearned[#unearned + 1] = item
   elseif technology.level ~= item.first_level or technology.researched == true then
     -- The first native level is already earned. Keep that credit, then use the
     -- common cap path to retire only subsequent levels.
@@ -179,13 +188,13 @@ local function reconcile_force(force, target_name)
   -- for a fresh no-preference profile.
   if not current and PREFER_MIR ~= true then return end
   current = current or ensure_state()
-  local limits, initial = {}, {}
+  local limits, unearned = {}, {}
   local queued = queued_names(force)
   if selected_item then
-    reconcile_item(force, current, selected_item, limits, initial, queued)
+    reconcile_item(force, current, selected_item, limits, unearned, queued)
   else
     for _, item in ipairs(CONTRACT.bindings) do
-      reconcile_item(force, current, item, limits, initial, queued)
+      reconcile_item(force, current, item, limits, unearned, queued)
     end
   end
   if next(limits) ~= nil then
@@ -195,7 +204,7 @@ local function reconcile_force(force, target_name)
         .. result.unresolved_current, 2)
     end
   end
-  for _, item in ipairs(initial) do retire_initial(force, current, item) end
+  for _, item in ipairs(unearned) do retire_unearned(force, current, item) end
   discard_empty_state(current)
 end
 

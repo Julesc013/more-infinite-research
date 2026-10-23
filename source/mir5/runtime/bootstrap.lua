@@ -27,7 +27,9 @@ if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~=
     or active_mods["plates-n-circuit-productivity"] ~= nil
     or active_mods.Science_packs_productivity ~= nil
     or active_mods["bioflux-productivity"] ~= nil
-    or active_mods["fish-productivity"] ~= nil)
+    or active_mods["fish-productivity"] ~= nil
+    or active_mods["crafting-efficiency-2"] ~= nil
+    or active_mods.ProductivityResearch ~= nil)
     and require("platform.target").id == "f200" then
   competing_productivity = require("runtime.competing_productivity")
 end
