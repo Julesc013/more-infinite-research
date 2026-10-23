@@ -249,6 +249,42 @@ class PrototypeLimitsTests(unittest.TestCase):
         ''')
 
 
+    def test_pipeline_extent_preserves_percentages_and_portable_numeric_meaning(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          for percent, expected in pairs({['25']=.25,['50']=.5,['75']=.75,
+            ['100']=1,['125']=1.25,['150']=1.5,['200']=2,['250']=2.5,
+            ['300']=3,['400']=4,['500']=5,['750']=7.5,['1000']=10}) do
+            assert(pipeline.multiplier(percent) == expected)
+          end
+          assert(pipeline.multiplier(2) == .02 and pipeline.multiplier("2") == 2)
+          assert(pipeline.multiplier("12.5") == .125 and pipeline.multiplier(100) == 1)
+          assert(pipeline.multiplier(nil) == 1 and pipeline.multiplier("invalid") == 1)
+          assert(pipeline.multiplier(0/0) == 1 and pipeline.multiplier(math.huge) == 1)
+          local raw = setmetatable({}, {__pairs=function() error("inactive pipeline traversal") end})
+          assert(pipeline.apply(raw, "100") == 0 and pipeline.apply(raw, nil) == 0)
+        ''')
+
+    def test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          local shared = {max_pipeline_extent=321,foreign="preserve"}
+          local a, b, c, d = {}, {max_pipeline_extent=1}, {max_pipeline_extent=4294967295},
+            {max_pipeline_extent=7}
+          local prototype = {fluid_box=shared, input_fluid_box=a, output_fluid_box=b,
+            energy_source={fuel_fluid_box=c,oxidizer_fluid_box=d},
+            fluid_boxes={shared},unrelated={max_pipeline_extent=17}}
+          prototype.cycle=prototype
+          assert(pipeline.apply({fixture={a=prototype,b=prototype}}, "150") == 5)
+          assert(shared.max_pipeline_extent == 482 and shared.foreign == "preserve")
+          assert(a.max_pipeline_extent == 480 and b.max_pipeline_extent == 2)
+          assert(c.max_pipeline_extent == 4294967295 and d.max_pipeline_extent == 11)
+          assert(prototype.unrelated.max_pipeline_extent == 17)
+          local tiny={fluid_box={max_pipeline_extent=1}}
+          assert(pipeline.apply(tiny,"25") == 1 and tiny.fluid_box.max_pipeline_extent == 1)
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)

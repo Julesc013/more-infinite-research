@@ -67,6 +67,11 @@ end
 -- These independent prototype limits are opt-in. Test effective post-import
 -- values before importing their body, so the normal data stage does not build
 -- its recipe classifier or inspect unrelated prototype groups.
+local pipeline_extent = values.options["mir-pipeline-extent-multiplier"]
+if pipeline_extent ~= nil and pipeline_extent ~= "100" and pipeline_extent ~= 100 then
+  require("overrides.pipeline_extent").apply(data.raw, pipeline_extent)
+end
+
 local prototype_limit_option_names = {
   "mir-prototype-productivity-cap",
   "mir-recycling-return-chance",

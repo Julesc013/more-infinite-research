@@ -633,6 +633,29 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
 
+    def test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults(self):
+        self.lua.execute('''
+          mods={base="2.1.23"}
+          settings, data, helpers, log={startup=defaults()}, full_world(mods), nil, function() end
+          package.loaded["overrides.pipeline_extent"]=nil
+          package.preload["overrides.pipeline_extent"]=function() error("inactive pipeline import") end
+          assert(loadfile(data_final_path))()
+          assert(package.loaded["overrides.pipeline_extent"] == nil)
+          package.preload["overrides.pipeline_extent"]=nil
+          data=full_world(mods)
+          local box={max_pipeline_extent=321,foreign="keep"}
+          data.raw.fixture={a={fluid_box=box}}
+          helpers={encode_string=function(value) return value end,
+            decode_string=function() return "{}" end, json_to_table=function()
+            return {schema=1, settings={["mir-pipeline-extent-multiplier"]="150"}}
+          end}
+          -- The direct setting remains default: only the effective imported
+          -- value activates the independent override.
+          settings.startup["mir-settings-profile-import"].value="MIRSET1:payload"
+          assert(loadfile(data_final_path))()
+          assert(box.max_pipeline_extent == 482 and box.foreign == "keep")
+        ''')
+
     def test_k2so_catalogue_keeps_exact_imersite_stages_and_owners_lazy(self):
         self.lua.execute('''
           local k2_body = "compatibility.modern_catalogue.k2so"
