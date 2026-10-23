@@ -85,14 +85,14 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             local name, setting = gear_name, "ips-max-level-research_gears"
             local source, operation = "generated-stream", "runtime-settings-transport"
             local kind = "settings-derived-v3"
-            local key = table.concat({name, setting, source, operation}, "\\0")
+            local key = table.concat({"nil", setting, source, operation}, "\\0")
             return {policy_version = 3, unique = {keep = true},
-              managed_technologies = {[name] = {technology = name, setting = setting,
+              managed_technologies = {[name] = {setting = setting,
                 source = source, operation = operation, policy_transport = kind,
                 ownership_kind = kind, legacy = false, selected = cap,
-                binding_fingerprint = "mir32-1a2b3c4d"}},
+                native_finite_stage = false}},
               disabled_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
-                cap = cap, binding_fingerprint = "mir32-1a2b3c4d", ownership_key = key,
+                cap = cap, ownership_key = key,
                 ownership_kind = kind, enabled_before_cap = true}}},
               visibility_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
                 ownership_key = key, ownership_kind = kind, value = false}}},
@@ -107,14 +107,14 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             local setting = "mir-max-level-worker-robots-speed"
             local source, operation = "native-owner", "native-owner-cap"
             local kind = "settings-derived-v3"
-            local key = table.concat({name, setting, source, operation}, "\\0")
+            local key = table.concat({"nil", setting, source, operation}, "\\0")
             return {policy_version = 3, unique = {keep = true},
-              managed_technologies = {[name] = {technology = name, setting = setting,
+              managed_technologies = {[name] = {setting = setting,
                 source = source, operation = operation, policy_transport = kind,
                 ownership_kind = kind, legacy = false, selected = cap,
-                binding_fingerprint = "mir32-5e6f7a8b"}},
+                native_finite_stage = false}},
               disabled_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
-                cap = cap, binding_fingerprint = "mir32-5e6f7a8b", ownership_key = key,
+                cap = cap, ownership_key = key,
                 ownership_kind = kind, enabled_before_cap = true}}},
               visibility_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
                 ownership_key = key, ownership_kind = kind, value = false}}},

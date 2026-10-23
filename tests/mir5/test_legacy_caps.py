@@ -81,6 +81,17 @@ class LegacyCapsTests(unittest.TestCase):
             if disable ~= false then
               row.disabled_by_cap[index][candidate.name] = disabled_for(index, candidate, cap, fingerprint, kind)
             end
+            if kind == "settings-derived-v3" then
+              -- Accepted F3943E...1010B7 maximum_level_control.lua:109-133,
+              -- 414-421, 668-675, 862-878: map-key identity, absent digest.
+              local policy = row.managed_technologies[candidate.name]
+              policy.technology, policy.binding_fingerprint = nil, nil
+              policy.native_finite_stage = false
+              local key = table.concat({"nil", candidate.setting, candidate.source, candidate.operation}, "\\0")
+              row.visibility_by_cap[index][candidate.name].ownership_key = key
+              local disabled = row.disabled_by_cap[index][candidate.name]
+              if disabled then disabled.ownership_key, disabled.binding_fingerprint = key, nil end
+            end
             return row
           end
 
@@ -161,9 +172,45 @@ class LegacyCapsTests(unittest.TestCase):
           rows, facts = legacy.import_for_force(wrong_old_cap, f, {f200}, nil, F200_ALLOWLIST)
           assert(rows[f200.name].disabled == nil
             and facts.decisions[1].outcome == "visibility_imported_disable_unproven")
-          local missing_fingerprint = old_bucket(41, f200, 2, nil, nil, "settings-derived-v3")
-          rows, facts = legacy.import_for_force(missing_fingerprint, f, {f200}, nil, F200_ALLOWLIST)
+          local invented_fingerprint = old_bucket(41, f200, 2, nil, nil, "settings-derived-v3")
+          invented_fingerprint.managed_technologies[f200.name].binding_fingerprint = "mir32-1a2b3c4d"
+          rows, facts = legacy.import_for_force(invented_fingerprint, f, {f200}, nil, F200_ALLOWLIST)
           assert(rows[f200.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
+        ''')
+
+    def test_f200_shape_rejects_invented_identity_stale_records_and_foreign_writes(self):
+        self.lua.execute('''
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "runtime-settings-transport")
+          local cases = {
+            {function(p,v,d,b,t) p.technology=gear.name end, "none"},
+            {function(p,v,d,b,t) p.binding_fingerprint="mir32-1234abcd" end, "none"},
+            {function(p,v,d,b,t) p.native_finite_stage=nil end, "none"},
+            {function(p,v,d,b,t) p.native_finite_stage="false" end, "none"},
+            {function(p,v,d,b,t) p.source="native-owner" end, "none"},
+            {function(p,v,d,b,t) p.operation="emit" end, "none"},
+            {function(p,v,d,b,t) p.setting="ips-max-level-research_iron" end, "none"},
+            {function(p,v,d,b,t) v.ownership_key=cap_key(gear) end, "none"},
+            {function(p,v,d,b,t) v.force_index=42 end, "none"},
+            {function(p,v,d,b,t) t.visible_when_disabled=false end, "none"},
+            {function(p,v,d,b,t) d.binding_fingerprint="mir32-1234abcd" end, "visibility"},
+            {function(p,v,d,b,t) d.ownership_key=cap_key(gear) end, "visibility"},
+            {function(p,v,d,b,t) d.force_index=42 end, "visibility"},
+            {function(p,v,d,b,t) d.enabled_before_cap=false end, "visibility"},
+            {function(p,v,d,b,t) d.migrated_from_policy_version=2 end, "visibility"},
+            {function(p,v,d,b,t) b.unowned_disabled_by_cap[41][gear.name]=true end, "visibility"},
+            {function(p,v,d,b,t) t.enabled=true end, "visibility"}
+          }
+          for index, opponent in ipairs(cases) do
+            local old=old_bucket(41,gear,2,nil,nil,"settings-derived-v3")
+            local t=native_technology()
+            opponent[1](old.managed_technologies[gear.name],old.visibility_by_cap[41][gear.name],
+              old.disabled_by_cap[41][gear.name],old,t)
+            local rows=legacy.import_for_force(old,native_force(41,{[gear.name]=t}),{gear},nil,F200_ALLOWLIST)
+            if opponent[2]=="none" then assert(rows[gear.name]==nil,"F200 opponent admitted: "..index)
+            else assert(rows[gear.name] and rows[gear.name].disabled==nil
+              and rows[gear.name].visible_when_disabled==false,"F200 foreign disable claimed: "..index) end
+          end
         ''')
 
     def test_imports_worker_only_when_the_revalidated_candidate_is_supplied(self):
@@ -215,6 +262,7 @@ class LegacyCapsTests(unittest.TestCase):
           assert(rows[worker.name] == nil and facts.decisions[1].outcome == "policy_mismatch")
           local wrong_fingerprint = old_bucket(61, worker, 2, "mir32-5E6f7a8b", nil,
             "settings-derived-v3")
+          wrong_fingerprint.managed_technologies[worker.name].binding_fingerprint = "mir32-5E6f7a8b"
           rows, facts = legacy.import_for_force(wrong_fingerprint, f, {worker}, nil,
             F200_WORKER_ALLOWLIST)
           assert(rows[worker.name] == nil and facts.decisions[1].outcome == "policy_mismatch")

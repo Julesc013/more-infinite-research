@@ -145,8 +145,17 @@ end
 
 local function policy_matches(policy, candidate, authority)
   if type(policy) ~= "table" then return false end
-  return policy.technology == candidate.name
-    and policy.setting == candidate.setting
+  local identity_matches
+  if authority.policy_transport == SETTINGS_DERIVED_KIND then
+    -- The exact F200 producer never stored technology or a binding digest.
+    -- Its name is the managed map key, independently selected by the caller.
+    identity_matches = policy.technology == nil and policy.binding_fingerprint == nil
+      and type(policy.native_finite_stage) == "boolean"
+  else
+    identity_matches = policy.technology == candidate.name
+      and mir32_fingerprint(policy.binding_fingerprint)
+  end
+  return identity_matches and policy.setting == candidate.setting
     and policy.source == candidate.source
     and policy.operation == candidate.operation
     and policy.policy_transport == authority.policy_transport
@@ -154,14 +163,22 @@ local function policy_matches(policy, candidate, authority)
     and policy.legacy == false
     and policy.blocked_reason == nil
     and positive_integer(policy.selected)
-    and mir32_fingerprint(policy.binding_fingerprint)
+end
+
+local function persisted_key(candidate, authority)
+  if authority.policy_transport == SETTINGS_DERIVED_KIND then
+    -- Historical ownership_key used tostring(policy.technology), hence the
+    -- literal "nil" for this producer. Never accept this key on F210.
+    return table.concat({"nil", candidate.setting, candidate.source, candidate.operation}, "\0")
+  end
+  return exact_key(candidate)
 end
 
 local function visibility_matches(record, force_index, candidate, authority)
   return type(record) == "table"
     and record.policy_version == POLICY_VERSION
     and record.force_index == force_index
-    and record.ownership_key == exact_key(candidate)
+    and record.ownership_key == persisted_key(candidate, authority)
     and record.ownership_kind == authority.ownership_kind
     and type(record.value) == "boolean"
 end
@@ -173,8 +190,9 @@ local function disable_matches(record, policy, force_index, candidate, authority
     and positive_integer(record.cap)
     and record.cap == policy.selected
     and record.binding_fingerprint == policy.binding_fingerprint
-    and mir32_fingerprint(record.binding_fingerprint)
-    and record.ownership_key == exact_key(candidate)
+    and ((authority.policy_transport == SETTINGS_DERIVED_KIND and record.binding_fingerprint == nil)
+      or (authority.policy_transport == TRANSPORTED_KIND and mir32_fingerprint(record.binding_fingerprint)))
+    and record.ownership_key == persisted_key(candidate, authority)
     and record.ownership_kind == authority.ownership_kind
     and record.enabled_before_cap == true
     -- Do not bridge rights that were themselves reconstructed from V2 state.
