@@ -336,6 +336,7 @@ try{
   if(-not $CreateOnly){
   $complete=Join-Path $writeData 'saves/mir5-native-complete.zip'
   $live=Join-Path $writeData 'factorio-current.log'
+  $historicalSaveComplete=${function:Test-HistoricalFixtureSaveComplete}
   $completion={
     if(-not(Test-Path -LiteralPath $live -PathType Leaf)){return $false}
     $stream=[IO.File]::Open($live,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::ReadWrite)
@@ -343,7 +344,7 @@ try{
     try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
     if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
     if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
-    if($historical){return Test-HistoricalFixtureSaveComplete $complete}
+    if($historical){return & $historicalSaveComplete $complete}
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()
   if($historical){

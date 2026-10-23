@@ -439,8 +439,10 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             $n.Name -ceq 'Test-HistoricalFixtureSaveComplete'},$true))
           if($nodes.Count -ne 1){throw 'save completion helper missing'}
           Invoke-Expression $nodes[0].Extent.Text
+          $saveComplete=${function:Test-HistoricalFixtureSaveComplete}
+          $completion={param($path) & $saveComplete $path}.GetNewClosure()
           foreach($name in @('old','later')){
-            if(-not (Test-HistoricalFixtureSaveComplete (Join-Path $env:MIR_TEST_TEMP ($name+'.zip')))){throw 'valid native save rejected'}
+            if(-not (& $completion (Join-Path $env:MIR_TEST_TEMP ($name+'.zip')))){throw 'valid native save rejected'}
           }
           foreach($name in @('missing','corrupt','wrong','empty')){
             if(Test-HistoricalFixtureSaveComplete (Join-Path $env:MIR_TEST_TEMP ($name+'.zip'))){throw 'invalid native save accepted'}
