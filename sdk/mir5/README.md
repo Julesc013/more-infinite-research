@@ -36,10 +36,21 @@ Run the current host controls with the explicit private Lua 5.2 runtime input:
 ```powershell
 python -B tests/mir5/test_api.py --lua-runtime-dir build/tmp/mir421-lua-runtime
 python -B tests/mir5/test_runtime_api.py --lua-runtime-dir build/tmp/mir421-lua-runtime
+python -B tests/mir5/test_sdk.py --lua-runtime-dir build/tmp/mir421-lua-runtime
 ```
 
-## Legacy consumer audit remains open
+`test_sdk.py` is a Lua host control that executes these small examples against the implemented data and runtime modules. It does not replace the independent consumer fixtures or establish Factorio-native qualification.
 
-The required and optional `examples/` trees are retained minimal public usage examples. They are not an audit of a real previous consumer. No MIR 4/MEP real-consumer inventory, preserved-field record, converter, adapter, or documented major-version transition has been implemented here. In particular, this draft does not reinterpret `MIR4ApiResponseV1` or historical MEP discovery data as MIR 5 input. Complete that audit before retiring an externally consumed old contract.
+## Published MIR 4 transition boundary
+
+The pinned MIR 4.7 F210 player archive shipped two conditional, unversioned runtime interfaces. `more-infinite-research-settings` was gated by `settings_profiles` and exposed `export_string(options)` and `validate_string(text)`: only strict `options.compact == true` changed export, a successful export returned an encoded string, failures returned `nil, error`, and validation returned either `{valid = true, recognized, invalid, unknown, import_setting}` or `{valid = false, error}`. `more-infinite-research-browser` was gated by `research_library` and exposed `open(player_index, options)`, whose recognized options were `mode` (1, 2, or 3), `search`, `tab` (`settings`, `research`, `queue`, `availability`, or `help`), `settings_scope` (`research` or `options`), `status` (1 through 4), `family`, `sort`, `selected`, `hidden`, and `page` (through the then-current catalogue limit); it returned whether the target player's browser root was open after rendering.
+
+## Current source bridge and remaining transition work
+
+Current MIR 5 control source collision-checks and registers both historical names, but this is a source and host-control bridge, not native or compatibility qualification. The settings facade retains the two method names, strict compact test, effective registered-setting export, metadata fields `mir_version`, `factorio_version`, and `import_setting`, and the validation count/result shape. It exports only the current MIR 5 registered settings through the MIRSET1 codec; it does not recreate the historical setting catalogue or apply a decoded profile.
+
+The browser bridge maps historical `search` to the current `query` and accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. `mode`, `tab`, and `settings_scope` have no current mapping. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
+
+No identified independent old consumer exists within the pinned source and archive search scope. The required and optional `examples/` trees are current MIR 5 public usage examples, not evidence of a previous consumer. MIR4 API-preview response fields and MEP envelope fields are developer-only historical preview shapes: MIR 5 neither emits nor imports them. The normative V0 removal obligation remains open and still requires accepted independent-consumer migration evidence plus an explicit later-release decision; this bridge does not satisfy or amend either gate.
 
 Read the [normative API contract](../../spec/mir5/api.md) for lifecycle and future-extension rules. The alpha and beta fixtures above remain the canonical current conformance consumers.

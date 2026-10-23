@@ -177,7 +177,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "canonical-host-tests",
-      "sha256": "13D5174E7B43878B6897CE98C2EF2C92B30F808512BB5B31385C6E97275328C0"
+      "sha256": "6C7BBA0028C20CC14303E61BB2727111FFE85B4990C1634561F93F57B32F42E7"
     },
     {
       "file": ".github/workflows/release-candidate.yml",
@@ -193,7 +193,7 @@
       "purpose": "ci",
       "surface": "public",
       "invocation": "public-mir-cli",
-      "sha256": "99D972861DAE6723236FAFF6F0EB81D1B0E4153C9810C8318E5EEEAD842CBBF1"
+      "sha256": "DD9E33731D0B581FCF8CD2A53C26222AAC9B5717560E2C12E2BFAE30543F8239"
     }
   ],
   "summary": {
@@ -219,5 +219,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8e0e249b8ab26885968b70ac2ffcfc4007eb746f9b2804b5b4b919b79daf5af0"
+  "digest": "sha256:64850ec9b07d984c4619f8d96668177721d5cb50a435a6f66e648e4ed0c3659b"
 }

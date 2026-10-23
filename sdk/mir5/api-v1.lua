@@ -35,6 +35,8 @@
 
 ---@alias MIRNativeTechnology table @A normal Factorio technology prototype table. MIR does not define a replacement prototype DSL.
 
+---@alias MIRNativeMaxLevel integer|string @A finite native maximum, or the native infinite marker when the active target exposes one.
+
 ---@class MIRResearchStatus
 ---@field name string
 ---@field force_index integer @Positive native uint32 force index.
@@ -42,7 +44,7 @@
 ---@field level integer @Finite native current technology level; not a derived completed-level count.
 ---@field enabled boolean
 ---@field saved_progress? number @Present only when the native field is available and finite.
----@field max_level integer @Finite native max level. On Factorio 2.1.23, 4294967295 is the native infinite maximum.
+---@field max_level MIRNativeMaxLevel @Native maximum. On Factorio 2.1.23, 4294967295 is the native infinite maximum.
 
 ---@class MIRDataApi
 ---@field get_version fun(): MIRApiVersion @Returns a fresh plain table.

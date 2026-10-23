@@ -143,7 +143,7 @@ def _normalise_selection(rows: Any, label: str, without_mir: bool) -> list[dict[
     return result
 
 
-def _read_capture(location: Path, expected_mir: bool) -> dict[str, Any]:
+def _read_capture(location: Path, expected_mir: bool, mir_custody: Path | None = None) -> dict[str, Any]:
     root = location.resolve()
     if not root.is_dir():
         raise ReplayError(f"capture directory is absent: {root}")
@@ -171,9 +171,13 @@ def _read_capture(location: Path, expected_mir: bool) -> dict[str, Any]:
         mir = _expect_mapping(mir, "published MIR archive")
         if mir.get("name") != "more-infinite-research" or not isinstance(mir.get("version"), str) or not mir["version"].startswith("4.7."):
             raise ReplayError("published capture must select an exact MIR 4.7 archive")
-        verified_mir = _external_record(mir, "published MIR archive")
+        # A direct-library selection is mutable between serial observations.
+        # An explicit retained archive may supply the exact recorded bytes;
+        # its hash still comes from the unchanged native receipt.
+        custody = {**mir, "path": str(mir_custody.resolve())} if mir_custody is not None else mir
+        verified_mir = _external_record(custody, "published MIR archive")
         verified_external.append(verified_mir)
-    elif mir is not None:
+    elif mir is not None or mir_custody is not None:
         raise ReplayError("no-MIR capture unexpectedly selected MIR")
 
     generated_selection = _expect_mapping(result.get("generated_selection"), "capture generated selection")
@@ -192,6 +196,10 @@ def _read_capture(location: Path, expected_mir: bool) -> dict[str, Any]:
 
     selected_records = _expect_list(result.get("selected_archives"), "selected archives")
     for index, selected_record in enumerate(selected_records, 1):
+        if selected_record.get("name") == "more-infinite-research" and mir_custody is not None:
+            if selected_record.get("sha256", "").upper() != mir["sha256"].upper():
+                raise ReplayError("selected MIR archive differs from capture MIR identity")
+            selected_record = {**selected_record, "path": str(mir_custody.resolve())}
         verified_external.append(_external_record(selected_record, f"selected archive {index}"))
     selected = _normalise_selection(selected_records, "selected archives", without_mir=True)
     loaded = result.get("loaded_selection")

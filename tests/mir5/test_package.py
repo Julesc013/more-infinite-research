@@ -1,6 +1,7 @@
 """Package boundary and reproducibility checks independent of research output."""
 import importlib.util
 import json
+import subprocess
 from pathlib import Path
 import tempfile
 import unittest
@@ -13,6 +14,34 @@ spec.loader.exec_module(pack)
 
 
 class PackageTests(unittest.TestCase):
+    def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            def git(*arguments):
+                return subprocess.check_output(["git", "-C", str(repository), *arguments])
+            git("init", "-q")
+            git("config", "user.name", "Package test")
+            git("config", "user.email", "package-test@example.invalid")
+            source = repository / "player"
+            source.mkdir()
+            (source / "info.json").write_text(json.dumps({"name": "test-fixture", "version": "0.1.0"}))
+            (source / "data.lua").write_bytes(b"return 'committed'\n")
+            git("add", ".")
+            git("commit", "-qm", "fixture")
+            commit = git("rev-parse", "HEAD").decode().strip()
+            (source / "data.lua").write_bytes(b"error('dirty')\r\n")
+            (source / "new.lua").write_text("error('untracked')")
+            output = repository / "package/test-fixture_0.1.0.zip"
+            record = pack.build(source, output, revision=commit)
+            self.assertEqual(record["source_commit"], commit)
+            with zipfile.ZipFile(output) as archive:
+                self.assertEqual(archive.read("test-fixture_0.1.0/data.lua"), b"return 'committed'\n")
+                self.assertNotIn("test-fixture_0.1.0/new.lua", archive.namelist())
+            self.assertEqual((source / "data.lua").read_bytes(), b"error('dirty')\r\n")
+            self.assertTrue((source / "new.lua").is_file())
+            with self.assertRaises(ValueError):
+                pack.build(repository, repository / "invalid/test-fixture_0.1.0.zip", revision=commit)
+
     def test_reproducible_members_and_fixture_version(self):
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)

@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "authored-adverse-native-scope-index-not-runner-receipt",
+  "status": "interrupted-native-preparation-not-prelaunch-refusal",
+  "runner_receipt": {
+    "path": "spec/mir5/evidence/menu-seed-preparation-adverse.json",
+    "sha256": "7CB36E190ED3CC0345A66F8BF03C58E81F6B635D04DD07186DFAA4FEDAA7A359"
+  },
+  "resource_ledger": {
+    "path": "build/tmp/mir5-menu-seed-preparation-r01/process-1.resources.jsonl",
+    "sha256": "0FFC840F6830663807743520651933123E038B24C26D7A4B7F477F7843D7BF6B",
+    "terminal_observation": {
+      "observed_at": "2026-10-23T02:22:18.2862999+00:00",
+      "phase": "interrupted",
+      "timed_out": false,
+      "error": "[mir441-resource-admission-commit]",
+      "resource_admission": {
+        "snapshot": {
+          "observed_at": "2026-10-23T02:22:17.7442934+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 5215657984,
+            "committed_bytes": 17131237376,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65848860672,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65848860672,
+            "total_bytes": 472446398464
+          }
+        },
+        "limits": {
+          "physical_bytes": 4294967296,
+          "commit_bytes": 3409536614,
+          "system_bytes": 21474836480,
+          "work_bytes": 21474836480
+        },
+        "estimated_peak_bytes": 33554432,
+        "expected_peak_memory_bytes": 67108864
+      },
+      "peak_working_set_bytes": 1261178880,
+      "peak_sampled_private_bytes": 3179360256
+    }
+  },
+  "observed": "The governed actor and its Factorio child started; the engine reached sprite loading, then commit reserve enforcement interrupted the process tree. No credential-free seed or responsive-menu sample was accepted. Library controls were restored.",
+  "performance_claimed": false,
+  "release_qualification": false
+}

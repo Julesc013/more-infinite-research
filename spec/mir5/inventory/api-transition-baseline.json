@@ -34,7 +34,8 @@
           "preserved_metadata_fields": [
             "mir_version",
             "factorio_version",
-            "import_setting"
+            "import_setting",
+            "export_mode"
           ]
         },
         "validate_string": {
@@ -74,6 +75,18 @@
             "hidden",
             "page"
           ],
+          "recognized_option_value_rules": {
+            "mode": "1, 2, or 3",
+            "search": "string, truncated by the shipped source to 160 characters and directed by the selected tab",
+            "tab": "settings, research, queue, availability, or help; availability selected the research tab with visibility 3",
+            "settings_scope": "research or options",
+            "status": "integral 1 through 4",
+            "family": "a string present in the target force's shipped catalogue",
+            "sort": "progression, native, name-asc, or name-desc",
+            "selected": "a string naming a technology in the target force",
+            "hidden": "accepted through the shipped hidden-set validator",
+            "page": "integral 1 through the then-current core.catalogue_limit"
+          },
           "result": "boolean: whether the player browser root is open after rendering",
           "side_effect": "updates the target player's stored browser view and renders its GUI"
         }
@@ -81,7 +94,50 @@
       "stability": "Player-shipped runtime surface, but the pinned source has no interface-version or stability declaration."
     }
   ],
+  "current_mir5_source_bridge": {
+    "status": "Source and host-control bridge present; native registration, consumer compatibility, and transition qualification remain pending.",
+    "registration_source": "source/mir5/runtime/bootstrap.lua:259-268 collision-checks and registers both historical names during control parse. It does not reproduce the MIR4 settings_profiles or research_library feature gates.",
+    "settings": {
+      "interface": "more-infinite-research-settings",
+      "members": [
+        "export_string",
+        "validate_string"
+      ],
+      "source": "source/mir5/runtime/settings_profile.lua:14-43; source/mir5/research/settings.lua:96-182",
+      "implemented_shape": "Non-table export options become {}; only compact == true selects compact export. Export uses effective current registered values, emits MIRSET1 through the current codec, and includes mir_version, factorio_version, and import_setting metadata. Validation is read-only and returns the historical valid/count/import_setting or invalid/error result shape.",
+      "bounded_difference": "The bridge exports only MIR5 registered settings and does not recreate the historical setting catalogue or apply a decoded profile."
+    },
+    "browser": {
+      "interface": "more-infinite-research-browser",
+      "members": [
+        "open"
+      ],
+      "source": "source/mir5/runtime/bootstrap.lua:105-146; source/mir5/runtime/library.lua:834-872",
+      "implemented_legacy_option_fields": {
+        "search": "Mapped to current query.",
+        "family": "Accepted only as all or mir.",
+        "status": "Accepted only as integral 1 through 4.",
+        "sort": "Accepted as progression, native, name-asc, or name-desc.",
+        "selected": "Accepted only after a bounded native-force technology lookup.",
+        "hidden": "Forwarded for Library validation.",
+        "page": "Accepted as integral 1 through 30000 and retained as the continuous UI page."
+      },
+      "unmapped_legacy_option_fields": [
+        "mode",
+        "tab",
+        "settings_scope"
+      ],
+      "result": "The bridge preserves the boolean open outcome. The old interface and the current bridge have no remote row/page response envelope; page-input equivalence is not established."
+    },
+    "not_implemented_or_qualified": [
+      "A converter or adapter for MIR4 API-preview response shapes or MEP envelopes.",
+      "An inventory or migration of independent external consumers.",
+      "Factorio-native proof that either interface registers and behaves compatibly for a selected profile.",
+      "A stable compatibility, deprecation, or removal promise."
+    ]
+  },
   "developer_sdk_and_mep": {
+    "transition_position": "These are developer-only historical preview shapes. They are neither a MIR5 emitted API nor accepted MIR5 import input, and this inventory does not authorise an adapter.",
     "location": "sdk/preview/mir4/ (excluded from the published player ZIP: no sdk/, preview/, or api/ members)",
     "api_v1": {
       "metadata_source": "sdk/preview/mir4/api-v1/package-metadata.json",
@@ -189,6 +245,18 @@
       },
       "v0_status": "Superseded compatibility input only; removal remains gated on accepted independent-consumer migration and an explicit later-release decision."
     }
+  },
+  "v0_removal_obligation": {
+    "status": "open",
+    "required_before_removal": [
+      "Accepted independent-consumer migration evidence.",
+      "An explicit later-release decision."
+    ],
+    "not_satisfied_by": [
+      "The current source bridge.",
+      "MIR-owned tests, conformance material, fixtures, or synthetic preview extensions.",
+      "This source-and-package recovery record."
+    ]
   },
   "known_repository_references": {
     "query_scope": "Exact-name text search of pinned source/ and tests/ only; generated outputs, package copies, and unrelated fixture trees were not treated as consumers.",

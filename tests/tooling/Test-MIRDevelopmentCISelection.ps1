@@ -116,8 +116,9 @@ $developmentLuaConsumers=@(
 )
 $developmentCurrentF210Consumer='static.f210-gunmetal-invar-direct-library'
 $developmentProfileIds=@($actualAssurance.profiles.'mir4-development'|ForEach-Object {[string]$_})
-Assert-MIRDevelopmentCISelection -Condition ($developmentProfileIds.Count -eq 51 -and
-  @($developmentProfileIds|Sort-Object -Unique).Count -eq 51) -Message 'Development profile must retain exactly fifty-one distinct hosted static controls.'
+Assert-MIRDevelopmentCISelection -Condition ($developmentProfileIds.Count -eq 52 -and
+  @($developmentProfileIds|Sort-Object -Unique).Count -eq 52) -Message 'Development profile must retain exactly fifty-two distinct hosted static controls.'
+Assert-MIRDevelopmentCISelection -Condition (@($developmentProfileIds|Where-Object {$_ -ceq 'static.mir5-host-controls'}).Count -eq 1) -Message 'Development profile omitted its MIR5 host-controls admission check.'
 Assert-MIRDevelopmentCISelection -Condition (@($developmentProfileIds|Where-Object {$_ -ceq $developmentCurrentF210Consumer}).Count -eq 1) -Message 'Development profile omitted its current F210 direct-library admission check.'
 foreach($consumerId in $developmentLuaConsumers) {
   Assert-MIRDevelopmentCISelection -Condition (@($developmentProfileIds|Where-Object {$_ -ceq $consumerId}).Count -eq 1) -Message "Development profile omitted its demonstrated Lua consumer: $consumerId"

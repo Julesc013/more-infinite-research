@@ -60,6 +60,24 @@ local major = type(version) == "string" and tonumber(version:match("^(%d+)")) or
 if major == 5 then
   local gear = data.raw.technology[gear_technology]
   if not gear or gear.type ~= "technology" then fail("MIR 5 did not create gear research") end
+  -- The original incident also named space science. A direct declaration must
+  -- accept the existing native item/prerequisite without discovering its
+  -- recipe-production or research-trigger dependency chain.
+  local api = require("__more-infinite-research__.api.v1.data")
+  local name = "mir-science-ambiguity-space-research"
+  local published = api.add_technology({
+    type = "technology", name = name,
+    icon = "__base__/graphics/technology/space-science-pack.png", icon_size = 256,
+    prerequisites = {"space-science-pack"},
+    unit = {count = 1, time = 1, ingredients = {{"space-science-pack", 1}}},
+    effects = {{type = "character-crafting-speed", modifier = 0.01}}
+  })
+  local research = data.raw.technology[name]
+  if published ~= name or not research
+      or research.prerequisites[1] ~= "space-science-pack"
+      or research.unit.ingredients[1][1] ~= "space-science-pack" then
+    fail("direct space-science declaration was not published intact")
+  end
 elseif major ~= 4 then
   fail("fixture requires a MIR 4.7+ or MIR 5 package")
 end

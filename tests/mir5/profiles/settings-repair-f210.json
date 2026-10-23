@@ -1,0 +1,7 @@
+{
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-settings-repair", "version": "0.1.0", "enabled": true}
+  ]
+}
