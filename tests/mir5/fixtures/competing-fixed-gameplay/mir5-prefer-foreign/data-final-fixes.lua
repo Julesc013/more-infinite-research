@@ -1,4 +1,5 @@
--- Captured false-preference remaining-MIR breeding row; accelerate only work.
+-- Capture all foreign rows before validating the remaining-MIR breeding row.
+require("foreign-data")
 local NAME = "recipe-prod-research_breeding-1"
 local INGREDIENTS = {
   {"automation-science-pack", 1}, {"logistic-science-pack", 1},

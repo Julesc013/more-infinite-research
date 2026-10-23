@@ -19,6 +19,7 @@ PROFILES = tuple(ROOT / "tests/mir5/profiles" / name for name in (
     "competing-fixed-mir5-prefer-mir-again-f200-sa-2077.json",
 ))
 FIXTURE_NAME = "mir-fixture-mir5-competing-fixed-gameplay"
+FOREIGN_DATA = FIXTURE / "foreign-data.lua"
 ALL = ("basic-plate-productivity", "electric-circuit-productivity", "advanced-circuit-productivity",
        "automation-science-productivity-4", "logistic-science-productivity-4", "military-science-productivity-4",
        "chemical-science-productivity-4", "production-science-productivity-4", "utility-science-productivity-4",
@@ -56,18 +57,31 @@ class CompetingFixedNativeFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
-function fixed_data(path, rows)
+local function fixture_require(env, path)
+  local loaded = false
+  return function(name)
+    if name ~= "foreign-data" then error("unexpected fixture module: " .. tostring(name)) end
+    if loaded then return true end
+    loaded = true
+    local chunk, message = loadfile(path, "t", env)
+    assert(chunk, message)
+    local result = chunk()
+    return result == nil and true or result
+  end
+end
+function fixed_data(path, foreign_data_path, rows)
   local raw={technology=rows,["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=true}}}
   local env={mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="4.7.20002",["plates-n-circuit-productivity"]="0.0.2",Science_packs_productivity="0.0.1",["bioflux-productivity"]="0.1.0",["fish-productivity"]="1.0.0"},data={raw=raw}}
-  env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+  env.require=fixture_require(env, foreign_data_path);env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local update=path:gsub("data%-final%-fixes%.lua$","settings-updates.lua")
   local chunk,message=loadfile(update,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result),raw=raw} end
   chunk,message=loadfile(path,"t",env);assert(chunk,message);ok,result=pcall(chunk);return {ok=ok,message=tostring(result),raw=raw}
 end
-function fixed_mir_data(path, fixture, preference, row)
-  local raw={technology={[row.name]=row},["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=preference}}}
+function fixed_mir_data(path, foreign_data_path, fixture, preference, row, foreign_rows)
+  local raw={technology=foreign_rows,["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=preference}}}
+  raw.technology[row.name]=row
   local env={mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["plates-n-circuit-productivity"]="0.0.2",Science_packs_productivity="0.0.1",["bioflux-productivity"]="0.1.0",["fish-productivity"]="1.0.0",["mir-fixture-mir5-competing-fixed-gameplay"]=fixture},data={raw=raw}}
-  env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+  env.require=fixture_require(env, foreign_data_path);env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local update=path:gsub("data%-final%-fixes%.lua$","settings-updates.lua")
   local chunk,message=loadfile(update,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result),raw=raw}end
   chunk,message=loadfile(path,"t",env);assert(chunk,message);ok,result=pcall(chunk);return {ok=ok,message=tostring(result),raw=raw}
@@ -192,13 +206,13 @@ end
         self.assertEqual(["biter-egg", "pentapod-egg"], [effect["recipe"] for effect in remaining["effects"]])
 
     def test_published_preflight_precedes_only_disposable_count_time_mutation(self):
-        result = self.lua.eval("fixed_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), lua_value(self.lua, self.selected_rows()))
+        result = self.lua.eval("fixed_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), str(FOREIGN_DATA), lua_value(self.lua, self.selected_rows()))
         self.assertTrue(result["ok"], result["message"]); rows = plain(result["raw"])["technology"]
         for name, expected in self.selected_rows().items():
             self.assertEqual((None, "1", 1), (rows[name]["unit"].get("count"), rows[name]["unit"]["count_formula"], rows[name]["unit"]["time"]))
             self.assertEqual(expected["effects"], rows[name]["effects"]); self.assertEqual(expected["prerequisites"], rows[name]["prerequisites"])
         bad = self.selected_rows(); bad["bioflux-productivity"]["effects"][0]["change"] = .2
-        result = self.lua.eval("fixed_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), lua_value(self.lua, bad))
+        result = self.lua.eval("fixed_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), str(FOREIGN_DATA), lua_value(self.lua, bad))
         self.assertFalse(result["ok"]); self.assertIn("bioflux-productivity effects changed", result["message"])
 
     def test_named_remaining_mir_breeding_preflight_distinguishes_true_and_false_effects(self):
@@ -208,15 +222,23 @@ end
                  ("mir5-prefer-foreign", "0.3.0", False, false, ["biter-egg", "pentapod-egg"]),
                  ("mir5-prefer-mir-again", "0.4.0", True, full, ["biter-egg", "fish-breeding", "pentapod-egg"]))
         for stage, fixture, preference, row, effects in cases:
-            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / stage / "data-final-fixes.lua"), fixture, preference, lua_value(self.lua, row))
+            result = self.lua.eval("fixed_mir_data")(str(FIXTURE / stage / "data-final-fixes.lua"), str(FOREIGN_DATA), fixture, preference, lua_value(self.lua, row), lua_value(self.lua, self.selected_rows()))
             self.assertTrue(result["ok"], result["message"])
-            actual = plain(result["raw"])["technology"]["recipe-prod-research_breeding-1"]
+            technologies = plain(result["raw"])["technology"]
+            actual = technologies["recipe-prod-research_breeding-1"]
             self.assertEqual((None, "1", 1), (actual["unit"].get("count"), actual["unit"]["count_formula"], actual["unit"]["time"]))
             self.assertEqual(effects, [effect["recipe"] for effect in actual["effects"]])
+            foreign_costs = {(foreign["unit"].get("count"), foreign["unit"]["count_formula"], foreign["unit"]["time"])
+                             for name, foreign in technologies.items() if name in self.selected_rows()}
+            self.assertEqual({(None, "1", 1)}, foreign_costs)
         bad = deepcopy(false); bad["effects"].append({"type": "change-recipe-productivity", "recipe": "fish-breeding", "change": .1})
-        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), "0.3.0", False, lua_value(self.lua, bad))
+        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), "0.3.0", False, lua_value(self.lua, bad), lua_value(self.lua, self.selected_rows()))
         self.assertFalse(result["ok"])
         self.assertIn("captured released MIR breeding effects count changed", result["message"])
+        foreign = self.selected_rows(); foreign["bioflux-productivity"]["effects"][0]["change"] = .2
+        result = self.lua.eval("fixed_mir_data")(str(FIXTURE / "mir5-prefer-foreign" / "data-final-fixes.lua"), str(FOREIGN_DATA), "0.3.0", False, lua_value(self.lua, false), lua_value(self.lua, foreign))
+        self.assertFalse(result["ok"])
+        self.assertIn("bioflux-productivity effects changed", result["message"])
 
     def test_controls_keep_parse_and_on_load_read_only(self):
         for stage, mir, fixture in (("published", "4.7.20002", "0.1.0"), ("mir5-prefer-mir", "5.0.20000", "0.2.0"), ("mir5-prefer-foreign", "5.0.20000", "0.3.0"), ("mir5-prefer-mir-again", "5.0.20000", "0.4.0")):
