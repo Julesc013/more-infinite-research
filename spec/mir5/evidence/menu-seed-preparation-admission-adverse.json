@@ -1,0 +1,13 @@
+{
+  "kind": "MIR5UntimedFreshMenuSeedPreparationV1",
+  "native": null,
+  "error": "[mir441-resource-admission-memory]",
+  "seed": null,
+  "seed_validation_error": "",
+  "pre_actor": null,
+  "claims": {
+    "performance": false,
+    "release": false
+  },
+  "controls_restored": false
+}
