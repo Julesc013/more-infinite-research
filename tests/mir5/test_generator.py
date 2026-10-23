@@ -170,7 +170,11 @@ class GeneratorTests(unittest.TestCase):
             if modern_catalogue.is_k2so(active_mods) then
               recipes["kr-iron-gear-wheel-from-enriched-iron"] = {}; recipes["kr-iron-gear-wheel-from-iron-ore"] = {}
             end
-            return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes}, writes = 0,
+            local lab_inputs = {}
+            for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
+            table.sort(lab_inputs)
+            return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes,
+              lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
           end
           function bound_output(active_mods, recipe_rows)
@@ -509,6 +513,42 @@ class GeneratorTests(unittest.TestCase):
           assert(environment.writes == 0, "native-owner failure emitted technologies")
           assert(environment.raw.technology["low-density-structure-productivity"].effects[1].change == .1,
             "native-owner failure applied an earlier owner patch")
+        ''')
+
+    def test_science_policy_is_applied_to_the_whole_owned_catalogue_before_publication(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          settings.startup["ips-require-space-gate"].value = true
+          settings.startup["mir-science-pack-ingredient-policy"].value = "space"
+          data = full_world(mods)
+          local foreign = setmetatable({}, {__index=function() error("foreign research inspected") end})
+          data.raw.technology["Space-Lab-Research-61"] = foreign
+          local reads = 0
+          local labs = data.raw.lab
+          data.raw.lab = setmetatable({}, {__pairs=function()
+            reads = reads + 1; return next,labs,nil
+          end})
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(reads == 1 and data.raw.technology["Space-Lab-Research-61"] == foreign)
+          for _, row in ipairs(data.emitted) do
+            local pack, gate = false, false
+            for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
+            for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
+            assert(pack and gate and row.enabled ~= false, row.name)
+          end
+        ''')
+
+    def test_lab_skip_retains_disabled_owned_identities_and_foreign_research(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          settings.startup["mir-lab-incompatibility-policy"].value = "skip"
+          data = full_world(mods)
+          data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
+          local foreign = {enabled=true,foreign=77}
+          data.raw.technology["foreign"] = foreign
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
+          assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
 
     def test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement(self):

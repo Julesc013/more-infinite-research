@@ -19,7 +19,7 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           spoilage_name = "recipe-prod-research_spoilage_preservation-1"
           function technology(name)
             return {name = name, level = 3, researched = false, enabled = false,
-              visible_when_disabled = true}
+              visible_when_disabled = true, prototype = {enabled = true}}
           end
           function force(index, technologies)
             return {index = index, valid = true, technologies = technologies,
@@ -261,6 +261,29 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           lifecycle.on_configuration_changed()
           assert(not item.enabled and item.visible_when_disabled)
           assert(current.owned_disabled[1] == nil and current.legacy_caps_checked)
+        ''')
+
+    def test_policy_disabled_generated_prototype_rejects_a_v3_enablement_right(self):
+        self.lua.execute('''
+          local policy_disabled = technology(gear_name)
+          policy_disabled.prototype.enabled = false
+          local old = legacy({gear_name}, {1})
+          boot({[1] = force(1, {[gear_name] = policy_disabled})}, old)
+          lifecycle.on_configuration_changed()
+          assert(not policy_disabled.enabled and policy_disabled.visible_when_disabled)
+          assert(storage.mir_caps.legacy_caps_checked
+            and storage.mir_caps.owned_disabled[1] == nil,
+            "policy-disabled prototype imported an old cap enablement right")
+
+          -- A normally enabled prototype still imports and restores the exact
+          -- published V3 right when the current cap is unlimited.
+          local ordinary = technology(gear_name)
+          local ordinary_old = legacy({gear_name}, {2})
+          boot({[2] = force(2, {[gear_name] = ordinary})}, ordinary_old)
+          lifecycle.on_configuration_changed()
+          assert(ordinary.enabled and not ordinary.visible_when_disabled)
+          assert(storage.mir_caps.legacy_caps_checked
+            and next(storage.mir_caps.owned_disabled) == nil)
         ''')
 
     def test_scripted_families_import_their_exact_rights_and_a_disabled_family_cannot_reclaim_them(self):

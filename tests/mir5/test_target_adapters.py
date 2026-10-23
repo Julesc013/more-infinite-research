@@ -108,6 +108,10 @@ class TargetAdapterTests(unittest.TestCase):
                 unit={count=row.expected_previous_count, time=time},
                 max_level=continuation.numeric and nil or row.level - 2}
             end
+            local lab_inputs = {}
+            for name in pairs(raw.tool) do lab_inputs[#lab_inputs + 1] = name end
+            table.sort(lab_inputs)
+            raw.lab = {fixture={inputs=lab_inputs}}
             local stage = {raw=raw, writes=0}
             function stage:extend(rows)
               self.writes = self.writes + 1
@@ -152,6 +156,7 @@ class TargetAdapterTests(unittest.TestCase):
           local adapter = load_adapter("data-final-fixes", target("f013", false, false))
           adapter.apply()
           assert(data.writes == 1 and data.raw.technology["recipe-prod-research_cannon_shooting_speed-1"] == nil)
+          assert(data.raw.technology["recipe-prod-research_rocket_shooting_speed-1"].enabled ~= false)
           assert(data.raw.technology["recipe-prod-research_rocket_shooting_speed-1"].unit.count == 60)
           assert(data.raw.technology["inserter-capacity-bonus-8"].unit.count == 914489)
           assert(data.raw.technology["worker-robots-storage-4"].unit.count_formula == nil)
@@ -173,6 +178,7 @@ class TargetAdapterTests(unittest.TestCase):
           adapter.apply()
           local laser = data.raw.technology["laser-shooting-speed-8"]
           assert(data.writes == 1 and laser and laser.level == 8 and laser.max_level == "infinite")
+          assert(laser.enabled ~= false)
           assert(laser.unit.count_formula == "1*(1025.15625*1.5^(L-8))")
           assert(data.raw.technology["worker-robots-speed-6"] == nil)
           local continuations = 0

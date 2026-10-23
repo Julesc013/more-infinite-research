@@ -19,6 +19,9 @@ function M.apply()
   local technologies = historical_direct.technologies(target.id, values, stage.raw)
   local continuations = historical_continuations.technologies(target.id, values, stage.raw)
   for index = 1, #continuations do technologies[#technologies + 1] = continuations[index] end
+  require("research.science").apply_family(technologies, nil, {
+    options=values.options, raw=stage.raw, target=target, mods=rawget(_G, "mods"), log=rawget(_G, "log"),
+  })
   generator.install(technologies, stage)
 end
 

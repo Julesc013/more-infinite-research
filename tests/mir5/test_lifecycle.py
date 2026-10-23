@@ -17,7 +17,8 @@ class LifecycleTests(unittest.TestCase):
 
           function technology(name, level, enabled)
             return {name = name, level = level, researched = false,
-              enabled = enabled ~= false, visible_when_disabled = false}
+              enabled = enabled ~= false, visible_when_disabled = false,
+              prototype = {enabled = true}}
           end
 
           function force(index, technologies, queue, current, progress)
@@ -155,6 +156,45 @@ class LifecycleTests(unittest.TestCase):
           handlers.configuration()
           assert(native.enabled and not native.visible_when_disabled and storage.mir_caps == nil,
             "unlimited agricultural setting did not restore only its own cap transition")
+        ''')
+
+    def test_policy_disabled_generated_prototype_cannot_restore_mir_owned_cap_state(self):
+        self.lua.execute('''
+          local name = "recipe-prod-research_gears-1"
+          local policy_disabled = technology(name, 2, false)
+          policy_disabled.visible_when_disabled = true
+          policy_disabled.prototype.enabled = false
+          local f = force(34, {[name] = policy_disabled}, {}, nil, nil)
+          local saved = {mir_caps = {schema = 1, owned_disabled = {
+            [34] = {[name] = {disabled = true, visible_when_disabled = false}}
+          }}}
+
+          -- Full reconciliation must discard a stale cap right rather than
+          -- turning a data-stage lab/science disablement back on.
+          boot({[34] = f}, 0, "", saved)
+          handlers.configuration()
+          assert(not policy_disabled.enabled and policy_disabled.visible_when_disabled
+            and storage.mir_caps == nil)
+
+          -- The named research-event path applies the same admission rule.
+          saved = {mir_caps = {schema = 1, owned_disabled = {
+            [34] = {[name] = {disabled = true, visible_when_disabled = false}}
+          }}}
+          boot({[34] = f}, 2, "", saved)
+          policy_disabled.force = f
+          handlers.events[defines.events.on_research_reversed]({research = policy_disabled})
+          assert(not policy_disabled.enabled and storage.mir_caps == nil)
+
+          -- A true prototype default retains normal cap-right restoration.
+          local cap_owned = technology(name, 2, false)
+          cap_owned.visible_when_disabled = true
+          local true_default = force(35, {[name] = cap_owned}, {}, nil, nil)
+          saved = {mir_caps = {schema = 1, owned_disabled = {
+            [35] = {[name] = {disabled = true, visible_when_disabled = false}}
+          }}}
+          boot({[35] = true_default}, 0, "", saved)
+          handlers.configuration()
+          assert(cap_owned.enabled and not cap_owned.visible_when_disabled and storage.mir_caps == nil)
         ''')
 
     def test_full_base_limits_are_precomputed_and_research_callbacks_touch_only_the_named_family(self):
@@ -440,7 +480,8 @@ class LifecycleTests(unittest.TestCase):
             return value
           end
           local admitted = native_tail(11, true)
-          local f = force(12, {[owner] = admitted}, {}, nil, nil)
+          local gear = technology("recipe-prod-research_gears-1", 1, true)
+          local f = force(12, {[owner] = admitted, [gear.name] = gear}, {}, nil, nil)
           admitted.force = f
           boot({[12] = f}, 0, "", nil, nil, 10)
           local lifecycle = require("runtime.lifecycle")

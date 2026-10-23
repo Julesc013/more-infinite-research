@@ -48,6 +48,11 @@ if type(mods) == "table" and mods["space-age"] ~= nil
   for index = 1, #scripted do technologies[#technologies + 1] = scripted[index] end
 end
 
+-- One lab/science view serves this complete owned catalogue. Native owners
+-- and foreign research are outside this detached publication boundary.
+require("research.science").apply_family(technologies, nil, {
+  options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
+})
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)
