@@ -172,7 +172,8 @@ local function assert_earned_source(state,label)
   assert_frozen(state)
 end
 local function assert_true(state)
-  assert_earned_source(state,'preferred')
+  assert_source_witness(state)
+  assert_frozen(state)
   local player=game.forces.player
   if state.mir_actual_labs~=2 then fail('preferred MIR actual lab witness differs') end
   assert_status(player,MIR_BIOFLUX,{level=2,researched=false,enabled=true,visible=false,maximum=UINT32_MAX,saved=0},'preferred MIR bioflux')
@@ -241,15 +242,19 @@ local function assert_readded(state)
 end
 local function marker(stage,state)
   local player,foreign=game.forces.player,game.forces[state.foreign_force_index]
+  -- Published false preference has no MIR bioflux or new signed carriers.
+  -- Phase assertions require their presence once MIR5 introduces them.
+  local bioflux,positive,negative=optional(player,MIR_BIOFLUX),optional(player,POSITIVE),optional(player,NEGATIVE)
+  local foreign_bioflux=optional(foreign,MIR_BIOFLUX)
   log('[MIR5_NATIVE_FIXTURE] REMOVAL_OBSERVATION '..helpers.table_to_json(removed_observation(foreign)))
   log('[MIR5_NATIVE_FIXTURE] RESULT '..helpers.table_to_json({stage=stage,case=CASE,status='passed',qualification='native-runner-readback-required',witnesses={
     source_actual_provider_labs=state.source_actual_labs,mir_actual_labs=state.mir_actual_labs,phase=state.phase,
     native_current=queue_snapshot(player).current,native_current_progress=queue_snapshot(player).progress,
-    native_tail_saved=technology(player,PLAYER_TAIL).saved_progress,mir_bioflux_next=technology(player,MIR_BIOFLUX).level,
-    mir_breeding_next=technology(player,MIR_BREEDING).level,credit_positive_next=technology(player,POSITIVE).level,
-    credit_negative_next=technology(player,NEGATIVE).level,bioflux_bonus=recipe_bonus(player,'bioflux'),fish_bonus=recipe_bonus(player,'fish-breeding'),
+    native_tail_saved=technology(player,PLAYER_TAIL).saved_progress,mir_bioflux_next=bioflux and bioflux.level or false,
+    mir_breeding_next=technology(player,MIR_BREEDING).level,credit_positive_next=positive and positive.level or false,
+    credit_negative_next=negative and negative.level or false,bioflux_bonus=recipe_bonus(player,'bioflux'),fish_bonus=recipe_bonus(player,'fish-breeding'),
     biter_bonus=recipe_bonus(player,'biter-egg'),pentapod_bonus=recipe_bonus(player,'pentapod-egg'),
-    foreign_mir_bioflux_disabled=technology(foreign,MIR_BIOFLUX).enabled==false,on_load_read_only=stage=='reload',
+    foreign_mir_bioflux_disabled=foreign_bioflux ~= nil and foreign_bioflux.enabled==false,on_load_read_only=stage=='reload',
   }}))
 end
 local function complete_phase(state)

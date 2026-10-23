@@ -70,9 +70,32 @@ function removal_parse(path)
   local callbacks,reads={events={}},{}
   local env={script={on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_event=function(e,f)callbacks.events[e]=f end,active_mods={base='2.0.77',['space-age']='2.0.77',['more-infinite-research']='5.0.20000',['mir-fixture-mir5-fixed-provider-removal-control']='0.5.0'}},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
   env._G=env;setmetatable(env,{__index=function(_,key)if key=='game' or key=='storage' or key=='settings' then reads[key]=(reads[key]or 0)+1 end;return _G[key]end})
-  local chunk,message=loadfile(path,'t',env);assert(chunk,message);local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
+  local chunk,message=loadfile(path,'t',env);assert(chunk,message);local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads,env=env}
+end
+function published_removal_marker(path)
+  local loaded=removal_parse(path);assert(loaded.ok,loaded.message)
+  local env=loaded.env
+  local player={technologies={['laser-shooting-speed-1']={name='laser-shooting-speed-1',saved_progress=.42},['recipe-prod-research_breeding-1']={name='recipe-prod-research_breeding-1',level=1}},recipes={},research_queue={},research_progress=.27}
+  for _,name in ipairs({'bioflux','fish-breeding','biter-egg','pentapod-egg'})do player.recipes[name]={productivity_bonus=.1} end
+  local foreign={technologies={},research_queue={},research_progress=.27}
+  env.game={forces={player=player,[4]=foreign}}
+  env.helpers={table_to_json=function(value)env.last_encoded=value;return '{}'end};env.log=function()end
+  for index=1,40 do
+    local name,callback=debug.getupvalue(loaded.callbacks.events[1],index)
+    if name=='marker' then callback('initial',{foreign_force_index=4,source_actual_labs=2,mir_actual_labs=0,phase='source-completed'});return env.last_encoded.witnesses end
+    if name==nil then break end
+  end
+  error('fixture marker callback is absent')
 end
 ''')
+
+    def test_published_marker_records_absent_new_mir_rows_without_fabricating_them(self):
+        value = self.lua.eval('published_removal_marker')(str(FIXTURE / 'control.lua'))
+        self.assertFalse(value['mir_bioflux_next'])
+        self.assertFalse(value['credit_positive_next'])
+        self.assertFalse(value['credit_negative_next'])
+        self.assertEqual(1, value['mir_breeding_next'])
+        self.assertEqual(2, value['source_actual_provider_labs'])
 
     def source_rows(self):
         bioflux = deepcopy(self.providers['bioflux']['arms']['upstream']['provider_rows']['bioflux-productivity'])
