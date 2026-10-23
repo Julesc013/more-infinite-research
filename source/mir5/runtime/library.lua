@@ -85,6 +85,7 @@ local function local_view(raw)
     schema = SCHEMA,
     query = text(raw.query),
     family = raw.family == "all" and "all" or "mir",
+    status = raw.status,
     selected = technology_id(raw.selected),
     location = location(raw.location),
     scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
@@ -94,11 +95,13 @@ local function local_view(raw)
   local normalized = library_model.normalize({
     search = value.query,
     family = value.family,
+    status = value.status,
     selected = value.selected
   })
   if type(normalized) == "table" then
     value.query = text(normalized.search or value.query)
     value.family = normalized.family == "mir" and "mir" or "all"
+    value.status = type(normalized.status) == "number" and normalized.status or 1
     value.selected = type(normalized.selected) == "string" and normalized.selected or nil
   end
   return value
@@ -193,6 +196,7 @@ local function legacy_view_as_private(value)
   return local_view({
     query = value.search,
     family = value.family,
+    status = value.status,
     selected = value.selected,
     location = value.location,
     scroll = value.scroll
@@ -255,6 +259,7 @@ local function model_view(view)
   return library_model.normalize({
     search = view.query,
     family = view.family,
+    status = view.status,
     selected = view.selected
   })
 end
@@ -344,15 +349,37 @@ local function detail_lines(parent, row, detail)
 
   add(parent, {type = "label", name = PREFIX .. "detail_title", caption = caption(row)})
   add(parent, {type = "label", name = PREFIX .. "detail_family", caption = {"mir-browser.family", row.family or "mir"}})
+  local context = add(parent, {type = "flow", name = PREFIX .. "detail_context", direction = "vertical"})
+  local status_key = {
+    ready = "mir-browser.status-ready",
+    locked = "mir-browser.status-locked",
+    queued = "mir-browser.status-queued",
+    missing = "mir-browser.status-missing"
+  }
+  add(context, {type = "label", name = PREFIX .. "context_status", caption = {"mir-browser.context-status", {status_key[row.status] or "mir-browser.detail-unavailable"}}})
+  if row.current == true then
+    add(context, {type = "label", name = PREFIX .. "context_current", caption = {"mir-browser.context-current"}})
+  elseif type(row.queued_count) == "number" and row.queued_count > 0 then
+    add(context, {type = "label", name = PREFIX .. "context_queued", caption = {"mir-browser.context-queued"}})
+  else
+    add(context, {type = "label", name = PREFIX .. "context_not_queued", caption = {"mir-browser.context-not-queued"}})
+  end
+  if type(row.queued_count) == "number" and row.queued_count > 0 then
+    add(context, {type = "label", name = PREFIX .. "context_queue_count", caption = {"mir-browser.context-queue-count", row.queued_count}})
+    if type(row.queue_index) == "number" and row.queue_index > 0 then
+      add(context, {type = "label", name = PREFIX .. "context_queue_position", caption = {"mir-browser.context-queue-position", row.queue_index}})
+    end
+  end
+  add(context, {type = "label", name = PREFIX .. "context_queue_guidance", caption = {"mir-browser.native-queue-guidance"}})
   if row.cap and row.cap > 0 then
     add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level-cap", row.current_level or 1, row.cap}})
-    add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"", {"mir-browser.setting-max-level"}, ": ", tostring(row.cap_setting or row.cap)}})
+    add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-finite", row.cap, tostring(row.cap_setting or "?")}})
   else
     add(parent, {type = "label", name = PREFIX .. "detail_level", caption = {"mir-browser.level", row.current_level or 1}})
     if row.cap_state == "unlimited" then
-      add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"", {"mir-browser.setting-max-level"}, ": ", {"mir-browser.setting-unlimited"}}})
+      add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-unlimited"}})
     elseif row.cap_state == "unavailable" then
-      add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.detail-unavailable", {"mir-browser.setting-max-level"}}})
+      add(parent, {type = "label", name = PREFIX .. "detail_cap", caption = {"mir-browser.cap-unavailable"}})
     end
   end
   if type(detail) == "table" and detail.cost ~= nil then
@@ -415,6 +442,8 @@ local function create_frame(player, view)
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
   add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
   add(filters, {type = "drop-down", name = PREFIX .. "family", items = {{"mir-browser.scope-all"}, {"mir-browser.scope-mir"}}, selected_index = view.family == "mir" and 2 or 1})
+  add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status})
   add(frame, {type = "flow", name = PREFIX .. "content", direction = "vertical"})
   return frame
 end
@@ -437,6 +466,8 @@ local function render(player, view, context, preserve_query)
   if valid(query) and not preserve_query then query.text = view.query end
   local family = valid(filters) and filters[PREFIX .. "family"] or nil
   if valid(family) then family.selected_index = view.family == "mir" and 2 or 1 end
+  local status = valid(filters) and filters[PREFIX .. "status"] or nil
+  if valid(status) then status.selected_index = view.status end
   update_content(frame, player, view, context)
   set_shortcut(player, true)
   return frame
@@ -507,6 +538,15 @@ function M.on_gui_selection_state_changed(event)
     }) then return end
     local view = view_for(player.index)
     view.family = element.selected_index == 2 and "mir" or "all"
+    view.scroll = 1
+    render(player, view)
+  elseif element.name == PREFIX .. "status" then
+    if not owns_element(player, element, {
+      PREFIX .. "status", PREFIX .. "filters", ROOT
+    }) then return end
+    local view = view_for(player.index)
+    local status = element.selected_index
+    view.status = type(status) == "number" and status >= 1 and status <= 4 and math.floor(status) == status and status or 1
     view.scroll = 1
     render(player, view)
   elseif element.name == PREFIX .. "results" then

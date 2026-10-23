@@ -7,11 +7,67 @@
 local lifecycle = require("runtime.lifecycle")
 local library = require("runtime.library")
 local runtime_api = require("api.v1.runtime")
+local settings_profile = require("runtime.settings_profile")
+local settings_commands = require("runtime.settings_commands")
+local passive_repair = require("runtime.passive_repair")
+local effective = require("runtime.configuration")
+local repair_config = {enabled = effective.passive_repair_enabled == true}
 
 local M = {}
 
 local API_INTERFACE = "more-infinite-research.api.v1"
 local BROWSER_INTERFACE = "more-infinite-research-browser"
+local SETTINGS_INTERFACE = "more-infinite-research-settings"
+local repair_scheduled
+local on_repair_tick
+
+-- Keep the shipped unversioned bucket in place, including saved LuaEntity
+-- references. Neither a closed Library nor a disabled fresh feature allocates
+-- this namespace; unrelated historical MIR fields stay with their owner.
+local function repair_state(read_only)
+  local namespace = storage.mir
+  if namespace ~= nil and type(namespace) ~= "table" then
+    if read_only then return nil end
+    error("MIR invalid saved namespace")
+  end
+  local value = namespace and namespace.passive_repair
+  if value ~= nil and type(value) ~= "table" then
+    if read_only then return nil end
+    error("MIR invalid passive repair state")
+  end
+  return value
+end
+
+local function save_repair_state(value)
+  if value == nil then return end
+  if storage.mir == nil then storage.mir = {} end
+  storage.mir.passive_repair = value
+end
+
+local function schedule_repair(needed)
+  needed = needed == true
+  if repair_scheduled == needed then return end
+  script.on_nth_tick(passive_repair.repair_interval_ticks, needed and on_repair_tick or nil)
+  repair_scheduled = needed
+end
+
+local function reconcile_repair()
+  local value, facts = passive_repair.reconcile(repair_config, repair_state())
+  save_repair_state(value)
+  schedule_repair(facts.needs_schedule)
+end
+
+local function on_entity_damaged(event)
+  local value, facts = passive_repair.on_entity_damaged(game, repair_config, repair_state(), event)
+  save_repair_state(value)
+  schedule_repair(facts.needs_schedule)
+end
+
+on_repair_tick = function(event)
+  local value, facts = passive_repair.on_nth_tick(game, repair_config, repair_state(), event)
+  save_repair_state(value)
+  schedule_repair(facts.needs_schedule)
+end
 
 local function valid(value)
   return value ~= nil and value.valid ~= false
@@ -68,21 +124,34 @@ local function add_command()
     local player = player_for(event and event.player_index)
     if player then library.open(player) end
   end)
+  commands.add_command("mir-settings-export",
+    "Export the current effective MIR startup settings to script-output/more-infinite-research/settings/<name>.txt. Use --compact to omit defaults.",
+    settings_commands.export)
+  commands.add_command("mir-settings-import-check",
+    "Validate a MIR settings profile string before pasting it into the mir-settings-profile-import startup setting.",
+    settings_commands.validate)
 end
 
 local function on_init()
   lifecycle.on_init()
   library.on_init()
+  reconcile_repair()
 end
 
 local function on_configuration_changed(event)
   lifecycle.on_configuration_changed(event)
   library.on_configuration_changed(event)
+  reconcile_repair()
 end
 
 local function on_load()
   lifecycle.on_load()
   library.on_load()
+  -- No save writes or game access on load. Each joining client reconstructs
+  -- the same conditional subscription from the retained queue.
+  -- The shipped unversioned reader treated malformed legacy buckets as
+  -- absent. Retain them unchanged here; writable boundaries still reject them.
+  schedule_repair(passive_repair.on_load(repair_config, repair_state(true)).needs_schedule)
 end
 
 function M.register()
@@ -94,6 +163,10 @@ function M.register()
     get_research = runtime_api.get_research
   }, "API")
   register_interface(BROWSER_INTERFACE, {open = open_browser}, "Research Library")
+  register_interface(SETTINGS_INTERFACE, {
+    export_string = settings_profile.export_string,
+    validate_string = settings_profile.validate_string
+  }, "Settings profile")
   add_command()
 
   if script and type(script.on_init) == "function" then script.on_init(on_init) end
@@ -103,6 +176,11 @@ function M.register()
   if script and type(script.on_load) == "function" then script.on_load(on_load) end
 
   local events = defines and defines.events or {}
+  schedule_repair(false)
+  if events.on_entity_damaged then
+    script.on_event(events.on_entity_damaged, repair_config.enabled and on_entity_damaged or nil,
+      repair_config.enabled and {{filter = "type", type = "wall"}, {filter = "type", type = "gate", mode = "or"}} or nil)
+  end
   if lifecycle.caps_active() then
     if events.on_force_created then script.on_event(events.on_force_created, lifecycle.on_force_created) end
     if events.on_force_reset then script.on_event(events.on_force_reset, lifecycle.on_force_reset) end

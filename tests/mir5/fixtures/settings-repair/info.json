@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-settings-repair",
+  "version": "0.1.0",
+  "title": "MIR 5 private settings and passive-repair fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world observation for the MIR settings profile and passive repair slices.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

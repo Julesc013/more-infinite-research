@@ -20,10 +20,26 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
-          function install_modules(caps_enabled)
+          function install_modules(caps_enabled, repair_enabled)
             CAP_ACTIVE = caps_enabled == true
+            REPAIR_ACTIVE = repair_enabled == true
             lifecycle_calls = {}
             library_calls = {}
+            package.preload["research.settings"] = function()
+              return {resolve = function() return {passive_repair_enabled = REPAIR_ACTIVE} end}
+            end
+            package.preload["runtime.settings_profile"] = function()
+              return {
+                export_string = function(options) return "exported-profile", options end,
+                validate_string = function(text) return {valid = text == "valid-profile"} end
+              }
+            end
+            package.preload["runtime.settings_commands"] = function()
+              return {
+                export = function(command) library_calls.profile_export = command end,
+                validate = function(command) library_calls.profile_validate = command end
+              }
+            end
             package.preload["runtime.lifecycle"] = function()
               return {
                 cap_limits = function(force)
@@ -73,7 +89,9 @@ class BootstrapTests(unittest.TestCase):
           end
 
           function install_runtime(foreign_interfaces)
-            handlers = {events = {}}
+            handlers = {events = {}, filters = {}, nth = {}, nth_calls = 0}
+            settings = {startup = {}}
+            storage = {}
             remote = {interfaces = foreign_interfaces or {}}
             remote.add_interface = function(name, members)
               remote.interfaces[name] = members
@@ -86,14 +104,21 @@ class BootstrapTests(unittest.TestCase):
               on_init = function(callback) handlers.init = callback end,
               on_configuration_changed = function(callback) handlers.configuration = callback end,
               on_load = function(callback) handlers.load = callback end,
-              on_event = function(id, callback) handlers.events[id] = callback end
+              on_event = function(id, callback, filters)
+                handlers.events[id], handlers.filters[id] = callback, filters
+              end,
+              on_nth_tick = function(interval, callback)
+                handlers.nth[interval] = callback
+                handlers.nth_calls = handlers.nth_calls + 1
+              end
             }
             defines = {events = {
               on_force_created = 1, on_force_reset = 2, on_forces_merged = 3,
               on_research_finished = 4, on_research_started = 5, on_research_cancelled = 6,
               on_lua_shortcut = 7, on_gui_text_changed = 8,
               on_gui_selection_state_changed = 9, on_gui_click = 10,
-              on_gui_location_changed = 11, on_gui_closed = 12, on_player_removed = 13
+              on_gui_location_changed = 11, on_gui_closed = 12, on_player_removed = 13,
+              on_entity_damaged = 14
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -104,9 +129,13 @@ class BootstrapTests(unittest.TestCase):
           function load_control()
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
+            package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.library"] = nil
             package.loaded["api.v1.runtime"] = nil
+            package.loaded["runtime.settings_profile"] = nil
+            package.loaded["runtime.settings_commands"] = nil
+            package.loaded["research.settings"] = nil
             return require("control")
           end
         ''')
@@ -119,6 +148,15 @@ class BootstrapTests(unittest.TestCase):
             and type(api.get_capabilities) == "function" and type(api.get_research) == "function")
           local browser = remote.interfaces["more-infinite-research-browser"]
           assert(type(browser) == "table" and type(browser.open) == "function")
+          local profiles = remote.interfaces["more-infinite-research-settings"]
+          assert(type(profiles.export_string) == "function" and type(profiles.validate_string) == "function")
+          assert(profiles.export_string({compact = true}) == "exported-profile")
+          assert(profiles.validate_string("valid-profile").valid == true)
+          assert(profiles.get_research == nil and profiles.apply == nil)
+          commands.registered["mir-settings-export"].callback({parameter = "--compact"})
+          commands.registered["mir-settings-import-check"].callback({parameter = "valid-profile"})
+          assert(library_calls.profile_export.parameter == "--compact")
+          assert(library_calls.profile_validate.parameter == "valid-profile")
           assert(commands.registered["mir-research"].help[1] == "mir-browser.command")
 
           assert(type(handlers.init) == "function" and type(handlers.configuration) == "function"
@@ -131,6 +169,7 @@ class BootstrapTests(unittest.TestCase):
           for id = 1, 6 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
+          assert(handlers.events[14] == nil and handlers.nth[60] == nil and storage.mir == nil)
           handlers.events[7]({player_index = 1})
           handlers.events[8]({player_index = 1})
           handlers.events[9]({player_index = 1})
@@ -183,6 +222,65 @@ class BootstrapTests(unittest.TestCase):
           ok, message = pcall(load_control)
           assert(not ok and tostring(message):find("MIR Research Library interface collision", 1, true))
           assert(remote.interfaces["more-infinite-research-browser"] == foreign_browser)
+
+          local foreign_settings = {}; install_modules(false)
+          install_runtime({["more-infinite-research-settings"] = foreign_settings})
+          ok, message = pcall(load_control)
+          assert(not ok and tostring(message):find("MIR Settings profile interface collision", 1, true))
+          assert(remote.interfaces["more-infinite-research-settings"] == foreign_settings)
+        ''')
+
+    def test_repair_subscribes_only_for_pending_work_and_preserves_native_rate(self):
+        self.lua.execute('''
+          install_modules(false, true); install_runtime(); load_control(); handlers.init()
+          assert(handlers.nth[60] == nil and storage.mir == nil)
+          local damage = handlers.events[14]
+          assert(type(damage) == "function" and #handlers.filters[14] == 2)
+          assert(handlers.filters[14][1].filter == "type" and handlers.filters[14][1].type == "wall")
+          assert(handlers.filters[14][2].type == "gate" and handlers.filters[14][2].mode == "or")
+          local owner = {valid = true, name = "player", index = 1}
+          game.forces = {player = owner}
+          local wall = {valid = true, type = "wall", unit_number = 1, force = owner,
+            surface = {index = 1}, health = 9, max_health = 10}
+          damage({entity = wall, tick = 0})
+          assert(#storage.mir.passive_repair.queue == 1 and type(handlers.nth[60]) == "function")
+          local registrations = handlers.nth_calls
+          damage({entity = wall, tick = 60})
+          assert(handlers.nth_calls == registrations and #storage.mir.passive_repair.queue == 1)
+          handlers.nth[60]({tick = 600})
+          assert(wall.health == 9 and type(handlers.nth[60]) == "function")
+          handlers.nth[60]({tick = 660})
+          assert(wall.health == 10 and handlers.nth[60] == nil)
+          assert(#storage.mir.passive_repair.queue == 0 and not storage.mir.passive_repair.scheduled)
+          for id = 1, 6 do assert(handlers.events[id] == nil) end
+        ''')
+
+    def test_repair_load_reconnects_without_save_writes_or_game_access_and_disable_clears(self):
+        self.lua.execute('''
+          install_modules(false, true); install_runtime(); load_control()
+          local members = {[7] = {retained = true}}
+          local queue = {7}
+          local bucket = {queue = queue, members = members, scheduled = false, unknown = "keep"}
+          storage.mir = {passive_repair = bucket, historical_other = "keep"}
+          game = setmetatable({}, {__index = function() error("on_load accessed game") end})
+          handlers.load()
+          assert(type(handlers.nth[60]) == "function")
+          assert(storage.mir.passive_repair == bucket and bucket.queue == queue and bucket.members == members)
+          assert(bucket.scheduled == false and bucket.unknown == "keep" and storage.mir.historical_other == "keep")
+
+          install_modules(false, false); remote.interfaces = {}; load_control()
+          assert(handlers.events[14] == nil and handlers.nth[60] == nil)
+          handlers.configuration({})
+          assert(storage.mir.passive_repair == bucket and #bucket.queue == 0 and next(bucket.members) == nil)
+          assert(bucket.scheduled == false and bucket.unknown == "keep" and storage.mir.historical_other == "keep")
+
+          storage.mir = "unversioned malformed namespace"
+          handlers.load()
+          assert(storage.mir == "unversioned malformed namespace" and handlers.nth[60] == nil)
+          storage.mir = {passive_repair = "unversioned malformed bucket", historical_other = "keep"}
+          handlers.load()
+          assert(storage.mir.passive_repair == "unversioned malformed bucket"
+            and storage.mir.historical_other == "keep" and handlers.nth[60] == nil)
         ''')
 
     def test_data_stage_emits_only_the_published_shortcut_identity(self):
@@ -205,11 +303,10 @@ class BootstrapTests(unittest.TestCase):
             and space_age.icon_size == 256)
         ''')
 
-    def test_bootstrap_has_no_late_module_loading_or_periodic_dispatch(self):
+    def test_bootstrap_has_no_late_module_loading_or_unconditional_tick_dispatch(self):
         source = (ROOT / "source/mir5/runtime/bootstrap.lua").read_text(encoding="utf-8")
         control = (ROOT / "source/mir5/control.lua").read_text(encoding="utf-8")
         self.assertNotIn("on_tick", source)
-        self.assertNotIn("on_nth_tick", source)
         self.assertNotIn("require(", source[source.index("function M.register"):])
         self.assertIn('require("runtime.bootstrap")', control)
         self.assertIn("remote.add_interface", control)

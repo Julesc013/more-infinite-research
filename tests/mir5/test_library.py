@@ -30,22 +30,44 @@ class LibraryTests(unittest.TestCase):
           end
 
           package.preload["presentation.library_model"] = function()
-            local function copy(row, technology, queue)
-              return {
+            local function copy(row, technology, queued_count, queue_index, current)
+              local result = {
                 id = row.id, name = row.name, family = row.family, finite = row.finite,
                 max_level = row.max_level, cap = row.cap, cap_setting = row.cap_setting,
+                cap_state = row.cap and "finite" or "unlimited",
                 current_level = technology and technology.level or 1,
                 researched = technology and technology.researched or false,
                 enabled = technology and technology.enabled or false,
                 visible = technology and technology.visible_when_disabled or false,
-                queued_count = queue and 1 or 0, prerequisites = {}
+                queued_count = queued_count, queue_index = queue_index, current = current,
+                prerequisites = {}
               }
+              if current or queued_count > 0 then result.status = "queued"
+              elseif result.enabled then result.status = "ready"
+              else result.status = "locked" end
+              return result
+            end
+            local function queue_facts(force, id)
+              local count, first = 0, nil
+              for index, queued in ipairs(force.research_queue or {}) do
+                local name = type(queued) == "table" and queued.name or queued
+                if name == id then
+                  count = count + 1
+                  if first == nil then first = index end
+                end
+              end
+              local current = force.current_research
+              local current_name = type(current) == "table" and current.name or current
+              return count, first, current_name == id
             end
             return {
               normalize = function(view)
+                local status = type(view.status) == "number" and view.status or 1
+                if status < 1 or status > 4 or status ~= math.floor(status) then status = 1 end
                 return {
                   query = type(view.search) == "string" and view.search or (type(view.query) == "string" and view.query or ""),
                   family = view.family == "mir" and "mir" or "all",
+                  status = status,
                   selected = type(view.selected) == "string" and view.selected or nil
                 }
               end,
@@ -56,9 +78,15 @@ class LibraryTests(unittest.TestCase):
                   local technology = force.technologies[row.id]
                   local name = string.lower(row.name)
                   local query = string.lower(view.query or view.search or "")
+                  local queued_count, queue_index, current = queue_facts(force, row.id)
+                  local copied = copy(row, technology, queued_count, queue_index, current)
                   if (view.family == "all" or row.family == view.family)
-                    and (query == "" or string.find(name, query, 1, true)) then
-                    output[#output + 1] = copy(row, technology, false)
+                    and (query == "" or string.find(name, query, 1, true))
+                    and (view.status == 1
+                      or (view.status == 2 and copied.status == "ready")
+                      or (view.status == 3 and copied.status == "locked")
+                      or (view.status == 4 and copied.status == "queued")) then
+                    output[#output + 1] = copied
                   end
                 end
                 return output
@@ -112,7 +140,12 @@ class LibraryTests(unittest.TestCase):
               researched = false, enabled = true, visible_when_disabled = false,
               prototype = {max_level = 3}}
             player = {valid = true, index = 1, gui = {screen = screen},
-              force = {technologies = {[gear.name] = gear, [foreign.name] = foreign}}}
+              force = {
+                technologies = {[gear.name] = gear, [foreign.name] = foreign},
+                research_queue = {gear}, current_research = gear, research_progress = .5,
+                add_research = function() error("Library must not add native research") end,
+                cancel_current_research = function() error("Library must not cancel native research") end
+              }}
             player.set_shortcut_toggled = function(name, value)
               player.shortcut_name, player.shortcut_toggled = name, value
             end
@@ -146,7 +179,8 @@ class LibraryTests(unittest.TestCase):
           library.on_lua_shortcut({prototype_name = "mir-research-browser", player_index = 1})
           local root = player.gui.screen["mir_research_browser"]
           assert(root and player.shortcut_name == "mir-research-browser" and player.shortcut_toggled)
-          assert(storage.mir_library.schema == 1 and storage.mir_library.players[1].query == "")
+          assert(storage.mir_library.schema == 1 and storage.mir_library.players[1].query == ""
+            and storage.mir_library.players[1].status == 1)
           library.on_gui_location_changed({player_index = 1, element = root,})
           root.location = {x = 91, y = 44}
           library.on_gui_location_changed({player_index = 1, element = root})
@@ -199,6 +233,47 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1] == nil)
         ''')
 
+    def test_status_filter_persists_read_only_queue_context_and_cap_explanation(self):
+        self.lua.execute('''
+          boot()
+          library.open(player)
+          local root = player.gui.screen["mir_research_browser"]
+          local status = root["mir_library_filters"]["mir_library_status"]
+          status.selected_index = 4
+          library.on_gui_selection_state_changed({player_index = 1, element = status})
+
+          root = player.gui.screen["mir_research_browser"]
+          local state = storage.mir_library.players[1]
+          assert(state.status == 4 and root["mir_library_filters"]["mir_library_status"].selected_index == 4)
+          local rows = root["mir_library_content"]["mir_library_results"]
+          assert(#rows.items == 1 and rows.items[1] == "Iron gear wheel productivity")
+          rows.selected_index = 1
+          library.on_gui_selection_state_changed({player_index = 1, element = rows})
+
+          root = player.gui.screen["mir_research_browser"]
+          local detail = root["mir_library_content"]["mir_library_detail"]
+          local context = detail["mir_library_detail_context"]
+          assert(context["mir_library_context_status"].caption[1] == "mir-browser.context-status")
+          assert(context["mir_library_context_current"].caption[1] == "mir-browser.context-current")
+          assert(context["mir_library_context_queue_count"].caption[1] == "mir-browser.context-queue-count"
+            and context["mir_library_context_queue_count"].caption[2] == 1)
+          assert(context["mir_library_context_queue_position"].caption[1] == "mir-browser.context-queue-position"
+            and context["mir_library_context_queue_position"].caption[2] == 1)
+          assert(context["mir_library_context_queue_guidance"].caption[1] == "mir-browser.native-queue-guidance")
+          assert(detail["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite")
+
+          local queue, current, progress = player.force.research_queue, player.force.current_research, player.force.research_progress
+          local saved = storage.mir_library
+          library.on_load()
+          assert(storage.mir_library == saved and storage.mir_library.players[1].status == 4)
+          library.close(player)
+          library.open(player)
+          root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_filters"]["mir_library_status"].selected_index == 4)
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress)
+        ''')
+
     def test_foreign_same_named_root_and_children_never_create_preferences_or_receive_callbacks(self):
         self.lua.execute('''
           boot()
@@ -206,6 +281,7 @@ class LibraryTests(unittest.TestCase):
           local filters = foreign.add{type = "flow", name = "mir_library_filters"}
           local query = filters.add{type = "textfield", name = "mir_library_query", text = "foreign text"}
           local family = filters.add{type = "drop-down", name = "mir_library_family", selected_index = 2}
+          local status = filters.add{type = "drop-down", name = "mir_library_status", selected_index = 4}
           local content = foreign.add{type = "flow", name = "mir_library_content"}
           local results = content.add{type = "list-box", name = "mir_library_results", selected_index = 1}
           local actions = content.add{type = "flow", name = "mir_library_actions"}
@@ -226,13 +302,14 @@ class LibraryTests(unittest.TestCase):
           query.text = "attempted mutation"
           library.on_gui_text_changed({player_index = 1, element = query})
           library.on_gui_selection_state_changed({player_index = 1, element = family})
+          library.on_gui_selection_state_changed({player_index = 1, element = status})
           library.on_gui_selection_state_changed({player_index = 1, element = results})
           library.on_gui_click({player_index = 1, element = close})
           library.on_gui_click({player_index = 1, element = open_native})
           library.on_gui_location_changed({player_index = 1, element = foreign})
           library.on_gui_closed({player_index = 1, element = foreign})
           assert(next(storage) == nil and foreign.valid)
-          assert(query.text == "attempted mutation" and family.selected_index == 2)
+          assert(query.text == "attempted mutation" and family.selected_index == 2 and status.selected_index == 4)
           assert(player.gui.screen["mir_research_browser"] == foreign and player.opened_technology == nil)
         ''')
 
@@ -262,7 +339,9 @@ class LibraryTests(unittest.TestCase):
           detail = root["mir_library_content"]["mir_library_detail"]
           assert(cap_calls == 2)
           assert(detail["mir_library_detail_level"].caption[1] == "mir-browser.level-cap")
-          assert(detail["mir_library_detail_cap"].caption[2][1] == "mir-browser.setting-max-level")
+          assert(detail["mir_library_detail_cap"].caption[1] == "mir-browser.cap-finite"
+            and detail["mir_library_detail_cap"].caption[2] == 2
+            and detail["mir_library_detail_cap"].caption[3] == "ips-max-level-research_gears")
           local ok = pcall(function() library.set_cap_provider("not a function") end)
           assert(not ok)
         ''')
@@ -327,7 +406,7 @@ class LibraryTests(unittest.TestCase):
 
           local state = storage.mir_library
           local view = state.players[1]
-          assert(view.query == "historical gear" and view.family == "all")
+          assert(view.query == "historical gear" and view.family == "all" and view.status == 2)
           assert(view.selected == gear.name and view.scroll == 6)
           -- The currently open published frame location wins over its stale
           -- persisted location, as the old browser itself did on close.
@@ -391,7 +470,7 @@ class LibraryTests(unittest.TestCase):
           library.on_configuration_changed()
 
           local view = storage.mir_library.players[1]
-          assert(view.query == "newer private query" and view.family == "mir")
+          assert(view.query == "newer private query" and view.family == "mir" and view.status == 1)
           assert(view.location.x == 7 and view.location.y == 8 and view.scroll == 3)
           assert(storage.mir_library.legacy_browser.players[1].family == "external")
           assert(foreign.valid and player.gui.screen["mir_research_browser"] == foreign)
@@ -406,6 +485,9 @@ class LibraryTests(unittest.TestCase):
         self.assertNotIn("prototypes.mir", source)
         self.assertNotIn("force.caps", source)
         self.assertNotIn("game.create_player", source)
+        self.assertNotIn("force.research_queue =", source)
+        self.assertNotIn("force.add_research", source)
+        self.assertNotIn("force.cancel_current_research", source)
 
 
 if __name__ == "__main__":

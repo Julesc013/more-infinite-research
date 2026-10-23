@@ -3,7 +3,6 @@
 -- authority for levels, completed effects, current research, and progress.
 local caps = require("runtime.caps")
 local native_owners = require("research.native_owners")
-local settings_catalogue = require("research.settings")
 
 local M = {}
 
@@ -12,15 +11,11 @@ local SCHEMA = 1
 local GEAR_TECHNOLOGY = require("research.catalogue").gear_id()
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
 
-local function report(message)
-  if type(log) == "function" then log(message) end
-end
-
 -- `settings` and `helpers` are runtime globals at control parse time.  Startup
 -- values cannot change during a loaded save, so this is one immutable native
 -- setting/profile resolution for this control instance rather than work on
 -- every research event.
-local effective_values = settings_catalogue.resolve(settings.startup, helpers, report)
+local effective_values = require("runtime.configuration")
 local GEAR_LIMIT = effective_values.max_level
 local WORKER_ROBOT_SPEED_LIMIT = effective_values.worker_robots_speed_max_level
 local CAPS_ACTIVE = GEAR_LIMIT > 0 or WORKER_ROBOT_SPEED_LIMIT > 0

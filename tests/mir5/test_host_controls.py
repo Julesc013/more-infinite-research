@@ -87,15 +87,18 @@ class HostControlsTests(unittest.TestCase):
         self.assertFalse(plan["native_execution"])
         controls = plan["controls"]
         paths = [row["path"] for row in controls]
-        self.assertEqual(len(paths), 19)
+        self.assertEqual(len(paths), 22)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_library.py", paths)
         self.assertIn("tests/mir5/test_library_model.py", paths)
+        self.assertIn("tests/mir5/test_passive_repair.py", paths)
+        self.assertIn("tests/mir5/test_settings_profile.py", paths)
+        self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:12]))
-        self.assertTrue(all(not row["lua"] for row in controls[12:]))
+        self.assertTrue(all(row["lua"] for row in controls[:15]))
+        self.assertTrue(all(not row["lua"] for row in controls[15:]))
 
     def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
         result = selections()
