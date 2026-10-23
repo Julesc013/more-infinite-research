@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-startup-hotfix-471",
+  "version": "0.1.0",
+  "title": "MIR 4.7.1 representative startup regression",
+  "author": "MIR maintainers",
+  "factorio_version": "2.1",
+  "dependencies": ["base >= 2.1.23", "more-infinite-research >= 4.7.21000"]
+}

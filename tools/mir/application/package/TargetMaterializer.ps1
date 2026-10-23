@@ -201,6 +201,7 @@ function Get-MIR4PrivatePatchPackageChangelogText {
       $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
     }
   } elseif ($SourceVersion -ceq '4.7.1') {
+    $normalized = Get-MIR4PrivatePatchPackageChangelogText -Changelog $normalized -DistributionVersion ("4.7.${targetCode}00") -SourceVersion '4.7.0' -MinimumFactorioVersion $MinimumFactorioVersion
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
     $entry += "  Bugfixes:`n    - Match foreign infinite technology effects before qualifying their science; retain qualification of matching owners.`n"
     $entry += "    - Bind independently seeded replacement recipes for declared named science sources when the named recipe is absent.`n"
