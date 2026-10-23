@@ -52,7 +52,8 @@ class ModernTargetTests(unittest.TestCase):
           assert(#molten == 2, "2.0 must retain the published lava-only effect scope")
           assert(existing.research_molten_metals.effects[3].recipe == "copper-ore-melting"
             and existing.research_molten_metals.effects[4].recipe == "iron-ore-melting")
-          assert(#catalogue.select({}).definitions == 46)
+          local base = catalogue.select({})
+          assert(#base.definitions == 47 and names(base.definitions).research_science_pack_productivity)
           for _, row in ipairs(historical.definitions) do
             for _, effect in ipairs(row.effects) do
               assert(effect.type ~= "cargo-landing-pad-count" and effect.type ~= "max-cargo-bay-unloading-distance")

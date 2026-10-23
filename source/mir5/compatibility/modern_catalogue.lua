@@ -441,6 +441,22 @@ function M.select(active_mods)
   local definitions, by_key = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
+  if target.id == "f200" and not active_space_age(active_mods) then
+    -- Published 2.0 Base includes the six craftable science recipes. There is
+    -- no corresponding 2.1 Base row; keep this actual target difference local.
+    definitions[#definitions + 1] = {
+      key="research_science_pack_productivity", family="research_science_pack_productivity", kind="productivity",
+      science="science_automation_logistic_chemical_production_military_utility", prerequisites={},
+      effects={{recipe="automation-science-pack",scale=1},{recipe="chemical-science-pack",scale=1},
+        {recipe="logistic-science-pack",scale=1},{recipe="military-science-pack",scale=1},
+        {recipe="production-science-pack",scale=1},{recipe="utility-science-pack",scale=1}},
+      icon="__base__/graphics/technology/space-science-pack.png", icon_size=256,
+      overlay="__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+      localised_name={"technology-name.more-infinite-research.research_science_pack_productivity"},
+      localised_description={"technology-description.more-infinite-research.recipe_productivity"},
+      order="p[research_science_pack_productivity]",
+    }
+  end
   if active_space_age(active_mods) then
     local delta
     definitions, delta = apply_space_age(definitions, by_key)

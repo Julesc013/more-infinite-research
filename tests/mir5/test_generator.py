@@ -945,6 +945,30 @@ class GeneratorTests(unittest.TestCase):
                     f"{profile}:{patch['name']}",
                 )
 
+    def test_f200_complete_technology_output_matches_its_own_published_oracle(self):
+        oracle = json.loads((ROOT / "spec/mir5/inventory/modern-f200-470.json").read_text(encoding="utf-8"))
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+          target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
+        ''')
+        for profile in oracle["profiles"]:
+            active_mods = {"base": "2.0.77"}
+            if profile["id"] == "space-age-f200":
+                active_mods["space-age"] = "2.0.77"
+            self.lua.globals().published_mods = lua_table(self.lua, active_mods)
+            self.lua.execute('''
+              mods = published_mods
+              package.loaded["research.settings"] = nil
+              config = require("research.settings")
+              settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+              assert(dofile(data_final_path) == nil)
+            ''')
+            expected = {row["name"]: host_row(row["row"])
+                        for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"}
+            actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
+            self.assertEqual(actual, expected, profile["id"])
+
     def test_effective_global_option_lazily_activates_prototype_limits(self):
         self.lua.execute('''
           local startup, environment = defaults(), full_world({})

@@ -1,0 +1,62 @@
+{
+  "baseline_receipt": {
+    "data_raw": {
+      "bytes": 13250907,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "BE65DC3615D5939E522B00543B2925A02CFA890DBC9C00882DFE1C4629670F60"
+    },
+    "mod_settings": {
+      "bytes": 5,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "DDC90D598D1720B207196690C35441CAEFE32A4E25535EDC93A80484C659D69E"
+    },
+    "result": {
+      "bytes": 6486,
+      "path": "result.json",
+      "sha256": "F64F6B437E52E1D112F614315E2E27597C5130274801E48869FC182BCD188B35"
+    },
+    "selection": {
+      "bytes": 110,
+      "path": "selection.json",
+      "sha256": "C5845AA0715554DEA759D4F05BFE5D7A3B6A1A72EC1A18094616B341E12D52D1"
+    }
+  },
+  "candidate_receipt": {
+    "data_raw": {
+      "bytes": 13355194,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "1108EA9AEE1855F8184DF6C225937B031E8E71FEBD4AB14842F8446C7BA054A2"
+    },
+    "mod_settings": {
+      "bytes": 737708,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "180D91B5AFBC95CD3F5D97EE352F06772A1ACAB384E7FD8153004493A3089EBC"
+    },
+    "result": {
+      "bytes": 7659,
+      "path": "result.json",
+      "sha256": "4A93C01E12DB8056EC7BFE7F8E06F1377F9B94CAC34A4DD28C44F6C85FCF5D12"
+    },
+    "selection": {
+      "bytes": 220,
+      "path": "selection.json",
+      "sha256": "08D21148F7AF9C01B360342E79AFC6388B7723F8FDFA5FA6731EB96A2FA3F639"
+    }
+  },
+  "differences": [
+    {
+      "domain": "data",
+      "names": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ],
+      "type": "technology"
+    }
+  ],
+  "inventory_sha256": "BF285A56864491DE95A6DF739586A1F6859D320EBE620E5E8615FA37DEA9A2D4",
+  "kind": "MIR5ModernCandidateComparisonV1",
+  "profile": "base-f200",
+  "reviewed_differences": [],
+  "schema": 2,
+  "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+  "status": "different-intended-native-output"
+}
