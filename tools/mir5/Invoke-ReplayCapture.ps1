@@ -10,6 +10,7 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [Parameter(Mandatory)][string]$ProfilePath,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [string]$ActiveModsObserver='',
   [ValidateRange(128,8192)][int]$ExpectedPeakMemoryMiB=384
 )
 $ErrorActionPreference='Stop'
@@ -44,7 +45,7 @@ $swapped=$false
 try{
   Set-ReplayLibraryArchive $replay $PublishedSha256 $ReplaySha256
   $swapped=$true
-  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60
+  & (Join-Path $PSScriptRoot 'Invoke-PrototypeCapture.ps1') -ArchiveLibrary $library -FactorioBin $FactorioBin -ProfilePath $ProfilePath -OutputRoot $OutputRoot -MIRArchive $destination -ExpectedMIRArchiveSha256 $ReplaySha256 -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -AdmissionWaitSeconds 60 -ActiveModsObserver $ActiveModsObserver
 }finally{
   if($swapped){Set-ReplayLibraryArchive $published $ReplaySha256 $PublishedSha256}
   Assert-Replay ((Get-ReplaySha $published) -ceq $PublishedSha256.ToUpperInvariant()) 'published custody changed'

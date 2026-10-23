@@ -2,8 +2,8 @@
 -- is limited to transitions made by runtime.caps; native research remains the
 -- authority for levels, completed effects, current research, and progress.
 local caps = require("runtime.caps")
+local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
-local settings_catalogue = require("research.settings")
 
 local M = {}
 
@@ -12,18 +12,15 @@ local SCHEMA = 1
 local GEAR_TECHNOLOGY = require("research.catalogue").gear_id()
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
 
-local function report(message)
-  if type(log) == "function" then log(message) end
-end
-
 -- `settings` and `helpers` are runtime globals at control parse time.  Startup
 -- values cannot change during a loaded save, so this is one immutable native
 -- setting/profile resolution for this control instance rather than work on
 -- every research event.
-local effective_values = settings_catalogue.resolve(settings.startup, helpers, report)
+local effective_values = require("runtime.configuration")
+local GEAR_ENABLED = effective_values.enabled ~= false
 local GEAR_LIMIT = effective_values.max_level
 local WORKER_ROBOT_SPEED_LIMIT = effective_values.worker_robots_speed_max_level
-local CAPS_ACTIVE = GEAR_LIMIT > 0 or WORKER_ROBOT_SPEED_LIMIT > 0
+local CAPS_ACTIVE = (GEAR_ENABLED and GEAR_LIMIT > 0) or WORKER_ROBOT_SPEED_LIMIT > 0
 
 local function existing_state()
   local value = storage[STORAGE_KEY]
@@ -44,7 +41,9 @@ local function ensure_state()
 end
 
 local function discard_empty_state(value)
-  if next(value.owned_disabled) == nil then storage[STORAGE_KEY] = nil end
+  if next(value.owned_disabled) == nil and value.legacy_caps_checked ~= true then
+    storage[STORAGE_KEY] = nil
+  end
 end
 
 local function valid_force(force)
@@ -70,7 +69,8 @@ local function worker_owner(force)
 end
 
 local function limits_for(force, include_worker, selected_owner, owner_resolved)
-  local limits = {[GEAR_TECHNOLOGY] = GEAR_LIMIT}
+  local limits = {}
+  if GEAR_ENABLED then limits[GEAR_TECHNOLOGY] = GEAR_LIMIT end
   if not valid_force(force) or (WORKER_ROBOT_SPEED_LIMIT == 0 and not include_worker) then
     return limits
   end
@@ -111,11 +111,30 @@ local function discard_unbound_worker_ownership(force, owned_disabled, owner)
   return owned
 end
 
-local function reconcile_force(force, owned_disabled)
+-- A disabled gear feature has no authority to restore prior cap writes. Drop
+-- any rows we previously owned without touching the native technology, so an
+-- administrator's explicit disablement cannot re-enable it during a profile
+-- or configuration transition.
+local function discard_disabled_gear_ownership(force, owned_disabled)
+  local owned = owned_disabled[force.index]
+  if GEAR_ENABLED or type(owned) ~= "table" then return owned end
+  owned[GEAR_TECHNOLOGY] = nil
+  if next(owned) == nil then
+    owned_disabled[force.index] = nil
+    return nil
+  end
+  return owned
+end
+
+local function reconcile_force(force, owned_disabled, selected_owner, owner_resolved)
   if not valid_force(force) then return end
   local owned = type(owned_disabled) == "table" and owned_disabled[force.index] or nil
+  if type(owned_disabled) == "table" then
+    owned = discard_disabled_gear_ownership(force, owned_disabled)
+  end
   local include_worker = WORKER_ROBOT_SPEED_LIMIT > 0 or has_worker_ownership(owned)
-  local owner = include_worker and worker_owner(force) or nil
+  local owner = selected_owner
+  if include_worker and not owner_resolved then owner = worker_owner(force) end
   if type(owned_disabled) == "table" and has_worker_ownership(owned) then
     owned = discard_unbound_worker_ownership(force, owned_disabled, owner)
   end
@@ -127,7 +146,13 @@ local function reconcile_force(force, owned_disabled)
   end
 end
 
-local function reconcile_all(clean_stale_forces)
+local function force_for_index(index)
+  local ok, force = pcall(function() return game.forces[index] end)
+  if ok then return force end
+  return nil
+end
+
+local function reconcile_all(clean_stale_forces, selected_owners)
   if not game or not game.forces then return end
   -- Unlimited startup settings need no state unless a previous finite setting
   -- left an ownership transition that has to be restored exactly once.
@@ -136,13 +161,92 @@ local function reconcile_all(clean_stale_forces)
   local owned_disabled = current.owned_disabled
   if clean_stale_forces then
     for index in pairs(owned_disabled) do
-      if not valid_force(game.forces[index]) then owned_disabled[index] = nil end
+      if not valid_force(force_for_index(index)) then owned_disabled[index] = nil end
     end
   end
   for _, force in pairs(game.forces) do
-    reconcile_force(force, owned_disabled)
+    local owner = valid_force(force) and selected_owners and selected_owners[force.index] or nil
+    reconcile_force(force, owned_disabled, owner, selected_owners ~= nil)
   end
   discard_empty_state(current)
+end
+
+local function legacy_candidates(worker_name)
+  local candidates = {}
+  if GEAR_ENABLED then
+    candidates[#candidates + 1] = {
+      name = GEAR_TECHNOLOGY,
+      setting = "ips-max-level-research_gears",
+      source = "generated-stream",
+      operation = "runtime-settings-transport",
+      admitted = true
+    }
+  end
+  if worker_name then
+    candidates[#candidates + 1] = {
+      name = worker_name,
+      setting = "mir-max-level-worker-robots-speed",
+      source = "native-owner",
+      operation = "native-owner-cap",
+      admitted = true
+    }
+  end
+  return candidates
+end
+
+local function merge_legacy_rows(owned_disabled, force_index, rows)
+  local owned = owned_disabled[force_index]
+  if owned ~= nil and type(owned) ~= "table" then
+    error("MIR invalid caps ownership row", 2)
+  end
+  if next(rows) == nil then return end
+  if owned == nil then
+    owned = {}
+    owned_disabled[force_index] = owned
+  end
+  for name, row in pairs(rows) do
+    -- The pure importer has already rejected an existing MIR5 row. Keep this
+    -- guard at the persistence boundary so MIR5 ownership always wins.
+    if owned[name] == nil then
+      owned[name] = {
+        disabled = row.disabled == true and true or nil,
+        visible_when_disabled = row.visible_when_disabled
+      }
+    end
+  end
+end
+
+-- This is the sole reader of the published bucket. It is deliberately called
+-- only by on_configuration_changed: initialization and load never transport
+-- historical cap rights into a new save.
+local function import_legacy_caps_on_configuration()
+  local mir = storage.mir
+  local legacy_bucket = type(mir) == "table" and mir.maximum_level_control or nil
+  if legacy_bucket == nil then return nil end
+
+  local current = existing_state()
+  if current and current.legacy_caps_checked == true then return nil end
+  current = ensure_state()
+  -- Preserve this marker even when no candidate is currently admitted or the
+  -- old bucket is malformed. A reused force index must never re-open import.
+  current.legacy_caps_checked = true
+
+  local selected_owners = {}
+  if not game or not game.forces then return selected_owners end
+  for _, force in pairs(game.forces) do
+    if valid_force(force) then
+      local owned = discard_disabled_gear_ownership(force, current.owned_disabled)
+      -- Revalidate the native tail even if the new worker cap is unlimited;
+      -- importing its historical restoration right still depends on that
+      -- exact current owner.
+      local owner = worker_owner(force)
+      selected_owners[force.index] = owner
+      local rows = legacy_caps.import_for_force(legacy_bucket, force,
+        legacy_candidates(owner), owned)
+      merge_legacy_rows(current.owned_disabled, force.index, rows)
+    end
+  end
+  return selected_owners
 end
 
 local function event_force(event)
@@ -156,7 +260,11 @@ end
 local function reconcile_event(event)
   local force = event_force(event)
   if not force then return end
-  local current = ensure_state()
+  -- These callbacks are registered only while finite caps are active. Keep
+  -- the defensive direct-call path allocation-free for an unlimited fresh
+  -- save, while still restoring a retained owned or legacy-marker state.
+  local current = CAPS_ACTIVE and ensure_state() or existing_state()
+  if not current then return end
   reconcile_force(force, current.owned_disabled)
   discard_empty_state(current)
 end
@@ -174,7 +282,7 @@ function M.on_init()
 end
 
 function M.on_configuration_changed()
-  reconcile_all(true)
+  reconcile_all(true, import_legacy_caps_on_configuration())
 end
 
 function M.on_force_created(event)

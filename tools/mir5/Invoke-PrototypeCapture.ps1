@@ -8,6 +8,7 @@ param(
   [Parameter(Mandatory)][string]$OutputRoot,
   [string]$MIRArchive = '',
   [string]$ExpectedMIRArchiveSha256 = '',
+  [string]$ActiveModsObserver = '',
   [ValidateRange(30,600)][int]$TimeoutSeconds = 240,
   [ValidateRange(64,8192)][int]$ExpectedPeakMemoryMiB = 1024,
   [ValidateRange(16,2048)][int]$MaxNewOutputMiB = 512,
@@ -104,6 +105,7 @@ $profileDefinition = (Get-Content -LiteralPath $profileInput -Raw).TrimStart([ch
 Assert-MIR5PrototypeCapture ($profileDefinition.ContainsKey('mods') -and $profileDefinition.mods -is [array]) 'profile must contain a mods array'
 Assert-MIR5PrototypeCapture (@($profileDefinition.mods | Where-Object { [string]$_.name -ceq 'more-infinite-research' }).Count -eq 0) 'profile must omit MIR; MIRArchive is the sole explicit MIR selection'
 $hasMIRArchive = -not [string]::IsNullOrWhiteSpace($MIRArchive)
+$activeModsObserver = $ActiveModsObserver.Trim()
 Assert-MIR5PrototypeCapture ($hasMIRArchive -eq (-not [string]::IsNullOrWhiteSpace($ExpectedMIRArchiveSha256))) 'MIRArchive and ExpectedMIRArchiveSha256 must be supplied together'
 
 # LibraryActivation receives only generic immutable-input primitives. The
@@ -141,6 +143,7 @@ $record = [ordered]@{
   engine=[ordered]@{path=$engine;sha256=Get-MIR5PrototypeCaptureSha256 $engine;base_version=[string]$base.version;factorio_version=$engineLine}
   profile_input=[ordered]@{path=$profileInput;sha256=Get-MIR5PrototypeCaptureSha256 $profileInput}
   mir_archive=$mir
+  active_mods_observer=$null
   budget=[ordered]@{timeout_seconds=$TimeoutSeconds;expected_peak_memory_mib=$ExpectedPeakMemoryMiB;max_new_output_mib=$MaxNewOutputMiB}
   native_qualification=$false
 }
@@ -168,6 +171,18 @@ try {
   $record.selected_archives = @($activation.selected | ForEach-Object {
     [ordered]@{name=[string]$_.name;version=[string]$_.version;builtin=[bool]$_.builtin;path=[string]$_.path;sha256=[string]$_.sha256}
   } | Sort-Object name,version)
+  if (-not [string]::IsNullOrWhiteSpace($activeModsObserver)) {
+    $observerRows = @($activation.selected | Where-Object { [string]$_.name -ceq $activeModsObserver })
+    Assert-MIR5PrototypeCapture ($observerRows.Count -eq 1) 'ActiveModsObserver must be selected exactly once'
+    $observer = $observerRows[0]
+    Assert-MIR5PrototypeCapture (-not [bool]$observer.builtin -and [string]$observer.sha256 -match '^[A-Fa-f0-9]{64}$') 'ActiveModsObserver must be a hash-bound archive'
+    $record.active_mods_observer = [ordered]@{
+      name=[string]$observer.name
+      version=[string]$observer.version
+      archive=[IO.Path]::GetFileName([string]$observer.path)
+      sha256=[string]$observer.sha256
+    }
+  }
 
   $arguments = @('--config',$config,'--mod-directory',$activation.library,'--no-log-rotation','--disable-audio','--dump-data')
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments $arguments
@@ -184,7 +199,7 @@ try {
     }
   }
 
-  $record.loaded_selection = Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $factorioLog -LatestInvocation
+  $record.loaded_selection = Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $factorioLog -LatestInvocation -ActiveModsObserver $activeModsObserver
   $dumpRoot = Join-Path $writeData 'script-output'
   Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $dumpRoot -PathType Container) 'Factorio dump script-output directory is absent'
   $jsonDumps = @(Get-ChildItem -LiteralPath $dumpRoot -File -Filter '*.json')

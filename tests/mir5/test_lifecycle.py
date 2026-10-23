@@ -87,7 +87,11 @@ class LifecycleTests(unittest.TestCase):
               on_init = function(handler) handlers.init = handler end,
               on_configuration_changed = function(handler) handlers.configuration = handler end,
               on_load = function(handler) handlers.load = handler end,
-              on_event = function(id, handler) handlers.events[id] = handler end
+              on_event = function(id, handler) handlers.events[id] = handler end,
+              on_nth_tick = function(interval, handler)
+                handlers.nth = handlers.nth or {}
+                handlers.nth[interval] = handler
+              end
             }
             defines = {events = {
               on_force_created = 1, on_force_reset = 2, on_forces_merged = 3,
@@ -100,6 +104,7 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["runtime.bootstrap"] = nil
             package.loaded["runtime.library"] = nil
             package.loaded["runtime.lifecycle"] = nil
+            package.loaded["runtime.configuration"] = nil
             control = require("control")
           end
         ''')
