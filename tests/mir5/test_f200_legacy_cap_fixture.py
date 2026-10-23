@@ -90,10 +90,44 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local GEAR="recipe-prod-research_gears-1"
             local science={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local function inventory()
-              local value={items={}}
-              function value.insert(row)value.items[row.name]=(value.items[row.name]or 0)+row.count;return row.count end
-              function value.get_item_count(name)return value.items[name]or 0 end
-              return value
+              local value={items={},slots={},slot_by_name={}}
+              local function stack(name)
+                local current=value.slot_by_name[name]
+                if current==nil then
+                  current={valid_for_read=true,name=name,count=0,quality={name="normal"},durability=1}
+                  value.slot_by_name[name]=current;value.slots[#value.slots+1]=current
+                end
+                return current
+              end
+              function value.insert(row)
+                local current=stack(row.name);current.count=current.count+row.count;current.valid_for_read=current.count>0
+                value.items[row.name]=current.count;return row.count
+              end
+              function value.get_item_count(name)
+                local current=value.slot_by_name[name];return current and current.count or 0
+              end
+              function value.consume(name,amount)
+                local current=stack(name);assert(current.count>=1 and current.durability>0)
+                if amount==1 then
+                  assert(math.abs(current.durability-1)<.000001)
+                  current.count=current.count-1;current.valid_for_read=current.count>0
+                else
+                  assert(amount>0 and amount<1 and math.abs(current.durability-1)<.000001)
+                  current.durability=current.durability-amount
+                end
+                value.items[name]=current.count
+              end
+              return setmetatable(value,{__len=function(current)return #current.slots end,
+                __index=function(current,key)
+                  if type(key)=="number" then return current.slots[key] end
+                  return rawget(current,key)
+                end})
+            end
+            local item_prototypes={}
+            for _,name in ipairs(science) do
+              item_prototypes[name]={get_durability=function(quality)
+                assert(quality and quality.name=="normal");return 1
+              end}
             end
             local input=inventory()
             local lab={valid=true,energy=0}
@@ -132,7 +166,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
               local env={script={active_mods={base="2.0.77",["more-infinite-research"]=mir,["mir-fixture-mir5-f200-legacy-cap"]=version},
                 on_init=function(f)c.init=f end,on_configuration_changed=function(f)c.changed=f end,on_load=function(f)c.load=f end,
                 on_event=function(e,f)c.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                game=game,storage=storage,settings=settings_values,helpers={table_to_json=function(row)assert(row.status=="passed");assert(row.stage=="initial" or row.stage=="reload");return "{}"end},
+                game=game,storage=storage,settings=settings_values,prototypes={item=item_prototypes},helpers={table_to_json=function(row)assert(row.status=="passed");assert(row.stage=="initial" or row.stage=="reload");return "{}"end},
                 log=function(row)assert(row:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
               env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
               local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
@@ -146,10 +180,10 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             local function tick(control)
               game.tick=game.tick+1;return invoke(control,"tick")
             end
-            local function complete_player(control, level, bonus)
+            local function complete_player(control, level, bonus, consumed_units)
               player.current_research=nil;player.research_queue={};player.technologies[GEAR].level=level
               player.technologies[GEAR].researched=false;player.recipes['iron-gear-wheel'].productivity_bonus=bonus
-              for _,name in ipairs(science)do input.items[name]=input.items[name]-1 end
+              for _,science_name in ipairs(science)do input.consume(science_name,consumed_units or 1) end
               return invoke(control,"finished",{research=player.technologies[GEAR]})
             end
             local source,message=load_control(source_path,"4.7.20002","0.1.0",startup(2));if not source then return {ok=false,message=message}end
@@ -158,9 +192,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             player.technologies[GEAR].visible_when_disabled=true
             player.technologies[GEAR].prototype.visible_when_disabled=true
             local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result}end
-            ok,result=complete_player(source,2,.01);if not ok then return {ok=false,message=result}end
+            ok,result=complete_player(source,2,.01,1);if not ok then return {ok=false,message=result}end
             ok,result=tick(source);if not ok then return {ok=false,message=result}end
-            ok,result=complete_player(source,3,.02);if not ok then return {ok=false,message=result}end
+            ok,result=complete_player(source,3,.02,1);if not ok then return {ok=false,message=result}end
             player.technologies[GEAR].enabled=false;player.technologies[GEAR].visible_when_disabled=true
             ok,result=tick(source);if not ok then return {ok=false,message=result}end
             -- Two cold-source reload markers; on_load itself must only rebuild local witnesses.
@@ -177,14 +211,15 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
-            ok,result=complete_player(destination,4,.03);if not ok then return {ok=false,message=result}end
+            ok,result=complete_player(destination,4,.03,opponent=="wrong-consumed-fraction" and .72 or .73);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
             return {ok=true,message="",phase=state.phase,source_labs=state.actual_lab_completions,destination_labs=state.destination_lab_completions,
               player_level=player.technologies[GEAR].level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
               player_enabled=player.technologies[GEAR].enabled,player_visible=player.technologies[GEAR].visible_when_disabled,
-              foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
+              science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
+              remaining_invest=state.destination_remaining_invest,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[GEAR].enabled,
               markers=markers,saves=saves}
           end
         ''')
@@ -255,6 +290,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((4, .03), (result["player_level"], result["bonus"]))
         self.assertTrue(result["player_enabled"])
         self.assertTrue(result["player_visible"])
+        self.assertAlmostEqual(22, result["science_before"], places=6)
+        self.assertAlmostEqual(21.27, result["science_after"], places=6)
+        self.assertAlmostEqual(.73, result["remaining_invest"], places=6)
         self.assertEqual(.42, result["foreign_progress"])
         self.assertFalse(result["foreign_enabled"])
         self.assertEqual((6, 2), (result["markers"], result["saves"]))
@@ -267,6 +305,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             "saved-progress": "MIR5 restored player saved progress differs",
             "lab-count": "published positive-cap source witness is absent",
             "duplicate-lab": "successor did not finish exactly one further lab level",
+            "wrong-consumed-fraction": "successor real lab consumption differs for automation-science-pack: observed_units=",
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
@@ -274,6 +313,9 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
                                                            str(FIXTURE / "mir5" / "control.lua"), opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+                if opponent == "wrong-consumed-fraction":
+                    self.assertIn("expected_units=21.27", result["message"])
+                    self.assertIn("remaining_invest=0.73", result["message"])
 
 
 if __name__ == "__main__":

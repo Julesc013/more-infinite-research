@@ -91,7 +91,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local function build_gui(client, options)
               local target=client
               if opponent=="view-crosspollution" and client.index==2 then target=en end
-              local root=element("frame",ROOT_NAME)
+              local root=element("frame",ROOT_NAME);root.visible=true
               local filters=element("flow",FILTERS)
               root[FILTERS]=filters
               filters[QUERY]=element("textfield",QUERY)
@@ -160,6 +160,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if opponent~="unchanged-locales" then
               ok,result=call(callbacks.events[3],{player_index=2});if not ok then return {ok=false,message=result} end
             end
+            game.tick=game.tick+120
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="awaiting-rejoin" then return {ok=false,message="initial client phase did not await an actual rejoin"} end
             en.connected,de.connected=false,false
@@ -167,6 +168,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             en.connected,de.connected=true,true
             ok,result=call(callbacks.events[2],{player_index=1});if not ok then return {ok=false,message=result} end
             ok,result=call(callbacks.events[2],{player_index=2});if not ok then return {ok=false,message=result} end
+            game.tick=game.tick+120
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="capturing-rejoin" or #saves~=0 then return {ok=false,message="rejoin capture did not defer the save"} end
             game.tick=game.tick+59
@@ -187,6 +189,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             en.connected,de.connected=true,true
             ok,result=call(callbacks.events[2],{player_index=1});if not ok then return {ok=false,message=result} end
             ok,result=call(callbacks.events[2],{player_index=2});if not ok then return {ok=false,message=result} end
+            game.tick=game.tick+120
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="capturing-restart" or #saves~=1 then return {ok=false,message="restart capture did not defer the save"} end
             game.tick=game.tick+60

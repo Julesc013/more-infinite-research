@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerRenderingObservationV1",
+  "source": "9e450aed8114c4b1e28a46af4e26863ee0dc0f7c",
+  "run": {
+    "id": 40008631354,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40008631354",
+    "conclusion": "success"
+  },
+  "player": {
+    "sha256": "D59767E521BD4EE89A6BF3BEF8517FEFF10DE4EA9EF28F5081950FB7996328E6",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "custody": "build/mir5/black-glass/incoming/40008631354/black-glass-library-multiplayer-40008631354-1",
+  "manifest_members_verified": 220,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-join-render-observation-native.json.gz",
+    "uncompressed_sha256": "3AD2BBE01D3C2BA5D7B19FB0DA038E81483025323695B863FD865F0804BEC7E5"
+  },
+  "session": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-join-render-observation-session.json.gz",
+    "uncompressed_sha256": "B4CD9AD19B8A01BD7D63425B02EE41A903908A092FF8B26D24D4DC1DF7365118"
+  },
+  "screenshot": {
+    "path": "spec/mir5/evidence/library-multiplayer-join-render-observation-de-restart.png",
+    "sha256": "8E015144B956D58857C47B84A740E7C2ECC4EA03E13EE0793751838C781EFD4E"
+  },
+  "independent_review": [
+    "All native six-join, distinct personal-view, unchanged gameplay-state, rejoin and host-restart actor witnesses passed.",
+    "Save deferral removed the saving overlay from reviewed German rejoin/restart captures, but the Library itself is still absent from those pixels. The English restart remains readable.",
+    "The last joining client was asked for screenshots immediately on its join tick. Native GUI objects alone do not prove that the joining client has rendered them.",
+    "The revised fixture requires a visible root and gives both actual clients120 ticks after the latest join before requesting GUI screenshots. This is a changed capture mechanism, not a rendering pass."
+  ],
+  "complete_rendering_qualification": false,
+  "release_qualification": false
+}

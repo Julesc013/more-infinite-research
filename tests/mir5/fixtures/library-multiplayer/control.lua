@@ -119,7 +119,7 @@ end
 local function frame_parts(player)
   local screen = player.gui and player.gui.screen
   local root = screen and screen[ROOT]
-  if not valid(root) or root.type ~= "frame" then fail("native browser root is absent") end
+  if not valid(root) or root.type ~= "frame" or root.visible ~= true then fail("native browser root is absent or hidden") end
   local filters = root[FILTERS]
   local query, sort = valid(filters) and filters[QUERY] or nil, valid(filters) and filters[SORT] or nil
   local tabs = root[TABS]
@@ -238,6 +238,11 @@ local function pair(state, expected_joins)
       or by_locale.de.force.index ~= state.force_index then
     fail("connected clients do not share the prepared disposable force")
   end
+  -- A join event exposes synchronized simulation objects before the joining
+  -- client has necessarily finished its local game/GUI transition. Give both
+  -- real clients a bounded render interval before requesting GUI captures.
+  if game.tick - math.max(state.clients[by_locale.en.index].join_tick,
+      state.clients[by_locale.de.index].join_tick) < 120 then return nil end
   return by_locale.en, by_locale.de
 end
 

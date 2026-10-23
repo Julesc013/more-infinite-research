@@ -91,6 +91,33 @@ local function lab(state)
   return inventory
 end
 
+local function science_units(inventory, item, label)
+  local total, stacks = 0, 0
+  local prototype = prototypes.item[item]
+  if prototype == nil or type(prototype.get_durability) ~= "function" then
+    fail(label .. " native science item prototype is absent: " .. item)
+  end
+  for index = 1, #inventory do
+    local stack = inventory[index]
+    if stack.valid_for_read and stack.name == item then
+      local quality = stack.quality
+      if quality == nil or quality.name ~= "normal" then
+        fail(label .. " native science quality changed for " .. item)
+      end
+      local maximum = prototype.get_durability(quality)
+      local durability = stack.durability
+      if not close(maximum, 1) or type(durability) ~= "number"
+          or durability <= 0 or durability > maximum or type(stack.count) ~= "number" or stack.count < 1 then
+        fail(label .. " native science durability changed for " .. item)
+      end
+      total = total + stack.count - 1 + durability / maximum
+      stacks = stacks + 1
+    end
+  end
+  if stacks == 0 then fail(label .. " native science stack is absent for " .. item) end
+  return total
+end
+
 local function assert_acceleration(value)
   if value.research_unit_count ~= 1 or not close(value.research_unit_energy, 60) then
     fail("fixture did not retain one-unit one-second native research")
@@ -127,10 +154,25 @@ local function assert_completed(state)
   end
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
   local inventory = lab(state)
+  local expected_units = state.destination_science_units_before
+  local remaining_invest = state.destination_remaining_invest
+  if type(expected_units) ~= "table" or not close(remaining_invest, 0.73) then
+    fail("successor native science accounting witness is absent")
+  end
+  state.destination_science_units_after = state.destination_science_units_after or {}
   for _, item in ipairs(SCIENCE) do
-    if inventory.get_item_count(item) ~= state.destination_inventory_before[item] - 1 then
-      fail("successor real lab consumption differs for " .. item)
+    local expected = expected_units[item] - remaining_invest
+    local observed = science_units(inventory, item, "successor post-lab")
+    if not close(observed, expected) then
+      fail("successor real lab consumption differs for " .. item
+        .. ": observed_units=" .. tostring(observed) .. " expected_units=" .. tostring(expected)
+        .. " remaining_invest=" .. tostring(remaining_invest))
     end
+    local prior = state.destination_science_units_after[item]
+    if prior ~= nil and not close(prior, observed) then
+      fail("successor cold reload changed native science units for " .. item)
+    end
+    state.destination_science_units_after[item] = observed
   end
   return player
 end
@@ -146,7 +188,10 @@ local function marker(stage, state)
       destination_actual_lab_completions = state.destination_lab_completions,
       milestone = state.milestone, next_level = player.level, productivity_bonus = player.bonus,
       player_enabled = player.enabled, player_visible_when_disabled = player.visible,
-      foreign_queue_progress = state.foreign_queue.progress, on_load_read_only = stage == "reload",
+      foreign_queue_progress = state.foreign_queue.progress,
+      science_remaining_invest = state.destination_remaining_invest,
+      science_units_after = state.destination_science_units_after,
+      on_load_read_only = stage == "reload",
     },
   }))
 end
@@ -165,14 +210,22 @@ script.on_configuration_changed(function()
   local state = storage[KEY]
   assert_restored(state) -- required before this fixture queues any successor lab work.
   local inventory = lab(state)
-  local before = {}
+  local before_units = {}
   for _, item in ipairs(SCIENCE) do
-    before[item] = inventory.get_item_count(item)
+    local prior = science_units(inventory, item, "successor pre-insert")
     local inserted = inventory.insert{name = item, count = DESTINATION_PACKS}
     if inserted ~= DESTINATION_PACKS then fail("could not insert successor science " .. item) end
-    before[item] = before[item] + inserted
+    local observed = science_units(inventory, item, "successor pre-lab")
+    local expected = prior + DESTINATION_PACKS
+    if not close(observed, expected) then
+      fail("fixture-added normal-durability science changed for " .. item
+        .. ": observed_units=" .. tostring(observed) .. " expected_units=" .. tostring(expected))
+    end
+    before_units[item] = observed
   end
-  state.destination_inventory_before = before
+  state.destination_science_units_before = before_units
+  state.destination_science_units_after = nil
+  state.destination_remaining_invest = 0.73
   state.destination_lab_completions = 0
   state.phase = "await-successor-lab"
   state.deadline_tick = game.tick + DEADLINE
