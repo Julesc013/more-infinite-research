@@ -133,7 +133,7 @@ local function copy_rule(rule, ordinal)
   }
 end
 
--- Compile the authored bindings before inspecting recipes.  The returned
+-- Index the selected authored bindings before inspecting recipes. The returned
 -- context is phase-local: callers must prepare it again after a foreign data
 -- stage can replace recipes or binding declarations.
 function M.prepare(bindings, options)

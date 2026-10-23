@@ -587,6 +587,13 @@ class ScienceTests(unittest.TestCase):
           cycle.alternatives[1] = cycle
           valid, reason = science.validate_source_contract(raw, cycle, "bound-pack")
           assert(not valid and reason == "cyclic-alternative")
+          local nested={kind='alternatives',pack='bound-pack',alternatives={
+            {kind='initial-recipe',pack='bound-pack',recipe='unrelated'},
+            {kind='alternatives',pack='bound-pack',alternatives={}}
+          }}
+          local guarded={recipe=setmetatable({}, {__index=function() error('source read before flat preflight') end})}
+          valid,reason=science.validate_source_contract(guarded,nested,'bound-pack')
+          assert(not valid and reason=='nested-alternative')
 
           raw.resource = { ["dmrsa-tenemut"] = {name="dmrsa-tenemut", autoplace={},
             minable={results={{type="item", name="dmrsa-tenemut", amount=1}}}}}
@@ -654,6 +661,92 @@ class ScienceTests(unittest.TestCase):
           local reports, context = science.apply_family(rows, bindings, {raw=raw, target={id="f210"}, options={}})
           assert(context.lab_visits == 3 and #reports == 75)
           for _, row in ipairs(rows) do assert(names(row.unit.ingredients) == "A:1,B:1") end
+        ''')
+
+
+    def test_472_foreign_native_science_unit_preserves_named_cryo_gate_and_quantities(self):
+        self.lua.execute(r'''
+          local packs={'A','automation-science-pack','logistic-science-pack','chemical-science-pack',
+            'production-science-pack','military-science-pack','utility-science-pack','space-science-pack',
+            'agricultural-science-pack','metallurgic-science-pack','electromagnetic-science-pack',
+            'cryogenic-science-pack','promethium-science-pack','mir472-native-science'}
+          local raw=raw_with(packs,{lab=packs})
+          install_sources(raw,true)
+          local owner=raw.technology['cryogenic-science-pack']
+          owner.research_trigger=nil
+          owner.unit={count=1,time=1,ingredients={{'mir472-native-science',1}}}
+          raw.resource={['mir472-native-science-resource']={minable={result='mir472-native-science'}}}
+          raw.recipe['late-cryo']={enabled=false,ingredients={{'cryogenic-science-pack',1}},
+            results={{type='item',name='cryogenic-science-pack',amount=1}}}
+          raw.technology['late-cyclic-owner']={prerequisites={'late-cyclic-owner'},
+            effects={{type='unlock-recipe',recipe='late-cryo'}}}
+          setmetatable(raw.technology,{__pairs=function() error('must not scan foreign research graphs') end})
+          setmetatable(raw.recipe,{__pairs=function() error('must not scan optional science producers') end})
+          local context=science.prepare({raw=raw,target={id='f210'},mods={['space-age']='2.1.23'},
+            options={['mir-science-pack-ingredient-policy']='all-official'}})
+          local row=technology({{'A',2},{'cryogenic-science-pack',3}}, {'cryogenic-science-pack'})
+          local result=science.apply(row,{required_science={'cryogenic-science-pack'}},context)
+          assert(result.enabled, result.reason)
+          local cryo,gate=false,false
+          for _,ingredient in ipairs(row.unit.ingredients) do
+            if ingredient[1]=='cryogenic-science-pack' then assert(ingredient[2]==3);cryo=true end
+          end
+          for _,name in ipairs(row.prerequisites) do if name=='cryogenic-science-pack' then gate=true end end
+          assert(cryo and gate and owner.research_trigger==nil)
+          local added=technology({{'A',2}})
+          assert(science.apply(added,{},context).enabled)
+          local added_pack,added_gate=false,false
+          for _,ingredient in ipairs(added.unit.ingredients) do
+            if ingredient[1]=='cryogenic-science-pack' then assert(ingredient[2]==1);added_pack=true end
+          end
+          for _,name in ipairs(added.prerequisites) do if name=='cryogenic-science-pack' then added_gate=true end end
+          assert(added_pack and added_gate)
+          assert(owner.unit.ingredients[1][1]=='mir472-native-science' and owner.unit.ingredients[1][2]==1)
+          assert(raw.technology['late-cyclic-owner'].prerequisites[1]=='late-cyclic-owner')
+        ''')
+
+    def test_cryo_unit_alternative_remains_narrow_and_rejects_invalid_native_units(self):
+        self.lua.execute(r'''
+          local raw=raw_with({'cryogenic-science-pack','foreign-native-pack'}, {})
+          install_sources(raw,true)
+          local contract=bindings.select({id='f210'},{['space-age']='2.1.23'}).source_contracts['cryogenic-science-pack']
+          local function owner()
+            local row={prerequisites={'cryogenic-plant'},
+              effects={{type='unlock-recipe',recipe='cryogenic-science-pack'}},
+              unit={count=1,time=1,ingredients={{'foreign-native-pack',1}}}}
+            raw.technology['cryogenic-science-pack']=row
+            return row
+          end
+          assert(science.validate_source_contract(raw,contract))
+          for _,mutate in ipairs({
+            function(o) o.enabled=false end,
+            function(o) o.effects={} end,
+            function(o) o.prerequisites={} end,
+            function(o) o.research_trigger={type='craft-item',item='wrong'} end,
+            function(o) o.unit.count=0 end,
+            function(o) o.unit.time=0 end,
+            function(o) o.unit.count=0/0 end,
+            function(o) o.unit.ingredients={} end,
+            function(o) o.unit.ingredients[1][2]=0 end,
+            function(o) o.unit.ingredients[1].type='fluid' end,
+            function(o) o.unit.ingredients[1][1]='missing-native-pack' end,
+            function(o) o.unit.ingredients[2]={'foreign-native-pack',1} end,
+            function(o) o.unit.ingredients={{'cryogenic-science-pack',1}} end,
+            function(o) o.unit.count_formula='100' end,
+            function(o) o.unit.count=nil;o.unit.count_formula='   ' end,
+          }) do
+            local row=owner();mutate(row)
+            assert(not science.validate_source_contract(raw,contract))
+          end
+          local row=owner()
+          row.unit.count=nil;row.unit.count_formula='100*2^L'
+          assert(science.validate_source_contract(raw,contract))
+          contract.pack='foreign-native-pack'
+          assert(not science.validate_source_contract(raw,contract,'foreign-native-pack'),
+            'the cryogenic unit alternative must not admit another pack')
+          contract.pack='cryogenic-science-pack'
+          contract.owner_unit_alternative=false
+          assert(not science.validate_source_contract(raw,contract))
         ''')
 
 

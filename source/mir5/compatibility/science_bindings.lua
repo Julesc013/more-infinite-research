@@ -269,10 +269,21 @@ local function source_contracts(target, has_space_age)
     for _, pack in ipairs(SPACE_AGE) do put(pack, recipe_unlock(pack, pack)) end
     put("cryogenic-science-pack", recipe_unlock("cryogenic-science-pack", "cryogenic-science-pack",
       {"cryogenic-plant"}, {type = "craft-item", item = "cryogenic-plant"}))
+    -- A mod may replace this native trigger with an ordinary research unit
+    -- (including resource-sourced foreign science). Preserve its named gate;
+    -- this does not certify the foreign pack's transitive researchability.
+    out["cryogenic-science-pack"].owner_unit_alternative = true
     put("promethium-science-pack", recipe_unlock("promethium-science-pack", "promethium-science-pack",
       {"biter-egg-handling", "stellar-discovery-solar-system-edge"}))
   end
   return out
+end
+
+function M.owner_unit_alternative_is_declared(contract)
+  local trigger = contract.owner_trigger
+  return contract.owner_unit_alternative == true and contract.pack == "cryogenic-science-pack"
+    and contract.owner == "cryogenic-science-pack" and contract.recipe == "cryogenic-science-pack"
+    and type(trigger) == "table" and trigger.type == "craft-item" and trigger.item == "cryogenic-plant"
 end
 
 -- These are the historical policy's hard science requirements. They are not

@@ -1,0 +1,57 @@
+MIR5 Black Glass: bounded worker handoff
+
+Purpose: move native CPU/RAM work to Black Glass while Aero remains the
+implementation, integration and release manager. Black Glass is optional;
+this does not restore a mandatory two-machine performance gate.
+
+Recommended transport: a dedicated GitHub Actions runner executes scripts and
+uploads native artifacts. Luna may triage a failed job. Do not spend model
+turns repeatedly polling an idle queue. No repository runner was registered
+at the 2026-10-23 inspection. A local worker/runner must be started on Black
+Glass; Aero has no remote process connection to that machine.
+
+Initial Codex/Luna assignment to paste in the Black Glass local clone:
+
+You are the Black Glass MIR5 test worker. Read AGENTS.md, spec/mir5/README.md,
+spec/mir5/verification.md, spec/mir5/performance.md and this bounded assignment.
+Do not load the manager's entire conversation. You are not alone in this repo.
+Preserve dirty work, unique commits, original saves and existing test owners.
+The manager is implementing MIR5 on Aero. Do not tag, publish, change main,
+register credentials/runners or alter repository protections in this task.
+
+First report machine readiness through a small branch/PR to dev:
+- Identify hostname, RAM/commit/disk headroom and the local checkout branch.
+- Fetch origin/feat/mir5-k2-catalogue-r01 without resetting local work. Record
+  the exact fetched commit. Use an isolated clean branch/worktree if needed.
+- Inventory installed Factorio binaries and hashes. Follow AGENTS engine
+  authority; never download/replace historical engines or Steam depots.
+- Locate the transferred archive libraries. Read exact selected ZIP metadata
+  and hashes, not folder names alone. Keep dependencies in the direct library;
+  do not copy, extract or hard-link dependencies into profile directories.
+- Run workspace development health and inspect the MIR5 host verification
+  plan. Report which F210 Base/Space Age/K2SO and historical targets are actually
+  available, with missing inputs and paths. Do not invent passes.
+- Check whether a GitHub Actions runner is already configured locally; report
+  its name/state without printing credentials or registering a new one.
+
+Stop this initial assignment after committing/pushing the compact readiness
+record and opening its PR. Include exact native commands proposed for the
+available targets, but do not launch an unassigned heavy campaign. The manager
+will send a frozen test packet and claim scope through GitHub. No idle polling
+or independent implementation programme is needed.
+
+Subsequent native assignments must bind exact committed player/harness inputs,
+engine/mod/settings/save hashes, commands and endpoints. Use the existing
+governor and exclusive archive-library locks, one heavy native job per machine.
+Keep original saves untouched. Report failures with their original logs;
+never rewrite expected output, lower gates or relabel partial observations.
+Return small receipts via GitHub and large logs/saves/dumps as job artifacts;
+Aero will download them into primary custody and verify hashes before reuse.
+
+Current useful entrypoints:
+- tests/mir5/Test-MIR5HostControls.ps1 -Plan
+- tools/mir5/package.py (committed-source private packages)
+- tools/mir5/Invoke-PrototypeCapture.ps1 (native data/settings observation)
+- tools/mir5/Invoke-NativeFixture.ps1 (production and two cold reloads)
+- tools/mir5/Invoke-MenuComparison.ps1 (matched menu performance)
+- docs/mir5/progress.md (one canonical worklist and exact known limitations)

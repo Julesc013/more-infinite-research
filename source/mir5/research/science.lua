@@ -167,7 +167,28 @@ local function valid_owner(raw, contract, require_unlock)
     return nil, "owner-prerequisites:" .. tostring(contract.owner)
   end
   if not has_expected_trigger(owner, contract.owner_trigger) then
-    return nil, "owner-trigger:" .. tostring(contract.owner)
+    if not bindings.owner_unit_alternative_is_declared(contract) or owner.research_trigger ~= nil then
+      return nil, "owner-trigger:" .. tostring(contract.owner)
+    end
+    local unit = owner.unit
+    if type(unit) ~= "table" or not positive(unit.time)
+      or not (positive(unit.count) or (type(unit.count_formula) == "string" and unit.count_formula:find("%S")))
+      or (unit.count ~= nil and unit.count_formula ~= nil)
+      or type(unit.ingredients) ~= "table" or #unit.ingredients == 0 then
+      return nil, "owner-unit:" .. tostring(contract.owner)
+    end
+    local count, seen = 0, {}
+    for key, ingredient in pairs(unit.ingredients) do
+      count = count + 1
+      local name = named_entry(ingredient)
+      if type(key) ~= "number" or key < 1 or key % 1 ~= 0 or key > #unit.ingredients
+        or type(ingredient) ~= "table" or (ingredient.type ~= nil and ingredient.type ~= "item")
+        or not item_exists(raw, name) or seen[name] or not positive(ingredient.amount or ingredient[2]) then
+        return nil, "owner-unit-ingredient:" .. tostring(contract.owner)
+      end
+      seen[name] = true
+    end
+    if count ~= #unit.ingredients then return nil, "owner-unit-ingredient:" .. tostring(contract.owner) end
   end
   if owner_uses_own_pack(owner, contract.pack) then return nil, "self-supporting-owner:" .. tostring(contract.owner) end
   return owner
@@ -208,38 +229,14 @@ end
 -- A source contract is a small explicit relation.  It never enumerates raw
 -- recipes, owners, labs, or acquisition paths.  `alternatives` is likewise a
 -- caller-authored finite OR, not an invitation to find another producer.
-local function validate_contract_shape(contract, expected_pack, visiting)
+local function validate_contract_shape(contract, expected_pack)
   if type(contract) ~= "table" or type(contract.kind) ~= "string" then return nil, "unbound" end
   if type(contract.pack) ~= "string" or contract.pack == "" then return nil, "missing-contract-pack" end
   if contract.pack ~= expected_pack then return nil, "contract-pack-mismatch:" .. tostring(contract.pack) end
-  if contract.kind ~= "alternatives" then return true end
-
-  if visiting[contract] then return nil, "cyclic-alternative" end
-  visiting[contract] = true
-  for _, candidate in ipairs(type(contract.alternatives) == "table" and contract.alternatives or {}) do
-    local valid, reason = validate_contract_shape(candidate, expected_pack, visiting)
-    if not valid then visiting[contract] = nil; return nil, reason end
-  end
-  visiting[contract] = nil
   return true
 end
 
-local function validate_source_contract(raw, contract, expected_pack, shape_checked)
-  expected_pack = expected_pack or (type(contract) == "table" and contract.pack)
-  if type(expected_pack) ~= "string" or expected_pack == "" then return nil, "missing-contract-pack" end
-  if not shape_checked then
-    local valid, reason = validate_contract_shape(contract, expected_pack, {})
-    if not valid then return nil, reason end
-  end
-  if contract.kind == "alternatives" then
-    local reasons = {}
-    for _, candidate in ipairs(contract.alternatives or {}) do
-      local valid, reason = validate_source_contract(raw, candidate, expected_pack, true)
-      if valid then return true end
-      reasons[#reasons + 1] = reason or "invalid"
-    end
-    return nil, "no-complete-alternative:" .. table.concat(reasons, ",")
-  end
+local function validate_single_source(raw, contract)
   if contract.kind == "initial-recipe" then
     local _, reason = valid_recipe(raw, contract, true)
     return reason == nil, reason
@@ -301,6 +298,30 @@ local function validate_source_contract(raw, contract, expected_pack, shape_chec
     return true
   end
   return nil, "unknown-contract:" .. contract.kind
+end
+
+-- Alternatives are one flat authored list. Reject nested/cyclic declarations
+-- before reading any source; never interpret a recursive acquisition tree.
+local function validate_source_contract(raw, contract, expected_pack)
+  expected_pack = expected_pack or (type(contract) == "table" and contract.pack)
+  if type(expected_pack) ~= "string" or expected_pack == "" then return nil, "missing-contract-pack" end
+  local valid, reason = validate_contract_shape(contract, expected_pack)
+  if not valid then return nil, reason end
+  if contract.kind ~= "alternatives" then return validate_single_source(raw, contract) end
+  local candidates = type(contract.alternatives) == "table" and contract.alternatives or {}
+  for _, candidate in ipairs(candidates) do
+    if candidate == contract then return nil, "cyclic-alternative" end
+    local shape_valid, shape_reason = validate_contract_shape(candidate, expected_pack)
+    if not shape_valid then return nil, shape_reason end
+    if candidate.kind == "alternatives" then return nil, "nested-alternative" end
+  end
+  local reasons = {}
+  for _, candidate in ipairs(candidates) do
+    local accepted, source_reason = validate_single_source(raw, candidate)
+    if accepted then return true end
+    reasons[#reasons + 1] = source_reason or "invalid"
+  end
+  return nil, "no-complete-alternative:" .. table.concat(reasons, ",")
 end
 
 local function ingredient(ingredient)

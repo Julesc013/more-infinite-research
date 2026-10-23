@@ -377,15 +377,14 @@ function M.is_k2so(active_mods)
 end
 
 local function copy_definitions(definitions)
-  local out, by_key = {}, {}
+  local out = {}
   for index = 1, #definitions do
-    local definition = copy(definitions[index])
-    out[#out + 1], by_key[definition.key] = definition, definition
+    out[index] = copy(definitions[index])
   end
-  return out, by_key
+  return out
 end
 
-local function apply_space_age(definitions, by_key)
+local function apply_space_age(definitions)
   -- Required laziness: do not move this require above the active profile gate.
   local delta = require("compatibility.modern_catalogue.space_age")
   local omit = {}
@@ -409,7 +408,7 @@ local function apply_space_age(definitions, by_key)
   return selected, delta
 end
 
-local function apply_k2so(definitions, by_key)
+local function apply_k2so(definitions)
   -- Required laziness: only an exact K2SO profile creates this map.
   local delta = require("compatibility.modern_catalogue.k2so")
   local selected_by_key = {}
@@ -438,7 +437,7 @@ function M.science_ingredients(key)
 end
 
 function M.select(active_mods)
-  local definitions, by_key = copy_definitions(BASE.definitions)
+  local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
   if target.id == "f200" and not active_space_age(active_mods) then
@@ -459,12 +458,12 @@ function M.select(active_mods)
   end
   if active_space_age(active_mods) then
     local delta
-    definitions, delta = apply_space_age(definitions, by_key)
+    definitions, delta = apply_space_age(definitions)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
   end
   if M.is_k2so(active_mods) then
-    k2so = apply_k2so(definitions, by_key)
+    k2so = apply_k2so(definitions)
     profile = "k2so-f210"
   end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
