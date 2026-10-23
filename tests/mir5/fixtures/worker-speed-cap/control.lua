@@ -52,6 +52,8 @@ local function marker(stage, state)
       initial_level = state.initial_level,
       next_level = state.next_level,
       completed_levels = 2,
+      original_owner_enabled = state.original_owner_enabled,
+      original_owner_visible = state.original_owner_visible,
       modifier_before = state.modifier_before,
       modifier_after = state.modifier_after,
       modifier_delta = state.modifier_delta,
@@ -94,6 +96,7 @@ script.on_init(function()
   -- Establish the presentation value whose later restoration this fixture
   -- observes; the upstream prototype default is not a restoration witness.
   owner.enabled, owner.visible_when_disabled = true, false
+  local original_owner_enabled, original_owner_visible = owner.enabled, owner.visible_when_disabled
   local modifier_before = force.worker_robots_speed_modifier
   -- These two direct native setters observe earned infinite levels. They do
   -- not claim lab work or science consumption; the assertions below read the
@@ -112,16 +115,18 @@ script.on_init(function()
   local foreign = game.create_force("mir5-native-worker-speed-foreign")
   foreign.enable_all_prototypes()
   local foreign_owner = owner_for(foreign)
-  foreign_owner.level = owner.level
+  -- Infinite level writes raise research events immediately. Establish the
+  -- foreign disable before crossing the cap so MIR never owns enablement.
   foreign_owner.enabled = false
   foreign_owner.visible_when_disabled = false
+  foreign_owner.level = owner.level
   start_unrelated_research(foreign)
 
   storage[KEY] = {
     owner = owner.name,
     initial_level = initial_level,
-    original_owner_enabled = true,
-    original_owner_visible = false,
+    original_owner_enabled = original_owner_enabled,
+    original_owner_visible = original_owner_visible,
     next_level = owner.level,
     modifier_before = modifier_before,
     modifier_after = modifier_after,
