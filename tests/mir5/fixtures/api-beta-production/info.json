@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-api-beta-production",
+  "version": "0.1.0",
+  "title": "MIR 5 API beta native cable production fixture",
+  "author": "MIR maintainers",
+  "description": "Private disposable-world native production consumer for the MIR 5 API beta technology.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "more-infinite-research = 5.0.21000",
+    "mir-fixture-mir5-api-beta = 0.1.0"
+  ]
+}

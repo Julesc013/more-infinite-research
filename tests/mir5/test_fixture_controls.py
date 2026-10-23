@@ -89,6 +89,101 @@ class FixtureControlHostStageTests(unittest.TestCase):
             end
             return forbidden.reads.mods
           end
+
+          function run_beta_production_final_tick(path, phase_output, observed_output)
+            local callbacks = {}
+            local saves = 0
+            local logged = 0
+            local input = {
+              get_item_count = function() return 0 end
+            }
+            local output = {
+              get_item_count = function() return observed_output end,
+              remove = function(item) return item.count end
+            }
+            local modules = {is_empty = function() return true end}
+            local technology = {enabled = true, researched = true, level = 1}
+            local force = {
+              valid = true,
+              index = 1,
+              technologies = {['mir-api-fixture-beta-cable-1'] = technology},
+              recipes = {['copper-cable'] = {productivity_bonus = 0.01}}
+            }
+            local machine = {
+              valid = true,
+              productivity_bonus = 0.01,
+              crafting_progress = 0,
+              get_inventory = function(index)
+                if index == 1 then return input end
+                if index == 2 then return output end
+                if index == 3 then return modules end
+                error('unexpected inventory id ' .. tostring(index))
+              end
+            }
+            local environment = {
+              script = {
+                active_mods = {
+                  base = '2.1.23',
+                  ['more-infinite-research'] = '5.0.21000',
+                  ['mir-fixture-mir5-api-beta'] = '0.1.0'
+                },
+                on_init = function(callback) callbacks.on_init = callback end,
+                on_load = function(callback) callbacks.on_load = callback end,
+                on_event = function(event, callback) callbacks.on_event = {event = event, callback = callback} end
+              },
+              defines = {events = {on_tick = 1}, inventory = {
+                crafter_input = 1, crafter_output = 2, crafter_modules = 3
+              }},
+              remote = {
+                interfaces = {['more-infinite-research.api.v1'] = true},
+                call = function(interface, method, force_index, technology_name)
+                  assert(interface == 'more-infinite-research.api.v1')
+                  assert(method == 'get_research')
+                  assert(force_index == 1)
+                  assert(technology_name == 'mir-api-fixture-beta-cable-1')
+                  return {
+                    name = technology_name, force_index = force_index, level = 1,
+                    max_level = 1, researched = true, enabled = true
+                  }
+                end
+              },
+              helpers = {table_to_json = function() return '{}' end},
+              log = function() logged = logged + 1 end,
+              game = {
+                tick = 1,
+                forces = {player = force},
+                server_save = function(name)
+                  assert(name == 'mir5-native-complete')
+                  saves = saves + 1
+                end
+              },
+              storage = {}
+            }
+            environment._G = environment
+            setmetatable(environment, {__index = function(_, key) return _G[key] end})
+            local chunk, message = loadfile(path, 't', environment)
+            assert(chunk ~= nil, message)
+            assert(pcall(chunk))
+            assert(type(callbacks.on_event) == 'table' and callbacks.on_event.event == 1)
+            environment.storage.mir5_api_beta_production = {
+              phase = 'researched', machine = machine,
+              phase_plates_remaining = 0, phase_plates_inserted = 100,
+              phase_refills = 1, phase_output = phase_output,
+              baseline_plates_inserted = 100, researched_plates_inserted = 0,
+              baseline_output = 200, researched_output = 0,
+              research_completed_by_native_setter = true, deadline_tick = 100
+            }
+            local ok, message = pcall(callbacks.on_event.callback)
+            local state = environment.storage.mir5_api_beta_production
+            return ok, message, {
+              phase = state.phase,
+              saved = state.saved == true,
+              phase_output = state.phase_output,
+              researched_output = state.researched_output,
+              server_saves = saves,
+              marker_count = logged
+            }
+          end
         """)
 
     def control(self, fixture):
@@ -131,6 +226,28 @@ class FixtureControlHostStageTests(unittest.TestCase):
             "assert_consumer_control_parse(fixture_control, false, false)"
         )
         self.assertIsNone(reads_mods)
+
+    def test_beta_production_final_tick_waits_for_output_and_finalizes_before_reload_oracle(self):
+        self.lua.globals().fixture_control = self.control("api-beta-production")
+        early_ok, early_error, early = self.lua.eval(
+            "run_beta_production_final_tick(fixture_control, 200, 0)"
+        )
+        self.assertTrue(early_ok, early_error)
+        self.assertEqual(early.phase, "researched")
+        self.assertFalse(early.saved)
+        self.assertEqual(early.phase_output, 200)
+        self.assertEqual(early.server_saves, 0)
+        self.assertEqual(early.marker_count, 0)
+
+        complete_ok, complete_error, complete = self.lua.eval(
+            "run_beta_production_final_tick(fixture_control, 202, 0)"
+        )
+        self.assertTrue(complete_ok, complete_error)
+        self.assertEqual(complete.phase, "completed")
+        self.assertTrue(complete.saved)
+        self.assertEqual(complete.researched_output, 202)
+        self.assertEqual(complete.server_saves, 1)
+        self.assertEqual(complete.marker_count, 1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
