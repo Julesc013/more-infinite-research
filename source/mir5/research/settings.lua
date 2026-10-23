@@ -20,7 +20,8 @@ local fields = {
 
 local native_fields = {
   {key = "worker_robots_speed_max_level", name = "mir-max-level-worker-robots-speed", type = "int-setting", default_value = 0, minimum_value = 0, maximum_value = 2147483647},
-  {key = "passive_repair_enabled", name = "mir-enable-passive-repair", type = "bool-setting", default_value = false}
+  {key = "passive_repair_enabled", name = "mir-enable-passive-repair", type = "bool-setting", default_value = false},
+  {key = "unrestricted_modules", name = "mir-unrestricted-modules", type = "bool-setting", default_value = false}
 }
 
 local function copy_spec(spec)
@@ -74,7 +75,13 @@ function M.prototypes()
     else
       name = {"mod-setting-name." .. spec.name}
       description = {"mod-setting-description." .. spec.name}
-      order = spec.name == "mir-max-level-worker-robots-speed" and "c-200-worker-robots-speed-cap" or "c-210-passive-repair"
+      if spec.name == "mir-max-level-worker-robots-speed" then
+        order = "c-200-worker-robots-speed-cap"
+      elseif spec.name == "mir-enable-passive-repair" then
+        order = "c-210-passive-repair"
+      else
+        order = "c-220-unrestricted-modules"
+      end
     end
     out[#out + 1] = {
       type = spec.type, name = spec.name, setting_type = "startup",

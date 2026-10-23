@@ -39,14 +39,16 @@ class SettingsProfileTests(unittest.TestCase):
     def test_registered_settings_are_the_single_active_profile_authority(self):
         self.lua.execute(r'''
           local prototypes, names = config.prototypes(), config.registered_names()
-          assert(#prototypes == 10 and #names == 9)
+          assert(#prototypes == 11 and #names == 10)
           local found = {}
           for _, name in ipairs(names) do found[name] = true end
           assert(not found[config.import_setting_name])
           assert(found["ips-enable-research_gears"])
           assert(found["mir-max-level-worker-robots-speed"])
           assert(found["mir-enable-passive-repair"])
+          assert(found["mir-unrestricted-modules"])
           assert(config.default_value("mir-enable-passive-repair") == false)
+          assert(config.default_value("mir-unrestricted-modules") == false)
           local growth
           for _, spec in ipairs(prototypes) do
             if spec.name == "ips-cost-growth-research_gears" then growth = spec end
@@ -62,13 +64,15 @@ class SettingsProfileTests(unittest.TestCase):
         self.lua.execute(r'''
           settings.startup["ips-cost-base-research_gears"].value = 100
           settings.startup["ips-cost-growth-research_gears"].value = 2
+          settings.startup["mir-unrestricted-modules"].value = true
           settings.startup[config.import_setting_name].value = "MIRSET1:incoming"
           decoded.incoming = {schema=1, kind="mir-settings-profile", settings={
             ["ips-enable-research_gears"] = false,
             ["ips-cost-base-research_gears"] = 777,
             ["ips-cost-growth-research_gears"] = 1001,
             ["ips-research-time-research_gears"] = 0,
-            ["mir-enable-passive-repair"] = true
+            ["mir-enable-passive-repair"] = true,
+            ["mir-unrestricted-modules"] = false
           }}
           local effective = config.effective_values(settings.startup, helpers)
           local result = config.resolve(settings.startup, helpers)
@@ -77,6 +81,7 @@ class SettingsProfileTests(unittest.TestCase):
           assert(effective["ips-research-time-research_gears"] == 0)
           assert(result.enabled == false and result.base_cost == 777 and result.growth_factor == 2)
           assert(result.research_time == 60 and result.passive_repair_enabled == true)
+          assert(result.unrestricted_modules == false)
           assert(settings.startup[config.import_setting_name].value == "MIRSET1:incoming")
         ''')
 
@@ -129,12 +134,14 @@ class SettingsProfileTests(unittest.TestCase):
           settings.startup[config.import_setting_name].value = "MIRSET1:effective"
           decoded.effective = {schema=1, settings={
             ["ips-cost-base-research_gears"] = 901,
-            ["mir-enable-passive-repair"] = true
+            ["mir-enable-passive-repair"] = true,
+            ["mir-unrestricted-modules"] = true
           }}
           local wire, err = facade.export_string({compact = false})
           assert(not err and wire:sub(1, 8) == "MIRSET1:")
           assert(last_encoded:find('"ips%-cost%-base%-research_gears":901'))
           assert(last_encoded:find('"mir%-enable%-passive%-repair":true'))
+          assert(last_encoded:find('"mir%-unrestricted%-modules":true'))
           local settings_part = last_encoded:sub(assert(last_encoded:find('"settings":{', 1, true)))
           assert(not settings_part:find(config.import_setting_name, 1, true))
           decoded.status = {schema=1, settings={
