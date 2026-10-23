@@ -106,6 +106,7 @@ class PackTests(unittest.TestCase):
                 "research/settings.lua",
                 "research/settings_profile.lua",
                 "research/historical_settings.lua",
+                "research/native_direct_definitions.lua",
                 "compatibility/modern_catalogue.lua",
                 "compatibility/modern_catalogue/base.lua",
                 "compatibility/modern_catalogue/space_age.lua",
