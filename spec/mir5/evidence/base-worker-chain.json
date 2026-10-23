@@ -1,0 +1,242 @@
+{
+  "schema": 1,
+  "kind": "authored-private-native-base-worker-scope-index-not-runner-receipt",
+  "scope": "F210 base tail-six saved unlimited baseline to cap seven and back",
+  "release_qualification": false,
+  "player_archive_sha256": "31EDAD840A721C313E25BBCE996BCC30E3D9B862E695B075F998B1186E9150EE",
+  "player_source_commit": "d2be4a08bc4ce683a94eadb82e76667b7251ed7f",
+  "accepted_scenarios": [
+    {
+      "receipt": "spec/mir5/evidence/base-worker-precap-native.json",
+      "receipt_sha256": "EB7926098E7C5904C2FD85A2EC53C78DC71CD8812018364840E34E09CA4A2CDE",
+      "original_run": "build/tmp/mir5-base-worker-precap-native-r01/result.json",
+      "status": "passed-private-native-fixture",
+      "runner_source_head": "7590b92231b4d98d954448b0728bdfd9963de240",
+      "runner_source_dirty": true,
+      "fixture_inputs": [
+        {
+          "sha256": "0F63673F8636C924D7E7589B8CA5E89F2F1EFBF9B08BA64B48FA6189150CCC39",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.0.1.zip",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-precap"
+        }
+      ],
+      "profile_input": {
+        "sha256": "ABA9BA3E2CDB893E2837078750E222BB375D6715808A0A8520ADCB0DE8627120",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-precap-f210.json"
+      },
+      "input_save": null,
+      "controls_restored": true,
+      "observed": {
+        "owner": "worker-robots-speed-6",
+        "next_level": 8,
+        "cap": 0,
+        "completed_levels": 2,
+        "modifier_before": 2.4,
+        "modifier_after": 3.6999999999999997,
+        "native_researched_setter_observation": true,
+        "primary_enabled": true,
+        "primary_visible": false,
+        "foreign_enabled": false,
+        "foreign_visible": false,
+        "on_load_read_only": false
+      },
+      "completed_save_sha256": "9AE44FB4F347B72B19158B4F0F61613E0E85F60E125326FB942890E9DBEF1B64",
+      "two_cold_reloads_byte_identical": true
+    },
+    {
+      "receipt": "spec/mir5/evidence/base-worker-cap-config-native.json",
+      "receipt_sha256": "61945AB0A265387B21357AED2BF4FAAFF2C0B99D62BEE1862D4F6DE4308E753A",
+      "original_run": "build/tmp/mir5-base-worker-cap-upgrade-native-r02/result.json",
+      "status": "passed-private-native-fixture",
+      "runner_source_head": "a146bd0041fd3a6a0dab8b777ebb55aab37798a2",
+      "runner_source_dirty": true,
+      "fixture_inputs": [
+        {
+          "sha256": "8D6402F78E1F53D5075387AACE45DB19FE598529ADDA61D40E75845D1D6B77CE",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.1.4.zip"
+        }
+      ],
+      "profile_input": {
+        "sha256": "B69370B81D38F4750CB80651B875C15C58C230505C9E99DD6E4EFA99A2FD12A1",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-f210.json"
+      },
+      "input_save": {
+        "sha256": "9AE44FB4F347B72B19158B4F0F61613E0E85F60E125326FB942890E9DBEF1B64",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "controls_restored": true,
+      "observed": {
+        "owner": "worker-robots-speed-6",
+        "cap": 7,
+        "initial_level": 6,
+        "next_level": 8,
+        "completed_levels": 2,
+        "original_owner_enabled": true,
+        "original_owner_visible": false,
+        "modifier_before": 2.4,
+        "modifier_after": 3.6999999999999997,
+        "modifier_delta": 1.2999999999999998,
+        "owner_enabled": false,
+        "owner_visible": true,
+        "foreign_enabled": false,
+        "foreign_visible": true,
+        "native_researched_setter_observation": true,
+        "on_load_read_only": false
+      },
+      "completed_save_sha256": "512A44C7ADD879BF4367B1B1D0DF3DAA00B6C26062438A660C4A2669E096868B",
+      "two_cold_reloads_byte_identical": true,
+      "source_save_byte_identical": true
+    },
+    {
+      "receipt": "spec/mir5/evidence/base-worker-uncap-config-native.json",
+      "receipt_sha256": "6E5AA2114A044FF8E8A22FB5B2799A5218B4B574EB29EAB858A33E95BEDE2011",
+      "original_run": "build/tmp/mir5-base-worker-uncap-config-native-r01/result.json",
+      "status": "passed-private-native-fixture",
+      "runner_source_head": "a146bd0041fd3a6a0dab8b777ebb55aab37798a2",
+      "runner_source_dirty": true,
+      "fixture_inputs": [
+        {
+          "sha256": "834FE84323E275AE457B21604F344684E5F0F2D0609458813EF310E767E47E88",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.2.zip",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap-relaxed"
+        }
+      ],
+      "profile_input": {
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-relaxed-f210.json",
+        "sha256": "0B49ADF1D989A9796D58ADCE7565B420A8C0AEB8AD44CAFF6E09C66F999F8EA2"
+      },
+      "input_save": {
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-cap-upgrade-native-r02\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "512A44C7ADD879BF4367B1B1D0DF3DAA00B6C26062438A660C4A2669E096868B"
+      },
+      "controls_restored": true,
+      "observed": {
+        "owner": "worker-robots-speed-6",
+        "next_level": 8,
+        "startup_cap": 0,
+        "worker_robots_speed_modifier": 3.6999999999999997,
+        "owner_enabled": true,
+        "owner_visible": false,
+        "foreign_enabled": false,
+        "foreign_visible": false,
+        "on_load_read_only": false
+      },
+      "completed_save_sha256": "DAA5B6741849B51253CDE546CD4E455328C4301A5376CBADD3983F788E8E11AF",
+      "two_cold_reloads_byte_identical": true,
+      "source_save_byte_identical": true
+    }
+  ],
+  "unchanged_adverse_receipts": [
+    {
+      "receipt": "spec/mir5/evidence/base-worker-uncap-foreign-adverse.json",
+      "receipt_sha256": "62AAC1E44E71DCAD07F0490CBA107B64AD8BF697A57A9968A0125C5077F63B3C",
+      "original_run": "build/tmp/mir5-base-worker-uncap-native-r01/result.json",
+      "status": "failed",
+      "runner_source_head": "ac53c36586301700327c1480402cef02e1e8fc50",
+      "runner_source_dirty": false,
+      "fixture_inputs": [
+        {
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap-relaxed",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.1.zip",
+          "sha256": "7D3FB9902B90B121FF463925A6DA1EF30A16B7FE346C24D7C962930D8FB12B0A"
+        }
+      ],
+      "profile_input": {
+        "sha256": "55E8CED8D2BF5197C4B4195A83F65FF014C9B181CC4A384220B0F201D1F33598",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-relaxed-f210.json"
+      },
+      "input_save": {
+        "sha256": "FEA3792F59AC30A3F48CCDE820D9A3C8F8A8DA0EE80A253E7E603A9CD27678CC",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-cap-native-r01\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "controls_restored": true,
+      "failure": "[mir441-process-exit] -1"
+    },
+    {
+      "receipt": "spec/mir5/evidence/base-worker-uncap-foreign-values-adverse.json",
+      "receipt_sha256": "18E960CE9F3BDF9E3FE9B862E95B0532E1B0D29E4273C3F3118EE3ACCA9EB28C",
+      "original_run": "build/tmp/mir5-base-worker-uncap-native-r02/result.json",
+      "status": "failed",
+      "runner_source_head": "51c329b350eab6dabab6d1b3509b36d31390881f",
+      "runner_source_dirty": false,
+      "fixture_inputs": [
+        {
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.2.zip",
+          "sha256": "834FE84323E275AE457B21604F344684E5F0F2D0609458813EF310E767E47E88",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap-relaxed"
+        }
+      ],
+      "profile_input": {
+        "sha256": "0B49ADF1D989A9796D58ADCE7565B420A8C0AEB8AD44CAFF6E09C66F999F8EA2",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-relaxed-f210.json"
+      },
+      "input_save": {
+        "sha256": "FEA3792F59AC30A3F48CCDE820D9A3C8F8A8DA0EE80A253E7E603A9CD27678CC",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-cap-native-r01\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "controls_restored": true,
+      "failure": "[mir441-process-exit] -1"
+    },
+    {
+      "receipt": "spec/mir5/evidence/base-worker-uncap-event-order-adverse.json",
+      "receipt_sha256": "79362CF46569ABBAD56CA93F93FFA2BE6EEC01E1C91534FC7E2F61F4D4C4C3AB",
+      "original_run": "build/tmp/mir5-base-worker-uncap-native-r03/result.json",
+      "status": "failed",
+      "runner_source_head": "80e4aec3c723583e9c731d4cfc70a37c192ab29e",
+      "runner_source_dirty": false,
+      "fixture_inputs": [
+        {
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap-relaxed",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.2.2.zip",
+          "sha256": "834FE84323E275AE457B21604F344684E5F0F2D0609458813EF310E767E47E88"
+        }
+      ],
+      "profile_input": {
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-relaxed-f210.json",
+        "sha256": "0B49ADF1D989A9796D58ADCE7565B420A8C0AEB8AD44CAFF6E09C66F999F8EA2"
+      },
+      "input_save": {
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-cap-native-r02\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "7356A34C30B28967371A3B7E6BB639C5CD6B37282E0AF9E965114C2762ED4483"
+      },
+      "controls_restored": true,
+      "failure": "[mir441-process-exit] -1"
+    },
+    {
+      "receipt": "spec/mir5/evidence/base-worker-cap-empty-range-adverse.json",
+      "receipt_sha256": "3E7728B0A3ACB6E9371A387CFFA351289B40035D437E7C5663D5B17C3F98F5E8",
+      "original_run": "build/tmp/mir5-base-worker-cap-upgrade-native-r01/result.json",
+      "status": "failed",
+      "runner_source_head": "7590b92231b4d98d954448b0728bdfd9963de240",
+      "runner_source_dirty": true,
+      "fixture_inputs": [
+        {
+          "sha256": "83BA1E68DC8AF1FF1C00832325BFB21D9B12EDA137E2C477BA801CEA2FD2092A",
+          "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\worker-speed-cap",
+          "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-worker-speed-cap_0.1.3.zip"
+        }
+      ],
+      "profile_input": {
+        "sha256": "EA5552D868919ED5E07946CE25C3A29468B4C49C92FAE9035653DC2D06A5062D",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\worker-speed-cap-f210.json"
+      },
+      "input_save": {
+        "sha256": "9AE44FB4F347B72B19158B4F0F61613E0E85F60E125326FB942890E9DBEF1B64",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-base-worker-precap-native-r01\\write-data\\saves\\mir5-native-complete.zip"
+      },
+      "controls_restored": true,
+      "failure": "[mir441-process-exit] 1"
+    }
+  ],
+  "limitations": [
+    "Disposable partial-catalogue worlds; no historical MIR4 or production upgrade.",
+    "Two native researched setters, not laboratories, science consumption or physical robot travel.",
+    "Fixture-only valid setting ranges clamp the saved cap for both configuration directions.",
+    "Earlier same-initializer foreign-disable setup fails relaxation even after reordering; it is not accepted foreign ownership evidence.",
+    "The accepted chain establishes the foreign baseline in a separate unlimited saved world before finite-cap ownership exists.",
+    "The empty-range attempt is an engine-rejected fixture error, not a candidate failure or sample.",
+    "Runner checkouts include separately owned in-progress source edits; held player and fixture archive bytes are exact. These are not final-candidate runs.",
+    "No real clients, multiplayer, full catalogue or performance qualification."
+  ]
+}
