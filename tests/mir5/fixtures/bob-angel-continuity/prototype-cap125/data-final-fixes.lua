@@ -126,6 +126,7 @@ end
 -- The MIR data-final override has already resolved the selected startup
 -- policy. Verify every named native route before the disposable technology
 -- count/time acceleration below.
+local production = require("production-data")
 local REQUIRED_RECIPE_CAPS = {
   "angels-plate-aluminium", "angels-plate-aluminium-2", "bob-copper-tungsten-alloy",
   "angels-plate-gold", "angels-plate-gold-2", "angels-wire-gold-2",
@@ -135,6 +136,9 @@ for _, name in ipairs(REQUIRED_RECIPE_CAPS) do
   local recipe = assert(data.raw.recipe and data.raw.recipe[name], "named recipe is absent: " .. name)
   assert(recipe.maximum_productivity == 1.25, "named recipe productivity cap changed: " .. name)
 end
+production.assert_recipe(assert(data.raw.recipe and data.raw.recipe[production.name],
+  "captured solid production recipe is absent"), 1.25)
+production.install_machine()
 
 -- All ten defaults were checked before the first write. The native fixture
 -- changes only disposable count/time, leaving output identity/effects intact.

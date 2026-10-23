@@ -11,9 +11,11 @@ local START_NEXT_LEVEL = 63
 local FINISHED_NEXT_LEVEL = 64
 local START_BONUS = 1.24
 local RAW_COMPLETED_BONUS = 1.26
+local PRODUCTION = {cap=CAP, earned=RAW_COMPLETED_BONUS, effective=CAP, minimum_bonus_crafts=1250, maximum_bonus_crafts=1250, minimum_output=56250, maximum_output=56250}
 local INITIAL_PACKS = 16
 local DEADLINE_TICKS = 18000
 local loaded, reload_logged = nil, false
+local production = require("production")
 
 local FAMILIES = {
   {key="research_material_aluminium", early="recipe-prod-research_material_aluminium-1", tail="recipe-prod-research_material_aluminium-4", recipes={"angels-plate-aluminium", "angels-plate-aluminium-2"}},
@@ -217,13 +219,24 @@ local function marker(stage, state)
       native_recipe_productivity_bonus=state.player_bonus,
       raw_completed_bonus_formula=RAW_COMPLETED_BONUS,
       native_recipe_bonus_is_observed_separately_from_prototype_cap=true,
+      physical_solid_recipe=production.recipe_name(), physical_solid_crafts=production.crafts(),
+      physical_solid_base_output=state.production and state.production.base,
+      physical_solid_effective_bonus=state.production and state.production.effective,
+      physical_solid_expected_bonus_crafts_min=PRODUCTION.minimum_bonus_crafts,
+      physical_solid_expected_bonus_crafts_max=PRODUCTION.maximum_bonus_crafts,
+      physical_solid_expected_output_min=PRODUCTION.minimum_output,
+      physical_solid_expected_output_max=PRODUCTION.maximum_output,
+      physical_solid_bonus_crafts=state.production and state.production.bonus_crafts,
+      physical_solid_output_mass_balance_progress=state.production and state.production.remaining_productivity_progress,
+      physical_solid_native_bonus_progress=state.production and state.production.native_bonus_progress,
+      physical_solid_output=state.production and state.production.output,
       foreign_disabled_effect_and_queue_preserved=true,
       sequential_native_queue_entries=state.queue_count, on_load_read_only=stage == "reload",
       qualification="native-runner-readback-required",
     },
   }))
 end
-local function assert_complete(state)
+local function assert_complete(state, physical)
   if state.completed ~= #state.plan or state.events ~= #state.plan or state.queue_count ~= #state.plan then
     fail("actual cap-boundary lab completions differ")
   end
@@ -239,6 +252,7 @@ local function assert_complete(state)
       fail("real lab science consumption differs for " .. science)
     end
   end
+  if physical then production.assert_complete(state, player, PRODUCTION, "125-percent physical production") end
   local foreign = game.forces[state.foreign_index]
   if not foreign or foreign.valid == false then fail("foreign force is absent") end
   check_rows(foreign, START_NEXT_LEVEL, false, "foreign")
@@ -271,7 +285,8 @@ script.on_init(function()
     fail("native queue did not accept first cap-boundary research")
   end
   storage[KEY] = {phase="prototype-cap125-running", plan=sequence, completed=0, events=0, queue_count=1,
-    deadline=game.tick + DEADLINE_TICKS, lab=lab, foreign_index=foreign.index, foreign=foreign_state}
+    deadline=game.tick + DEADLINE_TICKS, lab=lab, foreign_index=foreign.index, foreign=foreign_state,
+    production_machine=production.machine_for(player, {cap=CAP}, "125-percent production setup")}
 end)
 script.on_load(function()
   local state = storage[KEY]
@@ -295,10 +310,9 @@ script.on_event(defines.events.on_tick, function()
     if game.tick > state.deadline then fail("actual cap-boundary lab did not complete") end
     state.lab.energy = 100000000
     if state.completed == #state.plan then
-      assert_complete(state)
-      state.phase = "prototype-cap125-saved"
-      marker("initial", state)
-      game.server_save(SAVE)
+      assert_complete(state, false)
+      production.begin(state, game.forces.player, PRODUCTION, "125-percent physical production")
+      state.phase = "prototype-cap125-production"
     elseif game.forces.player.current_research == nil then
       local name = state.plan[state.completed + 1]
       local force = game.forces.player
@@ -308,11 +322,19 @@ script.on_event(defines.events.on_tick, function()
       end
       state.queue_count = state.queue_count + 1
     end
+  elseif state.phase == "prototype-cap125-production" then
+    if game.tick > state.deadline then fail("native 125-percent physical production did not complete") end
+    if production.tick(state) then
+      assert_complete(state, true)
+      state.phase = "prototype-cap125-saved"
+      marker("initial", state)
+      game.server_save(SAVE)
+    end
   elseif state.phase == "prototype-cap125-saved" and loaded and not reload_logged then
     if loaded.completed ~= state.completed or loaded.events ~= state.events or loaded.queue_count ~= state.queue_count then
       fail("on_load changed cap-boundary state")
     end
-    assert_complete(state)
+    assert_complete(state, true)
     marker("reload", state)
     reload_logged = true
   end
