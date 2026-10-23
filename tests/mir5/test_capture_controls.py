@@ -15,6 +15,7 @@ FIXTURE = ROOT / "tests/mir5/fixtures/active-mods-observer"
 PROTOTYPE_CAPTURE = ROOT / "tools/mir5/Invoke-PrototypeCapture.ps1"
 REPLAY_CAPTURE = ROOT / "tools/mir5/Invoke-ReplayCapture.ps1"
 MENU_COMPARISON = ROOT / "tools/mir5/Invoke-MenuComparison.ps1"
+NATIVE_FIXTURE = ROOT / "tools/mir5/Invoke-NativeFixture.ps1"
 LIBRARY_ACTIVATION = ROOT / "tools/lib/compatibility/LibraryActivation.ps1"
 
 
@@ -33,6 +34,42 @@ def assert_powershell_parses(path: Path) -> None:
         text=True,
         capture_output=True,
     )
+
+
+def native_fixture_observer_guard_cases() -> dict:
+    """Execute the wrapper's isolated observer-binding helper, never its runner."""
+    escaped = str(NATIVE_FIXTURE).replace("'", "''")
+    command = rf"""
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw ($errors | ForEach-Object {{$_.ToString()}})}}
+$definition=@($ast.Find({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-FixtureActiveModsObserver'}},$true))
+if($definition.Count -ne 1){{throw 'observer helper missing or ambiguous'}}
+function Assert-Fixture([bool]$Condition,[string]$Message) {{if(-not $Condition){{throw "[mir5-native-fixture] $Message"}}}}
+. ([scriptblock]::Create($definition[0].Extent.Text))
+function Invoke-ObserverCase([string]$Name,[object[]]$Rows,[object[]]$Inputs) {{
+  try {{[ordered]@{{valid=$true;value=(Get-FixtureActiveModsObserver -Name $Name -ProfileRows $Rows -FixtureInputs $Inputs)}}}}
+  catch {{[ordered]@{{valid=$false;message=$_.Exception.Message}}}}
+}}
+$verified=@([pscustomobject]@{{name='mir-fixture-mir5-active-mods-observer';version='0.1.0';source='fixture-source';archive='fixture.zip';sha256=('A'*64)}})
+$selected=@([pscustomobject]@{{name='mir-fixture-mir5-active-mods-observer';version='0.1.0';enabled=$true}})
+$cases=[ordered]@{{
+  positive=(Invoke-ObserverCase 'mir-fixture-mir5-active-mods-observer' $selected $verified)
+  blank=(Invoke-ObserverCase '   ' $selected $verified)
+  missing=(Invoke-ObserverCase 'mir-fixture-mir5-active-mods-observer' @([pscustomobject]@{{name='other';version='0.1.0';enabled=$true}}) $verified)
+  unselected=(Invoke-ObserverCase 'mir-fixture-mir5-active-mods-observer' @([pscustomobject]@{{name='mir-fixture-mir5-active-mods-observer';version='0.1.0';enabled=$false}}) $verified)
+  unverified=(Invoke-ObserverCase 'mir-fixture-mir5-active-mods-observer' $selected @([pscustomobject]@{{name='other';version='0.1.0';source='other';archive='other.zip';sha256=('B'*64)}}))
+}}
+$cases | ConvertTo-Json -Compress -Depth 6
+"""
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", command],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    return json.loads(result.stdout)
 
 
 class CaptureControlTests(unittest.TestCase):
@@ -118,8 +155,9 @@ class CaptureControlTests(unittest.TestCase):
         prototype = PROTOTYPE_CAPTURE.read_text(encoding="utf-8")
         replay = REPLAY_CAPTURE.read_text(encoding="utf-8")
         menu = MENU_COMPARISON.read_text(encoding="utf-8")
+        native_fixture = NATIVE_FIXTURE.read_text(encoding="utf-8")
 
-        for source in (prototype, replay, menu):
+        for source in (prototype, replay, menu, native_fixture):
             self.assertRegex(source, r"\[string\]\$ActiveModsObserver\s*=\s*''")
 
         self.assertIn(
@@ -133,9 +171,41 @@ class CaptureControlTests(unittest.TestCase):
         self.assertIn("-ActiveModsObserver $ActiveModsObserver", replay)
         self.assertIn("-ActiveModsObserver $Inputs.active_mods_observer", menu)
         self.assertIn("active_mods_observer=$activeModsObserver", menu)
+        self.assertIn("function Get-FixtureActiveModsObserver", native_fixture)
+        self.assertIn("ActiveModsObserver must be a verified FixtureSources input", native_fixture)
+        self.assertIn("$activation.selected | Where-Object", native_fixture)
+        self.assertIn("$record.active_mods_observer=[ordered]", native_fixture)
+        self.assertIn(
+            "-LatestInvocation -ActiveModsObserver $activeModsObserverName",
+            native_fixture,
+        )
+
+    def test_native_fixture_observer_binding_rejects_missing_unselected_and_unverified_inputs(self):
+        cases = native_fixture_observer_guard_cases()
+
+        self.assertTrue(cases["positive"]["valid"])
+        self.assertEqual(
+            cases["positive"]["value"],
+            {
+                "name": "mir-fixture-mir5-active-mods-observer",
+                "version": "0.1.0",
+                "source": "fixture-source",
+                "archive": "fixture.zip",
+                "sha256": "A" * 64,
+            },
+        )
+        self.assertTrue(cases["blank"]["valid"])
+        self.assertIsNone(cases["blank"]["value"])
+
+        self.assertFalse(cases["missing"]["valid"])
+        self.assertIn("must appear exactly once in the profile", cases["missing"]["message"])
+        self.assertFalse(cases["unselected"]["valid"])
+        self.assertIn("must be selected exactly once", cases["unselected"]["message"])
+        self.assertFalse(cases["unverified"]["valid"])
+        self.assertIn("must be a verified FixtureSources input", cases["unverified"]["message"])
 
     def test_capture_wrappers_remain_powershell_parseable(self):
-        for script in (PROTOTYPE_CAPTURE, REPLAY_CAPTURE, MENU_COMPARISON):
+        for script in (PROTOTYPE_CAPTURE, REPLAY_CAPTURE, MENU_COMPARISON, NATIVE_FIXTURE):
             assert_powershell_parses(script)
 
     def test_shared_contract_still_has_missing_and_unselected_observer_refusals(self):

@@ -6,6 +6,7 @@ param(
   [Parameter(Mandatory)][string]$ProfilePath,
   [Parameter(Mandatory)][string[]]$FixtureSources,
   [string]$ExpectedMIRArchiveSha256='',
+  [string]$ActiveModsObserver='',
   [Parameter(Mandatory)][string]$CaseName,
   [Parameter(Mandatory)][string]$OutputRoot,
   [string[]]$ConsumerMarkers=@(),
@@ -47,6 +48,19 @@ function Read-ConsumerResults([string]$Text,[string]$Stage) {
   }
   $results
 }
+function Get-FixtureActiveModsObserver([string]$Name,[object[]]$ProfileRows,[object[]]$FixtureInputs) {
+  $name=$Name.Trim()
+  if([string]::IsNullOrWhiteSpace($name)){return $null}
+  $profileMatches=@($ProfileRows | Where-Object {[string]$_.name -ceq $name})
+  Assert-Fixture ($profileMatches.Count -eq 1) 'ActiveModsObserver must appear exactly once in the profile'
+  Assert-Fixture ([bool]$profileMatches[0].enabled) 'ActiveModsObserver must be selected exactly once'
+  $sourceMatches=@($FixtureInputs | Where-Object {[string]$_.name -ceq $name})
+  Assert-Fixture ($sourceMatches.Count -eq 1) 'ActiveModsObserver must be a verified FixtureSources input'
+  $source=$sourceMatches[0]
+  Assert-Fixture ([string]$profileMatches[0].version -ceq [string]$source.version) 'ActiveModsObserver selected version differs from verified FixtureSources input'
+  Assert-Fixture ([string]$source.sha256 -cmatch '^[a-fA-F0-9]{64}$') 'ActiveModsObserver verified archive hash is invalid'
+  [ordered]@{name=[string]$source.name;version=[string]$source.version;source=[string]$source.source;archive=[string]$source.archive;sha256=[string]$source.sha256}
+}
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {
   $live=Join-Path $writeData 'factorio-current.log'
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
@@ -66,12 +80,13 @@ function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptbloc
   }else{
     Assert-Fixture ($native.result.exit_code -eq 0) "$Name natural exit was not zero"
   }
-  [ordered]@{process=$native;log=$log;log_sha256=Get-FixtureSha $log;loaded_selection=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation}
+  [ordered]@{process=$native;log=$log;log_sha256=Get-FixtureSha $log;loaded_selection=Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $log -LatestInvocation -ActiveModsObserver $activeModsObserverName}
 }
 
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
 $library=(Resolve-Path -LiteralPath $ArchiveLibrary).Path
 $engine=(Resolve-Path -LiteralPath $FactorioBin).Path
+$activeModsObserverName=$ActiveModsObserver.Trim()
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $inputSave=$null
 if($InputSavePath -or $ExpectedInputSaveSha256){
@@ -99,15 +114,18 @@ if($MIRAbsent){
   $mir=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -ceq $mirRows[0].version})
   Assert-Fixture ($mir.Count -eq 1 -and (Get-FixtureSha $mir[0].path) -ceq $ExpectedMIRArchiveSha256.ToUpperInvariant()) 'MIR archive hash differs'
 }
-$fixtureInputs=@()
+$fixtureInputs=@();$fixtureBindings=@()
 foreach($source in $FixtureSources){
   $source=(Resolve-Path -LiteralPath $source).Path
   $info=Get-Content -LiteralPath (Join-Path $source 'info.json') -Raw | ConvertFrom-Json
   $archive=Join-Path $library ($info.name+'_'+$info.version+'.zip')
   Assert-MIRLibraryFixtureArchive -Archive $archive -SourceDirectory $source
   Assert-Fixture (@($rows | Where-Object {$_.enabled -and $_.name -ceq $info.name -and $_.version -ceq $info.version}).Count -eq 1) 'fixture is not selected exactly once'
-  $fixtureInputs+=@{source=$source;archive=$archive;sha256=Get-FixtureSha $archive}
+  $archiveSha=Get-FixtureSha $archive
+  $fixtureInputs+=@{source=$source;archive=$archive;sha256=$archiveSha}
+  $fixtureBindings+=@{name=[string]$info.name;version=[string]$info.version;source=$source;archive=$archive;sha256=$archiveSha}
 }
+$activeModsObserverBinding=Get-FixtureActiveModsObserver -Name $activeModsObserverName -ProfileRows $rows -FixtureInputs $fixtureBindings
 & (Join-Path $repo 'tools/commands/workspace/Test-MIRDevelopmentHealth.ps1') -MaxScanSeconds 2 -MaxEntriesPerRoot 500 | Out-Host
 $resources=$null;$activation=$null;$failure=$null
 $record=[ordered]@{
@@ -138,6 +156,14 @@ try{
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
+  if($null -ne $activeModsObserverBinding){
+    $actualObserver=@($activation.selected | Where-Object {[string]$_.name -ceq $activeModsObserverBinding.name})
+    Assert-Fixture ($actualObserver.Count -eq 1) 'ActiveModsObserver must be selected exactly once in the activation'
+    $actualObserver=$actualObserver[0]
+    Assert-Fixture ([string]$actualObserver.version -ceq [string]$activeModsObserverBinding.version) 'ActiveModsObserver activation version differs from verified FixtureSources input'
+    Assert-Fixture ((Get-FixtureSha ([string]$actualObserver.path)) -ceq [string]$activeModsObserverBinding.sha256) 'ActiveModsObserver activation archive differs from verified FixtureSources input'
+    $record.active_mods_observer=[ordered]@{name=[string]$actualObserver.name;version=[string]$actualObserver.version;source=[string]$activeModsObserverBinding.source;archive=[string]$actualObserver.path;sha256=Get-FixtureSha ([string]$actualObserver.path)}
+  }
   $seed=$inputSave
   if(-not $seed){
     $seed=Join-Path $writeData 'saves/seed.zip'
