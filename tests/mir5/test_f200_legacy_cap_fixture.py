@@ -156,6 +156,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             -- The independently observed published on_init owns visibility
             -- before the dependent fixture's init, even below the cap.
             player.technologies[GEAR].visible_when_disabled=true
+            player.technologies[GEAR].prototype.visible_when_disabled=true
             local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result}end
             ok,result=complete_player(source,2,.01);if not ok then return {ok=false,message=result}end
             ok,result=tick(source);if not ok then return {ok=false,message=result}end
@@ -171,7 +172,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             elseif opponent=="saved-progress" then player.technologies[GEAR].saved_progress=.26
             elseif opponent=="lab-count" then state.actual_lab_completions=1 end
             -- This is the candidate lifecycle result under test, not a fixture write.
-            if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=false end
+            if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true end
             local destination,message=load_control(destination_path,"5.0.20000","0.2.0",startup(40));if not destination then return {ok=false,message=message}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
             ok,result=complete_player(destination,4,.03);if not ok then return {ok=false,message=result}end
@@ -251,7 +252,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
         self.assertEqual((2, 1), (result["source_labs"], result["destination_labs"]))
         self.assertEqual((4, .03), (result["player_level"], result["bonus"]))
         self.assertTrue(result["player_enabled"])
-        self.assertFalse(result["player_visible"])
+        self.assertTrue(result["player_visible"])
         self.assertEqual(.42, result["foreign_progress"])
         self.assertFalse(result["foreign_enabled"])
         self.assertEqual((6, 2), (result["markers"], result["saves"]))

@@ -117,7 +117,12 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             local player,foreign=force("player",1,1.25),nil
             local game={tick=0,speed=1,forces={player=player,[1]=player},surfaces={}}
             game.surfaces[1]={create_entity=function(row)assert(row.name=="lab" and row.force==player);return lab end}
-            function game.create_force(name)foreign=force(name,2,2.5);game.forces[name]=foreign;game.forces[2]=foreign;return foreign end
+            function game.create_force(name)
+              foreign=force(name,2,2.5)
+              -- Prototype presentation was patched globally by published F200 data final fixes.
+              foreign.technologies[WORKER].prototype.visible_when_disabled=player.technologies[WORKER].prototype.visible_when_disabled
+              game.forces[name]=foreign;game.forces[2]=foreign;return foreign
+            end
             function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
             local storage={}
             local function startup(cap)
@@ -149,6 +154,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             end
             local source,message=load_control(source_path,"4.7.20002","0.1.0",startup(7));if not source then return {ok=false,message=message}end
             -- Published MIR is a dependency, so its on_init cap presentation precedes fixture on_init.
+            player.technologies[WORKER].prototype.visible_when_disabled=true
             player.technologies[WORKER].visible_when_disabled=true
             local ok,result=invoke(source,"init");if not ok then return {ok=false,message=result}end
             local state=storage.mir5_f200_legacy_worker
@@ -167,8 +173,10 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             elseif opponent=="saved-progress"then player.technologies[WORKER].saved_progress=.26
             elseif opponent=="speed-bonus"then player.worker_robots_speed_modifier=0
             elseif opponent=="lab-count"then state.actual_lab_completions=1 end
-            -- Emulates the candidate lifecycle restoration; it is not a fixture write.
-            if opponent~="stale-enable"then player.technologies[WORKER].enabled=true;player.technologies[WORKER].visible_when_disabled=false end
+            -- The source state owns the published positive-cap presentation.
+            -- The successor data-stage prototype independently returns to the
+            -- Base default before its lifecycle restores the source value.
+            if opponent~="stale-enable"then player.technologies[WORKER].enabled=true;player.technologies[WORKER].visible_when_disabled=true;player.technologies[WORKER].prototype.visible_when_disabled=false end
             local destination,message=load_control(destination_path,"5.0.20000","0.2.0",startup(40));if not destination then return {ok=false,message=message}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
             ok,result=complete(destination,9,state.player_with_independent+1.95);if not ok then return {ok=false,message=result}end
@@ -200,14 +208,17 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
     def test_exact_base_native_row_preflight_precedes_only_disposable_count_time_mutation(self):
         for directory, mir in (("published", "4.7.20002"), ("mir5", "5.0.20000")):
             with self.subTest(directory=directory):
-                result = self.lua.eval("worker_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, self.row())
+                row = self.row()
+                if directory == "published":
+                    row["visible_when_disabled"] = True
+                result = self.lua.eval("worker_data")(str(FIXTURE / directory / "data-final-fixes.lua"), mir, row)
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual((None, "1", 1), (result["row"]["unit"]["count"], result["row"]["unit"]["count_formula"], result["row"]["unit"]["time"]))
-        bad = self.row(); bad["effects"][1]["modifier"] = .6
+        bad = self.row(); bad["visible_when_disabled"] = True; bad["effects"][1]["modifier"] = .6
         result = self.lua.eval("worker_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", bad)
         self.assertFalse(result["ok"]); self.assertIn("published native worker effect changed", result["message"])
         self.assertEqual("2^(L-6)*1000", result["row"]["unit"]["count_formula"])
-        bad_default = self.row(); bad_default["visible_when_disabled"] = True
+        bad_default = self.row(); bad_default["visible_when_disabled"] = False
         result = self.lua.eval("worker_data")(str(FIXTURE / "published" / "data-final-fixes.lua"), "4.7.20002", bad_default)
         self.assertFalse(result["ok"]); self.assertIn("identity or progression changed", result["message"])
 
@@ -240,7 +251,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual(("completed", 2, 1, 9), (result["phase"], result["source_labs"], result["destination_labs"], result["player_level"]))
         self.assertAlmostEqual(3.323, result["bonus"], places=6)
-        self.assertTrue(result["player_enabled"]); self.assertFalse(result["player_visible"])
+        self.assertTrue(result["player_enabled"]); self.assertTrue(result["player_visible"])
         self.assertEqual(.42, result["foreign_progress"]); self.assertFalse(result["foreign_enabled"])
         self.assertEqual((6, 2), (result["markers"], result["saves"]))
 

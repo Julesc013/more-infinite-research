@@ -128,7 +128,10 @@ end
 local function assert_restored(state)
   assert_source_witness(state)
   local player = status(game.forces.player)
-  assert_status(player, {level = 8, researched = false, enabled = true, visible = false,
+  -- The source controller captured the positive-cap presentation value after
+  -- its data-stage patch. MIR5 restores that owned force presentation even
+  -- though the successor prototype itself keeps the Base default.
+  assert_status(player, {level = 8, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = state.player_with_independent + 2 * MODIFIER,
     saved_progress = 0.27}, "MIR5 restored native worker")
   assert_native_owner(technology(game.forces.player, WORKER))
@@ -140,7 +143,7 @@ end
 local function assert_completed(state)
   if state.destination_lab_completions ~= 1 then fail("successor did not finish exactly one further native worker lab level") end
   local player = status(game.forces.player)
-  assert_status(player, {level = 9, researched = false, enabled = true, visible = false,
+  assert_status(player, {level = 9, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = state.player_with_independent + 3 * MODIFIER},
     "MIR5 post-lab native worker")
   if game.forces.player.current_research ~= nil or #game.forces.player.research_queue ~= 0 then

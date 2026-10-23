@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 40000747035,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40000747035",
+    "conclusion": "failure"
+  },
+  "source": "0686d84fc062de16d8bfc27c6524cce6e2a7a5bd",
+  "player": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "83543A20B056E16A5B6B2F2FB553EC98FE70D0D2F7F3D1A49D7EAEEF78A22D21"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-kick-classification-adverse-native.json.gz",
+    "uncompressed_sha256": "771C7013A2CB488055F0F353A58BC1A89421616CC907C7592721B3273458E1CE"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-kick-classification-adverse-server.log.gz",
+      "uncompressed_sha256": "C4B249D8BE90BC77B9924E60DA6784970434E0FBEE55311AB02FED765F5E3EA6"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-kick-classification-adverse-german.log.gz",
+      "uncompressed_sha256": "2C05F5A4FFFC0A772F3D95AD73212A93D1E15195CE6398C0FA42800F22287EC7"
+    },
+    {
+      "gzip": "spec/mir5/evidence/library-multiplayer-kick-classification-adverse-actor.log.gz",
+      "uncompressed_sha256": "4A456BCAE168556930C1ED921CDF175AE4AF75D08BA6D7F8643F64FD85FEC0F5"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/40000747035/black-glass-library-multiplayer-40000747035-1",
+  "manifest_members_verified": 203,
+  "diagnosis": [
+    "Both real clients joined and passed initial distinct personal en/de view and unchanged native-research/queue/effect checks. Two actual GUI PNGs were produced, but rejoin/restart acceptance did not complete.",
+    "The test actor kicked its live clients; Factorio reports the normal localized kick notification as Error ClientMultiplayerManager.cpp:86. Strict fatal checking correctly stopped the actor on that text.",
+    "The revised actor stops its own clients before clearing their server peers. Fatal/desync rejection remains unchanged; no error whitelist is added.",
+    "Visual inspection of the original PNGs found overflowing controls and native research ticks labelled seconds. The revised Library uses bounded wrapping/scrolling and divides native energy by60 for its seconds label; new native verification remains required."
+  ],
+  "release_qualification": false,
+  "initial_screenshots": [
+    {
+      "locale": "en",
+      "path": "spec/mir5/evidence/library-multiplayer-initial-en-overflow-adverse.png",
+      "sha256": "3761A5CA3AA6BB6EA1C871993B7A2297FC4BE940784DD9FD3FA83DFCD4C32A11"
+    },
+    {
+      "locale": "de",
+      "path": "spec/mir5/evidence/library-multiplayer-initial-de-overflow-adverse.png",
+      "sha256": "10AC539B4FCCAB288FCC525C1C3BFE42528F196BC58231824A9209566A5DA142"
+    }
+  ]
+}

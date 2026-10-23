@@ -19,7 +19,7 @@ assert(mods.base == "2.0.77" and mods["more-infinite-research"] == "4.7.20002"
 local technology = assert(data.raw.technology[NAME], "published native worker tail is absent")
 assert(technology.type == "technology" and technology.name == NAME and technology.level == nil
   and technology.upgrade == true and technology.max_level == "infinite"
-  and technology.enabled == nil and technology.visible_when_disabled == nil and technology.hidden == nil,
+  and technology.enabled == nil and technology.visible_when_disabled == true and technology.hidden == nil,
   "published native worker identity or progression changed")
 names(technology.prerequisites, {"worker-robots-speed-5", "space-science-pack"},
   "published native worker prerequisites")

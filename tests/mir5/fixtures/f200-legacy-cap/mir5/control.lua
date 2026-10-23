@@ -108,7 +108,9 @@ end
 local function assert_restored(state)
   assert_source_witness(state)
   local player = status(game.forces.player)
-  assert_status(player, {level = 3, researched = false, enabled = true, visible = false,
+  -- Preserve the actual value captured by the published controller after its
+  -- data-final presentation patch, rather than inventing a false predecessor.
+  assert_status(player, {level = 3, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = 0.02, saved_progress = 0.27}, "MIR5 restored player")
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue)
   assert_acceleration(technology(game.forces.player, GEAR))
@@ -118,7 +120,7 @@ end
 local function assert_completed(state)
   if state.destination_lab_completions ~= 1 then fail("successor did not finish exactly one further lab level") end
   local player = status(game.forces.player)
-  assert_status(player, {level = 4, researched = false, enabled = true, visible = false,
+  assert_status(player, {level = 4, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = 0.03}, "MIR5 post-lab player")
   if game.forces.player.current_research ~= nil or #game.forces.player.research_queue ~= 0 then
     fail("successor gear research queue survived native completion")

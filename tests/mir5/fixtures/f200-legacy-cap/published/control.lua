@@ -184,10 +184,10 @@ script.on_init(function()
   player.enable_all_prototypes()
   local gear = technology(player, GEAR)
   assert_acceleration(gear)
-  -- The published controller already owns visibility at on_init whenever a
-  -- positive cap is selected. The immutable prototype still supplies false;
+  -- Published data-final cap presentation already patches the immutable
+  -- prototype to true. Its controller captures that true value at the cap;
   -- this fixture never writes either player gear presentation property.
-  if gear.prototype.visible_when_disabled ~= false then fail("published native prototype visibility changed") end
+  if gear.prototype.visible_when_disabled ~= true then fail("published native prototype visibility changed") end
   local before = status(player)
   assert_status(before, {level = 1, researched = false, enabled = true, visible = true,
     maximum = UINT32_MAX, bonus = 0, saved_progress = 0}, "published initial player")

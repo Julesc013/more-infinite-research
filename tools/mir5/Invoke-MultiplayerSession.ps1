@@ -428,7 +428,7 @@ function Start-Clients([string]$Phase) {
   $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
   $started=[Collections.Generic.List[object]]::new()
   foreach($client in $clients){
-    $actor=Start-Native ("client-$Phase-$($client.locale)") @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)
+    $actor=Start-Native ("client-$Phase-$($client.locale)") @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
     # until the first real join proves those startup writes finished before
@@ -447,8 +447,12 @@ try {
   $activeClients = Start-Clients 'initial'
   [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 })
   [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
+  # Stop our clients before clearing their server peers. A live kicked client
+  # logs the expected disconnect as an engine Error, which must not be confused
+  # with a product failure or hidden by weakening native fatal checks.
+  foreach ($client in $activeClients) { Stop-Record $client }
   Invoke-LoopbackRconKicks $rconPort $rconPassword
-  foreach ($client in $activeClients) { Stop-Record $client }; $activeClients = Start-Clients 'rejoin'
+  $activeClients = Start-Clients 'rejoin'
   [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 })
   [void](Wait-For 'complete rejoin client screenshots' { Find-Screenshots @('rejoin') })
   [void](Wait-For 'complete restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })

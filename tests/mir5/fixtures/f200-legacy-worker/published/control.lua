@@ -108,7 +108,9 @@ end
 
 local function assert_native_owner(value)
   if value.name ~= WORKER or value.prototype.max_level ~= UINT32_MAX
-      or value.prototype.visible_when_disabled ~= false
+      -- Published F200 applies its positive-cap presentation patch in data
+      -- final fixes before this control-stage observer runs.
+      or value.prototype.visible_when_disabled ~= true
       or value.level ~= 6 or value.researched then
     fail("F200 native worker tail identity or initial level differs")
   end

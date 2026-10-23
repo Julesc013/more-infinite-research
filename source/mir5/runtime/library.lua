@@ -793,7 +793,29 @@ local function row_index(rows, selected)
 end
 
 local function add(parent, spec)
-  return parent.add(spec)
+  local element = parent.add(spec)
+  -- Bound only this owned GUI subtree. Native labels wrap inside their
+  -- container; no world/catalogue work is involved in sizing a requested view.
+  local parent_style = spec.name ~= ROOT and parent.style or nil
+  local style = element.style
+  local width = parent_style and parent_style.maximal_width
+  if style and type(width) == "number" and width > 0 then
+    if spec.type == "label" then
+      style.single_line = false
+      style.maximal_width = width
+    elseif spec.type == "flow" or spec.type == "scroll-pane"
+        or spec.type == "tabbed-pane" or spec.type == "list-box" then
+      style.maximal_width = width
+      style.horizontally_stretchable = true
+    end
+  end
+  return element
+end
+
+local function research_seconds(cost)
+  if type(cost) ~= "table" then return "?" end
+  if type(cost.energy) == "number" then return cost.energy / 60 end
+  return cost.time or cost[2] or "?"
 end
 
 local function detail_lines(parent, row, detail)
@@ -838,7 +860,7 @@ local function detail_lines(parent, row, detail)
     end
   end
   if type(detail) == "table" and detail.cost ~= nil then
-    add(parent, {type = "label", name = PREFIX .. "detail_cost", caption = {"mir-browser.research-cost", tostring(type(detail.cost) == "table" and (detail.cost.count or detail.cost[1] or "?") or detail.cost), tostring(type(detail.cost) == "table" and (detail.cost.energy or detail.cost.time or detail.cost[2] or "?") or "?")}})
+    add(parent, {type = "label", name = PREFIX .. "detail_cost", caption = {"mir-browser.research-cost", tostring(type(detail.cost) == "table" and (detail.cost.count or detail.cost[1] or "?") or detail.cost), tostring(research_seconds(detail.cost))}})
     if type(detail.cost) == "table" and type(detail.cost.ingredients) == "table"
         and #detail.cost.ingredients > 0 then
       add(parent, {type = "label", name = PREFIX .. "detail_science", caption = {"mir-browser.science"}})
@@ -1117,9 +1139,19 @@ local function create_frame(player, view)
     type = "frame", name = ROOT, direction = "vertical", caption = {"mir-browser.title"},
     tags = {[ROOT_TAG] = true}
   })
-  if view.location then frame.location = view.location end
+  local resolution, scale = player.display_resolution, player.display_scale
+  scale = type(scale) == "number" and scale > 0 and scale or 1
+  local width = math.min(1000, math.max(1, (resolution and resolution.width or 1280) / scale - 32))
+  local height = math.min(800, math.max(1, (resolution and resolution.height or 720) / scale - 32))
+  if frame.style then
+    frame.style.width, frame.style.height = width, height
+    frame.style.maximal_width = width
+  end
+  if view.location then frame.location = view.location
+  elseif type(frame.auto_center) == "function" then frame.auto_center() end
 
-  local filters = add(frame, {type = "flow", name = PREFIX .. "filters", direction = "horizontal"})
+  local pairs_per_row = width >= 800 and 2 or 1
+  local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
   add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
   local families = family_values()
@@ -1140,11 +1172,22 @@ local function create_frame(player, view)
     {"mir-browser.order-progression"}, {"mir-browser.order-native"},
     {"mir-browser.order-name-asc"}, {"mir-browser.order-name-desc"}
   }, selected_index = SORT_INDEX[view.sort] or 1})
+  for _, field in ipairs({"query", "family", "visibility", "mode", "status", "sort"}) do
+    local control = filters[PREFIX .. field]
+    if control.style then control.style.width = math.min(280, math.max(100, width / pairs_per_row - 175)) end
+  end
   local tabs = add(frame, {type = "tabbed-pane", name = PREFIX .. "tabs"})
+  if tabs.style then tabs.style.maximal_width = math.max(1, width - 32) end
   for _, tab_name in ipairs(TABS) do
     local tab = add(tabs, {type = "tab", name = PREFIX .. "tab_" .. tab_name,
       caption = {"mir-browser." .. (tab_name == "queue" and "queue-tab" or tab_name)}})
-    local content = add(tabs, {type = "flow", name = PREFIX .. tab_name .. "_content", direction = "vertical"})
+    local content = add(tabs, {type = "scroll-pane", name = PREFIX .. tab_name .. "_content",
+      horizontal_scroll_policy = "never", vertical_scroll_policy = "auto"})
+    if content.style then
+      content.style.width = math.max(1, width - 48)
+      content.style.maximal_width = math.max(1, width - 48)
+      content.style.height = math.max(1, height - (pairs_per_row == 2 and 230 or 350))
+    end
     tabs.add_tab(tab, content)
   end
   tabs.selected_tab_index = TAB_INDEX[view.tab] or 1
