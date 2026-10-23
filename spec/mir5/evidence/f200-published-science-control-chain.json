@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIR5IndependentPublishedF200WholeTickControlV1",
+  "source": "627129d723f5ba3ba3f68e0d98ab9296b16b9508",
+  "run": 40016585434,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40016585434",
+  "manifest_members_verified": 68,
+  "cases": {
+    "published": {
+      "receipt": {
+        "gzip": "spec/mir5/evidence/f200-published-science-published-native.json.gz",
+        "uncompressed_sha256": "CC5BC178202F377C5DA77EC8D8F5753BA8F9491CFFB5CF5D1DB1223CF9DCF7CA"
+      },
+      "player": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "actual_lab_completions": 2,
+        "milestone": "actual2labs",
+        "seededpartial": "after-actual2labs",
+        "next_level": 3,
+        "productivity_bonus": 0.019999999552965164,
+        "player_enabled": false,
+        "player_visible_when_disabled": true,
+        "saved_progress": 0.27,
+        "foreign_queue_progress": 0.42000000000000004,
+        "foreign_disabled": true,
+        "on_load_read_only": false
+      }
+    },
+    "published-relaxed-control": {
+      "receipt": {
+        "gzip": "spec/mir5/evidence/f200-published-science-published-relaxed-control-native.json.gz",
+        "uncompressed_sha256": "53F96351FBA66836814D0071AB2382CEA9F1962E49139C4B420B5654332542FA"
+      },
+      "player": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "destination_mir": "4.7.20002",
+        "source_actual_lab_completions": 2,
+        "destination_actual_lab_completions": 1,
+        "milestone": "actual2labs",
+        "next_level": 4,
+        "productivity_bonus": 0.029999999329447746,
+        "player_enabled": true,
+        "player_visible_when_disabled": true,
+        "foreign_queue_progress": 0.42000000000000004,
+        "science_consumed_units": 0.7333333333333333,
+        "science_remaining_ticks": 44,
+        "science_processing_ticks": 44,
+        "science_elapsed_ticks": 43,
+        "science_units_after": {
+          "automation-science-pack": 21.266666666666666,
+          "logistic-science-pack": 21.266666666666666,
+          "chemical-science-pack": 21.266666666666666,
+          "production-science-pack": 21.266666666666666
+        },
+        "on_load_read_only": false
+      }
+    }
+  },
+  "scope": "Only exact published4.7.20002 on F2002.0.77: two source labs under cap2, preserved0.27 work, cap40 restoration, a further actual lab, native44/60 science consumption, save and two cold reloads per stage.",
+  "candidate_acceptance": false,
+  "release_qualification": false
+}

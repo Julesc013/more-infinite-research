@@ -7,8 +7,17 @@ assert(technology.level == 1 and technology.upgrade == true and technology.max_l
 assert(technology.enabled ~= false, "historical transition direct is disabled")
 
 local unit = assert(technology.unit, "historical transition direct has no research unit")
-assert(unit.count == 8000 and unit.count_formula == nil and unit.time == 60,
-  "historical transition direct cost or time differs")
+local formula_targets = {
+  f015 = true, f016 = true, f017 = true, f100 = true, f110 = true,
+}
+if target.id == "f013" or target.id == "f014" then
+  assert(unit.count == 8000 and unit.count_formula == nil and unit.time == 60,
+    "historical transition direct numeric cost or time differs")
+else
+  assert(formula_targets[target.id], "historical transition target cost family differs")
+  assert(unit.count_formula == "1*(8000*2^(L-1))" and unit.time == 60,
+    "historical transition direct formula cost or time differs")
+end
 assert(type(unit.ingredients) == "table" and #unit.ingredients == #target.direct_science,
   "historical transition direct science count differs")
 for index, name in ipairs(target.direct_science) do
@@ -23,5 +32,6 @@ assert(type(technology.effects) == "table" and #technology.effects == 1
 
 -- Fixture-only acceleration follows the exact row check.  It changes neither
 -- identity, level boundary, science nor modifier.
+unit.count_formula = nil
 unit.count = 1
 unit.time = 1

@@ -16,12 +16,14 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/historical-transition"
 RUNNER = ROOT / "tools/mir5/Invoke-NativeFixture.ps1"
+DIRECT_ORACLE = ROOT / "tests/mir5/fixtures/historical-direct-native-oracle.json"
 
 
 class HistoricalTransitionFixtureControls(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.metadata = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        cls.direct_oracle = json.loads(DIRECT_ORACLE.read_text(encoding="utf-8"))
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -273,38 +275,95 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           assert(not ok and tostring(message):find("lacks the published fixture state",1,true))
         ''')
 
-    def test_data_final_preflight_rejects_wrong_authored_effect_before_acceleration(self):
+    def test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration(self):
+        self.assertEqual(self.direct_oracle["kind"], "MIR5HistoricalDirectNativeCharacterizationV1")
+        self.assertEqual(self.direct_oracle["status"], "historical-characterization-not-mir5-native-qualification")
+        expected_costs = {
+            "f013": (8000, None),
+            "f014": (8000, None),
+            "f015": (None, "1*(8000*2^(L-1))"),
+            "f016": (None, "1*(8000*2^(L-1))"),
+            "f017": (None, "1*(8000*2^(L-1))"),
+            "f100": (None, "1*(8000*2^(L-1))"),
+            "f110": (None, "1*(8000*2^(L-1))"),
+        }
+        observed_costs = {}
+        for capture in self.direct_oracle["captures"]:
+            row = next(row for row in capture["technologies"]
+                       if row["id"] == "recipe-prod-research_character_mining_speed-1")
+            definition = row["definition"]
+            observed_costs[capture["target"]] = (
+                definition["unit_count"] if "unit_count_formula" not in definition else None,
+                definition.get("unit_count_formula"),
+            )
+        self.assertEqual(expected_costs, observed_costs)
+
         self.lua.globals().fixture = FIXTURE.as_posix()
         self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.execute(r'''
           package.path=fixture .. "/?.lua"
-          function data_final_row(id, expected_effect, actual_effect, science)
+          function data_final_row(id, expected_effect, actual_effect, science, count, count_formula)
             package.loaded.target=nil;package.loaded["target-literal"]=nil
             package.preload["target-literal"]=function()return {id=id,stage="published",mir_version="4.7." .. id:sub(2) .. "02",
               direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode=(id == "f013" and "preservation-only" or "lab"),partial_progress=.42,
               direct_science=science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
             local ingredients={};for index,name in ipairs(science) do ingredients[index]={name,1} end
             local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
-              unit={count=8000,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
+              unit={count=count,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
             data={raw={technology={[row.name]=row}}}
             local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
             return ok,tostring(message),row
           end
         ''')
-        rows = (
-            ("f013", .05, ("alien-science-pack",)),
-            ("f015", .1, ("high-tech-science-pack", "military-science-pack")),
-            ("f017", .1, ("military-science-pack", "utility-science-pack")),
-        )
-        for target, effect, science in rows:
+        for target, (count, formula) in expected_costs.items():
+            fact = self.metadata["targets"][target]
             with self.subTest(target=target):
-                good = self.lua.eval("data_final_row")(target, effect, effect, self.lua.table_from(science))
+                observed_count = count if count is not None else 16000
+                good = self.lua.eval("data_final_row")(target, fact["direct_effect"], fact["direct_effect"],
+                                                        self.lua.table_from(fact["direct_science"]), observed_count, formula)
                 self.assertTrue(good[0])
-                self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["time"]), (1, 1))
-        bad = self.lua.eval("data_final_row")("f017", .1, .05, self.lua.table_from(("military-science-pack", "utility-science-pack")))
+                self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["count_formula"], good[2]["unit"]["time"]),
+                                 (1, None, 1))
+
+                wrong_formula = "1*(8000*2^(L-1))" if formula is None else "1*(8000*1.5^(L-1))"
+                bad_formula = self.lua.eval("data_final_row")(target, fact["direct_effect"], fact["direct_effect"],
+                                                               self.lua.table_from(fact["direct_science"]), observed_count, wrong_formula)
+                self.assertFalse(bad_formula[0])
+                self.assertIn("cost or time differs", bad_formula[1])
+                self.assertEqual((bad_formula[2]["unit"]["count"], bad_formula[2]["unit"]["count_formula"], bad_formula[2]["unit"]["time"]),
+                                 (observed_count, wrong_formula, 60))
+
+        unknown = self.lua.eval("data_final_row")("f999", .1, .1,
+                                                   self.lua.table_from(("military-science-pack", "utility-science-pack")), 8000,
+                                                   expected_costs["f015"][1])
+        self.assertFalse(unknown[0])
+        self.assertIn("target cost family differs", unknown[1])
+
+    def test_data_final_preflight_rejects_wrong_authored_effect_before_acceleration(self):
+        self.lua.globals().fixture = FIXTURE.as_posix()
+        self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
+        self.lua.execute(r'''
+          package.path=fixture .. "/?.lua"
+          function data_final_effect_row(id, expected_effect, actual_effect, science, count_formula)
+            package.loaded.target=nil;package.loaded["target-literal"]=nil
+            package.preload["target-literal"]=function()return {id=id,stage="published",mir_version="4.7." .. id:sub(2) .. "02",
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode="lab",partial_progress=.42,
+              direct_science=science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
+            local ingredients={};for index,name in ipairs(science) do ingredients[index]={name,1} end
+            local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
+              unit={count=8000,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
+            data={raw={technology={[row.name]=row}}}
+            local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
+            return ok,tostring(message),row
+          end
+        ''')
+        bad = self.lua.eval("data_final_effect_row")("f017", .1, .05,
+                                                       self.lua.table_from(("military-science-pack", "utility-science-pack")),
+                                                       "1*(8000*2^(L-1))")
         self.assertFalse(bad[0])
         self.assertIn("effect differs", bad[1])
-        self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["time"]), (8000, 60))
+        self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["count_formula"], bad[2]["unit"]["time"]),
+                         (8000, "1*(8000*2^(L-1))", 60))
 
 
 def main():
