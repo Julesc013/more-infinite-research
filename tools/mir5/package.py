@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -29,10 +30,82 @@ def admitted(relative):
             or (relative.startswith("graphics/") and path.suffix.lower() in {".png", ".jpg", ".ogg"}))
 
 
+def target_record_path(value):
+    """Return one unambiguous, repository-relative target record path."""
+    try:
+        raw = os.fspath(value)
+    except TypeError as error:
+        raise ValueError("Target record must be a repository path") from error
+    if not isinstance(raw, str) or not raw or "\x00" in raw:
+        raise ValueError("Target record must be a repository path")
+    portable = raw.replace("\\", "/")
+    parts = portable.split("/")
+    if (portable.startswith("/") or re.match(r"^[A-Za-z]:", portable)
+            or any(part in {"", ".", ".."} for part in parts)
+            or parts[0] != "targets" or not parts[-1].endswith(".json")):
+        raise ValueError("Target record must be an unambiguous targets/*.json repository path")
+    return "/".join(parts)
+
+
+def git_repository(source):
+    source = Path(source).resolve(strict=True)
+    repository = Path(subprocess.check_output(
+        ["git", "-C", str(source), "rev-parse", "--show-toplevel"]).decode().strip()).resolve()
+    try:
+        source.relative_to(repository)
+    except ValueError as error:
+        raise ValueError("Package source must be inside its Git repository") from error
+    return source, repository
+
+
+def checked_target_record(source, target_record, revision=None):
+    """Read a tracked target record without mixing a frozen source with local metadata."""
+    source, repository = git_repository(source)
+    relative = target_record_path(target_record)
+    pieces = relative.split("/")
+    current = repository
+    for piece in pieces:
+        current /= piece
+        if current.is_symlink() or (hasattr(current, "is_junction") and current.is_junction()):
+            raise ValueError("Linked target record path is not admitted")
+    try:
+        current.resolve(strict=True).relative_to(repository)
+    except (FileNotFoundError, ValueError) as error:
+        raise ValueError("Selected target record is not an ordinary repository file") from error
+    if not current.is_file():
+        raise ValueError("Selected target record is not an ordinary repository file")
+
+    commit = revision
+    if commit is None:
+        commit = subprocess.check_output(
+            ["git", "-C", str(repository), "rev-parse", "--verify", "HEAD^{commit}"]).decode().strip()
+    else:
+        commit = subprocess.check_output(
+            ["git", "-C", str(repository), "rev-parse", "--verify", commit + "^{commit}"]).decode().strip()
+        status = subprocess.check_output(
+            ["git", "-C", str(repository), "status", "--porcelain=v1", "--untracked-files=all", "--", relative])
+        if status:
+            raise ValueError("Selected target record differs from the frozen revision")
+    tree = subprocess.check_output(
+        ["git", "-C", str(repository), "ls-tree", "-z", commit, "--", relative])
+    entries = [entry for entry in tree.split(b"\0") if entry]
+    if len(entries) != 1:
+        raise ValueError("Selected target record is not tracked at the selected revision")
+    metadata, name = entries[0].split(b"\t", 1)
+    mode, kind, _ = metadata.split()
+    if (name.decode("utf-8") != relative or kind != b"blob"
+            or mode not in (b"100644", b"100755")):
+        raise ValueError("Selected target record is not an ordinary tracked file")
+    if revision is None:
+        return relative, current.read_bytes()
+    return relative, subprocess.check_output(
+        ["git", "-C", str(repository), "show", commit + ":" + relative])
+
+
 def git_source(source, revision):
     def git(*arguments):
         return subprocess.check_output(["git", "-C", str(source), *arguments])
-    repository = Path(git("rev-parse", "--show-toplevel").decode().strip()).resolve()
+    source, repository = git_repository(source)
     relative = source.relative_to(repository).as_posix()
     commit = git("rev-parse", "--verify", revision + "^{commit}").decode().strip()
     prefix = relative + "/" if relative != "." else ""
@@ -63,11 +136,8 @@ def git_source(source, revision):
     return commit, files
 
 
-def read_editions(source, revision=None):
-    if revision is None:
-        data = (Path(__file__).resolve().parents[2] / TARGET_RECORD).read_bytes()
-    else:
-        data = subprocess.check_output(["git", "-C", str(source), "show", revision + ":" + TARGET_RECORD])
+def read_editions(source, revision=None, target_record=TARGET_RECORD):
+    _, data = checked_target_record(source, target_record, revision)
     record = json.loads(data.decode("utf-8"))
     if record.get("schema") != 1 or not isinstance(record.get("targets"), dict):
         raise ValueError("Invalid edition record")
@@ -136,7 +206,11 @@ def select_edition(files, info, target, editions):
     return {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
 
 
-def members(source, version=None, committed_files=None, target=None, editions=None):
+def members(source, version=None, committed_files=None, target=None, editions=None,
+            target_record=TARGET_RECORD):
+    selected_record = target_record_path(target_record)
+    if target is None and selected_record != TARGET_RECORD:
+        raise ValueError("Target record selection requires a declared target")
     if committed_files is None:
         committed_files = {}
         for path in sorted(source.rglob("*")):
@@ -158,7 +232,7 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         if version is not None:
             raise ValueError("Selected player editions derive their version from the source codec")
         if editions is None:
-            editions, _ = read_editions(source)
+            editions, _ = read_editions(source, target_record=selected_record)
         committed_files = select_edition(committed_files, info, target, editions)
     rows = []
     for relative, contents in sorted(committed_files.items()):
@@ -169,15 +243,20 @@ def members(source, version=None, committed_files=None, target=None, editions=No
     return info, rows
 
 
-def build(source, output, version=None, revision=None, target=None):
+def build(source, output, version=None, revision=None, target=None, target_record=TARGET_RECORD):
+    selected_record = target_record_path(target_record)
+    if target is None and selected_record != TARGET_RECORD:
+        raise ValueError("Target record selection requires a declared target")
     if source.is_symlink() or (hasattr(source, "is_junction") and source.is_junction()):
         raise ValueError("Select an ordinary source root, not a filesystem link")
     source = source.resolve(strict=True)
     if not source.is_dir() or source.is_symlink():
         raise ValueError("Select an ordinary existing source root")
     commit, files = git_source(source, revision) if revision is not None else (None, None)
-    editions, editions_sha = read_editions(source, commit) if target is not None else (None, None)
-    info, rows = members(source, version, files, target, editions)
+    record_path = selected_record if target is not None else None
+    editions, editions_sha = (read_editions(source, commit, record_path)
+                              if target is not None else (None, None))
+    info, rows = members(source, version, files, target, editions, record_path or TARGET_RECORD)
     root = f"{info['name']}_{info['version']}"
     expected_name = root + ".zip"
     if output.name != expected_name:
@@ -196,7 +275,7 @@ def build(source, output, version=None, revision=None, target=None):
         "kind": "native-package-members-not-gameplay-qualification",
         "source_root": str(source), "archive": str(output.resolve()),
         "source_commit": commit,
-        "target": target, "edition_record_sha256": editions_sha,
+        "target": target, "target_record": record_path, "edition_record_sha256": editions_sha,
         "name": info["name"], "version": info["version"],
         "sha256": digest(output.read_bytes()), "bytes": output.stat().st_size,
         "members": [{"path": relative, "sha256": digest(contents), "bytes": len(contents)} for relative, contents in rows],
@@ -211,8 +290,10 @@ def main():
     parser.add_argument("--version", help="Explicit target/fixture metadata version; never a product packaging retry counter")
     parser.add_argument("--revision", help="Read exact committed blobs, excluding dirty and untracked development work")
     parser.add_argument("--target", help="Select an implemented edition; this is not native qualification")
+    parser.add_argument("--target-record", default=TARGET_RECORD,
+                        help="Tracked targets/*.json selection record, frozen with --revision")
     args = parser.parse_args()
-    record = build(args.source, args.output, args.version, args.revision, args.target)
+    record = build(args.source, args.output, args.version, args.revision, args.target, args.target_record)
     if args.record:
         args.record.parent.mkdir(parents=True, exist_ok=True)
         with args.record.open("x", encoding="utf-8", newline="\n") as stream:

@@ -2,6 +2,7 @@
 import importlib.util
 import hashlib
 import json
+import shutil
 import subprocess
 from pathlib import Path
 import tempfile
@@ -15,6 +16,34 @@ spec.loader.exec_module(pack)
 
 
 class PackageTests(unittest.TestCase):
+    @staticmethod
+    def _git(repository, *arguments):
+        return subprocess.check_output(["git", "-C", str(repository), *arguments])
+
+    @classmethod
+    def _write_layout_repository(cls, repository, source_path, target_record):
+        cls._git(repository, "init", "-q")
+        cls._git(repository, "config", "user.name", "Package test")
+        cls._git(repository, "config", "user.email", "package-test@example.invalid")
+        cls._git(repository, "config", "core.autocrlf", "false")
+        staged_source = ROOT / "source/mir5"
+        for file in staged_source.rglob("*"):
+            if file.is_file():
+                destination = repository / source_path / file.relative_to(staged_source)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(file, destination)
+        # This is deliberately present in both layouts and must stay outside
+        # the selected player member set.
+        excluded = repository / source_path / "tools/not-a-player-member.lua"
+        excluded.parent.mkdir(parents=True, exist_ok=True)
+        excluded.write_text("error('developer-only')\n", encoding="utf-8")
+        record = repository / target_record
+        record.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / pack.TARGET_RECORD, record)
+        cls._git(repository, "add", ".")
+        cls._git(repository, "commit", "-qm", "player and target record")
+        return cls._git(repository, "rev-parse", "HEAD").decode().strip()
+
     def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
         source = ROOT / "source/mir5"
         published = json.loads((ROOT / "spec/mir5/inventory/target-load-order-470.json").read_text())
@@ -74,7 +103,7 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing source dependency"):
             pack.members(source, committed_files=files, target="f015")
 
-    def test_committed_target_record_is_frozen_with_the_player_source(self):
+    def test_committed_target_record_is_frozen_with_the_player_source_and_refuses_dirty_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             def git(*arguments):
@@ -96,16 +125,75 @@ class PackageTests(unittest.TestCase):
             git("add", ".")
             git("commit", "-qm", "frozen player and edition")
             commit = git("rev-parse", "HEAD").decode().strip()
-            edition.write_text('{"schema":1,"targets":{}}\n')
             record = pack.build(source, root / "out/more-infinite-research_5.0.21000.zip",
                                 revision=commit, target="f210")
             self.assertEqual(record["edition_record_sha256"], hashlib.sha256(original).hexdigest())
             self.assertEqual(record["source_commit"], commit)
             self.assertEqual(record["target"], "f210")
+            self.assertEqual(record["target_record"], pack.TARGET_RECORD)
             with zipfile.ZipFile(record["archive"]) as archive:
                 info = json.loads(archive.read("more-infinite-research_5.0.21000/info.json"))
                 self.assertEqual(info["dependencies"], ["base >= 2.1.23"])
+            edition.write_text('{"schema":1,"targets":{}}\n')
+            git("add", edition.relative_to(root).as_posix())
+            rejected = root / "dirty/more-infinite-research_5.0.21000.zip"
+            with self.assertRaisesRegex(ValueError, "target record differs from the frozen revision"):
+                pack.build(source, rejected, revision=commit, target="f210")
+            self.assertFalse(rejected.exists())
             self.assertEqual(edition.read_text(), '{"schema":1,"targets":{}}\n')
+
+    def test_staged_and_canonical_target_record_layouts_have_identical_selected_members(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary = Path(temporary)
+            staged_repository = temporary / "staged"
+            canonical_repository = temporary / "canonical"
+            staged_repository.mkdir()
+            canonical_repository.mkdir()
+            staged_commit = self._write_layout_repository(
+                staged_repository, Path("source/mir5"), Path("targets/mir5/editions.json"))
+            canonical_commit = self._write_layout_repository(
+                canonical_repository, Path("source"), Path("targets/editions.json"))
+            staged = pack.build(
+                staged_repository / "source/mir5",
+                staged_repository / "out/more-infinite-research_5.0.20000.zip",
+                revision=staged_commit, target="f200", target_record="targets/mir5/editions.json")
+            canonical = pack.build(
+                canonical_repository / "source",
+                canonical_repository / "out/more-infinite-research_5.0.20000.zip",
+                revision=canonical_commit, target="f200", target_record="targets/editions.json")
+            self.assertEqual(staged["target_record"], "targets/mir5/editions.json")
+            self.assertEqual(canonical["target_record"], "targets/editions.json")
+            self.assertEqual(staged["edition_record_sha256"], canonical["edition_record_sha256"])
+            self.assertEqual(staged["members"], canonical["members"])
+            self.assertEqual(staged["sha256"], canonical["sha256"])
+            self.assertEqual(staged["version"], "5.0.20000")
+            with zipfile.ZipFile(canonical["archive"]) as archive:
+                info = json.loads(archive.read("more-infinite-research_5.0.20000/info.json"))
+                target = archive.read("more-infinite-research_5.0.20000/platform/target.lua")
+                names = archive.namelist()
+            self.assertEqual(info["factorio_version"], "2.0")
+            self.assertEqual(info["dependencies"][0], "base >= 2.0.77")
+            self.assertIn(b'id = "f200"', target)
+            self.assertFalse(any("/tools/" in name or "/tests/" in name for name in names))
+
+    def test_target_record_path_refuses_external_or_ambiguous_repository_inputs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source/mir5"
+            source.parent.mkdir(parents=True)
+            commit = self._write_layout_repository(root, Path("source/mir5"), Path(pack.TARGET_RECORD))
+            for value in (
+                root.parent / "external-editions.json",
+                "../targets/mir5/editions.json",
+                "targets/../targets/mir5/editions.json",
+                "source/editions.json",
+                "targets//mir5/editions.json",
+            ):
+                with self.subTest(target_record=str(value)):
+                    output = root / ("out-" + str(len(str(value)))) / "more-infinite-research_5.0.20000.zip"
+                    with self.assertRaisesRegex(ValueError, "Target record"):
+                        pack.build(source, output, revision=commit, target="f200", target_record=value)
+                    self.assertFalse(output.exists())
 
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:
