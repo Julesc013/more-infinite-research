@@ -107,6 +107,7 @@ class GeneratorTests(unittest.TestCase):
           package.cpath = ""
           config = require("research.settings")
           productivity = require("research.productivity")
+          cost = require("research.cost")
           gear_bindings = require("compatibility.gear_bindings")
           generator = require("research.generator")
           modern_catalogue = require("compatibility.modern_catalogue")
@@ -692,6 +693,27 @@ class GeneratorTests(unittest.TestCase):
           assert(not pcall(productivity.cost, 100, 0, math.huge))
           assert(not pcall(productivity.cost, 0/0, 0, 2))
           assert(not pcall(productivity.cost, 100, 0, 1001))
+        ''')
+
+    def test_continuation_cost_inheritance_uses_the_historical_l1_boundary(self):
+        self.lua.execute('''
+          local inherited = {base_cost=0, linear_increment=0, growth_factor=3.333333333333}
+          assert(cost.continuation(inherited, 8, 600, 400) == "1999.986000042*3.33333^(L-8)")
+          local floor = {base_cost=0, linear_increment=0, growth_factor=.5}
+          assert(cost.continuation(floor, 8, 600, 400) == "600")
+          local named_growth = {base_cost=0, linear_increment=0, growth_factor=0}
+          assert(cost.continuation(named_growth, 8, 600, 400) == "900.00004921875*1.5^(L-8)")
+          assert(not pcall(cost.continuation, inherited, 8, math.huge, 400))
+
+          local selected, definition = modern_catalogue.select({}), nil
+          for _, candidate in ipairs(selected.continuations) do
+            if candidate.id == "inserter-capacity-bonus-8" then definition = candidate end
+          end
+          assert(definition)
+          local values = config.resolve(defaults())
+          values.streams[definition.family].base_cost = 0
+          local output = modern.continuation(definition, values)
+          assert(output.unit.count_formula == "1999.986000042*3.33333^(L-8)")
         ''')
 
     def test_import_precedence_false_zero_and_invalid_entries(self):

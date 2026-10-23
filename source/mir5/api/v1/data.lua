@@ -85,11 +85,22 @@ local function copy_family(prototypes)
   return copied
 end
 
-local function reject_unsupported_productivity(prototypes)
-  if target.recipe_productivity == true then return end
+local function reject_unsupported_effects(prototypes)
   for _, prototype in ipairs(prototypes) do
-    for _, effect in ipairs(prototype.effects or {}) do
-      if effect.type == "change-recipe-productivity" then fail("unsupported_capability", "recipe productivity is unavailable") end
+    if type(prototype) ~= "table" then fail("invalid_definition", "technology must be a plain table") end
+    local effects = prototype.effects
+    if effects == nil then effects = {} end
+    local count = dense_array(effects, "effects", MAX_ENTRIES)
+    for index = 1, count do
+      local effect = effects[index]
+      if type(effect) ~= "table" then fail("invalid_definition", "effect must be a plain table") end
+      if effect.type == "change-recipe-productivity" and target.recipe_productivity ~= true then
+        fail("unsupported_capability", "recipe productivity is unavailable")
+      end
+      if (effect.type == "cargo-landing-pad-count" or effect.type == "max-cargo-bay-unloading-distance")
+          and target.cargo_research ~= true then
+        fail("unsupported_capability", "cargo research modifiers are unavailable")
+      end
     end
   end
 end
@@ -127,7 +138,7 @@ end
 
 function M.add_technologies(prototypes)
   local owned = copy_family(prototypes)
-  reject_unsupported_productivity(owned)
+  reject_unsupported_effects(owned)
   return publish(owned)
 end
 
@@ -167,6 +178,7 @@ function M.add_productivity(prototype, recipe_names, change)
       type = "change-recipe-productivity", recipe = recipe, change = change
     }
   end
+  reject_unsupported_effects({owned})
   return publish({owned})[1]
 end
 

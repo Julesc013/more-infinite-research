@@ -3,6 +3,7 @@
 -- tables and checks the named three-recipe Space Age patch boundary.
 local catalogue = require("compatibility.modern_catalogue")
 local productivity = require("research.productivity")
+local cost = require("research.cost")
 
 local M = {}
 
@@ -27,14 +28,6 @@ local function number_text(value)
   assert(finite(value) and value >= 0, "MIR invalid modern research number")
   if value == math.floor(value) then return tostring(math.floor(value)) end
   return string.format("%.15g", value)
-end
-
-local function legacy_six(value)
-  assert(finite(value) and value >= 0, "MIR invalid continuation cost number")
-  local text = string.format("%.6g", value)
-  local number = tonumber(text)
-  assert(number ~= nil, "MIR invalid continuation formula number")
-  return number, text
 end
 
 local function append_unique(out, seen, names)
@@ -174,23 +167,8 @@ local function k2_imersite_technologies(values)
 end
 
 local function continuation_formula(definition, stream)
-  local defaults, inheritance = definition.defaults, definition.inheritance
-  local growth = stream.growth_factor
-  if growth == 0 then growth = inheritance.last_count / inheritance.previous_count end
-  local base = stream.base_cost
-  if base == 0 then base = inheritance.last_count / (growth ^ (definition.level - 1)) end
-  local legacy_base, base_text = legacy_six(base)
-  local legacy_growth, growth_text = legacy_six(growth)
-  local first = legacy_base * (legacy_growth ^ (definition.level - 1))
-  local first_text = number_text(first)
-  local increment = stream.linear_increment
-  if legacy_growth == 1 then
-    if increment == 0 then return first_text end
-    return first_text .. "+" .. number_text(increment) .. "*(L-" .. definition.level .. ")"
-  end
-  if increment == 0 then return first_text .. "*" .. growth_text .. "^(L-" .. definition.level .. ")" end
-  return "(" .. first_text .. "+" .. number_text(increment) .. "*(L-" .. definition.level .. "))*"
-    .. growth_text .. "^(L-" .. definition.level .. ")"
+  local inheritance = definition.inheritance
+  return cost.continuation(stream, definition.level, inheritance.last_count, inheritance.previous_count)
 end
 
 local function continuation_effects(definition, stream)

@@ -95,7 +95,8 @@ def select_edition(files, info, target, editions):
     info["dependencies"] = ["base >= " + selected["minimum_base"]] + [
         item for item in dependencies if not re.match(r"^\s*base(?:\s|[<>=!]|$)", item)]
     metadata = {key: selected[key] for key in (
-        "factorio_version", "minimum_base", "reduced", "research_levels", "recipe_productivity")}
+        "factorio_version", "minimum_base", "reduced", "research_levels", "recipe_productivity",
+        "recipe_probability", "productivity_ignores_stats", "receiver_limits", "cargo_research")}
     metadata.update(id=target, distribution_version=info["version"])
     files = dict(files)
     fields = []

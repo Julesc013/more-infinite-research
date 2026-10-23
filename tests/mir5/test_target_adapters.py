@@ -79,6 +79,7 @@ class TargetAdapterTests(unittest.TestCase):
 
           function historical_stage(id)
             local contracts, definitions = require("compatibility.historical_direct"), require("research.native_direct_definitions")
+            local continuation_contracts = require("compatibility.historical_continuations")
             local raw = {technology={}, tool={}, item={}}
             for _, row in ipairs(contracts.for_target(id).emitted) do
               for _, prerequisite in ipairs(row.prerequisites) do raw.technology[prerequisite] = {icon="test/technology.png", icon_size=64} end
@@ -87,6 +88,25 @@ class TargetAdapterTests(unittest.TestCase):
                 if candidate.technology then raw.technology[candidate.technology] = {icon="test/icon.png", icon_size=64} end
                 if candidate.item then raw.item[candidate.item] = {icon="test/icon.png", icon_size=64} end
               end
+            end
+            local continuation = continuation_contracts.for_target(id)
+            local source_time = {
+              ["braking-force"]=60, ["inserter-capacity-bonus"]=30, ["research-speed"]=30,
+              ["weapon-shooting-speed"]=60, ["worker-robots-storage"]=60, ["laser-shooting-speed"]=60,
+            }
+            for _, row in ipairs(continuation.rows) do
+              for _, prerequisite in ipairs(row.prerequisites) do
+                raw.technology[prerequisite] = {icon="test/technology.png", icon_size=64,
+                  order="other-" .. prerequisite, unit={count=1, time=30}}
+              end
+              for _, ingredient in ipairs(row.science) do raw.tool[ingredient[1]] = {} end
+              local time = source_time[row.family]
+              raw.technology[row.predecessor] = {icon="test/icon.png", icon_size=64, order=row.order,
+                unit={count=row.expected_predecessor_count, time=time},
+                max_level=continuation.numeric and nil or row.level - 1}
+              raw.technology[row.previous] = {icon="test/icon.png", icon_size=64,
+                unit={count=row.expected_previous_count, time=time},
+                max_level=continuation.numeric and nil or row.level - 2}
             end
             local stage = {raw=raw, writes=0}
             function stage:extend(rows)
@@ -133,12 +153,34 @@ class TargetAdapterTests(unittest.TestCase):
           adapter.apply()
           assert(data.writes == 1 and data.raw.technology["recipe-prod-research_cannon_shooting_speed-1"] == nil)
           assert(data.raw.technology["recipe-prod-research_rocket_shooting_speed-1"].unit.count == 60)
-          local count = 0
+          assert(data.raw.technology["inserter-capacity-bonus-8"].unit.count == 914489)
+          assert(data.raw.technology["worker-robots-storage-4"].unit.count_formula == nil)
+          local direct, continuations = 0, 0
           for name in pairs(data.raw.technology) do
-            if name:find("recipe-prod-", 1, true) == 1 then count = count + 1 end
+            if name:find("recipe-prod-", 1, true) == 1 then direct = direct + 1 end
+            if name == "inserter-capacity-bonus-8" or name == "worker-robots-storage-4" then
+              continuations = continuations + 1
+            end
           end
-          assert(count == 7)
+          assert(direct == 7 and continuations == 2)
           assert(package.loaded["presentation.library"] == nil and package.loaded["runtime.bootstrap"] == nil)
+        ''')
+
+    def test_reduced_final_fixes_selects_the_late_six_continuation_contract(self):
+        self.lua.execute(r'''
+          data, settings = historical_stage("f110"), {startup={}}
+          local adapter = load_adapter("data-final-fixes", target("f110", true, false))
+          adapter.apply()
+          local laser = data.raw.technology["laser-shooting-speed-8"]
+          assert(data.writes == 1 and laser and laser.level == 8 and laser.max_level == "infinite")
+          assert(laser.unit.count_formula == "1*(1025.15625*1.5^(L-8))")
+          assert(data.raw.technology["worker-robots-speed-6"] == nil)
+          local continuations = 0
+          for _, name in ipairs({"braking-force-8", "inserter-capacity-bonus-8", "research-speed-7",
+              "weapon-shooting-speed-7", "worker-robots-storage-4", "laser-shooting-speed-8"}) do
+            if data.raw.technology[name] then continuations = continuations + 1 end
+          end
+          assert(continuations == 6)
         ''')
 
     def test_reduced_control_registers_only_the_unified_api(self):

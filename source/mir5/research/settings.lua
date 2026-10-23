@@ -39,30 +39,32 @@ local native_fields = {
 
 local streams = {}
 for _, historical_stream in ipairs(historical.streams) do
-  local fields, defaults = {}, historical_stream.defaults
-  local field_overrides = historical_stream.field_overrides
-  if space_age_active and historical_stream.space_age_visible then
-    field_overrides = historical_stream.space_age_field_overrides or {}
+  if modern_catalogue.supports_family(historical_stream.key) then
+    local fields, defaults = {}, historical_stream.defaults
+    local field_overrides = historical_stream.field_overrides
+    if space_age_active and historical_stream.space_age_visible then
+      field_overrides = historical_stream.space_age_field_overrides or {}
+    end
+    if k2so_active and historical_stream.k2so_defaults then
+      defaults = {}
+      for key, value in pairs(historical_stream.defaults) do defaults[key] = value end
+      for key, value in pairs(historical_stream.k2so_defaults) do defaults[key] = value end
+    end
+    for index, base in ipairs(normal_fields) do
+      local field, override = {}, field_overrides[base.key] or {}
+      for key, value in pairs(base) do field[key] = value end
+      for key, value in pairs(override) do field[key] = value end
+      -- Published K2SO omits the hidden field instead of declaring false.
+      if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
+      fields[index] = field
+    end
+    streams[#streams + 1] = {
+      key=historical_stream.key, technology_locale=historical_stream.locale,
+      order_prefix=historical_stream.order_prefix, fields=fields, defaults=defaults,
+      description_note=historical_stream.description_note, enabled_note=historical_stream.enabled_note,
+      native_owner=native_owner_families[historical_stream.key] == true
+    }
   end
-  if k2so_active and historical_stream.k2so_defaults then
-    defaults = {}
-    for key, value in pairs(historical_stream.defaults) do defaults[key] = value end
-    for key, value in pairs(historical_stream.k2so_defaults) do defaults[key] = value end
-  end
-  for index, base in ipairs(normal_fields) do
-    local field, override = {}, field_overrides[base.key] or {}
-    for key, value in pairs(base) do field[key] = value end
-    for key, value in pairs(override) do field[key] = value end
-    -- Published K2SO omits the hidden field instead of declaring false.
-    if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
-    fields[index] = field
-  end
-  streams[#streams + 1] = {
-    key=historical_stream.key, technology_locale=historical_stream.locale,
-    order_prefix=historical_stream.order_prefix, fields=fields, defaults=defaults,
-    description_note=historical_stream.description_note, enabled_note=historical_stream.enabled_note,
-    native_owner=native_owner_families[historical_stream.key] == true
-  }
 end
 
 -- Stable MIR4 continuation IDs retain their own prefix, zero sentinels and

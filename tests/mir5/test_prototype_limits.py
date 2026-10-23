@@ -193,6 +193,50 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(group.g.energy_usage == "bad" and group.h.energy_usage == -1)
         ''')
 
+    def test_f200_recycling_uses_its_native_probability_field_and_preserves_zero(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.receiver_limits = "probability", false
+          local result = {name="component", amount=8, probability=0.25, foreign=9}
+          local zero = {name="component", amount=8, probability=0}
+          local recipe = {category="recycling", hidden=true, unlock_results=false,
+            ingredients={{"component",1}}, results={result,zero}}
+          local facts = limits.apply({recipe={back=recipe}}, options("engine-default",false,"percent-20"))
+          assert(facts.recycling_products == 1 and result.probability == 0.2)
+          assert(result.independent_probability == nil and result.foreign == 9)
+          assert(zero.probability == 0 and zero.independent_probability == nil)
+          assert(limits.apply({recipe={back=recipe}}, options(nil,false,"percent-25")).recycling_products == 0)
+        ''')
+
+    def test_f200_productivity_also_inherits_the_stats_exclusion(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.productivity_ignores_stats = "probability", true
+          target.receiver_limits = false
+          local recipes = {make=manufacture(),back=reclaim({amount=2,probability=0.5,ignored_by_stats=1},2)}
+          local facts = limits.apply({recipe=recipes}, options("percent-10000",true))
+          assert(facts.indexed_recipes == 2 and recipes.back.maximum_productivity == 2)
+          assert(recipes.make.maximum_productivity == 100)
+          assert(recipes.back.results[1].ignored_by_productivity == nil)
+        ''')
+
+    def test_fixed_receiver_limits_are_reported_without_inventing_native_fields(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.receiver_limits = "probability", false
+          local raw = setmetatable({}, {__index=function() error("unsupported receiver read") end,
+            __pairs=function() error("unsupported receiver enumeration") end})
+          local facts = limits.apply(raw, {["mir-prototype-speed-cap"]="bonus-400",
+            ["mir-prototype-efficiency-cap"]="saving-9999"})
+          assert(facts.unsupported_receiver_limits == 2 and facts.receivers == 0)
+          local foreign = {uses_module_effects=false, base_effect={speed=0.2}}
+          local lab = {effect_receiver=foreign}
+          facts = limits.apply({lab={lab}}, {["mir-prototype-quality-cap"]="bonus-250"})
+          assert(facts.unsupported_receiver_limits == 1 and facts.receivers == 0)
+          assert(lab.effect_receiver == foreign and foreign.quality_limits == nil)
+          assert(foreign.base_effect.speed == 0.2 and foreign.uses_module_effects == false)
+        ''')
+
     def test_scope_indexes_recipes_once_and_preserves_modern_exclusion_default(self):
         self.lua.execute('''
           local recipes = {make=manufacture(),back=reclaim({amount=2,probability=0.5,ignored_by_stats=1},2)}

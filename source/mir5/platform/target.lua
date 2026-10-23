@@ -9,4 +9,8 @@ return {
   reduced=false,
   research_levels=true,
   recipe_productivity=true,
+  recipe_probability="independent_probability",
+  productivity_ignores_stats=true,
+  receiver_limits=true,
+  cargo_research=true,
 }

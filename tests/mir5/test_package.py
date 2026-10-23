@@ -21,7 +21,7 @@ class PackageTests(unittest.TestCase):
             ("f013", "0.13", "0.13.20"), ("f014", "0.14", "0.14.23"),
             ("f015", "0.15", "0.15.40"), ("f016", "0.16", "0.16.51"),
             ("f017", "0.17", "0.17.79"), ("f100", "1.0", "1.0.0"),
-            ("f110", "1.1", "1.1.110"), ("f210", "2.1", "2.1.23"),
+            ("f110", "1.1", "1.1.110"), ("f200", "2.0", "2.0.77"), ("f210", "2.1", "2.1.23"),
         ]:
             with self.subTest(target=target):
                 info, rows = pack.members(source, target=target)
@@ -31,7 +31,10 @@ class PackageTests(unittest.TestCase):
                 self.assertEqual(info["version"], "5.0." + target[1:] + "00")
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
-                reduced = target != "f210"
+                probability = "independent_probability" if target == "f210" else "probability"
+                self.assertIn(('recipe_probability = "' + probability + '"').encode(), files["platform/target.lua"])
+                self.assertIn(('receiver_limits = ' + str(target == "f210").lower()).encode(), files["platform/target.lua"])
+                reduced = target not in ("f200", "f210")
                 self.assertEqual("research/historical_direct.lua" in files, reduced)
                 self.assertEqual("runtime/bootstrap.lua" in files, not reduced)
                 self.assertEqual("research/modern.lua" in files, not reduced)
@@ -47,7 +50,7 @@ class PackageTests(unittest.TestCase):
 
     def test_unimplemented_unknown_and_arbitrary_edition_versions_refuse_before_output(self):
         with tempfile.TemporaryDirectory() as temporary:
-            for target in ("f200", "f018", "../f210"):
+            for target in ("f018", "../f210"):
                 output = Path(temporary) / target.replace("/", "_") / "more-infinite-research_5.0.20000.zip"
                 with self.assertRaises(ValueError):
                     pack.build(ROOT / "source/mir5", output, target=target)
@@ -55,6 +58,10 @@ class PackageTests(unittest.TestCase):
                 self.assertFalse(output.parent.exists())
             with self.assertRaises(ValueError):
                 pack.members(ROOT / "source/mir5", version="5.0.01501", target="f015")
+            editions, _ = pack.read_editions(ROOT / "source/mir5")
+            editions["f200"]["source_available"] = False
+            with self.assertRaisesRegex(ValueError, "adaptation remains incomplete"):
+                pack.members(ROOT / "source/mir5", target="f200", editions=editions)
 
     def test_selected_edition_missing_module_refuses_instead_of_shipping_broken_imports(self):
         source = ROOT / "source/mir5"

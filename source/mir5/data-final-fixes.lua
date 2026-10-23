@@ -76,7 +76,11 @@ for _, name in ipairs(prototype_limit_option_names) do
   end
 end
 if prototype_limits_active then
-  require("overrides.prototype_limits").apply(data.raw, values.options)
+  local result = require("overrides.prototype_limits").apply(data.raw, values.options)
+  if result.unsupported_receiver_limits > 0 and type(log) == "function" then
+    log("[more-infinite-research] This engine has fixed effect-receiver limits; "
+      .. result.unsupported_receiver_limits .. " selected receiver limit overrides have no native effect.")
+  end
 end
 
 -- The published experimental override is unavailable by default. Keeping its

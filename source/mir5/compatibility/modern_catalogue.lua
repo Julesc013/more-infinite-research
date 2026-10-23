@@ -2,6 +2,23 @@
 -- The Space Age delta remains in its own module: a base stage never imports or
 -- constructs its definitions, recipe patches, or continuation changes.
 local M = {}
+local target = require("platform.target")
+
+-- These two native modifiers were added in the selected 2.1 engine family.
+-- Their absence on 2.0 is an actual capability boundary, not a disabled row.
+function M.supports_family(key)
+  return target.cargo_research == true
+    or (key ~= "research_cargo_landing_pad_count" and key ~= "research_cargo_bay_unloading_distance")
+end
+
+local function supported_definitions(definitions)
+  if target.cargo_research == true then return definitions end
+  local out = {}
+  for _, definition in ipairs(definitions) do
+    if M.supports_family(definition.key) then out[#out + 1] = definition end
+  end
+  return out
+end
 
 local BASE = require("compatibility.modern_catalogue.base")
 
@@ -420,7 +437,7 @@ function M.select(active_mods)
     k2so = apply_k2so(definitions, by_key)
     profile = "k2so-f210"
   end
-  return {profile = profile, definitions = definitions, continuations = M.continuations(active_mods),
+  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
     k2_imersite = k2so and k2so.imersite or false}
 end
@@ -434,7 +451,7 @@ function M.setting_definitions(active_mods)
     local delta = require("compatibility.modern_catalogue.space_age")
     for index = 1, #delta.additions do definitions[#definitions + 1] = copy(delta.additions[index]) end
   end
-  return definitions
+  return supported_definitions(definitions)
 end
 
 function M.continuations(active_mods)

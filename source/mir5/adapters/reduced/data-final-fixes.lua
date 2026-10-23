@@ -2,6 +2,7 @@
 local target = require("platform.target")
 local generator = require("research.generator")
 local historical_direct = require("research.historical_direct")
+local historical_continuations = require("research.historical_continuations")
 local historical_settings = require("research.historical_direct_settings")
 
 local M = {}
@@ -15,7 +16,10 @@ function M.apply()
   local current_settings = rawget(_G, "settings")
   local startup = type(current_settings) == "table" and current_settings.startup or nil
   local values = historical_settings.resolve(target.id, startup)
-  generator.install(historical_direct.technologies(target.id, values, stage.raw), stage)
+  local technologies = historical_direct.technologies(target.id, values, stage.raw)
+  local continuations = historical_continuations.technologies(target.id, values, stage.raw)
+  for index = 1, #continuations do technologies[#technologies + 1] = continuations[index] end
+  generator.install(technologies, stage)
 end
 
 return M
