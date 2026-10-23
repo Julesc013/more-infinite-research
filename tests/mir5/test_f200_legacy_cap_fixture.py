@@ -174,6 +174,8 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             -- This is the candidate lifecycle result under test, not a fixture write.
             if opponent~="stale-enable" then player.technologies[GEAR].enabled=true;player.technologies[GEAR].visible_when_disabled=true end
             local destination,message=load_control(destination_path,"5.0.20000","0.2.0",startup(40));if not destination then return {ok=false,message=message}end
+            -- Native upgrade loads the old fixture state before configuration_changed.
+            ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
             ok,result=complete_player(destination,4,.03);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end

@@ -193,7 +193,7 @@ end)
 
 script.on_load(function()
   local state = storage[KEY]
-  if type(state) == "table" and state.phase == "completed" then
+  if type(state) == "table" and state.phase == "completed" and type(state.successor_player) == "table" then
     -- Do not touch LuaGameScript or LuaForce from on_load.  This local witness
     -- is read from fixture-owned durable state and checked on the next tick.
     loaded_snapshot = {player = copy_status(state.successor_player), foreign = copy_queue(state.foreign_queue),

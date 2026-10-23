@@ -217,7 +217,7 @@ end)
 
 script.on_load(function()
   local state = storage[KEY]
-  if type(state) == "table" and state.phase == "completed" then
+  if type(state) == "table" and state.phase == "completed" and type(state.successor_player) == "table" then
     loaded_snapshot = {player = copy_status(state.successor_player), foreign = copy_queue(state.foreign_queue),
       source = state.actual_lab_completions, destination = state.destination_lab_completions,
       foreign_baseline = state.foreign_baseline}

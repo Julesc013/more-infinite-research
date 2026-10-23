@@ -178,6 +178,8 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             -- Base default before its lifecycle restores the source value.
             if opponent~="stale-enable"then player.technologies[WORKER].enabled=true;player.technologies[WORKER].visible_when_disabled=true;player.technologies[WORKER].prototype.visible_when_disabled=false end
             local destination,message=load_control(destination_path,"5.0.20000","0.2.0",startup(40));if not destination then return {ok=false,message=message}end
+            -- Native upgrade loads the old fixture state before configuration_changed.
+            ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
             ok,result=complete(destination,9,state.player_with_independent+1.95);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
