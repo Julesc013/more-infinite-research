@@ -169,6 +169,7 @@ local function local_view(raw)
     schema = SCHEMA,
     query = text(raw.query),
     family = raw.family == "all" and "all" or "mir",
+    mode = raw.mode,
     status = raw.status,
     page = raw.page,
     sort = raw.sort,
@@ -183,6 +184,7 @@ local function local_view(raw)
   local normalized = library_model.normalize({
     search = value.query,
     family = value.family,
+    mode = value.mode,
     status = value.status,
     page = value.page,
     sort = value.sort,
@@ -193,6 +195,7 @@ local function local_view(raw)
   if type(normalized) == "table" then
     value.query = text(normalized.search or value.query)
     value.family = normalized.family == "mir" and "mir" or "all"
+    value.mode = whole_option(normalized.mode, 1, 3) or 1
     value.status = type(normalized.status) == "number" and normalized.status or 1
     value.page = type(normalized.page) == "number" and normalized.page or 1
     value.sort = type(normalized.sort) == "string" and normalized.sort or "progression"
@@ -406,6 +409,7 @@ local function legacy_view_as_private(value)
   return local_view({
     query = value.search,
     family = value.family,
+    mode = value.mode,
     status = value.status,
     page = value.page,
     sort = value.sort,
@@ -473,6 +477,7 @@ local function model_view(view)
   return library_model.normalize({
     search = view.query,
     family = view.family,
+    mode = view.mode,
     status = view.status,
     page = view.page,
     sort = view.sort,
@@ -780,6 +785,10 @@ local function create_frame(player, view)
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
   add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
   add(filters, {type = "drop-down", name = PREFIX .. "family", items = {{"mir-browser.scope-all"}, {"mir-browser.scope-mir"}}, selected_index = view.family == "mir" and 2 or 1})
+  add(filters, {type = "label", name = PREFIX .. "mode_label", caption = {"mir-browser.filter-level"}})
+  add(filters, {type = "drop-down", name = PREFIX .. "mode", items = {
+    {"mir-browser.all"}, {"mir-browser.finite"}, {"mir-browser.infinite"}
+  }, selected_index = view.mode})
   add(filters, {type = "label", name = PREFIX .. "status_label", caption = {"mir-browser.filter-status"}})
   add(filters, {type = "drop-down", name = PREFIX .. "status", items = {{"mir-browser.status-all"}, {"mir-browser.status-ready"}, {"mir-browser.status-locked"}, {"mir-browser.status-queued"}}, selected_index = view.status})
   add(filters, {type = "label", name = PREFIX .. "sort_label", caption = {"mir-browser.filter-order"}})
@@ -810,6 +819,8 @@ local function render(player, view, context, preserve_query)
   if valid(query) and not preserve_query then query.text = view.query end
   local family = valid(filters) and filters[PREFIX .. "family"] or nil
   if valid(family) then family.selected_index = view.family == "mir" and 2 or 1 end
+  local mode = valid(filters) and filters[PREFIX .. "mode"] or nil
+  if valid(mode) then mode.selected_index = view.mode end
   local status = valid(filters) and filters[PREFIX .. "status"] or nil
   if valid(status) then status.selected_index = view.status end
   local sort = valid(filters) and filters[PREFIX .. "sort"] or nil
@@ -844,6 +855,8 @@ function M.open(player, options)
   if options.family == "all" or options.family == "mir" then
     view.family, reset_page = options.family, true
   end
+  local mode = whole_option(options.mode, 1, 3)
+  if mode then view.mode, reset_page = mode, true end
   local status = status_option(options.status)
   if status then view.status, reset_page = status, true end
   local sort = sort_option(options.sort)
@@ -916,6 +929,15 @@ function M.on_gui_selection_state_changed(event)
     view.family = element.selected_index == 2 and "mir" or "all"
     view.page = 1
     view.scroll = 1
+    render(player, view)
+  elseif element.name == PREFIX .. "mode" then
+    if not owns_element(player, element, {
+      PREFIX .. "mode", PREFIX .. "filters", ROOT
+    }) then return end
+    local mode = whole_option(element.selected_index, 1, 3)
+    if mode == nil then return end
+    local view = view_for(player.index)
+    view.mode, view.page, view.scroll = mode, 1, 1
     render(player, view)
   elseif element.name == PREFIX .. "status" then
     if not owns_element(player, element, {

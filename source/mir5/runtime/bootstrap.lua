@@ -107,6 +107,7 @@ local function browser_options(player, options)
   local result = {}
   if type(options.search) == "string" then result.query = options.search end
   if options.family == "all" or options.family == "mir" then result.family = options.family end
+  if options.mode == 1 or options.mode == 2 or options.mode == 3 then result.mode = options.mode end
   if type(options.status) == "number" and options.status == math.floor(options.status)
       and options.status >= 1 and options.status <= 4 then
     result.status = options.status
