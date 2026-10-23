@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR5K2SOMaterialNativeChainV1",
-  "status": "equal-complete-intended-native-data-settings",
+  "status": "equal-native-output-and-nine-lab-completions-two-cold-reloads",
   "player_source": "75a8ebfcad568ebe9540c17570f810feb24133e1",
   "player_archive_sha256": "D6DF6B485C16F77CD2C94E4CECBBE2E7D1B203C5EB08346C4CB2FD896CEA406E",
   "profile": "k2so-f210",
@@ -26,6 +26,11 @@
       "path": "spec/mir5/inventory/k2so-material-intended-differences.json",
       "bytes": 6918,
       "sha256": "5F8C970E5FE06E853946E7E07C855FB3A50946D879F76B8CFF803B03AFA30536"
+    },
+    "lab_native": {
+      "path": "spec/mir5/evidence/k2so-material-lab-native.json",
+      "bytes": 30169,
+      "sha256": "CEDA8CFE68E627FEDB17AE919C8EF6C3ADF5662555F74834558485649B04C526"
     }
   },
   "raw_custody": "build/tmp/mir5-k2so-material-native-f210-r01",
@@ -34,13 +39,14 @@
   "claims": {
     "native_load": true,
     "complete_intended_data_settings": true,
-    "physical_research": false,
+    "physical_research": true,
     "production": false,
     "save_upgrade": false,
-    "two_cold_reloads": false,
+    "two_cold_reloads": true,
     "multiplayer": false,
     "performance": false,
-    "release_qualification": false
+    "release_qualification": false,
+    "earned_native_recipe_effects": true
   },
   "original_predeclared_input_custody": {
     "path": "build/mir5/material-catalogue-r01/frozen/intended-differences.json",
@@ -48,5 +54,38 @@
     "sha256": "3ADFB74E7D602354298109589331DB8E069F096E527E89BCC8ADC9BADC813294",
     "semantic_equality_with_canonical_record": true,
     "difference": "Windows CRLF input preserved in frozen custody; repository inventory uses LF under its existing text policy"
-  }
+  },
+  "fixture_source": "a390b94c01202f390d639de1e33fea379499cfa1",
+  "fixture_archive_sha256": "6357A70DC080E32ECA32C84DC692CB3D84230F8F52B69AF4867E5297BB07AE05",
+  "lab_raw_custody": "build/tmp/mir5-materials-k2so-native-r01",
+  "fixture_source_custody": "build/mir5/material-native-r01; exact committed source-member hashes in materials.json/observer.json; owned two-member observer staged without the separate F200 metadata",
+  "witnesses": {
+    "profile": "k2so",
+    "technology_ids": [
+      "recipe-prod-research_material_rare_metals-1",
+      "recipe-prod-research_material_silicon-1",
+      "recipe-prod-research_material_glass-1"
+    ],
+    "finite_levels_per_family": 3,
+    "actual_lab_completions": 9,
+    "native_recipe_productivity_per_recipe": 0.06,
+    "native_effect_per_completed_level": 0.02,
+    "science_consumed": {
+      "automation": 9,
+      "logistic": 9,
+      "chemical": 6
+    },
+    "native_laboratory_productivity": 0,
+    "foreign_force_preserved": true,
+    "fixture_accelerates_count_formula_and_time": true,
+    "ordinary_tuning_qualified": false,
+    "physical_productivity_observed": false,
+    "on_load_read_only": false,
+    "gameplay_scope": "disposable-native-k2so-materials-only"
+  },
+  "limits": [
+    "Disposable accelerated material lab world only; default count/time observed separately by complete native data comparison",
+    "No physical crafting-output observation in this fixture, predecessor upgrade, multiplayer, performance or final candidate qualification",
+    "The harness reports source_dirty=true because independent K2Base source work was in progress; player ZIP was frozen at75a8 and fixtures hash-bound to committed a390 blobs, so uncommitted player drafts were never installed"
+  ]
 }
