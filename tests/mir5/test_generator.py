@@ -8,6 +8,39 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 
+# Exact data-raw rows retained from the accepted published 4.7 F210 captures:
+# vanilla inventory, Space Age capture, and K2SO capture respectively. Keeping
+# them here makes this host control portable; it does not read local build data.
+FROZEN_GEAR_ROWS = json.loads(r'''{
+  "vanilla": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
+  "space_age": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
+  "k2so": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-enriched-iron","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-iron-ore","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}}
+}''')
+
+
+def lua_table(lua, value):
+    if isinstance(value, dict):
+        table = lua.table()
+        for key, item in value.items():
+            table[key] = lua_table(lua, item)
+        return table
+    if isinstance(value, list):
+        table = lua.table()
+        for index, item in enumerate(value, 1):
+            table[index] = lua_table(lua, item)
+        return table
+    return value
+
+
+def plain_lua(value):
+    if not hasattr(value, "items"):
+        return value
+    items = dict(value.items())
+    numeric = sorted(key for key in items if isinstance(key, int))
+    if len(numeric) == len(items) and numeric == list(range(1, len(items) + 1)):
+        return [plain_lua(items[index]) for index in numeric]
+    return {key: plain_lua(item) for key, item in items.items()}
+
 
 class GeneratorTests(unittest.TestCase):
     def setUp(self):
@@ -18,6 +51,7 @@ class GeneratorTests(unittest.TestCase):
           package.cpath = ""
           config = require("research.settings")
           productivity = require("research.productivity")
+          gear_bindings = require("compatibility.gear_bindings")
           generator = require("research.generator")
           function defaults()
             local values = {}
@@ -41,7 +75,29 @@ class GeneratorTests(unittest.TestCase):
             assert(environment.writes == 0, "preflight rejection wrote prototypes")
             assert(tostring(message):find(fragment, 1, true), tostring(message))
           end
+          function bound_output(active_mods, recipe_rows)
+            local binding = gear_bindings.select(active_mods, {recipe = recipe_rows})
+            return productivity.gears(config.resolve(defaults()), binding)
+          end
+          function disabled_data_final()
+            local startup, environment = defaults(), world()
+            startup["ips-enable-research_gears"].value = false
+            settings, mods, data, helpers, log = {startup = startup}, {['space-age'] = '2.1.23'}, environment, nil, function() end
+            package.loaded["compatibility.gear_bindings"] = nil
+            package.preload["compatibility.gear_bindings"] = function() error("inactive binding was loaded") end
+            local ok, message = pcall(dofile, data_final_path)
+            package.preload["compatibility.gear_bindings"] = nil
+            package.loaded["compatibility.gear_bindings"] = gear_bindings
+            return ok, message, environment
+          end
+          function missing_active_space_age_binding()
+            local startup, environment = defaults(), world()
+            settings, mods, data, helpers, log = {startup = startup}, {['space-age'] = '2.1.23'}, environment, nil, function() end
+            local ok, message = pcall(dofile, data_final_path)
+            return ok, message, environment
+          end
         ''')
+        self.lua.globals().data_final_path = (ROOT / "source/mir5/data-final-fixes.lua").as_posix()
 
     def test_published_default_and_detachment(self):
         self.lua.execute('''
@@ -60,6 +116,75 @@ class GeneratorTests(unittest.TestCase):
           a.effects[1].change = 99; a.unit.ingredients[1][2] = 99; a.prerequisites[1] = "changed"
           assert(b.effects[1].change == .10 and b.unit.ingredients[1][2] == 1)
           assert(b.prerequisites[1] == "automation-science-pack")
+        ''')
+
+    def test_approved_profile_bindings_match_frozen_full_native_rows(self):
+        profiles = {
+            "vanilla": ({}, ["iron-gear-wheel"]),
+            "space_age": ({"space-age": "2.1.23"}, ["casting-iron-gear-wheel", "iron-gear-wheel"]),
+            "k2so": ({
+                "space-age": "2.1.23", "Krastorio2": "2.1.4",
+                "Krastorio2-spaced-out": "2.0.19", "Krastorio2Assets": "2.1.0",
+                "k2so-assets": "1.0.7",
+            }, [
+                "casting-iron-gear-wheel", "iron-gear-wheel",
+                "kr-iron-gear-wheel-from-enriched-iron", "kr-iron-gear-wheel-from-iron-ore",
+            ]),
+        }
+        for profile, (mods, recipes) in profiles.items():
+            recipe_rows = {name: {} for name in recipes}
+            self.lua.globals().profile_mods = lua_table(self.lua, mods)
+            self.lua.globals().profile_recipes = lua_table(self.lua, recipe_rows)
+            actual = self.lua.eval("bound_output(profile_mods, profile_recipes)")
+            self.assertEqual(plain_lua(actual), FROZEN_GEAR_ROWS[profile], profile)
+
+    def test_profile_bindings_are_detached_direct_and_fail_closed(self):
+        self.lua.execute('''
+          local unrelated_reads = 0
+          local recipes = setmetatable({
+            ["casting-iron-gear-wheel"] = {}, ["iron-gear-wheel"] = {},
+            ["kr-iron-gear-wheel-from-enriched-iron"] = {}, ["kr-iron-gear-wheel-from-iron-ore"] = {}
+          }, {__pairs = function() error("whole recipe enumeration") end,
+              __index = function() unrelated_reads = unrelated_reads + 1; error("unrelated recipe read") end})
+          local mods = {['Krastorio2'] = '2.1.4', ['Krastorio2-spaced-out'] = '2.0.19',
+            ['Krastorio2Assets'] = '2.1.0', ['k2so-assets'] = '1.0.7', ['space-age'] = '2.1.23'}
+          local first = gear_bindings.select(mods, {recipe = recipes})
+          assert(unrelated_reads == 0, "binding inspected an unrelated recipe")
+          first.recipes[1] = "foreign"
+          local second = gear_bindings.select(mods, {recipe = recipes})
+          assert(second.recipes[1] == "casting-iron-gear-wheel")
+          local a, b = productivity.gears(config.resolve(defaults()), second), productivity.gears(config.resolve(defaults()), second)
+          a.effects[1].recipe = "foreign"; assert(b.effects[1].recipe == "casting-iron-gear-wheel")
+          local partial = {['Krastorio2'] = '2.1.4'}
+          assert(not pcall(gear_bindings.select, partial, {recipe = recipes}))
+          local no_space_age = {['Krastorio2'] = '2.1.4', ['Krastorio2-spaced-out'] = '2.0.19',
+            ['Krastorio2Assets'] = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          assert(not pcall(gear_bindings.select, no_space_age, {recipe = recipes}))
+          local incomplete = {['space-age'] = '2.1.23'}
+          assert(not pcall(gear_bindings.select, incomplete, {recipe = {['iron-gear-wheel'] = {}}}))
+        ''')
+
+    def test_vanilla_selection_does_not_load_inactive_profile_bodies(self):
+        self.lua.execute('''
+          local space_age = "compatibility.gear_bindings.space_age"
+          local k2so = "compatibility.gear_bindings.k2so"
+          package.loaded[space_age], package.loaded[k2so] = nil, nil
+          package.preload[space_age] = function() error("inactive Space Age profile was loaded") end
+          package.preload[k2so] = function() error("inactive K2SO profile was loaded") end
+          local binding = gear_bindings.select({}, {recipe = {['iron-gear-wheel'] = {}}})
+          assert(binding.profile == "vanilla-f210" and binding.recipes[1] == "iron-gear-wheel")
+          assert(package.loaded[space_age] == nil and package.loaded[k2so] == nil,
+            "vanilla selection loaded an inactive profile body")
+          package.preload[space_age], package.preload[k2so] = nil, nil
+        ''')
+
+    def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
+        self.lua.execute('''
+          local ok, message, environment = disabled_data_final()
+          assert(ok, message); assert(environment.writes == 1 and environment.emitted[1].enabled == false)
+          ok, message, environment = missing_active_space_age_binding()
+          assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
+          assert(environment.writes == 0, "active binding wrote before named preflight")
         ''')
 
     def test_cost_variants_and_nonfinite(self):

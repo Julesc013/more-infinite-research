@@ -220,6 +220,12 @@ class BootstrapTests(unittest.TestCase):
             and library_calls.open.options.selected == known_technology.name
             and library_calls.open.options.status == 4 and library_calls.open.options.sort == "name-desc"
             and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
+          assert(browser.open(1, {page = 30000}))
+          assert(library_calls.open.options.page == 30000)
+          assert(browser.open(1, {page = 0}))
+          assert(library_calls.open.options.page == nil)
+          assert(browser.open(1, {page = 1.5}))
+          assert(library_calls.open.options.page == nil)
           assert(browser.open(1, {selected = "unknown", family = "external", status = 5,
             sort = "invalid", page = 30001, hidden = "not-a-list"}))
           assert(library_calls.open.options.family == nil and library_calls.open.options.selected == nil
