@@ -114,6 +114,7 @@ function Run([string]$Phase,[string[]]$EngineArguments,[string]$Save=''){
   $completion=if($Save){ {
     if(-not(Test-Path -LiteralPath $log)-or-not(Test-Path -LiteralPath $Save)){return $false}
     try{$text=[string](Get-Content -LiteralPath $log -Raw -ErrorAction Stop)}catch [IO.IOException]{return $false}
+    if([string]::IsNullOrEmpty($text)){return $false}
     if(-not$text.Contains('Hosting game')-or-not($text-match '\[mir-fixture\] complete (research|Space Age) state retained')){return $false}
     if($Phase-like'reload*'){return $text.Contains('upgraded save reload proof complete')}
     $saved=$text.Contains('Saving finished')
