@@ -1,0 +1,157 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerQualifiedScenarioChainV1",
+  "source": "700c4769452f3f49793411cffd3aa18664317f11",
+  "run": {
+    "id": 40011659409,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40011659409",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/40011659409/black-glass-library-multiplayer-40011659409-1",
+  "manifest_members_verified": 220,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-qualified-native.json.gz",
+    "uncompressed_sha256": "2A8D91308F1F9252C3B33A985B3F22321A16E66B4D0546A3B00EE044113BE8D1"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "sha256": "D59767E521BD4EE89A6BF3BEF8517FEFF10DE4EA9EF28F5081950FB7996328E6",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "profile": {
+    "sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD",
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\library-multiplayer-f200-2077.json"
+  },
+  "session": {
+    "schema": 1,
+    "kind": "MIR5LibraryMultiplayerSessionV1",
+    "status": "passed-private-two-client-session",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "seed_sha256": "D0114C0CE72D8B34B197E4CCACB98FCED7944376D46080B01A2D9DFE1E712995",
+    "restart_save_sha256": "3FD5117DCFBFED46F28DBD5E4C96592927E6D1768DE569286A64B939123D3432",
+    "final_save_sha256": "ED6D9406216A715E98CC7693696DBF8D16BA038FEB1697AD197F55B07DC29C4E",
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "clients": [
+      {
+        "name": "MIR5English",
+        "locale": "en",
+        "port": 62497,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-en.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-en"
+      },
+      {
+        "name": "MIR5Deutsch",
+        "locale": "de",
+        "port": 62498,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-de.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-de"
+      }
+    ],
+    "screenshots": [
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\initial-1.png",
+        "sha256": "37C76057F8B27ACEB8EEAF1ABAEB7D06F93F2DFC65D95D055AAFB0356095333C",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\rejoin-1.png",
+        "sha256": "C02B8E1F8692D4A981465C0989DB3E4B4EB757548ECDF1018087115394F17CB9",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\restart-1.png",
+        "sha256": "9E33D4FA79C7D5F6740E6E9CE569A887B04876928F8A3C7DDDE58EF1A3E67608",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\initial-2.png",
+        "sha256": "473029AE90B19D9B29AF5CD5A22B45D1F3EFC6A23F64B241B20DCD0CCBAEA826",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\rejoin-2.png",
+        "sha256": "359B8EC3933B5D654984E5CECE659F918075902D635A5857FAD6584994D7B9BE",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40011659409-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\restart-2.png",
+        "sha256": "782FFBC3904AC150911113FFF74528702123BD1CAE7E4E4845DC77406F3984F8",
+        "width": 1280,
+        "height": 720
+      }
+    ]
+  },
+  "screenshots": [
+    {
+      "locale": "en",
+      "stage": "initial",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-en-initial.png",
+      "sha256": "37C76057F8B27ACEB8EEAF1ABAEB7D06F93F2DFC65D95D055AAFB0356095333C",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    },
+    {
+      "locale": "en",
+      "stage": "rejoin",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-en-rejoin.png",
+      "sha256": "C02B8E1F8692D4A981465C0989DB3E4B4EB757548ECDF1018087115394F17CB9",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    },
+    {
+      "locale": "en",
+      "stage": "restart",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-en-restart.png",
+      "sha256": "9E33D4FA79C7D5F6740E6E9CE569A887B04876928F8A3C7DDDE58EF1A3E67608",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    },
+    {
+      "locale": "de",
+      "stage": "initial",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-de-initial.png",
+      "sha256": "473029AE90B19D9B29AF5CD5A22B45D1F3EFC6A23F64B241B20DCD0CCBAEA826",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    },
+    {
+      "locale": "de",
+      "stage": "rejoin",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-de-rejoin.png",
+      "sha256": "359B8EC3933B5D654984E5CECE659F918075902D635A5857FAD6584994D7B9BE",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    },
+    {
+      "locale": "de",
+      "stage": "restart",
+      "path": "spec/mir5/evidence/library-multiplayer-qualified-de-restart.png",
+      "sha256": "782FFBC3904AC150911113FFF74528702123BD1CAE7E4E4845DC77406F3984F8",
+      "visual_review": "Library visible, readable and inside the 1280x720 viewport; no saving overlay."
+    }
+  ],
+  "visual_review": true,
+  "original_seed_byte_identical": true,
+  "scope": [
+    "One F2002.0.77 Base server plus two real graphical loopback clients with distinct en/de personal views.",
+    "Both clients join, rejoin and reconnect after host save/restart; native research/effect/queue sentinels remain unchanged.",
+    "All six actual client-local PNGs independently reviewed; no invented numeric LuaProfiler timings."
+  ],
+  "limitations": [
+    "Non-final source/package, single host, Base only; no cross-hardware or other scripted-feature multiplayer claim.",
+    "Numeric first-open/search/refresh/reopen performance and final-candidate stress remain unqualified.",
+    "Initial asynchronous research captions may still show their native IDs before translation callbacks."
+  ],
+  "release_qualification": false
+}
