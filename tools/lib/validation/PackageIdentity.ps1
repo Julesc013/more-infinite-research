@@ -104,22 +104,6 @@ function Get-MIRPackageSourceFiles {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
-  $defaultRoots = @(Get-MIRPackageSourceRoots | ForEach-Object { ([string]$_).Replace('\','/') })
-  $requestedRoots = @($Roots | ForEach-Object { ([string]$_).Replace('\','/') })
-  $canonicalLayout = (
-    $requestedRoots.Count -eq $defaultRoots.Count -and
-    ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n")) -and
-    (Test-Path -LiteralPath (Join-Path $repo 'source/package-source.json') -PathType Leaf) -and
-    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf)
-  )
-  if ($canonicalLayout) {
-    if (-not (Get-Command Get-MIR4CanonicalPackageSourceFiles -ErrorAction SilentlyContinue)) {
-      $authorityRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
-      . (Join-Path $authorityRoot 'tools/mir/application/package/PackageAuthority.ps1')
-    }
-    return @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
-  }
-
   $files = @()
   foreach ($relative in @($Roots)) {
     $path = Join-Path $repo $relative
@@ -304,8 +288,27 @@ function Get-MIRPackageSourceFingerprint {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $defaultRoots = @(Get-MIRPackageSourceRoots | ForEach-Object { ([string]$_).Replace('\','/') })
+  $requestedRoots = @($Roots | ForEach-Object { ([string]$_).Replace('\','/') })
+  $canonicalLayout = (
+    $requestedRoots.Count -eq $defaultRoots.Count -and
+    ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n")) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'source/package-source.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v2.schema.json') -PathType Leaf)
+  )
+  if ($canonicalLayout -and -not (Get-Command Get-MIR4CanonicalPackageSourceFiles -ErrorAction SilentlyContinue)) {
+    $authorityRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
+    . (Join-Path $authorityRoot 'tools/mir/application/package/PackageAuthority.ps1')
+  }
+  $files = if ($canonicalLayout) {
+    @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
+  } else {
+    @(Get-MIRPackageSourceFiles -RepoRoot $repo -Roots $Roots)
+  }
   $rows = @(
-    foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo -Roots $Roots) {
+    foreach ($relative in $files) {
       $path = Join-Path $repo $relative
       $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
       "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256
