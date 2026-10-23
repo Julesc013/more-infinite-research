@@ -23,6 +23,26 @@ local function current_name(force)
   return value and value.name or nil
 end
 
+local function queue_names(queue)
+  local names = {}
+  for _, value in ipairs(queue or {}) do
+    names[#names + 1] = value and value.name or tostring(value)
+  end
+  return "[" .. table.concat(names, ",") .. "]"
+end
+
+local function queue_enabled(force)
+  return target.queue_api and force.research_queue_enabled == true
+end
+
+local function enable_research_queue(force)
+  if not target.queue_api then return end
+  if force.research_queue_enabled ~= true then force.research_queue_enabled = true end
+  if force.research_queue_enabled ~= true then
+    fail("could not enable the supported historical research queue")
+  end
+end
+
 -- 0.17 and later expose current_research as a read-only observation.  The
 -- established historical-native fixture uses add_research for those targets;
 -- the older targets retain their supported direct setter contract.
@@ -94,14 +114,25 @@ end
 
 local function assert_partial(force)
   if target.successor_mode ~= "lab" then return end
-  if current_name(force) ~= target.direct or not close(force.research_progress, target.partial_progress) then
-    fail("published direct partial research differs")
-  end
+  local current, progress = current_name(force), force.research_progress
+  local queue, expected_queue = {}, "unavailable"
   if target.queue_api then
-    local queue = force.research_queue
-    if #queue ~= 2 or queue[1].name ~= target.direct or queue[2].name ~= target.queue_probe then
-      fail("published supported research queue differs")
-    end
+    queue, expected_queue = force.research_queue or {}, "[" .. target.direct .. "," .. target.queue_probe .. "]"
+  end
+  local queue_matches = not target.queue_api
+  if target.queue_api then
+    queue_matches = queue_enabled(force) and #queue == 2
+      and queue[1].name == target.direct and queue[2].name == target.queue_probe
+  end
+  if current ~= target.direct or not close(progress, target.partial_progress) or not queue_matches then
+    fail("published direct partial research differs: expected_current=" .. target.direct
+      .. " actual_current=" .. tostring(current)
+      .. " expected_progress=" .. tostring(target.partial_progress)
+      .. " actual_progress=" .. tostring(progress)
+      .. " expected_queue=" .. expected_queue
+      .. " actual_queue=" .. queue_names(queue)
+      .. " expected_queue_enabled=" .. tostring(target.queue_api)
+      .. " actual_queue_enabled=" .. tostring(queue_enabled(force)))
   end
 end
 
@@ -115,6 +146,7 @@ local function configure_partial(state)
   end
   if current_name(force) ~= nil then fail("published completion retained active research") end
   if target.queue_api then
+    enable_research_queue(force)
     local probe = technology(force, target.queue_probe)
     unlock_prerequisites(probe)
     probe.enabled = true
@@ -162,7 +194,7 @@ local function assert_candidate_complete(state)
   end
   if target.queue_api then
     local queue = force.research_queue
-    if current_name(force) ~= target.queue_probe or #queue ~= 1 or queue[1].name ~= target.queue_probe
+    if not queue_enabled(force) or current_name(force) ~= target.queue_probe or #queue ~= 1 or queue[1].name ~= target.queue_probe
         or technology(force, target.queue_probe).researched then
       fail("MIR5 changed the supported queued research")
     end
@@ -186,6 +218,7 @@ local function marker(stage, state)
     .. "\"current_research\":\"" .. tostring(current_name(force)) .. "\","
     .. "\"research_progress\":" .. tostring(force.research_progress) .. ","
     .. "\"queue_api\":" .. tostring(target.queue_api == true) .. ","
+    .. "\"research_queue_enabled\":" .. tostring(queue_enabled(force)) .. ","
     .. "\"two_cold_reload_witness\":" .. tostring(stage == "reload") .. ","
     .. "\"on_load_read_only\":" .. tostring(stage == "reload")
     .. "}")
@@ -206,6 +239,7 @@ local function initialize_published()
     source_lab=lab, source_lab_initial=initial, source_direct_finished=0,
     deadline=game.tick + DEADLINE_TICKS,
   }
+  enable_research_queue(force)
   start_research(force, target.direct)
 end
 

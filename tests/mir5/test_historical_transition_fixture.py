@@ -214,7 +214,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           function mock_world(queue)
             local direct={name="recipe-prod-research_character_mining_speed-1",level=1,researched=false,enabled=true,prerequisites={}}
             local braking={name="braking-force-1",level=1,researched=false,enabled=true,prerequisites={}}
-            local force={technologies={[direct.name]=direct,[braking.name]=braking},manual_mining_speed_modifier=0,research_progress=0}
+            local force={technologies={[direct.name]=direct,[braking.name]=braking},manual_mining_speed_modifier=0,research_progress=0,research_queue_enabled=not queue}
             setmetatable(force,{__index=function(t,key)
               if key == "current_research" then return rawget(t,"_current") end
               if key == "research_queue" then return rawget(t,"_queue") or {} end
@@ -224,11 +224,13 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 if queue then error("LuaForce::current_research is read only") end
                 rawset(t,"_current",type(value)=="string" and t.technologies[value] or value)
               elseif key == "research_queue" then
+                if queue and t.research_queue_enabled ~= true then error("LuaForce::research_queue is unavailable while disabled") end
                 local rows={};for index,item in ipairs(value) do rows[index]=type(item)=="string" and t.technologies[item] or item end;rawset(t,"_queue",rows);rawset(t,"_current",rows[1])
               else rawset(t,key,value) end
             end})
             function force.add_research(value)
               if type(value)=="string" then value=force.technologies[value] end
+              if queue and force.research_queue_enabled ~= true then return false end
               if not value or force.current_research ~= nil then return false end
               force.research_queue={value}
               return true
@@ -248,10 +250,12 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             if queue then
               local readonly,message=pcall(function()force.current_research=direct end)
               assert(not readonly and tostring(message):find("read only",1,true),"modern mock accepted a current_research write")
+              assert(force.research_queue_enabled == false and force.add_research(direct) == false
+                and force.current_research == nil and #force.research_queue == 0,"disabled queue admitted research")
             end
             assert(loadfile(control,"t",_ENV))();callbacks.init()
             assert(force.current_research == direct)
-            if queue then assert(#force.research_queue == 1 and force.research_queue[1] == direct) end
+            if queue then assert(force.research_queue_enabled == true and #force.research_queue == 1 and force.research_queue[1] == direct) end
             force.manual_mining_speed_modifier=fixture_target.direct_effect
             if queue or old_lab then direct.level=2 else direct.researched=true;force.current_research=nil end
             local source=global.mir5_historical_transition.source_lab
@@ -264,7 +268,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               if queue then force.research_queue={} else force.current_research=nil end
               callbacks.events[defines.events.on_tick]()
               assert(force.current_research == direct and math.abs(force.research_progress-.42)<.000001)
-              if queue then assert(#force.research_queue == 2 and force.research_queue[2] == braking) end
+              if queue then assert(force.research_queue_enabled == true and #force.research_queue == 2 and force.research_queue[2] == braking) end
             else assert(force.current_research == nil and direct.researched) end
             callbacks.events[defines.events.on_tick]()
             assert(saves[#saves] == "mir5-native-complete")
@@ -288,6 +292,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 self.assertIn('"transition_stage":"published"', witness)
                 self.assertIn('"transition_stage":"mir5"', witness)
                 self.assertIn('"stage":"reload"', witness)
+                if queue:
+                    self.assertIn('"research_queue_enabled":true', witness)
 
         self.lua.execute(r'''
           callbacks={events={}};install_target("mir5",true);mock_world(true);global={}
