@@ -5,7 +5,7 @@
   "registry": "validation/tests.yml",
   "executable_authority_root": "tests",
   "compatibility_root": "validation/tests",
-  "test_count": 240,
+  "test_count": 241,
   "tests": [
     {
       "id": "docs.check",
@@ -8475,6 +8475,39 @@
       "matrix": null
     },
     {
+      "id": "static.mir5-host-controls",
+      "proposition": "The governed test 'static.mir5-host-controls' passes for its exact selected inputs.",
+      "cohort": "package-repository",
+      "kind": "static",
+      "layer": "F1",
+      "command": "./tests/mir5/Test-MIR5HostControls.ps1",
+      "canonical_implementation": "tests/mir5/Test-MIR5HostControls.ps1",
+      "target_scope": "portable",
+      "freshness": "exact-input-fingerprint",
+      "evaluator_abi": "powershell-exit-code/v1",
+      "result_schema": "mir-assurance-evidence/v1",
+      "exit_behavior": "zero-pass-nonzero-fail",
+      "requires_factorio": false,
+      "inputs": [
+        "source/mir5/**",
+        "targets/mir5/**",
+        "tests/mir5/**",
+        "tools/mir5/**",
+        "spec/mir5/**",
+        "sdk/mir5/**",
+        "docs/mir5/**",
+        ".github/workflows/mir5.yml",
+        ".github/workflows/validate.yml",
+        ".mir/assurance.json",
+        "validation/tests.yml",
+        "governance/repository/development-epoch-v1.json",
+        "tools/lib/assurance/Core.ps1",
+        "tools/mir/application/assurance/DevelopmentValidation.ps1"
+      ],
+      "captured_artifacts": [],
+      "matrix": null
+    },
+    {
       "id": "static.modern-launch-return-harness",
       "proposition": "The governed test 'static.modern-launch-return-harness' passes for its exact selected inputs.",
       "cohort": "runtime-upgrade",
@@ -8804,13 +8837,13 @@
   ],
   "summary": {
     "cohorts": {
-      "package-repository": 69,
+      "package-repository": 70,
       "tooling-release": 70,
       "runtime-upgrade": 63,
       "compiler-static": 23,
       "compatibility-historical": 15
     },
-    "canonical_test_commands": 227,
+    "canonical_test_commands": 228,
     "aggregate_commands": 10,
     "orchestrated_runtime": 3,
     "compatibility_selected": 0,
@@ -8823,5 +8856,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:1f7cab8564443c8c59bdfe06909230518d46493b8bc2a3754b2acbdffb249c27"
+  "digest": "sha256:f0f25885c9281354cafe5a20289010e58d11b443e58bcd790d9ece880be1cccd"
 }

@@ -98,7 +98,7 @@ function Get-MIR4WorkflowPurposeCatalogueV1 {
     'branch-policy.yml'='governance';'control-plane-v5.yml'='qualification';'emergency-package.yml'='release';
     'extended-compat-audit.yml'='qualification';'mir4-independent-verification.yml'='qualification';
     'mir4-preview-assets.yml'='qualification';'mir4-promotion.yml'='release';'mir4-public-readback.yml'='release';
-    'mir4-release-seal.yml'='release';'mir4-restore-drill.yml'='release';'mir4-source-freeze.yml'='release';
+    'mir4-release-seal.yml'='release';'mir4-restore-drill.yml'='release';'mir4-source-freeze.yml'='release';'mir5.yml'='ci';
     'mir4-target-build.yml'='release';'mir4-target-publication.yml'='release';'mir4-target-qualification.yml'='qualification';
     'release-candidate.yml'='release';'validate.yml'='ci'
   }
@@ -115,6 +115,7 @@ function Get-MIR4WorkflowPurposeCatalogueV1 {
       elseif ($file.Name -ceq 'mir4-target-publication.yml') { 'confined-publisher-client' }
       elseif ($file.Name -ceq 'branch-policy.yml') { 'canonical-governance-test' }
       elseif ($file.Name -ceq 'extended-compat-audit.yml') { 'compatibility-audit-adapter' }
+      elseif ($file.Name -ceq 'mir5.yml') { 'mir5-host-controls' }
       else { 'unknown' }
     if ($invocation -ceq 'unknown') { throw "[mir4-workflow-invocation-unclassified] $($file.Name)" }
     $rows += [pscustomobject][ordered]@{

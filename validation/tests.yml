@@ -227,6 +227,29 @@
       ]
     },
     {
+      "id": "static.mir5-host-controls",
+      "kind": "static",
+      "layer": "F1",
+      "command": "./tests/mir5/Test-MIR5HostControls.ps1",
+      "requires_factorio": false,
+      "inputs": [
+        "source/mir5/**",
+        "targets/mir5/**",
+        "tests/mir5/**",
+        "tools/mir5/**",
+        "spec/mir5/**",
+        "sdk/mir5/**",
+        "docs/mir5/**",
+        ".github/workflows/mir5.yml",
+        ".github/workflows/validate.yml",
+        ".mir/assurance.json",
+        "validation/tests.yml",
+        "governance/repository/development-epoch-v1.json",
+        "tools/lib/assurance/Core.ps1",
+        "tools/mir/application/assurance/DevelopmentValidation.ps1"
+      ]
+    },
+    {
       "id": "static.mir-development-health",
       "kind": "static",
       "layer": "F0",
