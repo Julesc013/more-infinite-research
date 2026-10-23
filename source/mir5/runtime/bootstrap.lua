@@ -162,6 +162,14 @@ local function browser_options(player, options)
   if type(options) ~= "table" then return nil end
   local result = {}
   if type(options.search) == "string" then result.query = options.search end
+  if options.tab == "research" or options.tab == "settings" or options.tab == "queue"
+      or options.tab == "availability" or options.tab == "help" then
+    result.tab = options.tab
+  end
+  if options.settings_scope == "research" or options.settings_scope == "options" then
+    result.settings_scope = options.settings_scope
+  end
+  if type(options.settings_search) == "string" then result.settings_search = options.settings_search end
   if type(options.family) == "string" and browser_families[options.family] == true then
     result.family = options.family
   end
@@ -293,6 +301,11 @@ end
 
 local function on_library_selection_changed(event)
   library.on_gui_selection_state_changed(event)
+  reconcile_translations()
+end
+
+local function on_library_tab_changed(event)
+  library.on_gui_selected_tab_changed(event)
   reconcile_translations()
 end
 
@@ -453,6 +466,7 @@ function M.register()
   end
   if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
   if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, on_library_text_changed) end
+  if events.on_gui_selected_tab_changed then script.on_event(events.on_gui_selected_tab_changed, on_library_tab_changed) end
   if events.on_gui_selection_state_changed then script.on_event(events.on_gui_selection_state_changed, on_library_selection_changed) end
   if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
   if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end

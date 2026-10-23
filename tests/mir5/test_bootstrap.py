@@ -95,6 +95,7 @@ class BootstrapTests(unittest.TestCase):
               module.on_load = function() library_calls.load = (library_calls.load or 0) + 1 end
               module.on_lua_shortcut = function(event) library_calls.shortcut = event end
               module.on_gui_text_changed = function(event) library_calls.text = event end
+              module.on_gui_selected_tab_changed = function(event) library_calls.tab = event end
               module.on_gui_selection_state_changed = function(event) library_calls.selection = event end
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
@@ -150,7 +151,7 @@ class BootstrapTests(unittest.TestCase):
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
-              on_technology_effects_reset = 20
+              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -203,11 +204,13 @@ class BootstrapTests(unittest.TestCase):
           assert(type(handlers.events[19]) == "function" and type(handlers.events[20]) == "function")
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
+          assert(type(handlers.events[21]) == "function")
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
           handlers.events[7]({player_index = 1})
           handlers.events[8]({player_index = 1})
+          handlers.events[21]({player_index = 1})
           handlers.events[9]({player_index = 1})
           handlers.events[10]({player_index = 1})
           handlers.events[11]({player_index = 1})
@@ -219,7 +222,8 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[18]({player_index = 1})
           handlers.events[19]({research = known_technology})
           handlers.events[20]({force = player.force})
-          assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1)
+          assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1
+            and library_calls.tab.player_index == 1)
           assert(library_calls.selection.player_index == 1 and library_calls.click.player_index == 1)
           assert(library_calls.location.player_index == 1 and library_calls.closed.player_index == 1
             and library_calls.removed.player_index == 1)
