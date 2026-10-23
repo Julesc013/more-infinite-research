@@ -48,6 +48,11 @@ if type(mods) == "table" and mods["space-age"] ~= nil
   for index = 1, #scripted do technologies[#technologies + 1] = scripted[index] end
 end
 
+-- Retain broad product targeting in one relevant recipe pass. This extends
+-- detached authored effects without discovering families or inspecting
+-- foreign research. Existing named routes and weights retain precedence.
+require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods})
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {

@@ -13,6 +13,8 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_historical_continuations.py';lua=$true},
   [ordered]@{path='tests/mir5/test_modern_targets.py';lua=$true},
   [ordered]@{path='tests/mir5/test_science.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_product_targets.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_product_target_extension.py';lua=$true},
   [ordered]@{path='tests/mir5/test_target_adapters.py';lua=$true},
   [ordered]@{path='tests/mir5/test_caps.py';lua=$true},
   [ordered]@{path='tests/mir5/test_legacy_caps.py';lua=$true},
