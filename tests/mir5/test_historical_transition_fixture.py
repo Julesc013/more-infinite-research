@@ -256,6 +256,10 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             assert(loadfile(control,"t",_ENV))();callbacks.init()
             assert(force.current_research == direct)
             if queue then assert(force.research_queue_enabled == true and #force.research_queue == 1 and force.research_queue[1] == direct) end
+            -- Factorio's initial --create path invokes on_load after on_init
+            -- while the published direct research is active.  It is not a
+            -- completed-save reload witness and must not change fixture state.
+            local before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before)
             force.manual_mining_speed_modifier=fixture_target.direct_effect
             if queue or old_lab then direct.level=2 else direct.researched=true;force.current_research=nil end
             local source=global.mir5_historical_transition.source_lab
@@ -272,8 +276,17 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             else assert(force.current_research == nil and direct.researched) end
             callbacks.events[defines.events.on_tick]()
             assert(saves[#saves] == "mir5-native-complete")
-            local before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
-            callbacks={events={}};install_target("mir5",queue,old_lab);assert(loadfile(control,"t",_ENV))();callbacks.configuration({})
+            -- The initial source load above must not be mistaken for a cold
+            -- reload once the published save becomes ready.
+            callbacks.events[defines.events.on_tick]()
+            before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
+            -- Model the source save loading again immediately before the
+            -- successor configuration.  The configuration callback clears
+            -- its local witness latch before starting MIR5 research.
+            callbacks.load();assert(global.mir5_historical_transition.phase == before)
+            fixture_target.stage="mir5"
+            fixture_target.mir_version=queue and "5.0.01700" or (old_lab and "5.0.01500" or "5.0.01300")
+            callbacks.configuration({})
             if queue or old_lab then
               assert(global.mir5_historical_transition.phase == "mir5-successor" and force.current_research == direct)
               direct.level=3;force.manual_mining_speed_modifier=2*fixture_target.direct_effect
@@ -282,6 +295,10 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               if queue then assert(force.current_research == braking and #force.research_queue == 1) else assert(force.current_research == nil) end
             else assert(global.mir5_historical_transition.phase == "mir5-complete" and direct.researched and force.current_research == nil) end
             callbacks.events[defines.events.on_tick]();assert(saves[#saves] == "mir5-native-complete")
+            -- A retained published-ready latch would reject this MIR5 tick.
+            -- Its absence proves configuration discarded the pre-successor
+            -- source-load observation before the successor started.
+            callbacks.events[defines.events.on_tick]()
             before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
             return table.concat(messages,"\n")
           end

@@ -267,6 +267,10 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function()
+  -- A source save can load immediately before its successor configuration.
+  -- Only a completed save is a cold-reload witness; never carry a source
+  -- witness into the successor stage.
+  loaded, reported = false, false
   if target.stage == "mir5" then initialize_mir5() end
 end)
 
@@ -295,7 +299,10 @@ end)
 
 script.on_load(function()
   local state = global[KEY]
-  loaded = state and state.phase or nil
+  -- `--create` saves while the published direct research is still running.
+  -- That ordinary load must remain observational.  Cold-reload assertions
+  -- apply only after a stage wrote its completed save.
+  loaded = state and (state.phase == "published-ready" or state.phase == "mir5-complete") and state.phase or nil
   reported = false
 end)
 
