@@ -233,7 +233,7 @@
       "command": "./tests/mir5/Test-MIR5HostControls.ps1",
       "requires_factorio": false,
       "inputs": [
-        "source/mir5/**",
+        "source:source/mir5/**",
         "targets/mir5/**",
         "tests/mir5/**",
         "tools/mir5/**",

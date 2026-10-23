@@ -8489,7 +8489,7 @@
       "exit_behavior": "zero-pass-nonzero-fail",
       "requires_factorio": false,
       "inputs": [
-        "source/mir5/**",
+        "source:source/mir5/**",
         "targets/mir5/**",
         "tests/mir5/**",
         "tools/mir5/**",
@@ -8856,5 +8856,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f0f25885c9281354cafe5a20289010e58d11b443e58bcd790d9ece880be1cccd"
+  "digest": "sha256:77eb526b6ae9b889cfaa70e4677320d4a77f3e1fa30db348a87bb1caf95a49ef"
 }
