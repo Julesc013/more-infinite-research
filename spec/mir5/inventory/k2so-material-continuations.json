@@ -1,0 +1,34 @@
+{
+  "continuations": [
+    {
+      "technology": "recipe-prod-research_material_rare_metals-4",
+      "predecessor": "recipe-prod-research_material_rare_metals-1",
+      "first_level": 4,
+      "effect_recipes": [
+        "kr-rare-metals",
+        "kr-rare-metals-from-enriched-rare-metals"
+      ],
+      "research_cost": "1600+200*(L-4)",
+      "science_policy": "derive-qualified-route-late-frontier",
+      "carrier_ids": []
+    },
+    {
+      "technology": "recipe-prod-research_material_silicon-4",
+      "predecessor": "recipe-prod-research_material_silicon-1",
+      "first_level": 4,
+      "effect_recipes": ["kr-silicon"],
+      "research_cost": "1600+200*(L-4)",
+      "science_policy": "derive-qualified-route-late-frontier",
+      "carrier_ids": []
+    },
+    {
+      "technology": "recipe-prod-research_material_glass-4",
+      "predecessor": "recipe-prod-research_material_glass-1",
+      "first_level": 4,
+      "effect_recipes": ["kr-glass"],
+      "research_cost": "1600+200*(L-4)",
+      "science_policy": "derive-qualified-route-late-frontier",
+      "carrier_ids": []
+    }
+  ]
+}

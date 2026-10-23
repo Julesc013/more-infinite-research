@@ -1,0 +1,307 @@
+{
+  "adaptations": {
+    "additional_product_effects": 32,
+    "continuation_effect_identities": [
+      "braking-force-8",
+      "inserter-capacity-bonus-8",
+      "laser-shooting-speed-8",
+      "research-speed-7",
+      "weapon-shooting-speed-7",
+      "worker-robots-storage-4"
+    ],
+    "presentation_identities": [
+      "recipe-prod-research_gears-1",
+      "recipe-prod-research_belts-1",
+      "recipe-prod-research_copper-1",
+      "recipe-prod-research_iron-1",
+      "recipe-prod-research_mining_drill-1",
+      "recipe-prod-research_steel-1",
+      "recipe-prod-research_science_pack_productivity-1",
+      "recipe-prod-research_character_mining_speed-1",
+      "recipe-prod-research_character_reach-1",
+      "recipe-prod-research_lab_productivity-1"
+    ]
+  },
+  "baseline_receipt": {
+    "engine": {
+      "base_version": "2.0.77",
+      "factorio_version": "2.0",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "files": {
+      "data_raw": {
+        "bytes": 16906765,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390"
+      },
+      "mod_settings": {
+        "bytes": 2344,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "2C60A465AA5CEC4E8B3A62578F7B5314D95D578F58413D439D7F16482829A17B"
+      },
+      "result": {
+        "bytes": 15527,
+        "path": "result.json",
+        "sha256": "4BD2F4D9C01026B10A2680C9FFEECC8E3CBEDFC5131B3DD616202FCBCBF51539"
+      },
+      "selection": {
+        "bytes": 730,
+        "path": "selection.json",
+        "sha256": "76C0FAE9A812F5521C11B59179D248E35C9E0AE65710EE4F53BF082DFE294C2F"
+      }
+    },
+    "loaded_without_mir": [
+      "base@2.0.77",
+      "ChangeInserterDropLane@1.2.0",
+      "flib@0.16.5",
+      "Krastorio2@2.0.19",
+      "Krastorio2Assets@2.0.5",
+      "Krastorio2MenuSimulations@2.0.2",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "profile_input": {
+      "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\k2-base-f200-2077.json",
+      "sha256": "A9293B7B7C4F5EAE968814C38FEDF05D6B11ECFBFF3AF4A1DFF3C9204A606702"
+    },
+    "selected_archives_without_mir": [
+      {
+        "builtin": true,
+        "name": "base",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "version": "2.0.77"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2",
+        "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+        "version": "2.0.19"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2Assets",
+        "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+        "version": "2.0.5"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2MenuSimulations",
+        "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+        "version": "2.0.2"
+      },
+      {
+        "builtin": false,
+        "name": "ChangeInserterDropLane",
+        "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+        "version": "1.2.0"
+      },
+      {
+        "builtin": false,
+        "name": "flib",
+        "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+        "version": "0.16.5"
+      },
+      {
+        "builtin": false,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "version": "0.1.0"
+      }
+    ],
+    "selection_without_mir": [
+      {
+        "enabled": true,
+        "name": "base",
+        "version": "2.0.77"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2",
+        "version": "2.0.19"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2Assets",
+        "version": "2.0.5"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2"
+      },
+      {
+        "enabled": true,
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0"
+      },
+      {
+        "enabled": true,
+        "name": "flib",
+        "version": "0.16.5"
+      },
+      {
+        "enabled": true,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "basis": "published Base F200 output plus explicit K2 source/native facts; published K2 failed",
+  "candidate_player": {
+    "factorio_version": "2.0",
+    "name": "more-infinite-research",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "root": "more-infinite-research_5.0.20000",
+    "sha256": "2DDC19153525EC61970E9F9DF2C0D088B3C3F871E60123ECE27DEBAB20DB764D",
+    "version": "5.0.20000"
+  },
+  "candidate_receipt": {
+    "engine": {
+      "base_version": "2.0.77",
+      "factorio_version": "2.0",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "files": {
+      "data_raw": {
+        "bytes": 17019542,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "BCB8FEE4F3F4958E5E5B56D23A9E2DED5D5DDF68311E17EA2F652D8E3E857F87"
+      },
+      "mod_settings": {
+        "bytes": 739991,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "F64E3ACF18907818CF0D854E3310BF7269D5F8D3222B50BD5594D7AD1B6F9A9E"
+      },
+      "result": {
+        "bytes": 16685,
+        "path": "result.json",
+        "sha256": "36FAFD506C6DF75DDCE04A8E55B93911B8795C971C03539D5936C12013660FCB"
+      },
+      "selection": {
+        "bytes": 840,
+        "path": "selection.json",
+        "sha256": "03A56C0762A8285FDB3A8622ADBCDF579015B013EA7331F0C1B3F43F6A8685EF"
+      }
+    },
+    "loaded_without_mir": [
+      "base@2.0.77",
+      "ChangeInserterDropLane@1.2.0",
+      "flib@0.16.5",
+      "Krastorio2@2.0.19",
+      "Krastorio2Assets@2.0.5",
+      "Krastorio2MenuSimulations@2.0.2",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "profile_input": {
+      "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\k2-base-f200-2077.json",
+      "sha256": "A9293B7B7C4F5EAE968814C38FEDF05D6B11ECFBFF3AF4A1DFF3C9204A606702"
+    },
+    "selected_archives_without_mir": [
+      {
+        "builtin": true,
+        "name": "base",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "version": "2.0.77"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2",
+        "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+        "version": "2.0.19"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2Assets",
+        "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+        "version": "2.0.5"
+      },
+      {
+        "builtin": false,
+        "name": "Krastorio2MenuSimulations",
+        "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+        "version": "2.0.2"
+      },
+      {
+        "builtin": false,
+        "name": "ChangeInserterDropLane",
+        "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+        "version": "1.2.0"
+      },
+      {
+        "builtin": false,
+        "name": "flib",
+        "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+        "version": "0.16.5"
+      },
+      {
+        "builtin": false,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "version": "0.1.0"
+      }
+    ],
+    "selection_without_mir": [
+      {
+        "enabled": true,
+        "name": "base",
+        "version": "2.0.77"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2",
+        "version": "2.0.19"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2Assets",
+        "version": "2.0.5"
+      },
+      {
+        "enabled": true,
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2"
+      },
+      {
+        "enabled": true,
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0"
+      },
+      {
+        "enabled": true,
+        "name": "flib",
+        "version": "0.16.5"
+      },
+      {
+        "enabled": true,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "differences": [
+    {
+      "domain": "data",
+      "names": [
+        "recipe-prod-research_belts-1",
+        "recipe-prod-research_character_mining_speed-1",
+        "recipe-prod-research_character_reach-1",
+        "recipe-prod-research_copper-1",
+        "recipe-prod-research_iron-1",
+        "recipe-prod-research_lab_productivity-1",
+        "recipe-prod-research_mining_drill-1",
+        "recipe-prod-research_science_pack_productivity-1",
+        "recipe-prod-research_steel-1"
+      ],
+      "type": "technology"
+    }
+  ],
+  "expected_semantic_sha256": "F5E5DB183C014CA713E711ADA66A9EE0BD7D5597256A11879A6A1679BB4AD10C",
+  "inputs": {
+    "base_inventory_semantic_sha256": "BF285A56864491DE95A6DF739586A1F6859D320EBE620E5E8615FA37DEA9A2D4",
+    "k2_facts_semantic_sha256": "411870B703D0A6D6A426A35B4605C4E459BA3E193B833E097D1CA79C17C14735",
+    "no_mir_raw_sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390"
+  },
+  "kind": "MIR5K2BaseIndependentCandidateComparisonV1",
+  "schema": 1,
+  "scope": "complete data/settings; no physical production, gameplay, saves, multiplayer or release pass",
+  "status": "different-intended-native-output"
+}

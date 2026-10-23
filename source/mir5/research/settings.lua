@@ -10,6 +10,9 @@ M.import_setting_name = "mir-settings-profile-import"
 
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
+local k2so_active = modern_catalogue.is_k2so(active_mods)
+local native_owner_families = {}
+for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do native_owner_families[owner.family] = true end
 
 local normal_fields = {
   {key="enabled", prefix="ips-enable-", type="bool-setting"},
@@ -36,22 +39,32 @@ local native_fields = {
 
 local streams = {}
 for _, historical_stream in ipairs(historical.streams) do
-  local fields = {}
-  local field_overrides = historical_stream.field_overrides
-  if space_age_active and historical_stream.space_age_visible then
-    field_overrides = historical_stream.space_age_field_overrides or {}
+  if modern_catalogue.supports_family(historical_stream.key) then
+    local fields, defaults = {}, historical_stream.defaults
+    local field_overrides = historical_stream.field_overrides
+    if space_age_active and historical_stream.space_age_visible then
+      field_overrides = historical_stream.space_age_field_overrides or {}
+    end
+    if k2so_active and historical_stream.k2so_defaults then
+      defaults = {}
+      for key, value in pairs(historical_stream.defaults) do defaults[key] = value end
+      for key, value in pairs(historical_stream.k2so_defaults) do defaults[key] = value end
+    end
+    for index, base in ipairs(normal_fields) do
+      local field, override = {}, field_overrides[base.key] or {}
+      for key, value in pairs(base) do field[key] = value end
+      for key, value in pairs(override) do field[key] = value end
+      -- Published K2SO omits the hidden field instead of declaring false.
+      if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
+      fields[index] = field
+    end
+    streams[#streams + 1] = {
+      key=historical_stream.key, technology_locale=historical_stream.locale,
+      order_prefix=historical_stream.order_prefix, fields=fields, defaults=defaults,
+      description_note=historical_stream.description_note, enabled_note=historical_stream.enabled_note,
+      native_owner=native_owner_families[historical_stream.key] == true
+    }
   end
-  for index, base in ipairs(normal_fields) do
-    local field, override = {}, field_overrides[base.key] or {}
-    for key, value in pairs(base) do field[key] = value end
-    for key, value in pairs(override) do field[key] = value end
-    fields[index] = field
-  end
-  streams[#streams + 1] = {
-    key=historical_stream.key, technology_locale=historical_stream.locale,
-    order_prefix=historical_stream.order_prefix, fields=fields, defaults=historical_stream.defaults,
-    description_note=historical_stream.description_note, enabled_note=historical_stream.enabled_note
-  }
 end
 
 -- Stable MIR4 continuation IDs retain their own prefix, zero sentinels and
@@ -228,17 +241,26 @@ function M.resolve(startup, helpers, report)
   local effective, values = M.effective_values(startup, helpers, report), {streams={}, native_continuations={}}
   for _, stream in ipairs(streams) do
     local stream_values, setting_key = {}, stream.setting_key or stream.key
+    local configured = {}
     for _, field in ipairs(stream.fields) do
       local value = effective[field.prefix .. setting_key]
-      if field.key == "research_time" and value == 0 and not stream.inherit_research_time then value = stream.defaults.research_time end
+      configured[field.key] = value ~= stream.defaults[field.key]
+      if field.key == "research_time" and value == 0 and not stream.inherit_research_time
+          and not stream.native_owner then
+        value = stream.defaults.research_time
+      end
       stream_values[field.key] = value
     end
+    stream_values.configured = configured
     values.streams[stream.key] = stream_values
     if stream.value_key then values[stream.value_key] = stream_values end
     if stream.native_continuation then values.native_continuations[stream.key] = stream_values end
     if stream.key == "research_gears" then for key, value in pairs(stream_values) do values[key] = value end end
     if stream.key == "research_agricultural_growth_speed" then values.agricultural_growth_speed = stream_values end
     if stream.key == "research_spoilage_preservation" then values.spoilage_preservation = stream_values end
+  end
+  if k2so_active then
+    values.streams.research_material_imersite__continuation = values.streams.research_material_imersite
   end
   values.options = {}
   local aliases = { ["mir-max-level-worker-robots-speed"]="worker_robots_speed_max_level",

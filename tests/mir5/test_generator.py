@@ -11,6 +11,12 @@ ROOT = Path(__file__).resolve().parents[2]
 MODERN_ORACLE = json.loads(
     (ROOT / "spec/mir5/inventory/modern-f210-470.json").read_text(encoding="utf-8")
 )
+SCIENCE_SOURCE_ORACLE = json.loads(
+    (ROOT / "tests/mir5/fixtures/science-source-native-oracle.json").read_text(encoding="utf-8")
+)
+K2SO_MATERIAL_FACTS = json.loads(
+    (ROOT / "spec/mir5/inventory/k2so-material-facts.json").read_text(encoding="utf-8")
+)
 
 # Exact data-raw rows retained from the accepted published 4.7 F210 captures:
 # vanilla inventory, Space Age capture, and K2SO capture respectively. Keeping
@@ -20,6 +26,128 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
   "space_age": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__base__/graphics/icons/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}},
   "k2so": {"type":"technology","name":"recipe-prod-research_gears-1","icons":[{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64},{"icon":"__core__/graphics/icons/technology/constants/constant-recipe-productivity.png","icon_size":128,"scale":0.5,"shift":[50,50],"floating":true}],"level":1,"localised_name":["technology-name.more-infinite-research.research_gears",["item-name.iron-gear-wheel"]],"localised_description":["technology-description.more-infinite-research.recipe_productivity"],"upgrade":true,"max_level":"infinite","order":"p[research_gears]","prerequisites":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"],"effects":[{"type":"change-recipe-productivity","recipe":"casting-iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"iron-gear-wheel","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-enriched-iron","change":0.1},{"type":"change-recipe-productivity","recipe":"kr-iron-gear-wheel-from-iron-ore","change":0.1}],"unit":{"count_formula":"8000*2^(L-1)","time":60,"ingredients":[["automation-science-pack",1],["logistic-science-pack",1],["chemical-science-pack",1],["production-science-pack",1]]}}
 }''')
+
+
+# These are the only permitted additions to the published 4.7.2 K2SO
+# 75-technology capture. They restore the three finite A05 -1 identities
+# whose exact reviewed-forward tuple was omitted by 4.7.2, while preserving
+# every captured row as its own full expected value. Fields below come from
+# the historical material declarations; routes, owner unlocks, and icons are
+# independently bound to the hash-recorded current no-MIR raw facts.
+K2SO_MATERIAL_ADDITION_PROVENANCE = {
+    "reason": (
+        "restore the three A05-delivered finite material -1 identities absent from "
+        "the captured 4.7.2 K2SO output because its reviewed-forward tuple lock withheld them"
+    ),
+    "historical_declarations": "source/prototypes/streams/productivity.lua:753-783,1120-1135",
+    "native_facts": "spec/mir5/inventory/k2so-material-facts.json",
+    "a05_receipt": (
+        "spec/programmes/evidence/synthesis-2026-09-10/a05-k2-materials/"
+        "k2-materials/MIR4-A05-K2-Materials-ClosureV1.json"
+    ),
+}
+
+
+def _current_k2so_material_facts():
+    """Return only named raw rows independently captured for the three additions."""
+    current = K2SO_MATERIAL_FACTS["current_no_mir_native"]
+    recipe_rows = {}
+    for row in current["recipes"]:
+        name = row["recipe"]
+        if (row["enabled"] is not False or row["allow_productivity"] is not True
+                or row["ignored_by_productivity"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["shared_probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["independent_probability"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }
+                or row["extra_count_fraction"] != {
+                    "present_on_recipe": False,
+                    "present_on_ingredients": [False] * len(row["ingredients"]),
+                    "present_on_products": [False] * len(row["products"]),
+                }):
+            raise AssertionError(f"invalid captured K2SO material recipe facts: {name}")
+        recipe_rows[name] = {
+            "enabled": row["enabled"],
+            "allow_productivity": row["allow_productivity"],
+            "ingredients": row["ingredients"],
+            "results": row["products"],
+        }
+    owner_rows = {}
+    for row in current["owners"]:
+        if len(row["relevant_effects"]) != 1:
+            raise AssertionError(f"invalid captured K2SO material owner facts: {row['technology']}")
+        owner_rows[row["technology"]] = {"effects": row["relevant_effects"]}
+    icons = {}
+    for row in current["items"]:
+        if row["icon_size"] != {"present": False, "value": None}:
+            raise AssertionError(f"unexpected native item icon_size: {row['item']}")
+        icons[row["item"]] = row["icon"]
+    return {"recipe": recipe_rows, "technology": owner_rows, "icons": icons}
+
+
+K2SO_MATERIAL_NATIVE = _current_k2so_material_facts()
+
+
+def _intended_k2so_material_row(name, item, routes, science, owners):
+    return {
+        "type": "technology",
+        "name": name,
+        "icons": [
+            {"icon": K2SO_MATERIAL_NATIVE["icons"][item], "icon_size": 64},
+            {"icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+             "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": True},
+        ],
+        "localised_name": ["", ["description.productivity-bonus"], ": ", [f"item-name.{item}"]],
+        "localised_description": ["technology-description.more-infinite-research.recipe_productivity"],
+        "level": 1,
+        "upgrade": True,
+        "max_level": 3,
+        "order": f"p[research_material_{item.removeprefix('kr-').replace('-', '_')}]",
+        "prerequisites": [*science, *owners],
+        "effects": [
+            {"type": "change-recipe-productivity", "recipe": route, "change": 0.02}
+            for route in routes
+        ],
+        "unit": {
+            "count_formula": "200*2^(L-1)",
+            "time": 30,
+            "ingredients": [[pack, 1] for pack in science],
+        },
+    }
+
+
+K2SO_INTENDED_MATERIAL_ROWS = {
+    "recipe-prod-research_material_rare_metals-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_rare_metals-1", "kr-rare-metals",
+        ["kr-rare-metals", "kr-rare-metals-from-enriched-rare-metals"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack"],
+        ["kr-rare-metal-processing", "kr-enriched-ores"],
+    ),
+    "recipe-prod-research_material_silicon-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_silicon-1", "kr-silicon", ["kr-silicon"],
+        ["automation-science-pack", "logistic-science-pack"], ["kr-silicon-processing"],
+    ),
+    "recipe-prod-research_material_glass-1": _intended_k2so_material_row(
+        "recipe-prod-research_material_glass-1", "kr-glass", ["kr-glass"],
+        ["automation-science-pack", "logistic-science-pack", "chemical-science-pack"],
+        ["kr-stone-processing"],
+    ),
+}
 
 
 def lua_table(lua, value):
@@ -46,6 +174,58 @@ def plain_lua(value):
     return {key: plain_lua(item) for key, item in items.items()}
 
 
+K2SO_MODS = {
+    "space-age": "2.1.23", "Krastorio2": "2.1.4", "Krastorio2-spaced-out": "2.0.19",
+    "Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7",
+}
+
+
+def profile_mods(identifier):
+    if identifier == "base-f210":
+        return {}
+    if identifier == "space-age-f210":
+        return {"space-age": "2.1.23"}
+    if identifier == "k2so-f210":
+        return K2SO_MODS
+    raise AssertionError(f"unknown published profile: {identifier}")
+
+
+def host_row(row):
+    """Map the two empty Lua prerequisite tables to Lupa's list view only."""
+    output = json.loads(json.dumps(row))
+    if (output.get("name") in {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
+            and output.get("prerequisites") == {}):
+        output["prerequisites"] = []
+    return output
+
+
+def intended_setting_rows(profile):
+    """Apply only the exact planner-field retirement named by the oracle."""
+    records = profile["published_output"]["settings"]["additions"]
+    retirements = {
+        (item["type"], item["name"], item["field"]): item
+        for item in profile["intended_player_output"]["settings"]["remove_published_fields"]
+    }
+    expected = {}
+    for item in records:
+        row = json.loads(json.dumps(item["row"]))
+        key = (item["type"], item["name"], "targets")
+        retirement = retirements.pop(key, None)
+        if "targets" in row:
+            if retirement is None:
+                raise AssertionError(f"oracle lacks targets retirement for {item['name']}")
+            if (retirement["reason"] != "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer"
+                    or retirement["provenance"] != "published-4.7 setting descriptor targets field"):
+                raise AssertionError(f"oracle has an invalid targets retirement for {item['name']}")
+            row.pop("targets")
+        elif retirement is not None:
+            raise AssertionError(f"oracle retires absent targets for {item['name']}")
+        expected[item["name"]] = row
+    if retirements:
+        raise AssertionError(f"oracle retires fields outside published settings: {sorted(retirements)}")
+    return expected
+
+
 class GeneratorTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -55,6 +235,7 @@ class GeneratorTests(unittest.TestCase):
           package.cpath = ""
           config = require("research.settings")
           productivity = require("research.productivity")
+          cost = require("research.cost")
           gear_bindings = require("compatibility.gear_bindings")
           generator = require("research.generator")
           modern_catalogue = require("compatibility.modern_catalogue")
@@ -83,6 +264,11 @@ class GeneratorTests(unittest.TestCase):
           end
           -- Test fixture construction follows only the explicit authored
           -- selection; it never enumerates data.raw to make a family pass.
+          local function source_copy(value)
+            if type(value) ~= "table" then return value end
+            local out = {}; for key, child in pairs(value) do out[key] = source_copy(child) end
+            return out
+          end
           function full_world(active_mods)
             local tools, technologies, recipes = {}, {}, {}
             local function add_technology(name) if name then technologies[name] = technologies[name] or {} end end
@@ -101,6 +287,12 @@ class GeneratorTests(unittest.TestCase):
               add_science(definition.science)
               for _, name in ipairs(definition.prerequisites) do add_technology(name) end
             end
+            if selected.k2_imersite then
+              add_science("science_automation_logistic_chemical_production")
+              add_science("science_production_space")
+              add_technology("kr-quarry-minerals-extraction")
+              recipes["kr-imersite-powder"] = {}
+            end
             for _, name in ipairs({"automation", "logistic", "chemical", "production", "military", "utility", "space", "agricultural", "electromagnetic", "cryogenic", "metallurgic", "promethium"}) do
               tools[name .. "-science-pack"] = {}; add_technology(name .. "-science-pack")
             end
@@ -108,7 +300,26 @@ class GeneratorTests(unittest.TestCase):
             if active_mods and active_mods["space-age"] then
               recipes["casting-iron-gear-wheel"] = {}; technologies["agriculture"] = {}; technologies["spoilage"] = {}
             end
-            return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes}, writes = 0,
+            if modern_catalogue.is_k2so(active_mods) then
+              recipes["kr-iron-gear-wheel-from-enriched-iron"] = {}; recipes["kr-iron-gear-wheel-from-iron-ore"] = {}
+            end
+            local profile = active_mods and active_mods["space-age"] and "space-age-f210" or "base-f210"
+            local sources = source_worlds[profile].raw
+            for name, row in pairs(sources.recipe) do recipes[name] = source_copy(row) end
+            for name, row in pairs(sources.technology) do technologies[name] = source_copy(row) end
+            -- The K2SO host fixture is a named subset from the current
+            -- no-MIR capture. It supplies only the four recipes and four
+            -- owner effects that the restored material rows bind directly.
+            if modern_catalogue.is_k2so(active_mods) then
+              for name, row in pairs(k2so_material_native.recipe) do recipes[name] = source_copy(row) end
+              for name, row in pairs(k2so_material_native.technology) do technologies[name] = source_copy(row) end
+            end
+            local lab_inputs = {}
+            for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
+            table.sort(lab_inputs)
+            local items = source_copy(sources.item); items.spoilage = {}
+            return {raw = {technology = technologies, tool = tools, item = items, recipe = recipes,
+              lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
           end
           function bound_output(active_mods, recipe_rows)
@@ -139,6 +350,8 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
         self.lua.globals().data_final_path = (ROOT / "source/mir5/data-final-fixes.lua").as_posix()
+        self.lua.globals().source_worlds = lua_table(self.lua, SCIENCE_SOURCE_ORACLE["profiles"])
+        self.lua.globals().k2so_material_native = lua_table(self.lua, K2SO_MATERIAL_NATIVE)
 
     def test_published_default_and_detachment(self):
         self.lua.execute('''
@@ -288,6 +501,529 @@ class GeneratorTests(unittest.TestCase):
           assert(#space_declared == 76 and owners == 5)
         ''')
 
+    def test_native_owner_settings_keep_zero_time_as_native_inherit_only_for_active_owners(self):
+        self.lua.execute('''
+          local function startup_for(configuration)
+            local startup = {}
+            for _, spec in ipairs(configuration.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+            return startup
+          end
+
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          local space_settings = require("research.settings")
+          local startup = startup_for(space_settings)
+          startup["ips-research-time-research_low_density_structure"].value = 0
+          local space = space_settings.resolve(startup)
+          local owner = space.streams.research_low_density_structure
+          assert(owner.research_time == 0 and owner.configured.research_time,
+            "Space Age native owner lost its documented inherit sentinel")
+
+          mods = {}
+          package.loaded["research.settings"] = nil
+          local base_settings = require("research.settings")
+          startup = startup_for(base_settings)
+          startup["ips-research-time-research_low_density_structure"].value = 0
+          local base = base_settings.resolve(startup)
+          assert(base.streams.research_low_density_structure.research_time == 60
+            and base.streams.research_low_density_structure.configured.research_time,
+            "ordinary emitted research changed the zero-time meaning")
+        ''')
+
+    def test_native_owner_patches_are_atomic_profile_bound_and_preserve_unowned_fields(self):
+        self.lua.execute('''
+          local function owner_fixture(definitions)
+            local owners = {}
+            for _, definition in ipairs(definitions) do
+              local effects = {{type = "foreign-effect", recipe = "foreign", change = 7}}
+              for _, recipe in ipairs(definition.admission.recipes) do
+                effects[#effects + 1] = {type = definition.admission.effect_type, recipe = recipe,
+                  change = definition.expected.effect_change}
+              end
+              owners[definition.id] = {name = definition.id, max_level = definition.expected.max_level,
+                unit = {count_formula = definition.expected.count_formula, time = definition.expected.research_time,
+                  ingredients = {{"foreign-science", 1}}, foreign_unit_field = "preserve"},
+                effects = effects, foreign_top_level_field = "preserve"}
+            end
+            return owners
+          end
+          local function owner_values(definitions)
+            local values = {streams = {}}
+            for _, definition in ipairs(definitions) do
+              values.streams[definition.family] = {enabled = true, base_cost = definition.expected.base_cost,
+                linear_increment = definition.expected.linear_increment, growth_factor = definition.expected.growth_factor,
+                research_time = definition.expected.research_time, effect_percent = definition.expected.effect_change * 100,
+                configured = {}}
+            end
+            return values
+          end
+          local function assert_named_changes(owner, definition, value)
+            assert(owner.foreign_top_level_field == "preserve" and owner.unit.foreign_unit_field == "preserve")
+            assert(owner.effects[1].type == "foreign-effect" and owner.effects[1].change == 7)
+            local named = {}
+            for _, effect in ipairs(owner.effects) do named[effect.recipe] = effect end
+            for _, recipe in ipairs(definition.admission.recipes) do
+              assert(named[recipe].change == value)
+            end
+          end
+
+          local space = modern_catalogue.select({['space-age'] = '2.1.23'})
+          local owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          for _, definition in ipairs(space.native_owners) do
+            values.streams[definition.family].effect_percent = 20
+            values.streams[definition.family].configured.effect_percent = true
+          end
+          local first = space.native_owners[1]
+          values.streams[first.family].base_cost = 200
+          values.streams[first.family].linear_increment = 3
+          values.streams[first.family].growth_factor = 2
+          values.streams[first.family].research_time = 0
+          values.streams[first.family].configured.base_cost = true
+          values.streams[first.family].configured.linear_increment = true
+          values.streams[first.family].configured.research_time = true
+          values.streams[first.family].max_level = 7
+          values.streams[first.family].configured.max_level = true
+          local second = space.native_owners[2]
+          values.streams[second.family].research_time = 123
+          values.streams[second.family].configured.research_time = true
+          local original_unit, original_effects = owners[first.id].unit, owners[first.id].effects
+          local patches = modern.preflight_native_owner_patches(space, {technology = owners}, values)
+          assert(#patches == 5 and owners[first.id].unit == original_unit and owners[first.id].effects == original_effects)
+          modern.apply_native_owner_patches(patches)
+          assert(owners[first.id].unit.count_formula == "(200+3*(L-1))*2^(L-1)"
+            and owners[first.id].unit.time == 60 and owners[first.id].unit ~= original_unit
+            and owners[first.id].max_level == "infinite")
+          assert(owners[second.id].unit.time == 123, "positive owner research time was not applied")
+          for _, definition in ipairs(space.native_owners) do assert_named_changes(owners[definition.id], definition, .2) end
+
+          -- Every selected patch is checked before any owner table is changed.
+          owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          for _, definition in ipairs(space.native_owners) do
+            values.streams[definition.family].configured.effect_percent = true
+            values.streams[definition.family].effect_percent = 20
+          end
+          owners[space.native_owners[2].id].effects[2].change = .2
+          local ok, message = pcall(modern.preflight_native_owner_patches, space, {technology = owners}, values)
+          assert(not ok and tostring(message):find("unexpected effect change", 1, true), tostring(message))
+          assert(owners[space.native_owners[1].id].effects[2].change == .1,
+            "a later malformed owner allowed an earlier patch")
+
+          -- Disabling an owner preserves the established owner even when a
+          -- stale non-default setting value is also present.
+          owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          values.streams[first.family].enabled = false
+          values.streams[first.family].effect_percent = 20
+          values.streams[first.family].configured.effect_percent = true
+          owners[first.id].unit.count_formula = "foreign-owner-formula"
+          patches = modern.preflight_native_owner_patches(space, {technology = owners}, values)
+          assert(#patches == 0 and owners[first.id].unit.count_formula == "foreign-owner-formula")
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          local k2 = modern_catalogue.select(k2mods)
+          owners, values = owner_fixture(k2.native_owners), owner_values(k2.native_owners)
+          for _, definition in ipairs(k2.native_owners) do
+            values.streams[definition.family].effect_percent = 25
+            values.streams[definition.family].configured.effect_percent = true
+          end
+          modern.apply_native_owner_patches(modern.preflight_native_owner_patches(k2, {technology = owners}, values))
+          assert(#k2.native_owners == 4 and owners["steel-plate-productivity"] == nil)
+          for _, definition in ipairs(k2.native_owners) do assert_named_changes(owners[definition.id], definition, .25) end
+        ''')
+
+    def test_data_final_preflights_nondefault_native_owners_before_emitting(self):
+        self.lua.execute('''
+          local function add_native_owners(environment, definitions)
+            for _, definition in ipairs(definitions) do
+              local effects = {}
+              for _, recipe in ipairs(definition.admission.recipes) do
+                effects[#effects + 1] = {type = definition.admission.effect_type, recipe = recipe,
+                  change = definition.expected.effect_change}
+              end
+              environment.raw.technology[definition.id] = {max_level = definition.expected.max_level,
+                unit = {count_formula = definition.expected.count_formula, time = definition.expected.research_time}, effects = effects}
+            end
+          end
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          local space_settings = require("research.settings")
+          local startup, selected = {}, modern_catalogue.select(mods)
+          for _, spec in ipairs(space_settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["ips-effect-per-level-research_low_density_structure"].value = 20
+          startup["ips-effect-per-level-research_plastic"].value = 20
+          local environment = full_world(mods)
+          add_native_owners(environment, selected.native_owners)
+          environment.raw.technology["plastic-bar-productivity"].effects[1].change = .2
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          local ok, message = pcall(dofile, data_final_path)
+          assert(not ok and tostring(message):find("native-owner preflight", 1, true), tostring(message))
+          assert(environment.writes == 0, "native-owner failure emitted technologies")
+          assert(environment.raw.technology["low-density-structure-productivity"].effects[1].change == .1,
+            "native-owner failure applied an earlier owner patch")
+        ''')
+
+    def test_science_policy_is_applied_to_the_whole_owned_catalogue_before_publication(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          settings.startup["ips-require-space-gate"].value = true
+          settings.startup["mir-science-pack-ingredient-policy"].value = "space"
+          data = full_world(mods)
+          local foreign = setmetatable({}, {__index=function() error("foreign research inspected") end})
+          data.raw.technology["Space-Lab-Research-61"] = foreign
+          local reads = 0
+          local labs = data.raw.lab
+          data.raw.lab = setmetatable({}, {__pairs=function()
+            reads = reads + 1; return next,labs,nil
+          end})
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(reads == 1 and data.raw.technology["Space-Lab-Research-61"] == foreign)
+          for _, row in ipairs(data.emitted) do
+            local pack, gate = false, false
+            for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
+            for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
+            assert(pack and gate and row.enabled ~= false, row.name)
+          end
+        ''')
+
+    def test_lab_skip_retains_disabled_owned_identities_and_foreign_research(self):
+        self.lua.execute('''
+          settings, mods, helpers, log = {startup=defaults()}, {}, nil, function() end
+          settings.startup["mir-lab-incompatibility-policy"].value = "skip"
+          data = full_world(mods)
+          data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
+          local foreign = {enabled=true,foreign=77}
+          data.raw.technology["foreign"] = foreign
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
+          assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
+        ''')
+
+    def test_k2so_material_rows_receive_common_all_official_science_and_lab_disablement(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["mir-science-pack-ingredient-policy"].value = "all-official"
+          startup["mir-lab-incompatibility-policy"].value = "skip"
+          local environment = full_world(mods)
+          environment.raw.lab = {restricted = {inputs = {"automation-science-pack"}}}
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local wanted = {
+            ["recipe-prod-research_material_rare_metals-1"] = true,
+            ["recipe-prod-research_material_silicon-1"] = true,
+            ["recipe-prod-research_material_glass-1"] = true,
+          }
+          local seen = 0
+          for _, row in ipairs(environment.emitted) do
+            if wanted[row.name] then
+              -- The selected K2 phase retains its own exact early vector
+              -- under all-official policy. The restricted lab must still
+              -- pass through the common skip disposition rather than leave
+              -- this appended row enabled.
+              assert(row.enabled == false and #row.unit.ingredients > 0,
+                row.name .. " bypassed common science/lab policy")
+              seen = seen + 1
+            end
+          end
+          assert(seen == 3)
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
+    def test_k2so_material_native_stage_keeps_three_levels_while_runtime_caps_remain_named(self):
+        self.lua.execute('''
+          mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["ips-max-level-research_material_rare_metals"].value = 1
+          startup["ips-max-level-research_material_silicon"].value = 2
+          startup["ips-max-level-research_material_glass"].value = 3
+          local environment = full_world(mods)
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1)
+          local generated = {}; for _, row in ipairs(environment.emitted) do generated[row.name] = row end
+          for _, id in ipairs({"recipe-prod-research_material_rare_metals-1",
+              "recipe-prod-research_material_silicon-1", "recipe-prod-research_material_glass-1"}) do
+            assert(generated[id] and generated[id].max_level == 3, id .. " truncated native earned levels")
+          end
+
+          package.loaded["research.catalogue"] = nil
+          local declared, count = require("research.catalogue").declared(), 0
+          for _, row in ipairs(declared) do
+            if row.id == "recipe-prod-research_material_rare_metals-1"
+              or row.id == "recipe-prod-research_material_silicon-1"
+              or row.id == "recipe-prod-research_material_glass-1" then
+              assert(row.ownership_kind == "authored_generated" and row.cap_setting == "ips-max-level-" .. row.family)
+              count = count + 1
+            end
+          end
+          assert(count == 3, "runtime caps catalogue lost or duplicated a material identity")
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
+    def test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement(self):
+        self.lua.execute('''
+          local function outputs(value, enabled)
+            local direct = {name = "recipe-prod-direct-1",
+              effects = {{type = "gun-speed", ammo_category = "bullet", modifier = value}}}
+            if not enabled then direct.enabled = false end
+            return {
+              direct,
+              {name = "weapon-shooting-speed-7", effects = {
+                {type = "gun-speed", ammo_category = "bullet", modifier = .4},
+                {type = "gun-speed", ammo_category = "shotgun-shell", modifier = .4},
+                {type = "laboratory-speed", modifier = .1},
+              }},
+            }
+          end
+          local selection = {definitions = {{key = "direct", family = "research_cannon_shooting_speed"}}}
+          local function values(mode, enabled)
+            return {options = {["mir-adjust-vanilla-weapon-speed-techs"] = mode},
+              streams = {research_cannon_shooting_speed = {enabled = enabled}}}
+          end
+          local rows = outputs(.1, true)
+          modern.apply_weapon_speed_overlap(selection, rows, values("off", true))
+          assert(#rows[2].effects == 3)
+          for _, mode in ipairs({"only-when-dedicated-tech-enabled", "always"}) do
+            rows = outputs(.1, true)
+            modern.apply_weapon_speed_overlap(selection, rows, values(mode, true))
+            assert(#rows[2].effects == 2 and rows[2].effects[1].ammo_category == "shotgun-shell"
+              and rows[2].effects[2].type == "laboratory-speed")
+          end
+          rows = outputs(.1, false)
+          modern.apply_weapon_speed_overlap(selection, rows, values("always", false))
+          assert(#rows[2].effects == 3, "always removed a paid effect without an enabled owner")
+          rows = outputs(0, true)
+          modern.apply_weapon_speed_overlap(selection, rows, values("only-when-dedicated-tech-enabled", true))
+          assert(#rows[2].effects == 3, "zero direct effect removed a paid effect")
+
+          -- The captured defaults have no overlapping direct category, so the
+          -- policy is inert for the exact published Base output.
+          local selected = modern_catalogue.select({})
+          local generated = modern.technologies(selected, config.resolve(defaults()))
+          modern.apply_weapon_speed_overlap(selected, generated, config.resolve(defaults()))
+          for _, technology in ipairs(generated) do
+            if technology.name == "weapon-shooting-speed-7" then
+              assert(#technology.effects == 2 and technology.effects[1].ammo_category == "bullet"
+                and technology.effects[2].ammo_category == "shotgun-shell")
+            end
+          end
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          mods = k2mods
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          selected = modern_catalogue.select(k2mods)
+          generated = modern.technologies(selected, k2settings.resolve(startup))
+          modern.apply_weapon_speed_overlap(selected, generated, k2settings.resolve(startup))
+          for _, technology in ipairs(generated) do
+            if technology.name == "weapon-shooting-speed-7" then
+              assert(#technology.effects == 7 and technology.effects[1].ammo_category == "bullet"
+                and technology.effects[7].ammo_category == "kr-heavy-rocket",
+                "unexpected K2 weapon continuation: " .. #technology.effects .. ":"
+                  .. tostring(technology.effects[1].ammo_category) .. ":"
+                  .. tostring(technology.effects[#technology.effects].ammo_category))
+            end
+          end
+        ''')
+
+    def test_pipeline_extent_uses_effective_import_and_never_imports_for_defaults(self):
+        self.lua.execute('''
+          mods={base="2.1.23"}
+          settings, data, helpers, log={startup=defaults()}, full_world(mods), nil, function() end
+          package.loaded["overrides.pipeline_extent"]=nil
+          package.preload["overrides.pipeline_extent"]=function() error("inactive pipeline import") end
+          assert(loadfile(data_final_path))()
+          assert(package.loaded["overrides.pipeline_extent"] == nil)
+          package.preload["overrides.pipeline_extent"]=nil
+          data=full_world(mods)
+          local box={max_pipeline_extent=321,foreign="keep"}
+          data.raw.fixture={a={fluid_box=box}}
+          helpers={encode_string=function(value) return value end,
+            decode_string=function() return "{}" end, json_to_table=function()
+            return {schema=1, settings={["mir-pipeline-extent-multiplier"]="150"}}
+          end}
+          -- The direct setting remains default: only the effective imported
+          -- value activates the independent override.
+          settings.startup["mir-settings-profile-import"].value="MIRSET1:payload"
+          assert(loadfile(data_final_path))()
+          assert(box.max_pipeline_extent == 482 and box.foreign == "keep")
+        ''')
+
+    def test_k2so_catalogue_keeps_exact_imersite_stages_and_owners_lazy(self):
+        self.lua.execute('''
+          local k2_body = "compatibility.modern_catalogue.k2so"
+          package.loaded[k2_body] = nil
+          package.preload[k2_body] = function() error("inactive K2SO catalogue loaded") end
+          assert(modern_catalogue.select({}).profile == "base")
+          assert(package.loaded[k2_body] == nil, "base selection loaded K2SO catalogue")
+          package.preload[k2_body] = nil
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          assert(modern_catalogue.is_k2so(k2mods) and not modern_catalogue.is_k2so({Krastorio2 = '2.1.4'}))
+          local selected = modern_catalogue.select(k2mods)
+          assert(selected.profile == "k2so-f210" and selected.k2_imersite
+            and #selected.definitions == 62 and #selected.continuations == 6 and #selected.recipe_patches == 3)
+          assert(#modern_catalogue.native_owners(k2mods) == 4)
+          local has_steel = false
+          for _, owner in ipairs(modern_catalogue.native_owners(k2mods)) do
+            if owner.id == "steel-plate-productivity" then has_steel = true end
+          end
+          assert(not has_steel, "K2SO retained the absent steel native-owner admission")
+          local owners = {}
+          for _, owner in ipairs(modern_catalogue.native_owners(k2mods)) do owners[owner.id] = owner end
+          assert(owners["low-density-structure-productivity"].admission.recipes[2] == "casting-low-density-structure")
+          assert(owners["plastic-bar-productivity"].admission.recipes[2] == "bioplastic")
+          assert(owners["processing-unit-productivity"].admission.recipes[2] == "kr-bio-processing-circuit")
+          assert(owners["rocket-fuel-productivity"].admission.recipes[4] == "kr-rocket-fuel-with-hydrogen-chloride")
+
+          mods = k2mods
+          package.loaded["research.settings"] = nil
+          local k2config = require("research.settings")
+          local startup = {}
+          for _, spec in ipairs(k2config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          local visible = {research_material_black_paving=true, research_material_glass=true, research_material_imersite=true,
+            research_material_rare_metals=true, research_material_silicon=true, research_material_white_paving=true}
+          for _, spec in ipairs(k2config.prototypes()) do
+            local family = spec.name:match("^ips%-%a+%-research_material_(.+)$")
+            if family and visible["research_material_" .. family] then assert(spec.hidden == nil, spec.name .. " remains hidden") end
+          end
+          assert(startup["ips-max-level-research_material_imersite"].value == 0)
+          local values = k2config.resolve(startup)
+          assert(values.streams.research_material_imersite__continuation == values.streams.research_material_imersite)
+          package.loaded["research.catalogue"] = nil
+          local declared = require("research.catalogue").declared()
+          assert(#declared == 80)
+          local declared_ids, holder_ids = {}, { ["mir-k2-imersite-staged-state-1"] = true, ["mir-k2-imersite-continuation-state-4"] = true }
+          for _, row in ipairs(declared) do
+            assert(values.streams[row.family] ~= nil, "catalogue family has no resolved value: " .. row.family)
+            assert(row.legacy_binding and row.legacy_binding.source and row.legacy_binding.operation)
+            assert(not holder_ids[row.id], "migration holder entered caps catalogue")
+            declared_ids[row.id] = row
+          end
+          assert(declared_ids["recipe-prod-research_material_imersite-1"].cap_setting == "ips-max-level-research_material_imersite")
+          assert(declared_ids["recipe-prod-research_material_imersite-4"].family == "research_material_imersite__continuation")
+          local expected_material_rows = {
+            ["recipe-prod-research_material_rare_metals-1"] = {family="research_material_rare_metals", recipe="kr-rare-metals"},
+            ["recipe-prod-research_material_silicon-1"] = {family="research_material_silicon", recipe="kr-silicon"},
+            ["recipe-prod-research_material_glass-1"] = {family="research_material_glass", recipe="kr-glass"},
+          }
+          local material_count = 0
+          for id, expected in pairs(expected_material_rows) do
+            local row = declared_ids[id]
+            assert(row and row.family == expected.family and row.recipe == expected.recipe
+              and row.ownership_kind == "authored_generated"
+              and row.setting == "ips-enable-" .. expected.family
+              and row.cap_setting == "ips-max-level-" .. expected.family
+              and row.legacy_binding.source == "generated-stream" and row.legacy_binding.operation == "emit", id)
+            material_count = material_count + 1
+          end
+          assert(material_count == 3, "K2SO runtime catalogue material identity/count")
+          local rows = modern.technologies(selected, values)
+          assert(#rows == 72)
+          local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
+          local early = by_id["recipe-prod-research_material_imersite-1"]
+          local continuation = by_id["recipe-prod-research_material_imersite-4"]
+          local early_holder = by_id["mir-k2-imersite-staged-state-1"]
+          local continuation_holder = by_id["mir-k2-imersite-continuation-state-4"]
+          assert(early.level == 1 and early.max_level == 3 and early.effects[1].recipe == "kr-imersite-powder" and early.effects[1].change == .02)
+          assert(early.unit.count_formula == "200*2^(L-1)" and early.unit.time == 30)
+          assert(continuation.level == 4 and continuation.max_level == "infinite" and continuation.show_levels_info == false
+            and continuation.visible_when_disabled and continuation.unit.count_formula == "1600+200*(L-4)")
+          assert(continuation.effects[1].recipe == "kr-imersite-powder" and continuation.effects[1].change == .02)
+          assert(by_id["laser-shooting-speed-8"].effects[1].modifier == .1
+            and by_id["laser-shooting-speed-8"].effects[2].ammo_category == "kr-impulse-rifle")
+          assert(by_id["weapon-shooting-speed-7"].effects[1].modifier == .15
+            and by_id["weapon-shooting-speed-7"].effects[5].modifier == .2)
+          assert(by_id["inserter-capacity-bonus-8"].unit.ingredients[6][1] == "agricultural-science-pack"
+            and by_id["worker-robots-storage-4"].unit.ingredients[6][1] == "electromagnetic-science-pack")
+          assert(by_id["recipe-prod-research_mining_drill-1"].effects[1].change == .2
+            and by_id["recipe-prod-research_mining_drill-1"].effects[4].change == .05)
+          assert(early_holder.hidden and early_holder.enabled and not early_holder.upgrade and early_holder.level == 1
+            and continuation_holder.hidden and continuation_holder.enabled and not continuation_holder.upgrade and continuation_holder.level == 4)
+          assert(early_holder.effects[1].recipe == "kr-imersite-powder" and early_holder.effects[1].change == .02
+            and continuation_holder.effects[1].recipe == "kr-imersite-powder" and continuation_holder.effects[1].change == .02)
+          local environment = full_world(k2mods)
+          generator.install(rows, environment)
+          assert(environment.writes == 1 and #environment.emitted == 72)
+          environment = full_world(k2mods)
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil)
+          assert(environment.writes == 1 and #environment.emitted == 78)
+          local final_ids, final_count = {}, 0
+          for _, row in ipairs(environment.emitted) do
+            assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
+            final_ids[row.name], final_count = row, final_count + 1
+          end
+          assert(final_count == 78)
+          assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
+            and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
+          assert(final_ids["recipe-prod-research_material_rare_metals-1"]
+            and final_ids["recipe-prod-research_material_silicon-1"]
+            and final_ids["recipe-prod-research_material_glass-1"])
+
+          startup["ips-cost-base-research_material_imersite"].value = 300
+          startup["ips-cost-linear-increment-research_material_imersite"].value = 10
+          startup["ips-cost-growth-research_material_imersite"].value = 1.5
+          startup["ips-research-time-research_material_imersite"].value = 40
+          startup["ips-effect-per-level-research_material_imersite"].value = 3.5
+          rows = modern.technologies(selected, k2config.resolve(startup)); by_id = {}
+          for _, row in ipairs(rows) do by_id[row.name] = row end
+          assert(by_id[early.name].unit.count_formula == "(300+10*(L-1))*1.5^(L-1)" and by_id[early.name].effects[1].change == .035)
+          assert(by_id[continuation.name].unit.count_formula == "1113.75+300*(L-4)" and by_id[continuation.name].unit.time == 40)
+          local contract = require("research.k2_imersite")
+          assert(contract.schema == 1 and contract.storage_key == "mir_k2_imersite_state" and contract.effect.change == .02
+            and #contract.carriers == 2 and contract.carriers[2].source_id == continuation.name)
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
+    def test_k2_authored_structural_routes_obey_action_and_legacy_settings(self):
+        self.lua.execute('''
+          local selected=modern_catalogue.select({['space-age']='2.1.23',Krastorio2='2.1.4',
+            ['Krastorio2-spaced-out']='2.0.19',Krastorio2Assets='2.1.0',['k2so-assets']='1.0.7'})
+          local expected={research_belts={['kr-advanced-loader']=true,['kr-loader']=true,
+            ['kr-superior-loader']=true,['kr-superior-splitter']=true,
+            ['kr-superior-transport-belt']=true,['kr-superior-underground-belt']=true},
+            research_inserters={['kr-superior-inserter']=true,['kr-superior-long-inserter']=true}}
+          local options={
+            {['mir-automatic-productivity-action']='disabled'},
+            {['mir-automatic-productivity-action']='preview'},
+            {['mir-automatic-compiler-mode']='off'},
+            {['mir-automatic-compiler-mode']='report'},
+          }
+          for _,definition in ipairs(selected.definitions) do
+            local removed=expected[definition.key]
+            if removed then
+              local values=config.resolve(defaults())
+              local full=modern.technology(definition,values)
+              for _,option in ipairs(options) do
+                values.options=option
+                local output=modern.technology(definition,values)
+                local before,after={},{}
+                for _,effect in ipairs(full.effects) do before[effect.recipe]=effect.change end
+                for _,effect in ipairs(output.effects) do after[effect.recipe]=effect.change end
+                for recipe,change in pairs(before) do
+                  assert(after[recipe]==(not removed[recipe] and change or nil),recipe)
+                end
+                assert(output.name==full.name and output.enabled==full.enabled)
+                assert(output.automatic_recipe_targets==nil)
+              end
+              values.options={['mir-automatic-compiler-mode']='off',['mir-automatic-create-research']=true}
+              assert(#modern.technology(definition,values).effects==#full.effects)
+            end
+          end
+        ''')
+
     def test_cost_variants_and_nonfinite(self):
         self.lua.execute('''
           assert(productivity.cost(100, 0, 1) == "100")
@@ -297,6 +1033,27 @@ class GeneratorTests(unittest.TestCase):
           assert(not pcall(productivity.cost, 100, 0, math.huge))
           assert(not pcall(productivity.cost, 0/0, 0, 2))
           assert(not pcall(productivity.cost, 100, 0, 1001))
+        ''')
+
+    def test_continuation_cost_inheritance_uses_the_historical_l1_boundary(self):
+        self.lua.execute('''
+          local inherited = {base_cost=0, linear_increment=0, growth_factor=3.333333333333}
+          assert(cost.continuation(inherited, 8, 600, 400) == "1999.986000042*3.33333^(L-8)")
+          local floor = {base_cost=0, linear_increment=0, growth_factor=.5}
+          assert(cost.continuation(floor, 8, 600, 400) == "600")
+          local named_growth = {base_cost=0, linear_increment=0, growth_factor=0}
+          assert(cost.continuation(named_growth, 8, 600, 400) == "900.00004921875*1.5^(L-8)")
+          assert(not pcall(cost.continuation, inherited, 8, math.huge, 400))
+
+          local selected, definition = modern_catalogue.select({}), nil
+          for _, candidate in ipairs(selected.continuations) do
+            if candidate.id == "inserter-capacity-bonus-8" then definition = candidate end
+          end
+          assert(definition)
+          local values = config.resolve(defaults())
+          values.streams[definition.family].base_cost = 0
+          local output = modern.continuation(definition, values)
+          assert(output.unit.count_formula == "1999.986000042*3.33333^(L-8)")
         ''')
 
     def test_import_precedence_false_zero_and_invalid_entries(self):
@@ -430,7 +1187,7 @@ class GeneratorTests(unittest.TestCase):
 
     def test_full_published_setting_output_matches_oracle_without_retired_planner_metadata(self):
         for profile in MODERN_ORACLE["profiles"]:
-            active_mods = {"space-age": "2.1.23"} if profile["id"] == "space-age-f210" else {}
+            active_mods = profile_mods(profile["id"])
             self.lua.globals().profile_setting_mods = lua_table(self.lua, active_mods)
             self.lua.execute('''
               mods = profile_setting_mods
@@ -441,19 +1198,12 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.eval("profile_settings.prototypes()").values()
             }
-            expected = {}
-            for item in profile["published_output"]["settings"]["additions"]:
-                row = dict(item["row"])
-                # targets fed the retired MIR4 planner. It is neither a
-                # Factorio setting field nor MIR5 authoring/runtime input.
-                row.pop("targets", None)
-                expected[item["name"]] = row
-            self.assertEqual(actual, expected, profile["id"])
+            self.assertEqual(actual, intended_setting_rows(profile), profile["id"])
 
     def test_data_final_full_published_technology_output_matches_oracle(self):
         expected_profiles = {
             profile["id"]: {
-                row["name"]: row["row"]
+                row["name"]: host_row(row["row"])
                 for row in profile["published_output"]["data"]["additions"]
                 if row["type"] == "technology"
             }
@@ -466,6 +1216,7 @@ class GeneratorTests(unittest.TestCase):
         cases = (
             ("base-f210", {}),
             ("space-age-f210", {"space-age": "2.1.23"}),
+            ("k2so-f210", K2SO_MODS),
         )
         for profile, active_mods in cases:
             self.lua.globals().published_mods = lua_table(self.lua, active_mods)
@@ -479,7 +1230,19 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.globals().published_emitted.values()
             }
-            self.assertEqual(actual, expected_profiles[profile], profile)
+            expected = dict(expected_profiles[profile])
+            if profile == "k2so-f210":
+                self.assertEqual(
+                    set(expected).intersection(K2SO_INTENDED_MATERIAL_ROWS), set(),
+                    K2SO_MATERIAL_ADDITION_PROVENANCE["reason"],
+                )
+                expected.update(K2SO_INTENDED_MATERIAL_ROWS)
+                emitted = list(self.lua.globals().published_emitted.values())
+                self.assertEqual(
+                    len(emitted), len(actual),
+                    "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
+                )
+            self.assertEqual(actual, expected, profile)
             expected_patches = patch_profiles[profile]
             self.assertEqual(
                 set(self.lua.globals().published_raw.recipe.keys())
@@ -494,6 +1257,30 @@ class GeneratorTests(unittest.TestCase):
                     {"allow_productivity": True},
                     f"{profile}:{patch['name']}",
                 )
+
+    def test_f200_complete_technology_output_matches_its_own_published_oracle(self):
+        oracle = json.loads((ROOT / "spec/mir5/inventory/modern-f200-470.json").read_text(encoding="utf-8"))
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+          target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
+        ''')
+        for profile in oracle["profiles"]:
+            active_mods = {"base": "2.0.77"}
+            if profile["id"] == "space-age-f200":
+                active_mods["space-age"] = "2.0.77"
+            self.lua.globals().published_mods = lua_table(self.lua, active_mods)
+            self.lua.execute('''
+              mods = published_mods
+              package.loaded["research.settings"] = nil
+              config = require("research.settings")
+              settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+              assert(dofile(data_final_path) == nil)
+            ''')
+            expected = {row["name"]: host_row(row["row"])
+                        for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"}
+            actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
+            self.assertEqual(actual, expected, profile["id"])
 
     def test_effective_global_option_lazily_activates_prototype_limits(self):
         self.lua.execute('''

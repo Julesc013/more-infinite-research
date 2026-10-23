@@ -41,7 +41,7 @@ end
 local DECLARATIONS = catalogue.declared()
 local STREAM_VALUES = effective_values.streams
 if type(STREAM_VALUES) ~= "table" then error("MIR caps missing resolved stream values", 2) end
-local STATIC_LIMITS, DECLARATION_BY_ID, NATIVE_OWNER_BY_ID, ORDERED_DECLARATIONS = {}, {}, {}, {}
+local STATIC_GENERATED_BY_ID, DECLARATION_BY_ID, NATIVE_OWNER_BY_ID, ORDERED_DECLARATIONS = {}, {}, {}, {}
 local CAPS_ACTIVE = WORKER_ROBOT_SPEED_LIMIT > 0
 for index = 1, #DECLARATIONS do
   local declaration = DECLARATIONS[index]
@@ -66,9 +66,13 @@ for index = 1, #DECLARATIONS do
   ORDERED_DECLARATIONS[#ORDERED_DECLARATIONS + 1] = row
   DECLARATION_BY_ID[row.id] = row
   if row.enabled and row.limit > 0 then CAPS_ACTIVE = true end
-  if row.ownership_kind == "nativeowner" then NATIVE_OWNER_BY_ID[row.id] = row
+  if row.ownership_kind == "nativeowner" then
+    if type(values.configured) == "table" and values.configured.effect_percent == true then
+      row.configured_effect_change = values.effect_percent / 100
+    end
+    NATIVE_OWNER_BY_ID[row.id] = row
   elseif row.enabled then
-    STATIC_LIMITS[row.id] = row.limit
+    STATIC_GENERATED_BY_ID[row.id] = row
   end
 end
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS)
@@ -115,22 +119,31 @@ local function worker_owner(force)
   end, worker_modifiers)
 end
 
-local function copy_limits(limits)
-  local result = {}
-  for name, value in pairs(limits) do result[name] = value end
-  return result
-end
-
 local function native_owner_admitted(force, row)
   return valid_force(force) and cap_admission.admits_native_owner(function(name)
     return force.technologies and force.technologies[name] or nil
-  end, row.declaration)
+  end, row.declaration, row.configured_effect_change)
+end
+
+-- Startup settings decide whether a stream may be considered, but the data
+-- stage can retain its identity with prototype.enabled=false when science or
+-- lab policy rejects it. Only that immutable default distinguishes the latter
+-- from a per-force cap disablement, so do not use ForceTechnology.enabled.
+local function authored_generated_admitted(force, row)
+  if not valid_force(force) then return false end
+  local ok, enabled = pcall(function()
+    local technology = force.technologies and force.technologies[row.id] or nil
+    return technology and technology.prototype and technology.prototype.enabled == true
+  end)
+  return ok and enabled == true
 end
 
 local function full_limits_for(force, include_worker, selected_owner, owner_resolved)
-  local limits, admitted = copy_limits(STATIC_LIMITS), {}
-  for name in pairs(STATIC_LIMITS) do admitted[name] = true end
+  local limits, admitted = {}, {}
   if valid_force(force) then
+    for name, row in pairs(STATIC_GENERATED_BY_ID) do
+      if authored_generated_admitted(force, row) then limits[name], admitted[name] = row.limit, true end
+    end
     for name, row in pairs(NATIVE_OWNER_BY_ID) do
       if row.enabled and native_owner_admitted(force, row) then
         limits[name], admitted[name] = row.limit, true
@@ -149,8 +162,11 @@ end
 local function event_limits_for(force, name, include_worker)
   local row = DECLARATION_BY_ID[name]
   if row and row.enabled then
-    if row.ownership_kind == "authored_generated" then return {[name] = row.limit}, {[name] = true}, nil end
-    if native_owner_admitted(force, row) then return {[name] = row.limit}, {[name] = true}, nil end
+    if row.ownership_kind == "authored_generated" and authored_generated_admitted(force, row) then
+      return {[name] = row.limit}, {[name] = true}, nil
+    elseif row.ownership_kind == "nativeowner" and native_owner_admitted(force, row) then
+      return {[name] = row.limit}, {[name] = true}, nil
+    end
   end
   if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
     local owner = worker_owner(force)
@@ -213,7 +229,10 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if target_name then
     limits, admitted, owner = event_limits_for(force, target_name, include_worker)
     if limits == nil then
-      if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil then owned[target_name] = nil end
+      if type(owned_disabled) == "table" and owned and owned[target_name] ~= nil then
+        owned[target_name] = nil
+        if next(owned) == nil then owned_disabled[force.index] = nil end
+      end
       return
     end
   else
@@ -222,7 +241,10 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if type(owned_disabled) == "table" then
     if target_name then
       local row = owned_disabled[force.index]
-      if type(row) == "table" and row[target_name] ~= nil and admitted[target_name] ~= true then row[target_name] = nil end
+      if type(row) == "table" and row[target_name] ~= nil and admitted[target_name] ~= true then
+        row[target_name] = nil
+        if next(row) == nil then owned_disabled[force.index] = nil end
+      end
       if target_name == WORKER_TAIL_NAMES[1] or target_name == WORKER_TAIL_NAMES[2] then
         discard_unbound_ownership(force, owned_disabled, admitted, owner, true)
       end
@@ -272,8 +294,14 @@ local function legacy_candidates(force, worker_name)
   local candidates = {}
   for index = 1, #ORDERED_DECLARATIONS do
     local row = ORDERED_DECLARATIONS[index]
-    local admitted = row.enabled and (row.ownership_kind == "authored_generated"
-      or native_owner_admitted(force, row))
+    local admitted = false
+    if row.enabled then
+      if row.ownership_kind == "authored_generated" then
+        admitted = authored_generated_admitted(force, row)
+      else
+        admitted = native_owner_admitted(force, row)
+      end
+    end
     if admitted then
       candidates[#candidates + 1] = {
         name = row.id,

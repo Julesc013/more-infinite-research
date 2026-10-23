@@ -19,7 +19,7 @@ source_of_truth_for:
 ## Three binding paths
 
 1. **Exact:** named recipe, owner, prerequisites and science vector. Prefer this when it preserves the existing effect coverage.
-2. **Finite alternatives:** a short authored list selected by relevant current fields. No transitive production-route search or guessed progression.
+2. **Finite alternatives:** a short, flat authored list selected by relevant current fields. Reject nested alternatives; do not interpret recursive acquisition trees. No transitive production-route search or guessed progression.
 3. **Bounded collection:** a retained broad contract may collect matching recipes for an already-authored research family in one relevant pass. Build a typed-product → interested-family map, then visit product entries once and emit only approved matches. Work is proportional to visited input plus actual matches/output, not families multiplied by all recipes.
 
 `COMP-02` — A collector may select targets; it must not invent technology identities, science, prerequisites or family meaning. It lives outside the Generator. A public API call does not trigger global collection. Repeated calls cannot silently initiate repeated world passes. Scope any reusable result to the data-stage phase in which its inputs are valid; later foreign prototype edits invalidate that assumption. Prefer one explicit integration point over a generic invalidation system.

@@ -95,6 +95,7 @@ class BootstrapTests(unittest.TestCase):
               module.on_load = function() library_calls.load = (library_calls.load or 0) + 1 end
               module.on_lua_shortcut = function(event) library_calls.shortcut = event end
               module.on_gui_text_changed = function(event) library_calls.text = event end
+              module.on_gui_selected_tab_changed = function(event) library_calls.tab = event end
               module.on_gui_selection_state_changed = function(event) library_calls.selection = event end
               module.on_gui_click = function(event) library_calls.click = event end
               module.on_gui_location_changed = function(event) library_calls.location = event end
@@ -150,7 +151,7 @@ class BootstrapTests(unittest.TestCase):
               on_entity_damaged = 14, on_string_translated = 15,
               on_player_locale_changed = 16, on_player_changed_force = 17,
               on_player_joined_game = 18, on_research_reversed = 19,
-              on_technology_effects_reset = 20
+              on_technology_effects_reset = 20, on_gui_selected_tab_changed = 21
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -203,11 +204,13 @@ class BootstrapTests(unittest.TestCase):
           assert(type(handlers.events[19]) == "function" and type(handlers.events[20]) == "function")
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
+          assert(type(handlers.events[21]) == "function")
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
           handlers.events[7]({player_index = 1})
           handlers.events[8]({player_index = 1})
+          handlers.events[21]({player_index = 1})
           handlers.events[9]({player_index = 1})
           handlers.events[10]({player_index = 1})
           handlers.events[11]({player_index = 1})
@@ -219,7 +222,8 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[18]({player_index = 1})
           handlers.events[19]({research = known_technology})
           handlers.events[20]({force = player.force})
-          assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1)
+          assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1
+            and library_calls.tab.player_index == 1)
           assert(library_calls.selection.player_index == 1 and library_calls.click.player_index == 1)
           assert(library_calls.location.player_index == 1 and library_calls.closed.player_index == 1
             and library_calls.removed.player_index == 1)
@@ -534,6 +538,50 @@ class BootstrapTests(unittest.TestCase):
         self.assertNotIn("require(", source[source.index("function M.register"):])
         self.assertIn('require("runtime.bootstrap")', control)
         self.assertIn("remote.add_interface", control)
+
+    def test_k2_carrier_lifecycle_is_independent_of_caps_and_scripted_features(self):
+        self.lua.execute('''
+          install_modules(false,false,false)
+          install_runtime({}, {base="2.1.23",["space-age"]="2.1.23",Krastorio2="2.1.4",
+            ["Krastorio2-spaced-out"]="2.0.19",Krastorio2Assets="2.0.0",["k2so-assets"]="1.0.0"})
+          package.preload["research.settings"] = function()
+            return {resolve=function() return {passive_repair_enabled=false,
+              streams={research_material_imersite={effect_percent=6}}} end}
+          end
+          local initialized,reconciled = {},{}
+          package.preload["runtime.k2_imersite_migration"] = function()
+            return {
+              initialize_force=function(force,change)
+                assert(change == .06); initialized[#initialized+1]=force.index
+              end,
+              reconcile_force=function(force,change,records)
+                assert(change == .06); reconciled[#reconciled+1]=force.index
+                records[force.index]={status="completed"}
+              end
+            }
+          end
+          local one,two = {index=1},{index=2}
+          game.forces={one}
+          load_control()
+          for id=1,3 do assert(type(handlers.events[id]) == "function") end
+          assert(handlers.events[4] == nil and handlers.events[5] == nil and handlers.events[6] == nil)
+          assert(storage.mir_k2_imersite_state == nil)
+          handlers.init()
+          assert(initialized[1] == 1 and storage.mir_k2_imersite_state == nil)
+          handlers.configuration({mod_changes={}})
+          assert(reconciled[1] == 1 and storage.mir_k2_imersite_state.forces[1])
+          handlers.events[1]({force=two})
+          handlers.events[3]({source_index=1,destination=two})
+          assert(initialized[2] == 2 and initialized[3] == 2 and reconciled[2] == 2)
+          assert(storage.mir_k2_imersite_state.forces[1] == nil and storage.mir_k2_imersite_state.forces[2])
+          handlers.events[2]({force=two})
+          assert(initialized[4] == 2 and storage.mir_k2_imersite_state.forces[2] == nil)
+          game=nil
+          handlers.load()
+          assert(#initialized == 4 and #reconciled == 2)
+          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
+            and lifecycle_calls.forces_merged == nil)
+        ''')
 
 
 if __name__ == "__main__":

@@ -128,14 +128,17 @@ def _published_settings() -> dict:
     return settings
 
 
-def _capture(root: Path, raw: dict, settings: dict, *, published: bool) -> Path:
+def _capture(root: Path, raw: dict, settings: dict, *, published: bool,
+             target: str = "f210", mir_version: str | None = None) -> Path:
+    family, engine_version = ("2.0", "2.0.77") if target == "f200" else ("2.1", "2.1.23")
+    mir_version = mir_version or "4.7." + target[1:] + "00"
     root.mkdir(parents=True)
     external = root.parent / "external"
     external.mkdir(exist_ok=True)
     engine = external / "factorio.exe"
     profile = external / "profile.json"
     base = external / "base-info.json"
-    mir = external / "more-infinite-research_4.7.21000.zip"
+    mir = external / ("more-infinite-research_" + mir_version + ".zip")
     for path, content in ((engine, b"synthetic engine"), (profile, b"synthetic shared profile\n"),
                           (base, b"synthetic base"), (mir, b"synthetic published MIR")):
         if not path.exists():
@@ -144,27 +147,27 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool) -> Path:
         root / "data-raw-dump.json", root / "mod-settings-dump.json", root / "selection.json")
     _write_json(data_path, raw)
     _write_json(settings_path, settings)
-    mods = [{"name": "base", "version": "2.1.23", "enabled": True}]
-    selected = [{"name": "base", "version": "2.1.23", "builtin": True,
+    mods = [{"name": "base", "version": engine_version, "enabled": True}]
+    selected = [{"name": "base", "version": engine_version, "builtin": True,
                  "sha256": hashlib.sha256(base.read_bytes()).hexdigest().upper()}]
-    loaded = ["base@2.1.23"]
+    loaded = ["base@" + engine_version]
     if published:
-        mods.append({"name": "more-infinite-research", "version": "4.7.21000", "enabled": True})
-        selected.append({"name": "more-infinite-research", "version": "4.7.21000", "builtin": False,
+        mods.append({"name": "more-infinite-research", "version": mir_version, "enabled": True})
+        selected.append({"name": "more-infinite-research", "version": mir_version, "builtin": False,
                          "sha256": hashlib.sha256(mir.read_bytes()).hexdigest().upper()})
-        loaded.append("more-infinite-research@4.7.21000")
+        loaded.append("more-infinite-research@" + mir_version)
     _write_json(selection_path, {"mods": mods})
     result = {
         "status": "completed-data-stage-observation-only",
         "process": {"passed": True, "timed_out": False, "exit_code": 0},
         "engine": {"sha256": hashlib.sha256(engine.read_bytes()).hexdigest().upper(),
-                   "base_version": "2.1.23", "factorio_version": "2.1"},
+                   "base_version": engine_version, "factorio_version": family},
         "profile_input": {"path": str(profile), "sha256": hashlib.sha256(profile.read_bytes()).hexdigest().upper()},
         "generated_selection": {**_record(root, selection_path), "mods": mods},
         "selected_archives": selected,
         "loaded_selection": loaded,
         "dumps": {"data_raw": _record(root, data_path), "mod_settings": _record(root, settings_path)},
-        "mir_archive": ({"name": "more-infinite-research", "version": "4.7.21000",
+        "mir_archive": ({"name": "more-infinite-research", "version": mir_version,
                          "sha256": hashlib.sha256(mir.read_bytes()).hexdigest().upper()} if published else None),
     }
     _write_json(root / "result.json", result)
@@ -172,6 +175,42 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool) -> Path:
 
 
 class ModernCatalogueTests(unittest.TestCase):
+    def test_f200_recovery_compares_complete_output_and_rejects_wrong_engine_or_oracle(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            baseline = _capture(root / "baseline", _baseline_raw(), _baseline_settings(), published=False, target="f200")
+            published_raw = _published_raw()
+            del published_raw["mod-data"]
+            published = _capture(root / "published", published_raw, _published_settings(), published=True, target="f200")
+            inventory = catalogue.recover_inventory(baseline, published, baseline, published, target="f200")
+            self.assertEqual(inventory["kind"], catalogue.GENERAL_KIND)
+            self.assertEqual(inventory["source"], {"published_version": "4.7.20000", "engine_family": "2.0",
+                             "profiles": ["base-f200", "space-age-f200"]})
+            self.assertIsNone(inventory["profiles"][0]["captured_maximum_level_bindings"])
+            inventory_path = root / "inventory.json"
+            catalogue._write_new_json(inventory_path, inventory)
+            raw = deepcopy(published_raw)
+            candidate = _capture(root / "candidate", raw, _published_settings(), published=True,
+                                 target="f200", mir_version="5.0.20000")
+            result = catalogue.compare_candidate(inventory_path, "base-f200", baseline, candidate)
+            self.assertEqual(result["status"], "equal-intended-native-output")
+            raw["technology"]["recipe-prod-research_alpha-1"]["effects"].append({"type": "nothing"})
+            changed = _capture(root / "changed", raw, _published_settings(), published=True,
+                               target="f200", mir_version="5.0.20000")
+            self.assertEqual(catalogue.compare_candidate(inventory_path, "base-f200", baseline, changed)["status"],
+                             "different-intended-native-output")
+            with self.assertRaisesRegex(catalogue.CatalogueError, "never a MIR5 candidate"):
+                catalogue.recover_inventory(baseline, candidate, baseline, candidate, target="f200")
+            wrong_version = _capture(root / "wrong-version", _published_raw(), _published_settings(),
+                                     published=True, target="f200", mir_version="4.7.20001")
+            with self.assertRaisesRegex(catalogue.CatalogueError, "exact published 4.7.0"):
+                catalogue.recover_inventory(baseline, wrong_version, baseline, wrong_version, target="f200")
+            baseline210 = _capture(root / "engine210-baseline", _baseline_raw(), _baseline_settings(), published=False)
+            published210 = _capture(root / "engine210-published", _published_raw(), _published_settings(),
+                                     published=True, mir_version="4.7.20000")
+            with self.assertRaisesRegex(catalogue.CatalogueError, "actual captured engine family"):
+                catalogue.recover_inventory(baseline210, published210, baseline210, published210, target="f200")
+
     def _captures(self, root: Path) -> tuple[Path, Path, Path, Path]:
         no_mir = _capture(root / "base-no-mir", _baseline_raw(), _baseline_settings(), published=False)
         published = _capture(root / "base-published", _published_raw(), _published_settings(), published=True)
@@ -185,6 +224,50 @@ class ModernCatalogueTests(unittest.TestCase):
         path = root / "modern-catalogue.json"
         catalogue._write_new_json(path, inventory)
         return path, no_mir, published
+
+    def test_optional_k2so_profile_requires_a_pair_and_compares_as_its_own_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            base_no_mir, base_published, space_no_mir, space_published = self._captures(root)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "requires both"):
+                catalogue.recover_inventory(base_no_mir, base_published, space_no_mir, space_published,
+                                            base_no_mir, None)
+            inventory = catalogue.recover_inventory(base_no_mir, base_published, space_no_mir, space_published,
+                                                    base_no_mir, base_published)
+            self.assertEqual([profile["id"] for profile in inventory["profiles"]],
+                             ["base-f210", "space-age-f210", "k2so-f210"])
+            path = root / "k2so-inventory.json"
+            catalogue._write_new_json(path, inventory)
+            expected_raw, expected_settings = _published_raw(), _published_settings()
+            del expected_raw["mod-data"]["more-infinite-research-compiler-evidence"]
+            del expected_raw["mod-data"]["more-infinite-research-maximum-level-policy"]
+            candidate = _capture(root / "k2so-candidate", expected_raw, expected_settings, published=True)
+            self.assertEqual(catalogue.compare_candidate(path, "k2so-f210", base_no_mir, candidate)["status"],
+                             "equal-intended-native-output")
+
+    def test_settings_targets_retirement_is_exact_and_does_not_touch_captured_rows(self):
+        records = {
+            "additions": [{
+                "type": "bool-setting", "name": "ips-enable-research_alpha",
+                "row": {"type": "bool-setting", "name": "ips-enable-research_alpha", "targets": {"planner": "only"}},
+            }],
+            "patches": [],
+        }
+        instruction = catalogue._intended_settings(records)
+        self.assertEqual(instruction["remove_published_fields"], [{
+            "type": "bool-setting", "name": "ips-enable-research_alpha", "field": "targets",
+            "reason": "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer",
+            "provenance": "published-4.7 setting descriptor targets field",
+        }])
+        profile = {"published_output": {"settings": records}, "intended_player_output": {"settings": instruction}}
+        intended = catalogue._intended_domain(profile, "settings")
+        self.assertNotIn("targets", intended["additions"][0]["row"])
+        self.assertEqual(records["additions"][0]["row"]["targets"], {"planner": "only"})
+        forged = deepcopy(instruction)
+        forged["remove_published_fields"][0]["field"] = "default_value"
+        profile["intended_player_output"]["settings"] = forged
+        with self.assertRaisesRegex(catalogue.CatalogueError, "exact settings targets"):
+            catalogue._intended_domain(profile, "settings")
 
     def test_recovery_retains_full_rows_and_explicitly_excludes_private_mir4_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:

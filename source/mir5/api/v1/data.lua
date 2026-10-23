@@ -1,6 +1,7 @@
 -- Draft MIR API v1 data-stage surface. Calls publish immediately in the
 -- caller's current data stage; no contributions are retained for a finalizer.
 local generator = require("__more-infinite-research__/research/generator")
+local target = require("platform.target")
 
 local M = {}
 local MAX_FAMILY = 64
@@ -84,6 +85,26 @@ local function copy_family(prototypes)
   return copied
 end
 
+local function reject_unsupported_effects(prototypes)
+  for _, prototype in ipairs(prototypes) do
+    if type(prototype) ~= "table" then fail("invalid_definition", "technology must be a plain table") end
+    local effects = prototype.effects
+    if effects == nil then effects = {} end
+    local count = dense_array(effects, "effects", MAX_ENTRIES)
+    for index = 1, count do
+      local effect = effects[index]
+      if type(effect) ~= "table" then fail("invalid_definition", "effect must be a plain table") end
+      if effect.type == "change-recipe-productivity" and target.recipe_productivity ~= true then
+        fail("unsupported_capability", "recipe productivity is unavailable")
+      end
+      if (effect.type == "cargo-landing-pad-count" or effect.type == "max-cargo-bay-unloading-distance")
+          and target.cargo_research ~= true then
+        fail("unsupported_capability", "cargo research modifiers are unavailable")
+      end
+    end
+  end
+end
+
 local function error_code(message)
   if message:find("duplicate technology", 1, true) then return "duplicate_identity" end
   if message:find("missing", 1, true) then return "missing_target" end
@@ -103,20 +124,22 @@ local function publish(prototypes)
 end
 
 function M.get_version()
-  return {major = 1, minor = 0, product = "5.0.21000"}
+  return {major = 1, minor = 0, product = target.distribution_version}
 end
 
 function M.get_capabilities()
   return {
     technology_creation = true,
     technology_family = true,
-    recipe_productivity = true,
+    recipe_productivity = target.recipe_productivity == true,
     research_query = false
   }
 end
 
 function M.add_technologies(prototypes)
-  return publish(copy_family(prototypes))
+  local owned = copy_family(prototypes)
+  reject_unsupported_effects(owned)
+  return publish(owned)
 end
 
 function M.add_technology(prototype)
@@ -124,6 +147,7 @@ function M.add_technology(prototype)
 end
 
 function M.add_productivity(prototype, recipe_names, change)
+  if target.recipe_productivity ~= true then fail("unsupported_capability", "recipe productivity is unavailable") end
   if not finite(change) then fail("invalid_definition", "change must be finite") end
   local recipe_count = dense_array(recipe_names, "recipe names", MAX_FAMILY)
   if recipe_count == 0 then fail("invalid_definition", "recipe names must not be empty") end
@@ -154,6 +178,7 @@ function M.add_productivity(prototype, recipe_names, change)
       type = "change-recipe-productivity", recipe = recipe, change = change
     }
   end
+  reject_unsupported_effects({owned})
   return publish({owned})[1]
 end
 

@@ -193,6 +193,50 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(group.g.energy_usage == "bad" and group.h.energy_usage == -1)
         ''')
 
+    def test_f200_recycling_uses_its_native_probability_field_and_preserves_zero(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.receiver_limits = "probability", false
+          local result = {name="component", amount=8, probability=0.25, foreign=9}
+          local zero = {name="component", amount=8, probability=0}
+          local recipe = {category="recycling", hidden=true, unlock_results=false,
+            ingredients={{"component",1}}, results={result,zero}}
+          local facts = limits.apply({recipe={back=recipe}}, options("engine-default",false,"percent-20"))
+          assert(facts.recycling_products == 1 and result.probability == 0.2)
+          assert(result.independent_probability == nil and result.foreign == 9)
+          assert(zero.probability == 0 and zero.independent_probability == nil)
+          assert(limits.apply({recipe={back=recipe}}, options(nil,false,"percent-25")).recycling_products == 0)
+        ''')
+
+    def test_f200_productivity_also_inherits_the_stats_exclusion(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.productivity_ignores_stats = "probability", true
+          target.receiver_limits = false
+          local recipes = {make=manufacture(),back=reclaim({amount=2,probability=0.5,ignored_by_stats=1},2)}
+          local facts = limits.apply({recipe=recipes}, options("percent-10000",true))
+          assert(facts.indexed_recipes == 2 and recipes.back.maximum_productivity == 2)
+          assert(recipes.make.maximum_productivity == 100)
+          assert(recipes.back.results[1].ignored_by_productivity == nil)
+        ''')
+
+    def test_fixed_receiver_limits_are_reported_without_inventing_native_fields(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          target.recipe_probability, target.receiver_limits = "probability", false
+          local raw = setmetatable({}, {__index=function() error("unsupported receiver read") end,
+            __pairs=function() error("unsupported receiver enumeration") end})
+          local facts = limits.apply(raw, {["mir-prototype-speed-cap"]="bonus-400",
+            ["mir-prototype-efficiency-cap"]="saving-9999"})
+          assert(facts.unsupported_receiver_limits == 2 and facts.receivers == 0)
+          local foreign = {uses_module_effects=false, base_effect={speed=0.2}}
+          local lab = {effect_receiver=foreign}
+          facts = limits.apply({lab={lab}}, {["mir-prototype-quality-cap"]="bonus-250"})
+          assert(facts.unsupported_receiver_limits == 1 and facts.receivers == 0)
+          assert(lab.effect_receiver == foreign and foreign.quality_limits == nil)
+          assert(foreign.base_effect.speed == 0.2 and foreign.uses_module_effects == false)
+        ''')
+
     def test_scope_indexes_recipes_once_and_preserves_modern_exclusion_default(self):
         self.lua.execute('''
           local recipes = {make=manufacture(),back=reclaim({amount=2,probability=0.5,ignored_by_stats=1},2)}
@@ -202,6 +246,42 @@ class PrototypeLimitsTests(unittest.TestCase):
           for i=1,250 do assert(classifier.approve("make")) end
           assert(classifier.visited == 1002)
           assert(scope.build(recipes,3,false).maximum_safe_productivity("back") == 1)
+        ''')
+
+
+    def test_pipeline_extent_preserves_percentages_and_portable_numeric_meaning(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          for percent, expected in pairs({['25']=.25,['50']=.5,['75']=.75,
+            ['100']=1,['125']=1.25,['150']=1.5,['200']=2,['250']=2.5,
+            ['300']=3,['400']=4,['500']=5,['750']=7.5,['1000']=10}) do
+            assert(pipeline.multiplier(percent) == expected)
+          end
+          assert(pipeline.multiplier(2) == .02 and pipeline.multiplier("2") == 2)
+          assert(pipeline.multiplier("12.5") == .125 and pipeline.multiplier(100) == 1)
+          assert(pipeline.multiplier(nil) == 1 and pipeline.multiplier("invalid") == 1)
+          assert(pipeline.multiplier(0/0) == 1 and pipeline.multiplier(math.huge) == 1)
+          local raw = setmetatable({}, {__pairs=function() error("inactive pipeline traversal") end})
+          assert(pipeline.apply(raw, "100") == 0 and pipeline.apply(raw, nil) == 0)
+        ''')
+
+    def test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          local shared = {max_pipeline_extent=321,foreign="preserve"}
+          local a, b, c, d = {}, {max_pipeline_extent=1}, {max_pipeline_extent=4294967295},
+            {max_pipeline_extent=7}
+          local prototype = {fluid_box=shared, input_fluid_box=a, output_fluid_box=b,
+            energy_source={fuel_fluid_box=c,oxidizer_fluid_box=d},
+            fluid_boxes={shared},unrelated={max_pipeline_extent=17}}
+          prototype.cycle=prototype
+          assert(pipeline.apply({fixture={a=prototype,b=prototype}}, "150") == 5)
+          assert(shared.max_pipeline_extent == 482 and shared.foreign == "preserve")
+          assert(a.max_pipeline_extent == 480 and b.max_pipeline_extent == 2)
+          assert(c.max_pipeline_extent == 4294967295 and d.max_pipeline_extent == 11)
+          assert(prototype.unrelated.max_pipeline_extent == 17)
+          local tiny={fluid_box={max_pipeline_extent=1}}
+          assert(pipeline.apply(tiny,"25") == 1 and tiny.fluid_box.max_pipeline_extent == 1)
         ''')
 
 

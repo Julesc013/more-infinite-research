@@ -1,0 +1,183 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "k2-base-continuations",
+  "source_head": "98f139f62db7dd1b143b37723f587141ce4060d0",
+  "source_dirty": false,
+  "harness_sha256": "C3C7FD214E7400D038C2513D93CA53D5E6B4674AD609293C5224809504C8D36C",
+  "native_probe_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "profile": {
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\k2-base-continuations-f200.json",
+    "sha256": "3FEDB5E5C32CF5E6300A78EFC0C4E220E02E9B038101F95F33AE855A34B39867"
+  },
+  "fixtures": [
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\fixture-sources\\k2-base-continuations",
+      "sha256": "DB9774C8A4ABFD070E2D3905E6EA1A391F669BE0932404CC93311840DDEEBE91",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-k2-base-continuations_0.1.0.zip"
+    },
+    {
+      "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\fixture-sources\\active-mods-observer",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+      "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+    }
+  ],
+  "historical_target": null,
+  "mir_archive": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.067,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T15:03:36.8693699+00:00",
+    "deadline_at": "2026-10-23T15:04:06.8693699+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T15:03:36.9104602+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20397584384,
+        "committed_bytes": 18778611712,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 205389643776,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 205389643776,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "source": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\fixture-sources\\active-mods-observer",
+    "archive": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "failure": "[mir441-process-exit] 1",
+  "resource_admission": null,
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "3FEDB5E5C32CF5E6300A78EFC0C4E220E02E9B038101F95F33AE855A34B39867",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.0.19",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2_2.0.19.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED3",
+        "sha256": "1B1DBF55522AB8961037356844E24A8E47A85AD983954F01A768FFAFC9910C32",
+        "bytes": 778318
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.0.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2Assets_2.0.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002F00000001EED0",
+        "sha256": "E8D9079BB5F99623EA81A425C5441B4F2FE21807766F893C9A4E90170110E92B",
+        "bytes": 158227416
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.0.2",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\Krastorio2MenuSimulations_2.0.2.zip",
+        "builtin": false,
+        "identity": "1B6DF063:002B00000001EED1",
+        "sha256": "0ED38E61EE45DCBE6D94159F25C38F073A3EA47F0322D02B062036044EA95F7B",
+        "bytes": 3112390
+      },
+      {
+        "name": "ChangeInserterDropLane",
+        "version": "1.2.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\ChangeInserterDropLane_1.2.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:019F00000001BD72",
+        "sha256": "8773256DFDDBC2C504AA98E6C1323FBBCEE792A4240594FCCDB5BA2C07983C74",
+        "bytes": 305568
+      },
+      {
+        "name": "flib",
+        "version": "0.16.5",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\flib_0.16.5.zip",
+        "builtin": false,
+        "identity": "1B6DF063:003200000001EE9D",
+        "sha256": "8FC5073D374A149620333777D959D2C204AB0AF0C59669BE94C5CAB7DE978627",
+        "bytes": 453091
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000D0000000217BA",
+        "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E",
+        "bytes": 353516
+      },
+      {
+        "name": "mir-fixture-mir5-k2-base-continuations",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-k2-base-continuations_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000A0000000217D9",
+        "sha256": "DB9774C8A4ABFD070E2D3905E6EA1A391F669BE0932404CC93311840DDEEBE91",
+        "bytes": 6899
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "interrupted",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\gameplay\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\gameplay\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39974903162-1\\gameplay\\process-1.stderr.txt",
+      "error": "[mir441-process-exit] 1"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIR5ScriptedEffectsNativeChainV1",
+  "status": "real-lab-tower-spoil-clocks-and-two-cold-reloads-pass",
+  "source_commit": "25296f5017679acaddc7d5e6f7fccf301e452079",
+  "player_sha256": "D43C3159F608D04B4B6E7CFE5F6DECCBB98704F8715DD0A6E697AE372B9E0E02",
+  "fixture_source_commit": "fc7633d9520ca5d98becd9b884993ed79f999743",
+  "fixture_sha256": "E14A5F68C027E15FEC3EA7EF34BC9C32B27F38488C367AAF88D3C0DFDA7BB490",
+  "records": [
+    {
+      "id": "native-r02",
+      "path": "spec/mir5/evidence/scripted-effects-native.json",
+      "sha256": "0A0F40EAAEC2052CD7FB5AF8E095EB6D293B81C4E81E6931CFD6EBD0EC649CEB"
+    },
+    {
+      "id": "fixture-r01-adverse",
+      "path": "spec/mir5/evidence/scripted-effects-lab-freshness-adverse.json",
+      "sha256": "C5400A6CF141A39E557918B9215685741B1E0C8D31ADB8E67418F3D7D8C657B1"
+    }
+  ],
+  "capture_custody": "build/tmp/mir5-scripted-effects-native-r02",
+  "witnesses": {
+    "profile": "space-age-f210",
+    "completed_research": {
+      "agricultural_growth_speed": 2,
+      "spoilage_preservation": 3
+    },
+    "required_science_pack_names": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "military-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack",
+      "space-science-pack",
+      "metallurgic-science-pack",
+      "agricultural-science-pack",
+      "electromagnetic-science-pack",
+      "cryogenic-science-pack",
+      "promethium-science-pack"
+    ],
+    "nonspoiling_required_science_pack_consumed_each": 5,
+    "agricultural_science_pack_freshness_witness": {
+      "prototype_spoil_ticks": 216000,
+      "initial_runtime_modifier": 2,
+      "initial_input_count": 16,
+      "physical_consumption_minimum": 6,
+      "physical_consumption_maximum": 10,
+      "observed": {
+        "completion_tick": 513,
+        "consumed": {
+          "automation-science-pack": 5,
+          "logistic-science-pack": 5,
+          "military-science-pack": 5,
+          "chemical-science-pack": 5,
+          "production-science-pack": 5,
+          "utility-science-pack": 5,
+          "space-science-pack": 5,
+          "metallurgic-science-pack": 5,
+          "agricultural-science-pack": 6,
+          "electromagnetic-science-pack": 5,
+          "cryogenic-science-pack": 5,
+          "promethium-science-pack": 5
+        },
+        "agricultural_science_lab_fill_tick": 0,
+        "agricultural_science_initial_spoil_tick": 432000,
+        "agricultural_science_initial_runtime_ticks": 432000,
+        "agricultural_science_remaining_ticks": 431487,
+        "agricultural_science_remaining_input": 10,
+        "agricultural_science_completion_spoil_tick": 432000,
+        "agricultural_science_completion_modifier": 2.0606020000000003
+      }
+    },
+    "all_official_policy": true,
+    "named_space_gate": true,
+    "cap_disabled_after_completed_levels": {
+      "agricultural_growth_speed": 2,
+      "spoilage_preservation": 3
+    },
+    "tower_surface": "nauvis",
+    "tower_pressure": 1000,
+    "tower_seed": "yumako-seed",
+    "plant": "yumako-tree",
+    "native_growth_ticks": 18000,
+    "trained_remaining_ticks": 17645,
+    "trained_expected_remaining_ticks": 17645,
+    "foreign_zero_research_remaining_ticks": 18000,
+    "tower_planted_events_observed_after_mir_callback": 2,
+    "external_spoilage_baseline": 2,
+    "global_spoil_time_modifier": 2.0606020000000003,
+    "player_spoil_interval": 1236,
+    "foreign_spoil_interval": 1236,
+    "fixture_yumako_spoil_ticks": 600,
+    "equal_native_spoil_clock_tolerance_ticks": 1,
+    "native_spoil_ticks_persisted": false,
+    "on_load_read_only": false,
+    "ordinary_tuning_qualified": false,
+    "recurring_native_effect_maintenance_qualified": false,
+    "gameplay_scope": "disposable-native-scripted-effects-only"
+  },
+  "adverse_resolution": "R01 incorrectly expected five fresh agricultural science items. Native spoilage reduces usable science durability; R02 retains the native timer, records six physical packs and independently bounds consumption by five research points and measured freshness above one half.",
+  "limits": [
+    "Accelerated disposable all-official Space Age F210 fixture; ordinary cost/effect tuning is not qualified.",
+    "Actual native tower event and two real force inventories; not multiplayer or two-client Library evidence.",
+    "Does not qualify predecessor scripted-effect upgrades, other engine families, external-writer transitions, stress, performance or stable release."
+  ],
+  "release_qualification": false
+}

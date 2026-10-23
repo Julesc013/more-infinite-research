@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "b6f45af029d8f0926aa2922221eb2d1d013f5db7",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "BDEFE909F1C0CF146B6CBC6F0E4917F2AD0C03975489F85A276BD2A405E662ED",
+    "direct_library_startup_measurement_sha256": "74F91F11B559B920F872E658AE1737C1ECAB9F425B48BBAC028BD1026D782AD9",
+    "native_probe_resources_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+    "library_activation_sha256": "FA6D606C5CD1BCE9F262781C896853BAC0F1E9DCA2B396CB0B5548FA520D88D2"
+  },
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_version": "2.1.23",
+    "factorio_version": "2.1"
+  },
+  "profile_input": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\space-age-observed-f210-2123.json",
+    "sha256": "9018502B98C2BAC8DAB279C9A115BE1C16B4FE180F41EC31AEFA964B0F44DFFF"
+  },
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "31BC54C28E9DDB0EB2C3DA3380241F045A20A91BF67A61D37FA3473728195F1B",
+    "name": "more-infinite-research",
+    "version": "5.0.21000",
+    "factorio_version": "2.1",
+    "root": "more-infinite-research_5.0.21000"
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "budget": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 1024,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T09:48:29.0857162+00:00",
+    "deadline_at": "2026-10-23T09:48:29.0857162+00:00",
+    "admission": null
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "5D898FE9C3624676D23432FF1D2164401B7683C18CEF3A3C8E36B28E742AF4C1",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "quality",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "recycler",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "space-age",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+      "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\elevated-rails\\info.json",
+      "sha256": "65CDEAAD31CAEB6E0563808DD38F48344B973269C51624C7AFF80A5EF4A16317"
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\quality\\info.json",
+      "sha256": "DF4EBB16C00D6B0D933FED2E4AC3CE7425E57EBA31D06EFCD3CCCABB636D0DD0"
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\recycler\\info.json",
+      "sha256": "EADDDD558BFA97F0D7D91E856A05674785BAA60E0D13D94647D9173F0508122A"
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\space-age\\info.json",
+      "sha256": "D97C5AB5940F76C9710E7424EEACEDBB91F08A325F7491451C7269583973A7DD"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+      "sha256": "31BC54C28E9DDB0EB2C3DA3380241F045A20A91BF67A61D37FA3473728195F1B"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 12.651361,
+    "peak_working_set_bytes": 533729280,
+    "peak_sampled_private_bytes": 532140032,
+    "admission": {
+      "observed_at": "2026-10-23T09:48:35.0837744+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 6723117056,
+        "committed_bytes": 14223532032,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 64241344512,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 64241344512,
+        "total_bytes": 472446398464
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    }
+  },
+  "loaded_selection": [
+    "base@2.1.23",
+    "elevated-rails@2.1.23",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.21000",
+    "quality@2.1.23",
+    "recycler@2.1.23",
+    "space-age@2.1.23"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 29695561,
+      "sha256": "026527A9F1C70B638C6CEAE74C338F42B076C4CE110419251EF607C0D8D142FE"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 747041,
+      "sha256": "DCCFA0DB85D5402E2AEC2911EFE025E78F8D850CDE4F77587565D4C7C85B6CDA"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "5D898FE9C3624676D23432FF1D2164401B7683C18CEF3A3C8E36B28E742AF4C1",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\elevated-rails\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00680000002467EA",
+        "sha256": "65CDEAAD31CAEB6E0563808DD38F48344B973269C51624C7AFF80A5EF4A16317",
+        "bytes": 316
+      },
+      {
+        "name": "quality",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\quality\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00570000002467F0",
+        "sha256": "DF4EBB16C00D6B0D933FED2E4AC3CE7425E57EBA31D06EFCD3CCCABB636D0DD0",
+        "bytes": 318
+      },
+      {
+        "name": "recycler",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\recycler\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00630000002467EB",
+        "sha256": "EADDDD558BFA97F0D7D91E856A05674785BAA60E0D13D94647D9173F0508122A",
+        "bytes": 271
+      },
+      {
+        "name": "space-age",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\space-age\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00630000002467EC",
+        "sha256": "D97C5AB5940F76C9710E7424EEACEDBB91F08A325F7491451C7269583973A7DD",
+        "bytes": 508
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00620000001EA22B",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "31BC54C28E9DDB0EB2C3DA3380241F045A20A91BF67A61D37FA3473728195F1B",
+        "bytes": 332138
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f210-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f210-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-science-space-age-f210-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 12.651361,
+        "peak_working_set_bytes": 533729280,
+        "peak_sampled_private_bytes": 532140032,
+        "admission": {
+          "observed_at": "2026-10-23T09:48:35.0837744+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6723117056,
+            "committed_bytes": 14223532032,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 64241344512,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 64241344512,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    }
+  ]
+}

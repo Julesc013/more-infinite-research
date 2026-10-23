@@ -1,0 +1,54 @@
+{
+  "baseline_receipt": {
+    "data_raw": {
+      "bytes": 13781148,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "CE25CB854FF66F3239C29E3F2EFA4F848363586D0D8EB2AADB8DB0FCEB31B769"
+    },
+    "mod_settings": {
+      "bytes": 5,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "DDC90D598D1720B207196690C35441CAEFE32A4E25535EDC93A80484C659D69E"
+    },
+    "result": {
+      "bytes": 10342,
+      "path": "result.json",
+      "sha256": "76E8E4E1DFC5224B742B5FA88F5CBFB069670AD508BEF8C34AF6BC5DB80D4412"
+    },
+    "selection": {
+      "bytes": 110,
+      "path": "selection.json",
+      "sha256": "44C978BFD75A35C9928444EBB99DD9CC26294524339BC3E55EE217CDB2A3ADCF"
+    }
+  },
+  "candidate_receipt": {
+    "data_raw": {
+      "bytes": 13885435,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "05EED4A9465F830BF88262D74D6E1637EC7AEED1AA42C89203821089FE6D83A9"
+    },
+    "mod_settings": {
+      "bytes": 750429,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "62EE1E0BA70A1939A4FE7EE9B9A091F2E6E3459A1DF54D891318811A42EABCBB"
+    },
+    "result": {
+      "bytes": 7761,
+      "path": "result.json",
+      "sha256": "ED41ABD9D679E9114520C88C5DC0F36D9557E0DD8AAE05DCD5C6AD3AFF216FF3"
+    },
+    "selection": {
+      "bytes": 220,
+      "path": "selection.json",
+      "sha256": "B3896D1061952460A97694EC9ED15DB5C2A8C3059E8AFFF2FAC380AD2DE5E2D1"
+    }
+  },
+  "differences": [],
+  "inventory_sha256": "C37027F17D4F02C50C664739B242D62E29AAE0C68079450FCBA95499DC7EFB79",
+  "kind": "MIR5ModernF210CandidateComparisonV1",
+  "profile": "base-f210",
+  "reviewed_differences": [],
+  "schema": 2,
+  "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+  "status": "equal-intended-native-output"
+}

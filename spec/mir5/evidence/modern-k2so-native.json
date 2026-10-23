@@ -1,0 +1,596 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "da02530c972d755a03f2641e937e22791255e7a7",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "BDEFE909F1C0CF146B6CBC6F0E4917F2AD0C03975489F85A276BD2A405E662ED",
+    "direct_library_startup_measurement_sha256": "74F91F11B559B920F872E658AE1737C1ECAB9F425B48BBAC028BD1026D782AD9",
+    "native_probe_resources_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+    "library_activation_sha256": "FA6D606C5CD1BCE9F262781C896853BAC0F1E9DCA2B396CB0B5548FA520D88D2"
+  },
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_version": "2.1.23",
+    "factorio_version": "2.1"
+  },
+  "profile_input": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\k2so-observed-f210-2123.json",
+    "sha256": "34EAA33D1B0871AEB3BFA7F561660F3988ABE58C3CA008147AAFFAD7E7B24FBA"
+  },
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "22A95340965E05885842E136918190862EB4841BFA4900C793E20E0E331504D8",
+    "name": "more-infinite-research",
+    "version": "5.0.21000",
+    "factorio_version": "2.1",
+    "root": "more-infinite-research_5.0.21000"
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "budget": {
+    "timeout_seconds": 240,
+    "expected_peak_memory_mib": 1024,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 15,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.766,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T07:53:54.9261697+00:00",
+    "deadline_at": "2026-10-23T07:54:09.9261697+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T07:53:55.6531833+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 5916938240,
+        "committed_bytes": 15083040768,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 64858304512,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 64858304512,
+        "total_bytes": 472446398464
+      }
+    }
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "7410DF4B7E3881BFC64661F166382640CF8B52F54148E8F47943CC8FF33C9FFC",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "quality",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "recycler",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "space-age",
+        "version": "2.1.23",
+        "enabled": true
+      },
+      {
+        "name": "flib",
+        "version": "0.17.2",
+        "enabled": true
+      },
+      {
+        "name": "k2so-assets",
+        "version": "1.0.7",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.1.4",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2-spaced-out",
+        "version": "2.0.19",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.1.0",
+        "enabled": true
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.1.0",
+        "enabled": true
+      },
+      {
+        "name": "xy-k2so-enhancements-nulls-fork",
+        "version": "0.8.3",
+        "enabled": true
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+      "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F"
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\elevated-rails\\info.json",
+      "sha256": "65CDEAAD31CAEB6E0563808DD38F48344B973269C51624C7AFF80A5EF4A16317"
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\quality\\info.json",
+      "sha256": "DF4EBB16C00D6B0D933FED2E4AC3CE7425E57EBA31D06EFCD3CCCABB636D0DD0"
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\recycler\\info.json",
+      "sha256": "EADDDD558BFA97F0D7D91E856A05674785BAA60E0D13D94647D9173F0508122A"
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "builtin": true,
+      "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\space-age\\info.json",
+      "sha256": "D97C5AB5940F76C9710E7424EEACEDBB91F08A325F7491451C7269583973A7DD"
+    },
+    {
+      "name": "flib",
+      "version": "0.17.2",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\flib_0.17.2.zip",
+      "sha256": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D"
+    },
+    {
+      "name": "k2so-assets",
+      "version": "1.0.7",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\k2so-assets_1.0.7.zip",
+      "sha256": "C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017"
+    },
+    {
+      "name": "Krastorio2",
+      "version": "2.1.4",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2_2.1.4.zip",
+      "sha256": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E"
+    },
+    {
+      "name": "Krastorio2-spaced-out",
+      "version": "2.0.19",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2-spaced-out_2.0.19.zip",
+      "sha256": "8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B"
+    },
+    {
+      "name": "Krastorio2Assets",
+      "version": "2.1.0",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2Assets_2.1.0.zip",
+      "sha256": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29"
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "version": "2.1.0",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2MenuSimulations_2.1.0.zip",
+      "sha256": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7"
+    },
+    {
+      "name": "xy-k2so-enhancements-nulls-fork",
+      "version": "0.8.3",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+      "sha256": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "builtin": false,
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+      "sha256": "22A95340965E05885842E136918190862EB4841BFA4900C793E20E0E331504D8"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 7.92803,
+    "peak_working_set_bytes": 584097792,
+    "peak_sampled_private_bytes": 587677696,
+    "admission": {
+      "observed_at": "2026-10-23T07:54:02.9624076+00:00",
+      "memory": {
+        "total_bytes": 17047683072,
+        "free_bytes": 6064459776,
+        "committed_bytes": 14717333504,
+        "commit_limit_bytes": 20357242880
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 64858238976,
+        "total_bytes": 472446398464
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 64858238976,
+        "total_bytes": 472446398464
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 15,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.212,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-10-23T07:54:02.7513599+00:00",
+      "deadline_at": "2026-10-23T07:54:17.7513599+00:00",
+      "admission": {
+        "observed_at": "2026-10-23T07:54:02.9624076+00:00",
+        "memory": {
+          "total_bytes": 17047683072,
+          "free_bytes": 6064459776,
+          "committed_bytes": 14717333504,
+          "commit_limit_bytes": 20357242880
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 64858238976,
+          "total_bytes": 472446398464
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 64858238976,
+          "total_bytes": 472446398464
+        }
+      }
+    }
+  },
+  "loaded_selection": [
+    "base@2.1.23",
+    "elevated-rails@2.1.23",
+    "flib@0.17.2",
+    "k2so-assets@1.0.7",
+    "Krastorio2-spaced-out@2.0.19",
+    "Krastorio2@2.1.4",
+    "Krastorio2Assets@2.1.0",
+    "Krastorio2MenuSimulations@2.1.0",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.21000",
+    "quality@2.1.23",
+    "recycler@2.1.23",
+    "space-age@2.1.23",
+    "xy-k2so-enhancements-nulls-fork@0.8.3"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 34234821,
+      "sha256": "513B4AA0CCA1D5D25CE270E5AA40600481FB1B69B43A475A1C428EC9B67EFDFD"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 757021,
+      "sha256": "9BE20E846678492468848B5460F5DDB7C9F2D89FF26A0EAA02EA95C1DA2727D3"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "7410DF4B7E3881BFC64661F166382640CF8B52F54148E8F47943CC8FF33C9FFC",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\elevated-rails\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00680000002467EA",
+        "sha256": "65CDEAAD31CAEB6E0563808DD38F48344B973269C51624C7AFF80A5EF4A16317",
+        "bytes": 316
+      },
+      {
+        "name": "quality",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\quality\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00570000002467F0",
+        "sha256": "DF4EBB16C00D6B0D933FED2E4AC3CE7425E57EBA31D06EFCD3CCCABB636D0DD0",
+        "bytes": 318
+      },
+      {
+        "name": "recycler",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\recycler\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00630000002467EB",
+        "sha256": "EADDDD558BFA97F0D7D91E856A05674785BAA60E0D13D94647D9173F0508122A",
+        "bytes": 271
+      },
+      {
+        "name": "space-age",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\space-age\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:00630000002467EC",
+        "sha256": "D97C5AB5940F76C9710E7424EEACEDBB91F08A325F7491451C7269583973A7DD",
+        "bytes": 508
+      },
+      {
+        "name": "flib",
+        "version": "0.17.2",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\flib_0.17.2.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:000C00000025E566",
+        "sha256": "0A48C15DC0FC6C13BB3FE8293BA6CB35A07F3B0F37D37ACB50AB30E32E8E019D",
+        "bytes": 393792
+      },
+      {
+        "name": "k2so-assets",
+        "version": "1.0.7",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\k2so-assets_1.0.7.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:011E0000001F47A4",
+        "sha256": "C3E11214407B08120B2EE717405D3B0398F533647695AB2E6EF6DF9267D62017",
+        "bytes": 4142076
+      },
+      {
+        "name": "Krastorio2",
+        "version": "2.1.4",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2_2.1.4.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00860000002303BE",
+        "sha256": "9E5A56AC52BA0DD96A2D9FFBEFB8B242270EC946159D3DBED77B24B3C1C7147E",
+        "bytes": 778547
+      },
+      {
+        "name": "Krastorio2-spaced-out",
+        "version": "2.0.19",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2-spaced-out_2.0.19.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:006D0000002303CD",
+        "sha256": "8FCA3A3C202DD4939D5D85ACE93BE775CEDFE3D02FBDAF9DB78B77883B2C662B",
+        "bytes": 215770
+      },
+      {
+        "name": "Krastorio2Assets",
+        "version": "2.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2Assets_2.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:000C00000025E567",
+        "sha256": "39EF950EC8B21A40357DD0240EF8389501EE75CCA82717F2773B98554DA46E29",
+        "bytes": 158227438
+      },
+      {
+        "name": "Krastorio2MenuSimulations",
+        "version": "2.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\Krastorio2MenuSimulations_2.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:002500000025E56A",
+        "sha256": "3A485B449B356DC4B3EB4233DE4E803B3A001259FBC251BDC9F9D9120B3C53A7",
+        "bytes": 3112407
+      },
+      {
+        "name": "xy-k2so-enhancements-nulls-fork",
+        "version": "0.8.3",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:01AD0000000623FF",
+        "sha256": "930F43B96B04012FEF090C40D8B16A6B3F259D1713C86CF59DFF3E9A5A97E2BE",
+        "bytes": 1661473
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00620000001EA22B",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "22A95340965E05885842E136918190862EB4841BFA4900C793E20E0E331504D8",
+        "bytes": 320267
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-modern-k2so-native-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-modern-k2so-native-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-modern-k2so-native-r01\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 7.92803,
+        "peak_working_set_bytes": 584097792,
+        "peak_sampled_private_bytes": 587677696,
+        "admission": {
+          "observed_at": "2026-10-23T07:54:02.9624076+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6064459776,
+            "committed_bytes": 14717333504,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 64858238976,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 64858238976,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 15,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.212,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T07:54:02.7513599+00:00",
+          "deadline_at": "2026-10-23T07:54:17.7513599+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T07:54:02.9624076+00:00",
+            "memory": {
+              "total_bytes": 17047683072,
+              "free_bytes": 6064459776,
+              "committed_bytes": 14717333504,
+              "commit_limit_bytes": 20357242880
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 64858238976,
+              "total_bytes": 472446398464
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 64858238976,
+              "total_bytes": 472446398464
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "prototype-capture-engine",
+        "admission_wait_seconds": 15,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.212,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T07:54:02.7513599+00:00",
+        "deadline_at": "2026-10-23T07:54:17.7513599+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T07:54:02.9624076+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6064459776,
+            "committed_bytes": 14717333504,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 64858238976,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 64858238976,
+            "total_bytes": 472446398464
+          }
+        }
+      }
+    }
+  ]
+}

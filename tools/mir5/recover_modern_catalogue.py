@@ -2,7 +2,7 @@
 
 This package-excluded tool consumes only hash-verified Factorio data-stage
 captures.  It records the full published additions and patches for the fixed
-F210 Base and Space Age profiles, then compares a later candidate capture
+F200/F210 Base, Space Age, and optional exact K2SO profiles, then compares a later candidate capture
 against the independent no-MIR baseline plus that explicit intended output.
 It does not execute Factorio, construct player output, or provide a runtime
 catalogue.
@@ -24,8 +24,9 @@ class CatalogueError(ValueError):
     """A capture, oracle, or candidate does not meet this narrow contract."""
 
 
-SCHEMA = 1
-KIND = "MIR5ModernF210PublishedCatalogueV1"
+SCHEMA = 2
+KIND = "MIR5ModernF210PublishedCatalogueV2"
+GENERAL_KIND = "MIR5ModernPublishedCatalogueV2"
 REVIEW_KIND = "MIR5ModernCatalogueReviewedDifferencesV1"
 PRIVATE_MOD_DATA_PREFIX = "more-infinite-research-"
 MAXIMUM_LEVEL_POLICY = "more-infinite-research-maximum-level-policy"
@@ -354,6 +355,32 @@ def _intended_data(records: Mapping[str, list[dict[str, Any]]]) -> dict[str, Any
     }
 
 
+def _retired_setting_targets(records: Mapping[str, list[dict[str, Any]]]) -> list[dict[str, str]]:
+    """Name every planner-only descriptor field removed from MIR5 intent."""
+    retired: list[dict[str, str]] = []
+    for record in records["additions"]:
+        row = _mapping(record["row"], "published setting addition")
+        if "targets" not in row:
+            continue
+        retired.append({
+            "type": record["type"],
+            "name": record["name"],
+            "field": "targets",
+            "reason": "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer",
+            "provenance": "published-4.7 setting descriptor targets field",
+        })
+    return retired
+
+
+def _intended_settings(records: Mapping[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    # The captured rows remain complete evidence. The derived player intent
+    # removes only named MIR4 planner metadata, never a candidate-derived field.
+    return {
+        "from_published_output": True,
+        "remove_published_fields": _retired_setting_targets(records),
+    }
+
+
 def _captured_maximum_level_bindings(raw: Mapping[str, Any]) -> dict[str, Any]:
     """Keep the compact policy tuples as evidence, never as player input."""
     mod_data = _mapping(raw.get("mod-data"), "published mod-data")
@@ -407,9 +434,14 @@ def _capture_receipt(capture: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def recover_profile(identifier: str, no_mir_root: Path, published_root: Path) -> dict[str, Any]:
+def recover_profile(identifier: str, no_mir_root: Path, published_root: Path,
+                    *, expected_version: str | None = None) -> dict[str, Any]:
     no_mir = read_capture(no_mir_root, require_mir=False)
     published = read_capture(published_root, require_mir=True)
+    if not published["published_mir"]["version"].startswith("4.7."):
+        raise CatalogueError("oracle recovery requires published MIR 4.7, never a MIR5 candidate")
+    if expected_version is not None and published["published_mir"]["version"] != expected_version:
+        raise CatalogueError("recovery requires the exact published 4.7.0 target distribution")
     _assert_matching_inputs(no_mir, published)
     data = _diff_domain(no_mir["raw"], published["raw"], f"{identifier} data")
     settings = _diff_domain(no_mir["settings"], published["settings"], f"{identifier} settings")
@@ -427,24 +459,41 @@ def recover_profile(identifier: str, no_mir_root: Path, published_root: Path) ->
         "published_output": {"data": data, "settings": settings},
         "intended_player_output": {
             "data": _intended_data(data),
-            "settings": {"from_published_output": True},
+            "settings": _intended_settings(settings),
         },
         "normal_patterns": _normal_patterns(data, settings),
         "special_cases": special,
         "technology_owner_progression_facts": _technology_facts(generated),
-        "captured_maximum_level_bindings": _captured_maximum_level_bindings(published["raw"]),
+        # ModData was introduced after 2.0. Preserve absence on that engine;
+        # an absent/malformed 2.1 policy remains an oracle input error.
+        "captured_maximum_level_bindings": (
+            None if published["engine"]["factorio_version"] == "2.0" and "mod-data" not in published["raw"]
+            else _captured_maximum_level_bindings(published["raw"])),
     }
 
 
 def recover_inventory(base_no_mir: Path, base_published: Path,
-                      space_age_no_mir: Path, space_age_published: Path) -> dict[str, Any]:
+                      space_age_no_mir: Path, space_age_published: Path,
+                      k2so_no_mir: Path | None = None, k2so_published: Path | None = None,
+                      *, target: str = "f210") -> dict[str, Any]:
+    if target not in {"f200", "f210"}:
+        raise CatalogueError("modern recovery requires F200 or F210")
+    if (k2so_no_mir is None) != (k2so_published is None):
+        raise CatalogueError("K2SO recovery requires both no-MIR and published captures")
+    published_version = "4.7." + target[1:] + "00"
     profiles = [
-        recover_profile("base-f210", base_no_mir, base_published),
-        recover_profile("space-age-f210", space_age_no_mir, space_age_published),
+        recover_profile("base-" + target, base_no_mir, base_published, expected_version=published_version),
+        recover_profile("space-age-" + target, space_age_no_mir, space_age_published, expected_version=published_version),
     ]
+    if k2so_no_mir is not None and k2so_published is not None:
+        profiles.append(recover_profile("k2so-" + target, k2so_no_mir, k2so_published, expected_version=published_version))
+    family = "2.0" if target == "f200" else "2.1"
+    for profile in profiles:
+        if profile["capture_receipts"]["published_470"]["engine"]["factorio_version"] != family:
+            raise CatalogueError("recovery target differs from the actual captured engine family")
     return {
         "schema": SCHEMA,
-        "kind": KIND,
+        "kind": KIND if target == "f210" else GENERAL_KIND,
         "status": "hash-verified-published-modern-catalogue-oracle",
         "claims": {
             "native_qualification": False,
@@ -453,8 +502,8 @@ def recover_inventory(base_no_mir: Path, base_published: Path,
             "candidate_expectations_derived_from_candidate": False,
         },
         "source": {
-            "published_version": "4.7.21000",
-            "engine_family": "2.1",
+            "published_version": published_version,
+            "engine_family": family,
             "profiles": [profile["id"] for profile in profiles],
         },
         "profiles": profiles,
@@ -475,7 +524,7 @@ def _write_new_json(path: Path, value: Any) -> None:
 
 
 def _inventory_profile(inventory: Mapping[str, Any], identifier: str) -> Mapping[str, Any]:
-    if inventory.get("schema") != SCHEMA or inventory.get("kind") != KIND:
+    if inventory.get("schema") != SCHEMA or inventory.get("kind") not in {KIND, GENERAL_KIND}:
         raise CatalogueError("inventory has an unsupported schema or kind")
     rows = _list(inventory.get("profiles"), "inventory profiles")
     matches = [row for row in rows if isinstance(row, Mapping) and row.get("id") == identifier]
@@ -540,6 +589,26 @@ def _intended_domain(profile: Mapping[str, Any], domain: str) -> Mapping[str, An
     ]
     if len(output["additions"]) + len(names) != len(_list(source.get("additions"), f"published {domain} additions")):
         raise CatalogueError(f"intended {domain} excludes output absent from the published capture")
+
+    retirements = _list(instruction.get("remove_published_fields", []), f"intended {domain} field retirements")
+    seen_fields: set[tuple[str, str, str]] = set()
+    by_identity = {(row.get("type"), row.get("name")): row for row in output["additions"]}
+    for raw in retirements:
+        retirement = _mapping(raw, f"intended {domain} field retirement")
+        prototype_type, name, field = retirement.get("type"), retirement.get("name"), retirement.get("field")
+        if domain != "settings" or field != "targets" or not all(isinstance(value, str) and value for value in (prototype_type, name)):
+            raise CatalogueError(f"intended {domain} field retirement is not an exact settings targets record")
+        if (retirement.get("reason") != "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer"
+                or retirement.get("provenance") != "published-4.7 setting descriptor targets field"):
+            raise CatalogueError("intended settings field retirement lacks its approved reason/provenance")
+        identity = (prototype_type, name, field)
+        if identity in seen_fields:
+            raise CatalogueError("intended settings field retirements duplicate a descriptor")
+        seen_fields.add(identity)
+        record = by_identity.get((prototype_type, name))
+        if not isinstance(record, Mapping) or not isinstance(record.get("row"), Mapping) or field not in record["row"]:
+            raise CatalogueError("intended settings field retirement does not name a captured descriptor field")
+        record["row"].pop(field)
     return output
 
 
@@ -619,7 +688,7 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
                    + _difference_summary(expected_settings, candidate["settings"], "settings"))
     return {
         "schema": SCHEMA,
-        "kind": "MIR5ModernF210CandidateComparisonV1",
+        "kind": "MIR5ModernF210CandidateComparisonV1" if profile_id.endswith("f210") else "MIR5ModernCandidateComparisonV1",
         "status": "equal-intended-native-output" if not differences else "different-intended-native-output",
         "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
         "profile": profile_id,
@@ -639,10 +708,14 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument("--base-published", type=Path, required=True)
     recover.add_argument("--space-age-no-mir", type=Path, required=True)
     recover.add_argument("--space-age-published", type=Path, required=True)
+    recover.add_argument("--k2so-no-mir", type=Path)
+    recover.add_argument("--k2so-published", type=Path)
     recover.add_argument("--output", type=Path, required=True)
+    recover.add_argument("--target", choices=("f200", "f210"), default="f210")
     compare = commands.add_parser("compare", help="compare a candidate capture with the independent oracle")
     compare.add_argument("--inventory", type=Path, required=True)
-    compare.add_argument("--profile", choices=("base-f210", "space-age-f210"), required=True)
+    compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210",
+        "base-f200", "space-age-f200", "k2so-f200"), required=True)
     compare.add_argument("--baseline", type=Path, required=True)
     compare.add_argument("--candidate", type=Path, required=True)
     compare.add_argument("--reviewed-differences", type=Path)
@@ -651,7 +724,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "recover":
             result = recover_inventory(args.base_no_mir, args.base_published,
-                                       args.space_age_no_mir, args.space_age_published)
+                                       args.space_age_no_mir, args.space_age_published,
+                                       args.k2so_no_mir, args.k2so_published, target=args.target)
             _write_new_json(args.output, result)
             print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
             return 0

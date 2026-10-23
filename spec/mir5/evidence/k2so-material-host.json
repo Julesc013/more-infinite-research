@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2SOMaterialHostControlsV1",
+  "status": "selected-current-host-controls-passed",
+  "scope": "Three recovered finite -1 material identities; no native qualification",
+  "input_members": [
+    {
+      "path": "source/mir5/compatibility/material_catalogue.lua",
+      "bytes": 5445,
+      "sha256": "A40329A515578FF9F040F30796AB4A8BAAA07D1A242FAA92570735B495A2FE9E"
+    },
+    {
+      "path": "source/mir5/research/k2_materials.lua",
+      "bytes": 2289,
+      "sha256": "1D809D89C77826126AF8C2BF7986AE087197CBE227E067B39755DABA77DB4A84"
+    },
+    {
+      "path": "source/mir5/data-final-fixes.lua",
+      "bytes": 5406,
+      "sha256": "56CE599164D76D692EB6C8935816711708860BDA6EE7121D39E973747813795E"
+    },
+    {
+      "path": "source/mir5/research/catalogue.lua",
+      "bytes": 6530,
+      "sha256": "1B329C29D93756C6D7CB35D1F37A682948A6D869C829A8B3D50B89D8AD182B16"
+    },
+    {
+      "path": "source/mir5/research/cost.lua",
+      "bytes": 3218,
+      "sha256": "044978690FEB3863D790019A89356496AE442AB0C803BEE92503945C8385CBE2"
+    },
+    {
+      "path": "source/mir5/research/science.lua",
+      "bytes": 33399,
+      "sha256": "611CEA273B6E7EC18CAA1992C09967C80BAF3DEC94BCDBA8352BA4E1FC6D957E"
+    },
+    {
+      "path": "source/mir5/compatibility/modern_catalogue.lua",
+      "bytes": 25401,
+      "sha256": "28E82A1A9157C19AD284BE726E414C11D72583575978468B2D42DE6D4AD92D09"
+    },
+    {
+      "path": "spec/mir5/inventory/k2so-material-facts.json",
+      "bytes": 23366,
+      "sha256": "27D997DB8DC1EB57ACCE2B577E4FD5291AA92EEBADF559C9050AEDD419BE014F"
+    },
+    {
+      "path": "spec/mir5/inventory/k2so-material-continuations.json",
+      "bytes": 1100,
+      "sha256": "5B0A7E99506C8738841E2A62FAEC48CDEB50F155BDB8580D2A108F01EE3CD717"
+    },
+    {
+      "path": "tests/mir5/test_material_catalogue.py",
+      "bytes": 16099,
+      "sha256": "CA171962C03E63B2D131BBB5CA42A183A8F662870BEA44D0EC8814ACB1C8A143"
+    },
+    {
+      "path": "tests/mir5/test_generator.py",
+      "bytes": 86357,
+      "sha256": "8353A16C2F8DAADA4380FE3EB4851F10F90FBF550D1E643823782B4F25F24FFC"
+    },
+    {
+      "path": "tests/mir5/test_module_permissions_activation.py",
+      "bytes": 10517,
+      "sha256": "0138F7DBF0FB7043538D6B2D43CA9FD49A9FB58A2D4A4342EF7A7F68B82C5820"
+    },
+    {
+      "path": "tests/mir5/test_capture_controls.py",
+      "bytes": 11283,
+      "sha256": "155FCCB3A3528908FAE3088C6BDA9345F5C19F56B5BFD780B49F89671953FDB1"
+    },
+    {
+      "path": "tests/mir5/test_host_controls.py",
+      "bytes": 11484,
+      "sha256": "F7DE048BB39CBBA647E45F0795FFDBB9DCA895E630469F7A0C478B4DAE663540"
+    },
+    {
+      "path": "tests/mir5/Test-MIR5HostControls.ps1",
+      "bytes": 4556,
+      "sha256": "CED147BA07E3F278FB9FD1361394D88558E3C63425A420A174B1FFF8B1FBA84E"
+    }
+  ],
+  "host_control_plan_commands": 47,
+  "current_passed_groups": [
+    {
+      "scope": "First 26 plan commands through recipe-schema repairs, before obsolete isolated module-override stub failed",
+      "commands": 26,
+      "log": {
+        "path": "build/mir5/material-catalogue-r01/47-host-controls-r02.txt",
+        "bytes": 51332,
+        "sha256": "4089653A5D4F475F6167EC3825174FA6910DEE54D37C523CFDA4A61657BFC842"
+      }
+    },
+    {
+      "scope": "Corrected isolated module-override stub and remaining 20 plan commands",
+      "commands": 21,
+      "log": {
+        "path": "build/mir5/material-catalogue-r01/host-controls-suffix-r03.txt",
+        "bytes": 27804,
+        "sha256": "A8C6E226D7829C55801CEB259986D90949D2BE8B101276C73AB94479230250F4"
+      }
+    }
+  ],
+  "prior_adverse_lanes": [
+    {
+      "log": {
+        "path": "build/mir5/material-catalogue-r01/47-host-controls-r01.txt",
+        "bytes": 41414,
+        "sha256": "52BAD3B1E718012ECADFB3CB7C362A776DCC0C17C8A73613C44C51E1FAC82EA6"
+      },
+      "reason": "Exact member check predated committed F200 observer metadata; explicit two-target metadata assertion now passes"
+    },
+    {
+      "path": "build/mir5/material-catalogue-r01/47-host-controls-r02.txt",
+      "reason": "Isolated override fixture omitted modern_catalogue.is_k2so; strict inactive stub now passes"
+    }
+  ],
+  "expected_catalogue_difference": {
+    "profile": "k2so-f210",
+    "captured_technologies": 75,
+    "expected_technologies": 78,
+    "added_identities": [
+      "recipe-prod-research_material_rare_metals-1",
+      "recipe-prod-research_material_silicon-1",
+      "recipe-prod-research_material_glass-1"
+    ],
+    "captured_reference_unchanged": true,
+    "other_rows_must_match_completely": true
+  },
+  "review_corrections": [
+    "Check neutral shared_probability in four named routes",
+    "Reject any matching upstream productivity effect regardless of sign/value",
+    "Bind probability/independent_probability/shared_probability/extra_count_fraction absences to the hash-verified raw capture"
+  ],
+  "limits": [
+    "A05 complete prototype rows are unavailable; source-authority fields are separately labelled",
+    "F200 standalone K2SO has different activation and rare-metals source; no parity claim for it",
+    "No historical -4 material identity emission was established; no invented carriers or continuations",
+    "Native load/effects/production/migrations and final candidate remain pending"
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

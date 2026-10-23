@@ -12,9 +12,11 @@ function M.gear_id() return GEAR_ID end
 
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
--- Only ordinary vanilla/Space Age rows have recovered full bindings. The
--- already captured K2SO families remain independently authored elsewhere.
 local ordinary_profile = type(active_mods) == "table" and active_mods.Krastorio2 == nil
+  and active_mods["Krastorio2-spaced-out"] == nil and active_mods.Krastorio2Assets == nil
+  and active_mods["k2so-assets"] == nil
+local k2_base_profile = modern_catalogue.is_k2_base(active_mods)
+local k2so_profile = modern_catalogue.is_k2so(active_mods)
 
 local function copy(value, seen)
   if type(value) ~= "table" then return value end
@@ -51,10 +53,29 @@ local function generated_row(id, family, order, locale, recipe)
     ownership_kind="authored_generated", legacy_binding={source="generated-stream", operation="emit"}}
 end
 
+local function imersite_rows()
+  local contract = require("research.k2_imersite")
+  local settings = stream_settings(contract.stream)
+  return {
+    {id=contract.early.id, family=contract.early.family, progression=contract.early.first_level,
+      native_order=contract.early.order, setting="ips-enable-" .. contract.stream,
+      cap_setting="ips-max-level-" .. contract.stream, settings=settings,
+      recipe=contract.effect.recipe, locale_key="description.productivity-bonus", ownership_kind="authored_generated",
+      legacy_binding={source="generated-stream", operation="emit"}},
+    {id=contract.continuation.id, family=contract.continuation.family, progression=contract.continuation.first_level,
+      native_order=contract.continuation.order, setting="ips-enable-" .. contract.stream,
+      cap_setting="ips-max-level-" .. contract.stream, settings=settings,
+      recipe=contract.effect.recipe, locale_key="description.productivity-bonus", ownership_kind="authored_generated",
+      legacy_binding={source="generated-stream", operation="emit"}},
+  }
+end
+
 local function static_rows()
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
-  if not ordinary_profile then
+  local selected
+  if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
+  if not selected then
     if space_age_active then
       rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
         "p[research_agricultural_growth_speed]", "technology-name.more-infinite-research.research_agricultural_growth_speed")
@@ -63,7 +84,6 @@ local function static_rows()
     end
     return rows
   end
-  local selected = modern_catalogue.select(active_mods)
   for index = 1, #selected.definitions do
     local definition = selected.definitions[index]
     rows[#rows + 1] = generated_row("recipe-prod-" .. definition.key .. "-1", definition.family,
@@ -81,6 +101,13 @@ local function static_rows()
       cap_setting="mir-max-level-" .. continuation.setting_key, settings=continuation_settings(continuation.setting_key),
       locale_key=locale_key(continuation.localised_name), ownership_kind="authored_generated",
       legacy_binding={source=continuation.source, operation=continuation.operation}}
+  end
+  if selected.k2_imersite then
+    for _, row in ipairs(imersite_rows()) do rows[#rows +1] = row end
+    for _, definition in ipairs(require("research.k2_materials")) do
+      rows[#rows + 1] = generated_row(definition.name, definition.key, definition.order,
+        "description.productivity-bonus", definition.routes[1].recipe)
+    end
   end
   if space_age_active then
     for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do

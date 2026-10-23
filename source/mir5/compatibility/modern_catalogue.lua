@@ -1,7 +1,38 @@
--- Explicit F210 base and Space Age selection for the delivered modern catalogue.
+-- Explicit Base/Space Age selection and narrow K2 profile gates for the delivered modern catalogue.
 -- The Space Age delta remains in its own module: a base stage never imports or
 -- constructs its definitions, recipe patches, or continuation changes.
 local M = {}
+local target = require("platform.target")
+
+-- These two native modifiers were added in the selected 2.1 engine family.
+-- Their absence on 2.0 is an actual capability boundary, not a disabled row.
+function M.supports_family(key)
+  return target.cargo_research == true
+    or (key ~= "research_cargo_landing_pad_count" and key ~= "research_cargo_bay_unloading_distance")
+end
+
+local function supported_definitions(definitions)
+  if target.cargo_research == true then return definitions end
+  local out = {}
+  for _, definition in ipairs(definitions) do
+    if M.supports_family(definition.key) then
+      if target.id == "f200" and definition.key == "research_molten_metals" then
+        -- Published 2.0 research targets the two lava recipes only. The ore
+        -- recipes entered this authored stream on 2.1; do not add new 2.0
+        -- bonuses merely because another producer has the same fluid output.
+        local effects = {}
+        for _, effect in ipairs(definition.effects) do
+          if effect.recipe ~= "copper-ore-melting" and effect.recipe ~= "iron-ore-melting" then
+            effects[#effects + 1] = effect
+          end
+        end
+        definition.effects = effects
+      end
+      out[#out + 1] = definition
+    end
+  end
+  return out
+end
 
 local BASE = require("compatibility.modern_catalogue.base")
 
@@ -38,7 +69,16 @@ local SCIENCE = {
   science_automation_logistic_chemical_production_utility_electromagnetic = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "electromagnetic-science-pack"},
   science_automation_logistic_chemical_military_utility = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack", "utility-science-pack"},
   science_automation_logistic_chemical_military_utility_space = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack"},
-  science_automation_logistic_chemical_production_utility_military = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack"}
+  science_automation_logistic_chemical_production_utility_military = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack"},
+  science_production_agricultural_space = {"production-science-pack", "agricultural-science-pack", "space-science-pack"},
+  science_production_space = {"production-science-pack", "space-science-pack"},
+  science_production_space_agricultural = {"production-science-pack", "space-science-pack", "agricultural-science-pack"},
+  science_production_metallurgic_space = {"production-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  science_production_space_cryogenic = {"production-science-pack", "space-science-pack", "cryogenic-science-pack"},
+  science_production_utility_space = {"production-science-pack", "utility-science-pack", "space-science-pack"},
+  science_utility_space = {"utility-science-pack", "space-science-pack"},
+  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"},
+  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium_k2 = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "kr-advanced-tech-card", "kr-matter-tech-card", "kr-singularity-tech-card"}
 }
 
 -- These are declared continuations of the six named native chains. They are
@@ -328,16 +368,33 @@ local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
 
-local function copy_definitions(definitions)
-  local out, by_key = {}, {}
-  for index = 1, #definitions do
-    local definition = copy(definitions[index])
-    out[#out + 1], by_key[definition.key] = definition, definition
-  end
-  return out, by_key
+-- K2 Base is a separate F200-only admission.  It uses the ordinary authored
+-- catalogue and must never be inferred from the K2SO tuple.
+function M.is_k2_base(active_mods)
+  return target.id == "f200" and type(active_mods) == "table"
+    and active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
+    and active_mods["Krastorio2-spaced-out"] == nil
+    and active_mods["k2so-assets"] == nil
+    and not active_space_age(active_mods)
 end
 
-local function apply_space_age(definitions, by_key)
+-- K2SO is an exact delivered tuple, not a broad Krastorio assumption. Keep
+-- this gate here so inactive profiles never construct the K2SO body.
+function M.is_k2so(active_mods)
+  if not active_space_age(active_mods) then return false end
+  return active_mods.Krastorio2 ~= nil and active_mods["Krastorio2-spaced-out"] ~= nil
+    and active_mods.Krastorio2Assets ~= nil and active_mods["k2so-assets"] ~= nil
+end
+
+local function copy_definitions(definitions)
+  local out = {}
+  for index = 1, #definitions do
+    out[index] = copy(definitions[index])
+  end
+  return out
+end
+
+local function apply_space_age(definitions)
   -- Required laziness: do not move this require above the active profile gate.
   local delta = require("compatibility.modern_catalogue.space_age")
   local omit = {}
@@ -361,6 +418,32 @@ local function apply_space_age(definitions, by_key)
   return selected, delta
 end
 
+local function apply_k2so(definitions)
+  -- Required laziness: only an exact K2SO profile creates this map.
+  local delta = require("compatibility.modern_catalogue.k2so")
+  local selected_by_key = {}
+  for index = 1, #definitions do selected_by_key[definitions[index].key] = definitions[index] end
+  for key, changed in pairs(delta.definition_overrides) do
+    local definition = selected_by_key[key]
+    if not definition then error("MIR K2SO catalogue lacks declared key " .. key, 3) end
+    for field, value in pairs(changed) do definition[field] = copy(value) end
+  end
+  return delta
+end
+
+local function apply_k2_base(definitions)
+  -- Exact F200 K2 Base presentation only; never import the K2SO body here.
+  local delta = require("compatibility.modern_catalogue.k2_base")
+  local selected_by_key = {}
+  for index = 1, #definitions do selected_by_key[definitions[index].key] = definitions[index] end
+  for key, changed in pairs(delta.definition_overrides or {}) do
+    local definition = selected_by_key[key]
+    if not definition then error("MIR K2 Base catalogue lacks declared key " .. key, 3) end
+    for field, value in pairs(changed) do definition[field] = copy(value) end
+  end
+  return delta
+end
+
 function M.science_names(key)
   local vector = SCIENCE[key]
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -377,16 +460,42 @@ function M.science_ingredients(key)
 end
 
 function M.select(active_mods)
-  local definitions, by_key = copy_definitions(BASE.definitions)
+  local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
-  local profile = "base"
+  local profile, k2so = "base", nil
+  if M.is_k2_base(active_mods) then profile = "k2-base-f200" end
+  if target.id == "f200" and not active_space_age(active_mods) then
+    -- Published 2.0 Base includes the six craftable science recipes. There is
+    -- no corresponding 2.1 Base row; keep this actual target difference local.
+    definitions[#definitions + 1] = {
+      key="research_science_pack_productivity", family="research_science_pack_productivity", kind="productivity",
+      science="science_automation_logistic_chemical_production_military_utility", prerequisites={},
+      effects={{recipe="automation-science-pack",scale=1},{recipe="chemical-science-pack",scale=1},
+        {recipe="logistic-science-pack",scale=1},{recipe="military-science-pack",scale=1},
+        {recipe="production-science-pack",scale=1},{recipe="utility-science-pack",scale=1}},
+      icon="__base__/graphics/technology/space-science-pack.png", icon_size=256,
+      overlay="__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+      localised_name={"technology-name.more-infinite-research.research_science_pack_productivity"},
+      localised_description={"technology-description.more-infinite-research.recipe_productivity"},
+      order="p[research_science_pack_productivity]",
+    }
+  end
   if active_space_age(active_mods) then
     local delta
-    definitions, delta = apply_space_age(definitions, by_key)
+    definitions, delta = apply_space_age(definitions)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
   end
-  return {profile = profile, definitions = definitions, continuations = M.continuations(active_mods), recipe_patches = recipe_patches}
+  if M.is_k2_base(active_mods) then
+    apply_k2_base(definitions)
+  end
+  if M.is_k2so(active_mods) then
+    k2so = apply_k2so(definitions)
+    profile = "k2so-f210"
+  end
+  return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
+    native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
+    k2_imersite = k2so and k2so.imersite or false}
 end
 
 -- Settings preserve their historical names across target selection. Space Age
@@ -398,23 +507,36 @@ function M.setting_definitions(active_mods)
     local delta = require("compatibility.modern_catalogue.space_age")
     for index = 1, #delta.additions do definitions[#definitions + 1] = copy(delta.additions[index]) end
   end
-  return definitions
+  return supported_definitions(definitions)
 end
 
 function M.continuations(active_mods)
   local rows = copy(CONTINUATIONS)
+  local overrides = {}
   if active_space_age(active_mods) then
-    local delta = require("compatibility.modern_catalogue.space_age")
-    local overrides = delta.continuation_overrides or {}
-    for index = 1, #rows do
-      local changed = overrides[rows[index].key]
-      if changed then for key, value in pairs(changed) do rows[index][key] = copy(value) end end
+    for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do
+      overrides[key] = value
     end
+  end
+  if M.is_k2_base(active_mods) then
+    for key, value in pairs(require("compatibility.modern_catalogue.k2_base").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  if M.is_k2so(active_mods) then
+    for key, value in pairs(require("compatibility.modern_catalogue.k2so").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  for index = 1, #rows do
+    local changed = overrides[rows[index].key]
+    if changed then for key, value in pairs(changed) do rows[index][key] = copy(value) end end
   end
   return rows
 end
 
 function M.native_owners(active_mods)
+  if M.is_k2so(active_mods) then return copy(require("compatibility.modern_catalogue.k2so").native_owners) end
   if not active_space_age(active_mods) then return {} end
   return copy(require("compatibility.modern_catalogue.space_age").native_owners)
 end

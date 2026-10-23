@@ -3,6 +3,7 @@
 local M = {}
 
 local K2SO_MODS = {"Krastorio2", "Krastorio2-spaced-out", "Krastorio2Assets", "k2so-assets"}
+local modern_catalogue = require("compatibility.modern_catalogue")
 
 local function has_mod(mods, name)
   local version = mods[name]
@@ -32,6 +33,14 @@ end
 -- safe fallback to the one- or two-recipe mappings.
 function M.select(mods, raw)
   if type(mods) ~= "table" then error("MIR gear binding requires the data-stage mods table", 2) end
+  local space_age = has_mod(mods, "space-age")
+  if modern_catalogue.is_k2_base(mods) then
+    -- The shared predicate owns admission; retain binding's version-shape
+    -- validation before importing the named K2 Base mapping.
+    has_mod(mods, "Krastorio2")
+    has_mod(mods, "Krastorio2Assets")
+    return checked_copy(require("compatibility.gear_bindings.k2_base"), raw)
+  end
   local k2so = false
   for index = 1, #K2SO_MODS do
     local present = has_mod(mods, K2SO_MODS[index])
@@ -40,12 +49,12 @@ function M.select(mods, raw)
     end
   end
   if k2so then
-    if not has_mod(mods, "space-age") then
+    if not space_age then
       error("MIR gear binding has an unsupported partial K2SO selection", 2)
     end
     return checked_copy(require("compatibility.gear_bindings.k2so"), raw)
   end
-  if has_mod(mods, "space-age") then
+  if space_age then
     return checked_copy(require("compatibility.gear_bindings.space_age"), raw)
   end
   return checked_copy(require("compatibility.gear_bindings.vanilla"), raw)
