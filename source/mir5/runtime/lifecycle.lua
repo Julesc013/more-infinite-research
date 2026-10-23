@@ -178,7 +178,10 @@ local function legacy_candidates(worker_name)
       name = GEAR_TECHNOLOGY,
       setting = "ips-max-level-research_gears",
       source = "generated-stream",
-      operation = "runtime-settings-transport",
+      -- The candidate is a decoder key for published 4.7 F210 storage. It
+      -- deliberately retains the old generated-binding operation rather than
+      -- nominating MIR5's current runtime-settings provenance.
+      operation = "emit",
       admitted = true
     }
   end

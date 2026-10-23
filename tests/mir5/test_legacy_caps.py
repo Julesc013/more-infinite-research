@@ -73,8 +73,11 @@ class LegacyCapsTests(unittest.TestCase):
 
     def test_imports_exact_paired_gear_disable_without_mutating_native_state(self):
         self.lua.execute('''
+          -- Exact accepted 4.7.21000 F210 provenance: archive member
+          -- `prototypes/mir/domain/technology/maximum_level_binding.lua`
+          -- lines 264-277 emits this generated technology with operation=emit.
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "runtime-settings-transport")
+            "generated-stream", "emit")
           local technology = native_technology()
           local f = native_force(4, {[gear.name] = technology})
           local old = old_bucket(4, gear, 10, "mir32-1a2b3c4d")
@@ -87,6 +90,21 @@ class LegacyCapsTests(unittest.TestCase):
             "output retained a mutable legacy row")
           assert(technology.enabled == false and technology.visible_when_disabled == true
             and technology.level == 11 and technology.researched and technology.saved_progress == .42)
+        ''')
+
+    def test_rejects_the_former_runtime_settings_transport_tuple_for_published_gear_state(self):
+        self.lua.execute('''
+          -- The archive-backed `emit` tuple is exact. Do not admit the prior
+          -- synthetic runtime-settings-transport tuple as an alternate key.
+          local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "emit")
+          local f = native_force(41, {[gear.name] = native_technology()})
+          local old = old_bucket(41, gear, 2, "mir32-1a2b3c4d")
+          local former = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
+            "generated-stream", "runtime-settings-transport")
+          local rows, facts = legacy.import_for_force(old, f, {former}, nil)
+          assert(rows[gear.name] == nil and facts.imported == 0)
+          assert(facts.decisions[1].outcome == "candidate_not_admitted")
         ''')
 
     def test_imports_worker_only_when_the_revalidated_candidate_is_supplied(self):
@@ -106,7 +124,7 @@ class LegacyCapsTests(unittest.TestCase):
     def test_visibility_only_preserves_a_foreign_disable_and_current_rows_win(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "runtime-settings-transport")
+            "generated-stream", "emit")
           local f = native_force(6, {[gear.name] = native_technology()})
           local old = old_bucket(6, gear, 3, "mir32-0a1b2c3d", false)
           local rows, facts = legacy.import_for_force(old, f, {gear}, nil)
@@ -120,7 +138,7 @@ class LegacyCapsTests(unittest.TestCase):
     def test_any_non_nil_current_entry_blocks_historical_restoration(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "runtime-settings-transport")
+            "generated-stream", "emit")
           local f = native_force(61, {[gear.name] = native_technology()})
           local old = old_bucket(61, gear, 3, "mir32-0a1b2c3d")
           local values = {false, "preserved-tombstone", 7}
@@ -136,7 +154,7 @@ class LegacyCapsTests(unittest.TestCase):
     def test_visibility_is_independent_of_malformed_disable_v2_continuity_and_reenablement(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "runtime-settings-transport")
+            "generated-stream", "emit")
           local f = native_force(7, {[gear.name] = native_technology()})
           local old = old_bucket(7, gear, 4, "mir32-1234abcd")
           old.disabled_by_cap[7][gear.name].binding_fingerprint = "mir32-deadbeef"
@@ -178,7 +196,7 @@ class LegacyCapsTests(unittest.TestCase):
     def test_uses_only_two_declared_candidates_and_does_not_enumerate_legacy_maps(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
-            "generated-stream", "runtime-settings-transport")
+            "generated-stream", "emit")
           local worker = candidate("worker-robots-speed-7", "mir-max-level-worker-robots-speed",
             "native-owner", "native-owner-cap")
           local reads = 0

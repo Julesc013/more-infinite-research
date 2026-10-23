@@ -13,7 +13,10 @@ local GEAR = {
   name = "recipe-prod-research_gears-1",
   setting = "ips-max-level-research_gears",
   source = "generated-stream",
-  operation = "runtime-settings-transport"
+  -- This is the released F210 V3 binding operation, not MIR5's current
+  -- settings-transport provenance. See the accepted 4.7.21000 archive,
+  -- `prototypes/mir/domain/technology/maximum_level_binding.lua:264-277`.
+  operation = "emit"
 }
 
 local WORKER = {

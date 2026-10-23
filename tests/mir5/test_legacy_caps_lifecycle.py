@@ -43,7 +43,10 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
               local setting = gear and "ips-max-level-research_gears"
                 or "mir-max-level-worker-robots-speed"
               local source = gear and "generated-stream" or "native-owner"
-              local operation = gear and "runtime-settings-transport" or "native-owner-cap"
+              -- Only the predecessor-storage decoder uses this tuple. The
+              -- published F210 V3 generated binding recorded `emit`; MIR5's
+              -- live cap provenance is intentionally not represented here.
+              local operation = gear and "emit" or "native-owner-cap"
               local key = table.concat({name, setting, source, operation}, "\\0")
               old.managed_technologies[name] = {technology = name, setting = setting,
                 source = source, operation = operation, policy_transport = "transported-v3",
