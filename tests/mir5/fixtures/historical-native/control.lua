@@ -130,7 +130,7 @@ local function start_research(force, name)
   if force.current_research == nil then fail("could not start real lab research " .. name) end
 end
 
-script.on_init(function()
+local function initialize()
   if not game.active_mods["more-infinite-research"] then
     fail("historical fixture requires more-infinite-research")
   end
@@ -168,6 +168,17 @@ script.on_init(function()
     deadline=game.tick + DEADLINE_TICKS,
   }
   start_research(force, target.direct)
+end
+
+script.on_init(function()
+  local ok, message = pcall(initialize)
+  if not ok then
+    -- Some old --create processes exit without putting the Lua error in the
+    -- native log. Preserve that original diagnostic; still fail the run.
+    pcall(function() game.write_file("mir5-historical-init-error.txt", tostring(message), false) end)
+    if log then log("[mir5-historical-native] init failed: " .. tostring(message)) end
+    error(message)
+  end
 end)
 
 script.on_event(defines.events.on_research_finished, function(event)
