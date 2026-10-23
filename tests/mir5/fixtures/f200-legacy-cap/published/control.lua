@@ -4,7 +4,7 @@ local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-cap"
 local GEAR = "recipe-prod-research_gears-1"
 local RECIPE = "iron-gear-wheel"
-local PROBE = "automation"
+local PROBE = "braking-force-1"
 local FOREIGN = "mir5-f200-legacy-cap-foreign"
 local SCIENCE = {
   "automation-science-pack", "logistic-science-pack",
@@ -202,6 +202,7 @@ script.on_init(function()
   foreign_gear.visible_when_disabled = false
   local probe = technology(foreign, PROBE)
   prerequisites(probe)
+  if probe.researched then fail("unrelated foreign probe was already researched: " .. PROBE) end
   if foreign.add_research(probe) ~= true then fail("could not queue foreign probe") end
   foreign.research_progress = 0.42
   local foreign_queue = assert_foreign(foreign)

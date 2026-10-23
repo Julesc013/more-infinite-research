@@ -885,7 +885,7 @@ local function detail_lines(parent, row, detail)
       local change = type(effect) == "table" and (effect.change or effect.modifier) or nil
       local text_value = tostring(effect_type or "")
       if effect_type == "change-recipe-productivity" and type(change) == "number" then
-        text_value = {"mir-browser.productivity-increment", tostring(change * 100)}
+        text_value = {"mir-browser.productivity-increment", string.format("%.6g", change * 100)}
       elseif change ~= nil then
         text_value = text_value .. " " .. tostring(change)
         if type(effect) == "table" and effect.ammo_category then text_value = text_value .. " " .. effect.ammo_category end
@@ -1154,6 +1154,7 @@ local function create_frame(player, view)
   local filters = add(frame, {type = "table", name = PREFIX .. "filters", column_count = 2 * pairs_per_row})
   add(filters, {type = "label", name = PREFIX .. "search_label", caption = {"mir-browser.search-label"}})
   add(filters, {type = "textfield", name = PREFIX .. "query", text = view.query})
+  add(filters, {type = "label", name = PREFIX .. "family_label", caption = {"mir-browser.filter-scope"}})
   local families = family_values()
   add(filters, {type = "drop-down", name = PREFIX .. "family", items = family_items(families, player),
     selected_index = family_index(families, view.family) or 1})

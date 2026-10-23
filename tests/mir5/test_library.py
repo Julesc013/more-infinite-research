@@ -208,7 +208,8 @@ class LibraryTests(unittest.TestCase):
           player.display_resolution, player.display_scale = {width=1280,height=720}, 1.25
           local model = require("presentation.library_model")
           model.detail = function()
-            return {cost={count=8000,energy=3600},prerequisites={},effects={}}
+            return {cost={count=8000,energy=3600},prerequisites={},
+              effects={{type="change-recipe-productivity",change=.10000000149}}}
           end
           local root = library.open(player,{selected=gear.name,query="gear"})
           assert(root.style.width <= 1280/1.25 and root.style.height <= 720/1.25)
@@ -222,6 +223,8 @@ class LibraryTests(unittest.TestCase):
           local cost = content["mir_library_detail"]["mir_library_detail_cost"]
           assert(cost.caption[1] == "mir-browser.research-cost" and tonumber(cost.caption[3]) == 60)
           assert(cost.style.single_line == false and cost.style.maximal_width < root.style.width)
+          assert(content["mir_library_detail"]["mir_library_effect_1"].caption[2] == "10")
+          assert(filters["mir_library_family_label"].caption[1] == "mir-browser.filter-scope")
           library.close(player)
           player.display_resolution, player.display_scale = {width=1280,height=720}, 2
           root = library.open(player,{selected=gear.name})

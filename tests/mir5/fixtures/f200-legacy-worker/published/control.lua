@@ -3,7 +3,7 @@ local CASE = "f200-positive-legacy-worker"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-worker"
 local WORKER = "worker-robots-speed-6"
-local PROBE = "automation"
+local PROBE = "braking-force-1"
 local FOREIGN = "mir5-f200-legacy-worker-foreign"
 local SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",

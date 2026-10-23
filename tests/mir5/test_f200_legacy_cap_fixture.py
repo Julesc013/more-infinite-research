@@ -105,7 +105,7 @@ class F200LegacyCapFixtureTests(unittest.TestCase):
             end
             local function force(name,index)
               local value={name=name,index=index,valid=true,technologies={},recipes={['iron-gear-wheel']={productivity_bonus=0}},research_queue={},research_progress=0}
-              value.technologies[GEAR]=tech(GEAR,value);value.technologies.automation=tech("automation",value)
+              value.technologies[GEAR]=tech(GEAR,value);value.technologies["braking-force-1"]=tech("braking-force-1",value)
               function value.enable_all_prototypes()end
               function value.reset_technology_effects() value.recipes['iron-gear-wheel'].productivity_bonus=0 end
               function value.add_research(research)

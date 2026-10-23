@@ -42,6 +42,7 @@ try {
   $null=New-Item -ItemType Directory -Path $resources.root
   $serverWrite=Join-Path $resources.root 'server'
   $null=New-Item -ItemType Directory -Path $serverWrite
+  $null=New-Item -ItemType Directory -Path (Join-Path $serverWrite 'saves')
   $serverConfig=Join-Path $resources.root 'server.ini'
   New-MIRDirectLibraryStartupConfig -Path $serverConfig -EngineDataDirectory $engineData -WriteDataDirectory $serverWrite
   $settings=Get-Content -LiteralPath (Join-Path $engineData 'server-settings.example.json') -Raw|ConvertFrom-Json -AsHashtable

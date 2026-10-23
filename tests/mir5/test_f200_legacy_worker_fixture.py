@@ -105,7 +105,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             local function force(name,index,modifier)
               local value={name=name,index=index,valid=true,technologies={},research_queue={},research_progress=0,
                 worker_robots_speed_modifier=modifier}
-              value.technologies[WORKER]=tech(WORKER,value);value.technologies.automation=tech("automation",value)
+              value.technologies[WORKER]=tech(WORKER,value);value.technologies["braking-force-1"]=tech("braking-force-1",value)
               function value.enable_all_prototypes()end
               function value.add_research(research)
                 if type(research)=="string"then research=value.technologies[research]end
