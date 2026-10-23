@@ -295,6 +295,53 @@ class ProductTargetExtensionTests(unittest.TestCase):
         ''')
 
 
+    def test_published_pattern_groups_preserve_weights_settings_and_explicit_routes(self):
+        self.lua.execute(r'''
+          local cases={
+            {'research_explosives',10,'bio-explosives',.1,'item'},
+            {'research_mining_drill',40,'kr-quarry-drill',.1,'item'},
+            {'research_bullets',10,'tungsten-rifle-magazine',.01,'ammo'},
+            {'research_heavy_ammo',10,'kr-antimatter-artillery-shell',.01,'ammo'},
+            {'research_rockets',10,'plutonium-heavy-bomb',.01,'ammo'},
+            {'research_belts',10,'kr-fast-loader',.05,'item'},
+            {'research_belts',10,'kr-express-loader',.02,'item'},
+            {'research_belts',10,'custom-hyper-loader',.005,'item'},
+            {'research_inserters',10,'custom-bulk-inserter',.02,'item'},
+            {'research_inserters',10,'custom-stack-inserter',.01,'item'},
+            {'research_armor_components',10,'titanium-armour-plating',.05,'item'},
+            {'research_armor_components',10,'armor-plate-heavy',.02,'item'},
+            {'research_artificial_soil',10,'artificial-new-soil',.1,'item'},
+            {'research_artificial_soil',10,'overgrowth-new-soil',.05,'item'},
+          }
+          for _,case in ipairs(cases) do
+            local family,percent,name,expected,kind=table.unpack(case)
+            local row=generated(family, {productivity('known',.33)})
+            local raw=raw_with_recipes({producer=recipe({}, {product('item',name)}),
+              fluid=recipe({}, {product('fluid',name)}),
+              hidden=recipe({}, {product('item',name)}, {hidden=true})})
+            raw[kind]={[name]={}}
+            local result=extension.extend({row}, {streams={[family]={effect_percent=percent}}}, {
+              raw=raw, mods={['space-age']='2.1.23'}})
+            assert(result.extended_effects == 1 and #row.effects == 2, family .. ':' .. name)
+            assert(row.effects[1].change == .33 and row.effects[2].recipe == 'producer')
+            assert(math.abs(row.effects[2].change-expected) < 1e-12, family .. ':' .. name)
+            assert(result.work.items == 1 and result.work.recipes == 3)
+          end
+        ''')
+
+    def test_inactive_space_age_and_literal_families_do_not_read_pattern_classes(self):
+        self.lua.execute(r'''
+          local source=raw_with_recipes({gear=recipe({}, {product('item','iron-gear-wheel')})})
+          setmetatable(source, {__index=function(_,key) error('unexpected item class read: ' .. key) end})
+          local gear=generated('research_gears', {productivity('known',.1)})
+          local soil=generated('research_artificial_soil', {productivity('known-soil',.1)})
+          local result=extension.extend({gear,soil}, {effect_percent=10,
+            streams={research_artificial_soil={effect_percent=10}}}, {raw=source, mods={}})
+          assert(result.extended_effects == 1 and result.work.items == 0)
+          assert(#soil.effects == 1)
+        ''')
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lua-runtime-dir", type=Path, required=True)

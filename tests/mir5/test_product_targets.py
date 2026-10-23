@@ -205,6 +205,67 @@ class ProductTargetTests(unittest.TestCase):
           assert(result.work.products == 1 and result.work.recipes == 1)
         ''')
 
+    def test_patterns_resolve_native_item_classes_once_with_typed_and_group_precedence(self):
+        self.lua.execute(r'''
+          local reads = 0
+          local items = {['common-drill']={}, ['custom-drill']={}, other={}}
+          setmetatable(items, {__pairs=function(value) reads=reads+1; return next,value,nil end})
+          local raw = {item=items, ammo={['special-shell']={}}, fluid={['fluid-drill']={}}}
+          local rules = {
+            binding('drills',1,{{type='item',name='common-drill'}}),
+            binding('drills',.25,{}, {item_patterns={'%-drill$'}}),
+            binding('ammo',.1,{}, {item_patterns={'%-shell$'}}),
+          }
+          local before = frozen_copy(rules)
+          local context = targets.prepare(rules, {raw=raw})
+          assert(reads == 1 and context.items == 4 and context.pattern_tests == 8)
+          local recipes = {
+            mixed=recipe({}, {product('item','custom-drill'), product('item','common-drill')}),
+            custom=recipe({}, {product('item','custom-drill')}),
+            ammo=recipe({}, {product('item','special-shell')}),
+            wrong_type=recipe({}, {product('fluid','custom-drill')}),
+            nonexistent=recipe({}, {product('item','absent-drill')}),
+            fluid_only=recipe({}, {product('fluid','fluid-drill')}),
+          }
+          local result = targets.collect(recipes, context)
+          assert(target_names(result.targets) == 'ammo:ammo:item:special-shell:0.1,'
+            .. 'drills:custom:item:custom-drill:0.25,drills:mixed:item:common-drill:1')
+          assert(reads == 1 and result.work.products == 7 and result.work.items == 4)
+          assert(frozen_copy(rules) == before)
+          rules[2].item_patterns[1]='other'
+          raw.item['late-drill']={}
+          assert(context.items == 4 and #context.rules[2].products == 2)
+        ''')
+
+    def test_literal_rules_never_read_native_item_classes_and_invalid_patterns_fail_before_scan(self):
+        self.lua.execute(r'''
+          local raw=setmetatable({}, {__index=function() error('unexpected native class read') end})
+          local context=targets.prepare({binding('literal',1,{{name='x'}})}, {raw=raw})
+          assert(context.items == 0 and context.pattern_tests == 0)
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {item_patterns={'['}})}, {raw=raw}) end))
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {item_patterns={[2]='x'}})}, {raw=raw}) end))
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {item_patterns={'x'}})}) end))
+          assert(not pcall(function() targets.prepare({binding('bad',1,{})}, {raw=raw}) end))
+        ''')
+
+    def test_patterns_expand_insertion_independently_and_keep_one_product_pass(self):
+        self.lua.execute(r'''
+          local function run(reverse)
+            local items={}
+            if reverse then items['z-part']={}; items['a-part']={}
+            else items['a-part']={}; items['z-part']={} end
+            local recipes={}
+            for index=1,300 do recipes[tostring(index)]=recipe({}, {product('item','z-part')}) end
+            local result=targets.collect(recipes, targets.prepare({
+              binding('parts',.1,{}, {item_patterns={'%-part$'}})
+            }, {raw={item=items}}))
+            assert(result.work.items == 2 and result.work.pattern_tests == 2)
+            assert(result.work.recipes == 300 and result.work.products == 300)
+            return target_names(result.targets)
+          end
+          assert(run(false) == run(true))
+        ''')
+
     def test_prepare_rejects_ambiguous_or_sparse_authored_bindings(self):
         self.lua.execute(r'''
           assert(not pcall(function() targets.prepare({binding("x", 0, {{type="item", name="x"}})}) end))

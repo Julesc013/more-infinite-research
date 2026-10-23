@@ -5,6 +5,12 @@ local M = {}
 local target = require("platform.target")
 
 local SEPARATOR = "\0"
+local item_types = {
+  "item", "tool", "mining-tool", "module", "ammo", "capsule", "gun", "armor", "repair-tool",
+  "item-with-entity-data", "item-with-inventory", "item-with-label", "item-with-tags",
+  "selection-tool", "copy-paste-tool", "blueprint", "blueprint-book", "deconstruction-item",
+  "upgrade-item", "spidertron-remote", "rail-planner", "space-platform-starter-pack"
+}
 
 local function finite(value)
   return type(value) == "number" and value == value
@@ -56,9 +62,9 @@ local function copy_rule(rule, ordinal)
   if not finite(rule.weight) or rule.weight <= 0 then
     error("MIR product targets requires a positive finite binding weight", 3)
   end
-  dense_array(rule.products, "binding products")
+  dense_array(rule.products or {}, "binding products")
   local products, seen = {}, {}
-  for _, product in ipairs(rule.products) do
+  for _, product in ipairs(rule.products or {}) do
     local identity = product_identity(product)
     if not identity or seen[identity] then
       error("MIR product targets requires unique typed binding products", 3)
@@ -66,8 +72,6 @@ local function copy_rule(rule, ordinal)
     seen[identity] = true
     products[#products + 1] = identity
   end
-  if #products == 0 then error("MIR product targets requires at least one binding product", 3) end
-
   local function patterns(field)
     if rule[field] == nil then return nil end
     dense_array(rule[field], "binding " .. field)
@@ -83,6 +87,11 @@ local function copy_rule(rule, ordinal)
     return out
   end
 
+  local item_patterns = patterns("item_patterns")
+  if #products == 0 and (item_patterns == nil or #item_patterns == 0) then
+    error("MIR product targets requires at least one binding product or item pattern", 3)
+  end
+
   for _, field in ipairs({"include_hidden", "include_recycling", "allow_shared_input_output",
     "reject_explicit_productivity_denial"}) do
     if rule[field] ~= nil and type(rule[field]) ~= "boolean" then
@@ -94,6 +103,7 @@ local function copy_rule(rule, ordinal)
     weight = rule.weight,
     ordinal = ordinal,
     products = products,
+    item_patterns = item_patterns,
     exclude_recipe_patterns = patterns("exclude_recipe_patterns"),
     exclude_ingredient_patterns = patterns("exclude_ingredient_patterns"),
     include_hidden = rule.include_hidden == true,
@@ -121,9 +131,46 @@ function M.prepare(bindings, options)
     error("MIR product targets has invalid options", 2)
   end
   local interested, rules = {}, {}
+  local pattern_rules = {}
   for ordinal, binding in ipairs(bindings) do
     local rule = copy_rule(binding, ordinal)
     rules[#rules + 1] = rule
+    if rule.item_patterns and #rule.item_patterns > 0 then pattern_rules[#pattern_rules + 1] = rule end
+  end
+
+  -- Resolve the retained finite item patterns once into the same typed
+  -- product index. Never run a pattern search across recipes per family.
+  -- No item class is read when the selected bindings are all literal.
+  local item_count, pattern_tests = 0, 0
+  if #pattern_rules > 0 then
+    if type(options.raw) ~= "table" then error("MIR item pattern targets requires native prototypes", 2) end
+    local seen = {}
+    for _, rule in ipairs(pattern_rules) do
+      seen[rule.ordinal] = {}
+      for _, identity in ipairs(rule.products) do seen[rule.ordinal][identity] = true end
+    end
+    for _, kind in ipairs(item_types) do
+      for name, prototype in pairs(options.raw[kind] or {}) do
+        item_count = item_count + 1
+        if type(name) == "string" and name ~= "" and type(prototype) == "table" then
+          local identity = typed_identity("item", name)
+          for _, rule in ipairs(pattern_rules) do
+            if not seen[rule.ordinal][identity] then
+              for _, pattern in ipairs(rule.item_patterns) do
+                pattern_tests = pattern_tests + 1
+                if string.find(name, pattern) then
+                  rule.products[#rule.products + 1] = identity
+                  seen[rule.ordinal][identity] = true
+                  break
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  for _, rule in ipairs(rules) do
     for _, identity in ipairs(rule.products) do
       local rows = interested[identity]
       if rows == nil then rows = {}; interested[identity] = rows end
@@ -134,6 +181,8 @@ function M.prepare(bindings, options)
     schema = 1,
     interested = interested,
     rules = rules,
+    items = item_count,
+    pattern_tests = pattern_tests,
     probability_field = probability_field,
     productivity_ignores_stats = productivity_ignores_stats == true,
   }
@@ -314,7 +363,8 @@ function M.collect(recipes, context)
     if type(name) == "string" and name ~= "" then names[#names + 1] = name end
   end
   table.sort(names)
-  local work = {recipes = 0, products = 0, ingredients = 0, matches = 0}
+  local work = {recipes = 0, products = 0, ingredients = 0, matches = 0,
+    items = context.items, pattern_tests = context.pattern_tests}
   local targets, by_family = {}, {}
   for _, recipe_name in ipairs(names) do
     work.recipes = work.recipes + 1

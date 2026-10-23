@@ -49,7 +49,7 @@ function M.extend(technologies, values, context)
   if #rules == 0 then return report end
 
   local collector = require("compatibility.product_targets")
-  local result = collector.collect(context.raw.recipe, collector.prepare(rules))
+  local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}))
   report.work = result.work
   report.work.modules = module_count
   for family, rows in pairs(result.by_family) do
