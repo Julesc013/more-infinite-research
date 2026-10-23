@@ -1,0 +1,79 @@
+{
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "flib",
+      "version": "0.17.2",
+      "enabled": true
+    },
+    {
+      "name": "k2so-assets",
+      "version": "1.0.7",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2",
+      "version": "2.1.4",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2-spaced-out",
+      "version": "2.0.19",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2Assets",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "Krastorio2MenuSimulations",
+      "version": "2.1.0",
+      "enabled": true
+    },
+    {
+      "name": "xy-k2so-enhancements-nulls-fork",
+      "version": "0.8.3",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-worker-caps",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ]
+}
