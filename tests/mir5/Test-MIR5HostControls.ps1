@@ -11,6 +11,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_generator.py';lua=$true},
   [ordered]@{path='tests/mir5/test_historical_direct.py';lua=$true},
   [ordered]@{path='tests/mir5/test_historical_continuations.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_historical_native_runner.py';lua=$true},
   [ordered]@{path='tests/mir5/test_modern_targets.py';lua=$true},
   [ordered]@{path='tests/mir5/test_science.py';lua=$true},
   [ordered]@{path='tests/mir5/test_product_targets.py';lua=$true},
