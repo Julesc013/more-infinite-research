@@ -17,6 +17,8 @@ spec.loader.exec_module(pack)
 class PackageTests(unittest.TestCase):
     def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
         source = ROOT / "source/mir5"
+        published = json.loads((ROOT / "spec/mir5/inventory/target-load-order-470.json").read_text())
+        dependencies = {row["target"]: row["dependencies"] for row in published["records"]}
         for target, family, minimum in [
             ("f013", "0.13", "0.13.20"), ("f014", "0.14", "0.14.23"),
             ("f015", "0.15", "0.15.40"), ("f016", "0.16", "0.16.51"),
@@ -27,7 +29,8 @@ class PackageTests(unittest.TestCase):
                 info, rows = pack.members(source, target=target)
                 files = dict(rows)
                 self.assertEqual(info["factorio_version"], family)
-                self.assertEqual(info["dependencies"], ["base >= " + minimum])
+                self.assertEqual(info["dependencies"], dependencies[target])
+                self.assertEqual(info["dependencies"][0], "base >= " + minimum)
                 self.assertEqual(info["version"], "5.0." + target[1:] + "00")
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
                 self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])

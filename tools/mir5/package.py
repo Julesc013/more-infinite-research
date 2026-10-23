@@ -92,8 +92,13 @@ def select_edition(files, info, target, editions):
     info["version"] = major + "." + minor + "." + str(int(target[1:]) * 100 + int(encoded) % 100).zfill(5)
     info["factorio_version"] = selected["factorio_version"]
     dependencies = info.get("dependencies", [])
-    info["dependencies"] = ["base >= " + selected["minimum_base"]] + [
-        item for item in dependencies if not re.match(r"^\s*base(?:\s|[<>=!]|$)", item)]
+    extras = [item for item in dependencies if not re.match(r"^\s*base(?:\s|[<>=!]|$)", item)]
+    # Reduced published editions have no optional integration ordering. The
+    # 2.0 target retains its own DLC minima and lacks the 2.1 K2SO adapter.
+    extras = [] if selected["reduced"] else selected.get("optional_dependencies", extras)
+    if not isinstance(extras, list) or any(not isinstance(item, str) for item in extras):
+        raise ValueError("Invalid target dependency metadata")
+    info["dependencies"] = ["base >= " + selected["minimum_base"]] + extras
     metadata = {key: selected[key] for key in (
         "factorio_version", "minimum_base", "reduced", "research_levels", "recipe_productivity",
         "recipe_probability", "productivity_ignores_stats", "receiver_limits", "cargo_research")}
