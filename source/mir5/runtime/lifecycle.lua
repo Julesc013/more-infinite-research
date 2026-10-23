@@ -66,7 +66,11 @@ for index = 1, #DECLARATIONS do
   ORDERED_DECLARATIONS[#ORDERED_DECLARATIONS + 1] = row
   DECLARATION_BY_ID[row.id] = row
   if row.enabled and row.limit > 0 then CAPS_ACTIVE = true end
-  if row.ownership_kind == "nativeowner" then NATIVE_OWNER_BY_ID[row.id] = row
+  if row.ownership_kind == "nativeowner" then
+    if type(values.configured) == "table" and values.configured.effect_percent == true then
+      row.configured_effect_change = values.effect_percent / 100
+    end
+    NATIVE_OWNER_BY_ID[row.id] = row
   elseif row.enabled then
     STATIC_LIMITS[row.id] = row.limit
   end
@@ -124,7 +128,7 @@ end
 local function native_owner_admitted(force, row)
   return valid_force(force) and cap_admission.admits_native_owner(function(name)
     return force.technologies and force.technologies[name] or nil
-  end, row.declaration)
+  end, row.declaration, row.configured_effect_change)
 end
 
 local function full_limits_for(force, include_worker, selected_owner, owner_resolved)

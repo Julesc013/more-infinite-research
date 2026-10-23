@@ -349,6 +349,235 @@ class GeneratorTests(unittest.TestCase):
           assert(#space_declared == 76 and owners == 5)
         ''')
 
+    def test_native_owner_settings_keep_zero_time_as_native_inherit_only_for_active_owners(self):
+        self.lua.execute('''
+          local function startup_for(configuration)
+            local startup = {}
+            for _, spec in ipairs(configuration.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+            return startup
+          end
+
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          local space_settings = require("research.settings")
+          local startup = startup_for(space_settings)
+          startup["ips-research-time-research_low_density_structure"].value = 0
+          local space = space_settings.resolve(startup)
+          local owner = space.streams.research_low_density_structure
+          assert(owner.research_time == 0 and owner.configured.research_time,
+            "Space Age native owner lost its documented inherit sentinel")
+
+          mods = {}
+          package.loaded["research.settings"] = nil
+          local base_settings = require("research.settings")
+          startup = startup_for(base_settings)
+          startup["ips-research-time-research_low_density_structure"].value = 0
+          local base = base_settings.resolve(startup)
+          assert(base.streams.research_low_density_structure.research_time == 60
+            and base.streams.research_low_density_structure.configured.research_time,
+            "ordinary emitted research changed the zero-time meaning")
+        ''')
+
+    def test_native_owner_patches_are_atomic_profile_bound_and_preserve_unowned_fields(self):
+        self.lua.execute('''
+          local function owner_fixture(definitions)
+            local owners = {}
+            for _, definition in ipairs(definitions) do
+              local effects = {{type = "foreign-effect", recipe = "foreign", change = 7}}
+              for _, recipe in ipairs(definition.admission.recipes) do
+                effects[#effects + 1] = {type = definition.admission.effect_type, recipe = recipe,
+                  change = definition.expected.effect_change}
+              end
+              owners[definition.id] = {name = definition.id, max_level = definition.expected.max_level,
+                unit = {count_formula = definition.expected.count_formula, time = definition.expected.research_time,
+                  ingredients = {{"foreign-science", 1}}, foreign_unit_field = "preserve"},
+                effects = effects, foreign_top_level_field = "preserve"}
+            end
+            return owners
+          end
+          local function owner_values(definitions)
+            local values = {streams = {}}
+            for _, definition in ipairs(definitions) do
+              values.streams[definition.family] = {enabled = true, base_cost = definition.expected.base_cost,
+                linear_increment = definition.expected.linear_increment, growth_factor = definition.expected.growth_factor,
+                research_time = definition.expected.research_time, effect_percent = definition.expected.effect_change * 100,
+                configured = {}}
+            end
+            return values
+          end
+          local function assert_named_changes(owner, definition, value)
+            assert(owner.foreign_top_level_field == "preserve" and owner.unit.foreign_unit_field == "preserve")
+            assert(owner.effects[1].type == "foreign-effect" and owner.effects[1].change == 7)
+            local named = {}
+            for _, effect in ipairs(owner.effects) do named[effect.recipe] = effect end
+            for _, recipe in ipairs(definition.admission.recipes) do
+              assert(named[recipe].change == value)
+            end
+          end
+
+          local space = modern_catalogue.select({['space-age'] = '2.1.23'})
+          local owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          for _, definition in ipairs(space.native_owners) do
+            values.streams[definition.family].effect_percent = 20
+            values.streams[definition.family].configured.effect_percent = true
+          end
+          local first = space.native_owners[1]
+          values.streams[first.family].base_cost = 200
+          values.streams[first.family].linear_increment = 3
+          values.streams[first.family].growth_factor = 2
+          values.streams[first.family].research_time = 0
+          values.streams[first.family].configured.base_cost = true
+          values.streams[first.family].configured.linear_increment = true
+          values.streams[first.family].configured.research_time = true
+          values.streams[first.family].max_level = 7
+          values.streams[first.family].configured.max_level = true
+          local second = space.native_owners[2]
+          values.streams[second.family].research_time = 123
+          values.streams[second.family].configured.research_time = true
+          local original_unit, original_effects = owners[first.id].unit, owners[first.id].effects
+          local patches = modern.preflight_native_owner_patches(space, {technology = owners}, values)
+          assert(#patches == 5 and owners[first.id].unit == original_unit and owners[first.id].effects == original_effects)
+          modern.apply_native_owner_patches(patches)
+          assert(owners[first.id].unit.count_formula == "(200+3*(L-1))*2^(L-1)"
+            and owners[first.id].unit.time == 60 and owners[first.id].unit ~= original_unit
+            and owners[first.id].max_level == "infinite")
+          assert(owners[second.id].unit.time == 123, "positive owner research time was not applied")
+          for _, definition in ipairs(space.native_owners) do assert_named_changes(owners[definition.id], definition, .2) end
+
+          -- Every selected patch is checked before any owner table is changed.
+          owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          for _, definition in ipairs(space.native_owners) do
+            values.streams[definition.family].configured.effect_percent = true
+            values.streams[definition.family].effect_percent = 20
+          end
+          owners[space.native_owners[2].id].effects[2].change = .2
+          local ok, message = pcall(modern.preflight_native_owner_patches, space, {technology = owners}, values)
+          assert(not ok and tostring(message):find("unexpected effect change", 1, true), tostring(message))
+          assert(owners[space.native_owners[1].id].effects[2].change == .1,
+            "a later malformed owner allowed an earlier patch")
+
+          -- Disabling an owner preserves the established owner even when a
+          -- stale non-default setting value is also present.
+          owners, values = owner_fixture(space.native_owners), owner_values(space.native_owners)
+          values.streams[first.family].enabled = false
+          values.streams[first.family].effect_percent = 20
+          values.streams[first.family].configured.effect_percent = true
+          owners[first.id].unit.count_formula = "foreign-owner-formula"
+          patches = modern.preflight_native_owner_patches(space, {technology = owners}, values)
+          assert(#patches == 0 and owners[first.id].unit.count_formula == "foreign-owner-formula")
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          local k2 = modern_catalogue.select(k2mods)
+          owners, values = owner_fixture(k2.native_owners), owner_values(k2.native_owners)
+          for _, definition in ipairs(k2.native_owners) do
+            values.streams[definition.family].effect_percent = 25
+            values.streams[definition.family].configured.effect_percent = true
+          end
+          modern.apply_native_owner_patches(modern.preflight_native_owner_patches(k2, {technology = owners}, values))
+          assert(#k2.native_owners == 4 and owners["steel-plate-productivity"] == nil)
+          for _, definition in ipairs(k2.native_owners) do assert_named_changes(owners[definition.id], definition, .25) end
+        ''')
+
+    def test_data_final_preflights_nondefault_native_owners_before_emitting(self):
+        self.lua.execute('''
+          local function add_native_owners(environment, definitions)
+            for _, definition in ipairs(definitions) do
+              local effects = {}
+              for _, recipe in ipairs(definition.admission.recipes) do
+                effects[#effects + 1] = {type = definition.admission.effect_type, recipe = recipe,
+                  change = definition.expected.effect_change}
+              end
+              environment.raw.technology[definition.id] = {max_level = definition.expected.max_level,
+                unit = {count_formula = definition.expected.count_formula, time = definition.expected.research_time}, effects = effects}
+            end
+          end
+          mods = {['space-age'] = '2.1.23'}
+          package.loaded["research.settings"] = nil
+          local space_settings = require("research.settings")
+          local startup, selected = {}, modern_catalogue.select(mods)
+          for _, spec in ipairs(space_settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          startup["ips-effect-per-level-research_low_density_structure"].value = 20
+          startup["ips-effect-per-level-research_plastic"].value = 20
+          local environment = full_world(mods)
+          add_native_owners(environment, selected.native_owners)
+          environment.raw.technology["plastic-bar-productivity"].effects[1].change = .2
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          local ok, message = pcall(dofile, data_final_path)
+          assert(not ok and tostring(message):find("native-owner preflight", 1, true), tostring(message))
+          assert(environment.writes == 0, "native-owner failure emitted technologies")
+          assert(environment.raw.technology["low-density-structure-productivity"].effects[1].change == .1,
+            "native-owner failure applied an earlier owner patch")
+        ''')
+
+    def test_weapon_speed_overlap_requires_an_enabled_positive_direct_replacement(self):
+        self.lua.execute('''
+          local function outputs(value, enabled)
+            local direct = {name = "recipe-prod-direct-1",
+              effects = {{type = "gun-speed", ammo_category = "bullet", modifier = value}}}
+            if not enabled then direct.enabled = false end
+            return {
+              direct,
+              {name = "weapon-shooting-speed-7", effects = {
+                {type = "gun-speed", ammo_category = "bullet", modifier = .4},
+                {type = "gun-speed", ammo_category = "shotgun-shell", modifier = .4},
+                {type = "laboratory-speed", modifier = .1},
+              }},
+            }
+          end
+          local selection = {definitions = {{key = "direct", family = "research_cannon_shooting_speed"}}}
+          local function values(mode, enabled)
+            return {options = {["mir-adjust-vanilla-weapon-speed-techs"] = mode},
+              streams = {research_cannon_shooting_speed = {enabled = enabled}}}
+          end
+          local rows = outputs(.1, true)
+          modern.apply_weapon_speed_overlap(selection, rows, values("off", true))
+          assert(#rows[2].effects == 3)
+          for _, mode in ipairs({"only-when-dedicated-tech-enabled", "always"}) do
+            rows = outputs(.1, true)
+            modern.apply_weapon_speed_overlap(selection, rows, values(mode, true))
+            assert(#rows[2].effects == 2 and rows[2].effects[1].ammo_category == "shotgun-shell"
+              and rows[2].effects[2].type == "laboratory-speed")
+          end
+          rows = outputs(.1, false)
+          modern.apply_weapon_speed_overlap(selection, rows, values("always", false))
+          assert(#rows[2].effects == 3, "always removed a paid effect without an enabled owner")
+          rows = outputs(0, true)
+          modern.apply_weapon_speed_overlap(selection, rows, values("only-when-dedicated-tech-enabled", true))
+          assert(#rows[2].effects == 3, "zero direct effect removed a paid effect")
+
+          -- The captured defaults have no overlapping direct category, so the
+          -- policy is inert for the exact published Base output.
+          local selected = modern_catalogue.select({})
+          local generated = modern.technologies(selected, config.resolve(defaults()))
+          modern.apply_weapon_speed_overlap(selected, generated, config.resolve(defaults()))
+          for _, technology in ipairs(generated) do
+            if technology.name == "weapon-shooting-speed-7" then
+              assert(#technology.effects == 2 and technology.effects[1].ammo_category == "bullet"
+                and technology.effects[2].ammo_category == "shotgun-shell")
+            end
+          end
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          mods = k2mods
+          package.loaded["research.settings"] = nil
+          local k2settings, startup = require("research.settings"), {}
+          for _, spec in ipairs(k2settings.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          selected = modern_catalogue.select(k2mods)
+          generated = modern.technologies(selected, k2settings.resolve(startup))
+          modern.apply_weapon_speed_overlap(selected, generated, k2settings.resolve(startup))
+          for _, technology in ipairs(generated) do
+            if technology.name == "weapon-shooting-speed-7" then
+              assert(#technology.effects == 7 and technology.effects[1].ammo_category == "bullet"
+                and technology.effects[7].ammo_category == "kr-heavy-rocket",
+                "unexpected K2 weapon continuation: " .. #technology.effects .. ":"
+                  .. tostring(technology.effects[1].ammo_category) .. ":"
+                  .. tostring(technology.effects[#technology.effects].ammo_category))
+            end
+          end
+        ''')
+
     def test_k2so_catalogue_keeps_exact_imersite_stages_and_owners_lazy(self):
         self.lua.execute('''
           local k2_body = "compatibility.modern_catalogue.k2so"

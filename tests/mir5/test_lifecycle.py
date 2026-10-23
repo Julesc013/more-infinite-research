@@ -113,6 +113,10 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["runtime.library"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.configuration"] = nil
+            -- Each boot models a fresh native control stage. Startup settings
+            -- capture that stage's mod profile; do not reuse a Base instance
+            -- while testing a subsequent K2 stage in the same host Lua VM.
+            package.loaded["research.settings"] = nil
             package.loaded["research.catalogue"] = nil
             control = require("control")
           end
@@ -237,6 +241,37 @@ class LifecycleTests(unittest.TestCase):
           local ok, message = pcall(require, "control")
           assert(not ok and tostring(message):find("MIR API interface collision", 1, true))
           assert(remote.interfaces["more-infinite-research.api.v1"] == foreign and not remote.removed)
+        ''')
+
+    def test_native_owner_custom_effect_tuning_keeps_caps_bound_to_current_values(self):
+        self.lua.execute('''
+          local name="low-density-structure-productivity"
+          local function candidate(change)
+            local owner=technology(name,3,true)
+            owner.prototype={max_level=4294967295,effects={
+              {type="change-recipe-productivity",recipe="low-density-structure",change=change},
+              {type="change-recipe-productivity",recipe="casting-low-density-structure",change=change}}}
+            local value=force(46,{[name]=owner},{},nil,nil)
+            owner.force=value
+            return value,owner
+          end
+          local current,owner=candidate(.2)
+          boot({[46]=current},0,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+            {["ips-max-level-research_low_density_structure"]=2,
+              ["ips-effect-per-level-research_low_density_structure"]=20})
+          handlers.init()
+          assert(not owner.enabled and storage.mir_caps.owned_disabled[46][name].disabled)
+          owner.level=2
+          handlers.events[7]({research=owner})
+          assert(owner.enabled and not owner.visible_when_disabled)
+
+          local foreign,unexpected=candidate(.1)
+          boot({[46]=foreign},0,"",nil,nil,0,{["space-age"]="2.1.23"},nil,
+            {["ips-max-level-research_low_density_structure"]=2,
+              ["ips-effect-per-level-research_low_density_structure"]=20})
+          handlers.init()
+          assert(unexpected.enabled and storage.mir_caps == nil,
+            "a stale default effect inherited configured owner cap rights")
         ''')
 
     def test_profile_cap_is_resolved_once_and_preserves_valid_current_progress(self):

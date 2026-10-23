@@ -238,6 +238,171 @@ function M.technologies(selection, values)
   return out
 end
 
+local function owner_error(definition, reason)
+  error("MIR native-owner preflight " .. definition.id .. ": " .. reason, 3)
+end
+
+local function configured(stream, field)
+  return type(stream.configured) == "table" and stream.configured[field] == true
+end
+
+local function planned_owner_change(stream)
+  if stream.enabled ~= true then return false end
+  return configured(stream, "base_cost") or configured(stream, "linear_increment")
+    or configured(stream, "growth_factor") or configured(stream, "effect_percent")
+    or (configured(stream, "research_time") and stream.research_time > 0)
+end
+
+local function named_owner_effects(owner, definition)
+  local expected, admission = definition.expected, definition.admission
+  if type(owner.effects) ~= "table" then owner_error(definition, "missing effects") end
+  local found = {}
+  for index = 1, #admission.recipes do found[admission.recipes[index]] = 0 end
+  for _, effect in ipairs(owner.effects) do
+    if effect.type == admission.effect_type and found[effect.recipe] ~= nil then
+      if effect.change ~= expected.effect_change then
+        owner_error(definition, "unexpected effect change for " .. effect.recipe)
+      end
+      found[effect.recipe] = found[effect.recipe] + 1
+    end
+  end
+  for index = 1, #admission.recipes do
+    local recipe = admission.recipes[index]
+    if found[recipe] ~= 1 then owner_error(definition, "missing or duplicate effect for " .. recipe) end
+  end
+end
+
+local function preflight_owner(owner, definition)
+  local expected = definition.expected
+  if type(owner) ~= "table" then owner_error(definition, "missing technology") end
+  if owner.enabled ~= expected.enabled then owner_error(definition, "unexpected enabled state") end
+  if owner.max_level ~= expected.max_level then owner_error(definition, "unexpected max level") end
+  if type(owner.unit) ~= "table" then owner_error(definition, "missing unit") end
+  if owner.unit.count ~= nil or owner.unit.count_formula ~= expected.count_formula then
+    owner_error(definition, "unexpected count formula")
+  end
+  if owner.unit.time ~= expected.research_time then owner_error(definition, "unexpected research time") end
+  named_owner_effects(owner, definition)
+end
+
+local function owner_unit_plan(owner, definition, stream)
+  local expected = definition.expected
+  local cost_changed = configured(stream, "base_cost") or configured(stream, "linear_increment")
+    or configured(stream, "growth_factor")
+  local time_changed = configured(stream, "research_time") and stream.research_time > 0
+  if not cost_changed and not time_changed then return nil end
+  local unit = copy(owner.unit)
+  if cost_changed then
+    -- Published native-owner binding treats the cost controls as one tuple:
+    -- when any member changes, all three effective setting values take over.
+    unit.count, unit.count_formula = nil,
+      productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+  end
+  if time_changed then unit.time = stream.research_time end
+  return unit
+end
+
+local function owner_effect_plan(owner, definition, stream)
+  if not configured(stream, "effect_percent") then return nil end
+  local effects, replacement = copy(owner.effects), stream.effect_percent / 100
+  local admitted = {}
+  for index = 1, #definition.admission.recipes do admitted[definition.admission.recipes[index]] = true end
+  for _, effect in ipairs(effects) do
+    if effect.type == definition.admission.effect_type and admitted[effect.recipe] then effect.change = replacement end
+  end
+  return effects
+end
+
+-- Native owners are established technology prototypes. This bounded path only
+-- plans changes for enabled, non-default streams, checks every owned field of
+-- each named owner before the first assignment, and leaves unrelated effects
+-- and unit fields in place.
+function M.preflight_native_owner_patches(selection, raw, values)
+  if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.technology) ~= "table" then
+    error("MIR native-owner preflight requires data.raw.technology", 2)
+  end
+  local patches = {}
+  for index = 1, #selection.native_owners do
+    local definition = selection.native_owners[index]
+    local stream = require_stream(values, definition.family)
+    if planned_owner_change(stream) then
+      local owner = raw.technology[definition.id]
+      preflight_owner(owner, definition)
+      patches[#patches + 1] = {
+        owner = owner,
+        unit = owner_unit_plan(owner, definition, stream),
+        effects = owner_effect_plan(owner, definition, stream),
+      }
+    end
+  end
+  return patches
+end
+
+function M.apply_native_owner_patches(patches)
+  if type(patches) ~= "table" then error("MIR native-owner patches are required", 2) end
+  for index = 1, #patches do
+    local patch = patches[index]
+    if patch.unit then patch.owner.unit = patch.unit end
+    if patch.effects then patch.owner.effects = patch.effects end
+  end
+end
+
+local weapon_speed_option = "mir-adjust-vanilla-weapon-speed-techs"
+local weapon_overlap_families = {
+  research_cannon_shooting_speed = true,
+  research_electric_shooting_speed = true,
+  research_flamethrower_shooting_speed = true,
+  research_rocket_shooting_speed = true,
+}
+
+local function positive_weapon_categories(selection, outputs, values)
+  local generated, categories = {}, {}
+  for index = 1, #outputs do generated[outputs[index].name] = outputs[index] end
+  for index = 1, #selection.definitions do
+    local definition = selection.definitions[index]
+    local stream = require_stream(values, definition.family)
+    local technology = generated["recipe-prod-" .. definition.key .. "-1"]
+    if weapon_overlap_families[definition.family] and stream.enabled == true and technology and technology.enabled ~= false then
+      for _, effect in ipairs(technology.effects) do
+        if effect.type == "gun-speed" and type(effect.ammo_category) == "string"
+          and finite(effect.modifier) and effect.modifier > 0 then
+          categories[effect.ammo_category] = true
+        end
+      end
+    end
+  end
+  return categories
+end
+
+-- This intentionally operates only on the one authored continuation we just
+-- constructed. It has no data.raw scan and never removes an existing paid
+-- category unless an enabled, positive direct MIR replacement is present.
+function M.apply_weapon_speed_overlap(selection, outputs, values)
+  local options = values and values.options or {}
+  local mode = options[weapon_speed_option]
+  if mode == nil then mode = "only-when-dedicated-tech-enabled" end
+  if mode == "off" then return end
+  if mode ~= "only-when-dedicated-tech-enabled" and mode ~= "always" then
+    error("MIR invalid weapon-speed overlap mode", 2)
+  end
+  local categories = positive_weapon_categories(selection, outputs, values)
+  if next(categories) == nil then return end
+  for index = 1, #outputs do
+    local technology = outputs[index]
+    if technology.name == "weapon-shooting-speed-7" then
+      local retained = {}
+      for effect_index = 1, #technology.effects do
+        local effect = technology.effects[effect_index]
+        if not (effect.type == "gun-speed" and categories[effect.ammo_category]) then
+          retained[#retained + 1] = effect
+        end
+      end
+      technology.effects = retained
+      return
+    end
+  end
+end
+
 function M.preflight_recipe_patches(selection, raw)
   if type(selection) ~= "table" or type(raw) ~= "table" or type(raw.recipe) ~= "table" then
     error("MIR modern recipe patch preflight requires data.raw.recipe", 2)

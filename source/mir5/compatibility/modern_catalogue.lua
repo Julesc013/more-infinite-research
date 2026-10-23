@@ -421,7 +421,8 @@ function M.select(active_mods)
     profile = "k2so-f210"
   end
   return {profile = profile, definitions = definitions, continuations = M.continuations(active_mods),
-    recipe_patches = recipe_patches, k2_imersite = k2so and k2so.imersite or false}
+    native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
+    k2_imersite = k2so and k2so.imersite or false}
 end
 
 -- Settings preserve their historical names across target selection. Space Age

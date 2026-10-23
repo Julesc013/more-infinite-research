@@ -1301,6 +1301,8 @@ return {
     {
       family = "research_low_density_structure",
       id = "low-density-structure-productivity",
+      expected = {enabled = nil, max_level = "infinite", count_formula = "1.5^L*1000", research_time = 60,
+        base_cost = 1500, growth_factor = 1.5, linear_increment = 0, effect_change = 0.1},
       admission = {
         recipes = {"low-density-structure", "casting-low-density-structure"},
         effect_type = "change-recipe-productivity",
@@ -1310,6 +1312,8 @@ return {
     {
       family = "research_plastic",
       id = "plastic-bar-productivity",
+      expected = {enabled = nil, max_level = "infinite", count_formula = "1.5^L*1000", research_time = 60,
+        base_cost = 1500, growth_factor = 1.5, linear_increment = 0, effect_change = 0.1},
       admission = {
         recipes = {"plastic-bar", "bioplastic"},
         effect_type = "change-recipe-productivity",
@@ -1319,6 +1323,8 @@ return {
     {
       family = "research_processing_unit",
       id = "processing-unit-productivity",
+      expected = {enabled = nil, max_level = "infinite", count_formula = "1.5^L*1000", research_time = 60,
+        base_cost = 1500, growth_factor = 1.5, linear_increment = 0, effect_change = 0.1},
       admission = {
         recipes = {"processing-unit"},
         effect_type = "change-recipe-productivity",
@@ -1328,6 +1334,8 @@ return {
     {
       family = "research_rocket_fuel",
       id = "rocket-fuel-productivity",
+      expected = {enabled = nil, max_level = "infinite", count_formula = "1.5^L*1000", research_time = 60,
+        base_cost = 1500, growth_factor = 1.5, linear_increment = 0, effect_change = 0.1},
       admission = {
         recipes = {"rocket-fuel", "rocket-fuel-from-jelly", "ammonia-rocket-fuel"},
         effect_type = "change-recipe-productivity",
@@ -1337,6 +1345,8 @@ return {
     {
       family = "research_steel",
       id = "steel-plate-productivity",
+      expected = {enabled = nil, max_level = "infinite", count_formula = "1.5^L*1000", research_time = 60,
+        base_cost = 1500, growth_factor = 1.5, linear_increment = 0, effect_change = 0.1},
       admission = {
         recipes = {"steel-plate", "casting-steel"},
         effect_type = "change-recipe-productivity",
