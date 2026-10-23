@@ -59,6 +59,60 @@ class LibraryModelTests(unittest.TestCase):
             and second_by_id["recipe-prod-research_gears-1"].settings[1] == "ips-enable-research_gears")
         ''')
 
+    def test_availability_is_small_authored_detached_and_checks_only_the_named_lab_owner(self):
+        self.lua.execute('''
+          local availability = require("presentation.availability")
+
+          local productivity_target = {recipe_productivity = true}
+          local base = availability.rows({}, productivity_target, nil, "")
+          assert(#base == 2
+            and base[1].family == "research_agricultural_growth_speed"
+            and base[2].family == "research_spoilage_preservation")
+          assert(base[1].status == "not-added" and base[1].reason == "requires-space-age"
+            and base[1].required_mod == "space-age" and base[1].technology_id == nil)
+          base[1].family, base[1].required_mod = "foreign", "foreign"
+          local fresh = availability.rows({}, productivity_target, nil, "")
+          assert(fresh[1].family == "research_agricultural_growth_speed"
+            and fresh[1].required_mod == "space-age")
+          local spoilage = availability.rows({}, productivity_target, nil, "spoilage-preservation")
+          assert(#spoilage == 1 and spoilage[1].family == "research_spoilage_preservation")
+
+          local product = {valid = true, prototype = {effects = {
+            {type = "laboratory-productivity", modifier = .10000000149}
+          }}}
+          local force = {
+            technologies = setmetatable({["research-productivity"] = product}, {
+              __pairs = function() error("availability scanned native technologies") end
+            })
+          }
+          local space_age = { ["space-age"] = "2.1.23" }
+          local native = availability.rows(space_age, productivity_target, force, "lab")
+          assert(#native == 1 and native[1].family == "research_lab_productivity"
+            and native[1].reason == "native-research-productivity"
+            and native[1].native_owner == "research-productivity"
+            and native[1].technology_id == nil)
+          assert(#availability.rows(space_age, productivity_target, force, "spoilage") == 0,
+            "active Space Age must not report its two absent-DLC explanations")
+
+          assert(#availability.rows({}, {recipe_productivity = false}, force, "") == 0,
+            "historical targets without recipe productivity must not advertise modern omissions")
+
+          product.prototype.effects[1].modifier = .1001
+          assert(#availability.rows(space_age, productivity_target, force, "") == 0,
+            "a changed named native effect must not invent the laboratory explanation")
+          product.prototype.effects = {{type = "laboratory-productivity", modifier = .1}, {type = "other", modifier = .1}}
+          assert(#availability.rows(space_age, productivity_target, force, "") == 0,
+            "the captured owner contract has exactly one effect")
+          force.technologies["research-productivity"] = nil
+          assert(#availability.rows(space_age, productivity_target, force, "") == 0,
+            "an absent named owner must not be inferred from the wider technology set")
+          force.technologies["research-productivity"] = setmetatable({}, {
+            __index = function() error("malformed named owner") end
+          })
+          assert(#availability.rows(space_age, productivity_target, force, "") == 0,
+            "a malformed named owner must not escape the bounded availability check")
+        ''')
+
     def test_normalize_preserves_schema_three_defaults_and_copies_view(self):
         self.lua.execute('''
           local hidden = {["recipe-prod-research_gears-1"] = true}
@@ -324,9 +378,13 @@ class LibraryModelTests(unittest.TestCase):
 
     def test_model_does_not_import_generator_or_touch_host_globals(self):
         source = (ROOT / "source/mir5/presentation/library_model.lua").read_text(encoding="utf-8")
+        availability = (ROOT / "source/mir5/presentation/availability.lua").read_text(encoding="utf-8")
         catalogue = (ROOT / "source/mir5/research/catalogue.lua").read_text(encoding="utf-8")
         self.assertNotIn("require(", source)
         self.assertNotIn("Generator", source)
+        self.assertNotIn("require(", availability)
+        for forbidden in ("game.", "storage.", "data.raw", "pairs(technologies)", "technology_id"):
+            self.assertNotIn(forbidden, availability)
         self.assertIn('require("compatibility.modern_catalogue")', catalogue)
         for forbidden in ('require("research.generator")', 'require("research.modern")',
                           'require("research.settings")', "data.raw", "game.", "storage."):
