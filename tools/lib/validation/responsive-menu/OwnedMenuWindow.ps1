@@ -43,6 +43,7 @@ function New-MIROwnedMenuObserverDiagnostics {
     client_geometry_unavailable=0
     offscreen=0
     occluded=0
+    last_occlusion=$null
     last_rejection=''
   }
 }
@@ -87,6 +88,30 @@ function Test-MIROwnedMenuWindowIconic {
 
 function Get-MIROwnedMenuForegroundHandle {
   return [MIROwnedMenuNative]::GetForegroundWindow()
+}
+
+function Get-MIROwnedMenuPointRoot {
+  param([Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y)
+  $probe = New-Object MIROwnedMenuNative+Point
+  $probe.X=$X; $probe.Y=$Y
+  $under=[MIROwnedMenuNative]::WindowFromPoint($probe)
+  return [MIROwnedMenuNative]::GetAncestor($under,2)
+}
+
+function Get-MIROwnedMenuOcclusion {
+  param([Parameter(Mandatory)][IntPtr]$Handle,[Parameter(Mandatory)][int]$X,[Parameter(Mandatory)][int]$Y,[Parameter(Mandatory)][int]$Width,[Parameter(Mandatory)][int]$Height)
+  $probeIndex=0
+  foreach ($offset in @(@(1,1),@(($Width-2),1),@(1,($Height-2)),@(($Width-2),($Height-2)),@([int]($Width/2),[int]($Height/2)))) {
+    $probeX=$X+$offset[0]; $probeY=$Y+$offset[1]
+    $root=Get-MIROwnedMenuPointRoot -X $probeX -Y $probeY
+    if ($root -ne $Handle) {
+      # Record only our own geometry and a hit-test category. Never collect
+      # foreign window identities, titles, text or pixels for this diagnostic.
+      return [ordered]@{probe_index=$probeIndex;probe_x=$probeX;probe_y=$probeY;owned_x=$X;owned_y=$Y;owned_width=$Width;owned_height=$Height;hit=$(if($root-eq[IntPtr]::Zero){'no-window'}else{'other-window'})}
+    }
+    $probeIndex++
+  }
+  return $null
 }
 
 function Set-MIROwnedMenuForegroundHandle {
@@ -144,11 +169,11 @@ function Get-MIROwnedMenuWindow {
   $screen = [Windows.Forms.SystemInformation]::VirtualScreen
   if ($point.X -lt $screen.Left -or $point.Y -lt $screen.Top -or $point.X + $width -gt $screen.Right -or $point.Y + $height -gt $screen.Bottom) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'offscreen'; return $null }
   # Reject covered capture regions, including a foreign always-on-top window.
-  foreach ($offset in @(@(1,1),@(($width-2),1),@(1,($height-2)),@(($width-2),($height-2)),@([int]($width/2),[int]($height/2)))) {
-    $probe = New-Object MIROwnedMenuNative+Point
-    $probe.X = $point.X + $offset[0]; $probe.Y = $point.Y + $offset[1]
-    $under = [MIROwnedMenuNative]::WindowFromPoint($probe)
-    if ([MIROwnedMenuNative]::GetAncestor($under, 2) -ne $handle) { Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'occluded'; return $null }
+  $occlusion=Get-MIROwnedMenuOcclusion -Handle $handle -X $point.X -Y $point.Y -Width $width -Height $height
+  if ($null-ne$occlusion) {
+    if ($null-ne$Diagnostics) { $Diagnostics.last_occlusion=$occlusion }
+    Add-MIROwnedMenuRejection -Diagnostics $Diagnostics -Name 'occluded'
+    return $null
   }
   [pscustomobject]@{process_id=$Process.Id;start_utc=$ExpectedStartUtc.ToString('o');handle=$handle.ToInt64();x=$point.X;y=$point.Y;width=$width;height=$height}
 }
