@@ -1,0 +1,7260 @@
+{
+  "schema": 1,
+  "kind": "mir5-f200-competing-epr-captured-facts",
+  "status": "developer-only-source-test-input",
+  "scope": "Exact F200 2.0.77 ExpandedProductivityResearch 1.3.8 upstream/published data-stage delta. The rows are a compact, hash-locked subset copied from the independent capture, not candidate MIR5 output. It establishes no MIR5 runtime, save, gameplay, or release qualification.",
+  "target": {
+    "id": "f200",
+    "factorio_version": "2.0",
+    "minimum_base": "2.0.77"
+  },
+  "profile": {
+    "path": "tests/mir5/profiles/competing-epr-f200-2077.json",
+    "sha256": "D53A27C78690B1592898E081160F0F74021E4BB66E35D1BC2B33E648D24C5B58"
+  },
+  "foreign_preference_profile": {
+    "path": "tests/mir5/profiles/competing-epr-foreign-f200-2077.json",
+    "sha256": "FA4017B0FDC1812C99AEAF2B49685ED00A2A5B4AE95B0AA277D187B6DCD33829"
+  },
+  "required_mods": {
+    "base": "2.0.77",
+    "ExpandedProductivityResearch": "1.3.8"
+  },
+  "published_reference": {
+    "archive": "more-infinite-research_4.7.20002.zip",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "captures": {
+    "upstream": {
+      "path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/upstream/write-data/script-output/data-raw-dump.json",
+      "sha256": "3CE178A6189DEA205EB6E4DBFD47510CDFFD219A4344728233786EF1D9E0B9E2",
+      "mod_settings_path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/upstream/write-data/script-output/mod-settings-dump.json",
+      "mod_settings_sha256": "DD1948F8854069CF42B459B57FF4263B5CC23B6DAA8B0B54AC17C1AB24F0C309"
+    },
+    "published": {
+      "path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/published/write-data/script-output/data-raw-dump.json",
+      "sha256": "6DD75B093463FA821106A31597D800577CB6EF14581F5F2382A630C82D7DF08F",
+      "mod_settings_path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/published/write-data/script-output/mod-settings-dump.json",
+      "mod_settings_sha256": "B304375A71887C64BE00457A4DF9C601AB6113CF5CE283B81251660423929BA2"
+    },
+    "foreign": {
+      "path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/foreign/write-data/script-output/data-raw-dump.json",
+      "sha256": "E84E5D05C7022A8010E0353E9FB5FDD315DD8EEDF0D459E7E3D9774747A67405",
+      "mod_settings_path": "build/mir5/black-glass/incoming/39999658774/black-glass-competing-epr-reference-39999658774-1/capture/foreign/write-data/script-output/mod-settings-dump.json",
+      "mod_settings_sha256": "98DCA0A8E396E9B06699BB4590D2BCF7B9D90DB0A9D8DAEDE3CE9149D10E3450"
+    }
+  },
+  "captured_settings": {
+    "published_prefer_mir": true,
+    "foreign_prefer_mir": false
+  },
+  "transition": {
+    "upstream_epr_technology_count": 163,
+    "published_epr_technology_count": 133,
+    "foreign_epr_technology_count": 163,
+    "removed_epr_infinite_tail_count": 30,
+    "published_technology_addition_count": 54,
+    "retained_epr_infinite_tail_names": [
+      "epr_barrel-productivity-5",
+      "epr_nuclear-fuel-productivity-3",
+      "epr_rocket-part-productivity-2",
+      "epr_solid-fuel-productivity-5",
+      "epr_uranium-235-productivity-4",
+      "epr_uranium-fuel-cell-productivity-4"
+    ]
+  },
+  "removed_epr_tails": [
+    {
+      "type": "technology",
+      "name": "epr_advanced-circuit-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/advanced-circuit.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-circuit",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_advanced-circuit-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.advanced-circuit"
+          ],
+          [
+            "fluid-name.advanced-circuit"
+          ],
+          [
+            "entity-name.advanced-circuit"
+          ],
+          [
+            "equipment-name.advanced-circuit"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.advanced-circuit"
+          ],
+          [
+            "fluid-name.advanced-circuit"
+          ],
+          [
+            "entity-name.advanced-circuit"
+          ],
+          [
+            "equipment-name.advanced-circuit"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_automation-science-pack-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/automation-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "automation-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_automation-science-pack-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.automation-science-pack"
+          ],
+          [
+            "fluid-name.automation-science-pack"
+          ],
+          [
+            "entity-name.automation-science-pack"
+          ],
+          [
+            "equipment-name.automation-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.automation-science-pack"
+          ],
+          [
+            "fluid-name.automation-science-pack"
+          ],
+          [
+            "entity-name.automation-science-pack"
+          ],
+          [
+            "equipment-name.automation-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_battery-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/battery.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "battery",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_battery-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.battery"
+          ],
+          [
+            "fluid-name.battery"
+          ],
+          [
+            "entity-name.battery"
+          ],
+          [
+            "equipment-name.battery"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.battery"
+          ],
+          [
+            "fluid-name.battery"
+          ],
+          [
+            "entity-name.battery"
+          ],
+          [
+            "equipment-name.battery"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_chemical-science-pack-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/chemical-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "chemical-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_chemical-science-pack-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.chemical-science-pack"
+          ],
+          [
+            "fluid-name.chemical-science-pack"
+          ],
+          [
+            "entity-name.chemical-science-pack"
+          ],
+          [
+            "equipment-name.chemical-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.chemical-science-pack"
+          ],
+          [
+            "fluid-name.chemical-science-pack"
+          ],
+          [
+            "entity-name.chemical-science-pack"
+          ],
+          [
+            "equipment-name.chemical-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_copper-cable-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/copper-cable.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-cable",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_copper-cable-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.copper-cable"
+          ],
+          [
+            "fluid-name.copper-cable"
+          ],
+          [
+            "entity-name.copper-cable"
+          ],
+          [
+            "equipment-name.copper-cable"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.copper-cable"
+          ],
+          [
+            "fluid-name.copper-cable"
+          ],
+          [
+            "entity-name.copper-cable"
+          ],
+          [
+            "equipment-name.copper-cable"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_copper-plate-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/copper-plate.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-plate",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_copper-plate-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.copper-plate"
+          ],
+          [
+            "fluid-name.copper-plate"
+          ],
+          [
+            "entity-name.copper-plate"
+          ],
+          [
+            "equipment-name.copper-plate"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.copper-plate"
+          ],
+          [
+            "fluid-name.copper-plate"
+          ],
+          [
+            "entity-name.copper-plate"
+          ],
+          [
+            "equipment-name.copper-plate"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_electric-engine-unit-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/electric-engine-unit.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electric-engine-unit",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_electric-engine-unit-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.electric-engine-unit"
+          ],
+          [
+            "fluid-name.electric-engine-unit"
+          ],
+          [
+            "entity-name.electric-engine-unit"
+          ],
+          [
+            "equipment-name.electric-engine-unit"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.electric-engine-unit"
+          ],
+          [
+            "fluid-name.electric-engine-unit"
+          ],
+          [
+            "entity-name.electric-engine-unit"
+          ],
+          [
+            "equipment-name.electric-engine-unit"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_electronic-circuit-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/electronic-circuit.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electronic-circuit",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_electronic-circuit-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.electronic-circuit"
+          ],
+          [
+            "fluid-name.electronic-circuit"
+          ],
+          [
+            "entity-name.electronic-circuit"
+          ],
+          [
+            "equipment-name.electronic-circuit"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.electronic-circuit"
+          ],
+          [
+            "fluid-name.electronic-circuit"
+          ],
+          [
+            "entity-name.electronic-circuit"
+          ],
+          [
+            "equipment-name.electronic-circuit"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_engine-unit-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/engine-unit.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "engine-unit",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_engine-unit-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.engine-unit"
+          ],
+          [
+            "fluid-name.engine-unit"
+          ],
+          [
+            "entity-name.engine-unit"
+          ],
+          [
+            "equipment-name.engine-unit"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.engine-unit"
+          ],
+          [
+            "fluid-name.engine-unit"
+          ],
+          [
+            "entity-name.engine-unit"
+          ],
+          [
+            "equipment-name.engine-unit"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_explosives-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/explosives.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosives",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "explosives",
+        "space-science-pack",
+        "epr_explosives-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.explosives"
+          ],
+          [
+            "fluid-name.explosives"
+          ],
+          [
+            "entity-name.explosives"
+          ],
+          [
+            "equipment-name.explosives"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.explosives"
+          ],
+          [
+            "fluid-name.explosives"
+          ],
+          [
+            "entity-name.explosives"
+          ],
+          [
+            "equipment-name.explosives"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_flying-robot-frame-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/flying-robot-frame.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "flying-robot-frame",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_flying-robot-frame-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.flying-robot-frame"
+          ],
+          [
+            "fluid-name.flying-robot-frame"
+          ],
+          [
+            "entity-name.flying-robot-frame"
+          ],
+          [
+            "equipment-name.flying-robot-frame"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.flying-robot-frame"
+          ],
+          [
+            "fluid-name.flying-robot-frame"
+          ],
+          [
+            "entity-name.flying-robot-frame"
+          ],
+          [
+            "equipment-name.flying-robot-frame"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_heavy-oil-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/heavy-oil.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "coal-liquefaction",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_heavy-oil-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.heavy-oil"
+          ],
+          [
+            "fluid-name.heavy-oil"
+          ],
+          [
+            "entity-name.heavy-oil"
+          ],
+          [
+            "equipment-name.heavy-oil"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.heavy-oil"
+          ],
+          [
+            "fluid-name.heavy-oil"
+          ],
+          [
+            "entity-name.heavy-oil"
+          ],
+          [
+            "equipment-name.heavy-oil"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_iron-gear-wheel-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-gear-wheel.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-gear-wheel",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_iron-gear-wheel-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.iron-gear-wheel"
+          ],
+          [
+            "fluid-name.iron-gear-wheel"
+          ],
+          [
+            "entity-name.iron-gear-wheel"
+          ],
+          [
+            "equipment-name.iron-gear-wheel"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.iron-gear-wheel"
+          ],
+          [
+            "fluid-name.iron-gear-wheel"
+          ],
+          [
+            "entity-name.iron-gear-wheel"
+          ],
+          [
+            "equipment-name.iron-gear-wheel"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_iron-plate-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-plate.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-plate",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_iron-plate-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.iron-plate"
+          ],
+          [
+            "fluid-name.iron-plate"
+          ],
+          [
+            "entity-name.iron-plate"
+          ],
+          [
+            "equipment-name.iron-plate"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.iron-plate"
+          ],
+          [
+            "fluid-name.iron-plate"
+          ],
+          [
+            "entity-name.iron-plate"
+          ],
+          [
+            "equipment-name.iron-plate"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_iron-stick-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-stick.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-stick",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_iron-stick-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.iron-stick"
+          ],
+          [
+            "fluid-name.iron-stick"
+          ],
+          [
+            "entity-name.iron-stick"
+          ],
+          [
+            "equipment-name.iron-stick"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.iron-stick"
+          ],
+          [
+            "fluid-name.iron-stick"
+          ],
+          [
+            "entity-name.iron-stick"
+          ],
+          [
+            "equipment-name.iron-stick"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_light-oil-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/light-oil.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "heavy-oil-cracking",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_light-oil-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.light-oil"
+          ],
+          [
+            "fluid-name.light-oil"
+          ],
+          [
+            "entity-name.light-oil"
+          ],
+          [
+            "equipment-name.light-oil"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.light-oil"
+          ],
+          [
+            "fluid-name.light-oil"
+          ],
+          [
+            "entity-name.light-oil"
+          ],
+          [
+            "equipment-name.light-oil"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_logistic-science-pack-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/logistic-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "logistic-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_logistic-science-pack-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.logistic-science-pack"
+          ],
+          [
+            "fluid-name.logistic-science-pack"
+          ],
+          [
+            "entity-name.logistic-science-pack"
+          ],
+          [
+            "equipment-name.logistic-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.logistic-science-pack"
+          ],
+          [
+            "fluid-name.logistic-science-pack"
+          ],
+          [
+            "entity-name.logistic-science-pack"
+          ],
+          [
+            "equipment-name.logistic-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_low-density-structure-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/low-density-structure.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "low-density-structure",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_low-density-structure-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.low-density-structure"
+          ],
+          [
+            "fluid-name.low-density-structure"
+          ],
+          [
+            "entity-name.low-density-structure"
+          ],
+          [
+            "equipment-name.low-density-structure"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.low-density-structure"
+          ],
+          [
+            "fluid-name.low-density-structure"
+          ],
+          [
+            "entity-name.low-density-structure"
+          ],
+          [
+            "equipment-name.low-density-structure"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_lubricant-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/lubricant.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "lubricant",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_lubricant-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.lubricant"
+          ],
+          [
+            "fluid-name.lubricant"
+          ],
+          [
+            "entity-name.lubricant"
+          ],
+          [
+            "equipment-name.lubricant"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.lubricant"
+          ],
+          [
+            "fluid-name.lubricant"
+          ],
+          [
+            "entity-name.lubricant"
+          ],
+          [
+            "equipment-name.lubricant"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_military-science-pack-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/military-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "military-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "military-science-pack",
+        "space-science-pack",
+        "epr_military-science-pack-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.military-science-pack"
+          ],
+          [
+            "fluid-name.military-science-pack"
+          ],
+          [
+            "entity-name.military-science-pack"
+          ],
+          [
+            "equipment-name.military-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.military-science-pack"
+          ],
+          [
+            "fluid-name.military-science-pack"
+          ],
+          [
+            "entity-name.military-science-pack"
+          ],
+          [
+            "equipment-name.military-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_petroleum-gas-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/petroleum-gas.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "basic-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "light-oil-cracking",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_petroleum-gas-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.petroleum-gas"
+          ],
+          [
+            "fluid-name.petroleum-gas"
+          ],
+          [
+            "entity-name.petroleum-gas"
+          ],
+          [
+            "equipment-name.petroleum-gas"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.petroleum-gas"
+          ],
+          [
+            "fluid-name.petroleum-gas"
+          ],
+          [
+            "entity-name.petroleum-gas"
+          ],
+          [
+            "equipment-name.petroleum-gas"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_plastic-bar-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/plastic-bar.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "plastic-bar",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_plastic-bar-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.plastic-bar"
+          ],
+          [
+            "fluid-name.plastic-bar"
+          ],
+          [
+            "entity-name.plastic-bar"
+          ],
+          [
+            "equipment-name.plastic-bar"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.plastic-bar"
+          ],
+          [
+            "fluid-name.plastic-bar"
+          ],
+          [
+            "entity-name.plastic-bar"
+          ],
+          [
+            "equipment-name.plastic-bar"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_processing-unit-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/processing-unit.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "processing-unit",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_processing-unit-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.processing-unit"
+          ],
+          [
+            "fluid-name.processing-unit"
+          ],
+          [
+            "entity-name.processing-unit"
+          ],
+          [
+            "equipment-name.processing-unit"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.processing-unit"
+          ],
+          [
+            "fluid-name.processing-unit"
+          ],
+          [
+            "entity-name.processing-unit"
+          ],
+          [
+            "equipment-name.processing-unit"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_production-science-pack-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/production-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "production-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_production-science-pack-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.production-science-pack"
+          ],
+          [
+            "fluid-name.production-science-pack"
+          ],
+          [
+            "entity-name.production-science-pack"
+          ],
+          [
+            "equipment-name.production-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.production-science-pack"
+          ],
+          [
+            "fluid-name.production-science-pack"
+          ],
+          [
+            "entity-name.production-science-pack"
+          ],
+          [
+            "equipment-name.production-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_rocket-fuel-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/rocket-fuel.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "rocket-fuel",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_rocket-fuel-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.rocket-fuel"
+          ],
+          [
+            "fluid-name.rocket-fuel"
+          ],
+          [
+            "entity-name.rocket-fuel"
+          ],
+          [
+            "equipment-name.rocket-fuel"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.rocket-fuel"
+          ],
+          [
+            "fluid-name.rocket-fuel"
+          ],
+          [
+            "entity-name.rocket-fuel"
+          ],
+          [
+            "equipment-name.rocket-fuel"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_steel-plate-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/steel-plate.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "steel-plate",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_steel-plate-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.steel-plate"
+          ],
+          [
+            "fluid-name.steel-plate"
+          ],
+          [
+            "entity-name.steel-plate"
+          ],
+          [
+            "equipment-name.steel-plate"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.steel-plate"
+          ],
+          [
+            "fluid-name.steel-plate"
+          ],
+          [
+            "entity-name.steel-plate"
+          ],
+          [
+            "equipment-name.steel-plate"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_stone-brick-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/stone-brick.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "stone-brick",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_stone-brick-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.stone-brick"
+          ],
+          [
+            "fluid-name.stone-brick"
+          ],
+          [
+            "entity-name.stone-brick"
+          ],
+          [
+            "equipment-name.stone-brick"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.stone-brick"
+          ],
+          [
+            "fluid-name.stone-brick"
+          ],
+          [
+            "entity-name.stone-brick"
+          ],
+          [
+            "equipment-name.stone-brick"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_sulfur-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/sulfur.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfur",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_sulfur-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.sulfur"
+          ],
+          [
+            "fluid-name.sulfur"
+          ],
+          [
+            "entity-name.sulfur"
+          ],
+          [
+            "equipment-name.sulfur"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.sulfur"
+          ],
+          [
+            "fluid-name.sulfur"
+          ],
+          [
+            "entity-name.sulfur"
+          ],
+          [
+            "equipment-name.sulfur"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_sulfuric-acid-productivity-5",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/sulfuric-acid.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfuric-acid",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-4)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_sulfuric-acid-productivity-4"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.sulfuric-acid"
+          ],
+          [
+            "fluid-name.sulfuric-acid"
+          ],
+          [
+            "entity-name.sulfuric-acid"
+          ],
+          [
+            "equipment-name.sulfuric-acid"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.sulfuric-acid"
+          ],
+          [
+            "fluid-name.sulfuric-acid"
+          ],
+          [
+            "entity-name.sulfuric-acid"
+          ],
+          [
+            "equipment-name.sulfuric-acid"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    },
+    {
+      "type": "technology",
+      "name": "epr_utility-science-pack-productivity-4",
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/utility-science-pack.png"
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/effect-constant/effect-constant-recipe-productivity.png",
+          "icon_size": 64
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "utility-science-pack",
+          "change": 0.1
+        }
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "space-science-pack",
+            1
+          ]
+        ],
+        "time": 60,
+        "count_formula": "1.5^(L-3)*1000"
+      },
+      "prerequisites": [
+        "space-science-pack",
+        "epr_utility-science-pack-productivity-3"
+      ],
+      "upgrade": true,
+      "localised_name": [
+        "technology-name.epr_productivity_tech_final",
+        [
+          "?",
+          [
+            "item-name.utility-science-pack"
+          ],
+          [
+            "fluid-name.utility-science-pack"
+          ],
+          [
+            "entity-name.utility-science-pack"
+          ],
+          [
+            "equipment-name.utility-science-pack"
+          ]
+        ]
+      ],
+      "localised_description": [
+        "technology-description.epr_productivity_tech",
+        [
+          "?",
+          [
+            "item-name.utility-science-pack"
+          ],
+          [
+            "fluid-name.utility-science-pack"
+          ],
+          [
+            "entity-name.utility-science-pack"
+          ],
+          [
+            "equipment-name.utility-science-pack"
+          ]
+        ]
+      ],
+      "max_level": "infinite"
+    }
+  ],
+  "published_mir_additions": [
+    {
+      "name": "braking-force-8",
+      "localised_name": [
+        "technology-name.braking-force"
+      ],
+      "localised_description": [
+        "technology-description.braking-force"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/braking-force.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-braking-force.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "train-braking-force-bonus",
+          "modifier": 0.15
+        }
+      ],
+      "prerequisites": [
+        "braking-force-6",
+        "braking-force-7",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "861.51212960553*1.33333^(L-8)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "level": 8,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "inserter-capacity-bonus-8",
+      "localised_name": [
+        "technology-name.inserter-capacity-bonus"
+      ],
+      "localised_description": [
+        "",
+        [
+          "technology-description.inserter-capacity-bonus"
+        ],
+        "\n\n",
+        [
+          "mod-setting-description.mir-note-inserter-capacity"
+        ]
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/inserter-capacity.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "inserter-stack-size-bonus",
+          "modifier": 2
+        },
+        {
+          "type": "bulk-inserter-capacity-bonus",
+          "modifier": 4
+        }
+      ],
+      "prerequisites": [
+        "inserter-capacity-bonus-6",
+        "utility-science-pack",
+        "inserter-capacity-bonus-7",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "914488.340211249*3.33333^(L-8)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "level": 8,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "laser-shooting-speed-8",
+      "localised_name": [
+        "technology-name.laser-shooting-speed"
+      ],
+      "localised_description": [
+        "technology-description.laser-shooting-speed"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/laser-shooting-speed.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "laser",
+          "modifier": 0.5
+        }
+      ],
+      "prerequisites": [
+        "laser-shooting-speed-6",
+        "laser-shooting-speed-7",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "1025.15625*1.5^(L-8)",
+        "time": 120
+      },
+      "max_level": "infinite",
+      "level": 8,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_advanced_circuit-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_advanced_circuit",
+        [
+          "item-name.advanced-circuit"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/advanced-circuit.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-circuit",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_advanced_circuit]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_batteries-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_batteries",
+        [
+          "item-name.battery"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/battery.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "battery",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_batteries]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_belts-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_belts",
+        [
+          "technology-name.logistics"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/logistics-1.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "splitter",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "transport-belt",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "underground-belt",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "fast-splitter",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "fast-transport-belt",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "fast-underground-belt",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "express-splitter",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "express-transport-belt",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "express-underground-belt",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_belts]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_bullets-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_bullets",
+        [
+          "technology-name.military"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/military.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "firearm-magazine",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "shotgun-shell",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "piercing-rounds-magazine",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "piercing-shotgun-shell",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "uranium-rounds-magazine",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_bullets]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_cannon_shooting_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_cannon_shooting_speed"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/weapon-shooting-speed-2.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "cannon-shell",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "weapon-shooting-speed-5",
+        "tank"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "60*1.5^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_cannon_shooting_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_character_crafting_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_character_crafting_speed"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/automation-3.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "character-crafting-speed",
+          "modifier": 0.05
+        }
+      ],
+      "prerequisites": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_character_crafting_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_character_mining_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_character_mining_speed",
+        [
+          "technology-name.steel-axe"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/steel-axe.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-mining.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "character-mining-speed",
+          "modifier": 0.05
+        }
+      ],
+      "prerequisites": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_character_mining_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_character_reach-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_character_reach",
+        [
+          "technology-name.steel-axe"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/steel-axe.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-range.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "character-reach-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-build-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-resource-reach-distance",
+          "modifier": 10
+        },
+        {
+          "type": "character-item-drop-distance",
+          "modifier": 10
+        }
+      ],
+      "prerequisites": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_character_reach]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_character_walking_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_character_walking_speed",
+        [
+          "technology-name.exoskeleton-equipment"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/exoskeleton-equipment.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "character-running-speed",
+          "modifier": 0.05
+        }
+      ],
+      "prerequisites": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_character_walking_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_concrete-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_concrete",
+        [
+          "technology-name.concrete"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/concrete.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "stone-brick",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "concrete",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "hazard-concrete",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "refined-concrete",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "refined-hazard-concrete",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_concrete]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_copper-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_copper",
+        [
+          "item-name.copper-plate"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/copper-plate.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-plate",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_copper]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_copper_cable-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_copper_cable",
+        [
+          "item-name.copper-cable"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/copper-cable.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-cable",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_copper_cable]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_electric_energy-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_electric_energy",
+        [
+          "technology-name.electric-energy-accumulators"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/electric-energy-acumulators.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "accumulator",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "solar-panel",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_electric_energy]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_electric_engine-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_electric_engine",
+        [
+          "item-name.electric-engine-unit"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/electric-engine.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electric-engine-unit",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_electric_engine]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_electric_shooting_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_electric_shooting_speed"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.electric_shooting_speed"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/discharge-defense-equipment.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "electric",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "discharge-defense-equipment"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "60*1.5^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_electric_shooting_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_electronic_circuit-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_electronic_circuit",
+        [
+          "item-name.electronic-circuit"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/electronics.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electronic-circuit",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_electronic_circuit]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_engine-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_engine",
+        [
+          "item-name.engine-unit"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/engine.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "engine-unit",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_engine]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_explosives-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_explosives",
+        [
+          "item-name.explosives"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/explosives.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosives",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_explosives]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_flamethrower_shooting_speed",
+        [
+          "technology-name.flamethrower"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.flamethrower_shooting_speed"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/flamethrower.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "flamethrower",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "flamethrower"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "60*1.5^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_flamethrower_shooting_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_flying_robot_frame-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_flying_robot_frame",
+        [
+          "item-name.flying-robot-frame"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/robotics.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "flying-robot-frame",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_flying_robot_frame]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_furnace-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_furnace",
+        [
+          "technology-name.advanced-material-processing-2"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/advanced-material-processing-2.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "stone-furnace",
+          "change": 0.2
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "steel-furnace",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electric-furnace",
+          "change": 0.05
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_furnace]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_gears-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_gears",
+        [
+          "item-name.iron-gear-wheel"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-gear-wheel.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-gear-wheel",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_gears]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_grenades-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_grenades",
+        [
+          "item-name.grenade"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/grenade.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "grenade",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "cluster-grenade",
+          "change": 0.05
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_grenades]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_heavy_ammo-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_heavy_ammo",
+        [
+          "item-name.cannon-shell"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/cannon-shell.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "cannon-shell",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosive-cannon-shell",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosive-uranium-cannon-shell",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "uranium-cannon-shell",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "artillery-shell",
+          "change": 0.01
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_heavy_ammo]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_inserters-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_inserters",
+        [
+          "technology-name.fast-inserter"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/fast-inserter.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "burner-inserter",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "inserter",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "fast-inserter",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "long-handed-inserter",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "bulk-inserter",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_inserters]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_inventory_capacity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_inventory_capacity",
+        [
+          "technology-name.toolbelt"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/toolbelt.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "character-inventory-slots-bonus",
+          "modifier": 1
+        },
+        {
+          "type": "character-logistic-trash-slots",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "utility-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*1.1^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_inventory_capacity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_iron-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_iron",
+        [
+          "item-name.iron-plate"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-plate.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-plate",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_iron]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_iron_sticks-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_iron_sticks",
+        [
+          "item-name.iron-stick"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/iron-stick.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-stick",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_iron_sticks]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_lab_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_lab_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.lab_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/military-science-pack.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "military-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "utility-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "1000*1.2^(L-1)",
+        "time": 120
+      },
+      "max_level": "infinite",
+      "order": "p[research_lab_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_landfill-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_landfill",
+        [
+          "technology-name.landfill"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/landfill.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "landfill",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_landfill]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_low_density_structure-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_low_density_structure",
+        [
+          "item-name.low-density-structure"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/low-density-structure.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "low-density-structure",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_low_density_structure]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_lubricant_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_lubricant_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/lubricant.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "lubricant",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_lubricant_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_mining_drill-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_mining_drill",
+        [
+          "item-name.electric-mining-drill"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/electric-mining-drill.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "burner-mining-drill",
+          "change": 0.2
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electric-mining-drill",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_mining_drill]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_modules-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_modules",
+        [
+          "technology-name.modules"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/module.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "efficiency-module",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "productivity-module",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "speed-module",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "efficiency-module-2",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "productivity-module-2",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "speed-module-2",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "efficiency-module-3",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "productivity-module-3",
+          "change": 0.02
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "speed-module-3",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_modules]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_oil_cracking_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_oil_cracking_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/oil-processing.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "heavy-oil-cracking",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "light-oil-cracking",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_oil_cracking_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_oil_processing_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_oil_processing_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/advanced-oil-processing.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "basic-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "coal-liquefaction",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_oil_processing_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_plastic-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_plastic",
+        [
+          "item-name.plastic-bar"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/plastics.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "plastic-bar",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_plastic]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_processing_unit-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_processing_unit",
+        [
+          "item-name.processing-unit"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/processing-unit.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "processing-unit",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_processing_unit]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_rails-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_rails",
+        [
+          "item-name.rail"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/rail.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "rail",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_rails]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_robot_battery-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_robot_battery",
+        [
+          "technology-name.logistic-robotics"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/logistic-robotics.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-battery.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-battery",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*1.2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_robot_battery]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_rocket_fuel-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_rocket_fuel",
+        [
+          "item-name.rocket-fuel"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/rocket-fuel.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "rocket-fuel",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_rocket_fuel]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_rocket_shooting_speed-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_rocket_shooting_speed",
+        [
+          "technology-name.rocketry"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.direct_effect"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/rocketry.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "rocket",
+          "modifier": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "rocketry"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "60*1.5^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_rocket_shooting_speed]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_rockets-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_rockets",
+        [
+          "technology-name.rocketry"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/rocketry.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "rocket",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosive-rocket",
+          "change": 0.05
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "atomic-bomb",
+          "change": 0.02
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_rockets]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_science_pack_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_science_pack_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/space-science-pack.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "automation-science-pack",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "chemical-science-pack",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "logistic-science-pack",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "military-science-pack",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "production-science-pack",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "utility-science-pack",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack",
+        "utility-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 120
+      },
+      "max_level": "infinite",
+      "order": "p[research_science_pack_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_steel-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_steel",
+        [
+          "item-name.steel-plate"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/steel-processing.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "steel-plate",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_steel]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_sulfur-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_sulfur",
+        [
+          "item-name.sulfur"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/sulfur-processing.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfur",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_sulfur]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_sulfuric_acid_productivity-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_sulfuric_acid_productivity"
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/icons/fluid/sulfuric-acid.png",
+          "icon_size": 64
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfuric-acid",
+          "change": 0.1
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_sulfuric_acid_productivity]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "recipe-prod-research_walls-1",
+      "localised_name": [
+        "technology-name.more-infinite-research.research_walls",
+        [
+          "item-name.stone-wall"
+        ]
+      ],
+      "localised_description": [
+        "technology-description.more-infinite-research.recipe_productivity"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/gate.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "stone-wall",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "gate",
+          "change": 0.05
+        }
+      ],
+      "prerequisites": [
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "8000*2^(L-1)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "order": "p[research_walls]",
+      "level": 1,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "research-speed-7",
+      "localised_name": [
+        "technology-name.research-speed"
+      ],
+      "localised_description": [
+        "technology-description.research-speed"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/research-speed.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "laboratory-speed",
+          "modifier": 0.6
+        }
+      ],
+      "prerequisites": [
+        "research-speed-5",
+        "utility-science-pack",
+        "research-speed-6",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "683.4375*1.5^(L-7)",
+        "time": 120
+      },
+      "max_level": "infinite",
+      "level": 7,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "weapon-shooting-speed-7",
+      "localised_name": [
+        "technology-name.weapon-shooting-speed"
+      ],
+      "localised_description": [
+        "technology-description.weapon-shooting-speed"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/weapon-shooting-speed-3.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-speed.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "gun-speed",
+          "ammo_category": "bullet",
+          "modifier": 0.4
+        },
+        {
+          "type": "gun-speed",
+          "ammo_category": "shotgun-shell",
+          "modifier": 0.4
+        }
+      ],
+      "prerequisites": [
+        "weapon-shooting-speed-5",
+        "utility-science-pack",
+        "weapon-shooting-speed-6",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "military-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "military-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "683.4375*1.5^(L-7)",
+        "time": 120
+      },
+      "max_level": "infinite",
+      "level": 7,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    },
+    {
+      "name": "worker-robots-storage-4",
+      "localised_name": [
+        "technology-name.worker-robots-storage"
+      ],
+      "localised_description": [
+        "technology-description.worker-robots-storage"
+      ],
+      "icons": [
+        {
+          "icon": "__base__/graphics/technology/worker-robots-storage.png",
+          "icon_size": 256
+        },
+        {
+          "icon": "__core__/graphics/icons/technology/constants/constant-capacity.png",
+          "icon_size": 128,
+          "scale": 0.5,
+          "shift": [
+            50,
+            50
+          ],
+          "floating": true
+        }
+      ],
+      "effects": [
+        {
+          "type": "worker-robot-storage",
+          "modifier": 1
+        }
+      ],
+      "prerequisites": [
+        "worker-robots-storage-2",
+        "utility-science-pack",
+        "worker-robots-storage-3",
+        "automation-science-pack",
+        "logistic-science-pack",
+        "chemical-science-pack",
+        "production-science-pack"
+      ],
+      "unit": {
+        "ingredients": [
+          [
+            "automation-science-pack",
+            1
+          ],
+          [
+            "logistic-science-pack",
+            1
+          ],
+          [
+            "chemical-science-pack",
+            1
+          ],
+          [
+            "production-science-pack",
+            1
+          ],
+          [
+            "utility-science-pack",
+            1
+          ]
+        ],
+        "count_formula": "675*1.5^(L-4)",
+        "time": 60
+      },
+      "max_level": "infinite",
+      "level": 4,
+      "hidden": false,
+      "upgrade": true,
+      "type": "technology"
+    }
+  ],
+  "binding_coverage": [
+    {
+      "foreign": "epr_advanced-circuit-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_advanced-circuit-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-circuit",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_advanced_circuit-1"
+      ]
+    },
+    {
+      "foreign": "epr_automation-science-pack-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_automation-science-pack-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "automation-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_battery-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_battery-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "battery",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_batteries-1"
+      ]
+    },
+    {
+      "foreign": "epr_chemical-science-pack-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_chemical-science-pack-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "chemical-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_copper-cable-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_copper-cable-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-cable",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_copper_cable-1"
+      ]
+    },
+    {
+      "foreign": "epr_copper-plate-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_copper-plate-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "copper-plate",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_copper-1"
+      ]
+    },
+    {
+      "foreign": "epr_electric-engine-unit-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_electric-engine-unit-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electric-engine-unit",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_electric_engine-1"
+      ]
+    },
+    {
+      "foreign": "epr_electronic-circuit-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_electronic-circuit-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "electronic-circuit",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_electronic_circuit-1"
+      ]
+    },
+    {
+      "foreign": "epr_engine-unit-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_engine-unit-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "engine-unit",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_engine-1"
+      ]
+    },
+    {
+      "foreign": "epr_explosives-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_explosives-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "explosives",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_explosives-1"
+      ]
+    },
+    {
+      "foreign": "epr_flying-robot-frame-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_flying-robot-frame-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "flying-robot-frame",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_flying_robot_frame-1"
+      ]
+    },
+    {
+      "foreign": "epr_heavy-oil-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_heavy-oil-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "advanced-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "coal-liquefaction",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_oil_processing_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_iron-gear-wheel-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_iron-gear-wheel-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-gear-wheel",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_gears-1"
+      ]
+    },
+    {
+      "foreign": "epr_iron-plate-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_iron-plate-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-plate",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_iron-1"
+      ]
+    },
+    {
+      "foreign": "epr_iron-stick-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_iron-stick-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "iron-stick",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_iron_sticks-1"
+      ]
+    },
+    {
+      "foreign": "epr_light-oil-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_light-oil-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "heavy-oil-cracking",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_oil_cracking_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_logistic-science-pack-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_logistic-science-pack-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "logistic-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_low-density-structure-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_low-density-structure-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "low-density-structure",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_low_density_structure-1"
+      ]
+    },
+    {
+      "foreign": "epr_lubricant-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_lubricant-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "lubricant",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_lubricant_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_military-science-pack-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_military-science-pack-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "military-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_petroleum-gas-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_petroleum-gas-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "basic-oil-processing",
+          "change": 0.1
+        },
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "light-oil-cracking",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_oil_cracking_productivity-1",
+        "recipe-prod-research_oil_processing_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_plastic-bar-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_plastic-bar-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "plastic-bar",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_plastic-1"
+      ]
+    },
+    {
+      "foreign": "epr_processing-unit-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_processing-unit-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "processing-unit",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_processing_unit-1"
+      ]
+    },
+    {
+      "foreign": "epr_production-science-pack-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_production-science-pack-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "production-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_rocket-fuel-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_rocket-fuel-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "rocket-fuel",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_rocket_fuel-1"
+      ]
+    },
+    {
+      "foreign": "epr_steel-plate-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_steel-plate-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "steel-plate",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_steel-1"
+      ]
+    },
+    {
+      "foreign": "epr_stone-brick-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_stone-brick-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "stone-brick",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_concrete-1"
+      ]
+    },
+    {
+      "foreign": "epr_sulfur-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_sulfur-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfur",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_sulfur-1"
+      ]
+    },
+    {
+      "foreign": "epr_sulfuric-acid-productivity-5",
+      "first_level": 5,
+      "predecessor": "epr_sulfuric-acid-productivity-4",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "sulfuric-acid",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_sulfuric_acid_productivity-1"
+      ]
+    },
+    {
+      "foreign": "epr_utility-science-pack-productivity-4",
+      "first_level": 4,
+      "predecessor": "epr_utility-science-pack-productivity-3",
+      "foreign_effects": [
+        {
+          "type": "change-recipe-productivity",
+          "recipe": "utility-science-pack",
+          "change": 0.1
+        }
+      ],
+      "mir_replacements": [
+        "recipe-prod-research_science_pack_productivity-1"
+      ]
+    }
+  ]
+}
