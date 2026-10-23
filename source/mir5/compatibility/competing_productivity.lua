@@ -431,8 +431,13 @@ function M.retain_foreign_coverage(technologies, raw, active_mods, selected_targ
           effects[#effects + 1] = effect
         end
       end
-      row.effects = effects
-      if #effects == 0 then row.enabled = false end
+      if #effects == 0 then
+        -- An unresearchable owned row can retain its native effect vector.
+        -- Removing it would also erase the player's previously earned bonus.
+        row.enabled = false
+      else
+        row.effects = effects
+      end
     end
   end
 end

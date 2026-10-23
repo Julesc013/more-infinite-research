@@ -711,11 +711,11 @@ class CompetingProductivityTests(unittest.TestCase):
                     row = owned[index]
                     original = rows[row["name"]]
                     expected = provider["foreign_remaining_mir_rows"][row["name"]]
-                    self.assertEqual([] if expected is None else expected["effects"], effects(row))
+                    self.assertEqual(original["effects"] if expected is None else expected["effects"], effects(row))
                     self.assertEqual(original["level"], row["level"])
                     self.assertEqual(original["unit"]["count_formula"], row["unit"]["count_formula"])
                     self.assertEqual(original["max_level"], row["max_level"])
-                    if not effects(row):
+                    if expected is None:
                         self.assertFalse(row["enabled"])
                 for name, original in provider["arms"]["upstream"]["provider_rows"].items():
                     self.assertEqual(original["effects"], effects(raw["technology"][name]))
@@ -981,7 +981,11 @@ class CompetingProductivityTests(unittest.TestCase):
                     output = actual[name]
                     expected = expected_foreign[name]
                     if expected is None:
-                        self.assertEqual([], productivity_effects(output))
+                        self.assertEqual(
+                            [effect for effect in original["effects"] if effect["type"] == "change-recipe-productivity"],
+                            productivity_effects(output),
+                            "A disabled historical identity must retain its earned native effect vector",
+                        )
                         self.assertFalse(output["enabled"])
                     else:
                         self.assertEqual(
@@ -1010,7 +1014,7 @@ class CompetingProductivityTests(unittest.TestCase):
           binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,true)
           assert(#row.effects == 2, "preference true retains exact complete MIR coverage")
           binding.retain_foreign_coverage({row},{technology={[foreign.name]=foreign}},active,target,false)
-          assert(#row.effects == 0 and row.enabled == false, "captured omitted prerequisite is empty")
+          assert(#row.effects == 2 and row.enabled == false, "disabled owned research retains earned native effects")
           foreign.prerequisites={"unrelated-prerequisite"}
           row.enabled=true; row.effects={{type="change-recipe-productivity",recipe="copper-plate",change=.1},
             {type="change-recipe-productivity",recipe="casting-copper",change=.1}}

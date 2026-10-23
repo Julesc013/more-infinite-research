@@ -89,6 +89,10 @@ if require("platform.target").id == "f200" and type(mods) == "table"
     values.options["mir-prefer-this-mod-for-competing-techs"])
 end
 
+-- Stable native credit holders preserve already-earned partial overlaps when
+-- a provider or its ownership preference changes. They are explicit authored
+-- rows, independent of whether the provider is currently installed.
+require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"))
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)
