@@ -107,6 +107,11 @@ local function assert_source_and_preference(state)
   end
   assert_tail(state.preferred_player, {level=7, researched=false, enabled=false, visible=true,
     maximum=UINT32_MAX, bonus=state.player_bonus, saved_progress=0.27}, "stored preferred player")
+  if type(state.preferred_queue) ~= "table" or state.preferred_queue.current ~= PROBE
+      or not close(state.preferred_queue.progress, 0.42)
+      or not close(state.preferred_current_saved_progress, 0) then
+    fail("stored preferred EPR progress witnesses are absent")
+  end
 end
 local function assert_foreign(state)
   local force = game.forces[state.foreign_force_index]
@@ -121,6 +126,10 @@ local function assert_foreign(state)
   assert_tail(tail_status(force), {level=5, researched=false, enabled=false, visible=true,
     maximum=UINT32_MAX, bonus=state.foreign_bonus, saved_progress=0}, "foreign")
   assert_queue(force, state.foreign_queue, "foreign")
+  if not close(technology(force, PROBE).saved_progress, state.foreign_current_saved_progress)
+      or not close(state.foreign_current_saved_progress, 0) then
+    fail("foreign current braking raw progress changed")
+  end
 end
 local function assert_released(state)
   assert_source_and_preference(state)
@@ -129,7 +138,9 @@ local function assert_released(state)
   assert_tail(tail_status(player), {level=7, researched=false, enabled=true, visible=false,
     maximum=UINT32_MAX, bonus=state.player_bonus, saved_progress=0.27}, "MIR5 released player")
   assert_queue(player, {current=PROBE, queue={PROBE}, progress=0.42}, "MIR5 released player")
-  if not close(technology(player, PROBE).saved_progress, 0.42) then fail("MIR5 changed retained braking progress") end
+  if not close(technology(player, PROBE).saved_progress, 0) then
+    fail("MIR5 duplicated current braking progress")
+  end
   assert_acceleration(technology(player, TAIL))
   assert_frozen(state)
   assert_foreign(state)
@@ -141,6 +152,7 @@ local function marker(stage, state)
     witnesses={source_mir=state.source_mir, destination_mir=script.active_mods["more-infinite-research"],
       source_actual_lab_completions=state.actual_lab_completions, tail=TAIL, tail_next_level=player.level,
       productivity_bonus=player.bonus, tail_saved_progress=player.saved_progress,
+      current_research_progress=queue_snapshot(game.forces.player).progress,
       player_reenabled=player.enabled == true, player_visible_when_disabled=player.visible,
       braking_saved_progress=technology(game.forces.player, PROBE).saved_progress,
       player_queue=queue_snapshot(game.forces.player).queue, foreign_still_disabled=tail_status(game.forces[state.foreign_force_index]).enabled == false,

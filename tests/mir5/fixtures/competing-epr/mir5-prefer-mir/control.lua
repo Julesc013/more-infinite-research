@@ -110,7 +110,10 @@ local function assert_source(state)
   if type(state.player_queue) ~= "table" or state.player_queue.current ~= TAIL
       or #state.player_queue.queue ~= 2 or state.player_queue.queue[1] ~= TAIL
       or state.player_queue.queue[2] ~= PROBE or not close(state.player_queue.progress, 0.27) then
-    fail("published EPR source queue witness is absent")
+    fail("published EPR current queue witness is absent")
+  end
+  if not close(state.player_current_saved_progress, 0) or not close(state.braking_inactive_saved_progress, 0.42) then
+    fail("published EPR raw progress witnesses are absent")
   end
   if not close(state.player_bonus, state.player_start_bonus + 0.2) then fail("published EPR earned effect witness is absent") end
 end
@@ -127,6 +130,10 @@ local function assert_foreign(state)
   assert_tail(tail_status(force), {level=5, researched=false, enabled=false, visible=true,
     maximum=UINT32_MAX, bonus=state.foreign_bonus, saved_progress=0}, "foreign")
   assert_queue(force, state.foreign_queue, "foreign")
+  if not close(technology(force, PROBE).saved_progress, state.foreign_current_saved_progress)
+      or not close(state.foreign_current_saved_progress, 0) then
+    fail("foreign current braking raw progress changed")
+  end
 end
 local function assert_preferred(state)
   assert_source(state)
@@ -135,7 +142,9 @@ local function assert_preferred(state)
   assert_tail(tail_status(player), {level=7, researched=false, enabled=false, visible=true,
     maximum=UINT32_MAX, bonus=state.player_bonus, saved_progress=0.27}, "MIR5 preferred player")
   assert_queue(player, {current=PROBE, queue={PROBE}, progress=0.42}, "MIR5 preferred player")
-  if not close(technology(player, PROBE).saved_progress, 0.42) then fail("MIR5 changed retained braking progress") end
+  if not close(technology(player, PROBE).saved_progress, 0) then
+    fail("MIR5 duplicated current braking progress")
+  end
   assert_acceleration(technology(player, TAIL))
   assert_frozen(state)
   assert_foreign(state)
@@ -147,7 +156,7 @@ local function marker(stage, state)
     witnesses={source_mir=state.source_mir, destination_mir=script.active_mods["more-infinite-research"],
       source_actual_lab_completions=state.actual_lab_completions, tail=TAIL, tail_next_level=player.level,
       productivity_bonus=player.bonus, tail_saved_progress=player.saved_progress,
-      player_disabled=player.enabled == false, player_visible_when_disabled=player.visible,
+      current_research_progress=queue_snapshot(game.forces.player).progress, player_disabled=player.enabled == false, player_visible_when_disabled=player.visible,
       braking_saved_progress=technology(game.forces.player, PROBE).saved_progress,
       player_queue=queue_snapshot(game.forces.player).queue, foreign_disabled=tail_status(game.forces[state.foreign_force_index]).enabled == false,
       retained_epr_tail_count=#EPR_TAILS, lab_frozen=true, on_load_read_only=stage == "reload"},
@@ -167,6 +176,7 @@ script.on_configuration_changed(function()
   state.phase = "prefer-mir-completed"
   state.preferred_player = copy_status(tail_status(game.forces.player))
   state.preferred_queue = copy_queue(queue_snapshot(game.forces.player))
+  state.preferred_current_saved_progress = technology(game.forces.player, PROBE).saved_progress
   marker("initial", state)
   game.server_save(SAVE)
 end)

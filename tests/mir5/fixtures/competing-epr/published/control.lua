@@ -158,13 +158,19 @@ local function assert_source(state)
   end
   local player = game.forces.player
   assert_retained(player, "player")
+  -- The current queue entry owns its effective progress on LuaForce.  Its
+  -- LuaTechnology.saved_progress must be empty; queued braking remains inactive.
   assert_tail(tail_status(player), {level=7, researched=false, enabled=true, visible=false,
-    maximum=UINT32_MAX, bonus=state.player_bonus, saved_progress=0.27}, "published player")
+    maximum=UINT32_MAX, bonus=state.player_bonus, saved_progress=0}, "published player")
   assert_queue(player, state.player_queue, "published player")
   if state.player_queue.current ~= TAIL or #state.player_queue.queue ~= 2
       or state.player_queue.queue[1] ~= TAIL or state.player_queue.queue[2] ~= PROBE
-      or not close(state.player_queue.progress, 0.27) then fail("source partial EPR queue witness differs") end
-  if not close(technology(player, PROBE).saved_progress, 0.42) then fail("source braking progress witness differs") end
+      or not close(state.player_queue.progress, 0.27) then fail("source current EPR progress witness differs") end
+  if not close(state.player_current_saved_progress, 0) then fail("source current EPR raw progress witness differs") end
+  if not close(technology(player, PROBE).saved_progress, 0.42)
+      or not close(state.braking_inactive_saved_progress, 0.42) then
+    fail("source inactive braking progress witness differs")
+  end
   assert_frozen(state)
   assert_foreign(state)
 end
@@ -175,7 +181,8 @@ local function marker(stage, state)
     witnesses={source_mir=state.source_mir, fixture_version=state.fixture_version,
       actual_lab_completions=state.actual_lab_completions, prerequisite_seeding=state.prerequisite_seeding,
       tail=TAIL, tail_next_level=player.level, productivity_bonus=player.bonus,
-      tail_saved_progress=player.saved_progress, braking_saved_progress=technology(game.forces.player, PROBE).saved_progress,
+      tail_saved_progress=player.saved_progress, current_research_progress=queue_snapshot(game.forces.player).progress,
+      braking_saved_progress=technology(game.forces.player, PROBE).saved_progress,
       player_queue=state.player_queue.queue, foreign_disabled=tail_status(game.forces[state.foreign_force_index]).enabled == false,
       retained_epr_tail_count=#EPR_TAILS, lab_frozen=true, on_load_read_only=stage == "reload"},
   }))
@@ -215,10 +222,12 @@ script.on_init(function()
   local probe = technology(foreign, PROBE)
   prerequisites(probe)
   if probe.researched then fail("foreign braking probe was already researched") end
-  if foreign.add_research(probe) ~= true then fail("could not queue foreign braking probe") end
+  -- Seed while inactive.  Assigning the queue makes braking current and
+  -- transfers this value to LuaForce.research_progress.
   probe.saved_progress = 0.42
-  foreign.research_progress = 0.42
+  if foreign.add_research(probe) ~= true then fail("could not queue foreign braking probe") end
   local foreign_queue = assert_queue(foreign, {current=PROBE, queue={PROBE}, progress=0.42}, "foreign setup")
+  if not close(probe.saved_progress, 0) then fail("foreign current braking retained raw saved progress") end
 
   local lab = game.surfaces[1].create_entity{name="lab", position={0, 0}, force=player}
   if lab == nil or lab.valid == false then fail("could not create real player lab") end
@@ -226,7 +235,8 @@ script.on_init(function()
     fixture_version=script.active_mods[FIXTURE], actual_lab_completions=0,
     milestone="prerequisites-seeded", prerequisite_seeding="completed-before-native-tail-labs",
     player_start_bonus=before.bonus, foreign_bonus=foreign_bonus,
-    foreign_force_index=foreign.index, foreign_queue=foreign_queue, lab=lab, deadline_tick=game.tick + DEADLINE}
+    foreign_force_index=foreign.index, foreign_queue=foreign_queue,
+    foreign_current_saved_progress=probe.saved_progress, lab=lab, deadline_tick=game.tick + DEADLINE}
   storage[KEY] = state
   fill(power_lab(state))
   if player.add_research(tail) ~= true then fail("could not queue first native EPR tail research") end
@@ -297,6 +307,11 @@ script.on_event(defines.events.on_tick, function()
     player.research_progress = 0.27
     state.player_bonus = now.bonus
     state.player_queue = assert_queue(player, {current=TAIL, queue={TAIL, PROBE}, progress=0.27}, "source seeded queue")
+    -- Factorio transfers the first queued technology's saved progress to the
+    -- force.  Keep raw inactive braking progress separately as the successor
+    -- will make braking current after removing the EPR tail.
+    state.player_current_saved_progress = technology(player, TAIL).saved_progress
+    state.braking_inactive_saved_progress = probe.saved_progress
     state.milestone = "two-native-epr-tail-labs"
     state.phase = "source-completed"
     state.player_tail = copy_status(tail_status(player))

@@ -116,23 +116,35 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
               value.technologies["braking-force-1"]=tech("braking-force-1",value,1)
               return value
             end
+            -- LuaForce owns active progress.  Queueing the first technology
+            -- transfers its saved progress and empties the raw technology field.
+            local function set_queue(value, entries)
+              rawset(value, "research_queue", entries)
+              local current = entries and entries[1] or nil
+              rawset(value, "current_research", current)
+              if current then
+                rawset(value, "research_progress", current.saved_progress or 0)
+                current.saved_progress = 0
+              else rawset(value, "research_progress", 0) end
+            end
             local player=force("player",1)
             local foreign=force("mir5-competing-epr-foreign",2)
             foreign.recipes['iron-gear-wheel'].productivity_bonus=.4
             for _,epr in ipairs(tails) do foreign.technologies[epr].enabled=false;foreign.technologies[epr].visible_when_disabled=true end
             local fprobe=foreign.technologies["braking-force-1"]
-            fprobe.saved_progress=.42; foreign.current_research=fprobe; foreign.research_queue={fprobe}; foreign.research_progress=.42
+            fprobe.saved_progress=.42; set_queue(foreign,{fprobe})
             local tail=player.technologies["epr_iron-gear-wheel-productivity-5"]
             local probe=player.technologies["braking-force-1"]
             tail.level=7;tail.saved_progress=.27;probe.saved_progress=.42
-            player.current_research=tail;player.research_queue={tail,probe};player.research_progress=.27
+            set_queue(player,{tail,probe})
             local game={forces={player=player,[1]=player,[2]=foreign,["mir5-competing-epr-foreign"]=foreign}}
             function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
             local storage={mir5_competing_epr={phase="source-completed",source_mir="4.7.20002",fixture_version="0.1.0",
               actual_lab_completions=2,milestone="two-native-epr-tail-labs",prerequisite_seeding="completed-before-native-tail-labs",player_start_bonus=.4,player_bonus=.6,
               foreign_bonus=.4,foreign_force_index=2,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},
+              foreign_current_saved_progress=0,
               player_queue={current="epr_iron-gear-wheel-productivity-5",queue={"epr_iron-gear-wheel-productivity-5","braking-force-1"},progress=.27},
-              lab=lab}}
+              player_current_saved_progress=0,braking_inactive_saved_progress=.42,lab=lab}}
             local function load_control(path, version, preference)
               local c={events={}}
               local env={script={active_mods={base="2.0.77",ExpandedProductivityResearch="1.3.8",["more-infinite-research"]="5.0.20000",
@@ -152,12 +164,15 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
               local ok,result=pcall(callback);return ok,tostring(result)
             end
             -- Candidate runtime outcome under test; the fixture itself does not make these writes.
-            tail.enabled=false;tail.visible_when_disabled=true;player.current_research=probe;player.research_queue={probe};player.research_progress=.42
+            -- Removing the active EPR tail pauses its effective force progress on that
+            -- now-inactive technology, then makes braking current with its own progress.
+            tail.saved_progress=player.research_progress;tail.enabled=false;tail.visible_when_disabled=true;set_queue(player,{probe})
             if opponent=="stale-disable" then tail.enabled=true
             elseif opponent=="lost-tail-progress" then tail.saved_progress=.26
-            elseif opponent=="lost-braking" then probe.saved_progress=.41
+            elseif opponent=="lost-braking" then player.research_progress=.41
+            elseif opponent=="duplicate-current-progress" then probe.saved_progress=.42
             elseif opponent=="foreign-reenabled" then foreign.technologies["epr_iron-gear-wheel-productivity-5"].enabled=true
-            elseif opponent=="stale-epr-current" then player.current_research=tail;player.research_queue={tail,probe};player.research_progress=.27 end
+            elseif opponent=="stale-epr-current" then set_queue(player,{tail,probe}) end
             local preferred,message=load_control(preferred_path,"0.2.0",true);if not preferred then return {ok=false,message=message}end
             local ok,result=invoke(preferred,"changed");if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(preferred,"load");if not ok then return {ok=false,message=result}end;ok,result=invoke(preferred,"tick");if not ok then return {ok=false,message=result}end end
@@ -168,7 +183,8 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             for _=1,2 do ok,result=invoke(released,"load");if not ok then return {ok=false,message=result}end;ok,result=invoke(released,"tick");if not ok then return {ok=false,message=result}end end
             return {ok=true,message="",phase=storage.mir5_competing_epr.phase,tail_level=tail.level,tail_enabled=tail.enabled,
               tail_visible=tail.visible_when_disabled,tail_progress=tail.saved_progress,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
-              probe_progress=probe.saved_progress,foreign_enabled=foreign.technologies["epr_iron-gear-wheel-productivity-5"].enabled,
+              probe_progress=probe.saved_progress,current_progress=player.research_progress,
+              foreign_enabled=foreign.technologies["epr_iron-gear-wheel-productivity-5"].enabled,
               markers=markers,saves=saves}
           end
         ''')
@@ -199,14 +215,18 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
                 rawset(target,key,item)
                 if key=="research_queue" then
                   rawset(target,"current_research",item and item[1] or nil)
-                  if item and item[1] and item[1].saved_progress then rawset(target,"research_progress",item[1].saved_progress) end
+                  if item and item[1] then
+                    rawset(target,"research_progress",item[1].saved_progress or 0)
+                    rawset(item[1],"saved_progress",0)
+                  else rawset(target,"research_progress",0) end
                 end
               end})
               function value.enable_all_prototypes()end
               function value.add_research(research)
                 if type(research)=="string" then research=value.technologies[research] end
                 if research==nil or value.current_research~=nil then return false end
-                value.current_research=research;value.research_queue={research};value.research_progress=0;return true
+                local progress=research.saved_progress or 0
+                research.saved_progress=0;value.current_research=research;value.research_queue={research};value.research_progress=progress;return true
               end
               return value
             end
@@ -242,7 +262,8 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             for _=1,2 do ok,result=pcall(c.load);if not ok then return {ok=false,message=tostring(result)}end;game.tick=game.tick+1;ok,result=pcall(c.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
             local state=storage.mir5_competing_epr
             return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,next=tail.level,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,
-              tail_saved=tail.saved_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves}
+              tail_saved=tail.saved_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,
+              current_progress=player.research_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves}
           end
         ''')
 
@@ -333,8 +354,9 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         run = self.lua.eval("epr_fixture_source_flow")
         result = run(str(FIXTURE / "published" / "control.lua"), "", lua_value(self.lua, self.tail_names))
         self.assertTrue(result["ok"], result["message"])
-        self.assertEqual(("source-completed", 2, 7, .6, .27, .42),
-                         (result["phase"], result["labs"], result["next"], result["bonus"], result["tail_saved"], result["probe_saved"]))
+        self.assertEqual(("source-completed", 2, 7, .6, 0, .42, .27),
+                         (result["phase"], result["labs"], result["next"], result["bonus"], result["tail_saved"],
+                          result["probe_saved"], result["current_progress"]))
         self.assertFalse(result["lab_active"])
         self.assertEqual(0, result["lab_energy"])
         self.assertEqual((3, 1), (result["markers"], result["saves"]))
@@ -353,7 +375,8 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         result = run(str(FIXTURE / "mir5-prefer-mir" / "control.lua"), str(FIXTURE / "mir5-prefer-foreign" / "control.lua"), "", lua_value(self.lua, self.tail_names))
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual("prefer-foreign-completed", result["phase"])
-        self.assertEqual((7, .6, .27, .42), (result["tail_level"], result["bonus"], result["tail_progress"], result["probe_progress"]))
+        self.assertEqual((7, .6, .27, 0, .42),
+                         (result["tail_level"], result["bonus"], result["tail_progress"], result["probe_progress"], result["current_progress"]))
         self.assertTrue(result["tail_enabled"])
         self.assertFalse(result["tail_visible"])
         self.assertFalse(result["foreign_enabled"])
@@ -361,9 +384,10 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         opponents = {
             "stale-disable": "MIR5 preferred player EPR tail state differs",
             "lost-tail-progress": "MIR5 preferred player EPR tail saved progress differs",
-            "lost-braking": "MIR5 changed retained braking progress",
+            "lost-braking": "MIR5 preferred player queue or progress differs",
+            "duplicate-current-progress": "MIR5 duplicated current braking progress",
             "foreign-reenabled": "foreign EPR tail presentation changed",
-            "stale-epr-current": "MIR5 preferred player queue or progress differs",
+            "stale-epr-current": "MIR5 preferred player EPR tail saved progress differs",
             "stale-release": "MIR5 released player EPR tail state differs",
         }
         for opponent, phrase in opponents.items():
