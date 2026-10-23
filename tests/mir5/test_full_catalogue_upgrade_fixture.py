@@ -129,6 +129,7 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
         fixture_fields = set(self.plan["force_fields"])
         self.assertIn("character_trash_slot_count", fixture_fields)
         self.assertNotIn("character_logistic_trash_slots", fixture_fields)
+        self.assertNotIn("research_queue_enabled", fields)
         self.assertTrue(fixture_fields <= fields)
 
     def test_profiles_controls_and_native_boundaries_are_explicit(self):
@@ -158,7 +159,7 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertIn("queued_progress=.42", source); self.assertIn("paused_progress=.27", source)
         self.assertIn("assert_credits(player, plan", successor); self.assertIn("assert_successor_snapshot", successor)
         for text in (source, successor):
-            self.assertIn("player.research_queue_enabled = true", text)
+            self.assertNotIn("research_queue_enabled", text)
             self.assertIn("paused_snapshot", text)
             self.assertIn("assert_same_snapshot(paused, plan, state.paused_snapshot", text)
 

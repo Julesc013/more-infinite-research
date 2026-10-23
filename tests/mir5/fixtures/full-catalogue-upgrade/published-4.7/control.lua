@@ -188,7 +188,6 @@ local function source_init()
   game.speed = 16
   local player = game.forces.player
   player.enable_all_prototypes()
-  player.research_queue_enabled = true
   seed_levels(player, plan, "source player")
   local gear = technology(player, GEAR)
   prerequisites(gear)
