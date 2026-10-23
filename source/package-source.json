@@ -1242,10 +1242,10 @@
         "predecessor_source_path": "src/mod/common/prototypes/mir/policy/native_effect_coverage.lua"
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 10665,
-      "source_sha256": "D4E4FA8A8C519A5CD4694735FAA324131752FD75FDDF0411F3F9DC9514E3DA0F",
-      "output_bytes": 10665,
-      "output_sha256": "D4E4FA8A8C519A5CD4694735FAA324131752FD75FDDF0411F3F9DC9514E3DA0F"
+      "source_bytes": 10874,
+      "source_sha256": "4D7A22262A9E36C126848A7A88F8DEC1D63BAFE8C5B79AA8CB4AAD1D7A40FD1A",
+      "output_bytes": 10874,
+      "output_sha256": "4D7A22262A9E36C126848A7A88F8DEC1D63BAFE8C5B79AA8CB4AAD1D7A40FD1A"
     },
     {
       "layer": "shared",
@@ -7621,10 +7621,10 @@
         "reason": "Maintainer-directed unified compiler: bind source-owned approved science references without player-time acquisition discovery."
       },
       "transform": "copy-exact-bytes",
-      "source_bytes": 38891,
-      "source_sha256": "37A8077403101AF4743BB30FE5BA8CA58A80F83444899F9DA205BD7C98AB9878",
-      "output_bytes": 38891,
-      "output_sha256": "37A8077403101AF4743BB30FE5BA8CA58A80F83444899F9DA205BD7C98AB9878"
+      "source_bytes": 39930,
+      "source_sha256": "21F855211D485D2402096DAB91733B02D5F722AA92D376C90C5491F6BE9C9F62",
+      "output_bytes": 39930,
+      "output_sha256": "21F855211D485D2402096DAB91733B02D5F722AA92D376C90C5491F6BE9C9F62"
     },
     {
       "layer": "shared",
@@ -7757,5 +7757,5 @@
     "historical_archives_not_production_inputs": true,
     "package_cutover_complete": true
   },
-  "record_sha256": "B1F9CA1266ACE8CEA51F4E86E38BEC6CB6DF4B46B8A15551888D40DA4FD65626"
+  "record_sha256": "CCA001B4B872E74A7281E8D577B59F832318063BEEAF153D37444460127A9A45"
 }

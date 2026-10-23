@@ -377,12 +377,14 @@ local function declared_source(pack_name, shared)
   local native = direct_resource_source(pack_name, shared)
   if native then return native end
   local declarations = shared.science_bindings or {}
+  local named_declaration = false
   local declared_roles = {}
   for role in pairs(declarations) do declared_roles[#declared_roles + 1] = role end
   table.sort(declared_roles)
   for _, role in ipairs(declared_roles) do
     local declaration = M.declaration_for_role(role, declarations)
     if declaration and declaration.pack == pack_name then
+      named_declaration = declaration.recipe == pack_name
       local result, reason = binding(pack_name, declaration, true)
       if result then return with_retained_progression(shared, result) end
       -- Different actual unlocks require the separately authored direct-owner
@@ -409,22 +411,30 @@ local function declared_source(pack_name, shared)
       if excluded then return excluded end
       return nil, "missing-approved-pack-source:" .. pack_name
     end
-    if #producers ~= 1 then return nil, "ambiguous-approved-pack-source:" .. pack_name end
+    if #producers ~= 1 then
+      return nil, "ambiguous-approved-pack-source:" .. pack_name, false, nil, named_declaration
+    end
     recipe_name = producers[1]
     fact = recipe_facts.view(recipe_name)
     if not outputs_pack(fact, pack_name) then
       return nil, "approved-pack-recipe-output-mismatch:" .. recipe_name
     end
   end
-  local gates = {}
+  local gates, rejected = {}, {}
   if fact.enabled_without_research ~= true then
     for _, name in ipairs(recipe_unlocks.for_recipe(recipe_name)) do
-      if not technology_reason(name) then gates[#gates + 1] = name end
+      local reason = technology_reason(name)
+      if not reason then gates[#gates + 1] = name
+      else rejected[#rejected + 1] = name .. "=" .. reason end
     end
     if #gates == 0 or (#gates > 1
       and not (shared.science_binding_policy or {}).direct_unlock_alternatives) then
       local trigger_source = trigger_output_source(pack_name, recipe_name, fact)
       if trigger_source then return trigger_source, nil, true, {trigger_source.unlocker} end
+      if #gates == 0 then
+        if #rejected == 0 then return nil, "missing-approved-pack-unlock:" .. pack_name end
+        return nil, "rejected-approved-pack-unlock:" .. pack_name .. ":" .. table.concat(rejected, ",")
+      end
       return nil, "ambiguous-approved-pack-unlock:" .. pack_name
     end
   end
@@ -613,24 +623,30 @@ end
 local function build_reference_bindings(shared, labs)
   local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, unavailable_labs = {},
     technologies = {}, rules = {}}
-  local unknown_sources, route_choices = {}, {}
+  local unknown_sources, route_choices, replacement_choices = {}, {}, {}
   local tracked_sources
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
   end
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
-    local source, reason, parameterized, primary_gates = declared_source(pack, shared)
+    local source, reason, parameterized, primary_gates, named_declaration = declared_source(pack, shared)
     local sources, competing_recipes
     local policy = shared.science_binding_policy or {}
     if policy.unique_direct_recipe and (parameterized
-      or (not source and reason == "ambiguous-approved-pack-unlock:" .. pack
+      or (not source and (reason == "ambiguous-approved-pack-unlock:" .. pack
+        or (named_declaration and reason == "ambiguous-approved-pack-source:" .. pack)
+        or reason == "missing-approved-pack-unlock:" .. pack
+        or (reason and reason:find("rejected-approved-pack-unlock:" .. pack .. ":", 1, true) == 1))
         and policy.named_pack_recipe and policy.unique_direct_unlock and policy.direct_unlock_alternatives)) then
       -- A named recipe with no usable owner is a failed source, not proof
       -- that every direct producer is unavailable. Reuse the same finite
       -- alternatives and AND/OR rules, including each owner's actual science.
       sources, competing_recipes = direct_alternatives(pack, source, shared, primary_gates)
-      if not source and #sources > 0 then source, reason = sources[1], nil end
+      if not source and #sources > 0 then
+        replacement_choices[pack] = true
+        source, reason = sources[1], nil
+      end
     end
     result.packs[pack], result.issues[pack] = source, reason
     if not source then unknown_sources[node("pack", pack)] = true end
@@ -657,7 +673,7 @@ local function build_reference_bindings(shared, labs)
           add("pack", pack, {node("pack-source", route)})
           route_choices[pack] = route_choices[pack] or {}
           route_choices[pack][#route_choices[pack] + 1] = {node = node("pack-source", route), source = candidate}
-          if competing_recipes[candidate.recipe_name] then
+          if replacement_choices[pack] or competing_recipes[candidate.recipe_name] then
             tracked_sources = tracked_sources or {}
             tracked_sources[node("pack-source", route)] = true
           end
@@ -745,11 +761,13 @@ local function build_reference_bindings(shared, labs)
     for _, choice in ipairs(choices) do
       if result.facts[choice.node] then
         if not selected then selected = choice
-        elseif choice.source.recipe_name == selected.source.recipe_name
+        elseif (replacement_choices[pack] or choice.source.recipe_name == selected.source.recipe_name)
           and source_order[choice.node] < source_order[selected.node] then selected = choice end
       end
     end
-    -- Keep the established recipe preference. Within that recipe, retain the
+    -- With no usable named source, retain the independently established seed
+    -- across replacement recipes; a circular replacement cannot inherit it.
+    -- Otherwise keep the established recipe preference. Within that recipe, retain the
     -- first independently established owner: a circular owner becoming true
     -- after another owner supplied the pack cannot replace its own seed.
     if selected then result.packs[pack] = selected.source end

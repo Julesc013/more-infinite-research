@@ -657,7 +657,8 @@ for _, change in ipairs({
   Context.with_active(Context.new(), function()
     local science = require("prototypes.mir.capabilities.science_integration.science_packs")
     local ok, reason = pcall(science.pack_production_status, trigger_pack)
-    check(not ok and tostring(reason):find("ambiguous-approved-pack-unlock:" .. trigger_pack, 1, true),
+    check(not ok and (tostring(reason):find("missing-approved-pack-unlock:" .. trigger_pack, 1, true)
+        or tostring(reason):find("rejected-approved-pack-unlock:" .. trigger_pack, 1, true)),
       "A mismatched, non-item, zero, disabled, or separately owned trigger recipe cannot admit a disabled recipe")
   end)
 end
@@ -1581,6 +1582,52 @@ do
     check(status == "initial" and #source.unlockers == 0
         and source.recipe_name == "later-automation-alternative-1",
       "An actual initial replacement remains initial despite a disabled named recipe")
+  end)
+end
+-- Missing and rejected unlockers are distinct failures, not ambiguity.
+for _, rejected in ipairs({false, true}) do
+  local raw = world(0, false)
+  if rejected then raw.technology[roles[1]].enabled = false
+  else raw.technology[roles[1]].effects = {} end
+  Context.with_active(Context.new(), function()
+    local index = bindings.compile_references(catalogue.shared, lab_bindings.view())
+    local status, reason = bindings.bound_pack_status(index, roles[1])
+    local expected = rejected and ("rejected-approved-pack-unlock:" .. roles[1] .. ":"
+      .. roles[1] .. "=disabled-technology:" .. roles[1]) or ("missing-approved-pack-unlock:" .. roles[1])
+    check(status == nil and reason == expected,
+      "Zero acceptable unlockers retain their actual " .. (rejected and "rejection" or "absence") .. " reason")
+  end)
+end
+
+-- The named recipe can be removed while several direct producers remain.
+-- Each route must still establish its own complete science requirements.
+for _, seed in ipairs({"initial", "trigger", "none"}) do
+  local raw = world(0, false)
+  local pack = roles[1]
+  raw.recipe[pack] = nil
+  raw.technology[pack].effects = {}
+  raw.recipe["a-circular-red-pack"] = {type = "recipe", name = "a-circular-red-pack", enabled = false,
+    results = {{type = "item", name = pack, amount = 1}}}
+  raw.technology["circular-red-owner"] = {type = "technology", name = "circular-red-owner",
+    unit = {count = 1, ingredients = {{pack, 1}}},
+    effects = {{type = "unlock-recipe", recipe = "a-circular-red-pack"}}}
+  raw.recipe["z-seeded-red-pack"] = {type = "recipe", name = "z-seeded-red-pack", enabled = seed == "initial",
+    results = {{type = "item", name = pack, amount = 1}}}
+  raw.technology["seeded-red-owner"] = {type = "technology", name = "seeded-red-owner",
+    enabled = seed ~= "none", research_trigger = {type = "craft-item", item = "iron-plate", count = 1},
+    effects = {{type = "unlock-recipe", recipe = "z-seeded-red-pack"}}}
+  Context.with_active(Context.new(), function()
+    if seed == "none" then
+      local ok, status = pcall(science_packs.pack_production_status, pack)
+      check(not ok or (status ~= "initial" and status ~= "research"),
+        "Multiple replacement recipes without a seed never prove availability")
+    else
+      local status = science_packs.pack_production_status(pack)
+      local source = science_packs.production_route_for_pack(pack)
+      check(status == (seed == "initial" and "initial" or "research")
+          and source.recipe_name == "z-seeded-red-pack",
+        "Multiple replacements retain the independently established " .. seed .. " source")
+    end
   end)
 end
 return checks

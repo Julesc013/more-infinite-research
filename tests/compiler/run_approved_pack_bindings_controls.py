@@ -178,6 +178,14 @@ return result
         runtime.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path")
         return plain(runtime.execute(command_export_source(shape)))
 
+    ownership = fresh_lua_runtime(lua52)
+    ownership.globals().source_root = (repo / 'source').as_posix()
+    ownership.globals().adapter_root = (repo / 'source/adapters/f210').as_posix()
+    ownership.execute("package.path = adapter_root .. '/?.lua;' .. source_root .. '/?.lua;' .. package.path; "
+                      "data = {raw = {}, extend = function() error('No ownership-control mutation') end}; "
+                      "mods = {base = '2.1.23'}; settings = {startup = {}}")
+    ownership_assertions = ownership.execute((repo / 'tests/compiler/startup_ownership.lua').read_text(encoding='utf-8'))
+
     lua = fresh_lua_runtime(lua52)
     lua.globals().repo_source = (repo / 'source').as_posix()
     lua.execute('''
@@ -231,7 +239,7 @@ return result
                        'prototypes.mir.domain.streams.descriptor',
                        'prototypes.mir.platform.factorio.target_line',
                        'prototypes.streams.init', 'prototypes.mir.compatibility.profiles'}
-    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo),
+    module_paths = [fixture.relative_to(repo), emission_fixture.relative_to(repo), Path('tests/compiler/startup_ownership.lua'),
                     Path('tests/compiler/recipe_source_owner_contract.lua'), Path(__file__).resolve().relative_to(repo),
                     Path('.mir/targets.json'),
                     Path('source/adapters/f210/prototypes/mir/platform/factorio/target_profiles.lua')]
@@ -248,6 +256,7 @@ return result
                     module_paths.append(root / relative)
                     break
     print(json.dumps({'status': 'MIR-APPROVED-PACK-BINDINGS-PASSED', 'assertions': assertions,
+                      'startup_ownership_assertions': ownership_assertions,
                       'scope': 'controlled-approved-reference-graph-and-facade-not-native-qualification',
                       'factorio_processes': 0, 'runtime': 'Lua 5.2',
                       'stubbed_module_boundaries': sorted(stubbed_modules),

@@ -47,10 +47,11 @@ function M.technology_is_researchable_infinite(name)
 end
 
 function M.technology_has_exact_effect(name, expected_effect)
-  if not M.technology_is_researchable_infinite(name) then return false end
   local expected_signature = M.effect_signature(expected_effect)
   for _, effect in ipairs((data_raw.technology(name) or {}).effects or {}) do
-    if M.effect_signature(effect) == expected_signature then return true end
+    if M.effect_signature(effect) == expected_signature then
+      return M.technology_is_researchable_infinite(name)
+    end
   end
   return false
 end
@@ -66,15 +67,21 @@ function M.technology_effect_identity_qualification_reason(name, expected_effect
   if technology.unit.count == nil and technology.unit.count_formula == nil then
     return "technology_missing_research_cost"
   end
-  if not science.technology_is_researchable(name) then return "technology_science_unreachable" end
   local expected_identity = effect_contracts.effect_identity_signature(expected_effect)
   local found_identity = false
+  local qualified_identity = false
   for _, effect in ipairs(technology.effects or {}) do
     if effect_contracts.effect_identity_signature(effect) == expected_identity then
       found_identity = true
-      if not (options and options.positive_numeric_value) then return nil end
-      if effect_contracts.effect_has_positive_numeric_value(effect) then return nil end
+      if not (options and options.positive_numeric_value)
+        or effect_contracts.effect_has_positive_numeric_value(effect) then qualified_identity = true end
     end
+  end
+  -- Only an actual qualifying effect can make this technology an owner.
+  -- Matching unresolved owners must still fail through the science contract.
+  if qualified_identity then
+    if not science.technology_is_researchable(name) then return "technology_science_unreachable" end
+    return nil
   end
   if found_identity and options and options.positive_numeric_value then
     return "effect_identity_nonpositive_or_non_numeric"

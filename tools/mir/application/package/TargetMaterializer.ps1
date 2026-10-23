@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Resolve-MIR4CurrentPackageMetadataSourceVersion {
   param([Parameter(Mandatory)][string]$SourceVersion)
 
-  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1')
   if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
     throw '[mir4-current-package-metadata-source-version]'
   }
@@ -200,6 +200,14 @@ function Get-MIR4PrivatePatchPackageChangelogText {
     if ($MinimumFactorioVersion) {
       $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
     }
+  } elseif ($SourceVersion -ceq '4.7.1') {
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    $entry += "  Bugfixes:`n    - Match foreign infinite technology effects before qualifying their science; retain qualification of matching owners.`n"
+    $entry += "    - Bind independently seeded replacement recipes for declared named science sources when the named recipe is absent.`n"
+    $entry += "    - Distinguish missing science unlocks from rejected unlock candidates and retain their rejection reasons.`n"
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n"
+    $entry += "    - Retain the published 4.7.0 changelog and earlier history.`n"
+    if ($MinimumFactorioVersion) { $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line.`n" }
   } elseif ($SourceVersion -ceq '4.7.0') {
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
     if ($targetCode -cin @('210','200','110','100')) {
@@ -271,7 +279,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $minimumFactorioVersion = ''
-  if ($SourceVersion -cin @('4.6.0','4.7.0')) {
+  if ($SourceVersion -cin @('4.6.0','4.7.0','4.7.1')) {
     $dependenciesProperty = $info.PSObject.Properties['dependencies']
     $declaredDependencies = if ($null -eq $dependenciesProperty) { @() } else { @($dependenciesProperty.Value) }
     $baseRequirements = @($declaredDependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
@@ -351,7 +359,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output
