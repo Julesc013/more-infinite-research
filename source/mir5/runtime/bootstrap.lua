@@ -20,6 +20,13 @@ local active_mods = script and script.active_mods or mods or {}
 if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
 end
+-- A bounded foreign-owner adapter is needed only while its named provider is
+-- present. It owns no module discovery and is imported before callbacks.
+local competing_productivity
+if type(active_mods) == "table" and active_mods.ExpandedProductivityResearch ~= nil
+    and require("platform.target").id == "f200" then
+  competing_productivity = require("runtime.competing_productivity")
+end
 
 -- Historical JSON carrier recovery is independent of caps and scripted
 -- contributions. No K2 body or migration state exists on an inactive profile.
@@ -247,15 +254,35 @@ end
 local function on_init()
   initialize_imersite()
   lifecycle.on_init()
+  if competing_productivity then competing_productivity.on_init() end
   if scripted_effects then scripted_effects.on_init() end
   library.on_init()
   reconcile_repair()
   reconcile_translations()
 end
 
+-- The provider can be removed between saves. No native EPR technology can be
+-- trusted after that change, so discard only this exact private schema rather
+-- than carrying an old disablement right into a later provider re-addition.
+-- This deliberately performs no force or technology write.
+local function discard_absent_competing_productivity_state()
+  if competing_productivity or storage == nil then return end
+  local value = storage.mir_competing_productivity
+  if value == nil then return end
+  if type(value) ~= "table" or value.schema ~= 1 or type(value.owned_disabled) ~= "table" then
+    error("MIR unsupported competing productivity storage", 2)
+  end
+  storage.mir_competing_productivity = nil
+end
+
 local function on_configuration_changed(event)
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
+  if competing_productivity then
+    competing_productivity.on_configuration_changed(event)
+  else
+    discard_absent_competing_productivity_state()
+  end
   if scripted_effects then
     scripted_effects.on_configuration_changed(event)
   else
@@ -279,6 +306,7 @@ end
 
 local function on_load()
   lifecycle.on_load()
+  if competing_productivity then competing_productivity.on_load() end
   if scripted_effects then scripted_effects.on_load() end
   library.on_load()
   -- No save writes or game access on load. Each joining client reconstructs
@@ -351,17 +379,30 @@ end
 
 local function on_research_finished(event)
   if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
+  if competing_productivity then competing_productivity.on_research_finished(event) end
   if scripted_effects then scripted_effects.on_research_finished(event) end
 end
 
 local function on_research_reversed(event)
   if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
+  if competing_productivity then competing_productivity.on_research_reversed(event) end
   if scripted_effects then scripted_effects.on_research_reversed(event) end
 end
 
 local function on_technology_effects_reset(event)
   if lifecycle.caps_active() then lifecycle.on_technology_effects_reset(event) end
+  if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
+end
+
+local function on_research_started(event)
+  if lifecycle.caps_active() then lifecycle.on_research_started(event) end
+  if competing_productivity then competing_productivity.on_research_started(event) end
+end
+
+local function on_research_cancelled(event)
+  if lifecycle.caps_active() then lifecycle.on_research_cancelled(event) end
+  if competing_productivity then competing_productivity.on_research_cancelled(event) end
 end
 
 local function on_tower_planted_seed(event)
@@ -371,12 +412,14 @@ end
 local function on_force_created(event)
   if event and event.force then initialize_imersite(event.force) end
   if lifecycle.caps_active() then lifecycle.on_force_created(event) end
+  if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
 end
 
 local function on_force_reset(event)
   if event and event.force then initialize_imersite(event.force) end
   if lifecycle.caps_active() then lifecycle.on_force_reset(event) end
+  if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
 end
 
@@ -391,6 +434,7 @@ local function on_forces_merged(event)
     reconcile_imersite(event.destination)
   end
   if lifecycle.caps_active() then lifecycle.on_forces_merged(event) end
+  if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
 end
 
@@ -422,7 +466,9 @@ function M.register()
     script.on_event(events.on_entity_damaged, repair_config.enabled and on_entity_damaged or nil,
       repair_config.enabled and {{filter = "type", type = "wall"}, {filter = "type", type = "gate", mode = "or"}} or nil)
   end
+  local competing_active = competing_productivity and competing_productivity.active()
   local force_lifecycle_active = lifecycle.caps_active()
+    or competing_active
     or (scripted_effects and scripted_effects.events_active())
     or imersite ~= nil
   if force_lifecycle_active then
@@ -441,23 +487,23 @@ function M.register()
   -- direct scripted effects need the force callbacks above, but do not own
   -- start/cancel handling when every cap is unlimited.
   if events.on_research_started then
-    script.on_event(events.on_research_started,
-      lifecycle.caps_active() and lifecycle.on_research_started or nil)
+    local active = lifecycle.caps_active() or competing_active
+    script.on_event(events.on_research_started, active and on_research_started or nil)
   end
   if events.on_research_cancelled then
-    script.on_event(events.on_research_cancelled,
-      lifecycle.caps_active() and lifecycle.on_research_cancelled or nil)
+    local active = lifecycle.caps_active() or competing_active
+    script.on_event(events.on_research_cancelled, active and on_research_cancelled or nil)
   end
   if events.on_research_finished then
-    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active())
     script.on_event(events.on_research_finished, active and on_research_finished or nil)
   end
   if events.on_research_reversed then
-    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active())
     script.on_event(events.on_research_reversed, active and on_research_reversed or nil)
   end
   if events.on_technology_effects_reset then
-    local active = lifecycle.caps_active() or (scripted_effects and scripted_effects.events_active())
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active())
     script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
   if events.on_tower_planted_seed then

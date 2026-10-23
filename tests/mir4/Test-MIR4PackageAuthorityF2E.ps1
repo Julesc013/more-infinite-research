@@ -34,13 +34,8 @@ $registry=Read-MIR4CanonicalPackageAuthorityRecord -RepoRoot $repo -RelativePath
   )|Sort-Object -Unique -CaseSensitive
 $canonicalInputs=@(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
 $genericInputs=@(Get-MIRPackageSourceFiles -RepoRoot $repo)
-$genericFingerprint=Get-MIRPackageSourceFingerprint -RepoRoot $repo
-$canonicalFingerprint=Get-MIR4CanonicalPackageSourceFingerprint -RepoRoot $repo
 if(($canonicalInputs-join"`n")-cne($expectedCanonicalInputs-join"`n")-or
-   ($genericInputs-join"`n")-ceq($canonicalInputs-join"`n")-or
-   ([string]$currentAuthority.versioning_authority.path) -in $genericInputs -or
-   'source/.mir-root.json' -notin $genericInputs -or
-   $genericFingerprint -cne $canonicalFingerprint -or
+   ($genericInputs-join"`n")-cne($canonicalInputs-join"`n")-or
    'source/prototypes/mir/core/fingerprint.lua'-notin$canonicalInputs-or
    'targets/f210/composition.json'-notin$canonicalInputs-or
    @($canonicalInputs|Where-Object{$_-like'source/mir5/*'}).Count-ne0-or

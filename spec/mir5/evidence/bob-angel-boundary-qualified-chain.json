@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelNativeQualificationChainV1",
+  "source": "784be1397047b08844b3788cc4abd1a39765dc33",
+  "run": {
+    "id": 39993575130,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39993575130",
+    "conclusion": "success"
+  },
+  "custody": "build/mir5/black-glass/incoming/39993575130/black-glass-bob-angel-boundary-39993575130-1",
+  "manifest_members_verified": 108,
+  "cases": {
+    "effect1-cap40": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-boundary-qualified-effect1-cap40-native.json.gz",
+      "uncompressed_receipt_sha256": "D61BB284C5F484C1E9F3426396236D31AA4367DC9677BA95116CFFE19731EB88",
+      "status": "passed-private-native-fixture",
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3"
+      },
+      "input_save": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39993575130-1\\gameplay\\effect3-cap2\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "97DB1ED7E5FA9C167E282A4F24A491843569D57D67F9F3A2138506E95A90D9DD"
+      },
+      "witnesses": {
+        "effect_percent": 1,
+        "useful_level_headroom": 300,
+        "user_cap": 40,
+        "effective_cap": 40,
+        "saved_finite_tail_level": 150,
+        "preserved_infinite_next_level": 151,
+        "native_recipe_bonus": 1.5,
+        "player_owned_visibility": true,
+        "foreign_queue_and_effects_preserved": true,
+        "prior_foreign_disable_erased_by_upstream": true,
+        "foreign_disable_preservation_qualified": false,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "7A938B1B3036EF0B1A12826AF10BB3E15B54AF95354FDA05E87D84BF2A92C78A",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "7A938B1B3036EF0B1A12826AF10BB3E15B54AF95354FDA05E87D84BF2A92C78A",
+          "byte_identical": true
+        }
+      ]
+    },
+    "effect3-cap2": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-boundary-qualified-effect3-cap2-native.json.gz",
+      "uncompressed_receipt_sha256": "5F0B0A98189C757ED278B4387115FD68AD96643B702074EFB80141A3517553DD",
+      "status": "passed-private-native-fixture",
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3"
+      },
+      "input_save": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39993575130-1\\gameplay\\upgrade\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "267D35B16D91773D431F114C84372BC4AF791C865E2C777DC3A8F10E1C2E2FD3"
+      },
+      "witnesses": {
+        "effect_percent": 3,
+        "useful_level_headroom": 100,
+        "user_cap": 2,
+        "effective_cap": 2,
+        "saved_finite_tail_level": 150,
+        "preserved_infinite_next_level": 151,
+        "native_recipe_bonus": 4.5,
+        "player_owned_visibility": true,
+        "foreign_queue_and_effects_preserved": true,
+        "prior_foreign_disable_erased_by_upstream": true,
+        "foreign_disable_preservation_qualified": false,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "97DB1ED7E5FA9C167E282A4F24A491843569D57D67F9F3A2138506E95A90D9DD",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "97DB1ED7E5FA9C167E282A4F24A491843569D57D67F9F3A2138506E95A90D9DD",
+          "byte_identical": true
+        }
+      ]
+    },
+    "published": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-boundary-qualified-published-native.json.gz",
+      "uncompressed_receipt_sha256": "CC3E27F7AE09DF3EA55D73FB85ED12FD40A9BCB0DB2D1C2F0667624F936D2233",
+      "status": "passed-private-native-fixture",
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+        "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      },
+      "input_save": null,
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "finite_tail_level": 150,
+        "finite_tail_effect_percent": 2,
+        "seeded_boundary_levels": true,
+        "historical_lab_completed_levels": 0,
+        "no_fabricated_150_completion_claim": true,
+        "native_recipe_bonus": 3,
+        "foreign_disabled": true,
+        "foreign_queue": "mir5-ba-continuity-queue-probe",
+        "foreign_progress": 0.42000000000000004,
+        "foreign_external_disable_transition": true,
+        "foreign_prewrite_enabled": true,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "5F6D04D4820306C6D026DC09C41BFEA65E6AC03B7BB7EF3D1FFCFA5036E64951",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "5F6D04D4820306C6D026DC09C41BFEA65E6AC03B7BB7EF3D1FFCFA5036E64951",
+          "byte_identical": true
+        }
+      ]
+    },
+    "upgrade": {
+      "receipt_gzip": "spec/mir5/evidence/bob-angel-boundary-qualified-upgrade-native.json.gz",
+      "uncompressed_receipt_sha256": "96CACEE8047C6435CA457C2B53D81EBB29F5FB96C09CE691076E8E6C567AA5FF",
+      "status": "passed-private-native-fixture",
+      "mir_archive": {
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "sha256": "D51312D2474E7DFAD09D5D6D190AADAB833A51C557F571B0A1FFDC3084AC56E3"
+      },
+      "input_save": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39993575130-1\\gameplay\\published\\write-data\\saves\\mir5-native-complete.zip",
+        "sha256": "5F6D04D4820306C6D026DC09C41BFEA65E6AC03B7BB7EF3D1FFCFA5036E64951"
+      },
+      "witnesses": {
+        "source_mir": "4.7.20002",
+        "fixture_version": "0.2.0",
+        "default_rows_preflighted_before_mutation": true,
+        "on_load_read_only": false,
+        "qualification": "native-runner-readback-required",
+        "real_lab_completed_levels": 0,
+        "seeded_boundary_levels": true,
+        "seeded_finite_tail_level": 150,
+        "preserved_infinite_next_level": 151,
+        "no_fabricated_150_completion_claim": true,
+        "native_recipe_bonus": 3,
+        "foreign_queue_and_effects_preserved": true,
+        "prior_foreign_disable_erased_by_upstream": true,
+        "foreign_disable_preservation_qualified": false,
+        "foreign_external_disable_transition": true
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "267D35B16D91773D431F114C84372BC4AF791C865E2C777DC3A8F10E1C2E2FD3",
+          "byte_identical": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "267D35B16D91773D431F114C84372BC4AF791C865E2C777DC3A8F10E1C2E2FD3",
+          "byte_identical": true
+        }
+      ]
+    }
+  },
+  "release_qualification": false,
+  "scope": "Five material families: published finite150 source, MIR5 next151/bonus3, effect3% with cap2/bonus4.5, effect1% with cap40/bonus1.5; every case saves and cold-reloads twice.",
+  "limits": [
+    "Boundary levels are seeded through native API, not150 actual lab completions.",
+    "Independent published reset-control39991831062 proves upstream re-enable. The fixture explicitly does not claim discarded foreign enablement survives that upstream write.",
+    "Physical smelting, multiplayer and final-candidate release remain separate."
+  ]
+}

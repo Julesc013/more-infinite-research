@@ -1,0 +1,62 @@
+{
+  "baseline_receipt": {
+    "data_raw": {
+      "bytes": 25694420,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "E278C678ADB7DB6080749474002874D1091EF65DAD8AF82898DAAF50660ECA44"
+    },
+    "mod_settings": {
+      "bytes": 13628,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "AFC8DF2869290CC801CFA9644FFA6E6FAF24B4376085B4D92F2E6D3CE116830B"
+    },
+    "result": {
+      "bytes": 21688,
+      "path": "result.json",
+      "sha256": "48444A48A0AFA05AC1C493BC2A1BBAB4328A96D566FDE083406ABA6D737DB563"
+    },
+    "selection": {
+      "bytes": 1528,
+      "path": "selection.json",
+      "sha256": "37F03254ED53521993CAC7AEEA03673D18468DF3662118EF7411DD1D979C9CFC"
+    }
+  },
+  "candidate_receipt": {
+    "data_raw": {
+      "bytes": 25820414,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "CE4D84D7539BE147E04165762E270EDBFD0B1A59F7E974BE3D292A66051883A0"
+    },
+    "mod_settings": {
+      "bytes": 748140,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "0D54F32197671EFB160A5007A4917B8B810FD422BA71F4F142F4EA46FFC761D6"
+    },
+    "result": {
+      "bytes": 22849,
+      "path": "result.json",
+      "sha256": "DBEDCBB4505EE2149C67E9003C594E4C39D2DA9B56823A7184258A5D1F1A52CC"
+    },
+    "selection": {
+      "bytes": 1638,
+      "path": "selection.json",
+      "sha256": "3067C3A8C7F965DE5D2287A644647134287B1CE7741DFD0439F3E1F52C970A93"
+    }
+  },
+  "differences": [],
+  "inventory_sha256": "3AD7EA25EC20DD47AC55425E0C6ECAB204808C6BDAA43F7A7DBB93495CF992AC",
+  "kind": "MIR5ModernCandidateComparisonV1",
+  "profile": "bob-angel-f200",
+  "reviewed_differences": [
+    "BA-NONTRUNCATING-ALUMINIUM",
+    "BA-NONTRUNCATING-COPPER_TUNGSTEN",
+    "BA-NONTRUNCATING-GOLD",
+    "BA-NONTRUNCATING-TIN",
+    "BA-NONTRUNCATING-TITANIUM",
+    "BA-BASE-IDENTITY-RESEARCH_OIL_PROCESSING_PRODUCTIVITY",
+    "BA-BASE-IDENTITY-RESEARCH_OIL_CRACKING_PRODUCTIVITY"
+  ],
+  "schema": 2,
+  "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+  "status": "equal-intended-native-output"
+}

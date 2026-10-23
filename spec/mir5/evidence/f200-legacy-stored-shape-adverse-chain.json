@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200PublishedCapStorageShapeInvestigationV1",
+  "cases": [
+    {
+      "run": {
+        "id": 40006832949,
+        "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40006832949",
+        "conclusion": "failure"
+      },
+      "source": "1f40e70a99efa6552924771c5233a79cc76f3794",
+      "family": "cap",
+      "custody": "build/mir5/black-glass/incoming/40006832949/black-glass-f200-legacy-caps-40006832949-1",
+      "manifest_members_verified": 53,
+      "source_receipt": {
+        "gzip": "spec/mir5/evidence/f200-legacy-cap-stored-shape-adverse-published.json.gz",
+        "uncompressed_sha256": "E8BCBC34DA0C13C5FAB4FA1A7AD5AB2052AFE02B9BE180E17829EDCC6D0EAAD3"
+      },
+      "failed_upgrade_receipt": {
+        "gzip": "spec/mir5/evidence/f200-legacy-cap-stored-shape-adverse-upgrade.json.gz",
+        "uncompressed_sha256": "F598CE948589DD5CAEF2D5B1EE9070B4AF958AC5BD61F3A27E0A8BD0E708DEC7"
+      },
+      "failed_upgrade_log": {
+        "gzip": "spec/mir5/evidence/f200-legacy-cap-stored-shape-adverse-upgrade.log.gz",
+        "uncompressed_sha256": "42458DC8E11B3BDAA62A931619C55AEF7BF9B103CAA7A72142646E58A074A4B9"
+      }
+    },
+    {
+      "run": {
+        "id": 40006838416,
+        "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40006838416",
+        "conclusion": "failure"
+      },
+      "source": "1f40e70a99efa6552924771c5233a79cc76f3794",
+      "family": "worker",
+      "custody": "build/mir5/black-glass/incoming/40006838416/black-glass-f200-legacy-worker-40006838416-1",
+      "manifest_members_verified": 53,
+      "source_receipt": {
+        "gzip": "spec/mir5/evidence/f200-legacy-worker-stored-shape-adverse-published.json.gz",
+        "uncompressed_sha256": "1FA62E719D70E8D50C1D9294CFED92CC09DDEA7489D19CB01A05D5987752139E"
+      },
+      "failed_upgrade_receipt": {
+        "gzip": "spec/mir5/evidence/f200-legacy-worker-stored-shape-adverse-upgrade.json.gz",
+        "uncompressed_sha256": "E02DDD85A180763F4F3407596F9F19A71F0B6796970C11411F65E5079EEA4E41"
+      },
+      "failed_upgrade_log": {
+        "gzip": "spec/mir5/evidence/f200-legacy-worker-stored-shape-adverse-upgrade.log.gz",
+        "uncompressed_sha256": "2D3F450D42618F60A425682BC2FB0B165FE2E7D05E61363BBA53B963DE760C2E"
+      }
+    }
+  ],
+  "independent_producer": {
+    "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "member": "more-infinite-research_4.7.20002/prototypes/mir/runtime/maximum_level_control.lua",
+    "member_sha256": "D786E6D522B87B9102F2D774D7B0CAA825B54DDF18753C4CC776CD6DB1789FCE",
+    "functions": {
+      "add_runtime_binding": "109-133",
+      "ownership_key": "414-421",
+      "captured_visibility": "668-675",
+      "disable_writer": "862-878"
+    }
+  },
+  "diagnosis": [
+    "Both published two-lab saves passed two cold reloads. Their MIR5 successors failed the restoration assertion after configuration change.",
+    "The exact F200 producer stores the technology name only as the managed map key, omits policy.technology and both binding_fingerprint fields, records boolean native_finite_stage, and creates an ownership key starting with literal nil.",
+    "The initial MIR5 decoder incorrectly imposed the F210 transported technology/digest/key fields on this distinct F200 settings-derived producer.",
+    "The correction admits only the exact F200 authored tuple and missing-field shape, matching positive cap, force/version, visibility, and proven owned enabled-to-disabled write. F210 retains its named identity and MIR32 digest requirements.",
+    "Synthetic controls were corrected from the independently reviewed producer source, with opponents for invented fields, stale force, wrong key/setting/source/operation, V2 rows and foreign writes. Native successor acceptance remains required."
+  ],
+  "release_qualification": false
+}

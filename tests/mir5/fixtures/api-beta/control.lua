@@ -59,8 +59,11 @@ local function run(stage)
   local technology = force.technologies[technology_name]
   if technology == nil then fail("immediate cable technology is absent") end
   local effects = technology.prototype.effects
+  -- Keep the authored .01 exact in data; the native engine exposes a
+  -- float32 effect here, independently of its double API result fields.
   if #effects ~= 1 or effects[1].type ~= "change-recipe-productivity"
-    or effects[1].recipe ~= "copper-cable" or effects[1].change ~= 0.01 then
+    or effects[1].recipe ~= "copper-cable" or type(effects[1].change) ~= "number"
+    or math.abs(effects[1].change - 0.01) > 0.00000001 then
     fail("native cable productivity effect differs")
   end
   local status = assert_query(force)

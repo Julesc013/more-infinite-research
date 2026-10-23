@@ -1760,7 +1760,17 @@
         "admitted_recipe_targets": "capture-required",
         "emitted_effects": "capture-required",
         "resolved_science_packs": "capture-required",
-        "resolved_prerequisites": "capture-required"
+        "resolved_prerequisites": "capture-required",
+        "profile_evidence": [
+          {
+            "profile": "tests/mir5/profiles/base-create-research-f200-2077.json",
+            "published_version": "4.7.20002",
+            "native_run": 39984529343,
+            "result": "not-emitted-no-matching-recipes",
+            "facts": "tests/mir5/fixtures/automatic-families-f200-captured-facts.json",
+            "obligation": "Do not infer Base delivery from declared released identity metadata. Historical custom-fixture identity and other profiles remain separate continuity subjects; no community request is marked fulfilled."
+          }
+        ]
       }
     },
     {
@@ -1776,7 +1786,17 @@
         "admitted_recipe_targets": "capture-required",
         "emitted_effects": "capture-required",
         "resolved_science_packs": "capture-required",
-        "resolved_prerequisites": "capture-required"
+        "resolved_prerequisites": "capture-required",
+        "profile_evidence": [
+          {
+            "profile": "tests/mir5/profiles/base-create-research-f200-2077.json",
+            "published_version": "4.7.20002",
+            "native_run": 39984529343,
+            "result": "not-emitted-no-matching-recipes",
+            "facts": "tests/mir5/fixtures/automatic-families-f200-captured-facts.json",
+            "obligation": "Do not infer Base delivery from declared released identity metadata. Historical custom-fixture identity and other profiles remain separate continuity subjects; no community request is marked fulfilled."
+          }
+        ]
       }
     },
     {

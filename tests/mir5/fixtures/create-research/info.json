@@ -1,0 +1,8 @@
+{
+  "name": "mir-fixture-mir5-create-research",
+  "version": "0.1.0",
+  "title": "MIR5 opt-in research reference observer",
+  "author": "MIR maintainers",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.77", "? more-infinite-research"]
+}

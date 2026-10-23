@@ -11,6 +11,9 @@ M.import_setting_name = "mir-settings-profile-import"
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
 local k2so_active = modern_catalogue.is_k2so(active_mods)
+local bob_angel_active = modern_catalogue.is_bob_angel(active_mods)
+local atan_active = (active_mods["atan-air-scrubbing"] or active_mods["atan-ash"])
+  and require("compatibility.atan_profile").select(active_mods, require("platform.target")) ~= nil
 local native_owner_families = {}
 for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do native_owner_families[owner.family] = true end
 
@@ -56,6 +59,11 @@ for _, historical_stream in ipairs(historical.streams) do
       for key, value in pairs(override) do field[key] = value end
       -- Published K2SO omits the hidden field instead of declaring false.
       if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
+      if bob_angel_active and require("compatibility.bob_angel_profile").setting_visible(historical_stream.key) then
+        field.hidden = nil
+      end
+      if atan_active and (historical_stream.key == "research_air_scrubbing_clean_filter"
+        or historical_stream.key == "research_ash_separation") then field.hidden = nil end
       fields[index] = field
     end
     streams[#streams + 1] = {

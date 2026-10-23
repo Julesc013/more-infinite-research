@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "kind": "MIR5AdverseNativeChainV1",
+  "run": {
+    "id": 39991218699,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39991218699"
+  },
+  "source": "bce423f223649bb4d6d2db6be6b027ae92a6c4d6",
+  "custody": "build/mir5/black-glass/incoming/39991218699/black-glass-bob-angel-prototype-cap125-39991218699-1",
+  "receipt_gzip": "spec/mir5/evidence/bob-angel-cap125-seed-reset-adverse-native.json.gz",
+  "uncompressed_receipt_sha256": "A09173434D6CD7E0C419650270E7AF92B96C1389F7662092765E1D5C30957F1C",
+  "status": "failed",
+  "release_qualification": false,
+  "diagnosis": "Foreign fixture disable was written before native effect reset; establish it after seeding/reset operations. No native cap or historical upgrade pass."
+}

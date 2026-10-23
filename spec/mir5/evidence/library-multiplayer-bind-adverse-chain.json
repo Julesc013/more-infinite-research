@@ -1,0 +1,20 @@
+{
+  "receipt_gzip": "spec/mir5/evidence/library-multiplayer-bind-adverse-native.json.gz",
+  "uncompressed_receipt_sha256": "76484AFF4BB5951928B17D27FD40E13C00C9B34E2C1E49987B941D5CB3E5D759",
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerAdverseChainV1",
+  "source": "447bf669a680375239e5cb3fe42f8ec2980c9ebd",
+  "run": {
+    "id": 39994784633,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39994784633",
+    "conclusion": "failure"
+  },
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/39994784633/black-glass-library-multiplayer-39994784633-1",
+  "diagnosis": [
+    "World preparation passed; a fixed socket bind failed with WSAEACCES10013 before any client started.",
+    "87 available artifact members verified; the upload omitted its manifested empty server/.lock. No complete artifact pass is claimed.",
+    "The revised actor selects OS-assigned loopback ports; no firewall or reservation controls change.",
+    "Future upload includes owned hidden output files to match the manifest."
+  ],
+  "release_qualification": false
+}

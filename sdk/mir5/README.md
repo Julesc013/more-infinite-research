@@ -1,6 +1,6 @@
 # MIR 5 API v1 draft SDK
 
-This is developer material for the current MIR API v1 draft. It is not loaded by the player package, it is not a released compatibility promise, and it establishes no native, save/reload, multiplayer, modpack, or API-stability qualification.
+This is developer material for the current MIR API v1 draft. It is not loaded by the player package and is not yet a released compatibility promise. Exact native consumer evidence is linked below; multiplayer, optional-absence and final-candidate API qualification remain separate.
 
 The annotation-only [Lua surface](api-v1.lua) follows the implemented data module `__more-infinite-research__.api.v1.data` and the runtime remote interface `more-infinite-research.api.v1`. It has no implementation code, registration, storage, or callbacks.
 
@@ -15,7 +15,7 @@ Use the existing independent fixtures as the examples. They are deliberately sep
 
 ## Current data surface
 
-`get_version()` returns `{major = 1, minor = 0, product = "5.0.21000"}`. `get_capabilities()` reports `technology_creation`, `technology_family`, and `recipe_productivity` as true, and `research_query` as false. The data module provides `add_technology`, `add_technologies`, and `add_productivity`.
+`get_version()` returns the API version and selected product distribution, for example `{major = 1, minor = 0, product = "5.0.20000"}` on F200. `get_capabilities()` reports the selected engine adapter: modern targets support `technology_creation`, `technology_family`, and `recipe_productivity`; data-stage `research_query` is false. Check capabilities before requesting an effect unavailable on a historical engine. The data module provides `add_technology`, `add_technologies`, and `add_productivity`.
 
 A data call operates immediately in the caller's present data stage through native publication. It does not enqueue a contribution for an MIR finalizer. A required consumer declares the normal MIR dependency and may import directly. An optional consumer declares `? more-infinite-research >= 5.0.21000`, guards with `mods[...]` before its import, and makes its absent-MIR path inert.
 
@@ -29,7 +29,7 @@ The snapshot exposes native `name`, `force_index`, `researched`, `level`, `enabl
 
 ## Draft target and validation limits
 
-This draft is scoped only to the current Factorio 2.1 path; the two consumer fixtures declare `base >= 2.1.23`. It has host controls for the data and runtime boundary. Native consumer, optional-absence, save/reload, joining-client, cross-modpack, historical-target, and stable API acceptance remain separate qualification work. Use a disposable test world only.
+The canonical fixtures use Factorio 2.1 metadata (`base >= 2.1.23`); each `info-f200.json` supplies the exact Factorio 2.0.77 variant while sharing the same Lua consumer. [The F200 selection](../../tests/mir5/profiles/api-consumers-f200-2077.json) runs required alpha, optional late beta and the physical-production observer together. [Exact native evidence](../../spec/mir5/evidence/api-consumers-f200-chain.json) at source `86a9babd4462b5967f56bcc57669c22de26474fb` proves immediate data publication, independent detached runtime queries, alpha’s native crafting bonus, 200 then 202 cables from equal 100-plate inputs, save and two cold reloads. Research in that scenario uses native setters, not labs. Optional absence, joining clients, other modpacks, historical consumer targets and final released API acceptance remain separate. Use disposable test worlds while the product is incomplete.
 
 Run the current host controls with the explicit private Lua 5.2 runtime input:
 
@@ -49,7 +49,7 @@ The pinned MIR 4.7 F210 player archive shipped two conditional, unversioned runt
 
 Current MIR 5 control source collision-checks and registers both historical names, but this is a source and host-control bridge, not native or compatibility qualification. The settings facade retains the two method names, strict compact test, effective registered-setting export, metadata fields `mir_version`, `factorio_version`, and `import_setting`, and the validation count/result shape. It exports only the current MIR 5 registered settings through the MIRSET1 codec; it does not recreate the historical setting catalogue or apply a decoded profile.
 
-The browser bridge maps historical `search` to the current `query` and accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. `mode`, `tab`, and `settings_scope` have no current mapping. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
+The browser bridge maps historical `search` to the current `query` and accepts `family`, `status`, `sort`, `selected`, `hidden`, and integral `page` from 1 through 30000. It verifies a selected technology against the player's native force before passing it to the Library and retains the boolean open result. The current bridge also accepts `mode`, `tab`, `settings_scope`, `settings_search` and `visibility`; Library host controls cover their current mapping. Rendered joined-client behavior still requires native qualification. The bridged `page` is a saved continuous UI position, and neither historical nor current `open` supplies a remote row/page response envelope; pagination equivalence has not been established.
 
 No identified independent old consumer exists within the pinned source and archive search scope. The required and optional `examples/` trees are current MIR 5 public usage examples, not evidence of a previous consumer. MIR4 API-preview response fields and MEP envelope fields are developer-only historical preview shapes: MIR 5 neither emits nor imports them. The normative V0 removal obligation remains open and still requires accepted independent-consumer migration evidence plus an explicit later-release decision; this bridge does not satisfy or amend either gate.
 

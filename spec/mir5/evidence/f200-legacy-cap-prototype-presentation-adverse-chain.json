@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "run": {
+    "id": 40000740557,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40000740557",
+    "conclusion": "failure"
+  },
+  "source": "0686d84fc062de16d8bfc27c6524cce6e2a7a5bd",
+  "player": {
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+  },
+  "receipt": {
+    "gzip": "spec/mir5/evidence/f200-legacy-cap-prototype-presentation-adverse-native.json.gz",
+    "uncompressed_sha256": "1796A7C2006A4C97A990A5CFED04E4C7005E922CFA45F6C06B09BB73170CF26E"
+  },
+  "logs": [
+    {
+      "gzip": "spec/mir5/evidence/f200-legacy-cap-prototype-presentation-adverse-create.log.gz",
+      "uncompressed_sha256": "3461EA84F60CCF705F8BA5F9D60B80F2EB90AF474BF4330A081916DE9724786B"
+    }
+  ],
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/40000740557/black-glass-f200-legacy-caps-40000740557-1",
+  "manifest_members_verified": 29,
+  "diagnosis": [
+    "The prior fixture correction still incorrectly expected the Base pre-MIR prototype default after the published MIR data-final presentation patch.",
+    "Exact published maximum_level_presentation.lua applies visible_when_disabled=true for the selected positive cap before runtime. The old controller captures that actual true value at disablement.",
+    "The corrected source requires prototype/force true; the MIR5 successor must preserve that captured true value while restoring only its owned enablement. Earned levels, bonuses, partial work and foreign state remain required.",
+    "This supersedes the unverified false-prototype expectation in the prior adverse diagnosis; neither failed create attempt established a source save or upgrade pass."
+  ],
+  "release_qualification": false
+}

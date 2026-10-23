@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeContinuityAdverseChainV1",
+  "source": "f660e62f53fd1e01e830beadb68aeb3894eee8ab",
+  "run": {
+    "id": 40006313159,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40006313159",
+    "conclusion": "failure"
+  },
+  "custody": "build/mir5/black-glass/incoming/40006313159/black-glass-competing-epr-gameplay-40006313159-1",
+  "manifest_members_verified": 92,
+  "receipt": {
+    "gzip": "spec/mir5/evidence/competing-epr-current-progress-adverse-native.json.gz",
+    "uncompressed_sha256": "180E312E1FBEE0C8073FB68AF7D1F0E0F1C33AE135943B861C8A510B06145139"
+  },
+  "source_log": {
+    "gzip": "spec/mir5/evidence/competing-epr-current-progress-adverse-source.log.gz",
+    "uncompressed_sha256": "2350219C4C48DABCB0E6ACDBD33D7A3A23DC354DF2C974A53758421452785321"
+  },
+  "diagnosis": [
+    "The source reached the observation after two actual EPR tail lab levels, then failed its raw saved_progress assertion after making that same technology current.",
+    "The fixture conflated inactive saved_progress with active force.research_progress. Current and suspended investments must be independently observed across queue filtering.",
+    "No complete published save/reload or MIR5 preference-transition pass is claimed from this failed run."
+  ],
+  "release_qualification": false
+}
