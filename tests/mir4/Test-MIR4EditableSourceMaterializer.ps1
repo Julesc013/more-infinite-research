@@ -138,9 +138,17 @@ if((@($registry.targets.target|Sort-Object)-join'|')-cne'f100|f110|f200|f210'-or
 if(@($support.targets|Where-Object{[string]$_.qualification-cne'independent-exact-engine-required'}).Count-ne0-or-not[bool]$support.invariants.no_cross_target_proof_substitution){throw '[mir4-editable-source-independent-target-proof]'}
 
 $declared=@($manifest.bindings.source_path|Sort-Object -CaseSensitive -Unique)
-$actual=[Collections.Generic.List[string]]::new()
-foreach($file in @(Get-ChildItem -LiteralPath (Join-Path $repo 'source') -Recurse -File|Where-Object{$_.FullName-notin@((Join-Path $repo 'source/package-source.json'),(Join-Path $repo 'source/.mir-root.json'))})){$actual.Add([IO.Path]::GetRelativePath($repo,$file.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/'))}
-if(($declared-join"`n")-cne(@($actual|Sort-Object -CaseSensitive -Unique)-join"`n")){throw '[mir4-editable-source-physical-source-set]'}
+# MIR 5 is the explicitly selected replacement staging subtree.  It has no
+# MIR 4 package-source bindings and must never enter a MIR 4 target selection;
+# all other physical source files remain an exact manifest set.
+$mir5StagingPrefix='source/mir5/'
+$physical=[Collections.Generic.List[string]]::new()
+foreach($file in @(Get-ChildItem -LiteralPath (Join-Path $repo 'source') -Recurse -File|Where-Object{$_.FullName-notin@((Join-Path $repo 'source/package-source.json'),(Join-Path $repo 'source/.mir-root.json'))})){$physical.Add([IO.Path]::GetRelativePath($repo,$file.FullName).Replace([IO.Path]::DirectorySeparatorChar,'/'))}
+$mir5Staging=@($physical|Where-Object{$_.StartsWith($mir5StagingPrefix,[StringComparison]::Ordinal)}|Sort-Object -CaseSensitive -Unique)
+if($mir5Staging.Count-eq0){throw '[mir4-editable-source-mir5-staging-missing]'}
+if(@($declared|Where-Object{$_.StartsWith($mir5StagingPrefix,[StringComparison]::Ordinal)}).Count-ne0){throw '[mir4-editable-source-mir5-package-admission]'}
+$actual=@($physical|Where-Object{-not$_.StartsWith($mir5StagingPrefix,[StringComparison]::Ordinal)}|Sort-Object -CaseSensitive -Unique)
+if(($declared-join"`n")-cne($actual-join"`n")){throw '[mir4-editable-source-physical-source-set]'}
 if(Test-Path -LiteralPath (Join-Path $repo 'src') -PathType Container){throw '[mir4-editable-source-abbreviated-root-retained]'}
 if(Test-Path -LiteralPath (Join-Path $repo 'source/families') -PathType Container){throw '[mir4-editable-source-era-family-retained]'}
 if(@(Get-ChildItem -LiteralPath (Join-Path $repo 'targets') -Recurse -File|Where-Object{$_.FullName-match'[\\/](?:files|generation)[\\/]'}).Count-ne0){throw '[mir4-editable-source-payload-outside-source-root]'}
@@ -161,6 +169,7 @@ foreach($target in @('f210','f200','f110','f100')){
   $state=Get-MIR4TargetMaterializerState -RepoRoot $repo -Target $target
   $selection=Get-MIR4TargetMaterializationBindings -State $state
   if(-not[bool]$selection.scoped_operation_closure-or@($selection.bindings).Count-ne@($state.manifest.bindings|Where-Object{$target-in@($_.target_scope)}).Count){throw "[mir4-editable-source-scoped-operation-closure] $target"}
+  if(@($selection.bindings|Where-Object{([string]$_.source_path).StartsWith($mir5StagingPrefix,[StringComparison]::Ordinal)}).Count-ne0){throw "[mir4-editable-source-mir5-target-admission] $target"}
   foreach($binding in @($state.manifest.bindings|Where-Object{$target-in@($_.target_scope)})){[void](Read-MIR4CanonicalSourceBindingBytes -State $state -Binding $binding)}
 }
 
