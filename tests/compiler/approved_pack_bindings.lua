@@ -1346,9 +1346,9 @@ for _, change in ipairs({
 }) do
   alternate_space_world(change)
   Context.with_active(Context.new(), function()
-    local ok, reason = pcall(science_packs.pack_production_status, "space-science-pack")
-    check(not ok and tostring(reason):find("unresolved-approved-pack-dependencies:space-science-pack", 1, true),
-      "Missing, zero, fluid, circular or unresolved alternatives never fabricate a space-science binding")
+    local status, reason = bindings.bound_pack_status(science_packs.binding_snapshot(), "space-science-pack")
+    check(not status and tostring(reason):find("unresolved-approved-pack-dependencies:space-science-pack", 1, true),
+      "Missing, zero, fluid, circular or unresolved alternatives never prove transitive science availability")
   end)
 end
 for _, reversed in ipairs({false, true}) do
@@ -1439,9 +1439,9 @@ for _, pack in ipairs({"promethium-science-pack", "electromagnetic-science-pack"
   end)
   raw.technology["z-valid-alternate-owner"].unit.ingredients = {{"unknown-upstream-pack", 1}}
   Context.with_active(Context.new(), function()
-    local ok, reason = pcall(science_packs.pack_production_status, pack)
-    check(not ok and tostring(reason):find("unresolved-approved-pack-dependencies:" .. pack, 1, true),
-      "Multiple unknown or circular alternate owners never manufacture a valid science source")
+    local status, reason = bindings.bound_pack_status(science_packs.binding_snapshot(), pack)
+    check(not status and tostring(reason):find("unresolved-approved-pack-dependencies:" .. pack, 1, true),
+      "Multiple unknown or circular alternate owners never prove transitive science availability")
   end)
 end
 do
@@ -1629,5 +1629,44 @@ for _, seed in ipairs({"initial", "trigger", "none"}) do
         "Multiple replacements retain the independently established " .. seed .. " source")
     end
   end)
+end
+
+-- A valid native cryogenic source can depend on a foreign pack outside the
+-- finite recipe fragment. Keep its actual science and native owner without
+-- promoting the unknown factory bootstrap to a positive graph fact.
+do
+  local raw = world(0, false)
+  for _, pack in ipairs({"cryogenic-science-pack", "foreign-native-pack"}) do
+    raw.tool[pack] = {type = "tool", name = pack}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+  end
+  raw.recipe["cryogenic-science-pack"] = {type = "recipe", name = "cryogenic-science-pack", enabled = false,
+    results = {{type = "item", name = "cryogenic-science-pack", amount = 1}}}
+  raw.technology["cryogenic-science-pack"] = {type = "technology", name = "cryogenic-science-pack",
+    unit = {count = 1, ingredients = {{"foreign-native-pack", 1}}},
+    effects = {{type = "unlock-recipe", recipe = "cryogenic-science-pack"}}}
+  local before = fingerprint.of(raw)
+  Context.with_active(Context.new(), function()
+    local index = science_packs.binding_snapshot()
+    local strict, reason = bindings.bound_pack_status(index, "cryogenic-science-pack")
+    check(not strict and reason == "unresolved-approved-pack-dependencies:cryogenic-science-pack",
+      "Strict diagnostics retain the reported cryogenic unresolved-dependency result")
+    local status, gate = science_packs.pack_production_status("cryogenic-science-pack")
+    check(status == "research" and gate == "cryogenic-science-pack",
+      "Startup retains the valid native cryogenic recipe and its exact unlock owner")
+    local selected = science_packs.best_lab_compatible_ingredients(
+      {{roles[1], 2}, {"cryogenic-science-pack", 3}}, "cryogenic-startup-reference", {"cryogenic-science-pack"})
+    check(selected and #selected == 2 and selected[1][2] == 2 and selected[2][2] == 3,
+      "The reported lab-policy path keeps cryogenic science and its quantities")
+    check(science_packs.prereq_tech_for_science_pack("cryogenic-science-pack") == "cryogenic-science-pack",
+      "Generated research retains the native cryogenic prerequisite")
+    check(not index.facts["pack:cryogenic-science-pack"] and not index.facts["pack:foreign-native-pack"],
+      "Reference-only startup does not fabricate transitive availability facts")
+    check(science_packs.technology_is_researchable("cryogenic-science-pack"),
+      "A valid acyclic native technology remains a progression reference")
+    check(not pcall(science_packs.pack_production_status, "foreign-native-pack"),
+      "An absent direct science source still fails explicitly")
+  end)
+  check(fingerprint.of(raw) == before, "Reference-only qualification never mutates native prototypes")
 end
 return checks

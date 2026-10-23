@@ -126,7 +126,7 @@ function Get-MIR4TargetMaterializationBindings {
 function Resolve-MIR4CurrentPackageMetadataSourceVersion {
   param([Parameter(Mandatory)][string]$SourceVersion)
 
-  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1')
+  $admitted = @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1','4.7.2')
   if ($SourceVersion -cnotin $admitted -or $SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$') {
     throw '[mir4-current-package-metadata-source-version]'
   }
@@ -200,6 +200,13 @@ function Get-MIR4PrivatePatchPackageChangelogText {
     if ($MinimumFactorioVersion) {
       $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line, matching the accepted exact-engine tests.`n"
     }
+  } elseif ($SourceVersion -ceq '4.7.2') {
+    $normalized = Get-MIR4PrivatePatchPackageChangelogText -Changelog $normalized -DistributionVersion ("4.7.${targetCode}01") -SourceVersion '4.7.1' -MinimumFactorioVersion $MinimumFactorioVersion
+    $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
+    $entry += "  Bugfixes:`n    - Preserve unambiguous native science sources and their unlock gates when acyclic transitive factory dependencies are unknown.`n"
+    $entry += "    - Keep strict diagnostics, missing-source rejection and cyclic-reference rejection; never remove selected cryogenic science to suppress startup errors.`n"
+    $entry += "  Info:`n    - Target package from source $SourceVersion.`n    - Retain the published 4.7.1 changelog and earlier history.`n"
+    if ($MinimumFactorioVersion) { $entry += "    - Require Factorio $MinimumFactorioVersion or newer in this target line.`n" }
   } elseif ($SourceVersion -ceq '4.7.1') {
     $normalized = Get-MIR4PrivatePatchPackageChangelogText -Changelog $normalized -DistributionVersion ("4.7.${targetCode}00") -SourceVersion '4.7.0' -MinimumFactorioVersion $MinimumFactorioVersion
     $entry = "---------------------------------------------------------------------------------------------------`nVersion: $DistributionVersion`n"
@@ -280,7 +287,7 @@ function Write-MIR4PrivatePatchPackageIdentity {
   $readme = if (Test-Path -LiteralPath $readmePath -PathType Leaf) { [IO.File]::ReadAllBytes($readmePath) } else { $null }
   $utf8 = [Text.UTF8Encoding]::new($false)
   $minimumFactorioVersion = ''
-  if ($SourceVersion -cin @('4.6.0','4.7.0','4.7.1')) {
+  if ($SourceVersion -cin @('4.6.0','4.7.0','4.7.1','4.7.2')) {
     $dependenciesProperty = $info.PSObject.Properties['dependencies']
     $declaredDependencies = if ($null -eq $dependenciesProperty) { @() } else { @($dependenciesProperty.Value) }
     $baseRequirements = @($declaredDependencies | Where-Object { $_ -match '^base >= [0-9]+[.][0-9]+[.][0-9]+$' })
@@ -360,7 +367,7 @@ function New-MIR4TargetPackage {
     $infoJson = ($info | ConvertTo-Json -Depth 20).Replace("`r`n","`n") + "`n"
     [IO.File]::WriteAllText($infoPath, $infoJson, [Text.UTF8Encoding]::new($false))
   }
-  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1')) {
+  if ([string]$identity.source_version -in @('4.2.1','4.2.2','4.2.3','4.3.0','4.3.1','4.4.0','4.4.1','4.4.2','4.5.0','4.5.1','4.5.2','4.6.0','4.7.0','4.7.1','4.7.2')) {
     Write-MIR4PrivatePatchPackageIdentity -Tree $tree -DistributionVersion ([string]$identity.distribution_version) -SourceVersion ([string]$identity.source_version)
   }
   Write-MIR4DeterministicRawTreeArchive -SourceRoot $tree -EntryRoot ([string]$identity.distribution_root) -OutputPath $archive -ContainmentRoot $output

@@ -250,7 +250,7 @@ function Set-MIR422F200CompleteStateUpgradeOracle {
   $published451To452=$FromVersion-ceq'4.5.20001'-and$ToVersion-ceq'4.5.20002'
   $published452To460=$FromVersion-ceq'4.5.20002'-and$ToVersion-ceq'4.6.20000'
   $published460To470=$FromVersion-ceq'4.6.20000'-and$ToVersion-ceq'4.7.20000'
-  $published470To471=$FromVersion-ceq'4.7.20000'-and$ToVersion-ceq'4.7.20001'
+  $published470To471=($FromVersion-ceq'4.7.20000'-and$ToVersion-ceq'4.7.20001')-or($FromVersion-ceq'4.7.20001'-and$ToVersion-ceq'4.7.20002')
   $published410Transition=$ToVersion-ceq'4.3.20000'-and$FromVersion-ceq'4.1.20000'
   if(-not($legacyTransition-or$crossMinorTransition-or$published430Maintenance-or$direct422To440-or$published430To440-or$direct422To442-or$retained440To442-or$published441To442-or$published442To450-or$direct422To450-or$published442To452-or$published451To452-or$published452To460-or$published460To470-or$published470To471-or$published410Transition)){throw '[mir422-f200-complete-oracle-transition]'}
   # Reuse the complete canonical oracle. Only its private native test copy is

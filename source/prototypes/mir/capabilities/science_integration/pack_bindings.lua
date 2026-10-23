@@ -622,8 +622,9 @@ end
 
 local function build_reference_bindings(shared, labs)
   local result = {packs = {}, issues = {}, labs = labs, lab_names = {}, unavailable_labs = {},
-    technologies = {}, rules = {}}
+    technologies = {}, rules = {}, reference_sources = {}}
   local unknown_sources, route_choices, replacement_choices = {}, {}, {}
+  local reference_requirements = {}
   local tracked_sources
   local function add(kind, name, required)
     result.rules[#result.rules + 1] = {result = node(kind, name), requires = required}
@@ -658,6 +659,9 @@ local function build_reference_bindings(shared, labs)
         unknown_sources[node("pack", pack)] = true
       end
       sources, competing_recipes = sources or {source}, competing_recipes or {}
+      local reference_source = not replacement_choices[pack] and (#sources == 1
+        or (source.recipe_name == pack and #(primary_gates or {}) <= 1)) and source or nil
+      result.reference_sources[pack] = reference_source
       for index, candidate in ipairs(sources) do
         local required = {}
         for _, gate in ipairs(candidate.unlockers) do required[#required + 1] = node("technology", gate) end
@@ -665,6 +669,7 @@ local function build_reference_bindings(shared, labs)
           required[#required + 1] = node("technology", gate)
         end
         for _, ingredient in ipairs(candidate.ingredient_packs) do required[#required + 1] = node("pack", ingredient) end
+        if candidate == reference_source then reference_requirements[node("pack", pack)] = required end
         if #sources == 1 then
           add("pack", pack, required)
         else
@@ -832,6 +837,47 @@ local function build_reference_bindings(shared, labs)
   end
   result.work.closed_reference_pack_exclusions = closed_exclusions
   if closed_exclusions > 0 then result.has_policy_exclusions = true end
+  -- Remove the optional bootstrap veto only for acyclic declared references.
+  -- Drain leaves of the unresolved reference graph. Nodes left behind are in,
+  -- or depend on, a cycle and cannot use this reference-only startup path.
+  -- Proven nodes are terminals: their unused alternatives cannot veto them.
+  local dependencies, reverse, queue, acyclic = {}, {}, {}, {}
+  local function include(name)
+    if not result.facts[name] and not dependencies[name] then dependencies[name] = {} end
+  end
+  for _, rule in ipairs(result.rules) do
+    if not result.facts[rule.result] then
+      include(rule.result)
+      -- Follow the unambiguous native declaration, rather than making an
+      -- optional recycling/late producer a required bootstrap dependency.
+      for _, dependency in ipairs(reference_requirements[rule.result] or rule.requires) do
+        if not result.facts[dependency] then
+          include(dependency)
+          dependencies[rule.result][dependency] = true
+        end
+      end
+    end
+  end
+  local pending = {}
+  for name, required in pairs(dependencies) do
+    local count = 0
+    for dependency in pairs(required) do
+      count = count + 1
+      reverse[dependency] = reverse[dependency] or {}
+      reverse[dependency][#reverse[dependency] + 1] = name
+    end
+    pending[name] = count
+    if count == 0 then queue[#queue + 1] = name end
+  end
+  local cursor = 1
+  while cursor <= #queue do
+    local name = queue[cursor]; cursor = cursor + 1; acyclic[name] = true
+    for _, dependent in ipairs(reverse[name] or {}) do
+      pending[dependent] = pending[dependent] - 1
+      if pending[dependent] == 0 then queue[#queue + 1] = dependent end
+    end
+  end
+  result.reference_acyclic = acyclic
   -- Rule counters are sufficient for ordinary metadata. Do not retain the
   -- reverse propagation graph or expanded explanation inventories.
   result.rules = nil
@@ -854,6 +900,26 @@ function M.bound_technology_reason(index, technology_name)
   if index.technologies[technology_name] == nil then return "missing" end
   if index.facts[node("technology", technology_name)] then return nil end
   return index.technologies[technology_name] or ("unresolved-approved-research-dependencies:" .. tostring(technology_name))
+end
+
+-- Startup consumes declared progression references, not a proof that a modded
+-- factory can bootstrap. A positive, typed recipe and its validated native
+-- owners remain usable references when a transitive dependency is unknown.
+-- Missing sources and completed negative/cyclic results keep their strict
+-- answers. The strict queries above remain available to diagnostic consumers.
+function M.bound_pack_reference_status(index, pack_name)
+  local source = index.packs[pack_name]
+  if source and source.status ~= "not-admitted" and index.reference_sources[pack_name]
+    and index.reference_acyclic[node("pack", pack_name)] then
+    return source.status, source.unlocker
+  end
+  return M.bound_pack_status(index, pack_name)
+end
+
+function M.bound_technology_reference_reason(index, technology_name)
+  if index.technologies[technology_name] == false
+    and index.reference_acyclic[node("technology", technology_name)] then return nil end
+  return M.bound_technology_reason(index, technology_name)
 end
 
 function M.bound_lab_available(index, lab_name)

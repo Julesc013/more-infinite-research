@@ -22,7 +22,7 @@ end
 
 local function source_for(pack_name)
   local bindings = index()
-  local status, reason = pack_bindings.bound_pack_status(bindings, pack_name)
+  local status, reason = pack_bindings.bound_pack_reference_status(bindings, pack_name)
   if not status then
     error("MIR approved science binding is unresolved: " .. tostring(pack_name) .. " (" .. tostring(reason)
       .. "). No research was removed and the former solver will not be invoked.", 2)
@@ -54,7 +54,7 @@ end
 
 local function researchability_reason(technology_name)
   local bindings = index()
-  local reason = pack_bindings.bound_technology_reason(bindings, technology_name)
+  local reason = pack_bindings.bound_technology_reference_reason(bindings, technology_name)
   if reason and string.find(reason, "unresolved-approved-research-dependencies:", 1, true) == 1 then
     error("MIR approved research binding is unresolved: " .. tostring(technology_name)
       .. ". Refusing to discard established research or enter production discovery.", 2)
