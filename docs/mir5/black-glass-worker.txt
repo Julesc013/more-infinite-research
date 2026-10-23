@@ -1,57 +1,133 @@
-MIR5 Black Glass: bounded worker handoff
+You are the Black Glass MIR 5 test-worker setup agent. Use medium reasoning.
+Execute this setup and start real testing; do not stop at a plan or inventory.
 
-Purpose: move native CPU/RAM work to Black Glass while Aero remains the
-implementation, integration and release manager. Black Glass is optional;
-this does not restore a mandatory two-machine performance gate.
+Repository: Julesc013/more-infinite-research
+Manager: Aero. Product development: dev; stable: main; preservation: legacy.
+Black Glass owns test execution, not MIR implementation or release authority.
 
-Recommended transport: a dedicated GitHub Actions runner executes scripts and
-uploads native artifacts. Luna may triage a failed job. Do not spend model
-turns repeatedly polling an idle queue. No repository runner was registered
-at the 2026-10-23 inspection. A local worker/runner must be started on Black
-Glass; Aero has no remote process connection to that machine.
+AUTHORIZATION AND BOUNDARIES
+You are authorized to install/configure the official GitHub Actions runner,
+create/reuse a small PRIVATE Julesc013/mir-native-worker control repository,
+create its minimal dispatch workflow, register/start the worker, create test
+branches/PRs, and execute bounded tests. Communicate and deliver through GitHub.
+Do not tag/publish releases, promote product code to main, change protections,
+create broad credentials, or expose existing credentials. Do not change MIR5
+implementation, expectations, resource reserves or other agents' work.
+Aero continues source work. You are not alone: preserve dirty/unique checkouts,
+original saves, active test owners and exact historical evidence.
 
-Initial Codex/Luna assignment to paste in the Black Glass local clone:
+1. CHECK OUT THE ACTUAL WORK
+Locate the local MIR clone. Fetch origin without resets or lost modifications.
+Use an isolated clean clone/worktree for the worker and each frozen packet;
+keep the existing local checkout intact. Fetch this trusted initial commit:
+  b26d45025c8e012951169724ecdf56ae632644e7
+It is on origin/feat/mir5-k2-catalogue-r01; dev does not yet include all of it.
+Read AGENTS.md, spec/mir5/README.md, verification.md, targets.md, performance.md
+and docs/mir5/progress.md from that commit. Do not load Aero's chat history.
+MIR5 is a small deterministic Generator, never the MIR4 compiler. Test tooling
+must not become player code or grant a release pass by static checks.
 
-You are the Black Glass MIR5 test worker. Read AGENTS.md, spec/mir5/README.md,
-spec/mir5/verification.md, spec/mir5/performance.md and this bounded assignment.
-Do not load the manager's entire conversation. You are not alone in this repo.
-Preserve dirty work, unique commits, original saves and existing test owners.
-The manager is implementing MIR5 on Aero. Do not tag, publish, change main,
-register credentials/runners or alter repository protections in this task.
+2. INVENTORY THIS MACHINE, NOT AERO'S PATHS
+Record hostname, OS, RAM, actual commit/physical headroom, free disk, Git,
+GitHub CLI, PowerShell7 and Python. Locate the installed engines in the existing
+Factorio/X.x directories on the disks. Read each engine's base/info.json and
+hash its actual executable. The maintainer explicitly authorizes Black Glass's
+actual installed locations; do not impose Aero's drive letters here.
+Do not download/replace historical engines or mutate Steam depots.
+Locate the transferred flat test-mod archive libraries by engine family.
+Read selected ZIP info.json, versions, dependencies and hashes. Check required
+patch minima and actual dependency closure. Folder names alone are not proof.
+Keep one archive copy per engine library. No dependency copying, extraction,
+hard-link profile staging, or retired-profile reconstruction. Keep machine paths
+in an ignored/local config and pass the libraries/engines explicitly to scripts.
+Run workspace development health before creating stages/packages/log batches.
 
-First report machine readiness through a small branch/PR to dev:
-- Identify hostname, RAM/commit/disk headroom and the local checkout branch.
-- Fetch origin/feat/mir5-k2-catalogue-r01 without resetting local work. Record
-  the exact fetched commit. Use an isolated clean branch/worktree if needed.
-- Inventory installed Factorio binaries and hashes. Follow AGENTS engine
-  authority; never download/replace historical engines or Steam depots.
-- Locate the transferred archive libraries. Read exact selected ZIP metadata
-  and hashes, not folder names alone. Keep dependencies in the direct library;
-  do not copy, extract or hard-link dependencies into profile directories.
-- Run workspace development health and inspect the MIR5 host verification
-  plan. Report which F210 Base/Space Age/K2SO and historical targets are actually
-  available, with missing inputs and paths. Do not invent passes.
-- Check whether a GitHub Actions runner is already configured locally; report
-  its name/state without printing credentials or registering a new one.
+3. INSTALL A DEDICATED RUNNER AND MAKE IT LIVE
+Use existing gh authentication; verify it without printing tokens. If login or
+OS privilege is indispensable and unavailable, ask the maintainer once for the
+specific local action, while continuing independent setup. Never invent access.
+Use a PRIVATE control repo so public source-repo workflows cannot schedule this
+machine. Product source stays exclusively in more-infinite-research. Keep the
+control repo to dispatch/runner wiring, not another source tree or test system.
+Check for an existing matching runner before registering; adopt a healthy one
+and preserve other runners. Obtain the current official actions/runner Windows
+x64 distribution and verify its official checksum before installation.
+Register the runner to the PRIVATE control repo with a short-lived registration
+token obtained through gh. Never print/store that token in tracked files/logs.
+Name it mir5-black-glass; use --no-default-labels and labels
+  mir5-native,black-glass
+Do not add publisher labels or register this runner to the public source repo.
+Use an existing suitable non-admin execution identity. Run persistently as a
+Windows service if available; otherwise use a durable hidden background runner
+under the current user. Use Start-Process -WindowStyle Hidden for console
+helpers. Prove online status through GitHub and a completed smoke job.
+A service in session0 cannot qualify rendered GUI/client interaction. Keep
+headless jobs separate; later GUI jobs require the actual logged-in desktop.
 
-Stop this initial assignment after committing/pushing the compact readiness
-record and opening its PR. Include exact native commands proposed for the
-available targets, but do not launch an unassigned heavy campaign. The manager
-will send a frozen test packet and claim scope through GitHub. No idle polling
-or independent implementation programme is needed.
+4. ADD ONE SMALL TRUSTED DISPATCH WORKFLOW
+Create the workflow on the private control repo's default branch so
+workflow_dispatch is actually available. Use official pinned actions, read-only
+job permissions, checkout persist-credentials:false, a fixed concurrency group
+for Black Glass with cancel-in-progress:false, and one heavy job at a time.
+Runs-on must match [mir5-native,black-glass]. Accept a full source SHA plus a
+small enumerated task choice, not arbitrary shell text. Require the maintainer
+actor, fetch source only from Julesc013/more-infinite-research, and verify that
+SHA belongs to the named trusted development branch/dev before executing it.
+Do not accept fork/PR code, pull_request_target, arbitrary repositories, paths
+or commands. Do not copy release/signing/Portal credentials to this worker.
+Reuse tools/mir5 scripts and the existing governor/library locks. Do not build
+a new queue, daemon compiler or general test framework. GitHub's runner waits
+for jobs; no LLM polling loop is needed. Use the existing pinned Python/Lupa
+setup from .github/workflows/mir5.yml for host controls when required.
+Upload receipts, original logs, dumps and disposable test saves with a manifest
+of SHA256s even on failure. No engine/mod dependency archives, credentials or
+original player saves in artifacts. Keep large artifacts private; send compact
+status/links through a MIR test-worker branch/PR and Actions run links.
 
-Subsequent native assignments must bind exact committed player/harness inputs,
-engine/mod/settings/save hashes, commands and endpoints. Use the existing
-governor and exclusive archive-library locks, one heavy native job per machine.
-Keep original saves untouched. Report failures with their original logs;
-never rewrite expected output, lower gates or relabel partial observations.
-Return small receipts via GitHub and large logs/saves/dumps as job artifacts;
-Aero will download them into primary custody and verify hashes before reuse.
+5. START THE FIRST REAL ASSIGNED TEST
+First task: independent K2 Base F200 prototype reference on the initial SHA.
+Use tests/mir5/profiles/k2-base-f200-2077.json. It pins Factorio2.0.77 and:
+  Krastorio2 2.0.19; Krastorio2Assets 2.0.5;
+  Krastorio2MenuSimulations 2.0.2; ChangeInserterDropLane 1.2.0; flib 0.16.5.
+Use the profile's archive hashes and dependency minima, not nearby versions.
+Build the tiny observer ZIP from committed
+  tests/mir5/fixtures/active-mods-observer/data-final-fixes.lua
+with info-f200.json installed as its info.json, canonical root
+  mir-fixture-mir5-active-mods-observer_0.1.0/
+and deterministic ZIP metadata. The expected archive SHA256 is
+  723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87
+Verify that exact hash and retain a source-member receipt. Install only this
+owned fixture under exclusive library ownership; hash-preserve any differing
+same-name archive first. Do not copy any dependencies or replace original saves.
+Run tools/mir5/Invoke-PrototypeCapture.ps1 with the actual F200 executable and
+archive library, that committed profile, -ActiveModsObserver
+mir-fixture-mir5-active-mods-observer, and a fresh bounded output root. Begin
+with NO MIR archive: this is the independent upstream reference, not a MIR5 pass.
+Use a conservative process-memory estimate suited to Black Glass; keep actual
+reserves, watchdogs, archive integrity checks and control restoration intact.
+If exact inputs are missing, report them and finish runner/smoke setup without
+pretending a nearby profile passed. Do not weaken/change the packet to fit.
+After the No-MIR reference, obtain the exact published F200 MIR4.7.0 package
+through its authenticated release inventory, verify its accepted hash, and run
+the matched published-reference capture on the SAME engine/mod/settings closure.
+Retain a startup failure if it fails; never turn it into a successful oracle.
+Do not run the known-incomplete MIR5 K2 Base catalogue as a claimed parity test;
+Aero will send the completed candidate and next exact packet through GitHub.
+Do not rerun all seven historical scenarios merely because this host is new;
+Aero already has exact private lab/save/two-reload evidence for those bytes.
 
-Current useful entrypoints:
-- tests/mir5/Test-MIR5HostControls.ps1 -Plan
-- tools/mir5/package.py (committed-source private packages)
-- tools/mir5/Invoke-PrototypeCapture.ps1 (native data/settings observation)
-- tools/mir5/Invoke-NativeFixture.ps1 (production and two cold reloads)
-- tools/mir5/Invoke-MenuComparison.ps1 (matched menu performance)
-- docs/mir5/progress.md (one canonical worklist and exact known limitations)
+6. FINISH SETUP WITH A LIVE WORKER, NOT JUST A REPORT
+Return: private control repo/workflow URL, runner name/labels/online status,
+local config location, exact source SHA, engines/libraries actually available,
+smoke and first native-run URLs/status, hashes/artifact manifest and missing
+inputs. Report failures honestly; partial inventories or prelaunch refusals
+are not native passes. Commit/push the small source-repo readiness record on a
+new test-worker branch and open a PR to dev. Do not merge Aero's production PRs.
+Leave the runner listening and the job interface usable by Aero. The local
+model can finish after setup/testing; the background runner keeps receiving
+explicit frozen jobs without spending model tokens while idle.
+
+Subsequent work: one assigned heavy batch at a time. Matched performance arms
+must use the same host and inputs; never subtract Aero from Black Glass. GUI,
+real client joins, historical save upgrades and final package qualification
+remain distinct results. No MIR5 release authority comes with this assignment.
