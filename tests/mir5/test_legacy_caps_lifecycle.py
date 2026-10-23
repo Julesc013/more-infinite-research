@@ -66,6 +66,7 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           end
           function boot(forces, old, current, options)
             options = options or {}
+            script = {active_mods = options.active_mods or {}}
             storage = {mir = {maximum_level_control = old, unrelated = {keep = true}},
               mir_caps = current}
             game = {forces = forces}
@@ -75,6 +76,34 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             package.loaded["runtime.lifecycle"] = nil
             lifecycle = require("runtime.lifecycle")
           end
+        ''')
+
+    def test_k2_historical_worker_right_is_bound_to_the_admitted_native_effect(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-7"
+          local k2 = {Krastorio2 = "2.1.4", ['Krastorio2-spaced-out'] = "2.0.19",
+            Krastorio2Assets = "2.1.0", ['k2so-assets'] = "1.0.7", ['space-age'] = "2.1.23"}
+          local native = worker(name)
+          native.level, native.prototype.effects[1].modifier = 9, .6
+          local f = force(7, {[name] = native})
+          local old = legacy({name}, {7})
+          old.managed_technologies[name].selected = 8
+          old.disabled_by_cap[7][name].cap = 8
+          boot({[7] = f}, old, nil, {active_mods = k2, worker_limit = 8})
+          lifecycle.on_configuration_changed()
+          assert(not native.enabled and native.visible_when_disabled)
+          assert(storage.mir_caps.owned_disabled[7][name].worker_effect_modifier == .6)
+          assert(old.disabled_by_cap[7][name].enabled_before_cap
+            and old.visibility_by_cap[7][name].value == false)
+          local saved = storage.mir_caps
+          boot({[7] = f}, old, saved, {active_mods = k2, worker_limit = 0})
+          lifecycle.on_configuration_changed()
+          assert(native.enabled and not native.visible_when_disabled and native.level == 9)
+          assert(native.prototype.effects[1].modifier == .6)
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil)
+          native.enabled = false
+          lifecycle.on_configuration_changed()
+          assert(not native.enabled, "old K2 rights were imported twice")
         ''')
 
     def test_fresh_unlimited_config_and_load_do_not_allocate_or_use_game(self):

@@ -11,6 +11,16 @@ local STORAGE_KEY = "mir_caps"
 local SCHEMA = 1
 local GEAR_TECHNOLOGY = require("research.catalogue").gear_id()
 local WORKER_TAIL_NAMES = {"worker-robots-speed-6", "worker-robots-speed-7"}
+local active_mods = script and script.active_mods or {}
+local worker_modifiers
+if active_mods.Krastorio2 and active_mods["Krastorio2-spaced-out"]
+    and active_mods.Krastorio2Assets and active_mods["k2so-assets"] and active_mods["space-age"] then
+  worker_modifiers = require("compatibility.k2so_worker_speed")
+end
+
+local function worker_modifier(name)
+  return worker_modifiers and worker_modifiers[name] or 0.65
+end
 
 -- `settings` and `helpers` are runtime globals at control parse time.  Startup
 -- values cannot change during a loaded save, so this is one immutable native
@@ -65,7 +75,7 @@ local function worker_owner(force)
   local technologies = force.technologies
   return native_owners.runtime_worker_robot_speed_owner(function(name)
     return technologies and technologies[name] or nil
-  end)
+  end, worker_modifiers)
 end
 
 local function limits_for(force, include_worker, selected_owner, owner_resolved)
@@ -102,7 +112,14 @@ local function discard_unbound_worker_ownership(force, owned_disabled, owner)
   local owned = owned_disabled[force.index]
   if not has_worker_ownership(owned) then return owned end
   for _, name in ipairs(WORKER_TAIL_NAMES) do
-    if type(owned[name]) == "table" and name ~= owner then owned[name] = nil end
+    local row = owned[name]
+    if type(row) == "table" then
+      -- Earlier private MIR5 rows could only represent the 0.65 variant.
+      -- Historical MIR4 imports are stamped with their admitted variant below.
+      local modifier = row.worker_effect_modifier
+      if modifier == nil then modifier = 0.65 end
+      if name ~= owner or modifier ~= worker_modifier(name) then owned[name] = nil end
+    end
   end
   if next(owned) == nil then
     owned_disabled[force.index] = nil
@@ -143,6 +160,11 @@ local function reconcile_force(force, owned_disabled, selected_owner, owner_reso
   if result.unresolved_current then
     error("MIR unsupported native research queue state for over-cap current research: "
       .. result.unresolved_current, 2)
+  end
+  local owned = owned_disabled[force.index]
+  local row = owner and owned and owned[owner]
+  if type(row) == "table" and row.worker_effect_modifier == nil then
+    row.worker_effect_modifier = worker_modifier(owner)
   end
 end
 
@@ -215,6 +237,9 @@ local function merge_legacy_rows(owned_disabled, force_index, rows)
         disabled = row.disabled == true and true or nil,
         visible_when_disabled = row.visible_when_disabled
       }
+      if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
+        owned[name].worker_effect_modifier = worker_modifier(name)
+      end
     end
   end
 end

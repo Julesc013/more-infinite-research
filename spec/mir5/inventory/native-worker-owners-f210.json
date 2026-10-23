@@ -1,0 +1,267 @@
+{
+  "schema": 1,
+  "kind": "published-native-worker-owner-characterization",
+  "status": "historical-evidence-not-replacement-qualification",
+  "variants": {
+    "space-age": {
+      "worker-robots-speed-6": {
+        "type": "technology",
+        "name": "worker-robots-speed-6",
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/worker-robots-speed.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-speed",
+            "modifier": 0.65
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-speed-5",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "time": 60,
+          "count": 1000
+        },
+        "upgrade": true,
+        "order": "c-k-f-f"
+      },
+      "worker-robots-speed-7": {
+        "type": "technology",
+        "name": "worker-robots-speed-7",
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/worker-robots-speed.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-speed",
+            "modifier": 0.65
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-speed-6",
+          "electromagnetic-science-pack"
+        ],
+        "unit": {
+          "count_formula": "2^(L-6)*1000",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "max_level": "infinite",
+        "upgrade": true
+      }
+    },
+    "k2so": {
+      "worker-robots-speed-6": {
+        "type": "technology",
+        "name": "worker-robots-speed-6",
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/worker-robots-speed.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ],
+            "floating": true
+          }
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-speed",
+            "modifier": 0.65
+          }
+        ],
+        "prerequisites": [
+          "worker-robots-speed-5",
+          "space-science-pack"
+        ],
+        "unit": {
+          "ingredients": [
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "time": 60,
+          "count": 1000
+        },
+        "upgrade": true,
+        "order": "c-k-f-f"
+      },
+      "worker-robots-speed-7": {
+        "type": "technology",
+        "name": "worker-robots-speed-7",
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/worker-robots-speed.png",
+            "icon_size": 256
+          },
+          {
+            "icon": "__core__/graphics/icons/technology/constants/constant-movement-speed.png",
+            "icon_size": 128,
+            "shift": [
+              50,
+              50
+            ],
+            "scale": 0.5,
+            "floating": true
+          }
+        ],
+        "icon_size": 256,
+        "order": "c-k-f-w",
+        "upgrade": true,
+        "max_level": "infinite",
+        "unit": {
+          "time": 60,
+          "count_formula": "2^(L-6)*1000",
+          "ingredients": [
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ],
+            [
+              "electromagnetic-science-pack",
+              1
+            ]
+          ]
+        },
+        "prerequisites": [
+          "worker-robots-speed-6",
+          "electromagnetic-science-pack"
+        ],
+        "effects": [
+          {
+            "type": "worker-robot-speed",
+            "modifier": 0.6
+          }
+        ]
+      }
+    }
+  },
+  "sources": [
+    {
+      "receipt": "spec/mir5/evidence/space-age-no-mir-native.json",
+      "receipt_sha256": "A6F70EDD7865C3F43C40BF855E3890462302F4A78D708B86C5A4AFDB44E9DFFF",
+      "data_raw_sha256": "04CAD41D26A0471702AB1D7538A842E95433C98E5E4AD6D27F0415E401F210ED"
+    },
+    {
+      "receipt": "spec/mir5/evidence/space-age-published-native.json",
+      "receipt_sha256": "A4D7C1A184D3163AB84D569540C6BBB908BBA304AF86F4F681420A2851D6A8B6",
+      "data_raw_sha256": "1DBB20D9FF6BAC65E835DD6CA1E17595266EA99C42C34AA30E94404681C951AA"
+    },
+    {
+      "receipt": "spec/mir5/evidence/k2so-no-mir-native.json",
+      "receipt_sha256": "A19BF235D2A9FCD49C7C4F9AAE6E641050ACEA872E77ED274179C8C84324379B",
+      "data_raw_sha256": "FC3ED041D804A07B948572CB2D1F4ED6BB8FAD387E06E13504B56273A4F544F2"
+    },
+    {
+      "receipt": "spec/mir5/evidence/k2so-published-native.json",
+      "receipt_sha256": "7B636E4CA5BFEEA14D00A11F31E647A5924637DD783797599C4A811C42570A10",
+      "data_raw_sha256": "FAE33EEC385E7B316D1070BC69ABB594CD341E2F1DDA67F8CF1394329F2A094E"
+    }
+  ]
+}
