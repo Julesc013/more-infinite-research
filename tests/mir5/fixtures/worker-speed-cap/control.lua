@@ -136,6 +136,19 @@ script.on_init(function()
   }
 end)
 
+script.on_configuration_changed(function()
+  local prior = storage["mir5_native_worker_speed_precap"]
+  if not prior or not prior.saved or prior.original_owner_enabled ~= true
+      or prior.original_owner_visible ~= false then fail("uncapped saved baseline is absent") end
+  storage[KEY] = {
+    owner = prior.owner, initial_level = prior.initial_level, next_level = prior.next_level,
+    original_owner_enabled = prior.original_owner_enabled,
+    original_owner_visible = prior.original_owner_visible,
+    modifier_before = prior.modifier_before, modifier_after = prior.modifier_after,
+    modifier_delta = prior.modifier_delta, deadline = game.tick + 1200, phase = "await-cap"
+  }
+end)
+
 script.on_load(function()
   local state = storage[KEY]
   loaded = state and state.saved and {
