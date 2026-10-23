@@ -23,6 +23,19 @@ local function current_name(force)
   return value and value.name or nil
 end
 
+-- 0.17 and later expose current_research as a read-only observation.  The
+-- established historical-native fixture uses add_research for those targets;
+-- the older targets retain their supported direct setter contract.
+local function start_research(force, name)
+  local value = technology(force, name)
+  if target.queue_api then
+    if force.add_research(value) ~= true then fail("could not queue research " .. name) end
+  else
+    force.current_research = name
+  end
+  if current_name(force) ~= name then fail("could not start research " .. name) end
+end
+
 local function unlock_prerequisites(value, seen)
   seen = seen or {}
   if seen[value.name] then return end
@@ -107,7 +120,7 @@ local function configure_partial(state)
     if probe.researched then fail("queue probe was already researched") end
     force.research_queue = {technology(force, target.direct), probe}
   else
-    force.current_research = target.direct
+    start_research(force, target.direct)
   end
   force.research_progress = target.partial_progress
   assert_partial(force)
@@ -192,8 +205,7 @@ local function initialize_published()
     source_lab=lab, source_lab_initial=initial, source_direct_finished=0,
     deadline=game.tick + DEADLINE_TICKS,
   }
-  force.current_research = target.direct
-  if current_name(force) ~= target.direct then fail("could not start published direct research") end
+  start_research(force, target.direct)
 end
 
 local function initialize_mir5()

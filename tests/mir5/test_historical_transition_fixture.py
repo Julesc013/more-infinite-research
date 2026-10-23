@@ -219,11 +219,19 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               if key == "research_queue" then return rawget(t,"_queue") or {} end
               if key == "get_spawn_position" then return function()return {x=0,y=0}end end
             end,__newindex=function(t,key,value)
-              if key == "current_research" then rawset(t,"_current",type(value)=="string" and t.technologies[value] or value)
+              if key == "current_research" then
+                if queue then error("LuaForce::current_research is read only") end
+                rawset(t,"_current",type(value)=="string" and t.technologies[value] or value)
               elseif key == "research_queue" then
                 local rows={};for index,item in ipairs(value) do rows[index]=type(item)=="string" and t.technologies[item] or item end;rawset(t,"_queue",rows);rawset(t,"_current",rows[1])
               else rawset(t,key,value) end
             end})
+            function force.add_research(value)
+              if type(value)=="string" then value=force.technologies[value] end
+              if not value or force.current_research ~= nil then return false end
+              force.research_queue={value}
+              return true
+            end
             local function lab()
               local counts={};local inventory={insert=function(stack)counts[stack.name]=(counts[stack.name] or 0)+stack.count;return stack.count end,get_item_count=function(name)return counts[name] or 0 end}
               return {valid=true,active=true,energy=0,get_inventory=function()return inventory end},counts
@@ -236,8 +244,13 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           end
           function execute_transition(queue)
             callbacks={events={}};install_target("published",queue);local force,direct,braking=mock_world(queue);global={}
+            if queue then
+              local readonly,message=pcall(function()force.current_research=direct end)
+              assert(not readonly and tostring(message):find("read only",1,true),"modern mock accepted a current_research write")
+            end
             assert(loadfile(control,"t",_ENV))();callbacks.init()
             assert(force.current_research == direct)
+            if queue then assert(#force.research_queue == 1 and force.research_queue[1] == direct) end
             force.manual_mining_speed_modifier=fixture_target.direct_effect
             if queue then direct.level=2 else direct.researched=true;force.current_research=nil end
             local source=global.mir5_historical_transition.source_lab
