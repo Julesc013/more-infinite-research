@@ -4,7 +4,7 @@
 # this script. Spec fields: engine, engine_sha256, archive_library, workroot,
 # seed_save, seed_sha256, server_config, server_settings, server_write_data,
 # port, rcon_port, rcon_password, clients, expected_screenshots. Screenshot
-# entries are absolute client write-data patterns: initial/rejoin/restart-*.png
+# entries are absolute client write-data patterns: availability/initial/rejoin/restart-*.png
 # for each locale.
 [CmdletBinding()]
 param(
@@ -313,7 +313,7 @@ function Find-Screenshots([string[]]$Stages) {
     if ($matches.Count -ne 1) { return $null }
     $path = Resolve-BuildInput $matches[0].FullName 'Leaf' 'captured screenshot'
     if (-not (Test-Png1280x720 $path)) { return $null }
-    $match = [regex]::Match($matches[0].Name, '^(initial|rejoin|restart)-([12])[.]png$')
+    $match = [regex]::Match($matches[0].Name, '^(availability|initial|rejoin|restart)-([12])[.]png$')
     Assert-Session $match.Success 'captured screenshot filename differs'
     if ($indices.ContainsKey($expected.client) -and $indices[$expected.client] -ne $match.Groups[2].Value) {
       throw "screenshot player index changed for $($expected.client)"
@@ -321,7 +321,7 @@ function Find-Screenshots([string[]]$Stages) {
     $indices[$expected.client] = $match.Groups[2].Value
     $files.Add($path)
   }
-  if ($Stages.Count -eq 3) {
+  if ($Stages.Count -eq 4) {
     Assert-Session ($indices.Count -eq 2 -and (@($indices.Values | Select-Object -Unique)).Count -eq 2) 'client screenshot player indexes are not distinct and stable'
   }
   return [pscustomobject]@{files=@($files);indexes=$indices}
@@ -393,16 +393,16 @@ $finalSave = Resolve-BuildOutput (Join-Path $serverWriteData 'saves/mir5-native-
 $sessionPath = Resolve-BuildOutput (Join-Path $workroot 'session.json') 'session output'
 $screenshotPatterns = [Collections.Generic.List[object]]::new()
 $patterns = @($spec.expected_screenshots | ForEach-Object { Resolve-BuildOutput ([string]$_) 'expected screenshot pattern' })
-Assert-Session ($patterns.Count -eq 6 -and (@($patterns | Select-Object -Unique)).Count -eq 6) 'session requires six distinct screenshot patterns'
+Assert-Session ($patterns.Count -eq 8 -and (@($patterns | Select-Object -Unique)).Count -eq 8) 'session requires eight distinct screenshot patterns'
 foreach ($client in $clients) {
   $root = [IO.Path]::GetFullPath((Join-Path $client.write_data 'script-output/mir5-library-multiplayer'))
   $clientPatterns = @($patterns | Where-Object { Test-Within $root $_ })
-  Assert-Session ($clientPatterns.Count -eq 3) "client $($client.name) requires three local screenshot patterns"
+  Assert-Session ($clientPatterns.Count -eq 4) "client $($client.name) requires four local screenshot patterns"
   $stages = [Collections.Generic.List[string]]::new()
   foreach ($pattern in $clientPatterns) {
     $relative = [IO.Path]::GetRelativePath($root, $pattern)
     $leaf = [IO.Path]::GetFileName($pattern)
-    $name = [regex]::Match($leaf, '^(initial|rejoin|restart)-[*][.]png$')
+    $name = [regex]::Match($leaf, '^(availability|initial|rejoin|restart)-[*][.]png$')
     Assert-Session ($name.Success -and $relative -ceq $leaf) "screenshot pattern differs for $($client.name)"
     $null = $stages.Add($name.Groups[1].Value)
     $parent = [IO.Path]::GetDirectoryName($pattern)
@@ -411,9 +411,9 @@ foreach ($client in $clients) {
     }
     $screenshotPatterns.Add([pscustomobject]@{client=$client.name;stage=$name.Groups[1].Value;path=$pattern;leaf=$leaf})
   }
-  Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'initial,rejoin,restart') "client $($client.name) screenshot stages differ"
+  Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'availability,initial,rejoin,restart') "client $($client.name) screenshot stages differ"
 }
-Assert-Session ($screenshotPatterns.Count -eq 6) 'screenshot patterns do not map exactly to the two clients'
+Assert-Session ($screenshotPatterns.Count -eq 8) 'screenshot patterns do not map exactly to the two clients'
 foreach ($output in @($restartSave,$finalSave,$sessionPath)) { Assert-Session (-not (Test-Path -LiteralPath $output)) "fresh output already exists: $output" }
 
 $records = [Collections.Generic.List[object]]::new()
@@ -446,6 +446,7 @@ try {
   [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 })
   $activeClients = Start-Clients 'initial'
   [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 })
+  [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
   [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
   # Stop our clients before clearing their server peers. A live kicked client
   # logs the expected disconnect as an engine Error, which must not be confused
@@ -471,9 +472,9 @@ try {
   })
   $activeClients = Start-Clients 'restart'
   $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 }
-  Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true -and $completed.witnesses.screenshot_calls -eq 6) 'completed witness lacks host-reload evidence'
+  Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true -and $completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 8) 'completed witness lacks host-reload Availability evidence'
   $captures = Wait-For 'complete final save and client screenshots' {
-    $screens = Find-Screenshots @('initial','rejoin','restart')
+    $screens = Find-Screenshots @('availability','initial','rejoin','restart')
     if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }; return $false
   }
   $screenshots = @($captures.files)

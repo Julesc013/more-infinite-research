@@ -16,6 +16,11 @@ local RESEARCH_CONTENT = "mir_library_research_content"
 local RESULTS = "mir_library_results"
 local DETAIL = "mir_library_detail"
 local DETAIL_TITLE = "mir_library_detail_title"
+local AVAILABILITY = {"mir_library_availability_1", "mir_library_availability_2"}
+local AVAILABILITY_FAMILIES = {
+  "research_agricultural_growth_speed",
+  "research_spoilage_preservation",
+}
 
 local GEAR = "recipe-prod-research_gears-1"
 local MINING = "recipe-prod-research_mining_drill-1"
@@ -110,9 +115,16 @@ end
 local function open(player, view)
   if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
   if remote.call(BROWSER, "open", player.index, {
-    search=view.query, family="mir", selected=view.selected, sort=view.sort, tab="research"
+    search=view.query, family="mir", selected=view.selected, sort=view.sort, tab="research", visibility=1
   }) ~= true then
     fail("public browser interface did not open for connected client")
+  end
+end
+
+local function open_availability(player)
+  if not (remote.interfaces and remote.interfaces[BROWSER]) then fail("shipped public browser interface is absent") end
+  if remote.call(BROWSER, "open", player.index, {tab="availability", search=""}) ~= true then
+    fail("public browser interface did not open Availability for connected client")
   end
 end
 
@@ -152,6 +164,39 @@ local function assert_personal_views(english, german)
   end
 end
 
+local function localized_key(value)
+  return type(value) == "table" and value[1] or nil
+end
+
+local function assert_availability(player)
+  local screen = player.gui and player.gui.screen
+  local root = screen and screen[ROOT]
+  local filters = valid(root) and root[FILTERS] or nil
+  local query = valid(filters) and filters[QUERY] or nil
+  local tabs = valid(root) and root[TABS] or nil
+  local content = valid(tabs) and tabs[RESEARCH_CONTENT] or nil
+  local children = valid(content) and content.children or nil
+  if not valid(root) or root.type ~= "frame" or root.visible ~= true or not valid(query) or query.text ~= ""
+      or not valid(content) or children == nil then
+    fail("native Availability browser GUI tree is incomplete")
+  end
+  if valid(content[RESULTS]) or valid(content[DETAIL]) or valid(content["mir_library_actions"]) then
+    fail("Availability exposed research results or actions")
+  end
+  for index, name in ipairs(AVAILABILITY) do
+    local label = content[name]
+    local caption = valid(label) and label.caption or nil
+    if not valid(label) or label.type ~= "label" or localized_key(caption) ~= "mir-browser.availability-entry"
+        or localized_key(caption[2]) ~= "technology-name.more-infinite-research." .. AVAILABILITY_FAMILIES[index]
+        or localized_key(caption[3]) ~= "mir-browser.availability-requires-space-age" then
+      fail("native Availability terminal label differs: " .. AVAILABILITY_FAMILIES[index])
+    end
+  end
+  if #children ~= #AVAILABILITY then
+    fail("native Availability terminal label count differs")
+  end
+end
+
 local function measure(state, label, callback)
   local profiler = game.create_profiler(true)
   profiler.restart()
@@ -187,6 +232,7 @@ local function marker(stage, state)
       locales_required={"en", "de"},
       distinct_personal_query_and_selection=true,
       native_research_queue_and_effects_unchanged=true,
+      availability_terminal_labels_checked=state.availability_checked == true,
       host_restart_observed=stage == "completed",
       on_load_read_only=stage == "completed",
       rendering_pending_external_png_readback=true,
@@ -247,6 +293,21 @@ local function pair(state, expected_joins)
 end
 
 local function run_initial(state, english, german)
+  open_availability(english)
+  open_availability(german)
+  assert_availability(english)
+  assert_availability(german)
+  assert_native(state, english.force)
+  state.availability_checked = true
+  screenshot(state, "availability", english)
+  screenshot(state, "availability", german)
+  -- Client screenshot requests are asynchronous. Keep the terminal view open
+  -- for a full second before its ordinary personal view replaces it.
+  state.phase = "capturing-availability"
+  state.capture_after_tick = game.tick + 60
+end
+
+local function restore_initial_views(state, english, german)
   measure(state, "first_open", function() open(english, VIEWS.en) end)
   measure(state, "search", function() open(german, VIEWS.de) end)
   measure(state, "refresh", function() open(english, VIEWS.en) end)
@@ -306,7 +367,7 @@ script.on_init(function()
   storage[KEY] = {
     phase="waiting-initial-clients", world={force_index=force.index, surface_index=surface.index}, force_index=force.index,
     native=native, native_initial=copy_snapshot(native), clients={}, join_events=0,
-    screenshot_calls=0, measurements={}
+    screenshot_calls=0, measurements={}, availability_checked=false
   }
   marker("ready", storage[KEY])
   ready_logged = true
@@ -357,6 +418,12 @@ script.on_event(defines.events.on_tick, function()
     if not ready_logged then marker("ready", state);ready_logged = true end
     local english, german = pair(state, 1)
     if english and german then run_initial(state, english, german) end
+  elseif state.phase == "capturing-availability" and game.tick >= state.capture_after_tick then
+    local english, german = pair(state, 1)
+    if english and german then
+      state.capture_after_tick = nil
+      restore_initial_views(state, english, german)
+    end
   elseif state.phase == "awaiting-rejoin" then
     local english, german = pair(state, 2)
     if english and german then run_rejoin(state, english, german) end

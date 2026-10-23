@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/library-multiplayer"
 CONTROL = FIXTURE / "control.lua"
 PROFILE = ROOT / "tests/mir5/profiles/library-multiplayer-f200-2077.json"
+WRAPPER = ROOT / "tools/mir5/Invoke-MultiplayerFixture.ps1"
+SESSION = ROOT / "tools/mir5/Invoke-MultiplayerSession.ps1"
 
 
 def plain(value, seen=None):
@@ -43,6 +45,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local RESULTS="mir_library_results"
             local DETAIL="mir_library_detail"
             local DETAIL_TITLE="mir_library_detail_title"
+            local AVAILABILITY={"mir_library_availability_1","mir_library_availability_2"}
+            local AVAILABILITY_FAMILIES={"research_agricultural_growth_speed","research_spoilage_preservation"}
             local key="mir5_library_multiplayer"
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
@@ -101,7 +105,26 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local tabs=element("tabbed-pane",TABS)
               root[TABS]=tabs
               local content=element("flow",CONTENT)
+              content.children={}
               tabs[CONTENT]=content
+              if options.tab=="availability" then
+                if opponent~="missing-availability-label" then
+                  for index,name in ipairs(AVAILABILITY) do
+                    local label=element("label",name)
+                    label.caption={"mir-browser.availability-entry",
+                      {"technology-name.more-infinite-research."..AVAILABILITY_FAMILIES[index]},
+                      {"mir-browser.availability-requires-space-age"}}
+                    content[name]=label
+                    content.children[#content.children+1]=label
+                  end
+                end
+                if opponent=="extra-availability-label" then
+                  content.children[#content.children+1]=element("label","mir_library_availability_unexpected")
+                end
+                target.gui.screen[ROOT_NAME]=root
+                return
+              end
+              assert(options.visibility==1,"ordinary Library opens must reset Availability visibility")
               local results=element("list-box",RESULTS)
               results.items={options.selected};results.selected_index=1
               content[RESULTS]=results
@@ -162,6 +185,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             game.tick=game.tick+120
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if storage[key].phase~="capturing-availability" then return {ok=false,message="Availability capture did not retain the terminal view"} end
+            game.tick=game.tick+59
+            ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+            if storage[key].phase~="capturing-availability" then return {ok=false,message="Availability view restored before render grace"} end
+            game.tick=game.tick+1
+            ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="awaiting-rejoin" then return {ok=false,message="initial client phase did not await an actual rejoin"} end
             en.connected,de.connected=false,false
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
@@ -178,12 +207,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             if storage[key].phase~="awaiting-host-restart" then return {ok=false,message="rejoin phase did not request host restart"} end
             local before_load={phase=storage[key].phase,joins=storage[key].join_events,screenshots=storage[key].screenshot_calls,
-              first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
+              availability=storage[key].availability_checked,first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
             ok,result=call(callbacks.load);if not ok then return {ok=false,message=result} end
             local after_load={phase=storage[key].phase,joins=storage[key].join_events,screenshots=storage[key].screenshot_calls,
-              first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
+              availability=storage[key].availability_checked,first=storage[key].measurements.first_open,native=storage[key].native.recipes["iron-gear-wheel"]}
             local load_unchanged=before_load.phase==after_load.phase and before_load.joins==after_load.joins
-              and before_load.screenshots==after_load.screenshots and before_load.first==after_load.first and before_load.native==after_load.native
+              and before_load.screenshots==after_load.screenshots and before_load.availability==after_load.availability
+              and before_load.first==after_load.first and before_load.native==after_load.native
             en.connected,de.connected=false,false
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             en.connected,de.connected=true,true
@@ -228,16 +258,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual((result["phase"], result["join_events"]), ("completed", 6))
         self.assertTrue(result["load_unchanged"])
         self.assertEqual([item["stage"] for item in result["markers"]], ["ready", "rejoin-ready", "restart-ready", "completed"])
+        completed = result["markers"][-1]["witnesses"]
+        self.assertTrue(completed["on_load_read_only"])
+        self.assertTrue(completed["availability_terminal_labels_checked"])
+        self.assertEqual(completed["screenshot_calls"], 8)
         self.assertEqual(result["saves"], ["mir5-library-multiplayer-restart", "mir5-native-complete"])
         self.assertEqual(set(result["measurements"]), {"first_open", "search", "refresh", "reopen"})
         self.assertTrue(all(isinstance(value, str) and value.startswith("mock-profiler-") for value in result["measurements"].values()))
-        self.assertEqual(len(result["screenshots"]), 6)
+        self.assertEqual(len(result["screenshots"]), 8)
+        self.assertEqual(
+            {stage: sum(f"/{stage}-" in item["path"] for item in result["screenshots"])
+             for stage in ("availability", "initial", "rejoin", "restart")},
+            {"availability": 2, "initial": 2, "rejoin": 2, "restart": 2},
+        )
         for screenshot in result["screenshots"]:
             self.assertTrue(screenshot["player_matches"])
             self.assertTrue(screenshot["show_gui"])
             self.assertTrue(screenshot["force_render"])
             self.assertEqual(screenshot["resolution"], [1280, 720])
-            self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(initial|rejoin|restart)-[12]\.png$")
+            self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
 
     def test_fixture_rejects_missing_clients_wrong_locale_cross_player_view_and_native_mutation(self):
         absent = self.run_case("absent-second-client")
@@ -249,9 +288,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         expected = {
             "fake-connected": "actually connected client",
             "locale": "actual en/de locales",
-            "view-crosspollution": "native browser root is absent",
+            "view-crosspollution": "Availability browser GUI tree is incomplete",
             "gameplay-mutation": "mutated native research, queue, or recipe effects",
             "native-witness-overwritten": "stored native witness was overwritten",
+            "missing-availability-label": "Availability terminal label differs",
+            "extra-availability-label": "Availability terminal label count differs",
         }
         for opponent, message in expected.items():
             with self.subTest(opponent=opponent):
@@ -268,6 +309,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
     def test_fixture_uses_only_public_browser_and_native_gui_witnesses(self):
         source = CONTROL.read_text(encoding="utf-8")
         self.assertIn('remote.call(BROWSER, "open", player.index', source)
+        self.assertIn('{tab="availability", search=""}', source)
+        self.assertIn('tab="research", visibility=1', source)
+        self.assertIn('state.capture_after_tick = game.tick + 60', source)
+        self.assertIn('"research_agricultural_growth_speed"', source)
+        self.assertIn('"research_spoilage_preservation"', source)
         self.assertIn("on_player_locale_changed", source)
         self.assertIn("on_player_joined_game", source)
         self.assertIn("game.create_profiler(true)", source)
@@ -276,6 +322,16 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertNotIn("require(", source)
         self.assertNotIn("storage.mir_library", source)
         self.assertNotIn("research_queue_enabled", source)
+
+    def test_native_session_requires_eight_client_local_captures(self):
+        wrapper = WRAPPER.read_text(encoding="utf-8")
+        session = SESSION.read_text(encoding="utf-8")
+        self.assertIn("@('availability','initial','rejoin','restart')", wrapper)
+        self.assertIn("$patterns.Count -eq 8", session)
+        self.assertIn("$clientPatterns.Count -eq 4", session)
+        self.assertIn("@('availability','initial','rejoin','restart')", session)
+        self.assertIn("$completed.witnesses.availability_terminal_labels_checked -eq $true", session)
+        self.assertIn("$completed.witnesses.screenshot_calls -eq 8", session)
 
 
 if __name__ == "__main__":
