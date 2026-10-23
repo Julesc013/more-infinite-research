@@ -431,6 +431,19 @@ local function apply_k2so(definitions)
   return delta
 end
 
+local function apply_k2_base(definitions)
+  -- Exact F200 K2 Base presentation only; never import the K2SO body here.
+  local delta = require("compatibility.modern_catalogue.k2_base")
+  local selected_by_key = {}
+  for index = 1, #definitions do selected_by_key[definitions[index].key] = definitions[index] end
+  for key, changed in pairs(delta.definition_overrides or {}) do
+    local definition = selected_by_key[key]
+    if not definition then error("MIR K2 Base catalogue lacks declared key " .. key, 3) end
+    for field, value in pairs(changed) do definition[field] = copy(value) end
+  end
+  return delta
+end
+
 function M.science_names(key)
   local vector = SCIENCE[key]
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -472,6 +485,9 @@ function M.select(active_mods)
     definitions, delta = apply_space_age(definitions)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
+  end
+  if M.is_k2_base(active_mods) then
+    apply_k2_base(definitions)
   end
   if M.is_k2so(active_mods) then
     k2so = apply_k2so(definitions)

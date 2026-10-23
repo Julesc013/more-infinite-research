@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR5BlackGlassK2BaseReferenceChainV1",
-  "status": "upstream-reference-passed-published-reference-failed",
+  "status": "published-references-failed-mir5-candidate-loaded-with-nine-icon-differences",
   "host": "BLACKGLASS-WIN1",
   "control_source": "3945b662481fdb66bec3210e48de21e52f6139cf",
   "tested_source": "b26d45025c8e012951169724ecdf56ae632644e7",
@@ -52,6 +52,61 @@
           "sha256": "96DFFC8176CA6FC0A2494A52451C54DCB288EE090E71F2E23477833DAEEB3957"
         }
       }
+    },
+    {
+      "run_id": "39968795644",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39968795644",
+      "tested_source": "0d6bd9f0cb37ab3724d2890b0bbd8f56b9c9e964",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-472-adverse.json",
+          "bytes": 10443,
+          "sha256": "5D8D86FB622CDBDB09DBFCD846B13380EC9CB6AA725C06661A9C34295CA465D4"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1/artifact-manifest.json",
+          "bytes": 2200,
+          "sha256": "50693DF559F98A121E57F932FF0E8AB50F57565E051201CC2134CFED02E61125"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1",
+        "native_log": {
+          "path": "build/mir5/black-glass/incoming/39968795644/black-glass-k2-hotfix-reference-39968795644-1/capture/write-data/factorio-current.log",
+          "bytes": 12047,
+          "sha256": "4064BB90002757161FAB73ACCA578AC53C18DCF962477A34B3535FC4E72D3042"
+        },
+        "compressed_native_log": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-472-adverse.log.gz",
+          "bytes": 2102,
+          "sha256": "F522DEB00C24524898736ED70B76E9795F8E30B13BF45F1FC05DF46C3E22FFFB"
+        }
+      }
+    },
+    {
+      "run_id": "39969822288",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39969822288",
+      "tested_source": "c74bfb5411da52cb8f314fd7bc3875566a2b5707",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "completed-data-stage-with-nine-icon-differences",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-c74-native.json",
+          "bytes": 16685,
+          "sha256": "36FAFD506C6DF75DDCE04A8E55B93911B8795C971C03539D5936C12013660FCB"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39969822288/black-glass-k2-candidate-39969822288-1/artifact-manifest.json",
+          "bytes": 2387,
+          "sha256": "7488ADBDF9C460C06129D4E30775818F9AEF3B2A2E6648689B5C2D30EE91BF4F"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39969822288/black-glass-k2-candidate-39969822288-1",
+        "comparison": {
+          "path": "spec/mir5/evidence/k2-base-f200-c74-adverse-comparison.json",
+          "bytes": 9798,
+          "sha256": "1B26F1FF7E3278BBABEF17113B60D045528DD17967EE42C8CB99FD840281FE00"
+        }
+      }
     }
   ],
   "failure_class": "SCI-UNLOCK-01; published MIR4 approved automation science binding unresolved",
@@ -68,7 +123,19 @@
     "Native data-stage only; no native output dump exists for the failed published arm",
     "All original artifact member hashes verified after private download; source receipts unchanged",
     "Published4.7 F200 archive hash7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
-    "Runner has only2.1.14 F210 installed; it cannot qualify the2.1.23 F210 target",
-    "Original failed arm remains adverse evidence; no expectations recovered from a failed capture"
-  ]
+    "Original failed arm remains adverse evidence; no expectations recovered from a failed capture",
+    "Black Glass has F210 2.1.14 standalone and 2.1.17 Steam; neither qualifies the required 2.1.23 target",
+    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. Corrected-package comparison remains pending."
+  ],
+  "frozen_corrected_expectation": {
+    "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected-r02.json",
+    "sha256": "9A83773BC5BEB7A57C03D3FD369C1A20AF9AFCA468D8B69947F253C3CD74DEB7",
+    "basis": "published Base F200 plus explicit K2 source/native facts and independent raw/settings locks; frozen before corrected candidate execution"
+  },
+  "prior_expectation": {
+    "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected.json",
+    "sha256": "F5E5DB183C014CA713E711ADA66A9EE0BD7D5597256A11879A6A1679BB4AD10C",
+    "basis": "published Base F200 plus explicit K2 source/native facts, frozen before corrected candidate execution",
+    "disposition": "preserved original c74 comparison expectation; tightened by adding the independent native-settings hash before corrected native execution"
+  }
 }

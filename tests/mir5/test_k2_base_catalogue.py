@@ -9,6 +9,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTS_PATH = ROOT / "tests/mir5/fixtures/k2-base-f200-captured-facts.json"
+sys.path.insert(0, str(ROOT / "tools/mir5"))
+import compare_k2_base
 
 
 def _sha256(path: Path) -> str:
@@ -29,6 +31,15 @@ def _lua_value(lua, value):
     return value
 
 
+def _plain(value):
+    if not hasattr(value, "items"):
+        return value
+    items = dict(value.items())
+    if items and set(items) == set(range(1, len(items) + 1)):
+        return [_plain(items[index]) for index in range(1, len(items) + 1)]
+    return {key: _plain(nested) for key, nested in items.items()}
+
+
 class K2BaseCatalogueTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -40,6 +51,9 @@ class K2BaseCatalogueTests(unittest.TestCase):
         # hosted-test dependency. When it is locally present, still prove it
         # is the exact source of the committed portable native subset.
         cls.raw_path = ROOT / cls.facts["raw"]["path"]
+        native_settings = ROOT / cls.facts["native_settings"]["path"]
+        if native_settings.is_file() and _sha256(native_settings) != cls.facts["native_settings"]["sha256"]:
+            raise AssertionError("captured native settings changed")
         if cls.raw_path.is_file():
             if _sha256(cls.raw_path) != cls.facts["raw"]["sha256"]:
                 raise AssertionError(f"hash-locked K2 Base raw changed: {cls.raw_path}")
@@ -70,6 +84,15 @@ class K2BaseCatalogueTests(unittest.TestCase):
             else:
                 rows.append((row.get("type", "item"), row.get("name"), row.get("amount", 1)))
         return rows
+
+    @staticmethod
+    def _field_at(value, path):
+        for field in path:
+            if isinstance(field, int):
+                value = value[field] if isinstance(value, list) and 0 <= field < len(value) else None
+            else:
+                value = value.get(field) if isinstance(value, dict) else None
+        return value
 
     @classmethod
     def _verify_local_raw_subset(cls, raw):
@@ -106,6 +129,15 @@ class K2BaseCatalogueTests(unittest.TestCase):
                 value = value.get(field) if isinstance(value, dict) else None
             if value != category["value"]:
                 raise AssertionError(f"captured K2 category drifted: {category['name']}")
+        for presentation in cls.facts["presentation_icon_facts"]:
+            native = presentation["native"]
+            prototype = raw.get(native["prototype_type"], {}).get(native["name"])
+            if not isinstance(prototype, dict):
+                raise AssertionError(f"captured icon source is missing: {native['name']}")
+            if cls._field_at(prototype, native["icon_path"]) != native["icon"]:
+                raise AssertionError(f"captured K2 icon drifted: {presentation['id']}")
+            if cls._field_at(prototype, native["icon_size_path"]) != native["icon_size"]:
+                raise AssertionError(f"captured K2 icon size drifted: {presentation['id']}")
         gear = subset["gear"]
         item = raw.get("item", {}).get(gear["native_item"])
         if not isinstance(item, dict) or item.get("icon") != gear["native_item_icon"]:
@@ -214,6 +246,25 @@ class K2BaseCatalogueTests(unittest.TestCase):
 
     def test_f200_k2_base_emits_the_hash_locked_catalogue_once(self):
         self._run_captured_subset_data_stage()
+        # Whole independent published rows: this catches omitted fields, tuning,
+        # presentation, progression and targets beyond the mechanism assertions.
+        expected = compare_k2_base.intended_output()
+        rows = {row["name"]: row["row"] for row in expected["data"]["additions"]
+                if row["type"] == "technology"}
+        actual = self.lua.globals().data.raw.technology
+        for name, wanted in rows.items():
+            found = _plain(actual[name])
+            self.assertTrue(compare_k2_base.catalogue._same(found, wanted),
+                            f"{name}: {compare_k2_base.catalogue._changed_paths(wanted, found)}")
+        # Opponents exercise the whole-row boundary, including numeric types.
+        from copy import deepcopy
+        for name, field, changed in (
+                ("recipe-prod-research_gears-1", "effects", []),
+                ("recipe-prod-research_copper-1", "max_level", 1),
+                ("braking-force-8", "hidden", 0)):
+            mutated = deepcopy(rows[name])
+            mutated[field] = changed
+            self.assertFalse(compare_k2_base.catalogue._same(rows[name], mutated))
         self.lua.globals().facts = _lua_value(self.lua, self.facts)
         self.lua.globals().expected_ids = _lua_value(self.lua, self.facts["emitted_ids"])
         self.lua.execute(r'''
@@ -267,6 +318,36 @@ class K2BaseCatalogueTests(unittest.TestCase):
             assert(not technology_name:find("imersite", 1, true) and not technology_name:find("material", 1, true))
           end
 
+           local function same_value(left, right)
+             if type(left) ~= type(right) then return false end
+             if type(left) ~= "table" then return left == right end
+             for key, value in pairs(left) do if not same_value(value, right[key]) then return false end end
+             for key in pairs(right) do if left[key] == nil then return false end end
+             return true
+           end
+           local function without_fields(value, omitted)
+             local out = {}
+             for key, nested in pairs(value) do if not omitted[key] then out[key] = nested end end
+             return out
+           end
+           local base_selection, base_by_key = catalogue.select({base="2.0.77"}), {}
+           for _, definition in ipairs(base_selection.definitions) do base_by_key[definition.key] = definition end
+           assert(#base_selection.definitions == #selection.definitions)
+           for _, definition in ipairs(selection.definitions) do
+             local base_definition = base_by_key[definition.key]
+             assert(base_definition and same_value(without_fields(definition, {icon=true, icon_size=true}),
+               without_fields(base_definition, {icon=true, icon_size=true})),
+               "K2 Base changed a non-presentation definition field for " .. definition.key)
+           end
+           local base_continuations, base_continuations_by_key = catalogue.continuations({base="2.0.77"}), {}
+           for _, continuation in ipairs(base_continuations) do base_continuations_by_key[continuation.key] = continuation end
+           for _, continuation in ipairs(selection.continuations) do
+             local base_continuation = base_continuations_by_key[continuation.key]
+             assert(base_continuation and same_value(without_fields(continuation, {effects=true}),
+               without_fields(base_continuation, {effects=true})),
+               "K2 Base changed a non-effect continuation field for " .. continuation.key)
+           end
+
           local expected_science = {}
           for _, definition in ipairs(selection.definitions) do
             expected_science["recipe-prod-" .. definition.key .. "-1"] = catalogue.science_names(definition.science)
@@ -294,6 +375,23 @@ class K2BaseCatalogueTests(unittest.TestCase):
               end
             end
           end
+           local definitions_by_key = {}
+           for _, definition in ipairs(selection.definitions) do definitions_by_key[definition.key] = definition end
+           assert(#facts.presentation_icon_facts == 10)
+           for _, fact in ipairs(facts.presentation_icon_facts) do
+             local actual = raw.technology[fact.id].icons[1]
+             for key, value in pairs(fact.emitted) do
+               assert(actual[key] == value, "presentation field drifted for " .. fact.id .. ":" .. key)
+             end
+             for key in pairs(actual) do
+               assert(fact.emitted[key] == actual[key], "unexpected presentation field for " .. fact.id .. ":" .. key)
+             end
+             if fact.definition_key then
+               local definition = definitions_by_key[fact.definition_key]
+               assert(definition and definition.icon == fact.emitted.icon and definition.icon_size == fact.emitted.icon_size,
+                 "K2 Base definition icon drifted for " .. fact.definition_key)
+             end
+           end
            local direct_keys, direct_names = {}, {}
            for _, fact in ipairs(facts.direct_effect_families) do
              local key = fact.id:match("^recipe%-prod%-(.+)%-1$")

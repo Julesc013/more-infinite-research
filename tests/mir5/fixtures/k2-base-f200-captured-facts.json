@@ -12,6 +12,10 @@
     "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/capture/write-data/script-output/data-raw-dump.json",
     "sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390"
   },
+  "native_settings": {
+    "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/capture/write-data/script-output/mod-settings-dump.json",
+    "sha256": "2C60A465AA5CEC4E8B3A62578F7B5314D95D578F58413D439D7F16482829A17B"
+  },
   "captured_native_subset": {
     "role": "portable fields selected from the hash-locked no-MIR raw for the hosted Generator test",
     "source_sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390",
@@ -296,6 +300,58 @@
     {"prototype_type":"gun","name":"flamethrower","field_path":["attack_parameters","ammo_category"],"value":"flamethrower"},
     {"prototype_type":"active-defense-equipment","name":"discharge-defense-equipment","field_path":["attack_parameters","ammo_category"],"value":"electric"},
     {"prototype_type":"gun","name":"artillery-wagon-cannon","field_path":["attack_parameters","ammo_category"],"value":"artillery-shell"}
+  ],
+  "presentation_icon_facts": [
+    {
+      "id":"recipe-prod-research_gears-1",
+      "native":{"prototype_type":"item","name":"iron-gear-wheel","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_belts-1", "definition_key":"research_belts",
+      "native":{"prototype_type":"technology","name":"logistics","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/logistics-1.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/logistics-1.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_copper-1", "definition_key":"research_copper",
+      "native":{"prototype_type":"item","name":"copper-plate","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/copper-plate.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/copper-plate.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_iron-1", "definition_key":"research_iron",
+      "native":{"prototype_type":"item","name":"iron-plate","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/iron-plate.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/iron-plate.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_mining_drill-1", "definition_key":"research_mining_drill",
+      "native":{"prototype_type":"item","name":"electric-mining-drill","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/entities/electric-mining-drill.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/entities/electric-mining-drill.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_steel-1", "definition_key":"research_steel",
+      "native":{"prototype_type":"technology","name":"steel-processing","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/steel-processing.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-processing.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_science_pack_productivity-1", "definition_key":"research_science_pack_productivity",
+      "native":{"prototype_type":"technology","name":"space-science-pack","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/optimization-tech-card.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/optimization-tech-card.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_character_mining_speed-1", "definition_key":"research_character_mining_speed",
+      "native":{"prototype_type":"technology","name":"steel-axe","icon_path":["icons",0,"icon"],"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size_path":["icons",0,"icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_character_reach-1", "definition_key":"research_character_reach",
+      "native":{"prototype_type":"technology","name":"steel-axe","icon_path":["icons",0,"icon"],"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size_path":["icons",0,"icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_lab_productivity-1", "definition_key":"research_lab_productivity",
+      "native":{"prototype_type":"technology","name":"military-science-pack","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/military-tech-card.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/military-tech-card.png","icon_size":256}
+    }
   ],
   "k2_product_target_additions": [
     {"family": "research_belts", "recipe": "kr-advanced-loader", "weight": 0.05},
