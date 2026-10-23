@@ -46,5 +46,18 @@ data:extend({
     effects = {{type = "laboratory-speed", modifier = 0.061}},
     max_level = 61,
     upgrade = true
+  },
+  {
+    type = "technology",
+    name = "Space-Lab-Research-62",
+    icon = "__base__/graphics/technology/research-speed.png",
+    icon_size = 256,
+    prerequisites = {foreign_research},
+    unit = {
+      count = 62, time = 62,
+      ingredients = {{"automation-science-pack", 1}, {"utility-science-pack", 1}, {foreign_science, 1}}
+    },
+    effects = {{type = "laboratory-speed", modifier = 0.062}},
+    max_level = 62, upgrade = true
   }
 })

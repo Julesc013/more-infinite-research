@@ -2,8 +2,9 @@
 -- preserves a foreign technology and effects without claiming the reporter's
 -- exact provider, package closure, or MIR 4.7 startup outcome.
 local KEY = "mir5_foreign_research_preservation"
-local SAVE = "mir5-foreign-research-preservation-mir5"
+local SAVE = "mir5-native-complete"
 local FOREIGN = "Space-Lab-Research-61"
+local PENDING = "Space-Lab-Research-62"
 local NATIVE = "research-speed-7"
 local MIR = "recipe-prod-research_gears-1"
 local GEAR = "iron-gear-wheel"
@@ -29,7 +30,16 @@ local function snapshot(force)
   local foreign = technology(force, FOREIGN)
   local native = technology(force, NATIVE)
   local mir = technology(force, MIR)
+  local pending = technology(force, PENDING)
+  local queue = {}
+  for index, queued in ipairs(force.research_queue or {}) do queue[index] = queued.name end
   return {
+    pending = {level = pending.level, researched = pending.researched, enabled = pending.enabled,
+      max_level = pending.prototype.max_level},
+    queue = queue,
+    current_research = force.current_research and force.current_research.name or false,
+    research_progress = force.research_progress,
+    mir_saved_progress = mir.saved_progress,
     foreign = {
       level = foreign.level,
       researched = foreign.researched,
@@ -60,6 +70,18 @@ end
 
 local function assert_continuity(state)
   local current = snapshot(game.forces.player)
+  if not same(current.pending, state.pending) or current.pending.level ~= 62
+      or current.pending.researched ~= false or current.pending.max_level ~= 62
+      or current.current_research ~= state.current_research or current.current_research ~= PENDING
+      or #current.queue ~= #state.queue or #current.queue ~= 2
+      or current.queue[1] ~= state.queue[1] or current.queue[2] ~= state.queue[2]
+      or current.queue[1] ~= PENDING or current.queue[2] ~= MIR
+      or not close(current.research_progress, state.research_progress)
+      or not close(current.research_progress, 0.42)
+      or not close(current.mir_saved_progress, state.mir_saved_progress)
+      or not close(current.mir_saved_progress, 0.27) then
+    fail("foreign queue or partial foreign/MIR investment was changed by the MIR 5 transition")
+  end
   if not same(current.foreign, state.foreign) or current.foreign.level ~= 61
       or current.foreign.researched ~= true or current.foreign.max_level ~= 61 then
     fail("foreign finite research was changed by the MIR 5 transition")
@@ -81,7 +103,7 @@ local function assert_continuity(state)
 end
 
 local function marker(stage, state)
-  log("[MIR5_FOREIGN_RESEARCH_PRESERVATION] RESULT " .. helpers.table_to_json({
+  log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     stage = stage,
     case = "SCI-RESEARCH-01-representative",
     status = "passed",
@@ -99,6 +121,8 @@ local function marker(stage, state)
       mir_productivity_bonus = state.mir.productivity_bonus,
       laboratory_speed_modifier = state.laboratory_speed_modifier,
       direct_native_setter_completion = state.direct_native_setter_completion,
+      current_research = state.current_research, queue = state.queue,
+      foreign_progress = state.research_progress, mir_saved_progress = state.mir_saved_progress,
       on_load_read_only = stage == "reload"
     }
   }))

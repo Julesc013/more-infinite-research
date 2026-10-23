@@ -1,11 +1,13 @@
 -- The source side is deliberately a small representative, not an assertion
 -- that this was Tr1ckY_Fate's provider or that MIR 4.7 loaded it successfully.
 local KEY = "mir5_foreign_research_preservation"
-local SAVE = "mir5-foreign-research-preservation-source"
+local SAVE = "mir5-native-complete"
 local FOREIGN = "Space-Lab-Research-61"
+local PENDING = "Space-Lab-Research-62"
 local NATIVE = "research-speed-7"
 local MIR = "recipe-prod-research_gears-1"
 local GEAR = "iron-gear-wheel"
+local loaded, reload_logged = false, false
 
 local function fail(message)
   error("[mir5-foreign-research-preservation-source] " .. message)
@@ -29,7 +31,16 @@ local function snapshot(force)
   local foreign = technology(force, FOREIGN)
   local native = technology(force, NATIVE)
   local mir = technology(force, MIR)
+  local pending = technology(force, PENDING)
+  local queue = {}
+  for index, queued in ipairs(force.research_queue or {}) do queue[index] = queued.name end
   return {
+    pending = {level = pending.level, researched = pending.researched, enabled = pending.enabled,
+      max_level = pending.prototype.max_level},
+    queue = queue,
+    current_research = force.current_research and force.current_research.name or false,
+    research_progress = force.research_progress,
+    mir_saved_progress = mir.saved_progress,
     foreign = {
       level = foreign.level,
       researched = foreign.researched,
@@ -58,6 +69,13 @@ local function assert_seeded(force, state)
   local foreign = current.foreign
   local native = current.native
   local mir = current.mir
+  if current.pending.level ~= 62 or current.pending.researched ~= false
+      or current.pending.enabled ~= true or current.pending.max_level ~= 62
+      or current.current_research ~= PENDING or #current.queue ~= 2
+      or current.queue[1] ~= PENDING or current.queue[2] ~= MIR
+      or not close(current.research_progress, 0.42) or not close(current.mir_saved_progress, 0.27) then
+    fail("foreign queue or partial foreign/MIR investment differs")
+  end
   if foreign.level ~= 61 or foreign.researched ~= true or foreign.enabled ~= true
       or foreign.max_level ~= 61 then
     fail("finite foreign research state differs")
@@ -78,7 +96,7 @@ local function assert_seeded(force, state)
 end
 
 local function marker(stage, state)
-  log("[MIR5_FOREIGN_RESEARCH_PRESERVATION] RESULT " .. helpers.table_to_json({
+  log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     stage = stage,
     case = "SCI-RESEARCH-01-representative",
     status = "passed",
@@ -94,7 +112,9 @@ local function marker(stage, state)
       mir_level = state.mir.level,
       mir_productivity_bonus = state.mir.productivity_bonus,
       laboratory_speed_modifier = state.laboratory_speed_modifier,
-      direct_native_setter_completion = state.direct_native_setter_completion
+      direct_native_setter_completion = state.direct_native_setter_completion,
+      current_research = state.current_research, queue = state.queue,
+      foreign_progress = state.research_progress, mir_saved_progress = state.mir_saved_progress
     }
   }))
 end
@@ -138,6 +158,14 @@ script.on_init(function()
     fail("published MIR gear setters did not retain two earned levels")
   end
 
+  -- Retain an unfinished foreign level and suspended MIR investment as well
+  -- as earned effects. No lab is provisioned, so ordinary ticks cannot spend it.
+  local pending = technology(force, PENDING)
+  mir.saved_progress = 0.27
+  force.research_queue_enabled = true
+  force.research_queue = {pending, mir}
+  force.research_progress = 0.42
+
   local state = snapshot(force)
   state.phase = "await-source-save"
   state.source_mir = script.active_mods["more-infinite-research"]
@@ -146,11 +174,22 @@ script.on_init(function()
   storage[KEY] = state
 end)
 
+script.on_load(function()
+  loaded = storage[KEY] ~= nil and storage[KEY].phase == "seeded-4.7"
+  reload_logged = false
+end)
+
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
-  if type(state) ~= "table" or state.phase ~= "await-source-save" then return end
-  assert_seeded(game.forces.player, state)
-  marker("source", state)
-  state.phase = "seeded-4.7"
-  game.server_save(SAVE)
+  if type(state) ~= "table" then return end
+  if state.phase == "await-source-save" then
+    assert_seeded(game.forces.player, state)
+    marker("initial", state)
+    state.phase = "seeded-4.7"
+    game.server_save(SAVE)
+  elseif state.phase == "seeded-4.7" and loaded and not reload_logged then
+    assert_seeded(game.forces.player, state)
+    marker("reload", state)
+    reload_logged = true
+  end
 end)

@@ -26,7 +26,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             return fixture_rows
           end
 
-          function run_foreign_research_transition(source_path, destination_path)
+          function run_foreign_research_transition(source_path, destination_path, opponent)
             local callbacks = {}
             local marker_count, source_saves, destination_saves = 0, 0, 0
             local force = {
@@ -37,6 +37,12 @@ class ForeignResearchPreservationTests(unittest.TestCase):
               technologies = {}
             }
             function force.enable_all_prototypes() end
+            setmetatable(force, {__newindex = function(self, key, value)
+              if key == 'research_queue' then
+                rawset(self, 'current_research', value[1])
+              end
+              rawset(self, key, value)
+            end})
 
             local function prerequisite()
               return {research_recursive = function()
@@ -48,7 +54,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             local function technology(name, level, max_level, finite, laboratory_speed, gear_bonus)
               local state = {
                 name = name, level = level, researched = false, enabled = true,
-                visible_when_disabled = false,
+                visible_when_disabled = false, saved_progress = 0,
                 prototype = {max_level = max_level}, prerequisites = {prerequisite()}
               }
               return setmetatable({}, {
@@ -77,24 +83,25 @@ class ForeignResearchPreservationTests(unittest.TestCase):
 
             force.technologies['Space-Lab-Research-61'] =
               technology('Space-Lab-Research-61', 61, 61, true, .061, nil)
+            force.technologies['Space-Lab-Research-62'] =
+              technology('Space-Lab-Research-62', 62, 62, true, .062, nil)
             force.technologies['research-speed-7'] =
               technology('research-speed-7', 7, 4294967295, false, .6, nil)
             force.technologies['recipe-prod-research_gears-1'] =
               technology('recipe-prod-research_gears-1', 1, 4294967295, false, nil, .1)
 
+            local storage = {}
             local game = {
               forces = {player = force},
               server_save = function(name)
-                if name == 'mir5-foreign-research-preservation-source' then
+                assert(name == 'mir5-native-complete', 'fixture must use existing native runner save')
+                if storage.mir5_foreign_research_preservation.phase == 'seeded-4.7' then
                   source_saves = source_saves + 1
-                elseif name == 'mir5-foreign-research-preservation-mir5' then
-                  destination_saves = destination_saves + 1
                 else
-                  error('unexpected save name ' .. tostring(name))
+                  destination_saves = destination_saves + 1
                 end
               end
             }
-            local storage = {}
 
             local function load_control(path, mir_version, fixture_version)
               local callbacks_for_load = {}
@@ -117,7 +124,10 @@ class ForeignResearchPreservationTests(unittest.TestCase):
                 storage = storage,
                 game = game,
                 helpers = {table_to_json = function() return '{}' end},
-                log = function() marker_count = marker_count + 1 end
+                log = function(message)
+                  assert(message:match('^%[MIR5_NATIVE_FIXTURE%] RESULT '), 'unsupported native runner marker')
+                  marker_count = marker_count + 1
+                end
               }
               environment._G = environment
               setmetatable(environment, {__index = function(_, key) return _G[key] end})
@@ -132,6 +142,15 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             assert(pcall(source.on_init))
             assert(pcall(source.on_event.callback))
             assert(storage.mir5_foreign_research_preservation.phase == 'seeded-4.7')
+            assert(pcall(source.on_load))
+            assert(pcall(source.on_event.callback))
+
+            if opponent == 'queue' then table.remove(force.research_queue, 2)
+            elseif opponent == 'foreign-progress' then force.research_progress = .12
+            elseif opponent == 'mir-progress' then force.technologies['recipe-prod-research_gears-1'].saved_progress = .13
+            elseif opponent == 'foreign-effect' then force.laboratory_speed_modifier = force.laboratory_speed_modifier + .061
+            elseif opponent == 'foreign-level' then force.technologies['Space-Lab-Research-61'].researched = false
+            end
 
             local destination = load_control(destination_path, '5.0.21000', '0.2.0')
             assert(type(destination.on_configuration_changed) == 'function'
@@ -156,6 +175,10 @@ class ForeignResearchPreservationTests(unittest.TestCase):
               gear_bonus = force.recipes['iron-gear-wheel'].productivity_bonus,
               laboratory_speed_modifier = force.laboratory_speed_modifier,
               saved_lab_modifier = state.laboratory_speed_modifier,
+              current_research = force.current_research.name,
+              queue_count = #force.research_queue,
+              foreign_progress = force.research_progress,
+              mir_progress = force.technologies['recipe-prod-research_gears-1'].saved_progress,
               direct_setter = state.direct_native_setter_completion
             }
           end
@@ -219,6 +242,11 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             self.assertEqual(research["unit"]["ingredients"][3][1], science["name"])
             self.assertEqual(research["effects"][1]["type"], "laboratory-speed")
             self.assertAlmostEqual(research["effects"][1]["modifier"], 0.061)
+            pending = rows[4]
+            self.assertEqual(pending["name"], "Space-Lab-Research-62")
+            self.assertEqual(pending["prerequisites"][1], research["name"])
+            self.assertEqual(pending["max_level"], 62)
+            self.assertAlmostEqual(pending["effects"][1]["modifier"], 0.062)
             rows_by_version.append((science["name"], prerequisite["name"], research["effects"][1]["modifier"]))
         self.assertEqual(rows_by_version[0], rows_by_version[1])
 
@@ -230,7 +258,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         )
         self.assertEqual(result["source_saves"], 1)
         self.assertEqual(result["destination_saves"], 1)
-        self.assertEqual(result["marker_count"], 3)
+        self.assertEqual(result["marker_count"], 4)
         self.assertEqual(result["foreign_level"], 61)
         self.assertTrue(result["foreign_researched"])
         self.assertEqual(result["native_level"], 8)
@@ -239,6 +267,23 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         self.assertAlmostEqual(result["laboratory_speed_modifier"], 0.961)
         self.assertAlmostEqual(result["saved_lab_modifier"], 0.961)
         self.assertEqual(result["direct_setter"], "foreign-finite-61,native-lab-speed,mir-gear-levels")
+        self.assertEqual(result["current_research"], "Space-Lab-Research-62")
+        self.assertEqual(result["queue_count"], 2)
+        self.assertAlmostEqual(result["foreign_progress"], 0.42)
+        self.assertAlmostEqual(result["mir_progress"], 0.27)
+
+    def test_transition_rejects_lost_investment_queue_earned_state_or_duplicate_effect(self):
+        self.lua.globals().source_control_path = (SOURCE / "control.lua").as_posix()
+        self.lua.globals().destination_control_path = (DESTINATION / "control.lua").as_posix()
+        for opponent in ("queue", "foreign-progress", "mir-progress", "foreign-effect", "foreign-level"):
+            with self.subTest(opponent=opponent):
+                self.lua.globals().opponent = opponent
+                passed, message = self.lua.eval(
+                    "pcall(run_foreign_research_transition, source_control_path, destination_control_path, opponent)"
+                )
+                self.assertFalse(passed)
+                expected = "duplicated or removed" if opponent == "foreign-effect" else "changed"
+                self.assertIn(expected, str(message))
 
     def test_destination_rejects_a_created_world_without_the_published_seed(self):
         self.lua.globals().destination_control_path = (DESTINATION / "control.lua").as_posix()
