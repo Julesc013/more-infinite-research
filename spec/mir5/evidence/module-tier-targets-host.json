@@ -13,7 +13,7 @@
     },
     {
       "path": "tests/mir5/test_product_target_extension.py",
-      "sha256": "59A96B06FE0DAB679BC584E87FF0518C9C09D658FD63C77686115FE770F2C6C3"
+      "sha256": "D9F7D8626EA6B5D036FB62861362F9AB0F39465835A4C625270FF76C45809CB1"
     }
   ],
   "captured_native_input_probe": [
