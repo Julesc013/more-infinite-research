@@ -165,9 +165,10 @@ function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[
   $settings.auto_pause=$false
   [IO.File]::WriteAllText($Path,($settings|ConvertTo-Json -Depth 10)+"`n",[Text.UTF8Encoding]::new($false))
   $arguments=@('--server-settings',$Path)
-  # The exact F013 binary has no --bind option; hidden visibility is its
-  # private-server contract. F014 and later support loopback binding.
-  if($FactorioVersion -cne '0.13'){$arguments+=@('--bind','127.0.0.1')}
+  # F013 uses a CLI switch rather than the later auto_pause JSON field. Its
+  # binary has no --bind option; hidden visibility keeps it unadvertised.
+  if($FactorioVersion -ceq '0.13'){$arguments+='--no-auto-pause'}
+  else{$arguments+=@('--bind','127.0.0.1')}
   [pscustomobject][ordered]@{path=$Path;sha256=Get-FixtureSha $Path;visibility=$settings.visibility;auto_pause=$false;arguments=$arguments}
 }
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {

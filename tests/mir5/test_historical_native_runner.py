@@ -413,7 +413,8 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             if($value.auto_pause -or $result.auto_pause){throw 'fixture paused without players'}
             foreach($field in @('username','password','token')){if($value[$field] -cne ''){throw 'credential field retained'}}
             if($version -ceq '0.13'){
-              if($value.visibility -cne 'hidden' -or $value.verify_user_identity -or $result.arguments.Count -ne 2){throw 'F013 server contract differs'}
+              if($value.visibility -cne 'hidden' -or $value.verify_user_identity -or $result.arguments.Count -ne 3 -or
+                $result.arguments[2] -cne '--no-auto-pause'){throw 'F013 server contract differs'}
             }else{
               if($value.visibility.public -or $value.visibility.lan -or $value.require_user_verification){throw 'server advertised'}
               if(($result.arguments -join '|') -cnotmatch '[|]--bind[|]127[.]0[.]0[.]1$'){throw 'loopback bind absent'}
