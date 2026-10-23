@@ -160,7 +160,7 @@ local function k2_imersite_technologies(values)
       carrier.kind == "early" and productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
         or imersite_continuation_formula(stream, contract.continuation.first_level)
     carriers[index] = {
-      type = "technology", name = carrier.id, icon = "__base__/graphics/technology/automation.png", icon_size = 256,
+      type = "technology", name = carrier.id, icon = "__base__/graphics/technology/automation-1.png", icon_size = 256,
       localised_name = {"technology-name.more-infinite-research.recipe_productivity"},
       localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
       level = stage.first_level, upgrade = false, hidden = true, enabled = true, max_level = "infinite",

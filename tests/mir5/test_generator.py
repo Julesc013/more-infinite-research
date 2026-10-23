@@ -964,6 +964,8 @@ class GeneratorTests(unittest.TestCase):
             and by_id["recipe-prod-research_mining_drill-1"].effects[4].change == .05)
           assert(early_holder.hidden and early_holder.enabled and not early_holder.upgrade and early_holder.level == 1
             and continuation_holder.hidden and continuation_holder.enabled and not continuation_holder.upgrade and continuation_holder.level == 4)
+          assert(early_holder.icon == "__base__/graphics/technology/automation-1.png" and early_holder.icon_size == 256
+            and continuation_holder.icon == "__base__/graphics/technology/automation-1.png" and continuation_holder.icon_size == 256)
           assert(early_holder.effects[1].recipe == "kr-imersite-powder" and early_holder.effects[1].change == .02
             and continuation_holder.effects[1].recipe == "kr-imersite-powder" and continuation_holder.effects[1].change == .02)
           local environment = full_world(k2mods)
@@ -1246,6 +1248,14 @@ class GeneratorTests(unittest.TestCase):
             }
             expected = dict(expected_profiles[profile])
             if profile == "k2so-f210":
+                # The immutable 4.7 inventory records the historical missing
+                # `automation.png` carrier icon. F210 AtlasBuilder rejects it;
+                # current hidden Imersite carriers deliberately use Base's
+                # verified `automation-1.png` asset instead.
+                for carrier_id in ("mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"):
+                    historical = expected[carrier_id]
+                    self.assertEqual("__base__/graphics/technology/automation.png", historical["icon"])
+                    expected[carrier_id] = {**historical, "icon": "__base__/graphics/technology/automation-1.png"}
                 self.assertEqual(
                     set(expected).intersection(K2SO_INTENDED_MATERIAL_ROWS), set(),
                     K2SO_MATERIAL_ADDITION_PROVENANCE["reason"],

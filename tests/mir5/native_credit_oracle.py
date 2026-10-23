@@ -20,6 +20,7 @@ NATIVE_CREDIT_DESCRIPTORS = (
     ("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"),
 )
 NATIVE_CREDIT_DEFAULT_SCALAR = 0.1
+NATIVE_CREDIT_ICON = "__base__/graphics/technology/automation-1.png"
 
 
 def native_credit_carrier_rows(public_rows, captured_recipes):
@@ -47,7 +48,7 @@ def native_credit_carrier_rows(public_rows, captured_recipes):
             expected[name] = {
                 "type": "technology",
                 "name": name,
-                "icon": "__base__/graphics/technology/automation.png",
+                "icon": NATIVE_CREDIT_ICON,
                 "icon_size": 256,
                 "level": 1,
                 "upgrade": True,

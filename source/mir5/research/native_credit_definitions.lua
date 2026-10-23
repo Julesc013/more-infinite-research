@@ -3,7 +3,7 @@
 -- TechnologyPrototype tables; runtime accounting has a separate lifecycle.
 local M = {}
 
-local ICON = "__base__/graphics/technology/automation.png"
+local ICON = "__base__/graphics/technology/automation-1.png"
 local ORDER_PREFIX = "zz[mir-native-credit]-"
 
 local function credit_id(family, recipe, direction)

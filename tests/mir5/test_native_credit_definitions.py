@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import NATIVE_CREDIT_ICON
+
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAYER = ROOT / "source/mir5"
@@ -97,7 +99,7 @@ class NativeCreditDefinitionTests(unittest.TestCase):
             local positive, negative = names[descriptor.positive_id], names[descriptor.negative_id]
             assert(positive and negative and positive ~= negative)
             for _, row in ipairs({positive, negative}) do
-              assert(row.type == "technology" and row.icon == "__base__/graphics/technology/automation.png"
+              assert(row.type == "technology" and row.icon == "__base__/graphics/technology/automation-1.png"
                 and row.icon_size == 256 and row.level == 1 and row.upgrade == true
                 and row.hidden == true and row.enabled == false and row.visible_when_disabled == false
                 and row.max_level == "infinite" and row.unit.count == 1 and row.unit.time == 1
@@ -151,8 +153,34 @@ class NativeCreditDefinitionTests(unittest.TestCase):
           assert(#active == before, "invalid tuning appended a partial carrier set")
         ''')
 
+    def test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path(self):
+        self.assertEqual("__base__/graphics/technology/automation-1.png", NATIVE_CREDIT_ICON)
+        relative = Path("graphics/technology/automation-1.png")
+        legacy = Path("graphics/technology/automation.png")
+        engines = {
+            "f200": Path(r"D:/Programs/Factorio/2.0/data/base"),
+            "f210": Path(r"C:/Program Files/Steam/steamapps/common/Factorio/data/base"),
+        }
+        for target, base in engines.items():
+            with self.subTest(target=target):
+                if not base.is_dir():
+                    self.skipTest(f"{target} native assets are unavailable on this host")
+                self.assertTrue((base / relative).is_file(), f"{target} missing {relative.as_posix()}")
+                self.assertFalse((base / legacy).exists(), f"{target} unexpectedly restored the invalid legacy icon")
+                technology_source = (base / "prototypes/technology.lua").read_text(encoding="utf-8")
+                self.assertRegex(
+                    technology_source,
+                    r'type = "technology",\s+name = "automation",\s+'
+                    r'icon = "__base__/graphics/technology/automation-1\.png",\s+icon_size = 256',
+                )
+
     def test_source_remains_descriptor_bounded_and_does_not_scan_raw_worlds(self):
         source = (PLAYER / "research/native_credit_definitions.lua").read_text(encoding="utf-8")
+        modern = (PLAYER / "research/modern.lua").read_text(encoding="utf-8")
+        self.assertIn(NATIVE_CREDIT_ICON, source)
+        self.assertIn(NATIVE_CREDIT_ICON, modern)
+        self.assertNotIn("__base__/graphics/technology/automation.png", source)
+        self.assertNotIn("__base__/graphics/technology/automation.png", modern)
         self.assertNotIn("require(", source)
         self.assertNotIn("pairs(raw.recipe)", source)
         self.assertNotIn("ipairs(raw.recipe)", source)
