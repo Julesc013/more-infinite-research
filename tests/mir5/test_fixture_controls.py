@@ -309,6 +309,28 @@ class FixtureControlHostStageTests(unittest.TestCase):
         self.assertEqual(state.server_saves, 0)
         self.assertEqual(state.marker_count, 0)
 
+    def test_relaxed_gear_setting_has_a_valid_native_range_that_clamps_the_saved_positive_cap(self):
+        script = ROOT / "tests/mir5/fixtures/gear-upgrade-relaxed/settings-updates.lua"
+        self.lua.execute('''
+          data = {raw = {
+            ['int-setting'] = {['ips-max-level-research_gears'] = {
+              setting_type = 'startup', minimum_value = 0,
+              maximum_value = 2147483647, default_value = 0
+            }},
+            ['string-setting'] = {['mir-settings-profile-import'] = {
+              setting_type = 'startup', default_value = ''
+            }}
+          }}
+        ''')
+        self.lua.execute(script.read_text(encoding="utf-8"))
+        self.lua.execute('''
+          local setting = data.raw['int-setting']['ips-max-level-research_gears']
+          assert(setting.minimum_value < setting.maximum_value)
+          assert(setting.default_value == 0 and setting.maximum_value == 0)
+          assert(math.max(setting.minimum_value, math.min(setting.maximum_value, 2)) == 0)
+          assert(data.raw['string-setting']['mir-settings-profile-import'].default_value == '')
+        ''')
+
     def test_module_permissions_create_only_callback_accepts_complete_public_maps_and_rejects_a_wrong_permission(self):
         self.lua.globals().fixture_control = self.control("module-permissions")
         ok, message, markers = self.lua.eval(

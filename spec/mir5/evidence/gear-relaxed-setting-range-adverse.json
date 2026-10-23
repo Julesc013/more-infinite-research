@@ -1,0 +1,109 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "gear-upgrade-relaxed",
+  "source_head": "5d4ddd91ebf0a4fb34ac5c408c6b4be7823470b7",
+  "source_dirty": true,
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "sha256": "2FF9191B8C133A9869CFC874F2977143F778187C3BFE09182C1985FFF8D21E4B",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\gear-upgrade-relaxed-f210.json"
+  },
+  "fixtures": [
+    {
+      "sha256": "A68C2E931567CD3AB38D1617883DBD3DE2F79F7117347A66450ACEEE9CC97BB0",
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\gear-upgrade-relaxed",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.2.0.zip"
+    }
+  ],
+  "mir_archive": {
+    "sha256": "8A4F7120E01C2902C60725CF0353AA46FFD6BE55A1E4795AD0A261D9BEE22D08",
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": {
+    "sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-published-seed-r02\\write-data\\saves\\seed.zip"
+  },
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T02:58:01.1898637+00:00",
+    "deadline_at": "2026-10-23T02:58:01.1898637+00:00",
+    "admission": null
+  },
+  "seed_sha256": "7080EB050770EE5BB5C0525C23F4B25E573A6055E76DFBE6292AD69A4AB627A0",
+  "server_settings": {
+    "sha256": "5B4C546FFCA63E1AEC8F67FFA5C32F3108CBC334DFA5AB1C5E2C212005639610",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A",
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-relaxed-current-r01\\server-settings.json"
+  },
+  "failure": "[mir441-process-exit] 1",
+  "resource_admission": null,
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "2FF9191B8C133A9869CFC874F2977143F778187C3BFE09182C1985FFF8D21E4B",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "8A4F7120E01C2902C60725CF0353AA46FFD6BE55A1E4795AD0A261D9BEE22D08",
+        "bytes": 209321
+      },
+      {
+        "name": "mir-fixture-mir5-gear-upgrade",
+        "version": "0.2.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-gear-upgrade_0.2.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:002700000020A710",
+        "sha256": "A68C2E931567CD3AB38D1617883DBD3DE2F79F7117347A66450ACEEE9CC97BB0",
+        "bytes": 4002
+      }
+    ]
+  },
+  "input_save_byte_identical": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "interrupted",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-relaxed-current-r01\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-relaxed-current-r01\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-gear-upgrade-relaxed-current-r01\\process-1.stderr.txt",
+      "error": "[mir441-process-exit] 1"
+    }
+  ]
+}

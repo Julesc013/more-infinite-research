@@ -1,6 +1,8 @@
 -- This successor fixture shares the published seed fixture's mod identity.
--- Constraining the native prototype to exactly zero makes the saved 4.7 cap
--- value ineligible without changing player settings at runtime. The ordinary
+-- A fixture-only [-1, 0] prototype range clamps the saved positive 4.7 cap to
+-- zero. Factorio rejects degenerate [0, 0] numeric ranges. The actual selected
+-- value must be zero; MIR's real setting semantics still reject negatives.
+-- This changes no player settings at runtime. The ordinary
 -- MIR profile import remains blank here: a nonblank valid import has its
 -- documented precedence and is deliberately outside this raw-default case.
 local max_name = "ips-max-level-research_gears"
@@ -18,6 +20,6 @@ if profile_import == nil or profile_import.setting_type ~= "startup"
   error("[mir5-gear-upgrade-relaxed] expected blank normal profile import is absent")
 end
 
-maximum.minimum_value = 0
+maximum.minimum_value = -1
 maximum.maximum_value = 0
 maximum.default_value = 0
