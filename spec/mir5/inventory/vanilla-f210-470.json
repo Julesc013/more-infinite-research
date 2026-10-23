@@ -1211,33 +1211,32 @@
       "unit.count_formula",
       "unit.ingredients",
       "unit.time",
+      "order",
+      "level",
+      "enabled",
       "upgrade",
       "max_level"
     ],
-    "excluded_from_this_comparison": [
+    "matching_field_notes": [
       {
         "field": "enabled",
-        "reason": "MIR5 writes values.enabled, which resolves true at its declared default; the captured row omits the default-valued field."
+        "reason": "Both rows omit enabled at the effective true default. The constructor authors enabled only for the explicit false setting."
       },
       {
         "field": "level",
-        "reason": "The captured data.raw row has level 1; the current MIR5 constructor does not author this metadata field. Its native runtime level remains derived from the -1 technology-name suffix."
-      }
-    ],
-    "differences": [
+        "reason": "Both rows author level 1. Its native runtime level also follows the -1 technology-name suffix."
+      },
       {
         "field": "order",
-        "captured_published_value": "p[research_gears]",
-        "current_mir5_constructor_value": "absent",
-        "source_effect": "M.gears currently does not write order.",
-        "continuity_disposition": "Recorded for implementation review; this evidence record makes no product change."
+        "reason": "Both rows author p[research_gears]."
       }
     ],
+    "differences": [],
     "resolution": {
-      "status": "source-order-corrected-native-recheck-pending",
-      "constructor_sha256": "48da6b4a4e6426b210f6a9508889205cd23a6a380f01a379f2d86bacd156da29",
+      "status": "authored-default-parity-native-recheck-pending",
+      "constructor_sha256": "561c473d5a393e12b7a49156696e6738de8b5ce9fd77097685724662168cd429",
       "regression_control": "tests/mir5/test_generator.py:test_published_default_and_detachment",
-      "note": "The historical comparison above remains bound to its recorded source head."
+      "note": "The original comparison at the recorded source head noted an absent order. The current constructor now authors order, level and default-enabled parity; native recheck remains pending."
     }
   }
 }
