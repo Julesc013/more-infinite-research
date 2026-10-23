@@ -20,6 +20,9 @@ local BROWSER_INTERFACE = "more-infinite-research-browser"
 local SETTINGS_INTERFACE = "more-infinite-research-settings"
 local repair_scheduled
 local on_repair_tick
+local translation_scheduled
+local translation_maintenance_callback
+local reconcile_translations
 
 -- Keep the shipped unversioned bucket in place, including saved LuaEntity
 -- references. Neither a closed Library nor a disabled fresh feature allocates
@@ -69,6 +72,25 @@ on_repair_tick = function(event)
   schedule_repair(facts.needs_schedule)
 end
 
+-- The Library exposes a read-only answer based on its bounded durable
+-- request ledger. It keeps translation cleanup independent from the shipped
+-- repair cadence: no queue means no 61-tick callback is installed.
+local function schedule_translations(needed)
+  needed = needed == true
+  if translation_scheduled == needed then return end
+  script.on_nth_tick(library.translation_maintenance_ticks, needed and translation_maintenance_callback or nil)
+  translation_scheduled = needed
+end
+
+reconcile_translations = function()
+  schedule_translations(library.subscription_needs() == true)
+end
+
+translation_maintenance_callback = function(event)
+  library.on_translation_maintenance(event)
+  reconcile_translations()
+end
+
 local function valid(value)
   return value ~= nil and value.valid ~= false
 end
@@ -103,7 +125,9 @@ end
 local function open_browser(player_index, options)
   local player = player_for(player_index)
   if not player then return false end
-  return library.open(player, browser_options(player, options)) ~= nil
+  local opened = library.open(player, browser_options(player, options)) ~= nil
+  reconcile_translations()
+  return opened
 end
 
 local function register_interface(name, members, label)
@@ -123,6 +147,7 @@ local function add_command()
   commands.add_command("mir-research", {"mir-browser.command"}, function(event)
     local player = player_for(event and event.player_index)
     if player then library.open(player) end
+    reconcile_translations()
   end)
   commands.add_command("mir-settings-export",
     "Export the current effective MIR startup settings to script-output/more-infinite-research/settings/<name>.txt. Use --compact to omit defaults.",
@@ -136,12 +161,14 @@ local function on_init()
   lifecycle.on_init()
   library.on_init()
   reconcile_repair()
+  reconcile_translations()
 end
 
 local function on_configuration_changed(event)
   lifecycle.on_configuration_changed(event)
   library.on_configuration_changed(event)
   reconcile_repair()
+  reconcile_translations()
 end
 
 local function on_load()
@@ -152,6 +179,62 @@ local function on_load()
   -- The shipped unversioned reader treated malformed legacy buckets as
   -- absent. Retain them unchanged here; writable boundaries still reject them.
   schedule_repair(passive_repair.on_load(repair_config, repair_state(true)).needs_schedule)
+  reconcile_translations()
+end
+
+local function on_library_shortcut(event)
+  library.on_lua_shortcut(event)
+  reconcile_translations()
+end
+
+local function on_library_text_changed(event)
+  library.on_gui_text_changed(event)
+  reconcile_translations()
+end
+
+local function on_library_selection_changed(event)
+  library.on_gui_selection_state_changed(event)
+  reconcile_translations()
+end
+
+local function on_library_click(event)
+  library.on_gui_click(event)
+  reconcile_translations()
+end
+
+local function on_library_location_changed(event)
+  library.on_gui_location_changed(event)
+  reconcile_translations()
+end
+
+local function on_library_closed(event)
+  library.on_gui_closed(event)
+  reconcile_translations()
+end
+
+local function on_library_player_removed(event)
+  library.on_player_removed(event)
+  reconcile_translations()
+end
+
+local function on_library_string_translated(event)
+  library.on_string_translated(event)
+  reconcile_translations()
+end
+
+local function on_library_locale_changed(event)
+  library.on_player_locale_changed(event)
+  reconcile_translations()
+end
+
+local function on_library_force_changed(event)
+  library.on_player_changed_force(event)
+  reconcile_translations()
+end
+
+local function on_library_player_joined(event)
+  library.on_player_joined_game(event)
+  reconcile_translations()
 end
 
 function M.register()
@@ -177,6 +260,7 @@ function M.register()
 
   local events = defines and defines.events or {}
   schedule_repair(false)
+  schedule_translations(false)
   if events.on_entity_damaged then
     script.on_event(events.on_entity_damaged, repair_config.enabled and on_entity_damaged or nil,
       repair_config.enabled and {{filter = "type", type = "wall"}, {filter = "type", type = "gate", mode = "or"}} or nil)
@@ -199,13 +283,17 @@ function M.register()
     if events.on_research_started then script.on_event(events.on_research_started, nil) end
     if events.on_research_cancelled then script.on_event(events.on_research_cancelled, nil) end
   end
-  if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, library.on_lua_shortcut) end
-  if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, library.on_gui_text_changed) end
-  if events.on_gui_selection_state_changed then script.on_event(events.on_gui_selection_state_changed, library.on_gui_selection_state_changed) end
-  if events.on_gui_click then script.on_event(events.on_gui_click, library.on_gui_click) end
-  if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, library.on_gui_location_changed) end
-  if events.on_gui_closed then script.on_event(events.on_gui_closed, library.on_gui_closed) end
-  if events.on_player_removed then script.on_event(events.on_player_removed, library.on_player_removed) end
+  if events.on_lua_shortcut then script.on_event(events.on_lua_shortcut, on_library_shortcut) end
+  if events.on_gui_text_changed then script.on_event(events.on_gui_text_changed, on_library_text_changed) end
+  if events.on_gui_selection_state_changed then script.on_event(events.on_gui_selection_state_changed, on_library_selection_changed) end
+  if events.on_gui_click then script.on_event(events.on_gui_click, on_library_click) end
+  if events.on_gui_location_changed then script.on_event(events.on_gui_location_changed, on_library_location_changed) end
+  if events.on_gui_closed then script.on_event(events.on_gui_closed, on_library_closed) end
+  if events.on_player_removed then script.on_event(events.on_player_removed, on_library_player_removed) end
+  if events.on_string_translated then script.on_event(events.on_string_translated, on_library_string_translated) end
+  if events.on_player_locale_changed then script.on_event(events.on_player_locale_changed, on_library_locale_changed) end
+  if events.on_player_changed_force then script.on_event(events.on_player_changed_force, on_library_force_changed) end
+  if events.on_player_joined_game then script.on_event(events.on_player_joined_game, on_library_player_joined) end
 end
 
 return M

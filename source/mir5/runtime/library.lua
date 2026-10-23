@@ -6,6 +6,7 @@
 -- recurring subscription by itself.
 local catalogue = require("research.catalogue")
 local library_model = require("presentation.library_model")
+local translation_queue = require("runtime.library_translations")
 
 local M = {}
 
@@ -27,6 +28,15 @@ local LEGACY_SNAPSHOT_MAX_DEPTH = 8
 local LEGACY_SNAPSHOT_MAX_ENTRIES = 512
 local LEGACY_SNAPSHOT_MAX_STRING = 4096
 local cap_provider = nil
+local TRANSLATION_SCHEMA = 1
+local TRANSLATION_MAINTENANCE_TICKS = 61
+
+-- Derived translated labels and catalogue order remain local to a currently
+-- open view. The small issued-request ledger lives in the Library state so a
+-- future Factorio callback can still release its bounded slot after a save.
+local translation_caches = {}
+
+M.translation_maintenance_ticks = TRANSLATION_MAINTENANCE_TICKS
 
 local function finite_number(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
@@ -117,6 +127,120 @@ end
 local function player_index(value)
   if type(value) ~= "number" or value < 1 or value ~= math.floor(value) then return nil end
   return value
+end
+
+local function whole_number(value, minimum)
+  return type(value) == "number" and value == value and value > -math.huge and value < math.huge
+    and value == math.floor(value) and value >= minimum
+end
+
+-- This sidecar intentionally holds only a monotonic lifetime epoch and
+-- bounded issued-request records. Labels, catalogue IDs, retries, and any
+-- LuaObjects remain in translation_caches while an owned view is open.
+local function existing_translation_ledger(state)
+  local value = type(state) == "table" and state.translations or nil
+  if type(value) ~= "table" or value.schema ~= TRANSLATION_SCHEMA
+      or not whole_number(value.next_epoch, 0)
+      or type(value.active) ~= "table" or type(value.retired) ~= "table" then
+    return nil
+  end
+  return value
+end
+
+-- Unknown or malformed private state may still contain issued native request
+-- IDs. A writable view must leave it intact and decline translation issuance;
+-- only an absent sidecar may receive this schema.
+local function ensure_translation_ledger(state)
+  local value = existing_translation_ledger(state)
+  if value then return value end
+  if state.translations ~= nil then return nil end
+  value = {
+    schema = TRANSLATION_SCHEMA,
+    next_epoch = 0,
+    active = {},
+    retired = {}
+  }
+  state.translations = value
+  return value
+end
+
+local function entry_pending(entry)
+  return type(entry) == "table" and type(entry.pending) == "table" and #entry.pending > 0
+    and entry.pending or nil
+end
+
+local function next_translation_epoch(ledger)
+  local previous = whole_number(ledger.next_epoch, 0) and ledger.next_epoch or 0
+  ledger.next_epoch = previous + 1
+  return ledger.next_epoch
+end
+
+local function scope_for(player, epoch)
+  local force = player and player.force
+  if not valid(player) or not whole_number(player.index, 1) or type(player.locale) ~= "string"
+      or not whole_number(epoch, 0) or force == nil then
+    return nil
+  end
+  local force_index = force and force.index
+  if not whole_number(force_index, 1) then return nil end
+  return {
+    player_index = player.index,
+    locale = player.locale,
+    force_index = force_index,
+    generation = epoch
+  }
+end
+
+local function same_translation_scope(left, right)
+  return type(left) == "table" and type(right) == "table"
+    and left.player_index == right.player_index and left.locale == right.locale
+    and left.force_index == right.force_index and left.generation == right.generation
+end
+
+-- Default MIR views translate authored identities only. An explicit all-family
+-- view additionally scans the caller's current native force, once per
+-- family/scope change, and keeps a bounded deterministic request order.
+local function ordered_translation_ids(player, family)
+  local ok, declared = pcall(catalogue.declared)
+  if not ok or type(declared) ~= "table" then return nil end
+  local ids, seen = {}, {}
+  local function add_id(id)
+    if type(id) ~= "string" or id == "" or #id > translation_queue.label_limit then return false end
+    if seen[id] then return true end
+    if #ids >= translation_queue.catalogue_limit then return false end
+    seen[id] = true
+    ids[#ids + 1] = id
+    return true
+  end
+
+  for _, row in ipairs(declared) do
+    if type(row) ~= "table" or not add_id(row.id) then return nil end
+  end
+  if family ~= "all" then return ids end
+
+  local force = player and player.force
+  local technologies = force and force.technologies
+  if technologies == nil then return nil end
+  local native, overflow = {}, false
+  local scanned_ok = pcall(function()
+    for id, technology in pairs(technologies) do
+      if not valid(technology) or type(id) ~= "string" or id == "" or #id > translation_queue.label_limit then
+        overflow = true
+        return
+      end
+      native[#native + 1] = id
+      if #native > translation_queue.catalogue_limit then
+        overflow = true
+        return
+      end
+    end
+  end)
+  if not scanned_ok or overflow then return nil end
+  table.sort(native)
+  for _, id in ipairs(native) do
+    if not add_id(id) then return nil end
+  end
+  return ids
 end
 
 -- Preserve the old browser's personal records as a bounded convenience copy.
@@ -276,15 +400,135 @@ local function context_for(force)
   end}
 end
 
-local function rows_for(player, view, context)
-  local rows = library_model.rows(player.force, catalogue.declared(), model_view(view), {}, context)
+local EMPTY_TRANSLATIONS = {}
+
+local function cache_from_pending(pending)
+  if type(pending) ~= "table" or #pending == 0 then return nil end
+  local first = pending[1]
+  if type(first) ~= "table" or type(first.scope) ~= "table" then return nil end
+  local cache = translation_queue.new(first.scope)
+  if cache == nil or not translation_queue.hydrate_pending(cache, pending) then return nil end
+  return cache
+end
+
+local function sync_issued_cache(record)
+  if type(record) ~= "table" or type(record.ledger) ~= "table" then return false end
+  local pending = translation_queue.export_pending(record.cache)
+  if pending == nil then return false end
+  if #pending == 0 then
+    record.ledger.active[record.player_index] = nil
+  else
+    record.ledger.active[record.player_index] = {
+      epoch = record.scope.generation,
+      pending = pending
+    }
+  end
+  return true
+end
+
+local function discard_translation_cache(index)
+  local record = translation_caches[index]
+  if record then sync_issued_cache(record) end
+  translation_caches[index] = nil
+end
+
+local function open_translation_cache(player, view)
+  local index = player and player.index
+  if not whole_number(index, 1) then return nil end
+  local family = type(view) == "table" and view.family == "all" and "all" or "mir"
+  local retained = translation_caches[index]
+  local same_live_scope = retained and retained.scope and retained.scope.locale == player.locale
+    and retained.scope.force_index == (player.force and player.force.index)
+
+  if retained and same_live_scope and retained.family == family then
+    -- Ordered identities are local immutable presentation data. Reusing this
+    -- record prevents a native catalogue traversal on every GUI render.
+    return retained
+  end
+
+  if retained and same_live_scope then
+    -- Family selection changes the requester-visible catalogue. Retain engine
+    -- IDs already issued, but replace all unissued work under a fresh caller
+    -- epoch so former responses cannot label the new view.
+    local ids = ordered_translation_ids(player, family)
+    local ledger = retained.ledger
+    local scope = ledger and scope_for(player, next_translation_epoch(ledger)) or nil
+    if ids == nil or scope == nil or not translation_queue.prepare(retained.cache, scope, ids) then
+      discard_translation_cache(index)
+      return nil
+    end
+    retained.scope, retained.family = scope, family
+    sync_issued_cache(retained)
+    return retained
+  end
+  if retained then discard_translation_cache(index) end
+
+  local state = ensure_state()
+  local ledger = ensure_translation_ledger(state)
+  if ledger == nil then return nil end
+  -- A removed player can have an old engine request in flight. Preserve an
+  -- unfamiliar retired entry rather than deleting it and reusing this index.
+  if ledger.retired[index] ~= nil then return nil end
+
+  -- A nonnil active record is an issued native window until it fully validates
+  -- through the pure ledger hydrator. Do not discard it and create 16 more.
+  local active = ledger.active[index]
+  local pending = nil
+  if active ~= nil then
+    pending = entry_pending(active)
+    if pending == nil then return nil end
+  end
+
+  local scope = scope_for(player, next_translation_epoch(ledger))
+  local ids = ordered_translation_ids(player, family)
+  local cache = scope and ids and translation_queue.new(scope) or nil
+  if cache == nil or not translation_queue.prepare(cache, scope, ids) then return nil end
+  if pending and not translation_queue.hydrate_pending(cache, pending) then return nil end
+
+  local record = {player_index = index, scope = scope, family = family, cache = cache, ledger = ledger}
+  translation_caches[index] = record
+  return record
+end
+
+local function translated_labels(record)
+  if type(record) ~= "table" then return EMPTY_TRANSLATIONS end
+  return translation_queue.labels(record.cache, record.scope) or EMPTY_TRANSLATIONS
+end
+
+local function current_tick()
+  local value = game and game.tick
+  return whole_number(value, 0) and value or 0
+end
+
+local function request_translation(player, key)
+  if not valid(player) or player.connected ~= true or type(player.request_translation) ~= "function" then return nil end
+  local ok, request_id = pcall(function()
+    local force = player.force
+    local technologies = force and force.technologies
+    local technology = technologies and technologies[key] or nil
+    if not valid(technology) then return nil end
+    return player.request_translation(technology.localised_name)
+  end)
+  return ok and request_id or nil
+end
+
+local function dispatch_translations(player, record)
+  if type(record) ~= "table" or player.connected ~= true or not valid(owned_root(player)) then return end
+  translation_queue.dispatch(record.cache, record.scope, current_tick(), function(key)
+    return request_translation(player, key)
+  end)
+  sync_issued_cache(record)
+end
+
+local function rows_for(player, view, context, labels)
+  local rows = library_model.rows(player.force, catalogue.declared(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
   if type(rows) ~= "table" then return {} end
   return rows
 end
 
-local function selected_detail(player, view, context)
+local function selected_detail(player, view, context, labels)
   if not view.selected then return nil end
-  return library_model.detail(player.force, catalogue.declared(), model_view(view), {}, context)
+  return library_model.detail(player.force, catalogue.declared(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
 end
 
 local function set_shortcut(player, toggled)
@@ -403,24 +647,24 @@ local function detail_lines(parent, row, detail)
   end
 end
 
-local function update_content(frame, player, view, context)
+local function update_content(frame, player, view, context, translations)
   local content = frame[PREFIX .. "content"]
   if not valid(content) then return end
   content.clear()
 
-  local rows = rows_for(player, view, context)
-  local labels = {}
-  for index, row in ipairs(rows) do labels[index] = caption(row) end
+  local rows = rows_for(player, view, context, translations)
+  local item_labels = {}
+  for index, row in ipairs(rows) do item_labels[index] = caption(row) end
   local selected_index = row_index(rows, view.selected) or 0
-  local results = add(content, {type = "list-box", name = PREFIX .. "results", items = labels, selected_index = selected_index})
-  if view.scroll and view.scroll <= #labels and type(results.scroll_to_item) == "function" then
+  local results = add(content, {type = "list-box", name = PREFIX .. "results", items = item_labels, selected_index = selected_index})
+  if view.scroll and view.scroll <= #item_labels and type(results.scroll_to_item) == "function" then
     results.scroll_to_item(view.scroll, "top-third")
   end
   add(content, {type = "label", name = PREFIX .. "count", caption = {"mir-browser.count", #rows}})
 
   local selected = selected_index > 0 and rows[selected_index] or nil
   if selected then view.selected = selected.id end
-  local detail = selected and selected_detail(player, view, context) or nil
+  local detail = selected and selected_detail(player, view, context, translations) or nil
   local detail_box = add(content, {type = "flow", name = PREFIX .. "detail", direction = "vertical"})
   detail_lines(detail_box, selected, detail)
 
@@ -451,6 +695,7 @@ end
 -- Dynamic list/detail content is rebuilt under a stable root. In particular,
 -- query edits preserve the existing text field, native focus and caret.
 local function render(player, view, context, preserve_query)
+  if not valid(player) or player.connected ~= true then return nil end
   context = context or context_for(player.force)
   local frame = owned_root(player)
   if not valid(frame) then
@@ -468,8 +713,10 @@ local function render(player, view, context, preserve_query)
   if valid(family) then family.selected_index = view.family == "mir" and 2 or 1 end
   local status = valid(filters) and filters[PREFIX .. "status"] or nil
   if valid(status) then status.selected_index = view.status end
-  update_content(frame, player, view, context)
+  local translations = open_translation_cache(player, view)
+  update_content(frame, player, view, context, translated_labels(translations))
   set_shortcut(player, true)
+  dispatch_translations(player, translations)
   return frame
 end
 
@@ -484,7 +731,7 @@ function M.set_cap_provider(provider)
 end
 
 function M.open(player, options)
-  if not valid(player) or type(player.index) ~= "number" then return nil end
+  if not valid(player) or player.connected ~= true or type(player.index) ~= "number" then return nil end
   local existing = named_root(player)
   if valid(existing) and existing ~= owned_root(player) then return nil end
   local view = view_for(player.index)
@@ -500,7 +747,7 @@ function M.close(player)
   if not valid(player) or type(player.index) ~= "number" then return end
   if not valid(owned_root(player)) then return end
   local view = view_for(player.index)
-  destroy_frame(player, view)
+  if destroy_frame(player, view) then discard_translation_cache(player.index) end
 end
 
 function M.on_lua_shortcut(event)
@@ -555,7 +802,7 @@ function M.on_gui_selection_state_changed(event)
     }) then return end
     local view = view_for(player.index)
     local context = context_for(player.force)
-    local rows = rows_for(player, view, context)
+    local rows = rows_for(player, view, context, translated_labels(translation_caches[player.index]))
     local index = element.selected_index
     local row = type(index) == "number" and rows[index] or nil
     if row then
@@ -589,7 +836,7 @@ function M.on_gui_click(event)
   if technologies == nil then return end
   local ok, technology = pcall(function() return technologies[selected] end)
   if not ok or not valid(technology) then return end
-  destroy_frame(player, view)
+  if destroy_frame(player, view) then discard_translation_cache(player.index) end
   if type(player.open_technology_gui) == "function" then player.open_technology_gui(technology) end
 end
 
@@ -609,10 +856,177 @@ function M.on_gui_closed(event)
   M.close(player)
 end
 
-function M.on_player_removed(event)
-  if not event or type(event.player_index) ~= "number" then return end
+local function expire_durable_entry(entry, tick)
+  local cache = cache_from_pending(entry_pending(entry))
+  if cache == nil then return nil, false end
+  translation_queue.maintain(cache, cache.scope, tick)
+  local pending = translation_queue.export_pending(cache)
+  if pending == nil then return nil, false end
+  return pending, true
+end
+
+local function release_durable_request(entry, request_id)
+  local cache = cache_from_pending(entry_pending(entry))
+  if cache == nil then return false, nil end
+  local result = translation_queue.complete(cache, cache.scope, request_id, nil)
+  return result.released == true, translation_queue.export_pending(cache)
+end
+
+local function update_durable_entry(bucket, group, index, entry, pending)
+  if type(pending) ~= "table" or #pending == 0 then
+    bucket[group][index] = nil
+  else
+    entry.pending = pending
+    bucket[group][index] = entry
+  end
+end
+
+local function invalidate_open_translation(index)
+  local record = translation_caches[index]
+  if not record then return end
+  discard_translation_cache(index)
+  local player = player_for(index)
+  if player and valid(owned_root(player)) then render(player, view_for(index), nil, true) end
+end
+
+function M.on_string_translated(event)
+  if not event or not whole_number(event.player_index, 1) then return end
+  local index, player = event.player_index, player_for(event.player_index)
+  local record = translation_caches[index]
+  local rooted = player and player.connected == true and valid(owned_root(player))
+  if record and not rooted then
+    -- The frame can disappear without our close callback. Retain only the
+    -- durable issued window; callbacks then release it without a hidden view.
+    discard_translation_cache(index)
+    record = nil
+  end
+  if record then
+    -- A native locale/force change can be visible before its corresponding
+    -- event is delivered. Complete against the live token, never the cached
+    -- one, so the old reply releases its ID but cannot label this view.
+    local live_scope = scope_for(player, record.scope.generation)
+    local scope_matches = live_scope and same_translation_scope(live_scope, record.scope)
+    if live_scope == nil then
+      live_scope = {
+        player_index = record.scope.player_index,
+        locale = record.scope.locale,
+        force_index = record.scope.force_index,
+        generation = record.scope.generation == 0 and 1 or 0
+      }
+    end
+    local label = scope_matches and event.translated == true and type(event.result) == "string"
+      and event.result or nil
+    local result = translation_queue.complete(record.cache, live_scope, event.id, label)
+    if not result.released then return end
+    sync_issued_cache(record)
+    if result.published and scope_matches and rooted
+        and translation_queue.take_refresh(record.cache, record.scope) then
+      render(player, view_for(index), nil, true)
+    end
+    return
+  end
+
+  -- With no open local cache a reply is useful only for releasing a durable
+  -- request. It never rebuilds a closed view or creates presentation state.
   local state = existing_state()
-  if state then state.players[event.player_index] = nil end
+  local ledger = state and existing_translation_ledger(state) or nil
+  if not ledger then return end
+  for _, group in ipairs({"active", "retired"}) do
+    local entry = ledger[group][index]
+    if entry then
+      local released, pending = release_durable_request(entry, event.id)
+      if released then update_durable_entry(ledger, group, index, entry, pending) end
+      return
+    end
+  end
+end
+
+function M.on_player_locale_changed(event)
+  if event and whole_number(event.player_index, 1) then invalidate_open_translation(event.player_index) end
+end
+
+function M.on_player_changed_force(event)
+  if event and whole_number(event.player_index, 1) then invalidate_open_translation(event.player_index) end
+end
+
+function M.on_player_joined_game(event)
+  if not event or not whole_number(event.player_index, 1) then return end
+  local player = player_for(event.player_index)
+  local state = existing_state()
+  if player and player.connected == true and state and type(state.players[event.player_index]) == "table" and valid(owned_root(player)) then
+    -- A deferred native request may now be issued, but only because this
+    -- player's tagged Library is actually open and connected.
+    render(player, view_for(event.player_index), nil, true)
+  end
+end
+
+function M.on_player_removed(event)
+  if not event or not whole_number(event.player_index, 1) then return end
+  local state = existing_state()
+  if not state then return end
+  local index = event.player_index
+  state.players[index] = nil
+  discard_translation_cache(index)
+  local ledger = existing_translation_ledger(state)
+  if not ledger then return end
+  local active = ledger.active[index]
+  if active ~= nil and ledger.retired[index] == nil then
+    -- LuaPlayer indices are reusable after removal. Retain even an unfamiliar
+    -- active record rather than assuming it has no engine-issued IDs.
+    ledger.retired[index] = active
+    ledger.active[index] = nil
+  elseif active == nil then
+    ledger.active[index] = nil
+  end
+end
+
+function M.on_translation_maintenance(event)
+  local tick = event and event.tick
+  if not whole_number(tick, 0) then return end
+  local state = existing_state()
+  local ledger = state and existing_translation_ledger(state) or nil
+  if not ledger then return end
+
+  for index, entry in pairs(ledger.active) do
+    local record = translation_caches[index]
+    local player = player_for(index)
+    local rooted = player and player.connected == true and valid(owned_root(player))
+    if record and record.ledger == ledger and rooted then
+      translation_queue.maintain(record.cache, record.scope, tick)
+      sync_issued_cache(record)
+      if translation_queue.take_refresh(record.cache, record.scope) then
+        render(player, view_for(index), nil, true)
+      else
+        dispatch_translations(player, record)
+      end
+    elseif record and record.ledger == ledger then
+      -- A closed, disconnected, or externally destroyed root retains no local
+      -- labels/catalogue. Its persisted issued window is expiry-only.
+      discard_translation_cache(index)
+      local durable = ledger.active[index]
+      if durable then
+        local pending, handled = expire_durable_entry(durable, tick)
+        if handled then update_durable_entry(ledger, "active", index, durable, pending) end
+      end
+    else
+      local pending, handled = expire_durable_entry(entry, tick)
+      if handled then update_durable_entry(ledger, "active", index, entry, pending) end
+    end
+  end
+  for index, entry in pairs(ledger.retired) do
+    local pending, handled = expire_durable_entry(entry, tick)
+    if handled then update_durable_entry(ledger, "retired", index, entry, pending) end
+    -- A reused index receives no new request while its prior lifetime has an
+    -- issued ID. Once the retained window has drained, an already open owned
+    -- view may resume normally; a closed or disconnected player remains
+    -- expiry-only and receives no hidden render or dispatch.
+    if ledger.retired[index] == nil and translation_caches[index] == nil then
+      local player = player_for(index)
+      if player and player.connected == true and valid(owned_root(player)) then
+        render(player, view_for(index), nil, true)
+      end
+    end
+  end
 end
 
 -- Lifecycle callbacks deliberately do not initialize player state.  A later
@@ -631,68 +1045,82 @@ end
 function M.on_configuration_changed()
   local legacy = legacy_browser_state()
   local legacy_players = legacy and legacy.players
-  if type(legacy_players) ~= "table" then return end
+  if type(legacy_players) == "table" then
+    local candidates = {}
+    for index, historical_view in pairs(legacy_players) do
+      local normalized_index = player_index(index)
+      if normalized_index and type(historical_view) == "table" then
+        candidates[#candidates + 1] = {index = normalized_index, view = historical_view}
+      end
+    end
+    if #candidates > 0 then
+      local state = existing_state() or ensure_state()
+      local preserved = state.legacy_browser
+      if type(preserved) ~= "table" then
+        preserved = {
+          version = LEGACY_SNAPSHOT_VERSION,
+          source = "storage.mir.research_browser",
+          authoritative_source = "storage.mir.research_browser",
+          players = {},
+          snapshot_status = {}
+        }
+        state.legacy_browser = preserved
+      elseif type(preserved.players) ~= "table" then
+        preserved.players = {}
+      end
+      if type(preserved.snapshot_status) ~= "table" then preserved.snapshot_status = {} end
 
-  local candidates = {}
-  for index, historical_view in pairs(legacy_players) do
-    local normalized_index = player_index(index)
-    if normalized_index and type(historical_view) == "table" then
-      candidates[#candidates + 1] = {index = normalized_index, view = historical_view}
+      for _, candidate in ipairs(candidates) do
+        local index, historical_view = candidate.index, candidate.view
+        if preserved.players[index] == nil then
+          local snapshot, status = legacy_snapshot(historical_view)
+          preserved.players[index] = snapshot
+          preserved.snapshot_status[index] = status
+        end
+        if type(state.players[index]) ~= "table" then
+          state.players[index] = legacy_view_as_private(historical_view)
+        end
+      end
+
+      -- game.get_player(uint32) and LuaGuiElement child lookup/destroy are
+      -- documented by the local 2.1 runtime API.  No player is created here:
+      -- a headless native process cannot establish GUI-client evidence.
+      for _, candidate in ipairs(candidates) do
+        local player = player_for(candidate.index)
+        if player then
+          local view = local_view(state.players[candidate.index])
+          state.players[candidate.index] = view
+          rebuild_owned_legacy_root(player, view)
+        end
+      end
     end
   end
-  if #candidates == 0 then return end
 
-  local state = existing_state() or ensure_state()
-  local preserved = state.legacy_browser
-  if type(preserved) ~= "table" then
-    preserved = {
-      version = LEGACY_SNAPSHOT_VERSION,
-      source = "storage.mir.research_browser",
-      authoritative_source = "storage.mir.research_browser",
-      players = {},
-      snapshot_status = {}
-    }
-    state.legacy_browser = preserved
-  elseif type(preserved.players) ~= "table" then
-    preserved.players = {}
-  end
-  if type(preserved.snapshot_status) ~= "table" then preserved.snapshot_status = {} end
-
-  for _, candidate in ipairs(candidates) do
-    local index, historical_view = candidate.index, candidate.view
-    if preserved.players[index] == nil then
-      local snapshot, status = legacy_snapshot(historical_view)
-      preserved.players[index] = snapshot
-      preserved.snapshot_status[index] = status
-    end
-    if type(state.players[index]) ~= "table" then
-      state.players[index] = legacy_view_as_private(historical_view)
-    end
-  end
-
-  -- game.get_player(uint32) and LuaGuiElement child lookup/destroy are
-  -- documented by the local 2.1 runtime API.  No player is created here: a
-  -- headless native process cannot establish GUI-client evidence.
-  for _, candidate in ipairs(candidates) do
-    local player = player_for(candidate.index)
-    if player then
-      local view = local_view(state.players[candidate.index])
-      state.players[candidate.index] = view
-      rebuild_owned_legacy_root(player, view)
-    end
-  end
+  -- Configuration may change the compact catalogue. Keep engine-issued IDs,
+  -- but give every open view a new caller epoch before it can publish labels.
+  local open = {}
+  for index in pairs(translation_caches) do open[#open + 1] = index end
+  for _, index in ipairs(open) do invalidate_open_translation(index) end
 end
 
--- Load is intentionally read-only: it neither migrates, repairs, nor rebuilds
--- a player view.  Migration belongs to configuration change only.
+-- Load is intentionally read-only: it neither migrates, repairs, rebuilds a
+-- view, nor allocates a translation cache. Bootstrap reads subscription_needs
+-- below to reconnect the conditional 61-tick handler from durable requests.
 function M.on_load()
 end
 
--- Root event composition can call this after any library callback. This first
--- slice resolves search synchronously and has no localization dispatcher, so
--- it requests no periodic work while closed or open.
+-- Read-only on-load-safe decision. Do not call ensure_state here: malformed or
+-- absent private state has no outstanding request this callback can own.
 function M.subscription_needs()
-  return nil
+  local state = type(storage) == "table" and storage[STORAGE_KEY] or nil
+  local ledger = existing_translation_ledger(state)
+  if not ledger then return false end
+  for _, group in ipairs({ledger.active, ledger.retired}) do
+    for _, entry in pairs(group) do
+      if entry_pending(entry) then return true end
+    end
+  end
+  return false
 end
 
 return M

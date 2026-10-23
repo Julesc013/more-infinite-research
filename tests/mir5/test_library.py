@@ -21,18 +21,16 @@ class LibraryTests(unittest.TestCase):
                 return {
                   {id = "recipe-prod-research_gears-1", name = "Iron gear wheel productivity",
                     family = "mir", cap = 2, cap_setting = "ips-max-level-research_gears",
-                    finite = false, max_level = "infinite"},
-                  {id = "foreign-research", name = "Foreign research", family = "external",
-                    finite = true, max_level = 3}
+                    finite = false, max_level = "infinite"}
                 }
               end
             }
           end
 
           package.preload["presentation.library_model"] = function()
-            local function copy(row, technology, queued_count, queue_index, current)
+            local function copy(row, technology, queued_count, queue_index, current, display_name)
               local result = {
-                id = row.id, name = row.name, family = row.family, finite = row.finite,
+                id = row.id, name = display_name or row.name, family = row.family, finite = row.finite,
                 max_level = row.max_level, cap = row.cap, cap_setting = row.cap_setting,
                 cap_state = row.cap and "finite" or "unlimited",
                 current_level = technology and technology.level or 1,
@@ -76,10 +74,11 @@ class LibraryTests(unittest.TestCase):
                 local output = {}
                 for _, row in ipairs(rows) do
                   local technology = force.technologies[row.id]
-                  local name = string.lower(row.name)
+                  local display_name = translations[row.id] or row.name
+                  local name = string.lower(display_name)
                   local query = string.lower(view.query or view.search or "")
                   local queued_count, queue_index, current = queue_facts(force, row.id)
-                  local copied = copy(row, technology, queued_count, queue_index, current)
+                  local copied = copy(row, technology, queued_count, queue_index, current, display_name)
                   if (view.family == "all" or row.family == view.family)
                     and (query == "" or string.find(name, query, 1, true))
                     and (view.status == 1
@@ -135,13 +134,14 @@ class LibraryTests(unittest.TestCase):
             screen = gui_container(nil)
             gear = {valid = true, name = "recipe-prod-research_gears-1", level = 3,
               researched = true, enabled = false, visible_when_disabled = true,
+              localised_name = "Iron gear wheel productivity",
               prototype = {max_level = 4294967295}}
             foreign = {valid = true, name = "foreign-research", level = 1,
               researched = false, enabled = true, visible_when_disabled = false,
-              prototype = {max_level = 3}}
-            player = {valid = true, index = 1, gui = {screen = screen},
+              localised_name = "Foreign research", prototype = {max_level = 3}}
+            player = {valid = true, index = 1, locale = "en", connected = true, gui = {screen = screen},
               force = {
-                technologies = {[gear.name] = gear, [foreign.name] = foreign},
+                index = 1, technologies = {[gear.name] = gear, [foreign.name] = foreign},
                 research_queue = {gear}, current_research = gear, research_progress = .5,
                 add_research = function() error("Library must not add native research") end,
                 cancel_current_research = function() error("Library must not cancel native research") end
@@ -152,7 +152,14 @@ class LibraryTests(unittest.TestCase):
             player.open_technology_gui = function(technology)
               player.opened_technology = technology
             end
-            game = {get_player = function(index) return index == 1 and player or nil end}
+            player.translation_requests, player.next_translation_id = {}, 0
+            player.request_translation = function(localised)
+              player.next_translation_id = player.next_translation_id + 1
+              local request = {id = player.next_translation_id, localised = localised}
+              player.translation_requests[#player.translation_requests + 1] = request
+              return request.id
+            end
+            game = {tick = 0, get_player = function(index) return index == 1 and player or nil end}
             package.loaded["runtime.library"] = nil
             library = require("runtime.library")
           end
@@ -175,7 +182,7 @@ class LibraryTests(unittest.TestCase):
         self.lua.execute('''
           boot()
           library.on_init(); library.on_configuration_changed(); library.on_load()
-          assert(next(storage) == nil and library.subscription_needs() == nil)
+          assert(next(storage) == nil and library.subscription_needs() == false)
           library.on_lua_shortcut({prototype_name = "mir-research-browser", player_index = 1})
           local root = player.gui.screen["mir_research_browser"]
           assert(root and player.shortcut_name == "mir-research-browser" and player.shortcut_toggled)
@@ -233,6 +240,193 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1] == nil)
         ''')
 
+    def test_translation_dispatch_is_open_connected_only_and_closed_callbacks_only_release(self):
+        self.lua.execute('''
+          boot()
+          player.connected = false
+          library.open(player)
+          assert(#player.translation_requests == 0 and next(storage) == nil and library.subscription_needs() == false)
+          library.close(player)
+
+          player.connected = true
+          library.open(player)
+          assert(#player.translation_requests == 1 and library.subscription_needs())
+          local gear_request = player.translation_requests[1].id
+          library.close(player)
+          assert(player.gui.screen["mir_research_browser"] == nil)
+          library.on_translation_maintenance({tick = 1})
+          assert(#player.translation_requests == 1 and library.subscription_needs())
+          library.on_string_translated({player_index = 1, id = gear_request,
+            translated = true, result = "Closed stale gear"})
+          assert(library.subscription_needs() == false)
+        ''')
+
+    def test_all_view_scans_native_identities_once_and_family_change_invalidates_unissued_work(self):
+        self.lua.execute('''
+          boot()
+          library.open(player)
+          assert(#player.translation_requests == 1
+            and player.translation_requests[1].localised == "Iron gear wheel productivity")
+          local root = player.gui.screen["mir_research_browser"]
+          local query = root["mir_library_filters"]["mir_library_query"]
+          query.text = "gear"
+          library.on_gui_text_changed({player_index = 1, element = query})
+          assert(#player.translation_requests == 1)
+
+          local family = root["mir_library_filters"]["mir_library_family"]
+          family.selected_index = 1
+          library.on_gui_selection_state_changed({player_index = 1, element = family})
+          -- The first request remains a stale issued window; the all-family
+          -- cache requests its current MIR row and actual foreign native row.
+          assert(#player.translation_requests == 3)
+          local old_id = player.translation_requests[1].id
+          local all_gear = player.translation_requests[2].id
+          local all_foreign = player.translation_requests[3].id
+          library.on_string_translated({player_index = 1, id = old_id,
+            translated = true, result = "old label"})
+          library.on_string_translated({player_index = 1, id = all_gear,
+            translated = true, result = "Gear translated"})
+          library.on_string_translated({player_index = 1, id = all_foreign,
+            translated = true, result = "Foreign translated"})
+          root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Gear translated")
+        ''')
+
+    def test_all_view_native_translation_scan_is_bounded_before_request_dispatch(self):
+        self.lua.execute('''
+          boot()
+          for index = 1, 30001 do
+            local id = "native-" .. index
+            player.force.technologies[id] = {valid = true, name = id, localised_name = id}
+          end
+          library.open(player, {family = "all"})
+          assert(#player.translation_requests == 0 and library.subscription_needs() == false)
+        ''')
+    def test_translation_callback_checks_live_scope_and_discards_vanished_root(self):
+        self.lua.execute('''
+          boot()
+          library.open(player)
+          local id = player.translation_requests[1].id
+          local root = player.gui.screen["mir_research_browser"]
+          player.locale = "de"
+          -- Native state may lead its locale-change event. The response frees
+          -- the ID without applying the label to the stale cached scope.
+          library.on_string_translated({player_index = 1, id = id,
+            translated = true, result = "incorrect locale label"})
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Iron gear wheel productivity")
+          assert(library.subscription_needs() == false)
+          library.on_player_locale_changed({player_index = 1})
+          assert(#player.translation_requests == 2)
+
+          local locale_current = player.translation_requests[2].id
+          player.force.index = 2
+          library.on_string_translated({player_index = 1, id = locale_current,
+            translated = true, result = "incorrect force label"})
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Iron gear wheel productivity")
+          library.on_player_changed_force({player_index = 1})
+          assert(#player.translation_requests == 3)
+
+          local current = player.translation_requests[3].id
+          root = player.gui.screen["mir_research_browser"]
+          root.destroy()
+          library.on_string_translated({player_index = 1, id = current,
+            translated = true, result = "rootless label"})
+          assert(player.gui.screen["mir_research_browser"] == nil and library.subscription_needs() == false)
+        ''')
+
+    def test_malformed_translation_sidecar_and_active_window_are_preserved_without_new_requests(self):
+        self.lua.execute('''
+          boot()
+          local unknown = {version = "future", retained = {request = 99}}
+          storage.mir_library = {schema = 1, players = {}, translations = unknown}
+          library.open(player)
+          assert(storage.mir_library.translations == unknown and #player.translation_requests == 0)
+
+          boot()
+          local malformed = {pending = {{request_id = "not-a-native-id"}}}
+          local ledger = {schema = 1, next_epoch = 0, active = {[1] = malformed}, retired = {}}
+          storage.mir_library = {schema = 1, players = {}, translations = ledger}
+          library.open(player)
+          assert(storage.mir_library.translations == ledger and ledger.active[1] == malformed)
+          assert(#player.translation_requests == 0)
+          library.on_translation_maintenance({tick = 1800})
+          assert(ledger.active[1] == malformed and #player.translation_requests == 0)
+        ''')
+    def test_translation_stale_scope_reload_and_reused_index_never_publish_old_labels(self):
+        self.lua.execute('''
+          boot()
+          library.open(player, {family = "all"})
+          local old_gear = player.translation_requests[1].id
+          local old_foreign = player.translation_requests[2].id
+          player.locale = "de"
+          library.on_player_locale_changed({player_index = 1})
+          assert(#player.translation_requests == 4)
+          local locale_gear = player.translation_requests[3].id
+          local locale_foreign = player.translation_requests[4].id
+          library.on_string_translated({player_index = 1, id = old_gear,
+            translated = true, result = "OLD GEAR"})
+          library.on_string_translated({player_index = 1, id = old_foreign,
+            translated = true, result = "OLD FOREIGN"})
+          local root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Iron gear wheel productivity")
+
+          player.force.index = 2
+          library.on_player_changed_force({player_index = 1})
+          assert(#player.translation_requests == 6)
+          local force_gear = player.translation_requests[5].id
+          local force_foreign = player.translation_requests[6].id
+          library.on_string_translated({player_index = 1, id = locale_gear,
+            translated = true, result = "STALE LOCALE GEAR"})
+          library.on_string_translated({player_index = 1, id = locale_foreign,
+            translated = true, result = "STALE LOCALE FOREIGN"})
+          root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Iron gear wheel productivity")
+          library.on_string_translated({player_index = 1, id = force_gear,
+            translated = true, result = "Zahnrad"})
+          library.on_string_translated({player_index = 1, id = force_foreign,
+            translated = true, result = "Fremde Forschung"})
+          root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_content"]["mir_library_results"].items[1] == "Zahnrad")
+
+          local saved = storage.mir_library
+          local reload_gear, reload_foreign = force_gear, force_foreign
+          library.close(player)
+          library.open(player)
+          reload_gear, reload_foreign = player.translation_requests[7].id, player.translation_requests[8].id
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          library.on_load()
+          assert(storage.mir_library == saved and library.subscription_needs())
+          library.on_string_translated({player_index = 1, id = reload_gear,
+            translated = true, result = "late"})
+          library.on_string_translated({player_index = 1, id = reload_foreign,
+            translated = true, result = "late"})
+          assert(library.subscription_needs() == false)
+
+          library.open(player)
+          local removed_gear, removed_foreign = player.translation_requests[9].id, player.translation_requests[10].id
+          library.on_player_removed({player_index = 1})
+          assert(storage.mir_library.players[1] == nil and library.subscription_needs())
+
+          local prior_requests = #player.translation_requests
+          screen = gui_container(nil)
+          player = {
+            valid = true, index = 1, locale = "en", connected = true, gui = {screen = screen},
+            force = {index = 1, technologies = {[gear.name] = gear, [foreign.name] = foreign},
+              research_queue = {}, current_research = nil},
+            translation_requests = {}, next_translation_id = 100
+          }
+          player.set_shortcut_toggled = function() end
+          player.request_translation = function(localised)
+            player.next_translation_id = player.next_translation_id + 1
+            player.translation_requests[#player.translation_requests + 1] = {id = player.next_translation_id, localised = localised}
+            return player.next_translation_id
+          end
+          library.open(player)
+          assert(#player.translation_requests == 0)
+          library.on_translation_maintenance({tick = 1800})
+          assert(#player.translation_requests == 1 and library.subscription_needs())
+        ''')
     def test_status_filter_persists_read_only_queue_context_and_cap_explanation(self):
         self.lua.execute('''
           boot()
@@ -327,7 +521,7 @@ class LibraryTests(unittest.TestCase):
             return {[gear.name] = 2}
           end)
           library.on_load()
-          assert(cap_calls == 0 and library.subscription_needs() == nil)
+          assert(cap_calls == 0 and library.subscription_needs() == false)
           library.open(player)
           local root = player.gui.screen["mir_research_browser"]
           local detail = root["mir_library_content"]["mir_library_detail"]

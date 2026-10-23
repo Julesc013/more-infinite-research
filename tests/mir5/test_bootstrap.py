@@ -25,6 +25,7 @@ class BootstrapTests(unittest.TestCase):
             REPAIR_ACTIVE = repair_enabled == true
             lifecycle_calls = {}
             library_calls = {}
+            library_pending = false
             package.preload["research.settings"] = function()
               return {resolve = function() return {passive_repair_enabled = REPAIR_ACTIVE} end}
             end
@@ -62,7 +63,9 @@ class BootstrapTests(unittest.TestCase):
             end
             package.preload["runtime.library"] = function()
               local module = {}
+              module.translation_maintenance_ticks = 61
               module.set_cap_provider = function(provider) library_calls.provider = provider end
+              module.subscription_needs = function() return library_pending == true end
               module.open = function(player, options)
                 library_calls.open = {player = player, options = options}
                 return player.frame
@@ -77,6 +80,11 @@ class BootstrapTests(unittest.TestCase):
               module.on_gui_location_changed = function(event) library_calls.location = event end
               module.on_gui_closed = function(event) library_calls.closed = event end
               module.on_player_removed = function(event) library_calls.removed = event end
+              module.on_string_translated = function(event) library_calls.translated = event end
+              module.on_player_locale_changed = function(event) library_calls.locale = event end
+              module.on_player_changed_force = function(event) library_calls.force = event end
+              module.on_player_joined_game = function(event) library_calls.joined = event end
+              module.on_translation_maintenance = function(event) library_calls.translation_tick = event end
               return module
             end
             package.preload["api.v1.runtime"] = function()
@@ -118,7 +126,9 @@ class BootstrapTests(unittest.TestCase):
               on_lua_shortcut = 7, on_gui_text_changed = 8,
               on_gui_selection_state_changed = 9, on_gui_click = 10,
               on_gui_location_changed = 11, on_gui_closed = 12, on_player_removed = 13,
-              on_entity_damaged = 14
+              on_entity_damaged = 14, on_string_translated = 15,
+              on_player_locale_changed = 16, on_player_changed_force = 17,
+              on_player_joined_game = 18
             }}
             known_technology = {valid = true, name = "recipe-prod-research_gears-1"}
             player = {valid = true, index = 1, frame = {valid = true},
@@ -169,7 +179,9 @@ class BootstrapTests(unittest.TestCase):
           for id = 1, 6 do assert(type(handlers.events[id]) == "function") end
           assert(handlers.events[1] == nil or handlers.events[1] ~= handlers.events[7])
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
-          assert(handlers.events[14] == nil and handlers.nth[60] == nil and storage.mir == nil)
+          for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
+          for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
+          assert(handlers.events[14] == nil and handlers.nth[60] == nil and handlers.nth[61] == nil and storage.mir == nil)
           handlers.events[7]({player_index = 1})
           handlers.events[8]({player_index = 1})
           handlers.events[9]({player_index = 1})
@@ -177,10 +189,25 @@ class BootstrapTests(unittest.TestCase):
           handlers.events[11]({player_index = 1})
           handlers.events[12]({player_index = 1})
           handlers.events[13]({player_index = 1})
+          handlers.events[15]({player_index = 1, id = 1, translated = true, result = "Gear"})
+          handlers.events[16]({player_index = 1})
+          handlers.events[17]({player_index = 1})
+          handlers.events[18]({player_index = 1})
           assert(library_calls.shortcut.player_index == 1 and library_calls.text.player_index == 1)
           assert(library_calls.selection.player_index == 1 and library_calls.click.player_index == 1)
           assert(library_calls.location.player_index == 1 and library_calls.closed.player_index == 1
             and library_calls.removed.player_index == 1)
+          assert(library_calls.translated.result == "Gear" and library_calls.locale.player_index == 1
+            and library_calls.force.player_index == 1 and library_calls.joined.player_index == 1)
+
+          library_pending = true
+          handlers.events[15]({player_index = 1, id = 2, translated = false, result = "unused"})
+          assert(type(handlers.nth[61]) == "function")
+          handlers.nth[61]({tick = 61})
+          assert(library_calls.translation_tick.tick == 61)
+          library_pending = false
+          handlers.events[15]({player_index = 1, id = 3, translated = false, result = "unused"})
+          assert(handlers.nth[61] == nil)
 
           local cap_map = library_calls.provider(player.force)
           assert(cap_map[known_technology.name] == 2 and lifecycle_calls.cap_force == player.force)
@@ -207,6 +234,7 @@ class BootstrapTests(unittest.TestCase):
           install_modules(false); install_runtime(); load_control()
           for id = 1, 6 do assert(handlers.events[id] == nil) end
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
+          for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
         ''')
 
     def test_interface_collisions_are_rejected_without_replacement(self):
