@@ -5,6 +5,8 @@ execution, package acceptance, or release evidence.
 """
 import hashlib
 import importlib.util
+import contextlib
+import io
 import json
 from pathlib import Path
 import tempfile
@@ -29,7 +31,8 @@ class ComposeReplayTests(unittest.TestCase):
         path.write_bytes(content)
         return content
 
-    def _write_replay(self, root: Path, published_archive_sha256: str = "0" * 64) -> dict[str, bytes]:
+    def _write_replay(self, root: Path, published_archive_sha256: str = "0" * 64,
+                      version: str = composer.MOD_VERSION) -> dict[str, bytes]:
         root.mkdir()
         stages = {name: ("-- synthetic replay " + name + "\n").encode("utf-8")
                   for name in composer.STAGE_ENTRYPOINTS}
@@ -50,7 +53,7 @@ class ComposeReplayTests(unittest.TestCase):
             },
             "published_mir": {
                 "name": composer.MOD_NAME,
-                "version": composer.MOD_VERSION,
+                "version": version,
                 "sha256": published_archive_sha256,
             },
             "outputs": records,
@@ -70,15 +73,16 @@ class ComposeReplayTests(unittest.TestCase):
 
     def _write_archive(self, path: Path, *, root: str | None = None,
                        extra_members: list[tuple[str, bytes]] | None = None,
-                       omit_stages: tuple[str, ...] = ()) -> dict[str, bytes]:
-        archive_root = composer.ARCHIVE_ROOT if root is None else root
+                       omit_stages: tuple[str, ...] = (), version: str = composer.MOD_VERSION,
+                       factorio_family: str | None = None) -> dict[str, bytes]:
+        archive_root = f"{composer.MOD_NAME}_{version}" if root is None else root
         original_stages = {name: ("-- published " + name + "\n").encode("utf-8")
                            for name in composer.STAGE_ENTRYPOINTS}
         members = {
             f"{archive_root}/info.json": json.dumps({
                 "name": composer.MOD_NAME,
-                "version": composer.MOD_VERSION,
-                "factorio_version": "2.1",
+                "version": version,
+                "factorio_version": factorio_family or ("2.0" if version.startswith("4.7.200") else "2.1"),
             }, sort_keys=True).encode("utf-8"),
             f"{archive_root}/control.lua": b"return require('published-control')\n",
             f"{archive_root}/graphics/icons/published.png": b"\x89PNG\r\nsynthetic-asset",
@@ -94,6 +98,52 @@ class ComposeReplayTests(unittest.TestCase):
                 for name, content in extra_members or []:
                     archive.writestr(name, content)
         return members
+
+    def test_explicit_f200_and_f210_hotfix_replays_keep_complete_archive_identity(self):
+        for version in ("4.7.20002", "4.7.21002"):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                filename = f"{composer.MOD_NAME}_{version}.zip"
+                archive = root / filename
+                original = self._write_archive(archive, version=version)
+                expected_sha = self._sha(archive.read_bytes())
+                replay, output = root / "replay", root / "composed"
+                stages = self._write_replay(replay, expected_sha, version)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    status = composer.main([
+                        "--published-archive", str(archive), "--expected-sha256", expected_sha,
+                        "--published-version", version, "--replay-root", str(replay),
+                        "--output-root", str(output),
+                    ])
+                self.assertEqual(status, 0)
+                receipt = json.loads((output / composer.COMPOSITION_RECEIPT).read_text())
+                self.assertEqual(receipt["published_archive"]["version"], version)
+                self.assertEqual(receipt["output_archive"]["path"], filename)
+                archive_root = f"{composer.MOD_NAME}_{version}"
+                with zipfile.ZipFile(output / filename) as actual:
+                    self.assertEqual(set(actual.namelist()), set(original))
+                    for name, content in original.items():
+                        relative = name.removeprefix(archive_root + "/")
+                        self.assertEqual(actual.read(name), stages.get(relative, content))
+                with self.assertRaisesRegex(composer.ComposeReplayError, "unexpected published MIR identity"):
+                    composer.compose_replay(archive, expected_sha, replay, root / "implicit")
+                self.assertFalse((root / "implicit").exists())
+
+    def test_cross_family_or_unknown_diagnostic_identity_is_refused_before_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            version = "4.7.20002"
+            archive = root / f"{composer.MOD_NAME}_{version}.zip"
+            self._write_archive(archive, version=version, factorio_family="2.1")
+            expected_sha = self._sha(archive.read_bytes())
+            replay, output = root / "replay", root / "composed"
+            self._write_replay(replay, expected_sha, version)
+            with self.assertRaisesRegex(composer.ComposeReplayError, "info.json does not retain"):
+                composer.compose_replay(archive, expected_sha, replay, output, version)
+            self.assertFalse(output.exists())
+            with self.assertRaisesRegex(composer.ComposeReplayError, "unsupported published diagnostic"):
+                composer.compose_replay(archive, expected_sha, replay, output, "5.0.20000")
+            self.assertFalse(output.exists())
 
     def _compose(self, root: Path) -> tuple[Path, Path, Path, dict[str, bytes]]:
         archive = root / composer.PUBLISHED_ARCHIVE_NAME
