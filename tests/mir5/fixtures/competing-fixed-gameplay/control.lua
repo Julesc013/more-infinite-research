@@ -65,10 +65,15 @@ local function status(force, name)
 end
 local function assert_status(force, name, expected, label)
   local actual = status(force, name)
+  local function display(value)
+    return "level:" .. tostring(value.level) .. ",researched:" .. tostring(value.researched)
+      .. ",enabled:" .. tostring(value.enabled) .. ",visible:" .. tostring(value.visible)
+      .. ",maximum:" .. tostring(value.maximum) .. ",saved_progress:" .. tostring(value.saved_progress)
+  end
   if actual.level ~= expected.level or actual.researched ~= expected.researched
       or actual.enabled ~= expected.enabled or actual.visible ~= expected.visible
       or actual.maximum ~= expected.maximum or not close(actual.saved_progress, expected.saved_progress) then
-    fail(label .. " state differs: " .. name)
+    fail(label .. " state differs: " .. name .. " expected=" .. display(expected) .. " actual=" .. display(actual))
   end
   return actual
 end
@@ -553,7 +558,8 @@ script.on_event(defines.events.on_tick, function()
     assert_source(state)
     marker("initial", state)
     game.server_save(SAVE)
-  elseif state.phase == "await-lab" then
+  elseif state.phase == "await-lab" or state.phase == "await-preferred-breeding-lab"
+      or state.phase == "await-released-breeding-lab" then
     state.lab.energy = 1000000000
   end
 end)
