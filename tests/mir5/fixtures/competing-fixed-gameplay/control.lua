@@ -134,8 +134,12 @@ local function advanced_effects(start, names)
   return values
 end
 local function assert_effects(force, expected, label)
+  local actual = effects(force)
   for _, recipe in ipairs(EFFECT_RECIPES) do
-    if not close(effects(force)[recipe], expected[recipe]) then fail(label .. " productivity changed: " .. recipe) end
+    if not close(actual[recipe], expected[recipe]) then
+      fail(label .. " productivity changed: " .. recipe .. " expected=" .. tostring(expected[recipe])
+        .. " actual=" .. tostring(actual[recipe]))
+    end
   end
 end
 local function copy_effects(value)
@@ -370,7 +374,6 @@ script.on_init(function()
   game.speed = 16
   local player = game.forces.player
   player.enable_all_prototypes()
-  local starting_effects = effects(player)
   for _, target in ipairs(TARGETS) do
     local value = tech(player, target.id)
     prerequisites(value)
@@ -385,6 +388,10 @@ script.on_init(function()
   local probe = tech(player, PROBE)
   prerequisites(probe)
   if probe.researched then fail("unrelated braking probe was researched by prerequisites") end
+  -- Completing the authored science prerequisites earns their finite native
+  -- productivity bonuses. Measure the baseline after all player prerequisites;
+  -- the four observed lab completions must each add exactly one further level.
+  local starting_effects = effects(player)
 
   local foreign = game.create_force(FOREIGN)
   foreign.enable_all_prototypes()

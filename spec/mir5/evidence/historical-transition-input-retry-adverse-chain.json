@@ -1,0 +1,134 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalTransitionInputRetryAdverseChainV1",
+  "runs": [
+    {
+      "id": 40018951254,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40018951254",
+      "manifest_members_verified": 84,
+      "custody": "build/mir5/black-glass/incoming/40018951254/black-glass-historical-transitions-40018951254-1",
+      "cases": [
+        {
+          "path": "historical/f013/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f013-published-native.json.gz",
+            "uncompressed_sha256": "93E12213B284B4B2FFA86888AB596A7FA92BE1B5585CC50EB76EE309052D4892"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f013-published-factorio.log.gz",
+            "uncompressed_sha256": "C2B7DF1C38A329BCA92D4F98AB755AF4710BC5ED0BE48C1F5F44E8E438251E14"
+          }
+        },
+        {
+          "path": "historical/f014/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f014-published-native.json.gz",
+            "uncompressed_sha256": "A8D85800B197E0076B98306B118871381E407E66294C6535937EB85D1D176BE2"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f014-published-factorio.log.gz",
+            "uncompressed_sha256": "742331B43B98662B353F5CA7C333769790558EAFCDB1DC7010F9F6C581A3ACE6"
+          }
+        },
+        {
+          "path": "historical/f015/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f015-published-native.json.gz",
+            "uncompressed_sha256": "67E3B0BA7B3140CFDE3231581CF1E1A060730A541C6B122710CB9DB0AFC081AB"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f015-published-factorio.log.gz",
+            "uncompressed_sha256": "5BF6D3CF13E7996EAAFE6D928A242BBF93F894C892A30275E250B0FD4E2439BE"
+          }
+        },
+        {
+          "path": "historical/f016/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f016-published-native.json.gz",
+            "uncompressed_sha256": "C6AF402871C72D8F85F1536F43F7DFCC6105D20AAF027E01AFB0C1741799E9B5"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f016-published-factorio.log.gz",
+            "uncompressed_sha256": "B876196A66948F92D5A2AF4EDE1D46799C93BC0D3874503E4C2DAB335CA86EF6"
+          }
+        },
+        {
+          "path": "historical/f017/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f017-published-native.json.gz",
+            "uncompressed_sha256": "A89E71A8E46A3366E8D216034700A20CEC1597FED7118344A1D5C705CA5A9E4C"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f017-published-factorio.log.gz",
+            "uncompressed_sha256": "00CC29C8210376572C9AA669FD2C15C1FA63AA6D02A1C7BEE8531090DB7FFF57"
+          }
+        },
+        {
+          "path": "historical/f100/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f100-published-native.json.gz",
+            "uncompressed_sha256": "32AEEAF197A23599C0969B36C388F38BC91B44BBDBD6C8591A7AF20C86300A1E"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f100-published-factorio.log.gz",
+            "uncompressed_sha256": "82BDBBF63AC9A6B6BDCFAEE35F97585CFED1FB126E7394AF59F7E4E6BFF0B4C0"
+          }
+        },
+        {
+          "path": "historical/f110/published/result.json",
+          "status": "failed",
+          "source": "dd0104a6c0ed23dd025df871452bbb6e36c45737",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f110-published-native.json.gz",
+            "uncompressed_sha256": "4B9C772275E7B362ED1EC168B2994A81C5BE48611F330B2AF09A29379A5546CA"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40018951254-historical-f110-published-factorio.log.gz",
+            "uncompressed_sha256": "24F43D3F4CD8B85D901601DF6D504995EBCEF748355C9640460B488E6A3EEE5F"
+          }
+        }
+      ]
+    },
+    {
+      "id": 40024011863,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40024011863",
+      "manifest_members_verified": 14,
+      "custody": "build/mir5/black-glass/incoming/40024011863/black-glass-historical-transitions-40024011863-1",
+      "cases": [
+        {
+          "path": "historical/f017/published/result.json",
+          "status": "failed",
+          "source": "c0044a92ff248ed271202d5bfc8c10f1b6e992a0",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40024011863-historical-f017-published-native.json.gz",
+            "uncompressed_sha256": "39FDD8249617C3FE373C4567A0D73EB432C5F2D0D6DAC5E972A49E619E62A901"
+          },
+          "native_log": {
+            "gzip": "spec/mir5/evidence/historical-transition-input-retry-adverse-40024011863-historical-f017-published-factorio.log.gz",
+            "uncompressed_sha256": "0B72FB28C9123A1668A5DEA17BD2F403C52A379BD2965B3A25E5366A9A7AC597"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Second all-seven historical preparation run: early engines do not honor the selected own-mod version, requiring the existing checkout-local own-archive pin.",
+    "Later published arms reject an older customized formula expectation before any successor upgrade.",
+    "A narrowed F017 diagnostic observes exact published4.7.01702 defaults: formula8000*2^(L-1), time60, utility and military science, mining modifier0.05.",
+    "The historical direct oracle retains its original customized input provenance; it does not define default4.7.2 values.",
+    "No native historical predecessor transition passes are established by these failed runs."
+  ],
+  "release_qualification": false
+}
