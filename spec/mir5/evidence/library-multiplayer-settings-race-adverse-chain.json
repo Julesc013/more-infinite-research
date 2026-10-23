@@ -1,0 +1,20 @@
+{
+  "receipt_gzip": "spec/mir5/evidence/library-multiplayer-settings-race-adverse-native.json.gz",
+  "uncompressed_receipt_sha256": "FA67F09C7E2B8654BA62EB62EAAE4584EC3398E1EB675623268011DB1587AA9F",
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerAdverseChainV1",
+  "source": "612009082cb7b76ef47bf1ea21de693dc4f2700c",
+  "run": {
+    "id": 39996437898,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39996437898",
+    "conclusion": "failure"
+  },
+  "custody": "C:/Projects/Factorio/more-infinite-research/build/mir5/black-glass/incoming/39996437898/black-glass-library-multiplayer-39996437898-1",
+  "manifest_members_verified": 96,
+  "diagnosis": [
+    "The OS-assigned loopback socket fix permits host startup. Both graphical clients start but race on shared mod-settings.tmp.dat writes.",
+    "No two-connected-client, rendered GUI or multiplayer acceptance pass is claimed.",
+    "The revised actor starts clients serially and waits for each real native join before starting the next. Both still use the exclusive direct archive library; no dependency copies."
+  ],
+  "release_qualification": false
+}

@@ -425,9 +425,20 @@ function Start-Server([string]$Name, [string]$Save) {
   Start-Native $Name ($baseServer + @('--start-server',$Save,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort))
 }
 function Start-Clients([string]$Phase) {
-  @($clients | ForEach-Object {
-    Start-Native ("client-$Phase-$($_.locale)") @('--config',$_.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$_.port)
-  })
+  $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
+  $started=[Collections.Generic.List[object]]::new()
+  foreach($client in $clients){
+    $actor=Start-Native ("client-$Phase-$($client.locale)") @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)
+    $started.Add($actor)
+    # Each native startup writes the shared library's settings cache. Wait
+    # until the first real join proves those startup writes finished before
+    # starting another client; archive/settings custody stays one exclusive job.
+    $joined='\[MIR5_LIBRARY_MULTIPLAYER_JOIN\] '+[regex]::Escape([string]$client.name)+' '+$expectedJoin+'(?:\r?\n|$)'
+    [void](Wait-For ("native join of "+$client.name) {
+      return [regex]::IsMatch((Read-LogText (Join-Path $serverWriteData 'factorio-current.log')),$joined)
+    })
+  }
+  $started.ToArray()
 }
 
 try {

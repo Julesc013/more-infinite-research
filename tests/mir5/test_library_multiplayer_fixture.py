@@ -57,7 +57,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               force.recipes[name]={valid=true,name=name,productivity_bonus=0}
             end
             local function player(index, locale)
-              local value={valid=true,index=index,locale=locale,connected=false,force=force,gui={screen={valid=true,type="screen"}}}
+              local value={valid=true,index=index,name=index==1 and "MIR5English" or "MIR5Deutsch",locale=locale,connected=false,force=force,gui={screen={valid=true,type="screen"}}}
               players[index]=value
               return value
             end
@@ -125,7 +125,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3}},
               game=game,storage=storage,remote=remote,
               helpers={table_to_json=function(value)markers[#markers+1]=value;return "{}" end},
-              log=function(value)assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT "))end,
+              log=function(value)assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
+                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] "))end,
             }
             environment._G=environment;setmetatable(environment,{__index=function(_,name)return _G[name]end})
             local chunk,message=loadfile(path,"t",environment);assert(chunk,message)

@@ -314,6 +314,7 @@ script.on_event(defines.events.on_player_joined_game, function(event)
   end
   record.joins = record.joins + 1
   state.join_events = state.join_events + 1
+  log("[MIR5_LIBRARY_MULTIPLAYER_JOIN] " .. player.name .. " " .. tostring(record.joins))
 end)
 
 script.on_event(defines.events.on_player_locale_changed, function(event)
