@@ -6,18 +6,22 @@ import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNTIME_API = Path("C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json")
+F200_RUNTIME_API = Path("D:/Programs/Factorio/2.0/doc-html/runtime-api.json")
+F210_RUNTIME_API = Path("C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json")
 
 
 class FixtureControlHostStageTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r"""
-          function parse_consumer_control(path, active_mir)
+          function parse_consumer_control(path, active_mir, base_version, mir_version, beta_present)
             local callbacks = {}
             local forbidden = {reads = {}, writes = {}}
-            local active_mods = {base = "2.1.23"}
-            if active_mir then active_mods["more-infinite-research"] = "5.0.21000" end
+            local active_mods = {base = base_version or "2.1.23"}
+            if active_mir then
+              active_mods["more-infinite-research"] = mir_version or "5.0.21000"
+            end
+            if beta_present then active_mods["mir-fixture-mir5-api-beta"] = "0.1.0" end
 
             local remote_probe = setmetatable({}, {
               __index = function() error("control parse accessed remote") end
@@ -70,9 +74,9 @@ class FixtureControlHostStageTests(unittest.TestCase):
             return ok, result, callbacks, forbidden, environment
           end
 
-          function assert_consumer_control_parse(path, active_mir, expected_callbacks)
+          function assert_consumer_control_parse(path, active_mir, expected_callbacks, base_version, mir_version, beta_present)
             local ok, result, callbacks, forbidden, environment =
-              parse_consumer_control(path, active_mir)
+              parse_consumer_control(path, active_mir, base_version, mir_version, beta_present)
             assert(ok, tostring(result))
             assert(rawget(environment, "mods") == nil, "control created a mods global")
             assert(rawget(environment, "game") == nil and rawget(environment, "storage") == nil,
@@ -94,7 +98,80 @@ class FixtureControlHostStageTests(unittest.TestCase):
             return forbidden.reads.mods
           end
 
-          function run_beta_production_final_tick(path, phase_output, observed_output, machine_bonus)
+          function run_alpha_native_effect(path, observed_modifier)
+            local callbacks = {}
+            local logged = 0
+            local alpha_state = {researched = false, level = 1, enabled = true}
+            local force = {valid = true, index = 1, manual_crafting_speed_modifier = 0}
+            local beta = {researched = false, level = 1, enabled = true}
+            local alpha = {}
+            setmetatable(alpha, {
+              __index = function(_, key)
+                if key == "prototype" then
+                  return {effects = {{type = "character-crafting-speed", modifier = observed_modifier}}, max_level = 1}
+                end
+                return alpha_state[key]
+              end,
+              __newindex = function(_, key, value)
+                if key == "researched" and alpha_state.researched ~= value and value then
+                  force.manual_crafting_speed_modifier = force.manual_crafting_speed_modifier + observed_modifier
+                end
+                alpha_state[key] = value
+              end
+            })
+            force.technologies = {
+              automation = {researched = false},
+              ["mir-api-fixture-alpha-2"] = {researched = false},
+              ["mir-api-fixture-alpha-1"] = alpha,
+              ["mir-api-fixture-beta-cable-1"] = beta
+            }
+            local environment = {
+              script = {
+                active_mods = {base = "2.0.77", ["more-infinite-research"] = "5.0.20000"},
+                on_init = function(callback) callbacks.on_init = callback end,
+                on_load = function(callback) callbacks.on_load = callback end,
+                on_configuration_changed = function(callback) callbacks.on_configuration_changed = callback end,
+                on_event = function(event, callback) callbacks.on_event = {event = event, callback = callback} end
+              },
+              defines = {events = {on_tick = 1}},
+              remote = {
+                interfaces = {["more-infinite-research.api.v1"] = true},
+                call = function(interface, method, force_index, technology_name)
+                  assert(interface == "more-infinite-research.api.v1")
+                  if method == "get_version" then return {major = 1, minor = 0, product = "5.0.20000"} end
+                  if method == "get_capabilities" then return {research_query = true} end
+                  assert(method == "get_research")
+                  if force_index ~= force.index then return nil, "force_not_found" end
+                  if technology_name ~= "mir-api-fixture-alpha-1" then return nil, "technology_not_found" end
+                  return {
+                    name = technology_name, force_index = force_index, researched = alpha_state.researched,
+                    level = alpha_state.level, enabled = alpha_state.enabled, max_level = 1
+                  }
+                end
+              },
+              helpers = {table_to_json = function() return "{}" end},
+              log = function() logged = logged + 1 end,
+              game = {tick = 1, forces = {player = force}}
+            }
+            environment._G = environment
+            setmetatable(environment, {__index = function(_, key) return _G[key] end})
+            local chunk, message = loadfile(path, "t", environment)
+            assert(chunk ~= nil, message)
+            assert(pcall(chunk))
+            assert(type(callbacks.on_init) == "function")
+            local ok, message = pcall(callbacks.on_init)
+            return ok, message, {
+              alpha_researched = alpha_state.researched,
+              alpha_level = alpha_state.level,
+              beta_researched = beta.researched,
+              beta_level = beta.level,
+              beta_enabled = beta.enabled,
+              manual_crafting_speed_modifier = force.manual_crafting_speed_modifier,
+              markers = logged
+            }
+          end
+
+          function run_beta_production_final_tick(path, phase_output, observed_output, machine_bonus, base_version, mir_version)
             local callbacks = {}
             local saves = 0
             local logged = 0
@@ -127,8 +204,8 @@ class FixtureControlHostStageTests(unittest.TestCase):
             local environment = {
               script = {
                 active_mods = {
-                  base = '2.1.23',
-                  ['more-infinite-research'] = '5.0.21000',
+                  base = base_version or '2.1.23',
+                  ['more-infinite-research'] = mir_version or '5.0.21000',
                   ['mir-fixture-mir5-api-beta'] = '0.1.0'
                 },
                 on_init = function(callback) callbacks.on_init = callback end,
@@ -248,20 +325,112 @@ class FixtureControlHostStageTests(unittest.TestCase):
     def control(self, fixture):
         return (ROOT / "tests/mir5/fixtures" / fixture / "control.lua").as_posix()
 
-    def test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary(self):
-        if not RUNTIME_API.is_file():
-            self.skipTest("local Factorio runtime API documentation is not installed")
-        document = json.loads(RUNTIME_API.read_text(encoding="utf-8"))
-        self.assertEqual(document["application_version"], "2.1.23")
-        bootstrap = next(row for row in document["classes"] if row["name"] == "LuaBootstrap")
-        active_mods = next(field for field in bootstrap["attributes"] if field["name"] == "active_mods")
-        self.assertEqual(
-            active_mods["description"],
-            "A dictionary listing the names of all currently active mods and mapping them to their version.",
+    def test_api_consumer_f200_metadata_and_profile_select_one_exact_closure(self):
+        expected = {
+            "api-alpha": ["base >= 2.0.77", "more-infinite-research >= 5.0.20000"],
+            "api-beta": ["base >= 2.0.77", "? more-infinite-research >= 5.0.20000"],
+            "api-beta-production": [
+                "base >= 2.0.77",
+                "more-infinite-research = 5.0.20000",
+                "mir-fixture-mir5-api-beta = 0.1.0",
+            ],
+        }
+        for fixture, dependencies in expected.items():
+            with self.subTest(fixture=fixture):
+                info = json.loads(
+                    (ROOT / "tests/mir5/fixtures" / fixture / "info-f200.json").read_text(encoding="utf-8")
+                )
+                self.assertEqual(info["name"], f"mir-fixture-mir5-{fixture}")
+                self.assertEqual(info["version"], "0.1.0")
+                self.assertEqual(info["factorio_version"], "2.0")
+                self.assertEqual(info["dependencies"], dependencies)
+
+        profile = json.loads(
+            (ROOT / "tests/mir5/profiles/api-consumers-f200-2077.json").read_text(encoding="utf-8")
         )
-        self.assertFalse(active_mods["optional"])
-        self.assertEqual(active_mods["read_type"], {
-            "complex_type": "dictionary", "key": "string", "value": "string",
+        self.assertEqual(profile["kind"], "mir5-api-consumers-f200-native-selection")
+        self.assertEqual(profile["target"], "f200")
+        self.assertEqual(profile["factorio_line"], "2.0")
+        self.assertEqual(profile["engine"]["version"], "2.0.77")
+        self.assertEqual(profile["settings_mode"], "Defaults")
+        self.assertEqual(
+            [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+            [
+                ("base", "2.0.77", True),
+                ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                ("more-infinite-research", "5.0.20000", True),
+                ("mir-fixture-mir5-api-alpha", "0.1.0", True),
+                ("mir-fixture-mir5-api-beta", "0.1.0", True),
+                ("mir-fixture-mir5-api-beta-production", "0.1.0", True),
+            ],
+        )
+
+    def test_alpha_accepts_float32_native_effect_without_mutating_beta(self):
+        self.lua.globals().fixture_control = self.control("api-alpha")
+        actual_float32 = 0.05000000074505806
+        self.lua.globals().observed_alpha_modifier = actual_float32
+        passed, message, state = self.lua.eval(
+            "run_alpha_native_effect(fixture_control, observed_alpha_modifier)"
+        )
+        self.assertTrue(passed, message)
+        self.assertTrue(state.alpha_researched)
+        self.assertAlmostEqual(state.manual_crafting_speed_modifier, 0.05, places=6)
+        self.assertFalse(state.beta_researched)
+        self.assertEqual(state.beta_level, 1)
+        self.assertTrue(state.beta_enabled)
+        self.assertEqual(state.markers, 1)
+
+        self.lua.globals().observed_alpha_modifier = 0.04
+        rejected, rejected_message, rejected_state = self.lua.eval(
+            "run_alpha_native_effect(fixture_control, observed_alpha_modifier)"
+        )
+        self.assertFalse(rejected)
+        self.assertIn("native character crafting speed effect differs", str(rejected_message))
+        self.assertFalse(rejected_state.alpha_researched)
+        self.assertFalse(rejected_state.beta_researched)
+        self.assertEqual(rejected_state.manual_crafting_speed_modifier, 0)
+
+    def test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary(self):
+        for runtime_api, version in ((F200_RUNTIME_API, "2.0.77"), (F210_RUNTIME_API, "2.1.23")):
+            with self.subTest(version=version):
+                if not runtime_api.is_file():
+                    self.skipTest("local Factorio runtime API documentation is not installed")
+                document = json.loads(runtime_api.read_text(encoding="utf-8"))
+                self.assertEqual(document["application_version"], version)
+                bootstrap = next(row for row in document["classes"] if row["name"] == "LuaBootstrap")
+                active_mods = next(field for field in bootstrap["attributes"] if field["name"] == "active_mods")
+                self.assertEqual(
+                    active_mods["description"],
+                    "A dictionary listing the names of all currently active mods and mapping them to their version.",
+                )
+                self.assertFalse(active_mods["optional"])
+                self.assertEqual(active_mods["read_type"], {
+                    "complex_type": "dictionary", "key": "string", "value": "string",
+                })
+
+    def test_f200_documented_production_and_alpha_members_match_the_fixture_usage(self):
+        if not F200_RUNTIME_API.is_file():
+            self.skipTest("local Factorio 2.0 runtime API documentation is not installed")
+        document = json.loads(F200_RUNTIME_API.read_text(encoding="utf-8"))
+        self.assertEqual(document["application_version"], "2.0.77")
+        classes = {row["name"]: row for row in document["classes"]}
+        force = classes["LuaForce"]
+        manual_crafting = next(
+            field for field in force["attributes"] if field["name"] == "manual_crafting_speed_modifier"
+        )
+        self.assertEqual(manual_crafting["read_type"], "double")
+        self.assertEqual(manual_crafting["write_type"], "double")
+        recipe = classes["LuaRecipe"]
+        productivity = next(field for field in recipe["attributes"] if field["name"] == "productivity_bonus")
+        self.assertEqual(productivity["read_type"], "float")
+        entity = classes["LuaEntity"]
+        aggregate = next(field for field in entity["attributes"] if field["name"] == "productivity_bonus")
+        self.assertEqual(aggregate["read_type"], "double")
+        set_recipe = next(method for method in entity["methods"] if method["name"] == "set_recipe")
+        self.assertEqual(set_recipe["parameters"][0]["name"], "quality")
+        self.assertEqual(set_recipe["parameters"][1]["name"], "recipe")
+        self.assertEqual(set_recipe["return_values"][0]["type"], {
+            "complex_type": "array", "value": "ItemWithQualityCount",
         })
 
     def test_both_controls_parse_with_mods_nil_and_runtime_mir_present(self):
@@ -286,6 +455,25 @@ class FixtureControlHostStageTests(unittest.TestCase):
         )
         self.assertIsNone(reads_mods)
 
+    def test_beta_production_accepts_f200_closure_and_rejects_an_unsupported_target(self):
+        self.lua.globals().fixture_control = self.control("api-beta-production")
+        passed, message, callbacks, forbidden, _ = self.lua.eval(
+            "parse_consumer_control(fixture_control, true, '2.0.77', '5.0.20000', true)"
+        )
+        self.assertTrue(passed, message)
+        self.assertIsNotNone(callbacks.on_init)
+        self.assertIsNotNone(callbacks.on_load)
+        self.assertIsNotNone(callbacks.on_event)
+        self.assertEqual(len(forbidden.reads), 0)
+
+        passed, message, callbacks, forbidden, _ = self.lua.eval(
+            "parse_consumer_control(fixture_control, true, '2.0.76', '5.0.20000', true)"
+        )
+        self.assertFalse(passed)
+        self.assertIn("unsupported Factorio, MIR, or API-beta closure", str(message))
+        self.assertEqual(len(callbacks), 0)
+        self.assertEqual(len(forbidden.reads), 0)
+
     def test_beta_production_final_tick_waits_for_output_and_finalizes_before_reload_oracle(self):
         self.lua.globals().fixture_control = self.control("api-beta-production")
         early_ok, early_error, early = self.lua.eval(
@@ -307,6 +495,16 @@ class FixtureControlHostStageTests(unittest.TestCase):
         self.assertEqual(complete.researched_output, 202)
         self.assertEqual(complete.server_saves, 1)
         self.assertEqual(complete.marker_count, 1)
+
+        f200_ok, f200_error, f200 = self.lua.eval(
+            "run_beta_production_final_tick(fixture_control, 202, 0, nil, '2.0.77', '5.0.20000')"
+        )
+        self.assertTrue(f200_ok, f200_error)
+        self.assertEqual(f200.phase, "completed")
+        self.assertTrue(f200.saved)
+        self.assertEqual(f200.researched_output, 202)
+        self.assertEqual(f200.server_saves, 1)
+        self.assertEqual(f200.marker_count, 1)
 
     def test_beta_production_rejects_wrong_assembler_bonus_at_completed_output(self):
         self.lua.globals().fixture_control = self.control("api-beta-production")

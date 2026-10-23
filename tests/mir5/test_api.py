@@ -60,6 +60,22 @@ class ApiTests(unittest.TestCase):
     def fresh(self):
         self.lua.execute("data = world(); mods = {[\"more-infinite-research\"] = \"5.0.21000\"}")
 
+    def fresh_f200(self):
+        self.lua.execute('''
+          package.loaded["platform.target"] = {
+            id = "f200", factorio_version = "2.0", minimum_base = "2.0.77",
+            distribution_version = "5.0.20000", reduced = false,
+            research_levels = true, recipe_productivity = true,
+            recipe_probability = "independent_probability",
+            productivity_ignores_stats = true, receiver_limits = true,
+            cargo_research = false
+          }
+          package.loaded["__more-infinite-research__.api.v1.data"] = nil
+          api = require("__more-infinite-research__.api.v1.data")
+          data = world()
+          mods = {["more-infinite-research"] = "5.0.20000"}
+        ''')
+
     def test_version_and_capabilities_are_detached_actual_metadata(self):
         self.fresh()
         self.lua.execute('''
@@ -173,6 +189,31 @@ class ApiTests(unittest.TestCase):
           assert(data.writes == 2 and beta and #beta.effects == 1)
           assert(beta.effects[1].type == "change-recipe-productivity"
             and beta.effects[1].recipe == "copper-cable")
+        ''')
+
+    def test_f200_required_alpha_and_late_optional_beta_remain_detached(self):
+        self.fresh_f200()
+        alpha = ROOT / "tests/mir5/fixtures/api-alpha/data.lua"
+        beta = ROOT / "tests/mir5/fixtures/api-beta/data-final-fixes.lua"
+        self.lua.globals().alpha_fixture = alpha.as_posix()
+        self.lua.globals().beta_fixture = beta.as_posix()
+        self.lua.execute('''
+          assert(api.get_version().product == "5.0.20000")
+          assert(api.get_capabilities().recipe_productivity == true)
+          assert(loadfile(alpha_fixture))()
+          assert(loadfile(beta_fixture))()
+          local alpha = assert(data.raw.technology["mir-api-fixture-alpha-1"])
+          local prerequisite = assert(data.raw.technology["mir-api-fixture-alpha-2"])
+          local beta = assert(data.raw.technology["mir-api-fixture-beta-cable-1"])
+          assert(data.writes == 2 and alpha ~= prerequisite and alpha ~= beta and prerequisite ~= beta)
+          assert(#alpha.effects == 1 and alpha.effects[1].type == "character-crafting-speed"
+            and alpha.effects[1].modifier == .05)
+          assert(#prerequisite.effects == 0)
+          assert(#beta.effects == 1 and beta.effects[1].type == "change-recipe-productivity"
+            and beta.effects[1].recipe == "copper-cable" and beta.effects[1].change == .01)
+          alpha.effects[1].modifier = .5
+          assert(beta.effects[1].change == .01,
+            "required alpha mutation must not alias the optional beta effect")
         ''')
 
     def test_optional_consumer_handles_mir_absence_before_importing(self):

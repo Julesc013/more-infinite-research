@@ -68,7 +68,10 @@ local function run_initial()
   local technology = force.technologies[alpha_name]
   if automation == nil or prerequisite == nil or technology == nil then fail("alpha technologies are absent") end
   local effects = technology.prototype.effects
-  if #effects ~= 1 or effects[1].type ~= "character-crafting-speed" or effects[1].modifier ~= 0.05 then
+  -- Factorio returns native effect modifiers as float32 values.  The data-stage
+  -- declaration remains exact; this gameplay observation must accept the
+  -- corresponding native readback without accepting a material drift.
+  if #effects ~= 1 or effects[1].type ~= "character-crafting-speed" or not close(effects[1].modifier, 0.05) then
     fail("native character crafting speed effect differs")
   end
   local before = force.manual_crafting_speed_modifier

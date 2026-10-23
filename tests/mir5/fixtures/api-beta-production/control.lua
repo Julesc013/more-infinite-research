@@ -21,6 +21,25 @@ local function fail(message)
   error("[mir5-api-beta-production] " .. message)
 end
 
+local expected_mir_by_base = {
+  ["2.0.77"] = "5.0.20000",
+  ["2.1.23"] = "5.0.21000"
+}
+
+local function assert_supported_closure()
+  local active_mods = script.active_mods
+  local expected_mir = active_mods and expected_mir_by_base[active_mods.base]
+  if expected_mir == nil or active_mods["more-infinite-research"] ~= expected_mir
+      or active_mods["mir-fixture-mir5-api-beta"] ~= "0.1.0" then
+    fail("fixture loaded with an unsupported Factorio, MIR, or API-beta closure")
+  end
+end
+
+-- Keep the fixture bounded to its two exact engine/product closures before
+-- registering runtime callbacks.  It does not infer support from a version
+-- range or mutate either API consumer during this check.
+assert_supported_closure()
+
 local function close(actual, expected)
   return type(actual) == "number" and math.abs(actual - expected) <= 0.000000001
 end
@@ -219,10 +238,6 @@ local function marker(stage, state)
 end
 
 script.on_init(function()
-  if script.active_mods.base ~= "2.1.23" or script.active_mods["more-infinite-research"] ~= "5.0.21000"
-      or script.active_mods["mir-fixture-mir5-api-beta"] ~= "0.1.0" then
-    fail("fixture loaded with an unexpected Factorio, MIR, or API-beta closure")
-  end
   game.speed = 16
   local force = player_force()
   force.enable_all_prototypes()
