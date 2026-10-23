@@ -41,6 +41,23 @@ function Read-FixtureResult([string]$Text,[string]$Stage) {
   Assert-Fixture ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "missing unique passed $Stage witness for $CaseName"
   $rows[0]
 }
+function Test-HistoricalFixtureSaveComplete([string]$Path) {
+  # Early engines do not print the later "Saving finished" message. A closed,
+  # readable save with its native level member is their completion boundary;
+  # the two actual native reloads below establish loadability separately.
+  $stream=$null;$zip=$null
+  try {
+    $stream=[IO.File]::Open($Path,[IO.FileMode]::Open,[IO.FileAccess]::Read,[IO.FileShare]::None)
+    $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Read)
+    $root=[IO.Path]::GetFileNameWithoutExtension($Path)
+    foreach($name in @('level.dat','level-init.dat')){
+      $entry=$zip.GetEntry($root+'/'+$name)
+      if($null -ne $entry -and $entry.Length -gt 0){return $true}
+    }
+    return $false
+  } catch { return $false }
+  finally {if($null -ne $zip){$zip.Dispose()};if($null -ne $stream){$stream.Dispose()}}
+}
 function Read-ConsumerResults([string]$Text,[string]$Stage) {
   $results=[ordered]@{}
   foreach($marker in $ConsumerMarkers){
@@ -325,7 +342,9 @@ try{
     $reader=[IO.StreamReader]::new($stream)
     try{$text=$reader.ReadToEnd()}finally{$reader.Dispose();$stream.Dispose()}
     if([regex]::IsMatch($text,'(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$')){throw 'fatal native production diagnostic'}
-    return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
+    if(-not $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ')){return $false}
+    if($historical){return Test-HistoricalFixtureSaveComplete $complete}
+    return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('Saving finished')
   }.GetNewClosure()
   if($historical){
     $serverSettings=New-HistoricalFixtureServerSettings (Join-Path $resources.root 'server-settings.json') $engineData $historicalFixture.factorio_version

@@ -429,6 +429,42 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                                     capture_output=True, text=True, env=env, check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_historical_save_completion_requires_a_closed_native_archive(self):
+        script = r'''
+          $ErrorActionPreference='Stop'
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse differs'}
+          $nodes=@($ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and
+            $n.Name -ceq 'Test-HistoricalFixtureSaveComplete'},$true))
+          if($nodes.Count -ne 1){throw 'save completion helper missing'}
+          Invoke-Expression $nodes[0].Extent.Text
+          foreach($name in @('old','later')){
+            if(-not (Test-HistoricalFixtureSaveComplete (Join-Path $env:MIR_TEST_TEMP ($name+'.zip')))){throw 'valid native save rejected'}
+          }
+          foreach($name in @('missing','corrupt','wrong','empty')){
+            if(Test-HistoricalFixtureSaveComplete (Join-Path $env:MIR_TEST_TEMP ($name+'.zip'))){throw 'invalid native save accepted'}
+          }
+          $path=Join-Path $env:MIR_TEST_TEMP 'old.zip'
+          $writer=[IO.File]::Open($path,[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+          try{if(Test-HistoricalFixtureSaveComplete $path){throw 'open writer accepted'}}finally{$writer.Dispose()}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-save-") as work:
+            folder = Path(work)
+            for name, member, contents in (
+                ("old", "old/level-init.dat", b"native bytes"),
+                ("later", "later/level.dat", b"native bytes"),
+                ("wrong", "other/level.dat", b"native bytes"),
+                ("empty", "empty/level.dat", b""),
+            ):
+                with zipfile.ZipFile(folder / (name + ".zip"), "w") as archive:
+                    archive.writestr(member, contents)
+            (folder / "corrupt.zip").write_bytes(b"incomplete native archive")
+            env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_TEMP=work)
+            result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                                    capture_output=True, text=True, env=env, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_actual_archive_guard_accepts_six_members_and_rejects_merged_dependencies_or_missing_member(self):
         functions = r'''
           $ErrorActionPreference='Stop'
