@@ -161,7 +161,7 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
     end})
     local function technology(name)
       return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-        prototype={max_level=4294967295},prerequisites={},research_unit_count=1,research_unit_energy=60,research_unit_ingredients={}}
+        prototype={max_level=4294967295,level=1},prerequisites={},research_unit_count=1,research_unit_energy=60,research_unit_ingredients={}}
     end
     for _,id in ipairs(ids) do force.technologies[id]=technology(id) end
     local target=force.technologies[target_name];for _,item in ipairs(science)do target.research_unit_ingredients[#target.research_unit_ingredients+1]={name=item,amount=1}end
@@ -190,17 +190,17 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
   function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
   local active={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="4.7.20002",["mir-fixture-mir5-competing-dynamic-gameplay"]="0.1.0"}
   if provider=="ce"then active["crafting-efficiency-2"]="0.2.20"else active.ProductivityResearch="1.3.2"end
-  local storage={};local env={script={active_mods=active,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},game=game,storage=storage,settings={startup={["mir-prefer-this-mod-for-competing-techs"]={value=false}}},helpers={table_to_json=function(value)assert(value.status=="passed"and(value.stage=="initial"or value.stage=="reload"));return "{}"end},log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
+  local diagnostics={};local storage={};local env={script={active_mods=active,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},game=game,storage=storage,settings={startup={["mir-prefer-this-mod-for-competing-techs"]={value=false}}},helpers={table_to_json=function(value)if value.status=="passed"then assert(value.stage=="initial"or value.stage=="reload") else assert(value.provider and value.target and value.levels)end;return "{}"end},log=function(value)if value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ")then markers=markers+1 elseif value:match("^%[MIR5_DYNAMIC_INITIAL_LEVELS%] ")then diagnostics[#diagnostics+1]=value else error("unexpected fixture log")end end}
   env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
   ok,result=pcall(callbacks.init);if not ok then return {ok=false,message=tostring(result)}end
   local target=player.technologies[target_name]
-  player.research_queue={};target.level=2;player.recipes[recipe_name].productivity_bonus=opponent=="wrong-effect"and .09 or .1
+  player.research_queue={};target.level=opponent=="wrong-level"and 3 or 2;player.recipes[recipe_name].productivity_bonus=opponent=="wrong-effect"and .09 or .1
   ok,result=pcall(callbacks.events[2],{research=target});if not ok then return {ok=false,message=tostring(result)}end
   game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end
   for _=1,2 do ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)}end;game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
   local state=storage.mir5_competing_dynamic_gameplay
-  return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,level=target.level,bonus=player.recipes[recipe_name].productivity_bonus,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,foreign_disabled=foreign.technologies[target_name].enabled==false,detached_saved=detached.technologies[target_name].saved_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves,predecessor_calls=predecessor_calls}
+  return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,level=target.level,bonus=player.recipes[recipe_name].productivity_bonus,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,foreign_disabled=foreign.technologies[target_name].enabled==false,detached_saved=detached.technologies[target_name].saved_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves,predecessor_calls=predecessor_calls,initial_levels=state.initial_levels,diagnostics=diagnostics}
 end
 function dynamic_successor_flow(path, provider, target_name, recipe_name, science, ids, fixture, preference, opponent)
   local callbacks,markers,saves={events={}},0,0
@@ -209,8 +209,8 @@ function dynamic_successor_flow(path, provider, target_name, recipe_name, scienc
   local function force(name,index)
     local value={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=.1}},research_progress=0,_queue={}}
     setmetatable(value,{__index=function(item,key)if key=="research_queue"then return rawget(item,"_queue")end end,__newindex=function(item,key,row)if key=="research_queue"then rawset(item,"_queue",row or {});local current=row and row[1]or nil;rawset(item,"current_research",current);if current then rawset(item,"research_progress",current.saved_progress or 0);current.saved_progress=0 else rawset(item,"research_progress",0)end else rawset(item,key,row)end end})
-    for _,id in ipairs(ids)do value.technologies[id]={name=id,valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295}}end
-    value.technologies[target_name].level=2;value.technologies["braking-force-1"]={name="braking-force-1",valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295}}
+    for _,id in ipairs(ids)do value.technologies[id]={name=id,valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=1}}end
+    value.technologies[target_name].level=2;value.technologies["braking-force-1"]={name="braking-force-1",valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=1}}
     return value
   end
   local player,foreign,detached=force("player",1),force("mir5-competing-dynamic-foreign",2),force("mir5-competing-dynamic-detached",3)
@@ -223,7 +223,8 @@ function dynamic_successor_flow(path, provider, target_name, recipe_name, scienc
   if opponent=="lost-current"then target.saved_progress=.26 elseif opponent=="foreign-reenabled"then foreign.technologies[target_name].enabled=true elseif opponent=="detached-disabled"then detached.technologies[target_name].enabled=false elseif opponent=="duplicate-effect"then player.recipes[recipe_name].productivity_bonus=.2 end
   local phase=preference and "source-completed" or "prefer-mir-completed"
   local predecessor=provider=="ce" and "ce-iron-gear-wheel-14" or false
-  local state={provider=provider,source_mir="4.7.20002",fixture_version="0.1.0",predecessor=predecessor,prerequisite_seeding="captured-direct-prerequisites",phase=phase,actual_lab_completions=1,milestone="one-native-dynamic-lab",player_start_bonus=0,player_bonus=.1,current_target_progress=.27,foreign_force_index=2,detached_force_index=3,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},player_queue={current=target_name,queue={target_name,"braking-force-1"},progress=.27},lab=lab}
+  local snapshot={level=2,researched=false,enabled=player.technologies[target_name].enabled,visible=player.technologies[target_name].visible_when_disabled,maximum=4294967295,saved_progress=.27,bonus=.1}
+  local state={provider=provider,source_mir="4.7.20002",fixture_version="0.1.0",predecessor=predecessor,prerequisite_seeding="captured-direct-prerequisites",phase=phase,actual_lab_completions=1,milestone="one-native-dynamic-lab",player_start_bonus=0,player_bonus=.1,current_target_progress=.27,foreign_force_index=2,detached_force_index=3,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},player_queue={current=target_name,queue={target_name,"braking-force-1"},progress=.27},player_snapshot=snapshot,lab=lab}
   local game={tick=1,forces={player=player,[1]=player,[2]=foreign,[3]=detached,["mir5-competing-dynamic-foreign"]=foreign,["mir5-competing-dynamic-detached"]=detached}}
   function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
   local active={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-competing-dynamic-gameplay"]=fixture}
@@ -231,7 +232,9 @@ function dynamic_successor_flow(path, provider, target_name, recipe_name, scienc
   local env={script={active_mods=active,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},game=game,storage={mir5_competing_dynamic_gameplay=state},settings={startup={["mir-prefer-this-mod-for-competing-techs"]={value=preference}}},helpers={table_to_json=function(value)assert(value.status=="passed"and(value.stage=="initial"or value.stage=="reload"));return "{}"end},log=function(value)assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT "));markers=markers+1 end}
   env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
+  ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)}end
   ok,result=pcall(callbacks.changed);if not ok then return {ok=false,message=tostring(result)}end
+  ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end
   ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end
   for _=1,2 do ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)}end;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
   return {ok=true,message="",phase=state.phase,markers=markers,saves=saves,target_enabled=target.enabled,target_visible=target.visible_when_disabled,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,bonus=player.recipes[recipe_name].productivity_bonus,foreign_enabled=foreign.technologies[target_name].enabled,detached_enabled=detached.technologies[target_name].enabled}
@@ -342,6 +345,12 @@ end
                                  (result["phase"], result["labs"], result["level"], result["bonus"], result["target_saved"], result["current"], result["current_progress"], result["probe_saved"], result["detached_saved"], result["lab_active"], result["lab_energy"], result["markers"], result["saves"]))
                 self.assertTrue(result["foreign_disabled"])
                 self.assertEqual(16 if provider == "ce" else 2, result["predecessor_calls"])
+                self.assertEqual(
+                    [{"id": name, "technology_level": 1, "prototype_level": 1}
+                     for name in self.provider_ids(fact_key)],
+                    plain(result["initial_levels"]),
+                )
+                self.assertEqual(1, len(plain(result["diagnostics"])))
         ce = TARGETS["ce"]
         pr = TARGETS["pr"]
         opponents = (
@@ -355,6 +364,17 @@ end
                 result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids("crafting-efficiency" if provider == "ce" else "productivity-research")), opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
+        result = run(str(FIXTURE / "control.lua"), "ce", ce["target"], ce["predecessor"],
+                     lua_value(self.lua, ce["prerequisites"]), ce["recipe"], lua_value(self.lua, ce["science"]),
+                     lua_value(self.lua, self.provider_ids("crafting-efficiency")), "wrong-level")
+        self.assertFalse(result["ok"])
+        self.assertIn("actual_level=3", result["message"])
+        self.assertIn("prototype_level=1", result["message"])
+        self.assertIn("baseline_bonus=0", result["message"])
+        self.assertIn("actual_bonus=0.1", result["message"])
+        control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertLess(control.index("capture_initial_levels(player, config)"),
+                        control.index("verify_and_seed_prerequisites(target, config.prerequisites"))
 
     def test_preference_chain_preserves_paused_current_foreign_and_earned_output_without_duplication(self):
         run = self.lua.eval("dynamic_successor_flow")

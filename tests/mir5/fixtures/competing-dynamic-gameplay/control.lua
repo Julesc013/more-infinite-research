@@ -117,6 +117,15 @@ local function assert_all_rows(force, config, enabled, visible, label)
     if visible ~= nil and value.visible_when_disabled ~= visible then fail(label .. " visibility differs: " .. name) end
   end
 end
+local function capture_initial_levels(force, config)
+  local rows, by_id = {}, {}
+  for index, name in ipairs(config.ids) do
+    local value = technology(force, name)
+    local row = {id=name, technology_level=value.level, prototype_level=value.prototype.level}
+    rows[index], by_id[name] = row, row
+  end
+  return rows, by_id
+end
 local function inventory(lab)
   local value = lab and lab.valid ~= false and lab.get_inventory(defines.inventory.lab_input)
   if value == nil then fail("real lab input inventory is absent") end
@@ -233,6 +242,10 @@ script.on_init(function()
   player.enable_all_prototypes()
   assert_all_rows(player, config, true, false, "source player")
   local target = technology(player, config.target)
+  local initial_levels, initial_by_id = capture_initial_levels(player, config)
+  log("[MIR5_DYNAMIC_INITIAL_LEVELS] " .. helpers.table_to_json({
+    provider=provider, target=config.target, levels=initial_levels,
+  }))
   if config.predecessor ~= false and config.prerequisites[1] ~= config.predecessor then
     fail("captured named predecessor disposition differs")
   end
@@ -262,6 +275,7 @@ script.on_init(function()
   local state = {provider=provider, source_mir=mir, fixture_version=fixture, predecessor=config.predecessor,
     prerequisite_seeding="captured-direct-prerequisites", phase="await-source-lab", actual_lab_completions=0,
     milestone="prerequisites-seeded", player_start_bonus=before.bonus, player_bonus=before.bonus,
+    initial_levels=initial_levels, target_initial=initial_by_id[config.target],
     foreign_force_index=foreign.index, detached_force_index=detached.index, foreign_queue=foreign_queue,
     lab=lab, deadline_tick=game.tick + DEADLINE}
   storage[KEY] = state
@@ -285,6 +299,7 @@ script.on_configuration_changed(function()
   local state = storage[KEY]
   local provider, config, mir, fixture, preference = selected()
   if type(state) ~= "table" or state.provider ~= provider or mir ~= "5.0.20000" then fail("successor source identity differs") end
+  loaded_snapshot, reload_logged = nil, false
   if fixture == "0.2.0" and preference == true then
     assert_preferred(state, config)
     state.phase, pending_save = "prefer-mir-completed", true
@@ -332,7 +347,15 @@ script.on_event(defines.events.on_tick, function()
     local player = game.forces.player
     local target = status(player, config.target, config.recipe)
     if target.level ~= 2 or target.researched ~= false or not close(target.bonus, state.player_start_bonus + 0.1) then
-      fail("native target completion/effect differs")
+      local initial = state.target_initial
+      fail("native target completion/effect differs: id=" .. config.target
+        .. " expected_level=2 actual_level=" .. tostring(target.level)
+        .. " prototype_level=" .. tostring(technology(player, config.target).prototype.level)
+        .. " initial_level=" .. tostring(initial and initial.technology_level)
+        .. " initial_prototype_level=" .. tostring(initial and initial.prototype_level)
+        .. " baseline_bonus=" .. tostring(state.player_start_bonus)
+        .. " actual_bonus=" .. tostring(target.bonus)
+        .. " expected_bonus=" .. tostring(state.player_start_bonus + 0.1))
     end
     freeze(state)
     local target_technology, probe = technology(player, config.target), technology(player, PROBE)
