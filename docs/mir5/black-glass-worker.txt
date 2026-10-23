@@ -99,6 +99,11 @@ and deterministic ZIP metadata. The expected archive SHA256 is
 Verify that exact hash and retain a source-member receipt. Install only this
 owned fixture under exclusive library ownership; hash-preserve any differing
 same-name archive first. Do not copy any dependencies or replace original saves.
+Exact ZIP recipe, verified on Aero: read the unmodified committed blob bytes;
+write info.json first, data-final-fixes.lua second; each ZipInfo has timestamp
+(1980,1,1,0,0,0), create_system=0 and external_attr=(0o600 << 16); use DEFLATE
+with explicit compresslevel=6. No directory entries or extra members. Read Git
+blobs as bytes so checkout newline conversion cannot change the fixture hash.
 Run tools/mir5/Invoke-PrototypeCapture.ps1 with the actual F200 executable and
 archive library, that committed profile, -ActiveModsObserver
 mir-fixture-mir5-active-mods-observer, and a fresh bounded output root. Begin
