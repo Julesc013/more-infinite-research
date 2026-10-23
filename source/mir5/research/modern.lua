@@ -110,6 +110,69 @@ function M.technology(definition, values)
   return output
 end
 
+local function imersite_effect(stream)
+  return {type = "change-recipe-productivity", recipe = "kr-imersite-powder", change = stream.effect_percent / 100}
+end
+
+local function imersite_continuation_formula(stream, first_level)
+  local anchor = (stream.base_cost + (first_level - 1) * stream.linear_increment) * (stream.growth_factor ^ (first_level - 1))
+  local head = number_text(anchor)
+  if stream.base_cost == 0 then return head end
+  return head .. "+" .. number_text(stream.base_cost) .. "*(L-" .. first_level .. ")"
+end
+
+-- K2SO's published Imersite stream has a finite public stage, an independent
+-- late formula, and two hidden state carriers. It is a named historical shape,
+-- not a generic finite-stage engine.
+local function k2_imersite_technologies(values)
+  local contract = require("research.k2_imersite")
+  local stream = require_stream(values, contract.stream)
+  local early_science = "science_automation_logistic_chemical_production"
+  local continuation_science = "science_production_space"
+  local effect = imersite_effect(stream)
+  local early = {
+    type = "technology", name = contract.early.id, icons = {
+      {icon = "__Krastorio2Assets__/icons/items/imersite-powder.png", icon_size = 64},
+      {icon = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png", icon_size = OVERLAY_SIZE,
+        scale = 0.5, shift = {50, 50}, floating = true},
+    }, localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name.kr-imersite-powder"}},
+    localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+    level = contract.early.first_level, upgrade = true, max_level = contract.early.last_level, order = contract.early.order,
+    prerequisites = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "kr-quarry-minerals-extraction"},
+    effects = {effect}, unit = {count_formula = productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
+      time = stream.research_time, ingredients = catalogue.science_ingredients(early_science)},
+  }
+  local continuation = {
+    type = "technology", name = contract.continuation.id, icons = icons({icon = "__Krastorio2Assets__/icons/items/imersite-powder.png", icon_size = 64,
+      overlay = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"}),
+    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name.kr-imersite-powder"}},
+    localised_description = {"", {"technology-description.more-infinite-research.recipe_productivity"}, "\n",
+      {"mod-setting-name.ips-max-level-stream", {"", {"description.productivity-bonus"}, ": ", {"item-name.kr-imersite-powder"}}}, ": ", "150"},
+    level = contract.continuation.first_level, upgrade = true, max_level = "infinite", order = contract.continuation.order,
+    show_levels_info = false, visible_when_disabled = true,
+    prerequisites = {"kr-quarry-minerals-extraction", "production-science-pack", contract.early.id, "space-science-pack"},
+    effects = {imersite_effect(stream)}, unit = {count_formula = imersite_continuation_formula(stream, contract.continuation.first_level),
+      time = stream.research_time, ingredients = catalogue.science_ingredients(continuation_science)},
+  }
+  if stream.enabled == false then early.enabled, continuation.enabled = false, false end
+  local carriers = {}
+  for index, carrier in ipairs(contract.carriers) do
+    local stage, science, formula = carrier.kind == "early" and contract.early or contract.continuation,
+      carrier.kind == "early" and early_science or continuation_science,
+      carrier.kind == "early" and productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor)
+        or imersite_continuation_formula(stream, contract.continuation.first_level)
+    carriers[index] = {
+      type = "technology", name = carrier.id, icon = "__base__/graphics/technology/automation.png", icon_size = 256,
+      localised_name = {"technology-name.more-infinite-research.recipe_productivity"},
+      localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
+      level = stage.first_level, upgrade = false, hidden = true, enabled = true, max_level = "infinite",
+      order = "zz[mir-migration-state]", prerequisites = {}, effects = {imersite_effect(stream)},
+      unit = {count_formula = formula, time = stream.research_time, ingredients = catalogue.science_ingredients(science)},
+    }
+  end
+  return {early, continuation, carriers[1], carriers[2]}
+end
+
 local function continuation_formula(definition, stream)
   local defaults, inheritance = definition.defaults, definition.inheritance
   local growth = stream.growth_factor
@@ -168,6 +231,10 @@ function M.technologies(selection, values)
   local out = {}
   for index = 1, #selection.definitions do out[#out + 1] = M.technology(selection.definitions[index], values) end
   for index = 1, #selection.continuations do out[#out + 1] = M.continuation(selection.continuations[index], values) end
+  if selection.k2_imersite then
+    local staged = k2_imersite_technologies(values)
+    for index = 1, #staged do out[#out + 1] = staged[index] end
+  end
   return out
 end
 

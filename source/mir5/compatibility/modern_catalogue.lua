@@ -38,7 +38,16 @@ local SCIENCE = {
   science_automation_logistic_chemical_production_utility_electromagnetic = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "electromagnetic-science-pack"},
   science_automation_logistic_chemical_military_utility = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack", "utility-science-pack"},
   science_automation_logistic_chemical_military_utility_space = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack"},
-  science_automation_logistic_chemical_production_utility_military = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack"}
+  science_automation_logistic_chemical_production_utility_military = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack"},
+  science_production_agricultural_space = {"production-science-pack", "agricultural-science-pack", "space-science-pack"},
+  science_production_space = {"production-science-pack", "space-science-pack"},
+  science_production_space_agricultural = {"production-science-pack", "space-science-pack", "agricultural-science-pack"},
+  science_production_metallurgic_space = {"production-science-pack", "metallurgic-science-pack", "space-science-pack"},
+  science_production_space_cryogenic = {"production-science-pack", "space-science-pack", "cryogenic-science-pack"},
+  science_production_utility_space = {"production-science-pack", "utility-science-pack", "space-science-pack"},
+  science_utility_space = {"utility-science-pack", "space-science-pack"},
+  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"},
+  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium_k2 = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "kr-advanced-tech-card", "kr-matter-tech-card", "kr-singularity-tech-card"}
 }
 
 -- These are declared continuations of the six named native chains. They are
@@ -328,6 +337,14 @@ local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
 
+-- K2SO is an exact delivered tuple, not a broad Krastorio assumption. Keep
+-- this gate here so inactive profiles never construct the K2SO body.
+function M.is_k2so(active_mods)
+  if not active_space_age(active_mods) then return false end
+  return active_mods.Krastorio2 ~= nil and active_mods["Krastorio2-spaced-out"] ~= nil
+    and active_mods.Krastorio2Assets ~= nil and active_mods["k2so-assets"] ~= nil
+end
+
 local function copy_definitions(definitions)
   local out, by_key = {}, {}
   for index = 1, #definitions do
@@ -361,6 +378,19 @@ local function apply_space_age(definitions, by_key)
   return selected, delta
 end
 
+local function apply_k2so(definitions, by_key)
+  -- Required laziness: only an exact K2SO profile creates this map.
+  local delta = require("compatibility.modern_catalogue.k2so")
+  local selected_by_key = {}
+  for index = 1, #definitions do selected_by_key[definitions[index].key] = definitions[index] end
+  for key, changed in pairs(delta.definition_overrides) do
+    local definition = selected_by_key[key]
+    if not definition then error("MIR K2SO catalogue lacks declared key " .. key, 3) end
+    for field, value in pairs(changed) do definition[field] = copy(value) end
+  end
+  return delta
+end
+
 function M.science_names(key)
   local vector = SCIENCE[key]
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -379,14 +409,19 @@ end
 function M.select(active_mods)
   local definitions, by_key = copy_definitions(BASE.definitions)
   local recipe_patches = {}
-  local profile = "base"
+  local profile, k2so = "base", nil
   if active_space_age(active_mods) then
     local delta
     definitions, delta = apply_space_age(definitions, by_key)
     for index = 1, #delta.recipe_patches do recipe_patches[index] = delta.recipe_patches[index] end
     profile = "space-age"
   end
-  return {profile = profile, definitions = definitions, continuations = M.continuations(active_mods), recipe_patches = recipe_patches}
+  if M.is_k2so(active_mods) then
+    k2so = apply_k2so(definitions, by_key)
+    profile = "k2so-f210"
+  end
+  return {profile = profile, definitions = definitions, continuations = M.continuations(active_mods),
+    recipe_patches = recipe_patches, k2_imersite = k2so and k2so.imersite or false}
 end
 
 -- Settings preserve their historical names across target selection. Space Age
@@ -403,18 +438,26 @@ end
 
 function M.continuations(active_mods)
   local rows = copy(CONTINUATIONS)
+  local overrides = {}
   if active_space_age(active_mods) then
-    local delta = require("compatibility.modern_catalogue.space_age")
-    local overrides = delta.continuation_overrides or {}
-    for index = 1, #rows do
-      local changed = overrides[rows[index].key]
-      if changed then for key, value in pairs(changed) do rows[index][key] = copy(value) end end
+    for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do
+      overrides[key] = value
     end
+  end
+  if M.is_k2so(active_mods) then
+    for key, value in pairs(require("compatibility.modern_catalogue.k2so").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  for index = 1, #rows do
+    local changed = overrides[rows[index].key]
+    if changed then for key, value in pairs(changed) do rows[index][key] = copy(value) end end
   end
   return rows
 end
 
 function M.native_owners(active_mods)
+  if M.is_k2so(active_mods) then return copy(require("compatibility.modern_catalogue.k2so").native_owners) end
   if not active_space_age(active_mods) then return {} end
   return copy(require("compatibility.modern_catalogue.space_age").native_owners)
 end

@@ -20,6 +20,7 @@ def admitted(relative):
         return False
     return (relative in {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
             or path.suffix == ".lua"
+            or (len(path.parts) == 2 and path.parts[0] == "migrations" and path.suffix == ".json")
             or (relative.startswith("locale/") and path.suffix == ".cfg")
             or (relative.startswith("graphics/") and path.suffix.lower() in {".png", ".jpg", ".ogg"}))
 

@@ -186,6 +186,50 @@ class ModernCatalogueTests(unittest.TestCase):
         catalogue._write_new_json(path, inventory)
         return path, no_mir, published
 
+    def test_optional_k2so_profile_requires_a_pair_and_compares_as_its_own_profile(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            base_no_mir, base_published, space_no_mir, space_published = self._captures(root)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "requires both"):
+                catalogue.recover_inventory(base_no_mir, base_published, space_no_mir, space_published,
+                                            base_no_mir, None)
+            inventory = catalogue.recover_inventory(base_no_mir, base_published, space_no_mir, space_published,
+                                                    base_no_mir, base_published)
+            self.assertEqual([profile["id"] for profile in inventory["profiles"]],
+                             ["base-f210", "space-age-f210", "k2so-f210"])
+            path = root / "k2so-inventory.json"
+            catalogue._write_new_json(path, inventory)
+            expected_raw, expected_settings = _published_raw(), _published_settings()
+            del expected_raw["mod-data"]["more-infinite-research-compiler-evidence"]
+            del expected_raw["mod-data"]["more-infinite-research-maximum-level-policy"]
+            candidate = _capture(root / "k2so-candidate", expected_raw, expected_settings, published=True)
+            self.assertEqual(catalogue.compare_candidate(path, "k2so-f210", base_no_mir, candidate)["status"],
+                             "equal-intended-native-output")
+
+    def test_settings_targets_retirement_is_exact_and_does_not_touch_captured_rows(self):
+        records = {
+            "additions": [{
+                "type": "bool-setting", "name": "ips-enable-research_alpha",
+                "row": {"type": "bool-setting", "name": "ips-enable-research_alpha", "targets": {"planner": "only"}},
+            }],
+            "patches": [],
+        }
+        instruction = catalogue._intended_settings(records)
+        self.assertEqual(instruction["remove_published_fields"], [{
+            "type": "bool-setting", "name": "ips-enable-research_alpha", "field": "targets",
+            "reason": "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer",
+            "provenance": "published-4.7 setting descriptor targets field",
+        }])
+        profile = {"published_output": {"settings": records}, "intended_player_output": {"settings": instruction}}
+        intended = catalogue._intended_domain(profile, "settings")
+        self.assertNotIn("targets", intended["additions"][0]["row"])
+        self.assertEqual(records["additions"][0]["row"]["targets"], {"planner": "only"})
+        forged = deepcopy(instruction)
+        forged["remove_published_fields"][0]["field"] = "default_value"
+        profile["intended_player_output"]["settings"] = forged
+        with self.assertRaisesRegex(catalogue.CatalogueError, "exact settings targets"):
+            catalogue._intended_domain(profile, "settings")
+
     def test_recovery_retains_full_rows_and_explicitly_excludes_private_mir4_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             inventory_path, _, _ = self._inventory(Path(temporary))

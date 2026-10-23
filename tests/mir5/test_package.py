@@ -65,6 +65,24 @@ class PackageTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 pack.build(source, first, "0.2.0")
 
+    def test_only_top_level_migration_json_is_admitted(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source"
+            (source / "migrations" / "nested").mkdir(parents=True)
+            (source / "info.json").write_text(json.dumps({"name": "test-fixture", "version": "0.1.0"}))
+            (source / "data.lua").write_text("data:extend({})\n")
+            (source / "migrations" / "more-infinite-research_4.7.0.json").write_bytes(b'{"technology": []}\n')
+            (source / "migrations" / "nested" / "not-a-factorio-migration.json").write_text("{}\n")
+            (source / "unrelated.json").write_text("{}\n")
+            output = root / "package/test-fixture_0.1.0.zip"
+            pack.build(source, output)
+            with zipfile.ZipFile(output) as archive:
+                names = archive.namelist()
+            self.assertIn("test-fixture_0.1.0/migrations/more-infinite-research_4.7.0.json", names)
+            self.assertNotIn("test-fixture_0.1.0/migrations/nested/not-a-factorio-migration.json", names)
+            self.assertNotIn("test-fixture_0.1.0/unrelated.json", names)
+
     def test_archive_identity_mismatch_is_refused_before_output(self):
         with tempfile.TemporaryDirectory() as temporary:
             source = Path(temporary) / "source"

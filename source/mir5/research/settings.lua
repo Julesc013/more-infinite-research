@@ -10,6 +10,7 @@ M.import_setting_name = "mir-settings-profile-import"
 
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
+local k2so_active = modern_catalogue.is_k2so(active_mods)
 
 local normal_fields = {
   {key="enabled", prefix="ips-enable-", type="bool-setting"},
@@ -36,20 +37,27 @@ local native_fields = {
 
 local streams = {}
 for _, historical_stream in ipairs(historical.streams) do
-  local fields = {}
+  local fields, defaults = {}, historical_stream.defaults
   local field_overrides = historical_stream.field_overrides
   if space_age_active and historical_stream.space_age_visible then
     field_overrides = historical_stream.space_age_field_overrides or {}
+  end
+  if k2so_active and historical_stream.k2so_defaults then
+    defaults = {}
+    for key, value in pairs(historical_stream.defaults) do defaults[key] = value end
+    for key, value in pairs(historical_stream.k2so_defaults) do defaults[key] = value end
   end
   for index, base in ipairs(normal_fields) do
     local field, override = {}, field_overrides[base.key] or {}
     for key, value in pairs(base) do field[key] = value end
     for key, value in pairs(override) do field[key] = value end
+    -- Published K2SO omits the hidden field instead of declaring false.
+    if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
     fields[index] = field
   end
   streams[#streams + 1] = {
     key=historical_stream.key, technology_locale=historical_stream.locale,
-    order_prefix=historical_stream.order_prefix, fields=fields, defaults=historical_stream.defaults,
+    order_prefix=historical_stream.order_prefix, fields=fields, defaults=defaults,
     description_note=historical_stream.description_note, enabled_note=historical_stream.enabled_note
   }
 end
@@ -239,6 +247,9 @@ function M.resolve(startup, helpers, report)
     if stream.key == "research_gears" then for key, value in pairs(stream_values) do values[key] = value end end
     if stream.key == "research_agricultural_growth_speed" then values.agricultural_growth_speed = stream_values end
     if stream.key == "research_spoilage_preservation" then values.spoilage_preservation = stream_values end
+  end
+  if k2so_active then
+    values.streams.research_material_imersite__continuation = values.streams.research_material_imersite
   end
   values.options = {}
   local aliases = { ["mir-max-level-worker-robots-speed"]="worker_robots_speed_max_level",

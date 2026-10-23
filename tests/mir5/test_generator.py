@@ -46,6 +46,58 @@ def plain_lua(value):
     return {key: plain_lua(item) for key, item in items.items()}
 
 
+K2SO_MODS = {
+    "space-age": "2.1.23", "Krastorio2": "2.1.4", "Krastorio2-spaced-out": "2.0.19",
+    "Krastorio2Assets": "2.1.0", "k2so-assets": "1.0.7",
+}
+
+
+def profile_mods(identifier):
+    if identifier == "base-f210":
+        return {}
+    if identifier == "space-age-f210":
+        return {"space-age": "2.1.23"}
+    if identifier == "k2so-f210":
+        return K2SO_MODS
+    raise AssertionError(f"unknown published profile: {identifier}")
+
+
+def host_row(row):
+    """Map the two empty Lua prerequisite tables to Lupa's list view only."""
+    output = json.loads(json.dumps(row))
+    if (output.get("name") in {"mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"}
+            and output.get("prerequisites") == {}):
+        output["prerequisites"] = []
+    return output
+
+
+def intended_setting_rows(profile):
+    """Apply only the exact planner-field retirement named by the oracle."""
+    records = profile["published_output"]["settings"]["additions"]
+    retirements = {
+        (item["type"], item["name"], item["field"]): item
+        for item in profile["intended_player_output"]["settings"]["remove_published_fields"]
+    }
+    expected = {}
+    for item in records:
+        row = json.loads(json.dumps(item["row"]))
+        key = (item["type"], item["name"], "targets")
+        retirement = retirements.pop(key, None)
+        if "targets" in row:
+            if retirement is None:
+                raise AssertionError(f"oracle lacks targets retirement for {item['name']}")
+            if (retirement["reason"] != "MIR4 planner-only target metadata has no Factorio setting or MIR5 runtime consumer"
+                    or retirement["provenance"] != "published-4.7 setting descriptor targets field"):
+                raise AssertionError(f"oracle has an invalid targets retirement for {item['name']}")
+            row.pop("targets")
+        elif retirement is not None:
+            raise AssertionError(f"oracle retires absent targets for {item['name']}")
+        expected[item["name"]] = row
+    if retirements:
+        raise AssertionError(f"oracle retires fields outside published settings: {sorted(retirements)}")
+    return expected
+
+
 class GeneratorTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -101,12 +153,21 @@ class GeneratorTests(unittest.TestCase):
               add_science(definition.science)
               for _, name in ipairs(definition.prerequisites) do add_technology(name) end
             end
+            if selected.k2_imersite then
+              add_science("science_automation_logistic_chemical_production")
+              add_science("science_production_space")
+              add_technology("kr-quarry-minerals-extraction")
+              recipes["kr-imersite-powder"] = {}
+            end
             for _, name in ipairs({"automation", "logistic", "chemical", "production", "military", "utility", "space", "agricultural", "electromagnetic", "cryogenic", "metallurgic", "promethium"}) do
               tools[name .. "-science-pack"] = {}; add_technology(name .. "-science-pack")
             end
             recipes["iron-gear-wheel"] = {}
             if active_mods and active_mods["space-age"] then
               recipes["casting-iron-gear-wheel"] = {}; technologies["agriculture"] = {}; technologies["spoilage"] = {}
+            end
+            if modern_catalogue.is_k2so(active_mods) then
+              recipes["kr-iron-gear-wheel-from-enriched-iron"] = {}; recipes["kr-iron-gear-wheel-from-iron-ore"] = {}
             end
             return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
@@ -288,6 +349,111 @@ class GeneratorTests(unittest.TestCase):
           assert(#space_declared == 76 and owners == 5)
         ''')
 
+    def test_k2so_catalogue_keeps_exact_imersite_stages_and_owners_lazy(self):
+        self.lua.execute('''
+          local k2_body = "compatibility.modern_catalogue.k2so"
+          package.loaded[k2_body] = nil
+          package.preload[k2_body] = function() error("inactive K2SO catalogue loaded") end
+          assert(modern_catalogue.select({}).profile == "base")
+          assert(package.loaded[k2_body] == nil, "base selection loaded K2SO catalogue")
+          package.preload[k2_body] = nil
+
+          local k2mods = {['space-age'] = '2.1.23', Krastorio2 = '2.1.4',
+            ['Krastorio2-spaced-out'] = '2.0.19', Krastorio2Assets = '2.1.0', ['k2so-assets'] = '1.0.7'}
+          assert(modern_catalogue.is_k2so(k2mods) and not modern_catalogue.is_k2so({Krastorio2 = '2.1.4'}))
+          local selected = modern_catalogue.select(k2mods)
+          assert(selected.profile == "k2so-f210" and selected.k2_imersite
+            and #selected.definitions == 62 and #selected.continuations == 6 and #selected.recipe_patches == 3)
+          assert(#modern_catalogue.native_owners(k2mods) == 4)
+          local has_steel = false
+          for _, owner in ipairs(modern_catalogue.native_owners(k2mods)) do
+            if owner.id == "steel-plate-productivity" then has_steel = true end
+          end
+          assert(not has_steel, "K2SO retained the absent steel native-owner admission")
+          local owners = {}
+          for _, owner in ipairs(modern_catalogue.native_owners(k2mods)) do owners[owner.id] = owner end
+          assert(owners["low-density-structure-productivity"].admission.recipes[2] == "casting-low-density-structure")
+          assert(owners["plastic-bar-productivity"].admission.recipes[2] == "bioplastic")
+          assert(owners["processing-unit-productivity"].admission.recipes[2] == "kr-bio-processing-circuit")
+          assert(owners["rocket-fuel-productivity"].admission.recipes[4] == "kr-rocket-fuel-with-hydrogen-chloride")
+
+          mods = k2mods
+          package.loaded["research.settings"] = nil
+          local k2config = require("research.settings")
+          local startup = {}
+          for _, spec in ipairs(k2config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+          local visible = {research_material_black_paving=true, research_material_glass=true, research_material_imersite=true,
+            research_material_rare_metals=true, research_material_silicon=true, research_material_white_paving=true}
+          for _, spec in ipairs(k2config.prototypes()) do
+            local family = spec.name:match("^ips%-%a+%-research_material_(.+)$")
+            if family and visible["research_material_" .. family] then assert(spec.hidden == nil, spec.name .. " remains hidden") end
+          end
+          assert(startup["ips-max-level-research_material_imersite"].value == 0)
+          local values = k2config.resolve(startup)
+          assert(values.streams.research_material_imersite__continuation == values.streams.research_material_imersite)
+          package.loaded["research.catalogue"] = nil
+          local declared = require("research.catalogue").declared()
+          assert(#declared == 77)
+          local declared_ids, holder_ids = {}, { ["mir-k2-imersite-staged-state-1"] = true, ["mir-k2-imersite-continuation-state-4"] = true }
+          for _, row in ipairs(declared) do
+            assert(values.streams[row.family] ~= nil, "catalogue family has no resolved value: " .. row.family)
+            assert(row.legacy_binding and row.legacy_binding.source and row.legacy_binding.operation)
+            assert(not holder_ids[row.id], "migration holder entered caps catalogue")
+            declared_ids[row.id] = row
+          end
+          assert(declared_ids["recipe-prod-research_material_imersite-1"].cap_setting == "ips-max-level-research_material_imersite")
+          assert(declared_ids["recipe-prod-research_material_imersite-4"].family == "research_material_imersite__continuation")
+          local rows = modern.technologies(selected, values)
+          assert(#rows == 72)
+          local by_id = {}; for _, row in ipairs(rows) do by_id[row.name] = row end
+          local early = by_id["recipe-prod-research_material_imersite-1"]
+          local continuation = by_id["recipe-prod-research_material_imersite-4"]
+          local early_holder = by_id["mir-k2-imersite-staged-state-1"]
+          local continuation_holder = by_id["mir-k2-imersite-continuation-state-4"]
+          assert(early.level == 1 and early.max_level == 3 and early.effects[1].recipe == "kr-imersite-powder" and early.effects[1].change == .02)
+          assert(early.unit.count_formula == "200*2^(L-1)" and early.unit.time == 30)
+          assert(continuation.level == 4 and continuation.max_level == "infinite" and continuation.show_levels_info == false
+            and continuation.visible_when_disabled and continuation.unit.count_formula == "1600+200*(L-4)")
+          assert(continuation.effects[1].recipe == "kr-imersite-powder" and continuation.effects[1].change == .02)
+          assert(by_id["laser-shooting-speed-8"].effects[1].modifier == .1
+            and by_id["laser-shooting-speed-8"].effects[2].ammo_category == "kr-impulse-rifle")
+          assert(by_id["weapon-shooting-speed-7"].effects[1].modifier == .15
+            and by_id["weapon-shooting-speed-7"].effects[5].modifier == .2)
+          assert(by_id["inserter-capacity-bonus-8"].unit.ingredients[6][1] == "agricultural-science-pack"
+            and by_id["worker-robots-storage-4"].unit.ingredients[6][1] == "electromagnetic-science-pack")
+          assert(by_id["recipe-prod-research_mining_drill-1"].effects[1].change == .2
+            and by_id["recipe-prod-research_mining_drill-1"].effects[4].change == .05)
+          assert(early_holder.hidden and early_holder.enabled and not early_holder.upgrade and early_holder.level == 1
+            and continuation_holder.hidden and continuation_holder.enabled and not continuation_holder.upgrade and continuation_holder.level == 4)
+          assert(early_holder.effects[1].recipe == "kr-imersite-powder" and early_holder.effects[1].change == .02
+            and continuation_holder.effects[1].recipe == "kr-imersite-powder" and continuation_holder.effects[1].change == .02)
+          local environment = full_world(k2mods)
+          generator.install(rows, environment)
+          assert(environment.writes == 1 and #environment.emitted == 72)
+          environment = full_world(k2mods)
+          settings, data, helpers, log = {startup = startup}, environment, nil, function() end
+          assert(dofile(data_final_path) == nil)
+          assert(environment.writes == 1 and #environment.emitted == 75)
+          local final_ids = {}; for _, row in ipairs(environment.emitted) do final_ids[row.name] = row end
+          assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
+            and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
+
+          startup["ips-cost-base-research_material_imersite"].value = 300
+          startup["ips-cost-linear-increment-research_material_imersite"].value = 10
+          startup["ips-cost-growth-research_material_imersite"].value = 1.5
+          startup["ips-research-time-research_material_imersite"].value = 40
+          startup["ips-effect-per-level-research_material_imersite"].value = 3.5
+          rows = modern.technologies(selected, k2config.resolve(startup)); by_id = {}
+          for _, row in ipairs(rows) do by_id[row.name] = row end
+          assert(by_id[early.name].unit.count_formula == "(300+10*(L-1))*1.5^(L-1)" and by_id[early.name].effects[1].change == .035)
+          assert(by_id[continuation.name].unit.count_formula == "1113.75+300*(L-4)" and by_id[continuation.name].unit.time == 40)
+          local contract = require("research.k2_imersite")
+          assert(contract.schema == 1 and contract.storage_key == "mir_k2_imersite_state" and contract.effect.change == .02
+            and #contract.carriers == 2 and contract.carriers[2].source_id == continuation.name)
+          package.loaded["research.settings"] = nil
+          mods = nil
+        ''')
+
     def test_cost_variants_and_nonfinite(self):
         self.lua.execute('''
           assert(productivity.cost(100, 0, 1) == "100")
@@ -430,7 +596,7 @@ class GeneratorTests(unittest.TestCase):
 
     def test_full_published_setting_output_matches_oracle_without_retired_planner_metadata(self):
         for profile in MODERN_ORACLE["profiles"]:
-            active_mods = {"space-age": "2.1.23"} if profile["id"] == "space-age-f210" else {}
+            active_mods = profile_mods(profile["id"])
             self.lua.globals().profile_setting_mods = lua_table(self.lua, active_mods)
             self.lua.execute('''
               mods = profile_setting_mods
@@ -441,19 +607,12 @@ class GeneratorTests(unittest.TestCase):
                 row["name"]: plain_lua(row)
                 for row in self.lua.eval("profile_settings.prototypes()").values()
             }
-            expected = {}
-            for item in profile["published_output"]["settings"]["additions"]:
-                row = dict(item["row"])
-                # targets fed the retired MIR4 planner. It is neither a
-                # Factorio setting field nor MIR5 authoring/runtime input.
-                row.pop("targets", None)
-                expected[item["name"]] = row
-            self.assertEqual(actual, expected, profile["id"])
+            self.assertEqual(actual, intended_setting_rows(profile), profile["id"])
 
     def test_data_final_full_published_technology_output_matches_oracle(self):
         expected_profiles = {
             profile["id"]: {
-                row["name"]: row["row"]
+                row["name"]: host_row(row["row"])
                 for row in profile["published_output"]["data"]["additions"]
                 if row["type"] == "technology"
             }

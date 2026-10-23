@@ -73,6 +73,8 @@ class PackTests(unittest.TestCase):
             if (PLAYER / name).is_file()
         )
         expected.update(path.relative_to(PLAYER).as_posix() for path in PLAYER.rglob("*.lua"))
+        migrations = PLAYER / "migrations"
+        expected.update(path.relative_to(PLAYER).as_posix() for path in migrations.glob("*.json"))
         expected.update(path.relative_to(PLAYER).as_posix() for path in (PLAYER / "locale").rglob("*.cfg"))
         graphics = PLAYER / "graphics"
         if graphics.is_dir():
@@ -83,10 +85,16 @@ class PackTests(unittest.TestCase):
             )
         self.assertEqual(admitted, expected)
         self.assertIn("locale/en/more-infinite-research.cfg", admitted)
+        self.assertEqual(
+            {path for path in admitted if path.startswith("migrations/")},
+            {"migrations/more-infinite-research_2.0.5.json", "migrations/more-infinite-research_2.1.0.json",
+             "migrations/more-infinite-research_4.7.0.json"},
+        )
         self.assertNotIn("README.md", admitted)
         standalone = {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
         self.assertTrue(
-            all(path in standalone or path.endswith((".lua", ".cfg", ".png", ".jpg", ".ogg")) for path in admitted)
+            all(path in standalone or path.endswith((".lua", ".cfg", ".png", ".jpg", ".ogg"))
+                or (path.startswith("migrations/") and path.endswith(".json")) for path in admitted)
         )
 
     def test_settings_stage_closure_is_data_only(self):
@@ -101,6 +109,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue.lua",
                 "compatibility/modern_catalogue/base.lua",
                 "compatibility/modern_catalogue/space_age.lua",
+                "compatibility/modern_catalogue/k2so.lua",
             },
         )
         self.assertNotIn(PLAYER / "research/generator.lua", closure)

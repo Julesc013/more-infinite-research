@@ -14,13 +14,12 @@ else
 end
 local technologies = {gear}
 
--- The full authored catalogue has exact Base and ordinary Space Age captures.
--- K2SO keeps its independently captured gear/spoilage paths below; no unbound
--- K2SO profile is treated as equivalent to vanilla Space Age definitions.
+-- The full authored catalogue has exact Base, Space Age, and K2SO captures.
+-- A Krastorio marker alone never admits ordinary Space Age definitions.
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
+local modern_catalogue = require("compatibility.modern_catalogue")
 local modern, modern_selection
-if ordinary_profile then
-  local modern_catalogue = require("compatibility.modern_catalogue")
+if ordinary_profile or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods)
   -- Check each named patch before any intended technology write.
