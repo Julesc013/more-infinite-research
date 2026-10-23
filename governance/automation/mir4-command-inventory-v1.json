@@ -5659,9 +5659,9 @@
     {
       "path": "tools/mir/application/tooling/TestWorkflowCatalogues.ps1",
       "classification": "compatibility-wrapper",
-      "sha256": "B66E074F71FBFE6C0813388DD2C8AE9E7F1520F56E1DDEEA0D3F553B1A0B8D08",
+      "sha256": "B26D9FFB88CB8FD5064500598FA77C4E440CBA0979709199AB3DCB1495D7E141",
       "hash_mode": "canonical-text-v1",
-      "lines": 191,
+      "lines": 192,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:8c946cae4e99161ee9e3991e29dd23aef4e3f56ed9ed37c66d0a91ef8e87eb12"
+  "digest": "sha256:af19dac783b0939e16abcef21cbf08a15fade5b29cb549d4f54df10e5d0e07f3"
 }
