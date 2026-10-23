@@ -372,6 +372,49 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn('\"stage\":\"reload\"', source)
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)
 
+    def test_historical_server_settings_are_private_unpaused_and_use_supported_bind_flags(self):
+        script = r'''
+          $ErrorActionPreference='Stop'
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse differs'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','New-HistoricalFixtureServerSettings')){
+            $node=$ast.FindAll({param($n) $n -is [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true)
+            if(@($node).Count -ne 1){throw 'function missing'}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          foreach($version in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')){
+            $engine=Join-Path $env:MIR_TEST_TEMP $version
+            [IO.Directory]::CreateDirectory($engine)|Out-Null
+            # Exact relevant shapes of the historical engine-owned examples.
+            $example=if($version -ceq '0.13'){
+              @{name='public';description='example';visibility='public';verify_user_identity=$true;max_players='0'}
+            }else{
+              @{name='public';description='example';visibility=@{public=$true;lan=$true};require_user_verification=$true;auto_pause=$true;max_players=0}
+            }
+            $source=Join-Path $engine 'server-settings.example.json'
+            $example|ConvertTo-Json -Depth 10|Set-Content -LiteralPath $source
+            $before=Get-FixtureSha $source
+            $result=New-HistoricalFixtureServerSettings (Join-Path $engine 'private.json') $engine $version
+            $value=Get-Content -LiteralPath $result.path -Raw|ConvertFrom-Json -AsHashtable
+            if($value.auto_pause -or $result.auto_pause){throw 'fixture paused without players'}
+            foreach($field in @('username','password','token')){if($value[$field] -cne ''){throw 'credential field retained'}}
+            if($version -ceq '0.13'){
+              if($value.visibility -cne 'hidden' -or $value.verify_user_identity -or $result.arguments.Count -ne 2){throw 'F013 server contract differs'}
+            }else{
+              if($value.visibility.public -or $value.visibility.lan -or $value.require_user_verification){throw 'server advertised'}
+              if(($result.arguments -join '|') -cnotmatch '[|]--bind[|]127[.]0[.]0[.]1$'){throw 'loopback bind absent'}
+            }
+            if($result.arguments[0] -cne '--server-settings' -or $result.arguments[1] -cne $result.path){throw 'explicit settings absent'}
+            if((Get-FixtureSha $source) -cne $before -or (Get-FixtureSha $result.path) -cne $result.sha256){throw 'server settings custody differs'}
+          }
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-private-server-") as work:
+            env = dict(os.environ, MIR_TEST_RUNNER=str(RUNNER), MIR_TEST_TEMP=work)
+            result = subprocess.run(["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                                    capture_output=True, text=True, env=env, check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_actual_archive_guard_accepts_six_members_and_rejects_merged_dependencies_or_missing_member(self):
         functions = r'''
           $ErrorActionPreference='Stop'

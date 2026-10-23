@@ -152,6 +152,24 @@ function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirecto
     Assert-Fixture ((@($info.dependencies) -join "`n") -ceq ($expectedInfo.dependencies -join "`n")) 'historical fixture dependencies differ'
   } finally {$zip.Dispose()}
 }
+function New-HistoricalFixtureServerSettings([string]$Path,[string]$EngineData,[string]$FactorioVersion) {
+  Assert-Fixture ($FactorioVersion -in @('0.13','0.14','0.15','0.16','0.17','1.0','1.1')) 'historical server target differs'
+  $settings=Get-Content -LiteralPath (Join-Path $EngineData 'server-settings.example.json') -Raw | ConvertFrom-Json -AsHashtable
+  $settings.name='MIR private historical fixture'
+  $settings.description=''
+  $settings.visibility=if($FactorioVersion -ceq '0.13'){'hidden'}else{@{public=$false;lan=$false}}
+  foreach($field in @('username','password','token')){$settings[$field]=''}
+  foreach($field in @('verify_user_identity','require_user_verification')){
+    if($settings.ContainsKey($field)){$settings[$field]=$false}
+  }
+  $settings.auto_pause=$false
+  [IO.File]::WriteAllText($Path,($settings|ConvertTo-Json -Depth 10)+"`n",[Text.UTF8Encoding]::new($false))
+  $arguments=@('--server-settings',$Path)
+  # The exact F013 binary has no --bind option; hidden visibility is its
+  # private-server contract. F014 and later support loopback binding.
+  if($FactorioVersion -cne '0.13'){$arguments+=@('--bind','127.0.0.1')}
+  [pscustomobject][ordered]@{path=$Path;sha256=Get-FixtureSha $Path;visibility=$settings.visibility;auto_pause=$false;arguments=$arguments}
+}
 function Invoke-FixtureStage([string]$Name,[string[]]$StageArguments,[scriptblock]$Completion=$null) {
   $live=Join-Path $writeData 'factorio-current.log'
   if(Test-Path -LiteralPath $live){Remove-Item -LiteralPath $live}
@@ -309,7 +327,10 @@ try{
     return (Test-Path -LiteralPath $complete -PathType Leaf) -and $text.Contains('[MIR5_NATIVE_FIXTURE] RESULT ') -and $text.Contains('Saving finished')
   }.GetNewClosure()
   if($historical){
-    $record.production=Invoke-FixtureStage 'production' @('--start-server',$seed) $completion
+    $serverSettings=New-HistoricalFixtureServerSettings (Join-Path $resources.root 'server-settings.json') $engineData $historicalFixture.factorio_version
+    $record.historical_server_settings=$serverSettings
+    $historicalServerArguments=@($serverSettings.arguments)
+    $record.production=Invoke-FixtureStage 'production' ($historicalServerArguments+@('--start-server',$seed)) $completion
     $record.historical_server_mode='start-server-two-cold-reloads'
   }else{
     $server=Join-Path $resources.root 'server-settings.json'
@@ -332,7 +353,7 @@ try{
   $saveHash=Get-FixtureSha $complete
   $record.reloads=@()
   foreach($ordinal in 1..2){
-    $reloadArguments=if($historical){@('--start-server',$complete)}else{@('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')}
+    $reloadArguments=if($historical){$historicalServerArguments+@('--start-server',$complete)}else{@('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')}
     $reloadCompletion=$null
     if($historical){
       $reloadCompletion={
