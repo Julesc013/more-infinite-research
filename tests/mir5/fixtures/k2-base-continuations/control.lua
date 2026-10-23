@@ -108,7 +108,11 @@ local function exact_effects(actual, expected, label)
     local effect = actual[index]
     if type(effect) ~= "table" or effect.type ~= wanted.type then fail(label .. " effect type changed") end
     for key, value in pairs(wanted) do
-      if effect[key] ~= value then fail(label .. " effect changed at " .. tostring(index) .. "." .. key) end
+      -- Native numeric effect fields can be single precision. The data-stage
+      -- defaults above remain exact; use the existing native witness tolerance.
+      local same = type(value) == "number" and close(effect[key], value) or effect[key] == value
+      if not same then fail(label .. " effect changed at " .. tostring(index) .. "." .. key
+        .. ": actual=" .. tostring(effect[key]) .. " expected=" .. tostring(value)) end
     end
   end
 end
@@ -257,6 +261,7 @@ local function marker(stage, state)
       one_lab = "kr-advanced-lab", queued_native_researches = state.queue_count,
       research_finished_events = state.events, completed_levels = state.finished,
       science_consumed = CONSUMPTION, foreign_force_preserved = true,
+      native_gear_effect_change = game.forces.player.technologies[PLAN[7].name].prototype.effects[1].change,
       fixture_accelerates_count_formula_and_time = true,
       default_rows_preflighted_before_mutation = true, on_load_read_only = stage == "reload",
       gameplay_scope = "disposable-f200-k2-base-continuations-and-gears",
