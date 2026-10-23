@@ -189,7 +189,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
             }
           end
 
-          function run_module_permissions_init(path, omit_quality)
+          function run_module_permissions_init(path, omit_quality, enable_parameter_quality)
             local callbacks = {}
             local logged = 0
             local effects = {
@@ -197,6 +197,11 @@ class FixtureControlHostStageTests(unittest.TestCase):
               pollution = true, quality = true
             }
             if omit_quality then effects.quality = nil end
+            local disabled_effects = {
+              speed = false, productivity = false, consumption = false,
+              pollution = false, quality = false
+            }
+            if enable_parameter_quality then disabled_effects.quality = true end
             local categories = {
               speed = true, quality = true,
               ["mir5-module-permissions-fixture"] = true
@@ -217,7 +222,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
                     allowed_effects = effects, allowed_module_categories = categories
                   },
                   ["mir5-module-permissions-parameter-recipe"] = {
-                    allowed_effects = {}, allowed_module_categories = {speed = true}
+                    allowed_effects = disabled_effects, allowed_module_categories = {speed = true}
                   }
                 },
                 entity = {
@@ -335,20 +340,30 @@ class FixtureControlHostStageTests(unittest.TestCase):
           assert(data.raw['string-setting']['mir-settings-profile-import'].default_value == '')
         ''')
 
-    def test_module_permissions_create_only_callback_accepts_complete_public_maps_and_rejects_a_wrong_permission(self):
+    def test_module_permissions_create_only_callback_accepts_false_effect_masks_and_rejects_wrong_permissions(self):
         self.lua.globals().fixture_control = self.control("module-permissions")
         ok, message, markers = self.lua.eval(
-            "run_module_permissions_init(fixture_control, false)"
+            "run_module_permissions_init(fixture_control, false, false)"
         )
         self.assertTrue(ok, message)
         self.assertEqual(markers, 1)
 
         wrong_ok, wrong_message, wrong_markers = self.lua.eval(
-            "run_module_permissions_init(fixture_control, true)"
+            "run_module_permissions_init(fixture_control, true, false)"
         )
         self.assertFalse(wrong_ok)
         self.assertIn("ordinary recipe native effects is missing quality", str(wrong_message))
         self.assertEqual(wrong_markers, 0)
+
+        parameter_ok, parameter_message, parameter_markers = self.lua.eval(
+            "run_module_permissions_init(fixture_control, false, true)"
+        )
+        self.assertFalse(parameter_ok)
+        self.assertIn(
+            "parameter recipe native effects unexpectedly enables quality",
+            str(parameter_message),
+        )
+        self.assertEqual(parameter_markers, 0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

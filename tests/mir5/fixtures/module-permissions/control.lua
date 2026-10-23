@@ -10,7 +10,7 @@ local function fail(message)
   error("[mir5-module-permissions] " .. message)
 end
 
-local function exact_dictionary(actual, expected, label)
+local function exact_true_dictionary(actual, expected, label)
   local count = 0
   for name, value in pairs(actual or {}) do
     if value ~= true or expected[name] ~= true then
@@ -24,6 +24,33 @@ local function exact_dictionary(actual, expected, label)
     if actual == nil or actual[name] ~= true then fail(label .. " is missing " .. name) end
   end
   if count ~= expected_count then fail(label .. " cardinality differs") end
+end
+
+local function exact_effect_mask(actual, enabled, label)
+  if actual == nil then fail(label .. " is absent") end
+
+  local known = {}
+  for _, name in ipairs(expected_effects) do
+    known[name] = true
+    local value = actual[name]
+    if value == nil then fail(label .. " is missing " .. name) end
+    if type(value) ~= "boolean" then fail(label .. " has a non-boolean " .. name) end
+    if enabled[name] == true and value ~= true then
+      fail(label .. " is missing " .. name)
+    end
+    if enabled[name] ~= true and value ~= false then
+      fail(label .. " unexpectedly enables " .. name)
+    end
+  end
+
+  for name, value in pairs(actual) do
+    if type(value) ~= "boolean" then
+      fail(label .. " has a non-boolean entry " .. tostring(name))
+    end
+    if value == true and (known[name] ~= true or enabled[name] ~= true) then
+      fail(label .. " has an unexpected enabled effect " .. tostring(name))
+    end
+  end
 end
 
 local function discovered_categories()
@@ -45,12 +72,12 @@ script.on_init(function()
   local effects = {}
   for _, name in ipairs(expected_effects) do effects[name] = true end
   local categories = discovered_categories()
-  exact_dictionary(ordinary.allowed_effects, effects, "ordinary recipe native effects")
-  exact_dictionary(ordinary.allowed_module_categories, categories, "ordinary recipe native categories")
-  exact_dictionary(receiver.allowed_effects, effects, "slot receiver native effects")
-  exact_dictionary(receiver.allowed_module_categories, categories, "slot receiver native categories")
-  exact_dictionary(parameter.allowed_effects, {}, "parameter recipe native effects")
-  exact_dictionary(parameter.allowed_module_categories, {speed = true}, "parameter recipe native categories")
+  exact_effect_mask(ordinary.allowed_effects, effects, "ordinary recipe native effects")
+  exact_true_dictionary(ordinary.allowed_module_categories, categories, "ordinary recipe native categories")
+  exact_effect_mask(receiver.allowed_effects, effects, "slot receiver native effects")
+  exact_true_dictionary(receiver.allowed_module_categories, categories, "slot receiver native categories")
+  exact_effect_mask(parameter.allowed_effects, {}, "parameter recipe native effects")
+  exact_true_dictionary(parameter.allowed_module_categories, {speed = true}, "parameter recipe native categories")
 
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
     stage = "init",
