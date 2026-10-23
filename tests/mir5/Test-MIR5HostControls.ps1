@@ -23,6 +23,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_native_owners.py';lua=$true},
   [ordered]@{path='tests/mir5/test_module_permissions_override.py';lua=$true},
   [ordered]@{path='tests/mir5/test_prototype_limits.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_recipe_schema_repairs.py';lua=$true},
   [ordered]@{path='tests/mir5/test_module_permissions_activation.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bootstrap.py';lua=$true},
   [ordered]@{path='tests/mir5/test_library.py';lua=$true},

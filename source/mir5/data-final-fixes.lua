@@ -1,3 +1,10 @@
+-- Preserve the two delivered exact-version loader repairs independently of
+-- research construction. Inactive profiles never import the override body.
+if type(mods) == "table" and type(mods.base) == "string" and mods.base:match("^2%.1%.")
+    and (mods["atan-ash"] == "2.2.1" or mods["atan-nuclear-science"] == "0.3.3") then
+  require("overrides.recipe_schema").apply(data.raw, mods, log)
+end
+
 local configuration = require("research.settings")
 local values = configuration.resolve(settings.startup, helpers, log)
 local productivity = require("research.productivity")
