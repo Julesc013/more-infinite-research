@@ -25,6 +25,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_competing_productivity.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_epr_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_fixed_reference.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_competing_fixed_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_science.py';lua=$true},
   [ordered]@{path='tests/mir5/test_cryogenic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_material_catalogue.py';lua=$true},

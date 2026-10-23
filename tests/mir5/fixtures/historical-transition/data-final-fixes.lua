@@ -7,6 +7,30 @@ assert(technology.level == 1 and technology.upgrade == true and technology.max_l
 assert(technology.enabled ~= false, "historical transition direct is disabled")
 
 local unit = assert(technology.unit, "historical transition direct has no research unit")
+local function display(value)
+  if value == nil then return "nil" end
+  return tostring(value)
+end
+local science, effects = {}, {}
+for index, ingredient in ipairs(unit.ingredients or {}) do
+  if type(ingredient) == "table" then
+    science[index] = display(ingredient[1]) .. ":" .. display(ingredient[2])
+  else
+    science[index] = "invalid:" .. display(ingredient)
+  end
+end
+for index, effect in ipairs(technology.effects or {}) do
+  if type(effect) == "table" then
+    effects[index] = display(effect.type) .. ":modifier=" .. display(effect.modifier)
+      .. ":recipe=" .. display(effect.recipe) .. ":change=" .. display(effect.change)
+  else
+    effects[index] = "invalid:" .. display(effect)
+  end
+end
+log("[MIR5_HISTORICAL_TRANSITION_PREFLIGHT] target=" .. display(target.id)
+  .. " count=" .. display(unit.count) .. " count_formula=" .. display(unit.count_formula)
+  .. " time=" .. display(unit.time) .. " science=" .. table.concat(science, ",")
+  .. " effects=" .. table.concat(effects, ","))
 local formula_targets = {
   f015 = true, f016 = true, f017 = true, f100 = true, f110 = true,
 }

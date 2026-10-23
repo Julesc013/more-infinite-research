@@ -80,6 +80,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertIn("historical fixtures require a fresh full run", source)
         self.assertIn("historical-transition", source)
         self.assertIn("transition_stage", source)
+        self.assertIn("$historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016'))", source)
+        self.assertIn("$activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')", source)
         self.assertIn("freeze_source_lab", (FIXTURE / "control.lua").read_text(encoding="utf-8"))
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)
 
@@ -311,8 +313,9 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
               unit={count=count,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
             data={raw={technology={[row.name]=row}}}
+            local diagnostics={};log=function(value)diagnostics[#diagnostics+1]=value end
             local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
-            return ok,tostring(message),row
+            return ok,tostring(message),row,diagnostics[1]
           end
         ''')
         for target, (count, formula) in expected_costs.items():
@@ -324,6 +327,12 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 self.assertTrue(good[0])
                 self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["count_formula"], good[2]["unit"]["time"]),
                                  (1, None, 1))
+                self.assertIn(f"target={target}", good[3])
+                self.assertIn(f"count={observed_count}", good[3])
+                self.assertIn(f"count_formula={formula if formula is not None else 'nil'}", good[3])
+                self.assertIn("time=60", good[3])
+                self.assertIn("science=" + ",".join(f"{name}:1" for name in fact["direct_science"]), good[3])
+                self.assertIn(f"effects=character-mining-speed:modifier={fact['direct_effect']}:recipe=nil:change=nil", good[3])
 
                 wrong_formula = "1*(8000*2^(L-1))" if formula is None else "1*(8000*1.5^(L-1))"
                 bad_formula = self.lua.eval("data_final_row")(target, fact["direct_effect"], fact["direct_effect"],
@@ -332,6 +341,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 self.assertIn("cost or time differs", bad_formula[1])
                 self.assertEqual((bad_formula[2]["unit"]["count"], bad_formula[2]["unit"]["count_formula"], bad_formula[2]["unit"]["time"]),
                                  (observed_count, wrong_formula, 60))
+                self.assertIn(f"count_formula={wrong_formula}", bad_formula[3])
 
         unknown = self.lua.eval("data_final_row")("f999", .1, .1,
                                                    self.lua.table_from(("military-science-pack", "utility-science-pack")), 8000,
@@ -353,6 +363,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
             local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
               unit={count=8000,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
             data={raw={technology={[row.name]=row}}}
+            log=function() end
             local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
             return ok,tostring(message),row
           end
