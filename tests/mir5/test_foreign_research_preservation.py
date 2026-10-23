@@ -38,6 +38,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             }
             function force.enable_all_prototypes() end
             setmetatable(force, {__newindex = function(self, key, value)
+              if key == 'research_queue_enabled' then error('removed native API member') end
               if key == 'research_queue' then
                 rawset(self, 'current_research', value[1])
               end

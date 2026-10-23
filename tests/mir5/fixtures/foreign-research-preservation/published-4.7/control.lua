@@ -162,7 +162,6 @@ script.on_init(function()
   -- as earned effects. No lab is provisioned, so ordinary ticks cannot spend it.
   local pending = technology(force, PENDING)
   mir.saved_progress = 0.27
-  force.research_queue_enabled = true
   force.research_queue = {pending, mir}
   force.research_progress = 0.42
 
