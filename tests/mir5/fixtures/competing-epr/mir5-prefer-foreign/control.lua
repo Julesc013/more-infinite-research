@@ -15,6 +15,7 @@ local EPR_TAILS = {
 }
 local UINT32_MAX = 4294967295
 local loaded_snapshot, reload_logged = nil, false
+local pending_initial = false
 
 local function fail(message) error("[mir5-competing-epr-prefer-foreign] " .. message) end
 local function close(actual, expected)
@@ -173,8 +174,7 @@ script.on_configuration_changed(function()
   state.phase = "prefer-foreign-completed"
   state.released_player = copy_status(tail_status(game.forces.player))
   state.released_queue = copy_queue(queue_snapshot(game.forces.player))
-  marker("initial", state)
-  game.server_save(SAVE)
+  pending_initial = true
 end)
 
 script.on_load(function()
@@ -183,11 +183,19 @@ script.on_load(function()
     loaded_snapshot = {player=copy_status(state.released_player), queue=copy_queue(state.released_queue), labs=state.actual_lab_completions}
   else loaded_snapshot = nil end
   reload_logged = false
+  pending_initial = false
 end)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("foreign successor fixture storage is absent") end
+  if pending_initial then
+    assert_released(state)
+    marker("initial", state)
+    game.server_save(SAVE)
+    pending_initial = false
+    return
+  end
   if state.phase == "prefer-foreign-completed" and loaded_snapshot and not reload_logged then
     assert_released(state)
     assert_tail(tail_status(game.forces.player), loaded_snapshot.player, "foreign cold reload player")

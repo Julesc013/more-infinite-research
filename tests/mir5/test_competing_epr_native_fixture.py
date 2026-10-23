@@ -175,11 +175,15 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             elseif opponent=="stale-epr-current" then set_queue(player,{tail,probe}) end
             local preferred,message=load_control(preferred_path,"0.2.0",true);if not preferred then return {ok=false,message=message}end
             local ok,result=invoke(preferred,"changed");if not ok then return {ok=false,message=result}end
+            if markers~=0 or saves~=0 then return {ok=false,message="preferred saved before native hosting tick"} end
+            ok,result=invoke(preferred,"tick");if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(preferred,"load");if not ok then return {ok=false,message=result}end;ok,result=invoke(preferred,"tick");if not ok then return {ok=false,message=result}end end
             -- Candidate release under test; the fixture itself does not re-enable player EPR research.
             if opponent~="stale-release" then tail.enabled=true;tail.visible_when_disabled=false end
             local released,message=load_control(foreign_path,"0.3.0",false);if not released then return {ok=false,message=message}end
             ok,result=invoke(released,"changed");if not ok then return {ok=false,message=result}end
+            if markers~=3 or saves~=1 then return {ok=false,message="released saved before native hosting tick"} end
+            ok,result=invoke(released,"tick");if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(released,"load");if not ok then return {ok=false,message=result}end;ok,result=invoke(released,"tick");if not ok then return {ok=false,message=result}end end
             return {ok=true,message="",phase=storage.mir5_competing_epr.phase,tail_level=tail.level,tail_enabled=tail.enabled,
               tail_visible=tail.visible_when_disabled,tail_progress=tail.saved_progress,bonus=player.recipes['iron-gear-wheel'].productivity_bonus,

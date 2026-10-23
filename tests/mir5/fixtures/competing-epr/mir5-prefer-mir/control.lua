@@ -15,6 +15,7 @@ local EPR_TAILS = {
 }
 local UINT32_MAX = 4294967295
 local loaded_snapshot, reload_logged = nil, false
+local pending_initial = false
 
 local function fail(message) error("[mir5-competing-epr-prefer-mir] " .. message) end
 local function close(actual, expected)
@@ -177,8 +178,7 @@ script.on_configuration_changed(function()
   state.preferred_player = copy_status(tail_status(game.forces.player))
   state.preferred_queue = copy_queue(queue_snapshot(game.forces.player))
   state.preferred_current_saved_progress = technology(game.forces.player, PROBE).saved_progress
-  marker("initial", state)
-  game.server_save(SAVE)
+  pending_initial = true
 end)
 
 script.on_load(function()
@@ -187,11 +187,21 @@ script.on_load(function()
     loaded_snapshot = {player=copy_status(state.preferred_player), queue=copy_queue(state.preferred_queue), labs=state.actual_lab_completions}
   else loaded_snapshot = nil end
   reload_logged = false
+  pending_initial = false
 end)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("preferred successor fixture storage is absent") end
+  if pending_initial then
+    -- Configuration runs before hosting is active. Save from the next native
+    -- tick, after rechecking the observation against the real force state.
+    assert_preferred(state)
+    marker("initial", state)
+    game.server_save(SAVE)
+    pending_initial = false
+    return
+  end
   if state.phase == "prefer-mir-completed" and loaded_snapshot and not reload_logged then
     assert_preferred(state)
     assert_tail(tail_status(game.forces.player), loaded_snapshot.player, "preferred cold reload player")
