@@ -14,187 +14,592 @@
       "id": "CONT-01",
       "category": "research",
       "subject": "All generated IDs, effects and native patches",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "modern-default-catalogue-equality",
+          "source": [
+            "source/mir5/research/modern.lua",
+            "source/mir5/research/catalogue.lua",
+            "source/mir5/data-final-fixes.lua"
+          ],
+          "evidence": "spec/mir5/evidence/science-default-catalogue-chain.json",
+          "scope": "Five F200/F210 Base, Space Age and K2SO profiles have exact generated technology/settings comparison with zero unexplained differences."
+        },
+        {
+          "id": "named-native-owner-patches",
+          "source": [
+            "source/mir5/research/native_owners.lua",
+            "source/mir5/research/modern.lua"
+          ],
+          "evidence": "spec/mir5/evidence/modern-catalogue-chain.json",
+          "scope": "Named generated and native-owner definitions are preflighted from the authored catalogue; this is not a gameplay claim."
+        }
+      ],
       "test_subjects": [
         "host_output",
         "native_effect",
         "prototype_diff"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Complete affected gameplay, save/reload and nondefault policy outcomes for the full current catalogue.",
+        "Freeze and compare the final current-player package rather than earlier private packages."
       ]
     },
     {
       "id": "CONT-02",
       "category": "progression",
       "subject": "Finite stages, continuation offsets and native owners",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "event-driven-cap-and-legacy-owner-contracts",
+          "source": [
+            "source/mir5/runtime/lifecycle.lua",
+            "source/mir5/runtime/legacy_caps.lua",
+            "source/mir5/runtime/caps.lua"
+          ],
+          "evidence": "spec/mir5/evidence/f200-positive-cap-qualified-chain.json",
+          "scope": "Named F200 worker/gear ownership preserves earned levels, partial progress, foreign disablement, a successor completion and two cold reloads."
+        },
+        {
+          "id": "k2so-imersite-staged-contract",
+          "source": [
+            "source/mir5/research/k2_imersite.lua",
+            "source/mir5/runtime/k2_imersite_migration.lua"
+          ],
+          "evidence": "spec/mir5/evidence/k2so-material-native-chain.json",
+          "scope": "The finite public stages and named hidden-carrier handoff exist; the observed material labs do not establish predecessor migration."
+        }
+      ],
       "test_subjects": [
         "staged",
         "owner",
         "costs"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Exercise actual predecessor state, hidden-carrier removal/readdition and completed/current/queued handoff on the admitted K2SO profile.",
+        "Cover remaining catalogue continuations and native owners at their affected setting boundaries."
       ]
     },
     {
       "id": "CONT-03",
       "category": "settings",
       "subject": "All existing types/defaults/bounds/sentinels and profile precedence",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "modern-setting-descriptors-and-resolution",
+          "source": [
+            "source/mir5/research/historical_settings.lua",
+            "source/mir5/research/settings.lua"
+          ],
+          "evidence": "spec/mir5/evidence/science-default-catalogue-chain.json",
+          "scope": "Modern profile descriptor/default output is compared independently; it does not qualify every nondefault setting effect."
+        },
+        {
+          "id": "compiler-profile-compatibility-alias",
+          "source": [
+            "source/prototypes/mir/settings/compiler_profile.lua",
+            "source/mir5/research/historical_settings.lua"
+          ],
+          "scope": "MIR4 accepts full and classic but normalizes both to full, so MIR5 preserves the hidden saved startup identity without a second output mode."
+        },
+        {
+          "id": "explicit-safe-legacy-selector-boundaries",
+          "source": [
+            "source/mir5/compatibility/automatic_productivity.lua",
+            "source/mir5/research/product_target_extension.lua"
+          ],
+          "evidence": "docs/compatibility/README.md",
+          "scope": "Automatic preview has no compiler-created identities and reports withheld structural fallbacks; inactive DLC artwork falls back safely while mir-use-installed-space-age-icons remains registered."
+        }
+      ],
       "test_subjects": [
         "settings",
         "import_export"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Run nondefault effective-setting and profile-precedence cases where output or runtime behavior changes.",
+        "Retain the compiler, automatic-preview and inactive-artwork negative scopes as dispositions; do not recover a compiler or inspect disabled provider files."
       ]
     },
     {
       "id": "CONT-04",
       "category": "broad_binding",
       "subject": "Delivered product-based target collection and exclusions",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "bounded-one-pass-product-collector",
+          "source": [
+            "source/mir5/compatibility/product_targets.lua",
+            "source/mir5/compatibility/product_bindings.lua",
+            "source/mir5/research/product_target_extension.lua"
+          ],
+          "evidence": "spec/mir5/evidence/product-targets-native-chain.json",
+          "scope": "Literal, module-tier, item-pattern, recipe-alternative and structural bindings are collected once over selected recipes; no compiler or global research discovery is used."
+        },
+        {
+          "id": "automatic-base-preview-negative-scope",
+          "source": [
+            "source/mir5/research/product_target_extension.lua"
+          ],
+          "scope": "The old automatic preview deliberately emits no automatic research identities and logs that structural fallbacks are withheld."
+        }
+      ],
       "test_subjects": [
         "coverage",
         "unrelated_growth"
+      ],
+      "remaining_implementation": [
+        "Recover only named, exact native admission contracts for the Py/armor broad aliases; current evidence does not authorize a generic alias or discovery rule."
+      ],
+      "remaining_qualification": [
+        "Observe physical product outcomes and exclusions for each admitted profile/binding class."
       ]
     },
     {
       "id": "CONT-05",
       "category": "science",
       "subject": "Cryogenic/rocket/resource/alternative science and accepting labs",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "bounded-science-and-lab-policy",
+          "source": [
+            "source/mir5/research/science.lua",
+            "source/mir5/compatibility/science_bindings.lua"
+          ],
+          "evidence": "spec/mir5/evidence/science-default-catalogue-chain.json",
+          "scope": "Named source contracts, finite alternatives, lab reduction and required science gates are implemented without arbitrary foreign graph traversal."
+        },
+        {
+          "id": "cryogenic-named-unit-alternative",
+          "source": [
+            "source/mir5/compatibility/science_bindings.lua",
+            "source/mir5/research/science.lua"
+          ],
+          "evidence": "spec/mir5/evidence/cryogenic-native-chain.json",
+          "scope": "Cryogenic has a named source alternative; the current native evidence is data-only."
+        }
+      ],
       "test_subjects": [
         "science_positive",
         "science_negative"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Run native nondefault science/lab policies, including the named cryogenic-unit case.",
+        "Keep SCI-UNLOCK-01 and SCI-RESEARCH-01 open until exact reporter closures are recovered or a bounded representative is accepted."
       ]
     },
     {
       "id": "CONT-06",
       "category": "overrides",
       "subject": "Productivity/efficiency/speed/quality/pollution/recycling/modules/pipeline behavior",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "opt-in-prototype-and-pipeline-overrides",
+          "source": [
+            "source/mir5/overrides/prototype_limits.lua",
+            "source/mir5/overrides/recycling_scope.lua",
+            "source/mir5/overrides/pipeline_extent.lua",
+            "source/mir5/overrides/module_permissions.lua"
+          ],
+          "evidence": "spec/mir5/evidence/bob-angel-prototype-caps-chain.json",
+          "scope": "Opt-in limits, recycling scope, pipeline extent and module permissions are bounded data-stage operations."
+        },
+        {
+          "id": "atan-and-module-admissions",
+          "source": [
+            "source/mir5/compatibility/atan_productivity.lua",
+            "source/mir5/overrides/module_permissions.lua"
+          ],
+          "evidence": "spec/mir5/evidence/atan-f200-native-chain.json",
+          "scope": "ATAN output and module permission loading have named evidence; neither establishes all override interactions."
+        }
+      ],
       "test_subjects": [
         "overrides",
         "economics"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Observe physical recipe/productivity, recycling, pipeline and receiver-limit effects under nondefault settings.",
+        "Exercise cross-override interactions and supported profile boundaries."
       ]
     },
     {
       "id": "CONT-07",
       "category": "caps",
       "subject": "Earned-above-cap, queue/progress and foreign disablement",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "earned-cap-queue-and-foreign-rights",
+          "source": [
+            "source/mir5/runtime/lifecycle.lua",
+            "source/mir5/runtime/legacy_caps.lua"
+          ],
+          "evidence": "spec/mir5/evidence/f200-positive-cap-qualified-chain.json",
+          "scope": "F200 gear and worker chains retain earned state, partial research and foreign disablement through a successor lab and two cold reloads."
+        },
+        {
+          "id": "published-f200-science-tick-accounting",
+          "source": [
+            "source/mir5/runtime/legacy_caps.lua"
+          ],
+          "evidence": "spec/mir5/evidence/f200-published-science-control-chain.json",
+          "scope": "The narrow F200 stored-shape import accounts for processing ticks independently of raw elapsed ticks."
+        }
+      ],
       "test_subjects": [
         "caps",
         "cap_reload"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Qualify the remaining admitted cap identities and configuration/remove/readd boundaries; do not extrapolate the worker/gear result to untested owners."
       ]
     },
     {
       "id": "CONT-08",
       "category": "spoilage",
       "subject": "Global scope and independently applied contribution baseline",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "spoilage-contribution-runtime",
+          "source": [
+            "source/mir5/runtime/spoilage.lua",
+            "source/mir5/runtime/spoilage_contribution.lua"
+          ],
+          "evidence": "spec/mir5/evidence/scripted-effects-native-chain.json",
+          "scope": "Global spoilage contribution and external baseline behavior are observed in an accelerated Space Age fixture."
+        },
+        {
+          "id": "settings-and-passive-repair-lifecycle",
+          "source": [
+            "source/mir5/runtime/bootstrap.lua",
+            "source/mir5/runtime/passive_repair.lua"
+          ],
+          "evidence": "spec/mir5/evidence/settings-repair-chain.json",
+          "scope": "Focused setting/lifecycle routes are covered independently."
+        }
+      ],
       "test_subjects": [
         "runtime_scope",
         "external_write"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Run combined feature, external-writer, stress and multiplayer scenarios."
       ]
     },
     {
       "id": "CONT-09",
       "category": "agriculture_repair",
       "subject": "Planted-object and repair rate/lifecycle behavior",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "agriculture-tower-and-planting-runtime",
+          "source": [
+            "source/mir5/runtime/agriculture.lua",
+            "source/mir5/runtime/scripted_effects.lua"
+          ],
+          "evidence": "spec/mir5/evidence/scripted-effects-native-chain.json",
+          "scope": "Actual tower planting events and trained remaining growth ticks are observed for the named Space Age research."
+        }
+      ],
       "test_subjects": [
         "runtime_events",
         "stress_rate"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Run combined removal/readdition, stress and multiplayer rate/lifecycle cases."
       ]
     },
     {
       "id": "CONT-10",
       "category": "library",
       "subject": "Search/filter/details/settings/navigation/translations/personal views",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "real-host-personal-library-views",
+          "source": [
+            "source/mir5/presentation/library_model.lua",
+            "source/mir5/runtime/library.lua"
+          ],
+          "evidence": "spec/mir5/evidence/library-multiplayer-qualified-chain.json",
+          "scope": "Two F200 clients retain independent English/German views over join, rejoin and host restart with reviewed PNGs and unchanged research/queue witnesses."
+        },
+        {
+          "id": "availability-negative-scope",
+          "source": [
+            "source/mir5/runtime/library.lua"
+          ],
+          "scope": "Visibility option three currently renders the explicit no-omission-ledger state; it does not invent unavailable technologies or explanations."
+        }
+      ],
       "test_subjects": [
         "library",
         "two_clients"
+      ],
+      "remaining_implementation": [
+        "Recover a bounded historical availability snapshot before implementing availability explanations; the current empty route is intentional and not a substitute."
+      ],
+      "remaining_qualification": [
+        "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained."
       ]
     },
     {
       "id": "CONT-11",
       "category": "state",
       "subject": "Persistent roots, hidden carriers and migration filenames",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "named-k2so-carrier-migration",
+          "source": [
+            "source/mir5/migrations/more-infinite-research_4.7.0.json",
+            "source/mir5/runtime/k2_imersite_migration.lua"
+          ],
+          "evidence": "spec/mir5/evidence/k2so-material-native-chain.json",
+          "scope": "Named Imersite carrier identities and guarded runtime handoff exist; the material fixture excludes predecessor migration."
+        },
+        {
+          "id": "historical-direct-targets",
+          "source": [
+            "source/mir5/research/historical_direct.lua",
+            "source/mir5/research/historical_continuations.lua",
+            "source/mir5/migrations"
+          ],
+          "evidence": "spec/mir5/evidence/historical-native-chain.json",
+          "scope": "Seven fresh historical target packages complete the direct lab/save/two-reload scenarios, not predecessor upgrades."
+        }
+      ],
       "test_subjects": [
         "upgrade",
         "two_reload"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Diagnose and pass all exact published4.7.2 predecessor-to-MIR5 transitions, including earned/current/queued state.",
+        "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation."
       ]
     },
     {
       "id": "CONT-12",
       "category": "integrations",
       "subject": "Useful existing bundled integration outcomes by actual profile",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "named-modern-and-material-profiles",
+          "source": [
+            "source/mir5/compatibility/modern_catalogue.lua",
+            "source/mir5/compatibility/bob_angel_materials.lua"
+          ],
+          "evidence": "spec/mir5/evidence/bob-angel-materials-lab-native-chain.json",
+          "scope": "Bob/Angel material labs, finite/tail boundary, cap relaxation and cold reloads are observed for the admitted profile."
+        },
+        {
+          "id": "bounded-competing-provider-contracts",
+          "source": [
+            "source/mir5/compatibility/competing_productivity.lua",
+            "source/mir5/runtime/competing_productivity.lua"
+          ],
+          "evidence": "spec/mir5/evidence/competing-epr-native-chain.json",
+          "scope": "EPR three-stage preference continuity is native-observed; fixed/dynamic provider bindings are authored from captured rows."
+        }
+      ],
       "test_subjects": [
         "compatibility",
         "production"
+      ],
+      "remaining_implementation": [
+        "Admit Py/armor only after exact native identity and ownership facts are recovered; broad aliases are not an admission contract."
+      ],
+      "remaining_qualification": [
+        "Run composed fixed and dynamic provider true/false/true gameplay, including earned MIR overlaps and foreign rights.",
+        "Observe Bob/Angel physical recipe-cap output and remaining exact admitted integrations."
       ]
     },
     {
       "id": "CONT-13",
       "category": "targets",
       "subject": "All nine target editions and their actual delivered subsets",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "modern-target-profile-output",
+          "source": [
+            "source/mir5/compatibility/modern_catalogue.lua",
+            "source/mir5/adapters/reduced"
+          ],
+          "evidence": "spec/mir5/evidence/modern-catalogue-chain.json",
+          "scope": "Recovered modern profile data/settings output is independently compared; historical targets have separate direct adapters."
+        },
+        {
+          "id": "historical-target-fresh-native",
+          "source": [
+            "source/mir5/adapters/reduced",
+            "source/mir5/research/historical_direct.lua"
+          ],
+          "evidence": "spec/mir5/evidence/historical-native-chain.json",
+          "scope": "Seven historical editions have fresh package lab/save/reload evidence, not successor migration proof."
+        }
+      ],
       "test_subjects": [
         "targets",
         "package"
+      ],
+      "remaining_implementation": [
+        "Complete the selected source-root and package materialization cutover for all nine editions after parity is accepted."
+      ],
+      "remaining_qualification": [
+        "Run final current-package and affected native checks for every delivered target subset."
       ]
     },
     {
       "id": "CONT-14",
       "category": "interfaces",
       "subject": "Real public API/MEP/remote consumers versus unconsumed previews",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "mir-api-v1-and-two-native-consumers",
+          "source": [
+            "source/mir5/api/v1/data.lua",
+            "source/mir5/api/v1/runtime.lua",
+            "source/mir5/runtime/bootstrap.lua"
+          ],
+          "evidence": "spec/mir5/evidence/api-consumers-f200-chain.json",
+          "scope": "Two independent consumers exercise detached queries and physical product output with save/two-reload evidence."
+        },
+        {
+          "id": "mep-preview-negative-scope",
+          "source": [
+            "docs/mir5/design.md",
+            "docs/mir5/api.md"
+          ],
+          "scope": "MEP remains a separately distributed data-only preview with no player emission authority; it is not a missing runtime transport."
+        }
+      ],
       "test_subjects": [
         "api_consumers",
         "legacy_interface"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Verify custody for optional-absence native creation and run affected multiplayer/final-source API cases.",
+        "Audit genuine historic API/MEP consumers before removing or translating a legacy contract."
       ]
     },
     {
       "id": "CONT-15",
       "category": "requests",
       "subject": "Original community ledger and bug IDs; no parallel request authority",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "single-community-request-authority",
+          "source": [
+            "spec/programmes/community-requests.json"
+          ],
+          "scope": "The original ledger remains the sole request authority: 85 records, including 53 requested-not-qualified and 18 finite routes with open qualification."
+        },
+        {
+          "id": "distinct-open-science-reports",
+          "source": [
+            "spec/programmes/community-requests.json"
+          ],
+          "scope": "SCI-UNLOCK-01 and SCI-RESEARCH-01 remain distinct retained IDs; representative evidence does not close either reporter-specific request."
+        }
+      ],
       "test_subjects": [
         "ledger_reconciliation"
+      ],
+      "remaining_implementation": [
+        "Map each delivered bounded MIR5 route back to its original request ID without creating replacement IDs."
+      ],
+      "remaining_qualification": [
+        "Close only records with named exact source/package/engine/profile evidence; leave unknown reporter closures unreconciled."
       ]
     },
     {
       "id": "CONT-16",
       "category": "assets_docs",
       "subject": "Licenses/locales/icons/catalogue/support/changelog content",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "active-provider-artwork-boundary",
+          "source": [
+            "source/mir5/locale",
+            "docs/compatibility/README.md"
+          ],
+          "scope": "Inactive Space Age artwork is deliberately not probed; the saved icon setting remains registered and Base uses a safe fallback."
+        },
+        {
+          "id": "library-localisation-rendering",
+          "source": [
+            "source/mir5/locale/en/mir-library.cfg",
+            "source/mir5/locale/de/mir-library.cfg",
+            "source/mir5/runtime/library.lua"
+          ],
+          "evidence": "spec/mir5/evidence/library-multiplayer-qualified-chain.json",
+          "scope": "English/German rendered Library views are observed in the limited two-client F200 scenario."
+        }
+      ],
       "test_subjects": [
         "assets",
         "root_transfer"
+      ],
+      "remaining_implementation": [
+        "Complete package-excluded repository documentation and final player-package asset/catalogue transfer at the approved source-root cutover."
+      ],
+      "remaining_qualification": [
+        "Verify all player package assets, locales, support/changelog content and source-root transfer against final target packages."
       ]
     },
     {
       "id": "CONT-17",
       "category": "evidence",
       "subject": "Unique receipts/saves/logs and published/working artifact custody",
-      "status": "unreconciled",
-      "resolved_records": [],
+      "status": "partial",
+      "resolved_records": [
+        {
+          "id": "exact-evidence-chain-custody",
+          "source": [
+            "docs/mir5/progress.md",
+            "spec/mir5/evidence"
+          ],
+          "scope": "Each accepted chain records frozen input bounds and limitations; adverse receipts remain retained rather than overwritten."
+        },
+        {
+          "id": "historical-and-modern-receipt-boundaries",
+          "source": [
+            "spec/mir5/evidence/historical-native-chain.json",
+            "spec/mir5/evidence/science-default-catalogue-chain.json"
+          ],
+          "scope": "Fresh historical and modern data/settings receipts are bounded evidence, not final-candidate qualification."
+        }
+      ],
       "test_subjects": [
         "custody"
+      ],
+      "remaining_implementation": [],
+      "remaining_qualification": [
+        "Verify and retain final package, save, native, multiplayer, performance, publication and anonymous-download receipts for the frozen candidate."
       ]
     }
   ]
