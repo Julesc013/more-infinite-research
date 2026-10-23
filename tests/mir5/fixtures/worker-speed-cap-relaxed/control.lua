@@ -74,6 +74,9 @@ script.on_configuration_changed(function()
   -- state. Otherwise a lost level/bonus during configuration could self-pass.
   local prior = storage["mir5_native_worker_speed_cap"]
   if not prior or not prior.saved then fail("finite saved witness is absent") end
+  if prior.original_owner_enabled ~= true or prior.original_owner_visible ~= false then
+    fail("source did not establish the original owner presentation")
+  end
   storage[KEY] = {
     owner = prior.owner,
     next_level = prior.next_level,

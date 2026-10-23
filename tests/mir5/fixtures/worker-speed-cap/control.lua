@@ -91,6 +91,9 @@ script.on_init(function()
   local owner = owner_for(force)
   local initial_level = owner.level
   prepare_prerequisites(owner)
+  -- Establish the presentation value whose later restoration this fixture
+  -- observes; the upstream prototype default is not a restoration witness.
+  owner.enabled, owner.visible_when_disabled = true, false
   local modifier_before = force.worker_robots_speed_modifier
   -- These two direct native setters observe earned infinite levels. They do
   -- not claim lab work or science consumption; the assertions below read the
@@ -117,6 +120,8 @@ script.on_init(function()
   storage[KEY] = {
     owner = owner.name,
     initial_level = initial_level,
+    original_owner_enabled = true,
+    original_owner_visible = false,
     next_level = owner.level,
     modifier_before = modifier_before,
     modifier_after = modifier_after,
