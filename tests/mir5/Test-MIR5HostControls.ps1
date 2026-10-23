@@ -16,6 +16,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_science.py';lua=$true},
   [ordered]@{path='tests/mir5/test_cryogenic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_material_catalogue.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_material_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_product_targets.py';lua=$true},
   [ordered]@{path='tests/mir5/test_product_target_extension.py';lua=$true},
   [ordered]@{path='tests/mir5/test_target_adapters.py';lua=$true},

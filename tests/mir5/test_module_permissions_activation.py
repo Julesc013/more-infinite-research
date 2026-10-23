@@ -118,7 +118,10 @@ class ModulePermissionsActivationTests(unittest.TestCase):
             end}
           end
           package.preload["compatibility.modern_catalogue"] = function()
-            return {is_k2so = function(active_mods)
+            return {is_k2_base = function(active_mods)
+              assert(active_mods == mods)
+              return false
+            end, is_k2so = function(active_mods)
               assert(active_mods == mods)
               return false
             end, select = function(active_mods)
