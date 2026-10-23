@@ -347,6 +347,14 @@
             "source/mir5/runtime/library.lua"
           ],
           "scope": "Visibility option three currently renders the explicit no-omission-ledger state; it does not invent unavailable technologies or explanations."
+        },
+        {
+          "id": "historical-availability-internal-representation",
+          "source": [
+            "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
+            "source/mir5/presentation/library_model.lua"
+          ],
+          "scope": "Historical provider reads skip/excluded compiler generation-plan rows and hides entries whose technologies exist. MIR5 keeps existing disabled-ID views and technology_not_found for absent detail. Internal compiler ledgers have no authority to require another compiler; useful omission behavior still needs disposition."
         }
       ],
       "test_subjects": [
@@ -354,7 +362,7 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "Recover a bounded historical availability snapshot before implementing availability explanations; the current empty route is intentional and not a substitute."
+        "Resolve useful historical omission explanations against actual authored disabled/absent identities and bounded binding/settings facts. Do not recreate a compiler-generation-plan snapshot or invent rows from missing evidence."
       ],
       "remaining_qualification": [
         "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained."
@@ -384,6 +392,17 @@
           ],
           "evidence": "spec/mir5/evidence/historical-native-chain.json",
           "scope": "Seven fresh historical target packages complete the direct lab/save/two-reload scenarios, not predecessor upgrades."
+        },
+        {
+          "id": "published-seven-historical-upgrades",
+          "source": [
+            "tests/mir5/fixtures/historical-transition/control.lua"
+          ],
+          "evidence": [
+            "spec/mir5/evidence/historical-transition-013-016-chain.json",
+            "spec/mir5/evidence/historical-transition-017-100-110-chain.json"
+          ],
+          "scope": "All seven bounded published4.7.2 predecessor profiles preserve earned mining effects/save/two reloads; F015+ actual successor labs, F017+ queued42% work. Not complete catalogue or final-source acceptance."
         }
       ],
       "test_subjects": [
@@ -392,7 +411,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Diagnose and pass all exact published4.7.2 predecessor-to-MIR5 transitions, including earned/current/queued state.",
+        "Complete full relevant earned/current/queued catalogue-state and migration reconciliation beyond the seven passing bounded predecessor chains.",
         "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation."
       ]
     },
@@ -419,6 +438,14 @@
           ],
           "evidence": "spec/mir5/evidence/competing-epr-native-chain.json",
           "scope": "EPR three-stage preference continuity is native-observed; fixed/dynamic provider bindings are authored from captured rows."
+        },
+        {
+          "id": "separate-ce-pr-native-continuity",
+          "evidence": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-chain.json",
+          "source": [
+            "source/mir5/compatibility/competing_productivity.lua"
+          ],
+          "scope": "Exact separate CE28 and PR43 foreign tails pass actual predecessor labs, MIR5 preference true/false and two reloads each. Earned MIR overlap and composed/mixed providers remain unqualified."
         }
       ],
       "test_subjects": [
@@ -492,6 +519,14 @@
             "docs/mir5/api.md"
           ],
           "scope": "MEP remains a separately distributed data-only preview with no player emission authority; it is not a missing runtime transport."
+        },
+        {
+          "id": "optional-consumer-native-absence",
+          "evidence": "spec/mir5/evidence/api-optional-absence-chain.json",
+          "source": [
+            "tests/mir5/fixtures/api-beta"
+          ],
+          "scope": "Independent optional consumer loads without MIR on F200. CreateOnly native load evidence; no save/gameplay claim."
         }
       ],
       "test_subjects": [
@@ -500,7 +535,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Verify custody for optional-absence native creation and run affected multiplayer/final-source API cases.",
+        "Run affected multiplayer/final-source API and independent-consumer cases.",
         "Audit genuine historic API/MEP consumers before removing or translating a legacy contract."
       ]
     },
