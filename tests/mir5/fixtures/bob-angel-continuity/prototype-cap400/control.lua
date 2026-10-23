@@ -229,7 +229,6 @@ script.on_configuration_changed(function()
     if inventory.insert{name=science, count=16} ~= 16 then fail("cap125 lab rejected " .. science) end
     before[science] = inventory.get_item_count(science)
   end
-  player.research_queue_enabled = true
   if player.current_research ~= nil or #player.research_queue ~= 0 then fail("cap125 player queue was not empty") end
   local sequence = plan()
   if player.add_research(technology(player, sequence[1])) ~= true then fail("could not start relaxed-cap research") end

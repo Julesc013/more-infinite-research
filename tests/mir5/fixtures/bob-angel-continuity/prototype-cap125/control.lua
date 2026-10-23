@@ -182,7 +182,6 @@ local function seed_material_boundary(force, player)
   return bonus
 end
 local function seed_foreign(force)
-  force.research_queue_enabled = true
   force.enable_all_prototypes()
   seed_external_prerequisites(force)
   local bonus = seed_material_boundary(force, false)
@@ -246,7 +245,6 @@ script.on_init(function()
   if storage[KEY] ~= nil then fail("prototype-cap125 fixture found prior state") end
   game.speed = 16
   local player = game.forces.player
-  player.research_queue_enabled = true
   player.enable_all_prototypes()
   seed_external_prerequisites(player)
   seed_material_boundary(player, true)

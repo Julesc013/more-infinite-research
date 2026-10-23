@@ -110,12 +110,12 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
             local prototypes={recipe={}}
             for _,family in ipairs(F)do for _,name in ipairs(family[2])do prototypes.recipe[name]={maximum_productivity=1.25}end end
             local function force(name,index)
-              local value={name=name,index=index,valid=true,technologies={},recipes={},research_queue={},research_progress=0,research_queue_enabled=false}
+              local value={name=name,index=index,valid=true,technologies={},recipes={},research_queue={},research_progress=0}
               function value.enable_all_prototypes()end
               function value.get_spawn_position(_)return {0,0}end
               function value.add_research(tech)
                 if type(tech)=="string"then tech=value.technologies[tech]end
-                if not value.research_queue_enabled or not tech or value.current_research then return false end
+                if not tech or value.current_research then return false end
                 value.research_queue={tech};value.current_research=tech;return true
               end
               for _,family in ipairs(F)do
@@ -137,6 +137,10 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
                   for _,entry in ipairs(tail.prototype.effects)do value.recipes[entry.recipe].productivity_bonus=value.recipes[entry.recipe].productivity_bonus+t*entry.change end
                 end
               end
+              setmetatable(value,{__newindex=function(object,key,item)
+                if key=="research_queue_enabled"then error("removed F200 LuaForce property")end
+                rawset(object,key,item)
+              end})
               return value
             end
             local player,foreign,saves,markers=force("player",1),nil,0,0
@@ -259,7 +263,7 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
                 self.assertIsNotNone(result["callbacks"]["events"][2])
                 source = (FIXTURE / directory / "control.lua").read_text(encoding="utf-8")
                 self.assertIn("prototypes.recipe[name]", source)
-                self.assertIn("research_queue_enabled = true", source)
+                self.assertNotIn("research_queue_enabled = true", source)
                 self.assertIn("native_recipe_bonus_is_observed_separately_from_prototype_cap", source)
                 self.assertIn("game.server_save(SAVE)", source)
                 self.assertNotIn("require(", source)
