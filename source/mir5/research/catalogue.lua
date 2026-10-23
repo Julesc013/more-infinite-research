@@ -47,6 +47,19 @@ local function first_recipe(definition)
   local effect = definition.effects and definition.effects[1]
   return effect and effect.recipe or nil
 end
+local function named_productivity_recipes(routes)
+  local out, seen = {}, {}
+  if type(routes) ~= "table" then error("MIR catalogue material routes are invalid", 3) end
+  for index, route in ipairs(routes) do
+    local recipe = type(route) == "table" and route.recipe or nil
+    if type(recipe) ~= "string" or recipe == "" or seen[recipe] then
+      error("MIR catalogue material routes must name unique recipes", 3)
+    end
+    seen[recipe], out[index] = true, recipe
+  end
+  if #out == 0 then error("MIR catalogue material routes are empty", 3) end
+  return out
+end
 local function generated_row(id, family, order, locale, recipe)
   return {id=id, family=family, progression=1, native_order=order, setting="ips-enable-" .. family,
     cap_setting="ips-max-level-" .. family, settings=stream_settings(family), recipe=recipe, locale_key=locale,
@@ -124,6 +137,11 @@ local function static_rows()
           "description.productivity-bonus", definition.routes[1].recipe)
         row.progression = stage.first_level or 1
         row.productivity_ceiling = definition.productivity_ceiling
+        -- Runtime caps read only this finite declared route list. It names
+        -- neither a foreign family nor a classifier: data-final already
+        -- selected and bound these exact recipes before Factorio exposes their
+        -- effective LuaRecipePrototype productivity caps.
+        row.productivity_recipes = named_productivity_recipes(definition.routes)
         rows[#rows + 1] = row
       end
     end

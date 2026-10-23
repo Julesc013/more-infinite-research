@@ -34,6 +34,21 @@ local function nonnegative_integer(value)
   return type(value) == "number" and value == value and value >= 0
     and value < math.huge and value == math.floor(value)
 end
+local function named_recipe_array(value, label)
+  if type(value) ~= "table" then error("MIR caps missing named productivity recipes: " .. label, 2) end
+  local out, seen = {}, {}
+  for index, name in ipairs(value) do
+    if type(name) ~= "string" or name == "" or seen[name] then
+      error("MIR caps invalid named productivity recipe: " .. label, 2)
+    end
+    seen[name], out[index] = true, name
+  end
+  if #out == 0 then error("MIR caps empty named productivity recipes: " .. label, 2) end
+  return out
+end
+local function bounded_useful_limit(configured, useful)
+  return configured > 0 and math.min(configured, useful) or useful
+end
 
 -- Resolve the authored catalogue and immutable startup values once while
 -- control is parsed. Event paths use these compact maps; they never ask the
@@ -69,8 +84,13 @@ for index = 1, #DECLARATIONS do
       or type(percent) ~= "number" or not (percent > 0 and percent < math.huge) then
       error("MIR caps invalid authored productivity ceiling: " .. declaration.id, 2)
     end
-    local useful = math.ceil(ceiling * 100 / percent)
-    row.limit = row.limit > 0 and math.min(row.limit, useful) or useful
+    row.productivity_recipes = named_recipe_array(declaration.productivity_recipes, declaration.id)
+    row.productivity_effect_percent = percent
+    -- This construction-time bound only keeps the finite-cap lifecycle
+    -- registered. Active Bob/Angel rows replace it with the named
+    -- LuaRecipePrototype caps after data-final applies the user's
+    -- prototype/recycling policies; there is no control-stage fallback.
+    row.limit = bounded_useful_limit(row.limit, math.ceil(ceiling * 100 / percent))
   end
   ORDERED_DECLARATIONS[#ORDERED_DECLARATIONS + 1] = row
   DECLARATION_BY_ID[row.id] = row
@@ -85,6 +105,40 @@ for index = 1, #DECLARATIONS do
   end
 end
 local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS)
+
+-- Recipe caps are immutable for one loaded control profile. Resolve only the
+-- exact authored routes once through Factorio 2.0's `prototypes.recipe`; do
+-- not scan recipes or reconstruct the recycler/self-return classifier that
+-- data-final already used. A technology with several productivity effects
+-- remains useful while any named recipe has headroom, matching the historical
+-- per-effect OR semantics, so use the greatest route-derived level bound.
+local PRODUCTIVITY_USEFUL_LIMITS = {}
+local function useful_productivity_limit(row)
+  if row.productivity_recipes == nil then return nil end
+  local cached = PRODUCTIVITY_USEFUL_LIMITS[row.family]
+  if cached ~= nil then return cached end
+  local definitions = prototypes and prototypes.recipe
+  if definitions == nil then error("MIR caps missing Factorio 2.0 recipe prototypes", 2) end
+  local highest = 0
+  for _, name in ipairs(row.productivity_recipes) do
+    local prototype = definitions[name]
+    local maximum = prototype and tonumber(prototype.maximum_productivity) or nil
+    if type(maximum) ~= "number" or maximum ~= maximum
+        or maximum <= 0 or maximum == math.huge or maximum == -math.huge then
+      error("MIR caps missing valid named recipe productivity cap: " .. name, 2)
+    end
+    local useful = math.ceil(maximum * 100 / row.productivity_effect_percent)
+    if useful > highest then highest = useful end
+  end
+  if highest < 1 then error("MIR caps invalid named recipe productivity headroom: " .. row.id, 2) end
+  PRODUCTIVITY_USEFUL_LIMITS[row.family] = highest
+  return highest
+end
+local function effective_limit(row)
+  local useful = useful_productivity_limit(row)
+  if useful == nil then return row.limit end
+  return bounded_useful_limit(STREAM_VALUES[row.family].max_level, useful)
+end
 
 local function existing_state()
   local value = storage[STORAGE_KEY]
@@ -151,11 +205,11 @@ local function full_limits_for(force, include_worker, selected_owner, owner_reso
   local limits, admitted = {}, {}
   if valid_force(force) then
     for name, row in pairs(STATIC_GENERATED_BY_ID) do
-      if authored_generated_admitted(force, row) then limits[name], admitted[name] = row.limit, true end
+      if authored_generated_admitted(force, row) then limits[name], admitted[name] = effective_limit(row), true end
     end
     for name, row in pairs(NATIVE_OWNER_BY_ID) do
       if row.enabled and native_owner_admitted(force, row) then
-        limits[name], admitted[name] = row.limit, true
+        limits[name], admitted[name] = effective_limit(row), true
       end
     end
     if WORKER_ROBOT_SPEED_LIMIT > 0 or include_worker then
@@ -172,9 +226,9 @@ local function event_limits_for(force, name, include_worker)
   local row = DECLARATION_BY_ID[name]
   if row and row.enabled then
     if row.ownership_kind == "authored_generated" and authored_generated_admitted(force, row) then
-      return {[name] = row.limit}, {[name] = true}, nil
+      return {[name] = effective_limit(row)}, {[name] = true}, nil
     elseif row.ownership_kind == "nativeowner" and native_owner_admitted(force, row) then
-      return {[name] = row.limit}, {[name] = true}, nil
+      return {[name] = effective_limit(row)}, {[name] = true}, nil
     end
   end
   if name == WORKER_TAIL_NAMES[1] or name == WORKER_TAIL_NAMES[2] then
