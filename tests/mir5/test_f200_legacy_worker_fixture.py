@@ -123,8 +123,12 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
                 assert(quality and quality.name=="normal");return 1
               end}
             end
-            local input=inventory();local lab={valid=true,energy=0}
+            local input=inventory();local modules=setmetatable({},{__len=function()return 0 end})
+            local lab={valid=true,energy=0,quality={name="normal"},prototype={get_researching_speed=function(quality)
+              assert(quality and quality.name=="normal");return 1
+            end}}
             function lab.get_inventory(index)assert(index==1);return input end
+            function lab.get_module_inventory()return modules end
             local function prereq(name)return {name=name,research_recursive=function()end}end
             local function tech(name,force)
               local effect=name==WORKER and {{type="worker-robot-speed",modifier=.65}} or {}
@@ -138,13 +142,15 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             end
             local function force(name,index,modifier)
               local value={name=name,index=index,valid=true,technologies={},research_queue={},research_progress=0,
-                worker_robots_speed_modifier=modifier}
+                worker_robots_speed_modifier=modifier,laboratory_speed_modifier=0,laboratory_productivity_bonus=0}
               value.technologies[WORKER]=tech(WORKER,value);value.technologies["braking-force-1"]=tech("braking-force-1",value)
               function value.enable_all_prototypes()end
               function value.add_research(research)
                 if type(research)=="string"then research=value.technologies[research]end
                 if research==nil or value.current_research~=nil then return false end
-                value.current_research=research;value.research_queue={research};return true
+                local transferred=research.saved_progress or 0
+                if opponent=="lost-investment" and value.name=="player" and transferred>0 then transferred=.26 end
+                value.current_research=research;value.research_queue={research};value.research_progress=transferred;research.saved_progress=0;return true
               end
               return value
             end
@@ -181,7 +187,7 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             end
             local function tick(control)game.tick=game.tick+1;return invoke(control,"tick")end
             local function complete(control,level,bonus,consumed_units)
-              player.current_research=nil;player.research_queue={};player.technologies[WORKER].level=level
+              player.current_research=nil;player.research_queue={};player.research_progress=0;player.technologies[WORKER].level=level
               player.technologies[WORKER].researched=false;player.worker_robots_speed_modifier=bonus
               for _,science_name in ipairs(science)do input.consume(science_name,consumed_units or 1) end
               return invoke(control,"finished",{research=player.technologies[WORKER]})
@@ -215,7 +221,12 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             -- Native upgrade loads the old fixture state before configuration_changed.
             ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end
             ok,result=invoke(destination,"changed");if not ok then return {ok=false,message=result}end
-            ok,result=complete(destination,9,state.player_with_independent+1.95,opponent=="wrong-consumed-fraction" and .72 or .73);if not ok then return {ok=false,message=result}end
+            local consumed_units=state.destination_science_accounting.consumed_units
+            local elapsed_ticks=state.destination_science_accounting.remaining_ticks
+            if opponent=="wrong-tick-span" then elapsed_ticks=elapsed_ticks-1 end
+            game.tick=game.tick+elapsed_ticks
+            if opponent=="consumption-overshoot" then consumed_units=consumed_units+1/60 end
+            ok,result=complete(destination,9,state.player_with_independent+1.95,consumed_units);if not ok then return {ok=false,message=result}end
             if opponent=="duplicate-lab"then state.destination_lab_completions=2 end
             ok,result=tick(destination);if not ok then return {ok=false,message=result}end
             for _=1,2 do ok,result=invoke(destination,"load");if not ok then return {ok=false,message=result}end;ok,result=tick(destination);if not ok then return {ok=false,message=result}end end
@@ -223,7 +234,8 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
               player_level=player.technologies[WORKER].level,bonus=player.worker_robots_speed_modifier,
               player_enabled=player.technologies[WORKER].enabled,player_visible=player.technologies[WORKER].visible_when_disabled,
               science_before=state.destination_science_units_before[science[1]],science_after=state.destination_science_units_after[science[1]],
-              remaining_invest=state.destination_remaining_invest,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[WORKER].enabled,markers=markers,saves=saves}
+              consumed_units=state.destination_science_accounting.consumed_units,remaining_ticks=state.destination_science_accounting.remaining_ticks,
+              elapsed_ticks=state.destination_elapsed_ticks,current_progress=state.destination_science_accounting.progress,foreign_progress=foreign.research_progress,foreign_enabled=foreign.technologies[WORKER].enabled,markers=markers,saves=saves}
           end
         ''')
 
@@ -290,8 +302,11 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
         self.assertAlmostEqual(3.323, result["bonus"], places=6)
         self.assertTrue(result["player_enabled"]); self.assertTrue(result["player_visible"])
         self.assertAlmostEqual(22, result["science_before"], places=6)
-        self.assertAlmostEqual(21.27, result["science_after"], places=6)
-        self.assertAlmostEqual(.73, result["remaining_invest"], places=6)
+        self.assertAlmostEqual(22 - 44 / 60, result["science_after"], places=6)
+        self.assertAlmostEqual(44 / 60, result["consumed_units"], places=6)
+        self.assertEqual(44, result["remaining_ticks"])
+        self.assertEqual(44, result["elapsed_ticks"])
+        self.assertAlmostEqual(.27, result["current_progress"], places=6)
         self.assertEqual(.42, result["foreign_progress"]); self.assertFalse(result["foreign_enabled"])
         self.assertEqual((6, 2), (result["markers"], result["saves"]))
 
@@ -304,15 +319,18 @@ class F200LegacyWorkerFixtureTests(unittest.TestCase):
             "speed-bonus": "MIR5 restored native worker native worker state differs",
             "lab-count": "published native-worker source witness is absent",
             "duplicate-lab": "successor did not finish exactly one further native worker lab level",
-            "wrong-consumed-fraction": "successor real native worker lab consumption differs for automation-science-pack: observed_units=",
+            "lost-investment": "successor native worker saved investment did not become current research",
+            "wrong-tick-span": "successor real native worker lab tick duration differs",
+            "consumption-overshoot": "successor real native worker lab consumption differs for automation-science-pack: observed_units=",
         }
         for opponent, phrase in opponents.items():
             with self.subTest(opponent=opponent):
                 result = self.lua.eval("worker_flow")(str(FIXTURE / "published/control.lua"), str(FIXTURE / "mir5/control.lua"), opponent)
                 self.assertFalse(result["ok"]); self.assertIn(phrase, result["message"])
-                if opponent == "wrong-consumed-fraction":
-                    self.assertIn("expected_units=21.27", result["message"])
-                    self.assertIn("remaining_invest=0.73", result["message"])
+                if opponent == "consumption-overshoot":
+                    self.assertIn("expected_units=21.266", result["message"])
+                    self.assertIn("consumed_units=0.733", result["message"])
+                    self.assertIn("remaining_ticks=44", result["message"])
 
 
 if __name__ == "__main__":

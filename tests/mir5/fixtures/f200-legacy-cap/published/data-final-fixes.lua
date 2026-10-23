@@ -19,8 +19,8 @@ assert(mods.base == "2.0.77" and mods["more-infinite-research"] == "4.7.20002"
 local technology = assert(data.raw.technology[NAME], "published gear technology is absent")
 assert(technology.type == "technology" and technology.name == NAME and technology.level == 1
   and technology.upgrade == true and technology.max_level == "infinite"
-  and technology.enabled ~= false and technology.hidden == nil,
-  "published gear identity or progression changed")
+  and technology.enabled ~= false and technology.visible_when_disabled == true and technology.hidden == nil,
+  "published gear identity, progression, or cap presentation changed")
 names(technology.prerequisites, SCIENCE, "published gear prerequisites")
 local unit = assert(technology.unit, "published gear unit is absent")
 assert(unit.count == nil and unit.count_formula == "8000*2^(L-1)" and unit.time == 60,
