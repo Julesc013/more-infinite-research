@@ -17,6 +17,8 @@ FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-epr-f200-captured-facts.json"
 FIXED_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-fixed-f200-sa-captured-facts.json"
 DYNAMIC_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json"
 DYNAMIC_CHAIN_PATH = ROOT / "spec/mir5/evidence/competing-dynamic-f200-sa-reference-chain.json"
+DYNAMIC_NATIVE_INITIAL_FACTS_PATH = ROOT / "tests/mir5/fixtures/competing-dynamic-f200-sa-native-initial-levels.json"
+DYNAMIC_NATIVE_INITIAL_CHAIN_PATH = ROOT / "spec/mir5/evidence/competing-dynamic-native-initial-levels-chain.json"
 
 # Captured from verified F200 2.0.77 upstream/published EPR 1.3.8 run
 # 39999658774, under build/mir5/black-glass/incoming/39999658774.
@@ -197,6 +199,9 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def dynamic_facts(self):
         return json.loads(DYNAMIC_FACTS_PATH.read_text(encoding="utf-8"))
+
+    def dynamic_native_initial_facts(self):
+        return json.loads(DYNAMIC_NATIVE_INITIAL_FACTS_PATH.read_text(encoding="utf-8"))
 
     def captured_facts(self):
         return json.loads(FACTS_PATH.read_text(encoding="utf-8"))
@@ -752,6 +757,7 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def test_dynamic_f200_space_age_bindings_are_exact_and_negative_profiles_stay_unadmitted(self):
         facts = self.dynamic_facts()
+        native = self.dynamic_native_initial_facts()
         self.assertEqual(1, facts["schema"])
         self.assertEqual("MIR5DynamicCompetingF200SAReferenceFactsV1", facts["kind"])
         self.assertEqual(40018079589, facts["run"])
@@ -760,6 +766,51 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertEqual(119, facts["manifest_members_verified"])
         self.assertEqual(71, facts["binding_count"])
         self.assertFalse(facts["release_qualification"])
+        self.assertEqual(1, native["schema"])
+        self.assertEqual("MIR5DynamicCompetingF200SANativeInitialLevelsV1", native["kind"])
+        self.assertIn("not qualify a continuity transition", native["scope"])
+        self.assertEqual(hashlib.sha256(DYNAMIC_FACTS_PATH.read_bytes()).hexdigest().upper(),
+                         native["raw_reference"]["sha256"])
+        native_levels = {
+            observation["provider_key"]: {
+                row["id"]: row["technology_level"] for row in observation["levels"]
+            }
+            for observation in native["observations"]
+        }
+        self.assertEqual({"crafting-efficiency", "productivity-research"}, set(native_levels))
+        self.assertEqual((28, 43), tuple(len(native_levels[key]) for key in ("crafting-efficiency", "productivity-research")))
+        self.assertTrue(all(level == int(name.rsplit("-", 1)[1])
+                            for name, level in native_levels["crafting-efficiency"].items()))
+        self.assertEqual({1}, set(native_levels["productivity-research"].values()))
+        native_chain = json.loads(DYNAMIC_NATIVE_INITIAL_CHAIN_PATH.read_text(encoding="utf-8"))
+        self.assertEqual("MIR5DynamicCompetingF200SANativeInitialLevelsChainV1", native_chain["kind"])
+        self.assertEqual(hashlib.sha256(DYNAMIC_NATIVE_INITIAL_FACTS_PATH.read_bytes()).hexdigest().upper(),
+                         native_chain["facts"]["sha256"])
+        receipt = ROOT / native_chain["receipt"]["path"]
+        self.assertTrue(receipt.is_file())
+        self.assertEqual(native_chain["receipt"]["sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest().upper())
+        self.assertEqual(native_chain["receipt"]["uncompressed_sha256"],
+                         hashlib.sha256(gzip.decompress(receipt.read_bytes())).hexdigest().upper())
+        self.assertEqual((40027133277, 40027140695), tuple(run["id"] for run in native_chain["runs"]))
+        self.assertTrue(all(run["status"] == "failed" and run["release_qualification"] is False
+                            for run in native_chain["runs"]))
+        for observation in native["observations"]:
+            artifact = ROOT / observation["local_artifact_path"]
+            if not artifact.is_dir():
+                continue
+            manifest = artifact / "artifact-manifest.json"
+            self.assertEqual(observation["artifact_manifest"]["sha256"],
+                             hashlib.sha256(manifest.read_bytes()).hexdigest().upper())
+            entries = {entry["path"]: entry for entry in json.loads(manifest.read_text(encoding="utf-8"))}
+            create = artifact / observation["create_log"]["path"].replace("\\", "/")
+            self.assertEqual(observation["create_log"]["bytes"], create.stat().st_size)
+            self.assertEqual(observation["create_log"]["sha256"],
+                             hashlib.sha256(create.read_bytes()).hexdigest().upper())
+            self.assertEqual(observation["create_log"], entries[observation["create_log"]["path"]])
+            marker = next(json.loads(line.split("[MIR5_DYNAMIC_INITIAL_LEVELS] ", 1)[1])
+                          for line in create.read_text(encoding="utf-8").splitlines()
+                          if "[MIR5_DYNAMIC_INITIAL_LEVELS] " in line)
+            self.assertEqual(observation["levels"], marker["levels"])
         chain = json.loads(DYNAMIC_CHAIN_PATH.read_text(encoding="utf-8"))
         self.assertEqual("MIR5DynamicCompetingF200SAReferenceChainV1", chain["kind"])
         self.assertEqual(facts["run"], chain["run"]["id"])
@@ -796,17 +847,17 @@ class CompetingProductivityTests(unittest.TestCase):
                             tuple((effect["recipe"], effect["change"])
                                   for effect in replacement["effects"]))
                            for replacement in item["replacements"]),
-                     item["initial_retirement"], item["retire_if_unearned"])
+                      item["initial_retirement"])
                     for item in plain(contract)["bindings"]
                 )
                 expected = tuple(
-                    (item["id"], item["first_level"], item["predecessor"],
+                    (item["id"], native_levels[provider["key"]][item["id"]], item["predecessor"],
                      tuple((effect["recipe"], effect["change"]) for effect in item["effects"]),
                      tuple((replacement["id"],
                             tuple((effect["recipe"], effect["change"])
                                   for effect in replacement["effects"]))
                            for replacement in item["replacements"]),
-                     item["initial_retirement"], item["retire_if_unearned"])
+                      True)
                     for item in provider["bindings"]
                 )
                 self.assertEqual(expected, actual)
@@ -817,6 +868,15 @@ class CompetingProductivityTests(unittest.TestCase):
                 for item in provider["bindings"]:
                     self.assertEqual("omitted-default-one", item["level_source"])
                     self.assertEqual(1, item["first_level"])
+                    self.assertEqual(native_levels[provider["key"]][item["id"]],
+                                     next(actual_item["first_level"] for actual_item in plain(contract)["bindings"]
+                                          if actual_item["id"] == item["id"]))
+                    if provider["key"] == "crafting-efficiency":
+                        self.assertFalse(item["initial_retirement"])
+                        self.assertTrue(item["retire_if_unearned"])
+                    else:
+                        self.assertTrue(item["initial_retirement"])
+                        self.assertFalse(item["retire_if_unearned"])
                     self.assertEqual("infinite", item["foreign_row"]["max_level"])
                     self.assertEqual(item["effects"], [
                         {"recipe": effect["recipe"], "change": effect["change"]}
@@ -982,7 +1042,8 @@ class CompetingProductivityTests(unittest.TestCase):
           end
           assert(storage.mir_competing_productivity == nil)
 
-          -- CE has native level one despite its named nonadjacent predecessor.
+          -- CE begins at its observed suffix level despite its named
+          -- nonadjacent predecessor.
           -- Do not claim an untouched tail where investment, a live queue, or a
           -- foreign disabled presentation says otherwise.
           force = force_from_contract(ce_contract)
@@ -1018,33 +1079,34 @@ class CompetingProductivityTests(unittest.TestCase):
             and force.technologies[foreign.id].visible_when_disabled == false
             and storage.mir_competing_productivity.owned_disabled[force.index][foreign.id] == nil)
 
-          -- The direct level-one path does not overwrite an unusual earned
-          -- state. A later native level receives cap one and loses only its
-          -- future access, keeping the earned level itself intact.
+          -- The native first-level path does not overwrite an unusual earned
+          -- state. A later native level receives a cap at the observed first
+          -- level and loses only future access, keeping earned credit intact.
           force = force_from_contract(ce_contract)
-          local level_one_earned = ce_contract.bindings[4]
-          force.technologies[level_one_earned.id].researched = true
+          local first_level_earned = ce_contract.bindings[4]
+          force.technologies[first_level_earned.id].researched = true
           storage = {}
           runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
           runtime.on_init()
-          assert(force.technologies[level_one_earned.id].enabled == true
-            and force.technologies[level_one_earned.id].researched == true
-            and storage.mir_competing_productivity.owned_disabled[force.index][level_one_earned.id] == nil)
+          assert(force.technologies[first_level_earned.id].enabled == true
+            and force.technologies[first_level_earned.id].researched == true
+            and storage.mir_competing_productivity.owned_disabled[force.index][first_level_earned.id] == nil)
 
           force = force_from_contract(ce_contract)
-          local level_two = ce_contract.bindings[5]
-          force.technologies[level_two.id].level = 2
+          local after_first_level = ce_contract.bindings[5]
+          force.technologies[after_first_level.id].level = after_first_level.first_level + 1
           storage = {}
           runtime = install_competing(true, force, dynamic_active("crafting-efficiency-2", "0.2.20"))
           runtime.on_init()
-          assert(force.technologies[level_two.id].level == 2 and force.technologies[level_two.id].researched == false
-            and force.technologies[level_two.id].enabled == false
-            and force.technologies[level_two.id].visible_when_disabled == true)
+          assert(force.technologies[after_first_level.id].level == after_first_level.first_level + 1
+            and force.technologies[after_first_level.id].researched == false
+            and force.technologies[after_first_level.id].enabled == false
+            and force.technologies[after_first_level.id].visible_when_disabled == true)
 
           -- Bad level, missing predecessor, a .2 provider effect, or incomplete
           -- MIR coverage never grants a MIR disablement right.
           force = force_from_contract(ce_contract)
-          force.technologies[ce_contract.bindings[1].id].prototype.level = 2
+          force.technologies[ce_contract.bindings[1].id].prototype.level = ce_contract.bindings[1].first_level - 1
           force.technologies[ce_contract.bindings[2].id].prototype.prerequisites[ce_contract.bindings[2].predecessor] = nil
           force.technologies[ce_contract.bindings[3].id].prototype.effects[1].change = .2
           force.technologies[ce_contract.bindings[4].replacements[1].id] = nil
@@ -1097,6 +1159,7 @@ class CompetingProductivityTests(unittest.TestCase):
         runtime = (PLAYER / "runtime/competing_productivity.lua").read_text(encoding="utf-8")
         self.assertNotRegex(compatibility, r"\bpairs\s*\(\s*technologies\s*\)")
         self.assertNotIn("local function copy", compatibility)
+        self.assertNotIn("retire_if_unearned", compatibility)
         self.assertNotIn("pairs(force.technologies)", runtime)
         self.assertNotIn("research.catalogue", runtime)
         self.assertNotIn("prototypes.", runtime)

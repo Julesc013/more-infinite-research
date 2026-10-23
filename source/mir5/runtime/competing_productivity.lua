@@ -124,7 +124,7 @@ local function queued_names(force)
 end
 
 local function can_retire_unearned(technology, item, queued)
-  return (item.initial_retirement == true or item.retire_if_unearned == true) and technology.enabled == true
+  return item.initial_retirement == true and technology.enabled == true
     and technology.level == item.first_level and technology.researched ~= true
     and (technology.saved_progress == nil or technology.saved_progress == 0)
     and queued[item.id] ~= true
@@ -158,7 +158,7 @@ local function reconcile_item(force, current, item, limits, unearned, queued)
     limits[item.id] = 0
     return
   end
-  if item.initial_retirement ~= true and item.retire_if_unearned ~= true then
+  if item.initial_retirement ~= true then
     limits[item.id] = item.first_level - 1
     return
   end

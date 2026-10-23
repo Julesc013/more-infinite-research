@@ -14,6 +14,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/competing-dynamic-gameplay"
 FACTS = ROOT / "tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json"
+NATIVE_INITIAL_FACTS = ROOT / "tests/mir5/fixtures/competing-dynamic-f200-sa-native-initial-levels.json"
 NAME = "mir-fixture-mir5-competing-dynamic-gameplay"
 OBSERVER = "mir-fixture-mir5-active-mods-observer"
 UINT32_MAX = 4294967295
@@ -34,12 +35,14 @@ PROFILES = tuple(
 TARGETS = {
     "ce": {
         "target": "ce-iron-gear-wheel-19", "predecessor": "ce-iron-gear-wheel-14",
+        "initial_level": 19,
         "prerequisites": ["ce-iron-gear-wheel-14", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"],
         "recipe": "iron-gear-wheel",
         "science": ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"],
     },
     "pr": {
         "target": "sem-prfe_iron-gear-wheel-productivity-1", "predecessor": False, "prerequisites": [],
+        "initial_level": 1,
         "recipe": "iron-gear-wheel", "science": ["automation-science-pack"],
     },
 }
@@ -102,6 +105,11 @@ class CompetingDynamicNativeFixtureTests(unittest.TestCase):
     def setUpClass(cls):
         cls.facts = json.loads(FACTS.read_text(encoding="utf-8"))
         cls.providers = {entry["key"]: entry for entry in cls.facts["providers"]}
+        native = json.loads(NATIVE_INITIAL_FACTS.read_text(encoding="utf-8"))
+        cls.native_initial_levels = {
+            entry["provider_key"]: {row["id"]: row["technology_level"] for row in entry["levels"]}
+            for entry in native["observations"]
+        }
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -132,14 +140,15 @@ function dynamic_on_load(path, provider, phase)
   local callbacks={events={}}
   local active={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-competing-dynamic-gameplay"]="0.2.0"}
   if provider=="ce" then active["crafting-efficiency-2"]="0.2.20" else active.ProductivityResearch="1.3.2" end
-  local state={provider=provider,phase=phase,actual_lab_completions=1,player_snapshot={level=2,researched=false,enabled=false,visible=true,maximum=4294967295,saved_progress=.27,bonus=.1},player_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42}}
+  local completed_level=provider=="ce"and 20 or 2
+  local state={provider=provider,phase=phase,actual_lab_completions=1,player_snapshot={level=completed_level,researched=false,enabled=false,visible=true,maximum=4294967295,saved_progress=.27,bonus=.1},player_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42}}
   local store={mir5_competing_dynamic_gameplay=state};setmetatable(store,{__newindex=function()error("on_load wrote fixture storage")end})
   local env={script={active_mods=active,on_init=function(f)callbacks.init=f end,on_configuration_changed=function(f)callbacks.changed=f end,on_load=function(f)callbacks.load=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},storage=store}
   env._G=env;setmetatable(env,{__index=function(_,key)if key=="game" then error("on_load read LuaGameScript")end;return _G[key]end})
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
   ok,result=pcall(callbacks.load);return {ok=ok,message=tostring(result)}
 end
-function dynamic_source_flow(path, provider, target_name, predecessor_name, target_prerequisites, recipe_name, science, ids, opponent)
+function dynamic_source_flow(path, provider, target_name, predecessor_name, target_prerequisites, recipe_name, science, ids, initial_levels, opponent)
   local callbacks,markers,saves={events={}},0,0
   local predecessor_calls=0
   local function inventory()
@@ -155,21 +164,23 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
     local force={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=0}},research_progress=0,_queue={}}
     setmetatable(force,{__index=function(value,key)if key=="research_queue"then return rawget(value,"_queue")end end,__newindex=function(value,key,row)
       if key=="research_queue" then
-        rawset(value,"_queue",row or {});local current=row and row[1] or nil;rawset(value,"current_research",current)
+        local queue=row or {};for _,technology in ipairs(queue)do for _,prerequisite in pairs(technology.prerequisites)do assert(prerequisite.researched==true,"research queue accepted prerequisite-unready native work")end end
+        rawset(value,"_queue",queue);local current=row and row[1] or nil;rawset(value,"current_research",current)
         if current then rawset(value,"research_progress",current.saved_progress or 0);current.saved_progress=0 else rawset(value,"research_progress",0)end
       else rawset(value,key,row)end
     end})
     local function technology(name)
-      return {name=name,valid=true,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
-        prototype={max_level=4294967295,level=1},prerequisites={},research_unit_count=1,research_unit_energy=60,research_unit_ingredients={}}
+      local initial=initial_levels[name] or 1
+      return {name=name,valid=true,force=force,level=initial,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,
+        prototype={max_level=4294967295,level=initial},prerequisites={},research_unit_count=1,research_unit_energy=60,research_unit_ingredients={}}
     end
     for _,id in ipairs(ids) do force.technologies[id]=technology(id) end
     local target=force.technologies[target_name];for _,item in ipairs(science)do target.research_unit_ingredients[#target.research_unit_ingredients+1]={name=item,amount=1}end
     if opponent=="missing-predecessor" then target.prerequisites={}
-    else for _,required in ipairs(target_prerequisites) do target.prerequisites[required]={name=required,research_recursive=function()predecessor_calls=predecessor_calls+1 end}end end
+    else for _,required in ipairs(target_prerequisites) do local prerequisite={name=required,researched=false};prerequisite.research_recursive=function()prerequisite.researched=true;predecessor_calls=predecessor_calls+1 end;target.prerequisites[required]=prerequisite end end
     if opponent=="added-prerequisite" then target.prerequisites.unexpected={name="unexpected",research_recursive=function()end}end
     force.technologies["braking-force-1"]=technology("braking-force-1")
-    for _,required in ipairs({"railway","chemical-science-pack"}) do force.technologies["braking-force-1"].prerequisites[required]={name=required,research_recursive=function()predecessor_calls=predecessor_calls+1 end}end
+    for _,required in ipairs({"railway","chemical-science-pack"}) do local prerequisite={name=required,researched=false};prerequisite.research_recursive=function()prerequisite.researched=true;predecessor_calls=predecessor_calls+1 end;force.technologies["braking-force-1"].prerequisites[required]=prerequisite end
     function force.enable_all_prototypes()for _,item in pairs(force.technologies)do item.enabled=true;item.visible_when_disabled=false end end
     function force.add_research(value)
       if type(value)=="string"then value=force.technologies[value]end
@@ -195,22 +206,23 @@ function dynamic_source_flow(path, provider, target_name, predecessor_name, targ
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk);if not ok then return {ok=false,message=tostring(result)}end
   ok,result=pcall(callbacks.init);if not ok then return {ok=false,message=tostring(result)}end
   local target=player.technologies[target_name]
-  player.research_queue={};target.level=opponent=="wrong-level"and 3 or 2;player.recipes[recipe_name].productivity_bonus=opponent=="wrong-effect"and .09 or .1
+  local expected_level=target.prototype.level+1
+  player.research_queue={};target.level=opponent=="wrong-level"and expected_level+1 or expected_level;player.recipes[recipe_name].productivity_bonus=opponent=="wrong-effect"and .09 or .1
   ok,result=pcall(callbacks.events[2],{research=target});if not ok then return {ok=false,message=tostring(result)}end
   game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end
   for _=1,2 do ok,result=pcall(callbacks.load);if not ok then return {ok=false,message=tostring(result)}end;game.tick=game.tick+1;ok,result=pcall(callbacks.events[1]);if not ok then return {ok=false,message=tostring(result)}end end
   local state=storage.mir5_competing_dynamic_gameplay
   return {ok=true,message="",phase=state.phase,labs=state.actual_lab_completions,level=target.level,bonus=player.recipes[recipe_name].productivity_bonus,target_saved=target.saved_progress,current=player.current_research and player.current_research.name or false,current_progress=player.research_progress,probe_saved=player.technologies["braking-force-1"].saved_progress,foreign_disabled=foreign.technologies[target_name].enabled==false,detached_saved=detached.technologies[target_name].saved_progress,lab_active=lab.active,lab_energy=lab.energy,markers=markers,saves=saves,predecessor_calls=predecessor_calls,initial_levels=state.initial_levels,diagnostics=diagnostics}
 end
-function dynamic_successor_flow(path, provider, target_name, recipe_name, science, ids, fixture, preference, opponent)
+function dynamic_successor_flow(path, provider, target_name, recipe_name, science, ids, initial_levels, fixture, preference, opponent)
   local callbacks,markers,saves={events={}},0,0
   local function inventory()local value={items={}};function value.get_item_count(name)return value.items[name]or 0 end;function value.clear()value.items={}end;return value end
   local input=inventory();local lab={valid=true,active=false,energy=0};function lab.get_inventory(index)assert(index==1);return input end
   local function force(name,index)
     local value={name=name,index=index,valid=true,technologies={},recipes={[recipe_name]={productivity_bonus=.1}},research_progress=0,_queue={}}
     setmetatable(value,{__index=function(item,key)if key=="research_queue"then return rawget(item,"_queue")end end,__newindex=function(item,key,row)if key=="research_queue"then rawset(item,"_queue",row or {});local current=row and row[1]or nil;rawset(item,"current_research",current);if current then rawset(item,"research_progress",current.saved_progress or 0);current.saved_progress=0 else rawset(item,"research_progress",0)end else rawset(item,key,row)end end})
-    for _,id in ipairs(ids)do value.technologies[id]={name=id,valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=1}}end
-    value.technologies[target_name].level=2;value.technologies["braking-force-1"]={name="braking-force-1",valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=1}}
+    for _,id in ipairs(ids)do local initial=initial_levels[id]or 1;value.technologies[id]={name=id,valid=true,force=value,level=initial,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=initial}}end
+    value.technologies[target_name].level=value.technologies[target_name].prototype.level+1;value.technologies["braking-force-1"]={name="braking-force-1",valid=true,force=value,level=1,researched=false,enabled=true,visible_when_disabled=false,saved_progress=0,prototype={max_level=4294967295,level=1}}
     return value
   end
   local player,foreign,detached=force("player",1),force("mir5-competing-dynamic-foreign",2),force("mir5-competing-dynamic-detached",3)
@@ -223,8 +235,8 @@ function dynamic_successor_flow(path, provider, target_name, recipe_name, scienc
   if opponent=="lost-current"then target.saved_progress=.26 elseif opponent=="foreign-reenabled"then foreign.technologies[target_name].enabled=true elseif opponent=="detached-disabled"then detached.technologies[target_name].enabled=false elseif opponent=="duplicate-effect"then player.recipes[recipe_name].productivity_bonus=.2 end
   local phase=preference and "source-completed" or "prefer-mir-completed"
   local predecessor=provider=="ce" and "ce-iron-gear-wheel-14" or false
-  local snapshot={level=2,researched=false,enabled=player.technologies[target_name].enabled,visible=player.technologies[target_name].visible_when_disabled,maximum=4294967295,saved_progress=.27,bonus=.1}
-  local state={provider=provider,source_mir="4.7.20002",fixture_version="0.1.0",predecessor=predecessor,prerequisite_seeding="captured-direct-prerequisites",phase=phase,actual_lab_completions=1,milestone="one-native-dynamic-lab",player_start_bonus=0,player_bonus=.1,current_target_progress=.27,foreign_force_index=2,detached_force_index=3,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},player_queue={current=target_name,queue={target_name,"braking-force-1"},progress=.27},player_snapshot=snapshot,lab=lab}
+  local snapshot={level=player.technologies[target_name].prototype.level+1,researched=false,enabled=player.technologies[target_name].enabled,visible=player.technologies[target_name].visible_when_disabled,maximum=4294967295,saved_progress=.27,bonus=.1}
+  local state={provider=provider,source_mir="4.7.20002",fixture_version="0.1.0",predecessor=predecessor,prerequisite_seeding="captured-direct-prerequisites",phase=phase,actual_lab_completions=1,milestone="one-native-dynamic-lab",player_start_bonus=0,player_bonus=.1,current_target_progress=.27,target_initial={technology_level=target.prototype.level,prototype_level=target.prototype.level},foreign_force_index=2,detached_force_index=3,foreign_queue={current="braking-force-1",queue={"braking-force-1"},progress=.42},player_queue={current=target_name,queue={target_name,"braking-force-1"},progress=.27},player_snapshot=snapshot,lab=lab}
   local game={tick=1,forces={player=player,[1]=player,[2]=foreign,[3]=detached,["mir5-competing-dynamic-foreign"]=foreign,["mir5-competing-dynamic-detached"]=detached}}
   function game.server_save(name)assert(name=="mir5-native-complete");saves=saves+1 end
   local active={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-competing-dynamic-gameplay"]=fixture}
@@ -281,6 +293,13 @@ end
         for provider, fact_key in (("ce", "crafting-efficiency"), ("pr", "productivity-research")):
             literal_ids = re.findall(r'"([^\"]+)"', blocks[provider].split("ids = {", 1)[1])
             self.assertEqual(self.provider_ids(fact_key), literal_ids)
+        native_literals = {
+            name: int(level)
+            for name, level in re.findall(r'\["([^\"]+)"\]\s*=\s*(\d+),',
+                                          control.split("local CE_INITIAL_LEVELS = {", 1)[1].split("}\n\nlocal PROVIDERS", 1)[0])
+        }
+        self.assertEqual(self.native_initial_levels["crafting-efficiency"], native_literals)
+        self.assertEqual(19, native_literals[TARGETS["ce"]["target"]])
 
     def test_captured_source_rows_preflight_before_only_count_time_acceleration(self):
         run = self.lua.eval("dynamic_fixture_data")
@@ -339,14 +358,14 @@ end
         for provider, fact_key in (("ce", "crafting-efficiency"), ("pr", "productivity-research")):
             target = TARGETS[provider]
             with self.subTest(provider=provider):
-                result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), "")
+                result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), lua_value(self.lua, self.native_initial_levels[fact_key]), "")
                 self.assertTrue(result["ok"], result["message"])
-                self.assertEqual(("source-completed", 1, 2, .1, 0, target["target"], .27, .42, .27, False, 0, 3, 1),
+                self.assertEqual(("source-completed", 1, target["initial_level"] + 1, .1, 0, target["target"], .27, .42, .27, False, 0, 3, 1),
                                  (result["phase"], result["labs"], result["level"], result["bonus"], result["target_saved"], result["current"], result["current_progress"], result["probe_saved"], result["detached_saved"], result["lab_active"], result["lab_energy"], result["markers"], result["saves"]))
                 self.assertTrue(result["foreign_disabled"])
-                self.assertEqual(16 if provider == "ce" else 2, result["predecessor_calls"])
+                self.assertEqual(18 if provider == "ce" else 4, result["predecessor_calls"])
                 self.assertEqual(
-                    [{"id": name, "technology_level": 1, "prototype_level": 1}
+                    [{"id": name, "technology_level": self.native_initial_levels[fact_key][name], "prototype_level": self.native_initial_levels[fact_key][name]}
                      for name in self.provider_ids(fact_key)],
                     plain(result["initial_levels"]),
                 )
@@ -361,15 +380,16 @@ end
         )
         for provider, target, opponent, phrase in opponents:
             with self.subTest(provider=provider, opponent=opponent):
-                result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids("crafting-efficiency" if provider == "ce" else "productivity-research")), opponent)
+                fact_key = "crafting-efficiency" if provider == "ce" else "productivity-research"
+                result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["predecessor"], lua_value(self.lua, target["prerequisites"]), target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), lua_value(self.lua, self.native_initial_levels[fact_key]), opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(phrase, result["message"])
         result = run(str(FIXTURE / "control.lua"), "ce", ce["target"], ce["predecessor"],
                      lua_value(self.lua, ce["prerequisites"]), ce["recipe"], lua_value(self.lua, ce["science"]),
-                     lua_value(self.lua, self.provider_ids("crafting-efficiency")), "wrong-level")
+                     lua_value(self.lua, self.provider_ids("crafting-efficiency")), lua_value(self.lua, self.native_initial_levels["crafting-efficiency"]), "wrong-level")
         self.assertFalse(result["ok"])
-        self.assertIn("actual_level=3", result["message"])
-        self.assertIn("prototype_level=1", result["message"])
+        self.assertIn("expected_level=20 actual_level=21", result["message"])
+        self.assertIn("prototype_level=19", result["message"])
         self.assertIn("baseline_bonus=0", result["message"])
         self.assertIn("actual_bonus=0.1", result["message"])
         control = (FIXTURE / "control.lua").read_text(encoding="utf-8")
@@ -382,7 +402,7 @@ end
             target = TARGETS[provider]
             for fixture, preference, phase, enabled, visible in (("0.2.0", True, "prefer-mir-completed", False, True), ("0.3.0", False, "prefer-foreign-completed", True, False)):
                 with self.subTest(provider=provider, fixture=fixture):
-                    result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), fixture, preference, "")
+                    result = run(str(FIXTURE / "control.lua"), provider, target["target"], target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids(fact_key)), lua_value(self.lua, self.native_initial_levels[fact_key]), fixture, preference, "")
                     self.assertTrue(result["ok"], result["message"])
                     self.assertEqual((phase, 3, 1, enabled, visible, .27, "braking-force-1", .42, .1, False, True),
                                      (result["phase"], result["markers"], result["saves"], result["target_enabled"], result["target_visible"], result["target_saved"], result["current"], result["current_progress"], result["bonus"], result["foreign_enabled"], result["detached_enabled"]))
@@ -393,7 +413,7 @@ end
             ("detached-disabled", "detached partial target differs"),
             ("duplicate-effect", "target bonus/progress differs"),
         ):
-            result = run(str(FIXTURE / "control.lua"), "ce", target["target"], target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids("crafting-efficiency")), "0.2.0", True, opponent)
+            result = run(str(FIXTURE / "control.lua"), "ce", target["target"], target["recipe"], lua_value(self.lua, target["science"]), lua_value(self.lua, self.provider_ids("crafting-efficiency")), lua_value(self.lua, self.native_initial_levels["crafting-efficiency"]), "0.2.0", True, opponent)
             self.assertFalse(result["ok"])
             self.assertIn(phrase, result["message"])
 

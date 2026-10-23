@@ -1,0 +1,41 @@
+{
+  "disposition": {
+    "not_proven": "No published-to-MIR5 transition, preference, save, or release qualification follows from these failed diagnostic runs.",
+    "production_binding": "CE uses the observed numeric suffix as its named first level; ProductivityResearch remains first level one."
+  },
+  "facts": {
+    "path": "tests/mir5/fixtures/competing-dynamic-f200-sa-native-initial-levels.json",
+    "sha256": "593F3D6DDB0A4B8280845BB493EBF49BAC4BAF0227608FD9A0D258807A565366"
+  },
+  "kind": "MIR5DynamicCompetingF200SANativeInitialLevelsChainV1",
+  "receipt": {
+    "path": "spec/mir5/evidence/competing-dynamic-native-initial-levels-adverse-receipt.json.gz",
+    "sha256": "4D689D4507AB1290AE58C13CAE6F2793146FB0E2057961A2BF635BE1E31D466F",
+    "uncompressed_sha256": "99AA64E6021C355773250055566FE71BB6035DB3B68B86391C8CF91A210F9322"
+  },
+  "runs": [
+    {
+      "artifact_manifest": {
+        "members_verified": 95,
+        "sha256": "10BA18E2E7B836ADBCE90B2FC71ACF4FD1C142FC6660064D3C06AD4AE8D4AE6A"
+      },
+      "id": 40027133277,
+      "provider_key": "crafting-efficiency",
+      "release_qualification": false,
+      "status": "failed"
+    },
+    {
+      "artifact_manifest": {
+        "members_verified": 95,
+        "sha256": "7EB10D6E216314189F6BFA95C5151054738194C4F53109E6DE86AD467E7B2D01"
+      },
+      "id": 40027140695,
+      "provider_key": "productivity-research",
+      "release_qualification": false,
+      "status": "failed"
+    }
+  ],
+  "schema": 1,
+  "scope": "This chain proves the selected native initial levels and records the failures that prevented transition qualification.",
+  "status": "adverse-native-diagnostic-observation"
+}

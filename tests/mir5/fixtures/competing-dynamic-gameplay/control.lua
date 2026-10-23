@@ -13,12 +13,47 @@ local PROBE_PREREQUISITES = {"railway", "chemical-science-pack"}
 local DEADLINE = 60 * 60 * 8
 local loaded_snapshot, reload_logged, pending_save = nil, false, false
 
+-- Exact F200 2.0.77 native starting levels observed before prerequisite work.
+-- The raw capture leaves `level` absent; it is not an authority for these
+-- prototype boundaries.
+local CE_INITIAL_LEVELS = {
+  ["ce-advanced-circuit-16"] = 16,
+  ["ce-advanced-oil-processing-11"] = 11,
+  ["ce-agricultural-science-pack-30"] = 30,
+  ["ce-automation-science-pack-42"] = 42,
+  ["ce-basic-oil-processing-16"] = 16,
+  ["ce-battery-16"] = 16,
+  ["ce-chemical-science-pack-30"] = 30,
+  ["ce-coal-liquefaction-8"] = 8,
+  ["ce-copper-cable-19"] = 19,
+  ["ce-cryogenic-science-pack-15"] = 15,
+  ["ce-electric-engine-unit-11"] = 11,
+  ["ce-electromagnetic-science-pack-30"] = 30,
+  ["ce-electronic-circuit-19"] = 19,
+  ["ce-engine-unit-19"] = 19,
+  ["ce-firearm-magazine-17"] = 17,
+  ["ce-flying-robot-frame-11"] = 11,
+  ["ce-grenade-14"] = 14,
+  ["ce-iron-gear-wheel-19"] = 19,
+  ["ce-iron-stick-19"] = 19,
+  ["ce-logistic-science-pack-36"] = 36,
+  ["ce-lubricant-8"] = 8,
+  ["ce-metallurgic-science-pack-30"] = 30,
+  ["ce-military-science-pack-30"] = 30,
+  ["ce-production-science-pack-24"] = 24,
+  ["ce-promethium-science-pack-15"] = 15,
+  ["ce-space-science-pack-15"] = 15,
+  ["ce-sulfur-16"] = 16,
+  ["ce-utility-science-pack-15"] = 15,
+}
+
 local PROVIDERS = {
   ce = {
     mod = "crafting-efficiency-2", version = "0.2.20", target = "ce-iron-gear-wheel-19",
     predecessor = "ce-iron-gear-wheel-14", recipe = "iron-gear-wheel",
     prerequisites = {"ce-iron-gear-wheel-14", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
     science = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
+    initial_levels = CE_INITIAL_LEVELS,
     ids = {"ce-advanced-circuit-16", "ce-advanced-oil-processing-11", "ce-agricultural-science-pack-30", "ce-automation-science-pack-42", "ce-basic-oil-processing-16", "ce-battery-16", "ce-chemical-science-pack-30", "ce-coal-liquefaction-8", "ce-copper-cable-19", "ce-cryogenic-science-pack-15", "ce-electric-engine-unit-11", "ce-electromagnetic-science-pack-30", "ce-electronic-circuit-19", "ce-engine-unit-19", "ce-firearm-magazine-17", "ce-flying-robot-frame-11", "ce-grenade-14", "ce-iron-gear-wheel-19", "ce-iron-stick-19", "ce-logistic-science-pack-36", "ce-lubricant-8", "ce-metallurgic-science-pack-30", "ce-military-science-pack-30", "ce-production-science-pack-24", "ce-promethium-science-pack-15", "ce-space-science-pack-15", "ce-sulfur-16", "ce-utility-science-pack-15"},
   },
   pr = {
@@ -101,18 +136,33 @@ local function copy_queue(value)
 end
 local function assert_queue(force, expected, label)
   local actual = queue_snapshot(force)
-  if actual.current ~= expected.current or #actual.queue ~= #expected.queue or not close(actual.progress, expected.progress) then
-    fail(label .. " queue/progress differs")
-  end
+  local expected_names = "[" .. table.concat(expected.queue, ",") .. "]"
+  local actual_names = "[" .. table.concat(actual.queue, ",") .. "]"
+  local matches = actual.current == expected.current and #actual.queue == #expected.queue
+    and close(actual.progress, expected.progress)
   for index, name in ipairs(expected.queue) do
-    if actual.queue[index] ~= name then fail(label .. " queue changed at " .. tostring(index)) end
+    if actual.queue[index] ~= name then matches = false end
+  end
+  if not matches then
+    fail(label .. " queue/progress differs: expected_current=" .. tostring(expected.current)
+      .. " actual_current=" .. tostring(actual.current)
+      .. " expected_progress=" .. tostring(expected.progress)
+      .. " actual_progress=" .. tostring(actual.progress)
+      .. " expected_queue=" .. expected_names
+      .. " actual_queue=" .. actual_names)
   end
   return actual
+end
+local function initial_level(config, name)
+  return config.initial_levels and config.initial_levels[name] or 1
 end
 local function assert_all_rows(force, config, enabled, visible, label)
   for _, name in ipairs(config.ids) do
     local value = technology(force, name)
     if value.prototype.max_level ~= UINT32_MAX then fail(label .. " max level differs: " .. name) end
+    if value.prototype.level ~= initial_level(config, name) then
+      fail(label .. " native initial prototype level differs: " .. name)
+    end
     if enabled ~= nil and value.enabled ~= enabled then fail(label .. " enabled differs: " .. name) end
     if visible ~= nil and value.visible_when_disabled ~= visible then fail(label .. " visibility differs: " .. name) end
   end
@@ -122,6 +172,9 @@ local function capture_initial_levels(force, config)
   for index, name in ipairs(config.ids) do
     local value = technology(force, name)
     local row = {id=name, technology_level=value.level, prototype_level=value.prototype.level}
+    if row.technology_level ~= initial_level(config, name) or row.prototype_level ~= initial_level(config, name) then
+      fail("native initial level differs: " .. name)
+    end
     rows[index], by_id[name] = row, row
   end
   return rows, by_id
@@ -186,11 +239,18 @@ local function assert_source_witness(state, config)
       or state.prerequisite_seeding ~= "captured-direct-prerequisites"
       or state.predecessor ~= config.predecessor then fail("source completion witness differs") end
 end
+local function completed_level(state)
+  local initial = state.target_initial
+  if type(initial) ~= "table" or type(initial.technology_level) ~= "number" then
+    fail("native target initial level is absent")
+  end
+  return initial.technology_level + 1
+end
 local function assert_source(state, config)
   if state.phase ~= "source-completed" then fail("source completion phase differs") end
   assert_source_witness(state, config)
   assert_all_rows(game.forces.player, config, true, false, "source player")
-  assert_status(game.forces.player, config, {level=2, researched=false, enabled=true, visible=false,
+  assert_status(game.forces.player, config, {level=completed_level(state), researched=false, enabled=true, visible=false,
     maximum=UINT32_MAX, saved_progress=0, bonus=state.player_bonus}, "source player")
   assert_queue(game.forces.player, state.player_queue, "source player")
   if state.player_queue.current ~= config.target or not close(state.player_queue.progress, 0.27)
@@ -204,7 +264,7 @@ local function assert_preferred(state, config)
   if state.phase ~= "source-completed" and state.phase ~= "prefer-mir-completed" then fail("preferred source witness differs") end
   assert_source_witness(state, config)
   assert_all_rows(game.forces.player, config, false, true, "preferred player")
-  assert_status(game.forces.player, config, {level=2, researched=false, enabled=false, visible=true,
+  assert_status(game.forces.player, config, {level=completed_level(state), researched=false, enabled=false, visible=true,
     maximum=UINT32_MAX, saved_progress=state.current_target_progress, bonus=state.player_bonus}, "preferred player")
   assert_queue(game.forces.player, {current=PROBE, queue={PROBE}, progress=0.42}, "preferred player")
   assert_foreign_and_detached(state, config)
@@ -213,7 +273,7 @@ local function assert_released(state, config)
   if state.phase ~= "prefer-mir-completed" and state.phase ~= "prefer-foreign-completed" then fail("released source witness differs") end
   assert_source_witness(state, config)
   assert_all_rows(game.forces.player, config, true, false, "released player")
-  assert_status(game.forces.player, config, {level=2, researched=false, enabled=true, visible=false,
+  assert_status(game.forces.player, config, {level=completed_level(state), researched=false, enabled=true, visible=false,
     maximum=UINT32_MAX, saved_progress=state.current_target_progress, bonus=state.player_bonus}, "released player")
   assert_queue(game.forces.player, {current=PROBE, queue={PROBE}, progress=0.42}, "released player")
   assert_foreign_and_detached(state, config)
@@ -346,10 +406,11 @@ script.on_event(defines.events.on_tick, function()
   if state.phase == "await-source-freeze" then
     local player = game.forces.player
     local target = status(player, config.target, config.recipe)
-    if target.level ~= 2 or target.researched ~= false or not close(target.bonus, state.player_start_bonus + 0.1) then
+    local expected_level = completed_level(state)
+    if target.level ~= expected_level or target.researched ~= false or not close(target.bonus, state.player_start_bonus + 0.1) then
       local initial = state.target_initial
       fail("native target completion/effect differs: id=" .. config.target
-        .. " expected_level=2 actual_level=" .. tostring(target.level)
+        .. " expected_level=" .. tostring(expected_level) .. " actual_level=" .. tostring(target.level)
         .. " prototype_level=" .. tostring(technology(player, config.target).prototype.level)
         .. " initial_level=" .. tostring(initial and initial.technology_level)
         .. " initial_prototype_level=" .. tostring(initial and initial.prototype_level)
@@ -359,6 +420,7 @@ script.on_event(defines.events.on_tick, function()
     end
     freeze(state)
     local target_technology, probe = technology(player, config.target), technology(player, PROBE)
+    verify_and_seed_prerequisites(probe, PROBE_PREREQUISITES, "captured player braking probe")
     if probe.researched then fail("unrelated probe was researched by captured predecessor seeding") end
     target_technology.saved_progress, probe.saved_progress = 0.27, 0.42
     player.research_queue = {target_technology, probe}

@@ -23,7 +23,7 @@ local function replacement(id, recipes)
   return {id = id, first_level = 1, effects = effects(recipes)}
 end
 
-local function binding(id, first_level, predecessor, recipes, replacements, initial_retirement, retire_if_unearned)
+local function binding(id, first_level, predecessor, recipes, replacements, initial_retirement)
   return {
     id = id,
     first_level = first_level,
@@ -31,9 +31,6 @@ local function binding(id, first_level, predecessor, recipes, replacements, init
     effects = effects(recipes),
     replacements = replacements,
     initial_retirement = initial_retirement == true,
-    -- Some captured infinite tails begin at native level one but have an
-    -- explicit earlier predecessor. They can retire only before any work.
-    retire_if_unearned = retire_if_unearned == true,
   }
 end
 
@@ -105,34 +102,34 @@ local EPR_BINDINGS = {
 -- Exact F200 Space Age rows from the independent dynamic-provider capture.
 -- These remain flat literals: no runtime identifier or recipe discovery occurs.
 local CRAFTING_EFFICIENCY_BINDINGS = {
-  binding("ce-advanced-circuit-16", 1, "ce-advanced-circuit-11", {"advanced-circuit"}, {replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"})}, false, true),
-  binding("ce-advanced-oil-processing-11", 1, "ce-advanced-oil-processing-7", {"advanced-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"advanced-oil-processing"})}, false, true),
-  binding("ce-agricultural-science-pack-30", 1, "ce-agricultural-science-pack-16", {"agricultural-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"agricultural-science-pack"})}, false, true),
-  binding("ce-automation-science-pack-42", 1, "ce-automation-science-pack-28", {"automation-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"automation-science-pack"})}, false, true),
-  binding("ce-basic-oil-processing-16", 1, "ce-basic-oil-processing-11", {"basic-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"basic-oil-processing"})}, false, true),
-  binding("ce-battery-16", 1, "ce-battery-11", {"battery"}, {replacement("recipe-prod-research_batteries-1", {"battery"})}, false, true),
-  binding("ce-chemical-science-pack-30", 1, "ce-chemical-science-pack-16", {"chemical-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"chemical-science-pack"})}, false, true),
-  binding("ce-coal-liquefaction-8", 1, "ce-coal-liquefaction-4", {"coal-liquefaction"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"coal-liquefaction"})}, false, true),
-  binding("ce-copper-cable-19", 1, "ce-copper-cable-14", {"copper-cable", "casting-copper-cable"}, {replacement("recipe-prod-research_copper_cable-1", {"copper-cable", "casting-copper-cable"})}, false, true),
-  binding("ce-cryogenic-science-pack-15", 1, "ce-cryogenic-science-pack-1", {"cryogenic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"cryogenic-science-pack"})}, false, true),
-  binding("ce-electric-engine-unit-11", 1, "ce-electric-engine-unit-7", {"electric-engine-unit"}, {replacement("recipe-prod-research_electric_engine-1", {"electric-engine-unit"})}, false, true),
-  binding("ce-electromagnetic-science-pack-30", 1, "ce-electromagnetic-science-pack-16", {"electromagnetic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"electromagnetic-science-pack"})}, false, true),
-  binding("ce-electronic-circuit-19", 1, "ce-electronic-circuit-14", {"electronic-circuit"}, {replacement("recipe-prod-research_electronic_circuit-1", {"electronic-circuit"})}, false, true),
-  binding("ce-engine-unit-19", 1, "ce-engine-unit-14", {"engine-unit"}, {replacement("recipe-prod-research_engine-1", {"engine-unit"})}, false, true),
-  binding("ce-firearm-magazine-17", 1, "ce-firearm-magazine-13", {"firearm-magazine"}, {replacement("recipe-prod-research_bullets-1", {"firearm-magazine"})}, false, true),
-  binding("ce-flying-robot-frame-11", 1, "ce-flying-robot-frame-7", {"flying-robot-frame"}, {replacement("recipe-prod-research_flying_robot_frame-1", {"flying-robot-frame"})}, false, true),
-  binding("ce-grenade-14", 1, "ce-grenade-10", {"grenade"}, {replacement("recipe-prod-research_grenades-1", {"grenade"})}, false, true),
-  binding("ce-iron-gear-wheel-19", 1, "ce-iron-gear-wheel-14", {"iron-gear-wheel", "casting-iron-gear-wheel"}, {replacement("recipe-prod-research_gears-1", {"iron-gear-wheel", "casting-iron-gear-wheel"})}, false, true),
-  binding("ce-iron-stick-19", 1, "ce-iron-stick-14", {"iron-stick", "casting-iron-stick"}, {replacement("recipe-prod-research_iron_sticks-1", {"iron-stick", "casting-iron-stick"})}, false, true),
-  binding("ce-logistic-science-pack-36", 1, "ce-logistic-science-pack-22", {"logistic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"logistic-science-pack"})}, false, true),
-  binding("ce-lubricant-8", 1, "ce-lubricant-4", {"lubricant"}, {replacement("recipe-prod-research_lubricant_productivity-1", {"lubricant"})}, false, true),
-  binding("ce-metallurgic-science-pack-30", 1, "ce-metallurgic-science-pack-16", {"metallurgic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"metallurgic-science-pack"})}, false, true),
-  binding("ce-military-science-pack-30", 1, "ce-military-science-pack-16", {"military-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"military-science-pack"})}, false, true),
-  binding("ce-production-science-pack-24", 1, "ce-production-science-pack-10", {"production-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"production-science-pack"})}, false, true),
-  binding("ce-promethium-science-pack-15", 1, "ce-promethium-science-pack-1", {"promethium-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"promethium-science-pack"})}, false, true),
-  binding("ce-space-science-pack-15", 1, "ce-space-science-pack-1", {"space-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"space-science-pack"})}, false, true),
-  binding("ce-sulfur-16", 1, "ce-sulfur-11", {"sulfur", "biosulfur"}, {replacement("recipe-prod-research_sulfur-1", {"sulfur", "biosulfur"})}, false, true),
-  binding("ce-utility-science-pack-15", 1, "ce-utility-science-pack-1", {"utility-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}, false, true),
+  binding("ce-advanced-circuit-16", 16, "ce-advanced-circuit-11", {"advanced-circuit"}, {replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"})}, true),
+  binding("ce-advanced-oil-processing-11", 11, "ce-advanced-oil-processing-7", {"advanced-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"advanced-oil-processing"})}, true),
+  binding("ce-agricultural-science-pack-30", 30, "ce-agricultural-science-pack-16", {"agricultural-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"agricultural-science-pack"})}, true),
+  binding("ce-automation-science-pack-42", 42, "ce-automation-science-pack-28", {"automation-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"automation-science-pack"})}, true),
+  binding("ce-basic-oil-processing-16", 16, "ce-basic-oil-processing-11", {"basic-oil-processing"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"basic-oil-processing"})}, true),
+  binding("ce-battery-16", 16, "ce-battery-11", {"battery"}, {replacement("recipe-prod-research_batteries-1", {"battery"})}, true),
+  binding("ce-chemical-science-pack-30", 30, "ce-chemical-science-pack-16", {"chemical-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"chemical-science-pack"})}, true),
+  binding("ce-coal-liquefaction-8", 8, "ce-coal-liquefaction-4", {"coal-liquefaction"}, {replacement("recipe-prod-research_oil_processing_productivity-1", {"coal-liquefaction"})}, true),
+  binding("ce-copper-cable-19", 19, "ce-copper-cable-14", {"copper-cable", "casting-copper-cable"}, {replacement("recipe-prod-research_copper_cable-1", {"copper-cable", "casting-copper-cable"})}, true),
+  binding("ce-cryogenic-science-pack-15", 15, "ce-cryogenic-science-pack-1", {"cryogenic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"cryogenic-science-pack"})}, true),
+  binding("ce-electric-engine-unit-11", 11, "ce-electric-engine-unit-7", {"electric-engine-unit"}, {replacement("recipe-prod-research_electric_engine-1", {"electric-engine-unit"})}, true),
+  binding("ce-electromagnetic-science-pack-30", 30, "ce-electromagnetic-science-pack-16", {"electromagnetic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"electromagnetic-science-pack"})}, true),
+  binding("ce-electronic-circuit-19", 19, "ce-electronic-circuit-14", {"electronic-circuit"}, {replacement("recipe-prod-research_electronic_circuit-1", {"electronic-circuit"})}, true),
+  binding("ce-engine-unit-19", 19, "ce-engine-unit-14", {"engine-unit"}, {replacement("recipe-prod-research_engine-1", {"engine-unit"})}, true),
+  binding("ce-firearm-magazine-17", 17, "ce-firearm-magazine-13", {"firearm-magazine"}, {replacement("recipe-prod-research_bullets-1", {"firearm-magazine"})}, true),
+  binding("ce-flying-robot-frame-11", 11, "ce-flying-robot-frame-7", {"flying-robot-frame"}, {replacement("recipe-prod-research_flying_robot_frame-1", {"flying-robot-frame"})}, true),
+  binding("ce-grenade-14", 14, "ce-grenade-10", {"grenade"}, {replacement("recipe-prod-research_grenades-1", {"grenade"})}, true),
+  binding("ce-iron-gear-wheel-19", 19, "ce-iron-gear-wheel-14", {"iron-gear-wheel", "casting-iron-gear-wheel"}, {replacement("recipe-prod-research_gears-1", {"iron-gear-wheel", "casting-iron-gear-wheel"})}, true),
+  binding("ce-iron-stick-19", 19, "ce-iron-stick-14", {"iron-stick", "casting-iron-stick"}, {replacement("recipe-prod-research_iron_sticks-1", {"iron-stick", "casting-iron-stick"})}, true),
+  binding("ce-logistic-science-pack-36", 36, "ce-logistic-science-pack-22", {"logistic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"logistic-science-pack"})}, true),
+  binding("ce-lubricant-8", 8, "ce-lubricant-4", {"lubricant"}, {replacement("recipe-prod-research_lubricant_productivity-1", {"lubricant"})}, true),
+  binding("ce-metallurgic-science-pack-30", 30, "ce-metallurgic-science-pack-16", {"metallurgic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"metallurgic-science-pack"})}, true),
+  binding("ce-military-science-pack-30", 30, "ce-military-science-pack-16", {"military-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"military-science-pack"})}, true),
+  binding("ce-production-science-pack-24", 24, "ce-production-science-pack-10", {"production-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"production-science-pack"})}, true),
+  binding("ce-promethium-science-pack-15", 15, "ce-promethium-science-pack-1", {"promethium-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"promethium-science-pack"})}, true),
+  binding("ce-space-science-pack-15", 15, "ce-space-science-pack-1", {"space-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"space-science-pack"})}, true),
+  binding("ce-sulfur-16", 16, "ce-sulfur-11", {"sulfur", "biosulfur"}, {replacement("recipe-prod-research_sulfur-1", {"sulfur", "biosulfur"})}, true),
+  binding("ce-utility-science-pack-15", 15, "ce-utility-science-pack-1", {"utility-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}, true),
 }
 
 local PRODUCTIVITY_RESEARCH_BINDINGS = {
