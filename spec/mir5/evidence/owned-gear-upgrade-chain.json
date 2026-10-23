@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "kind": "authored-private-scenario-custody-index-not-runner-receipt",
+  "scope": "Published F210 gear cap ownership acquired through laboratories, then relaxed in MIR5",
+  "release_qualification": false,
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "published": {
+    "player_archive": {
+      "sha256": "708A529F1F6D649E0A732216CD8D8FEFE68F2C6C2DF2B40DA030C2C4C51558D1",
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_4.7.21000.zip"
+    },
+    "fixture_record": {
+      "path": "build/mir5/owned-gear-upgrade-r01/packages/published-seed.json",
+      "sha256": "FBCCD8B3D806345F3D3CC4B84724580A21A30791E622E5B6DE8872C3276E3A27"
+    },
+    "profile": {
+      "sha256": "AC9BCE7056E653A00D4938968DD5DCD428390AC12A6E5BA5372816A6209C426F",
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\owned-gear-upgrade-f210.json"
+    },
+    "receipt": {
+      "path": "spec/mir5/evidence/owned-gear-upgrade-published-native.json",
+      "sha256": "ECC3372709DAFC890AE139FB2C1DCA28B100E26CDC4C1C6EA877721EA1DE906E"
+    },
+    "runner_source_head": "0a46fdc204fff78262a14b76053419cb0641ac02",
+    "runner_source_dirty": true,
+    "observed": {
+      "source_mir_version": "4.7.21000",
+      "fixture_version": "0.1.0",
+      "lab_completed_levels": 2,
+      "no_gear_researched_setter": true,
+      "original_player_enabled": true,
+      "original_player_visible_when_disabled": false,
+      "post_cap_player_enabled": false,
+      "post_cap_player_visible_when_disabled": true,
+      "next_level": 3,
+      "productivity_bonus": 0.2,
+      "science_units_consumed": {
+        "automation-science-pack": 2,
+        "logistic-science-pack": 2,
+        "chemical-science-pack": 2,
+        "production-science-pack": 2
+      },
+      "lab_energy_seen": true,
+      "foreign_enabled": false,
+      "foreign_visible_when_disabled": false,
+      "on_load_read_only": false,
+      "qualification": "native-runner-readback-required"
+    },
+    "completed_save_sha256": "D75557DF4226537E20B5C68C30A180AFAEDAEC233FC1775924D42C98EF066537",
+    "two_cold_reloads_and_byte_identical_save": true
+  },
+  "candidate": {
+    "player_record": {
+      "path": "build/mir5/profile-bindings-r01/packages/player.json",
+      "sha256": "69AD4767BD25EDF20BE497B7676E2AFB89A1E56F0512F7E94DC5036D106E1911"
+    },
+    "player_archive": {
+      "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+      "sha256": "66475E0E19F7B137BA46F44F7B73F4C01C9920B73CA50A8B6EBFEAB1DF9B939A"
+    },
+    "player_source_commit": "0a46fdc204fff78262a14b76053419cb0641ac02",
+    "fixture_record": {
+      "path": "build/mir5/owned-gear-upgrade-r01/packages/relaxed.json",
+      "sha256": "EAC0680D77F262003B66421F4FEB89AF72B7BC1B528D1F7FD92294BBD0F2013A"
+    },
+    "profile": {
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\owned-gear-upgrade-relaxed-f210.json",
+      "sha256": "0C80450B2B0E4DF2BE419952C9D78635867BFBC9905C30D046FBCD71CAFB4E78"
+    },
+    "receipt": {
+      "path": "spec/mir5/evidence/owned-gear-upgrade-relaxed-native.json",
+      "sha256": "8AC0E31CB0BA70AD36369A3449E688A59F3B2EC25EA28824DDA6C930350BB537"
+    },
+    "runner_source_head": "a4af3f1b41091f4cecacb976a9f98ee1a1e0768b",
+    "runner_source_dirty": false,
+    "observed": {
+      "source_mir_version": "4.7.21000",
+      "fixture_successor_version": "0.2.0",
+      "source_original_player_enabled": true,
+      "source_original_player_visible_when_disabled": false,
+      "source_post_cap_player_enabled": false,
+      "source_post_cap_player_visible_when_disabled": true,
+      "raw_maximum_setting": 0,
+      "blank_profile_import": true,
+      "next_level": 3,
+      "productivity_bonus": 0.2,
+      "player_enabled": true,
+      "player_visible_when_disabled": false,
+      "foreign_enabled": false,
+      "foreign_visible_when_disabled": false,
+      "public_api_read_only": true,
+      "scope": "published-gear-cap-ownership-only",
+      "on_load_read_only": false,
+      "qualification": "native-runner-readback-required"
+    },
+    "input_save": {
+      "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-owned-gear-upgrade-published-native-r01\\write-data\\saves\\mir5-native-complete.zip",
+      "sha256": "D75557DF4226537E20B5C68C30A180AFAEDAEC233FC1775924D42C98EF066537"
+    },
+    "input_save_byte_identical": true,
+    "completed_save_sha256": "746B8A9AE65CE3639A0D931DEC18FA036C9E734684506BF11DAF4DC786384C46",
+    "two_cold_reloads_and_byte_identical_save": true
+  },
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "limitations": [
+    "Disposable partial-catalogue upgrade only, not a production-save or complete-product qualification.",
+    "The seed explicitly establishes original presentation values; published MIR4 acquires the cap rights after two actual lab completions.",
+    "The fixture changes its own cap prototype range to clamp the saved two to zero; production setting constraints are unchanged.",
+    "No worker-tail, overhaul progression, multiplayer or performance claim.",
+    "The earlier setter-based seed and its failed relaxed oracle remain separate evidence; no receipt was relabelled."
+  ]
+}

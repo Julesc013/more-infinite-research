@@ -60,6 +60,8 @@ class LibraryTests(unittest.TestCase):
             end
             return {
               normalize = function(view)
+                local mode = type(view.mode) == "number" and view.mode or 1
+                if mode < 1 or mode > 3 or mode ~= math.floor(mode) then mode = 1 end
                 local status = type(view.status) == "number" and view.status or 1
                 if status < 1 or status > 4 or status ~= math.floor(status) then status = 1 end
                 local page = type(view.page) == "number" and view.page or 1
@@ -79,6 +81,7 @@ class LibraryTests(unittest.TestCase):
                 return {
                   query = type(view.search) == "string" and view.search or (type(view.query) == "string" and view.query or ""),
                   family = view.family == "mir" and "mir" or "all",
+                  mode = mode,
                   status = status,
                   page = page,
                   sort = sort,
@@ -593,6 +596,58 @@ class LibraryTests(unittest.TestCase):
           assert(player.gui.screen["mir_research_browser"]["mir_library_content"]["mir_library_detail"] ~= nil)
         ''')
 
+    def test_level_modes_filter_real_native_rows_and_preserve_owned_personal_state(self):
+        self.lua.execute('''
+          package.preload["research.catalogue"], package.preload["presentation.library_model"] = nil, nil
+          package.loaded["research.catalogue"], package.loaded["presentation.library_model"] = nil, nil
+          boot()
+          local native_queue, native_current = player.force.research_queue, player.force.current_research
+          library.open(player, {family = "all", mode = 2, page = 7})
+          local view = storage.mir_library.players[1]
+          local root = player.gui.screen["mir_research_browser"]
+          local filters, content = root["mir_library_filters"], root["mir_library_content"]
+          local query, mode = filters["mir_library_query"], filters["mir_library_mode"]
+          assert(view.mode == 2 and view.page == 7 and mode.selected_index == 2)
+          assert(#content["mir_library_results"].items == 1
+            and content["mir_library_results"].items[1] == foreign.name)
+
+          mode.selected_index = 3
+          library.on_gui_selection_state_changed({player_index = 1, element = mode})
+          view = storage.mir_library.players[1]
+          assert(view.mode == 3 and view.page == 1 and view.scroll == 1)
+          assert(filters["mir_library_query"] == query and filters["mir_library_mode"] == mode)
+          assert(#content["mir_library_results"].items == 1
+            and content["mir_library_results"].items[1] == gear.name)
+
+          library.open(player, {page = 7})
+          for _, invalid in ipairs({0, 4, 1.5, "2", 0/0}) do
+            library.open(player, {mode = invalid})
+            view = storage.mir_library.players[1]
+            assert(view.mode == 3 and view.page == 7, "invalid mode reset accepted state")
+          end
+          local foreign_root = player.gui.screen.add{type = "frame", name = "foreign-frame"}
+          local foreign_filters = foreign_root.add{type = "flow", name = "mir_library_filters"}
+          local spoof = foreign_filters.add{type = "drop-down", name = "mir_library_mode", selected_index = 1}
+          library.on_gui_selection_state_changed({player_index = 1, element = spoof})
+          view = storage.mir_library.players[1]
+          assert(view.mode == 3 and view.page == 7, "foreign GUI changed the personal mode")
+          mode.selected_index = 4
+          library.on_gui_selection_state_changed({player_index = 1, element = mode})
+          view = storage.mir_library.players[1]
+          assert(view.mode == 3 and view.page == 7)
+
+          library.close(player); library.on_load(); library.open(player)
+          root = player.gui.screen["mir_research_browser"]
+          assert(root["mir_library_filters"]["mir_library_mode"].selected_index == 3
+            and storage.mir_library.players[1].mode == 3)
+          -- Published modes classify an effective capped infinity as finite.
+          library.set_cap_provider(function() return {[gear.name] = 2} end)
+          library.open(player, {mode = 2})
+          assert(#root["mir_library_content"]["mir_library_results"].items == 2)
+          assert(player.force.research_queue == native_queue and player.force.current_research == native_current
+            and player.force.research_progress == .5 and gear.level == 3 and gear.enabled == false)
+        ''')
+
     def test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state(self):
         self.lua.execute('''
           package.preload["research.catalogue"] = nil
@@ -611,6 +666,16 @@ class LibraryTests(unittest.TestCase):
           assert(root["mir_library_filters"]["mir_library_sort"].selected_index == 4)
           local rows = root["mir_library_content"]["mir_library_results"]
           assert(#rows.items == 2 and rows.items[1] == gear.name and rows.items[2] == foreign.name)
+
+          -- The historical page value survives reopening, but it was never a
+          -- player-list paginator: the continuous list retains both rows.
+          library.close(player)
+          library.open(player)
+          view = storage.mir_library.players[1]
+          root = player.gui.screen["mir_research_browser"]
+          rows = root["mir_library_content"]["mir_library_results"]
+          assert(view.page == 7 and #rows.items == 2
+            and rows.items[1] == gear.name and rows.items[2] == foreign.name)
 
           -- The valid dense remote list changes actual rendering and an
           -- explicit valid page wins over the normal filter page reset.
@@ -677,7 +742,7 @@ class LibraryTests(unittest.TestCase):
 
           local state = storage.mir_library
           local view = state.players[1]
-          assert(view.query == "historical gear" and view.family == "all" and view.status == 2)
+          assert(view.query == "historical gear" and view.family == "all" and view.status == 2 and view.mode == 3)
           assert(view.selected == gear.name and view.scroll == 6 and view.page == 7)
           assert(view.sort == "name-asc" and view.stable_sort == "native"
             and view.hidden["foreign-research"])

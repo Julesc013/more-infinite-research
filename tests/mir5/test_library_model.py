@@ -76,6 +76,26 @@ class LibraryModelTests(unittest.TestCase):
           assert(model.normalize({page = 30001}).page == 1)
         ''')
 
+    def test_retained_page_never_slices_or_reorders_the_continuous_library_rows(self):
+        self.lua.execute('''
+          local technologies = {}
+          for index = 1, 25 do
+            local id = string.format("page-continuity-%02d", index)
+            technologies[id] = technology(id, {order = string.format("p[%02d]", index)})
+          end
+          local force = {technologies = technologies, research_queue = {}}
+          local function ids(page)
+            local rows = model.rows(force, {}, {family = "all", sort = "native", page = page}, {})
+            local result = {}
+            for index, row in ipairs(rows) do result[index] = row.id end
+            return table.concat(result, ",")
+          end
+          local first = ids(1)
+          assert(#model.rows(force, {}, {family = "all", sort = "native", page = 1}, {}) == 25)
+          assert(ids(2) == first and ids(30000) == first)
+          assert(first == "page-continuity-01,page-continuity-02,page-continuity-03,page-continuity-04,page-continuity-05,page-continuity-06,page-continuity-07,page-continuity-08,page-continuity-09,page-continuity-10,page-continuity-11,page-continuity-12,page-continuity-13,page-continuity-14,page-continuity-15,page-continuity-16,page-continuity-17,page-continuity-18,page-continuity-19,page-continuity-20,page-continuity-21,page-continuity-22,page-continuity-23,page-continuity-24,page-continuity-25")
+        ''')
+
     def test_hidden_input_budget_counts_visited_entries_including_rejected_values(self):
         self.lua.execute('''
           local visits = 0

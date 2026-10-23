@@ -7,6 +7,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 CAPTURE = json.loads((ROOT / "spec/mir5/inventory/vanilla-f210-470.json").read_text(encoding="utf-8"))
+VARIANTS = json.loads((ROOT / "spec/mir5/inventory/native-worker-owners-f210.json").read_text(encoding="utf-8"))
 
 
 class NativeOwnersTests(unittest.TestCase):
@@ -90,6 +91,30 @@ class NativeOwnersTests(unittest.TestCase):
           assert(owners.runtime_worker_robot_speed_owner(function(name)
             return name == current.name and current or nil
           end) == nil)
+        ''')
+
+    def test_k2so_binding_preserves_its_captured_effect_without_widening_default_admission(self):
+        self.assertEqual(VARIANTS["variants"]["space-age"]["worker-robots-speed-7"]["effects"],
+                         [{"type": "worker-robot-speed", "modifier": .65}])
+        self.assertEqual(VARIANTS["variants"]["k2so"]["worker-robots-speed-7"]["effects"],
+                         [{"type": "worker-robot-speed", "modifier": .6}])
+        self.lua.execute('''
+          local name = "worker-robots-speed-7"
+          local binding = require("compatibility.k2so_worker_speed")
+          local effects = {{type = "worker-robot-speed", modifier = .6}}
+          local data = data_technology(name, "worker-robots-speed-6", {effects = effects})
+          local runtime = runtime_technology(name, "worker-robots-speed-6", {effects = effects})
+          local function only(value) return function(key) return key == name and value or nil end end
+          assert(owners.data_worker_robot_speed_owner(only(data)) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(only(runtime)) == nil)
+          assert(owners.data_worker_robot_speed_owner(only(data), binding) == name)
+          assert(owners.runtime_worker_robot_speed_owner(only(runtime), binding) == name)
+          effects[1].modifier = .65
+          assert(owners.data_worker_robot_speed_owner(only(data), binding) == nil)
+          assert(owners.runtime_worker_robot_speed_owner(only(runtime), binding) == nil)
+          effects[1].modifier = .6; effects[2] = {type = "laboratory-speed", modifier = .1}
+          assert(owners.runtime_worker_robot_speed_owner(only(runtime), binding) == nil)
+          assert(effects[1].modifier == .6, "selector changed the native effect")
         ''')
 
     def test_extra_effect_is_not_an_owner(self):

@@ -65,7 +65,7 @@ class LifecycleTests(unittest.TestCase):
             }
           end
 
-          function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap)
+          function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
             decoded_profiles = 0
@@ -84,6 +84,7 @@ class LifecycleTests(unittest.TestCase):
             handlers = retained_handlers or {events = {}}
             handlers.events = handlers.events or {}
             script = {
+              active_mods = active_mods or {},
               on_init = function(handler) handlers.init = handler end,
               on_configuration_changed = function(handler) handlers.configuration = handler end,
               on_load = function(handler) handlers.load = handler end,
@@ -314,6 +315,51 @@ class LifecycleTests(unittest.TestCase):
           handlers.init()
           assert(malformed.enabled and not malformed.visible_when_disabled and storage.mir_caps == nil,
             "malformed native tail was managed")
+        ''')
+
+    def test_k2_worker_variant_is_lazy_owned_and_does_not_inherit_another_effects_rights(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-7"
+          local k2 = {Krastorio2 = "2.1.4", ['Krastorio2-spaced-out'] = "2.0.19",
+            Krastorio2Assets = "2.1.0", ['k2so-assets'] = "1.0.7", ['space-age'] = "2.1.23"}
+          local native = technology(name, 9, true)
+          native.prototype = {max_level = 4294967295,
+            effects = {{type = "worker-robot-speed", modifier = .6}}}
+          native.prerequisites = {['worker-robots-speed-6'] = {name = "worker-robots-speed-6"}}
+          local f = force(20, {[name] = native}, {}, nil, nil)
+          native.force = f
+          package.preload['compatibility.k2so_worker_speed'] = function() error("inactive adapter loaded") end
+          boot({[20] = f}, 0, "", nil, nil, 8)
+          assert(require('runtime.lifecycle').cap_limits(f)[name] == nil)
+          assert(package.loaded['compatibility.k2so_worker_speed'] == nil)
+          package.preload['compatibility.k2so_worker_speed'] = nil
+
+          boot({[20] = f}, 0, "", nil, nil, 8, k2)
+          assert(require('runtime.lifecycle').cap_limits(f)[name] == 8)
+          handlers.init()
+          assert(not native.enabled and native.visible_when_disabled)
+          assert(storage.mir_caps.owned_disabled[20][name].worker_effect_modifier == .6)
+          local saved = storage
+          boot({[20] = f}, 0, "", saved, nil, 0, k2)
+          handlers.configuration()
+          assert(native.enabled and not native.visible_when_disabled and storage.mir_caps == nil)
+
+          -- An untagged earlier private row only ever represented 0.65.
+          native.enabled, native.visible_when_disabled = false, true
+          saved = {mir_caps = {schema = 1, owned_disabled = {[20] = {[name] = {
+            disabled = true, visible_when_disabled = false}}}}}
+          boot({[20] = f}, 0, "", saved, nil, 0, k2)
+          handlers.configuration()
+          assert(not native.enabled and native.visible_when_disabled and storage.mir_caps == nil)
+
+          -- A known 0.6 right cannot survive replacement by the 0.65 owner.
+          saved = {mir_caps = {schema = 1, owned_disabled = {[20] = {[name] = {
+            disabled = true, visible_when_disabled = false, worker_effect_modifier = .6}}}}}
+          native.prototype.effects[1].modifier = .65
+          boot({[20] = f}, 0, "", saved, nil, 0)
+          handlers.configuration()
+          assert(not native.enabled and native.visible_when_disabled and native.level == 9)
+          assert(native.prototype.effects[1].modifier == .65 and storage.mir_caps == nil)
         ''')
 
     def test_worker_tail_binding_change_discards_stale_enablement_right(self):
