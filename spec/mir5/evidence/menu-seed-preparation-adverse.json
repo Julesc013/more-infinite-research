@@ -1,0 +1,12 @@
+{
+  "kind": "MIR5UntimedFreshMenuSeedPreparationV1",
+  "native": null,
+  "error": "[mir441-resource-admission-commit]",
+  "seed": null,
+  "seed_validation_error": "",
+  "claims": {
+    "performance": false,
+    "release": false
+  },
+  "controls_restored": true
+}
