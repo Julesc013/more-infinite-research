@@ -329,6 +329,73 @@ class ProductTargetExtensionTests(unittest.TestCase):
           end
         ''')
 
+    def test_exact_recipe_and_breeding_batch_keeps_published_or_semantics_and_weights(self):
+        self.lua.execute(r'''
+          local cases={
+            {'research_oil_processing_productivity','advanced-oil-processing',1,'oil',true},
+            {'research_oil_cracking_productivity','heavy-oil-cracking',1,'light-oil'},
+            {'research_sulfuric_acid_productivity','acid-neutralisation',1,'stone'},
+            {'research_sulfuric_acid_productivity','acid-neutralization',1,'stone'},
+            {'research_carbon','carbonic-asteroid-crushing',1,'unrelated-output'},
+            {'research_carbon','burnt-spoilage',.5,'carbon'},
+            {'research_carbon','coal-synthesis',.2,'coal'},
+            {'research_ice','oxide-asteroid-crushing',1,'unrelated-output'},
+            {'research_bacteria_cultivation','iron-bacteria-cultivation',1,'bacteria',true},
+            {'research_nutrients','nutrients-from-bioflux',1,'nutrients'},
+            {'research_capture_robot_rockets','capture-robot-rocket',1,'rocket'},
+            {'research_molten_metals','molten-iron-from-lava',1,'molten-iron'},
+            {'research_molten_metals','iron-ore-melting',.5,'molten-iron'},
+            {'research_lithium','lithium',.5,'lithium'},
+            {'research_breeding','custom-culture',1,'custom-egg',true},
+          }
+          for _,case in ipairs(cases) do
+            local family,name,weight,output,shared=table.unpack(case)
+            local row=generated(family, {productivity('known',.33)})
+            local raw=raw_with_recipes({[name]=recipe(shared and {{output,1}} or {},
+              {product('item',output,{amount=2})})})
+            if family == 'research_carbon' or family == 'research_ice' then raw.technology={} end
+            local result=extension.extend({row}, {streams={[family]={effect_percent=20}}}, {
+              raw=raw,mods={['space-age']='2.1.23'}})
+            assert(result.extended_effects == 1 and #row.effects == 2, family .. ':' .. name)
+            assert(row.effects[2].recipe == name and math.abs(row.effects[2].change-.2*weight)<1e-12)
+          end
+          -- Product alternatives are deliberately ORed with recipe names in
+          -- the published selector, including recipes without those names.
+          local row=generated('research_breeding', {productivity('known',.33)})
+          local result=extension.extend({row}, {streams={research_breeding={effect_percent=10}}}, {
+            raw=raw_with_recipes({fish=recipe({}, {product('item','raw-fish')}),
+              ['fish-incineration']=recipe({}, {product('item','raw-fish')}),
+              ['iron-bacteria-cultivation']=recipe({}, {product('item','biter-egg')})}),mods={}})
+          assert(result.extended_effects == 1 and row.effects[2].recipe == 'fish')
+        ''')
+
+    def test_native_asteroid_and_scrap_owners_prevent_only_new_duplicate_targets(self):
+        self.lua.execute(r'''
+          local carbon=generated('research_carbon',{productivity('known',.33)})
+          local ice=generated('research_ice',{productivity('earned-mir-target',.44)})
+          local raw=raw_with_recipes({
+            ['carbonic-asteroid-crushing']=recipe({}, {product('item','carbon')}),
+            ['oxide-asteroid-crushing']=recipe({}, {product('item','ice')}),
+            ['scrap-recycling']=recipe({}, {product('item','ice')}),
+            ['earned-mir-target']=recipe({}, {product('item','ice')}),
+            custom=recipe({}, {product('item','ice')})})
+          local native={
+            ['asteroid-productivity']={effects={productivity('carbonic-asteroid-crushing',.1),
+              productivity('oxide-asteroid-crushing',.1)}},
+            ['scrap-recycling-productivity']={effects={productivity('scrap-recycling',.1),
+              productivity('earned-mir-target',.1)}}}
+          local reads=0
+          raw.technology=setmetatable({}, {__index=function(_,name)
+            reads=reads+1; assert(native[name]); return native[name] end,
+            __pairs=function() error('must not inspect unfamiliar foreign research') end})
+          local before=frozen_copy(native)
+          local result=extension.extend({carbon,ice}, {streams={research_carbon={effect_percent=10},
+            research_ice={effect_percent=10}}}, {raw=raw,mods={['space-age']='2.1.23'}})
+          assert(result.extended_effects==1 and result.work.owners==2 and reads==2)
+          assert(#carbon.effects==1 and #ice.effects==2 and ice.effects[1].change==.44)
+          assert(ice.effects[2].recipe=='custom' and frozen_copy(native)==before)
+        ''')
+
     def test_inactive_space_age_and_literal_families_do_not_read_pattern_classes(self):
         self.lua.execute(r'''
           local source=raw_with_recipes({gear=recipe({}, {product('item','iron-gear-wheel')})})

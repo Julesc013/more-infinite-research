@@ -266,6 +266,78 @@ class ProductTargetTests(unittest.TestCase):
           assert(run(false) == run(true))
         ''')
 
+    def test_exact_recipe_alternatives_are_a_union_with_products_and_keep_yield_gates(self):
+        self.lua.execute(r'''
+          local rules={binding('acid',1,{{type='fluid',name='acid'}}, {
+            recipes={'neutralisation','neutralization'}, exclude_recipe_patterns={'^empty%-barrel$'}})}
+          local before=frozen_copy(rules)
+          local context=targets.prepare(rules)
+          local result=targets.collect({
+            ordinary=recipe({}, {product('fluid','acid')}),
+            neutralisation=recipe({}, {product('item','stone')}),
+            neutralization=recipe({}, {product('item','stone',{ignored_by_productivity=1})}),
+            ['empty-barrel']=recipe({}, {product('fluid','acid')}),
+            unrelated=recipe({}, {product('item','stone')}),
+          },context)
+          assert(target_names(result.targets) ==
+            'acid:neutralisation:item:stone:1,acid:ordinary:fluid:acid:1')
+          assert(result.work.recipes == 5 and result.work.products == 5 and result.work.recipe_pattern_tests == 0)
+          assert(frozen_copy(rules) == before)
+          rules[1].recipes[1]='different'
+          assert(context.by_recipe.neutralisation[1].family == 'acid')
+          assert(context.by_recipe.different == nil)
+        ''')
+
+    def test_recipe_name_patterns_share_product_pass_and_preserve_exclusions_and_group_order(self):
+        self.lua.execute(r'''
+          local context=targets.prepare({
+            binding('breed',1,{}, {recipe_name_patterns={'cultivation','culture','breeding'},
+              exclude_recipe_patterns={'^iron%-bacteria%-cultivation$'}, allow_shared_input_output=true}),
+            binding('breed',.5,{}, {recipes={'iron-bacteria-cultivation'}}),
+          })
+          local result=targets.collect({
+            ['custom-culture']=recipe({{'egg',1}}, {product('item','egg',{amount=2})}),
+            ['iron-bacteria-cultivation']=recipe({}, {product('item','iron')}),
+            ['custom-breeding']=recipe({}, {product('item','egg')}, {hidden=true}),
+            ['cultivation-zero']=recipe({}, {product('item','egg',{amount=0})}),
+            ['unknown-production']=recipe({}, {product('item','egg')}),
+          },context)
+          assert(target_names(result.targets) ==
+            'breed:custom-culture:item:egg:1,breed:iron-bacteria-cultivation:item:iron:0.5')
+          assert(result.work.recipes == 5 and result.work.products == 5)
+          assert(result.work.recipe_pattern_tests <= 15)
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {recipes={'x','x'}})}) end))
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {recipes={[2]='x'}})}) end))
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {recipe_name_patterns={'['}})}) end))
+        ''')
+
+    def test_named_native_owners_are_read_once_without_foreign_graph_or_state_mutation(self):
+        self.lua.execute(r'''
+          local reads=0
+          local owner={enabled=false, max_level='infinite',
+            prerequisites={'unknown-cycle'}, unit={ingredients={{'unknown-science',1}}},
+            effects={{type='change-recipe-productivity', recipe='owned', change=.1},
+              {type='change-recipe-productivity', recipe='negative', change=-.1},
+              {type='laboratory-speed', recipe='wrong', change=.1}}}
+          local before=frozen_copy(owner)
+          local technologies=setmetatable({}, {
+            __index=function(_,name) assert(name=='native-owner'); reads=reads+1; return owner end,
+            __pairs=function() error('must not enumerate foreign research') end})
+          local context=targets.prepare({
+            binding('parts',1,{}, {recipes={'owned','negative','wrong'}, retained_owners={'native-owner'}}),
+            binding('other',1,{}, {recipes={'owned'}, retained_owners={'native-owner'}}),
+          }, {raw={technology=technologies}})
+          assert(reads==1 and context.owners==1)
+          local recipes={}
+          for _,name in ipairs({'owned','negative','wrong'}) do recipes[name]=recipe({}, {product('item','part')}) end
+          local result=targets.collect(recipes,context)
+          assert(target_names(result.targets)=='parts:negative:item:part:1,parts:wrong:item:part:1')
+          assert(frozen_copy(owner)==before and result.work.owners==1)
+          local absent=targets.prepare({binding('parts',1,{}, {recipes={'owned'},
+            retained_owners={'absent'}})}, {raw={technology={}}})
+          assert(#targets.collect(recipes,absent).targets==1)
+        ''')
+
     def test_prepare_rejects_ambiguous_or_sparse_authored_bindings(self):
         self.lua.execute(r'''
           assert(not pcall(function() targets.prepare({binding("x", 0, {{type="item", name="x"}})}) end))

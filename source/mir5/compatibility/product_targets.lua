@@ -88,8 +88,21 @@ local function copy_rule(rule, ordinal)
   end
 
   local item_patterns = patterns("item_patterns")
-  if #products == 0 and (item_patterns == nil or #item_patterns == 0) then
-    error("MIR product targets requires at least one binding product or item pattern", 3)
+  local function names(field)
+    local result = {}
+    for _, name in ipairs(dense_array(rule[field] or {}, "binding " .. field)) do
+      if type(name) ~= "string" or name == "" or result[name] then
+        error("MIR product targets requires unique nonempty binding " .. field, 3)
+      end
+      result[name] = true
+    end
+    return result
+  end
+  local recipe_names, retained_owners = names("recipes"), names("retained_owners")
+  local recipe_patterns = patterns("recipe_name_patterns")
+  if #products == 0 and (item_patterns == nil or #item_patterns == 0)
+    and next(recipe_names) == nil and (recipe_patterns == nil or #recipe_patterns == 0) then
+    error("MIR product targets requires a binding product, recipe or pattern", 3)
   end
 
   for _, field in ipairs({"include_hidden", "include_recycling", "allow_shared_input_output",
@@ -104,6 +117,10 @@ local function copy_rule(rule, ordinal)
     ordinal = ordinal,
     products = products,
     item_patterns = item_patterns,
+    recipes = recipe_names,
+    recipe_name_patterns = recipe_patterns,
+    retained_owners = retained_owners,
+    retained_owned_recipes = {},
     exclude_recipe_patterns = patterns("exclude_recipe_patterns"),
     exclude_ingredient_patterns = patterns("exclude_ingredient_patterns"),
     include_hidden = rule.include_hidden == true,
@@ -130,12 +147,42 @@ function M.prepare(bindings, options)
     or (probability_field ~= "probability" and probability_field ~= "independent_probability") then
     error("MIR product targets has invalid options", 2)
   end
-  local interested, rules = {}, {}
-  local pattern_rules = {}
+  local interested, rules, by_recipe = {}, {}, {}
+  local pattern_rules, recipe_pattern_rules = {}, {}
   for ordinal, binding in ipairs(bindings) do
     local rule = copy_rule(binding, ordinal)
     rules[#rules + 1] = rule
     if rule.item_patterns and #rule.item_patterns > 0 then pattern_rules[#pattern_rules + 1] = rule end
+    if rule.recipe_name_patterns and #rule.recipe_name_patterns > 0 then
+      recipe_pattern_rules[#recipe_pattern_rules + 1] = rule
+    end
+    for name in pairs(rule.recipes) do
+      if by_recipe[name] == nil then by_recipe[name] = {} end
+      by_recipe[name][#by_recipe[name] + 1] = rule
+    end
+  end
+
+  -- Preserve only the named native owners relevant to these declarations.
+  -- No technology enumeration, unlock/science check or foreign graph walk.
+  local owners, owner_count = {}, 0
+  for _, rule in ipairs(rules) do
+    for owner_name in pairs(rule.retained_owners) do
+      if owners[owner_name] == nil then
+        if type(options.raw) ~= "table" then error("MIR retained owner targets requires native prototypes", 2) end
+        local owner = options.raw.technology and options.raw.technology[owner_name]
+        local recipes = {}
+        if type(owner) == "table" and type(owner.effects) == "table" then
+          for _, effect in ipairs(owner.effects) do
+            if type(effect) == "table" and effect.type == "change-recipe-productivity"
+              and type(effect.recipe) == "string" and finite(effect.change) and effect.change > 0 then
+              recipes[effect.recipe] = true
+            end
+          end
+        end
+        owners[owner_name], owner_count = recipes, owner_count + 1
+      end
+      for recipe_name in pairs(owners[owner_name]) do rule.retained_owned_recipes[recipe_name] = true end
+    end
   end
 
   -- Resolve the retained finite item patterns once into the same typed
@@ -181,6 +228,9 @@ function M.prepare(bindings, options)
     schema = 1,
     interested = interested,
     rules = rules,
+    by_recipe = by_recipe,
+    recipe_pattern_rules = recipe_pattern_rules,
+    owners = owner_count,
     items = item_count,
     pattern_tests = pattern_tests,
     probability_field = probability_field,
@@ -292,6 +342,7 @@ local function name_matches(name, patterns)
 end
 
 local function recipe_blocked(recipe_name, summary, rule)
+  if rule.retained_owned_recipes[recipe_name] then return true end
   if name_matches(recipe_name, rule.exclude_recipe_patterns) then return true end
   if summary.hidden and not rule.include_hidden then return true end
   if summary.recycling and not rule.include_recycling then return true end
@@ -332,6 +383,7 @@ local function inspect_recipe(recipe, context, work)
       work.products = work.products + 1
       local identity, kind, name = positive_product(product, context.productivity_ignores_stats, context.probability_field)
       if identity then
+        if not summary.product_type then summary.product_type, summary.product_name = kind, name end
         if inputs[identity] then summary.shared_productive = true end
         local interested = context.interested[identity]
         if interested then
@@ -364,12 +416,32 @@ function M.collect(recipes, context)
   end
   table.sort(names)
   local work = {recipes = 0, products = 0, ingredients = 0, matches = 0,
-    items = context.items, pattern_tests = context.pattern_tests}
+    items = context.items, pattern_tests = context.pattern_tests, recipe_pattern_tests = 0,
+    owners = context.owners}
   local targets, by_family = {}, {}
   for _, recipe_name in ipairs(names) do
     work.recipes = work.recipes + 1
     local summary = inspect_recipe(recipes[recipe_name], context, work)
     if summary then
+      -- Exact alternatives use a direct lookup. The one retained breeding
+      -- name-pattern contract shares this same recipe pass, after local yield
+      -- inspection; a name alone never admits a zero/ignored output.
+      if summary.product_type then
+        local function match_rule(rule)
+          work.matches = work.matches + 1
+          if not summary.matches[rule.ordinal] then
+            summary.matches[rule.ordinal] = {rule=rule,
+              product_type=summary.product_type, product_name=summary.product_name}
+          end
+        end
+        for _, rule in ipairs(context.by_recipe[recipe_name] or {}) do match_rule(rule) end
+        for _, rule in ipairs(context.recipe_pattern_rules) do
+          for _, pattern in ipairs(rule.recipe_name_patterns) do
+            work.recipe_pattern_tests = work.recipe_pattern_tests + 1
+            if string.find(recipe_name, pattern) then match_rule(rule); break end
+          end
+        end
+      end
       local admitted = {}
       for _, match in pairs(summary.matches) do
         local rule = match.rule
