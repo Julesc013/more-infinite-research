@@ -3475,9 +3475,9 @@
     {
       "path": "tools/lib/assurance/evidence/EvidenceDecisions.ps1",
       "classification": "canonical-internal",
-      "sha256": "D09BB6EDFCC452340E2E9A5A45098762F66BD92BF5642A14CFBF84C98221CA4D",
+      "sha256": "4AD7D62D50297BD876722CC893D3B091E2CBBF862F7C7D77C56133154BDADFD4",
       "hash_mode": "canonical-text-v1",
-      "lines": 237,
+      "lines": 287,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:2c7a3d223a280eca9edf0acddb318bacedfce19e9446c704263ff541512efc81"
+  "digest": "sha256:66eb7ed137423928391a613fd35ef876f53d0d1d4cfe76d03bb57c881c57dba2"
 }

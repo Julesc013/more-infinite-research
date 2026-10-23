@@ -9,6 +9,39 @@ function ConvertTo-MIRAssuranceOrderedMap {
   return $map
 }
 
+function Write-MIRAssuranceOrphanedRunningLeaseCustody {
+  param(
+    [Parameter(Mandatory)]$Paths,
+    [Parameter(Mandatory)]$Running,
+    [Parameter(Mandatory)]$CurrentProducer,
+    [Parameter(Mandatory)][string]$Reason
+  )
+  # A cache restore supplies completed filesystem bytes. It can preserve a
+  # running lease as custody, but cannot reconnect that producer to this
+  # worker's private restored directory.
+  if (-not (Test-Path -LiteralPath $Paths.running -PathType Leaf)) { return $null }
+  $markerSha256 = Get-MIRAssuranceSha256 -Path $Paths.running
+  $currentProducerMap = ConvertTo-MIRAssuranceOrderedMap -Object $CurrentProducer
+  $currentProducerSha256 = Get-MIRAssuranceJsonHash -Value $currentProducerMap
+  $directory = Join-Path $Paths.root 'lease-custody'
+  $path = Join-Path $directory ("{0}-{1}.json" -f $markerSha256.ToLowerInvariant(), $currentProducerSha256.ToLowerInvariant())
+  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+    $record = [ordered]@{
+      schema=1
+      kind='mir-assurance-orphaned-running-lease-v1'
+      reason=$Reason
+      observed_at=[DateTimeOffset]::UtcNow.ToString('o')
+      marker_sha256=$markerSha256
+      current_producer=$currentProducerMap
+      marker=$Running
+    }
+    $record['record_sha256'] = Get-MIRAssuranceJsonHash -Value $record
+    Write-MIRAssuranceAtomicJson -Value $record -Path $path
+  }
+  Remove-Item -LiteralPath $Paths.running -Force
+  return $path
+}
+
 function Get-MIRAssuranceReusableEvidence {
   param(
     [Parameter(Mandatory)]$Fingerprint,
@@ -31,6 +64,11 @@ function Get-MIRAssuranceReusableEvidence {
     Assert-MIRAssuranceAttemptStateLock -Identity $identity -Lock $Lock
   }
   try {
+    # Every reusable lookup is also a lease-reconciliation point. In
+    # particular, aggregation traverses every planned identity before it saves
+    # the ledger, so a completed cache snapshot cannot carry an orphaned CI
+    # worker marker into the next run.
+    $null = Get-MIRAssuranceRunningEvidence -Fingerprint $Fingerprint -Context $Context
     # Never trust passed.json alone.  A durable immutable attempt may have been
     # published before a crashed producer reached its pointer transition.
     $snapshot = Get-MIRAssuranceAttemptStateSnapshot -Identity $identity -Context $Context -Lock $Lock
@@ -162,8 +200,20 @@ function Get-MIRAssuranceRunningEvidence {
       $sameJob = $runId -eq [string]$currentProducer.run_id -and
         $runAttempt -eq [string]$currentProducer.run_attempt -and
         $job -eq [string]$currentProducer.job
-      if ($sameJob -and $hostIdentity -ne (Get-MIRAssuranceHostIdentity)) {
-        Remove-Item -LiteralPath $paths.running -Force
+      if (-not $sameJob) {
+        $null = Write-MIRAssuranceOrphanedRunningLeaseCustody `
+          -Paths $paths `
+          -Running $running `
+          -CurrentProducer $currentProducer `
+          -Reason 'ci-job-lease-not-live-in-current-worker'
+        return $null
+      }
+      if ($hostIdentity -ne (Get-MIRAssuranceHostIdentity)) {
+        $null = Write-MIRAssuranceOrphanedRunningLeaseCustody `
+          -Paths $paths `
+          -Running $running `
+          -CurrentProducer $currentProducer `
+          -Reason 'ci-job-host-identity-mismatch'
         return $null
       }
     }

@@ -110,13 +110,6 @@ jobs:
               $planArguments = @('--target', $env:MIR_VALIDATION_TARGET, '--profile', $profile, '--baseline', $baseline, '--output', 'build/results/assurance/verification-plan.json')
             }
           }
-          # These controls validate the ledger and immutable input staging
-          # themselves.  Always bind them to this plan-owned fresh campaign so
-          # a restored abandoned worker marker cannot certify or block either.
-          $planArguments += @(
-            '--rerun', 'tooling.self-test',
-            '--rerun', 'static.immutable-input-staging'
-          )
           ./tools/mir.ps1 verify plan --candidate $env:MIR_DEVELOPMENT_CANDIDATE @planArguments
       - id: matrix
         name: Export required work
