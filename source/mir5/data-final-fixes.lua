@@ -21,12 +21,14 @@ else
 end
 local technologies = {gear}
 
--- The full authored catalogue has exact Base, Space Age, and K2SO captures.
--- A Krastorio marker alone never admits ordinary Space Age definitions.
+-- K2 Base admission is grounded in a hash-locked no-MIR F200 capture. That
+-- source fact does not constitute native MIR5 K2 Base qualification. It is a
+-- narrow no-Space-Age admission and never imports the K2SO profile body.
 local ordinary_profile = type(mods) == "table" and mods.Krastorio2 == nil
+  and mods["Krastorio2-spaced-out"] == nil and mods.Krastorio2Assets == nil and mods["k2so-assets"] == nil
 local modern_catalogue = require("compatibility.modern_catalogue")
 local modern, modern_selection, native_owner_patches
-if ordinary_profile or modern_catalogue.is_k2so(mods) then
+if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_k2so(mods) then
   modern = require("research.modern")
   modern_selection = modern_catalogue.select(mods)
   -- Check every selected narrow patch before any intended technology write.

@@ -110,6 +110,7 @@ class PackTests(unittest.TestCase):
                 "platform/target.lua",
                 "compatibility/modern_catalogue.lua",
                 "compatibility/modern_catalogue/base.lua",
+                "compatibility/modern_catalogue/k2_base.lua",
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/k2so.lua",
             },

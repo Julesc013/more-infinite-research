@@ -1,4 +1,4 @@
--- Explicit F210 base and Space Age selection for the delivered modern catalogue.
+-- Explicit Base/Space Age selection and narrow K2 profile gates for the delivered modern catalogue.
 -- The Space Age delta remains in its own module: a base stage never imports or
 -- constructs its definitions, recipe patches, or continuation changes.
 local M = {}
@@ -368,6 +368,16 @@ local function active_space_age(active_mods)
   return type(active_mods) == "table" and active_mods["space-age"] ~= nil
 end
 
+-- K2 Base is a separate F200-only admission.  It uses the ordinary authored
+-- catalogue and must never be inferred from the K2SO tuple.
+function M.is_k2_base(active_mods)
+  return target.id == "f200" and type(active_mods) == "table"
+    and active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
+    and active_mods["Krastorio2-spaced-out"] == nil
+    and active_mods["k2so-assets"] == nil
+    and not active_space_age(active_mods)
+end
+
 -- K2SO is an exact delivered tuple, not a broad Krastorio assumption. Keep
 -- this gate here so inactive profiles never construct the K2SO body.
 function M.is_k2so(active_mods)
@@ -440,6 +450,7 @@ function M.select(active_mods)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
+  if M.is_k2_base(active_mods) then profile = "k2-base-f200" end
   if target.id == "f200" and not active_space_age(active_mods) then
     -- Published 2.0 Base includes the six craftable science recipes. There is
     -- no corresponding 2.1 Base row; keep this actual target difference local.
@@ -488,6 +499,11 @@ function M.continuations(active_mods)
   local overrides = {}
   if active_space_age(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  if M.is_k2_base(active_mods) then
+    for key, value in pairs(require("compatibility.modern_catalogue.k2_base").continuation_overrides or {}) do
       overrides[key] = value
     end
   end

@@ -13,6 +13,9 @@ function M.gear_id() return GEAR_ID end
 local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
 local ordinary_profile = type(active_mods) == "table" and active_mods.Krastorio2 == nil
+  and active_mods["Krastorio2-spaced-out"] == nil and active_mods.Krastorio2Assets == nil
+  and active_mods["k2so-assets"] == nil
+local k2_base_profile = modern_catalogue.is_k2_base(active_mods)
 local k2so_profile = modern_catalogue.is_k2so(active_mods)
 
 local function copy(value, seen)
@@ -71,7 +74,7 @@ local function static_rows()
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
   local selected
-  if ordinary_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
+  if ordinary_profile or k2_base_profile or k2so_profile then selected = modern_catalogue.select(active_mods) end
   if not selected then
     if space_age_active then
       rows[#rows + 1] = generated_row(AGRICULTURE_ID, "research_agricultural_growth_speed",
