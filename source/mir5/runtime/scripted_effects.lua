@@ -21,6 +21,14 @@ end
 
 local agriculture_config = resolved_config(effective_values.agricultural_growth_speed)
 local spoilage_config = resolved_config(effective_values.spoilage_preservation)
+local scripted_effect_diagnostics = type(effective_values.options) == "table"
+  and effective_values.options["mir-debug-scripted-effects"] == true
+
+local function debug_log(message)
+  if scripted_effect_diagnostics and type(log) == "function" then
+    log("[more-infinite-research] scripted-effects " .. message)
+  end
+end
 
 local function bucket(name)
   local namespace = storage.mir
@@ -47,14 +55,27 @@ local function save_bucket(name, value)
   namespace[name] = value
 end
 
-local function refresh_agriculture()
-  local value = agriculture.refresh(game, agriculture_config, bucket(AGRICULTURE_BUCKET))
+local function refresh_agriculture(event_name)
+  local value, facts = agriculture.refresh(game, agriculture_config, bucket(AGRICULTURE_BUCKET))
   save_bucket(AGRICULTURE_BUCKET, value)
+  if scripted_effect_diagnostics then
+    debug_log("agriculture event=" .. event_name
+      .. " active=" .. tostring(facts.active)
+      .. " refreshed=" .. tostring(facts.refreshed))
+  end
 end
 
-local function reconcile_spoilage()
-  local value = spoilage.reconcile(game, spoilage_config, bucket(SPOILAGE_BUCKET))
+local function reconcile_spoilage(event_name)
+  local value, facts = spoilage.reconcile(game, spoilage_config, bucket(SPOILAGE_BUCKET))
   save_bucket(SPOILAGE_BUCKET, value)
+  if scripted_effect_diagnostics then
+    debug_log("spoilage event=" .. event_name
+      .. " active=" .. tostring(facts.active)
+      .. " reason=" .. tostring(facts.reason or "applied")
+      .. " restored=" .. tostring(facts.restored == true)
+      .. " level=" .. tostring(facts.effective_level or "")
+      .. " ambiguous=" .. tostring(facts.external_write_ambiguous == true))
+  end
 end
 
 local function research_name(event)
@@ -71,58 +92,66 @@ function M.agriculture_events_active()
 end
 
 function M.on_init()
-  refresh_agriculture()
-  reconcile_spoilage()
+  refresh_agriculture("init")
+  reconcile_spoilage("init")
 end
 
 function M.on_configuration_changed()
-  refresh_agriculture()
-  reconcile_spoilage()
+  refresh_agriculture("configuration-changed")
+  reconcile_spoilage("configuration-changed")
 end
 
-function M.on_research_finished(event)
+local function reconcile_research(event, event_name)
   local name = research_name(event)
   if name == agriculture.technology_name then
-    refresh_agriculture()
+    refresh_agriculture(event_name)
   elseif name == spoilage.technology_name then
-    reconcile_spoilage()
+    reconcile_spoilage(event_name)
   end
 end
 
+function M.on_research_finished(event)
+  reconcile_research(event, "research-finished")
+end
+
 function M.on_research_reversed(event)
-  M.on_research_finished(event)
+  reconcile_research(event, "research-reversed")
 end
 
 function M.on_technology_effects_reset()
-  refresh_agriculture()
-  reconcile_spoilage()
+  refresh_agriculture("technology-effects-reset")
+  reconcile_spoilage("technology-effects-reset")
 end
 
 -- Force lifecycle events can lower the highest completed spoilage level even
 -- when every configured cap is unlimited. The merged source is already
 -- invalid when Factorio raises on_forces_merged, so both components refresh
 -- from the current game.forces snapshot instead of retaining a source row.
-local function reconcile_force_change()
-  refresh_agriculture()
-  reconcile_spoilage()
+local function reconcile_force_change(event_name)
+  refresh_agriculture(event_name)
+  reconcile_spoilage(event_name)
 end
 
 function M.on_force_created()
-  reconcile_force_change()
+  reconcile_force_change("force-created")
 end
 
 function M.on_force_reset()
-  reconcile_force_change()
+  reconcile_force_change("force-reset")
 end
 
 function M.on_forces_merged()
-  reconcile_force_change()
+  reconcile_force_change("forces-merged")
 end
 
 function M.on_tower_planted_seed(event)
-  local value = agriculture.on_tower_planted_seed(game, agriculture_config,
+  local value, facts = agriculture.on_tower_planted_seed(game, agriculture_config,
     bucket(AGRICULTURE_BUCKET), event)
   save_bucket(AGRICULTURE_BUCKET, value)
+  if scripted_effect_diagnostics and facts.applied == true then
+    debug_log("agriculture event=tower-planted-seed applied=true level=" .. tostring(facts.level)
+      .. " multiplier=" .. tostring(facts.multiplier))
+  end
 end
 
 -- No save reads, writes, or game access are allowed while Factorio restores a

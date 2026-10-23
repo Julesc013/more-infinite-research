@@ -63,7 +63,7 @@ end
 -- Retain broad product targeting in one relevant recipe pass. This extends
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
-require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods})
+require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log})
 
 if modern_catalogue.is_k2so(mods) then
   local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
