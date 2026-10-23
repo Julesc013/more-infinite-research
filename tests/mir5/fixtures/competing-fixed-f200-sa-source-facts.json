@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "kind": "MIR5FixedCompetingProviderF200SpaceAgeSourceFactsV1",
+  "status": "archive-source-facts-only-not-native-reference",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "selection_closure": {
+    "builtins": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "elevated-rails",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "quality",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "space-age",
+        "version": "2.0.77",
+        "enabled": true
+      }
+    ],
+    "observer": {
+      "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    }
+  },
+  "providers": [
+    {
+      "key": "plates",
+      "archive": "plates-n-circuit-productivity_0.0.2.zip",
+      "sha256": "E7CC206A847C24E213A0E51568C5A4B00D399F21FF4E84A3A124347D0FF7119F",
+      "info": {
+        "name": "plates-n-circuit-productivity",
+        "version": "0.0.2",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "space-age"
+        ]
+      },
+      "source_member": "plates-n-circuit-productivity_0.0.2/prototypes/technology.lua",
+      "declared_technology_ids": [
+        "basic-plate-productivity",
+        "electric-circuit-productivity",
+        "advanced-circuit-productivity"
+      ]
+    },
+    {
+      "key": "science-packs",
+      "archive": "Science_packs_productivity_0.0.1.zip",
+      "sha256": "5E77A37884000B0DEBCD690F3489C4E69EA80DA4A924498940C34FD718AF92EC",
+      "info": {
+        "name": "Science_packs_productivity",
+        "version": "0.0.1",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0",
+          "space-age >= 2.0.0"
+        ]
+      },
+      "source_member": "Science_packs_productivity_0.0.1/prototypes/technology.lua",
+      "declared_technology_ids": [
+        "automation-science-productivity-1",
+        "automation-science-productivity-2",
+        "automation-science-productivity-3",
+        "automation-science-productivity-4",
+        "logistic-science-productivity-1",
+        "logistic-science-productivity-2",
+        "logistic-science-productivity-3",
+        "logistic-science-productivity-4",
+        "military-science-productivity-1",
+        "military-science-productivity-2",
+        "military-science-productivity-3",
+        "military-science-productivity-4",
+        "chemical-science-productivity-1",
+        "chemical-science-productivity-2",
+        "chemical-science-productivity-3",
+        "chemical-science-productivity-4",
+        "production-science-productivity-1",
+        "production-science-productivity-2",
+        "production-science-productivity-3",
+        "production-science-productivity-4",
+        "utility-science-productivity-1",
+        "utility-science-productivity-2",
+        "utility-science-productivity-3",
+        "utility-science-productivity-4",
+        "space-science-productivity-1",
+        "space-science-productivity-2",
+        "space-science-productivity-3",
+        "space-science-productivity-4",
+        "metallurgic-science-productivity-1",
+        "metallurgic-science-productivity-2",
+        "metallurgic-science-productivity-3",
+        "metallurgic-science-productivity-4",
+        "electromagnetic-science-productivity-1",
+        "electromagnetic-science-productivity-2",
+        "electromagnetic-science-productivity-3",
+        "electromagnetic-science-productivity-4",
+        "agricultural-science-productivity-1",
+        "agricultural-science-productivity-2",
+        "agricultural-science-productivity-3",
+        "agricultural-science-productivity-4",
+        "cryogenic-science-productivity-1",
+        "cryogenic-science-productivity-2",
+        "cryogenic-science-productivity-3",
+        "cryogenic-science-productivity-4",
+        "promethium-science-productivity-1",
+        "promethium-science-productivity-2",
+        "promethium-science-productivity-3",
+        "promethium-science-productivity-4"
+      ]
+    },
+    {
+      "key": "bioflux",
+      "archive": "bioflux-productivity_0.1.0.zip",
+      "sha256": "84B3A23218E596A4585AD405F8586E18DCA9C8B493EA77CE8EE90584C180F1AE",
+      "info": {
+        "name": "bioflux-productivity",
+        "version": "0.1.0",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0",
+          "space-age"
+        ]
+      },
+      "source_member": "bioflux-productivity_0.1.0/data.lua",
+      "declared_technology_ids": [
+        "bioflux-productivity"
+      ]
+    },
+    {
+      "key": "fish",
+      "archive": "fish-productivity_1.0.0.zip",
+      "sha256": "1B19C53C06A0BF0E9FE40C38C8755F3917B6BEECEBD3355439BD65980C45C1FB",
+      "info": {
+        "name": "fish-productivity",
+        "version": "1.0.0",
+        "factorio_version": "2.0",
+        "dependencies": [
+          "base >= 2.0.0",
+          "space-age"
+        ]
+      },
+      "source_member": "fish-productivity/prototypes/technology.lua",
+      "declared_technology_ids": [
+        "fish-breeding-productivity"
+      ]
+    }
+  ],
+  "limitations": [
+    "The facts are extracted from pinned local archive source members without launching Factorio.",
+    "They do not establish final-data technology presence, published preference behavior, ownership, replacement coverage, or gameplay/save semantics.",
+    "Each provider needs matched upstream, published-prefer-MIR, and published-prefer-foreign Black Glass captures before an MIR5 binding is considered."
+  ]
+}

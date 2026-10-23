@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "kind": "mir5-fixed-competing-provider-f200-space-age-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "plates-n-circuit-productivity",
+      "version": "0.0.2",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "plates-n-circuit-productivity_0.0.2.zip": "E7CC206A847C24E213A0E51568C5A4B00D399F21FF4E84A3A124347D0FF7119F",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Read-only upstream provider declaration selection. The private runner may add published MIR 4.7.20002 and the fixed-preference fixture for its true/false comparison; this profile makes no native, preference, or gameplay claim."
+}
