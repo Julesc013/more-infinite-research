@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "MIR5BlackGlassK2BaseReferenceChainV1",
+  "status": "upstream-reference-passed-published-reference-failed",
+  "host": "BLACKGLASS-WIN1",
+  "control_source": "3945b662481fdb66bec3210e48de21e52f6139cf",
+  "tested_source": "b26d45025c8e012951169724ecdf56ae632644e7",
+  "profile": "tests/mir5/profiles/k2-base-f200-2077.json",
+  "cases": [
+    {
+      "run_id": "39962601418",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39962601418",
+      "status": "completed-data-stage-observation-only",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-no-mir-native.json",
+          "bytes": 15527,
+          "sha256": "4BD2F4D9C01026B10A2680C9FFEECC8E3CBEDFC5131B3DD616202FCBCBF51539"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/artifact-manifest.json",
+          "bytes": 2067,
+          "sha256": "E8A5BF6EC572E7B60658481CF24E661ECD7E4B69381F1C85EEE57AD534171EC6"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1"
+      }
+    },
+    {
+      "run_id": "39962719955",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39962719955",
+      "status": "failed",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-adverse.json",
+          "bytes": 10443,
+          "sha256": "4FEC51D027632D52A6FA1CBE64111CD305CE4D13D56CF45C37B3D6BB36B973B9"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1/artifact-manifest.json",
+          "bytes": 1884,
+          "sha256": "D0B6F29D574A1739992B0ECED4E5430071873B506249C0773565B362267BA1E1"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1",
+        "native_log": {
+          "path": "build/mir5/black-glass/incoming/39962719955/black-glass-k2-published-39962719955-1/capture/write-data/factorio-current.log",
+          "bytes": 12047,
+          "sha256": "D3F3C67579F3468BBE40D8F3419C0029D3307AF222180657079457CEB5243851"
+        },
+        "compressed_native_log": {
+          "path": "spec/mir5/evidence/k2-base-f200-published-adverse.log.gz",
+          "bytes": 2098,
+          "sha256": "96DFFC8176CA6FC0A2494A52451C54DCB288EE090E71F2E23477833DAEEB3957"
+        }
+      }
+    }
+  ],
+  "failure_class": "SCI-UNLOCK-01; published MIR4 approved automation science binding unresolved",
+  "claims": {
+    "upstream_native_prototype_reference": true,
+    "published_mir_successful_oracle": false,
+    "mir5_candidate_qualification": false,
+    "physical_effects": false,
+    "migration": false,
+    "performance": false,
+    "release_qualification": false
+  },
+  "limits": [
+    "Native data-stage only; no native output dump exists for the failed published arm",
+    "All original artifact member hashes verified after private download; source receipts unchanged",
+    "Published4.7 F200 archive hash7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
+    "Runner has only2.1.14 F210 installed; it cannot qualify the2.1.23 F210 target",
+    "Original failed arm remains adverse evidence; no expectations recovered from a failed capture"
+  ]
+}

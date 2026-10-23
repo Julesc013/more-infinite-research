@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "MIR5K2SOMaterialNativeChainV1",
+  "status": "equal-complete-intended-native-data-settings",
+  "player_source": "75a8ebfcad568ebe9540c17570f810feb24133e1",
+  "player_archive_sha256": "D6DF6B485C16F77CD2C94E4CECBBE2E7D1B203C5EB08346C4CB2FD896CEA406E",
+  "profile": "k2so-f210",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "base_version": "2.1.23",
+    "factorio_version": "2.1"
+  },
+  "records": {
+    "native": {
+      "path": "spec/mir5/evidence/k2so-material-native-f210.json",
+      "bytes": 17459,
+      "sha256": "9F7B8EA7AD3F1F1D1D522DBBDE1C3E6D8C8FC4F541C441925D4D2E869F360971"
+    },
+    "comparison": {
+      "path": "spec/mir5/evidence/k2so-material-native-comparison.json",
+      "bytes": 2038,
+      "sha256": "C0DC598381FD99BFFF8083505C9BD71003D82178CD6CB8BCA177F557E4D9BACF"
+    },
+    "predeclared_intended_additions": {
+      "path": "spec/mir5/inventory/k2so-material-intended-differences.json",
+      "bytes": 7153,
+      "sha256": "3ADFB74E7D602354298109589331DB8E069F096E527E89BCC8ADC9BADC813294"
+    }
+  },
+  "raw_custody": "build/tmp/mir5-k2so-material-native-f210-r01",
+  "scope": "Complete current K2SO data/settings comparison retaining75captured rows and3independently sourced historical finite material restorations;78generated research IDs",
+  "predeclared_difference_source": "Host expected rows from historical source + hash-verified No-MIR native facts, frozen before candidate execution; never candidate-derived",
+  "claims": {
+    "native_load": true,
+    "complete_intended_data_settings": true,
+    "physical_research": false,
+    "production": false,
+    "save_upgrade": false,
+    "two_cold_reloads": false,
+    "multiplayer": false,
+    "performance": false,
+    "release_qualification": false
+  }
+}
