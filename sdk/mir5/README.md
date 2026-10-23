@@ -36,7 +36,12 @@ Run the current host controls with the explicit private Lua 5.2 runtime input:
 ```powershell
 python -B tests/mir5/test_api.py --lua-runtime-dir build/tmp/mir421-lua-runtime
 python -B tests/mir5/test_runtime_api.py --lua-runtime-dir build/tmp/mir421-lua-runtime
+python -B tests/mir5/test_sdk.py --lua-runtime-dir build/tmp/mir421-lua-runtime
 ```
+
+`test_sdk.py` is a Lua host control that executes these small examples against
+the implemented data and runtime modules. It does not replace the independent
+consumer fixtures or establish Factorio-native qualification.
 
 ## Legacy consumer audit remains open
 
