@@ -1,0 +1,253 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingFixedFullAndPartialEarnedNativeChainV1",
+  "runs": [
+    {
+      "run": 40034547698,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40034547698",
+      "manifest_members_verified": 117,
+      "manifest_sha256": "0D407714073AB62F138E190553FCAC88C91D92D787898E08C2EF5049022FF637",
+      "cases": [
+        {
+          "path": "gameplay/prefer-foreign/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "637ba5c7ab382f6dd1ea6ef1603dc8d0dd0c7c22",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-fixed-full-earned-native-40034547698-gameplay-prefer-foreign-native.json.gz",
+            "uncompressed_sha256": "2BEB788123B882B74F73F269E91FB4E1C2087506095792E64BC3C3DA3363B562"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-fixed-gameplay",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20002",
+              "destination_mir": "5.0.20000",
+              "actual_lab_completions": 4,
+              "milestone": "four-native-fixed-provider-labs",
+              "fully_covered_mir_bioflux": {
+                "status": "present",
+                "actual_lab_completions": 1,
+                "next_level": 2,
+                "enabled": false,
+                "productivity_bonus": 0.20000000298023224
+              },
+              "science_tail_next_level": 5,
+              "plate_next_level": 2,
+              "bioflux_next_level": 2,
+              "fish_next_level": 2,
+              "remaining_mir_breeding_next_level": 3,
+              "remaining_mir_biter_egg_bonus": 0.20000000298023224,
+              "remaining_mir_pentapod_egg_bonus": 0.20000000298023224,
+              "remaining_mir_fish_bonus": 0.20000000298023224,
+              "queued_initial_current": "electric-circuit-productivity",
+              "current_progress": 0.27,
+              "detached_initial_saved_progress": 0.27,
+              "foreign_still_disabled": true,
+              "foreign_full_mir_bioflux": {
+                "status": "present-pre-disabled",
+                "enabled": false
+              },
+              "false_preference_future_effect_coverage": "prepared-breeding-row-native-readback-required",
+              "lab_frozen": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "258720075B4B82F5307891FF9218CFC71F48F99D06DF2DC197932CD303940031",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/prefer-mir/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "637ba5c7ab382f6dd1ea6ef1603dc8d0dd0c7c22",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-fixed-full-earned-native-40034547698-gameplay-prefer-mir-native.json.gz",
+            "uncompressed_sha256": "CAB4B8EC85F63F1524EB8C49B9D83F2D93D2647B356AED929385BF9F221A522D"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-fixed-gameplay",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20002",
+              "destination_mir": "5.0.20000",
+              "actual_lab_completions": 4,
+              "milestone": "four-native-fixed-provider-labs",
+              "fully_covered_mir_bioflux": {
+                "status": "present",
+                "actual_lab_completions": 1,
+                "next_level": 2,
+                "enabled": true,
+                "productivity_bonus": 0.20000000298023224
+              },
+              "science_tail_next_level": 5,
+              "plate_next_level": 2,
+              "bioflux_next_level": 2,
+              "fish_next_level": 2,
+              "remaining_mir_breeding_next_level": 2,
+              "remaining_mir_biter_egg_bonus": 0.10000000149011612,
+              "remaining_mir_pentapod_egg_bonus": 0.10000000149011612,
+              "remaining_mir_fish_bonus": 0.20000000298023224,
+              "queued_initial_current": "electric-circuit-productivity",
+              "current_progress": 0.27,
+              "detached_initial_saved_progress": 0.27,
+              "foreign_still_disabled": true,
+              "foreign_full_mir_bioflux": {
+                "status": "present-pre-disabled",
+                "enabled": false
+              },
+              "false_preference_future_effect_coverage": "not-applicable",
+              "lab_frozen": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "258720075B4B82F5307891FF9218CFC71F48F99D06DF2DC197932CD303940031",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/prefer-mir-again/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "637ba5c7ab382f6dd1ea6ef1603dc8d0dd0c7c22",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-fixed-full-earned-native-40034547698-gameplay-prefer-mir-again-native.json.gz",
+            "uncompressed_sha256": "E52F25CF095B7822AEC29D88EE143F78491812A894A4853CBC20205AB61CC9F4"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-fixed-gameplay",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20002",
+              "destination_mir": "5.0.20000",
+              "actual_lab_completions": 4,
+              "milestone": "four-native-fixed-provider-labs",
+              "fully_covered_mir_bioflux": {
+                "status": "present",
+                "actual_lab_completions": 1,
+                "next_level": 2,
+                "enabled": true,
+                "productivity_bonus": 0.20000000298023224
+              },
+              "science_tail_next_level": 5,
+              "plate_next_level": 2,
+              "bioflux_next_level": 2,
+              "fish_next_level": 2,
+              "remaining_mir_breeding_next_level": 3,
+              "remaining_mir_biter_egg_bonus": 0.20000000298023224,
+              "remaining_mir_pentapod_egg_bonus": 0.20000000298023224,
+              "remaining_mir_fish_bonus": 0.20000000298023224,
+              "queued_initial_current": "electric-circuit-productivity",
+              "current_progress": 0.27,
+              "detached_initial_saved_progress": 0.27,
+              "foreign_still_disabled": true,
+              "foreign_full_mir_bioflux": {
+                "status": "present-pre-disabled",
+                "enabled": false
+              },
+              "false_preference_future_effect_coverage": "not-applicable",
+              "lab_frozen": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "258720075B4B82F5307891FF9218CFC71F48F99D06DF2DC197932CD303940031",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "637ba5c7ab382f6dd1ea6ef1603dc8d0dd0c7c22",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-fixed-full-earned-native-40034547698-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "677C0B567F1D239DC2A493259818F9AE7E5F47872372049D3528DC479B31D03E"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-fixed-gameplay",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "source_mir": "4.7.20002",
+              "destination_mir": "4.7.20002",
+              "actual_lab_completions": 4,
+              "milestone": "four-native-fixed-provider-labs",
+              "fully_covered_mir_bioflux": {
+                "status": "absent-published-predecessor"
+              },
+              "science_tail_next_level": 5,
+              "plate_next_level": 2,
+              "bioflux_next_level": 2,
+              "fish_next_level": 2,
+              "remaining_mir_breeding_next_level": 1,
+              "remaining_mir_biter_egg_bonus": 0,
+              "remaining_mir_pentapod_egg_bonus": 0,
+              "remaining_mir_fish_bonus": 0.10000000149011612,
+              "queued_initial_current": "electric-circuit-productivity",
+              "current_progress": 0.27,
+              "detached_initial_saved_progress": 0.27,
+              "foreign_still_disabled": true,
+              "foreign_full_mir_bioflux": {
+                "status": "absent-published-predecessor"
+              },
+              "false_preference_future_effect_coverage": "not-applicable",
+              "lab_frozen": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Space Age with four exact fixed providers; all four published/MIR5true/false/true-again stages save and cold-reload twice, with117 artifact members verified.",
+    "One actual preferred MIR bioflux lab earns its full effect. False preference retains that bonus and disables future MIR bioflux research; true-again restores only the recorded player enablement right. A matching pre-disabled foreign-force MIR row remains disabled.",
+    "The published false predecessor omits the MIR bioflux row; it is introduced only at the first MIR5 true stage, rather than inventing a published identity.",
+    "The actual breeding true/false/true native-credit scenario remains intact: earned fish bonus preserved, false-phase eggs add no fish, return true does not backfill fish.",
+    "Foreign levels/effects, current27%/queued42% work, detached27% work and foreign rights remain preserved. Provider removal/readdition, simultaneous first-upgrade preference change, other profiles and final-source acceptance remain open."
+  ],
+  "release_qualification": false
+}
