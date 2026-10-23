@@ -156,7 +156,6 @@ script.on_init(function()
 
   game.speed = 16
   local player = game.forces.player
-  player.enable_all_prototypes()
   local main = technology(player, MAIN)
   research_prerequisites(main)
   assert_carrier(player, POSITIVE, 1, "initial positive")
