@@ -331,6 +331,21 @@ local function assert_breeding_earned_before_false(state)
   assert_foreign(state)
   assert_detached(state)
   local player = game.forces.player
+  local credit = {}
+  for _, name in ipairs({MIR_BREEDING,
+      "mir-native-credit-research_breeding-fish-breeding-positive",
+      "mir-native-credit-research_breeding-fish-breeding-negative"}) do
+    local value = player.technologies[name]
+    local prototype = value and value.prototype
+    credit[#credit + 1] = {name=name, present=value ~= nil,
+      level=value and value.level, researched=value and value.researched,
+      prototype_name=prototype and prototype.name, prototype_level=prototype and prototype.level,
+      prototype_maximum=prototype and prototype.max_level, hidden=prototype and prototype.hidden,
+      prototype_enabled=prototype and prototype.enabled,
+      prototype_visible=prototype and prototype.visible_when_disabled,
+      effects=prototype and prototype.effects}
+  end
+  log("[MIR5_NATIVE_FIXTURE] CREDIT_TRANSITION " .. helpers.table_to_json(credit))
   assert_earned_source(state, "false transition", selected_source_effects(state, state.true_breeding_effects))
   assert_breeding(tech(player, MIR_BREEDING), 2, "false transition")
   assert_selected_effects(player, state.true_breeding_effects, MIR_BREEDING_FULL,
