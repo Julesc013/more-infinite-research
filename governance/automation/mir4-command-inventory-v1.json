@@ -6067,9 +6067,9 @@
     {
       "path": "tools/mir/domain/repository/RepositoryFixedPoint.ps1",
       "classification": "canonical-internal",
-      "sha256": "1DEA223B6DD7A3BF75BF342AE4B76B9F9288A788EAA29BAEFEE9E9D625422AEF",
+      "sha256": "DFEF3FAB820A07AC357C46E694C8C8C3226287058F6EA4BA8647EEAD7853A15E",
       "hash_mode": "canonical-text-v1",
-      "lines": 161,
+      "lines": 163,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:f26a38534551e8c6c1ad86fa888765b492f5e6b85a4af11e71687063d2909795"
+  "digest": "sha256:730d7c689e06c160c7eacbb0c217dfdea1b3cca19258286346082d9cc3a66841"
 }
