@@ -1,0 +1,398 @@
+{
+  "schema": 1,
+  "kind": "MIR5PrototypeCaptureV1",
+  "status": "completed-data-stage-observation-only",
+  "endpoint_class": "factorio-data-stage-dump-only",
+  "claims": {
+    "gameplay": false,
+    "menu": false,
+    "save": false,
+    "release_qualification": false
+  },
+  "source_head": "f1863064e7b01039af3f21e58f3782be16329953",
+  "harness": {
+    "path": "tools/mir5/Invoke-PrototypeCapture.ps1",
+    "sha256": "9A7E36050CD42BE983666BE684B7BE3BFB7D2A1B2039C029F33184F19C7A4DCB",
+    "direct_library_startup_measurement_sha256": "699D0F24C822BA31F212061E11787E5DB1792CA0C164D82219CE0852A6E1F6E1",
+    "native_probe_resources_sha256": "7DE4BD5B86B30BC6702D4F02EE6808F368EB2372C25FB10D8EA1CB576E67EEC6",
+    "library_activation_sha256": "5359CBC03A883F480A80083DE05A0A5B97BB68B919161344F418886A3D6F49E6"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "base_version": "2.0.77",
+    "factorio_version": "2.0"
+  },
+  "profile_input": {
+    "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\atan-base-f200-2077.json",
+    "sha256": "27368AE66004B6EC37532AE741BFA6BA39F2D68B4442877786CE9C65A45844CE"
+  },
+  "mir_archive": {
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+    "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2",
+    "name": "more-infinite-research",
+    "version": "5.0.20000",
+    "factorio_version": "2.0",
+    "root": "more-infinite-research_5.0.20000"
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "archive": "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "budget": {
+    "timeout_seconds": 600,
+    "expected_peak_memory_mib": 4096,
+    "max_new_output_mib": 512
+  },
+  "native_qualification": false,
+  "initial_admission_wait": {
+    "phase": "prototype-capture-initial",
+    "admission_wait_seconds": 30,
+    "status": "admitted-without-wait",
+    "attempt_count": 1,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.431,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T16:02:34.3003716+00:00",
+    "deadline_at": "2026-10-23T16:03:04.3003716+00:00",
+    "admission": {
+      "observed_at": "2026-10-23T16:02:34.6968121+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20275363840,
+        "committed_bytes": 18845315072,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 204979904512,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 204979904512,
+        "total_bytes": 599395090432
+      }
+    }
+  },
+  "generated_selection": {
+    "path": "selection.json",
+    "sha256": "42734DBA622C29A3DC120F0557950B21D81A8B4981625EB9E8B12567BFC497D4",
+    "mods": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "enabled": true
+      },
+      {
+        "name": "atan-air-scrubbing",
+        "version": "0.2.8",
+        "enabled": true
+      },
+      {
+        "name": "atan-ash",
+        "version": "2.2.1",
+        "enabled": true
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "enabled": true
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "enabled": true
+      }
+    ]
+  },
+  "selected_archives": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "builtin": true,
+      "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+      "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786"
+    },
+    {
+      "name": "atan-air-scrubbing",
+      "version": "0.2.8",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-air-scrubbing_0.2.8.zip",
+      "sha256": "FC1425EBEA1B2BD5BDD6DADB7BD594423DEBE8180D4781B25C92EA593D5D9AEF"
+    },
+    {
+      "name": "atan-ash",
+      "version": "2.2.1",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-ash_2.2.1.zip",
+      "sha256": "B46B85FC39D16331EA031F5F6459C5E99E8011097E782F958C08CE8AC9EEAE6C"
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+      "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "builtin": false,
+      "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+      "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2"
+    }
+  ],
+  "process": {
+    "status": "passed",
+    "exit_code": 0,
+    "timed_out": false,
+    "passed": true,
+    "completion_predicate_observed": false,
+    "duration_seconds": 2.219126,
+    "peak_working_set_bytes": 164687872,
+    "peak_sampled_private_bytes": 156102656,
+    "admission": {
+      "observed_at": "2026-10-23T16:02:39.7131732+00:00",
+      "memory": {
+        "total_bytes": 34045980672,
+        "free_bytes": 20392816640,
+        "committed_bytes": 18738548736,
+        "commit_limit_bytes": 44388642816
+      },
+      "work_volume": {
+        "name": "C:\\",
+        "free_bytes": 204979904512,
+        "total_bytes": 599395090432
+      },
+      "system_volume": {
+        "name": "C:\\",
+        "free_bytes": 204979904512,
+        "total_bytes": 599395090432
+      }
+    },
+    "duration_measurement": {
+      "scope": "direct-native-executable-start-to-exit",
+      "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+      "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+    },
+    "admission_wait": {
+      "phase": "prototype-capture-engine",
+      "admission_wait_seconds": 30,
+      "status": "admitted-without-wait",
+      "attempt_count": 2,
+      "refusal_count": 0,
+      "elapsed_seconds": 0.185,
+      "first_refusal": null,
+      "last_refusal": null,
+      "last_error": null,
+      "started_at": "2026-10-23T16:02:39.5285895+00:00",
+      "deadline_at": "2026-10-23T16:03:09.5285895+00:00",
+      "admission": {
+        "observed_at": "2026-10-23T16:02:39.7131732+00:00",
+        "memory": {
+          "total_bytes": 34045980672,
+          "free_bytes": 20392816640,
+          "committed_bytes": 18738548736,
+          "commit_limit_bytes": 44388642816
+        },
+        "work_volume": {
+          "name": "C:\\",
+          "free_bytes": 204979904512,
+          "total_bytes": 599395090432
+        },
+        "system_volume": {
+          "name": "C:\\",
+          "free_bytes": 204979904512,
+          "total_bytes": 599395090432
+        }
+      }
+    }
+  },
+  "loaded_selection": [
+    "atan-air-scrubbing@0.2.8",
+    "atan-ash@2.2.1",
+    "base@2.0.77",
+    "mir-fixture-mir5-active-mods-observer@0.1.0",
+    "more-infinite-research@5.0.20000"
+  ],
+  "dumps": {
+    "data_raw": {
+      "path": "write-data/script-output/data-raw-dump.json",
+      "bytes": 13377859,
+      "sha256": "2B1AB4950905261677C8C57F8B19596D66376611FA343611C4FA0957F3ABB330"
+    },
+    "mod_settings": {
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "bytes": 737810,
+      "sha256": "0C72FBE428CE23B776FE1A981A60729C75FE5669D3083C954B54BCD7AFCC3288"
+    }
+  },
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "42734DBA622C29A3DC120F0557950B21D81A8B4981625EB9E8B12567BFC497D4",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.0.77",
+        "path": "D:\\Games\\Factorio\\2.0\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "1B6DF063:00070000001F6A5B",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "bytes": 193
+      },
+      {
+        "name": "atan-air-scrubbing",
+        "version": "0.2.8",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-air-scrubbing_0.2.8.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000800000001A31A",
+        "sha256": "FC1425EBEA1B2BD5BDD6DADB7BD594423DEBE8180D4781B25C92EA593D5D9AEF",
+        "bytes": 6478555
+      },
+      {
+        "name": "atan-ash",
+        "version": "2.2.1",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\atan-ash_2.2.1.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000800000001A31B",
+        "sha256": "B46B85FC39D16331EA031F5F6459C5E99E8011097E782F958C08CE8AC9EEAE6C",
+        "bytes": 94526
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "1B6DF063:0008000000023718",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "bytes": 834
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.20000",
+        "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+        "builtin": false,
+        "identity": "1B6DF063:000D0000000217BA",
+        "sha256": "2F2DECBFDCFEAC49F45146F1CF754A5BA1B6D3EF55DCC023AA158D1E45A103B2",
+        "bytes": 366963
+      }
+    ]
+  },
+  "library_controls_restored": true,
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39983357778-1\\capture\\process-1.resources.jsonl",
+      "stdout": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39983357778-1\\capture\\process-1.stdout.txt",
+      "stderr": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-39983357778-1\\capture\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 2.219126,
+        "peak_working_set_bytes": 164687872,
+        "peak_sampled_private_bytes": 156102656,
+        "admission": {
+          "observed_at": "2026-10-23T16:02:39.7131732+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20392816640,
+            "committed_bytes": 18738548736,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 204979904512,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204979904512,
+            "total_bytes": 599395090432
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        },
+        "admission_wait": {
+          "phase": "prototype-capture-engine",
+          "admission_wait_seconds": 30,
+          "status": "admitted-without-wait",
+          "attempt_count": 2,
+          "refusal_count": 0,
+          "elapsed_seconds": 0.185,
+          "first_refusal": null,
+          "last_refusal": null,
+          "last_error": null,
+          "started_at": "2026-10-23T16:02:39.5285895+00:00",
+          "deadline_at": "2026-10-23T16:03:09.5285895+00:00",
+          "admission": {
+            "observed_at": "2026-10-23T16:02:39.7131732+00:00",
+            "memory": {
+              "total_bytes": 34045980672,
+              "free_bytes": 20392816640,
+              "committed_bytes": 18738548736,
+              "commit_limit_bytes": 44388642816
+            },
+            "work_volume": {
+              "name": "C:\\",
+              "free_bytes": 204979904512,
+              "total_bytes": 599395090432
+            },
+            "system_volume": {
+              "name": "C:\\",
+              "free_bytes": 204979904512,
+              "total_bytes": 599395090432
+            }
+          }
+        }
+      },
+      "admission_wait": {
+        "phase": "prototype-capture-engine",
+        "admission_wait_seconds": 30,
+        "status": "admitted-without-wait",
+        "attempt_count": 2,
+        "refusal_count": 0,
+        "elapsed_seconds": 0.185,
+        "first_refusal": null,
+        "last_refusal": null,
+        "last_error": null,
+        "started_at": "2026-10-23T16:02:39.5285895+00:00",
+        "deadline_at": "2026-10-23T16:03:09.5285895+00:00",
+        "admission": {
+          "observed_at": "2026-10-23T16:02:39.7131732+00:00",
+          "memory": {
+            "total_bytes": 34045980672,
+            "free_bytes": 20392816640,
+            "committed_bytes": 18738548736,
+            "commit_limit_bytes": 44388642816
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 204979904512,
+            "total_bytes": 599395090432
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 204979904512,
+            "total_bytes": 599395090432
+          }
+        }
+      }
+    }
+  ]
+}

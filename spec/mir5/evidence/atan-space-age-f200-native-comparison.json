@@ -1,0 +1,54 @@
+{
+  "baseline_receipt": {
+    "data_raw": {
+      "bytes": 27844298,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "E3F79EAF54031182DCDA9A97A32624F475EE5DB84D733452BAE02D934E80B90B"
+    },
+    "mod_settings": {
+      "bytes": 471,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "23B7D098B7C30BCA0BE48430881780203A2AB37289F3C62F6A0961F5658573D8"
+    },
+    "result": {
+      "bytes": 15354,
+      "path": "result.json",
+      "sha256": "A6C1F400CF8C3E6706B53F564BE326AE30A170C455AFCBCC4688A9B7D2A9D932"
+    },
+    "selection": {
+      "bytes": 710,
+      "path": "selection.json",
+      "sha256": "257724433B10FAA7639C06F8C65A8BCB4290C7DABD3C8FDA833622493133424E"
+    }
+  },
+  "candidate_receipt": {
+    "data_raw": {
+      "bytes": 28001626,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "6207C319FE1DACF4493EF6CE7691FB9822BA7D017E55416CDFB16AB98606905A"
+    },
+    "mod_settings": {
+      "bytes": 734730,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "56A7A5B543ECF1BDD5C3CC7D4BB3D66F417C6582F09EB458AB90F5D616122E88"
+    },
+    "result": {
+      "bytes": 16511,
+      "path": "result.json",
+      "sha256": "721B7A952AD832B36CE24E9E1D66DA7D5EFF4599CDC19149A70FDA093CE3D3FD"
+    },
+    "selection": {
+      "bytes": 820,
+      "path": "selection.json",
+      "sha256": "16C445B8FD892BBFCF79077F418B4CDD8319D3C8404D43D41A29A389CF68A3D1"
+    }
+  },
+  "differences": [],
+  "inventory_sha256": "654A850D17A52F533075AD0C992D55B65552DBE41929509634782506C03E0F64",
+  "kind": "MIR5ModernCandidateComparisonV1",
+  "profile": "atan-space-age-f200",
+  "reviewed_differences": [],
+  "schema": 2,
+  "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+  "status": "equal-intended-native-output"
+}

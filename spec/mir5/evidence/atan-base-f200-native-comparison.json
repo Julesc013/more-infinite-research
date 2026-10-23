@@ -1,0 +1,54 @@
+{
+  "baseline_receipt": {
+    "data_raw": {
+      "bytes": 13267257,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "48C9A11091B2F159A61B326F678CE5AED18F08CEC3EF5076EF6C9A9C8071F420"
+    },
+    "mod_settings": {
+      "bytes": 471,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "23B7D098B7C30BCA0BE48430881780203A2AB37289F3C62F6A0961F5658573D8"
+    },
+    "result": {
+      "bytes": 13181,
+      "path": "result.json",
+      "sha256": "2ED16F8D8946E447030F34FB3CC108821547F26CB2F95D08497ABDE2BA2BB621"
+    },
+    "selection": {
+      "bytes": 425,
+      "path": "selection.json",
+      "sha256": "0C9530FB930BA78B12D30ADCD742CD5FA9E96B77E3FED79EDB7EC0664632C064"
+    }
+  },
+  "candidate_receipt": {
+    "data_raw": {
+      "bytes": 13377859,
+      "path": "write-data/script-output/data-raw-dump.json",
+      "sha256": "2B1AB4950905261677C8C57F8B19596D66376611FA343611C4FA0957F3ABB330"
+    },
+    "mod_settings": {
+      "bytes": 737810,
+      "path": "write-data/script-output/mod-settings-dump.json",
+      "sha256": "0C72FBE428CE23B776FE1A981A60729C75FE5669D3083C954B54BCD7AFCC3288"
+    },
+    "result": {
+      "bytes": 14340,
+      "path": "result.json",
+      "sha256": "2DA1D58BB1AD2F232EBD9D3DD912E31A660454600CEA5AB4F8E935DBC3443469"
+    },
+    "selection": {
+      "bytes": 535,
+      "path": "selection.json",
+      "sha256": "42734DBA622C29A3DC120F0557950B21D81A8B4981625EB9E8B12567BFC497D4"
+    }
+  },
+  "differences": [],
+  "inventory_sha256": "654A850D17A52F533075AD0C992D55B65552DBE41929509634782506C03E0F64",
+  "kind": "MIR5ModernCandidateComparisonV1",
+  "profile": "atan-base-f200",
+  "reviewed_differences": [],
+  "schema": 2,
+  "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
+  "status": "equal-intended-native-output"
+}
