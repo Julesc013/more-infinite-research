@@ -125,7 +125,15 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               preflight_recipe_patches = function(selection, prototypes)
                 assert(selection.recipe_patches[1] == nil and prototypes == raw)
               end,
+              preflight_native_owner_patches = function(selection, prototypes)
+                assert(selection.native_owners == nil and prototypes == raw)
+                return {}
+              end,
               technologies = function(selection) assert(#selection.definitions == 0); return {} end,
+              apply_weapon_speed_overlap = function(selection, generated)
+                assert(#selection.definitions == 0 and #generated == 0)
+              end,
+              apply_native_owner_patches = function(patches) assert(#patches == 0) end,
               apply_recipe_patches = function(selection, prototypes)
                 assert(selection.recipe_patches[1] == nil and prototypes == raw)
               end

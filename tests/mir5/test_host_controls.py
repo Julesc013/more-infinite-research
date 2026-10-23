@@ -49,6 +49,7 @@ def development_routes() -> dict[str, dict]:
       $assurance = Get-Content -Raw -LiteralPath .mir/assurance.json | ConvertFrom-Json -Depth 100
       $profile = 'mir4-development'
       $local = Get-MIR4DevelopmentCISelection -RepoRoot $repo -Mode local-current-profile
+      $packageSourceFiles = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
       $paths = [ordered]@{
         mir5 = 'source/mir5/control.lua'
         docs = 'docs/mir5/README.md'
@@ -58,7 +59,7 @@ def development_routes() -> dict[str, dict]:
       $routes = [ordered]@{}
       foreach ($entry in $paths.GetEnumerator()) {
         $classification = Get-MIRAssuranceClassification -Paths @([string]$entry.Value) -Config $assurance
-        $rows = @(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $profile)
+        $rows = @(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $profile -PackageSourceFiles $packageSourceFiles)
         $selection = [ordered]@{
           baseline = ('a' * 40)
           baseline_state = 'resolved'
@@ -192,9 +193,10 @@ class HostControlsTests(unittest.TestCase):
         mir5 = routes["routes"]["mir5"]
         self.assertEqual(mir5["classification"]["tests"], ["static.mir5-host-controls"])
         self.assertFalse(mir5["classification"]["escalated"])
-        self.assertIn("static.mir5-host-controls", mir5["selected_tests"])
-        self.assertEqual(mir5["initial_plan"]["profile"], "mir4-development")
-        self.assertFalse(mir5["initial_plan"]["use_affected_selection"])
+        self.assertEqual(mir5["selected_tests"], ["static.mir5-host-controls"])
+        self.assertEqual(mir5["initial_plan"]["profile"], "auto")
+        self.assertTrue(mir5["initial_plan"]["use_affected_selection"])
+        self.assertTrue(mir5["initial_plan"]["selection_rows_covered_by_auto"])
 
         docs = routes["routes"]["docs"]
         self.assertEqual(docs["classification"]["tests"], ["docs.check"])
