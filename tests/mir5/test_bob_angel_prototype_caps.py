@@ -90,7 +90,7 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
             if route_bad=="energy" then recipes["bob-copper-tungsten-alloy"].energy_required=7 end
             local machines={
               ["angels-sintering-oven-4"]={type="assembling-machine",name="angels-sintering-oven-4",crafting_speed=2,module_slots=2,
-                crafting_categories={"angels-sintering","angels-sintering-2","angels-sintering-3","angels-sintering-4"},minable={result="angels-sintering-oven-4"}}
+                crafting_categories={"angels-sintering","angels-sintering-2","angels-sintering-3","angels-sintering-4"},minable={result="angels-sintering-oven-4"},next_upgrade="angels-sintering-oven-5"}
             }
             local data={raw={technology=rows,recipe=recipes,["assembling-machine"]=machines}}
             function data.extend(_, entries)
@@ -365,6 +365,8 @@ class BobAngelPrototypeCapsTests(unittest.TestCase):
                                  (fixture_machine["name"], fixture_machine["crafting_speed"], fixture_machine["module_slots"]))
                 self.assertEqual(source_machine["crafting_categories"], fixture_machine["crafting_categories"])
                 self.assertNotIn("minable", fixture_machine)
+                self.assertEqual("angels-sintering-oven-5", source_machine["next_upgrade"])
+                self.assertNotIn("next_upgrade", fixture_machine)
                 for expected in self.rows:
                     actual = plain(good["rows"][expected["name"]])
                     self.assertEqual(("1", 1), (actual["unit"]["count_formula"], actual["unit"]["time"]))

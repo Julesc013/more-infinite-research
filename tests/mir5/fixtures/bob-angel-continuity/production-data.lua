@@ -46,6 +46,7 @@ function M.install_machine()
   local fixture = table.deepcopy(source)
   fixture.name = M.machine_name
   fixture.minable = nil
+  fixture.next_upgrade = nil
   fixture.crafting_speed = FIXTURE_CRAFTING_SPEED
   fixture.module_slots = 0
   data:extend({fixture})
