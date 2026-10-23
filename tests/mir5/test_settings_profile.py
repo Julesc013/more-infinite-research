@@ -39,11 +39,34 @@ class SettingsProfileTests(unittest.TestCase):
     def test_registered_settings_are_the_single_active_profile_authority(self):
         self.lua.execute(r'''
           local prototypes, names = config.prototypes(), config.registered_names()
-          assert(#prototypes == 11 and #names == 10)
-          local found = {}
-          for _, name in ipairs(names) do found[name] = true end
+          -- The profile import transport is the one non-exportable descriptor.
+          -- The other 888 shipped startup descriptors are the complete F210
+          -- Base/Space Age settings closure, including retained identities.
+          assert(#prototypes == 889 and #names == 888)
+          assert(prototypes[1].name == config.import_setting_name)
+          local found, prototype_by_name, type_count = {}, {}, {}
+          for _, prototype in ipairs(prototypes) do
+            assert(not prototype_by_name[prototype.name])
+            prototype_by_name[prototype.name] = prototype
+            type_count[prototype.type] = (type_count[prototype.type] or 0) + 1
+          end
+          assert(type_count["bool-setting"] == 135)
+          assert(type_count["int-setting"] == 499)
+          assert(type_count["double-setting"] == 240)
+          assert(type_count["string-setting"] == 15)
+          for _, name in ipairs(names) do
+            assert(not found[name] and prototype_by_name[name])
+            found[name] = true
+            local spec = config.spec(name)
+            assert(spec and spec.name == name)
+            assert(config.default_value(name) == spec.default_value)
+            assert(config.validate_value(name, spec.default_value))
+          end
           assert(not found[config.import_setting_name])
           assert(found["ips-enable-research_gears"])
+          assert(found["ips-enable-research_agricultural_growth_speed"])
+          assert(found["ips-enable-research_artificial_soil"])
+          assert(found["mir-enable-braking-force"])
           assert(found["mir-max-level-worker-robots-speed"])
           assert(found["mir-enable-passive-repair"])
           assert(found["mir-unrestricted-modules"])

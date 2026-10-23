@@ -66,12 +66,13 @@ class LifecycleTests(unittest.TestCase):
           end
 
           function boot(forces, raw_cap, profile, saved_storage, retained_handlers, worker_cap, active_mods,
-              agriculture_cap)
+              agriculture_cap, extra_caps)
             storage = saved_storage or {}
             settings = {startup = startup_values(raw_cap, profile, worker_cap)}
             if agriculture_cap ~= nil then
               settings.startup["ips-max-level-research_agricultural_growth_speed"] = {value = agriculture_cap}
             end
+            for name, value in pairs(extra_caps or {}) do settings.startup[name] = {value = value} end
             decoded_profiles = 0
             helpers = {
               json_to_table = function(_) decoded_profiles = decoded_profiles + 1
@@ -112,6 +113,7 @@ class LifecycleTests(unittest.TestCase):
             package.loaded["runtime.library"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.configuration"] = nil
+            package.loaded["research.catalogue"] = nil
             control = require("control")
           end
         ''')
@@ -149,6 +151,72 @@ class LifecycleTests(unittest.TestCase):
           handlers.configuration()
           assert(native.enabled and not native.visible_when_disabled and storage.mir_caps == nil,
             "unlimited agricultural setting did not restore only its own cap transition")
+        ''')
+
+    def test_full_base_limits_are_precomputed_and_research_callbacks_touch_only_the_named_family(self):
+        self.lua.execute('''
+          local belt_name, brake_name = "recipe-prod-research_belts-1", "braking-force-8"
+          local belts, braking = technology(belt_name, 5, true), technology(brake_name, 8, true)
+          local raw, reads = {[belt_name] = belts, [brake_name] = braking}, {}
+          local technologies = setmetatable({}, {__index = function(_, name)
+            reads[name] = (reads[name] or 0) + 1
+            return raw[name]
+          end})
+          local f = force(43, technologies, {}, nil, nil)
+          belts.force, braking.force = f, f
+          boot({[43] = f}, 0, "", nil, nil, 0, nil, nil, {
+            ["ips-max-level-research_belts"] = 4,
+            ["mir-max-level-braking-force"] = 7
+          })
+          assert(require("runtime.lifecycle").caps_active())
+          handlers.init()
+          assert(not belts.enabled and belts.visible_when_disabled)
+          assert(not braking.enabled and braking.visible_when_disabled)
+          local limits = require("runtime.lifecycle").cap_limits(f)
+          assert(limits[belt_name] == 4 and limits[brake_name] == 7)
+          reads = {}
+          belts.level = 4
+          handlers.events[defines.events.on_research_reversed]({research = belts})
+          assert(belts.enabled and not belts.visible_when_disabled,
+            "named family reversal did not restore its owned disablement")
+          assert(not braking.enabled and braking.visible_when_disabled,
+            "named family callback changed another family")
+          assert((reads[brake_name] or 0) == 0,
+            "research callback looked up an unrelated authored family")
+        ''')
+
+    def test_space_age_native_owner_needs_the_exact_authored_effect_contract(self):
+        self.lua.execute('''
+          local name = "low-density-structure-productivity"
+          local function native_owner(effects)
+            local value = technology(name, 3, true)
+            value.prototype = {max_level = 4294967295, effects = effects}
+            return value
+          end
+          local exact = native_owner({
+            {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1},
+            {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .1}
+          })
+          local f = force(44, {[name] = exact}, {}, nil, nil)
+          exact.force = f
+          boot({[44] = f}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          assert(require("runtime.lifecycle").caps_active())
+          handlers.init()
+          assert(not exact.enabled and exact.visible_when_disabled)
+          assert(storage.mir_caps.owned_disabled[44][name].disabled == true)
+
+          local malformed = native_owner({
+            {type = "change-recipe-productivity", recipe = "low-density-structure", change = .1},
+            {type = "change-recipe-productivity", recipe = "casting-low-density-structure", change = .2}
+          })
+          local malformed_force = force(45, {[name] = malformed}, {}, nil, nil)
+          malformed.force = malformed_force
+          boot({[45] = malformed_force}, 0, "", nil, nil, 0, {['space-age'] = '2.1.23'}, nil,
+            {["ips-max-level-research_low_density_structure"] = 2})
+          handlers.init()
+          assert(malformed.enabled and not malformed.visible_when_disabled and storage.mir_caps == nil,
+            "a malformed native owner gained cap ownership")
         ''')
 
     def test_foreign_interface_collision_fails_without_removing_it(self):

@@ -8,6 +8,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 
+MODERN_ORACLE = json.loads(
+    (ROOT / "spec/mir5/inventory/modern-f210-470.json").read_text(encoding="utf-8")
+)
+
 # Exact data-raw rows retained from the accepted published 4.7 F210 captures:
 # vanilla inventory, Space Age capture, and K2SO capture respectively. Keeping
 # them here makes this host control portable; it does not read local build data.
@@ -53,6 +57,8 @@ class GeneratorTests(unittest.TestCase):
           productivity = require("research.productivity")
           gear_bindings = require("compatibility.gear_bindings")
           generator = require("research.generator")
+          modern_catalogue = require("compatibility.modern_catalogue")
+          modern = require("research.modern")
           function defaults()
             local values = {}
             for _, spec in ipairs(config.prototypes()) do values[spec.name] = {value = spec.default_value} end
@@ -75,14 +81,49 @@ class GeneratorTests(unittest.TestCase):
             assert(environment.writes == 0, "preflight rejection wrote prototypes")
             assert(tostring(message):find(fragment, 1, true), tostring(message))
           end
+          -- Test fixture construction follows only the explicit authored
+          -- selection; it never enumerates data.raw to make a family pass.
+          function full_world(active_mods)
+            local tools, technologies, recipes = {}, {}, {}
+            local function add_technology(name) if name then technologies[name] = technologies[name] or {} end end
+            local function add_science(key)
+              for _, name in ipairs(modern_catalogue.science_names(key)) do
+                tools[name] = {}; add_technology(name)
+              end
+            end
+            local selected = modern_catalogue.select(active_mods or {})
+            for _, definition in ipairs(selected.definitions) do
+              add_science(definition.science)
+              for _, name in ipairs(definition.prerequisites) do add_technology(name) end
+              for _, effect in ipairs(definition.effects) do if effect.recipe then recipes[effect.recipe] = {} end end
+            end
+            for _, definition in ipairs(selected.continuations) do
+              add_science(definition.science)
+              for _, name in ipairs(definition.prerequisites) do add_technology(name) end
+            end
+            for _, name in ipairs({"automation", "logistic", "chemical", "production", "military", "utility", "space", "agricultural", "electromagnetic", "cryogenic", "metallurgic", "promethium"}) do
+              tools[name .. "-science-pack"] = {}; add_technology(name .. "-science-pack")
+            end
+            recipes["iron-gear-wheel"] = {}
+            if active_mods and active_mods["space-age"] then
+              recipes["casting-iron-gear-wheel"] = {}; technologies["agriculture"] = {}; technologies["spoilage"] = {}
+            end
+            return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes}, writes = 0,
+              extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
+          end
           function bound_output(active_mods, recipe_rows)
             local binding = gear_bindings.select(active_mods, {recipe = recipe_rows})
             return productivity.gears(config.resolve(defaults()), binding)
           end
           function disabled_data_final()
-            local startup, environment = defaults(), world()
+            mods = {['space-age'] = '2.1.23'}
+            package.loaded["research.settings"] = nil
+            local space_config = require("research.settings")
+            local startup = {}
+            for _, spec in ipairs(space_config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
+            local environment = full_world(mods)
             startup["ips-enable-research_gears"].value = false
-            settings, mods, data, helpers, log = {startup = startup}, {['space-age'] = '2.1.23'}, environment, nil, function() end
+            settings, data, helpers, log = {startup = startup}, environment, nil, function() end
             package.loaded["compatibility.gear_bindings"] = nil
             package.preload["compatibility.gear_bindings"] = function() error("inactive binding was loaded") end
             local ok, message = pcall(dofile, data_final_path)
@@ -181,10 +222,70 @@ class GeneratorTests(unittest.TestCase):
     def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
-          assert(ok, message); assert(environment.writes == 1 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 71 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
+        ''')
+
+    def test_full_modern_catalogue_is_lazy_bounded_and_declares_exact_owners(self):
+        self.lua.execute('''
+          -- Base construction must not require the inactive Space Age body.
+          local space_body = "compatibility.modern_catalogue.space_age"
+          package.loaded[space_body] = nil
+          package.preload[space_body] = function() error("base selection loaded Space Age catalogue") end
+          local base = modern_catalogue.select({})
+          assert(base.profile == "base" and #base.definitions == 46
+            and #base.continuations == 6 and #base.recipe_patches == 0)
+          local base_rows = modern.technologies(base, config.resolve(defaults()))
+          assert(#base_rows == 52 and package.loaded[space_body] == nil)
+          local ids = {}; for _, row in ipairs(base_rows) do ids[row.name] = row end
+          assert(ids["recipe-prod-research_advanced_circuit-1"].effects[1].recipe == "advanced-circuit")
+          assert(ids["braking-force-8"].unit.count_formula == "861.51212960553*1.33333^(L-8)")
+          assert(ids["inserter-capacity-bonus-8"].effects[1].modifier == 2
+            and ids["worker-robots-storage-4"].effects[1].modifier == 1)
+          package.preload[space_body] = nil
+
+          local space_mods = {['space-age'] = '2.1.23'}
+          local space = modern_catalogue.select(space_mods)
+          assert(space.profile == "space-age" and #space.definitions == 62
+            and #space.continuations == 6 and #space.recipe_patches == 3)
+          local outputs = modern.technologies(space, config.resolve(defaults()))
+          local present = {}; for _, row in ipairs(outputs) do present[row.name] = row end
+          assert(#outputs == 68 and present["recipe-prod-research_low_density_structure-1"] == nil)
+          assert(present["recipe-prod-research_artificial_soil-1"].effects[3].change == .05)
+          assert(present["research-speed-7"].prerequisites[1] == "research-speed-5")
+          local recipes = {['capture-robot-rocket'] = {}, ['ice-platform'] = {}, ['space-platform-foundation'] = {}}
+          modern.preflight_recipe_patches(space, {recipe = recipes})
+          modern.apply_recipe_patches(space, {recipe = recipes})
+          assert(recipes['capture-robot-rocket'].allow_productivity and recipes['ice-platform'].allow_productivity
+            and recipes['space-platform-foundation'].allow_productivity)
+          space.definitions[1].effects[1].recipe = "foreign"
+          assert(modern_catalogue.select(space_mods).definitions[1].effects[1].recipe ~= "foreign")
+
+          -- The runtime admission list is a fresh, named declaration rather
+          -- than a scan of output tables. Every declared family has a setting.
+          mods = {}
+          package.loaded["research.catalogue"] = nil
+          local base_declared = require("research.catalogue").declared()
+          assert(#base_declared == 53)
+          for _, row in ipairs(base_declared) do
+            assert(config.resolve(defaults()).streams[row.family] ~= nil)
+            assert(row.legacy_binding and row.legacy_binding.source and row.legacy_binding.operation)
+          end
+          mods = space_mods
+          package.loaded["research.catalogue"] = nil
+          local space_declared = require("research.catalogue").declared()
+          local owners = 0
+          for _, row in ipairs(space_declared) do
+            if row.ownership_kind == "nativeowner" then
+              owners = owners + 1
+              assert(row.native_owner_identity == row.id and row.native_admission)
+              assert(row.legacy_binding.source == "native-owner"
+                and row.legacy_binding.operation == "preserve_native_owner")
+            end
+          end
+          assert(#space_declared == 76 and owners == 5)
         ''')
 
     def test_cost_variants_and_nonfinite(self):
@@ -206,11 +307,13 @@ class GeneratorTests(unittest.TestCase):
           local values = {schema=1, kind="mir-settings-profile", settings={
             ["ips-cost-base-research_gears"] = 8000, ["ips-enable-research_gears"] = false,
             ["ips-cost-linear-increment-research_gears"] = 0, ["ips-research-time-research_gears"] = 0,
-            ["ips-cost-growth-research_gears"] = -1}}
+            ["ips-cost-growth-research_gears"] = -1,
+            ["mir-prototype-positive-power-floor"] = true}}
           local codec = {json_to_table=function() return values end, decode_string=function(s) return s end, encode_string=function(s) return s end}
           local result = config.resolve(startup, codec)
           assert(result.base_cost == 8000 and result.enabled == false and result.linear_increment == 0)
           assert(result.research_time == 60 and result.growth_factor == 2)
+          assert(result.options["mir-prototype-positive-power-floor"] == true)
           startup["mir-settings-profile-import"].value = "MIRSET1:anything"
           assert(config.resolve(startup, codec).enabled == false)
           codec.json_to_table = function() error("malformed JSON") end
@@ -290,13 +393,19 @@ class GeneratorTests(unittest.TestCase):
 
     def test_base_stage_leaves_scripted_effect_modules_and_settings_unloaded(self):
         self.lua.execute('''
-          assert(config.spec("ips-enable-research_agricultural_growth_speed") == nil)
-          assert(config.spec("ips-enable-research_spoilage_preservation") == nil)
+          -- Historical startup IDs remain target-invariant, but their inactive
+          -- Space Age effect/binding bodies still stay unloaded in Base.
+          assert(config.spec("ips-enable-research_agricultural_growth_speed") ~= nil)
+          assert(config.spec("ips-enable-research_spoilage_preservation") ~= nil)
+          local counts = {}; for _, row in ipairs(config.prototypes()) do counts[row.type] = (counts[row.type] or 0) + 1 end
+          assert(counts["string-setting"] == 15 and counts["bool-setting"] == 135
+            and counts["int-setting"] == 499 and counts["double-setting"] == 240)
           assert(package.loaded["research.settings.space_age_scripted"] == nil)
+          assert(package.loaded["compatibility.modern_catalogue.space_age"] == nil)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
 
-          local startup, environment = defaults(), world()
+          local startup, environment = defaults(), full_world({})
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.preload["compatibility.space_age_scripted_effects"] = function()
             error("base data stage loaded a Space Age binding")
@@ -304,13 +413,99 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = function()
             error("base data stage loaded a Space Age technology body")
           end
+          package.loaded["overrides.prototype_limits"] = nil
+          package.preload["overrides.prototype_limits"] = function()
+            error("default data stage loaded prototype limits")
+          end
           local ok, message = pcall(dofile, data_final_path)
           package.preload["compatibility.space_age_scripted_effects"] = nil
           package.preload["research.scripted_effects"] = nil
+          package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 1)
+          assert(environment.writes == 1 and #environment.emitted == 53)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
+          assert(package.loaded["overrides.prototype_limits"] == nil)
+        ''')
+
+    def test_full_published_setting_output_matches_oracle_without_retired_planner_metadata(self):
+        for profile in MODERN_ORACLE["profiles"]:
+            active_mods = {"space-age": "2.1.23"} if profile["id"] == "space-age-f210" else {}
+            self.lua.globals().profile_setting_mods = lua_table(self.lua, active_mods)
+            self.lua.execute('''
+              mods = profile_setting_mods
+              package.loaded["research.settings"] = nil
+              profile_settings = require("research.settings")
+            ''')
+            actual = {
+                row["name"]: plain_lua(row)
+                for row in self.lua.eval("profile_settings.prototypes()").values()
+            }
+            expected = {}
+            for item in profile["published_output"]["settings"]["additions"]:
+                row = dict(item["row"])
+                # targets fed the retired MIR4 planner. It is neither a
+                # Factorio setting field nor MIR5 authoring/runtime input.
+                row.pop("targets", None)
+                expected[item["name"]] = row
+            self.assertEqual(actual, expected, profile["id"])
+
+    def test_data_final_full_published_technology_output_matches_oracle(self):
+        expected_profiles = {
+            profile["id"]: {
+                row["name"]: row["row"]
+                for row in profile["published_output"]["data"]["additions"]
+                if row["type"] == "technology"
+            }
+            for profile in MODERN_ORACLE["profiles"]
+        }
+        patch_profiles = {
+            profile["id"]: profile["published_output"]["data"]["patches"]
+            for profile in MODERN_ORACLE["profiles"]
+        }
+        cases = (
+            ("base-f210", {}),
+            ("space-age-f210", {"space-age": "2.1.23"}),
+        )
+        for profile, active_mods in cases:
+            self.lua.globals().published_mods = lua_table(self.lua, active_mods)
+            self.lua.execute('''
+              mods = published_mods
+              settings, data, helpers, log = {startup = defaults()}, full_world(mods), nil, function() end
+              assert(dofile(data_final_path) == nil)
+              published_emitted, published_raw = data.emitted, data.raw
+            ''')
+            actual = {
+                row["name"]: plain_lua(row)
+                for row in self.lua.globals().published_emitted.values()
+            }
+            self.assertEqual(actual, expected_profiles[profile], profile)
+            expected_patches = patch_profiles[profile]
+            self.assertEqual(
+                set(self.lua.globals().published_raw.recipe.keys())
+                >= {patch["name"] for patch in expected_patches},
+                True,
+                profile,
+            )
+            for patch in expected_patches:
+                self.assertEqual(patch["changed_paths"], ["allow_productivity"], profile)
+                self.assertEqual(
+                    plain_lua(self.lua.globals().published_raw.recipe[patch["name"]]),
+                    {"allow_productivity": True},
+                    f"{profile}:{patch['name']}",
+                )
+
+    def test_effective_global_option_lazily_activates_prototype_limits(self):
+        self.lua.execute('''
+          local startup, environment = defaults(), full_world({})
+          startup["mir-prototype-positive-power-floor"].value = true
+          environment.raw["fixture-receiver"] = {zero = {energy_usage = "0W"}}
+          settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
+          package.loaded["overrides.prototype_limits"] = nil
+          assert(dofile(data_final_path) == nil)
+          assert(environment.writes == 1 and #environment.emitted == 53)
+          assert(package.loaded["overrides.prototype_limits"] ~= nil)
+          assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
 
     def test_space_age_data_stage_installs_the_two_authored_effect_rows_once(self):
@@ -321,20 +516,16 @@ class GeneratorTests(unittest.TestCase):
           local space_config = require("research.settings")
           local startup = {}
           for _, spec in ipairs(space_config.prototypes()) do startup[spec.name] = {value = spec.default_value} end
-          local names = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
-            "production-science-pack", "space-science-pack", "agricultural-science-pack",
-            "electromagnetic-science-pack", "cryogenic-science-pack"}
-          local science = {}
-          for _, name in ipairs(names) do science[name] = {} end
-          local environment = {raw = {technology = science, tool = science, item = {spoilage = {}},
-            recipe = {['casting-iron-gear-wheel'] = {}, ['iron-gear-wheel'] = {}}}, writes = 0,
-            extend = function(self, rows) self.writes = self.writes + 1; self.emitted = rows end}
+          local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 3)
-          assert(environment.emitted[1].name == "recipe-prod-research_gears-1")
-          assert(environment.emitted[2].name == "recipe-prod-research_agricultural_growth_speed-1")
-          assert(environment.emitted[3].name == "recipe-prod-research_spoilage_preservation-1")
+          assert(environment.writes == 1 and #environment.emitted == 71)
+          local ids = {}
+          for _, row in ipairs(environment.emitted) do ids[row.name] = row end
+          assert(ids["recipe-prod-research_gears-1"] ~= nil)
+          assert(ids["recipe-prod-research_agricultural_growth_speed-1"] ~= nil)
+          assert(ids["recipe-prod-research_spoilage_preservation-1"] ~= nil)
+          assert(ids["braking-force-8"] ~= nil and ids["worker-robots-storage-4"] ~= nil)
         ''')
 
     def test_k2so_scripted_binding_keeps_the_captured_spoilage_subset_and_lazy_profiles(self):

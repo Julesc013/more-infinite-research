@@ -15,6 +15,24 @@ class LegacyCapsTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           legacy = require("runtime.legacy_caps")
 
+          -- The runtime builds this exact catalogue-derived allowlist once at
+          -- control parse. Keep the pure decoder tests independent of runtime
+          -- storage while preserving the same strict boundary.
+          local direct_allowlist = legacy.allowlist({
+            {id = "recipe-prod-research_gears-1", cap_setting = "ips-max-level-research_gears",
+              legacy_binding = {source = "generated-stream", operation = "emit"}},
+            {id = "recipe-prod-research_agricultural_growth_speed-1",
+              cap_setting = "ips-max-level-research_agricultural_growth_speed",
+              legacy_binding = {source = "generated-stream", operation = "emit"}},
+            {id = "recipe-prod-research_spoilage_preservation-1",
+              cap_setting = "ips-max-level-research_spoilage_preservation",
+              legacy_binding = {source = "generated-stream", operation = "emit"}}
+          })
+          local raw_import_for_force = legacy.import_for_force
+          function legacy.import_for_force(bucket, force, candidates, current, allowlist)
+            return raw_import_for_force(bucket, force, candidates, current, allowlist or direct_allowlist)
+          end
+
           function candidate(name, setting, source, operation, admitted)
             return {name = name, setting = setting, source = source,
               operation = operation, admitted = admitted ~= false}
@@ -215,7 +233,7 @@ class LegacyCapsTests(unittest.TestCase):
           assert(facts.decisions[1].outcome == "visibility_imported_enablement_reenabled")
         ''')
 
-    def test_uses_only_four_declared_candidates_and_does_not_enumerate_legacy_maps(self):
+    def test_uses_bounded_declared_candidates_and_does_not_enumerate_legacy_maps(self):
         self.lua.execute('''
           local gear = candidate("recipe-prod-research_gears-1", "ips-max-level-research_gears",
             "generated-stream", "emit")
@@ -238,10 +256,10 @@ class LegacyCapsTests(unittest.TestCase):
           local rows, facts = legacy.import_for_force(old, f, {gear, agriculture, spoilage, worker}, nil)
           assert(next(rows) == nil and facts.candidates_checked == 4 and #facts.decisions == 4)
           assert(reads <= 4)
-          local ok = pcall(function()
-            legacy.import_for_force(old, f, {gear, agriculture, spoilage, worker, gear}, nil)
-          end)
-          assert(not ok, "fifth candidate was accepted")
+          local oversized = {}
+          for index = 1, 129 do oversized[index] = gear end
+          local ok = pcall(function() legacy.import_for_force(old, f, oversized, nil) end)
+          assert(not ok, "candidate bound was not enforced")
         ''')
 
     def test_source_has_no_old_runtime_import_or_mutating_assignment(self):

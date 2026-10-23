@@ -40,7 +40,7 @@ class LibraryModelTests(unittest.TestCase):
           end
         ''')
 
-    def test_catalogue_is_current_gear_metadata_and_detached(self):
+    def test_catalogue_is_complete_base_metadata_and_detached(self):
         self.lua.execute('''
           local first, second = catalogue.declared(), catalogue.declared()
           local first_by_id, second_by_id = {}, {}
@@ -48,9 +48,10 @@ class LibraryModelTests(unittest.TestCase):
           for _, row in ipairs(first) do first_by_id[row.id], families[row.family] = row, true end
           for _, row in ipairs(second) do second_by_id[row.id] = row end
           local gear = first_by_id["recipe-prod-research_gears-1"]
-          assert(#first == 3 and gear and gear.family == "research_gears" and gear.recipe == "iron-gear-wheel")
-          assert(families.research_agricultural_growth_speed and families.research_gears
-            and families.research_spoilage_preservation)
+          assert(#first == 53 and gear and gear.family == "research_gears" and gear.recipe == "iron-gear-wheel")
+          assert(families.research_gears and families["braking-force"])
+          assert(first_by_id["braking-force-8"].cap_setting == "mir-max-level-braking-force")
+          assert(not families.research_agricultural_growth_speed and not families.research_spoilage_preservation)
           assert(gear.cap_setting == "ips-max-level-research_gears")
           assert(#gear.settings == 7 and gear.settings[1] == "ips-enable-research_gears")
           gear.settings[1] = "foreign"; gear.id = "foreign"
@@ -308,7 +309,10 @@ class LibraryModelTests(unittest.TestCase):
         catalogue = (ROOT / "source/mir5/research/catalogue.lua").read_text(encoding="utf-8")
         self.assertNotIn("require(", source)
         self.assertNotIn("Generator", source)
-        self.assertNotIn("require(", catalogue)
+        self.assertIn('require("compatibility.modern_catalogue")', catalogue)
+        for forbidden in ('require("research.generator")', 'require("research.modern")',
+                          'require("research.settings")', "data.raw", "game.", "storage."):
+            self.assertNotIn(forbidden, catalogue)
 
 
 if __name__ == "__main__":

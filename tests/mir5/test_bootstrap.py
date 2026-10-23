@@ -249,8 +249,8 @@ class BootstrapTests(unittest.TestCase):
             and library_calls.open.options.status == 4 and library_calls.open.options.mode == 3
             and library_calls.open.options.sort == "name-desc"
             and library_calls.open.options.page == 7 and library_calls.open.options.hidden == hidden)
-          assert(browser.open(1, {family = "research_spoilage_preservation", visibility = 2}))
-          assert(library_calls.open.options.family == "research_spoilage_preservation"
+          assert(browser.open(1, {family = "research_gears", visibility = 2}))
+          assert(library_calls.open.options.family == "research_gears"
             and library_calls.open.options.visibility == 2)
           assert(browser.open(1, {visibility = 3}))
           assert(library_calls.open.options.visibility == nil)
@@ -388,40 +388,49 @@ class BootstrapTests(unittest.TestCase):
             "unavailable native property discarded a contribution needed for re-addition")
         ''')
 
-    def test_catalogue_declares_the_three_authored_stream_identities_with_detached_metadata(self):
+    def test_catalogue_declares_full_base_and_space_age_cap_identities_with_detached_metadata(self):
         self.lua.execute('''
+          script, mods = {active_mods = {}}, {}
           package.loaded["research.catalogue"] = nil
           local catalogue = require("research.catalogue")
           local first, second = catalogue.declared(), catalogue.declared()
-          assert(#first == 3 and #second == 3)
-          local expected = {
-            {id = "recipe-prod-research_gears-1", family = "research_gears",
-              setting = "ips-enable-research_gears", cap = "ips-max-level-research_gears",
-              order = "p[research_gears]",
-              locale = "technology-name.more-infinite-research.research_gears"},
-            {id = "recipe-prod-research_agricultural_growth_speed-1",
-              family = "research_agricultural_growth_speed",
-              setting = "ips-enable-research_agricultural_growth_speed",
-              cap = "ips-max-level-research_agricultural_growth_speed",
-              order = "p[research_agricultural_growth_speed]",
-              locale = "technology-name.more-infinite-research.research_agricultural_growth_speed"},
-            {id = "recipe-prod-research_spoilage_preservation-1",
-              family = "research_spoilage_preservation",
-              setting = "ips-enable-research_spoilage_preservation",
-              cap = "ips-max-level-research_spoilage_preservation",
-              order = "p[research_spoilage_preservation]",
-              locale = "technology-name.more-infinite-research.research_spoilage_preservation"}
-          }
-          for index, row in ipairs(expected) do
-            local actual = first[index]
-            assert(actual.id == row.id and actual.family == row.family and actual.progression == 1)
-            assert(actual.setting == row.setting and actual.cap_setting == row.cap)
-            assert(actual.native_order == row.order and actual.locale_key == row.locale)
-            assert(#actual.settings == 7 and actual.settings[1] == row.setting
-              and actual.settings[5] == row.cap)
+          assert(#first == 53 and #second == 53)
+          local seen, continuations = {}, 0
+          for _, row in ipairs(first) do
+            assert(type(row.id) == "string" and seen[row.id] == nil)
+            seen[row.id] = true
+            assert(row.ownership_kind == "authored_generated"
+              and type(row.family) == "string" and type(row.cap_setting) == "string")
+            assert(type(row.legacy_binding) == "table")
+            if row.legacy_binding.source == "base-continuation" then
+              continuations = continuations + 1
+              assert(row.legacy_binding.operation == "emit_base_extension")
+            else
+              assert(row.legacy_binding.source == "generated-stream"
+                and row.legacy_binding.operation == "emit")
+            end
           end
-          first[2].settings[1] = "foreign"
-          assert(second[2].settings[1] == "ips-enable-research_agricultural_growth_speed")
+          assert(continuations == 6 and seen["recipe-prod-research_gears-1"])
+          first[1].settings[1] = "foreign"
+          assert(second[1].settings[1] == "ips-enable-research_gears")
+
+          script.active_mods, mods = {['space-age'] = '2.1.23'}, {['space-age'] = '2.1.23'}
+          package.loaded["research.catalogue"] = nil
+          local space_age = require("research.catalogue").declared()
+          local generated, native = 0, 0
+          for _, row in ipairs(space_age) do
+            if row.ownership_kind == "authored_generated" then
+              generated = generated + 1
+            else
+              native = native + 1
+              assert(row.ownership_kind == "nativeowner" and row.native_owner_identity == row.id)
+              assert(row.legacy_binding.source == "native-owner"
+                and row.legacy_binding.operation == "preserve_native_owner")
+              assert(row.native_admission.effect_type == "change-recipe-productivity"
+                and #row.native_admission.recipes > 0)
+            end
+          end
+          assert(#space_age == 76 and generated == 71 and native == 5)
         ''')
 
     def test_interface_collisions_are_rejected_without_replacement(self):

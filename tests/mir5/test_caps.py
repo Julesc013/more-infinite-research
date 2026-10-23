@@ -129,6 +129,22 @@ class CapsTests(unittest.TestCase):
           assert(speed.enabled and ownership[6] == nil)
         ''')
 
+    def test_named_target_filters_only_its_own_queue_entries(self):
+        self.lua.execute('''
+          local belts = technology("recipe-prod-research_belts-1", 5, true)
+          local braking = technology("braking-force-8", 8, true)
+          local f = force(8, {[belts.name] = belts, [braking.name] = braking},
+            {belts, braking}, belts, .33)
+          local _, result = caps.reconcile(f, {[belts.name] = 4, [braking.name] = 7}, {},
+            {[belts.name] = true})
+          assert(result.queue_changed and #f.research_queue == 1
+            and f.research_queue[1] == braking)
+          assert(f.current_research == braking and f.research_progress == 0,
+            "the native queue replacement owns cancellation of only the selected current research")
+          assert(not belts.enabled and braking.enabled,
+            "a named reconciliation changed another family")
+        ''')
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

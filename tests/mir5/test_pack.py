@@ -93,8 +93,15 @@ class PackTests(unittest.TestCase):
         closure = local_closure([PLAYER / "settings.lua"])
         self.assertEqual(
             {path.relative_to(PLAYER).as_posix() for path in closure},
-            {"settings.lua", "research/settings.lua", "research/settings_profile.lua",
-             "research/settings/space_age_scripted.lua"},
+            {
+                "settings.lua",
+                "research/settings.lua",
+                "research/settings_profile.lua",
+                "research/historical_settings.lua",
+                "compatibility/modern_catalogue.lua",
+                "compatibility/modern_catalogue/base.lua",
+                "compatibility/modern_catalogue/space_age.lua",
+            },
         )
         self.assertNotIn(PLAYER / "research/generator.lua", closure)
         self.assertFalse(any("runtime" in path.parts or "api" in path.parts for path in closure))

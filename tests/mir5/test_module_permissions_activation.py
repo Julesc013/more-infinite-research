@@ -16,6 +16,7 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           config = require("research.settings")
+          modern_catalogue = require("compatibility.modern_catalogue")
           mods = {base = "2.1.23"}
 
           function defaults()
@@ -27,20 +28,42 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           end
 
           function complete_world()
-            local packs = {}
-            for _, name in ipairs({"automation", "logistic", "chemical", "production"}) do
-              packs[name .. "-science-pack"] = {}
-            end
-            local recipe = {
+            -- Build only the current explicit base selection. This fixture
+            -- remains a narrow override probe while satisfying the generator's
+            -- named preflight without a data.raw discovery scan.
+            local packs, technologies, recipe = {}, {}, {
               ["iron-gear-wheel"] = {foreign = "gear"},
               target = {foreign = "recipe", allow_speed = false,
                 allowed_module_categories = {"narrow"}}
             }
+            local function add_technology(name)
+              if name then technologies[name] = technologies[name] or {} end
+            end
+            local function add_science(vector)
+              for _, name in ipairs(modern_catalogue.science_names(vector)) do
+                packs[name] = {}; add_technology(name)
+              end
+            end
+            local selected = modern_catalogue.select(mods)
+            for _, definition in ipairs(selected.definitions) do
+              add_science(definition.science)
+              for _, name in ipairs(definition.prerequisites) do add_technology(name) end
+              for _, effect in ipairs(definition.effects) do
+                if effect.recipe then recipe[effect.recipe] = {} end
+              end
+            end
+            for _, continuation in ipairs(selected.continuations) do
+              add_science(continuation.science)
+              for _, name in ipairs(continuation.prerequisites) do add_technology(name) end
+            end
+            for _, name in ipairs({"automation", "logistic", "chemical", "production", "military", "utility"}) do
+              packs[name .. "-science-pack"] = {}; add_technology(name .. "-science-pack")
+            end
             local lab = {module_slots = 1, foreign = "receiver",
               allowed_effects = {"speed"}, allowed_module_categories = {"narrow"}}
             return {
               raw = {
-                technology = packs,
+                technology = technologies,
                 tool = packs,
                 recipe = recipe,
                 ["module-category"] = {speed = {}, custom = {}},
@@ -74,6 +97,8 @@ class ModulePermissionsActivationTests(unittest.TestCase):
           package.loaded["research.productivity"] = nil
           package.loaded["research.generator"] = nil
           package.loaded["compatibility.gear_bindings"] = nil
+          package.loaded["compatibility.modern_catalogue"] = nil
+          package.loaded["research.modern"] = nil
           package.loaded["overrides.module_permissions"] = nil
           -- Isolate the independent research path: its named recipe preflight
           -- is covered by the Generator tests, not this inactive override test.
@@ -89,9 +114,26 @@ class ModulePermissionsActivationTests(unittest.TestCase):
               return {type = "technology", name = "stub"}
             end}
           end
+          package.preload["compatibility.modern_catalogue"] = function()
+            return {select = function(active_mods)
+              assert(active_mods == mods)
+              return {definitions = {}, continuations = {}, recipe_patches = {}}
+            end}
+          end
+          package.preload["research.modern"] = function()
+            return {
+              preflight_recipe_patches = function(selection, prototypes)
+                assert(selection.recipe_patches[1] == nil and prototypes == raw)
+              end,
+              technologies = function(selection) assert(#selection.definitions == 0); return {} end,
+              apply_recipe_patches = function(selection, prototypes)
+                assert(selection.recipe_patches[1] == nil and prototypes == raw)
+              end
+            }
+          end
           package.preload["research.generator"] = function()
             return {install = function(prototypes, stage)
-              assert(prototypes[1].name == "stub" and stage == data)
+              assert(#prototypes == 1 and prototypes[1].name == "stub" and stage == data)
               installs = installs + 1
             end}
           end
