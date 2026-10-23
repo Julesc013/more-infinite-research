@@ -323,8 +323,8 @@ script.on_init(function()
   -- All named prerequisites are seeded before the force bonus baseline.  Add
   -- the fixed seven entries once: the lab, not this control script, completes
   -- every research and raises the seven native completion events.
-  force.research_queue_enabled = true
-  if force.research_queue_enabled ~= true then fail("native research queue could not be enabled") end
+  -- F200 queues are always available. Do not write the removed 1.1
+  -- research_queue_enabled property; exact add/queue readback below is proof.
   for _, expected in ipairs(PLAN) do
     local value = technology(force, expected)
     if not force.add_research(value) then fail("could not queue native research " .. expected.name) end

@@ -175,13 +175,15 @@ class K2BaseNativeFixtureTests(unittest.TestCase):
             end
             local function force_for(name, index)
               local force = {name=name, index=index, valid=true, technologies={}, recipes={}, research_queue={},
-                research_queue_enabled=false,
                 current_research=nil, train_braking_force_bonus=0, inserter_stack_size_bonus=0,
                 bulk_inserter_capacity_bonus=0, laboratory_speed_modifier=0, worker_robots_storage_bonus=0, guns={}}
+              setmetatable(force, {__newindex=function(object, key, value)
+                if key == "research_queue_enabled" then error("removed F200 force property") end
+                rawset(object, key, value)
+              end})
               function force.get_gun_speed_modifier(category) return force.guns[category] or 0 end
               function force.get_spawn_position(_) return {0, 0} end
               function force.add_research(technology)
-                if force.research_queue_enabled ~= true then return false end
                 table.insert(force.research_queue, technology)
                 if not force.current_research then force.current_research = technology end
                 return true
@@ -412,7 +414,7 @@ class K2BaseNativeFixtureTests(unittest.TestCase):
         self.assertIn('name = "kr-advanced-lab"', source)
         self.assertIn("defines.inventory.lab_input", source)
         self.assertIn("force.add_research", source)
-        self.assertIn("force.research_queue_enabled = true", source)
+        self.assertNotIn("force.research_queue_enabled =", source)
         self.assertIn("#force.research_queue ~= #PLAN", source)
         self.assertIn("game.server_save(SAVE)", source)
         self.assertNotIn("research_recursive", source)
