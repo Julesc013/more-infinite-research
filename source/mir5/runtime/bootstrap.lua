@@ -21,6 +21,50 @@ if type(active_mods) == "table" and active_mods["space-age"] ~= nil then
   scripted_effects = require("runtime.scripted_effects")
 end
 
+-- Historical JSON carrier recovery is independent of caps and scripted
+-- contributions. No K2 body or migration state exists on an inactive profile.
+local imersite, imersite_contract, imersite_change
+if active_mods.Krastorio2 and active_mods["Krastorio2-spaced-out"]
+    and active_mods.Krastorio2Assets and active_mods["k2so-assets"] and active_mods["space-age"]
+    and type(active_mods.base) == "string" and active_mods.base:match("^2%.1%.") then
+  imersite_contract = require("research.k2_imersite")
+  imersite = require("runtime.k2_imersite_migration")
+  imersite_change = effective.streams[imersite_contract.stream].effect_percent / 100
+end
+
+local function imersite_state()
+  local value = storage[imersite_contract.storage_key]
+  if value ~= nil and (type(value) ~= "table" or value.schema ~= 1 or type(value.forces) ~= "table") then
+    error("MIR unsupported Imersite migration storage",2)
+  end
+  return value
+end
+
+local function reconcile_imersite(selected_force)
+  if not imersite then return end
+  local state = imersite_state() or {schema=1,forces={}}
+  local namespace = storage.mir
+  local adoption = type(namespace) == "table" and namespace.productivity_family_adoption
+  local legacy = type(adoption) == "table" and adoption.k2_imersite_staged_migration
+  local function reconcile(force)
+    imersite.reconcile_force(force,imersite_change,state.forces,type(legacy) == "table" and legacy[force.index] or nil)
+  end
+  if selected_force then reconcile(selected_force)
+  else for _, force in pairs(game.forces) do reconcile(force) end end
+  if next(state.forces) ~= nil then storage[imersite_contract.storage_key] = state end
+end
+
+local function initialize_imersite(force)
+  if not imersite then return end
+  if force then
+    local state = imersite_state()
+    if state then state.forces[force.index] = nil end
+    imersite.initialize_force(force,imersite_change)
+  else
+    for _, candidate in pairs(game.forces) do imersite.initialize_force(candidate,imersite_change) end
+  end
+end
+
 local M = {}
 
 local API_INTERFACE = "more-infinite-research.api.v1"
@@ -193,6 +237,7 @@ local function add_command()
 end
 
 local function on_init()
+  initialize_imersite()
   lifecycle.on_init()
   if scripted_effects then scripted_effects.on_init() end
   library.on_init()
@@ -201,6 +246,7 @@ local function on_init()
 end
 
 local function on_configuration_changed(event)
+  reconcile_imersite()
   lifecycle.on_configuration_changed(event)
   if scripted_effects then
     scripted_effects.on_configuration_changed(event)
@@ -310,16 +356,27 @@ local function on_tower_planted_seed(event)
 end
 
 local function on_force_created(event)
+  if event and event.force then initialize_imersite(event.force) end
   if lifecycle.caps_active() then lifecycle.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
 end
 
 local function on_force_reset(event)
+  if event and event.force then initialize_imersite(event.force) end
   if lifecycle.caps_active() then lifecycle.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
 end
 
 local function on_forces_merged(event)
+  if imersite and event and event.destination then
+    local state = imersite_state()
+    if state then
+      state.forces[event.source_index] = nil
+      state.forces[event.destination.index] = nil
+    end
+    initialize_imersite(event.destination)
+    reconcile_imersite(event.destination)
+  end
   if lifecycle.caps_active() then lifecycle.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
 end
@@ -354,6 +411,7 @@ function M.register()
   end
   local force_lifecycle_active = lifecycle.caps_active()
     or (scripted_effects and scripted_effects.events_active())
+    or imersite ~= nil
   if force_lifecycle_active then
     if events.on_force_created then script.on_event(events.on_force_created, on_force_created) end
     if events.on_force_reset then script.on_event(events.on_force_reset, on_force_reset) end

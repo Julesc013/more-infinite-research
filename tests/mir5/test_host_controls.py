@@ -92,10 +92,12 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_caps.py",
             "tests/mir5/test_legacy_caps.py",
             "tests/mir5/test_legacy_caps_lifecycle.py",
+            "tests/mir5/test_k2_imersite_migration.py",
             "tests/mir5/test_api.py",
             "tests/mir5/test_runtime_api.py",
             "tests/mir5/test_sdk.py",
             "tests/mir5/test_fixture_controls.py",
+            "tests/mir5/test_foreign_research_preservation.py",
             "tests/mir5/test_capture_controls.py",
             "tests/mir5/test_lifecycle.py",
             "tests/mir5/test_native_owners.py",
@@ -123,7 +125,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 34)
+        self.assertEqual(len(paths), 36)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
@@ -142,8 +144,8 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:26]))
-        self.assertTrue(all(not row["lua"] for row in controls[26:]))
+        self.assertTrue(all(row["lua"] for row in controls[:28]))
+        self.assertTrue(all(not row["lua"] for row in controls[28:]))
 
     def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
         result = selections()

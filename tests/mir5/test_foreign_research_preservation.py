@@ -1,0 +1,285 @@
+"""Host controls for the SCI-RESEARCH-01 representative fixture, not native evidence."""
+import argparse
+import json
+from pathlib import Path
+import sys
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[2]
+FIXTURE = ROOT / "tests/mir5/fixtures/foreign-research-preservation"
+SOURCE = FIXTURE / "published-4.7"
+DESTINATION = FIXTURE / "mir5"
+PROFILE = ROOT / "tests/mir5/profiles/foreign-research-preservation-f210.json"
+
+
+class ForeignResearchPreservationTests(unittest.TestCase):
+    def setUp(self):
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
+        self.lua.execute(r'''
+          function foreign_fixture_data(path)
+            fixture_rows = nil
+            data = {extend = function(_, rows) fixture_rows = rows end}
+            local chunk, message = loadfile(path, "t", _G)
+            assert(chunk, message)
+            chunk()
+            return fixture_rows
+          end
+
+          function run_foreign_research_transition(source_path, destination_path)
+            local callbacks = {}
+            local marker_count, source_saves, destination_saves = 0, 0, 0
+            local force = {
+              valid = true,
+              index = 1,
+              laboratory_speed_modifier = 0,
+              recipes = {['iron-gear-wheel'] = {productivity_bonus = 0}},
+              technologies = {}
+            }
+            function force.enable_all_prototypes() end
+
+            local function prerequisite()
+              return {research_recursive = function()
+                -- An opponent for the real prerequisite's native bonus. The
+                -- fixture must establish its baseline after all setup.
+                force.laboratory_speed_modifier = force.laboratory_speed_modifier + .1
+              end}
+            end
+            local function technology(name, level, max_level, finite, laboratory_speed, gear_bonus)
+              local state = {
+                name = name, level = level, researched = false, enabled = true,
+                visible_when_disabled = false,
+                prototype = {max_level = max_level}, prerequisites = {prerequisite()}
+              }
+              return setmetatable({}, {
+                __index = function(_, key) return state[key] end,
+                __newindex = function(_, key, value)
+                  if key == "researched" and value == true then
+                    if finite then
+                      state.researched = true
+                    else
+                      state.level = state.level + 1
+                      state.researched = false
+                    end
+                    if laboratory_speed then
+                      force.laboratory_speed_modifier = force.laboratory_speed_modifier + laboratory_speed
+                    end
+                    if gear_bonus then
+                      force.recipes['iron-gear-wheel'].productivity_bonus =
+                        force.recipes['iron-gear-wheel'].productivity_bonus + gear_bonus
+                    end
+                    return
+                  end
+                  state[key] = value
+                end
+              })
+            end
+
+            force.technologies['Space-Lab-Research-61'] =
+              technology('Space-Lab-Research-61', 61, 61, true, .061, nil)
+            force.technologies['research-speed-7'] =
+              technology('research-speed-7', 7, 4294967295, false, .6, nil)
+            force.technologies['recipe-prod-research_gears-1'] =
+              technology('recipe-prod-research_gears-1', 1, 4294967295, false, nil, .1)
+
+            local game = {
+              forces = {player = force},
+              server_save = function(name)
+                if name == 'mir5-foreign-research-preservation-source' then
+                  source_saves = source_saves + 1
+                elseif name == 'mir5-foreign-research-preservation-mir5' then
+                  destination_saves = destination_saves + 1
+                else
+                  error('unexpected save name ' .. tostring(name))
+                end
+              end
+            }
+            local storage = {}
+
+            local function load_control(path, mir_version, fixture_version)
+              local callbacks_for_load = {}
+              local environment = {
+                script = {
+                  active_mods = {
+                    base = '2.1.23', ['more-infinite-research'] = mir_version,
+                    ['mir-fixture-mir5-foreign-research-preservation'] = fixture_version
+                  },
+                  on_init = function(callback) callbacks_for_load.on_init = callback end,
+                  on_load = function(callback) callbacks_for_load.on_load = callback end,
+                  on_configuration_changed = function(callback)
+                    callbacks_for_load.on_configuration_changed = callback
+                  end,
+                  on_event = function(event, callback)
+                    callbacks_for_load.on_event = {event = event, callback = callback}
+                  end
+                },
+                defines = {events = {on_tick = 1}},
+                storage = storage,
+                game = game,
+                helpers = {table_to_json = function() return '{}' end},
+                log = function() marker_count = marker_count + 1 end
+              }
+              environment._G = environment
+              setmetatable(environment, {__index = function(_, key) return _G[key] end})
+              local chunk, message = loadfile(path, 't', environment)
+              assert(chunk, message)
+              assert(pcall(chunk))
+              return callbacks_for_load
+            end
+
+            local source = load_control(source_path, '4.7.21000', '0.1.0')
+            assert(type(source.on_init) == 'function' and type(source.on_event) == 'table')
+            assert(pcall(source.on_init))
+            assert(pcall(source.on_event.callback))
+            assert(storage.mir5_foreign_research_preservation.phase == 'seeded-4.7')
+
+            local destination = load_control(destination_path, '5.0.21000', '0.2.0')
+            assert(type(destination.on_configuration_changed) == 'function'
+              and type(destination.on_load) == 'function' and type(destination.on_event) == 'table')
+            assert(pcall(destination.on_configuration_changed))
+            assert(pcall(destination.on_event.callback))
+            assert(storage.mir5_foreign_research_preservation.phase == 'completed')
+            local state = storage.mir5_foreign_research_preservation
+            local completed_phase = state.phase
+            assert(pcall(destination.on_load))
+            assert(state.phase == completed_phase, 'on_load wrote fixture storage')
+            assert(pcall(destination.on_event.callback))
+
+            return {
+              marker_count = marker_count,
+              source_saves = source_saves,
+              destination_saves = destination_saves,
+              foreign_level = force.technologies['Space-Lab-Research-61'].level,
+              foreign_researched = force.technologies['Space-Lab-Research-61'].researched,
+              native_level = force.technologies['research-speed-7'].level,
+              gear_level = force.technologies['recipe-prod-research_gears-1'].level,
+              gear_bonus = force.recipes['iron-gear-wheel'].productivity_bonus,
+              laboratory_speed_modifier = force.laboratory_speed_modifier,
+              saved_lab_modifier = state.laboratory_speed_modifier,
+              direct_setter = state.direct_native_setter_completion
+            }
+          end
+
+          function reject_missing_foreign_seed(destination_path)
+            local callbacks = {}
+            local environment = {
+              script = {
+                active_mods = {base = '2.1.23', ['more-infinite-research'] = '5.0.21000'},
+                on_configuration_changed = function(callback) callbacks.changed = callback end,
+                on_load = function(callback) callbacks.loaded = callback end,
+                on_event = function(_, callback) callbacks.tick = callback end
+              },
+              defines = {events = {on_tick = 1}}, storage = {},
+              game = {forces = {player = {technologies = {}, recipes = {}}}},
+              helpers = {table_to_json = function() return '{}' end}, log = function() end
+            }
+            environment._G = environment
+            setmetatable(environment, {__index = function(_, key) return _G[key] end})
+            local chunk, message = loadfile(destination_path, 't', environment)
+            assert(chunk, message)
+            assert(pcall(chunk))
+            return pcall(callbacks.changed)
+          end
+        ''')
+
+    def test_versioned_fixture_identity_and_destination_profile_are_pinned(self):
+        source = json.loads((SOURCE / "info.json").read_text(encoding="utf-8"))
+        destination = json.loads((DESTINATION / "info.json").read_text(encoding="utf-8"))
+        profile = json.loads(PROFILE.read_text(encoding="utf-8"))
+        self.assertEqual(source["name"], destination["name"])
+        self.assertEqual(source["version"], "0.1.0")
+        self.assertEqual(destination["version"], "0.2.0")
+        self.assertEqual(source["dependencies"], ["base = 2.1.23", "more-infinite-research = 4.7.21000"])
+        self.assertEqual(destination["dependencies"], ["base = 2.1.23", "more-infinite-research = 5.0.21000"])
+        self.assertEqual(profile["mods"], [
+            {"name": "base", "version": "2.1.23", "enabled": True},
+            {"name": "more-infinite-research", "version": "5.0.21000", "enabled": True},
+            {"name": source["name"], "version": "0.2.0", "enabled": True},
+        ])
+
+    def test_both_data_variants_define_the_same_finite_foreign_effect_and_flow(self):
+        rows_by_version = []
+        for directory in (SOURCE, DESTINATION):
+            self.lua.globals().fixture_data_path = (directory / "data.lua").as_posix()
+            rows = self.lua.eval("foreign_fixture_data(fixture_data_path)")
+            science, prerequisite, research = rows[1], rows[2], rows[3]
+            self.assertEqual(science["type"], "tool")
+            self.assertEqual(science["name"], "mir5-foreign-astral-insight-pack")
+            self.assertEqual(science["durability"], 1)
+            self.assertEqual(prerequisite["name"], "mir5-foreign-astral-theory-17")
+            self.assertEqual(prerequisite["prerequisites"][1], "chemical-science-pack")
+            self.assertEqual(prerequisite["unit"]["ingredients"][3][1], science["name"])
+            self.assertEqual(research["name"], "Space-Lab-Research-61")
+            self.assertIsNone(research["level"])
+            self.assertEqual(research["max_level"], 61)
+            self.assertTrue(research["upgrade"])
+            self.assertEqual(research["prerequisites"][1], prerequisite["name"])
+            self.assertEqual(research["unit"]["count"], 61)
+            self.assertEqual(research["unit"]["time"], 61)
+            self.assertEqual(research["unit"]["ingredients"][3][1], science["name"])
+            self.assertEqual(research["effects"][1]["type"], "laboratory-speed")
+            self.assertAlmostEqual(research["effects"][1]["modifier"], 0.061)
+            rows_by_version.append((science["name"], prerequisite["name"], research["effects"][1]["modifier"]))
+        self.assertEqual(rows_by_version[0], rows_by_version[1])
+
+    def test_source_configuration_transition_and_reload_preserve_foreign_and_mir_effects(self):
+        self.lua.globals().source_control_path = (SOURCE / "control.lua").as_posix()
+        self.lua.globals().destination_control_path = (DESTINATION / "control.lua").as_posix()
+        result = self.lua.eval(
+            "run_foreign_research_transition(source_control_path, destination_control_path)"
+        )
+        self.assertEqual(result["source_saves"], 1)
+        self.assertEqual(result["destination_saves"], 1)
+        self.assertEqual(result["marker_count"], 3)
+        self.assertEqual(result["foreign_level"], 61)
+        self.assertTrue(result["foreign_researched"])
+        self.assertEqual(result["native_level"], 8)
+        self.assertEqual(result["gear_level"], 3)
+        self.assertAlmostEqual(result["gear_bonus"], 0.2)
+        self.assertAlmostEqual(result["laboratory_speed_modifier"], 0.961)
+        self.assertAlmostEqual(result["saved_lab_modifier"], 0.961)
+        self.assertEqual(result["direct_setter"], "foreign-finite-61,native-lab-speed,mir-gear-levels")
+
+    def test_destination_rejects_a_created_world_without_the_published_seed(self):
+        self.lua.globals().destination_control_path = (DESTINATION / "control.lua").as_posix()
+        passed, message = self.lua.eval("reject_missing_foreign_seed(destination_control_path)")
+        self.assertFalse(passed)
+        self.assertIn("published 4.7 representative seed witness is absent", str(message))
+
+    def test_real_mir5_publication_never_certifies_or_changes_unrelated_foreign_research(self):
+        # Reuse the explicit authored-reference world fixture, while exercising
+        # the actual data-final entrypoint and default values, not a stubbed
+        # research publisher. Full output equality has its separate oracle.
+        import test_generator
+        test_generator.LuaRuntime = LuaRuntime
+        host = test_generator.GeneratorTests("runTest")
+        host.setUp()
+        host.lua.execute('''
+          local environment = full_world({})
+          local foreign_effect = {type="laboratory-speed",modifier=.061}
+          local foreign = {type="technology",name="Space-Lab-Research-61",max_level=61,
+            prerequisites={"foreign-unfamiliar-frontier"},effects={foreign_effect},
+            unit={count=61,time=61,ingredients={{"foreign-unfamiliar-science",1}}}}
+          environment.raw.technology[foreign.name] = foreign
+          setmetatable(environment.raw.technology, {__pairs=function()
+            error("MIR5 enumerated unrelated foreign research")
+          end})
+          local original_effects, original_unit = foreign.effects,foreign.unit
+          settings,mods,data,helpers,log={startup=defaults()},{},environment,nil,function() end
+          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 53)
+          assert(environment.raw.technology[foreign.name] == foreign)
+          assert(foreign.effects == original_effects and foreign.effects[1] == foreign_effect
+            and foreign_effect.modifier == .061 and foreign.unit == original_unit)
+          assert(foreign.max_level == 61 and foreign.prerequisites[1] == "foreign-unfamiliar-frontier")
+        ''')
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--lua-runtime-dir", type=Path, required=True)
+    args = parser.parse_args()
+    sys.path.insert(0, str(args.lua_runtime_dir.resolve(strict=True)))
+    from lupa.lua52 import LuaRuntime
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(ForeignResearchPreservationTests))
+    sys.exit(0 if result.wasSuccessful() else 1)
