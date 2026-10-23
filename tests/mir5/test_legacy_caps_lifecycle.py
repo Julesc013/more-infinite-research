@@ -78,6 +78,49 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
             end
             return old
           end
+          -- Exact published F200 4.7.20002 maximum-level controller shape
+          -- for its generated gear stream.  Its V3 policy was settings-derived
+          -- because the 2.0 target did not carry the later finalizer binding.
+          function f200_gear_legacy(index, cap)
+            local name, setting = gear_name, "ips-max-level-research_gears"
+            local source, operation = "generated-stream", "runtime-settings-transport"
+            local kind = "settings-derived-v3"
+            local key = table.concat({name, setting, source, operation}, "\\0")
+            return {policy_version = 3, unique = {keep = true},
+              managed_technologies = {[name] = {technology = name, setting = setting,
+                source = source, operation = operation, policy_transport = kind,
+                ownership_kind = kind, legacy = false, selected = cap,
+                binding_fingerprint = "mir32-1a2b3c4d"}},
+              disabled_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
+                cap = cap, binding_fingerprint = "mir32-1a2b3c4d", ownership_key = key,
+                ownership_kind = kind, enabled_before_cap = true}}},
+              visibility_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
+                ownership_key = key, ownership_kind = kind, value = false}}},
+              unowned_disabled_by_cap = {[index] = {}}
+            }
+          end
+          -- The same published F200 controller recorded a settings-derived
+          -- V3 ownership row for either one of the two exact native worker
+          -- tails. Runtime still has to revalidate its current .65 effect.
+          function f200_worker_legacy(index, cap, name)
+            name = name or "worker-robots-speed-6"
+            local setting = "mir-max-level-worker-robots-speed"
+            local source, operation = "native-owner", "native-owner-cap"
+            local kind = "settings-derived-v3"
+            local key = table.concat({name, setting, source, operation}, "\\0")
+            return {policy_version = 3, unique = {keep = true},
+              managed_technologies = {[name] = {technology = name, setting = setting,
+                source = source, operation = operation, policy_transport = kind,
+                ownership_kind = kind, legacy = false, selected = cap,
+                binding_fingerprint = "mir32-5e6f7a8b"}},
+              disabled_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
+                cap = cap, binding_fingerprint = "mir32-5e6f7a8b", ownership_key = key,
+                ownership_kind = kind, enabled_before_cap = true}}},
+              visibility_by_cap = {[index] = {[name] = {policy_version = 3, force_index = index,
+                ownership_key = key, ownership_kind = kind, value = false}}},
+              unowned_disabled_by_cap = {[index] = {}}
+            }
+          end
           function boot(forces, old, current, options)
             options = options or {}
             script = {active_mods = options.active_mods or {}}
@@ -85,6 +128,18 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
               mir_caps = current}
             game = {forces = forces}
             mods = options.active_mods or {}
+            local target = require("platform.target")
+            if options.target_id == "f200" then
+              target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
+              target.distribution_version, target.cargo_research = "5.0.20000", false
+              target.recipe_probability, target.receiver_limits = "probability", false
+              target.productivity_ignores_stats = true
+            else
+              target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
+              target.distribution_version, target.cargo_research = "5.0.21000", true
+              target.recipe_probability, target.receiver_limits = "independent_probability", true
+              target.productivity_ignores_stats = false
+            end
             package.loaded["research.catalogue"] = nil
             local streams = {}
             for _, row in ipairs(require("research.catalogue").declared()) do
@@ -161,6 +216,113 @@ class LegacyCapsLifecycleTests(unittest.TestCase):
           assert(old.visibility_by_cap[2][gear_name].value == false)
           assert(storage.mir.unrelated.keep and storage.mir_caps.legacy_caps_checked == true)
           assert(next(storage.mir_caps.owned_disabled) == nil)
+        ''')
+
+    def test_f200_settings_derived_gear_right_restores_only_on_the_f200_catalogue(self):
+        self.lua.execute('''
+          local player, foreign = technology(gear_name), technology(gear_name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force = force(1, {[gear_name] = player})
+          player_force.research_queue, player_force.current_research, player_force.research_progress = {player}, player, .42
+          local foreign_force = force(2, {[gear_name] = foreign})
+          local old = f200_gear_legacy(1, 2)
+          boot({[1] = player_force, [2] = foreign_force}, old, nil,
+            {target_id = "f200", limit = 40})
+          local binding, generated = nil, 0
+          for _, row in ipairs(require("research.catalogue").declared()) do
+            if row.ownership_kind == "authored_generated" then
+              generated = generated + 1
+              local f200_binding = row.legacy_binding
+              assert(f200_binding and (f200_binding.source == "generated-stream"
+                or f200_binding.source == "base-continuation")
+                and f200_binding.operation == "runtime-settings-transport"
+                and f200_binding.target == "f200"
+                and f200_binding.policy_transport == "settings-derived-v3"
+                and f200_binding.ownership_kind == "settings-derived-v3",
+                "an F200 generated declaration gained a non-published cap identity")
+            end
+            if row.id == gear_name then binding = row.legacy_binding end
+          end
+          assert(generated > 1, "F200 control parse did not retain its named generated catalogue")
+          assert(binding and binding.source == "generated-stream"
+            and binding.operation == "runtime-settings-transport" and binding.target == "f200"
+            and binding.policy_transport == "settings-derived-v3"
+            and binding.ownership_kind == "settings-derived-v3")
+          local limits = lifecycle.cap_limits(player_force)
+          assert(limits[gear_name] == 40, "F200 current cap was not the configured successor value")
+          lifecycle.on_configuration_changed()
+          assert(player.level == 3 and player.researched == false
+            and player.enabled and not player.visible_when_disabled,
+            "F200 owned cap relaxation changed earned state or missed restoration")
+          assert(player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42,
+            "F200 owned cap relaxation changed a valid queued level or progress")
+          assert(not foreign.enabled and not foreign.visible_when_disabled and foreign.level == 3,
+            "F200 restoration claimed the foreign force's disablement")
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil
+            and old.unique.keep and old.disabled_by_cap[1][gear_name].cap == 2,
+            "F200 import changed predecessor evidence or left stale ownership")
+
+          -- The same old bucket is not a valid predecessor on F210, where
+          -- the current named gear declaration has the transported `emit`
+          -- identity instead.
+          local f210 = technology(gear_name)
+          f210.level, f210.enabled, f210.visible_when_disabled = 3, false, true
+          local f210_force = force(1, {[gear_name] = f210})
+          boot({[1] = f210_force}, old, nil, {target_id = "f210", limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(not f210.enabled and f210.visible_when_disabled
+            and storage.mir_caps.legacy_caps_checked
+            and storage.mir_caps.owned_disabled[1] == nil,
+            "F210 accepted an F200 settings-derived restoration right")
+        ''')
+
+    def test_f200_settings_derived_worker_right_restores_only_the_exact_native_tail(self):
+        self.lua.execute('''
+          local name = "worker-robots-speed-6"
+          local player, foreign = worker(name), worker(name)
+          player.level, player.researched = 3, false
+          player.enabled, player.visible_when_disabled = false, true
+          foreign.level, foreign.researched = 3, false
+          foreign.enabled, foreign.visible_when_disabled = false, false
+          local player_force = force(1, {[name] = player})
+          player_force.research_queue, player_force.current_research, player_force.research_progress =
+            {player}, player, .42
+          local foreign_force = force(2, {[name] = foreign})
+          local old = f200_worker_legacy(1, 2, name)
+          boot({[1] = player_force, [2] = foreign_force}, old, nil,
+            {target_id = "f200", worker_limit = 40})
+          assert(lifecycle.cap_limits(player_force)[name] == 40,
+            "F200 current worker successor cap was not configured")
+          lifecycle.on_configuration_changed()
+          assert(player.level == 3 and not player.researched and player.enabled
+            and not player.visible_when_disabled,
+            "F200 worker restoration changed earned state or missed its owned disable")
+          assert(player_force.research_queue[1] == player and player_force.current_research == player
+            and player_force.research_progress == .42,
+            "F200 worker restoration changed a valid queued level or progress")
+          assert(not foreign.enabled and not foreign.visible_when_disabled and foreign.level == 3,
+            "F200 worker restoration claimed a foreign disable")
+          assert(storage.mir_caps.legacy_caps_checked and next(storage.mir_caps.owned_disabled) == nil
+            and old.disabled_by_cap[1][name].cap == 2,
+            "F200 worker import changed predecessor evidence or retained stale ownership")
+
+          -- Native tuple validation remains ahead of persistence decoding. An
+          -- old F200 row cannot restore a similar foreign worker effect.
+          local invalid = worker(name)
+          invalid.level, invalid.researched = 3, false
+          invalid.enabled, invalid.visible_when_disabled = false, true
+          invalid.prototype.effects[1].modifier = .66
+          boot({[1] = force(1, {[name] = invalid})}, old, nil,
+            {target_id = "f200", worker_limit = 40})
+          lifecycle.on_configuration_changed()
+          assert(not invalid.enabled and invalid.visible_when_disabled and invalid.level == 3
+            and storage.mir_caps.legacy_caps_checked
+            and storage.mir_caps.owned_disabled[1] == nil,
+            "F200 worker import accepted a non-published native effect")
         ''')
 
     def test_marker_survives_empty_map_and_prevents_later_reimport(self):

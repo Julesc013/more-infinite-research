@@ -2,6 +2,7 @@
 -- declaration list never discovers a technology: each row names one emitted
 -- technology or one exact admitted native owner.
 local modern_catalogue = require("compatibility.modern_catalogue")
+local target = require("platform.target")
 
 local M = {}
 local GEAR_ID = "recipe-prod-research_gears-1"
@@ -60,10 +61,22 @@ local function named_productivity_recipes(routes)
   if #out == 0 then error("MIR catalogue material routes are empty", 3) end
   return out
 end
+-- The F200 4.7 controller recorded its cap ownership before the newer
+-- transported finalizer existed.  Keep that predecessor identity on exactly
+-- the named generated stream/base-continuation rows selected for F200; no
+-- runtime scan or generic legacy-policy fallback gets this authority.
+local function historical_binding(source, operation)
+  if target.id == "f200" and (source == "generated-stream" or source == "base-continuation") then
+    return {source=source, operation="runtime-settings-transport", target="f200",
+      policy_transport="settings-derived-v3", ownership_kind="settings-derived-v3"}
+  end
+  return {source=source, operation=operation}
+end
+
 local function generated_row(id, family, order, locale, recipe)
   return {id=id, family=family, progression=1, native_order=order, setting="ips-enable-" .. family,
     cap_setting="ips-max-level-" .. family, settings=stream_settings(family), recipe=recipe, locale_key=locale,
-    ownership_kind="authored_generated", legacy_binding={source="generated-stream", operation="emit"}}
+    ownership_kind="authored_generated", legacy_binding=historical_binding("generated-stream", "emit")}
 end
 
 local function imersite_rows()
@@ -74,12 +87,12 @@ local function imersite_rows()
       native_order=contract.early.order, setting="ips-enable-" .. contract.stream,
       cap_setting="ips-max-level-" .. contract.stream, settings=settings,
       recipe=contract.effect.recipe, locale_key="description.productivity-bonus", ownership_kind="authored_generated",
-      legacy_binding={source="generated-stream", operation="emit"}},
+      legacy_binding=historical_binding("generated-stream", "emit")},
     {id=contract.continuation.id, family=contract.continuation.family, progression=contract.continuation.first_level,
       native_order=contract.continuation.order, setting="ips-enable-" .. contract.stream,
       cap_setting="ips-max-level-" .. contract.stream, settings=settings,
       recipe=contract.effect.recipe, locale_key="description.productivity-bonus", ownership_kind="authored_generated",
-      legacy_binding={source="generated-stream", operation="emit"}},
+      legacy_binding=historical_binding("generated-stream", "emit")},
   }
 end
 
@@ -121,7 +134,7 @@ local function static_rows()
       native_order="", setting="mir-enable-" .. continuation.setting_key,
       cap_setting="mir-max-level-" .. continuation.setting_key, settings=continuation_settings(continuation.setting_key),
       locale_key=locale_key(continuation.localised_name), ownership_kind="authored_generated",
-      legacy_binding={source=continuation.source, operation=continuation.operation}}
+      legacy_binding=historical_binding(continuation.source, continuation.operation)}
   end
   if selected.k2_imersite then
     for _, row in ipairs(imersite_rows()) do rows[#rows +1] = row end

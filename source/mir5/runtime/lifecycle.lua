@@ -6,6 +6,7 @@ local legacy_caps = require("runtime.legacy_caps")
 local native_owners = require("research.native_owners")
 local cap_admission = require("runtime.cap_admission")
 local catalogue = require("research.catalogue")
+local platform_target = require("platform.target")
 
 local M = {}
 
@@ -104,7 +105,10 @@ for index = 1, #DECLARATIONS do
     STATIC_GENERATED_BY_ID[row.id] = row
   end
 end
-local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS)
+-- This literal target authority comes from package materialization, never
+-- predecessor storage. F200 alone had the published settings-derived V3
+-- native-worker transport; all other targets retain transported V3 admission.
+local LEGACY_ALLOWLIST = legacy_caps.allowlist(DECLARATIONS, platform_target.id)
 
 -- Recipe caps are immutable for one loaded control profile. Resolve only the
 -- exact authored routes once through Factorio 2.0's `prototypes.recipe`; do
