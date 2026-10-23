@@ -340,6 +340,30 @@ class FixtureControlHostStageTests(unittest.TestCase):
           assert(data.raw['string-setting']['mir-settings-profile-import'].default_value == '')
         ''')
 
+    def test_worker_fixture_ranges_are_native_valid_and_clamp_both_configuration_directions(self):
+        for fixture, saved, expected in (
+            ("worker-speed-precap", 7, 0),
+            ("worker-speed-cap", 0, 7),
+            ("worker-speed-cap-relaxed", 7, 0),
+        ):
+            with self.subTest(fixture=fixture):
+                self.lua.execute('''
+                  data = {raw = {['int-setting'] = {['mir-max-level-worker-robots-speed'] = {
+                    setting_type = 'startup', minimum_value = 0,
+                    maximum_value = 2147483647, default_value = 0
+                  }}}}
+                ''')
+                script = ROOT / "tests/mir5/fixtures" / fixture / "settings-updates.lua"
+                self.lua.execute(script.read_text(encoding="utf-8"))
+                minimum, maximum, default = self.lua.eval('''function()
+                  local value = data.raw['int-setting']['mir-max-level-worker-robots-speed']
+                  return value.minimum_value, value.maximum_value, value.default_value
+                end''')()
+                self.assertLess(minimum, maximum, "Factorio rejects an empty native setting range")
+                self.assertLessEqual(minimum, default)
+                self.assertLessEqual(default, maximum)
+                self.assertEqual(max(minimum, min(maximum, saved)), expected)
+
     def test_module_permissions_create_only_callback_accepts_false_effect_masks_and_rejects_wrong_permissions(self):
         self.lua.globals().fixture_control = self.control("module-permissions")
         ok, message, markers = self.lua.eval(

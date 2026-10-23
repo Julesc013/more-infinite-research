@@ -6,4 +6,4 @@ if not setting then error("[mir5-worker-speed-cap] missing startup setting " .. 
 -- earned levels before the controller disables next level eight.
 -- Clamp the saved unlimited baseline to seven for the configuration scenario.
 -- This fixture-only range does not change the player's production setting.
-setting.minimum_value, setting.maximum_value, setting.default_value = 7, 7, 7
+setting.minimum_value, setting.maximum_value, setting.default_value = 7, 8, 7
