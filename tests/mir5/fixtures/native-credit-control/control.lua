@@ -115,7 +115,12 @@ end
 local function set_level_with_diagnostic(force, name, level, label)
   local value = technology(force, name)
   local before = {carrier = carrier_status(force, name), bonuses = bonus_snapshot(force)}
-  local ok, err = pcall(function() value.level = level end)
+  local ok, err = pcall(function()
+    value.level = level
+    -- Factorio enables a technology after an explicit level write. These
+    -- fixture-owned credit holders must remain hidden and unresearchable.
+    value.enabled = false
+  end)
   local after_set = {carrier = carrier_status(force, name), bonuses = bonus_snapshot(force)}
   log("[MIR5_NATIVE_FIXTURE] NATIVE_CARRIER_LEVEL " .. helpers.table_to_json({
     case = CASE, label = label, carrier = name, requested_level = level,
