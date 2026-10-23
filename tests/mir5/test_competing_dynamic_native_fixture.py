@@ -106,12 +106,17 @@ class CompetingDynamicNativeFixtureTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(r'''
-function dynamic_fixture_data(path, provider, row)
-  local mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]="4.7.20002"}
+function dynamic_fixture_data(path, helper, provider, mir, row)
+  local mods={base="2.0.77",["space-age"]="2.0.77",["more-infinite-research"]=mir}
   if provider=="ce" then mods["crafting-efficiency-2"]="0.2.20" else mods.ProductivityResearch="1.3.2" end
   local raw={technology={[row.name]=row},["bool-setting"]={["mir-prefer-this-mod-for-competing-techs"]={default_value=false}}}
   local env={mods=mods,data={raw=raw}};env._G=env;setmetatable(env,{__index=function(_,key)return _G[key]end})
+  package.loaded["data-final-common"]=nil
+  package.preload["data-final-common"]=function()
+    local common,message=loadfile(helper,"t",env);assert(common,message);return common()
+  end
   local chunk,message=loadfile(path,"t",env);assert(chunk,message);local ok,result=pcall(chunk)
+  package.preload["data-final-common"]=nil;package.loaded["data-final-common"]=nil
   return {ok=ok,message=tostring(result),raw=raw,row=row}
 end
 function dynamic_fixture_parse(path, provider, mir, fixture)
@@ -277,23 +282,35 @@ end
     def test_captured_source_rows_preflight_before_only_count_time_acceleration(self):
         run = self.lua.eval("dynamic_fixture_data")
         for provider in ("ce", "pr"):
-            with self.subTest(provider=provider):
-                before = deepcopy(SOURCE_ROWS[provider])
-                result = run(str(FIXTURE / provider / "published" / "data-final-fixes.lua"), provider, lua_value(self.lua, before))
-                self.assertTrue(result["ok"], result["message"])
-                actual = plain(result["row"])
-                self.assertEqual((None, "1", 1), (actual["unit"].get("count"), actual["unit"]["count_formula"], actual["unit"]["time"]))
-                expected = deepcopy(before); expected["unit"] = deepcopy(expected["unit"]); expected["unit"].update({"count_formula": "1", "time": 1})
-                self.assertEqual(expected, actual)
+            helper = FIXTURE / provider / "data-final-common.lua"
+            for _, stage, mir, _, _ in STAGES:
+                with self.subTest(provider=provider, stage=stage):
+                    before = deepcopy(SOURCE_ROWS[provider])
+                    result = run(str(FIXTURE / provider / stage / "data-final-fixes.lua"), str(helper), provider, mir,
+                                 lua_value(self.lua, before))
+                    self.assertTrue(result["ok"], result["message"])
+                    actual = plain(result["row"])
+                    self.assertEqual((None, "1", 1), (actual["unit"].get("count"), actual["unit"]["count_formula"], actual["unit"]["time"]))
+                    expected = deepcopy(before); expected["unit"] = deepcopy(expected["unit"]); expected["unit"].update({"count_formula": "1", "time": 1})
+                    self.assertEqual(expected, actual)
+                    self.assertEqual('return require("data-final-common")\n',
+                                     (FIXTURE / provider / stage / "data-final-fixes.lua").read_text(encoding="utf-8"))
         bad = deepcopy(SOURCE_ROWS["ce"]); bad["effects"][0]["change"] = .2
-        result = run(str(FIXTURE / "ce/published/data-final-fixes.lua"), "ce", lua_value(self.lua, bad))
+        result = run(str(FIXTURE / "ce/published/data-final-fixes.lua"), str(FIXTURE / "ce/data-final-common.lua"), "ce", "4.7.20002",
+                     lua_value(self.lua, bad))
         self.assertFalse(result["ok"])
         self.assertIn("CE effect changed", result["message"])
         self.assertEqual(("1200 * 1.5 * l", 45), (plain(result["row"])["unit"]["count_formula"], plain(result["row"])["unit"]["time"]))
         bad = deepcopy(SOURCE_ROWS["pr"]); bad["prerequisites"] = ["unexpected"]
-        result = run(str(FIXTURE / "pr/published/data-final-fixes.lua"), "pr", lua_value(self.lua, bad))
+        result = run(str(FIXTURE / "pr/published/data-final-fixes.lua"), str(FIXTURE / "pr/data-final-common.lua"), "pr", "4.7.20002",
+                     lua_value(self.lua, bad))
         self.assertFalse(result["ok"])
         self.assertIn("empty prerequisites", result["message"])
+        bad = deepcopy(SOURCE_ROWS["ce"])
+        result = run(str(FIXTURE / "ce/mir5-prefer-mir/data-final-fixes.lua"), str(FIXTURE / "ce/data-final-common.lua"), "ce", "5.0.20001",
+                     lua_value(self.lua, bad))
+        self.assertFalse(result["ok"])
+        self.assertIn("unexpected CE fixture closure", result["message"])
 
     def test_shared_control_parses_without_runtime_access_and_on_load_only_reads_snapshots(self):
         parse = self.lua.eval("dynamic_fixture_parse")
