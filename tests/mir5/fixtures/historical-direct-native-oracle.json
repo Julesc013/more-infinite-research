@@ -1,0 +1,3024 @@
+{
+  "captures": [
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "ingredients",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f013-direct422-r02\\work\\u-1738c4d8c6d64c1a\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "82EBAABA878F17E0C9489265A8D0278C3990E2C01A9E609A7BE8885E3FBBE2D5"
+      },
+      "target": "f013",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "discharge-defense-equipment",
+              "5": "logistics"
+            },
+            "unit_count": 60,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "logistics",
+              "5": "rocketry"
+            },
+            "unit_count": 60,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1"
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "ingredients",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f014-direct422-r02\\work\\u-236bb1b1af224cbf\\userdata\\script-output\\mir-upgrade-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "C346F4A15E976D22393C10A1951AFE2D3AE33C142D36B0C6640B1ABA8403A847"
+      },
+      "target": "f014",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "discharge-defense-equipment",
+              "5": "logistics"
+            },
+            "unit_count": 60,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              }
+            },
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "alien-technology"
+            },
+            "unit_count": 8000,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1"
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "alien-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "alien-technology",
+              "3": "battery",
+              "4": "logistics",
+              "5": "rocketry"
+            },
+            "unit_count": 60,
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1"
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "ingredients",
+          "max_level",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_count_formula",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_flamethrower_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_robot_battery-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled",
+          "level"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f015-direct422-r01\\4.4.01502-upgrade-base-default-from-4.2.01502-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "5ACB802A1CDD7F8086C846178E9DDF9D359D417F0107006AB114624E9EB1BA42"
+      },
+      "target": "f015",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "discharge-defense-equipment",
+              "4": "electric-engine",
+              "5": "engine",
+              "6": "military-2",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "flamethrower",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_flamethrower_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine",
+              "5": "flamethrower",
+              "6": "military-2",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.1^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "worker-robot-battery"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_robot_battery]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_robot_battery-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine",
+              "5": "military-2",
+              "6": "rocketry",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "ingredients",
+          "max_level",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_count_formula",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_flamethrower_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_lab_productivity-1": [],
+          "recipe-prod-research_robot_battery-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled",
+          "level"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f016-direct422-r02\\4.4.01602-upgrade-base-default-from-4.2.01602-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "2036786CB20F9B9FE728CB42468BA4C61E58A9840651A1099849B1A9B3F63E87"
+      },
+      "target": "f016",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "discharge-defense-equipment",
+              "4": "electric-engine",
+              "5": "engine",
+              "6": "military-2",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "flamethrower",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_flamethrower_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine",
+              "5": "flamethrower",
+              "6": "military-2",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "advanced-electronics-2",
+              "2": "automation-2",
+              "3": "battery",
+              "4": "military-2",
+              "5": "speed-module",
+              "6": "turrets"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.1^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "laboratory-productivity"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "high-tech-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "6": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_lab_productivity]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "10": "turrets",
+              "2": "advanced-electronics-2",
+              "3": "advanced-material-processing-2",
+              "4": "automation-2",
+              "5": "battery",
+              "6": "electric-engine",
+              "7": "engine",
+              "8": "military-2",
+              "9": "speed-module"
+            },
+            "unit_count": 1000,
+            "unit_count_formula": "1*(1000*1.2^(L-1))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_lab_productivity-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "worker-robot-battery"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_robot_battery]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_robot_battery-1",
+          "level": 1
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "science-pack-1"
+              },
+              "4": {
+                "amount": 1,
+                "name": "science-pack-2"
+              },
+              "5": {
+                "amount": 1,
+                "name": "science-pack-3"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "advanced-electronics",
+              "2": "advanced-material-processing-2",
+              "3": "electric-engine",
+              "4": "engine",
+              "5": "military-2",
+              "6": "rocketry",
+              "7": "turrets"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "hidden",
+          "ingredients",
+          "max_level",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_count_formula",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_cannon_shooting_speed-1": [],
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_flamethrower_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_lab_productivity-1": [],
+          "recipe-prod-research_robot_battery-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled",
+          "level",
+          "visible_when_disabled"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\native-f017-published441-r02\\4.4.01702-upgrade-base-default-from-4.4.01701-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "E432FBE57BCC1A226D15CD1D337173CA1D8E72107D4DD58452016B7D33363830"
+      },
+      "target": "f017",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "cannon-shell",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_cannon_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "tanks",
+              "6": "weapon-shooting-speed-5"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_cannon_shooting_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "discharge-defense-equipment",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "flamethrower",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_flamethrower_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "flamethrower",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.1^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "laboratory-productivity"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_lab_productivity]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "utility-science-pack"
+            },
+            "unit_count": 1000,
+            "unit_count_formula": "1*(1000*1.2^(L-1))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_lab_productivity-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "worker-robot-battery"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_robot_battery]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack"
+            },
+            "unit_count": 8000,
+            "unit_count_formula": "1*(8000*1.2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_robot_battery-1",
+          "level": 1,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "rocketry"
+            },
+            "unit_count": 60,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1",
+          "level": 1,
+          "visible_when_disabled": false
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "hidden",
+          "ingredients",
+          "max_level",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_count_formula",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_cannon_shooting_speed-1": [],
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_flamethrower_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_lab_productivity-1": [],
+          "recipe-prod-research_robot_battery-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled",
+          "level",
+          "visible_when_disabled"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f100-upgrade-422\\4.4.10002-upgrade-base-default-from-4.2.10002-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "7CE16492153276E76D94419169E5DFA4D14A33E6DF7294ACB6E8B1221B7F5CA6"
+      },
+      "target": "f100",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "cannon-shell",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_cannon_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "tanks",
+              "6": "weapon-shooting-speed-5"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_cannon_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "discharge-defense-equipment",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "flamethrower",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_flamethrower_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "flamethrower",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8800,
+            "unit_count_formula": "1*(8000*1.1^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "laboratory-productivity"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_lab_productivity]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "utility-science-pack"
+            },
+            "unit_count": 1200,
+            "unit_count_formula": "1*(1000*1.2^(L-1))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_lab_productivity-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "worker-robot-battery"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_robot_battery]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack"
+            },
+            "unit_count": 9600,
+            "unit_count_formula": "1*(8000*1.2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_robot_battery-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "rocketry"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        }
+      ]
+    },
+    {
+      "observed_field_presence": {
+        "definition_fields": [
+          "effects",
+          "hidden",
+          "ingredients",
+          "max_level",
+          "order",
+          "prerequisites",
+          "unit_count",
+          "unit_count_formula",
+          "unit_energy"
+        ],
+        "definition_fields_absent_by_id": {
+          "recipe-prod-research_cannon_shooting_speed-1": [],
+          "recipe-prod-research_character_crafting_speed-1": [],
+          "recipe-prod-research_character_mining_speed-1": [],
+          "recipe-prod-research_character_reach-1": [],
+          "recipe-prod-research_character_walking_speed-1": [],
+          "recipe-prod-research_electric_shooting_speed-1": [],
+          "recipe-prod-research_flamethrower_shooting_speed-1": [],
+          "recipe-prod-research_inventory_capacity-1": [],
+          "recipe-prod-research_lab_productivity-1": [],
+          "recipe-prod-research_robot_battery-1": [],
+          "recipe-prod-research_rocket_shooting_speed-1": []
+        },
+        "technology_state_fields": [
+          "enabled",
+          "level",
+          "visible_when_disabled"
+        ]
+      },
+      "source": {
+        "force": "player",
+        "kind": "hash-verified-published-4.7-era-native-full-state-snapshot",
+        "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir442-postrelease-r22-qualification-r01\\f110-upgrade-422\\4.4.11002-upgrade-base-default-from-4.2.11002-full-state-upgrade.json",
+        "selection": "forces.player.technologies entries whose id begins recipe-prod-",
+        "sha256": "E61B752FB08FC385413C5614A49D813D4423FE0528F5D11272C84BAF80B5210A"
+      },
+      "target": "f110",
+      "technologies": [
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "cannon-shell",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_cannon_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "tank",
+              "6": "weapon-shooting-speed-5"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_cannon_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-crafting-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_crafting_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_crafting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-mining-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_mining_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_mining_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 10,
+                "type": "character-reach-distance"
+              },
+              "2": {
+                "modifier": 10,
+                "type": "character-build-distance"
+              },
+              "3": {
+                "modifier": 10,
+                "type": "character-resource-reach-distance"
+              },
+              "4": {
+                "modifier": 10,
+                "type": "character-item-drop-distance"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_reach]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_reach-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.05,
+                "type": "character-running-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_character_walking_speed]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 16000,
+            "unit_count_formula": "1*(8000*2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_character_walking_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "electric",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_electric_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "discharge-defense-equipment",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_electric_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "flamethrower",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_flamethrower_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "flamethrower",
+              "3": "logistic-science-pack",
+              "4": "military-science-pack",
+              "5": "production-science-pack"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 1,
+                "type": "character-inventory-slots-bonus"
+              },
+              "2": {
+                "modifier": 1,
+                "type": "character-logistic-trash-slots"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_inventory_capacity]",
+            "prerequisites": {
+              "1": "military-science-pack",
+              "2": "utility-science-pack"
+            },
+            "unit_count": 8800,
+            "unit_count_formula": "1*(8000*1.1^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_inventory_capacity-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "laboratory-productivity"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              },
+              "6": {
+                "amount": 1,
+                "name": "utility-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_lab_productivity]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "utility-science-pack"
+            },
+            "unit_count": 1200,
+            "unit_count_formula": "1*(1000*1.2^(L-1))",
+            "unit_energy": 7200
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_lab_productivity-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "modifier": 0.1,
+                "type": "worker-robot-battery"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_robot_battery]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "production-science-pack"
+            },
+            "unit_count": 9600,
+            "unit_count_formula": "1*(8000*1.2^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_robot_battery-1",
+          "level": 2,
+          "visible_when_disabled": false
+        },
+        {
+          "definition": {
+            "effects": {
+              "1": {
+                "ammo_category": "rocket",
+                "modifier": 0.1,
+                "type": "gun-speed"
+              }
+            },
+            "hidden": false,
+            "ingredients": {
+              "1": {
+                "amount": 1,
+                "name": "automation-science-pack"
+              },
+              "2": {
+                "amount": 1,
+                "name": "chemical-science-pack"
+              },
+              "3": {
+                "amount": 1,
+                "name": "logistic-science-pack"
+              },
+              "4": {
+                "amount": 1,
+                "name": "military-science-pack"
+              },
+              "5": {
+                "amount": 1,
+                "name": "production-science-pack"
+              }
+            },
+            "max_level": 4294967295,
+            "order": "p[research_rocket_shooting_speed]",
+            "prerequisites": {
+              "1": "chemical-science-pack",
+              "2": "logistic-science-pack",
+              "3": "military-science-pack",
+              "4": "production-science-pack",
+              "5": "rocketry"
+            },
+            "unit_count": 90,
+            "unit_count_formula": "1*(60*1.5^(L-1))",
+            "unit_energy": 3600
+          },
+          "enabled": true,
+          "id": "recipe-prod-research_rocket_shooting_speed-1",
+          "level": 2,
+          "visible_when_disabled": false
+        }
+      ]
+    }
+  ],
+  "description": "Portable characterization of observed published 4.7-era direct-research native definitions. It is evidence for a reduced historical adapter, not qualification of any MIR5 package.",
+  "kind": "MIR5HistoricalDirectNativeCharacterizationV1",
+  "limits": {
+    "captured_fields_only": true,
+    "f013_f014_missing_definition_fields": [
+      "max_level",
+      "unit_count_formula"
+    ],
+    "f013_f014_missing_state_fields": [
+      "level",
+      "visible_when_disabled"
+    ],
+    "force_state_level_meaning": "Technology state level is player-force progress, not a source-prototype level or upgrade assertion.",
+    "formula_unit_count_meaning": "When unit_count_formula is present, observed unit_count may be the force-level evaluation and is not a static source unit.count assertion.",
+    "omitted_key_meaning": "An omitted key was not observed in that capture and is not an assertion that a source prototype omits it.",
+    "unit_energy_meaning": "Engine observation in ticks; a source constructor may project seconds.",
+    "unobserved_source_projection_fields": [
+      "icon",
+      "icon_size",
+      "icons",
+      "localised_description",
+      "localised_name",
+      "upgrade"
+    ]
+  },
+  "schema": 1,
+  "status": "historical-characterization-not-mir5-native-qualification"
+}

@@ -8,6 +8,10 @@ import re
 import subprocess
 import zipfile
 
+TARGET_RECORD = "targets/mir5/editions.json"
+REQUIRE = re.compile(r'''\brequire\s*\(\s*["']([^"']+)["']\s*\)''')
+ENTRYPOINTS = ("data.lua", "settings.lua", "data-final-fixes.lua", "control.lua")
+
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()
@@ -59,7 +63,74 @@ def git_source(source, revision):
     return commit, files
 
 
-def members(source, version=None, committed_files=None):
+def read_editions(source, revision=None):
+    if revision is None:
+        data = (Path(__file__).resolve().parents[2] / TARGET_RECORD).read_bytes()
+    else:
+        data = subprocess.check_output(["git", "-C", str(source), "show", revision + ":" + TARGET_RECORD])
+    record = json.loads(data.decode("utf-8"))
+    if record.get("schema") != 1 or not isinstance(record.get("targets"), dict):
+        raise ValueError("Invalid edition record")
+    return record["targets"], digest(data)
+
+
+def select_edition(files, info, target, editions):
+    if info.get("name") != "more-infinite-research" or target not in editions:
+        raise ValueError("Select a declared MIR player edition")
+    selected = editions[target]
+    if not selected.get("source_available"):
+        raise ValueError("Edition source adaptation remains incomplete: " + target)
+    if not re.fullmatch(r"f\d{3}", target):
+        raise ValueError("Invalid target codec")
+    source_targets = [key for key, value in editions.items()
+                      if value["factorio_version"] == info.get("factorio_version")]
+    if len(source_targets) != 1:
+        raise ValueError("Source metadata has no unique declared edition")
+    major, minor, encoded = info["version"].split(".")
+    if len(encoded) != 5 or int(encoded) // 100 != int(source_targets[0][1:]):
+        raise ValueError("Source version does not use the declared distribution codec")
+    info["version"] = major + "." + minor + "." + str(int(target[1:]) * 100 + int(encoded) % 100).zfill(5)
+    info["factorio_version"] = selected["factorio_version"]
+    dependencies = info.get("dependencies", [])
+    info["dependencies"] = ["base >= " + selected["minimum_base"]] + [
+        item for item in dependencies if not re.match(r"^\s*base(?:\s|[<>=!]|$)", item)]
+    metadata = {key: selected[key] for key in (
+        "factorio_version", "minimum_base", "reduced", "research_levels", "recipe_productivity")}
+    metadata.update(id=target, distribution_version=info["version"])
+    files = dict(files)
+    fields = []
+    for key, value in metadata.items():
+        literal = str(value).lower() if isinstance(value, bool) else json.dumps(value)
+        fields.append("  " + key + " = " + literal)
+    files["platform/target.lua"] = ("-- Selected edition metadata; qualification is held outside player source.\nreturn {\n"
+        + ",\n".join(fields) + "\n}\n").encode("utf-8")
+    if selected["reduced"]:
+        for entrypoint in ENTRYPOINTS:
+            module = "adapters.reduced." + entrypoint[:-4]
+            files[entrypoint] = ('require("' + module + '").apply()\n').encode("utf-8")
+
+    # Follow the actual selected stage/public API imports. A reduced package
+    # never ships another edition's unused compiler, GUI or runtime body.
+    pending = [*ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"]
+    closure = set()
+    while pending:
+        relative = pending.pop()
+        if relative in closure:
+            continue
+        if relative not in files:
+            raise ValueError("Selected edition has a missing source dependency: " + relative)
+        closure.add(relative)
+        for module in REQUIRE.findall(files[relative].decode("utf-8")):
+            if module.startswith("__more-infinite-research__/"):
+                module = module[len("__more-infinite-research__/"):]
+            dependency = module.replace(".", "/") + ".lua"
+            if ".." in dependency or dependency.startswith("/"):
+                raise ValueError("Invalid player module dependency")
+            pending.append(dependency)
+    return {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
+
+
+def members(source, version=None, committed_files=None, target=None, editions=None):
     if committed_files is None:
         committed_files = {}
         for path in sorted(source.rglob("*")):
@@ -77,23 +148,30 @@ def members(source, version=None, committed_files=None):
         raise ValueError("Invalid mod name")
     if not re.fullmatch(r"\d+\.\d+\.\d+", info["version"]):
         raise ValueError("Invalid Factorio distribution version")
+    if target is not None:
+        if version is not None:
+            raise ValueError("Selected player editions derive their version from the source codec")
+        if editions is None:
+            editions, _ = read_editions(source)
+        committed_files = select_edition(committed_files, info, target, editions)
     rows = []
     for relative, contents in sorted(committed_files.items()):
         if admitted(relative):
-            if relative == "info.json" and version is not None:
+            if relative == "info.json" and (version is not None or target is not None):
                 contents = (json.dumps(info, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
             rows.append((relative, contents))
     return info, rows
 
 
-def build(source, output, version=None, revision=None):
+def build(source, output, version=None, revision=None, target=None):
     if source.is_symlink() or (hasattr(source, "is_junction") and source.is_junction()):
         raise ValueError("Select an ordinary source root, not a filesystem link")
     source = source.resolve(strict=True)
     if not source.is_dir() or source.is_symlink():
         raise ValueError("Select an ordinary existing source root")
     commit, files = git_source(source, revision) if revision is not None else (None, None)
-    info, rows = members(source, version, files)
+    editions, editions_sha = read_editions(source, commit) if target is not None else (None, None)
+    info, rows = members(source, version, files, target, editions)
     root = f"{info['name']}_{info['version']}"
     expected_name = root + ".zip"
     if output.name != expected_name:
@@ -112,6 +190,7 @@ def build(source, output, version=None, revision=None):
         "kind": "native-package-members-not-gameplay-qualification",
         "source_root": str(source), "archive": str(output.resolve()),
         "source_commit": commit,
+        "target": target, "edition_record_sha256": editions_sha,
         "name": info["name"], "version": info["version"],
         "sha256": digest(output.read_bytes()), "bytes": output.stat().st_size,
         "members": [{"path": relative, "sha256": digest(contents), "bytes": len(contents)} for relative, contents in rows],
@@ -125,8 +204,9 @@ def main():
     parser.add_argument("--record", type=Path)
     parser.add_argument("--version", help="Explicit target/fixture metadata version; never a product packaging retry counter")
     parser.add_argument("--revision", help="Read exact committed blobs, excluding dirty and untracked development work")
+    parser.add_argument("--target", help="Select an implemented edition; this is not native qualification")
     args = parser.parse_args()
-    record = build(args.source, args.output, args.version, args.revision)
+    record = build(args.source, args.output, args.version, args.revision, args.target)
     if args.record:
         args.record.parent.mkdir(parents=True, exist_ok=True)
         with args.record.open("x", encoding="utf-8", newline="\n") as stream:

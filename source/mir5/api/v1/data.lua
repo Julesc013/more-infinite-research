@@ -1,6 +1,7 @@
 -- Draft MIR API v1 data-stage surface. Calls publish immediately in the
 -- caller's current data stage; no contributions are retained for a finalizer.
 local generator = require("__more-infinite-research__/research/generator")
+local target = require("platform.target")
 
 local M = {}
 local MAX_FAMILY = 64
@@ -84,6 +85,15 @@ local function copy_family(prototypes)
   return copied
 end
 
+local function reject_unsupported_productivity(prototypes)
+  if target.recipe_productivity == true then return end
+  for _, prototype in ipairs(prototypes) do
+    for _, effect in ipairs(prototype.effects or {}) do
+      if effect.type == "change-recipe-productivity" then fail("unsupported_capability", "recipe productivity is unavailable") end
+    end
+  end
+end
+
 local function error_code(message)
   if message:find("duplicate technology", 1, true) then return "duplicate_identity" end
   if message:find("missing", 1, true) then return "missing_target" end
@@ -103,20 +113,22 @@ local function publish(prototypes)
 end
 
 function M.get_version()
-  return {major = 1, minor = 0, product = "5.0.21000"}
+  return {major = 1, minor = 0, product = target.distribution_version}
 end
 
 function M.get_capabilities()
   return {
     technology_creation = true,
     technology_family = true,
-    recipe_productivity = true,
+    recipe_productivity = target.recipe_productivity == true,
     research_query = false
   }
 end
 
 function M.add_technologies(prototypes)
-  return publish(copy_family(prototypes))
+  local owned = copy_family(prototypes)
+  reject_unsupported_productivity(owned)
+  return publish(owned)
 end
 
 function M.add_technology(prototype)
@@ -124,6 +136,7 @@ function M.add_technology(prototype)
 end
 
 function M.add_productivity(prototype, recipe_names, change)
+  if target.recipe_productivity ~= true then fail("unsupported_capability", "recipe productivity is unavailable") end
   if not finite(change) then fail("invalid_definition", "change must be finite") end
   local recipe_count = dense_array(recipe_names, "recipe names", MAX_FAMILY)
   if recipe_count == 0 then fail("invalid_definition", "recipe names must not be empty") end

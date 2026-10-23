@@ -1,5 +1,6 @@
 """Package boundary and reproducibility checks independent of research output."""
 import importlib.util
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -14,6 +15,88 @@ spec.loader.exec_module(pack)
 
 
 class PackageTests(unittest.TestCase):
+    def test_selected_editions_have_one_actual_import_closure_and_exact_codec(self):
+        source = ROOT / "source/mir5"
+        for target, family, minimum in [
+            ("f013", "0.13", "0.13.20"), ("f014", "0.14", "0.14.23"),
+            ("f015", "0.15", "0.15.40"), ("f016", "0.16", "0.16.51"),
+            ("f017", "0.17", "0.17.79"), ("f100", "1.0", "1.0.0"),
+            ("f110", "1.1", "1.1.110"), ("f210", "2.1", "2.1.23"),
+        ]:
+            with self.subTest(target=target):
+                info, rows = pack.members(source, target=target)
+                files = dict(rows)
+                self.assertEqual(info["factorio_version"], family)
+                self.assertEqual(info["dependencies"], ["base >= " + minimum])
+                self.assertEqual(info["version"], "5.0." + target[1:] + "00")
+                self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
+                self.assertIn(('id = "' + target + '"').encode(), files["platform/target.lua"])
+                reduced = target != "f210"
+                self.assertEqual("research/historical_direct.lua" in files, reduced)
+                self.assertEqual("runtime/bootstrap.lua" in files, not reduced)
+                self.assertEqual("research/modern.lua" in files, not reduced)
+                self.assertEqual(any(path.startswith("adapters/") for path in files), reduced)
+                self.assertIn("api/v1/data.lua", files)
+                self.assertIn("api/v1/runtime.lua", files)
+                for migration in ("2.0.5", "2.1.0", "4.7.0"):
+                    path = "migrations/more-infinite-research_" + migration + ".json"
+                    self.assertIn(path, files)
+                    self.assertEqual(files[path], (source / path).read_bytes())
+                for name in files:
+                    self.assertFalse(name.startswith(("source/", "targets/", "tests/", "spec/")))
+
+    def test_unimplemented_unknown_and_arbitrary_edition_versions_refuse_before_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            for target in ("f200", "f018", "../f210"):
+                output = Path(temporary) / target.replace("/", "_") / "more-infinite-research_5.0.20000.zip"
+                with self.assertRaises(ValueError):
+                    pack.build(ROOT / "source/mir5", output, target=target)
+                self.assertFalse(output.exists())
+                self.assertFalse(output.parent.exists())
+            with self.assertRaises(ValueError):
+                pack.members(ROOT / "source/mir5", version="5.0.01501", target="f015")
+
+    def test_selected_edition_missing_module_refuses_instead_of_shipping_broken_imports(self):
+        source = ROOT / "source/mir5"
+        _, rows = pack.members(source)
+        files = dict(rows)
+        del files["adapters/reduced/control.lua"]
+        with self.assertRaisesRegex(ValueError, "missing source dependency"):
+            pack.members(source, committed_files=files, target="f015")
+
+    def test_committed_target_record_is_frozen_with_the_player_source(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            def git(*arguments):
+                return subprocess.check_output(["git", "-C", str(root), *arguments])
+            git("init", "-q")
+            git("config", "user.name", "Package test")
+            git("config", "user.email", "package-test@example.invalid")
+            source = root / "player"
+            for name in [*pack.ENTRYPOINTS, "api/v1/data.lua", "api/v1/runtime.lua", "platform/target.lua"]:
+                file = source / name
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_text("return {}\n")
+            (source / "info.json").write_text(json.dumps({"name":"more-infinite-research",
+                "version":"5.0.21000","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
+            edition = root / pack.TARGET_RECORD
+            edition.parent.mkdir(parents=True)
+            original = (ROOT / pack.TARGET_RECORD).read_bytes()
+            edition.write_bytes(original)
+            git("add", ".")
+            git("commit", "-qm", "frozen player and edition")
+            commit = git("rev-parse", "HEAD").decode().strip()
+            edition.write_text('{"schema":1,"targets":{}}\n')
+            record = pack.build(source, root / "out/more-infinite-research_5.0.21000.zip",
+                                revision=commit, target="f210")
+            self.assertEqual(record["edition_record_sha256"], hashlib.sha256(original).hexdigest())
+            self.assertEqual(record["source_commit"], commit)
+            self.assertEqual(record["target"], "f210")
+            with zipfile.ZipFile(record["archive"]) as archive:
+                info = json.loads(archive.read("more-infinite-research_5.0.21000/info.json"))
+                self.assertEqual(info["dependencies"], ["base >= 2.1.23"])
+            self.assertEqual(edition.read_text(), '{"schema":1,"targets":{}}\n')
+
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:
             repository = Path(temporary)

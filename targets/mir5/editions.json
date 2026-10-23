@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "qualification": "private-source-composition-only",
+  "targets": {
+    "f013": {"factorio_version": "0.13", "minimum_base": "0.13.20", "reduced": true, "research_levels": false, "recipe_productivity": false, "source_available": true},
+    "f014": {"factorio_version": "0.14", "minimum_base": "0.14.23", "reduced": true, "research_levels": false, "recipe_productivity": false, "source_available": true},
+    "f015": {"factorio_version": "0.15", "minimum_base": "0.15.40", "reduced": true, "research_levels": true, "recipe_productivity": false, "source_available": true},
+    "f016": {"factorio_version": "0.16", "minimum_base": "0.16.51", "reduced": true, "research_levels": true, "recipe_productivity": false, "source_available": true},
+    "f017": {"factorio_version": "0.17", "minimum_base": "0.17.79", "reduced": true, "research_levels": true, "recipe_productivity": false, "source_available": true},
+    "f100": {"factorio_version": "1.0", "minimum_base": "1.0.0", "reduced": true, "research_levels": true, "recipe_productivity": false, "source_available": true},
+    "f110": {"factorio_version": "1.1", "minimum_base": "1.1.110", "reduced": true, "research_levels": true, "recipe_productivity": false, "source_available": true},
+    "f200": {"factorio_version": "2.0", "minimum_base": "2.0.77", "reduced": false, "research_levels": true, "recipe_productivity": true, "source_available": false},
+    "f210": {"factorio_version": "2.1", "minimum_base": "2.1.23", "reduced": false, "research_levels": true, "recipe_productivity": true, "source_available": true}
+  }
+}

@@ -9,6 +9,8 @@ $repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../..')).Path
 
 $controls = @(
   [ordered]@{path='tests/mir5/test_generator.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_historical_direct.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_target_adapters.py';lua=$true},
   [ordered]@{path='tests/mir5/test_caps.py';lua=$true},
   [ordered]@{path='tests/mir5/test_legacy_caps.py';lua=$true},
   [ordered]@{path='tests/mir5/test_legacy_caps_lifecycle.py';lua=$true},
