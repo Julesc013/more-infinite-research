@@ -28,6 +28,98 @@ FROZEN_GEAR_ROWS = json.loads(r'''{
 }''')
 
 
+# These twelve recipe-level pairs are the only authored native-credit carriers.
+# The public rows remain the immutable published output oracle below; this
+# separate expectation proves the private, hidden addition field-for-field.
+NATIVE_CREDIT_DESCRIPTORS = (
+    ("research_copper", "recipe-prod-research_copper-1", "copper-plate"),
+    ("research_iron", "recipe-prod-research_iron-1", "iron-plate"),
+    ("research_breeding", "recipe-prod-research_breeding-1", "fish-breeding"),
+    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "advanced-oil-processing"),
+    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "basic-oil-processing"),
+    ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "coal-liquefaction"),
+    ("research_bullets", "recipe-prod-research_bullets-1", "firearm-magazine"),
+    ("research_grenades", "recipe-prod-research_grenades-1", "grenade"),
+    ("research_lubricant_productivity", "recipe-prod-research_lubricant_productivity-1", "lubricant"),
+    ("research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"),
+    ("research_concrete", "recipe-prod-research_concrete-1", "stone-brick"),
+    ("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"),
+)
+NATIVE_CREDIT_DEFAULT_SCALAR = 0.1
+
+
+def native_credit_carrier_rows(public_rows, captured_recipes):
+    """Build the independent expected hidden rows from exact public routes.
+
+    A pair is admitted only when its exact public MIR row is present and the
+    captured no-MIR input contains that recipe.  The public effect must retain
+    its captured default scalar; this prevents a private carrier from hiding a
+    public route or tuning drift.
+    """
+    expected = {}
+    for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
+        main = public_rows.get(main_id)
+        if main is None or recipe not in captured_recipes:
+            continue
+        effects = [
+            effect for effect in main["effects"]
+            if effect == {
+                "type": "change-recipe-productivity",
+                "recipe": recipe,
+                "change": NATIVE_CREDIT_DEFAULT_SCALAR,
+            }
+        ]
+        if len(effects) != 1:
+            raise AssertionError(
+                f"native credit lacks one captured default route: {main_id}:{recipe}"
+            )
+        for direction, change in (("positive", NATIVE_CREDIT_DEFAULT_SCALAR),
+                                  ("negative", -NATIVE_CREDIT_DEFAULT_SCALAR)):
+            name = f"mir-native-credit-{family}-{recipe}-{direction}"
+            expected[name] = {
+                "type": "technology",
+                "name": name,
+                "icon": "__base__/graphics/technology/automation.png",
+                "icon_size": 256,
+                "level": 1,
+                "upgrade": True,
+                "hidden": True,
+                "enabled": False,
+                "visible_when_disabled": False,
+                "max_level": "infinite",
+                "order": f"zz[mir-native-credit]-{name}",
+                "effects": [{
+                    "type": "change-recipe-productivity",
+                    "recipe": recipe,
+                    "change": change,
+                }],
+                "unit": {
+                    "count": 1,
+                    "time": 1,
+                    "ingredients": [["automation-science-pack", 1]],
+                },
+            }
+    return expected
+
+
+def captured_public_productivity_recipes(public_rows):
+    """Return the exact named productivity routes preserved by a capture."""
+    return {
+        effect["recipe"]
+        for row in public_rows.values()
+        for effect in row.get("effects", [])
+        if effect.get("type") == "change-recipe-productivity"
+    }
+
+
+def split_public_and_native_credit_rows(rows):
+    public, credit = {}, {}
+    for name, row in rows.items():
+        destination = credit if name.startswith("mir-native-credit-") else public
+        destination[name] = row
+    return public, credit
+
+
 # These are the only permitted additions to the published 4.7.2 K2SO
 # 75-technology capture. They restore the three finite A05 -1 identities
 # whose exact reviewed-forward tuple was omitted by 4.7.2, while preserving
@@ -435,7 +527,7 @@ class GeneratorTests(unittest.TestCase):
     def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 71 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 95 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -675,13 +767,21 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
           assert(reads == 1 and data.raw.technology["Space-Lab-Research-61"] == foreign)
           for _, row in ipairs(data.emitted) do
-            local pack, gate = false, false
-            for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
-            for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
-            assert(pack and gate and row.enabled ~= false, row.name)
+            if row.name:sub(1, 18) == "mir-native-credit-" then
+              -- Private signed carriers are not player research. They retain
+              -- their isolated one-pack mechanism unit rather than inheriting
+              -- the public science policy checked below.
+              assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
+                and #row.unit.ingredients == 1 and row.unit.ingredients[1][1] == "automation-science-pack")
+            else
+              local pack, gate = false, false
+              for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
+              for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
+              assert(pack and gate and row.enabled ~= false, row.name)
+            end
           end
         ''')
 
@@ -693,7 +793,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -958,13 +1058,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 78)
+          assert(environment.writes == 1 and #environment.emitted == 102)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 78)
+          assert(final_count == 102)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -1179,7 +1279,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 53)
+          assert(environment.writes == 1 and #environment.emitted == 73)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
@@ -1242,7 +1342,14 @@ class GeneratorTests(unittest.TestCase):
                     len(emitted), len(actual),
                     "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
                 )
-            self.assertEqual(actual, expected, profile)
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            self.assertEqual(actual_public, expected, profile)
+            expected_credit = native_credit_carrier_rows(
+                expected,
+                captured_public_productivity_recipes(expected_profiles[profile]),
+            )
+            self.assertEqual(actual_credit, expected_credit, profile)
+            self.assertEqual(set(actual), set(expected) | set(expected_credit), profile)
             expected_patches = patch_profiles[profile]
             self.assertEqual(
                 set(self.lua.globals().published_raw.recipe.keys())
@@ -1280,7 +1387,13 @@ class GeneratorTests(unittest.TestCase):
             expected = {row["name"]: host_row(row["row"])
                         for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"}
             actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
-            self.assertEqual(actual, expected, profile["id"])
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            self.assertEqual(actual_public, expected, profile["id"])
+            expected_credit = native_credit_carrier_rows(
+                expected, captured_public_productivity_recipes(expected)
+            )
+            self.assertEqual(actual_credit, expected_credit, profile["id"])
+            self.assertEqual(set(actual), set(expected) | set(expected_credit), profile["id"])
 
     def test_effective_global_option_lazily_activates_prototype_limits(self):
         self.lua.execute('''
@@ -1290,7 +1403,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 53)
+          assert(environment.writes == 1 and #environment.emitted == 73)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -1306,7 +1419,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 71)
+          assert(environment.writes == 1 and #environment.emitted == 95)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)
