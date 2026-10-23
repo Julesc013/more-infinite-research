@@ -19,6 +19,7 @@ param(
   [string]$PlayerDataPath = '',
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedPlayerDataSha256 = '',
   [string]$OutputRoot = '',
+  [string]$ActiveModsObserver = '',
   [ValidateRange(1,300)][int]$TimeoutSeconds = 300,
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB = 2048,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
@@ -28,6 +29,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$activeModsObserver = $ActiveModsObserver.Trim()
 
 function New-MIR5MenuComparisonPlan {
   $specifications = [Collections.Generic.List[object]]::new()
@@ -291,8 +293,8 @@ function Invoke-MIR5MenuHostSwapSelfTest {
   # this checkout's build/tmp, never launches Factorio, and deletes the exact
   # temporary root after exercising action failure and lock refusal.
   $temporaryRoot = Join-Path $repo ('build/tmp/mir5-menu-swap-host-' + [guid]::NewGuid().ToString('N'))
-  $temporaryParent = (Resolve-Path -LiteralPath (Join-Path $repo 'build/tmp')).Path
   [IO.Directory]::CreateDirectory($temporaryRoot) | Out-Null
+  $temporaryParent = (Resolve-Path -LiteralPath (Join-Path $repo 'build/tmp')).Path
   $temporaryRoot = (Resolve-Path -LiteralPath $temporaryRoot).Path
   Assert-MIR5MenuComparison ($temporaryRoot.StartsWith($temporaryParent + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) 'host-swap-root'
 
@@ -404,7 +406,7 @@ function Invoke-MIR5MenuComparisonSample {
   $menuSampleCommand = Get-Command -Name Invoke-MIRDirectLibraryResponsiveMenuSample -CommandType Function -ErrorAction Stop
   $invoke = {
     param($Archive)
-    & $menuSampleCommand -RepoRoot $Inputs.repo -FactorioBin $Inputs.factorio.path -LibraryDirectory $Inputs.library -EngineDataDirectory $Inputs.engine_data -BaseRows $Inputs.base_rows -RunRoot $runRoot -WriteDataRoot $WriteDataRoot -Label ([string]$PlanRow.label) -Resources $Context -MirArchive $Archive -TimeoutSeconds $Inputs.timeout_seconds -OrdinaryPlayerConfig $OrdinaryPlayerConfig -OrdinaryMenuPreparation $OrdinaryMenuPreparation
+    & $menuSampleCommand -RepoRoot $Inputs.repo -FactorioBin $Inputs.factorio.path -LibraryDirectory $Inputs.library -EngineDataDirectory $Inputs.engine_data -BaseRows $Inputs.base_rows -RunRoot $runRoot -WriteDataRoot $WriteDataRoot -Label ([string]$PlanRow.label) -Resources $Context -MirArchive $Archive -TimeoutSeconds $Inputs.timeout_seconds -OrdinaryPlayerConfig $OrdinaryPlayerConfig -OrdinaryMenuPreparation $OrdinaryMenuPreparation -ActiveModsObserver $Inputs.active_mods_observer
   }.GetNewClosure()
   if($PlanRow.arm -ceq 'without-mir') {
     return [pscustomobject][ordered]@{sample=(& $invoke $null); swap=$null; swap_record=$null}
@@ -487,10 +489,11 @@ try {
     replay=$replay
     ordinary_player_config=[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}
     player_data=[ordered]@{path=$playerData.path;sha256=$playerData.sha256;bytes=$playerData.bytes;engine_version=$playerData.engine_version;kind=$playerData.kind}
+    active_mods_observer=$(if([string]::IsNullOrWhiteSpace($activeModsObserver)){$null}else{$activeModsObserver})
   }
   $inputs = [pscustomobject]@{
     repo=$repo; factorio=$engine; library=$library; engine_data=$engineData; base_rows=$baseRows; published=$published; replay=$replay
-    timeout_seconds=$TimeoutSeconds; library_idle_wait_milliseconds=$LibraryIdleWaitMilliseconds
+    timeout_seconds=$TimeoutSeconds; library_idle_wait_milliseconds=$LibraryIdleWaitMilliseconds; active_mods_observer=$activeModsObserver
   }
   foreach($planRow in @($planRecord.samples)) {
     $current = $planRow

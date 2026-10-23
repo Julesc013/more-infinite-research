@@ -15,6 +15,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_api.py';lua=$true},
   [ordered]@{path='tests/mir5/test_runtime_api.py';lua=$true},
   [ordered]@{path='tests/mir5/test_fixture_controls.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_capture_controls.py';lua=$true},
   [ordered]@{path='tests/mir5/test_lifecycle.py';lua=$true},
   [ordered]@{path='tests/mir5/test_native_owners.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bootstrap.py';lua=$true},
