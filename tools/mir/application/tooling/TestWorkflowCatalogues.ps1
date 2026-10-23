@@ -100,7 +100,7 @@ function Get-MIR4WorkflowPurposeCatalogueV1 {
     'mir4-preview-assets.yml'='qualification';'mir4-promotion.yml'='release';'mir4-public-readback.yml'='release';
     'mir4-release-seal.yml'='release';'mir4-restore-drill.yml'='release';'mir4-source-freeze.yml'='release';
     'mir4-target-build.yml'='release';'mir4-target-publication.yml'='release';'mir4-target-qualification.yml'='qualification';
-    'release-candidate.yml'='release';'validate.yml'='ci'
+    'mir5.yml'='ci';'release-candidate.yml'='release';'validate.yml'='ci'
   }
   $rows = @()
   $workflowRoot = Join-Path $repo '.github/workflows'
@@ -115,6 +115,7 @@ function Get-MIR4WorkflowPurposeCatalogueV1 {
       elseif ($file.Name -ceq 'mir4-target-publication.yml') { 'confined-publisher-client' }
       elseif ($file.Name -ceq 'branch-policy.yml') { 'canonical-governance-test' }
       elseif ($file.Name -ceq 'extended-compat-audit.yml') { 'compatibility-audit-adapter' }
+      elseif ($file.Name -ceq 'mir5.yml') { 'canonical-host-tests' }
       else { 'unknown' }
     if ($invocation -ceq 'unknown') { throw "[mir4-workflow-invocation-unclassified] $($file.Name)" }
     $rows += [pscustomobject][ordered]@{
