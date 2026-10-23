@@ -5,8 +5,9 @@
 -- `weight` is group.change / the canonical family default below, so it
 -- multiplies the current family effect-percent.  Bindings remain in published group order: product_targets
 -- admits the first matching group for a family after that group passes its own
--- exclusions.  Unimplemented selector forms are recorded below; item patterns expand once
--- over the relevant native item classes before the shared recipe pass.
+-- exclusions.  Item patterns and admitted place-result selectors expand once over relevant
+-- native classes before the shared recipe pass. These bindings never create
+-- a research family or discover its science/progression.
 local M = {
   schema = 1,
   first_admitted_group = "declaration-order",
@@ -90,16 +91,14 @@ local M = {
       {family = "research_belts", weight = 0.2, products = {{type = "item", name = "express-transport-belt"}, {type = "item", name = "express-underground-belt"}, {type = "item", name = "express-splitter"}, {type = "item", name = "express-loader"}, {type = "item", name = "aai-express-loader"}}, item_patterns = {"^.+%-express%-loader$"}},
       {family = "research_belts", weight = 0.1, products = {{type = "item", name = "turbo-transport-belt"}, {type = "item", name = "turbo-underground-belt"}, {type = "item", name = "turbo-splitter"}, {type = "item", name = "turbo-loader"}, {type = "item", name = "aai-turbo-loader"}}, item_patterns = {"^turbo%-transport%-belt$", "^turbo%-underground%-belt$", "^turbo%-splitter$", "^.+%-turbo%-loader$"}},
       {family = "research_belts", weight = 0.05, products = {{type = "item", name = "hyper-transport-belt"}, {type = "item", name = "hyper-underground-belt"}, {type = "item", name = "hyper-splitter"}, {type = "item", name = "hyper-loader"}, {type = "item", name = "aai-hyper-loader"}}, item_patterns = {"^hyper%-transport%-belt$", "^hyper%-underground%-belt$", "^hyper%-splitter$", "^.+%-hyper%-loader$"}},
+      {family = "research_belts", weight = 0.05, structural_fallback = true, place_result_entity_types = {"transport-belt", "underground-belt", "splitter", "lane-splitter", "loader", "loader-1x1"}, reject_explicit_productivity_denial = true},
       {family = "research_inserters", weight = 1, products = {{type = "item", name = "inserter"}, {type = "item", name = "burner-inserter"}}},
       {family = "research_inserters", weight = 0.5, products = {{type = "item", name = "fast-inserter"}, {type = "item", name = "long-handed-inserter"}}},
       {family = "research_inserters", weight = 0.2, products = {{type = "item", name = "bulk-inserter"}}, item_patterns = {"bulk%-inserter"}},
       {family = "research_inserters", weight = 0.1, products = {{type = "item", name = "stack-inserter"}}, item_patterns = {"stack%-inserter"}},
+      {family = "research_inserters", weight = 0.1, structural_fallback = true, place_result_entity_types = {"inserter"}, reject_explicit_productivity_denial = true},
       {family = "research_armor_components", weight = 0.5, item_patterns = {"^.+%-armor%-plating$", "^.+%-armour%-plating$", "^armor%-plating.*$", "^armour%-plating.*$"}},
       {family = "research_armor_components", weight = 0.2, item_patterns = {"^.+%-armor%-plate$", "^.+%-armour%-plate$", "^armor%-plate.*$", "^armour%-plate.*$"}},
-    },
-    unsupported = {
-      {family = "research_belts", selector = "place_result_entity_types structural fallback", disposition = "literal and pattern products retained; structural route unrepresented"},
-      {family = "research_inserters", selector = "place_result_entity_types structural fallback", disposition = "literal and pattern products retained; structural route unrepresented"},
     },
   },
 
@@ -130,8 +129,6 @@ local M = {
       {family = "research_thruster_fuel_productivity", weight = 1, products = {{type = "fluid", name = "thruster-fuel"}}, exclude_recipe_patterns = {"^empty%-.*%-barrel$"}},
       {family = "research_thruster_oxidizer_productivity", weight = 1, products = {{type = "fluid", name = "thruster-oxidizer"}}, exclude_recipe_patterns = {"^empty%-.*%-barrel$"}},
       {family = "research_tungsten", weight = 1, products = {{type = "item", name = "tungsten-plate"}, {type = "item", name = "tungsten-carbide"}}},
-    },
-    unsupported = {
     },
   },
 }

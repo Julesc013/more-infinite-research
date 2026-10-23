@@ -58,18 +58,22 @@ local function icons(definition)
   }
 end
 
-local function normal_effects(definition, values)
+local function normal_effects(definition, values, options)
   local out = {}
+  local automatic = definition.automatic_recipe_targets == nil
+    or require("compatibility.automatic_productivity").applies(options)
   for index = 1, #definition.effects do
     local effect = definition.effects[index]
-    if definition.kind == "productivity" then
-      out[index] = {type = "change-recipe-productivity", recipe = effect.recipe,
-        change = values.effect_percent * effect.scale / 100}
-    else
-      local result = {type = effect.type, modifier = values.effect_percent * effect.scale}
-      if effect.ammo_category then result.ammo_category = effect.ammo_category end
-      if not effect.raw then result.modifier = result.modifier / 100 end
-      out[index] = result
+    if automatic or not definition.automatic_recipe_targets[effect.recipe] then
+      if definition.kind == "productivity" then
+        out[#out + 1] = {type = "change-recipe-productivity", recipe = effect.recipe,
+          change = values.effect_percent * effect.scale / 100}
+      else
+        local result = {type = effect.type, modifier = values.effect_percent * effect.scale}
+        if effect.ammo_category then result.ammo_category = effect.ammo_category end
+        if not effect.raw then result.modifier = result.modifier / 100 end
+        out[#out + 1] = result
+      end
     end
   end
   return out
@@ -93,7 +97,7 @@ function M.technology(definition, values)
     icons = icons(definition), localised_name = copy(definition.localised_name),
     localised_description = copy(definition.localised_description), level = 1,
     upgrade = true, max_level = "infinite", order = definition.order,
-    prerequisites = generated_prerequisites(definition), effects = normal_effects(definition, stream),
+    prerequisites = generated_prerequisites(definition), effects = normal_effects(definition, stream, values.options),
     unit = {
       count_formula = productivity.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
       time = stream.research_time, ingredients = catalogue.science_ingredients(definition.science)

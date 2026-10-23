@@ -99,9 +99,11 @@ local function copy_rule(rule, ordinal)
     return result
   end
   local recipe_names, retained_owners = names("recipes"), names("retained_owners")
+  local place_types = names("place_result_entity_types")
   local recipe_patterns = patterns("recipe_name_patterns")
   if #products == 0 and (item_patterns == nil or #item_patterns == 0)
-    and next(recipe_names) == nil and (recipe_patterns == nil or #recipe_patterns == 0) then
+    and next(recipe_names) == nil and next(place_types) == nil
+    and (recipe_patterns == nil or #recipe_patterns == 0) then
     error("MIR product targets requires a binding product, recipe or pattern", 3)
   end
 
@@ -121,6 +123,7 @@ local function copy_rule(rule, ordinal)
     recipe_name_patterns = recipe_patterns,
     retained_owners = retained_owners,
     retained_owned_recipes = {},
+    place_result_entity_types = place_types,
     exclude_recipe_patterns = patterns("exclude_recipe_patterns"),
     exclude_ingredient_patterns = patterns("exclude_ingredient_patterns"),
     include_hidden = rule.include_hidden == true,
@@ -152,7 +155,9 @@ function M.prepare(bindings, options)
   for ordinal, binding in ipairs(bindings) do
     local rule = copy_rule(binding, ordinal)
     rules[#rules + 1] = rule
-    if rule.item_patterns and #rule.item_patterns > 0 then pattern_rules[#pattern_rules + 1] = rule end
+    if (rule.item_patterns and #rule.item_patterns > 0) or next(rule.place_result_entity_types) then
+      pattern_rules[#pattern_rules + 1] = rule
+    end
     if rule.recipe_name_patterns and #rule.recipe_name_patterns > 0 then
       recipe_pattern_rules[#recipe_pattern_rules + 1] = rule
     end
@@ -185,12 +190,25 @@ function M.prepare(bindings, options)
     end
   end
 
-  -- Resolve the retained finite item patterns once into the same typed
-  -- product index. Never run a pattern search across recipes per family.
-  -- No item class is read when the selected bindings are all literal.
-  local item_count, pattern_tests = 0, 0
+  -- Resolve the retained item patterns/place-result types once into the same
+  -- typed product index. Only named entity classes are inspected, never the
+  -- whole prototype world or a recipe pass for every family.
+  local item_count, pattern_tests, entity_count = 0, 0, 0
   if #pattern_rules > 0 then
     if type(options.raw) ~= "table" then error("MIR item pattern targets requires native prototypes", 2) end
+    local entity_types, entities = {}, {}
+    for _, rule in ipairs(pattern_rules) do
+      for kind in pairs(rule.place_result_entity_types) do entity_types[kind] = true end
+    end
+    for kind in pairs(entity_types) do
+      for name in pairs(options.raw[kind] or {}) do
+        entity_count = entity_count + 1
+        if entities[name] and entities[name] ~= kind then
+          error("MIR product target entity has multiple types: " .. tostring(name), 2)
+        end
+        entities[name] = kind
+      end
+    end
     local seen = {}
     for _, rule in ipairs(pattern_rules) do
       seen[rule.ordinal] = {}
@@ -203,13 +221,16 @@ function M.prepare(bindings, options)
           local identity = typed_identity("item", name)
           for _, rule in ipairs(pattern_rules) do
             if not seen[rule.ordinal][identity] then
-              for _, pattern in ipairs(rule.item_patterns) do
+              local matches = type(prototype.place_result) == "string"
+                and rule.place_result_entity_types[entities[prototype.place_result]] == true
+              for _, pattern in ipairs(rule.item_patterns or {}) do
+                if matches then break end
                 pattern_tests = pattern_tests + 1
-                if string.find(name, pattern) then
-                  rule.products[#rule.products + 1] = identity
-                  seen[rule.ordinal][identity] = true
-                  break
-                end
+                if string.find(name, pattern) then matches = true; break end
+              end
+              if matches then
+                rule.products[#rule.products + 1] = identity
+                seen[rule.ordinal][identity] = true
               end
             end
           end
@@ -232,6 +253,7 @@ function M.prepare(bindings, options)
     recipe_pattern_rules = recipe_pattern_rules,
     owners = owner_count,
     items = item_count,
+    entities = entity_count,
     pattern_tests = pattern_tests,
     probability_field = probability_field,
     productivity_ignores_stats = productivity_ignores_stats == true,
@@ -417,7 +439,7 @@ function M.collect(recipes, context)
   table.sort(names)
   local work = {recipes = 0, products = 0, ingredients = 0, matches = 0,
     items = context.items, pattern_tests = context.pattern_tests, recipe_pattern_tests = 0,
-    owners = context.owners}
+    owners = context.owners, entities = context.entities}
   local targets, by_family = {}, {}
   for _, recipe_name in ipairs(names) do
     work.recipes = work.recipes + 1

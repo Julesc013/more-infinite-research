@@ -396,6 +396,67 @@ class ProductTargetExtensionTests(unittest.TestCase):
           assert(ice.effects[2].recipe=='custom' and frozen_copy(native)==before)
         ''')
 
+    def test_structural_belt_and_inserter_fallbacks_preserve_denials_and_action_settings(self):
+        self.lua.execute(r'''
+          local function run(action,legacy,create,reviewed)
+            local belt=generated('research_belts',{productivity('known',.33)})
+            local inserter=generated('research_inserters',{productivity('known',.33)})
+            local raw=raw_with_recipes({custom=recipe({}, {product('item','custom-belt')}),
+              fast=recipe({}, {product('item','mod-fast-loader')}),
+              inserter=recipe({}, {product('item','custom-arm')}),
+              denied=recipe({}, {product('item','custom-belt')},{allow_productivity=false})})
+            raw.item={['custom-belt']={place_result='unusual-belt'},
+              ['custom-arm']={place_result='unusual-arm'},['mod-fast-loader']={place_result='unusual-loader'}}
+            local active=(action==nil or action=='apply') and
+              (create==true or reviewed==false or (legacy~='off' and legacy~='report'))
+            if active then
+              raw['transport-belt']={['unusual-belt']={}}
+              raw.inserter={['unusual-arm']={}}
+              raw.loader={['unusual-loader']={}}
+            else
+              setmetatable(raw,{__index=function(_,kind)
+                if kind=='transport-belt' or kind=='inserter' or kind=='loader' then
+                  error('inactive structural fallback inspected entities') end
+              end})
+            end
+            local result=extension.extend({belt,inserter},{streams={research_belts={effect_percent=20},
+              research_inserters={effect_percent=20}},options={
+                ['mir-automatic-productivity-action']=action,['mir-automatic-compiler-mode']=legacy,
+                ['mir-automatic-create-research']=create,['mir-automatic-require-reviewed-data']=reviewed}},
+              {raw=raw,mods={}})
+            assert(result.extended_effects==(active and 3 or 1))
+            assert(result.work.entities==(active and 3 or 0))
+            assert(belt.effects[#belt.effects].recipe=='fast' and belt.effects[#belt.effects].change==.1)
+            if active then assert(belt.effects[2].change==.01 and inserter.effects[2].change==.02) end
+          end
+          run(); run('apply'); run('preview'); run('disabled')
+          run('apply','off'); run('apply','report')
+          run('apply','safe-attach'); run('apply','exact-pack'); run('apply','safe-generate')
+          run('apply','off',true); run('apply','report',false,false)
+        ''')
+
+    def test_k2_science_card_binding_requires_selected_family_and_complete_markers(self):
+        self.lua.execute(r'''
+          local function run(mods)
+            local row=generated('research_science_pack_productivity',{productivity('known',.33)})
+            local result=extension.extend({row}, {streams={research_science_pack_productivity={effect_percent=15}}}, {
+              raw=raw_with_recipes({producer=recipe({}, {product('item','kr-advanced-tech-card')}),
+                cooling=recipe({}, {product('item','kr-matter-tech-card')}),
+                denied=recipe({}, {product('item','kr-singularity-tech-card')},{allow_productivity=false}),
+                homonym=recipe({}, {product('fluid','kr-advanced-tech-card')})}),mods=mods})
+            return row,result
+          end
+          package.preload['compatibility.modern_catalogue.k2so']=function() error('inactive K2SO imported') end
+          local row,result=run({Krastorio2='2.1.4'})
+          assert(result.extended_effects==0 and #row.effects==1)
+          package.preload['compatibility.modern_catalogue.k2so']=nil
+          row,result=run({['space-age']='2.1.23',Krastorio2='2.1.4',
+            ['Krastorio2-spaced-out']='2.0.19',Krastorio2Assets='2.1.0',['k2so-assets']='1.0.7'})
+          assert(result.extended_effects==2 and #row.effects==3)
+          assert(row.effects[2].recipe=='cooling' and row.effects[2].change==.15)
+          assert(row.effects[3].recipe=='producer' and row.effects[3].change==.15)
+        ''')
+
     def test_inactive_space_age_and_literal_families_do_not_read_pattern_classes(self):
         self.lua.execute(r'''
           local source=raw_with_recipes({gear=recipe({}, {product('item','iron-gear-wheel')})})

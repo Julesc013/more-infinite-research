@@ -761,6 +761,43 @@ class GeneratorTests(unittest.TestCase):
           mods = nil
         ''')
 
+    def test_k2_authored_structural_routes_obey_action_and_legacy_settings(self):
+        self.lua.execute('''
+          local selected=modern_catalogue.select({['space-age']='2.1.23',Krastorio2='2.1.4',
+            ['Krastorio2-spaced-out']='2.0.19',Krastorio2Assets='2.1.0',['k2so-assets']='1.0.7'})
+          local expected={research_belts={['kr-advanced-loader']=true,['kr-loader']=true,
+            ['kr-superior-loader']=true,['kr-superior-splitter']=true,
+            ['kr-superior-transport-belt']=true,['kr-superior-underground-belt']=true},
+            research_inserters={['kr-superior-inserter']=true,['kr-superior-long-inserter']=true}}
+          local options={
+            {['mir-automatic-productivity-action']='disabled'},
+            {['mir-automatic-productivity-action']='preview'},
+            {['mir-automatic-compiler-mode']='off'},
+            {['mir-automatic-compiler-mode']='report'},
+          }
+          for _,definition in ipairs(selected.definitions) do
+            local removed=expected[definition.key]
+            if removed then
+              local values=config.resolve(defaults())
+              local full=modern.technology(definition,values)
+              for _,option in ipairs(options) do
+                values.options=option
+                local output=modern.technology(definition,values)
+                local before,after={},{}
+                for _,effect in ipairs(full.effects) do before[effect.recipe]=effect.change end
+                for _,effect in ipairs(output.effects) do after[effect.recipe]=effect.change end
+                for recipe,change in pairs(before) do
+                  assert(after[recipe]==(not removed[recipe] and change or nil),recipe)
+                end
+                assert(output.name==full.name and output.enabled==full.enabled)
+                assert(output.automatic_recipe_targets==nil)
+              end
+              values.options={['mir-automatic-compiler-mode']='off',['mir-automatic-create-research']=true}
+              assert(#modern.technology(definition,values).effects==#full.effects)
+            end
+          end
+        ''')
+
     def test_cost_variants_and_nonfinite(self):
         self.lua.execute('''
           assert(productivity.cost(100, 0, 1) == "100")

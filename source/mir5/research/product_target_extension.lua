@@ -35,11 +35,18 @@ function M.extend(technologies, values, context)
   local rules = {}
   local function admit(rows)
     for _, row in ipairs(rows) do
-      if selected[row.family] then rules[#rules + 1] = row end
+      if selected[row.family] and (not row.structural_fallback
+        or require("compatibility.automatic_productivity").applies(values.options)) then
+        rules[#rules + 1] = row
+      end
     end
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
+  if selected.research_science_pack_productivity and context.mods and context.mods.Krastorio2
+    and require("compatibility.modern_catalogue").is_k2so(context.mods) then
+    admit(require("compatibility.modern_catalogue.k2so").product_bindings)
+  end
   local module_count = 0
   if selected.research_modules then
     local module_rules

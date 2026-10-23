@@ -13,12 +13,21 @@ local function direct_effect(type_name, scale, ammo_category)
 end
 
 return {
+  product_bindings = {
+    {family="research_science_pack_productivity", weight=1, reject_explicit_productivity_denial=true,
+      products={{type="item",name="kr-advanced-tech-card"}, {type="item",name="kr-matter-tech-card"},
+        {type="item",name="kr-singularity-tech-card"}}},
+  },
   definition_overrides = {
     research_artificial_soil = {
       science = "science_production_agricultural_space",
       prerequisites = {},
     },
     research_belts = {
+      automatic_recipe_targets = {
+        ["kr-advanced-loader"]=true, ["kr-loader"]=true, ["kr-superior-loader"]=true,
+        ["kr-superior-splitter"]=true, ["kr-superior-transport-belt"]=true, ["kr-superior-underground-belt"]=true,
+      },
       science = "science_production_space",
       prerequisites = {},
       effects = recipe_effects({
@@ -85,6 +94,7 @@ return {
       effects = recipe_effects({"ammoniacal-solution-separation", 1, "kr-matter-to-ice", 1}),
     },
     research_inserters = {
+      automatic_recipe_targets = {["kr-superior-inserter"]=true, ["kr-superior-long-inserter"]=true},
       science = "science_production_space", prerequisites = {},
       effects = recipe_effects({
         "burner-inserter", 1, "inserter", 1, "fast-inserter", 0.5, "long-handed-inserter", 0.5,

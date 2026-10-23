@@ -338,6 +338,34 @@ class ProductTargetTests(unittest.TestCase):
           assert(#targets.collect(recipes,absent).targets==1)
         ''')
 
+    def test_place_result_targets_share_item_index_and_only_read_named_entity_classes(self):
+        self.lua.execute(r'''
+          local raw={item={['known-fast-loader']={place_result='fast-loader'},
+            ['unusual-device']={place_result='custom-loader'}, ['wrong']={place_result='assembler'}},
+            ['loader-1x1']={['custom-loader']={},['fast-loader']={}}}
+          setmetatable(raw, {__index=function(_,kind)
+            if kind=='assembling-machine' then error('unrelated entity class read') end
+          end})
+          local context=targets.prepare({
+            binding('belts',.5,{{type='item',name='known-fast-loader'}}),
+            binding('belts',.05,{}, {place_result_entity_types={'loader-1x1'},
+              reject_explicit_productivity_denial=true}),
+          }, {raw=raw})
+          local result=targets.collect({
+            mixed=recipe({}, {product('item','unusual-device'),product('item','known-fast-loader')}),
+            custom=recipe({}, {product('item','unusual-device')}),
+            denied=recipe({}, {product('item','unusual-device')},{allow_productivity=false}),
+            zero=recipe({}, {product('item','unusual-device')},{maximum_productivity=0}),
+            wrong=recipe({}, {product('item','wrong')}),
+            fluid=recipe({}, {product('fluid','unusual-device')}),
+          },context)
+          assert(target_names(result.targets)=='belts:custom:item:unusual-device:0.05,'
+            .. 'belts:mixed:item:known-fast-loader:0.5')
+          assert(result.work.entities==2 and result.work.items==3 and result.work.products==7)
+          assert(not pcall(function() targets.prepare({binding('bad',1,{}, {
+            place_result_entity_types={'loader','loader'}})}, {raw=raw}) end))
+        ''')
+
     def test_prepare_rejects_ambiguous_or_sparse_authored_bindings(self):
         self.lua.execute(r'''
           assert(not pcall(function() targets.prepare({binding("x", 0, {{type="item", name="x"}})}) end))
