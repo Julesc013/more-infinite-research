@@ -2,7 +2,7 @@
 
 This package-excluded tool consumes only hash-verified Factorio data-stage
 captures.  It records the full published additions and patches for the fixed
-F210 Base, Space Age, and optional exact K2SO profiles, then compares a later candidate capture
+F200/F210 Base, Space Age, and optional exact K2SO profiles, then compares a later candidate capture
 against the independent no-MIR baseline plus that explicit intended output.
 It does not execute Factorio, construct player output, or provide a runtime
 catalogue.
@@ -26,6 +26,7 @@ class CatalogueError(ValueError):
 
 SCHEMA = 2
 KIND = "MIR5ModernF210PublishedCatalogueV2"
+GENERAL_KIND = "MIR5ModernPublishedCatalogueV2"
 REVIEW_KIND = "MIR5ModernCatalogueReviewedDifferencesV1"
 PRIVATE_MOD_DATA_PREFIX = "more-infinite-research-"
 MAXIMUM_LEVEL_POLICY = "more-infinite-research-maximum-level-policy"
@@ -127,7 +128,7 @@ def _loaded_without_mir(value: Any, label: str) -> list[str]:
         value = [value]
     if not isinstance(value, list) or not all(isinstance(entry, str) and entry for entry in value):
         raise CatalogueError(f"{label} is invalid")
-    return [entry for entry in value if not entry.startswith("more-infinite-research@")] 
+    return [entry for entry in value if not entry.startswith("more-infinite-research@")]
 
 
 def read_capture(root: Path, *, require_mir: bool | None) -> dict[str, Any]:
@@ -433,9 +434,14 @@ def _capture_receipt(capture: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def recover_profile(identifier: str, no_mir_root: Path, published_root: Path) -> dict[str, Any]:
+def recover_profile(identifier: str, no_mir_root: Path, published_root: Path,
+                    *, expected_version: str | None = None) -> dict[str, Any]:
     no_mir = read_capture(no_mir_root, require_mir=False)
     published = read_capture(published_root, require_mir=True)
+    if not published["published_mir"]["version"].startswith("4.7."):
+        raise CatalogueError("oracle recovery requires published MIR 4.7, never a MIR5 candidate")
+    if expected_version is not None and published["published_mir"]["version"] != expected_version:
+        raise CatalogueError("recovery requires the exact published 4.7.0 target distribution")
     _assert_matching_inputs(no_mir, published)
     data = _diff_domain(no_mir["raw"], published["raw"], f"{identifier} data")
     settings = _diff_domain(no_mir["settings"], published["settings"], f"{identifier} settings")
@@ -458,24 +464,36 @@ def recover_profile(identifier: str, no_mir_root: Path, published_root: Path) ->
         "normal_patterns": _normal_patterns(data, settings),
         "special_cases": special,
         "technology_owner_progression_facts": _technology_facts(generated),
-        "captured_maximum_level_bindings": _captured_maximum_level_bindings(published["raw"]),
+        # ModData was introduced after 2.0. Preserve absence on that engine;
+        # an absent/malformed 2.1 policy remains an oracle input error.
+        "captured_maximum_level_bindings": (
+            None if published["engine"]["factorio_version"] == "2.0" and "mod-data" not in published["raw"]
+            else _captured_maximum_level_bindings(published["raw"])),
     }
 
 
 def recover_inventory(base_no_mir: Path, base_published: Path,
                       space_age_no_mir: Path, space_age_published: Path,
-                      k2so_no_mir: Path | None = None, k2so_published: Path | None = None) -> dict[str, Any]:
+                      k2so_no_mir: Path | None = None, k2so_published: Path | None = None,
+                      *, target: str = "f210") -> dict[str, Any]:
+    if target not in {"f200", "f210"}:
+        raise CatalogueError("modern recovery requires F200 or F210")
     if (k2so_no_mir is None) != (k2so_published is None):
         raise CatalogueError("K2SO recovery requires both no-MIR and published captures")
+    published_version = "4.7." + target[1:] + "00"
     profiles = [
-        recover_profile("base-f210", base_no_mir, base_published),
-        recover_profile("space-age-f210", space_age_no_mir, space_age_published),
+        recover_profile("base-" + target, base_no_mir, base_published, expected_version=published_version),
+        recover_profile("space-age-" + target, space_age_no_mir, space_age_published, expected_version=published_version),
     ]
     if k2so_no_mir is not None and k2so_published is not None:
-        profiles.append(recover_profile("k2so-f210", k2so_no_mir, k2so_published))
+        profiles.append(recover_profile("k2so-" + target, k2so_no_mir, k2so_published, expected_version=published_version))
+    family = "2.0" if target == "f200" else "2.1"
+    for profile in profiles:
+        if profile["capture_receipts"]["published_470"]["engine"]["factorio_version"] != family:
+            raise CatalogueError("recovery target differs from the actual captured engine family")
     return {
         "schema": SCHEMA,
-        "kind": KIND,
+        "kind": KIND if target == "f210" else GENERAL_KIND,
         "status": "hash-verified-published-modern-catalogue-oracle",
         "claims": {
             "native_qualification": False,
@@ -484,8 +502,8 @@ def recover_inventory(base_no_mir: Path, base_published: Path,
             "candidate_expectations_derived_from_candidate": False,
         },
         "source": {
-            "published_version": "4.7.21000",
-            "engine_family": "2.1",
+            "published_version": published_version,
+            "engine_family": family,
             "profiles": [profile["id"] for profile in profiles],
         },
         "profiles": profiles,
@@ -506,7 +524,7 @@ def _write_new_json(path: Path, value: Any) -> None:
 
 
 def _inventory_profile(inventory: Mapping[str, Any], identifier: str) -> Mapping[str, Any]:
-    if inventory.get("schema") != SCHEMA or inventory.get("kind") != KIND:
+    if inventory.get("schema") != SCHEMA or inventory.get("kind") not in {KIND, GENERAL_KIND}:
         raise CatalogueError("inventory has an unsupported schema or kind")
     rows = _list(inventory.get("profiles"), "inventory profiles")
     matches = [row for row in rows if isinstance(row, Mapping) and row.get("id") == identifier]
@@ -670,7 +688,7 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
                    + _difference_summary(expected_settings, candidate["settings"], "settings"))
     return {
         "schema": SCHEMA,
-        "kind": "MIR5ModernF210CandidateComparisonV1",
+        "kind": "MIR5ModernF210CandidateComparisonV1" if profile_id.endswith("f210") else "MIR5ModernCandidateComparisonV1",
         "status": "equal-intended-native-output" if not differences else "different-intended-native-output",
         "scope": "complete data/settings output only; no gameplay, menu, save, runtime, or release qualification",
         "profile": profile_id,
@@ -693,9 +711,11 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument("--k2so-no-mir", type=Path)
     recover.add_argument("--k2so-published", type=Path)
     recover.add_argument("--output", type=Path, required=True)
+    recover.add_argument("--target", choices=("f200", "f210"), default="f210")
     compare = commands.add_parser("compare", help="compare a candidate capture with the independent oracle")
     compare.add_argument("--inventory", type=Path, required=True)
-    compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210"), required=True)
+    compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210",
+        "base-f200", "space-age-f200", "k2so-f200"), required=True)
     compare.add_argument("--baseline", type=Path, required=True)
     compare.add_argument("--candidate", type=Path, required=True)
     compare.add_argument("--reviewed-differences", type=Path)
@@ -705,7 +725,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "recover":
             result = recover_inventory(args.base_no_mir, args.base_published,
                                        args.space_age_no_mir, args.space_age_published,
-                                       args.k2so_no_mir, args.k2so_published)
+                                       args.k2so_no_mir, args.k2so_published, target=args.target)
             _write_new_json(args.output, result)
             print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
             return 0

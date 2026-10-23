@@ -17,12 +17,16 @@ local function supported_definitions(definitions)
   for _, definition in ipairs(definitions) do
     if M.supports_family(definition.key) then
       if target.id == "f200" and definition.key == "research_molten_metals" then
-        -- 2.1 renamed the two ore-to-fluid recipes; the 2.0 native producers
-        -- retain 500-unit outputs and the same authored half-rate effect.
+        -- Published 2.0 research targets the two lava recipes only. The ore
+        -- recipes entered this authored stream on 2.1; do not add new 2.0
+        -- bonuses merely because another producer has the same fluid output.
+        local effects = {}
         for _, effect in ipairs(definition.effects) do
-          if effect.recipe == "copper-ore-melting" then effect.recipe = "molten-copper"
-          elseif effect.recipe == "iron-ore-melting" then effect.recipe = "molten-iron" end
+          if effect.recipe ~= "copper-ore-melting" and effect.recipe ~= "iron-ore-melting" then
+            effects[#effects + 1] = effect
+          end
         end
+        definition.effects = effects
       end
       out[#out + 1] = definition
     end

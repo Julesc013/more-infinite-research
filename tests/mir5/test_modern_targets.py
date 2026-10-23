@@ -49,8 +49,7 @@ class ModernTargetTests(unittest.TestCase):
           local molten = selected.research_molten_metals.effects
           assert(molten[1].recipe == "molten-copper-from-lava" and molten[1].scale == 1)
           assert(molten[2].recipe == "molten-iron-from-lava" and molten[2].scale == 1)
-          assert(molten[3].recipe == "molten-copper" and molten[3].scale == 0.5)
-          assert(molten[4].recipe == "molten-iron" and molten[4].scale == 0.5)
+          assert(#molten == 2, "2.0 must retain the published lava-only effect scope")
           assert(existing.research_molten_metals.effects[3].recipe == "copper-ore-melting"
             and existing.research_molten_metals.effects[4].recipe == "iron-ore-melting")
           assert(#catalogue.select({}).definitions == 46)
