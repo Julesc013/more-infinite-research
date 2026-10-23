@@ -24,8 +24,8 @@
     },
     "predeclared_intended_additions": {
       "path": "spec/mir5/inventory/k2so-material-intended-differences.json",
-      "bytes": 7153,
-      "sha256": "3ADFB74E7D602354298109589331DB8E069F096E527E89BCC8ADC9BADC813294"
+      "bytes": 6918,
+      "sha256": "5F8C970E5FE06E853946E7E07C855FB3A50946D879F76B8CFF803B03AFA30536"
     }
   },
   "raw_custody": "build/tmp/mir5-k2so-material-native-f210-r01",
@@ -41,5 +41,12 @@
     "multiplayer": false,
     "performance": false,
     "release_qualification": false
+  },
+  "original_predeclared_input_custody": {
+    "path": "build/mir5/material-catalogue-r01/frozen/intended-differences.json",
+    "bytes": 7153,
+    "sha256": "3ADFB74E7D602354298109589331DB8E069F096E527E89BCC8ADC9BADC813294",
+    "semantic_equality_with_canonical_record": true,
+    "difference": "Windows CRLF input preserved in frozen custody; repository inventory uses LF under its existing text policy"
   }
 }
