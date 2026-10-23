@@ -107,6 +107,22 @@ local function browser_options(player, options)
   local result = {}
   if type(options.search) == "string" then result.query = options.search end
   if options.family == "all" or options.family == "mir" then result.family = options.family end
+  if type(options.status) == "number" and options.status == math.floor(options.status)
+      and options.status >= 1 and options.status <= 4 then
+    result.status = options.status
+  end
+  if options.sort == "progression" or options.sort == "native"
+      or options.sort == "name-asc" or options.sort == "name-desc" then
+    result.sort = options.sort
+  end
+  if type(options.page) == "number" and options.page == math.floor(options.page)
+      and options.page >= 1 and options.page <= 30000 then
+    result.page = options.page
+  end
+  -- Library validates density, duplicate names, and actual force membership
+  -- before persisting this remote list.  Keep this bridge shallow so it does
+  -- not duplicate the bounded native lookups or mutate caller-owned input.
+  if type(options.hidden) == "table" then result.hidden = options.hidden end
 
   -- The legacy interface admitted only technologies known to the caller's
   -- native force. Keep that boundary without asking the Library model to

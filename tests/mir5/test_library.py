@@ -62,10 +62,28 @@ class LibraryTests(unittest.TestCase):
               normalize = function(view)
                 local status = type(view.status) == "number" and view.status or 1
                 if status < 1 or status > 4 or status ~= math.floor(status) then status = 1 end
+                local page = type(view.page) == "number" and view.page or 1
+                if page < 1 or page > 30000 or page ~= math.floor(page) then page = 1 end
+                local sort = view.sort
+                if sort ~= "progression" and sort ~= "native" and sort ~= "name-asc" and sort ~= "name-desc" then
+                  sort = "progression"
+                end
+                local stable_sort = view.stable_sort
+                if stable_sort ~= "progression" and stable_sort ~= "native" then stable_sort = "progression" end
+                local hidden = {}
+                if type(view.hidden) == "table" then
+                  for id, hidden_value in pairs(view.hidden) do
+                    if hidden_value == true and type(id) == "string" then hidden[id] = true end
+                  end
+                end
                 return {
                   query = type(view.search) == "string" and view.search or (type(view.query) == "string" and view.query or ""),
                   family = view.family == "mir" and "mir" or "all",
                   status = status,
+                  page = page,
+                  sort = sort,
+                  stable_sort = stable_sort,
+                  hidden = hidden,
                   selected = type(view.selected) == "string" and view.selected or nil
                 }
               end,
@@ -575,6 +593,65 @@ class LibraryTests(unittest.TestCase):
           assert(player.gui.screen["mir_research_browser"]["mir_library_content"]["mir_library_detail"] ~= nil)
         ''')
 
+    def test_historical_filter_order_hidden_page_and_selection_options_drive_real_library_state(self):
+        self.lua.execute('''
+          package.preload["research.catalogue"] = nil
+          package.preload["presentation.library_model"] = nil
+          package.loaded["research.catalogue"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot()
+
+          library.open(player, {family = "all", status = 1, sort = "name-desc", page = 7,
+            selected = gear.name})
+          local view = storage.mir_library.players[1]
+          local root = player.gui.screen["mir_research_browser"]
+          assert(view.family == "all" and view.status == 1 and view.sort == "name-desc"
+            and view.stable_sort == "progression" and view.page == 7
+            and next(view.hidden) == nil and view.selected == gear.name)
+          assert(root["mir_library_filters"]["mir_library_sort"].selected_index == 4)
+          local rows = root["mir_library_content"]["mir_library_results"]
+          assert(#rows.items == 2 and rows.items[1] == gear.name and rows.items[2] == foreign.name)
+
+          -- The valid dense remote list changes actual rendering and an
+          -- explicit valid page wins over the normal filter page reset.
+          library.open(player, {hidden = {foreign.name}, page = 7})
+          view = storage.mir_library.players[1]
+          root = player.gui.screen["mir_research_browser"]
+          rows = root["mir_library_content"]["mir_library_results"]
+          assert(view.hidden[foreign.name] and view.page == 7
+            and #rows.items == 1 and rows.items[1] == gear.name)
+
+          -- Invalid remote-style values leave each previously accepted field
+          -- untouched, including unknown selected and hidden technologies.
+          library.open(player, {status = 5, sort = "invalid", page = 30001,
+            selected = "unknown", hidden = {gear.name, "unknown"}})
+          view = storage.mir_library.players[1]
+          assert(view.status == 1 and view.sort == "name-desc" and view.page == 7
+            and view.selected == gear.name and view.hidden[foreign.name]
+            and not view.hidden[gear.name])
+
+          -- A real filter operation resets the persisted historical page; the
+          -- continuous current list deliberately does not pretend to paginate.
+          local query = root["mir_library_filters"]["mir_library_query"]
+          query.text = "research_gears"
+          library.on_gui_text_changed({player_index = 1, element = query})
+          view = storage.mir_library.players[1]
+          assert(view.page == 1 and view.query == "research_gears")
+
+          root = player.gui.screen["mir_research_browser"]
+          local sort = root["mir_library_filters"]["mir_library_sort"]
+          sort.selected_index = 2
+          library.on_gui_selection_state_changed({player_index = 1, element = sort})
+          view = storage.mir_library.players[1]
+          assert(view.sort == "native" and view.stable_sort == "native" and view.page == 1)
+
+          local status = root["mir_library_filters"]["mir_library_status"]
+          status.selected_index = 4
+          library.on_gui_selection_state_changed({player_index = 1, element = status})
+          view = storage.mir_library.players[1]
+          assert(view.status == 4 and view.page == 1)
+        ''')
+
     def test_configuration_migrates_published_browser_view_without_dropping_later_fidelity_fields(self):
         self.lua.execute(r'''
           boot()
@@ -601,7 +678,9 @@ class LibraryTests(unittest.TestCase):
           local state = storage.mir_library
           local view = state.players[1]
           assert(view.query == "historical gear" and view.family == "all" and view.status == 2)
-          assert(view.selected == gear.name and view.scroll == 6)
+          assert(view.selected == gear.name and view.scroll == 6 and view.page == 7)
+          assert(view.sort == "name-asc" and view.stable_sort == "native"
+            and view.hidden["foreign-research"])
           -- The currently open published frame location wins over its stale
           -- persisted location, as the old browser itself did on close.
           assert(view.location.x == 55 and view.location.y == 66)

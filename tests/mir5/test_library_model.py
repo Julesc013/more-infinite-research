@@ -66,6 +66,16 @@ class LibraryModelTests(unittest.TestCase):
           assert(view.hidden["recipe-prod-research_gears-1"])
         ''')
 
+    def test_normalize_keeps_bounded_historical_page_and_sort_state(self):
+        self.lua.execute('''
+          local normalized = model.normalize({page = 30000, sort = "name-desc",
+            stable_sort = "native", hidden = {"recipe-prod-research_gears-1"}})
+          assert(normalized.page == 30000 and normalized.sort == "name-desc"
+            and normalized.stable_sort == "native"
+            and normalized.hidden["recipe-prod-research_gears-1"])
+          assert(model.normalize({page = 30001}).page == 1)
+        ''')
+
     def test_hidden_input_budget_counts_visited_entries_including_rejected_values(self):
         self.lua.execute('''
           local visits = 0
@@ -124,6 +134,32 @@ class LibraryModelTests(unittest.TestCase):
             [id] = "Gear", [alpha.name] = "Alpha", [beta.name] = "Beta"
           })
           assert(scans == 2 and #all == 3 and all[1].id == id and all[2].id == beta.name and all[3].id == alpha.name)
+        ''')
+
+    def test_name_sort_is_strict_for_both_directions_and_casefold_ties(self):
+        self.lua.execute('''
+          local labels = {
+            ["alpha-a"] = "ALPHA", ["alpha-b"] = "alpha", ["bravo"] = "Bravo",
+            ["charlie"] = "Charlie", ["delta"] = "Delta"
+          }
+          local function observed(insertion, sort)
+            local technologies = {}
+            for _, id in ipairs(insertion) do
+              technologies[id] = technology(id, {order = "z[unrelated]"})
+            end
+            local rows = model.rows({technologies = technologies, research_queue = {}}, {}, {
+              family = "all", sort = sort
+            }, labels)
+            local ids = {}
+            for index, row in ipairs(rows) do ids[index] = row.id end
+            return table.concat(ids, ",")
+          end
+          local forward = {"alpha-a", "alpha-b", "bravo", "charlie", "delta"}
+          local reverse = {"delta", "charlie", "bravo", "alpha-b", "alpha-a"}
+          local asc = "alpha-a,alpha-b,bravo,charlie,delta"
+          local desc = "delta,charlie,bravo,alpha-a,alpha-b"
+          assert(observed(forward, "name-asc") == asc and observed(reverse, "name-asc") == asc)
+          assert(observed(forward, "name-desc") == desc and observed(reverse, "name-desc") == desc)
         ''')
 
     def test_search_filters_modes_status_and_hidden_entries(self):
