@@ -15,7 +15,17 @@ local function supported_definitions(definitions)
   if target.cargo_research == true then return definitions end
   local out = {}
   for _, definition in ipairs(definitions) do
-    if M.supports_family(definition.key) then out[#out + 1] = definition end
+    if M.supports_family(definition.key) then
+      if target.id == "f200" and definition.key == "research_molten_metals" then
+        -- 2.1 renamed the two ore-to-fluid recipes; the 2.0 native producers
+        -- retain 500-unit outputs and the same authored half-rate effect.
+        for _, effect in ipairs(definition.effects) do
+          if effect.recipe == "copper-ore-melting" then effect.recipe = "molten-copper"
+          elseif effect.recipe == "iron-ore-melting" then effect.recipe = "molten-iron" end
+        end
+      end
+      out[#out + 1] = definition
+    end
   end
   return out
 end
