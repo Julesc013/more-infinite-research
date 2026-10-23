@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "MIR5BlackGlassK2BaseReferenceChainV1",
-  "status": "published-references-failed-mir5-candidate-loaded-with-nine-icon-differences",
+  "status": "published-references-failed-corrected-mir5-complete-intended-output-equal",
   "host": "BLACKGLASS-WIN1",
   "control_source": "3945b662481fdb66bec3210e48de21e52f6139cf",
   "tested_source": "b26d45025c8e012951169724ecdf56ae632644e7",
@@ -107,6 +107,36 @@
           "sha256": "1B26F1FF7E3278BBABEF17113B60D045528DD17967EE42C8CB99FD840281FE00"
         }
       }
+    },
+    {
+      "run_id": "39972744631",
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/39972744631",
+      "tested_source": "db0504b049342878ac6cf5f83eaca59917505886",
+      "control_source": "4f89148de0708c36bdcf1d63859451418025d6b5",
+      "status": "equal-intended-native-output",
+      "records": {
+        "receipt": {
+          "path": "spec/mir5/evidence/k2-base-f200-native.json",
+          "bytes": 16685,
+          "sha256": "A481102306323E3AF9E2162C8F7F6FCDE28FD9F81C35A1DDFE993EA1CD98BA5C"
+        },
+        "comparison": {
+          "path": "spec/mir5/evidence/k2-base-f200-native-comparison.json",
+          "bytes": 9376,
+          "sha256": "1DBBA5999E79EB612D54253F3F41D82B61EB573040338C32AF1517EF341255B0"
+        },
+        "private_artifact_manifest": {
+          "path": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1/artifact-manifest.json",
+          "bytes": 2387,
+          "sha256": "348E81F34027AF637A48DD620B8B5A52ABA81B3E10BD26716EAB9780EC40A5CD"
+        },
+        "raw_custody": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1",
+        "player_archive": {
+          "path": "build/mir5/black-glass/incoming/39972744631/black-glass-k2-candidate-39972744631-1/player/more-infinite-research_5.0.20000.zip",
+          "bytes": 353516,
+          "sha256": "03C4D13BE983FFAF73358DEFCB9D442D3C479E9A6FA0F9BD13769E89372E8F6E"
+        }
+      }
     }
   ],
   "failure_class": "SCI-UNLOCK-01; published MIR4 approved automation science binding unresolved",
@@ -117,7 +147,8 @@
     "physical_effects": false,
     "migration": false,
     "performance": false,
-    "release_qualification": false
+    "release_qualification": false,
+    "mir5_complete_intended_native_data_settings": true
   },
   "limits": [
     "Native data-stage only; no native output dump exists for the failed published arm",
@@ -125,7 +156,8 @@
     "Published4.7 F200 archive hash7958731AAD672C7F16B9307E7B20F97B8E97B58CC57E5D1F9AE670018A8A1B5B",
     "Original failed arm remains adverse evidence; no expectations recovered from a failed capture",
     "Black Glass has F210 2.1.14 standalone and 2.1.17 Steam; neither qualifies the required 2.1.23 target",
-    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. Corrected-package comparison remains pending."
+    "The c74 candidate has complete native data-stage output; its independent comparison finds exactly nine icon-row differences and zero setting differences. Corrected-package comparison remains pending.",
+    "Corrected db0504 candidate matches the independently frozen complete data/settings output; this does not qualify physical effects, gameplay, saves, multiplayer, performance or release."
   ],
   "frozen_corrected_expectation": {
     "path": "build/mir5/k2-base-catalogue-r01/comparison-r01/expected-r02.json",
