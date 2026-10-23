@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-bob-angel-continuity",
+  "version": "0.2.0",
+  "title": "MIR 5 private Bob/Angel continuity fixture",
+  "author": "MIR maintainers",
+  "description": "Disposable F200 Bob/Angel material lab and published-boundary continuity proof.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

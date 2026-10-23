@@ -17,6 +17,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_k2_base_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_angel_materials.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_angel_catalogue.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_bob_angel_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_atan_productivity.py';lua=$true},
   [ordered]@{path='tests/mir5/test_science.py';lua=$true},
   [ordered]@{path='tests/mir5/test_cryogenic_native_fixture.py';lua=$true},

@@ -9,6 +9,7 @@ tests/mir5/profiles/bob-angel-f200-2077.json text eol=lf
 tests/mir5/profiles/atan-base-f200-2077.json text eol=lf
 tests/mir5/profiles/atan-space-age-f200-2077.json text eol=lf
 tests/mir5/profiles/base-create-research-f200-2077.json text eol=lf
+tests/mir5/profiles/bob-angel-continuity*.json text eol=lf
 spec/mir5/inventory/*.json text eol=lf
 
 # This fixture is an exact raw-hash copy of the published 4.2.0 manifest.
