@@ -148,6 +148,8 @@ function Get-MIR4RepositoryPathClass {
   }
   if ($path -match '^\.mir/evidence/' ) { return 'durable-evidence' }
   if ($path -match '^(\.mir/views/|validation/generated/|docs/reference/generated/|sdk/(preview|experimental)/|CHANGELOG\.md$|mir\.lock$|.+/\.mir-root\.json$)') { return 'generated-projection' }
+  if ($path -eq 'MIR5-PACK.md') { return 'normative-authority' }
+  if ($path -match '^sdk/mir5/') { return 'executable-source' }
   if ($path -match '^(\.mir/|spec/|mir\.toml$|governance/|contracts/)') { return 'normative-authority' }
   if ($path -match '^(\.agents/|\.codex/)') { return 'normative-authority' }
   if ($path -match '^(fixtures/|validation/|tests/|examples/)') { return 'test-fixture' }

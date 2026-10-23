@@ -176,7 +176,7 @@
       "name": "MIR 5 host controls",
       "purpose": "ci",
       "surface": "public",
-      "invocation": "mir5-host-controls",
+      "invocation": "canonical-host-tests",
       "sha256": "6C7BBA0028C20CC14303E61BB2727111FFE85B4990C1634561F93F57B32F42E7"
     },
     {
@@ -219,5 +219,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:af284646dec936f0a38ec603aa8e0eba74fc33b6c7cb4d0ebdafdc270fbddbf7"
+  "digest": "sha256:64850ec9b07d984c4619f8d96668177721d5cb50a435a6f66e648e4ed0c3659b"
 }
