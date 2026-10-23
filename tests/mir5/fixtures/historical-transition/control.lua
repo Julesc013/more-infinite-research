@@ -32,7 +32,13 @@ local function queue_names(queue)
 end
 
 local function queue_enabled(force)
-  return target.queue_api and force.research_queue_enabled == true
+  return target.queue_api == true and force.research_queue_enabled == true
+end
+
+local function json_boolean_or_null(value)
+  if value == true then return "true" end
+  if value == false then return "false" end
+  return "null"
 end
 
 local function enable_research_queue(force)
@@ -205,6 +211,10 @@ end
 
 local function marker(stage, state)
   local force = game.forces.player
+  -- Older target engines have no queue property. Preserve that capability
+  -- distinction as JSON null rather than emitting Lua's invalid JSON `nil`.
+  local marker_queue_enabled = nil
+  if target.queue_api == true then marker_queue_enabled = queue_enabled(force) end
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
     .. "\"case\":\"historical-transition\","
     .. "\"stage\":\"" .. stage .. "\","
@@ -218,7 +228,7 @@ local function marker(stage, state)
     .. "\"current_research\":\"" .. tostring(current_name(force)) .. "\","
     .. "\"research_progress\":" .. tostring(force.research_progress) .. ","
     .. "\"queue_api\":" .. tostring(target.queue_api == true) .. ","
-    .. "\"research_queue_enabled\":" .. tostring(queue_enabled(force)) .. ","
+    .. "\"research_queue_enabled\":" .. json_boolean_or_null(marker_queue_enabled) .. ","
     .. "\"two_cold_reload_witness\":" .. tostring(stage == "reload") .. ","
     .. "\"on_load_read_only\":" .. tostring(stage == "reload")
     .. "}")

@@ -309,8 +309,20 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
                 self.assertIn('"transition_stage":"published"', witness)
                 self.assertIn('"transition_stage":"mir5"', witness)
                 self.assertIn('"stage":"reload"', witness)
-                if queue:
-                    self.assertIn('"research_queue_enabled":true', witness)
+                target = "f017" if queue else ("f015" if old_lab else "f013")
+                markers = [
+                    json.loads(line.split(" RESULT ", 1)[1])
+                    for line in witness.splitlines()
+                    if "[MIR5_NATIVE_FIXTURE] RESULT " in line
+                    and f'"target":"{target}"' in line
+                ]
+                self.assertTrue(markers, "fixture did not emit a parseable native result marker")
+                for marker in markers:
+                    self.assertEqual(marker["queue_api"], queue)
+                    if queue:
+                        self.assertIs(marker["research_queue_enabled"], True)
+                    else:
+                        self.assertIsNone(marker["research_queue_enabled"])
 
         self.lua.execute(r'''
           callbacks={events={}};install_target("mir5",true);mock_world(true);global={}
