@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredResponsiveMenuExperimentV1",
+  "status": "frozen-before-execution-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "profile": "tests/mir5/profiles/bob-angel-f200-2077.json",
+  "profile_checkout_sha256": "93EA20609F3EACDA4C8C1ABFCB5168BD82E89937A62824A2EB4140478262BE78",
+  "profile_git_blob_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+  "published": {
+    "version": "4.7.20002",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "candidate": {
+    "source_reference": "e400d6c765cd25748241d24e3353ab8cb9c7ade5",
+    "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA",
+    "scope": "Complete applicable current F200 Bob/Angel catalogue, runtime and Library; no per-technology slice. Later source commits may contain test/documentation changes only if this exact player ZIP still matches."
+  },
+  "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+  "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+  "endpoint": "Process start to observed response to a harmless ordinary main-menu action",
+  "arms": ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
+  "design": {
+    "warmups_per_arm": 1,
+    "same_version_aa_observations": 2,
+    "counterbalanced_blocks": 8,
+    "primary_observations_per_arm": 8,
+    "extensions": "None. Preserve every refusal/error/adverse observation; any changed-input run requires a separately identified plan."
+  },
+  "tolerances": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_percent": 5,
+    "aa_rule": "Absolute A/A difference must not exceed max(0.5 seconds, 5 percent of their mean).",
+    "control_regression_seconds": 0.5,
+    "control_rule": "Mean late-cycle control startup must not exceed mean early-cycle control startup by more than 0.5 seconds. Report every sample and spread.",
+    "minimum_mir_added_time_reduction_percent": 50,
+    "improvement_rule": "Use paired block differences against the same control, report direct and incremental differences, sample spread and uncertainty. A nonpositive or unresolved baseline increment supports no percentage claim."
+  },
+  "preconditions": [
+    "Fresh exact-input published/control captures and a native complete data/settings replay equality check precede timings.",
+    "Existing archive library only, no dependency copies or engine updates, exclusive native custody and unchanged resource admission.",
+    "No other heavy jobs during timed launches; one shared cache policy and the same ordinary configuration and credential-free engine-created player data for all arms."
+  ],
+  "limitations": [
+    "This is an engineering comparison, not final release qualification or a second-machine comparison.",
+    "Save, Library latency, runtime stress and retained/peak memory non-regression require their separate endpoints."
+  ]
+}
