@@ -1,0 +1,246 @@
+{
+  "kind": "MIR5NativeFixtureV1",
+  "status": "failed",
+  "case": "api-beta-production",
+  "source_head": "2d258d49b933eca46fd224e274258d0b8c0a66f6",
+  "source_dirty": true,
+  "harness_sha256": "00738675D162FDDE0F53567225A2022531C694FA87A14C59EC87F8CEE41ED050",
+  "native_probe_sha256": "FF8E62687A8AA05080E3F9AFF45DED34BA7FCFDF1F309542A66893380B7D51E3",
+  "governor_sha256": "9E27C4DDCCC10028246F89A09A7663F7FCA1D7BD26444681A7A8635F74D9BE96",
+  "engine": {
+    "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "profile": {
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\profiles\\api-beta-production-observed-f210.json",
+    "sha256": "B7A94139D5E83C5BE46E018B159FEA0E19184144BBB9A369C59D81716784092D"
+  },
+  "fixtures": [
+    {
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\api-beta",
+      "sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip"
+    },
+    {
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\api-beta-production",
+      "sha256": "0B7017F6C43336FE329471E3FD8325B1AE506190479721506B5E4410523E5E92",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta-production_0.1.0.zip"
+    },
+    {
+      "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\active-mods-observer",
+      "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip"
+    }
+  ],
+  "mir_archive": {
+    "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+    "sha256": "FD16CB3CC4E08EF6C8AB8249C782EF67729B8FAF594D2E95C2528804531D7032"
+  },
+  "observation": "native-fixture-production-and-two-cold-reloads",
+  "input_save": null,
+  "release_qualification": false,
+  "initial_admission_wait": {
+    "phase": "fixture-initial",
+    "admission_wait_seconds": 0,
+    "status": "not-requested",
+    "attempt_count": 0,
+    "refusal_count": 0,
+    "elapsed_seconds": 0.0,
+    "first_refusal": null,
+    "last_refusal": null,
+    "last_error": null,
+    "started_at": "2026-10-23T02:40:27.6846782+00:00",
+    "deadline_at": "2026-10-23T02:40:27.6846782+00:00",
+    "admission": null
+  },
+  "active_mods_observer": {
+    "name": "mir-fixture-mir5-active-mods-observer",
+    "version": "0.1.0",
+    "source": "C:\\Projects\\Factorio\\more-infinite-research\\tests\\mir5\\fixtures\\active-mods-observer",
+    "archive": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+    "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "create": {
+    "process": {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.364644,
+        "peak_working_set_bytes": 235532288,
+        "peak_sampled_private_bytes": 227426304,
+        "admission": {
+          "observed_at": "2026-10-23T02:40:32.8276210+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6973345792,
+            "committed_bytes": 13245915136,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65828691968,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65828691968,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    "log": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\create.factorio.log",
+    "log_sha256": "04061CE6F70F1755B0A2330BD14CA79F9FC34F2660B9E165C4DAD4C5EEDA9F1F",
+    "loaded_selection": [
+      "base@2.1.23",
+      "mir-fixture-mir5-active-mods-observer@0.1.0",
+      "mir-fixture-mir5-api-beta-production@0.1.0",
+      "mir-fixture-mir5-api-beta@0.1.0",
+      "more-infinite-research@5.0.21000"
+    ],
+    "consumers": {
+      "MIR5_API_BETA": {
+        "stage": "init",
+        "force_index": 1,
+        "researched": false,
+        "level": 1,
+        "max_level": 1,
+        "manual_crafting_speed_modifier": 0,
+        "tick": 0,
+        "reload_level": 1,
+        "reload_manual_crafting_speed_modifier": 0
+      }
+    }
+  },
+  "seed_sha256": "C4ABBCAB280AAD4AB9E7E26A970552F9A334A1FE96DE02C64A83C498B9F9FE7C",
+  "server_settings": {
+    "template": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\server-settings.example.json",
+    "path": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\server-settings.json",
+    "sha256": "2FB3E97FE934B92B6C4CCC2403A90A16C357BEC9183E9BC7E550822AC57504E4",
+    "template_sha256": "61E85918C477D86D0B347F8BF3E41B43413EC53F284D37F2888F1648FCA0849A"
+  },
+  "failure": "[mir441-process-exit] -1",
+  "resource_admission": null,
+  "library_control_restoration": {
+    "status": "restored-direct-library-controls",
+    "profile_sha256": "B7A94139D5E83C5BE46E018B159FEA0E19184144BBB9A369C59D81716784092D",
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0,
+    "owned_archive_names_temporarily_hidden": 0,
+    "selected": [
+      {
+        "name": "base",
+        "version": "2.1.23",
+        "path": "C:\\Program Files\\Steam\\steamapps\\common\\Factorio\\data\\base\\info.json",
+        "builtin": true,
+        "identity": "C65BE9DB:036C000000246719",
+        "sha256": "0DA4FCB137A0C38CD74EEB3A52462169F360F54B95AD0669270D08CFA9AA352F",
+        "bytes": 193
+      },
+      {
+        "name": "more-infinite-research",
+        "version": "5.0.21000",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\more-infinite-research_5.0.21000.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:0050000000198946",
+        "sha256": "FD16CB3CC4E08EF6C8AB8249C782EF67729B8FAF594D2E95C2528804531D7032",
+        "bytes": 209155
+      },
+      {
+        "name": "mir-fixture-mir5-api-beta",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:001E0000001CB5C1",
+        "sha256": "AB93F88CB19F2475ACA174D8A23CA30EB6EBCA63E578270CA36D9EBD6D552DE3",
+        "bytes": 2717
+      },
+      {
+        "name": "mir-fixture-mir5-api-beta-production",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-api-beta-production_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:002E00000024AD85",
+        "sha256": "0B7017F6C43336FE329471E3FD8325B1AE506190479721506B5E4410523E5E92",
+        "bytes": 4019
+      },
+      {
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0",
+        "path": "C:\\Projects\\Factorio\\testmods\\2.1\\mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        "builtin": false,
+        "identity": "C65BE9DB:00620000001EA22B",
+        "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+        "bytes": 834
+      }
+    ]
+  },
+  "process_runs": [
+    {
+      "index": 1,
+      "status": "passed",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-1.stderr.txt",
+      "result": {
+        "status": "passed",
+        "exit_code": 0,
+        "timed_out": false,
+        "passed": true,
+        "completion_predicate_observed": false,
+        "duration_seconds": 5.364644,
+        "peak_working_set_bytes": 235532288,
+        "peak_sampled_private_bytes": 227426304,
+        "admission": {
+          "observed_at": "2026-10-23T02:40:32.8276210+00:00",
+          "memory": {
+            "total_bytes": 17047683072,
+            "free_bytes": 6973345792,
+            "committed_bytes": 13245915136,
+            "commit_limit_bytes": 20357242880
+          },
+          "work_volume": {
+            "name": "C:\\",
+            "free_bytes": 65828691968,
+            "total_bytes": 472446398464
+          },
+          "system_volume": {
+            "name": "C:\\",
+            "free_bytes": 65828691968,
+            "total_bytes": 472446398464
+          }
+        },
+        "duration_measurement": {
+          "scope": "direct-native-executable-start-to-exit",
+          "historical_scope": "governed-powershell-wrapper-tree-start-to-exit",
+          "comparability": "scope-changed; compare only fresh direct-native measurements; no product-speedup claim"
+        }
+      }
+    },
+    {
+      "index": 2,
+      "status": "interrupted",
+      "ledger": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-2.resources.jsonl",
+      "stdout": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-2.stdout.txt",
+      "stderr": "C:\\Projects\\Factorio\\more-infinite-research\\build\\tmp\\mir5-beta-production-current-r02\\process-2.stderr.txt",
+      "error": "[mir441-process-exit] -1"
+    }
+  ]
+}
