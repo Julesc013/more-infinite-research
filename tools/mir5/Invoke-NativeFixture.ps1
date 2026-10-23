@@ -126,12 +126,12 @@ function Assert-HistoricalFixtureArchive([string]$Archive,[string]$SourceDirecto
   $root=$Fixture.name+'_'+$Fixture.version
   $expectedInfo=[ordered]@{
     name=$Fixture.name;version=$Fixture.version;factorio_version=$Fixture.factorio_version
-    dependencies=@('base >= '+$Fixture.minimum_base,'more-infinite-research = '+$Fixture.mir_version)
+    dependencies=@(('base >= '+$Fixture.minimum_base),('more-infinite-research = '+$Fixture.mir_version))
   }
   $zip=[IO.Compression.ZipFile]::OpenRead($Archive)
   try {
     $files=@($zip.Entries|Where-Object {-not $_.FullName.EndsWith('/')})
-    $expected=@($root+'/control.lua',$root+'/settings-updates.lua',$root+'/data-final-fixes.lua',$root+'/target.lua',$root+'/target-literal.lua',$root+'/info.json')|Sort-Object
+    $expected=@(@('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua','target-literal.lua','info.json')|ForEach-Object {$root+'/'+$_}|Sort-Object)
     Assert-Fixture ($files.Count -eq $expected.Count -and ((@($files.FullName|Sort-Object) -join "`n") -ceq ($expected -join "`n"))) 'historical fixture archive membership differs'
     foreach($name in @('control.lua','settings-updates.lua','data-final-fixes.lua','target.lua')){
       $entry=$zip.GetEntry($root+'/'+$name);$path=Join-Path $source $name

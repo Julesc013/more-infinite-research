@@ -5,9 +5,13 @@ not claim an engine result; the seven exact engines execute the fixture later.
 """
 import argparse
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/historical-native"
@@ -367,6 +371,70 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn("cold reload changed completed save bytes", source)
         self.assertIn('\"stage\":\"reload\"', source)
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)
+
+    def test_actual_archive_guard_accepts_six_members_and_rejects_merged_dependencies_or_missing_member(self):
+        functions = r'''
+          $ErrorActionPreference='Stop'
+          Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $PWD 'tools/mir5/Invoke-NativeFixture.ps1'),[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'parse failed'}
+          foreach($name in @('Assert-Fixture','Get-FixtureSha','Get-HistoricalFixtureTarget',
+            'ConvertTo-HistoricalFixtureTargetLiteral','Assert-HistoricalFixtureArchive')){
+            $node=@($ast.FindAll({param($n) $n -is
+              [Management.Automation.Language.FunctionDefinitionAst] -and $n.Name -ceq $name},$true))
+            if($node.Count -ne 1){throw 'helper missing'}
+            Invoke-Expression $node[0].Extent.Text
+          }
+          $source=Join-Path $PWD 'tests/mir5/fixtures/historical-native'
+          $selected=Get-HistoricalFixtureTarget -Target f013 -MetadataPath (Join-Path $source 'metadata.json')
+        '''
+        literal = subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", functions +
+             "ConvertTo-HistoricalFixtureTargetLiteral $selected"],
+            cwd=ROOT, text=True, capture_output=True, check=True,
+        ).stdout.strip() + "\n"
+        info = {"name": self.metadata["name"], "version": self.metadata["version"],
+                "factorio_version": "0.13",
+                "dependencies": ["base >= 0.13.20", "more-infinite-research = 5.0.01300"]}
+        members = {name: (FIXTURE / name).read_bytes() for name in
+                   ("control.lua", "settings-updates.lua", "data-final-fixes.lua", "target.lua")}
+        members["target-literal.lua"] = literal.encode("utf-8")
+        members["info.json"] = json.dumps(info).encode("utf-8")
+        temporary_root = ROOT / "build/tmp"
+        temporary_root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="mir5-historical-archive-guard-", dir=temporary_root) as folder:
+            folder = Path(folder).resolve()
+            self.assertTrue(folder.is_relative_to(temporary_root.resolve()))
+            archive_root = self.metadata["name"] + "_" + self.metadata["version"] + "/"
+            for label in ("good", "merged", "missing"):
+                rows = dict(members)
+                if label == "merged":
+                    bad = dict(info, dependencies=[" ".join(info["dependencies"])])
+                    rows["info.json"] = json.dumps(bad).encode("utf-8")
+                if label == "missing":
+                    del rows["data-final-fixes.lua"]
+                with zipfile.ZipFile(folder / (label + ".zip"), "w") as archive:
+                    for name, content in rows.items():
+                        archive.writestr(archive_root + name, content)
+            check = r'''
+              Assert-HistoricalFixtureArchive -Archive (Join-Path $env:MIR5_GUARD_ROOT 'good.zip') -SourceDirectory $source -Fixture $selected
+              foreach($case in @('merged','missing')){
+                $refused=$false
+                try{Assert-HistoricalFixtureArchive -Archive (Join-Path $env:MIR5_GUARD_ROOT ($case+'.zip')) -SourceDirectory $source -Fixture $selected}
+                catch{
+                  $message=$_.Exception.Message
+                  if(($case -eq 'merged' -and $message -notmatch 'dependencies differ') -or
+                    ($case -eq 'missing' -and $message -notmatch 'membership differs')){throw}
+                  $refused=$true
+                }
+                if(-not $refused){throw ('invalid archive accepted: '+$case)}
+              }
+            '''
+            subprocess.run(["pwsh", "-NoProfile", "-Command", functions + check],
+                           cwd=ROOT, text=True, capture_output=True, check=True,
+                           env=dict(os.environ, MIR5_GUARD_ROOT=str(folder)))
 
     def test_fixture_uses_real_engine_callbacks_and_no_synthetic_research_or_event(self):
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
