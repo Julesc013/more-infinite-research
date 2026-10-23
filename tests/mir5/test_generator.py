@@ -11,6 +11,9 @@ ROOT = Path(__file__).resolve().parents[2]
 MODERN_ORACLE = json.loads(
     (ROOT / "spec/mir5/inventory/modern-f210-470.json").read_text(encoding="utf-8")
 )
+SCIENCE_SOURCE_ORACLE = json.loads(
+    (ROOT / "tests/mir5/fixtures/science-source-native-oracle.json").read_text(encoding="utf-8")
+)
 
 # Exact data-raw rows retained from the accepted published 4.7 F210 captures:
 # vanilla inventory, Space Age capture, and K2SO capture respectively. Keeping
@@ -136,6 +139,11 @@ class GeneratorTests(unittest.TestCase):
           end
           -- Test fixture construction follows only the explicit authored
           -- selection; it never enumerates data.raw to make a family pass.
+          local function source_copy(value)
+            if type(value) ~= "table" then return value end
+            local out = {}; for key, child in pairs(value) do out[key] = source_copy(child) end
+            return out
+          end
           function full_world(active_mods)
             local tools, technologies, recipes = {}, {}, {}
             local function add_technology(name) if name then technologies[name] = technologies[name] or {} end end
@@ -170,10 +178,15 @@ class GeneratorTests(unittest.TestCase):
             if modern_catalogue.is_k2so(active_mods) then
               recipes["kr-iron-gear-wheel-from-enriched-iron"] = {}; recipes["kr-iron-gear-wheel-from-iron-ore"] = {}
             end
+            local profile = active_mods and active_mods["space-age"] and "space-age-f210" or "base-f210"
+            local sources = source_worlds[profile].raw
+            for name, row in pairs(sources.recipe) do recipes[name] = source_copy(row) end
+            for name, row in pairs(sources.technology) do technologies[name] = source_copy(row) end
             local lab_inputs = {}
             for name in pairs(tools) do lab_inputs[#lab_inputs + 1] = name end
             table.sort(lab_inputs)
-            return {raw = {technology = technologies, tool = tools, item = {spoilage = {}}, recipe = recipes,
+            local items = source_copy(sources.item); items.spoilage = {}
+            return {raw = {technology = technologies, tool = tools, item = items, recipe = recipes,
               lab = {fixture = {inputs=lab_inputs}}}, writes = 0,
               extend = function(self, values) self.writes = self.writes + 1; self.emitted = values end}
           end
@@ -205,6 +218,7 @@ class GeneratorTests(unittest.TestCase):
           end
         ''')
         self.lua.globals().data_final_path = (ROOT / "source/mir5/data-final-fixes.lua").as_posix()
+        self.lua.globals().source_worlds = lua_table(self.lua, SCIENCE_SOURCE_ORACLE["profiles"])
 
     def test_published_default_and_detachment(self):
         self.lua.execute('''

@@ -196,6 +196,85 @@ local function pack_prerequisites(target, has_space_age)
   return out
 end
 
+-- These are small, named source contracts for science which a policy can add
+-- or select as its end-game gate.  They are deliberately not a catalogue of
+-- every possible producer: a binding checks only the named source it carries.
+-- Configured ingredients retain their published vector without consulting
+-- this table.
+local function recipe_unlock(pack, owner, prerequisites, trigger)
+  return {
+    kind = "recipe-unlock", pack = pack, recipe = pack, owner = owner,
+    owner_prerequisites = prerequisites, owner_trigger = trigger
+  }
+end
+
+local function initial_recipe(pack)
+  return {kind = "initial-recipe", pack = pack, recipe = pack}
+end
+
+local function source_contracts(target, has_space_age)
+  local out = {}
+  local function put(pack, contract) out[pack] = contract end
+
+  if target.id == "f013" or target.id == "f014" then
+    put("science-pack-1", initial_recipe("science-pack-1"))
+    put("science-pack-2", initial_recipe("science-pack-2"))
+    put("science-pack-3", recipe_unlock("science-pack-3", "advanced-electronics"))
+    put("alien-science-pack", recipe_unlock("alien-science-pack", "alien-technology"))
+    return out
+  end
+
+  if target.id == "f015" or target.id == "f016" then
+    put("science-pack-1", initial_recipe("science-pack-1"))
+    put("science-pack-2", initial_recipe("science-pack-2"))
+    put("science-pack-3", recipe_unlock("science-pack-3", "advanced-electronics"))
+    put("production-science-pack", recipe_unlock("production-science-pack", "advanced-material-processing-2"))
+    put("military-science-pack", recipe_unlock("military-science-pack", "military-2"))
+    put("high-tech-science-pack", recipe_unlock("high-tech-science-pack", "advanced-electronics-2"))
+    if target.id == "f015" then
+      put("space-science-pack", {
+        kind = "legacy-rocket-result", pack = "space-science-pack", payload = "satellite",
+        rocket = "rocket-silo-rocket", owner = "rocket-silo", owner_recipe = "rocket-silo"
+      })
+    else
+      put("space-science-pack", {
+        kind = "legacy-rocket-product", pack = "space-science-pack", payload = "satellite",
+        owner = "rocket-silo", owner_recipe = "rocket-silo"
+      })
+    end
+    return out
+  end
+
+  for _, pack in ipairs(MODERN_BASE) do put(pack, recipe_unlock(pack, pack)) end
+  if target.id == "f017" or target.id == "f100" or target.id == "f110" then
+    -- 0.17 through 1.1 retain the satellite launch product.  The
+    -- same-named technology unlocks the satellite recipe; it does not have a
+    -- 2.0 research trigger.  See the respective base technology/item rows.
+    put("space-science-pack", {
+      kind = "satellite-launch-product", pack = "space-science-pack", payload = "satellite",
+      owner = "space-science-pack", owner_recipe = "satellite"
+    })
+  else
+    put("space-science-pack", {
+      kind = "trigger-output", pack = "space-science-pack", owner = "space-science-pack", payload = "satellite",
+      owner_trigger = {type = "send-item-to-orbit", item = "satellite"}
+    })
+  end
+
+  if has_space_age then
+    -- Space Age replaces the Base satellite trigger with an explicit recipe
+    -- unlock after the asteroid-collector trigger.
+    put("space-science-pack", recipe_unlock("space-science-pack", "space-science-pack",
+      {"space-platform"}, {type = "build-entity", entity = "asteroid-collector"}))
+    for _, pack in ipairs(SPACE_AGE) do put(pack, recipe_unlock(pack, pack)) end
+    put("cryogenic-science-pack", recipe_unlock("cryogenic-science-pack", "cryogenic-science-pack",
+      {"cryogenic-plant"}, {type = "craft-item", item = "cryogenic-plant"}))
+    put("promethium-science-pack", recipe_unlock("promethium-science-pack", "promethium-science-pack",
+      {"biter-egg-handling", "stellar-discovery-solar-system-edge"}))
+  end
+  return out
+end
+
 -- These are the historical policy's hard science requirements. They are not
 -- inferred from recipes or arbitrary technology names.
 local FAMILY_CONDITIONS = {
@@ -234,6 +313,7 @@ function M.select(target, mods)
       aliases = aliases, official = official, official_roles = official_roles,
       progression = progression(aliases, target, false),
       pack_prerequisites = pack_prerequisites(target, false),
+      source_contracts = source_contracts(target, false),
       space = "alien-science-pack",
       end_game = {pack = "alien-science-pack", prerequisites = {"alien-technology"}}
     }
@@ -256,6 +336,7 @@ function M.select(target, mods)
     official_roles = official_roles,
     progression = progression(aliases, target, has_space_age),
     pack_prerequisites = pack_prerequisites(target, has_space_age),
+    source_contracts = source_contracts(target, has_space_age),
     space = name_for(aliases, "space-science-pack"),
     end_game = nil
   }

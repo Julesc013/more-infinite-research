@@ -1,0 +1,1123 @@
+{
+  "kind": "selected-native-source-fields-not-gameplay-qualification",
+  "profiles": {
+    "base-f210": {
+      "raw": {
+        "item": {
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "item"
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "item"
+          },
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "item"
+          },
+          "military-science-pack": {
+            "name": "military-science-pack",
+            "type": "item"
+          },
+          "production-science-pack": {
+            "name": "production-science-pack",
+            "type": "item"
+          },
+          "satellite": {
+            "name": "satellite",
+            "rocket_launch_products": [
+              {
+                "amount": 1000,
+                "name": "space-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "item"
+          },
+          "space-science-pack": {
+            "name": "space-science-pack",
+            "type": "item"
+          },
+          "utility-science-pack": {
+            "name": "utility-science-pack",
+            "type": "item"
+          }
+        },
+        "recipe": {
+          "automation-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "copper-plate",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "iron-gear-wheel",
+                "type": "item"
+              }
+            ],
+            "name": "automation-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "automation-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "chemical-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 2,
+                "name": "engine-unit",
+                "type": "item"
+              },
+              {
+                "amount": 3,
+                "name": "advanced-circuit",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "sulfur",
+                "type": "item"
+              }
+            ],
+            "name": "chemical-science-pack",
+            "results": [
+              {
+                "amount": 2,
+                "name": "chemical-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "logistic-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "inserter",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "transport-belt",
+                "type": "item"
+              }
+            ],
+            "name": "logistic-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "logistic-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "military-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "piercing-rounds-magazine",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "grenade",
+                "type": "item"
+              },
+              {
+                "amount": 2,
+                "name": "stone-wall",
+                "type": "item"
+              }
+            ],
+            "name": "military-science-pack",
+            "results": [
+              {
+                "amount": 2,
+                "name": "military-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "production-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "electric-furnace",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "productivity-module",
+                "type": "item"
+              },
+              {
+                "amount": 30,
+                "name": "rail",
+                "type": "item"
+              }
+            ],
+            "name": "production-science-pack",
+            "results": [
+              {
+                "amount": 3,
+                "name": "production-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "utility-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 3,
+                "name": "low-density-structure",
+                "type": "item"
+              },
+              {
+                "amount": 2,
+                "name": "processing-unit",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "flying-robot-frame",
+                "type": "item"
+              }
+            ],
+            "name": "utility-science-pack",
+            "results": [
+              {
+                "amount": 3,
+                "name": "utility-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          }
+        },
+        "technology": {
+          "automation-science-pack": {
+            "effects": [
+              {
+                "recipe": "automation-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "automation-science-pack",
+            "prerequisites": [
+              "steam-power",
+              "electronics"
+            ],
+            "research_trigger": {
+              "item": "lab",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "chemical-science-pack": {
+            "effects": [
+              {
+                "recipe": "chemical-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "chemical-science-pack",
+            "prerequisites": [
+              "advanced-circuit",
+              "sulfur-processing"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 75,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ]
+              ],
+              "time": 10
+            }
+          },
+          "logistic-science-pack": {
+            "effects": [
+              {
+                "recipe": "logistic-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "logistic-science-pack",
+            "prerequisites": [
+              "automation-science-pack"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 75,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ]
+              ],
+              "time": 5
+            }
+          },
+          "military-science-pack": {
+            "effects": [
+              {
+                "recipe": "military-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "military-science-pack",
+            "prerequisites": [
+              "military-2",
+              "stone-wall"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 30,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ]
+              ],
+              "time": 15
+            }
+          },
+          "production-science-pack": {
+            "effects": [
+              {
+                "recipe": "production-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "production-science-pack",
+            "prerequisites": [
+              "productivity-module",
+              "advanced-material-processing-2",
+              "railway"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 100,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ],
+                [
+                  "chemical-science-pack",
+                  1
+                ]
+              ],
+              "time": 30
+            }
+          },
+          "space-science-pack": {
+            "effects": {},
+            "name": "space-science-pack",
+            "prerequisites": [
+              "rocket-silo"
+            ],
+            "research_trigger": {
+              "item": "satellite",
+              "type": "send-item-to-orbit"
+            },
+            "type": "technology"
+          },
+          "utility-science-pack": {
+            "effects": [
+              {
+                "recipe": "utility-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "utility-science-pack",
+            "prerequisites": [
+              "robotics",
+              "processing-unit",
+              "low-density-structure"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 100,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ],
+                [
+                  "chemical-science-pack",
+                  1
+                ]
+              ],
+              "time": 30
+            }
+          }
+        }
+      },
+      "receipt": {
+        "bytes": 10342,
+        "path": "result.json",
+        "sha256": "76E8E4E1DFC5224B742B5FA88F5CBFB069670AD508BEF8C34AF6BC5DB80D4412"
+      }
+    },
+    "space-age-f210": {
+      "raw": {
+        "item": {
+          "agricultural-science-pack": {
+            "name": "agricultural-science-pack",
+            "type": "item"
+          },
+          "automation-science-pack": {
+            "name": "automation-science-pack",
+            "type": "item"
+          },
+          "chemical-science-pack": {
+            "name": "chemical-science-pack",
+            "type": "item"
+          },
+          "cryogenic-science-pack": {
+            "name": "cryogenic-science-pack",
+            "type": "item"
+          },
+          "electromagnetic-science-pack": {
+            "name": "electromagnetic-science-pack",
+            "type": "item"
+          },
+          "logistic-science-pack": {
+            "name": "logistic-science-pack",
+            "type": "item"
+          },
+          "metallurgic-science-pack": {
+            "name": "metallurgic-science-pack",
+            "type": "item"
+          },
+          "military-science-pack": {
+            "name": "military-science-pack",
+            "type": "item"
+          },
+          "production-science-pack": {
+            "name": "production-science-pack",
+            "type": "item"
+          },
+          "promethium-science-pack": {
+            "name": "promethium-science-pack",
+            "type": "item"
+          },
+          "space-science-pack": {
+            "name": "space-science-pack",
+            "type": "item"
+          },
+          "utility-science-pack": {
+            "name": "utility-science-pack",
+            "type": "item"
+          }
+        },
+        "recipe": {
+          "agricultural-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "bioflux",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "pentapod-egg",
+                "type": "item"
+              }
+            ],
+            "name": "agricultural-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "agricultural-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "automation-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "copper-plate",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "iron-gear-wheel",
+                "type": "item"
+              }
+            ],
+            "name": "automation-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "automation-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "chemical-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 2,
+                "name": "engine-unit",
+                "type": "item"
+              },
+              {
+                "amount": 3,
+                "name": "advanced-circuit",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "sulfur",
+                "type": "item"
+              }
+            ],
+            "name": "chemical-science-pack",
+            "results": [
+              {
+                "amount": 2,
+                "name": "chemical-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "cryogenic-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 3,
+                "name": "ice",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "lithium-plate",
+                "type": "item"
+              },
+              {
+                "amount": 6,
+                "ignored_by_stats": 3,
+                "name": "fluoroketone-cold",
+                "type": "fluid"
+              }
+            ],
+            "name": "cryogenic-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "cryogenic-science-pack",
+                "type": "item"
+              },
+              {
+                "amount": 3,
+                "ignored_by_productivity": 3,
+                "ignored_by_stats": 3,
+                "name": "fluoroketone-hot",
+                "type": "fluid"
+              }
+            ],
+            "type": "recipe"
+          },
+          "electromagnetic-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "supercapacitor",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "accumulator",
+                "type": "item"
+              },
+              {
+                "amount": 25,
+                "name": "electrolyte",
+                "type": "fluid"
+              },
+              {
+                "amount": 25,
+                "name": "holmium-solution",
+                "type": "fluid"
+              }
+            ],
+            "name": "electromagnetic-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "electromagnetic-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "logistic-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "inserter",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "transport-belt",
+                "type": "item"
+              }
+            ],
+            "name": "logistic-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "logistic-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "metallurgic-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 3,
+                "name": "tungsten-carbide",
+                "type": "item"
+              },
+              {
+                "amount": 2,
+                "name": "tungsten-plate",
+                "type": "item"
+              },
+              {
+                "amount": 200,
+                "name": "molten-copper",
+                "type": "fluid"
+              }
+            ],
+            "name": "metallurgic-science-pack",
+            "results": [
+              {
+                "amount": 1,
+                "name": "metallurgic-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "military-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "piercing-rounds-magazine",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "grenade",
+                "type": "item"
+              },
+              {
+                "amount": 2,
+                "name": "stone-wall",
+                "type": "item"
+              }
+            ],
+            "name": "military-science-pack",
+            "results": [
+              {
+                "amount": 2,
+                "name": "military-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "production-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 1,
+                "name": "electric-furnace",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "productivity-module",
+                "type": "item"
+              },
+              {
+                "amount": 30,
+                "name": "rail",
+                "type": "item"
+              }
+            ],
+            "name": "production-science-pack",
+            "results": [
+              {
+                "amount": 3,
+                "name": "production-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "promethium-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 25,
+                "name": "promethium-asteroid-chunk",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "quantum-processor",
+                "type": "item"
+              },
+              {
+                "amount": 10,
+                "name": "biter-egg",
+                "type": "item"
+              }
+            ],
+            "name": "promethium-science-pack",
+            "results": [
+              {
+                "amount": 10,
+                "name": "promethium-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "space-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 2,
+                "name": "iron-plate",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "carbon",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "ice",
+                "type": "item"
+              }
+            ],
+            "name": "space-science-pack",
+            "results": [
+              {
+                "amount": 5,
+                "name": "space-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          },
+          "utility-science-pack": {
+            "enabled": false,
+            "ingredients": [
+              {
+                "amount": 3,
+                "name": "low-density-structure",
+                "type": "item"
+              },
+              {
+                "amount": 2,
+                "name": "processing-unit",
+                "type": "item"
+              },
+              {
+                "amount": 1,
+                "name": "flying-robot-frame",
+                "type": "item"
+              }
+            ],
+            "name": "utility-science-pack",
+            "results": [
+              {
+                "amount": 3,
+                "name": "utility-science-pack",
+                "type": "item"
+              }
+            ],
+            "type": "recipe"
+          }
+        },
+        "technology": {
+          "agricultural-science-pack": {
+            "effects": [
+              {
+                "recipe": "agricultural-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "agricultural-science-pack",
+            "prerequisites": [
+              "bioflux-processing",
+              "bacteria-cultivation",
+              "artificial-soil"
+            ],
+            "research_trigger": {
+              "count": 100,
+              "item": "bioflux",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "automation-science-pack": {
+            "effects": [
+              {
+                "recipe": "automation-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "automation-science-pack",
+            "prerequisites": [
+              "steam-power",
+              "electronics"
+            ],
+            "research_trigger": {
+              "item": "lab",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "chemical-science-pack": {
+            "effects": [
+              {
+                "recipe": "chemical-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "chemical-science-pack",
+            "prerequisites": [
+              "advanced-circuit",
+              "sulfur-processing"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 75,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ]
+              ],
+              "time": 10
+            }
+          },
+          "cryogenic-science-pack": {
+            "effects": [
+              {
+                "recipe": "cryogenic-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "cryogenic-science-pack",
+            "prerequisites": [
+              "cryogenic-plant"
+            ],
+            "research_trigger": {
+              "item": "cryogenic-plant",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "electromagnetic-science-pack": {
+            "effects": [
+              {
+                "recipe": "electromagnetic-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "electromagnetic-science-pack",
+            "prerequisites": [
+              "electromagnetic-plant"
+            ],
+            "research_trigger": {
+              "item": "supercapacitor",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "logistic-science-pack": {
+            "effects": [
+              {
+                "recipe": "logistic-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "logistic-science-pack",
+            "prerequisites": [
+              "automation-science-pack"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 75,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ]
+              ],
+              "time": 5
+            }
+          },
+          "metallurgic-science-pack": {
+            "effects": [
+              {
+                "recipe": "metallurgic-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "metallurgic-science-pack",
+            "prerequisites": [
+              "tungsten-steel"
+            ],
+            "research_trigger": {
+              "item": "tungsten-plate",
+              "type": "craft-item"
+            },
+            "type": "technology"
+          },
+          "military-science-pack": {
+            "effects": [
+              {
+                "recipe": "military-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "military-science-pack",
+            "prerequisites": [
+              "military-2",
+              "stone-wall"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 30,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ]
+              ],
+              "time": 15
+            }
+          },
+          "production-science-pack": {
+            "effects": [
+              {
+                "recipe": "production-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "production-science-pack",
+            "prerequisites": [
+              "productivity-module",
+              "advanced-material-processing-2",
+              "railway"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 100,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ],
+                [
+                  "chemical-science-pack",
+                  1
+                ]
+              ],
+              "time": 30
+            }
+          },
+          "promethium-science-pack": {
+            "effects": [
+              {
+                "space_location": "shattered-planet",
+                "type": "unlock-space-location"
+              },
+              {
+                "recipe": "promethium-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "promethium-science-pack",
+            "prerequisites": [
+              "biter-egg-handling",
+              "stellar-discovery-solar-system-edge"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 1000,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ],
+                [
+                  "chemical-science-pack",
+                  1
+                ],
+                [
+                  "production-science-pack",
+                  1
+                ],
+                [
+                  "utility-science-pack",
+                  1
+                ],
+                [
+                  "space-science-pack",
+                  1
+                ],
+                [
+                  "metallurgic-science-pack",
+                  1
+                ],
+                [
+                  "agricultural-science-pack",
+                  1
+                ],
+                [
+                  "electromagnetic-science-pack",
+                  1
+                ],
+                [
+                  "cryogenic-science-pack",
+                  1
+                ]
+              ],
+              "time": 60
+            }
+          },
+          "space-science-pack": {
+            "effects": [
+              {
+                "recipe": "space-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "space-science-pack",
+            "prerequisites": [
+              "space-platform"
+            ],
+            "research_trigger": {
+              "entity": "asteroid-collector",
+              "type": "build-entity"
+            },
+            "type": "technology"
+          },
+          "utility-science-pack": {
+            "effects": [
+              {
+                "recipe": "utility-science-pack",
+                "type": "unlock-recipe"
+              }
+            ],
+            "name": "utility-science-pack",
+            "prerequisites": [
+              "robotics",
+              "processing-unit",
+              "low-density-structure"
+            ],
+            "type": "technology",
+            "unit": {
+              "count": 100,
+              "ingredients": [
+                [
+                  "automation-science-pack",
+                  1
+                ],
+                [
+                  "logistic-science-pack",
+                  1
+                ],
+                [
+                  "chemical-science-pack",
+                  1
+                ]
+              ],
+              "time": 30
+            }
+          }
+        }
+      },
+      "receipt": {
+        "bytes": 10845,
+        "path": "result.json",
+        "sha256": "A6F70EDD7865C3F43C40BF855E3890462302F4A78D708B86C5A4AFDB44E9DFFF"
+      }
+    }
+  },
+  "schema": 1
+}

@@ -41,6 +41,268 @@ local function technology_exists(raw, name)
   return type(raw) == "table" and type(raw.technology) == "table" and raw.technology[name] ~= nil
 end
 
+local function positive(value)
+  return type(value) == "number" and value == value and value > 0
+    and value ~= math.huge and value ~= -math.huge
+end
+
+local function nonnegative(value)
+  return type(value) == "number" and value == value and value >= 0
+    and value ~= math.huge and value ~= -math.huge
+end
+
+local function named_entry(row)
+  if type(row) ~= "table" then return nil end
+  return row.name or row[1]
+end
+
+local function positive_product_amount(row)
+  if type(row) ~= "table" then return false end
+  if row.amount ~= nil then
+    return positive(row.amount) and row.amount_min == nil and row.amount_max == nil
+  end
+  if row.amount_min ~= nil or row.amount_max ~= nil then
+    -- A zero lower bound remains a productive outcome when its finite upper
+    -- bound is positive. This mirrors a probabilistic output rather than
+    -- treating the possible zero roll as an absent source.
+    return nonnegative(row.amount_min) and positive(row.amount_max) and row.amount_min <= row.amount_max
+  end
+  if row[2] ~= nil then return positive(row[2]) end
+  return true
+end
+
+local function positive_product_probability(row)
+  return type(row) == "table"
+    and (row.probability == nil or positive(row.probability))
+    and (row.independent_probability == nil or positive(row.independent_probability))
+end
+
+local function has_positive_item_output(rows, wanted)
+  for _, row in ipairs(type(rows) == "table" and rows or {}) do
+    if type(row) == "table" then
+      local name = named_entry(row)
+      if (row.type == nil or row.type == "item") and name == wanted
+        and positive_product_amount(row) and positive_product_probability(row) then return true end
+    end
+  end
+  return false
+end
+
+local function recipe_outputs(recipe, pack)
+  if type(recipe) ~= "table" then return false end
+  if recipe.result == pack then
+    return recipe.result_count == nil or positive(recipe.result_count)
+  end
+  return has_positive_item_output(recipe.results, pack)
+end
+
+local function recipe_forms(recipe)
+  if type(recipe) ~= "table" then return nil, "recipe-shape" end
+  if recipe.normal == nil and recipe.expensive == nil then return {recipe} end
+  if type(recipe.normal) ~= "table" or type(recipe.expensive) ~= "table" then
+    return nil, "recipe-difficulty-shape"
+  end
+  return {recipe.normal, recipe.expensive}
+end
+
+local function has_direct_self_input(recipe, pack)
+  for _, row in ipairs(type(recipe) == "table" and recipe.ingredients or {}) do
+    if named_entry(row) == pack then return true end
+  end
+  return false
+end
+
+local function has_unlock(technology, recipe)
+  for _, effect in ipairs(type(technology) == "table" and technology.effects or {}) do
+    if type(effect) == "table" and effect.type == "unlock-recipe" and effect.recipe == recipe then return true end
+  end
+  return false
+end
+
+local function has_named_prerequisites(technology, expected)
+  if type(expected) ~= "table" or #expected == 0 then return true end
+  local found = {}
+  for _, name in ipairs(type(technology) == "table" and technology.prerequisites or {}) do found[name] = true end
+  for _, name in ipairs(expected) do if not found[name] then return false end end
+  return true
+end
+
+local function has_expected_trigger(technology, expected)
+  if type(expected) ~= "table" then return true end
+  local trigger = type(technology) == "table" and technology.research_trigger or nil
+  if type(trigger) ~= "table" or trigger.type ~= expected.type then return false end
+  for key, value in pairs(expected) do
+    if key ~= "type" and trigger[key] ~= value then return false end
+  end
+  return true
+end
+
+local function owner_uses_own_pack(technology, pack)
+  for _, row in ipairs(type(technology) == "table" and type(technology.unit) == "table"
+    and technology.unit.ingredients or {}) do
+    if named_entry(row) == pack then return true end
+  end
+  for _, prerequisite in ipairs(type(technology) == "table" and technology.prerequisites or {}) do
+    if prerequisite == pack then return true end
+  end
+  return false
+end
+
+local function find_item(raw, name)
+  for _, kind in ipairs(ITEM_TYPES) do
+    local items = type(raw) == "table" and raw[kind] or nil
+    if type(items) == "table" and type(items[name]) == "table" then return items[name] end
+  end
+  return nil
+end
+
+local function valid_owner(raw, contract, require_unlock)
+  local owner = type(raw.technology) == "table" and raw.technology[contract.owner] or nil
+  if type(owner) ~= "table" then return nil, "missing-owner:" .. tostring(contract.owner) end
+  if owner.enabled == false then return nil, "disabled-owner:" .. tostring(contract.owner) end
+  if require_unlock ~= false and not has_unlock(owner, contract.recipe) then
+    return nil, "missing-owner-unlock:" .. tostring(contract.owner)
+  end
+  if not has_named_prerequisites(owner, contract.owner_prerequisites) then
+    return nil, "owner-prerequisites:" .. tostring(contract.owner)
+  end
+  if not has_expected_trigger(owner, contract.owner_trigger) then
+    return nil, "owner-trigger:" .. tostring(contract.owner)
+  end
+  if owner_uses_own_pack(owner, contract.pack) then return nil, "self-supporting-owner:" .. tostring(contract.owner) end
+  return owner
+end
+
+local function valid_recipe(raw, contract, require_initial)
+  local recipe = type(raw.recipe) == "table" and raw.recipe[contract.recipe] or nil
+  if type(recipe) ~= "table" then return nil, "missing-recipe:" .. tostring(contract.recipe) end
+  local forms, shape_reason = recipe_forms(recipe)
+  if not forms then return nil, shape_reason .. ":" .. tostring(contract.recipe) end
+  for _, form in ipairs(forms) do
+    -- RecipePrototype defaults `enabled` to true. The older red/green
+    -- definitions rely on that default, while an explicit false is not an
+    -- initial source. Each difficulty form must establish the named pack.
+    if require_initial and form.enabled == false then return nil, "recipe-not-initial:" .. tostring(contract.recipe) end
+    if not recipe_outputs(form, contract.pack) then return nil, "recipe-output:" .. tostring(contract.recipe) end
+    if has_direct_self_input(form, contract.pack) then return nil, "self-supporting-recipe:" .. tostring(contract.recipe) end
+  end
+  return recipe
+end
+
+local function recipe_is_explicitly_disabled(recipe)
+  local forms = recipe_forms(recipe)
+  if not forms then return false end
+  for _, form in ipairs(forms) do if form.enabled ~= false then return false end end
+  return true
+end
+
+local function valid_payload(item, pack, legacy)
+  if type(item) ~= "table" then return false end
+  if legacy == true then
+    local row = item.rocket_launch_product
+    return type(row) == "table" and row[1] == pack and positive(row[2])
+  end
+  return has_positive_item_output(item.rocket_launch_products, pack)
+end
+
+-- A source contract is a small explicit relation.  It never enumerates raw
+-- recipes, owners, labs, or acquisition paths.  `alternatives` is likewise a
+-- caller-authored finite OR, not an invitation to find another producer.
+local function validate_contract_shape(contract, expected_pack, visiting)
+  if type(contract) ~= "table" or type(contract.kind) ~= "string" then return nil, "unbound" end
+  if type(contract.pack) ~= "string" or contract.pack == "" then return nil, "missing-contract-pack" end
+  if contract.pack ~= expected_pack then return nil, "contract-pack-mismatch:" .. tostring(contract.pack) end
+  if contract.kind ~= "alternatives" then return true end
+
+  if visiting[contract] then return nil, "cyclic-alternative" end
+  visiting[contract] = true
+  for _, candidate in ipairs(type(contract.alternatives) == "table" and contract.alternatives or {}) do
+    local valid, reason = validate_contract_shape(candidate, expected_pack, visiting)
+    if not valid then visiting[contract] = nil; return nil, reason end
+  end
+  visiting[contract] = nil
+  return true
+end
+
+local function validate_source_contract(raw, contract, expected_pack, shape_checked)
+  expected_pack = expected_pack or (type(contract) == "table" and contract.pack)
+  if type(expected_pack) ~= "string" or expected_pack == "" then return nil, "missing-contract-pack" end
+  if not shape_checked then
+    local valid, reason = validate_contract_shape(contract, expected_pack, {})
+    if not valid then return nil, reason end
+  end
+  if contract.kind == "alternatives" then
+    local reasons = {}
+    for _, candidate in ipairs(contract.alternatives or {}) do
+      local valid, reason = validate_source_contract(raw, candidate, expected_pack, true)
+      if valid then return true end
+      reasons[#reasons + 1] = reason or "invalid"
+    end
+    return nil, "no-complete-alternative:" .. table.concat(reasons, ",")
+  end
+  if contract.kind == "initial-recipe" then
+    local _, reason = valid_recipe(raw, contract, true)
+    return reason == nil, reason
+  end
+  if contract.kind == "recipe-unlock" then
+    local _, recipe_reason = valid_recipe(raw, contract, false)
+    if recipe_reason then return nil, recipe_reason end
+    local _, owner_reason = valid_owner(raw, contract, true)
+    return owner_reason == nil, owner_reason
+  end
+  if contract.kind == "trigger-output" then
+    if contract.recipe ~= nil then
+      local recipe, recipe_reason = valid_recipe(raw, contract, false)
+      if recipe_reason then return nil, recipe_reason end
+      if not recipe_is_explicitly_disabled(recipe) then return nil, "trigger-recipe-enabled:" .. tostring(contract.recipe) end
+    end
+    local owner, owner_reason = valid_owner(raw, contract, false)
+    if owner_reason then return nil, owner_reason end
+    if contract.recipe ~= nil and has_unlock(owner, contract.recipe) then
+      return nil, "trigger-owner-unlock:" .. tostring(contract.owner)
+    end
+    local payload = find_item(raw, contract.payload)
+    if not valid_payload(payload, contract.pack, false) then return nil, "payload-output:" .. tostring(contract.payload) end
+    return true
+  end
+  if contract.kind == "legacy-rocket-result" then
+    local rocket = type(raw["rocket-silo-rocket"]) == "table" and raw["rocket-silo-rocket"][contract.rocket] or nil
+    if type(rocket) ~= "table" then return nil, "missing-rocket:" .. tostring(contract.rocket) end
+    local matched = false
+    for _, row in ipairs(rocket.result_items or {}) do
+      if type(row) == "table" and row[1] == contract.pack and positive(row[2]) and row[3] == contract.payload then
+        matched = true; break
+      end
+    end
+    if not matched then return nil, "rocket-result:" .. tostring(contract.rocket) end
+    if not find_item(raw, contract.payload) then return nil, "missing-payload:" .. tostring(contract.payload) end
+    local owner_contract = {pack = contract.pack, recipe = contract.owner_recipe, owner = contract.owner}
+    local _, owner_reason = valid_owner(raw, owner_contract, true)
+    return owner_reason == nil, owner_reason
+  end
+  if contract.kind == "legacy-rocket-product" or contract.kind == "satellite-launch-product" then
+    if not valid_payload(find_item(raw, contract.payload), contract.pack, true) then
+      return nil, "payload-output:" .. tostring(contract.payload)
+    end
+    local owner_contract = {pack = contract.pack, recipe = contract.owner_recipe, owner = contract.owner}
+    local _, owner_reason = valid_owner(raw, owner_contract, true)
+    return owner_reason == nil, owner_reason
+  end
+  if contract.kind == "resource" then
+    local resource = type(raw.resource) == "table" and raw.resource[contract.resource] or nil
+    local mined = type(resource) == "table" and resource.minable or nil
+    if type(resource) ~= "table" or type(resource.autoplace) ~= "table" or type(mined) ~= "table"
+      or mined.required_fluid ~= nil then return nil, "resource-shape:" .. tostring(contract.resource) end
+    local positive_result = mined.result == contract.pack and (mined.count == nil or positive(mined.count))
+      and (mined.result_count == nil or positive(mined.result_count))
+    if not positive_result and not has_positive_item_output(mined.results, contract.pack) then
+      return nil, "resource-output:" .. tostring(contract.resource)
+    end
+    return true
+  end
+  return nil, "unknown-contract:" .. contract.kind
+end
+
 local function ingredient(ingredient)
   if type(ingredient) ~= "table" then return nil end
   local name, amount = ingredient.name or ingredient[1], ingredient.amount or ingredient[2]
@@ -130,7 +392,7 @@ end
 local function policy_ingredients(source, binding, context, selected, view)
   local policy = option(context, "mir-science-pack-ingredient-policy", POLICY_DEFAULT)
   if not VALID_POLICIES[policy] then policy = POLICY_DEFAULT end
-  local out, seen, added, added_seen = {}, {}, {}, {}
+  local out, seen, added, added_seen, contracts = {}, {}, {}, {}, {}
   local function preserve(row)
     local name, amount = row[1], row[2]
     -- Existing ingredients retain their authored order and amounts, including
@@ -143,31 +405,39 @@ local function policy_ingredients(source, binding, context, selected, view)
   end
   for _, row in ipairs(source) do preserve(row) end
 
-  local function add_if_available(name)
-    if view.available[name] and not seen[name] then
+  local function add_if_available(name, contract)
+    if type(name) == "string" and view.available[name] and not seen[name] then
+      if type(contract) ~= "table" then
+        context.unbound_science_sources[name] = context.unbound_science_sources[name] or policy
+        return
+      end
       append(out, seen, name, 1)
       append_name(added, added_seen, name)
+      contracts[name] = contract
     end
   end
+  local function selected_contract(name)
+    return type(selected.source_contracts) == "table" and selected.source_contracts[name] or nil
+  end
   if policy == "space" then
-    add_if_available(selected.space)
+    add_if_available(selected.space, selected_contract(selected.space))
   elseif policy == "space-and-promethium" then
-    add_if_available(selected.space)
-    add_if_available("promethium-science-pack")
+    add_if_available(selected.space, selected_contract(selected.space))
+    add_if_available("promethium-science-pack", selected_contract("promethium-science-pack"))
   elseif policy == "space-age-progression" then
     local names = {}
     for _, row in ipairs(source) do names[row[1]] = true end
     local planets = {"agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack"}
     local has_planet = names["promethium-science-pack"] == true
     for _, name in ipairs(planets) do has_planet = has_planet or names[name] == true end
-    if has_planet then add_if_available(selected.space) end
+    if has_planet then add_if_available(selected.space, selected_contract(selected.space)) end
     if names["promethium-science-pack"] then
-      for _, name in ipairs(planets) do add_if_available(name) end
-      add_if_available("promethium-science-pack")
+      for _, name in ipairs(planets) do add_if_available(name, selected_contract(name)) end
+      add_if_available("promethium-science-pack", selected_contract("promethium-science-pack"))
     end
   elseif policy == "official-progression" then
     for _, row in ipairs(source) do
-      for _, name in ipairs(selected.progression[row[1]] or {}) do add_if_available(name) end
+      for _, name in ipairs(selected.progression[row[1]] or {}) do add_if_available(name, selected_contract(name)) end
     end
   elseif policy == "mod-progression" then
     -- A caller may supply an approved finite binding for a known external
@@ -176,21 +446,24 @@ local function policy_ingredients(source, binding, context, selected, view)
     for _, row in ipairs(source) do
       local additions = type(binding.mod_progression) == "table" and binding.mod_progression[row[1]] or nil
       if additions then
-        for _, name in ipairs(additions) do add_if_available(name) end
+        for _, name in ipairs(additions) do
+          local explicit = type(binding.mod_progression_sources) == "table" and binding.mod_progression_sources[name] or nil
+          add_if_available(name, explicit)
+        end
       elseif not selected.official_set[row[1]] then
         context.mod_progression_unbound[row[1]] = true
       end
     end
   elseif policy == "all-official" then
-    for _, name in ipairs(selected.official) do add_if_available(name) end
+    for _, name in ipairs(selected.official) do add_if_available(name, selected_contract(name)) end
   elseif policy == "all" then
     -- The shipped registry ordered native official roles before arbitrary
     -- lab inputs. Preserve that deterministic order without treating an
     -- external input as a newly official science role.
-    for _, name in ipairs(selected.official) do add_if_available(name) end
-    for _, name in ipairs(view.all) do add_if_available(name) end
+    for _, name in ipairs(selected.official) do add_if_available(name, selected_contract(name)) end
+    for _, name in ipairs(view.all) do add_if_available(name, selected_contract(name)) end
   end
-  return out, policy, added
+  return out, policy, added, contracts
 end
 
 -- This is the one retained K2 phase rule. It operates on the policy-selected
@@ -273,12 +546,26 @@ local function selected_binding(context)
   return selected
 end
 
+local function reported_policy(policy, context)
+  if policy == POLICY_DEFAULT then return "configured" end
+  for _, unresolved_policy in pairs(context.unbound_science_sources or {}) do
+    if unresolved_policy == policy then return policy .. "-unbound-sources" end
+  end
+  return policy
+end
+
 function M.prepare(environment)
   environment = environment or {}
   return {
     raw = environment.raw or {}, options = environment.options or {}, target = environment.target or {}, mods = environment.mods,
-    lab_visits = 0, mod_progression_unbound = {}
+    lab_visits = 0, mod_progression_unbound = {}, unbound_science_sources = {}
   }
+end
+
+-- Kept public only to make the finite compatibility rows independently
+-- testable.  It accepts an authored contract; callers cannot make it search.
+function M.validate_source_contract(raw, contract, expected_pack)
+  return validate_source_contract(raw or {}, contract, expected_pack)
 end
 
 -- Apply to a single owned, detached technology before Generator publication.
@@ -303,8 +590,21 @@ function M.apply(technology, binding, context)
   local required = copy_list(binding.required_science)
   for _, name in ipairs(required) do
     if not item_exists(raw, name) then return disable(technology, "missing-required-science:" .. name, source) end
+    if name == "cryogenic-science-pack" then
+      local contract = type(selected.source_contracts) == "table" and selected.source_contracts[name] or nil
+      local valid, source_reason = validate_source_contract(raw, contract, name)
+      if not valid then
+        return disable(technology, "invalid-required-science-source:" .. name .. ":" .. tostring(source_reason), source)
+      end
+    end
   end
-  local ingredients, policy, additions = policy_ingredients(source, binding, context, selected, view)
+  local ingredients, policy, additions, addition_contracts = policy_ingredients(source, binding, context, selected, view)
+  for _, name in ipairs(additions) do
+    local valid, source_reason = validate_source_contract(raw, addition_contracts[name], name)
+    if not valid then
+      return disable(technology, "invalid-science-source:" .. name .. ":" .. tostring(source_reason), source)
+    end
+  end
   local k2_phase_any
   ingredients, k2_phase_any = normalize_k2_phase(ingredients, selected)
   if not ingredients then
@@ -338,6 +638,11 @@ function M.apply(technology, binding, context)
     local gate = selected.end_game
     if not gate then return disable(technology, "missing-end-game-gate", ingredients, prerequisites) end
     if not item_exists(raw, gate.pack) then return disable(technology, "missing-end-game-science:" .. gate.pack, ingredients, prerequisites) end
+    local contract = type(selected.source_contracts) == "table" and selected.source_contracts[gate.pack] or nil
+    local valid, source_reason = validate_source_contract(raw, contract, gate.pack)
+    if not valid then
+      return disable(technology, "invalid-end-game-science-source:" .. gate.pack .. ":" .. tostring(source_reason), ingredients, prerequisites)
+    end
     for _, name in ipairs(gate.prerequisites) do
       if not technology_exists(raw, name) then
         return disable(technology, "missing-end-game-gate-prerequisite:" .. name, ingredients, prerequisites)
@@ -358,7 +663,7 @@ function M.apply(technology, binding, context)
   if lab_policy ~= "skip" and lab_policy ~= "engine-default" then lab_policy = LAB_DEFAULT end
   if compatible then
     technology.unit.ingredients, technology.prerequisites = ingredients, prerequisites
-    return {enabled = technology.enabled ~= false, reason = policy == POLICY_DEFAULT and "configured" or policy,
+    return {enabled = technology.enabled ~= false, reason = reported_policy(policy, context),
       ingredients = ingredients, prerequisites = prerequisites}
   end
   if lab_policy ~= "reduce" then
