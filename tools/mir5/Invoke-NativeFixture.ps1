@@ -291,7 +291,7 @@ try{
   if($historical){
     # Older engines use the retained direct-library minimal form.  Do not
     # inherit modern option keys into F013--F110.
-    $historicalConfig=@('[path]',"read-data=$($engineData.Replace('\','/'))","write-data=$($writeData.Replace('\','/'))",'', '[other]','check-updates=false') -join "`n"
+    $historicalConfig=@('[path]',"read-data=$($engineData.Replace('\','/'))","write-data=$($writeData.Replace('\','/'))",'', '[other]','check-updates=false','enable-new-mods=false') -join "`n"
     [IO.File]::WriteAllText($config,$historicalConfig+"`n",[Text.UTF8Encoding]::new($false))
   }else{
     New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData

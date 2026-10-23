@@ -365,6 +365,7 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn("ConvertTo-HistoricalFixtureTargetLiteral", source)
         self.assertIn("target-literal.lua", source)
         self.assertIn("if($historical){", source)
+        self.assertIn("'check-updates=false','enable-new-mods=false'", source)
         self.assertIn("@('--start-server',$complete)", source)
         self.assertIn("@('--benchmark',$complete,'--benchmark-ticks','1','--benchmark-runs','1','--benchmark-sanitize')", source)
         self.assertIn("$historicalFixture.factorio_version -notin @('0.13','0.14')", source)
