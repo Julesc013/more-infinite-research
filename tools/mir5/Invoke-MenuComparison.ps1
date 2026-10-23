@@ -6,7 +6,8 @@ param(
   [switch]$HostSwapSelfTest,
   [string]$FactorioBin = '',
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedFactorioSha256 = '',
-  [ValidatePattern('^2[.]1[.]23$')][string]$ExpectedEngineVersion = '2.1.23',
+  [ValidatePattern('^2[.](?:0|1)[.]\d+$')][string]$ExpectedEngineVersion = '2.1.23',
+  [ValidatePattern('^2[.](?:0|1)$')][string]$ExpectedFactorioLine = '2.1',
   [string]$ArchiveLibrary = '',
   [string]$ProfilePath = '',
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedProfileSha256 = '',
@@ -14,6 +15,8 @@ param(
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedPublishedSha256 = '',
   [string]$ReplayArchive = '',
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedReplaySha256 = '',
+  [string]$CandidateArchive = '',
+  [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedCandidateSha256 = '',
   [string]$OrdinaryPlayerConfigPath = '',
   [ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedOrdinaryPlayerConfigSha256 = '',
   [string]$PlayerDataPath = '',
@@ -24,24 +27,89 @@ param(
   [ValidateRange(1,8192)][int]$ExpectedPeakMemoryMiB = 2048,
   [ValidateRange(1,2048)][int]$MaxNewOutputMiB = 512,
   [ValidateRange(0,300)][int]$AdmissionWaitSeconds = 0,
-  [ValidateRange(0,5000)][int]$LibraryIdleWaitMilliseconds = 5000
+  [ValidateRange(0,5000)][int]$LibraryIdleWaitMilliseconds = 5000,
+  [double]$AaAbsoluteToleranceSeconds = 0,
+  [double]$AaRelativeTolerancePercent = 0,
+  [double]$ControlRegressionToleranceSeconds = 0,
+  [double]$MinimumMirAddedTimeReductionPercent = 0
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $activeModsObserver = $ActiveModsObserver.Trim()
 
+function Get-MIR5MenuComparisonPolicy {
+  $numeric = [ordered]@{
+    aa_absolute_tolerance_seconds = [double]$AaAbsoluteToleranceSeconds
+    aa_relative_tolerance_percent = [double]$AaRelativeTolerancePercent
+    control_regression_tolerance_seconds = [double]$ControlRegressionToleranceSeconds
+    minimum_mir_added_time_reduction_percent = [double]$MinimumMirAddedTimeReductionPercent
+  }
+  $declared = $true
+  foreach($value in @($numeric.Values)) {
+    if([double]::IsNaN([double]$value) -or [double]::IsInfinity([double]$value) -or [double]$value -le 0) {
+      $declared = $false
+      break
+    }
+  }
+  if($numeric.minimum_mir_added_time_reduction_percent -lt 50 -or $numeric.minimum_mir_added_time_reduction_percent -gt 100) {
+    $declared = $false
+  }
+  [pscustomobject][ordered]@{
+    status = $(if($declared) {'declared-before-execution'} else {'required-before-execution'})
+    same_version_aa_pilot = [ordered]@{
+      arm = 'published-4.7'
+      observations = 2
+      absolute_tolerance_seconds = $numeric.aa_absolute_tolerance_seconds
+      relative_tolerance_percent = $numeric.aa_relative_tolerance_percent
+    }
+    control_regression_tolerance_seconds = $numeric.control_regression_tolerance_seconds
+    minimum_mir_added_time_reduction_percent = $numeric.minimum_mir_added_time_reduction_percent
+    primary_samples_per_arm = 8
+    counterbalanced_blocks = 8
+    extension_policy = 'none; a refusal, error, or future extension requires a separately frozen plan and does not replace a declared sample'
+    interpretation = 'The runner records raw observations only. A separately reviewed analysis applies these declared tolerances and never treats a non-significant result as equivalence.'
+  }
+}
+
+function Add-MIR5MenuComparisonPolicyRequirements {
+  param([Parameter(Mandatory)][Collections.Generic.List[object]]$Missing,[Parameter(Mandatory)]$Policy)
+  $requirements = @(
+    @('AaAbsoluteToleranceSeconds', [double]$Policy.same_version_aa_pilot.absolute_tolerance_seconds, 'positive-seconds-required'),
+    @('AaRelativeTolerancePercent', [double]$Policy.same_version_aa_pilot.relative_tolerance_percent, 'positive-percent-required'),
+    @('ControlRegressionToleranceSeconds', [double]$Policy.control_regression_tolerance_seconds, 'positive-seconds-required'),
+    @('MinimumMirAddedTimeReductionPercent', [double]$Policy.minimum_mir_added_time_reduction_percent, 'at-least-50-and-at-most-100-percent-required')
+  )
+  foreach($requirement in $requirements) {
+    $value = [double]$requirement[1]
+    $valid = -not([double]::IsNaN($value) -or [double]::IsInfinity($value)) -and $value -gt 0
+    if($requirement[0] -ceq 'MinimumMirAddedTimeReductionPercent') {
+      $valid = $valid -and $value -ge 50 -and $value -le 100
+    }
+    if(-not $valid) {
+      $Missing.Add([ordered]@{name=[string]$requirement[0];reason=[string]$requirement[2]})
+    }
+  }
+}
+
 function New-MIR5MenuComparisonPlan {
   $specifications = [Collections.Generic.List[object]]::new()
-  foreach($arm in @('without-mir', 'published-4.7', 'replay')) {
+  foreach($arm in @('control-without-mir', 'published-4.7', 'replay', 'candidate-mir5')) {
     $specifications.Add([ordered]@{phase='warmup';arm=$arm;block=0;position=$specifications.Count+1})
   }
   $specifications.Add([ordered]@{phase='aa-pilot';arm='published-4.7';block=0;position=1})
   $specifications.Add([ordered]@{phase='aa-pilot';arm='published-4.7';block=0;position=2})
+  # Two complete Latin-square cycles retain the same fixed position balance
+  # while providing eight primary observations per arm.
   $rotations = @(
-    @('without-mir', 'published-4.7', 'replay'),
-    @('published-4.7', 'replay', 'without-mir'),
-    @('replay', 'without-mir', 'published-4.7')
+    @('control-without-mir', 'published-4.7', 'replay', 'candidate-mir5'),
+    @('published-4.7', 'replay', 'candidate-mir5', 'control-without-mir'),
+    @('replay', 'candidate-mir5', 'control-without-mir', 'published-4.7'),
+    @('candidate-mir5', 'control-without-mir', 'published-4.7', 'replay'),
+    @('control-without-mir', 'published-4.7', 'replay', 'candidate-mir5'),
+    @('published-4.7', 'replay', 'candidate-mir5', 'control-without-mir'),
+    @('replay', 'candidate-mir5', 'control-without-mir', 'published-4.7'),
+    @('candidate-mir5', 'control-without-mir', 'published-4.7', 'replay')
   )
   for($block = 1; $block -le $rotations.Count; $block++) {
     for($index = 0; $index -lt $rotations[$block - 1].Count; $index++) {
@@ -66,6 +134,7 @@ function New-MIR5MenuComparisonPlan {
 
 function New-MIR5MenuComparisonPlanRecord {
   $plan = @(New-MIR5MenuComparisonPlan)
+  $policy = Get-MIR5MenuComparisonPolicy
   [pscustomobject][ordered]@{
     schema = 1
     kind = 'MIR5ResponsiveMenuComparisonPlanV1'
@@ -73,6 +142,7 @@ function New-MIR5MenuComparisonPlanRecord {
     endpoint = 'ordinary-responsive-menu'
     samples = $plan
     fixed_before_execution = $true
+    tolerance_policy = $policy
     claims = [ordered]@{
       native_execution = $false
       performance_measurement = $false
@@ -80,8 +150,8 @@ function New-MIR5MenuComparisonPlanRecord {
       release_qualification = $false
     }
     limitations = @(
-      'The plan is a private first-batch comparison design, not a performance result.',
-      'A real credential-free engine-prepared player-data seed and a root-owned exclusive native window are still required.'
+      'The plan is a private complete-candidate comparison design, not a performance result.',
+      'Execution refuses an unspecified tolerance policy; a real credential-free engine-prepared player-data seed and a root-owned exclusive native window are also required.'
     )
   }
 }
@@ -109,6 +179,7 @@ function Get-MIR5MenuPreflight {
   Test-MIR5MenuRequiredInput -Name 'ProfilePath' -Path $ProfilePath -Hash $ExpectedProfileSha256 -Missing $missing
   Test-MIR5MenuRequiredInput -Name 'PublishedArchive' -Path $PublishedArchive -Hash $ExpectedPublishedSha256 -Missing $missing
   Test-MIR5MenuRequiredInput -Name 'ReplayArchive' -Path $ReplayArchive -Hash $ExpectedReplaySha256 -Missing $missing
+  Test-MIR5MenuRequiredInput -Name 'CandidateArchive' -Path $CandidateArchive -Hash $ExpectedCandidateSha256 -Missing $missing
   Test-MIR5MenuRequiredInput -Name 'OrdinaryPlayerConfigPath' -Path $OrdinaryPlayerConfigPath -Hash $ExpectedOrdinaryPlayerConfigSha256 -Missing $missing
   if([string]::IsNullOrWhiteSpace($PlayerDataPath)) {
     $missing.Add([ordered]@{
@@ -122,11 +193,18 @@ function Get-MIR5MenuPreflight {
   if([string]::IsNullOrWhiteSpace($OutputRoot)) {
     $missing.Add([ordered]@{name='OutputRoot'; reason='path-required'})
   }
+  if(-not $ExpectedEngineVersion.StartsWith($ExpectedFactorioLine + '.', [StringComparison]::Ordinal)) {
+    $missing.Add([ordered]@{name='ExpectedFactorioLine'; reason='must-match-expected-engine-family'; expected_engine_version=$ExpectedEngineVersion})
+  }
+  $policy = Get-MIR5MenuComparisonPolicy
+  Add-MIR5MenuComparisonPolicyRequirements -Missing $missing -Policy $policy
   [pscustomobject][ordered]@{
     schema = 1
     kind = 'MIR5ResponsiveMenuComparisonPreflightV1'
     status = $(if($missing.Count) {'blocked-prerequisites'} else {'inputs-present-not-executed'})
     required_engine_version = $ExpectedEngineVersion
+    required_factorio_line = $ExpectedFactorioLine
+    tolerance_policy = $policy
     missing = @($missing)
     plan = @(New-MIR5MenuComparisonPlan)
     claims = [ordered]@{native_execution=$false; performance_measurement=$false; performance_comparison=$false; release_qualification=$false}
@@ -408,7 +486,7 @@ function Invoke-MIR5MenuComparisonSample {
     param($Archive)
     & $menuSampleCommand -RepoRoot $Inputs.repo -FactorioBin $Inputs.factorio.path -LibraryDirectory $Inputs.library -EngineDataDirectory $Inputs.engine_data -BaseRows $Inputs.base_rows -RunRoot $runRoot -WriteDataRoot $WriteDataRoot -Label ([string]$PlanRow.label) -Resources $Context -MirArchive $Archive -TimeoutSeconds $Inputs.timeout_seconds -OrdinaryPlayerConfig $OrdinaryPlayerConfig -OrdinaryMenuPreparation $OrdinaryMenuPreparation -ActiveModsObserver $Inputs.active_mods_observer
   }.GetNewClosure()
-  if($PlanRow.arm -ceq 'without-mir') {
+  if($PlanRow.arm -ceq 'control-without-mir') {
     return [pscustomobject][ordered]@{sample=(& $invoke $null); swap=$null; swap_record=$null}
   }
   if($PlanRow.arm -ceq 'published-4.7') {
@@ -419,6 +497,10 @@ function Invoke-MIR5MenuComparisonSample {
     $archive = [pscustomobject]@{version=$Inputs.replay.version}
     $action = { & $invoke $archive }.GetNewClosure()
     return Invoke-MIR5MenuReplaySwap -LibraryDirectory $Inputs.library -Published $Inputs.published -Replay $Inputs.replay -WaitMilliseconds $Inputs.library_idle_wait_milliseconds -Action $action -RecordRoot $RecordRoot
+  }
+  if($PlanRow.arm -ceq 'candidate-mir5') {
+    $archive = [pscustomobject]@{version=$Inputs.candidate.version}
+    return [pscustomobject][ordered]@{sample=(& $invoke $archive); swap=$null; swap_record=$null}
   }
   throw '[mir5-menu-plan-arm]'
 }
@@ -461,10 +543,14 @@ try {
 
   $published = Read-MIR5MenuArchive -Path $PublishedArchive -ExpectedSha256 $ExpectedPublishedSha256 -Code 'published'
   $replay = Read-MIR5MenuArchive -Path $ReplayArchive -ExpectedSha256 $ExpectedReplaySha256 -Code 'replay'
+  $candidate = Read-MIR5MenuArchive -Path $CandidateArchive -ExpectedSha256 $ExpectedCandidateSha256 -Code 'candidate'
   Assert-MIR5MenuComparison ([IO.Path]::GetDirectoryName($published.path) -ceq $library) 'published-library-location'
   Assert-MIR5MenuComparison ([IO.Path]::GetDirectoryName($replay.path) -cne $library) 'replay-source-location'
+  Assert-MIR5MenuComparison ([IO.Path]::GetDirectoryName($candidate.path) -ceq $library) 'candidate-library-location'
   Assert-MIR5MenuComparison ($published.name -ceq $replay.name -and $published.version -ceq $replay.version -and $published.root -ceq $replay.root) 'same-metadata-required'
-  Assert-MIR5MenuComparison ($published.factorio_version -ceq '2.1' -and $replay.factorio_version -ceq '2.1') 'archive-factorio-line'
+  Assert-MIR5MenuComparison ($candidate.version -match '^5[.]' -and $candidate.version -cne $published.version) 'candidate-version'
+  Assert-MIR5MenuComparison ($candidate.sha256 -cne $published.sha256 -and $candidate.sha256 -cne $replay.sha256) 'candidate-different-bytes-required'
+  Assert-MIR5MenuComparison ($published.factorio_version -ceq $ExpectedFactorioLine -and $replay.factorio_version -ceq $ExpectedFactorioLine -and $candidate.factorio_version -ceq $ExpectedFactorioLine) 'archive-factorio-line'
 
   $ordinaryPlayerConfig = Get-MIRDirectLibraryOrdinaryPlayerConfigInput -Path $OrdinaryPlayerConfigPath
   Assert-MIR5MenuComparison ($ordinaryPlayerConfig.sha256 -ceq $ExpectedOrdinaryPlayerConfigSha256.ToUpperInvariant()) 'ordinary-config-sha256'
@@ -487,12 +573,13 @@ try {
     profile=[ordered]@{path=$profile;sha256=$ExpectedProfileSha256.ToUpperInvariant()}
     published=$published
     replay=$replay
+    candidate=$candidate
     ordinary_player_config=[ordered]@{path=$ordinaryPlayerConfig.path;sha256=$ordinaryPlayerConfig.sha256;bytes=$ordinaryPlayerConfig.bytes}
     player_data=[ordered]@{path=$playerData.path;sha256=$playerData.sha256;bytes=$playerData.bytes;engine_version=$playerData.engine_version;kind=$playerData.kind}
     active_mods_observer=$(if([string]::IsNullOrWhiteSpace($activeModsObserver)){$null}else{$activeModsObserver})
   }
   $inputs = [pscustomobject]@{
-    repo=$repo; factorio=$engine; library=$library; engine_data=$engineData; base_rows=$baseRows; published=$published; replay=$replay
+    repo=$repo; factorio=$engine; library=$library; engine_data=$engineData; base_rows=$baseRows; published=$published; replay=$replay; candidate=$candidate
     timeout_seconds=$TimeoutSeconds; library_idle_wait_milliseconds=$LibraryIdleWaitMilliseconds; active_mods_observer=$activeModsObserver
   }
   foreach($planRow in @($planRecord.samples)) {
@@ -503,11 +590,11 @@ try {
   }
   $result = [pscustomobject][ordered]@{
     schema=1;kind='MIR5ResponsiveMenuComparisonObservationV1';status='completed-observation-only';endpoint_class='ordinary-responsive-menu'
-    plan=[ordered]@{path='plan.json';sha256=$planSha;fixed_before_execution=$true;samples=@($planRecord.samples)}
+    plan=[ordered]@{path='plan.json';sha256=$planSha;fixed_before_execution=$true;tolerance_policy=$planRecord.tolerance_policy;samples=@($planRecord.samples)}
     inputs=$inputRecord;ordinary_menu_preparation=$ordinaryMenuPreparation;samples=@($samples)
     library_controls_restored=(-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json')))
     claims=[ordered]@{native_execution=$true;performance_measurement=$false;performance_comparison=$false;release_qualification=$false}
-    limitations=@('Raw owned-window menu observations only; no performance gate, score, or acceptance analysis is computed.','This private plan compares an exact published archive and same-metadata replay bytes only after a root-owned native run.','Full MIR5 package parity, gameplay, save continuity, Library fidelity, and release qualification remain outside this wrapper.')
+    limitations=@('Raw owned-window menu observations only; no performance gate, score, or acceptance analysis is computed.','The complete candidate, exact published archive, control, and same-metadata replay bytes run under one declared F200/F210 engine-family policy.','Full MIR5 package parity, gameplay, save continuity, Library fidelity, and release qualification remain outside this wrapper.')
   }
   Write-MIRNativeProbeResult -Context $resources -Record $result
   $result
