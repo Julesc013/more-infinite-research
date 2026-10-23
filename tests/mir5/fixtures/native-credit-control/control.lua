@@ -133,9 +133,15 @@ local function set_level_with_diagnostic(force, name, level, label)
   local after_reset = bonus_snapshot(force)
   log("[MIR5_NATIVE_FIXTURE] NATIVE_CARRIER_RESET " .. helpers.table_to_json({
     case = CASE, label = label, accepted = reset_ok, error = reset_ok and nil or tostring(reset_err),
-    before_reset = after_set.bonuses, after_reset = after_reset
+    before_reset = after_set.bonuses, after_reset = after_reset,
+    positive_after_reset = carrier_status(force, POSITIVE),
+    negative_after_reset = carrier_status(force, NEGATIVE)
   }))
   if not reset_ok then fail(label .. " reset_technology_effects failed: " .. tostring(reset_err)) end
+  -- This deliberately exercises a global engine reset as a control. A reset
+  -- re-enables researched infinite holders; restore only our two own flags.
+  technology(force, POSITIVE).enabled = false
+  technology(force, NEGATIVE).enabled = false
   return {before = before, after_set = after_set, after_reset = after_reset}
 end
 
@@ -200,6 +206,8 @@ script.on_event(defines.events.on_research_finished, function(event)
 
   local reset_ok, reset_err = pcall(function() player.reset_technology_effects() end)
   if not reset_ok then fail("repeat reset_technology_effects failed: " .. tostring(reset_err)) end
+  technology(player, POSITIVE).enabled = false
+  technology(player, NEGATIVE).enabled = false
   assert_bonus(player, 0.1, 0.1, "repeat reset consistency")
 
   state.phase = "completed"
