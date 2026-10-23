@@ -111,7 +111,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
             }
             local machine = {
               valid = true,
-              productivity_bonus = machine_bonus or 0.01,
+              productivity_bonus = machine_bonus or 0,
               crafting_progress = 0,
               get_inventory = function(index)
                 if index == 1 then return input end
@@ -302,7 +302,7 @@ class FixtureControlHostStageTests(unittest.TestCase):
     def test_beta_production_rejects_wrong_assembler_bonus_at_completed_output(self):
         self.lua.globals().fixture_control = self.control("api-beta-production")
         passed, message, state = self.lua.eval(
-            "run_beta_production_final_tick(fixture_control, 202, 0, 0)"
+            "run_beta_production_final_tick(fixture_control, 202, 0, 0.01)"
         )
         self.assertFalse(passed)
         self.assertIn("native assembler productivity bonus differs", str(message))

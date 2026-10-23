@@ -69,7 +69,10 @@ local function assert_productivity(force, machine, expected, phase)
   if not close(recipe.productivity_bonus, expected) then
     fail(phase .. " native recipe productivity bonus differs: " .. tostring(recipe.productivity_bonus))
   end
-  if not close(machine.productivity_bonus, expected) then
+  -- Recipe-specific research is reported by LuaRecipe. This separate entity
+  -- aggregate must remain zero: this machine has no modules, beacons or
+  -- general entity-productivity contribution.
+  if not close(machine.productivity_bonus, 0) then
     fail(phase .. " native assembler productivity bonus differs: " .. tostring(machine.productivity_bonus))
   end
 end
@@ -169,15 +172,7 @@ local function complete_beta_research_with_native_setter(state)
   end
   assert_beta_effect(technology)
   public_status(force, true)
-  -- The force recipe reflects the setter immediately. The existing assembler
-  -- refreshes its cached bonus during the next native production update.
-  -- Require its bonus together with physical output in the completion/reload
-  -- oracle, rather than treating this same-callback cache as that endpoint.
-  assert_no_modules(state.machine)
-  local recipe = force.recipes[recipe_name]
-  if recipe == nil or not close(recipe.productivity_bonus, expected_productivity) then
-    fail("researched native recipe productivity bonus differs")
-  end
+  assert_productivity(force, state.machine, expected_productivity, "researched")
   state.research_completed_by_native_setter = true
 end
 
@@ -210,7 +205,7 @@ local function marker(stage, state)
       baseline_recipe_productivity_bonus = 0,
       researched_recipe_productivity_bonus = expected_productivity,
       baseline_assembler_productivity_bonus = 0,
-      researched_assembler_productivity_bonus = expected_productivity,
+      researched_assembler_productivity_bonus = state.machine.productivity_bonus,
       assembler_modules_empty = true,
       beacon_entities_created = false,
       baseline_copper_plates_inserted = state.baseline_plates_inserted,
