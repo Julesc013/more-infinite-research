@@ -1,0 +1,113 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "nine-editions-rebuilt-byte-identical-not-native-acceptance",
+  "source": {
+    "commit": "56181d9e811cd3d38ee6955c0a3ff5d0dbf0e28c",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "ab2d89027feee751a18aecb9b0bc4b2c2bdc67eb",
+    "tree": "e80899650c86d26b16552740b1ebf885712e6c2f"
+  },
+  "inventory_sha256": "E9A75A112DF8610262A998D2F48A8ABA206043BACECA92120D086CD7F881A787",
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "commands": [
+    "python -B tools/release.py --source source --revision 56181d9e811cd3d38ee6955c0a3ff5d0dbf0e28c --output ../mir5-current-assets-56181d9e-r01",
+    "python -B tools/release.py --source source --output ../mir5-current-assets-56181d9e-r01 --verify"
+  ],
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 344203,
+      "archive_sha256": "c1933c14fa5b5a0c80f44658c0c61d2edd14fc702d00a1ea414eba001485efca"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 344204,
+      "archive_sha256": "d94d5a2597322e7bae26bd8b7e316a156268a89db058d3a3afe2e7399658ab10"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 344163,
+      "archive_sha256": "1fe3842df356e9003f693b7c95ca5b2985ec411221505952190b3ebcf4fd75fb"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 344154,
+      "archive_sha256": "caf24da53a523c0ca13e3242b9390b0874117b371530140a2404c0a11780cce5"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 344043,
+      "archive_sha256": "322ee60c6f576755cec477f9c69926ec7402af79dd5ee954b04f8931236576e6"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 357847,
+      "archive_sha256": "0d21bbd69db58bbe8708e0b8536d2f95ba4aef173b935ade17ccf266f22d3fe3"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 357845,
+      "archive_sha256": "a5cb3147142168372b3369354ca0f535de399c64be6c54bad927448fa986300a"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 546242,
+      "archive_sha256": "d5baeee78c4b4baa1c3cf9de4c12cccc75bb376319b6121e1ca015f433032a09"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 546771,
+      "archive_sha256": "fd1f3ad62c767cce34beedfee23b2d21a49fae31b97e7252f9afd5011179f2b2"
+    }
+  ],
+  "limits": [
+    "These are frozen development candidates; acceptance, final main/tag identity, publication and primary dist delivery remain pending.",
+    "Earlier native executions retain their original exact package identities. No old result is relabelled as this freeze."
+  ]
+}
