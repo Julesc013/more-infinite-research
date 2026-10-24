@@ -658,6 +658,16 @@
             "tests/mir5/fixtures/api-beta"
           ],
           "scope": "Independent optional consumer loads without MIR on F200. CreateOnly native load evidence; no save/gameplay claim."
+        },
+        {
+          "id": "available-integration-legacy-consumer-audit",
+          "evidence": "spec/mir5/evidence/api-consumer-available-archive-audit-chain.json",
+          "source": [
+            "spec/mir5/inventory/api-transition-baseline.json",
+            "source/mir5/runtime/bootstrap.lua",
+            "sdk/mir5/README.md"
+          ],
+          "scope": "Frozen-source exact-literal audit hash-verifies31 archives from five admitted reference selections and reads3322 text members (20027358bytes), with zero named old browser/settings or SDK/MEP consumer matches. Computed names and outside consumers remain unknown; both runtime bridges are retained, and no historical V0 preview removal or consumer migration is claimed."
         }
       ],
       "test_subjects": [
@@ -666,8 +676,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run affected multiplayer/final-source API and independent-consumer cases.",
-        "Audit genuine historic API/MEP consumers before removing or translating a legacy contract."
+        "Run affected multiplayer/final-source API and independent-consumer cases."
       ]
     },
     {
