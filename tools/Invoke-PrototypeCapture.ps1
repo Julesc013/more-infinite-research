@@ -154,7 +154,9 @@ try {
   $resources = New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $output -ExpectedPeakMemoryMiB $ExpectedPeakMemoryMiB -MaxNewOutputMiB $MaxNewOutputMiB -UseExactOutputRoot
   $run = $resources.root
   $writeData = Join-Path $run 'write-data'
-  [IO.Directory]::CreateDirectory($writeData) | Out-Null
+  $dumpRoot = Join-Path $writeData 'script-output'
+  # F200 writes its settings dump before creating this parent directory.
+  [IO.Directory]::CreateDirectory($dumpRoot) | Out-Null
   $selection = Join-Path $run 'selection.json'
   Write-MIRDirectLibraryStartupProfile -Path $selection -BaseRows $baseRows -MirArchive $mir
   $config = Join-Path $run 'config.ini'
@@ -200,7 +202,6 @@ try {
   }
 
   $record.loaded_selection = Assert-MIRLibraryLoadedSelection -Activation $activation -LogPath $factorioLog -LatestInvocation -ActiveModsObserver $activeModsObserver
-  $dumpRoot = Join-Path $writeData 'script-output'
   Assert-MIR5PrototypeCapture (Test-Path -LiteralPath $dumpRoot -PathType Container) 'Factorio dump script-output directory is absent'
   $jsonDumps = @(Get-ChildItem -LiteralPath $dumpRoot -File -Filter '*.json')
   $unexpected = @($jsonDumps | Where-Object { $_.Name -cnotin @('data-raw-dump.json','mod-settings-dump.json') })
