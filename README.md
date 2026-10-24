@@ -8,7 +8,15 @@
 
 More Infinite Research (MIR) is a proof-governed Factorio research product line. It adds configurable infinite productivity and bonus research while preserving explicit target identity, safe omission, deterministic packages, and evidence-bound compatibility claims.
 
-## Published 4.4.1 and 4.4.2 development
+## MIR 5 replacement development
+
+MIR 5 is being built and qualified for the nine supported Factorio families, including the current 2.1 target. It constructs authored native technologies through a small deterministic Generator with local, nonrecursive preflight and one publication. Bounded product collection, explicit compatibility bindings, effective settings, save reconciliation, opt-in overrides, scripted effects and the Research Library have separate responsibilities. The former discovery compiler is not a player fallback.
+
+**MIR 5.0.0 is not released yet.** Current work includes retained modded catalogue parity, exact native upgrade and client checks, matched startup/runtime performance, the final source-layout cutover and package qualification. The [continuation record](docs/mir5/progress.md) names actual results and remaining obligations; the [adopted specification](spec/mir5/README.md) defines acceptance. Host test passes do not qualify an arbitrary modpack or an untested save. The intended publication is a GitHub release with individual target ZIPs and checksums after acceptance; Mod Portal availability is separate.
+
+The historical release, recovery, catalogue and settings detail below remains intact while the replacement is completed. The MIR4 implementation descriptions are retained baseline context, not the MIR5 construction algorithm.
+
+## Historical 4.4.1 publication and 4.4.2 development
 
 **[MIR 4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1)** is published with the emergency correction for a load-only `on_tick` registration that prevented multiplayer joins. Its original packages and disclosed qualification limits remain unchanged; publication did not establish a completed native multiplayer test. The separate 4.3.1 publication was cancelled and its retained repairs were incorporated into 4.4.0.
 
