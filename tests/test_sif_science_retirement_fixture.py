@@ -124,10 +124,16 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
           end
           function sif_parse(path,contract_path)
             local callbacks,reads={events={}},{}
-            local env={script={on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,on_configuration_changed=function(f)callbacks.configuration=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
-            function env.require(name)assert(name:match('/contract$'));return assert(loadfile(contract_path,'t',env))()end
+            local parsing, imports = true, 0
+            local env={script={mod_name='mir-fixture-mir5-sif-science-retirement-f200',on_init=function(f)callbacks.init=f end,on_load=function(f)callbacks.load=f end,on_configuration_changed=function(f)callbacks.configuration=f end,on_event=function(e,f)callbacks.events[e]=f end},defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}}}
+            function env.require(name)
+              assert(parsing, 'late contract import')
+              assert(name == '__' .. env.script.mod_name .. '__/contract')
+              imports = imports + 1
+              return assert(loadfile(contract_path,'t',env))()
+            end
             env._G=env;setmetatable(env,{__index=function(_,key)if key=='game'or key=='storage'then reads[key]=(reads[key]or 0)+1;error('parse '..key)end;return _G[key]end})
-            local chunk,message=loadfile(path,'t',env);assert(chunk,message);local ok,result=pcall(chunk);return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads}
+            local chunk,message=loadfile(path,'t',env);assert(chunk,message);local ok,result=pcall(chunk);parsing=false;return {ok=ok,message=tostring(result),callbacks=callbacks,reads=reads,imports=imports}
           end
           function sif_transition(source_path,successor_path,source_contract,successor_contract,target,bad)
             local exact
@@ -216,8 +222,10 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             end
             local function load(path, contract_path, stage)
               callbacks = {events={}}
+              local parsing = true
               local env = {
                 script={
+                  mod_name='mir-fixture-mir5-sif-science-retirement-' .. target,
                   active_mods=active(stage),
                   on_init=function(f) callbacks.init=f end,
                   on_load=function(f) callbacks.load=f end,
@@ -233,7 +241,8 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 end
               }
               function env.require(name)
-                assert(name:match('/contract$'))
+                assert(parsing, 'late contract import')
+                assert(name == '__' .. env.script.mod_name .. '__/contract')
                 return assert(loadfile(contract_path,'t',env))()
               end
               env._G=env
@@ -241,6 +250,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
               local chunk, message = loadfile(path,'t',env)
               assert(chunk, message)
               local ok, result = pcall(chunk)
+              parsing = false
               if ok then set_runtime_rows(assert(loadfile(contract_path))(), stage) end
               return ok, tostring(result)
             end
@@ -405,6 +415,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             end})
             local env = {
               script={
+                mod_name=core,
                 active_mods=active,
                 on_init=function(f) callbacks.init=f end,
                 on_load=function(f) callbacks.load=f end,
@@ -420,8 +431,10 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 else error('unexpected fresh candidate marker') end
               end
             }
+            local parsing = true
             function env.require(name)
-              assert(name:match('/contract$'))
+              assert(parsing, 'late contract import')
+              assert(name == '__' .. env.script.mod_name .. '__/contract')
               return assert(loadfile(contract_path,'t',env))()
             end
             env._G=env
@@ -429,6 +442,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             local chunk, message = loadfile(path,'t',env)
             assert(chunk,message)
             local ok, result = pcall(chunk)
+            parsing = false
             if not ok then return {ok=false,message=tostring(result),writes=writes,markers=markers} end
             ok, result = pcall(callbacks.init)
             if not ok then return {ok=false,message=tostring(result),writes=writes,markers=markers} end
@@ -491,6 +505,13 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 result=plain(self.lua.eval('sif_selector')(str(self.selector_lua(policy)),lua_value(self.lua,raw)));self.assertTrue(result['ok'],result['message']);self.assertEqual(policy,result['raw']['string-setting']['mir-science-pack-ingredient-policy']['default_value'])
         raw={'string-setting':{'mir-science-pack-ingredient-policy':{'setting_type':'runtime-global','default_value':'configured','allowed_values':list(POLICIES)}}}
         result=plain(self.lua.eval('sif_selector')(str(self.selector_lua('space')),lua_value(self.lua,raw)));self.assertFalse(result['ok']);self.assertIn('setting contract differs',result['message']);self.assertEqual('configured',result['raw']['string-setting']['mir-science-pack-ingredient-policy']['default_value'])
+    def test_contract_is_imported_once_during_control_parsing(self):
+        result = self.lua.eval('sif_parse')(
+            str(self.core_lua('control.lua')), str(self.core_lua('contract.lua')))
+        self.assertTrue(result['ok'], result['message'])
+        self.assertEqual(1, result['imports'])
+        self.assertEqual({}, plain(result['reads']))
+
     def test_completed_reload_observation_preserves_native_and_durable_state(self):
         for target in TARGETS:
             with self.subTest(target=target):
