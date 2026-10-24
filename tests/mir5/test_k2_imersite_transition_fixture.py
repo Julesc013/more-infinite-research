@@ -53,11 +53,11 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             return {type="technology", name=name, level=level, upgrade=true, max_level=maximum, enabled=true,
               effects=effect(), unit={count_formula=formula, time=30, ingredients=ingredients(packs)}, prerequisites={}}
           end
-          local function carrier_row(name, level)
+          local function carrier_row(name, level, packs)
             return {type="technology", name=name, level=level, upgrade=false, hidden=true, enabled=true,
               max_level="infinite", effects=effect(), prerequisites={},
               unit={count_formula=level == 1 and "200*2^(L-1)" or "1600+200*(L-4)", time=30,
-                ingredients=ingredients(level == 1 and science_early or science_tail)}}
+                ingredients=ingredients(packs)}}
           end
           local function rows_for(stage)
             local rows = {}
@@ -66,18 +66,18 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               rows[early].prerequisites = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "kr-quarry-minerals-extraction"}
             elseif stage == "published-4.7" then
               rows[early] = public(early, 1, 3, "200*2^(L-1)", science_early)
-              rows[holder], rows[carrier] = carrier_row(holder, 1), carrier_row(carrier, 4)
+              rows[holder], rows[carrier] = carrier_row(holder, 1, science_early), carrier_row(carrier, 4, science_early)
             else
               rows[early] = public(early, 1, 3, "200*2^(L-1)", science_early)
               rows[early].prerequisites = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "kr-quarry-minerals-extraction"}
               rows[tail] = public(tail, 4, "infinite", "1600+200*(L-4)", science_tail)
               rows[tail].visible_when_disabled, rows[tail].show_levels_info = true, false
               rows[tail].prerequisites = {"kr-quarry-minerals-extraction", "production-science-pack", early, "space-science-pack"}
-              rows[holder], rows[carrier] = carrier_row(holder, 1), carrier_row(carrier, 4)
+              rows[holder], rows[carrier] = carrier_row(holder, 1, science_early), carrier_row(carrier, 4, science_tail)
             end
             return rows
           end
-          function run_k2_data_fixture(path, setting_path, stage, opponent)
+          function run_k2_data_fixture(path, setting_path, stage, opponent, setting_default)
             local rows = rows_for(stage)
             if opponent == "effect" then
               local target = stage == "predecessor-4.6" and early or tail
@@ -87,7 +87,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             if opponent == "carrier" then rows[carrier].hidden = false end
             if opponent == "carrier-unit" then rows[carrier].unit.count_formula = "1" end
             mods = {base="2.1.23", ["Krastorio2-spaced-out"]="2.0.19", ["more-infinite-research"]=stage == "predecessor-4.6" and "4.6.21000" or (stage == "published-4.7" and "4.7.21002" or "5.0.21000")}
-            data = {raw={technology=rows, ["int-setting"]={["ips-max-level-research_material_imersite"]={default_value=0}}}}
+            data = {raw={technology=rows, ["int-setting"]={["ips-max-level-research_material_imersite"]={default_value=setting_default or 0}}}}
             if setting_path ~= "" then
               local setting, message = loadfile(setting_path, "t", _G)
               assert(setting, message)
@@ -122,11 +122,13 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
           end
         ''')
 
-    def _data(self, stage: str, opponent: str = ""):
+    def _data(self, stage: str, opponent: str = "", setting_default=None):
+        if setting_default is None:
+            setting_default = 3 if stage == "predecessor-4.6" else 0
         path = (FIXTURE / stage / "data-final-fixes.lua").as_posix()
         setting = FIXTURE / stage / "settings-updates.lua"
         return self.lua.eval("run_k2_data_fixture")(
-            path, setting.as_posix() if setting.exists() else "", stage, opponent
+            path, setting.as_posix() if setting.exists() else "", stage, opponent, setting_default
         )
 
     def test_exact_profiles_pin_the_three_stage_k2so_closure(self):
@@ -154,8 +156,9 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             self.assertIn(digest, readme)
 
     def test_data_preflight_keeps_published_input_and_accelerates_only_real_lab_rows(self):
-        predecessor = self._data("predecessor-4.6")
+        predecessor = self._data("predecessor-4.6", setting_default=3)
         self.assertTrue(predecessor["ok"], predecessor["message"])
+        self.assertEqual(0, predecessor["setting"]["default_value"])
         row = predecessor["rows"][EARLY]
         self.assertIsNone(row["unit"]["count"])
         self.assertEqual("1", row["unit"]["count_formula"])
@@ -171,6 +174,10 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertTrue(published["rows"][CARRIER]["hidden"])
         self.assertEqual("1600+200*(L-4)", published["rows"][CARRIER]["unit"]["count_formula"])
         self.assertEqual(30, published["rows"][CARRIER]["unit"]["time"])
+        self.assertEqual(
+            ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"],
+            [published["rows"][CARRIER]["unit"]["ingredients"][index][1] for index in range(1, 5)],
+        )
 
         successor = self._data("mir5")
         self.assertTrue(successor["ok"], successor["message"])
@@ -198,6 +205,17 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         carrier_unit = self._data("published-4.7", "carrier-unit")
         self.assertFalse(carrier_unit["ok"])
         self.assertIn("carrier unit changed", carrier_unit["message"])
+
+    def test_predecessor_cap_refuses_unknown_default_before_fixture_mutation(self):
+        for source_default in (0, 1):
+            with self.subTest(source_default=source_default):
+                result = self._data("predecessor-4.6", setting_default=source_default)
+                self.assertFalse(result["ok"])
+                self.assertIn("published predecessor Imersite cap default changed", result["message"])
+                self.assertEqual(source_default, result["setting"]["default_value"])
+                row = result["rows"][EARLY]
+                self.assertEqual("200*2^(L-1)", row["unit"]["count_formula"])
+                self.assertEqual(30, row["unit"]["time"])
 
     def test_controls_register_without_game_or_storage_reads_and_keep_native_boundaries(self):
         for stage in STAGES:

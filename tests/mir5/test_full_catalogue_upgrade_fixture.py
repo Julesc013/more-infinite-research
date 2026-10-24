@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 import unittest
@@ -8,9 +9,22 @@ ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/full-catalogue-upgrade"
 PROFILES = ROOT / "tests/mir5/profiles"
 ORACLE = ROOT / "spec/mir5/inventory/modern-f200-470.json"
-F200_RUNTIME_API = Path("D:/Programs/Factorio/2.0/doc-html/runtime-api.json")
+F200_RUNTIME_API_CANDIDATES = (
+    os.environ.get("MIR_F200_RUNTIME_API"),
+    "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
+    "D:/Programs/Factorio/2.0/doc-html/runtime-api.json",
+)
 OWNERS = {"low-density-structure-productivity", "plastic-bar-productivity", "processing-unit-productivity", "rocket-fuel-productivity", "steel-plate-productivity"}
 DESCRIPTORS = (("research_copper", "recipe-prod-research_copper-1", "copper-plate"), ("research_iron", "recipe-prod-research_iron-1", "iron-plate"), ("research_breeding", "recipe-prod-research_breeding-1", "fish-breeding"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "advanced-oil-processing"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "basic-oil-processing"), ("research_oil_processing_productivity", "recipe-prod-research_oil_processing_productivity-1", "coal-liquefaction"), ("research_bullets", "recipe-prod-research_bullets-1", "firearm-magazine"), ("research_grenades", "recipe-prod-research_grenades-1", "grenade"), ("research_lubricant_productivity", "recipe-prod-research_lubricant_productivity-1", "lubricant"), ("research_breeding", "recipe-prod-research_breeding-1", "pentapod-egg"), ("research_concrete", "recipe-prod-research_concrete-1", "stone-brick"), ("research_sulfuric_acid_productivity", "recipe-prod-research_sulfuric_acid_productivity-1", "sulfuric-acid"))
+
+
+def f200_runtime_api_path():
+    for candidate in F200_RUNTIME_API_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_file():
+                return path
+    return None
 
 
 def py(value):
@@ -121,9 +135,11 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                 else: self.assertIsNotNone(result["callbacks"]["configuration"])
 
     def test_f200_force_field_schema_when_local_api_is_available(self):
-        if not F200_RUNTIME_API.is_file():
+        runtime_api = f200_runtime_api_path()
+        if runtime_api is None:
             self.skipTest("F200 runtime API documentation is not installed")
-        document = json.loads(F200_RUNTIME_API.read_text(encoding="utf-8"))
+        document = json.loads(runtime_api.read_text(encoding="utf-8"))
+        self.assertEqual(document["application_version"], "2.0.77")
         lua_force = next(row for row in document["classes"] if row["name"] == "LuaForce")
         fields = {row["name"] for row in lua_force["attributes"]}
         fixture_fields = set(self.plan["force_fields"])

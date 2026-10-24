@@ -1,13 +1,40 @@
 """Pure Lua 5.2 host-stage parse checks for MIR 5 API consumer controls."""
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
-F200_RUNTIME_API = Path("D:/Programs/Factorio/2.0/doc-html/runtime-api.json")
-F210_RUNTIME_API = Path("C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json")
+F200_RUNTIME_API_CANDIDATES = (
+    os.environ.get("MIR_F200_RUNTIME_API"),
+    "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
+    "D:/Programs/Factorio/2.0/doc-html/runtime-api.json",
+)
+F210_RUNTIME_API_CANDIDATES = (
+    os.environ.get("MIR_F210_RUNTIME_API"),
+    "D:/Games/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
+    "C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
+)
+
+
+def f200_runtime_api_path():
+    for candidate in F200_RUNTIME_API_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_file():
+                return path
+    return None
+
+
+def f210_runtime_api_path():
+    for candidate in F210_RUNTIME_API_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_file():
+                return path
+    return None
 
 
 class FixtureControlHostStageTests(unittest.TestCase):
@@ -391,9 +418,9 @@ class FixtureControlHostStageTests(unittest.TestCase):
         self.assertEqual(rejected_state.manual_crafting_speed_modifier, 0)
 
     def test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary(self):
-        for runtime_api, version in ((F200_RUNTIME_API, "2.0.77"), (F210_RUNTIME_API, "2.1.23")):
+        for runtime_api, version in ((f200_runtime_api_path(), "2.0.77"), (f210_runtime_api_path(), "2.1.23")):
             with self.subTest(version=version):
-                if not runtime_api.is_file():
+                if runtime_api is None:
                     self.skipTest("local Factorio runtime API documentation is not installed")
                 document = json.loads(runtime_api.read_text(encoding="utf-8"))
                 self.assertEqual(document["application_version"], version)
@@ -409,9 +436,10 @@ class FixtureControlHostStageTests(unittest.TestCase):
                 })
 
     def test_f200_documented_production_and_alpha_members_match_the_fixture_usage(self):
-        if not F200_RUNTIME_API.is_file():
+        runtime_api = f200_runtime_api_path()
+        if runtime_api is None:
             self.skipTest("local Factorio 2.0 runtime API documentation is not installed")
-        document = json.loads(F200_RUNTIME_API.read_text(encoding="utf-8"))
+        document = json.loads(runtime_api.read_text(encoding="utf-8"))
         self.assertEqual(document["application_version"], "2.0.77")
         classes = {row["name"]: row for row in document["classes"]}
         force = classes["LuaForce"]

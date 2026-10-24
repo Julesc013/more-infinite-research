@@ -113,6 +113,80 @@ class LibraryModelTests(unittest.TestCase):
             "a malformed named owner must not escape the bounded availability check")
         ''')
 
+    def test_availability_binds_withheld_materials_to_exact_bob_closures_without_force_mutation(self):
+        self.lua.execute('''
+          local availability = require("presentation.availability")
+
+          local function locked_force(technologies)
+            setmetatable(technologies, {
+              __pairs = function() error("availability scanned native technologies") end,
+              __newindex = function() error("availability mutated native technologies") end,
+            })
+            return {technologies = technologies}
+          end
+
+          local f200 = {id = "f200", factorio_version = "2.0", minimum_base = "2.0.77", recipe_productivity = true}
+          local bob_angel = {
+            base = "2.0.77", angelsbioprocessing = true, angelsbioprocessinggraphics = true,
+            angelspetrochem = true, angelspetrochemgraphics = true, angelsrefining = true,
+            angelsrefininggraphics = true, angelssmelting = true, angelssmeltinggraphics = true,
+            bobelectronics = true, boblibrary = true, bobores = true, bobplates = true, bobrevamp = true,
+          }
+          local empty_force = locked_force({})
+          local enabled_streams = {research_material_lead = {enabled = true}}
+          local f200_rows = availability.rows(bob_angel, f200, empty_force, "material", enabled_streams)
+          assert(#f200_rows == 11 and f200_rows[1].family == "research_material_lead"
+            and f200_rows[1].reason == "not-available-in-bob-angel-profile")
+          assert(f200_rows[1].emitted_id == nil,
+            "availability must return detached player descriptors")
+          f200_rows[1].family = "foreign"
+          assert(availability.rows(bob_angel, f200, empty_force, "lead", enabled_streams)[1].family == "research_material_lead")
+
+          bob_angel.bobrevamp = nil
+          assert(#availability.rows(bob_angel, f200, empty_force, "material", enabled_streams) == 0,
+            "an incomplete Bob/Angel closure must not advertise these material explanations")
+          bob_angel.bobrevamp = true
+          bob_angel["space-age"] = "2.1.23"
+          assert(#availability.rows(bob_angel, f200, empty_force, "lead", enabled_streams) == 0,
+            "a mixed Bob/Angel closure must not inherit the captured F200 explanation")
+          bob_angel["space-age"] = nil
+
+          local present_force = locked_force({["recipe-prod-research_material_lead-1"] = {valid = true}})
+          assert(#availability.rows(bob_angel, f200, present_force, "lead", enabled_streams) == 0,
+            "a real exact technology must suppress its terminal explanation")
+          settings = {startup = { ["ips-enable-research_material_lead"] = {value = false} }}
+          assert(#availability.rows(bob_angel, f200, empty_force, "lead", enabled_streams) == 1,
+            "Availability must use the supplied effective stream, not a raw setting")
+          local disabled_streams = {research_material_lead = {enabled = false}}
+          settings.startup["ips-enable-research_material_lead"].value = true
+          assert(#availability.rows(bob_angel, f200, empty_force, "lead", disabled_streams) == 0,
+            "an effective disabled stream must not receive an omission explanation")
+
+          local f210 = {id = "f210", factorio_version = "2.1", minimum_base = "2.1.23", recipe_productivity = true}
+          local bobtech_angel = {
+            base = "2.1.23", ["space-age"] = "2.1.23", boblibrary = true, bobores = true,
+            bobplates = true, bobelectronics = true, bobtech = true, angelsrefining = true,
+            angelsrefininggraphics = true, angelspetrochem = true, angelspetrochemgraphics = true,
+            angelssmelting = true, angelssmeltinggraphics = true,
+          }
+          local f210_rows = availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams)
+          assert(#f210_rows == 1 and f210_rows[1].family == "research_material_lead"
+            and f210_rows[1].reason == "not-available-in-bobtech-angel-profile")
+          assert(#availability.rows(bobtech_angel, f210, empty_force, "zinc", enabled_streams) == 0,
+            "the F210 explanation list must not invent a family outside its captured withholding")
+          f210.minimum_base = "2.1.24"
+          assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
+            "a different F210 target record must not reuse this closure")
+          f210.minimum_base = "2.1.23"
+          bobtech_angel.Krastorio2 = true
+          assert(#availability.rows(bobtech_angel, f210, empty_force, "lead", enabled_streams) == 0,
+            "an excluded mixed closure must not reuse the BobTech explanation")
+          bobtech_angel.Krastorio2 = nil
+
+          assert(next(empty_force.technologies) == nil and present_force.technologies["recipe-prod-research_material_lead-1"] ~= nil,
+            "availability must not mutate the force or named technologies")
+        ''')
+
     def test_normalize_preserves_schema_three_defaults_and_copies_view(self):
         self.lua.execute('''
           local hidden = {["recipe-prod-research_gears-1"] = true}

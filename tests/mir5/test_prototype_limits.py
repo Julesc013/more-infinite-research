@@ -94,6 +94,34 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(out.speed_limits.low == -0.8 and out.speed_limits.high == 2)
         ''')
 
+    def test_deep_foreign_receiver_detaches_with_bounded_call_depth(self):
+        self.lua.execute('''
+          local shared, key = {}, {}
+          shared.foreign = {[key]=key}
+          local cursor = shared.foreign
+          for index = 1, 4096 do cursor.child = {}; cursor = cursor.child end
+          cursor.self = cursor
+          local machine = {effect_receiver=shared}
+          debug.sethook(function()
+            if debug.getinfo(96, "f") then error("receiver copy grew the Lua call stack") end
+          end, "c")
+          local ok, result = pcall(limits.apply, {lab={machine}},
+            {["mir-prototype-speed-cap"]="bonus-200"})
+          debug.sethook()
+          assert(ok, result)
+          assert(result.receivers == 1 and shared.speed_limits == nil)
+          assert(machine.effect_receiver.speed_limits.high == 2)
+          local original, copied = shared.foreign, machine.effect_receiver.foreign
+          local copied_key, copied_value = next(copied)
+          if copied_key == "child" then copied_key, copied_value = next(copied, copied_key) end
+          assert(type(copied_key) == "table" and copied_key ~= key and copied_key == copied_value)
+          for index = 1, 4096 do
+            assert(copied ~= original)
+            original, copied = original.child, copied.child
+          end
+          assert(copied ~= original and copied.self == copied and original.self == original)
+        ''')
+
     def test_return_bounds_exclusions_probabilities_and_native_caps(self):
         self.lua.execute('''
           local cases = {
@@ -282,6 +310,37 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(prototype.unrelated.max_pipeline_extent == 17)
           local tiny={fluid_box={max_pipeline_extent=1}}
           assert(pipeline.apply(tiny,"25") == 1 and tiny.fluid_box.max_pipeline_extent == 1)
+        ''')
+
+    def test_pipeline_extent_deep_shared_cycles_use_bounded_call_depth_and_one_visit(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          local shared = {max_pipeline_extent=321}
+          local raw = {input_fluid_box=shared}
+          local cursor, visits = raw, {}
+          for index = 1, 4096 do
+            local node = setmetatable({}, {__pairs=function(value)
+              assert(visits[value] == nil, "prototype node visited twice")
+              visits[value] = true
+              return next, value, nil
+            end})
+            cursor.child = node
+            cursor = node
+          end
+          cursor.parent = raw
+          cursor.fluid_box = shared
+          cursor.fluid_boxes = {shared, {max_pipeline_extent=7}}
+          debug.sethook(function()
+            if debug.getinfo(96, "f") then error("pipeline walk grew the Lua call stack") end
+          end, "c")
+          local ok, count = pcall(pipeline.apply, raw, "150")
+          debug.sethook()
+          assert(ok, count)
+          assert(count == 2 and shared.max_pipeline_extent == 482)
+          assert(cursor.fluid_boxes[2].max_pipeline_extent == 11)
+          local visited = 0
+          for _ in pairs(visits) do visited = visited + 1 end
+          assert(visited == 4096)
         ''')
 
 

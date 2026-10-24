@@ -25,14 +25,24 @@ local function selected(value)
   if number then return (prefix == "saving" and -1 or 1) * number / 100 end
 end
 
-local function clone(value, seen)
+local function clone(value)
   if type(value) ~= "table" then return value end
-  seen = seen or {}
-  if seen[value] then return seen[value] end
-  local out = {}
-  seen[value] = out
-  for key, item in pairs(value) do out[clone(key, seen)] = clone(item, seen) end
-  return out
+  local copies, pending = {[value]={}}, {value}
+  local function detached(item)
+    if type(item) ~= "table" then return item end
+    if copies[item] == nil then
+      copies[item] = {}
+      pending[#pending + 1] = item
+    end
+    return copies[item]
+  end
+  while #pending > 0 do
+    local original = pending[#pending]
+    pending[#pending] = nil
+    local output = copies[original]
+    for key, item in pairs(original) do output[detached(key)] = detached(item) end
+  end
+  return copies[value]
 end
 
 local function variants(recipe)

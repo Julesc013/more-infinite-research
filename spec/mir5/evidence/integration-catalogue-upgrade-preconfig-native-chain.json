@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "kind": "MIR5IntegrationCatalogueUpgradePreconfigurationObservationV1",
+  "status": "observed-adverse-not-product-attributed",
+  "run": {
+    "id": 40067907151,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40067907151"
+  },
+  "engine": {
+    "version": "2.0.77",
+    "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "prior_adverse_chain": "spec/mir5/evidence/integration-catalogue-upgrade-adverse-chain.json",
+  "scope": "One F200 armor/BobWarfare published4.7.2-to-MIR5 fixture transition that isolates the foreign enabled-flag observation before successor configuration callbacks.",
+  "evidence_receipt": {
+    "path": "spec/mir5/evidence/integration-catalogue-upgrade-preconfig-native-receipts.json.gz",
+    "compression": "gzip",
+    "sha256": "01551924094B19BE069BB3D18E1C06ABA5E5BB6949965956C9CDBC697EC7C8B2",
+    "uncompressed_sha256": "8B927666EC318B358613379E3DFDD5663F4ACD01AA0B9232D4016A6FB8F7B0B3"
+  },
+  "inputs": {
+    "fixture_observation_commit": "b1c32b36b9f7b0860b6bba239b1e07c6399e816b",
+    "candidate_player_source": "0ff32f7cedcaec2155e55636c4ba63320513a1e4",
+    "candidate_archive_sha256": "3E00E98406DDD57FFA9C1FAD138BC965F51F05605EDF6B7D399E7DDBD0B90723",
+    "worker_control_commit": "d1c1b859bb01e3a051a2c3e27babffbf26af3514"
+  },
+  "artifact": {
+    "local_path": "build/mir5/recovery-historical/integration-catalogue-upgrade-preconfig-diagnostic/40067907151",
+    "github_artifact_id": 12550166152,
+    "members": 58,
+    "manifest_sha256": "78A3D9F8D47A1508D19CC6FA6191A01241E48A25E81A55E228B513E83E83CA72",
+    "members_verified": 58
+  },
+  "finding": {
+    "observed": "The foreign armor technology enabled flag was already true when the fixture migration ran.",
+    "ordering": "The fixture migration runs before successor configuration callbacks.",
+    "supported_conclusion": "This observation does not support attributing the enabled-flag change to an MIR5 configuration callback.",
+    "not_established": [
+      "No product acceptance or save-transition qualification.",
+      "No cause outside the successor configuration callback is identified.",
+      "Py profiles were not reached after the preserved armor assertion stopped the bounded chain."
+    ]
+  },
+  "claims": {
+    "native_execution": true,
+    "product_defect_attribution": false,
+    "save_transition_qualification": false,
+    "release_qualification": false
+  }
+}

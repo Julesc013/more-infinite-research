@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-integration-foreign-owner",
+  "version": "0.2.0",
+  "title": "MIR 5 integration foreign-owner successor actor",
+  "author": "MIR maintainers",
+  "description": "Restores its one exact persisted foreign-force disabled technology flag before configuration callbacks.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base = 2.0.77",
+    "mir-fixture-mir5-integration-catalogue-upgrade = 0.2.0"
+  ]
+}

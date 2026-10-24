@@ -4,6 +4,7 @@
 local KEY = "mir5_integration_catalogue_upgrade"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-integration-catalogue-upgrade"
+local FOREIGN_OWNER = "mir5-integration-foreign-owner"
 local DEADLINE = 36000
 local UINT32_MAX = 4294967295
 local PLAN = require("__mir-fixture-mir5-integration-catalogue-upgrade__/catalogue")
@@ -251,7 +252,10 @@ local function source_init()
   local foreign = game.create_force("mir5-integration-catalogue-upgrade-foreign")
   foreign.enable_all_prototypes(); seed_levels(foreign, plan, "foreign")
   local foreign_primary = technology(foreign, plan.primary)
-  foreign_primary.enabled, foreign_primary.visible_when_disabled = false, false
+  remote.call(FOREIGN_OWNER, "record_and_disable", foreign.index, plan.primary)
+  foreign_primary.visible_when_disabled = false
+  if foreign_primary.enabled ~= false then fail("foreign-owner actor did not disable the plan primary") end
+  if foreign_primary.visible_when_disabled ~= false then fail("foreign primary visibility witness did not persist") end
   local entity = game.surfaces[1].create_entity{name="lab", position={0, 0}, force=player}
   if entity == nil or entity.valid == false then fail("could not create a real integration lab") end
   local state = {phase="await-source-labs", profile=profile_name, lab=entity, paused_index=paused.index, foreign_index=foreign.index,

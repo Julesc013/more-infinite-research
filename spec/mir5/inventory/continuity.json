@@ -43,6 +43,17 @@
           ],
           "evidence": "spec/mir5/evidence/modern-catalogue-chain.json",
           "scope": "Named generated and native-owner definitions are preflighted from the authored catalogue; this is not a gameplay claim."
+        },
+        {
+          "id": "f210-bob-core-no-angel-material-recovery",
+          "source": [
+            "source/mir5/compatibility/bob_core_materials.lua",
+            "source/mir5/research/bob_core_materials.lua",
+            "source/mir5/research/material_stages.lua",
+            "tests/mir5/fixtures/bob-core-f210-captured-facts.json"
+          ],
+          "evidence": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
+          "scope": "Seven finite authored families retain14 independent published F210 no-Angel rows, tuning, direct native unlock gates and science. All16 captured material setting families remain visible; nine withheld families have bounded Availability facts. Focused default/tuned/opposing host controls pass. Complete candidate catalogue/native gameplay/save qualification remains open."
         }
       ],
       "test_subjects": [
@@ -54,7 +65,8 @@
       "remaining_qualification": [
         "Complete affected gameplay, save/reload and nondefault policy outcomes for the full current catalogue.",
         "Freeze and compare the final current-player package rather than earlier private packages.",
-        "Qualify the five recovered F210 BobTech material rows on the exact supported native closure."
+        "Qualify the five recovered F210 BobTech material rows on the exact supported native closure.",
+        "Compare the complete F210 Bob-core no-Angel candidate catalogue against its independent published capture, then qualify the seven material families natively."
       ]
     },
     {
@@ -429,6 +441,15 @@
           "id": "current-rendered-client-carrier-regression",
           "evidence": "spec/mir5/evidence/library-multiplayer-current-chain.json",
           "scope": "Current native-credit/lifecycle player bytes pass real2client join/rejoin/host restart, with220 members and six reviewed PNGs. Missing hidden-carrier icon caught by real rendering was corrected; numeric latency/stress remain open."
+        },
+        {
+          "id": "finite-captured-bob-material-availability",
+          "source": [
+            "source/mir5/presentation/availability.lua",
+            "source/mir5/runtime/library.lua"
+          ],
+          "evidence": "spec/mir5/evidence/host-controls-5874000-chain.json",
+          "scope": "The complete80-command observation covers22 authored omission explanations across the two Angel closures, effective setting precedence and direct emitted-ID suppression. The later no-Angel Bob-core unit adds nine separately grounded explanations with focused host controls; none of these31 profile-specific rows is native rendering qualification or a reconstructed compiler ledger."
         }
       ],
       "test_subjects": [
@@ -436,7 +457,7 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "Reconcile any remaining delivered terminal omission explanations against native disabled views or explicit preview/non-admission dispositions; two absent-expansion rows do not establish every historical explanation."
+        "Reconcile any remaining delivered terminal omission explanations against native disabled views or explicit preview/non-admission dispositions; the31 authored Bob material explanations do not establish every historical explanation."
       ],
       "remaining_qualification": [
         "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained.",
@@ -569,6 +590,17 @@
             "spec/mir5/evidence/armor-py-candidate-native-chain.json"
           ],
           "scope": "Independent upstream/published F200 references recover armor and PyCoal/HighTech output. Authored batch at5e1018e303f578b3716d4bd0b0d37ff4be943c72 and recheck at0612af568aa76fd78ff492b527340fdc45214dc2 complete three exact native data/settings captures with verified manifests and restored direct-library controls. An independently regenerated complete comparison against verified run40051640723 reference dumps finds48 retained native-credit carrier occurrences and zero other unresolved deltas; carrier additions remain unequal to intended published output. The authored rows preserve all48/49 Py productivity rows in host comparison, broad armor/plating weights, log finite/tail identities, three HighTech groups, weighted six native tails and settings visibility. Earned/physical transitions remain pending."
+        },
+        {
+          "id": "f210-bob-core-separate-material-closure",
+          "evidence": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
+          "source": [
+            "source/mir5/compatibility/bob_core_materials.lua",
+            "source/mir5/research/bob_core_materials.lua",
+            "source/mir5/research/material_stages.lua",
+            "tests/mir5/fixtures/bob-core-f210-captured-facts.json"
+          ],
+          "scope": "Seven finite authored families retain14 independent published F210 no-Angel rows, tuning, direct native unlock gates and science. All16 captured material setting families remain visible; nine withheld families have bounded Availability facts. Focused default/tuned/opposing host controls pass. Complete candidate catalogue/native gameplay/save qualification remains open."
         }
       ],
       "test_subjects": [
@@ -658,6 +690,16 @@
             "tests/mir5/fixtures/api-beta"
           ],
           "scope": "Independent optional consumer loads without MIR on F200. CreateOnly native load evidence; no save/gameplay claim."
+        },
+        {
+          "id": "available-integration-legacy-consumer-audit",
+          "evidence": "spec/mir5/evidence/api-consumer-available-archive-audit-chain.json",
+          "source": [
+            "spec/mir5/inventory/api-transition-baseline.json",
+            "source/mir5/runtime/bootstrap.lua",
+            "sdk/mir5/README.md"
+          ],
+          "scope": "Frozen-source exact-literal audit hash-verifies31 archives from five admitted reference selections and reads3322 text members (20027358bytes), with zero named old browser/settings or SDK/MEP consumer matches. Computed names and outside consumers remain unknown; both runtime bridges are retained, and no historical V0 preview removal or consumer migration is claimed."
         }
       ],
       "test_subjects": [
@@ -666,8 +708,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run affected multiplayer/final-source API and independent-consumer cases.",
-        "Audit genuine historic API/MEP consumers before removing or translating a legacy contract."
+        "Run affected multiplayer/final-source API and independent-consumer cases."
       ]
     },
     {
@@ -701,7 +742,9 @@
             "source/mir5/compatibility/modern_catalogue/py.lua",
             "source/mir5/research/py_materials.lua",
             "source/mir5/presentation/library_model.lua",
-            "source/mir5/runtime/library.lua"
+            "source/mir5/runtime/library.lua",
+            "source/mir5/research/bob_core_materials.lua",
+            "source/mir5/compatibility/bob_core_materials.lua"
           ],
           "routes": [
             {"request_id": "K2-01", "route": "Exact K2SO science policy only; not all K2 installations"},
@@ -711,15 +754,18 @@
             {"request_id": "K2-05", "route": "research_material_glass"},
             {"request_id": "BA-01", "route": "research_material_aluminium"},
             {"request_id": "BA-02", "route": "research_material_gold"},
-            {"request_id": "BA-07", "route": "research_material_tin"},
+            {"request_id": "BA-07", "route": "research_material_tin; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
             {"request_id": "BA-08", "route": "research_material_titanium"},
-            {"request_id": "BA-09", "route": "research_material_copper_tungsten"},
-            {"request_id": "BA-13", "route": "Exact F210 BobTech research_material_gunmetal; current native qualification pending"},
-            {"request_id": "BA-14", "route": "Exact F210 BobTech research_material_invar; current native qualification pending"},
+            {"request_id": "BA-09", "route": "research_material_copper_tungsten; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
+            {"request_id": "BA-13", "route": "Exact F210 BobTech research_material_gunmetal; current native qualification pending; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
+            {"request_id": "BA-14", "route": "Exact F210 BobTech research_material_invar; current native qualification pending; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
             {"request_id": "ECO-PY", "route": "Bounded F200 PyCoal and PyAlienLife/HighTech authored routes recovered from exact independent native references; physical/save qualification remains open and this is not full ecosystem support"},
             {"request_id": "UI-01", "route": "Per-player finite/infinite presentation filter"},
             {"request_id": "UI-02", "route": "Per-player finite/infinite presentation filter"},
-            {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"}
+            {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"},
+            {"request_id": "BA-03", "route": "Exact F210 Bob-core no-Angel research_material_lead stages; native qualification pending"},
+            {"request_id": "BA-11", "route": "Exact F210 Bob-core no-Angel research_material_bronze stages; native qualification pending"},
+            {"request_id": "BA-16", "route": "Exact F210 Bob-core no-Angel research_material_nitinol stages; native qualification pending"}
           ],
           "scope": "Reconciliation links retain original request IDs and do not change their decisions or qualification status. ECO-PY now links the bounded recovered routes, while its requested-not-qualified status remains accurate; armor has no original dedicated request ID. ATAN/provider contracts have no matching original request ID. No new IDs or automatic-preview delivery are invented; other retained historical material obligations remain open."
         }

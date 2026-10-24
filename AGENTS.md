@@ -27,6 +27,11 @@ More Infinite Research 4 is a proof-governed Factorio research product line. MIR
 - `v4.2.0-stable` is a one-time maintainer-authorized tag exception for source `6d19c874ea7d026d297865b96aa1b2b0916e9e61`, because GitHub permanently reserved the former immutable `v4.2.0` name. It changes no numeric version. Future final source tags use canonical `vMAJOR.MINOR.PATCH`; never infer another suffix exception.
 - Freeze the exact committed source and accepted assets before tagging. Stage the complete asset inventory in one draft, reconcile lost responses by release ID, verify names and hashes, publish, then verify anonymous downloads. Preserve historical receipts and reconcile existing remote objects before replacing anything.
 
+### MIR 5 publication direction
+
+- The maintainer's 2026-10-24 MIR 5 instruction authorizes unsigned tagging and GitHub publication if the existing signing key is unavailable. Publish `v5.0.0` on GitHub only for this goal; Mod Portal publication is outside its completion criteria. Supply accurate checksums and describe integrity files according to what they actually verify.
+- Complete the adopted product scope, README/documentation/changelog, required validation and native qualification before publication. Resolve current positive-fixture failures and perform an independent final review of the frozen source and evidence. Deadline pressure does not replace these gates; retain expected-negative and superseded adverse observations under their original identities.
+
 ## MIR Development housekeeping
 
 - Keep Git/GitHub execution available. Development health belongs in bounded observations, checkpoint requirements and the existing guarded cleanup commands; do not use housekeeping as a reason to deny commits, pushes, PRs or corrective Git actions.
@@ -50,8 +55,8 @@ The maintainer has selected `source/` as the single canonical editable product-s
 
 ## Local Factorio engine authority
 
-- Use `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
-- Use `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- On Black Glass, use the existing Steam installation `D:\Games\Steam\steamapps\common\Factorio` for the current Factorio 2.1 engine. The maintainer installed stable 2.1 through Steam after Aero became unavailable; verify its actual version and executable hash before native admission. The former Aero `C:\Program Files\Steam` locator is not an engine requirement on Black Glass.
+- On Black Glass, historical engines are existing installations under `D:\Games\Factorio\<version>`; Factorio 2.0 is `D:\Games\Factorio\2.0\bin\x64\factorio.exe`. The maintainer identified the transferred installations as local Programs/Games inputs. Preserve historical engine bytes and verify each actual version/hash; do not substitute Steam for a historical engine.
 - Never download, replace, retarget, or mutate Steam depots for historical engines without explicit maintainer authority.
 
 ## Required reading by task

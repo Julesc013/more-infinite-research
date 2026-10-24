@@ -48,4 +48,7 @@ holder(assert(data.raw.technology[HOLDER], "published staged holder is absent"),
   "200*2^(L-1)", {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"},
   HOLDER)
 holder(assert(data.raw.technology[CARRIER], "published continuation holder is absent"), 4,
-  "1600+200*(L-4)", {"production-science-pack", "space-science-pack"}, CARRIER)
+  -- The published 4.7 alias deliberately copies the predecessor's complete
+  -- four-pack unit.  MIR5's public continuation later uses the separate
+  -- two-pack frontier; do not rewrite this pinned migration carrier.
+  "1600+200*(L-4)", {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}, CARRIER)

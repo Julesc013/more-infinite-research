@@ -1,12 +1,11 @@
 -- Fixed F200 Py Coal constructor.  It binds the named log recipe and its
 -- unlock owner before returning detached stages; it does not discover Py
 -- forestry routes or infer a material progression graph.
-local cost = require("research.cost")
+local stages = require("research.material_stages")
 local DEFINITIONS = require("research.py_materials")
 local profile = require("compatibility.py_profile")
 
 local M = {}
-local OVERLAY = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"
 
 local function fail(message) error("MIR5 F200 Py material catalogue: " .. message, 3) end
 local function finite(value) return type(value) == "number" and value == value and value > -math.huge and value < math.huge end
@@ -81,38 +80,6 @@ local function stream_for(values, definition)
   return stream
 end
 
-local function copy_names(names)
-  local out = {}
-  for index, name in ipairs(names) do out[index] = name end
-  return out
-end
-
-local function continuation_cost(stream, stage)
-  local first = (stream.base_cost + 3 * stream.linear_increment) * (stream.growth_factor ^ 3)
-  if not finite(first) then fail("material continuation cost is not finite") end
-  return cost.continuation({base_cost=first,linear_increment=stream.base_cost,growth_factor=1},
-    stage.first_level, stage.predecessor_count, stage.previous_count)
-end
-
-local function technology(definition, stage, stream)
-  local ingredients = {}
-  for index, pack in ipairs(stage.science) do ingredients[index] = {pack, 1} end
-  local output = {
-    type="technology", name=stage.id,
-    icons={{icon=definition.icon,icon_size=definition.icon_size},
-      {icon=OVERLAY,icon_size=128,scale=.5,shift={50,50},floating=true}},
-    localised_name={"",{"description.productivity-bonus"},": ",{"item-name." .. definition.item}},
-    localised_description={"technology-description.more-infinite-research.recipe_productivity"},
-    level=stage.first_level or 1, upgrade=true, max_level=stage.max_level, order=stage.order,
-    prerequisites=copy_names(stage.prerequisites),
-    effects={{type="change-recipe-productivity",recipe=definition.routes[1].recipe,change=stream.effect_percent / 100}},
-    unit={count_formula=stage.first_level and continuation_cost(stream, stage)
-      or cost.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
-      time=stream.research_time,ingredients=ingredients},
-  }
-  if stream.enabled == false then output.enabled = false end
-  return output
-end
 
 function M.technologies(values, raw, active_mods)
   if not profile.select(active_mods).coal then return {} end
@@ -120,8 +87,8 @@ function M.technologies(values, raw, active_mods)
   for index, definition in ipairs(DEFINITIONS) do validate(raw, definition); streams[index] = stream_for(values, definition) end
   local out = {}
   for index, definition in ipairs(DEFINITIONS) do
-    out[#out + 1] = technology(definition, definition.early, streams[index])
-    out[#out + 1] = technology(definition, definition.continuation, streams[index])
+    out[#out + 1] = stages.technology(definition, definition.early, streams[index], fail)
+    out[#out + 1] = stages.technology(definition, definition.continuation, streams[index], fail)
   end
   return out
 end
