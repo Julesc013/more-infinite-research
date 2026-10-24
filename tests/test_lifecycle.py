@@ -135,8 +135,6 @@ class LifecycleTests(unittest.TestCase):
         self.lua.execute('''
           local target = require("platform.target")
           target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
-          target.minimum_base, target.distribution_version = "2.0.77", "5.0.20000"
-          target.recipe_probability, target.receiver_limits = "probability", false
           local active = {
             base="2.0.77", angelsbioprocessing="2.0.3", angelsbioprocessinggraphics="2.0.0",
             angelspetrochem="2.0.3", angelspetrochemgraphics="2.0.1",
@@ -599,6 +597,8 @@ class LifecycleTests(unittest.TestCase):
           -- boundary; it does not claim an engine cause for it.
           local target = require("platform.target")
           target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          target.minimum_base, target.distribution_version = "2.0.77", "5.0.20000"
+          target.recipe_probability, target.receiver_limits = "probability", false
           local name = "recipe-prod-research_gears-1"
           local gear = technology(name, 2, true)
           local worker_probes = 0
@@ -657,7 +657,7 @@ class LifecycleTests(unittest.TestCase):
           local finished = handlers.events[defines.events.on_research_finished]
           assert(type(finished) == "function", "active lifecycle did not bind research-finished")
           guard_writes = true
-          lifecycle.on_research_finished({research = gear, by_script = false})
+          finished({research = gear, by_script = false})
           assert(#writes == 0, "unlimited completed gear rewrote native research state")
           assert(worker_probes == 0, "unlimited gear completion probed unrelated worker tails")
           assert(protected.research_queue == native_queue and #native_queue == 2
