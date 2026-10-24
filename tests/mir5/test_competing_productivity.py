@@ -481,7 +481,9 @@ class CompetingProductivityTests(unittest.TestCase):
             return module
           end
           package.preload["runtime.library"] = function()
-            return {translation_maintenance_ticks=61, set_cap_provider=function() end, subscription_needs=function() return false end,
+            return {translation_maintenance_ticks=61,native_refresh_ticks=1,
+              native_subscription_needs=function() return false,false end,
+              set_cap_provider=function() end, subscription_needs=function() return false end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end,
               on_lua_shortcut=function() end, on_gui_text_changed=function() end, on_gui_selected_tab_changed=function() end,
               on_gui_selection_state_changed=function() end, on_gui_click=function() end, on_gui_location_changed=function() end,

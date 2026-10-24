@@ -201,6 +201,205 @@ class LibraryTests(unittest.TestCase):
             package.loaded["runtime.library"] = nil
             library = require("runtime.library")
           end
+
+          function route_native_events(reload_library, caps_active)
+            native_handlers, native_ticks = {events={}}, {}
+            native_cap_completions = 0
+            caps_active = caps_active == true
+            package.loaded["runtime.lifecycle"] = nil
+            package.preload["runtime.lifecycle"] = function()
+              return {caps_active=function() return caps_active end,cap_limits=function() return {} end,
+                on_init=function() end,on_configuration_changed=function() end,on_load=function() end,
+                on_research_finished=function() native_cap_completions=native_cap_completions+1 end,
+                on_force_created=function() end,on_force_reset=function() end,on_forces_merged=function() end}
+            end
+            script = {active_mods={base="2.1.23"},
+              on_event=function(id,callback) native_handlers.events[id]=callback end,
+              on_nth_tick=function(interval,callback) native_ticks[interval]=callback end,
+              on_init=function(callback) native_handlers.init=callback end,
+              on_load=function(callback) native_handlers.load=callback end,
+              on_configuration_changed=function(callback) native_handlers.configuration=callback end}
+            defines = {events={on_research_finished=1,on_gui_closed=2,on_research_started=3,
+              on_research_cancelled=4,on_research_reversed=5,on_research_queued=6,on_research_moved=7,
+              on_technology_effects_reset=8,on_force_reset=9,on_forces_merged=10,
+              on_player_left_game=11,on_player_joined_game=12,on_player_changed_force=13}}
+            remote = {interfaces={},add_interface=function(name,methods) remote.interfaces[name]=methods end}
+            commands = {add_command=function() end}
+            if reload_library then
+              package.loaded["runtime.library"] = nil
+              library = require("runtime.library")
+            end
+            package.loaded["runtime.bootstrap"] = nil
+            require("runtime.bootstrap").register()
+          end
+
+          function boot_native_events()
+            boot()
+            gear.force, foreign.force = player.force, player.force
+            route_native_events(false)
+          end
+
+          function open_routed(options)
+            assert(remote.interfaces["more-infinite-research-browser"].open(1,options) == true)
+            return player.gui.screen["mir_research_browser"]
+          end
+
+          function queued_rows()
+            return #research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items
+          end
+        ''')
+
+    def test_native_research_events_refresh_once_after_engine_state_settles_and_unsubscribe_on_close(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          assert(native_handlers.events[1] == nil and native_ticks[1] == nil)
+          local root = open_routed({status=4,selected=gear.name})
+          assert(queued_rows() == 1)
+          assert(type(native_handlers.events[1]) == "function", "open Library did not subscribe to native research")
+          local query = root["mir_library_filters"]["mir_library_query"]
+          -- The callback can precede the final native queue transition.
+          native_handlers.events[1]({research=gear})
+          native_handlers.events[3]({research=gear})
+          native_handlers.events[7]({force=player.force})
+          assert(queued_rows() == 1 and type(native_ticks[1]) == "function")
+          gear.level = 4
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+          local queue = player.force.research_queue
+          native_ticks[1]({tick=1})
+          assert(queued_rows() == 0 and native_ticks[1] == nil)
+          assert(player.gui.screen["mir_research_browser"] == root
+            and root["mir_library_filters"]["mir_library_query"] == query and query.valid)
+          assert(player.force.research_queue == queue and player.force.current_research == nil
+            and player.force.research_progress == 0 and gear.level == 4)
+          native_handlers.events[2]({player_index=1,element=root})
+          for _, id in ipairs({1,3,4,5,6,7}) do assert(native_handlers.events[id] == nil) end
+          assert(native_ticks[1] == nil and not library.native_subscription_needs())
+        ''')
+
+    def test_pending_native_view_refresh_reconstructs_after_cold_load_without_game_or_save_writes(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          open_routed({status=4})
+          native_handlers.events[6]({research=gear})
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+          local saved, view, available_game = storage, storage.mir_library.players[1], game
+          assert(view.open and view.refresh_pending)
+          game = nil
+          route_native_events(true)
+          native_handlers.load()
+          assert(storage == saved and storage.mir_library.players[1] == view and view.open and view.refresh_pending)
+          assert(type(native_handlers.events[1]) == "function" and type(native_ticks[1]) == "function")
+          game = available_game
+          native_ticks[1]({tick=1})
+          assert(queued_rows() == 0 and native_ticks[1] == nil)
+        ''')
+
+    def test_native_events_refresh_the_actual_library_model_and_selected_detail(self):
+        self.lua.execute(r'''
+          -- Exercise the production query model as well as the actual GUI and
+          -- bootstrap; the other controls isolate their GUI boundary with a
+          -- small model double.
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot_native_events()
+          local root = open_routed({status=4,selected=gear.name})
+          assert(queued_rows() == 1)
+          native_handlers.events[1]({research=gear})
+          gear.level, gear.researched, gear.enabled = 4,false,true
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+          local queue = player.force.research_queue
+          native_ticks[1]({tick=1})
+          assert(queued_rows() == 0 and native_ticks[1] == nil)
+          assert(open_routed({status=1,selected=gear.name}) == root)
+          local detail = research_content(root)["mir_library_detail"]
+          assert(detail["mir_library_detail_level"].caption[2] == 4)
+          native_handlers.events[5]({research=gear})
+          gear.level = 3
+          native_ticks[1]({tick=2})
+          assert(research_content(root)["mir_library_detail"]["mir_library_detail_level"].caption[2] == 3)
+          assert(player.force.research_queue == queue and player.force.current_research == nil
+            and player.force.research_progress == 0 and gear.level == 3 and not gear.researched)
+        ''')
+
+    def test_closing_a_view_retains_independent_cap_research_callbacks(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          route_native_events(false,true)
+          local root = open_routed()
+          native_handlers.events[2]({player_index=1,element=root})
+          assert(type(native_handlers.events[1]) == "function" and type(native_handlers.events[3]) == "function")
+          assert(native_handlers.events[6] == nil and native_handlers.events[7] == nil and native_ticks[1] == nil)
+          native_handlers.events[1]({research=gear})
+          assert(native_cap_completions == 1 and native_ticks[1] == nil)
+        ''')
+
+    def test_queue_reversal_effect_reset_and_force_boundaries_route_live_native_views(self):
+        self.lua.execute(r'''
+          for _, id in ipairs({4,5,6,7,8,9,10}) do
+            boot_native_events()
+            open_routed({status=4})
+            player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+            native_handlers.events[id]({research=gear,force=player.force,destination=player.force,source_index=2})
+            assert(type(native_ticks[1]) == "function", "native boundary did not schedule view refresh: "..id)
+            native_ticks[1]({tick=1})
+            assert(queued_rows() == 0 and native_ticks[1] == nil)
+          end
+        ''')
+
+    def test_force_change_refreshes_an_open_queue_tab_without_a_translation_cache(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local root = open_routed({tab="queue"})
+          local content = root["mir_library_tabs"]["mir_library_queue_content"]
+          assert(#content["mir_library_queue_list"].items == 1 and #player.translation_requests == 0)
+          player.force = {index=2,technologies={[gear.name]=gear},research_queue={},research_progress=0}
+          native_handlers.events[13]({player_index=1})
+          assert(player.gui.screen["mir_research_browser"] == root)
+          assert(#content["mir_library_queue_list"].items == 0,
+            "force change kept the old queue when no translation cache existed")
+        ''')
+
+    def test_native_refresh_ignores_other_forces_and_foreign_frames_and_rejoins_live_views(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local root = open_routed({status=4})
+          native_handlers.events[7]({force={index=2}})
+          assert(native_ticks[1] == nil)
+          player.connected = false
+          native_handlers.events[11]({player_index=1})
+          assert(native_handlers.events[1] == nil and native_ticks[1] == nil and root.valid)
+          player.connected = true
+          native_handlers.events[12]({player_index=1})
+          assert(type(native_handlers.events[1]) == "function")
+          root.destroy()
+          local foreign_root = screen.add{type="frame",name="mir_research_browser"}
+          native_handlers.events[5]({research=gear})
+          assert(foreign_root.valid and screen["mir_research_browser"] == foreign_root)
+          assert(native_ticks[1] == nil and native_handlers.events[1] == nil)
+        ''')
+
+    def test_native_refresh_orders_pending_players_independently_of_saved_map_iteration(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local order = {}
+          player.set_shortcut_toggled = function(_, active) if active then order[#order+1]=1 end end
+          local second = {valid=true,index=2,locale="de",connected=true,force=player.force,
+            gui={screen=gui_container(nil)},request_translation=function() return nil end,
+            set_shortcut_toggled=function(_, active) if active then order[#order+1]=2 end end}
+          game.get_player = function(index) return index == 1 and player or index == 2 and second or nil end
+          open_routed({status=4})
+          assert(remote.interfaces["more-infinite-research-browser"].open(2,{status=4}))
+          local views = storage.mir_library.players
+          setmetatable(views, {__pairs=function()
+            local index=3
+            return function() index=index-1; if index>0 then return index,views[index] end end
+          end})
+          native_handlers.events[1]({research=gear})
+          order = {}
+          native_ticks[1]({tick=1})
+          assert(table.concat(order,",") == "1,2", "pending view order follows hash/insertion traversal")
+          assert(native_ticks[1] == nil and storage.mir_library.players[1].query == ""
+            and storage.mir_library.players[2].query == "")
         ''')
 
     def test_authored_catalogue_builds_lazily_once_until_configuration_changes(self):

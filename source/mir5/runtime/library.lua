@@ -59,6 +59,7 @@ local function authored_declarations()
 end
 
 M.translation_maintenance_ticks = TRANSLATION_MAINTENANCE_TICKS
+M.native_refresh_ticks = 1
 
 local function finite_number(value)
   return type(value) == "number" and value == value and value > -math.huge and value < math.huge
@@ -276,6 +277,8 @@ local function local_view(raw)
     settings_scope = raw.settings_scope,
     settings_query = text(raw.settings_query),
     setting_selected = technology_id(raw.setting_selected),
+    open = raw.open == true,
+    refresh_pending = raw.refresh_pending == true,
     location = location(raw.location),
     scroll = type(raw.scroll) == "number" and raw.scroll > 0 and math.floor(raw.scroll) or 1
   }
@@ -770,6 +773,7 @@ local function remember_location(view, frame)
 end
 
 local function destroy_frame(player, view)
+  view.open, view.refresh_pending = false, false
   local frame = owned_root(player)
   if not valid(frame) then return false end
   remember_location(view, frame)
@@ -1284,6 +1288,7 @@ local function render(player, view, context, preserve_query)
     end
   end
   set_shortcut(player, true)
+  view.open = true
   return frame
 end
 
@@ -1590,8 +1595,7 @@ end
 
 local function invalidate_open_translation(index)
   local record = translation_caches[index]
-  if not record then return end
-  discard_translation_cache(index)
+  if record then discard_translation_cache(index) end
   local player = player_for(index)
   if player and valid(owned_root(player)) then render(player, view_for(index), nil, true) end
 end
@@ -1665,6 +1669,73 @@ function M.on_player_joined_game(event)
     -- player's tagged Library is actually open and connected.
     render(player, view_for(event.player_index), nil, true)
   end
+end
+
+function M.on_player_left_game(event)
+  if not event or not whole_number(event.player_index, 1) then return end
+  local state = existing_state()
+  local index = event and event.player_index
+  local view = state and state.players[index]
+  if type(view) == "table" then view.open, view.refresh_pending = false, false end
+  if index then discard_translation_cache(index) end
+end
+
+-- Research callbacks can precede the engine's final queue/level transition.
+-- Mark only relevant owned open views and refresh once on the following tick.
+function M.on_native_state_changed(event)
+  local state = existing_state()
+  if not state then return end
+  local force = event and (event.force or event.destination or (event.research and event.research.force))
+  for index, view in pairs(state.players) do
+    if type(view) == "table" and view.open == true then
+      local player = player_for(index)
+      if not player or player.connected ~= true or not valid(owned_root(player)) then
+        view.open, view.refresh_pending = false, false
+      elseif force == nil or (player.force and player.force.index == force.index) then
+        view.refresh_pending = true
+      end
+    end
+  end
+end
+
+function M.on_native_refresh_tick()
+  local state = existing_state()
+  if not state then return end
+  local pending = {}
+  for index, view in pairs(state.players) do
+    if type(view) == "table" and view.refresh_pending == true then
+      view.refresh_pending = false
+      if whole_number(index, 1) then pending[#pending + 1] = index else view.open = false end
+    end
+  end
+  -- Rendering may allocate durable translation epochs/native request IDs.
+  -- Process only the pending views, in a stable player order on every client.
+  table.sort(pending)
+  for _, index in ipairs(pending) do
+    local view, player = state.players[index], player_for(index)
+    if view.open == true and player and player.connected == true and valid(owned_root(player)) then
+      render(player, view_for(index), nil, true)
+    else
+      view.open = false
+    end
+  end
+end
+
+-- The two durable UI flags reconstruct subscriptions without accessing game
+-- or changing saved data during on_load. They cache no native research facts.
+function M.native_subscription_needs()
+  local state = type(storage) == "table" and storage[STORAGE_KEY] or nil
+  if type(state) ~= "table" or state.schema ~= SCHEMA or type(state.players) ~= "table" then
+    return false, false
+  end
+  local open, pending = false, false
+  for index, view in pairs(state.players) do
+    if whole_number(index, 1) and type(view) == "table" and view.open == true then
+      open = true
+      pending = pending or view.refresh_pending == true
+    end
+  end
+  return open, pending
 end
 
 function M.on_player_removed(event)
@@ -1800,6 +1871,19 @@ function M.on_configuration_changed()
           state.players[candidate.index] = view
           rebuild_owned_legacy_root(player, view)
         end
+      end
+    end
+  end
+
+  -- Older views have no subscription flags. Recover them only here, where
+  -- native players/GUI are available; a closed or foreign frame stays closed.
+  local current = existing_state()
+  if current then
+    for index, view in pairs(current.players) do
+      if type(view) == "table" then
+        local player = player_for(index)
+        view.open = player ~= nil and player.connected == true and valid(owned_root(player))
+        view.refresh_pending = view.open
       end
     end
   end
