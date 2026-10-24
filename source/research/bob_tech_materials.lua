@@ -75,6 +75,8 @@ return {
       previous_count = 400,
       max_level = "infinite",
       order = "p[research_material_gunmetal__continuation]",
+      show_levels_info = false,
+      visible_when_disabled = true,
       science = {"automation-science-pack", "logistic-science-pack", "space-science-pack"},
       prerequisites = {
         "angels-gunmetal-smelting-1", "automation-science-pack", "logistic-science-pack",
@@ -116,6 +118,8 @@ return {
       previous_count = 400,
       max_level = "infinite",
       order = "p[research_material_invar__continuation]",
+      show_levels_info = false,
+      visible_when_disabled = true,
       science = {"automation-science-pack", "logistic-science-pack", "space-science-pack"},
       prerequisites = {
         "angels-invar-smelting-1", "automation-science-pack", "logistic-science-pack",

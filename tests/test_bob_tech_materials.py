@@ -152,6 +152,15 @@ class BobTechMaterialTests(unittest.TestCase):
                 self.assertTrue(row["upgrade"])
                 self.assertEqual(stage["max_level"], row["max_level"])
                 self.assertEqual(stage["order"], row["order"])
+                # Published finite-runtime-cap presentation keeps these
+                # infinite prototype identities visible without native level
+                # information. The real BobTech fixture checks the same fields.
+                if stage_name == "continuation":
+                    self.assertIs(row.get("show_levels_info"), False)
+                    self.assertIs(row.get("visible_when_disabled"), True)
+                else:
+                    self.assertIsNone(row.get("show_levels_info"))
+                    self.assertIsNone(row.get("visible_when_disabled"))
                 self.assertEqual(stage["count_formula"], row["unit"]["count_formula"])
                 self.assertEqual(stage["time"], row["unit"]["time"])
                 self.assertEqual(stage["prerequisites"], row["prerequisites"])
