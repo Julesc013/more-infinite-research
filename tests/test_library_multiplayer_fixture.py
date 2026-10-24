@@ -72,6 +72,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local storage={}
             local callbacks={events={}}
             local next_profiler=0
+            local profiler_logs={}
             local game={forces={player=force},surfaces={[1]={valid=true,index=1}},tick=0}
             local function fire(name,event)
               local callback=callbacks.events[name]
@@ -124,7 +125,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local result={valid=true,stopped=stopped,ordinal=next_profiler}
               result.restart=function() result.running=true end
               result.stop=function() result.running=false end
-              return setmetatable(result,{__tostring=function(value)return "mock-profiler-"..value.ordinal end})
+              return setmetatable(result,{__tostring=function()error('profiler is not a Lua timing string')end})
             end
             game.take_screenshot=function(spec)
               screenshots[#screenshots+1]={by_player=spec.by_player,player_matches=spec.player==players[spec.by_player],show_gui=spec.show_gui,
@@ -246,9 +247,19 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 on_research_finished=6,on_research_cancelled=7,on_force_created=8},inventory={lab_input=1}},
               game=game,storage=storage,remote=remote,
               helpers={table_to_json=function(value)markers[#markers+1]=value;return "{}" end},
-              log=function(value)assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
-                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
-                or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] "))end,
+              log=function(value)
+                if type(value)=="table" then
+                  assert(value[1]=="" and value[2]=="[MIR5_LIBRARY_PROFILE] " and value[4]==" ")
+                  local profiler=value[5]
+                  assert(profiler.valid and profiler.running==false, 'native profiler was not stopped')
+                  profiler_logs[#profiler_logs+1]={label=value[3],
+                    native_output=(opponent=="profiler-variant" and "different-host-" or "host-")..profiler.ordinal}
+                else
+                  assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
+                    or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
+                    or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] "))
+                end
+              end,
             }
             environment._G=environment;setmetatable(environment,{__index=function(_,name)return _G[name]end})
             local chunk,message=loadfile(path,"t",environment);assert(chunk,message)
@@ -328,7 +339,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             game.tick=game.tick+60
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
-              load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements}
+              load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
+              profiler_logs=profiler_logs}
           end
         ''')
 
@@ -381,7 +393,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(live_refresh["root_and_query_identity_preserved"])
         self.assertTrue(live_refresh["cross_force_view_state_preserved"])
         self.assertEqual(set(result["measurements"]), {"first_open", "search", "refresh", "reopen"})
-        self.assertTrue(all(isinstance(value, str) and value.startswith("mock-profiler-") for value in result["measurements"].values()))
+        self.assertTrue(all(value is True for value in result["measurements"].values()))
+        self.assertEqual([row["label"] for row in result["profiler_logs"]],
+                         ["first_open", "search", "refresh", "reopen"])
         self.assertEqual(len(result["screenshots"]), 8)
         self.assertEqual(
             {stage: sum(f"/{stage}-" in item["path"] for item in result["screenshots"])
@@ -394,6 +408,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             self.assertTrue(screenshot["force_render"])
             self.assertEqual(screenshot["resolution"], [1280, 720])
             self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
+
+    def test_profiler_output_does_not_change_saved_witnesses(self):
+        first, other = self.run_case(), self.run_case("profiler-variant")
+        self.assertTrue(first["ok"], first["message"])
+        self.assertTrue(other["ok"], other["message"])
+        self.assertNotEqual(first["profiler_logs"], other["profiler_logs"])
+        self.assertEqual(first["measurements"], other["measurements"])
+        self.assertEqual(first["markers"], other["markers"])
+        self.assertEqual(first["saves"], other["saves"])
 
     def test_fixture_rejects_missing_clients_wrong_locale_cross_player_view_and_native_mutation(self):
         absent = self.run_case("absent-second-client")
