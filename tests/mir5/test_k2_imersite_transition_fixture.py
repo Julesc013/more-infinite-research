@@ -258,6 +258,7 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.lua.globals().source_opponent = opponent
         return self.lua.execute(r'''
           local callbacks, calls = {}, {created=0, inserted=0, added=0, prerequisites=0}
+          local diagnostics = {}
           local early, tail = "recipe-prod-research_material_imersite-1", "recipe-prod-research_material_imersite-4"
           local holder, carrier = "mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"
           local powder = "kr-imersite-powder"
@@ -296,6 +297,9 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
           if source_opponent == "source-version" then witness.source_mir="4.5.21000" end
           if source_opponent == "mixed-published" then witness.published_mir="4.7.21002" end
           if source_opponent == "published-progress" then witness.published.carrier_progress=.25 end
+          if source_opponent == "native-bonus" then force.recipes[powder].productivity_bonus=.12 end
+          helpers = {table_to_json=function(value) diagnostics[#diagnostics+1]=value; return "readback-json" end}
+          log = function(value) assert(value == "[MIR5_NATIVE_FIXTURE] DIAGNOSTIC readback-json") end
           local inventory = {insert=function(value)
             assert((value.name == "production-science-pack" or value.name == "space-science-pack") and value.count == 8)
             calls.inserted=calls.inserted+1; return value.count
@@ -315,7 +319,8 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
           assert(loadfile(successor_path))()
           local ok,message=pcall(callbacks.configuration)
           return {ok=ok,message=tostring(message),calls=calls,route=witness.handoff_source,
-            phase=witness.phase,progress=force.research_progress,real_tail=force.current_research == rows[tail]}
+            phase=witness.phase,progress=force.research_progress,real_tail=force.current_research == rows[tail],
+            diagnostics=diagnostics,bonus=force.recipes[powder].productivity_bonus}
         ''')
 
     def test_successor_accepts_both_exact_source_witnesses_and_starts_the_actual_native_tail(self):
@@ -339,6 +344,21 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"], result["message"])
                 self.assertEqual((0, 0, 0, 0), tuple(result["calls"][key] for key in
                                                   ("created", "inserted", "added", "prerequisites")))
+
+    def test_failed_native_readback_reports_values_without_repair_or_successor_writes(self):
+        result = self._successor_configuration("direct", "native-bonus")
+        self.assertFalse(result["ok"])
+        self.assertIn("recovered public Imersite state differs", result["message"])
+        self.assertEqual((0, 0, 0, 0), tuple(result["calls"][key] for key in
+                                          ("created", "inserted", "added", "prerequisites")))
+        self.assertEqual(0.12, result["bonus"])
+        diagnostic = result["diagnostics"][1]
+        self.assertEqual("direct-4.6", diagnostic["handoff_source"])
+        self.assertEqual(0.10, diagnostic["expected"]["powder_productivity"])
+        self.assertEqual(0.12, diagnostic["actual"]["powder_productivity"])
+        self.assertEqual(6, diagnostic["actual"]["tail"]["level"])
+        self.assertEqual(0.42, diagnostic["actual"]["tail"]["saved_progress"])
+        self.assertIsNone(result["diagnostics"][2])
 
 
 if __name__ == "__main__":

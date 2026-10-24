@@ -75,6 +75,18 @@ local function assert_recovered(state, label)
   if early.level ~= 3 or not early.researched or tail.level ~= 6 or tail.researched
       or not close(tail.saved_progress, 0.42) or tail.maximum ~= 4294967295
       or not close(powder_bonus(force), 0.10) then
+    local queue = {}
+    for _, value in ipairs(force.research_queue or {}) do queue[#queue + 1] = value.name end
+    log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({
+      case=CASE, checkpoint=label, handoff_source=source,
+      expected={early_level=3, early_researched=true, tail_level=6,
+        tail_researched=false, tail_saved_progress=0.42, tail_maximum=4294967295,
+        powder_productivity=0.10, queue_count=0},
+      actual={early=early, tail=tail, holder=status(force, HOLDER), carrier=status(force, CARRIER),
+        powder_productivity=powder_bonus(force), queue=queue,
+        current_research=force.current_research and force.current_research.name or nil,
+        research_progress=force.research_progress},
+    }))
     fail(label .. " recovered public Imersite state differs")
   end
   assert_effect(technology(force, EARLY), label .. " early")
