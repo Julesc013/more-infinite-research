@@ -117,6 +117,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_settings_commands.py",
             "tests/test_properties.py",
             "tests/test_replay.py",
+            "tests/test_library_profile_reader.py",
             "tests/test_package.py",
             "tests/test_release.py",
             "tests/test_compose_replay.py",
@@ -128,7 +129,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 90)
+        self.assertEqual(len(paths), 91)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
@@ -148,7 +149,7 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
         self.assertTrue(all(set(row) == {"path", "lua"} for row in controls))
-        first_python_only = paths.index("tests/test_package.py")
+        first_python_only = paths.index("tests/test_library_profile_reader.py")
         self.assertTrue(all(row["lua"] for row in controls[:first_python_only]))
         self.assertTrue(all(not row["lua"] for row in controls[first_python_only:]))
 
