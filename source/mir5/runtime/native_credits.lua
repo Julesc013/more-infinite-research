@@ -18,6 +18,7 @@ local PUBLISHED_F200_M4_VERSIONS = {
   ["4.7.20000"] = true,
   ["4.7.20001"] = true,
   ["4.7.20002"] = true,
+  ["4.7.20003"] = true,
 }
 local DESCRIPTORS = definitions.descriptors()
 
