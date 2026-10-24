@@ -481,6 +481,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             string_queue["witnesses"]["live_refresh"]["queue_lengths_observed"] = ["2", "1", "0"]
             add_rejection(f"{stage}/string-queue", string_queue, stage, expected_joins[stage])
 
+            boundary_productivity = deepcopy(row)
+            boundary_productivity["witnesses"]["live_refresh"]["gear_productivity"] = 0.2000005
+            add_rejection(f"{stage}/productivity-boundary", boundary_productivity, stage, expected_joins[stage])
+
+            string_productivity = deepcopy(row)
+            string_productivity["witnesses"]["live_refresh"]["gear_productivity"] = "0.2"
+            add_rejection(f"{stage}/string-productivity", string_productivity, stage, expected_joins[stage])
+
             for field, value in (("first_open", False),
                                  ("screenshot_calls", 0),
                                  ("availability_terminal_labels_checked", False)):

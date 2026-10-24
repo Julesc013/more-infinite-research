@@ -297,7 +297,7 @@ function Assert-LibraryWitnessInteger([object]$Witness, [string]$Field, [int]$Ex
 }
 function Assert-LibraryWitnessNumber([object]$Witness, [string]$Field, [double]$Expected, [string]$Stage) {
   $property = $Witness.PSObject.Properties[$Field]
-  Assert-Session ($null -ne $property -and (Test-LibraryNumber $property.Value) -and [Math]::Abs([double]$property.Value - $Expected) -le 0.000001) "$Stage Library witness $Field differs"
+  Assert-Session ($null -ne $property -and (Test-LibraryNumber $property.Value) -and [Math]::Abs([double]$property.Value - $Expected) -le 0.0000001) "$Stage Library witness $Field differs"
 }
 function Assert-LibraryWitnessString([object]$Witness, [string]$Field, [string]$Expected, [string]$Stage) {
   $property = $Witness.PSObject.Properties[$Field]
