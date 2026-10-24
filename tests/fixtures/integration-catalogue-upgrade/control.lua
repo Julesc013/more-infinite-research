@@ -7,6 +7,23 @@ local FIXTURE = "mir-fixture-mir5-integration-catalogue-upgrade"
 local FOREIGN_OWNER = "mir5-integration-foreign-owner"
 local DEADLINE = 36000
 local UINT32_MAX = 4294967295
+-- These are the only published-only configuration boundaries admitted by
+-- py-published-reset-control-native-chain.json.  They are not a general
+-- foreign-owner rule and they do not alter the saved source snapshot.
+local PUBLISHED_PY_FOREIGN_BOUNDARIES = {
+  ["py-coal"] = {
+    force = 5,
+    primary = "recipe-prod-research_material_py_log-4",
+    rows = 54,
+    marker = "[MIR5_INTEGRATION_PYCOAL_FOREIGN]",
+  },
+  ["py-alienlife-hightech"] = {
+    force = 5,
+    primary = "recipe-prod-research_breeding-1",
+    rows = 55,
+    marker = "[MIR5_INTEGRATION_PYALIEN_FOREIGN]",
+  },
+}
 local PLAN = require("__mir-fixture-mir5-integration-catalogue-upgrade__/catalogue")
 local loaded, reload_logged = false, false
 
@@ -160,6 +177,57 @@ local function assert_same_snapshot(force, plan, expected, label)
   for field, before in pairs(expected.fields) do if not close(actual.fields[field], before) then fail(label .. " native force effect changed: " .. field) end end
   return actual
 end
+local function published_py_boundary(state, plan)
+  local boundary = PUBLISHED_PY_FOREIGN_BOUNDARIES[state.profile]
+  if boundary == nil then return nil end
+  if state.foreign_index ~= boundary.force or plan.primary ~= boundary.primary then
+    fail("published Py foreign successor boundary differs")
+  end
+  return boundary
+end
+local function assert_published_py_successor_foreign(force, plan, expected, state, label, boundary)
+  -- Published-only control observed the named primary row re-enabled at the
+  -- configuration boundary after the actor migration.  The saved source
+  -- snapshot stays disabled; every other captured field remains strict. The
+  -- runner correlates the actor's separate migration log before accepting the
+  -- profile-specific CONFIGURATION marker below.
+  local expected_primary = expected.technologies and expected.technologies[boundary.primary]
+  if type(expected_primary) ~= "table" or expected_primary.enabled ~= false
+      or expected_primary.visible ~= false then
+    fail("published Py disabled primary witness differs")
+  end
+  local actual, checked = snapshot(force, plan), 0
+  for name, before in pairs(expected.technologies) do
+    local now = actual.technologies[name]
+    local wanted_enabled = name == boundary.primary and true or before.enabled
+    if now == nil or now.level ~= before.level or now.researched ~= before.researched
+        or now.enabled ~= wanted_enabled or now.visible ~= before.visible
+        or now.maximum ~= before.maximum or not close(now.saved, before.saved) then
+      fail(label .. " technology state changed: " .. name)
+    end
+    if actual.effects[name] ~= expected.effects[name] then fail(label .. " technology effects changed: " .. name) end
+    checked = checked + 1
+  end
+  if checked ~= boundary.rows then fail("published Py foreign catalogue row count differs") end
+  for recipe, before in pairs(expected.recipes) do
+    if not close(actual.recipes[recipe], before) then fail(label .. " recipe bonus changed: " .. recipe) end
+  end
+  for category, before in pairs(expected.guns) do
+    if not close(actual.guns[category], before) then fail(label .. " gun effect changed: " .. category) end
+  end
+  for field, before in pairs(expected.fields) do
+    if not close(actual.fields[field], before) then fail(label .. " native force effect changed: " .. field) end
+  end
+  return actual, checked
+end
+local function assert_successor_foreign(force, plan, expected, state, label)
+  local boundary = published_py_boundary(state, plan)
+  if boundary ~= nil then
+    local actual, checked = assert_published_py_successor_foreign(force, plan, expected, state, label, boundary)
+    return actual, checked, boundary
+  end
+  return assert_same_snapshot(force, plan, expected, label)
+end
 local function assert_advanced(force, plan, expected, delta, label)
   local actual = snapshot(force, plan)
   local advanced = {[plan.primary]=true, [plan.continuation]=true}
@@ -307,7 +375,22 @@ local function successor_config()
   local paused, foreign = game.forces[state.paused_index], game.forces[state.foreign_index]
   if paused == nil or foreign == nil then fail("successor lost auxiliary force") end
   assert_same_snapshot(paused, plan, state.paused_snapshot, "pre-successor paused")
-  assert_same_snapshot(foreign, plan, state.foreign_snapshot, "pre-successor foreign")
+  local foreign_actual, foreign_rows, boundary = assert_successor_foreign(
+    foreign, plan, state.foreign_snapshot, state, "pre-successor foreign"
+  )
+  if boundary ~= nil then
+    log(boundary.marker .. " CONFIGURATION " .. helpers.table_to_json({
+      actor=FOREIGN_OWNER,
+      actor_migration_log_required=true,
+      force=state.foreign_index,
+      technology=boundary.primary,
+      expected_disabled=true,
+      source_enabled=state.foreign_snapshot.technologies[boundary.primary].enabled,
+      post_configuration_enabled=foreign_actual.technologies[boundary.primary].enabled,
+      visibility=foreign_actual.technologies[boundary.primary].visible,
+      checked_technology_rows=foreign_rows,
+    }))
+  end
   state.phase, state.task_index, state.active_task, state.deadline = "await-successor-labs", 1, plan.primary, game.tick + DEADLINE
   fill(state, technology(player, plan.primary))
 end
@@ -317,7 +400,7 @@ local function finish_successor(state, plan, profile_name)
   local paused, foreign = game.forces[state.paused_index], game.forces[state.foreign_index]
   if paused == nil or foreign == nil then fail("successor lost auxiliary force") end
   assert_same_snapshot(paused, plan, state.paused_snapshot, "successor paused labs")
-  assert_same_snapshot(foreign, plan, state.foreign_snapshot, "successor foreign labs")
+  assert_successor_foreign(foreign, plan, state.foreign_snapshot, state, "successor foreign labs")
   state.phase = "successor-complete"
   marker("initial", state, plan, profile_name)
   game.server_save(SAVE)
@@ -332,7 +415,7 @@ local function successor_tick()
       local paused, foreign = game.forces[state.paused_index], game.forces[state.foreign_index]
       if paused == nil or foreign == nil then fail("successor cold reload lost auxiliary force") end
       assert_same_snapshot(paused, plan, state.paused_snapshot, "successor paused cold reload")
-      assert_same_snapshot(foreign, plan, state.foreign_snapshot, "successor foreign cold reload")
+      assert_successor_foreign(foreign, plan, state.foreign_snapshot, state, "successor foreign cold reload")
       marker("reload", state, plan, profile_name); reload_logged = true
     end
     return

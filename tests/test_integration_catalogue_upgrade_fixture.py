@@ -12,6 +12,7 @@ FOREIGN_OWNER = ROOT / "tests/fixtures/integration-foreign-owner"
 RECOVERED = ROOT / "tests/fixtures/armor-py-f200-472-recovered-facts.json"
 BASE_ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
 CONTINUATIONS = ROOT / "tests/fixtures/native-modded-continuations-f200-captured-facts.json"
+PY_PUBLISHED_RESET = ROOT / "spec/evidence/py-published-reset-control-native-chain.json"
 F200_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F200_RUNTIME_API"),
     "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
@@ -67,6 +68,7 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         cls.recovered = {row["id"]: row for row in json.loads(RECOVERED.read_text(encoding="utf-8"))["profiles"]}
         cls.base = next(row for row in json.loads(BASE_ORACLE.read_text(encoding="utf-8"))["profiles"] if row["id"] == "base-f200")
         cls.continuations = json.loads(CONTINUATIONS.read_text(encoding="utf-8"))
+        cls.py_published_reset = json.loads(PY_PUBLISHED_RESET.read_text(encoding="utf-8"))
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -157,6 +159,37 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertIn("value.level, value.researched = finite.tail_level, false", control)
         self.assertNotIn("finite.tail_level, true", control)
 
+    def test_published_py_successor_exceptions_are_bound_to_the_independent_published_control(self):
+        evidence = self.py_published_reset
+        self.assertEqual("published-only-configuration-boundary-observation-completed", evidence["status"])
+        self.assertFalse(evidence["release_qualification"])
+        accepted = evidence["accepted_observation"]
+        self.assertEqual(40091620986, accepted["run"])
+        self.assertEqual({"tag": "v4.7.2", "archive": "more-infinite-research_4.7.20002.zip"},
+                         {key: accepted["published_mir4"][key] for key in ("tag", "archive")})
+        expected = {
+            "py-coal": ("recipe-prod-research_material_py_log-4", 54),
+            "py-alienlife-hightech": ("recipe-prod-research_breeding-1", 55),
+        }
+        profiles = {row["id"]: row for row in accepted["profiles"]}
+        self.assertEqual(set(expected), set(profiles))
+        for identifier, (primary, rows) in expected.items():
+            with self.subTest(profile=identifier):
+                row = profiles[identifier]
+                self.assertEqual({
+                    "primary": primary, "force": 5,
+                    "correlated_actor_migration": {
+                        "actor": "mir5-integration-foreign-owner", "force": 5,
+                        "technology": primary,
+                        "expected_disabled": True, "observed_before": False, "observed_after": False,
+                    },
+                    "observed_configuration_boundary": {
+                        "source_primary_enabled": False, "post_configuration_primary_enabled": True,
+                        "primary_visible_when_disabled": False, "checked_technology_rows": rows,
+                    },
+                }, {key: row[key] for key in ("primary", "force", "correlated_actor_migration",
+                                               "observed_configuration_boundary")})
+
     def test_data_preflight_accelerates_only_the_two_real_lab_rows(self):
         for identifier, profile in self.plan["profiles"].items():
             raw = {"technology": copy.deepcopy(profile["preflight"]), "untouched": {"flag": 19}}
@@ -235,6 +268,160 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
                 self.assertIsNotNone(result["callbacks"]["events"][1])
                 self.assertIsNotNone(result["callbacks"]["events"][2])
                 self.assertIsNotNone(result["callbacks"]["init"] if source else result["callbacks"]["configuration"])
+
+    def _run_published_py_successor_config(self, identifier, opponent=None):
+        self.lua.globals().control_path = (FIXTURE / "control.lua").as_posix()
+        self.lua.globals().catalogue_path = (FIXTURE / "catalogue.lua").as_posix()
+        self.lua.execute(r'''
+          function run_published_py_successor_config(identifier, opponent)
+            local callbacks, logs = {}, {}
+            local function make_force(plan, force_fields, primary_enabled, other_enabled)
+              local values, writes = {}, {}
+              local force = {valid=true, technologies={}, recipes={}, research_queue={}, research_progress=0,
+                current_research=nil, _values=values, _writes=writes,
+                get_gun_speed_modifier=function() error("unexpected gun lookup") end}
+              for _, name in ipairs(plan.public) do
+                local maximum = 4294967295
+                if plan.finite ~= nil and name == plan.finite.early then maximum = plan.finite.early_level
+                elseif plan.finite ~= nil and name == plan.finite.tail then maximum = 50000000 end
+                local value = {valid=true, name=name, level=1, researched=false, enabled=true,
+                  visible_when_disabled=false, saved_progress=0, prototype={max_level=maximum,effects={}},
+                  research_unit_ingredients={}}
+                if name == plan.primary then value.enabled = primary_enabled end
+                if name == plan.continuation and other_enabled ~= nil then value.enabled = other_enabled end
+                values[name] = value
+                force.technologies[name] = setmetatable({}, {
+                  __index=value,
+                  __newindex=function(_, key, next)
+                    if name == plan.primary then writes[#writes + 1] = {key=key, value=next} end
+                    value[key] = next
+                  end,
+                })
+              end
+              for _, field in ipairs(force_fields) do force[field] = 0 end
+              return force
+            end
+            local function snapshot(force, plan, force_fields)
+              local out = {technologies={}, effects={}, recipes={}, guns={}, fields={}}
+              for _, name in ipairs(plan.public) do
+                local value = force._values[name]
+                out.technologies[name] = {level=value.level, researched=value.researched, enabled=value.enabled,
+                  visible=value.visible_when_disabled, saved=value.saved_progress, maximum=value.prototype.max_level}
+                out.effects[name] = "{}"
+              end
+              for _, field in ipairs(force_fields) do out.fields[field] = force[field] end
+              return out
+            end
+            local env, plan, force_fields
+            local profile_mods = {
+              ["py-coal"] = {pycoalprocessing="3.0.44"},
+              ["py-alienlife-hightech"] = {
+                pycoalprocessing="3.0.44", pyalienlife="3.0.67", pyhightech="3.0.19",
+              },
+            }
+            assert(profile_mods[identifier] ~= nil)
+            local active = {base="2.0.77", ["more-infinite-research"]="5.0.20000",
+              ["mir-fixture-mir5-integration-catalogue-upgrade"]="0.2.0"}
+            for name, version in pairs(profile_mods[identifier]) do active[name] = version end
+            env = {
+              require=function(name)
+                assert(name == "__mir-fixture-mir5-integration-catalogue-upgrade__/catalogue")
+                return assert(loadfile(catalogue_path, "t", env))()
+              end,
+              script={active_mods=active,
+                on_init=function(fn) callbacks.init=fn end, on_load=function(fn) callbacks.load=fn end,
+                on_configuration_changed=function(fn) callbacks.configuration=fn end,
+                on_event=function(event, fn) callbacks[event]=fn end},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
+              helpers={table_to_json=function(value) payload=value; return "<fixture-payload>" end},
+              log=function(value) logs[#logs + 1] = value end,
+            }
+            env._G=env
+            setmetatable(env, {__index=function(_, key) return _G[key] end})
+            local catalogue = assert(loadfile(catalogue_path, "t", env))()
+            plan, force_fields = catalogue.profiles[identifier], catalogue.force_fields
+            local player, paused = make_force(plan, force_fields, true), make_force(plan, force_fields, true)
+            local foreign = make_force(plan, force_fields, opponent ~= "restored-disabled", true)
+            local foreign_snapshot = snapshot(foreign, plan, force_fields)
+            foreign_snapshot.technologies[plan.primary].enabled = opponent == "source-enabled"
+            if opponent == "wrong-visibility" then foreign._values[plan.primary].visible_when_disabled = true end
+            if opponent == "primary-level" then foreign._values[plan.primary].level = 2 end
+            if opponent == "other-enabled" then foreign._values[plan.continuation].enabled = false end
+            local foreign_index = opponent == "wrong-force" and 6 or 5
+            local inventory = {clear=function() end, insert=function() return 128 end}
+            local state = {phase="source-complete", profile=identifier, paused_index=4, foreign_index=foreign_index,
+              source_snapshot=snapshot(player, plan, force_fields), paused_snapshot=snapshot(paused, plan, force_fields),
+              foreign_snapshot=foreign_snapshot, player_queue={current=false, queue={}, progress=0},
+              lab={valid=true, active=false, energy=0, get_inventory=function(kind) assert(kind == 1); return inventory end}}
+            env.storage=setmetatable({}, {
+              __index=function(_, key)
+                if key == "mir5_integration_catalogue_upgrade" then return state end
+                error("read outside fixture private storage: " .. tostring(key))
+              end,
+              __newindex=function() error("unexpected fixture storage write") end,
+            })
+            env.game={tick=0,forces={player=player,[4]=paused,[foreign_index]=foreign}}
+            local ok, message = pcall(function()
+              assert(loadfile(control_path, "t", env))()
+              callbacks.configuration()
+            end)
+            return {ok=ok, message=tostring(message), logs=logs, payload=payload, phase=state.phase,
+              source_enabled=state.foreign_snapshot.technologies[plan.primary].enabled,
+              foreign_enabled=foreign._values[plan.primary].enabled, foreign_writes=foreign._writes}
+          end
+        ''')
+        return py(self.lua.eval("run_published_py_successor_config")(identifier, opponent))
+
+    def test_published_py_successors_accept_only_the_published_enabled_boundary_and_request_actor_log_correlation(self):
+        boundaries = {
+            "py-coal": ("recipe-prod-research_material_py_log-4", 54, "[MIR5_INTEGRATION_PYCOAL_FOREIGN]"),
+            "py-alienlife-hightech": ("recipe-prod-research_breeding-1", 55, "[MIR5_INTEGRATION_PYALIEN_FOREIGN]"),
+        }
+        for identifier, (primary, rows, marker) in boundaries.items():
+            with self.subTest(profile=identifier):
+                actor = self._run_foreign_owner_migration(
+                    {"force_index": 5, "technology": primary, "disabled": True},
+                    technology_name=primary, force_index=5, enabled=False,
+                )
+                self.assertTrue(actor["ok"], actor["message"])
+                self.assertEqual("[MIR5_FOREIGN_OWNER_MIGRATION] <fixture-payload>", actor["marker"])
+                self.assertEqual({
+                    "actor": "mir5-integration-foreign-owner", "force": 5,
+                    "technology": primary, "expected_disabled": True,
+                    "observed_before": False, "observed_after": False,
+                }, py(actor["payload"]))
+                result = self._run_published_py_successor_config(identifier)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual("await-successor-labs", result["phase"])
+                self.assertFalse(result["source_enabled"])
+                self.assertTrue(result["foreign_enabled"])
+                self.assertFalse(result["foreign_writes"])
+                self.assertEqual([marker + " CONFIGURATION <fixture-payload>"], result["logs"])
+                self.assertEqual({
+                    "actor": "mir5-integration-foreign-owner", "actor_migration_log_required": True,
+                    "force": 5, "technology": primary,
+                    "expected_disabled": True, "source_enabled": False, "post_configuration_enabled": True,
+                    "visibility": False, "checked_technology_rows": rows,
+                }, result["payload"])
+
+    def test_published_py_successors_reject_restoration_and_any_other_boundary_drift_before_state_changes(self):
+        opponents = {
+            "restored-disabled": "pre-successor foreign technology state changed",
+            "wrong-force": "published Py foreign successor boundary differs",
+            "source-enabled": "published Py disabled primary witness differs",
+            "wrong-visibility": "pre-successor foreign technology state changed",
+            "primary-level": "pre-successor foreign technology state changed",
+            "other-enabled": "pre-successor foreign technology state changed",
+        }
+        for identifier in ("py-coal", "py-alienlife-hightech"):
+            for opponent, expected in opponents.items():
+                with self.subTest(profile=identifier, opponent=opponent):
+                    result = self._run_published_py_successor_config(identifier, opponent)
+                    self.assertFalse(result["ok"])
+                    self.assertIn(expected, result["message"])
+                    self.assertEqual("source-complete", result["phase"])
+                    self.assertFalse(result["foreign_writes"])
+                    self.assertFalse(result["logs"])
 
     def _run_read_only_integration_migration(self, profile, expected, actual):
         migration = FIXTURE / "migrations/0.2.0.lua"
