@@ -89,17 +89,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download ordinary directory
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: mir-action-transport-directory
           path: build/action-transport/downloaded-directory
       - name: Download exact ZIP
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: mir-action-transport-zip
           path: build/action-transport/downloaded-zip
       - name: Merge isolated worker evidence
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           pattern: mir-action-transport-worker-*
           path: build/action-transport/workers
@@ -107,7 +107,7 @@ jobs:
       - name: Prove missing artifacts fail closed
         id: missing_artifact
         continue-on-error: true
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
           name: mir-action-transport-intentionally-missing-${{ github.run_id }}
           path: build/action-transport/missing
