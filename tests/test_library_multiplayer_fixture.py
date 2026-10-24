@@ -3,8 +3,11 @@ import argparse
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
+import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -549,6 +552,59 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("@('availability','initial','rejoin','restart')", session)
         self.assertIn("$completed.witnesses.availability_terminal_labels_checked -eq $true", session)
         self.assertIn("$completed.witnesses.screenshot_calls -eq 8", session)
+
+    def test_pre_session_admission_refusal_is_preserved_without_launch_or_secrets(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'wrapper parse failed'}
+          $nodes=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.IfStatementAst] -and
+            $node.Extent.Text.Contains("'session-admission-refusal.json'")
+          },$true))
+          if($nodes.Count -ne 1){throw 'admission receipt writer missing or ambiguous'}
+          $write=[scriptblock]::Create($nodes[0].Extent.Text)
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Invoke-MIRNativeProbeProcess {throw 'native process must not start'}
+          function New-MIRNativeProbeResourceContext {throw 'admission must not be retried'}
+          $script:fullWrites=0
+          function Write-MIRNativeProbeResult {param($Context,$Record) $script:fullWrites++}
+          foreach($case in @('library-multiplayer','scripted-effects-multiplayer')){
+            $output=Join-Path $env:MIR_TEST_WORK $case
+            $null=New-Item -ItemType Directory -Path $output
+            $resources=$null
+            $failure=[Management.Automation.ErrorRecord]::new([InvalidOperationException]::new('[mir441-resource-admission-memory]'),'controlled',[Management.Automation.ErrorCategory]::ResourceUnavailable,$null)
+            $admission=@{snapshot=@{memory=@{total_bytes=32GB;free_bytes=13GB;committed_bytes=24GB;commit_limit_bytes=40GB}};limits=@{physical_bytes=6GB;commit_bytes=6GB};expected_peak_memory_bytes=8GB;estimated_peak_bytes=512MB}
+            $failure.Exception.Data['mir441_resource_admission']=$admission
+            $record=[ordered]@{case=$case;source_head=('a'*40);harness_sha256=('e'*64);engine=@{sha256=('b'*64);base_version='2.0.77'};profile=@{sha256=('c'*64)};mir_archive=@{sha256=('d'*64)};failure='[mir441-resource-admission-memory]';resource_admission=$admission;preparation=@{private_value='do-not-serialize'};rcon_password='do-not-serialize'}
+            & $write
+            $path=Join-Path $output 'session-admission-refusal.json'
+            $bytes=[IO.File]::ReadAllBytes($path);$text=[Text.Encoding]::UTF8.GetString($bytes);$receipt=$text|ConvertFrom-Json -AsHashtable
+            if($bytes.Length -gt 64KB -or $text.Contains('do-not-serialize')){throw 'unbounded/private receipt'}
+            if($receipt.status -cne 'refused-before-session' -or $receipt.case -cne $case -or $receipt.native_session_started -ne $false -or $receipt.release_qualification -ne $false){throw 'refusal claimed native acceptance'}
+            if($receipt.resource_admission.snapshot.memory.free_bytes -ne 13GB -or $receipt.resource_admission.expected_peak_memory_bytes -ne 8GB -or $receipt.source_head -cne ('a'*40) -or $receipt.profile_sha256 -cne ('c'*64) -or $receipt.mir_archive_sha256 -cne ('d'*64)){throw 'lost exact refusal facts'}
+            & $write
+            if([Convert]::ToBase64String([IO.File]::ReadAllBytes($path)) -cne [Convert]::ToBase64String($bytes) -or -not$failure.Exception.Data.Contains('admission_receipt_failure')){throw 'existing receipt was overwritten'}
+            if($failure.Exception.Message -cne '[mir441-resource-admission-memory]' -or $failure.Exception.Data['mir441_resource_admission'].snapshot.memory.free_bytes -ne 13GB){throw 'original admission exception changed'}
+          }
+          $output=Join-Path $env:MIR_TEST_WORK 'oversize';$null=New-Item -ItemType Directory -Path $output
+          $record.resource_admission=@{unexpected=('x'*64KB)}
+          & $write
+          if(Test-Path -LiteralPath (Join-Path $output 'session-admission-refusal.json')){throw 'oversize receipt written'}
+          $record.resource_admission=$null
+          & $write
+          if(Test-Path -LiteralPath (Join-Path $output 'session-admission-refusal.json')){throw 'non-admission error gained receipt'}
+          $resources=@{runs=[Collections.Generic.List[object]]::new()}
+          & $write
+          if($script:fullWrites -ne 1){throw 'admitted context lost its original result writer'}
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-mp-refusal-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_library_session_memory_calibration_keeps_the_generic_ceiling(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
