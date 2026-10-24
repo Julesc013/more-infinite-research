@@ -49,6 +49,14 @@ local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 -- open view. The small issued-request ledger lives in the Library state so a
 -- future Factorio callback can still release its bounded slot after a save.
 local translation_caches = {}
+local declaration_cache
+
+-- Authored metadata is immutable within a loaded configuration. Build its
+-- private copy only for actual UI use; force/research/cap facts stay live.
+local function authored_declarations()
+  if declaration_cache == nil then declaration_cache = catalogue.declared() end
+  return declaration_cache
+end
 
 M.translation_maintenance_ticks = TRANSLATION_MAINTENANCE_TICKS
 
@@ -125,7 +133,7 @@ local SORT_INDEX = {
 -- catalogue; a force's native technologies never create GUI selectors.
 local function family_values()
   local values, known = {"mir", "all", "external"}, {mir = true, all = true, external = true}
-  local ok, declared = pcall(catalogue.declared)
+  local ok, declared = pcall(authored_declarations)
   if not ok or type(declared) ~= "table" or #declared > MAX_FAMILY_DESCRIPTORS then return values, known end
   local extras = {}
   for index = 1, #declared do
@@ -166,7 +174,7 @@ end
 
 local function family_items(values, player)
   local native_names = {}
-  for _, row in ipairs(catalogue.declared()) do
+  for _, row in ipairs(authored_declarations()) do
     local family = type(row) == "table" and technology_id(row.family) or nil
     if family and native_names[family] == nil then
       local ok, name = pcall(function()
@@ -386,7 +394,7 @@ end
 -- in this force. All/external views scan the caller's current native force
 -- once per family/scope change and keep a bounded deterministic request order.
 local function ordered_translation_ids(player, family)
-  local ok, declared = pcall(catalogue.declared)
+  local ok, declared = pcall(authored_declarations)
   if not ok or type(declared) ~= "table" then return nil end
   local force = player and player.force
   local technologies = force and force.technologies
@@ -738,14 +746,14 @@ local function dispatch_translations(player, record)
 end
 
 local function rows_for(player, view, context, labels)
-  local rows = library_model.rows(player.force, catalogue.declared(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  local rows = library_model.rows(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
   if type(rows) ~= "table" then return {} end
   return rows
 end
 
 local function selected_detail(player, view, context, labels)
   if not view.selected then return nil end
-  return library_model.detail(player.force, catalogue.declared(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
+  return library_model.detail(player.force, authored_declarations(), model_view(view), labels or EMPTY_TRANSLATIONS, context)
 end
 
 local function set_shortcut(player, toggled)
@@ -1742,6 +1750,7 @@ end
 -- visits every saved player record (O(P)); it deliberately does not truncate
 -- migration candidates.
 function M.on_configuration_changed()
+  declaration_cache = nil
   local legacy = legacy_browser_state()
   local legacy_players = legacy and legacy.players
   if type(legacy_players) == "table" then
