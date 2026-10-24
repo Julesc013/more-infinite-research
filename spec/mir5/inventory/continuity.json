@@ -523,7 +523,7 @@
             "tools/mir5/package.py",
             "tests/mir5/test_package.py"
           ],
-          "scope": "Temporary-Git F200 staged/canonical layouts with equivalent source and target records produce identical player member hashes and ZIP bytes; unsafe and dirty selected records reject before output. This is not the actual all-nine-target cutover or native qualification."
+          "scope": "Temporary-Git staged/canonical layouts of the complete current player tree produce identical member hashes and ZIP bytes for all nine editions, preserving codec, exact patch floors, adapters, exclusions and migration filenames. Unsafe and dirty selected records reject before output. This is not the actual reviewed repository cutover or final-layout native qualification."
         }
       ],
       "test_subjects": [
@@ -599,6 +599,34 @@
             "spec/programmes/community-requests.json"
           ],
           "scope": "SCI-UNLOCK-01 and SCI-RESEARCH-01 remain distinct retained IDs; representative evidence does not close either reporter-specific request."
+        },
+        {
+          "id": "original-request-current-route-links",
+          "source": [
+            "spec/programmes/community-requests.json",
+            "source/mir5/research/catalogue.lua",
+            "source/mir5/research/k2_materials.lua",
+            "source/mir5/research/k2_imersite.lua",
+            "source/mir5/research/bob_angel_materials.lua",
+            "source/mir5/presentation/library_model.lua",
+            "source/mir5/runtime/library.lua"
+          ],
+          "routes": [
+            {"request_id": "K2-01", "route": "Exact K2SO science policy only; not all K2 installations"},
+            {"request_id": "K2-02", "route": "research_material_rare_metals"},
+            {"request_id": "K2-03", "route": "research_material_imersite"},
+            {"request_id": "K2-04", "route": "research_material_silicon"},
+            {"request_id": "K2-05", "route": "research_material_glass"},
+            {"request_id": "BA-01", "route": "research_material_aluminium"},
+            {"request_id": "BA-02", "route": "research_material_gold"},
+            {"request_id": "BA-07", "route": "research_material_tin"},
+            {"request_id": "BA-08", "route": "research_material_titanium"},
+            {"request_id": "BA-09", "route": "research_material_copper_tungsten"},
+            {"request_id": "UI-01", "route": "Per-player finite/infinite presentation filter"},
+            {"request_id": "UI-02", "route": "Per-player finite/infinite presentation filter"},
+            {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"}
+          ],
+          "scope": "Reconciliation links retain original request IDs and do not change their decisions or qualification status. ECO-PY remains unadmitted without exact native bindings; armor has no original dedicated request ID. ATAN/provider contracts have no matching original request ID. No new IDs or automatic-preview delivery are invented; other retained historical material obligations remain open."
         }
       ],
       "test_subjects": [

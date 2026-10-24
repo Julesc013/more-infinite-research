@@ -153,28 +153,33 @@ class PackageTests(unittest.TestCase):
                 staged_repository, Path("source/mir5"), Path("targets/mir5/editions.json"))
             canonical_commit = self._write_layout_repository(
                 canonical_repository, Path("source"), Path("targets/editions.json"))
-            staged = pack.build(
-                staged_repository / "source/mir5",
-                staged_repository / "out/more-infinite-research_5.0.20000.zip",
-                revision=staged_commit, target="f200", target_record="targets/mir5/editions.json")
-            canonical = pack.build(
-                canonical_repository / "source",
-                canonical_repository / "out/more-infinite-research_5.0.20000.zip",
-                revision=canonical_commit, target="f200", target_record="targets/editions.json")
-            self.assertEqual(staged["target_record"], "targets/mir5/editions.json")
-            self.assertEqual(canonical["target_record"], "targets/editions.json")
-            self.assertEqual(staged["edition_record_sha256"], canonical["edition_record_sha256"])
-            self.assertEqual(staged["members"], canonical["members"])
-            self.assertEqual(staged["sha256"], canonical["sha256"])
-            self.assertEqual(staged["version"], "5.0.20000")
-            with zipfile.ZipFile(canonical["archive"]) as archive:
-                info = json.loads(archive.read("more-infinite-research_5.0.20000/info.json"))
-                target = archive.read("more-infinite-research_5.0.20000/platform/target.lua")
-                names = archive.namelist()
-            self.assertEqual(info["factorio_version"], "2.0")
-            self.assertEqual(info["dependencies"][0], "base >= 2.0.77")
-            self.assertIn(b'id = "f200"', target)
-            self.assertFalse(any("/tools/" in name or "/tests/" in name for name in names))
+            editions = json.loads((ROOT / pack.TARGET_RECORD).read_bytes())["targets"]
+            self.assertEqual(set(editions), {"f013", "f014", "f015", "f016", "f017", "f100", "f110", "f200", "f210"})
+            for target_id, edition in editions.items():
+                with self.subTest(target=target_id):
+                    version = "5.0." + target_id[1:] + "00"
+                    member_root = "more-infinite-research_" + version
+                    filename = member_root + ".zip"
+                    staged = pack.build(
+                        staged_repository / "source/mir5", staged_repository / "out" / filename,
+                        revision=staged_commit, target=target_id, target_record="targets/mir5/editions.json")
+                    canonical = pack.build(
+                        canonical_repository / "source", canonical_repository / "out" / filename,
+                        revision=canonical_commit, target=target_id, target_record="targets/editions.json")
+                    self.assertEqual(staged["target_record"], "targets/mir5/editions.json")
+                    self.assertEqual(canonical["target_record"], "targets/editions.json")
+                    self.assertEqual(staged["edition_record_sha256"], canonical["edition_record_sha256"])
+                    self.assertEqual(staged["members"], canonical["members"])
+                    self.assertEqual(staged["sha256"], canonical["sha256"])
+                    self.assertEqual(staged["version"], version)
+                    with zipfile.ZipFile(canonical["archive"]) as archive:
+                        info = json.loads(archive.read(member_root + "/info.json"))
+                        target = archive.read(member_root + "/platform/target.lua")
+                        names = archive.namelist()
+                    self.assertEqual(info["factorio_version"], edition["factorio_version"])
+                    self.assertEqual(info["dependencies"][0], "base >= " + edition["minimum_base"])
+                    self.assertIn(('id = "' + target_id + '"').encode(), target)
+                    self.assertFalse(any("/tools/" in name or "/tests/" in name for name in names))
 
     def test_target_record_path_refuses_external_or_ambiguous_repository_inputs(self):
         with tempfile.TemporaryDirectory() as temporary:
