@@ -406,6 +406,20 @@
       ],
       "feature_group": "research-browser",
       "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua"
+        ],
+        "evidence": [
+          "spec/evidence/library-multiplayer-current-chain.json",
+          "spec/evidence/library-multiplayer-availability-native-chain.json"
+        ],
+        "limitations": [
+          "Native Library evidence is recorded at its original identity; final-package qualification remains open."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -442,6 +456,20 @@
       ],
       "feature_group": "research-browser",
       "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua"
+        ],
+        "evidence": [
+          "spec/evidence/library-multiplayer-current-chain.json",
+          "spec/evidence/library-multiplayer-availability-native-chain.json"
+        ],
+        "limitations": [
+          "Native Library evidence is recorded at its original identity; final-package qualification remains open."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -479,6 +507,20 @@
       ],
       "feature_group": "research-browser",
       "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua"
+        ],
+        "evidence": [
+          "spec/evidence/library-multiplayer-current-chain.json",
+          "spec/evidence/library-multiplayer-availability-native-chain.json"
+        ],
+        "limitations": [
+          "Native Library evidence is recorded at its original identity; final-package qualification remains open."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -516,6 +558,20 @@
       ],
       "feature_group": "research-browser",
       "status": "implemented-browser-reopened-by-player-usability-and-performance-findings",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/presentation/library_model.lua",
+          "source/runtime/library.lua"
+        ],
+        "evidence": [
+          "spec/evidence/library-multiplayer-current-chain.json",
+          "spec/evidence/library-multiplayer-availability-native-chain.json"
+        ],
+        "limitations": [
+          "Native Library evidence is recorded at its original identity; final-package qualification remains open."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/browser-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/browser-2.0.json"
@@ -1102,6 +1158,20 @@
       ],
       "feature_group": "REPAIR-02",
       "status": "implemented-passive-repair-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/runtime/bootstrap.lua",
+          "source/runtime/passive_repair.lua"
+        ],
+        "evidence": [
+          "spec/evidence/repair-stress-native-chain.json",
+          "spec/evidence/settings-repair-chain.json"
+        ],
+        "limitations": [
+          "The bounded F200 repair observation is not multiplayer, removal/readdition, large-scale scheduling or final-package qualification."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/community-2026-09-06/optional-2.1.json",
         "spec/programmes/evidence/community-2026-09-06/optional-2.0.json",
@@ -1417,6 +1487,20 @@
       ],
       "feature_group": "science-policy",
       "status": "existing-source-fix-with-open-current-environment-and-affected-save-proof",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/science.lua",
+          "source/compatibility/science_bindings.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/evidence/science-k2so-f210-native.json"
+        ],
+        "limitations": [
+          "This is the exact K2SO science-phase policy, not a route for arbitrary K2 closures; final-package qualification remains open."
+        ]
+      },
       "qualification": [
         "spec/programmes/evidence/synthesis-2026-09-06/science-modules.json",
         "spec/programmes/evidence/synthesis-2026-09-06/k2-science-reloads.json"
@@ -1478,6 +1562,20 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/k2_materials.lua",
+          "source/compatibility/material_catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/evidence/k2so-material-native-comparison.json"
+        ],
+        "limitations": [
+          "Finite research_material_rare_metals route only; not an arbitrary-K2, upgrade or final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out-locked-and-current",
@@ -1564,6 +1662,20 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/k2_imersite.lua",
+          "source/research/modern.lua",
+          "source/runtime/k2_imersite_migration.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json"
+        ],
+        "limitations": [
+          "The named carrier route is limited to captured K2SO; migration/removal-readdition/final-package qualification remains open."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out",
@@ -1660,6 +1772,20 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/k2_materials.lua",
+          "source/compatibility/material_catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/evidence/k2so-material-native-comparison.json"
+        ],
+        "limitations": [
+          "Finite research_material_silicon route only; not an arbitrary-K2, upgrade or final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out-locked-and-current",
@@ -1744,6 +1870,20 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/k2_materials.lua",
+          "source/compatibility/material_catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/evidence/k2so-material-native-comparison.json"
+        ],
+        "limitations": [
+          "Finite research_material_glass route only; not an arbitrary-K2, upgrade or final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out-locked-and-current",
@@ -1828,6 +1968,20 @@
       ],
       "feature_group": "material-families",
       "status": "withheld-with-exact-environment-evidence",
+      "mir5_route_disposition": {
+        "state": "withheld-current-k2so-closure",
+        "current_source": [
+          "source/research/k2_materials.lua",
+          "source/compatibility/material_catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/inventory/k2so-material-facts.json"
+        ],
+        "limitations": [
+          "No black tile plate family is admitted by the exact current K2SO material list; do not infer a route from another K2 installation."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out-locked-and-current",
@@ -1909,6 +2063,20 @@
       ],
       "feature_group": "material-families",
       "status": "withheld-with-exact-environment-evidence",
+      "mir5_route_disposition": {
+        "state": "withheld-current-k2so-closure",
+        "current_source": [
+          "source/research/k2_materials.lua",
+          "source/compatibility/material_catalogue.lua"
+        ],
+        "evidence": [
+          "spec/evidence/k2so-material-native-chain.json",
+          "spec/inventory/k2so-material-facts.json"
+        ],
+        "limitations": [
+          "No white tile plate family is admitted by the exact current K2SO material list; do not infer a route from another K2 installation."
+        ]
+      },
       "qualification": [
         {
           "scenario": "krastorio2-spaced-out-locked-and-current",
@@ -1992,6 +2160,19 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_angel_materials.lua",
+          "source/compatibility/bob_angel_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-angel-materials-lab-native-chain.json"
+        ],
+        "limitations": [
+          "Family: research_material_aluminium. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2080,6 +2261,19 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_angel_materials.lua",
+          "source/compatibility/bob_angel_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-angel-materials-lab-native-chain.json"
+        ],
+        "limitations": [
+          "Family: research_material_gold. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2175,6 +2369,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_lead. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2264,6 +2473,21 @@
       ],
       "feature_group": "material-families",
       "status": "withheld-with-exact-environment-evidence",
+      "mir5_route_disposition": {
+        "state": "withheld-in-all-three-admitted-bob-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_nickel. All three captured F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures retain finite absence dispositions; no current emitted route is admitted.",
+          "This does not amend the original request decision/status or revive a retired compiler route."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2352,6 +2576,20 @@
       ],
       "feature_group": "material-families",
       "status": "withheld-with-exact-environment-evidence",
+      "mir5_route_disposition": {
+        "state": "withheld-in-captured-f200-and-f210-bob-core-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_platinum. The F200 Bob/Angel and F210 no-Angel Bob-core captures retain finite absences; the BobTech capture has no platinum material route to map.",
+          "No current emitted route is admitted and original request data is unchanged."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2447,6 +2685,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "withheld-in-all-three-admitted-bob-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_silver. All three captured F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures retain finite absence dispositions; no current emitted route is admitted.",
+          "This does not amend the original request decision/status or revive a retired compiler route."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2542,6 +2795,28 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_angel_materials.lua",
+          "source/compatibility/bob_angel_materials.lua",
+          "source/research/bob_tech_materials.lua",
+          "source/compatibility/bob_tech_materials.lua",
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-angel-materials-lab-native-chain.json",
+          "spec/evidence/bob-tech-f210-pre-mir-default-diagnosis.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_tin. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2630,6 +2905,19 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_angel_materials.lua",
+          "source/compatibility/bob_angel_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-angel-materials-lab-native-chain.json"
+        ],
+        "limitations": [
+          "Family: research_material_titanium. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2718,6 +3006,24 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_angel_materials.lua",
+          "source/compatibility/bob_angel_materials.lua",
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-angel-materials-lab-native-chain.json",
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_copper_tungsten. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2806,6 +3112,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "withheld-in-all-three-admitted-bob-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_zinc. All three captured F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures retain finite absence dispositions; no current emitted route is admitted.",
+          "This does not amend the original request decision/status or revive a retired compiler route."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2894,6 +3215,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_bronze. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -2982,6 +3318,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "withheld-in-all-three-admitted-bob-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_brass. All three captured F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures retain finite absence dispositions; no current emitted route is admitted.",
+          "This does not amend the original request decision/status or revive a retired compiler route."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -3070,6 +3421,25 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_tech_materials.lua",
+          "source/compatibility/bob_tech_materials.lua",
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-tech-f210-pre-mir-default-diagnosis.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_gunmetal. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -3158,6 +3528,25 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_tech_materials.lua",
+          "source/compatibility/bob_tech_materials.lua",
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-tech-f210-pre-mir-default-diagnosis.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_invar. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -3246,6 +3635,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "withheld-in-all-three-admitted-bob-closures",
+        "current_source": [
+          "source/presentation/availability.lua"
+        ],
+        "evidence": [
+          "tests/fixtures/bob-angel-f200-captured-facts.json",
+          "tests/fixtures/bob-tech-f210-captured-facts.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_cobalt_steel. All three captured F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures retain finite absence dispositions; no current emitted route is admitted.",
+          "This does not amend the original request decision/status or revive a retired compiler route."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -3334,6 +3738,21 @@
       ],
       "feature_group": "material-families",
       "status": "implemented-finite-routes-with-open-qualification",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/research/bob_core_materials.lua",
+          "source/compatibility/bob_core_materials.lua"
+        ],
+        "evidence": [
+          "spec/evidence/bob-core-f210-reference-native-chain.json",
+          "spec/evidence/bob-core-f210-candidate-native-chain.json",
+          "tests/fixtures/bob-core-f210-captured-facts.json"
+        ],
+        "limitations": [
+          "Family: research_material_nitinol. The finite route is tied to the named captured closure; historical/native reference evidence is not final-package qualification."
+        ]
+      },
       "qualification": [
         {
           "scenario": "bob-core-suite",
@@ -3472,6 +3891,22 @@
       ],
       "feature_group": "ecosystem-admission",
       "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped",
+        "current_source": [
+          "source/compatibility/modern_catalogue/py.lua",
+          "source/compatibility/py_materials.lua",
+          "source/research/py_materials.lua",
+          "source/compatibility/native_modded_continuations.lua"
+        ],
+        "evidence": [
+          "spec/evidence/integration-reference-native-chain.json",
+          "spec/evidence/armor-py-candidate-native-chain.json"
+        ],
+        "limitations": [
+          "Only named F200 PyCoal and PyAlienLife/HighTech routes are mapped; historical inputs/candidate data capture do not qualify physical, save/migration, arbitrary-Py or final packages."
+        ]
+      },
       "qualification": []
     },
     {
@@ -3909,6 +4344,20 @@
       "source_ids": ["P6"],
       "feature_group": "startup-asset-availability",
       "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "implemented-source-mapped-with-host-evidence",
+        "current_source": [
+          "source/data.lua",
+          "source/presentation/shortcut.lua"
+        ],
+        "evidence": [
+          "tests/test_library.py",
+          "tests/test_bootstrap.py"
+        ],
+        "limitations": [
+          "The current route selects a Base icon unless Space Age is active, so it does not reference unavailable Space Age artwork. The host controls cover only that data-stage constructor and emitted shortcut identity; saved/imported opt-ins, Elevated Rails technology layers, graphical-client startup, upgrade and final-package qualification remain open."
+        ]
+      },
       "qualification": []
     },
     {
@@ -3937,6 +4386,19 @@
       ],
       "feature_group": "science-integration-regressions",
       "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "representative-observed-not-reporter-qualified",
+        "current_source": [
+          "source/research/science.lua",
+          "source/api/v1/data.lua"
+        ],
+        "evidence": [
+          "spec/evidence/api-canonical-native-chain.json"
+        ],
+        "limitations": [
+          "Run 40096782298 observes a representative ambiguous automation-science unlock plus an explicit space-science API declaration. It is not the reporter profile, does not establish either reported root cause and does not qualify startup, progression, upgrade or reload for the original report."
+        ]
+      },
       "qualification": [],
       "reported_evidence": {
         "basis": "Maintainer-pasted community thread titled Crash after update, received 2026-10-23; relative comment ages retained as relative, not converted to dates. Original thread URL was not supplied.",
@@ -4000,6 +4462,19 @@
       "source_ids": ["P-SCI-OWNER-2026-10-23"],
       "feature_group": "science-and-native-owner-regressions",
       "status": "requested-not-qualified",
+      "mir5_route_disposition": {
+        "state": "representative-observed-not-reporter-qualified",
+        "current_source": [
+          "source/research/science.lua",
+          "source/api/v1/data.lua"
+        ],
+        "evidence": [
+          "spec/evidence/api-canonical-native-chain.json"
+        ],
+        "limitations": [
+          "Run 40096782298 is a representative science-admission observation only. It does not instantiate Space-Lab-Research-61, its provider, effect owner, foreign research state or protected save, so it cannot qualify the original report."
+        ]
+      },
       "qualification": [],
       "reported_evidence": {
         "basis": "Maintainer pasted Error loading mod by Tr1ckY_Fate on 2026-10-23; relative age 10 minutes retained without converting to an event timestamp. Maintainer described continuing 4.7 errors; the pasted trace does not itself state an exact MIR or engine version.",

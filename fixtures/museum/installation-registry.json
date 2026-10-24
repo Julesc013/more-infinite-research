@@ -1,8 +1,0 @@
-{
-  "schema": 1,
-  "installations": {
-    "factorio-0.12.35": {
-      "root": "synthetic-installation"
-    }
-  }
-}

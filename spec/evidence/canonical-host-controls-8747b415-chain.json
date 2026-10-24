@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "kind": "MIR5CanonicalHostControlsChainV1",
+  "status": "passed",
+  "source_commit": "8747b4158098ade06aa6d22b26aa0e65c115abf5",
+  "source_tree": "6a93d73c6c8f29cf43237cf6c40f6d161bc385fe",
+  "player_source_tree": "0d70fa44b95475f4819ddbe4ed40374d965fb9d7",
+  "plan_before_execution": true,
+  "clean_tracked_checkout_before_and_after": true,
+  "host_commands": 89,
+  "started_utc": "2026-10-24T12:47:51.3096550Z",
+  "finished_utc": "2026-10-24T12:50:34.2713343Z",
+  "host_log_sha256": "38EB47B94B08DD3738A455C087720E3644940A3D758209749ABE73259F037665",
+  "hosted_checks": {
+    "run_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/40095356064",
+    "branch_policy_run_url": "https://github.com/Julesc013/more-infinite-research/actions/runs/40095356059",
+    "status": "all-four-checks-passed"
+  },
+  "raw_receipt": {
+    "path": "spec/evidence/canonical-host-controls-8747b415.json.gz",
+    "sha256": "754646CCCA7929F307CB880EF332D6D62A17B106DC9EEA79835D16C1669B0D28",
+    "bytes": 110007,
+    "uncompressed_sha256": "C2D38A19F1D36C5AF4CC444E4B61FBB65A8C6DAB172589C89532786DECBA2444",
+    "uncompressed_bytes": 487190,
+    "files": 89
+  },
+  "prior_observations": [
+    {
+      "source_commit": "1db645c68021838c9709913c2e204e4541722845",
+      "status": "failed-clean-at-command-10",
+      "log_sha256": "424F7BF1A05DA39959251C09AD2CFD93DE5C6D8AB2B8D1CFD062A1109C0F7B85",
+      "cause": "Bob/Angel full catalogue settings oracle still required the historical absent growth maximum. Existing independently predeclared r03 intent authorizes only maximum_value=1000 for its 121 named settings; test-only 8747b415 binds this disposition and preserves all other fields."
+    },
+    {
+      "source_commit": "1db645c68021838c9709913c2e204e4541722845",
+      "status": "diagnostic-only-not-qualification",
+      "controls": 80,
+      "harness_override_sha256": "F919F780E77896F80D4F3CBF8F3E0EFC90ECE228E31423F047B6A7343EA6154E",
+      "scope": "Commands10 through89 with an uncommitted test-only r03 oracle repair; source product bytes unchanged. Complete clean874 run supersedes diagnostic coverage without relabelling it."
+    }
+  ],
+  "optional_skip_lines": [
+    "test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present (__main__.AutomaticFamilyNonEmissionTests.test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present) ... skipped 'developer-custody raw captures are optional; portable facts remain checked'",
+    "test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present (__main__.FixedCompetingReferenceTests.test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present) ... skipped 'archive source verification requires --archive-library'"
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "limits": [
+    "Host checks only. Native API, BobTech, Library/client, save and performance acceptance remain separately required.",
+    "Player source bytes equal the separately built 1db645c6 nine-edition freeze; this observation does not relabel any older native run or grant final package acceptance.",
+    "Earlier canonical six-suite native-tooling controls remain under their own ddc091e7 observation; the current hosted native-tooling job also passed."
+  ]
+}

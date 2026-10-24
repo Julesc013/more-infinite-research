@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobTechF210GameplayNativeChainV1",
+  "status": "real-labs-save-two-cold-reloads-passed",
+  "source_commit": "75a5ad09e6216dba930189e5b8a37458b2ab66d1",
+  "controller_commit": "7d42246d7d7efa60aa36d3759ddf1675ee6c2942",
+  "run": 40097995231,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40097995231",
+  "engine": {
+    "path": "D:\\Games\\Steam\\steamapps\\common\\Factorio\\bin\\x64\\factorio.exe",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "file_version": "2.1.23.87750",
+    "product_version": "2.1.23",
+    "base_version": "2.1.23"
+  },
+  "player_sha256": "41AAE166911121CB7AD57BC53F04451B85B02229DF06518EC18E31FBDFCD1DBB",
+  "player_bytes": 546160,
+  "profile": "tests/profiles/bob-tech-f210-2123.json",
+  "profile_sha256": "A7CF3B7206FCC34BC5615B396E97B0AB001E67723DB8A01271F3829E9096D844",
+  "artifact_id": 12561806030,
+  "github_artifact_digest": "sha256:b8c82e8e61aca3d3bf36116c6f00cb86f1a426e3bd0de84e7d36dccd5173140a",
+  "manifest_sha256": "5BEB1B6A2F3DF23A7578359F913447073A9862A32F195FF0E25064A613692C20",
+  "verified_members": 34,
+  "native_result_sha256": "3B5592ABA6E552CF8EFEEE05184114012A08A57D258CC6762F05D852B60B7621",
+  "witnesses": {
+    "profile": "f210-bobtech-angel-smelting",
+    "selected_families": 3,
+    "named_technologies": 5,
+    "actual_lab_completions": 11,
+    "finite_levels_completed_by_lab": 9,
+    "continuation_levels_completed_by_lab": 2,
+    "science_consumed": {
+      "automation-science-pack": 11,
+      "logistic-science-pack": 8,
+      "space-science-pack": 2
+    },
+    "native_recipe_productivity": {
+      "tin": 0.06,
+      "gunmetal": 0.08,
+      "invar": 0.08
+    },
+    "native_effect_per_completed_level": 0.02,
+    "fixture_accelerates_count_and_time": true,
+    "ordinary_tuning_qualified": false,
+    "source_shape_preflight_required": true,
+    "on_load_read_only": false,
+    "foreign_force_witness_not_claimed": true
+  },
+  "cold_reloads": 2,
+  "unchanged_save_sha256": "7F03E54C59B28721732778539BBBB06C6BD9F7A1680B4FF38BB421890BDB8319",
+  "direct_library_controls_restored": true,
+  "raw_receipt": {
+    "path": "spec/evidence/bob-tech-f210-gameplay-native-receipts.json.gz",
+    "sha256": "A1C0EDDE0E46DD90948F7CC904ACA2C6AF7037BE594D0F8C8C37C577DF2D8742",
+    "bytes": 63155,
+    "uncompressed_sha256": "08C15EC882D51B1E4D389C0574520FEF28AADC718A14EEB7F35F24A7F321632B",
+    "uncompressed_bytes": 295520,
+    "selected_files": 26
+  },
+  "adverse_runs_retained": [
+    {
+      "run": 40092626572,
+      "scope": "pre-engine wrong package source locator; no gameplay"
+    },
+    {
+      "run": 40092894226,
+      "scope": "native recipe optional-default guard rejected before fixture/labs/save"
+    },
+    {
+      "run": 40097069300,
+      "scope": "strict predeclared fixture rejected missing current authored continuation presentation before labs/save"
+    }
+  ],
+  "presentation_disposition": {
+    "predeclared_fixture_source": "39fe949400fc2573aed6038a234342c62904b515",
+    "product_fix_source": "75a5ad09e6216dba930189e5b8a37458b2ab66d1",
+    "continuations": [
+      "recipe-prod-research_material_gunmetal-4",
+      "recipe-prod-research_material_invar-4"
+    ],
+    "fields": {
+      "show_levels_info": false,
+      "visible_when_disabled": true
+    },
+    "independent_authority": "Existing current fixture contract plus archived generic finite-runtime-cap presentation policy. Original fixture and historical facts were not changed to pass.",
+    "historic_route_matched_raw_capture_available": false,
+    "unrelated_bob_core_capture_used_as_route_proof": false
+  },
+  "native_execution": true,
+  "release_qualification": false,
+  "limits": [
+    "Actual current authored three-family/five-technology BobTech+Angel contract only; the native fixture preflights shapes before reducing only lab unit count/time.",
+    "Ordinary workload tuning, physical alloy production, unknown modpacks, unrelated foreign-force witnesses and final-package release acceptance remain separate.",
+    "This result does not establish route-matched historical raw presentation equality; the separately considered BobCore/no-Angel capture is not BobTech evidence."
+  ]
+}

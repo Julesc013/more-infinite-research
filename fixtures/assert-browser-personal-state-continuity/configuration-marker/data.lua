@@ -1,1 +1,0 @@
--- Deliberately inert: expose the marker's exact identity in native load logs.
