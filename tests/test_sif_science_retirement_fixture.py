@@ -638,6 +638,24 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 candidate=json.loads((PROFILES/f'sif-science-retirement-mir5-{policy}-{target}-{suffix}.json').read_text());mods={row['name']:row['version']for row in candidate['mods']};self.assertEqual((target,meta['line'],meta['engine'],meta['engine_sha'],'Defaults'),(candidate['target'],candidate['factorio_line'],candidate['engine']['version'],candidate['engine']['sha256'],candidate['settings_mode']));expected_mods={'base':meta['engine'],'elevated-rails':meta['engine'],'quality':meta['engine'],'space-age':meta['engine'],'cr-commons':meta['commons'],'space-is-fake':meta['sif'],'more-infinite-research':meta['candidate'],f'mir-fixture-mir5-sif-science-retirement-{target}':'0.2.0',f'mir-fixture-mir5-sif-policy-{policy}-{target}':'0.1.0','mir-fixture-mir5-active-mods-observer':'0.1.0'};
                 if target=='f210':expected_mods.update({'recycler':meta['engine'],'cr-extras':meta['extras']})
                 self.assertEqual(expected_mods,mods);self.assertEqual(expected,candidate['archive_sha256']);self.assertIn('does not qualify saved-game upgrade persistence',candidate['scope'])
+    def test_upstream_f210_control_omits_mir_without_changing_dependency_inputs(self):
+        upstream=json.loads((PROFILES/'sif-upstream-f210-2123.json').read_text())
+        candidate=json.loads((PROFILES/'sif-science-retirement-mir5-configured-f210-2123.json').read_text())
+        meta=TARGETS['f210']
+        expected={name:meta['engine'] for name in ('base','elevated-rails','quality','recycler','space-age')}
+        expected.update({'cr-commons':meta['commons'],'cr-extras':meta['extras'],
+          'space-is-fake':meta['sif'],'mir-fixture-mir5-active-mods-observer':'0.1.0'})
+        self.assertEqual(expected,{row['name']:row['version'] for row in upstream['mods']})
+        self.assertEqual(len(expected),len(upstream['mods']))
+        self.assertTrue(all(row['enabled'] is True for row in upstream['mods']))
+        omitted={'more-infinite-research','mir-fixture-mir5-sif-science-retirement-f210',
+          'mir-fixture-mir5-sif-policy-configured-f210'}
+        self.assertEqual([row for row in candidate['mods'] if row['name'] not in omitted],upstream['mods'])
+        for key in ('target','factorio_line','engine','settings_mode','archive_sha256'):
+            self.assertEqual(candidate[key],upstream[key],key)
+        self.assertEqual('Defaults',upstream['settings_mode'])
+        self.assertEqual('f210',upstream['target'])
+
     def test_fixture_metadata_binds_exact_source_and_selector_closures(self):
         for target,meta in TARGETS.items():
             core_name=f'mir-fixture-mir5-sif-science-retirement-{target}'
