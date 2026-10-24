@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "mir5-bob-core-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "boblibrary",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobores",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "bobplates",
+      "version": "3.0.2",
+      "enabled": true
+    },
+    {
+      "name": "bobelectronics",
+      "version": "3.0.1",
+      "enabled": true
+    },
+    {
+      "name": "bobtech",
+      "version": "3.0.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "boblibrary_3.0.1.zip": "3DD83A195E120BAECC51A43B0B3EB965C0D419A09883F9DAA018B3921C12D51B",
+    "bobores_3.0.0.zip": "7F8E33E35F59BB3F2CD72E3AB2FED30D1C2AE9C117E3731324AC307D9965082B",
+    "bobplates_3.0.2.zip": "0C9A4910E2DCAA8DCABBE5BFFA67333F214EAB2EFD8C798D5EF84D90B691862D",
+    "bobelectronics_3.0.1.zip": "50C2718E38D507CF4D4ACA2DBFE3240997172309413397C9C70083BBAE6927BE",
+    "bobtech_3.0.0.zip": "397D979976316C3CE082D2AD29A046CCBAA147E412A0AEB727230BDECF665E5B",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "source_selection": {
+    "path": "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json",
+    "sha256": "5ABF93B0727247FA81C88628DAA1A436A53C7A442F0DAECD32DAA2980203B4C7",
+    "scope": "Only the five verified Bob archive identities and current engine/official-mod selection are reused. Angel archives and qualification fixtures are absent; no prior native qualification transfers."
+  },
+  "historical_obligations": [
+    "spec/programmes/evidence/community-2026-09-06/outcomes.json",
+    "fixtures/assert-a06-bob-lead-qualification/qualification-dossier.json",
+    "fixtures/assert-a06-bob-ordinary-alloys-qualification/qualification-dossier.json"
+  ],
+  "scope": "Fresh independent upstream and published4.7.2 data/settings references for the retained Bob-core-with-BobTech F210 material obligations. Not a MIR5 implementation or native result."
+}
