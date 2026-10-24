@@ -280,7 +280,40 @@ function Assert-Active {
   }
   Assert-NoFatal (Read-LiveText) 'live native logs'
 }
+function Test-LibraryInteger([object]$Value) {
+  return $Value -is [int] -or $Value -is [long]
+}
+function Assert-LibraryWitnessBoolean([object]$Witness, [string]$Field, [bool]$Expected, [string]$Stage) {
+  $property = $Witness.PSObject.Properties[$Field]
+  Assert-Session ($null -ne $property -and $property.Value -is [bool] -and $property.Value -eq $Expected) "$Stage Library witness $Field differs"
+}
+function Assert-LibraryWitnessInteger([object]$Witness, [string]$Field, [int]$Expected, [string]$Stage) {
+  $property = $Witness.PSObject.Properties[$Field]
+  Assert-Session ($null -ne $property -and (Test-LibraryInteger $property.Value) -and [int64]$property.Value -eq $Expected) "$Stage Library witness $Field differs"
+}
+function Assert-LibraryLiveRefresh([object]$Witness, [string]$Stage) {
+  $property = $Witness.PSObject.Properties['live_refresh']
+  Assert-Session ($null -ne $property -and $property.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
+  $live = $property.Value
+  Assert-LibraryWitnessInteger $live 'real_lab_completions' 2 $Stage
+  Assert-LibraryWitnessBoolean $live 'native_laboratory_completion_by_script' $false $Stage
+  $started = $live.PSObject.Properties['native_research_started_events']
+  Assert-Session ($null -ne $started -and (Test-LibraryInteger $started.Value) -and [int64]$started.Value -ge 2) "$Stage Library witness native_research_started_events differs"
+  $queue = @($live.queue_lengths_observed)
+  Assert-Session ($queue.Count -eq 3 -and (Test-LibraryInteger $queue[0]) -and [int64]$queue[0] -eq 2 -and (Test-LibraryInteger $queue[1]) -and [int64]$queue[1] -eq 1 -and (Test-LibraryInteger $queue[2]) -and [int64]$queue[2] -eq 0) "$Stage Library witness queue_lengths_observed differs"
+  Assert-LibraryWitnessInteger $live 'native_research_cancelled_events' 1 $Stage
+  Assert-LibraryWitnessInteger $live 'native_foreign_force_created_events' 1 $Stage
+  Assert-LibraryWitnessInteger $live 'gear_level' 3 $Stage
+  $productivity = $live.PSObject.Properties['gear_productivity']
+  Assert-Session ($null -ne $productivity -and $productivity.Value -is [double] -and [Math]::Abs([double]$productivity.Value - 0.2) -le 0.0000001) "$Stage Library witness gear_productivity differs"
+  Assert-LibraryWitnessInteger $live 'science_consumed_per_named_pack' 2 $Stage
+  Assert-LibraryWitnessBoolean $live 'fixture_accelerates_gear_count_and_time_only' $true $Stage
+  Assert-LibraryWitnessBoolean $live 'ordinary_tuning_qualified' $false $Stage
+  Assert-LibraryWitnessBoolean $live 'root_and_query_identity_preserved' $true $Stage
+  Assert-LibraryWitnessBoolean $live 'cross_force_view_state_preserved' $true $Stage
+}
 function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
+  Assert-Session ($Stage -cin @('ready','rejoin-ready','restart-ready','completed')) "unsupported stage: $Stage"
   $rows = [Collections.Generic.List[object]]::new()
   foreach ($match in [regex]::Matches($Text, ('\['+[regex]::Escape($markerPrefix)+'\] RESULT (\{[^\r\n]+\})'))) {
     try { $row = $match.Groups[1].Value | ConvertFrom-Json }
@@ -290,30 +323,42 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
   if ($rows.Count -eq 0) { return $null }
   Assert-Session ($rows.Count -eq 1 -and $rows[0].status -ceq 'passed') "stage witness differs: $Stage"
   $witness = $rows[0].witnesses
-  Assert-Session ($witness.actual_join_events -eq $ExpectedJoins) "$Stage witness join count differs"
-  Assert-Session ($witness.two_connected_clients_required -eq $true) "$Stage witness lacks native two-client checks"
   if($fixtureCase-ceq'library-multiplayer') {
-    Assert-Session ($witness.distinct_personal_query_and_selection -eq $true -and $witness.initial_native_snapshot_immutable -eq $true) "$Stage witness lacks native Library checks"
-    Assert-Session ($witness.base_version -ceq '2.0.77' -and $witness.mir_version -ceq '5.0.20000') "$Stage witness version differs"
-    $live=$witness.live_refresh
-    Assert-Session ($live.native_laboratory_completion_by_script -eq $false -and $live.science_consumed_per_named_pack -eq 2 -and
-      $live.fixture_accelerates_gear_count_and_time_only -eq $true -and $live.ordinary_tuning_qualified -eq $false -and
-      $live.root_and_query_identity_preserved -eq $true -and $live.cross_force_view_state_preserved -eq $true) "$Stage live Library contract differs"
+    Assert-LibraryWitnessInteger $witness 'actual_join_events' $ExpectedJoins $Stage
+    Assert-LibraryWitnessBoolean $witness 'two_connected_clients_required' $true $Stage
+    Assert-LibraryWitnessBoolean $witness 'distinct_personal_query_and_selection' $true $Stage
+    Assert-LibraryWitnessBoolean $witness 'initial_native_snapshot_immutable' $true $Stage
+    $base = $witness.PSObject.Properties['base_version']
+    $mir = $witness.PSObject.Properties['mir_version']
+    Assert-Session ($null -ne $base -and $base.Value -is [string] -and $base.Value -ceq '2.0.77' -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq '5.0.20000') "$Stage Library witness version differs"
+    $liveProperty = $witness.PSObject.Properties['live_refresh']
+    Assert-Session ($null -ne $liveProperty -and $liveProperty.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
+    $live = $liveProperty.Value
     if($Stage-ceq'ready') {
-      Assert-Session ($live.gear_level -eq 1 -and $live.gear_productivity -eq 0 -and $witness.screenshot_calls -eq 0) 'ready Library state differs'
+      Assert-LibraryWitnessBoolean $live 'native_laboratory_completion_by_script' $false $Stage
+      Assert-LibraryWitnessInteger $live 'science_consumed_per_named_pack' 2 $Stage
+      Assert-LibraryWitnessBoolean $live 'fixture_accelerates_gear_count_and_time_only' $true $Stage
+      Assert-LibraryWitnessBoolean $live 'ordinary_tuning_qualified' $false $Stage
+      Assert-LibraryWitnessBoolean $live 'root_and_query_identity_preserved' $true $Stage
+      Assert-LibraryWitnessBoolean $live 'cross_force_view_state_preserved' $true $Stage
+      Assert-LibraryWitnessInteger $live 'gear_level' 1 $Stage
+      $productivity = $live.PSObject.Properties['gear_productivity']
+      Assert-Session ($null -ne $productivity -and (Test-LibraryInteger $productivity.Value) -and [int64]$productivity.Value -eq 0) 'ready Library gear_productivity differs'
+      Assert-LibraryWitnessInteger $witness 'screenshot_calls' 0 $Stage
+      Assert-LibraryWitnessBoolean $witness 'availability_terminal_labels_checked' $false $Stage
     } else {
-      # Live refresh deliberately earns research. Preserve the initial snapshot
-      # while requiring the independently authored lab/queue/event outcomes.
-      Assert-Session ($live.real_lab_completions -eq 2 -and $live.native_research_started_events -eq 3 -and
-        $live.native_research_cancelled_events -eq 1 -and $live.native_foreign_force_created_events -eq 1 -and
-        (@($live.queue_lengths_observed)-join',') -ceq '2,1,0' -and $live.gear_level -eq 3 -and
-        [Math]::Abs([double]$live.gear_productivity-.2) -le .0000001) "$Stage native Library refresh outcomes differ"
-      Assert-Session ($witness.first_open -eq $true -and $witness.search -eq $true -and $witness.refresh -eq $true) "$Stage lacks Library measurement witnesses"
+      Assert-LibraryLiveRefresh $witness $Stage
+      Assert-LibraryWitnessBoolean $witness 'first_open' $true $Stage
+      Assert-LibraryWitnessBoolean $witness 'search' $true $Stage
+      Assert-LibraryWitnessBoolean $witness 'refresh' $true $Stage
       $captures=if($Stage-ceq'rejoin-ready'){4}elseif($Stage-ceq'restart-ready'){6}else{8}
-      Assert-Session ($witness.screenshot_calls -eq $captures -and $witness.availability_terminal_labels_checked -eq $true) "$Stage Library capture witnesses differ"
-      if($Stage-cne'rejoin-ready'){Assert-Session ($witness.reopen -eq $true) "$Stage lacks Library reopen witness"}
+      Assert-LibraryWitnessInteger $witness 'screenshot_calls' $captures $Stage
+      Assert-LibraryWitnessBoolean $witness 'availability_terminal_labels_checked' $true $Stage
+      if($Stage-cne'rejoin-ready'){Assert-LibraryWitnessBoolean $witness 'reopen' $true $Stage}
     }
   } else {
+    Assert-Session ($witness.actual_join_events -eq $ExpectedJoins) "$Stage witness join count differs"
+    Assert-Session ($witness.two_connected_clients_required -eq $true) "$Stage witness lacks native two-client checks"
     foreach($field in @('runtime_owned_state_checked','physical_rates_checked','foreign_offsets_preserved')) {
       $expected=$Stage-cne'ready'
       Assert-Session ($witness.PSObject.Properties[$field] -and $witness.$field -eq $expected) "$Stage witness lacks scripted-effects $field"
