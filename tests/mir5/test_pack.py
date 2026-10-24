@@ -112,6 +112,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/base.lua",
                 "compatibility/modern_catalogue/k2_base.lua",
                 "compatibility/modern_catalogue/bob_angel.lua",
+                "compatibility/modern_catalogue/bob_core.lua",
                 "compatibility/bob_angel_profile.lua",
                 "compatibility/bob_tech_profile.lua",
                 "compatibility/bob_core_profile.lua",
