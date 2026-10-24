@@ -419,6 +419,33 @@ class BobAngelMaterialTests(unittest.TestCase):
         unrelated = {**self.facts["required_mods"], "unrelated-observer": "0.1.0"}
         self.assertEqual(10, len(self.rows(mods=_lua_value(self.lua, unrelated))))
 
+    def test_explicit_native_default_caps_keep_the_same_rows_and_upstream_inputs(self):
+        raw = self.raw_fixture()
+        for family in self.facts["selected_families"]:
+            for route in family["routes"]:
+                self.assertEqual(route["maximum_productivity"], "omitted")
+                raw["recipe"][route["recipe"]]["maximum_productivity"] = 3
+        before = _plain(raw)
+        self.assertEqual(self.expected_rows, _plain(self.rows(raw=raw)))
+        self.assertEqual(before, _plain(raw), "admission rewrote an upstream recipe or owner")
+
+    def test_different_or_malformed_productivity_caps_remain_rejected(self):
+        for cap in (0, 2, 4, False, "3", math.nan, math.inf, -math.inf):
+            with self.subTest(cap=cap):
+                raw = self.raw_fixture()
+                recipe = raw["recipe"]["angels-plate-aluminium"]
+                recipe["maximum_productivity"] = cap
+                with self.assertRaisesRegex(Exception, "angels-plate-aluminium changed"):
+                    self.rows(raw=raw)
+                observed = recipe["maximum_productivity"]
+                if isinstance(cap, float) and math.isnan(cap):
+                    self.assertTrue(math.isnan(observed))
+                else:
+                    self.assertEqual(type(observed), type(cap))
+                    self.assertEqual(observed, cap)
+                for row in self.expected_rows:
+                    self.assertIsNone(raw["technology"][row["name"]])
+
     def test_named_preflight_rejects_drift_without_a_global_scan_or_write(self):
         poison = self.lua.eval(
             'function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end'
@@ -454,7 +481,7 @@ class BobAngelMaterialTests(unittest.TestCase):
             self.rows(raw=catalyst_result)
 
         productivity_cap = self.raw_fixture()
-        productivity_cap["recipe"]["angels-plate-aluminium"]["maximum_productivity"] = 3
+        productivity_cap["recipe"]["angels-plate-aluminium"]["maximum_productivity"] = 2
         with self.assertRaisesRegex(Exception, "angels-plate-aluminium changed"):
             self.rows(raw=productivity_cap)
 
