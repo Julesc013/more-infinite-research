@@ -327,9 +327,10 @@ local function measure(state, label, callback)
   profiler.restart()
   callback()
   profiler.stop()
-  -- LuaProfiler exposes only a rendered string.  The value is observational
-  -- evidence and does not select gameplay or state-machine behavior.
-  state.measurements[label] = tostring(profiler)
+  -- Only the engine's LocalisedString renderer exposes the measurement.
+  -- Keep profiler objects/output out of synchronized saved state and JSON.
+  log({"", "[MIR5_LIBRARY_PROFILE] ", label, " ", profiler})
+  state.measurements[label] = true
 end
 
 local function screenshot(state, stage, player)
@@ -353,6 +354,8 @@ local function marker(stage, state)
       search=state.measurements.search,
       refresh=state.measurements.refresh,
       reopen=state.measurements.reopen,
+      measurement_output="native-localised-profiler-log",
+      timing_values_stored=false,
       two_connected_clients_required=true,
       locales_required={"en", "de"},
       distinct_personal_query_and_selection=true,
