@@ -8,6 +8,9 @@ param(
   [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedMIRArchiveSha256,
   [Parameter(Mandatory)][string]$OutputRoot,
   [ValidateSet('library-multiplayer','scripted-effects-multiplayer')][string]$FixtureCase='library-multiplayer',
+  # The lower value is calibrated solely for the bounded F200 Library session.
+  # Other multiplayer fixtures retain the existing 8 GiB process-tree ceiling.
+  [ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -25,6 +28,7 @@ $profile=(Resolve-Path -LiteralPath $ProfilePath).Path
 $selection=Get-Content -LiteralPath $profile -Raw|ConvertFrom-Json -AsHashtable
 Assert-Session ($selection.target -ceq 'f200' -and $selection.engine.version -ceq '2.0.77') 'requires the exact F200 fixture'
 Assert-Session ((Get-FileHash -LiteralPath $engine).Hash -ceq $selection.engine.sha256) 'engine hash differs'
+Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $SessionExpectedPeakMemoryMiB -eq 8192) 'only the Library session may use the calibrated peak override'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
 & (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $FixtureSources -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -ActiveModsObserver 'mir-fixture-mir5-active-mods-observer' -CaseName $FixtureCase -OutputRoot $preparation -CreateOnly -ExpectedPeakMemoryMiB 4096 -TimeoutSeconds 180 -RepoRoot $repo | Out-Null
@@ -36,11 +40,11 @@ $activation=$null;$resources=$null;$failure=$null
 $record=[ordered]@{
   kind=$(if($FixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerNativeResultV1'}else{'MIR5ScriptedEffectsMultiplayerNativeResultV1'});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
-  preparation=$prepared;release_qualification=$false;visual_review=$false
+  preparation=$prepared;session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB;release_qualification=$false;visual_review=$false
   harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
-  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB 8192 -MaxNewOutputMiB 512 -UseExactOutputRoot
+  $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512 -UseExactOutputRoot
   $null=New-Item -ItemType Directory -Path $resources.root
   $serverWrite=Join-Path $resources.root 'server'
   $null=New-Item -ItemType Directory -Path $serverWrite
