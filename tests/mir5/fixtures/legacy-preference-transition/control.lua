@@ -13,6 +13,15 @@ local RECIPES = {"biter-egg", "fish-breeding", "pentapod-egg"}
 local CARRIER_POSITIVE = "mir-native-credit-research_breeding-fish-breeding-positive"
 local CARRIER_NEGATIVE = "mir-native-credit-research_breeding-fish-breeding-negative"
 local loaded_snapshot, reload_logged, pending_save = nil, false, false
+local PUBLISHED_STAGES = {
+  ["4.7.20002"] = {["0.1.0"]=false, ["0.1.1"]=true},
+  ["4.7.20003"] = {["0.1.2"]=false, ["0.1.3"]=true},
+}
+
+local function published_preference(mir, fixture)
+  local stages = PUBLISHED_STAGES[mir]
+  return stages and stages[fixture]
+end
 
 local function fail(message) error("[mir5-legacy-preference-transition] " .. message) end
 local function close(actual, expected)
@@ -34,10 +43,11 @@ local function mode()
   local mir, fixture = active["more-infinite-research"], active[FIXTURE]
   local preference = settings.startup["mir-prefer-this-mod-for-competing-techs"]
   if preference == nil or type(preference.value) ~= "boolean" then fail("competing preference setting differs") end
-  local published = mir == "4.7.20002" and (fixture == "0.1.0" or fixture == "0.1.1")
+  local expected = published_preference(mir, fixture)
+  local published = type(expected) == "boolean"
   local candidate = mir == "5.0.20000" and (fixture == "0.2.0" or fixture == "0.2.1")
   if not published and not candidate then fail("fixture/MIR version differs") end
-  local expected = (fixture == "0.1.1" or fixture == "0.2.1")
+  if candidate then expected = fixture == "0.2.1" end
   if preference.value ~= expected then fail("fixture preference stage differs") end
   return {published=published, mir=mir, fixture=fixture, preference=expected}
 end
@@ -150,8 +160,8 @@ local function assert_foreign(state)
   assert_queue(foreign, state.foreign_queue, "foreign")
 end
 local function assert_source(state)
-  if state.source_mir ~= "4.7.20002" or type(state.source_preference) ~= "boolean"
-      or state.fixture_version ~= (state.source_preference and "0.1.1" or "0.1.0")
+  if type(state.source_preference) ~= "boolean"
+      or published_preference(state.source_mir, state.fixture_version) ~= state.source_preference
       or state.actual_lab_completions ~= 2 or state.phase ~= "source-complete" then
     fail("published source witness differs")
   end
@@ -251,7 +261,7 @@ script.on_init(function()
   local foreign_row = tech(foreign, ROW)
   foreign_row.enabled, foreign_row.visible_when_disabled = false, false
   local state = {
-    source_mir="4.7.20002", fixture_version=current.fixture, source_preference=current.preference,
+    source_mir=current.mir, fixture_version=current.fixture, source_preference=current.preference,
     phase="await-source-lab", actual_lab_completions=0, actual_switch_labs=0, lab=lab,
     foreign_force=foreign.index, foreign_queue=snapshot_queue(foreign), deadline_tick=game.tick + DEADLINE,
   }
