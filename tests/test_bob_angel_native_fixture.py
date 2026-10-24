@@ -22,6 +22,9 @@ PROFILE_PATHS = {
     "effect1": ROOT / "tests/profiles/bob-angel-continuity-effect1-cap40-f200.json",
 }
 FIXTURE_NAME = "mir-fixture-mir5-bob-angel-continuity"
+DEFAULT_CAP = ROOT / "tests/fixtures/bob-angel-default-cap"
+DEFAULT_CAP_PROFILE = ROOT / "tests/profiles/bob-angel-default-cap-f200-2077.json"
+DEFAULT_CAP_NAME = "mir-fixture-mir5-bob-angel-default-cap"
 
 
 def plain(value, seen=None):
@@ -56,6 +59,170 @@ def lua_value(lua, value):
 
 
 class BobAngelNativeFixtureTests(unittest.TestCase):
+    def default_cap_cases(self):
+        return self.lua.execute("return assert(loadfile(...))()", (DEFAULT_CAP / "cases.lua").as_posix())
+
+    def default_cap_raw(self):
+        facts = json.loads((ROOT / "tests/fixtures/bob-angel-f200-captured-facts.json").read_bytes())
+        recipes = {route["recipe"]: {"enabled": False, "allow_productivity": True,
+                   "ingredients": deepcopy(route["ingredients"]), "results": deepcopy(route["results"])}
+                   for family in facts["selected_families"] for route in family["routes"]}
+        recipes["unrelated-recipe"] = {"maximum_productivity": 2, "keep": "foreign"}
+        return lua_value(self.lua, {"recipe": recipes, "technology": {
+            row["name"]: deepcopy(row) for row in self.candidate_rows}})
+
+    def run_default_cap_data(self, phase, raw, *, wrong_version=False):
+        self.lua.execute(r'''
+          function run_default_cap_data(path, raw, cases, wrong_version)
+            local mods={base="2.0.77",["more-infinite-research"]="5.0.20000",
+              ["mir-fixture-mir5-bob-angel-default-cap"]="0.1.0"}
+            if wrong_version then mods["more-infinite-research"]="4.7.20003" end
+            local env={mods=mods,data={raw=raw,extend=function()error("fixture published prototypes")end}}
+            env.require=function(name)
+              assert(name=="__mir-fixture-mir5-bob-angel-default-cap__/cases");return cases
+            end
+            setmetatable(env,{__index=_G})
+            local ok,message=pcall(function()assert(loadfile(path,"t",env))()end)
+            return {ok=ok,message=tostring(message)}
+          end
+        ''')
+        return self.lua.globals().run_default_cap_data(
+            (DEFAULT_CAP / phase).as_posix(), raw, self.default_cap_cases(), wrong_version)
+
+    def test_default_cap_startup_selection_preserves_exact_upstream_inputs(self):
+        profile = json.loads(DEFAULT_CAP_PROFILE.read_bytes())
+        base = json.loads(BASE_PROFILE.read_bytes())
+        info = json.loads((DEFAULT_CAP / "info.json").read_bytes())
+        self.assertEqual(profile["engine"], base["engine"])
+        self.assertEqual(profile["engine"]["version"], "2.0.77")
+        self.assertEqual(profile["archive_sha256"], base["archive_sha256"])
+        self.assertEqual(profile["mods"], base["mods"] + [
+            {"name": "more-infinite-research", "version": "5.0.20000", "enabled": True},
+            {"name": DEFAULT_CAP_NAME, "version": "0.1.0", "enabled": True}])
+        self.assertEqual(info["name"], DEFAULT_CAP_NAME)
+        self.assertEqual(info["version"], "0.1.0")
+        self.assertEqual(info["dependencies"], ["base = 2.0.77", "more-infinite-research = 5.0.20000"])
+        self.assertEqual(profile["fixture"]["root"], DEFAULT_CAP.relative_to(ROOT).as_posix())
+        self.assertEqual(set(profile["fixture"]["included_members"]),
+                         {p.relative_to(DEFAULT_CAP).as_posix() for p in DEFAULT_CAP.rglob("*") if p.is_file()})
+        facts = json.loads((ROOT / "tests/fixtures/bob-angel-f200-captured-facts.json").read_bytes())
+        self.assertEqual(plain(self.default_cap_cases()), [
+            {"key": family["key"], "recipes": [r["recipe"] for r in family["routes"]]}
+            for family in facts["selected_families"]])
+        self.assertEqual(profile["case"], "bob-angel-default-cap")
+        self.assertEqual(profile["consumer_markers"], ["MIR5_F200_DEFAULT_CAP"])
+
+    def test_default_cap_input_checks_the_complete_preimage_before_writing(self):
+        raw = self.default_cap_raw()
+        expected = plain(raw)
+        for recipe in expected["recipe"].values():
+            if recipe.get("keep") != "foreign":
+                recipe["maximum_productivity"] = 3
+        result = self.run_default_cap_data("data-updates.lua", raw)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(plain(raw), expected)
+        for opponent in ("missing-last", "cap-last", "version"):
+            with self.subTest(opponent=opponent):
+                raw = self.default_cap_raw()
+                if opponent == "missing-last": raw["recipe"]["angels-plate-titanium-2"] = None
+                if opponent == "cap-last": raw["recipe"]["angels-plate-titanium-2"]["maximum_productivity"] = 2
+                before = plain(raw)
+                result = self.run_default_cap_data("data-updates.lua", raw, wrong_version=opponent == "version")
+                self.assertFalse(result["ok"])
+                self.assertEqual(plain(raw), before)
+
+    def test_default_cap_final_observer_rejects_missing_rows_or_changed_effects_without_writes(self):
+        for opponent in (None, "cap", "missing-tail", "effect", "maximum", "version"):
+            with self.subTest(opponent=opponent):
+                raw = self.default_cap_raw()
+                self.assertTrue(self.run_default_cap_data("data-updates.lua", raw)["ok"])
+                tail = "recipe-prod-research_material_titanium-4"
+                if opponent == "cap": raw["recipe"]["angels-plate-titanium-2"]["maximum_productivity"] = 2
+                if opponent == "missing-tail": raw["technology"][tail] = None
+                if opponent == "effect": raw["technology"][tail]["effects"][1]["change"] = .03
+                if opponent == "maximum": raw["technology"][tail]["max_level"] = 150
+                before = plain(raw)
+                result = self.run_default_cap_data("data-final-fixes.lua", raw, wrong_version=opponent == "version")
+                self.assertEqual(result["ok"], opponent is None, result["message"])
+                self.assertEqual(plain(raw), before)
+
+    def test_default_cap_init_is_read_only_and_rejects_native_state_drift(self):
+        self.lua.execute(r'''
+          function run_default_cap_init(path, cases, force, wrong_version)
+            local function readonly(value)
+              if type(value)~="table" then return value end
+              return setmetatable({}, {
+                __index=function(_,key)return readonly(value[key])end,
+                __len=function()return #value end,
+                __newindex=function()error("native state write")end,
+                __pairs=function()error("whole native collection scan")end,
+              })
+            end
+            local active={base="2.0.77",["more-infinite-research"]="5.0.20000",
+              ["mir-fixture-mir5-bob-angel-default-cap"]="0.1.0"}
+            if wrong_version then active.base="2.0.78" end
+            local callback,payload,line,initialized
+            local script={active_mods=readonly(active)}
+            script.on_init=function(value)assert(callback==nil);callback=value end
+            setmetatable(script,{__index=function()error("unexpected event registration")end})
+            local env={script=script,helpers={table_to_json=function(value)payload=value;return "<fixture>"end},
+              log=function(value)assert(line==nil);line=value end}
+            env.require=function(name)
+              assert(not initialized,"late fixture import")
+              assert(name=="__mir-fixture-mir5-bob-angel-default-cap__/cases");return cases
+            end
+            setmetatable(env,{__index=function(_,key)
+              if key=="storage" or key=="global" then error("saved-state access") end
+              if key=="game" then error("parse-time game access") end
+              return _G[key]
+            end})
+            local parsed,message=pcall(function()assert(loadfile(path,"t",env))()end)
+            if not parsed then return {ok=false,phase="parse",message=tostring(message)} end
+            assert(type(callback)=="function")
+            env.game={forces={player=readonly(force)}};initialized=true
+            local ok,message=pcall(callback)
+            return {ok=ok,phase="init",message=tostring(message),payload=payload,line=line}
+          end
+        ''')
+        facts = json.loads((ROOT / "tests/fixtures/bob-angel-f200-captured-facts.json").read_bytes())
+        for opponent in (None, "version", "force", "missing-row", "level", "researched", "enabled",
+                         "maximum", "effect", "target", "bonus"):
+            with self.subTest(opponent=opponent):
+                force = {"valid": True, "technologies": {}, "recipes": {}}
+                for family in facts["selected_families"]:
+                    for recipe in family["routes"]:
+                        force["recipes"][recipe["recipe"]] = {"valid": True, "productivity_bonus": 0}
+                for row in self.candidate_rows:
+                    level = 4 if row["name"].endswith("-4") else 1
+                    effects = deepcopy(row["effects"])
+                    for effect in effects:
+                        effect["change"] = 0.019999999552965164
+                    force["technologies"][row["name"]] = {
+                        "name": row["name"], "valid": True, "level": level, "researched": False, "enabled": True,
+                        "prototype": {"max_level": 4294967295 if level == 4 else 3, "effects": effects}}
+                tail = "recipe-prod-research_material_titanium-4"
+                if opponent == "missing-row": del force["technologies"][tail]
+                if opponent == "level": force["technologies"][tail]["level"] = 5
+                if opponent == "researched": force["technologies"][tail]["researched"] = True
+                if opponent == "enabled": force["technologies"][tail]["enabled"] = False
+                if opponent == "maximum": force["technologies"][tail]["prototype"]["max_level"] = 150
+                if opponent == "effect": force["technologies"][tail]["prototype"]["effects"][0]["change"] = .03
+                if opponent == "target": force["technologies"][tail]["prototype"]["effects"][0]["recipe"] = "foreign"
+                if opponent == "bonus": force["recipes"]["angels-plate-titanium-2"]["productivity_bonus"] = .02
+                result = self.lua.globals().run_default_cap_init(
+                    (DEFAULT_CAP / "control.lua").as_posix(), self.default_cap_cases(),
+                    None if opponent == "force" else lua_value(self.lua, force), opponent == "version")
+                self.assertEqual(result["phase"], "init", result["message"])
+                self.assertEqual(result["ok"], opponent is None, result["message"])
+                if opponent is None:
+                    self.assertEqual(result["line"], "[MIR5_F200_DEFAULT_CAP] RESULT <fixture>")
+                    self.assertEqual(plain(result["payload"]), {
+                        "case": "bob-angel-default-cap", "stage": "init", "status": "passed",
+                        "qualification": "representative-native-default-cap-startup-only",
+                        "families": 5, "technologies": 10, "recipes": 10, "fresh_recipe_productivity_bonus": 0})
+                else:
+                    self.assertIsNone(result["payload"])
+
     @classmethod
     def setUpClass(cls):
         source = json.loads(ORACLE.read_text(encoding="utf-8"))
