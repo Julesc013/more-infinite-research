@@ -106,6 +106,32 @@
       "archive_sha256": "d48cc28ac0c70b12d105fe935d33dc95ef2b5f27149f735fca7ebbdf9177f0f4"
     }
   ],
+  "independent_aero_readback": {
+    "status": "passed-offline-package-reproduction-not-native-acceptance",
+    "source_commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+    "source_tree": "dfb15b6152fd2fc44d232ff9729e716e25699494",
+    "observed_dev_commit": "01dc178424a56dd4e745171458ab3edab1677ac0",
+    "observed_dev_source_tree_equal": true,
+    "controller_and_compression_runtime_equal": true,
+    "execution": "tools/release.py freeze from pinned source, including its internal exact rebuild verification; compare all nine archive names, sizes and hashes to this record",
+    "inventory_bytes_sha256": "58fcb8871ab3f3f8afe4b11b82e3404c98d2bcc79a67a0b247e98431fb4c2753",
+    "nine_archives_equal": true,
+    "actual_native_input_archive_readback": {
+      "run": 40110777151,
+      "artifact": 12566865788,
+      "verified_manifest_members": 31,
+      "artifact_manifest_sha256": "984143BC8DE186DB51300A124127772C006EFACC0463F5EBA44B37BDD4EDAF39",
+      "targets": ["f200", "f210"],
+      "archive_bytes_equal": true,
+      "scope": "Actual player input ZIPs only. The workflow remains failed before map creation; its F200 stage was not reached."
+    },
+    "primary_receipt": "build/mir5/aero-f522-assets-r01/receipt.json",
+    "primary_receipt_sha256": "55d1e502a2355e136f2111919c61c2f9a2bb713f2b64c0128c80505612482dfe",
+    "candidate_asset_custody": "C:/Projects/Factorio/mir5-freeze/aero-f5223e1f-r01",
+    "native_tests_run": false,
+    "published": false,
+    "scope": "Independent Aero reproduction of frozen Black Glass package bytes. No new engine, save, client, performance, final-source or release acceptance is claimed; final primary dist delivery remains pending."
+  },
   "limits": [
     "These are frozen development candidates; acceptance, final main/tag identity, publication and primary dist delivery remain pending.",
     "Earlier native executions and menu plan r09 retain their original exact package identities. No old result is relabelled as this freeze.",
