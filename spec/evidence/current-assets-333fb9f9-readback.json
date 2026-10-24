@@ -1,0 +1,152 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "nine-editions-rebuilt-byte-identical-not-native-acceptance",
+  "source": {
+    "commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "7fc2797401182ec8eb9bc6a797c9dfbec5cdcf23",
+    "tree": "c60e776e93e80417b4716356dc0f4a3e8be16d1f"
+  },
+  "accepted_dev": {
+    "commit": "b28ef8f165a81fd628bf96c09dbc9046158995b0",
+    "tree": "c60e776e93e80417b4716356dc0f4a3e8be16d1f",
+    "full_tree_equal": true,
+    "original_review_ancestry_preserved": true
+  },
+  "inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0",
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "commands": [
+    "python tools/release.py --source source --revision 333fb9f94d4e48d07455154e22129c5c765b7ef9 --output ../mir5-current-assets-333fb9f9-r01",
+    "python tools/release.py --source source --output ../mir5-current-assets-333fb9f9-r01 --verify"
+  ],
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 344830,
+      "archive_sha256": "6227454ffcb6e2d0e8c80b79cb9c81e37b1694d80e127671c9ee9d6d028997aa"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 344830,
+      "archive_sha256": "74c805d70c94ecc6103eb9cbd79188bc1f90dd82f75e644f99799f06f6094011"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 344790,
+      "archive_sha256": "3ddfd66aa3a957c903a8bad4d20577d29dc0a26a5b07d5a28386a991d32f13da"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 344781,
+      "archive_sha256": "7e742e5894e94c391f835c3362a3c0263a63d49ba5c987aead734510693f26e0"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 344670,
+      "archive_sha256": "d94106d8587275241776e003fbf10dcbaa57dad36bb6b0e9df7842859a32b27e"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 358462,
+      "archive_sha256": "71143eb2c6f26264bfa880e22449196e01e76fbed9ddd4d6727afabae06777d5"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 358459,
+      "archive_sha256": "ef1b69ced184376baf6b7fcaabe4f33b501e11d421676de4f740e2f972253813"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 547144,
+      "archive_sha256": "5b00ede316cdc139085ebf274e8cdf02cd96f8961242e2942a2a55f55c9bb76d"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 547680,
+      "archive_sha256": "36e4d9e6b315c3c747f168a9f0d350fd298522dc0c874612cb403d0d32e84ac6"
+    }
+  ],
+  "previous_freeze": {
+    "source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "readback": "spec/evidence/current-assets-19a65f53-readback.json",
+    "retained_unchanged": true
+  },
+  "changed_members_from_19a65f53": {
+    "f013": [],
+    "f014": [],
+    "f015": [],
+    "f016": [],
+    "f017": [],
+    "f100": [],
+    "f110": [],
+    "f200": [
+      "research/catalogue.lua"
+    ],
+    "f210": [
+      "research/catalogue.lua"
+    ]
+  },
+  "archives_byte_identical_to_previous": [
+    "f013",
+    "f014",
+    "f015",
+    "f016",
+    "f017",
+    "f100",
+    "f110"
+  ],
+  "primary_custody": "build/qualification/current-assets-333fb9f9-r01",
+  "primary_files_verified": 11,
+  "limits": [
+    "The F200/F210 change is only research/catalogue.lua: prepare private authored rows during control parsing and return detached copies on queries; data-stage identity imports remain lazy. No Generator or emitted research tuning changes.",
+    "The seven historical player ZIPs are byte-identical to the prior freeze. Existing historical execution remains bound to its original source, tools and artifacts; no execution is relabelled.",
+    "The old modern players and their adverse/limited positive runs remain preserved. Current corrected-player native, saves, clients and matched performance qualification are still open.",
+    "This offline rebuild and local custody verification does not publish a release or grant native acceptance."
+  ]
+}
