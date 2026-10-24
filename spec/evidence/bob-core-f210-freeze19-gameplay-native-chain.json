@@ -1,0 +1,80 @@
+{
+  "artifact_manifest": {
+    "members_verified": 34,
+    "path": "build/mir5/recovery-historical/bob-core-gameplay/40124992987/artifact-manifest.json",
+    "sha256": "A7C6780B2C280D79E3746817B9AD63425AD901C144199EC9CFF457225D8F1D20"
+  },
+  "cold_reloads": [
+    {
+      "ordinal": 1,
+      "save_byte_identical": true,
+      "save_sha256": "427E80F8BBF1A92B28BBE42DE1893A11D14C2C1E87562550533724E2258082DA"
+    },
+    {
+      "ordinal": 2,
+      "save_byte_identical": true,
+      "save_sha256": "427E80F8BBF1A92B28BBE42DE1893A11D14C2C1E87562550533724E2258082DA"
+    }
+  ],
+  "controller_commit": "0fda5fe36d30ac06f70327575fda846978bae66c",
+  "controls_restored": true,
+  "engine": {
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "version": "2.1.23"
+  },
+  "kind": "MIR5BobCoreF210Freeze19GameplayNativeChainV1",
+  "limits": [
+    "This is exact evidence for the frozen source19 F210 player archive; the fixture-only public source revision b85ff4 is recorded separately and does not make it a later-package qualification.",
+    "The fixture accelerates count and time. It does not qualify ordinary tuning, foreign-force behavior, migrations, multiplayer, menu or throughput performance, a whole current package, signing, publication, or release.",
+    "The separate full catalogue comparison remains a distinct data/settings gate."
+  ],
+  "native_result": {
+    "observation": "native-fixture-production-and-two-cold-reloads",
+    "path": "gameplay/result.json",
+    "sha256": "FDDF12CE4D95A3D93D0DC78993E9B0DE50D54AB4DBECCA7FDB61FF5C2DEC8112",
+    "status": "passed-private-native-fixture"
+  },
+  "player": {
+    "bytes": 547459,
+    "fixture_only_source_delta": true,
+    "frozen_source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "sha256": "E5CCFBD2F19EC6C0001F86994011B23515997F61AB90F735A9C9B4A0379426B4",
+    "target": "f210",
+    "version": "5.0.21000"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 43215,
+    "gzip_sha256": "A52B61AC9A0C97D5D7E3A4BE1D2FB7990C9C3F13DC906D233038B71FF12179ED",
+    "members": 8,
+    "path": "spec/evidence/bob-core-f210-freeze19-gameplay-native-receipts.json.gz",
+    "uncompressed_bytes": 188228,
+    "uncompressed_sha256": "B22BB1599A5315F9D29AF0E0A95C20D62FFEC9A64BD17FE8B9ADEE0B6507C2F4"
+  },
+  "run": 40124992987,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40124992987",
+  "schema": 1,
+  "source_commit": "b85ff4b881414b51ab0b6c817c239df743cb2f8a",
+  "status": "old-freeze-f210-bob-core-labs-physical-output-save-two-reloads-pass",
+  "witnesses": {
+    "actual_lab_completions": 28,
+    "continuation_levels_completed_by_lab": 7,
+    "finite_levels_completed_by_lab": 21,
+    "named_technologies": 14,
+    "native_effect_per_completed_level": 0.02,
+    "native_recipe_productivity_per_route": 0.08,
+    "physical_crafts_per_route": 100,
+    "physical_routes": [
+      "bob-bronze-alloy",
+      "bob-gunmetal-alloy"
+    ],
+    "science_consumed": {
+      "automation-science-pack": 28,
+      "chemical-science-pack": 16,
+      "logistic-science-pack": 20,
+      "metallurgic-science-pack": 4,
+      "production-science-pack": 8,
+      "space-science-pack": 10
+    },
+    "selected_families": 7
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "artifact_manifest": {
+    "members_verified": 200,
+    "path": "build/mir5/recovery-historical/library-multiplayer-canonical/40124732144/artifact-manifest.json",
+    "sha256": "24E414CC563C4D79E0148C5C24BF46AAC1A15647EACA7D7FA12DA4967A128EDD"
+  },
+  "controller_commit": "4b9ba9a712c0e4d2c39bb30a99e7f0a0e334d155",
+  "engine": {
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "kind": "MIR5LibraryMultiplayerCanonicalLateRequireAdverseChainV1",
+  "limits": [
+    "The preparation and initial client join do not qualify Library multiplayer behavior: the session exits at the recorded runtime late require before the full two-client/rejoin/restart protocol.",
+    "This adverse binds the old source19 F200 player archive and fixture/controller identities. It is not evidence for a later Library fix or package freeze.",
+    "No retry of these unchanged inputs is authorized; a changed player package and its separately verified native session are required."
+  ],
+  "observed_before_failure": {
+    "controls_restored": true,
+    "initial_clients_reached_tick": 4257,
+    "initial_german_client_joined": true
+  },
+  "player": {
+    "bytes": 546923,
+    "player_source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "sha256": "5E0934A488EAB7510C58D0E0303295F804B60D7CECAD8F47F8E709A90EF8BC2C",
+    "target": "f200",
+    "version": "5.0.20000"
+  },
+  "preparation": {
+    "observation": "native-create-runtime-load-only",
+    "path": "library-multiplayer-canonical/native/preparation/result.json",
+    "sha256": "B015137204128BE96179930314DA596C12FA2AB1EAF8F83E844B1D59923F3FD7",
+    "status": "passed-private-native-runtime-load-only"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 27409,
+    "gzip_sha256": "B3053A425640B4EC822E9DC0574B7FDA810A49B097D91FD12303BF7A6A5EF549",
+    "members": 8,
+    "path": "spec/evidence/library-multiplayer-canonical-late-require-adverse-receipts.json.gz",
+    "uncompressed_bytes": 140551,
+    "uncompressed_sha256": "06AD9B83DC95F19E61EBDF1602011740CFC80D20693E95EE01951ED57D36AE2C"
+  },
+  "reproduced_failure": {
+    "message": "Require cannot be used outside of control.lua parsing.",
+    "stack": [
+      "compatibility/modern_catalogue.lua:590",
+      "modern_catalogue.select",
+      "research/catalogue.static_rows/declared",
+      "runtime/library.authored_declarations/family_items/create_frame",
+      "browser.open"
+    ],
+    "surface": "more-infinite-research-browser.open",
+    "tick": 4377
+  },
+  "run": 40124732144,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40124732144",
+  "schema": 1,
+  "session": {
+    "failure": "[mir441-process-exit] 1",
+    "path": "library-multiplayer-canonical/native/session/result.json",
+    "sha256": "071572B7BC6F31BD7916E0B1BB13E1A0D8AD486FBA5D0787D318657C82B94B99",
+    "status": "failed"
+  },
+  "source_commit": "2ffa19c3142305c1d3a78a6cccf50b537f5feecd",
+  "status": "old-freeze-f200-library-two-client-adverse-real-player-late-require"
+}
