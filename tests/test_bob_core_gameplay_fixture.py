@@ -27,6 +27,34 @@ CONSUMPTION = {
     "space-science-pack": 10,
     "metallurgic-science-pack": 4,
 }
+ALLOY_ROUTES = (
+    {
+        "recipe": "bob-bronze-alloy",
+        "owner": "bob-alloy-processing",
+        "energy": 16,
+        "categories": ["bob-mixing-furnace"],
+        "ingredients": [
+            {"type": "item", "name": "copper-plate", "amount": 3},
+            {"type": "item", "name": "bob-tin-plate", "amount": 2},
+        ],
+        "results": [{"type": "item", "name": "bob-bronze-alloy", "amount": 5}],
+    },
+    {
+        "recipe": "bob-gunmetal-alloy",
+        "owner": "bob-zinc-processing",
+        "energy": 32,
+        "categories": ["bob-mixing-furnace"],
+        "ingredients": [
+            {"type": "item", "name": "copper-plate", "amount": 8},
+            {"type": "item", "name": "bob-tin-plate", "amount": 1},
+            {"type": "item", "name": "bob-zinc-plate", "amount": 1},
+        ],
+        "results": [{"type": "item", "name": "bob-gunmetal-alloy", "amount": 10}],
+    },
+)
+SOURCE_MACHINE = "bob-electric-mixing-furnace"
+FIXTURE_MACHINE = "mir5-bob-core-alloy-witness-furnace"
+ALLOY_CRAFTS = 100
 
 
 def lua_value(runtime, value):
@@ -83,6 +111,41 @@ def fixture_spec(facts):
     } for family in facts["families"]]
 
 
+def fixture_raw(facts):
+    raw = {
+        "technology": fixture_rows(facts),
+        "recipe": {},
+        "assembling-machine": {
+            SOURCE_MACHINE: {
+                "type": "assembling-machine",
+                "name": SOURCE_MACHINE,
+                "crafting_speed": 2,
+                "module_slots": 2,
+                "crafting_categories": ["smelting", "bob-mixing-furnace"],
+                "minable": {"result": SOURCE_MACHINE},
+                "next_upgrade": "other-mixing-furnace",
+            },
+        },
+    }
+    for route in ALLOY_ROUTES:
+        raw["recipe"][route["recipe"]] = {
+            "type": "recipe",
+            "name": route["recipe"],
+            "enabled": False,
+            "allow_productivity": True,
+            "energy_required": route["energy"],
+            "categories": deepcopy(route["categories"]),
+            "ingredients": deepcopy(route["ingredients"]),
+            "results": deepcopy(route["results"]),
+        }
+        raw["technology"][route["owner"]] = {
+            "type": "technology",
+            "name": route["owner"],
+            "effects": [{"type": "unlock-recipe", "recipe": route["recipe"]}],
+        }
+    return raw
+
+
 class BobCoreGameplayFixtureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -100,12 +163,27 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         runner = (ROOT / "tools/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
         completed_save = re.findall(r"\$complete=Join-Path \$writeData 'saves/([^'/]+)\.zip'", runner)
         self.assertEqual(1, len(completed_save), "native runner must have one completed-save contract")
-        self.lua.globals().expected_complete_save = completed_save[0]
+        self.expected_complete_save = completed_save[0]
 
-    def run_data_fixture(self, rows):
-        self.lua.globals().fixture_rows = lua_value(self.lua, rows)
+    def run_data_fixture(self, raw):
+        self.lua.globals().fixture_raw = lua_value(self.lua, raw)
         return self.lua.execute(r'''
-          data = {raw = {technology = fixture_rows}}
+          local function copy(value, seen)
+            if type(value) ~= "table" then return value end
+            seen = seen or {}
+            if seen[value] then return seen[value] end
+            local out = {}
+            seen[value] = out
+            for key, item in pairs(value) do out[copy(key, seen)] = copy(item, seen) end
+            return out
+          end
+          table.deepcopy = copy
+          data = {raw = fixture_raw}
+          function data:extend(rows)
+            for _, row in ipairs(rows) do
+              self.raw[row.type][row.name] = row
+            end
+          end
           return pcall(assert(loadfile(data_fixture)))
         ''')
 
@@ -133,12 +211,16 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         ], info["dependencies"])
 
     def test_data_preflight_matches_all_fourteen_independent_rows_then_changes_only_cost_and_time(self):
-        rows = fixture_rows(self.facts)
-        result = self.run_data_fixture(rows)
+        raw = fixture_raw(self.facts)
+        result = self.run_data_fixture(raw)
         self.assertTrue(result[0] if isinstance(result, tuple) else result,
                         result[1] if isinstance(result, tuple) else result)
         actual = self.lua.globals().data["raw"]["technology"]
-        self.assertEqual(self.expected_ids, list(rows))
+        self.assertEqual(self.expected_ids, [
+            family[stage]["id"]
+            for family in self.facts["families"]
+            for stage in ("early", "continuation")
+        ])
         for family in self.facts["families"]:
             for stage_name in ("early", "continuation"):
                 with self.subTest(family=family["key"], stage=stage_name):
@@ -160,6 +242,27 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                         self.assertIsNone(row["visible_when_disabled"])
                     else:
                         self.assertEqual((False, True), (row["show_levels_info"], row["visible_when_disabled"]))
+        source = self.lua.globals().data["raw"]["assembling-machine"][SOURCE_MACHINE]
+        fixture = self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_MACHINE]
+        self.assertEqual((2, 2, ["smelting", "bob-mixing-furnace"]),
+                         (source["crafting_speed"], source["module_slots"],
+                          [source["crafting_categories"][index] for index in (1, 2)]))
+        self.assertEqual((200, 0, None, None),
+                         (fixture["crafting_speed"], fixture["module_slots"],
+                          fixture["minable"], fixture["next_upgrade"]))
+        for route in ALLOY_ROUTES:
+            recipe = self.lua.globals().data["raw"]["recipe"][route["recipe"]]
+            self.assertEqual(route["ingredients"], [
+                {"type": recipe["ingredients"][index]["type"],
+                 "name": recipe["ingredients"][index]["name"],
+                 "amount": recipe["ingredients"][index]["amount"]}
+                for index in range(1, len(route["ingredients"]) + 1)
+            ])
+            self.assertEqual(route["results"], [{
+                "type": recipe["results"][1]["type"],
+                "name": recipe["results"][1]["name"],
+                "amount": recipe["results"][1]["amount"],
+            }])
 
     def test_data_preflight_refuses_late_science_effect_or_continuation_boundary_drift_without_partial_acceleration(self):
         mutations = {
@@ -171,9 +274,9 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         }
         for name, mutate in mutations.items():
             with self.subTest(mutation=name):
-                rows = fixture_rows(self.facts)
-                mutate(rows)
-                result = self.run_data_fixture(rows)
+                raw = fixture_raw(self.facts)
+                mutate(raw["technology"])
+                result = self.run_data_fixture(raw)
                 self.assertFalse(result[0])
                 for family in self.facts["families"]:
                     for stage_name in ("early", "continuation"):
@@ -181,9 +284,30 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                         self.assertIsNone(row["unit"]["count"])
                         self.assertEqual(family[stage_name]["count_formula"], row["unit"]["count_formula"])
                         self.assertEqual(30, row["unit"]["time"])
+                self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_MACHINE])
 
-    def test_control_registration_and_saved_native_witness_are_read_only_and_reject_lost_earned_state(self):
-        self.lua.globals().spec = lua_value(self.lua, fixture_spec(self.facts))
+    def test_data_preflight_refuses_captured_alloy_or_machine_drift_before_any_acceleration(self):
+        mutations = {
+            "alloy-input": lambda raw: raw["recipe"]["bob-bronze-alloy"]["ingredients"].__setitem__(0, {
+                "type": "item", "name": "copper-plate", "amount": 4}),
+            "alloy-owner": lambda raw: raw["technology"]["bob-zinc-processing"]["effects"].__setitem__(0, {
+                "type": "unlock-recipe", "recipe": "wrong-route"}),
+            "alloy-machine": lambda raw: raw["assembling-machine"][SOURCE_MACHINE].__setitem__("crafting_speed", 3),
+        }
+        for name, mutate in mutations.items():
+            with self.subTest(mutation=name):
+                raw = fixture_raw(self.facts)
+                mutate(raw)
+                result = self.run_data_fixture(raw)
+                self.assertFalse(result[0])
+                for family in self.facts["families"]:
+                    for stage_name in ("early", "continuation"):
+                        row = self.lua.globals().data["raw"]["technology"][family[stage_name]["id"]]
+                        self.assertIsNone(row["unit"]["count"])
+                        self.assertEqual(family[stage_name]["count_formula"], row["unit"]["count_formula"])
+                self.assertIsNone(self.lua.globals().data["raw"]["assembling-machine"][FIXTURE_MACHINE])
+
+    def test_control_registration_is_read_only(self):
         result = self.lua.execute(r'''
           local callbacks, reads = {events={}}, {}
           local environment = {
@@ -211,29 +335,172 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.assertIsNotNone(result["callbacks"]["load"])
         self.assertIsNotNone(result["callbacks"]["events"][1])
         self.assertIsNotNone(result["callbacks"]["events"][2])
+        self.assertIn(f'local SAVE = "{self.expected_complete_save}"',
+                      (FIXTURE / "control.lua").read_text(encoding="utf-8"))
 
-        self.lua.globals().consumption = lua_value(self.lua, CONSUMPTION)
-        for opponent, expected in (("", ""), ("initial", ""), ("lost-earned", "earned finite-three/tail-four"),
-                                   ("lost-bonus", "native recipe productivity differs"),
-                                   ("science", "science consumption differs"),
-                                   ("lost-tail", "earned finite-three/tail-four")):
+    def test_physical_alloy_witness_requires_real_route_inputs_and_precedes_mir_research(self):
+        self.lua.globals().spec = lua_value(self.lua, fixture_spec(self.facts))
+        self.lua.globals().alloys = lua_value(self.lua, list(ALLOY_ROUTES))
+        for opponent, expected in (("", ""), ("wrong-output", "native alloy output differs")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
                 result = self.lua.execute(r'''
-                  local callbacks, markers, saves = {events={}}, 0, 0
+                  local callbacks, machines, started = {events={}}, {}, 0
                   local active = {
                     base="2.1.23", ["space-age"]="2.1.23", boblibrary="3.0.1", bobores="3.0.0",
                     bobplates="3.0.2", bobelectronics="3.0.1", bobtech="3.0.0",
                     ["more-infinite-research"]="5.0.21000",
                     ["mir-fixture-mir5-bob-core-gameplay"]="0.1.0",
                   }
+                  local function inventory()
+                    local contents = {}
+                    return {
+                      contents=contents,
+                      insert=function(stack) contents[stack.name] = (contents[stack.name] or 0) + stack.count; return stack.count end,
+                      remove=function(stack)
+                        local removed = math.min(contents[stack.name] or 0, stack.count)
+                        contents[stack.name] = (contents[stack.name] or 0) - removed
+                        return removed
+                      end,
+                      get_item_count=function(name) return contents[name] or 0 end,
+                      is_empty=function() for _, count in pairs(contents) do if count ~= 0 then return false end end return true end,
+                    }
+                  end
+                  local function alloy_machine()
+                    local input, output, modules = inventory(), inventory(), inventory()
+                    local machine = {
+                      valid=true,crafting_progress=0,bonus_progress=0,
+                      prototype={name="mir5-bob-core-alloy-witness-furnace",crafting_categories={['bob-mixing-furnace']=true}},
+                    }
+                    machine.set_recipe = function(name) machine.selected = {name=name}; return {} end
+                    machine.get_recipe = function() return machine.selected end
+                    machine.get_inventory = function(index)
+                      if index == 1 then return input end
+                      if index == 2 then return output end
+                      if index == 3 then return modules end
+                    end
+                    return machine
+                  end
+                  local player = {
+                    valid=true,technologies={},recipes={},current_research=nil,research_queue={},
+                    get_spawn_position=function() return {0, 0} end,
+                    add_research=function() started = started + 1; return true end,
+                  }
+                  for _, family in ipairs(spec) do
+                    local function technology(name, level, researched, maximum)
+                      local effects = {}
+                      for index, recipe in ipairs(family.recipes) do
+                        effects[index] = {type="change-recipe-productivity", recipe=recipe, change=.02}
+                        player.recipes[recipe] = {valid=true,enabled=true,productivity_bonus=0}
+                      end
+                      return {valid=true,name=name,level=level,researched=researched,enabled=true,
+                        prototype={max_level=maximum,effects=effects},research_unit_count=1,research_unit_energy=60}
+                    end
+                    player.technologies[family.early] = technology(family.early, 1, false, 3)
+                    player.technologies[family.tail] = technology(family.tail, 4, false, 4294967295)
+                  end
+                  for _, name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack",
+                      "production-science-pack","space-science-pack","metallurgic-science-pack","bob-alloy-processing",
+                      "bob-zinc-processing","bob-invar-processing","bob-nitinol-processing","bob-tungsten-processing"}) do
+                    player.technologies[name] = {valid=true,name=name,researched=false,enabled=true}
+                  end
+                  local proto_recipes = {}
+                  for _, route in ipairs(alloys) do
+                    proto_recipes[route.recipe] = {
+                      name=route.recipe,energy=route.energy,maximum_productivity=3,
+                      categories=route.categories,ingredients=route.ingredients,products=route.results,
+                    }
+                  end
+                  local lab_input = inventory()
+                  local lab = {valid=true,get_inventory=function(index) assert(index == 4); return lab_input end}
+                  local surface = {create_entity=function(parameters)
+                    if parameters.name == "lab" then return lab end
+                    local machine = alloy_machine()
+                    machines[parameters.name .. tostring(parameters.position[1])] = machine
+                    return machine
+                  end}
+                  local environment = {
+                    script={active_mods=active,on_init=function(callback) callbacks.init=callback end,
+                      on_load=function(callback) callbacks.load=callback end,
+                      on_event=function(event, callback) callbacks.events[event]=callback end},
+                    defines={events={on_tick=1,on_research_finished=2},inventory={crafter_input=1,crafter_output=2,crafter_modules=3,lab_input=4}},
+                    prototypes={recipe=proto_recipes},
+                    game={tick=1,speed=1,forces={player=player},surfaces={[1]=surface}}, storage={},
+                  }
+                  environment._G = environment
+                  setmetatable(environment,{__index=function(_, key) return _G[key] end})
+                  local chunk = assert(loadfile(control_fixture, "t", environment))
+                  assert(pcall(chunk))
+                  assert(pcall(callbacks.init))
+                  local state = environment.storage.mir5_bob_core_gameplay
+                  local function finish_named_route(wrong)
+                    assert(pcall(callbacks.events[1]))
+                    local production = state.alloy
+                    local machine = state.alloy_machines[production.recipe]
+                    local input = machine.get_inventory(1)
+                    local output = machine.get_inventory(2)
+                    for _, ingredient in ipairs(production.route.ingredients) do input.contents[ingredient.name] = 0 end
+                    local amount = production.route.result.amount * 100
+                    if wrong then amount = amount - production.route.result.amount end
+                    output.contents[production.route.result.name] = amount
+                    return pcall(callbacks.events[1])
+                  end
+                  local first_ok, first_message = finish_named_route(opponent == "wrong-output")
+                  local second_ok, second_message = true, ""
+                  if first_ok and opponent == "" then second_ok, second_message = finish_named_route(false) end
+                  return {
+                    first_ok=first_ok,first_message=tostring(first_message),second_ok=second_ok,second_message=tostring(second_message),
+                    phase=state.phase,started=started,physical=state.physical,lab_automation=lab_input.get_item_count("automation-science-pack"),
+                  }
+                ''')
+                if opponent:
+                    self.assertFalse(result["first_ok"])
+                    self.assertIn(expected, result["first_message"])
+                else:
+                    self.assertTrue(result["first_ok"], result["first_message"])
+                    self.assertTrue(result["second_ok"], result["second_message"])
+                    self.assertEqual(("researching", 0, INITIAL_PACKS),
+                                     (result["phase"], result["started"], result["lab_automation"]))
+                    for route in ALLOY_ROUTES:
+                        record = result["physical"]["physical-before"][route["recipe"]]
+                        self.assertEqual((route["results"][0]["amount"] * ALLOY_CRAFTS, 0, 0),
+                                         (record["output"], record["bonus_crafts"], record["native_bonus_progress"]))
+
+    def test_saved_witness_is_read_only_and_rejects_lost_lab_or_physical_state(self):
+        self.lua.globals().spec = lua_value(self.lua, fixture_spec(self.facts))
+        self.lua.globals().alloys = lua_value(self.lua, list(ALLOY_ROUTES))
+        self.lua.globals().consumption = lua_value(self.lua, CONSUMPTION)
+        for opponent, expected in (
+                ("", ""),
+                ("lost-earned", "earned finite-three/tail-four"),
+                ("lost-bonus", "native recipe productivity differs"),
+                ("science", "science consumption differs"),
+                ("lost-tail", "earned finite-three/tail-four"),
+                ("physical-output", "physical-after alloy record differs"),
+                ("physical-machine", "physical-after native alloy machine state differs")):
+            with self.subTest(opponent=opponent):
+                self.lua.globals().opponent = opponent
+                result = self.lua.execute(r'''
+                  local callbacks, markers = {events={}}, 0
+                  local active = {
+                    base="2.1.23", ["space-age"]="2.1.23", boblibrary="3.0.1", bobores="3.0.0",
+                    bobplates="3.0.2", bobelectronics="3.0.1", bobtech="3.0.0",
+                    ["more-infinite-research"]="5.0.21000",
+                    ["mir-fixture-mir5-bob-core-gameplay"]="0.1.0",
+                  }
+                  local function inventory(contents)
+                    return {
+                      get_item_count=function(name) return contents[name] or 0 end,
+                      is_empty=function() for _, count in pairs(contents) do if count ~= 0 then return false end end return true end,
+                    }
+                  end
                   local player = {valid=true, technologies={}, recipes={}, current_research=nil, research_queue={}}
                   for _, family in ipairs(spec) do
                     local function technology(name, level, researched, maximum)
                       local effects = {}
                       for index, recipe in ipairs(family.recipes) do
                         effects[index] = {type="change-recipe-productivity", recipe=recipe, change=.02}
-                        player.recipes[recipe] = {productivity_bonus=.08}
+                        player.recipes[recipe] = {valid=true,enabled=true,productivity_bonus=.08}
                       end
                       return {valid=true,name=name,level=level,researched=researched,enabled=true,
                         visible_when_disabled=false,prototype={max_level=maximum,effects=effects}}
@@ -241,12 +508,28 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     player.technologies[family.early] = technology(family.early, 3, true, 3)
                     player.technologies[family.tail] = technology(family.tail, 5, false, 4294967295)
                   end
+                  local proto_recipes, machines = {}, {}
+                  for _, route in ipairs(alloys) do
+                    proto_recipes[route.recipe] = {
+                      name=route.recipe,energy=route.energy,maximum_productivity=3,
+                      categories=route.categories,ingredients=route.ingredients,products=route.results,
+                    }
+                    local input, output, modules = inventory({}), inventory({}), inventory({})
+                    machines[route.recipe] = {
+                      valid=true,crafting_progress=0,bonus_progress=1,
+                      prototype={name="mir5-bob-core-alloy-witness-furnace",crafting_categories={['bob-mixing-furnace']=true}},
+                      get_inventory=function(index)
+                        if index == 1 then return input end
+                        if index == 2 then return output end
+                        if index == 3 then return modules end
+                      end,
+                    }
+                  end
                   local remaining = {}
                   for name, count in pairs(consumption) do remaining[name] = 64 - count end
-                  local inventory = {get_item_count=function(name) return remaining[name] end}
                   local lab = {valid=true,get_inventory=function(index)
-                    assert(index == 1, "unexpected inventory")
-                    return inventory
+                    assert(index == 4, "unexpected lab inventory")
+                    return {get_item_count=function(name) return remaining[name] end}
                   end}
                   local plan = {}
                   for _, family in ipairs(spec) do
@@ -255,21 +538,30 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     plan[#plan+1] = family.early
                     plan[#plan+1] = family.tail
                   end
-                  local state = {phase="complete",plan=plan,next=29,finished=28,events=28,lab=lab,deadline=36000}
-                  if opponent == "initial" then state.phase = "researching" end
+                  local physical = {["physical-before"]={}, ["physical-after"]={}}
+                  for _, route in ipairs(alloys) do
+                    physical["physical-before"][route.recipe] = {
+                      output=route.results[1].amount * 100, bonus_crafts=0, native_bonus_progress=0,
+                    }
+                    physical["physical-after"][route.recipe] = {
+                      output=route.results[1].amount * 107, bonus_crafts=7, native_bonus_progress=1,
+                    }
+                  end
+                  local state = {
+                    phase="complete",plan=plan,next=29,finished=28,events=28,lab=lab,
+                    alloy_machines=machines,physical=physical,deadline=36000,
+                  }
                   local environment = {
                     script={active_mods=active,on_init=function(callback) callbacks.init=callback end,
                       on_load=function(callback) callbacks.load=callback end,
                       on_event=function(event, callback) callbacks.events[event]=callback end},
-                    defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                    game={tick=2,forces={player=player},server_save=function(name)
-                      assert(name == expected_complete_save, "completed save does not match native runner")
-                      saves = saves + 1
-                    end}, storage={mir5_bob_core_gameplay=state},
+                    defines={events={on_tick=1,on_research_finished=2},inventory={crafter_input=1,crafter_output=2,crafter_modules=3,lab_input=4}},
+                    prototypes={recipe=proto_recipes},
+                    game={tick=2,forces={player=player}}, storage={mir5_bob_core_gameplay=state},
                     helpers={table_to_json=function(value)
-                      assert(value.case == "bob-core-gameplay"
-                        and value.stage == (opponent == "initial" and "initial" or "reload")
-                        and value.witnesses.actual_lab_completions == 28)
+                      assert(value.case == "bob-core-gameplay" and value.stage == "reload"
+                        and value.witnesses.actual_lab_completions == 28
+                        and value.witnesses.physical_alloy_witness == true)
                       return "{}"
                     end},
                     log=function(value) assert(value:match("^%[MIR5_NATIVE_FIXTURE%] RESULT ")); markers=markers+1 end,
@@ -278,32 +570,36 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   setmetatable(environment,{__index=function(_, key) return _G[key] end})
                   local chunk = assert(loadfile(control_fixture, "t", environment))
                   assert(pcall(chunk))
-                  local saved = {phase=state.phase,next=state.next,finished=state.finished,events=state.events}
+                  local saved = {phase=state.phase,next=state.next,finished=state.finished,events=state.events,
+                    output=state.physical["physical-after"][alloys[1].recipe].output}
                   local load_ok, load_message = pcall(callbacks.load)
                   local read_only = state.phase == saved.phase and state.next == saved.next
                     and state.finished == saved.finished and state.events == saved.events
+                    and state.physical["physical-after"][alloys[1].recipe].output == saved.output
                   if opponent == "lost-earned" then player.technologies[spec[1].early].level = 2 end
                   if opponent == "lost-bonus" then player.recipes[spec[2].recipes[1]].productivity_bonus = .06 end
                   if opponent == "science" then remaining["metallurgic-science-pack"] = remaining["metallurgic-science-pack"] + 1 end
                   if opponent == "lost-tail" then player.technologies[spec[3].tail].level = 4 end
+                  if opponent == "physical-output" then state.physical["physical-after"][alloys[1].recipe].output = 0 end
+                  if opponent == "physical-machine" then machines[alloys[1].recipe].bonus_progress = 0 end
                   local tick_ok, tick_message = pcall(callbacks.events[1])
                   return {load_ok=load_ok,load_message=tostring(load_message),read_only=read_only,
-                    tick_ok=tick_ok,tick_message=tostring(tick_message),markers=markers,saves=saves}
+                    tick_ok=tick_ok,tick_message=tostring(tick_message),markers=markers}
                 ''')
                 self.assertTrue(result["load_ok"], result["load_message"])
                 self.assertTrue(result["read_only"])
-                if opponent and opponent != "initial":
+                if opponent:
                     self.assertFalse(result["tick_ok"])
                     self.assertIn(expected, result["tick_message"])
                     self.assertEqual(0, result["markers"])
                 else:
                     self.assertTrue(result["tick_ok"], result["tick_message"])
                     self.assertEqual(1, result["markers"])
-                self.assertEqual(1 if opponent == "initial" else 0, result["saves"])
 
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn("on_research_finished", source)
         self.assertIn("actual_lab_completions=state.finished", source)
+        self.assertIn("physical_before_mir_productivity=true", source)
         self.assertIn("candidate_full_catalogue_comparison_required=true", source)
         self.assertNotIn("research_recursive", source)
         self.assertNotIn("enable_all_prototypes", source)
