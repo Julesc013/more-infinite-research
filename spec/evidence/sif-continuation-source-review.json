@@ -5,11 +5,12 @@
   "status": "implemented-source-host-controls-pass-native-pending",
   "scope": ["research-speed-7", "weapon-shooting-speed-7"],
   "retired_science": "space-science-pack",
-  "boundary": "Only the two named continuations while space-is-fake is active. Filter the selected science vector and corresponding policy additions before source and prerequisite validation. Explicit required science is appended later and remains mandatory. No Generator change, foreign-prototype mutation or traversal.",
+  "boundary": "Only the two named continuations while space-is-fake is active. Filter the selected science vector and corresponding policy additions before source and prerequisite validation, and remove the named retired prerequisite from the already-authored local list. Explicit required science and later policy/endgame gate additions remain mandatory. No Generator change, foreign-prototype mutation or traversal.",
   "current_source": ["source/compatibility/science_bindings.lua", "source/research/science.lua"],
   "host_control": "tests/test_science.py",
   "host_expectations": [
     "Both named rows on F200 and F210 under all eight policies preserve independently declared ordered ingredient amounts and finite anchors while excluding retired space science.",
+    "Actual Space Age continuation construction retains research-speed's eleven remaining packs and thirteen prerequisites under all eight policies. Weapon-shooting-speed retains its five remaining packs and seven prerequisites, plus the explicit policy additions: promethium for space-and-promethium, production for official-progression, and production plus five Space Age packs for all-official/all. The authored input arrays are not mutated.",
     "The same inputs without SIF preserve ordinary space-science policy behavior.",
     "Explicit required science, unrelated rows and mandatory endgame gates remain intact.",
     "The pre-fix unbound policy is rejected by SIF's changed native space-source contract rather than accepted as a valid continuation."

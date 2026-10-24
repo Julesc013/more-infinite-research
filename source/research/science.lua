@@ -649,10 +649,17 @@ local function disable(technology, reason, ingredients, prerequisites)
   return {enabled = false, reason = reason, ingredients = ingredients, prerequisites = prerequisites}
 end
 
-local function merge_prerequisites(source, additions)
+local function merge_prerequisites(source, additions, excluded_source)
   local out, seen = {}, {}
+  local denied
+  if excluded_source then
+    denied = {}
+    for _, name in ipairs(excluded_source) do denied[name] = true end
+  end
   for _, name in ipairs(source or {}) do
-    if type(name) == "string" and name ~= "" and not seen[name] then seen[name] = true; out[#out + 1] = name end
+    if type(name) == "string" and name ~= "" and not seen[name] and not (denied and denied[name]) then
+      seen[name] = true; out[#out + 1] = name
+    end
   end
   for _, name in ipairs(additions or {}) do
     if not seen[name] then seen[name] = true; out[#out + 1] = name end
@@ -775,7 +782,10 @@ function M.apply(technology, binding, context)
 
   local policy_prereqs, prerequisite_reason = policy_prerequisites(raw, selected, additions)
   if not policy_prereqs then return disable(technology, prerequisite_reason, source) end
-  local prerequisites = merge_prerequisites(technology.prerequisites, policy_prereqs)
+  -- A named compatibility binding may retire an already authored prerequisite.
+  -- Filter that local source list only; later explicit policy/gate additions
+  -- retain their authority. Never infer prerequisites from foreign prototypes.
+  local prerequisites = merge_prerequisites(technology.prerequisites, policy_prereqs, binding.excluded_prerequisites)
   if option(context, "ips-require-space-gate", false) == true and binding.space_gate ~= false then
     local gate = selected.end_game
     if not gate then return disable(technology, "missing-end-game-gate", ingredients, prerequisites) end
