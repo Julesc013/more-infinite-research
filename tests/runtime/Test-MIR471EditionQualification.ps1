@@ -45,10 +45,20 @@ $fixtureName='mir-fixture-471-edition-parity'
 $fixtures=@{}
 foreach($role in @('source','candidate')){
   $directory=Join-Path $root ('fixture-'+$role);[IO.Directory]::CreateDirectory($directory)|Out-Null
-  $fixtureEpoch=if($PlanetaryDataReproducer){3470}elseif($CryogenicReproducer){2470}elseif($Target-ceq'f210'-and$CandidateOnly){570}else{470}
+  $fixtureEpoch=if($PlanetaryDataReproducer){if($ExternalProfilePath){4470}else{3470}}elseif($CryogenicReproducer){2470}elseif($ExternalProfilePath){if($CandidateOnly){1570}else{1470}}elseif($Target-ceq'f210'-and$CandidateOnly){570}else{470}
   $version=if($SourceVersion-ceq'4.7.1'-and-not$CryogenicReproducer-and-not$PlanetaryDataReproducer){if($role-ceq'source'){'0.3.0'}else{'0.3.1'}}else{'0.'+($fixtureEpoch+$patch)+'.'+$(if($role-ceq'source'){0}elseif($CryogenicReproducer){2}else{1})}
   [ordered]@{name=$fixtureName;version=$version;title='MIR 4.7.1 focused edition acceptance';author='MIR maintainers';factorio_version=$line;dependencies=@("base >= $($engineInfo.version)","more-infinite-research >= $from")}|ConvertTo-Json -Depth 5|Set-Content (Join-Path $directory 'info.json')
   $observer=Get-Content (Join-Path $RepoRoot 'fixtures/assert-mir471-edition-parity/data-final-fixes.lua') -Raw
+  if($ExternalProfilePath){
+    $observer+="`n"+@'
+local active = {}
+for name, version in pairs(mods) do
+  if name ~= "core" then active[#active + 1] = name .. "@" .. version end
+end
+table.sort(active)
+log("[MIR_ACTIVE_MODS] " .. table.concat(active, "|"))
+'@
+  }
   if($PlanetaryDataReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-planetary-data-473/data-final-fixes.lua') -Raw)}
   if($CryogenicReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-final-fixes.lua') -Raw)}
   Copy-Item -LiteralPath (Join-Path $RepoRoot 'source/prototypes/mir/core/fingerprint.lua') -Destination (Join-Path $directory 'mir471_fingerprint.lua')
@@ -140,7 +150,8 @@ function Run([string]$Phase,[string[]]$EngineArguments,[string]$Save=''){
   }.GetNewClosure() }else{$null}
   $run=Invoke-MIRNativeProbeFactorioProcess -Context $resources -FilePath $FactorioBin -Arguments $arguments -TimeoutSeconds 120 -AdmissionWaitSeconds 30 -AdmissionPhase ($Target+'-'+$Phase) -CompletionPredicate $completion
   if($Save-and-not$run.result.completion_predicate_observed){throw "Incomplete $Phase save oracle"}
-  $null=Assert-MIRLibraryLoadedSelection -Activation $script:activation -LogPath $log
+  $observation=if($ExternalProfilePath){@{ActiveModsObserver=$fixtureName}}else{@{}}
+  $null=Assert-MIRLibraryLoadedSelection -Activation $script:activation -LogPath $log @observation
   $text=Get-Content -LiteralPath $log -Raw
   if($text-match '(?im)(Error Util|Error ModManager|Failed to load|stack traceback)'){throw 'Native log failure'}
   if($PlanetaryDataReproducer-and-not$text.Contains('[mir473] planetary-data research, quantities and native seed prerequisites retained')){throw 'Planetary-data behavior proof did not execute'}
