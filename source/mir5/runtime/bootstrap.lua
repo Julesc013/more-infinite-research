@@ -118,6 +118,9 @@ local on_repair_tick
 local translation_scheduled
 local translation_maintenance_callback
 local reconcile_translations
+local reconcile_library_events
+local library_events_scheduled
+local library_refresh_scheduled
 local browser_families = {all = true, external = true, mir = true}
 for _, declaration in ipairs(catalogue.declared()) do
   browser_families[declaration.family] = true
@@ -183,6 +186,7 @@ end
 
 reconcile_translations = function()
   schedule_translations(library.subscription_needs() == true)
+  reconcile_library_events()
 end
 
 translation_maintenance_callback = function(event)
@@ -422,16 +426,30 @@ local function on_library_player_joined(event)
   reconcile_translations()
 end
 
+local function on_library_player_left(event)
+  library.on_player_left_game(event)
+  reconcile_translations()
+end
+
+local function request_library_refresh(event)
+  if library_events_scheduled then
+    library.on_native_state_changed(event)
+    reconcile_translations()
+  end
+end
+
 local function on_research_finished(event)
   if lifecycle.caps_active() then lifecycle.on_research_finished(event) end
   if competing_productivity then competing_productivity.on_research_finished(event) end
   if scripted_effects then scripted_effects.on_research_finished(event) end
+  request_library_refresh(event)
 end
 
 local function on_research_reversed(event)
   if lifecycle.caps_active() then lifecycle.on_research_reversed(event) end
   if competing_productivity then competing_productivity.on_research_reversed(event) end
   if scripted_effects then scripted_effects.on_research_reversed(event) end
+  request_library_refresh(event)
 end
 
 local function on_technology_effects_reset(event)
@@ -439,16 +457,19 @@ local function on_technology_effects_reset(event)
   if native_credits then native_credits.on_technology_effects_reset(event) end
   if competing_productivity then competing_productivity.on_technology_effects_reset(event) end
   if scripted_effects then scripted_effects.on_technology_effects_reset(event) end
+  request_library_refresh(event)
 end
 
 local function on_research_started(event)
   if lifecycle.caps_active() then lifecycle.on_research_started(event) end
   if competing_productivity then competing_productivity.on_research_started(event) end
+  request_library_refresh(event)
 end
 
 local function on_research_cancelled(event)
   if lifecycle.caps_active() then lifecycle.on_research_cancelled(event) end
   if competing_productivity then competing_productivity.on_research_cancelled(event) end
+  request_library_refresh(event)
 end
 
 local function on_tower_planted_seed(event)
@@ -463,6 +484,7 @@ local function on_force_created(event)
   lifecycle.on_force_created(event)
   if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
+  request_library_refresh(event)
 end
 
 local function on_force_reset(event)
@@ -471,6 +493,7 @@ local function on_force_reset(event)
   lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
+  request_library_refresh(event)
 end
 
 local function on_forces_merged(event)
@@ -487,6 +510,71 @@ local function on_forces_merged(event)
   lifecycle.on_forces_merged(event)
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
+  request_library_refresh(event)
+end
+
+local function bind_runtime_events(library_open)
+  if library_events_scheduled == library_open then return end
+  library_events_scheduled = library_open
+  local events = defines and defines.events or {}
+  local competing_active = competing_productivity and competing_productivity.active()
+  local force_lifecycle_active = lifecycle.caps_active()
+    or native_credits ~= nil
+    or competing_active
+    or (scripted_effects and scripted_effects.events_active())
+    or imersite ~= nil
+    or library_open
+  if force_lifecycle_active then
+    if events.on_force_created then script.on_event(events.on_force_created, on_force_created) end
+    if events.on_force_reset then script.on_event(events.on_force_reset, on_force_reset) end
+    if events.on_forces_merged then script.on_event(events.on_forces_merged, on_forces_merged) end
+  else
+    -- Remove previous closures when no runtime owner or open Library needs
+    -- these force boundaries after a configuration/view transition.
+    if events.on_force_created then script.on_event(events.on_force_created, nil) end
+    if events.on_force_reset then script.on_event(events.on_force_reset, nil) end
+    if events.on_forces_merged then script.on_event(events.on_forces_merged, nil) end
+  end
+  -- The Library observes native changes only while a connected owned view is
+  -- open. Cap admission and scripted effects retain their independent guards.
+  if events.on_research_started then
+    local active = lifecycle.caps_active() or competing_active or library_open
+    script.on_event(events.on_research_started, active and on_research_started or nil)
+  end
+  if events.on_research_cancelled then
+    local active = lifecycle.caps_active() or competing_active or library_open
+    script.on_event(events.on_research_cancelled, active and on_research_cancelled or nil)
+  end
+  if events.on_research_finished then
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
+    script.on_event(events.on_research_finished, active and on_research_finished or nil)
+  end
+  if events.on_research_reversed then
+    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
+    script.on_event(events.on_research_reversed, active and on_research_reversed or nil)
+  end
+  if events.on_technology_effects_reset then
+    local active = lifecycle.caps_active() or native_credits ~= nil
+      or competing_active or (scripted_effects and scripted_effects.events_active()) or library_open
+    script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
+  end
+  if events.on_research_queued then script.on_event(events.on_research_queued, library_open and request_library_refresh or nil) end
+  if events.on_research_moved then script.on_event(events.on_research_moved, library_open and request_library_refresh or nil) end
+end
+
+local function on_library_native_refresh(event)
+  library.on_native_refresh_tick(event)
+  reconcile_translations()
+end
+
+reconcile_library_events = function()
+  local open, pending = library.native_subscription_needs()
+  bind_runtime_events(open == true)
+  pending = pending == true
+  if library_refresh_scheduled ~= pending then
+    script.on_nth_tick(library.native_refresh_ticks, pending and on_library_native_refresh or nil)
+    library_refresh_scheduled = pending
+  end
 end
 
 function M.register()
@@ -513,51 +601,13 @@ function M.register()
   local events = defines and defines.events or {}
   schedule_repair(false)
   schedule_translations(false)
+  library_events_scheduled = nil
+  bind_runtime_events(false)
+  script.on_nth_tick(library.native_refresh_ticks, nil)
+  library_refresh_scheduled = false
   if events.on_entity_damaged then
     script.on_event(events.on_entity_damaged, repair_config.enabled and on_entity_damaged or nil,
       repair_config.enabled and {{filter = "type", type = "wall"}, {filter = "type", type = "gate", mode = "or"}} or nil)
-  end
-  local competing_active = competing_productivity and competing_productivity.active()
-  local force_lifecycle_active = lifecycle.caps_active()
-    or native_credits ~= nil
-    or competing_active
-    or (scripted_effects and scripted_effects.events_active())
-    or imersite ~= nil
-  if force_lifecycle_active then
-    if events.on_force_created then script.on_event(events.on_force_created, on_force_created) end
-    if events.on_force_reset then script.on_event(events.on_force_reset, on_force_reset) end
-    if events.on_forces_merged then script.on_event(events.on_forces_merged, on_forces_merged) end
-  else
-    -- A settings/profile transition may reuse the control registration from a
-    -- finite save. Remove those exact native callbacks when all cap families
-    -- are unlimited; otherwise their previous closures remain active.
-    if events.on_force_created then script.on_event(events.on_force_created, nil) end
-    if events.on_force_reset then script.on_event(events.on_force_reset, nil) end
-    if events.on_forces_merged then script.on_event(events.on_forces_merged, nil) end
-  end
-  -- Research queue admission belongs solely to bounded cap ownership.  The
-  -- direct scripted effects need the force callbacks above, but do not own
-  -- start/cancel handling when every cap is unlimited.
-  if events.on_research_started then
-    local active = lifecycle.caps_active() or competing_active
-    script.on_event(events.on_research_started, active and on_research_started or nil)
-  end
-  if events.on_research_cancelled then
-    local active = lifecycle.caps_active() or competing_active
-    script.on_event(events.on_research_cancelled, active and on_research_cancelled or nil)
-  end
-  if events.on_research_finished then
-    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active())
-    script.on_event(events.on_research_finished, active and on_research_finished or nil)
-  end
-  if events.on_research_reversed then
-    local active = lifecycle.caps_active() or competing_active or (scripted_effects and scripted_effects.events_active())
-    script.on_event(events.on_research_reversed, active and on_research_reversed or nil)
-  end
-  if events.on_technology_effects_reset then
-    local active = lifecycle.caps_active() or native_credits ~= nil
-      or competing_active or (scripted_effects and scripted_effects.events_active())
-    script.on_event(events.on_technology_effects_reset, active and on_technology_effects_reset or nil)
   end
   if events.on_tower_planted_seed then
     local active = scripted_effects and scripted_effects.agriculture_events_active()
@@ -575,6 +625,7 @@ function M.register()
   if events.on_player_locale_changed then script.on_event(events.on_player_locale_changed, on_library_locale_changed) end
   if events.on_player_changed_force then script.on_event(events.on_player_changed_force, on_library_force_changed) end
   if events.on_player_joined_game then script.on_event(events.on_player_joined_game, on_library_player_joined) end
+  if events.on_player_left_game then script.on_event(events.on_player_left_game, on_library_player_left) end
 end
 
 return M
