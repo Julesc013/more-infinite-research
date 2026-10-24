@@ -1,8 +1,7 @@
 Set-StrictMode -Version Latest
-. (Join-Path $PSScriptRoot '../../mir/application/release/readiness/Common.ps1')
+. (Join-Path $PSScriptRoot 'NativeProbeCommon.ps1')
 . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
 . (Join-Path $PSScriptRoot 'ImmutableInputStaging.ps1')
-. (Join-Path $PSScriptRoot 'MIR4DistributionIdentity.ps1')
 
 # These adapters retain the existing governor and lease authorities. They own
 # one probe's total new-output budget, not a second scheduler or package writer.
@@ -39,10 +38,30 @@ function Resolve-MIRNativeProbeDependencyInputs {
 function Assert-MIRNativeProbeF210Candidate([bool]$Condition,[string]$Message) {
   if(-not $Condition){throw "[mir-native-probe-f210-candidate] $Message"}
 }
+function Import-MIRNativeProbeLegacyCandidateAuthorities {
+  if ((Get-Command Get-MIR4BootstrapRecordSha256 -ErrorAction SilentlyContinue) -and
+      (Get-Command New-MIR4DistributionIdentityProjection -ErrorAction SilentlyContinue) -and
+      (Get-Command Get-MIR4TargetMaterializerState -ErrorAction SilentlyContinue)) { return }
+  $legacyCommon=Join-Path $PSScriptRoot '../../mir/application/release/readiness/Common.ps1'
+  $legacyDistribution=Join-Path $PSScriptRoot 'MIR4DistributionIdentity.ps1'
+  $legacyMaterializer=Join-Path $PSScriptRoot '../../mir/application/package/TargetMaterializer.ps1'
+  # Dot-sourcing from this function would discard legacy commands when this
+  # scope returns. Import one ephemeral compatibility module instead, so the
+  # historical reader retains its original helper surface only when invoked.
+  $legacyModule=New-Module -Name 'MIRNativeProbeLegacyCandidate' -ArgumentList @($legacyCommon,$legacyDistribution,$legacyMaterializer) -ScriptBlock {
+    param($CommonPath,$DistributionPath,$MaterializerPath)
+    . $CommonPath
+    . $DistributionPath
+    . $MaterializerPath
+    Export-ModuleMember -Function * -Alias *
+  }
+  Import-Module -ModuleInfo $legacyModule -Global -Force
+}
 function Read-MIRNativeProbeCurrentCandidate {
   param([string]$Repository,[string]$Archive,[string]$ReceiptPath,
     [ValidateSet('f210','f200','f110','f100')][string]$Target='f210',
     [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1')
+  Import-MIRNativeProbeLegacyCandidateAuthorities
   Assert-MIRNativeProbeF210Candidate (-not [string]::IsNullOrWhiteSpace($Archive) -and -not [string]::IsNullOrWhiteSpace($ReceiptPath)) 'supply candidate and canonical materialization receipt'
   $candidate = (Resolve-Path -LiteralPath $Archive).Path
   $receipt = Get-Content -LiteralPath $ReceiptPath -Raw | ConvertFrom-Json -Depth 30 -DateKind String
@@ -297,6 +316,7 @@ function New-MIRNativeProbeTargetPackage {
     [ValidateSet('f210','f200')][string]$Target='f210',
     [ValidatePattern('^4[.](?:0|[1-9][0-9]{0,4})[.](?:0|[1-9][0-9]?)$')][string]$SourceVersion='4.2.1'
   )
+  Import-MIRNativeProbeLegacyCandidateAuthorities
   $targetKey=$Target.ToLowerInvariant()
   if($CandidatePrefix -cnotin @('BROWSER','SCIENCE-LAUNCH') -and $targetKey -cne 'f210'){throw '[mir-native-probe-observer-target]'}
   if($SourceVersion -cnotmatch '^4[.](?<minor>[0-9]{1,5})[.](?<patch>[0-9]{1,2})$'){throw '[mir-native-probe-source-version]'}

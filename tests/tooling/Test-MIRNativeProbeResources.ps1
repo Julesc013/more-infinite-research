@@ -17,6 +17,55 @@ function Refuses-Probe([scriptblock]$Action,[string]$Expected) {
   try { & $Action | Out-Null } catch { $failure=$_.Exception.Message }
   Assert-Probe ($failure.Contains($Expected)) "expected $Expected; got $failure"
 }
+function Assert-NativeProbeResourceImportBoundary {
+  # Run in a pristine PowerShell process. The parent test imports compatibility
+  # adapters before this point, so it cannot establish NativeProbeResources'
+  # standalone dependency closure.
+  $scratchRoot=Join-Path $repo 'build/tmp'
+  $boundaryRoot=Resolve-MIR441RecoveryScratchPath -Path (Join-Path $scratchRoot ('native-probe-import-boundary-'+[guid]::NewGuid().ToString('N')))
+  [IO.Directory]::CreateDirectory($boundaryRoot)|Out-Null
+  try {
+  $scriptPath=Join-Path $boundaryRoot 'native-probe-resource-import-boundary.ps1'
+  $script=@'
+param([Parameter(Mandatory)][string]$NativeProbeResourcesPath,[Parameter(Mandatory)][string]$Repository)
+$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+. $NativeProbeResourcesPath
+function Get-ImportBoundaryCommands {
+  [ordered]@{
+    native_resource=[bool](Get-Command New-MIRNativeProbeResourceContext -ErrorAction SilentlyContinue)
+    shared_path=[bool](Get-Command Test-MIR441PathContained -ErrorAction SilentlyContinue)
+    bootstrap=[bool](Get-Command Get-MIR4BootstrapRecordSha256 -ErrorAction SilentlyContinue)
+    distribution=[bool](Get-Command New-MIR4DistributionIdentityProjection -ErrorAction SilentlyContinue)
+    package_authority=[bool](Get-Command Resolve-MIR4CanonicalPackageIdentity -ErrorAction SilentlyContinue)
+    materializer=[bool](Get-Command Get-MIR4TargetMaterializerState -ErrorAction SilentlyContinue)
+  }
+}
+$before=Get-ImportBoundaryCommands
+$failure=''
+try { Read-MIRNativeProbeCurrentCandidate -Repository $Repository -Archive '' -ReceiptPath '' | Out-Null }
+catch { $failure=$_.Exception.Message }
+[ordered]@{before=$before;failure=$failure;after=(Get-ImportBoundaryCommands)} | ConvertTo-Json -Compress
+'@
+  [IO.File]::WriteAllText($scriptPath,$script,[Text.UTF8Encoding]::new($false))
+  $nativeResources=Join-Path $repo 'tools/lib/validation/NativeProbeResources.ps1'
+  $output=@(& (Get-Command pwsh -ErrorAction Stop).Source -NoProfile -File $scriptPath -NativeProbeResourcesPath $nativeResources -Repository $repo 2>&1)
+  $exitCode=$LASTEXITCODE
+  Assert-Probe ($exitCode-eq0) "standalone NativeProbeResources import subprocess failed: $($output -join "`n")"
+  $result=($output -join "`n")|ConvertFrom-Json -Depth 10 -DateKind String
+  Assert-Probe ([bool]$result.before.native_resource) 'standalone NativeProbeResources import omitted its resource context.'
+  Assert-Probe ([bool]$result.before.shared_path) 'standalone NativeProbeResources import omitted its shared path helper.'
+  foreach($name in @('bootstrap','distribution','package_authority','materializer')){
+    Assert-Probe (-not [bool]$result.before.$name) "standalone NativeProbeResources import eagerly loaded legacy $name authority."
+  }
+  Assert-Probe ($result.failure.Contains('supply candidate and canonical materialization receipt')) 'legacy candidate reader did not retain its missing-input guard.'
+  foreach($name in @('bootstrap','distribution','package_authority','materializer')){
+    Assert-Probe ([bool]$result.after.$name) "legacy candidate reader did not lazy-load $name authority."
+  }
+  } finally {
+    if(Test-Path -LiteralPath $boundaryRoot){Remove-MIR441ContainedTree -AdmittedRoot $scratchRoot -Path $boundaryRoot}
+  }
+}
 function Resolve-K2213LuaHost {
   param([Parameter(Mandatory)][string]$RuntimeDirectory,[Parameter(Mandatory)][string]$PythonExe)
   if(-not(Test-Path -LiteralPath $RuntimeDirectory -PathType Container)){
@@ -305,8 +354,13 @@ function Resolve-MIR4F210CurrentEngineCapHarnessAdmission {
     if(Test-Path -LiteralPath $capRoot){$null=Assert-MIRImmutableInputPathWithin -Path $capRoot -Root (Join-Path $repo 'build/tmp') -Context 'owned tiny F210 controls';Remove-Item -LiteralPath $capRoot -Recurse -Force}
   }
 }
+Assert-NativeProbeResourceImportBoundary
 Assert-F210CapSharedInputs
 if($CapOwnershipInputsOnly){return}
+# The remaining controlled legacy-reader cases construct their own authenticated
+# receipts. Trigger the reader's lazy compatibility import before constructing
+# those historical identities.
+Refuses-Probe {Read-MIRNativeProbeCurrentCandidate -Repository $repo -Archive '' -ReceiptPath ''} 'supply candidate and canonical materialization receipt'
 try {
   . (Join-Path $repo 'tests/support/MIR421SpaceFakeUpgrade.ps1')
   foreach ($target in @('f210','f200')) {
