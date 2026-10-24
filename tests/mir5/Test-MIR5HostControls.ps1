@@ -65,6 +65,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_library.py';lua=$true},
   [ordered]@{path='tests/mir5/test_library_multiplayer_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_scripted_effects_multiplayer_fixture.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_scripted_effects_toggle_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_library_model.py';lua=$true},
   [ordered]@{path='tests/mir5/test_library_translations.py';lua=$true},
   [ordered]@{path='tests/mir5/test_passive_repair.py';lua=$true},
