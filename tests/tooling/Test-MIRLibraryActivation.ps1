@@ -9,10 +9,10 @@ $root=Join-Path $repo ('build/tmp/mir5-library-activation-controls-'+[guid]::New
 $checks=0
 function Assert-Library([bool]$Condition,[string]$Code){if(-not$Condition){throw "[mir5-library-$Code]"};$script:checks++}
 function Refuses-Library([scriptblock]$Action,[string]$Expected){$actual='';try{&$Action|Out-Null}catch{$actual=$_.Exception.Message};Assert-Library ($actual.Contains($Expected)) "refusal-$Expected"}
-function New-TestArchive([string]$Library,[string]$Name,[string]$Version){
+function New-TestArchive([string]$Library,[string]$Name,[string]$Version,[string]$FactorioVersion='2.1'){
   $path=Join-Path $Library ($Name+'_'+$Version+'.zip')
   $zip=[IO.Compression.ZipFile]::Open($path,[IO.Compression.ZipArchiveMode]::Create)
-  try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version='2.1';dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
+  try{$entry=$zip.CreateEntry($Name+'_'+$Version+'/info.json');$writer=[IO.StreamWriter]::new($entry.Open());try{$writer.Write((@{name=$Name;version=$Version;factorio_version=$FactorioVersion;dependencies=@('base')}|ConvertTo-Json -Compress))}finally{$writer.Dispose()}}finally{$zip.Dispose()}
   return $path
 }
 try {
@@ -44,6 +44,39 @@ try {
   } finally {if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
   Assert-Library ($completion.status-ceq'restored-direct-library-controls'-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'completion'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'restoration'
+  # Exercise the existing legacy owned-name transaction with disposable
+  # authored ZIPs only. No real engine or external mod library is accessed.
+  $legacy=Join-Path $root 'legacy-library';$legacyData=Join-Path $root 'legacy-engine/data'
+  foreach($path in @($legacy,(Join-Path $legacyData 'base'))){[IO.Directory]::CreateDirectory($path)|Out-Null}
+  [IO.File]::WriteAllText((Join-Path $legacyData 'base/info.json'),'{"name":"base","version":"0.13.20","dependencies":[]}',[Text.UTF8Encoding]::new($false))
+  $chosen=New-TestArchive $legacy 'more-infinite-research' '5.0.01300' '0.13'
+  $alternate=New-TestArchive $legacy 'more-infinite-research' '4.7.01303' '0.13'
+  $dependency=New-TestArchive $legacy 'controlled' '1.0.0' '0.13'
+  $otherDependency=New-TestArchive $legacy 'controlled' '2.0.0' '0.13'
+  $originals=@{}
+  foreach($path in @($chosen,$alternate,$dependency,$otherDependency)){
+    $originals[$path]=@{sha256=Get-MIRImmutableInputSha256 $path;identity=Get-MIRImmutableInputFileIdentity $path}
+  }
+  [IO.File]::WriteAllText((Join-Path $legacy 'mod-list.json'),$originalList,[Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllBytes((Join-Path $legacy 'mod-settings.dat'),$originalSettings)
+  $legacyProfile=Join-Path $root 'legacy-profile.json'
+  [IO.File]::WriteAllText($legacyProfile,(@{mods=@(@{name='base';version='0.13.20';enabled=$true},@{name='more-infinite-research';version='5.0.01300';enabled=$true},@{name='controlled';version='1.0.0';enabled=$true})}|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
+  $legacyHashes=@{([IO.Path]::GetFileName($chosen))=$originals[$chosen].sha256;([IO.Path]::GetFileName($dependency))=$originals[$dependency].sha256}
+  Refuses-Library {Start-MIRLibraryActivation -LibraryDirectory $legacy -EngineDataDirectory $legacyData -ProfilePath $legacyProfile -ArchiveHashes $legacyHashes -PrePinMIROwnedArchiveNames @('controlled')} '[mir-library-owned-version-dependency-forbidden]'
+  $activation=Start-MIRLibraryActivation -LibraryDirectory $legacy -EngineDataDirectory $legacyData -ProfilePath $legacyProfile -ArchiveHashes $legacyHashes -PrePinMIROwnedArchiveNames @('more-infinite-research')
+  try{
+    $hidden=@(Get-ChildItem -LiteralPath $legacy -Filter '*.mir-hidden-*')
+    Assert-Library ($hidden.Count-eq1-and-not(Test-Path -LiteralPath $alternate)) 'only-alternate-owned-version-hidden'
+    Assert-Library ((Get-MIRImmutableInputSha256 $hidden[0].FullName)-ceq$originals[$alternate].sha256-and(Get-MIRImmutableInputFileIdentity $hidden[0].FullName)-ceq$originals[$alternate].identity) 'hidden-identity-and-bytes'
+    foreach($path in @($chosen,$dependency,$otherDependency)){
+      Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$originals[$path].sha256-and(Get-MIRImmutableInputFileIdentity $path)-ceq$originals[$path].identity) 'selected-and-dependency-archives-untouched'
+    }
+  }finally{if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
+  foreach($path in $originals.Keys){
+    Assert-Library ((Get-MIRImmutableInputSha256 $path)-ceq$originals[$path].sha256-and(Get-MIRImmutableInputFileIdentity $path)-ceq$originals[$path].identity) 'legacy-original-identity-and-bytes-restored'
+  }
+  Assert-Library ($completion.owned_archive_names_temporarily_hidden-eq1-and@(Get-ChildItem -LiteralPath $legacy -Filter '*.mir-hidden-*').Count-eq0-and-not(Test-Path -LiteralPath (Join-Path $legacy '.mir-active-profile.json'))) 'legacy-owned-selection-restored'
+  Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $legacy 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $legacy 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'legacy-controls-restored'
   [pscustomobject]@{status='passed';checks=$checks;native_execution=$false;package_materialization=$false}|ConvertTo-Json -Compress
 } finally {
   if(Test-Path -LiteralPath $root){Remove-MIR441ContainedTree -AdmittedRoot (Join-Path $repo 'build/tmp') -Path $root}

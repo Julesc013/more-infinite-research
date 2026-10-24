@@ -436,11 +436,14 @@ try{
   }
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
-  # Only the predecessor-to-successor transition on engines that parse
-  # disabled archive names needs the durable owned-version selection. Fresh
-  # historical runs retain their external direct-library path unchanged.
-  if($historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
-    $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+  # These engines also parse disabled archive versions in a fresh world.
+  # Preserve single-version external libraries. Coexisting owned versions
+  # use the existing checkout-local selector and identity/hash restoration.
+  if($historical -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
+    $otherMirVersions=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -cne $mirRows[0].version})
+    if($historicalTransition -or $otherMirVersions.Count -gt 0){
+      $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+    }
   }
   $activation=Start-MIRLibraryActivation @activationArguments
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
