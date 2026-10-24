@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalCurrentPackagesNativeChainV1",
+  "status": "passed-current-historical-packages",
+  "release_qualification": false,
+  "native_run": {
+    "run": 40120381830,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40120381830",
+    "controller_commit": "8f0afa751810338e166a55067570d71277d9441c",
+    "job": 120950433797
+  },
+  "source": {
+    "commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "source_checkout_head": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "native_runner_source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "native_runner_git_blob": "ca43f9b86d575301461ec5048c80275aa3df2b36",
+    "harness_sha256": "672188E8CCC75007487206161235BFE777EF6C2D87722CA446992151BC46696B",
+    "asset_inventory_sha256": "DB5A20C3251773867C10E57A56B0F128E09FFE3A4023EBCDC46C6251109EEF59"
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/artifact-manifest.json",
+    "sha256": "3AF1ECA3F6E71E29B876C45B72F16F733BC3D26F6424F090C5C4A4B3B17F865B",
+    "members": 480,
+    "verified_members": 480,
+    "member_bytes": 18632631
+  },
+  "cases": [
+    {
+      "target": "f013",
+      "engine": {
+        "version": "0.13.20",
+        "sha256": "F12C0DF5A5EF0D72F50A24BD76E077DFC9CBEAB4B31EE9EF0951A4A9C086B856"
+      },
+      "player": {
+        "version": "5.0.01300",
+        "sha256": "6227454FFCB6E2D0E8C80B79CB9C81E37B1694D80E127671C9EE9D6D028997AA",
+        "bytes": 344830
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f013.json",
+        "sha256": "C63A0763A1551C5C8947F5F0D3E0E4CA4E7F68BCB481BC39B7B92EFB4FEE2985"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "DDDAE0CFABAB785B7F1DA7BF057A74A6C30451964A72201068BEBBF37E603DE6"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f013/native/result.json",
+        "sha256": "5C724B380A3C62AB7883C7A0BE47AA2B2BAAF9D49CB7557168985CD232E8EB3F",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f013/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "7840D3DC01D7400B3F280820CC232B57A64DD286DFE989E75A8D967064E474EF"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "7840D3DC01D7400B3F280820CC232B57A64DD286DFE989E75A8D967064E474EF",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "5C724B380A3C62AB7883C7A0BE47AA2B2BAAF9D49CB7557168985CD232E8EB3F"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "7840D3DC01D7400B3F280820CC232B57A64DD286DFE989E75A8D967064E474EF",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "5C724B380A3C62AB7883C7A0BE47AA2B2BAAF9D49CB7557168985CD232E8EB3F"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f014",
+      "engine": {
+        "version": "0.14.23",
+        "sha256": "A2B7DC0FBC1D6D68CF4D71EB71D42952FBB3B0CF35EEC6BF8B4BA16B9F79715F"
+      },
+      "player": {
+        "version": "5.0.01400",
+        "sha256": "74C805D70C94ECC6103EB9CBD79188BC1F90DD82F75E644F99799F06F6094011",
+        "bytes": 344830
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f014.json",
+        "sha256": "5C16AFE16DBC0AB057EC648DD4D2BB93A5115C754A60E0EEBEA9CDF81FCAFE8D"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "DFE4E6D0640903661143A7752310A84A5FD3BE4846B50045C2C01ACDA35B2EF3"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f014/native/result.json",
+        "sha256": "8284DAEC7B6CA3869E86071ED81F460BEDC6516D34DFA1C72ED56716FB2EBEA3",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.05,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "numeric-finite-witness",
+        "continuation_lab_completions": 0,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f014/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "54E7F8E8816B79A24461B4E5C914011CBC8242DFFAD2D11C2D4A6C05EA097D19"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "54E7F8E8816B79A24461B4E5C914011CBC8242DFFAD2D11C2D4A6C05EA097D19",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "8284DAEC7B6CA3869E86071ED81F460BEDC6516D34DFA1C72ED56716FB2EBEA3"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "54E7F8E8816B79A24461B4E5C914011CBC8242DFFAD2D11C2D4A6C05EA097D19",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "8284DAEC7B6CA3869E86071ED81F460BEDC6516D34DFA1C72ED56716FB2EBEA3"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f015",
+      "engine": {
+        "version": "0.15.40",
+        "sha256": "A1C87043244BEAE8E5903FB7D4A96E7920189C6339F00E3A2398988B9C8E7DD6"
+      },
+      "player": {
+        "version": "5.0.01500",
+        "sha256": "3DDFD66AA3A957C903A8BAD4D20577D29DC0A26A5B07D5A28386A991D32F13DA",
+        "bytes": 344790
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f015.json",
+        "sha256": "6FE3DCE136FF3EC9FACD862936D05ABC1ED3881FC7BC166A30B08F90F84311D9"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "A461C4043EFDC5C1FCED2B9DF7BC8C4896B39E93C8429E791E6994981BAD3CCA"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f015/native/result.json",
+        "sha256": "E3FCDAC0C7540A4FFB421E7BC419DDBCDF96D22F545AAEC778EE9B7076E773D6",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f015/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "BD84171E7E51A26ACF0FF5C5B2730ADA54EB7A7C350C952B323A471E6722EEDA"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "BD84171E7E51A26ACF0FF5C5B2730ADA54EB7A7C350C952B323A471E6722EEDA",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "E3FCDAC0C7540A4FFB421E7BC419DDBCDF96D22F545AAEC778EE9B7076E773D6"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "BD84171E7E51A26ACF0FF5C5B2730ADA54EB7A7C350C952B323A471E6722EEDA",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "E3FCDAC0C7540A4FFB421E7BC419DDBCDF96D22F545AAEC778EE9B7076E773D6"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f016",
+      "engine": {
+        "version": "0.16.51",
+        "sha256": "ACBA4D8B766C8CB61CBB564E0D5041439DF32D93C86127DCC3887EB329630966"
+      },
+      "player": {
+        "version": "5.0.01600",
+        "sha256": "7E742E5894E94C391F835C3362A3C0263A63D49BA5C987AEAD734510693F26E0",
+        "bytes": 344781
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f016.json",
+        "sha256": "B25C25CE885CF7E4F6F487301C72AB776AD65331B46696EA6C4A26E8C6A2DB08"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "04CF8F275E81EAA352A1985B8D2D4E787670693CAD835BBF8C7B168446B7C422"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f016/native/result.json",
+        "sha256": "9A9B0444AA57218E274998C0FBA7EDECB1F3ABD44CE305F9264713FA86A89753",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f016/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "E380F890541BBA0C19516A0ADC760549E0F059264DDD6750A4F65E12F53A80FD"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "E380F890541BBA0C19516A0ADC760549E0F059264DDD6750A4F65E12F53A80FD",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "9A9B0444AA57218E274998C0FBA7EDECB1F3ABD44CE305F9264713FA86A89753"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "E380F890541BBA0C19516A0ADC760549E0F059264DDD6750A4F65E12F53A80FD",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "9A9B0444AA57218E274998C0FBA7EDECB1F3ABD44CE305F9264713FA86A89753"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f017",
+      "engine": {
+        "version": "0.17.79",
+        "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06"
+      },
+      "player": {
+        "version": "5.0.01700",
+        "sha256": "D94106D8587275241776E003FBF10DCBAA57DAD36BB6B0E9DF7842859A32B27E",
+        "bytes": 344670
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f017.json",
+        "sha256": "F1E03CB5E8A53C8F9A8AC737550383946A81C26B789987531899A4A21393B9AB"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "ABF1617C5700759D638B8A902BBDCFEABB05C9C3BEF9941EF889966900FB483F"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f017/native/result.json",
+        "sha256": "A09DD8143DB5EC06790A853281C9CA62D6C9B850373E2F4B6F1C5F008706C5EA",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f017/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "82C2E03D5A58BB343AF873EFA963AC3CE0577CBA059005B607EEAB06AC2B1299"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "82C2E03D5A58BB343AF873EFA963AC3CE0577CBA059005B607EEAB06AC2B1299",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "A09DD8143DB5EC06790A853281C9CA62D6C9B850373E2F4B6F1C5F008706C5EA"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "82C2E03D5A58BB343AF873EFA963AC3CE0577CBA059005B607EEAB06AC2B1299",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "A09DD8143DB5EC06790A853281C9CA62D6C9B850373E2F4B6F1C5F008706C5EA"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f100",
+      "engine": {
+        "version": "1.0.0",
+        "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70"
+      },
+      "player": {
+        "version": "5.0.10000",
+        "sha256": "71143EB2C6F26264BFA880E22449196E01E76FBED9DDD4D6727AFABAE06777D5",
+        "bytes": 358462
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f100.json",
+        "sha256": "4BE1D4755A050F5A3E5DA1362ACAC09B5DDC918423350B15B0F66E75003B16CE"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "E228A3DD40D632A3BD1EEC5F2689B97A388958EF04DE40B0373FF2EFC2141D11"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f100/native/result.json",
+        "sha256": "1A57F13E2230D6AD56693965445D9C98B88F4AFE9D724A8A979C8CE7BF444D84",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f100/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "74E05038E0E7B7DBB60E3C15E083F2701EA462910CEB3731E93E1C179C81B806"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "74E05038E0E7B7DBB60E3C15E083F2701EA462910CEB3731E93E1C179C81B806",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "1A57F13E2230D6AD56693965445D9C98B88F4AFE9D724A8A979C8CE7BF444D84"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "74E05038E0E7B7DBB60E3C15E083F2701EA462910CEB3731E93E1C179C81B806",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "1A57F13E2230D6AD56693965445D9C98B88F4AFE9D724A8A979C8CE7BF444D84"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "target": "f110",
+      "engine": {
+        "version": "1.1.110",
+        "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1"
+      },
+      "player": {
+        "version": "5.0.11000",
+        "sha256": "EF1B69CED184376BAF6B7FCAABE4F33B501E11D421676DE4F740E2F972253813",
+        "bytes": 358459
+      },
+      "profile": {
+        "path": "tests/profiles/historical-native-f110.json",
+        "sha256": "6D54A5C9724088F8417922CCEA168C7C45FD24E3367EEB30E9624F7B6B220269"
+      },
+      "fixture": {
+        "name": "mir-fixture-mir5-historical-native",
+        "sha256": "7DC5A7AAF7B47D0A47F79382ACCC42086DA3E55322362C2A56208DD757060F8D"
+      },
+      "result": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f110/native/result.json",
+        "sha256": "22D8C935A700E606BBAB91315FCC10E99D44E17668364E436C3F2BAEF7040710",
+        "status": "passed-private-native-fixture"
+      },
+      "witness": {
+        "direct": "recipe-prod-research_character_mining_speed-1",
+        "direct_lab_completions": 1,
+        "direct_mining_bonus": 0.1,
+        "continuation": "inserter-capacity-bonus-8",
+        "continuation_witness": "lab-completed",
+        "continuation_lab_completions": 1,
+        "native_observation": "native-fixture-production-and-two-cold-reloads"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/historical-current-packages/40120381830/historical-current-packages/f110/native/write-data/saves/mir5-native-complete.zip",
+        "sha256": "DA8E59D212410684DEAF9BDA5FD364B9F90EFE3DFC4101A0FBE9C45523B43109"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "DA8E59D212410684DEAF9BDA5FD364B9F90EFE3DFC4101A0FBE9C45523B43109",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "22D8C935A700E606BBAB91315FCC10E99D44E17668364E436C3F2BAEF7040710"
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "DA8E59D212410684DEAF9BDA5FD364B9F90EFE3DFC4101A0FBE9C45523B43109",
+          "save_byte_identical": true,
+          "on_load_read_only": true,
+          "result_sha256": "22D8C935A700E606BBAB91315FCC10E99D44E17668364E436C3F2BAEF7040710"
+        }
+      ],
+      "processes": {
+        "count": 4,
+        "all_passed": true,
+        "all_untimed": true
+      },
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    }
+  ],
+  "retained_adverse": {
+    "run": 40115160168,
+    "artifact_manifest_sha256": "9E9D96F46C499D07DE6EFFA186A39565E32167310AC7178E4AEDC861E02AB7A7",
+    "verified_members": 16,
+    "native_launches": 0,
+    "disposition": "pre-engine duplicate MIR archive refusal retained; it is not this passing execution"
+  },
+  "limits": [
+    "Fresh current-package behavior on seven installed historical engines only.",
+    "No historical published-to-current migration transition, multiplayer, full modpack compatibility, or release qualification follows from this chain.",
+    "Direct native timing measurements are governed execution evidence and make no product-speedup claim."
+  ]
+}
