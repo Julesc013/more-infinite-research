@@ -148,6 +148,12 @@ function Get-MIROwnedProcessMemorySleepMilliseconds {
   return [Math]::Max(1, [Math]::Min($MaximumDelayMilliseconds, [int][Math]::Ceiling($remaining)))
 }
 
+function ConvertTo-MIROwnedProcessMemoryObservationBytes {
+  param([Parameter(Mandatory)]$Receipt)
+  $json = $Receipt | ConvertTo-Json -Depth 8 -Compress
+  return ,[Text.UTF8Encoding]::new($false).GetBytes($json)
+}
+
 function Get-MIROwnedProcessMemoryObservationReceipt {
   param([Parameter(Mandatory)]$Sampler)
   foreach ($key in $Sampler.expected_slots.Keys) {
@@ -162,17 +168,35 @@ function Get-MIROwnedProcessMemoryObservationReceipt {
     target_interval_milliseconds = [int]($Sampler.target_interval_milliseconds)
     maximum_duration_seconds = [int]($Sampler.maximum_duration_seconds)
     maximum_observations = [int]($Sampler.maximum_observations)
-    maximum_serialized_bytes = [int64]($Sampler.maximum_serialized_bytes)
+    maximum_serialized_bytes = [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes
     observations = @($Sampler.observations)
     incomplete_reasons = @($Sampler.incomplete_reasons)
   }
-  $bytes = [Text.UTF8Encoding]::new($false).GetByteCount(($receipt | ConvertTo-Json -Depth 8 -Compress))
-  if ($bytes -gt [int64]($Sampler.maximum_serialized_bytes)) {
+  $bytes = ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt
+  if ($bytes.Length -gt [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes) {
     $Sampler.observations.Clear()
     Set-MIROwnedProcessMemoryIncomplete -Sampler $Sampler -Reason 'serialized-output-limit'
     $receipt.status = 'incomplete-observation'
     $receipt.observations = @()
     $receipt.incomplete_reasons = @($Sampler.incomplete_reasons)
+    $bytes = ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt
+  }
+  if ($bytes.Length -gt [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes) {
+    throw '[mir5-owned-process-memory-receipt-limit]'
   }
   return [pscustomobject]$receipt
+}
+
+function Write-MIROwnedProcessMemoryObservationReceipt {
+  param(
+    [Parameter(Mandatory)]$Sampler,
+    [Parameter(Mandatory)][string]$Path
+  )
+  $receipt = Get-MIROwnedProcessMemoryObservationReceipt -Sampler $Sampler
+  $bytes = ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt
+  if ($bytes.Length -gt [int64]$script:MIROwnedProcessMemoryMaximumOutputBytes) {
+    throw '[mir5-owned-process-memory-receipt-limit]'
+  }
+  [IO.File]::WriteAllBytes($Path, $bytes)
+  return $receipt
 }
