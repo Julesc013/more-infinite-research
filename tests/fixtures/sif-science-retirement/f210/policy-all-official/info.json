@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-sif-policy-all-official-f210",
+  "version": "0.1.0",
+  "title": "MIR 5 private SIF all-official policy selector (F210)",
+  "author": "MIR maintainers",
+  "description": "Selects one exact startup science policy for the private SIF fixture.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-sif-science-retirement-f210 >= 0.1.0"
+  ]
+}

@@ -1,0 +1,8 @@
+local setting = assert(data.raw["string-setting"] and data.raw["string-setting"]["mir-science-pack-ingredient-policy"],
+  "[mir5-sif-official-progression] MIR policy setting is absent")
+assert(setting.setting_type == "startup" and type(setting.allowed_values) == "table",
+  "[mir5-sif-official-progression] MIR policy setting contract differs")
+local found = false
+for _, value in ipairs(setting.allowed_values) do if value == "official-progression" then found = true end end
+assert(found, "[mir5-sif-official-progression] authored policy is not allowed")
+setting.default_value = "official-progression"
