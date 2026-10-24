@@ -1,0 +1,249 @@
+{
+  "schema": 1,
+  "kind": "MIRAeroIndependentFrozenAssetReadbackV1",
+  "status": "passed-offline-rebuild-and-member-comparison-not-native-acceptance",
+  "source": {
+    "commit": "4d35b9f478d7350d67e50c60b89b213aa8a100e3",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "9b8ee35322337177f2ba351cc6d7de1bc212aef0",
+    "tree": "e67d9d2486148771d8866a20759b26f35bc03e7b"
+  },
+  "target_record": {
+    "blob": "8b514fd337d10c17d6662e84ef90b1f7f054eeb9",
+    "path": "targets/editions.json",
+    "sha256": "fade5578945b1d397ff55d600efdff167db590231b6408d84e87035b96ba4800"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "inventory_sha256": "a7d206cdb2459e5a0d51a47edea21e090ffd795cf7a78aeea2bb95aaa8c0af81",
+  "inventory_self_digest": "e1520eff839bc8b1a0bd056ed374bc8b75d101f93c634abd99d661a5551299ba",
+  "checksums": {
+    "bytes": 927,
+    "name": "SHA256SUMS.txt",
+    "sha256": "9e2a22821bf153b223488b4248a9aaea5dd0cb472f792fe41b8ad9de0fbb831f"
+  },
+  "prior_freeze": {
+    "commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+    "inventory_sha256": "58fcb8871ab3f3f8afe4b11b82e3404c98d2bcc79a67a0b247e98431fb4c2753",
+    "evidence": "spec/evidence/current-assets-f5223e1f-readback.json"
+  },
+  "observed_black_glass_custody": {
+    "commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+    "whole_tree_equal": true,
+    "native_execution_claimed": false
+  },
+  "commands": [
+    "python -B tools/release.py --source source --revision 4d35b9f478d7350d67e50c60b89b213aa8a100e3 --output ../mir5-freeze/aero-4d35b9f4-r01",
+    "python -B tools/release.py --source source --output ../mir5-freeze/aero-4d35b9f4-r01 --verify"
+  ],
+  "asset_custody": "C:/Projects/Factorio/mir5-freeze/aero-4d35b9f4-r01",
+  "primary_command_custody": "build/mir5/aero-4d35-assets-r01",
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 344830,
+      "archive_sha256": "6227454ffcb6e2d0e8c80b79cb9c81e37b1694d80e127671c9ee9d6d028997aa",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 344830,
+      "archive_sha256": "74c805d70c94ecc6103eb9cbd79188bc1f90dd82f75e644f99799f06f6094011",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 344790,
+      "archive_sha256": "3ddfd66aa3a957c903a8bad4d20577d29dc0a26a5b07d5a28386a991d32f13da",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 344781,
+      "archive_sha256": "7e742e5894e94c391f835c3362a3c0263a63d49ba5c987aead734510693f26e0",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 344670,
+      "archive_sha256": "d94106d8587275241776e003fbf10dcbaa57dad36bb6b0e9df7842859a32b27e",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 358462,
+      "archive_sha256": "71143eb2c6f26264bfa880e22449196e01e76fbed9ddd4d6727afabae06777d5",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 358459,
+      "archive_sha256": "ef1b69ced184376baf6b7fcaabe4f33b501e11d421676de4f740e2f972253813",
+      "members": 128,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 546923,
+      "archive_sha256": "5e0934a488eab7510c58d0e0303295f804b60d7cecad8f47f8e709a90ef8bc2c",
+      "members": 198,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        },
+        {
+          "path": "info.json",
+          "before_sha256": "1f856c88d1d3d8c6334752d54ecd48be3cd949c3f9c44f324bea6450d5254fb3",
+          "after_sha256": "61e770487bf4a46c9234bf1b305084c3c4f6f01e4ec58d20420729a292b122f2"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 547459,
+      "archive_sha256": "e5ccfbd2f19ec6c0001f86994011b23515997f61ab90f735a9c9b4a0379426b4",
+      "members": 198,
+      "added_members": [],
+      "removed_members": [],
+      "changed_members": [
+        {
+          "path": "compatibility/science_bindings.lua",
+          "before_sha256": "63a300f7c5b84defce207199df5254a19f621b2bb7014dde8083cb81616ab58c",
+          "after_sha256": "7cda85d3728b2af59d285fd5e68a58343f5353309e5d82fa0d9027e7801f356c"
+        },
+        {
+          "path": "info.json",
+          "before_sha256": "798fa15c7a11936bb92dc23a9962f2910552e8db17f543abd63667cf33c18d8a",
+          "after_sha256": "e0ee3c2c3446837e4b72ad6e88d287a444d7f4cd8b0ef91d468d067c5585cbb6"
+        }
+      ],
+      "all_other_members_byte_identical": true
+    }
+  ],
+  "native_tests_run": false,
+  "published": false,
+  "limits": [
+    "Offline candidate reproduction and exact member impact only; no native, save, client, performance or release acceptance.",
+    "This record does not replace the earlier frozen inputs or rename their observed results.",
+    "Black Glass retains the native lane and final release coordination; its independently built inventory may have different commit provenance.",
+    "Final accepted asset delivery to primary dist, main/tag reconciliation and public readback remain pending."
+  ]
+}
