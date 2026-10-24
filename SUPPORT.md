@@ -23,4 +23,4 @@ MIR does not claim universal modpack support. A support result is exact to its t
 
 MEP/API/SDK/Inspector/ProcessIR are MIR 4.0 developer previews. Their contracts and conformance horizon are documented, but they do not grant player emission or stable public SDK 1.0 authority.
 
-The current [MIR5 support and upgrade guide](docs/mir5/support.md) describes candidate editions, first-upgrade precautions and exact evidence limits. Original published MIR4 preview contracts remain available through their pinned historical Git refs.
+The current [MIR5 support and upgrade guide](docs/support.md) describes candidate editions, first-upgrade precautions and exact evidence limits. Original published MIR4 preview contracts remain available through their pinned historical Git refs.

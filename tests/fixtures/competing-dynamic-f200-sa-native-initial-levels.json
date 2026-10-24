@@ -1,0 +1,430 @@
+{
+  "adverse_receipt": {
+    "path": "spec/evidence/competing-dynamic-native-initial-levels-adverse-receipt.json.gz",
+    "sha256": "4D689D4507AB1290AE58C13CAE6F2793146FB0E2057961A2BF635BE1E31D466F",
+    "uncompressed_sha256": "99AA64E6021C355773250055566FE71BB6035DB3B68B86391C8CF91A210F9322"
+  },
+  "kind": "MIR5DynamicCompetingF200SANativeInitialLevelsV1",
+  "observations": [
+    {
+      "artifact_manifest": {
+        "members_verified": 95,
+        "sha256": "10BA18E2E7B836ADBCE90B2FC71ACF4FD1C142FC6660064D3C06AD4AE8D4AE6A"
+      },
+      "case": "f200-competing-dynamic-ce-continuity",
+      "create_log": {
+        "bytes": 42046,
+        "path": "gameplay\\published\\create.factorio.log",
+        "sha256": "0161F2CAA256DDF33E1F4DE835640714714C2F08E08D9EB9BDD7D80A65A95D7E"
+      },
+      "engine": {
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77"
+      },
+      "levels": [
+        {
+          "id": "ce-advanced-circuit-16",
+          "prototype_level": 16,
+          "technology_level": 16
+        },
+        {
+          "id": "ce-advanced-oil-processing-11",
+          "prototype_level": 11,
+          "technology_level": 11
+        },
+        {
+          "id": "ce-agricultural-science-pack-30",
+          "prototype_level": 30,
+          "technology_level": 30
+        },
+        {
+          "id": "ce-automation-science-pack-42",
+          "prototype_level": 42,
+          "technology_level": 42
+        },
+        {
+          "id": "ce-basic-oil-processing-16",
+          "prototype_level": 16,
+          "technology_level": 16
+        },
+        {
+          "id": "ce-battery-16",
+          "prototype_level": 16,
+          "technology_level": 16
+        },
+        {
+          "id": "ce-chemical-science-pack-30",
+          "prototype_level": 30,
+          "technology_level": 30
+        },
+        {
+          "id": "ce-coal-liquefaction-8",
+          "prototype_level": 8,
+          "technology_level": 8
+        },
+        {
+          "id": "ce-copper-cable-19",
+          "prototype_level": 19,
+          "technology_level": 19
+        },
+        {
+          "id": "ce-cryogenic-science-pack-15",
+          "prototype_level": 15,
+          "technology_level": 15
+        },
+        {
+          "id": "ce-electric-engine-unit-11",
+          "prototype_level": 11,
+          "technology_level": 11
+        },
+        {
+          "id": "ce-electromagnetic-science-pack-30",
+          "prototype_level": 30,
+          "technology_level": 30
+        },
+        {
+          "id": "ce-electronic-circuit-19",
+          "prototype_level": 19,
+          "technology_level": 19
+        },
+        {
+          "id": "ce-engine-unit-19",
+          "prototype_level": 19,
+          "technology_level": 19
+        },
+        {
+          "id": "ce-firearm-magazine-17",
+          "prototype_level": 17,
+          "technology_level": 17
+        },
+        {
+          "id": "ce-flying-robot-frame-11",
+          "prototype_level": 11,
+          "technology_level": 11
+        },
+        {
+          "id": "ce-grenade-14",
+          "prototype_level": 14,
+          "technology_level": 14
+        },
+        {
+          "id": "ce-iron-gear-wheel-19",
+          "prototype_level": 19,
+          "technology_level": 19
+        },
+        {
+          "id": "ce-iron-stick-19",
+          "prototype_level": 19,
+          "technology_level": 19
+        },
+        {
+          "id": "ce-logistic-science-pack-36",
+          "prototype_level": 36,
+          "technology_level": 36
+        },
+        {
+          "id": "ce-lubricant-8",
+          "prototype_level": 8,
+          "technology_level": 8
+        },
+        {
+          "id": "ce-metallurgic-science-pack-30",
+          "prototype_level": 30,
+          "technology_level": 30
+        },
+        {
+          "id": "ce-military-science-pack-30",
+          "prototype_level": 30,
+          "technology_level": 30
+        },
+        {
+          "id": "ce-production-science-pack-24",
+          "prototype_level": 24,
+          "technology_level": 24
+        },
+        {
+          "id": "ce-promethium-science-pack-15",
+          "prototype_level": 15,
+          "technology_level": 15
+        },
+        {
+          "id": "ce-space-science-pack-15",
+          "prototype_level": 15,
+          "technology_level": 15
+        },
+        {
+          "id": "ce-sulfur-16",
+          "prototype_level": 16,
+          "technology_level": 16
+        },
+        {
+          "id": "ce-utility-science-pack-15",
+          "prototype_level": 15,
+          "technology_level": 15
+        }
+      ],
+      "local_artifact_path": "build/mir5/black-glass/incoming/40027133277/black-glass-competing-dynamic-ce-gameplay-40027133277-1",
+      "observation_scope": "pre-prerequisite native prototype/technology levels only; this adverse fixture run is not a transition pass",
+      "provider": {
+        "name": "crafting-efficiency-2",
+        "version": "0.2.20"
+      },
+      "provider_key": "crafting-efficiency",
+      "release_qualification": false,
+      "run": 40027133277,
+      "source_head": "3b6ce7df081a5b8b2e265f00f0ad530230b72b64",
+      "status": "failed"
+    },
+    {
+      "artifact_manifest": {
+        "members_verified": 95,
+        "sha256": "7EB10D6E216314189F6BFA95C5151054738194C4F53109E6DE86AD467E7B2D01"
+      },
+      "case": "f200-competing-dynamic-pr-continuity",
+      "create_log": {
+        "bytes": 54202,
+        "path": "gameplay\\published\\create.factorio.log",
+        "sha256": "56921C94B91E444DF4691C2D1236F0AAE690F774ECC502A9050C2154E4F21741"
+      },
+      "engine": {
+        "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+        "version": "2.0.77"
+      },
+      "levels": [
+        {
+          "id": "sem-prfe_advanced-circuit-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_advanced-oil-processing-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_agricultural-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_artificial-jellynut-soil-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_artificial-yumako-soil-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_automation-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_battery-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_bioflux-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_carbon-fiber-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_chemical-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_copper-cable-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_copper-plate-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_cryogenic-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_electric-engine-unit-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_electromagnetic-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_electronic-circuit-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_engine-unit-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_explosives-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_flying-robot-frame-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_holmium-plate-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_iron-gear-wheel-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_iron-plate-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_iron-stick-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_lithium-plate-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_logistic-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_lubricant-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_metallurgic-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_military-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_pentapod-egg-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_production-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_promethium-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_quantum-processor-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_space-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_stone-brick-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_sulfur-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_sulfuric-acid-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_supercapacitor-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_superconductor-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_thruster-fuel-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_thruster-oxidizer-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_tungsten-carbide-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_tungsten-plate-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        },
+        {
+          "id": "sem-prfe_utility-science-pack-productivity-1",
+          "prototype_level": 1,
+          "technology_level": 1
+        }
+      ],
+      "local_artifact_path": "build/mir5/black-glass/incoming/40027140695/black-glass-competing-dynamic-pr-gameplay-40027140695-1",
+      "observation_scope": "pre-prerequisite native prototype/technology levels only; this adverse fixture run is not a transition pass",
+      "provider": {
+        "name": "ProductivityResearch",
+        "version": "1.3.2"
+      },
+      "provider_key": "productivity-research",
+      "release_qualification": false,
+      "run": 40027140695,
+      "source_head": "3b6ce7df081a5b8b2e265f00f0ad530230b72b64",
+      "status": "failed"
+    }
+  ],
+  "raw_reference": {
+    "note": "Raw capture levels are deliberately retained unchanged: their omitted level field did not establish the native prototype starting level.",
+    "path": "tests/fixtures/competing-dynamic-f200-sa-captured-facts.json",
+    "sha256": "56963D4B04EC1F5770AF8C20587D8D594D0A9ACC2784EAEA3210E744EFCDCFA8"
+  },
+  "schema": 1,
+  "scope": "71 exact published-4.7 native initial technology/prototype level observations; the two diagnostic runs failed and do not qualify a continuity transition."
+}

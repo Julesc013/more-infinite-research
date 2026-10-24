@@ -28,6 +28,6 @@ Routine implementation branches, public development pushes, pull requests, integ
 
 Read back the protected target after integration and complete required forward-port dispositions. `main` and `dev` may intentionally differ during next-release development; `dev` is not a read-only mirror. Preserve dirty or uniquely valuable local work. Immutable release evidence is never rewritten; corrections are new events.
 
-See [Contributing](CONTRIBUTING.md), [Release runbook](docs/mir5/development.md#github-publication-after-acceptance), and [Project continuity](docs/mir5/progress.md).
+See [Contributing](CONTRIBUTING.md), [Release runbook](docs/development.md#github-publication-after-acceptance), and [Project continuity](docs/progress.md).
 
-The maintainer explicitly authorizes MIR5 main promotion and GitHub publication only after complete acceptance, with unsigned canonical tagging when the enrolled key is unavailable. This does not authorize credential/control changes or substitute source checks for native evidence. The [MIR5 release procedure](docs/mir5/development.md#github-publication-after-acceptance) owns that route; original MIR4 seals and maintainer decisions remain historical evidence.
+The maintainer explicitly authorizes MIR5 main promotion and GitHub publication only after complete acceptance, with unsigned canonical tagging when the enrolled key is unavailable. This does not authorize credential/control changes or substitute source checks for native evidence. The [MIR5 release procedure](docs/development.md#github-publication-after-acceptance) owns that route; original MIR4 seals and maintainer decisions remain historical evidence.

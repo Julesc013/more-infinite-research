@@ -1,1 +1,0 @@
--- Runtime-only upgrade fixture. The data-stage entrypoint is intentionally inert.

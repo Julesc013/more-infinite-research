@@ -1,0 +1,405 @@
+{
+  "schema": 1,
+  "kind": "mir5-k2-base-f200-captured-facts",
+  "status": "developer-only-source-test-input",
+  "profile": "tests/profiles/k2-base-f200-2077.json",
+  "profile_sha256": "664835819E0895AADA7426A777DAA9D046CB443603BF35EE0D047337E2E9C4F0",
+  "engine": {
+    "target": "f200",
+    "version": "2.0.77"
+  },
+  "raw": {
+    "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/capture/write-data/script-output/data-raw-dump.json",
+    "sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390"
+  },
+  "native_settings": {
+    "path": "build/mir5/black-glass/incoming/39962601418/black-glass-k2-upstream-39962601418-1/capture/write-data/script-output/mod-settings-dump.json",
+    "sha256": "2C60A465AA5CEC4E8B3A62578F7B5314D95D578F58413D439D7F16482829A17B"
+  },
+  "captured_native_subset": {
+    "role": "portable fields selected from the hash-locked no-MIR raw for the hosted Generator test",
+    "source_sha256": "24023000F3FCC8916869ED49DC4341AB05DC5F6AF91DAD5DCEB1D9736C0C7390",
+    "native_technology_names": [
+      "automation-science-pack", "braking-force-6", "braking-force-7", "chemical-science-pack",
+      "discharge-defense-equipment", "flamethrower", "inserter-capacity-bonus-6", "inserter-capacity-bonus-7",
+      "laser-shooting-speed-6", "laser-shooting-speed-7", "logistic-science-pack", "military-science-pack",
+      "production-science-pack", "research-speed-5", "research-speed-6", "rocketry", "tank",
+      "utility-science-pack", "weapon-shooting-speed-5", "weapon-shooting-speed-6",
+      "worker-robots-storage-2", "worker-robots-storage-3"
+    ],
+    "native_recipe_names": [
+      "accumulator", "advanced-circuit", "advanced-oil-processing", "artillery-shell", "atomic-bomb",
+      "automation-science-pack", "basic-oil-processing", "battery", "bulk-inserter", "burner-inserter",
+      "burner-mining-drill", "cannon-shell", "chemical-science-pack", "cluster-grenade", "coal-liquefaction",
+      "concrete", "copper-cable", "copper-plate", "efficiency-module", "efficiency-module-2", "efficiency-module-3",
+      "electric-engine-unit", "electric-furnace", "electric-mining-drill", "electronic-circuit", "engine-unit",
+      "explosive-cannon-shell", "explosive-rocket", "explosive-uranium-cannon-shell", "explosives",
+      "express-splitter", "express-transport-belt", "express-underground-belt", "fast-inserter", "fast-splitter",
+      "fast-transport-belt", "fast-underground-belt", "firearm-magazine", "flying-robot-frame", "gate",
+      "grenade", "hazard-concrete", "heavy-oil-cracking", "inserter", "iron-gear-wheel", "iron-plate",
+      "iron-stick", "kr-advanced-loader", "kr-advanced-splitter", "kr-advanced-transport-belt",
+      "kr-advanced-underground-belt", "kr-antimatter-artillery-shell", "kr-copper-cable-from-copper-ore",
+      "kr-copper-cable-from-enriched-copper", "kr-copper-plate-from-enriched-copper", "kr-express-loader",
+      "kr-fast-loader", "kr-iron-gear-wheel-from-enriched-iron", "kr-iron-gear-wheel-from-iron-ore",
+      "kr-iron-plate-from-enriched-iron", "kr-iron-stick-from-enriched-iron", "kr-iron-stick-from-iron-ore",
+      "kr-landfill-with-sand", "kr-loader", "kr-matter-to-copper-plate", "kr-matter-to-iron-plate",
+      "kr-matter-to-plastic-bar", "kr-matter-to-steel-plate", "kr-matter-to-sulfur",
+      "kr-nuclear-artillery-shell", "kr-quarry-drill", "kr-rocket-fuel-with-ammonia",
+      "kr-rocket-fuel-with-hydrogen-chloride", "kr-superior-inserter", "kr-superior-loader",
+      "kr-superior-long-inserter", "kr-superior-splitter", "kr-superior-transport-belt",
+      "kr-superior-underground-belt", "landfill", "light-oil-cracking", "logistic-science-pack",
+      "long-handed-inserter", "low-density-structure", "lubricant", "military-science-pack",
+      "piercing-rounds-magazine", "piercing-shotgun-shell", "plastic-bar", "processing-unit",
+      "production-science-pack", "productivity-module", "productivity-module-2", "productivity-module-3", "rail",
+      "refined-concrete", "refined-hazard-concrete", "rocket", "rocket-fuel", "shotgun-shell", "solar-panel",
+      "speed-module", "speed-module-2", "speed-module-3", "splitter", "steel-furnace", "steel-plate",
+      "stone-brick", "stone-furnace", "stone-wall", "sulfur", "sulfuric-acid", "transport-belt",
+      "underground-belt", "uranium-cannon-shell", "uranium-rounds-magazine", "utility-science-pack"
+    ],
+    "recipe_product_fields": [
+      {"recipe":"kr-advanced-loader","product":"kr-advanced-loader","amount":1},
+      {"recipe":"kr-advanced-splitter","product":"kr-advanced-splitter","amount":1},
+      {"recipe":"kr-advanced-transport-belt","product":"kr-advanced-transport-belt","amount":1},
+      {"recipe":"kr-advanced-underground-belt","product":"kr-advanced-underground-belt","amount":2},
+      {"recipe":"kr-express-loader","product":"kr-express-loader","amount":1},
+      {"recipe":"kr-fast-loader","product":"kr-fast-loader","amount":1},
+      {"recipe":"kr-loader","product":"kr-loader","amount":1},
+      {"recipe":"kr-superior-loader","product":"kr-superior-loader","amount":1},
+      {"recipe":"kr-superior-splitter","product":"kr-superior-splitter","amount":1},
+      {"recipe":"kr-superior-transport-belt","product":"kr-superior-transport-belt","amount":1},
+      {"recipe":"kr-superior-underground-belt","product":"kr-superior-underground-belt","amount":2},
+      {"recipe":"kr-copper-plate-from-enriched-copper","product":"copper-plate","amount":5},
+      {"recipe":"kr-matter-to-copper-plate","product":"copper-plate","amount":10},
+      {"recipe":"kr-copper-cable-from-copper-ore","product":"copper-cable","amount":2},
+      {"recipe":"kr-copper-cable-from-enriched-copper","product":"copper-cable","amount":2},
+      {"recipe":"kr-iron-gear-wheel-from-enriched-iron","product":"iron-gear-wheel","amount":1},
+      {"recipe":"kr-iron-gear-wheel-from-iron-ore","product":"iron-gear-wheel","amount":1},
+      {"recipe":"kr-antimatter-artillery-shell","product":"kr-antimatter-artillery-shell","amount":1},
+      {"recipe":"kr-nuclear-artillery-shell","product":"kr-nuclear-artillery-shell","amount":1},
+      {"recipe":"kr-superior-inserter","product":"kr-superior-inserter","amount":1},
+      {"recipe":"kr-superior-long-inserter","product":"kr-superior-long-inserter","amount":1},
+      {"recipe":"kr-iron-plate-from-enriched-iron","product":"iron-plate","amount":5},
+      {"recipe":"kr-matter-to-iron-plate","product":"iron-plate","amount":10},
+      {"recipe":"kr-iron-stick-from-enriched-iron","product":"iron-stick","amount":2},
+      {"recipe":"kr-iron-stick-from-iron-ore","product":"iron-stick","amount":2},
+      {"recipe":"kr-landfill-with-sand","product":"landfill","amount":1},
+      {"recipe":"kr-quarry-drill","product":"kr-quarry-drill","amount":1},
+      {"recipe":"kr-matter-to-plastic-bar","product":"plastic-bar","amount":10},
+      {"recipe":"kr-rocket-fuel-with-ammonia","product":"rocket-fuel","amount":1},
+      {"recipe":"kr-rocket-fuel-with-hydrogen-chloride","product":"rocket-fuel","amount":1},
+      {"recipe":"kr-matter-to-steel-plate","product":"steel-plate","amount":10},
+      {"recipe":"kr-matter-to-sulfur","product":"sulfur","amount":10}
+    ],
+    "item_place_results": [
+      {"name":"kr-advanced-loader","place_result":"kr-advanced-loader","entity_type":"loader-1x1"},
+      {"name":"kr-advanced-splitter","place_result":"kr-advanced-splitter","entity_type":"splitter"},
+      {"name":"kr-advanced-transport-belt","place_result":"kr-advanced-transport-belt","entity_type":"transport-belt"},
+      {"name":"kr-advanced-underground-belt","place_result":"kr-advanced-underground-belt","entity_type":"underground-belt"},
+      {"name":"kr-express-loader","place_result":"kr-express-loader","entity_type":"loader-1x1"},
+      {"name":"kr-fast-loader","place_result":"kr-fast-loader","entity_type":"loader-1x1"},
+      {"name":"kr-loader","place_result":"kr-loader","entity_type":"loader-1x1"},
+      {"name":"kr-superior-loader","place_result":"kr-superior-loader","entity_type":"loader-1x1"},
+      {"name":"kr-superior-splitter","place_result":"kr-superior-splitter","entity_type":"splitter"},
+      {"name":"kr-superior-transport-belt","place_result":"kr-superior-transport-belt","entity_type":"transport-belt"},
+      {"name":"kr-superior-underground-belt","place_result":"kr-superior-underground-belt","entity_type":"underground-belt"},
+      {"name":"kr-superior-inserter","place_result":"kr-superior-inserter","entity_type":"inserter"},
+      {"name":"kr-superior-long-inserter","place_result":"kr-superior-long-inserter","entity_type":"inserter"},
+      {"name":"kr-quarry-drill","place_result":"kr-quarry-drill","entity_type":"mining-drill"}
+    ],
+    "item_names": [
+      {"name":"kr-antimatter-artillery-shell","type":"ammo"},
+      {"name":"kr-nuclear-artillery-shell","type":"ammo"}
+    ],
+    "gear": {
+      "recipe": "iron-gear-wheel",
+      "native_item": "iron-gear-wheel",
+      "native_item_icon": "__Krastorio2Assets__/icons/items/iron-gear-wheel.png"
+    }
+  },
+  "emitted_ids": [
+    "recipe-prod-research_gears-1", "recipe-prod-research_advanced_circuit-1", "recipe-prod-research_batteries-1",
+    "recipe-prod-research_belts-1", "recipe-prod-research_bullets-1", "recipe-prod-research_concrete-1",
+    "recipe-prod-research_copper-1", "recipe-prod-research_copper_cable-1", "recipe-prod-research_electric_energy-1",
+    "recipe-prod-research_electric_engine-1", "recipe-prod-research_electronic_circuit-1", "recipe-prod-research_engine-1",
+    "recipe-prod-research_explosives-1", "recipe-prod-research_flying_robot_frame-1", "recipe-prod-research_furnace-1",
+    "recipe-prod-research_grenades-1", "recipe-prod-research_heavy_ammo-1", "recipe-prod-research_inserters-1",
+    "recipe-prod-research_iron-1", "recipe-prod-research_iron_sticks-1", "recipe-prod-research_landfill-1",
+    "recipe-prod-research_low_density_structure-1", "recipe-prod-research_lubricant_productivity-1",
+    "recipe-prod-research_mining_drill-1", "recipe-prod-research_modules-1",
+    "recipe-prod-research_oil_cracking_productivity-1", "recipe-prod-research_oil_processing_productivity-1",
+    "recipe-prod-research_plastic-1", "recipe-prod-research_processing_unit-1", "recipe-prod-research_rails-1",
+    "recipe-prod-research_rocket_fuel-1", "recipe-prod-research_rockets-1", "recipe-prod-research_steel-1",
+    "recipe-prod-research_sulfur-1", "recipe-prod-research_sulfuric_acid_productivity-1",
+    "recipe-prod-research_walls-1", "recipe-prod-research_science_pack_productivity-1",
+    "recipe-prod-research_cannon_shooting_speed-1", "recipe-prod-research_character_crafting_speed-1",
+    "recipe-prod-research_character_mining_speed-1", "recipe-prod-research_character_reach-1",
+    "recipe-prod-research_character_walking_speed-1", "recipe-prod-research_electric_shooting_speed-1",
+    "recipe-prod-research_flamethrower_shooting_speed-1", "recipe-prod-research_inventory_capacity-1",
+    "recipe-prod-research_lab_productivity-1", "recipe-prod-research_robot_battery-1",
+    "recipe-prod-research_rocket_shooting_speed-1", "braking-force-8", "inserter-capacity-bonus-8",
+    "laser-shooting-speed-8", "research-speed-7", "weapon-shooting-speed-7", "worker-robots-storage-4"
+  ],
+  "authored_selector_evidence": {
+    "path": "source/prototypes/streams/productivity.lua",
+    "sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
+    "role": "MIR4-authored-product-target-selector"
+  },
+  "catalogue_evidence": {
+    "base_path": "source/compatibility/modern_catalogue/base.lua",
+    "base_sha256": "48448C8BF3B6ED64B6DAF03D8C4E4CB2DCE04762D2255AB1D9F03C668F76B2CF",
+    "direct_path": "source/research/native_direct_definitions.lua",
+    "direct_sha256": "A954E044434783685A92D61E23C49712A31FD0FABC5929FE10667BF43AF16369"
+  },
+  "standard_science": [
+    "automation-science-pack",
+    "logistic-science-pack",
+    "military-science-pack",
+    "chemical-science-pack",
+    "production-science-pack",
+    "utility-science-pack"
+  ],
+  "advanced_lab": {
+    "name": "kr-advanced-lab",
+    "inputs": [
+      "automation-science-pack",
+      "logistic-science-pack",
+      "military-science-pack",
+      "chemical-science-pack",
+      "production-science-pack",
+      "utility-science-pack"
+    ]
+  },
+  "continuations": [
+    {
+      "id": "braking-force-8",
+      "predecessor": {"name":"braking-force-7","count":650,"time":60,"effects":[{"type":"train-braking-force-bonus","modifier":0.15}]},
+      "previous": {"name":"braking-force-6","count":550,"time":45},
+      "inheritance": {"last_count":650,"previous_count":550,"research_time":60},
+      "default": {"count_formula":"861.51212960553*1.33333^(L-8)","time":60,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"],"effects":[{"type":"train-braking-force-bonus","modifier":0.15}]}
+    },
+    {
+      "id": "inserter-capacity-bonus-8",
+      "predecessor": {"name":"inserter-capacity-bonus-7","count":600,"time":30,"effects":[{"type":"inserter-stack-size-bonus","modifier":1},{"type":"bulk-inserter-capacity-bonus","modifier":2}]},
+      "previous": {"name":"inserter-capacity-bonus-6","count":400,"time":30},
+      "inheritance": {"last_count":600,"previous_count":400,"research_time":60},
+      "default": {"count_formula":"914488.340211249*3.33333^(L-8)","time":60,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"],"effects":[{"type":"inserter-stack-size-bonus","modifier":2},{"type":"bulk-inserter-capacity-bonus","modifier":4}]}
+    },
+    {
+      "id": "laser-shooting-speed-8",
+      "predecessor": {"name":"laser-shooting-speed-7","count":450,"time":60,"effects":[{"type":"gun-speed","ammo_category":"laser","modifier":0.1},{"type":"gun-speed","ammo_category":"kr-impulse-rifle","modifier":0.1}]},
+      "previous": {"name":"laser-shooting-speed-6","count":350,"time":60},
+      "inheritance": {"last_count":450,"previous_count":350,"research_time":60},
+      "default": {"count_formula":"1025.15625*1.5^(L-8)","time":120,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","military-science-pack","utility-science-pack"],"effects":[{"type":"gun-speed","ammo_category":"laser","modifier":0.1},{"type":"gun-speed","ammo_category":"kr-impulse-rifle","modifier":0.1}]}
+    },
+    {
+      "id": "research-speed-7",
+      "predecessor": {"name":"research-speed-6","count":500,"time":30,"effects":[{"type":"laboratory-speed","modifier":0.6}]},
+      "previous": {"name":"research-speed-5","count":500,"time":30},
+      "inheritance": {"last_count":500,"previous_count":500,"research_time":60},
+      "default": {"count_formula":"683.4375*1.5^(L-7)","time":120,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack","military-science-pack"],"effects":[{"type":"laboratory-speed","modifier":0.6}]}
+    },
+    {
+      "id": "weapon-shooting-speed-7",
+      "predecessor": {"name":"weapon-shooting-speed-6","count":600,"time":60,"effects":[{"type":"gun-speed","ammo_category":"bullet","modifier":0.15},{"type":"gun-speed","ammo_category":"shotgun-shell","modifier":0.15},{"type":"gun-speed","ammo_category":"cannon-shell","modifier":0.15},{"type":"gun-speed","ammo_category":"rocket","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-pistol","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-anti-materiel-rifle-ammo","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-railgun-shell","modifier":0.2},{"type":"gun-speed","ammo_category":"kr-turret-missile","modifier":0.2},{"type":"gun-speed","ammo_category":"kr-heavy-rocket","modifier":0.2}]},
+      "previous": {"name":"weapon-shooting-speed-5","count":500,"time":60},
+      "inheritance": {"last_count":600,"previous_count":500,"research_time":60},
+      "default": {"count_formula":"683.4375*1.5^(L-7)","time":120,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","military-science-pack","utility-science-pack"],"effects":[{"type":"gun-speed","ammo_category":"bullet","modifier":0.15},{"type":"gun-speed","ammo_category":"shotgun-shell","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-pistol","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-anti-materiel-rifle-ammo","modifier":0.15},{"type":"gun-speed","ammo_category":"kr-railgun-shell","modifier":0.2},{"type":"gun-speed","ammo_category":"kr-turret-missile","modifier":0.2},{"type":"gun-speed","ammo_category":"kr-heavy-rocket","modifier":0.2}]}
+    },
+    {
+      "id": "worker-robots-storage-4",
+      "predecessor": {"name":"worker-robots-storage-3","count":450,"time":60,"effects":[{"type":"worker-robot-storage","modifier":1}]},
+      "previous": {"name":"worker-robots-storage-2","count":300,"time":60},
+      "inheritance": {"last_count":450,"previous_count":300,"research_time":60},
+      "default": {"count_formula":"675*1.5^(L-4)","time":60,"science":["automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack","utility-science-pack"],"effects":[{"type":"worker-robot-storage","modifier":1}]}
+    }
+  ],
+  "continuation_nondefault_settings": {
+    "startup": {
+      "mir-effect-per-level-laser-shooting-speed": 75,
+      "mir-effect-per-level-weapon-shooting-speed": 80
+    },
+    "effects": {
+      "laser-shooting-speed-8": [
+        {"type":"gun-speed","ammo_category":"laser","modifier":0.15},
+        {"type":"gun-speed","ammo_category":"kr-impulse-rifle","modifier":0.15}
+      ],
+      "weapon-shooting-speed-7": [
+        {"type":"gun-speed","ammo_category":"bullet","modifier":0.3},
+        {"type":"gun-speed","ammo_category":"shotgun-shell","modifier":0.3},
+        {"type":"gun-speed","ammo_category":"kr-pistol","modifier":0.3},
+        {"type":"gun-speed","ammo_category":"kr-anti-materiel-rifle-ammo","modifier":0.3},
+        {"type":"gun-speed","ammo_category":"kr-railgun-shell","modifier":0.4},
+        {"type":"gun-speed","ammo_category":"kr-turret-missile","modifier":0.4},
+        {"type":"gun-speed","ammo_category":"kr-heavy-rocket","modifier":0.4}
+      ]
+    }
+  },
+  "direct_effect_evidence": {
+    "path": "source/prototypes/streams/direct-effects.lua",
+    "sha256": "7AA6D11919D4CBB0149B1347474B732400010156A79C0E0E83635EB8290D8DC4",
+    "role": "MIR4-authored-direct-effect-selector"
+  },
+  "direct_effect_families": [
+    {
+      "id": "recipe-prod-research_cannon_shooting_speed-1",
+      "effects": [{"type":"gun-speed","ammo_category":"cannon-shell","modifier":0.1}]
+    },
+    {
+      "id": "recipe-prod-research_character_crafting_speed-1",
+      "effects": [{"type":"character-crafting-speed","modifier":0.05}]
+    },
+    {
+      "id": "recipe-prod-research_character_mining_speed-1",
+      "effects": [{"type":"character-mining-speed","modifier":0.05}]
+    },
+    {
+      "id": "recipe-prod-research_character_reach-1",
+      "effects": [
+        {"type":"character-reach-distance","modifier":10},
+        {"type":"character-build-distance","modifier":10},
+        {"type":"character-resource-reach-distance","modifier":10},
+        {"type":"character-item-drop-distance","modifier":10}
+      ]
+    },
+    {
+      "id": "recipe-prod-research_character_walking_speed-1",
+      "effects": [{"type":"character-running-speed","modifier":0.05}]
+    },
+    {
+      "id": "recipe-prod-research_electric_shooting_speed-1",
+      "effects": [{"type":"gun-speed","ammo_category":"electric","modifier":0.1}]
+    },
+    {
+      "id": "recipe-prod-research_flamethrower_shooting_speed-1",
+      "effects": [{"type":"gun-speed","ammo_category":"flamethrower","modifier":0.1}]
+    },
+    {
+      "id": "recipe-prod-research_inventory_capacity-1",
+      "effects": [
+        {"type":"character-inventory-slots-bonus","modifier":1},
+        {"type":"character-logistic-trash-slots","modifier":1}
+      ]
+    },
+    {
+      "id": "recipe-prod-research_lab_productivity-1",
+      "effects": [{"type":"laboratory-productivity","modifier":0.1}]
+    },
+    {
+      "id": "recipe-prod-research_robot_battery-1",
+      "effects": [{"type":"worker-robot-battery","modifier":0.1}]
+    },
+    {
+      "id": "recipe-prod-research_rocket_shooting_speed-1",
+      "effects": [{"type":"gun-speed","ammo_category":"rocket","modifier":0.1}]
+    }
+  ],
+  "k2so_direct_effect_overrides": [],
+  "k2_base_native_category_sources": [
+    {"prototype_type":"gun","name":"tank-cannon","field_path":["attack_parameters","ammo_category"],"value":"cannon-shell"},
+    {"prototype_type":"gun","name":"rocket-launcher","field_path":["attack_parameters","ammo_category"],"value":"rocket"},
+    {"prototype_type":"gun","name":"flamethrower","field_path":["attack_parameters","ammo_category"],"value":"flamethrower"},
+    {"prototype_type":"active-defense-equipment","name":"discharge-defense-equipment","field_path":["attack_parameters","ammo_category"],"value":"electric"},
+    {"prototype_type":"gun","name":"artillery-wagon-cannon","field_path":["attack_parameters","ammo_category"],"value":"artillery-shell"}
+  ],
+  "presentation_icon_facts": [
+    {
+      "id":"recipe-prod-research_gears-1",
+      "native":{"prototype_type":"item","name":"iron-gear-wheel","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/iron-gear-wheel.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_belts-1", "definition_key":"research_belts",
+      "native":{"prototype_type":"technology","name":"logistics","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/logistics-1.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/logistics-1.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_copper-1", "definition_key":"research_copper",
+      "native":{"prototype_type":"item","name":"copper-plate","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/copper-plate.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/copper-plate.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_iron-1", "definition_key":"research_iron",
+      "native":{"prototype_type":"item","name":"iron-plate","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/items/iron-plate.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/items/iron-plate.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_mining_drill-1", "definition_key":"research_mining_drill",
+      "native":{"prototype_type":"item","name":"electric-mining-drill","icon_path":["icon"],"icon":"__Krastorio2Assets__/icons/entities/electric-mining-drill.png","icon_size_path":["icon_size"],"icon_size":null},
+      "emitted":{"icon":"__Krastorio2Assets__/icons/entities/electric-mining-drill.png","icon_size":64}
+    },
+    {
+      "id":"recipe-prod-research_steel-1", "definition_key":"research_steel",
+      "native":{"prototype_type":"technology","name":"steel-processing","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/steel-processing.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-processing.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_science_pack_productivity-1", "definition_key":"research_science_pack_productivity",
+      "native":{"prototype_type":"technology","name":"space-science-pack","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/optimization-tech-card.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/optimization-tech-card.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_character_mining_speed-1", "definition_key":"research_character_mining_speed",
+      "native":{"prototype_type":"technology","name":"steel-axe","icon_path":["icons",0,"icon"],"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size_path":["icons",0,"icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_character_reach-1", "definition_key":"research_character_reach",
+      "native":{"prototype_type":"technology","name":"steel-axe","icon_path":["icons",0,"icon"],"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size_path":["icons",0,"icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/steel-pickaxe.png","icon_size":256}
+    },
+    {
+      "id":"recipe-prod-research_lab_productivity-1", "definition_key":"research_lab_productivity",
+      "native":{"prototype_type":"technology","name":"military-science-pack","icon_path":["icon"],"icon":"__Krastorio2Assets__/technologies/military-tech-card.png","icon_size_path":["icon_size"],"icon_size":256},
+      "emitted":{"icon":"__Krastorio2Assets__/technologies/military-tech-card.png","icon_size":256}
+    }
+  ],
+  "k2_product_target_additions": [
+    {"family": "research_belts", "recipe": "kr-advanced-loader", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-advanced-splitter", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-advanced-transport-belt", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-advanced-underground-belt", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-express-loader", "weight": 0.2},
+    {"family": "research_belts", "recipe": "kr-fast-loader", "weight": 0.5},
+    {"family": "research_belts", "recipe": "kr-loader", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-superior-loader", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-superior-splitter", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-superior-transport-belt", "weight": 0.05},
+    {"family": "research_belts", "recipe": "kr-superior-underground-belt", "weight": 0.05},
+    {"family": "research_copper", "recipe": "kr-copper-plate-from-enriched-copper", "weight": 1},
+    {"family": "research_copper", "recipe": "kr-matter-to-copper-plate", "weight": 1},
+    {"family": "research_copper_cable", "recipe": "kr-copper-cable-from-copper-ore", "weight": 1},
+    {"family": "research_copper_cable", "recipe": "kr-copper-cable-from-enriched-copper", "weight": 1},
+    {"family": "research_gears", "recipe": "kr-iron-gear-wheel-from-enriched-iron", "weight": 1},
+    {"family": "research_gears", "recipe": "kr-iron-gear-wheel-from-iron-ore", "weight": 1},
+    {"family": "research_heavy_ammo", "recipe": "kr-antimatter-artillery-shell", "weight": 0.1},
+    {"family": "research_heavy_ammo", "recipe": "kr-nuclear-artillery-shell", "weight": 0.1},
+    {"family": "research_inserters", "recipe": "kr-superior-inserter", "weight": 0.1},
+    {"family": "research_inserters", "recipe": "kr-superior-long-inserter", "weight": 0.1},
+    {"family": "research_iron", "recipe": "kr-iron-plate-from-enriched-iron", "weight": 1},
+    {"family": "research_iron", "recipe": "kr-matter-to-iron-plate", "weight": 1},
+    {"family": "research_iron_sticks", "recipe": "kr-iron-stick-from-enriched-iron", "weight": 1},
+    {"family": "research_iron_sticks", "recipe": "kr-iron-stick-from-iron-ore", "weight": 1},
+    {"family": "research_landfill", "recipe": "kr-landfill-with-sand", "weight": 1},
+    {"family": "research_mining_drill", "recipe": "kr-quarry-drill", "weight": 0.25},
+    {"family": "research_plastic", "recipe": "kr-matter-to-plastic-bar", "weight": 1},
+    {"family": "research_rocket_fuel", "recipe": "kr-rocket-fuel-with-ammonia", "weight": 1},
+    {"family": "research_rocket_fuel", "recipe": "kr-rocket-fuel-with-hydrogen-chloride", "weight": 1},
+    {"family": "research_steel", "recipe": "kr-matter-to-steel-plate", "weight": 1},
+    {"family": "research_sulfur", "recipe": "kr-matter-to-sulfur", "weight": 1}
+  ],
+  "not_admitted": {
+    "science_cards": [
+      "kr-advanced-tech-card",
+      "kr-matter-tech-card",
+      "kr-singularity-tech-card"
+    ],
+    "native_owner_families": [
+      "recipe-productivity",
+      "lab-productivity"
+    ],
+    "k2so_only": [
+      "k2so-assets",
+      "Krastorio2-spaced-out"
+    ]
+  }
+}

@@ -12,4 +12,4 @@ Report suspected vulnerabilities privately to the repository maintainers through
 
 Developer preview tooling has no signing, sealing, promotion, publication, prototype-mutation, runtime-state, or public-support authority.
 
-For an incident, preserve the suspect bytes and logs, stop promotion, record the immutable event, rotate or revoke affected credentials outside the repository, and follow [the release runbook](docs/mir5/development.md#github-publication-after-acceptance).
+For an incident, preserve the suspect bytes and logs, stop promotion, record the immutable event, rotate or revoke affected credentials outside the repository, and follow [the release runbook](docs/development.md#github-publication-after-acceptance).

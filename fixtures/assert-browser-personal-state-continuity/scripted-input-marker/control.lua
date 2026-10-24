@@ -1,1 +1,0 @@
--- Deliberately inert: the shared browser continuity fixture owns every scripted assertion.

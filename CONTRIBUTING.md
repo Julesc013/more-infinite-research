@@ -23,7 +23,7 @@ Every change must identify its maturity: stable, preview, shadow, experimental, 
 - Target behavior needs an explicit disposition and target-local proof.
 - Changes to authorities must update their machine-readable manifests.
 
-See [Governance](GOVERNANCE.md), [Extension Protocol](docs/mir5/api.md), and [the module boundaries](docs/mir5/architecture.md).
+See [Governance](GOVERNANCE.md), [Extension Protocol](docs/api.md), and [the module boundaries](docs/architecture.md).
 
 ## Development workflow
 
@@ -35,11 +35,11 @@ See [Governance](GOVERNANCE.md), [Extension Protocol](docs/mir5/api.md), and [th
 6. Update the current spec/docs/target records together; preserve pinned historical generated receipts without editing them.
 7. Open a PR, wait for the aggregate evidence gate, merge, and read back the protected branch.
 
-Current MIR5 commands are in [Development](docs/mir5/development.md). Inspect the explicit host plan before running the selected controls:
+Current MIR5 commands are in [Development](docs/development.md). Inspect the explicit host plan before running the selected controls:
 
 ```powershell
-.\tests\mir5\Test-MIR5HostControls.ps1 -Plan
-python -B tools/mir5/check_pack.py
+.\tests\Test-MIR5HostControls.ps1 -Plan
+python -B tools/check_repository.py
 ```
 
 Use an explicit pinned Lua runtime for the complete host driver. These checks do not launch Factorio or establish native/release acceptance. Current documentation uses front matter and one logical source line per paragraph; obsolete MIR4 generated indexes remain pinned history.
@@ -58,7 +58,7 @@ A PR should state:
 - rollback or compensation boundary;
 - remaining human, credential, or external-service blockers.
 
-Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/mir5/development.md#github-publication-after-acceptance).
+Release-changing PRs additionally require the phase-engine receipt and independent evidence specified by [the release runbook](docs/development.md#github-publication-after-acceptance).
 
 ## Changelog and player copy
 

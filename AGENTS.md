@@ -1,6 +1,6 @@
 # MIR contributor instructions
 
-Read [spec/README.md](spec/mir5/README.md) and the task-specific contract. [docs/development.md](docs/mir5/development.md) owns current commands and coordination; [docs/progress.md](docs/mir5/progress.md) records exact evidence and remaining release work. MIR5 is incomplete until its acceptance and publication gates pass.
+Read [spec/README.md](spec/README.md) and the task-specific contract. [docs/development.md](docs/development.md) owns current commands and coordination; [docs/progress.md](docs/progress.md) records exact evidence and remaining release work. MIR5 is incomplete until its acceptance and publication gates pass.
 
 ## Source and architecture
 

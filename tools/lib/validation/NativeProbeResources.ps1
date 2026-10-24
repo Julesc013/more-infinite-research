@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'NativeProbeCommon.ps1')
-. (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+. (Join-Path $PSScriptRoot 'ResourceGovernor.ps1')
 . (Join-Path $PSScriptRoot 'ImmutableInputStaging.ps1')
 
 # These adapters retain the existing governor and lease authorities. They own
