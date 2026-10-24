@@ -1,0 +1,244 @@
+{
+  "custody": {
+    "full_manifest_members": 223,
+    "full_manifest_path": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/artifact-manifest.json",
+    "full_manifest_sha256": "9AEEEC6538843A621D8107BC61FD7F6A2D6B06521254F3BAF0990467973234EA",
+    "full_private_artifact_path": "C:/Users/Jules/AppData/Local/MIRWorker/downloads/library-multiplayer-canonical/40137683610",
+    "maintainer_readback_path": "build/mir5/recovery/library-current8a-readback-401376-r01/readback.json",
+    "maintainer_readback_sha256": "E7507816A4BB02A4F1C5C03B981F12DCDACE69810100117DD35546746E4FF1E6",
+    "primary_safe_path": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610",
+    "safe_members": 23,
+    "safe_selection_path": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/safe-selection.json",
+    "safe_selection_sha256": "D95BB0F1E63347380974FF6682A95B506C86A5C9BB84C26769CB0CF55206075C"
+  },
+  "engine": {
+    "base_version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "target": "f200"
+  },
+  "fixture": {
+    "active_mods_observer_repacked": false,
+    "active_mods_observer_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "archive_bytes": 10931,
+    "archive_sha256": "292D38EF9DE91232B892B7F3F0E908C604973D9E47E6306512365D6ECF97204E",
+    "source_members": [
+      {
+        "bytes": 383,
+        "member": "info.json",
+        "sha256": "268818EA58DFEE57DD2BF30073BD6F557ECEB412730571ABE347604135446D4D",
+        "source": "tests/fixtures/library-multiplayer/info.json"
+      },
+      {
+        "bytes": 40686,
+        "member": "control.lua",
+        "sha256": "4FCBB362DD6D468AB9F85ADA7DE555CBBEADA188EA5486665C0A703E4243EF00",
+        "source": "tests/fixtures/library-multiplayer/control.lua"
+      },
+      {
+        "bytes": 1137,
+        "member": "settings-updates.lua",
+        "sha256": "659D9D74EA46394BB7E7FB8C17BFEDB0EAFFB63555B2284FDA35D44B6A23B2D1",
+        "source": "tests/fixtures/library-multiplayer/settings-updates.lua"
+      }
+    ]
+  },
+  "kind": "MIR5LibraryMultiplayerCurrent8aNativeChainV1",
+  "limits": [
+    "Private F200 two-client fixture only; it is not broad compatibility, public multiplayer, performance, or release qualification.",
+    "No PNG, save, full log, player-data, server settings, session specification, process-output or credential-bearing bytes are published.",
+    "The full private artifact and safe primary selection retain exact original and derived identities; the safe typed result is explicitly derived from original session result 63D99A3675944A8264E3BF874AFAA6A4F1DDAD0D0CF7D8A740D11DA53A3C99C6.",
+    "This run does not replay or relabel any retained adverse."
+  ],
+  "native": {
+    "chain_status": "completed",
+    "derived_safe_session_result": {
+      "path": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/result-safe.json",
+      "session_status": "passed-private-two-client-session",
+      "sha256": "62DC87EA348305828A46255A9C43D85FD9704DF0A09CA52FC6073633A298AE2B",
+      "status": "passed-private-two-client-fixture"
+    },
+    "library_control_details": {
+      "archive_extractions": 0,
+      "archive_links_created": 0,
+      "dependency_payload_bytes_copied": 0,
+      "owned_archive_names_temporarily_hidden": 0,
+      "status": "restored-direct-library-controls"
+    },
+    "library_controls_restored": true,
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "original_session_result": {
+      "path": "library-multiplayer-canonical/native/session/result.json",
+      "sha256": "63D99A3675944A8264E3BF874AFAA6A4F1DDAD0D0CF7D8A740D11DA53A3C99C6"
+    },
+    "preparation": {
+      "result_sha256": "54AEDCE91098E41E267291614543D213093282E8598AFE39592F0EF57A9538F5",
+      "status": "passed-private-native-runtime-load-only"
+    },
+    "process": {
+      "duration_seconds": 117.510185,
+      "exit_code": 0,
+      "passed": true,
+      "peak_sampled_private_bytes": 6021914624,
+      "peak_working_set_bytes": 2301902848,
+      "status": "passed",
+      "timed_out": false
+    },
+    "saves": {
+      "final_sha256": "9BB9B6388F1C991D6B779505D8C6A5DBBDE444F65EADBD53006702C78274995D",
+      "input_seed_byte_identical": true,
+      "restart_sha256": "E6E0688ACEBAB4FEA017CF5AB56891C3B3A0AEBF8FC7D71BF0CCE11F49F0491E",
+      "seed_sha256": "D804A2F5BA763D0E0111A2B75811AB0E5B68F34702B8D8FA9172277141D002E0"
+    }
+  },
+  "native_run": {
+    "artifact_digest": "sha256:d334b0eb502b2848831dbef83ab3f9c18b9301198568dad1066e6db6f2649d9a",
+    "artifact_id": 12577752356,
+    "artifact_name": "black-glass-library-multiplayer-canonical-40137683610-1",
+    "controller_commit": "337e5288c952b58fd90bf2ce965feff5f716ce04",
+    "id": 40137683610,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40137683610"
+  },
+  "profile": {
+    "execution_sha256": "BE4FC395EAAECE272324414787E52145A0DE1A57FD052753B457D25656AC6B72",
+    "raw_git_path": "tests/profiles/library-multiplayer-f200-2077.json",
+    "raw_sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 26791,
+    "gzip_sha256": "D67670F708FC84F4950D3FB2C99371D932D3D0728D785904401538EDA2AB5FF1",
+    "members": 6,
+    "path": "spec/evidence/library-multiplayer-current8a-native-receipts.json.gz",
+    "uncompressed_bytes": 122487,
+    "uncompressed_sha256": "0D15428D7C162B8A0771A2CAE62AB7D2A42AE805B08E9E212A83DF6556E37123"
+  },
+  "release_qualification": false,
+  "retained_adverses": [
+    {
+      "disposition": "preserved under original input/run identity",
+      "path": "spec/evidence/library-multiplayer-canonical-caption-type-adverse-chain.json"
+    },
+    {
+      "disposition": "preserved under original input/run identity",
+      "path": "spec/evidence/library-multiplayer-canonical-deadline-adverse-chain.json"
+    },
+    {
+      "disposition": "preserved under original input/run identity",
+      "path": "spec/evidence/library-multiplayer-canonical-late-require-adverse-chain.json"
+    },
+    {
+      "disposition": "earlier source333 recovery remains distinct from this current8a execution",
+      "path": "spec/evidence/library-multiplayer-canonical-session-recovery-chain.json"
+    }
+  ],
+  "schema": 1,
+  "screenshots": [
+    {
+      "height": 720,
+      "locale": "en",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+      "sha256": "99B4E2FAFD719427E9B2DD92EDA1616294E6286B5609D7F4C79F0072BE5FD1B7",
+      "stage": "availability",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "en",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+      "sha256": "08DF4165B8955EAB19A6E0152A3379660DF9EAA02DB8E3E79FFD52D29092612E",
+      "stage": "initial",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "en",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/settled-1.png",
+      "sha256": "87AEE5EE26E827CC308113A2EEBE9D62DB571219C4FB7E26AE8CBDDB470C50B0",
+      "stage": "settled",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "en",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+      "sha256": "E26F13DBD785BAF1300E7B05BC5994889A1C75D7BEF2BB1C82854E184FD0D5F5",
+      "stage": "rejoin",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "en",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+      "sha256": "98EE81EC096D6E9EA8B628508120A8B094C932CB72A9787AD9D3379522F93BC8",
+      "stage": "restart",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "de",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+      "sha256": "F80D7BBD90395F0BEC6D5F2A4015F4C53F88463B85C4F051A6D3D54CEFABAB2F",
+      "stage": "availability",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "de",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+      "sha256": "56DB6DFCDD735009BA681D6CFB9D1C3BFCE95EC262327F4507C75BC1919456D1",
+      "stage": "initial",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "de",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/settled-2.png",
+      "sha256": "56B3A8E7CBAD3B54664662F0DEAD447DEEF7AA36601FDF488F1FD20E8D58B72B",
+      "stage": "settled",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "de",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+      "sha256": "3F409D15F43707C607CA5C211B076A5946BE407FA3F1FA6F206000B075F8ADAF",
+      "stage": "rejoin",
+      "width": 1280
+    },
+    {
+      "height": 720,
+      "locale": "de",
+      "primary_custody": "build/mir5/recovery-historical/library-multiplayer-canonical/40137683610/library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+      "sha256": "96FBA26FA533F28729C9BA4A46C3CFC832B8DEDF145BC57D087FB64CC4B45EB3",
+      "stage": "restart",
+      "width": 1280
+    }
+  ],
+  "source": {
+    "asset_inventory_sha256": "15E69BD895391C201AF6BF0FB20691C1A23EC5CA48F475975DA7BB5D1D512014",
+    "fixture_commit": "8a6580e9d073616cf1d37b6e6c0bfc3e2a9ed6b2",
+    "player": {
+      "bytes": 547320,
+      "sha256": "CFBB3BC1DD386B67619E48F71ACB43D932F2AFFB7AE63035A602A83D87A93A87",
+      "target": "f200",
+      "version": "5.0.20000"
+    }
+  },
+  "status": "passed-private-two-client-fixture-with-bounded-visual-readback",
+  "visual_readback": {
+    "finding": "All ten 1280x720 PNGs were individually viewed and matched their hashes. English and German availability present their localized Space Age absence explanation; initial, settled, rejoin, and restart preserve distinct personal query and selection state. The original German initial horizontal-detail clipping class is not present: its detail text is fully visible and the later settled view matches. Normal vertical viewport clipping/scrolling and English/raw-identity fallbacks remain outside this bounded finding.",
+    "not_claimed": [
+      "complete localization",
+      "latency or stress performance",
+      "all viewports unclipped without scrolling",
+      "release qualification"
+    ],
+    "readback_path": "build/mir5/recovery/library-current8a-readback-401376-r01/readback.json",
+    "readback_sha256": "E7507816A4BB02A4F1C5C03B981F12DCDACE69810100117DD35546746E4FF1E6",
+    "status": "maintainer-reviewed"
+  }
+}

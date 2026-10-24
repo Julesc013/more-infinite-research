@@ -50,7 +50,18 @@ machine.effect_receiver = {base_effect={speed=0}, uses_module_effects=true, uses
 local pipeline = table.deepcopy(assert(data.raw["assembling-machine"] and data.raw["assembling-machine"]["chemical-plant"], "base chemical plant is absent"))
 pipeline.name = prefix .. "pipeline"
 local boxes = assert(pipeline.fluid_boxes, "base chemical plant fluid boxes are absent")
-for _, box in pairs(boxes) do box.max_pipeline_extent = 320 end
+assert(#boxes >= 2, "base chemical plant needs implicit and explicit pipeline boxes")
+for index, box in ipairs(boxes) do
+  if index == 1 then box.max_pipeline_extent = nil
+  else box.max_pipeline_extent = 320 end
+end
+
+-- This is the fixture's only global pipeline input.  Keep every other utility
+-- constant native, so the post-MIR witness can distinguish inherited extent
+-- from the explicit 320 fields above without adding non-prototype markers.
+local utility = assert(data.raw["utility-constants"] and data.raw["utility-constants"].default,
+  "base utility constants are absent")
+utility.default_pipeline_extent = 640
 
 data:extend({
   {type="module-category", name=category}, module, ordinary, recycled, parameter, machine, pipeline
