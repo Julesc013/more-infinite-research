@@ -290,10 +290,14 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             ok, message = tick()
             if not ok then return {ok=false,message=message} end
             for _=1,2 do
+              lab.energy = 17
               ok, message = invoke(callbacks.load)
               if not ok then return {ok=false,message=message} end
               ok, message = tick()
               if not ok then return {ok=false,message=message} end
+              if bad == 'reload-read-only' and lab.energy ~= 17 then
+                return {ok=false,message='completed source observer changed lab energy'}
+              end
             end
 
             if bad == 'source-state' then
@@ -320,11 +324,32 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message} end
             ok, message = tick()
             if not ok then return {ok=false,message=message} end
+            local completed_state = storage.mir5_sif_science_retirement
+            local completed_consumption = completed_state.successor_consumption
+            local completed_after = completed_consumption.after
+            local completed_rows = completed_state.successor_rows
+            local finished = player.technologies['research-speed-7']
+            if bad == 'reload-enabled' then finished.enabled = false
+            elseif bad == 'reload-researched' then finished.researched = true
+            elseif bad == 'reload-progress' then finished.saved_progress = .13
+            elseif bad == 'reload-queue' then player.current_research, player.research_queue = finished, {finished}
+            elseif bad == 'reload-consumption' then completed_after['automation-science-pack'] = -1
+            elseif bad == 'reload-inventory' then inventory.counts['automation-science-pack'] = -1
+            elseif bad == 'reload-bonus' then completed_state.successor_bonus.lab = -1
+            elseif bad == 'reload-missing-rows' then completed_state.successor_rows = nil
+            elseif bad == 'reload-missing-consumption' then completed_state.successor_consumption = nil end
             for _=1,2 do
+              lab.energy = 17
               ok, message = invoke(callbacks.load)
               if not ok then return {ok=false,message=message} end
               ok, message = tick()
               if not ok then return {ok=false,message=message} end
+              if bad == 'reload-read-only' and (lab.energy ~= 17
+                  or completed_state.successor_consumption ~= completed_consumption
+                  or completed_state.successor_consumption.after ~= completed_after
+                  or completed_state.successor_rows ~= completed_rows) then
+                return {ok=false,message='completed successor observer changed durable/native state'}
+              end
             end
             return {
               ok=true,message='',reports=#reports,saves=saves,scripted_ignored=ignored,
@@ -466,6 +491,38 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 result=plain(self.lua.eval('sif_selector')(str(self.selector_lua(policy)),lua_value(self.lua,raw)));self.assertTrue(result['ok'],result['message']);self.assertEqual(policy,result['raw']['string-setting']['mir-science-pack-ingredient-policy']['default_value'])
         raw={'string-setting':{'mir-science-pack-ingredient-policy':{'setting_type':'runtime-global','default_value':'configured','allowed_values':list(POLICIES)}}}
         result=plain(self.lua.eval('sif_selector')(str(self.selector_lua('space')),lua_value(self.lua,raw)));self.assertFalse(result['ok']);self.assertIn('setting contract differs',result['message']);self.assertEqual('configured',result['raw']['string-setting']['mir-science-pack-ingredient-policy']['default_value'])
+    def test_completed_reload_observation_preserves_native_and_durable_state(self):
+        for target in TARGETS:
+            with self.subTest(target=target):
+                result = plain(self.lua.eval('sif_transition')(
+                    str(self.core_lua('control.lua')), str(self.core_lua('control.lua')),
+                    str(self.core_lua('contract.lua')), str(self.core_lua('contract.lua')),
+                    target, 'reload-read-only'))
+                self.assertTrue(result['ok'], result['message'])
+                self.assertEqual(6, result['reports'])
+
+    def test_completed_reload_rejects_changed_saved_state(self):
+        opponents = {
+            'reload-enabled': 'successor durable research-speed-7 technology state differs',
+            'reload-researched': 'successor durable research-speed-7 technology state differs',
+            'reload-progress': 'successor durable research-speed-7 technology state differs',
+            'reload-queue': 'successor completed research is queued',
+            'reload-consumption': 'successor durable science inventory differs',
+            'reload-inventory': 'successor durable science inventory differs',
+            'reload-bonus': 'successor durable native effects differ',
+            'reload-missing-rows': 'successor durable witness is absent',
+            'reload-missing-consumption': 'successor durable witness is absent',
+        }
+        for target in TARGETS:
+            for opponent, expected in opponents.items():
+                with self.subTest(target=target, opponent=opponent):
+                    result = plain(self.lua.eval('sif_transition')(
+                        str(self.core_lua('control.lua')), str(self.core_lua('control.lua')),
+                        str(self.core_lua('contract.lua')), str(self.core_lua('contract.lua')),
+                        target, opponent))
+                    self.assertFalse(result['ok'], result['message'])
+                    self.assertIn(expected, result['message'])
+
     def test_control_protocol_requires_real_lab_events_restoration_and_read_only_reloads(self):
         for target in TARGETS:
             source,successor=self.core(target,'published'),self.core(target,'mir5')
