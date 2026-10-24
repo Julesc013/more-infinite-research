@@ -6,6 +6,13 @@ assert(mods.base == "2.1.23" and mods["more-infinite-research"] == "5.0.21000"
   "unresolved foreign startup fixture closure differs")
 assert(data.raw.tool[pack] and data.raw.recipe[pack] == nil,
   "unresolved foreign startup fixture gained its named pack producer")
+local accepted = {}
+for _, name in ipairs(assert(data.raw.lab.lab.inputs, "unresolved fixture base lab inputs are absent")) do
+  accepted[name] = true
+end
+for _, name in ipairs({"automation-science-pack", "chemical-science-pack", "utility-science-pack", pack}) do
+  assert(accepted[name], "unresolved fixture lacks a single accepting lab for " .. name)
+end
 for _, level in ipairs({61, 62}) do
   local name = "Space-Lab-Research-" .. level
   local row = assert(data.raw.technology[name], "foreign research disappeared: " .. name)
