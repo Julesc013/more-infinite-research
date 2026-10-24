@@ -437,10 +437,13 @@ try{
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
   # F013--F016 inspect every owned archive name before applying mod-list.json.
-  # Pin the selected MIR version in the existing durable activation transaction
-  # for both fresh historical fixtures and predecessor-to-successor transitions.
+  # Preserve single-version external libraries. Coexisting owned versions
+  # use the existing checkout-local selector and identity/hash restoration.
   if($historical -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
-    $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+    $otherMirVersions=@($inventory | Where-Object {$_.name -ceq 'more-infinite-research' -and $_.version -cne $mirRows[0].version})
+    if($historicalTransition -or $otherMirVersions.Count -gt 0){
+      $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+    }
   }
   $activation=Start-MIRLibraryActivation @activationArguments
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
