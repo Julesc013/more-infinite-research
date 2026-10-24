@@ -1,5 +1,6 @@
 """Pure Lua 5.2 controls for the private MIR5 Library slice, not native evidence."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -1181,7 +1182,10 @@ class LibraryTests(unittest.TestCase):
           package.preload["presentation.library_model"] = nil
           package.loaded["research.catalogue"] = nil
           package.loaded["presentation.library_model"] = nil
+          script = {active_mods={base="2.1.23"}}
           boot()
+          -- Native callbacks cannot import modules, including cached ones.
+          require = function(name) error("Library callback imported " .. name) end
           library.on_lua_shortcut({prototype_name = "mir-research-browser", player_index = 1})
           local root = player.gui.screen["mir_research_browser"]
           local query = root["mir_library_filters"]["mir_library_query"]
@@ -1195,6 +1199,69 @@ class LibraryTests(unittest.TestCase):
           assert(storage.mir_library.players[1].selected == gear.name)
           assert(research_content(player.gui.screen["mir_research_browser"])["mir_library_detail"] ~= nil)
         ''')
+
+    def _assert_real_selected_catalogue_opens_without_runtime_imports(self, profile_name, target_id, expected_id):
+        editions = json.loads((ROOT / "targets/editions.json").read_text(encoding="utf-8"))["targets"]
+        profile = json.loads((ROOT / f"tests/profiles/{profile_name}.json").read_text(encoding="utf-8"))
+        target = self.lua.table_from(editions[target_id])
+        target["id"] = target_id
+        self.lua.globals().selected_target = target
+        self.lua.globals().selected_mods = self.lua.table_from({
+            mod["name"]: mod["version"] for mod in profile["mods"] if mod["enabled"]
+        })
+        self.lua.globals().expected_id = expected_id
+        self.lua.execute(r'''
+          package.loaded["platform.target"] = selected_target
+          script, mods = {active_mods=selected_mods}, selected_mods
+          package.preload["research.catalogue"] = nil
+          package.preload["presentation.library_model"] = nil
+          package.loaded["research.catalogue"] = nil
+          package.loaded["presentation.library_model"] = nil
+          package.loaded["runtime.library"] = nil
+
+          -- control.lua parsing: real selected adapters and their
+          -- declarations load before Factorio begins callbacks.
+          boot()
+          local catalogue = package.loaded["research.catalogue"]
+          local modern = package.loaded["compatibility.modern_catalogue"]
+          assert(type(catalogue) == "table" and type(modern) == "table")
+          local before = catalogue.declared()
+          local found = false
+          for _, row in ipairs(before) do
+            if row.id == expected_id then found = true end
+          end
+          assert(found, "selected closure omitted " .. expected_id)
+
+          local select, selections = modern.select, 0
+          modern.select = function(...)
+            selections = selections + 1
+            return select(...)
+          end
+          -- Factorio rejects every require after parsing, including a
+          -- cached module.  Library.open must consume its parsed rows.
+          require = function(name) error("post-parse require: " .. tostring(name)) end
+
+          before[1].id = "foreign"
+          local after = catalogue.declared()
+          assert(after[1].id == "recipe-prod-research_gears-1",
+            "Library catalogue returned caller-owned rows")
+          local root = library.open(player, {selected=gear.name})
+          assert(root == player.gui.screen["mir_research_browser"]
+            and storage.mir_library.players[1].selected == gear.name)
+          assert(selections == 0, "Library rebuilt selected adapters after parsing")
+        ''')
+
+    def test_real_space_age_catalogue_opens_without_runtime_imports(self):
+        self._assert_real_selected_catalogue_opens_without_runtime_imports(
+            "space-age-f210-2123", "f210", "recipe-prod-research_agricultural_growth_speed-1")
+
+    def test_real_py_catalogue_opens_without_runtime_imports(self):
+        self._assert_real_selected_catalogue_opens_without_runtime_imports(
+            "py-coal-f200-2077", "f200", "recipe-prod-research_material_py_log-1")
+
+    def test_real_bob_core_catalogue_opens_without_runtime_imports(self):
+        self._assert_real_selected_catalogue_opens_without_runtime_imports(
+            "bob-core-f210-2123", "f210", "recipe-prod-research_material_tin-1")
 
     def test_level_modes_filter_real_native_rows_and_preserve_owned_personal_state(self):
         self.lua.execute('''
