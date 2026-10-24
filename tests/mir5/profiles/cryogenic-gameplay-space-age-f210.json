@@ -1,0 +1,13 @@
+{
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-cryogenic-native", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-cryogenic-gameplay", "version": "0.1.0", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-cryogenic-gameplay",
+  "version": "0.1.0",
+  "title": "MIR 5 private cryogenic laboratory witness",
+  "author": "MIR maintainers",
+  "description": "Disposable real laboratory completions for the foreign-unit cryogenic owner and all-official MIR gear research, with exact input consumption and cold reload witnesses.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "more-infinite-research = 5.0.21000",
+    "mir-fixture-mir5-cryogenic-native = 0.1.0"
+  ]
+}
