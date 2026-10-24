@@ -399,6 +399,13 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
               for index, row in ipairs(contract.rows[name].science[policy]) do
                 ingredients[index] = {name=row[1],amount=row[2]}
               end
+              if bad == 'science-permuted' then
+                ingredients[1], ingredients[#ingredients] = ingredients[#ingredients], ingredients[1]
+              elseif bad == 'science-amount' then ingredients[1].amount = 2
+              elseif bad == 'science-duplicate' then ingredients[2] = ingredients[1]
+              elseif bad == 'science-name' then ingredients[1].name = 'unrelated-science-pack'
+              elseif bad == 'science-space' then ingredients[1].name = 'space-science-pack'
+              end
               for index, row in ipairs(contract.rows[name].prerequisites[policy]) do prerequisites[index] = {name=row} end
               player.technologies[name] = {
                 valid=true, name=name, force=player, level=bad == 'level' and 8 or 7,
@@ -565,6 +572,30 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
         for bad,expected in (('level','fresh candidate research-speed-7 state differs'),('bonus','fresh candidate native effects differ'),('unit-count','fixture acceleration differs')):
             result=plain(self.lua.eval('sif_candidate_create')(str(self.core_lua('control.lua')),str(self.core_lua('contract.lua')),'f200','configured',bad))
             self.assertFalse(result['ok']);self.assertIn(expected,result['message']);self.assertEqual((0,0),(result['writes'],result['markers']))
+
+    def test_runtime_science_uses_exact_unique_names_and_amounts_without_array_order(self):
+        for target in TARGETS:
+            for policy in POLICIES:
+                with self.subTest(target=target, policy=policy):
+                    result = plain(self.lua.eval('sif_candidate_create')(
+                        str(self.core_lua('control.lua')), str(self.core_lua('contract.lua')),
+                        target, policy, 'science-permuted'))
+                    self.assertTrue(result['ok'], result['message'])
+                    self.assertEqual((0, 1, True),
+                                     (result['writes'], result['markers'], result['storage_empty']))
+            for bad, expected in (
+                ('science-amount', 'automation-science-pack: expected 1, got 2'),
+                ('science-duplicate', 'duplicate runtime science: automation-science-pack'),
+                ('science-name', 'automation-science-pack: expected 1, got nil'),
+                ('science-space', 'retained space science'),
+            ):
+                with self.subTest(target=target, opponent=bad):
+                    result = plain(self.lua.eval('sif_candidate_create')(
+                        str(self.core_lua('control.lua')), str(self.core_lua('contract.lua')),
+                        target, 'configured', bad))
+                    self.assertFalse(result['ok'], result['message'])
+                    self.assertIn(expected, result['message'])
+                    self.assertEqual((0, 0), (result['writes'], result['markers']))
 
     def test_profiles_pin_exact_archives_and_disclose_configured_only_transition(self):
         for target,meta in TARGETS.items():
