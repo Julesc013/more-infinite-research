@@ -230,7 +230,7 @@ class BobTechMaterialTests(unittest.TestCase):
             self.assertEqual(expected[row["name"]], [ingredient[0] for ingredient in row["unit"]["ingredients"]])
         self.assertTrue(all(report["reason"] == "configured" for report in reports.values()))
 
-    def test_profile_gate_blocks_complete_changed_predecessors_without_admitting_them(self):
+    def test_profile_gate_admits_changed_versions_only_for_the_same_raw_contract(self):
         self.assertEqual(5, len(self.rows()))
         self.lua.execute('target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"')
         self.assertEqual(0, len(self.rows()))
@@ -240,13 +240,25 @@ class BobTechMaterialTests(unittest.TestCase):
             self.rows()
         self.lua.execute('target.minimum_base = "2.1.23"')
 
-        for changed in ("base", "space-age", "bobtech", "angelssmelting"):
+        # Captured versions lock the qualified evidence, but an unchanged named
+        # raw contract remains applicable across an official patch or graphics
+        # package version change.  Semantic admission remains validate_raw.
+        baseline = _plain(self.rows())
+        for changed in ("base", "space-age", "bobtech", "angelssmeltinggraphics"):
             mods = dict(self.facts["required_mods"])
-            # 2.1.24 is a real compatible-looking patch update: it must not
-            # silently omit saved F210 BobTech identities.
-            mods[changed] = "2.1.24" if changed == "base" else "changed"
-            with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
-                self.rows(active_mods=_lua_value(self.lua, mods))
+            mods[changed] = "2.1.24" if changed in ("base", "space-age") else "changed"
+            self.assertEqual(baseline, _plain(self.rows(active_mods=_lua_value(self.lua, mods))))
+
+        changed = dict(self.facts["required_mods"])
+        changed["bobtech"] = "changed"
+        wrong_io = self.raw_fixture()
+        wrong_io["recipe"]["angels-plate-invar"]["results"][1]["amount"] = 5
+        with self.assertRaisesRegex(Exception, "angels-plate-invar changed"):
+            self.rows(raw=wrong_io, active_mods=_lua_value(self.lua, changed))
+        wrong_owner = self.raw_fixture()
+        wrong_owner["technology"]["angels-gunmetal-smelting-1"]["effects"][1]["type"] = "change-recipe-productivity"
+        with self.assertRaisesRegex(Exception, "angels-gunmetal-smelting-1 no longer owns angels-plate-gunmetal"):
+            self.rows(raw=wrong_owner, active_mods=_lua_value(self.lua, changed))
         for marker in self.facts["forbidden_markers"]:
             mods = dict(self.facts["required_mods"])
             mods[marker] = "present"
@@ -259,15 +271,15 @@ class BobTechMaterialTests(unittest.TestCase):
         unrelated = {**self.facts["required_mods"], "unrelated-observer": "0.1.0"}
         self.assertEqual(5, len(self.rows(active_mods=_lua_value(self.lua, unrelated))))
 
-    def test_complete_changed_bobtech_closure_refuses_during_settings_declaration(self):
+    def test_complete_changed_bobtech_closure_declares_settings_before_raw_preflight(self):
         # Settings are declared before data-final emission. This must fail
         # there too, rather than hiding the three setting families and later
         # omitting their five established technology IDs.
         changed = dict(self.facts["required_mods"])
         changed["base"] = "2.1.24"
         self.lua.globals().mods = _lua_value(self.lua, changed)
-        with self.assertRaisesRegex(Exception, "unsupported F210 BobTech saved-profile transition"):
-            self.lua.execute('package.loaded["research.settings"] = nil; return require("research.settings")')
+        settings = self.lua.execute('package.loaded["research.settings"] = nil; return require("research.settings")')
+        self.assertIsNotNone(settings)
 
     def test_named_preflight_rejects_route_owner_and_stage_drift_without_scanning(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')

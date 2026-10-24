@@ -7,19 +7,9 @@ local target = require("platform.target")
 local M = {}
 
 local REQUIRED = {
-  base = "2.1.23",
-  ["space-age"] = "2.1.23",
-  boblibrary = "3.0.1",
-  bobores = "3.0.0",
-  bobplates = "3.0.2",
-  bobelectronics = "3.0.1",
-  bobtech = "3.0.0",
-  angelsrefining = "2.1.2",
-  angelsrefininggraphics = "2.1.0",
-  angelspetrochem = "2.1.3",
-  angelspetrochemgraphics = "2.1.0",
-  angelssmelting = "2.1.1",
-  angelssmeltinggraphics = "2.1.1",
+  "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
+  "angelsrefining", "angelsrefininggraphics", "angelspetrochem", "angelspetrochemgraphics",
+  "angelssmelting", "angelssmeltinggraphics",
 }
 
 local VISIBLE = {
@@ -29,7 +19,7 @@ local VISIBLE = {
 }
 
 local function complete_closure(active)
-  for name in pairs(REQUIRED) do
+  for _, name in ipairs(REQUIRED) do
     if active[name] == nil then return false end
   end
   return true
@@ -41,9 +31,9 @@ end
 
 function M.applies(active)
   if target.id ~= "f210" or target.factorio_version ~= "2.1" or type(active) ~= "table" then return false end
-  -- A partial closure could be a fresh, unrelated mod selection. A complete
-  -- named predecessor with a changed member could instead carry these five
-  -- already-saved identities, so it must block before data-stage omission.
+  -- A partial closure is an unrelated selection.  A complete closure proceeds to
+  -- the material module's mandatory named raw-prototype preflight; captured
+  -- versions are qualification evidence, not an applicability fingerprint.
   if not complete_closure(active) then return false end
   -- Target records may raise their declared minimum for an official patch.
   -- That is not evidence that this F210 predecessor can be omitted.
@@ -53,11 +43,6 @@ function M.applies(active)
   if active.Krastorio2 ~= nil or active.Krastorio2Assets ~= nil
       or active["Krastorio2-spaced-out"] ~= nil or active["k2so-assets"] ~= nil then
     fail_transition("captured BobTech closure has an unsupported Krastorio selection")
-  end
-  for name, version in pairs(REQUIRED) do
-    if active[name] ~= version then
-      fail_transition(name .. " is " .. tostring(active[name]) .. ", expected " .. version)
-    end
   end
   return true
 end
