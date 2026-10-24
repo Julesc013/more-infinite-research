@@ -15,11 +15,11 @@
     "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
   },
   "candidate": {
-    "source_reference": "83e22cc7720b6688b95af4d28d04bb3f833cb6d5",
-    "source_tree": "1d4d5f47ae668ba7d5cf1bdea4884b007057403e",
-    "sha256": "F947D291B9EE6F2165E38856D74812C5386CB0C2CFCA1B5A58CDA8DA7B60F64C",
-    "bytes": 545595,
-    "scope": "Complete applicable canonical F200 player with Aero805/809 Library event and saved-translation fixes, bounded API draft3, reviewed BobTech default-ceiling handling, native growth ceiling1000 and Aero811 first-upgrade guard. Exact nine-edition freeze83e22cc7; this experiment does not establish final save/client/release acceptance."
+    "source_reference": "75a5ad09e6216dba930189e5b8a37458b2ab66d1",
+    "source_tree": "0734ec80bdb72023b16e1bd569727c39e952cdb0",
+    "sha256": "9BF94CC7729F61B62E9135784AA0FD2292893A66DEDFFF875614968A8C59317A",
+    "bytes": 545632,
+    "scope": "Complete applicable canonical F200 player with Aero805/809 Library event and saved-translation fixes, bounded API draft3, reviewed BobTech default-ceiling handling, native growth ceiling1000 and Aero811 first-upgrade guard. Includes the predeclared BobTech continuation presentation correction; exact nine-edition freeze75a5ad09; this experiment does not establish final save/client/release acceptance."
   },
   "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
   "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
@@ -82,14 +82,15 @@
   ],
   "previous_plan": "spec/evidence/bob-angel-menu-plan-r07.json",
   "changed_inputs": [
-    "Advance the complete candidate from ddc091e7 to exact83e22cc7 and its actual F200 freezeF947D291\u2026F64C. Earlier r06/r07 retain zero accepted timing samples.",
+    "Advance the complete candidate from ddc091e7 to exact75a5ad09 and its actual F200 freeze9BF94CC7729F61B62E9135784AA0FD2292893A66DEDFFF875614968A8C59317A. Earlier r06/r07 and the first83e22cc7 r08 predeclaration retain zero accepted timing samples.",
     "Include reviewed Aero805/809 Library behavior, public API draft3 native reconstruction, BobTech documented default-ceiling equivalence, the independently declared growth1000 safety bound and Aero811 preference ambiguity guard.",
     "Use complete independent r03 intent: retain all27 r02 data records unchanged and add only121 full named setting maximum_value replacements. No candidate-derived expectation, omitted technology or threshold change.",
     "Recover and verify the original39974658753 no-MIR capture. Its full receipt exactly matches the published inventory. Original profile CRLF bytes and current canonical LF bytes have different recorded hashes but identical complete JSON; use the existing strict explicit paired-file contract.",
     "Preserve the published4.7 replay as its original empirical diagnostic arm. Rebuild with pinned canonical tools; a changed replay ZIP requires a fresh native equality capture. Do not claim candidate/replay output equivalence.",
     "Use current canonical source/spec/tests/tools roots and exact helper Git hashes. Preserve all original captures, receipt identities and adverse observations.",
     "Keep all four arms,38 launches,A/A0.5 seconds and5 percent,control0.5 seconds,50 percent MIR-added objective,cache/player configuration and all resource reserves unchanged.",
-    "No timing until current host/tooling checks, exact candidate/default intent equality, published/replay equality and a fresh owned-window diagnostic pass. Exclude builds,host suites,inference and other heavy jobs from timed observations."
+    "No timing until current host/tooling checks, exact candidate/default intent equality, published/replay equality and a fresh owned-window diagnostic pass. Exclude builds,host suites,inference and other heavy jobs from timed observations.",
+    "Before any r08 native preparation or timing, advance83e22cc7 to75a5ad09 after the separately predeclared F210 BobTech fixture exposed missing continuation presentation. Only two authored records gain their four boolean fields; Generator, routes, effects, workload and thresholds are unchanged. The corrected F210 case passes11 real labs/save/two reloads under its original source75 identity. Actual F200 freeze9BF94CC7\u20269317A/545632 bytes is newly pinned; old plan bytes remain atb2ca599c with zero samples."
   ],
   "resources": {
     "expected_peak_memory_mib": 6144,
@@ -98,7 +99,7 @@
     "worker_timeout_minutes": 45,
     "governor_reserves_changed": false
   },
-  "observer_source_reference": "83e22cc7720b6688b95af4d28d04bb3f833cb6d5",
+  "observer_source_reference": "75a5ad09e6216dba930189e5b8a37458b2ab66d1",
   "observer_git_blobs": [
     {
       "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
@@ -118,7 +119,7 @@
     }
   ],
   "adverse_evidence": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
-  "shared_harness_source_reference": "83e22cc7720b6688b95af4d28d04bb3f833cb6d5",
+  "shared_harness_source_reference": "75a5ad09e6216dba930189e5b8a37458b2ab66d1",
   "shared_harness_git_blobs": [
     {
       "path": "tools/lib/validation/NativeProbeCommon.ps1",
@@ -160,5 +161,7 @@
       "path": "tools/Invoke-PrototypeCapture.ps1",
       "sha256": "BB857E5960E983EBE903BEC58F7E8835C978C8524F7AE1D3AFFAB3058CC37AE0"
     }
-  ]
+  ],
+  "prior_predeclaration_commit": "b2ca599ca1a3f4df711c8e91dfaf900a007b8fb2",
+  "preparation_or_timing_started_for_prior_revision": false
 }
