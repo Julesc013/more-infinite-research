@@ -13,9 +13,18 @@ import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
 from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, native_credit_carrier_rows, verified_public_rows
 
+SETTINGS_INTENT = ROOT / "spec/inventory/bob-angel-f200-intent-r03.json"
+SETTINGS_INTENT_SHA256 = "1D200906E8996F4049009EE6761E73C88FFC70824BC838496786A32EF927207C"
+GROWTH_MAXIMUM = 1000
+
 
 def sha256(path):
     return hashlib.sha256(path.read_bytes()).hexdigest().upper()
+
+
+def canonical_row_sha256(row):
+    text = json.dumps(row, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    return hashlib.sha256(text.encode("utf-8")).hexdigest().upper()
 
 
 class BobAngelCatalogueTests(unittest.TestCase):
@@ -43,6 +52,31 @@ class BobAngelCatalogueTests(unittest.TestCase):
         cls.expected_data = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "data"), "data")
         cls.expected_settings = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "settings"), "settings")
         reviewed = catalogue._reviewed_differences(ROOT / cls.inputs["reviewed_intent"]["path"], "bob-angel-f200")
+        if sha256(SETTINGS_INTENT) != SETTINGS_INTENT_SHA256:
+            raise AssertionError("predeclared Bob/Angel growth-cap intent changed")
+        r03 = catalogue._reviewed_differences(SETTINGS_INTENT, "bob-angel-f200")
+        r03_data = [row for row in r03 if row["domain"] == "data"]
+        settings_review = [row for row in r03 if row["domain"] == "settings"]
+        if not catalogue._same(reviewed, r03_data):
+            raise AssertionError("Bob/Angel r03 changed the retained r02 data dispositions")
+        expected_growth_names = {
+            name for name, row in cls.expected_settings["double-setting"].items()
+            if name.startswith(("ips-cost-growth-", "mir-cost-growth-"))
+        }
+        if len(settings_review) != 121 or {row["name"] for row in settings_review} != expected_growth_names:
+            raise AssertionError("Bob/Angel r03 growth-cap intent does not replace every and only named growth setting")
+        for row in settings_review:
+            before = cls.expected_settings[row["type"]][row["name"]]
+            minimum = 1 if row["name"].startswith("ips-cost-growth-") else 0
+            expected = deepcopy(before)
+            expected["maximum_value"] = GROWTH_MAXIMUM
+            if (row["type"] != "double-setting" or before.get("type") != "double-setting"
+                    or before.get("setting_type") != "startup" or before.get("minimum_value") != minimum
+                    or "maximum_value" in before
+                    or canonical_row_sha256(before) != row.get("independent_before_sha256")
+                    or not catalogue._same(expected, row["expected_candidate"])):
+                raise AssertionError("Bob/Angel r03 growth-cap record is not an exact independent replacement: " + row["name"])
+        catalogue._apply_reviewed(cls.expected_settings, settings_review, "settings")
         # Derive every dormant carrier from the published public rows and
         # captured recipes, independently of candidate or player code.
         public_review = [row for row in reviewed if not row["name"].startswith("mir-native-credit-")]
@@ -115,7 +149,7 @@ class BobAngelCatalogueTests(unittest.TestCase):
         declared = _plain(lua.execute('return require("research.catalogue").declared()'))
         self.assertEqual({row["id"] for row in declared}, set(expected["technology"]))
 
-    def test_all_875_settings_preserve_published_fields(self):
+    def test_all_875_settings_match_published_fields_with_reviewed_growth_bound(self):
         lua = self.stage()
         rows = _plain(lua.execute('return require("research.settings").prototypes()'))
         actual = {}
