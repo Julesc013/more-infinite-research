@@ -80,11 +80,24 @@ local function validate_raw(raw, definition)
   end
   for _, route in ipairs(definition.routes) do
     local recipe = raw.recipe[route.recipe]
-    if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.hidden == true
-        or recipe.allow_productivity ~= true or recipe.maximum_productivity ~= route.maximum_productivity
-        or not ordinary_rows(recipe.ingredients, route.ingredients)
-        or not ordinary_rows(recipe.results, route.results) then
-      fail(route.recipe .. " changed")
+    if type(recipe) ~= "table" then fail(route.recipe .. " changed: recipe is absent") end
+    -- F210 RecipePrototype defaults an omitted maximum_productivity to 3.
+    -- The preserved native facts describe that effective ceiling, not whether
+    -- the optional field was explicitly authored in data.raw.
+    local maximum_productivity = recipe.maximum_productivity
+    if maximum_productivity == nil then maximum_productivity = 3 end
+    if maximum_productivity ~= route.maximum_productivity then
+      fail(route.recipe .. " changed: maximum_productivity is " .. tostring(recipe.maximum_productivity)
+        .. ", expected effective " .. tostring(route.maximum_productivity))
+    end
+    if recipe.enabled ~= false or recipe.hidden == true or recipe.allow_productivity ~= true then
+      fail(route.recipe .. " changed: availability or productivity flags")
+    end
+    if not ordinary_rows(recipe.ingredients, route.ingredients) then
+      fail(route.recipe .. " changed: ingredients")
+    end
+    if not ordinary_rows(recipe.results, route.results) then
+      fail(route.recipe .. " changed: results")
     end
     if not owner_matches(raw.technology[route.owner], route) then
       fail(route.owner .. " no longer owns " .. route.recipe)

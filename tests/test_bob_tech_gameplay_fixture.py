@@ -179,6 +179,30 @@ class BobTechGameplayFixtureTests(unittest.TestCase):
             "recipe-prod-research_material_invar-4",
         ], accelerated)
 
+    def test_omitted_native_maximum_keeps_all_five_preflight_rows_and_explicit_drift_refuses(self):
+        omitted = deepcopy(self.raw)
+        for recipe in omitted["recipe"].values():
+            del recipe["maximum_productivity"]
+        result = self.run_data_fixture(omitted)
+        self.assertTrue(result[0] if isinstance(result, tuple) else result)
+        for family in self.facts["families"]:
+            for stage_name in ("early", "continuation"):
+                if stage_name in family:
+                    row = self.lua.globals().data["raw"]["technology"][family[stage_name]["id"]]
+                    self.assertEqual((None, 1, 1),
+                                     (row["unit"]["count_formula"], row["unit"]["count"], row["unit"]["time"]))
+        for maximum in (0, 2, 4, False, "3"):
+            with self.subTest(maximum=maximum):
+                changed = deepcopy(omitted)
+                changed["recipe"]["angels-plate-invar"]["maximum_productivity"] = maximum
+                result = self.run_data_fixture(changed)
+                self.assertFalse(result[0] if isinstance(result, tuple) else result)
+                for family in self.facts["families"]:
+                    for stage_name in ("early", "continuation"):
+                        if stage_name in family:
+                            row = self.lua.globals().data["raw"]["technology"][family[stage_name]["id"]]
+                            self.assertIsNone(row["unit"]["count"])
+
     def test_data_preflight_refuses_a_route_or_owner_or_effect_mismatch_without_partial_acceleration(self):
         mutations = {
             "route": lambda raw: raw["recipe"]["angels-plate-tin"].__setitem__("maximum_productivity", 2),

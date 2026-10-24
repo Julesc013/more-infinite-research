@@ -281,6 +281,28 @@ class BobTechMaterialTests(unittest.TestCase):
         settings = self.lua.execute('package.loaded["research.settings"] = nil; return require("research.settings")')
         self.assertIsNotNone(settings)
 
+    def test_omitted_native_maximum_is_three_without_accepting_changed_caps_or_denials(self):
+        baseline = _plain(self.rows())
+        raw = self.raw_fixture()
+        for family in self.facts["families"]:
+            for route in family["routes"]:
+                raw["recipe"][route["recipe"]]["maximum_productivity"] = None
+        self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+        for family in self.facts["families"]:
+            for route in family["routes"]:
+                self.assertIsNone(raw["recipe"][route["recipe"]]["maximum_productivity"])
+                for maximum in (0, 2, 4, False, "3", float("nan"), float("inf")):
+                    with self.subTest(recipe=route["recipe"], maximum=maximum):
+                        changed = self.raw_fixture()
+                        changed["recipe"][route["recipe"]]["maximum_productivity"] = maximum
+                        with self.assertRaisesRegex(Exception, route["recipe"] + " changed: maximum_productivity"):
+                            self.rows(raw=changed)
+        for field, value in (("allow_productivity", False), ("enabled", True), ("hidden", True)):
+            changed = self.raw_fixture()
+            changed["recipe"]["angels-plate-tin"][field] = value
+            with self.assertRaisesRegex(Exception, "angels-plate-tin changed: availability or productivity flags"):
+                self.rows(raw=changed)
+
     def test_named_preflight_rejects_route_owner_and_stage_drift_without_scanning(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')
         raw = self.raw_fixture()

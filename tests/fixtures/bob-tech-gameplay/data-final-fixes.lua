@@ -108,8 +108,11 @@ end
 
 local function assert_route(raw, route)
   local value = raw.recipe[route.recipe]
+  local maximum = type(value) == "table" and value.maximum_productivity
+  -- Independent F210 schema fact: this optional raw field defaults to 3.0.
+  if maximum == nil then maximum = 3 end
   if type(value) ~= "table" or value.enabled ~= false or value.hidden == true
-      or value.allow_productivity ~= true or value.maximum_productivity ~= route.maximum_productivity then
+      or value.allow_productivity ~= true or maximum ~= route.maximum_productivity then
     fail(route.recipe .. " route flags changed")
   end
   ordinary_rows(value.ingredients, route.ingredients, route.recipe .. " ingredients")
