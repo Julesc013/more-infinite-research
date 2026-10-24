@@ -1182,6 +1182,8 @@ class LibraryTests(unittest.TestCase):
           package.loaded["research.catalogue"] = nil
           package.loaded["presentation.library_model"] = nil
           boot()
+          -- Native callbacks cannot import modules, including cached ones.
+          require = function(name) error("Library callback imported " .. name) end
           library.on_lua_shortcut({prototype_name = "mir-research-browser", player_index = 1})
           local root = player.gui.screen["mir_research_browser"]
           local query = root["mir_library_filters"]["mir_library_query"]

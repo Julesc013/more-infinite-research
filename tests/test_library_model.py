@@ -1,5 +1,6 @@
 """Pure Lua 5.2 controls for the bounded MIR 5 Library model, not native GUI evidence."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -8,6 +9,54 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryModelTests(unittest.TestCase):
+    def test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse(self):
+        editions = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
+        profiles = [
+            "library-multiplayer-f200-2077", "library-native-f210", "space-age-f210-2123",
+            "k2-base-f200-2077", "k2so-f210-2123", "bob-angel-f200-2077",
+            "bob-core-f210-2123", "py-coal-f200-2077",
+            "py-alienlife-hightech-f200-2077", "armor-bobwarfare-f200-2077",
+            "atan-base-f200-2077", "atan-space-age-f200-2077",
+        ]
+        for name in profiles:
+            with self.subTest(profile=name):
+                profile = json.loads((ROOT / f"tests/profiles/{name}.json").read_text())
+                lua = LuaRuntime(unpack_returned_tuples=True)
+                lua.globals().player_root = (ROOT / "source").as_posix()
+                target_id = "f210" if name == "library-native-f210" else profile["target"]
+                target = lua.table_from(editions[target_id])
+                target["id"] = target_id
+                lua.globals().selected_target = target
+                lua.globals().selected_mods = lua.table_from({
+                    mod["name"]: mod["version"] for mod in profile["mods"] if mod["enabled"]
+                })
+                lua.execute('''
+                  package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
+                  package.loaded["platform.target"] = selected_target
+                  script, mods = {active_mods=selected_mods}, selected_mods
+                  local modern = require("compatibility.modern_catalogue")
+                  local select, selections = modern.select, 0
+                  modern.select = function(...)
+                    selections = selections + 1
+                    return select(...)
+                  end
+                  local catalogue = require("research.catalogue")
+                  local parse_selections = selections
+                  -- Factorio refuses even cached require calls in callbacks.
+                  require = function(name) error("late runtime import: " .. name) end
+                  local first, second = catalogue.declared(), catalogue.declared()
+                  assert(parse_selections == 1 and selections == parse_selections,
+                    "runtime query rebuilt the authored profile")
+                  assert(#first > 1 and #first == #second)
+                  assert(first[1].id == "recipe-prod-research_gears-1")
+                  first[1].id, first[1].settings[1] = "foreign", "foreign"
+                  local third = catalogue.declared()
+                  assert(second[1].id == "recipe-prod-research_gears-1"
+                    and third[1].id == second[1].id
+                    and third[1].settings[1] == "ips-enable-research_gears")
+                  assert(package.loaded["research.generator"] == nil)
+                ''')
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
