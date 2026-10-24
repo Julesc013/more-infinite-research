@@ -1,5 +1,5 @@
 local KEY = "mir5_f200_legacy_worker"
-local CASE = "f200-positive-legacy-worker"
+local MIR5_CASE = "f200-positive-legacy-worker"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-f200-legacy-worker"
 local WORKER = "worker-robots-speed-6"
@@ -130,6 +130,45 @@ local function science_units(inventory, item, label)
   return total
 end
 
+local function expected_science_consumption(force, value, lab_entity, saved_progress)
+  if force.current_research ~= value or #force.research_queue ~= 1 then
+    fail("successor native worker research is not singly current")
+  end
+  local progress = force.research_progress
+  if not close(progress, saved_progress) then
+    fail("successor native worker saved investment did not become current research")
+  end
+  local quality = lab_entity.quality
+  if quality == nil or quality.name ~= "normal" then fail("successor native worker lab quality is not normal") end
+  local prototype = lab_entity.prototype
+  if prototype == nil or type(prototype.get_researching_speed) ~= "function" then
+    fail("successor native worker lab researching speed is absent")
+  end
+  local researching_speed = prototype.get_researching_speed(quality)
+  local laboratory_speed, productivity = force.laboratory_speed_modifier, force.laboratory_productivity_bonus
+  if not close(researching_speed, 1) or not close(laboratory_speed, 0) or not close(productivity, 0) then
+    fail("successor native worker lab speed or productivity fixture input changed")
+  end
+  local modules = lab_entity.get_module_inventory and lab_entity.get_module_inventory()
+  if modules ~= nil then
+    for index = 1, #modules do
+      if modules[index].valid_for_read then fail("successor native worker lab has a module") end
+    end
+  end
+  local energy = value.research_unit_energy
+  local work_per_tick = researching_speed * (1 + laboratory_speed)
+  local remaining_work = (1 - progress) * energy
+  if type(energy) ~= "number" or energy <= 0 or work_per_tick <= 0 or remaining_work <= 0 then
+    fail("successor native worker research timing differs")
+  end
+  local ticks = math.ceil(remaining_work / work_per_tick)
+  local consumed_units = ticks * work_per_tick / energy
+  if ticks <= 0 or consumed_units <= 0 or consumed_units > 1 then fail("successor native worker science timing differs") end
+  return {progress = progress, energy = energy, researching_speed = researching_speed,
+    laboratory_speed = laboratory_speed, remaining_work = remaining_work, remaining_ticks = ticks,
+    consumed_units = consumed_units}
+end
+
 local function assert_acceleration(value)
   if value.research_unit_count ~= 1 or not close(value.research_unit_energy, 60) then
     fail("fixture did not retain one-unit one-second native worker research")
@@ -147,7 +186,8 @@ local function assert_source_witness(state)
   if state.source_mir ~= "4.7.20002" or state.fixture_version ~= "0.1.0"
       or state.actual_lab_completions ~= 2 or state.milestone ~= "actual2labs"
       or type(state.foreign_queue) ~= "table" or type(state.player_with_independent) ~= "number"
-      or type(state.foreign_baseline) ~= "number" then
+      or type(state.foreign_baseline) ~= "number" or type(state.player_cap) ~= "table"
+      or not close(state.player_cap.saved_progress, 0.27) then
     fail("published native-worker source witness is absent or malformed")
   end
 end
@@ -179,18 +219,19 @@ local function assert_completed(state)
   assert_foreign(game.forces[state.foreign_force_index], state.foreign_queue, state.foreign_baseline)
   local inventory = lab(state)
   local expected_units = state.destination_science_units_before
-  local remaining_invest = state.destination_remaining_invest
-  if type(expected_units) ~= "table" or not close(remaining_invest, 0.73) then
+  local accounting = state.destination_science_accounting
+  if type(expected_units) ~= "table" or type(accounting) ~= "table" then
     fail("successor native science accounting witness is absent")
   end
   state.destination_science_units_after = state.destination_science_units_after or {}
   for _, item in ipairs(SCIENCE) do
-    local expected = expected_units[item] - remaining_invest
+    local expected = expected_units[item] - accounting.consumed_units
     local observed = science_units(inventory, item, "successor post-lab")
     if not close(observed, expected) then
       fail("successor real native worker lab consumption differs for " .. item
         .. ": observed_units=" .. tostring(observed) .. " expected_units=" .. tostring(expected)
-        .. " remaining_invest=" .. tostring(remaining_invest))
+        .. " consumed_units=" .. tostring(accounting.consumed_units)
+        .. " remaining_ticks=" .. tostring(accounting.remaining_ticks))
     end
     local prior = state.destination_science_units_after[item]
     if prior ~= nil and not close(prior, observed) then
@@ -204,7 +245,7 @@ end
 local function marker(stage, state)
   local player = status(game.forces.player)
   log("[MIR5_NATIVE_FIXTURE] RESULT " .. helpers.table_to_json({
-    stage = stage, case = CASE, status = "passed",
+    stage = stage, case = MIR5_CASE, status = "passed",
     qualification = "native-runner-readback-required",
     witnesses = {
       source_mir = state.source_mir, destination_mir = script.active_mods["more-infinite-research"],
@@ -215,10 +256,30 @@ local function marker(stage, state)
       worker_speed_modifier = player.bonus, independent_modifier_baseline = state.player_with_independent,
       player_enabled = player.enabled, player_visible_when_disabled = player.visible,
       foreign_queue_progress = state.foreign_queue.progress,
-      science_remaining_invest = state.destination_remaining_invest,
+      science_consumed_units = state.destination_science_accounting.consumed_units,
+      science_remaining_ticks = state.destination_science_accounting.remaining_ticks,
+      science_processing_ticks = state.destination_processing_ticks,
+      science_elapsed_ticks = state.destination_elapsed_ticks,
       science_units_after = state.destination_science_units_after,
       on_load_read_only = stage == "reload",
     },
+  }))
+end
+
+local function finish_diagnostic(state, accounting)
+  local observed = {}
+  local inventory = lab(state)
+  for _, item in ipairs(SCIENCE) do
+    observed[item] = science_units(inventory, item, "successor native worker finish")
+  end
+  log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({
+    stage = "finish-before-assertion", case = MIR5_CASE,
+    research_start_tick = state.destination_research_start_tick,
+    research_finished_tick = game.tick,
+    raw_elapsed_ticks = game.tick - state.destination_research_start_tick,
+    processing_ticks = state.destination_processing_ticks,
+    expected_processing_ticks = type(accounting) == "table" and accounting.remaining_ticks or false,
+    science_units_observed = observed,
   }))
 end
 
@@ -249,7 +310,7 @@ script.on_configuration_changed(function()
   end
   state.destination_science_units_before = before_units
   state.destination_science_units_after = nil
-  state.destination_remaining_invest = 0.73
+  state.destination_science_accounting = nil
   state.destination_lab_completions = 0
   state.phase = "await-successor-lab"
   state.deadline_tick = game.tick + DEADLINE
@@ -257,12 +318,24 @@ script.on_configuration_changed(function()
     fail("could not queue successor native worker research")
   end
   if #game.forces.player.research_queue ~= 1 then fail("successor native worker research was not queued singly") end
+  state.destination_science_accounting = expected_science_consumption(game.forces.player,
+    technology(game.forces.player, WORKER), state.lab, 0.27)
+  state.destination_research_start_tick = game.tick
+  state.destination_processing_ticks = 0
+  state.destination_elapsed_ticks = nil
 end)
 
 script.on_event(defines.events.on_research_finished, function(event)
   local state = storage[KEY]
   if type(state) ~= "table" or state.phase ~= "await-successor-lab" or event.research == nil
       or event.research.force ~= game.forces.player or event.research.name ~= WORKER then return end
+  local accounting = state.destination_science_accounting
+  local elapsed = game.tick - state.destination_research_start_tick
+  finish_diagnostic(state, accounting)
+  if type(accounting) ~= "table" or state.destination_processing_ticks ~= accounting.remaining_ticks then
+    fail("successor real native worker lab processing ticks differ")
+  end
+  state.destination_elapsed_ticks = elapsed
   state.destination_lab_completions = state.destination_lab_completions + 1
   if state.destination_lab_completions ~= 1 then fail("successor completed duplicate native worker level") end
   state.phase = "await-successor-observation"
@@ -299,6 +372,9 @@ script.on_event(defines.events.on_tick, function()
   end
   if game.tick > state.deadline_tick then fail("successor lab did not complete one native worker level") end
   lab(state)
+  if state.phase == "await-successor-lab" then
+    state.destination_processing_ticks = state.destination_processing_ticks + 1
+  end
   if state.phase == "await-successor-observation" then
     state.successor_player = copy_status(assert_completed(state))
     state.phase = "completed"

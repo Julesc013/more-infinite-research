@@ -659,7 +659,12 @@ function Test-MIR4PlatformConformance {
   catch { if (-not $_.Exception.Message.StartsWith("[$expected]")) { throw "[mir4-mep-negative-diagnostic] Expected $expected, got $($_.Exception.Message)" } }
   $sourceAfter = Get-MIRPackageSourceFingerprint -RepoRoot $repo
   if ($sourceBefore -cne $sourceAfter) { throw '[mir4-platform-package-mutation] Platform generation changed player package sources.' }
-  $shipped = @(Get-MIRPackageSourceFiles -RepoRoot $repo)
+  # The canonical source fingerprint deliberately includes the versioning
+  # authority and target records.  Those files govern materialization, but
+  # are not player-package members.  Check the declared materialized paths
+  # here so a required authority record such as .mir/releases/... cannot
+  # create a false package-visibility failure.
+  $shipped = @(Get-MIRPackageOutputPaths -RepoRoot $repo)
   foreach ($prefix in @('sdk/','spec/','fixtures/','docs/','tools/','.mir/','mir.toml','mir.lock')) {
     if (@($shipped | Where-Object { $_.StartsWith($prefix) -or $_ -eq $prefix.TrimEnd('/') }).Count -gt 0) { throw "[mir4-platform-package-visible] $prefix" }
   }

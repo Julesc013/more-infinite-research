@@ -12,6 +12,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_historical_direct.py';lua=$true},
   [ordered]@{path='tests/mir5/test_historical_continuations.py';lua=$true},
   [ordered]@{path='tests/mir5/test_historical_native_runner.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_historical_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_modern_targets.py';lua=$true},
   [ordered]@{path='tests/mir5/test_k2_base_catalogue.py';lua=$true},
   [ordered]@{path='tests/mir5/test_k2_base_native_fixture.py';lua=$true},

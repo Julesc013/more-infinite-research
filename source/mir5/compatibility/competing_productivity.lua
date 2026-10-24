@@ -1,9 +1,8 @@
--- Exact F200 binding for Expanded Productivity Research 1.3.8.
+-- Exact F200 bindings for named competing productivity providers.
 --
--- These declarations retain the thirty published competing tails as foreign
--- technologies.  They only name the proved one-to-one (or explicitly split)
--- productivity coverage that can be capped at runtime; no recipe or
--- technology discovery is performed here.
+-- These declarations name only proved foreign tails or initial identities and
+-- their one-to-one (or explicitly split) MIR productivity coverage. Runtime
+-- retirement never discovers recipes or technologies.
 local M = {}
 
 local PROVIDER = "ExpandedProductivityResearch"
@@ -18,20 +17,21 @@ local function effects(recipes)
 end
 
 local function replacement(id, recipes)
-  return {id = id, effects = effects(recipes)}
+  return {id = id, first_level = 1, effects = effects(recipes)}
 end
 
-local function binding(id, first_level, predecessor, recipes, replacements)
+local function binding(id, first_level, predecessor, recipes, replacements, initial_retirement)
   return {
     id = id,
     first_level = first_level,
     predecessor = predecessor,
     effects = effects(recipes),
     replacements = replacements,
+    initial_retirement = initial_retirement == true,
   }
 end
 
-local BINDINGS = {
+local EPR_BINDINGS = {
   binding("epr_advanced-circuit-productivity-5", 5, "epr_advanced-circuit-productivity-4", {"advanced-circuit"},
     {replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"})}),
   binding("epr_automation-science-pack-productivity-5", 5, "epr_automation-science-pack-productivity-4", {"automation-science-pack"},
@@ -96,10 +96,87 @@ local BINDINGS = {
     {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}),
 }
 
-local function exact_profile(active_mods, target)
-  return type(active_mods) == "table" and type(target) == "table"
-    and target.id == "f200" and target.factorio_version == "2.0"
-    and active_mods.base == BASE_VERSION and active_mods[PROVIDER] == PROVIDER_VERSION
+-- The four F200 Space Age providers below are deliberately flat authored
+-- groups. They have disjoint foreign identities and recipe effects, so exact
+-- simultaneous groups compose without any arbitrary priority. EPR plus a
+-- fixed Space Age provider has no admitted mixed contract.
+local PLATES_BINDINGS = {
+  binding("basic-plate-productivity", 1, "advanced-material-processing", {"copper-plate", "iron-plate"}, {
+    replacement("recipe-prod-research_copper-1", {"copper-plate"}),
+    replacement("recipe-prod-research_iron-1", {"iron-plate"}),
+  }, true),
+  binding("electric-circuit-productivity", 1, "automation-2", {"electronic-circuit"}, {
+    replacement("recipe-prod-research_electronic_circuit-1", {"electronic-circuit"}),
+  }, true),
+  binding("advanced-circuit-productivity", 1, "chemical-science-pack", {"advanced-circuit"}, {
+    replacement("recipe-prod-research_advanced_circuit-1", {"advanced-circuit"}),
+  }, true),
+}
+
+local SCIENCE_PACK_BINDINGS = {
+  binding("automation-science-productivity-4", 4, "automation-science-productivity-3", {"automation-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"automation-science-pack"})}),
+  binding("logistic-science-productivity-4", 4, "logistic-science-productivity-3", {"logistic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"logistic-science-pack"})}),
+  binding("military-science-productivity-4", 4, "military-science-productivity-3", {"military-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"military-science-pack"})}),
+  binding("chemical-science-productivity-4", 4, "chemical-science-productivity-3", {"chemical-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"chemical-science-pack"})}),
+  binding("production-science-productivity-4", 4, "production-science-productivity-3", {"production-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"production-science-pack"})}),
+  binding("utility-science-productivity-4", 4, "utility-science-productivity-3", {"utility-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"utility-science-pack"})}),
+  binding("space-science-productivity-4", 4, "space-science-productivity-3", {"space-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"space-science-pack"})}),
+  binding("metallurgic-science-productivity-4", 4, "metallurgic-science-productivity-3", {"metallurgic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"metallurgic-science-pack"})}),
+  binding("electromagnetic-science-productivity-4", 4, "electromagnetic-science-productivity-3", {"electromagnetic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"electromagnetic-science-pack"})}),
+  binding("agricultural-science-productivity-4", 4, "agricultural-science-productivity-3", {"agricultural-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"agricultural-science-pack"})}),
+  binding("cryogenic-science-productivity-4", 4, "cryogenic-science-productivity-3", {"cryogenic-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"cryogenic-science-pack"})}),
+  binding("promethium-science-productivity-4", 4, "promethium-science-productivity-3", {"promethium-science-pack"}, {replacement("recipe-prod-research_science_pack_productivity-1", {"promethium-science-pack"})}),
+}
+
+local BIOFLUX_BINDINGS = {
+  binding("bioflux-productivity", 1, "bioflux", {"bioflux"}, {
+    replacement("recipe-prod-research_bioflux-1", {"bioflux"}),
+  }, true),
+}
+
+local FISH_BINDINGS = {
+  binding("fish-breeding-productivity", 1, "fish-breeding", {"fish-breeding"}, {
+    replacement("recipe-prod-research_breeding-1", {"fish-breeding"}),
+  }, true),
+}
+
+local PROFILES = {
+  {key = "epr-base-f200", provider = PROVIDER, version = PROVIDER_VERSION, bindings = EPR_BINDINGS},
+  {key = "plates-f200-space-age", provider = "plates-n-circuit-productivity", version = "0.0.2", space_age = true, bindings = PLATES_BINDINGS},
+  {key = "science-packs-f200-space-age", provider = "Science_packs_productivity", version = "0.0.1", space_age = true, bindings = SCIENCE_PACK_BINDINGS},
+  {key = "bioflux-f200-space-age", provider = "bioflux-productivity", version = "0.1.0", space_age = true, bindings = BIOFLUX_BINDINGS},
+  {key = "fish-f200-space-age", provider = "fish-productivity", version = "1.0.0", space_age = true, bindings = FISH_BINDINGS},
+}
+
+local ALL_BINDINGS = {}
+for _, profile in ipairs(PROFILES) do
+  for _, item in ipairs(profile.bindings) do ALL_BINDINGS[#ALL_BINDINGS + 1] = item end
+end
+
+local function selected_profiles(active_mods, target)
+  if type(active_mods) ~= "table" or type(target) ~= "table"
+      or target.id ~= "f200" or target.factorio_version ~= "2.0" or active_mods.base ~= BASE_VERSION then
+    return nil
+  end
+  local epr, fixed = nil, {}
+  for _, profile in ipairs(PROFILES) do
+    local actual = active_mods[profile.provider]
+    if actual ~= nil then
+      if actual ~= profile.version then return nil end
+      if profile.space_age == true then
+        if active_mods["space-age"] ~= BASE_VERSION then return nil end
+        fixed[#fixed + 1] = profile
+      else
+        epr = profile
+      end
+    end
+  end
+  if epr ~= nil then
+    if #fixed ~= 0 then return nil end
+    return {epr}
+  end
+  if #fixed == 0 then return nil end
+  return fixed
 end
 
 local function close(actual, expected)
@@ -138,18 +215,27 @@ local function runtime_includes_effects(actual, required)
 end
 
 function M.select(active_mods, target)
-  if not exact_profile(active_mods, target) then return nil end
-  return {provider = PROVIDER, provider_version = PROVIDER_VERSION, base_version = BASE_VERSION,
-    effect_change = EFFECT, bindings = BINDINGS}
+  local profiles = selected_profiles(active_mods, target)
+  if profiles == nil then return nil end
+  local bindings, providers = {}, {}
+  for _, profile in ipairs(profiles) do
+    providers[#providers + 1] = {name = profile.provider, version = profile.version, key = profile.key}
+    for _, item in ipairs(profile.bindings) do bindings[#bindings + 1] = item end
+  end
+  return {provider = providers[1].name, provider_version = providers[1].version,
+    providers = providers, base_version = BASE_VERSION, effect_change = EFFECT, bindings = bindings}
 end
 
 function M.active(active_mods, target)
-  return type(active_mods) == "table" and type(target) == "table"
-    and target.id == "f200" and active_mods[PROVIDER] ~= nil
+  if type(active_mods) ~= "table" or type(target) ~= "table" or target.id ~= "f200" then return false end
+  for _, profile in ipairs(PROFILES) do
+    if active_mods[profile.provider] ~= nil then return true end
+  end
+  return false
 end
 
 function M.bindings()
-  return BINDINGS
+  return ALL_BINDINGS
 end
 
 function M.runtime_effects_match(actual, expected)
