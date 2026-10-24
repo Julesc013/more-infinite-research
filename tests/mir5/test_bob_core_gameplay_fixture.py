@@ -8,6 +8,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
+import re
 import sys
 import unittest
 
@@ -96,6 +97,10 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().data_fixture = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.globals().control_fixture = (FIXTURE / "control.lua").as_posix()
+        runner = (ROOT / "tools/mir5/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
+        completed_save = re.findall(r"\$complete=Join-Path \$writeData 'saves/([^'/]+)\.zip'", runner)
+        self.assertEqual(1, len(completed_save), "native runner must have one completed-save contract")
+        self.lua.globals().expected_complete_save = completed_save[0]
 
     def run_data_fixture(self, rows):
         self.lua.globals().fixture_rows = lua_value(self.lua, rows)
@@ -208,14 +213,14 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
         self.assertIsNotNone(result["callbacks"]["events"][2])
 
         self.lua.globals().consumption = lua_value(self.lua, CONSUMPTION)
-        for opponent, expected in (("", ""), ("lost-earned", "earned finite-three/tail-four"),
+        for opponent, expected in (("", ""), ("initial", ""), ("lost-earned", "earned finite-three/tail-four"),
                                    ("lost-bonus", "native recipe productivity differs"),
                                    ("science", "science consumption differs"),
                                    ("lost-tail", "earned finite-three/tail-four")):
             with self.subTest(opponent=opponent):
                 self.lua.globals().opponent = opponent
                 result = self.lua.execute(r'''
-                  local callbacks, markers = {events={}}, 0
+                  local callbacks, markers, saves = {events={}}, 0, 0
                   local active = {
                     base="2.1.23", ["space-age"]="2.1.23", boblibrary="3.0.1", bobores="3.0.0",
                     bobplates="3.0.2", bobelectronics="3.0.1", bobtech="3.0.0",
@@ -251,14 +256,19 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                     plan[#plan+1] = family.tail
                   end
                   local state = {phase="complete",plan=plan,next=29,finished=28,events=28,lab=lab,deadline=36000}
+                  if opponent == "initial" then state.phase = "researching" end
                   local environment = {
                     script={active_mods=active,on_init=function(callback) callbacks.init=callback end,
                       on_load=function(callback) callbacks.load=callback end,
                       on_event=function(event, callback) callbacks.events[event]=callback end},
                     defines={events={on_tick=1,on_research_finished=2},inventory={lab_input=1}},
-                    game={tick=2,forces={player=player}}, storage={mir5_bob_core_gameplay=state},
+                    game={tick=2,forces={player=player},server_save=function(name)
+                      assert(name == expected_complete_save, "completed save does not match native runner")
+                      saves = saves + 1
+                    end}, storage={mir5_bob_core_gameplay=state},
                     helpers={table_to_json=function(value)
-                      assert(value.case == "bob-core-gameplay" and value.stage == "reload"
+                      assert(value.case == "bob-core-gameplay"
+                        and value.stage == (opponent == "initial" and "initial" or "reload")
                         and value.witnesses.actual_lab_completions == 28)
                       return "{}"
                     end},
@@ -278,17 +288,18 @@ class BobCoreGameplayFixtureTests(unittest.TestCase):
                   if opponent == "lost-tail" then player.technologies[spec[3].tail].level = 4 end
                   local tick_ok, tick_message = pcall(callbacks.events[1])
                   return {load_ok=load_ok,load_message=tostring(load_message),read_only=read_only,
-                    tick_ok=tick_ok,tick_message=tostring(tick_message),markers=markers}
+                    tick_ok=tick_ok,tick_message=tostring(tick_message),markers=markers,saves=saves}
                 ''')
                 self.assertTrue(result["load_ok"], result["load_message"])
                 self.assertTrue(result["read_only"])
-                if opponent:
+                if opponent and opponent != "initial":
                     self.assertFalse(result["tick_ok"])
                     self.assertIn(expected, result["tick_message"])
                     self.assertEqual(0, result["markers"])
                 else:
                     self.assertTrue(result["tick_ok"], result["tick_message"])
                     self.assertEqual(1, result["markers"])
+                self.assertEqual(1 if opponent == "initial" else 0, result["saves"])
 
         source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
         self.assertIn("on_research_finished", source)

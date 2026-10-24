@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-tier-32",
+  "version": "0.1.0",
+  "title": "MIR 5 private agriculture scale tier 32 selector",
+  "author": "MIR maintainers",
+  "description": "Selects the fixed 32-tower tier for the private MIR 5 agriculture scale fixture.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-agriculture-scale >= 0.1.0"
+  ]
+}

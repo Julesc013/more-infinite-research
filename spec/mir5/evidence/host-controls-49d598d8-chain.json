@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompleteHostControlObservationV1",
+  "status": "passed",
+  "controls": 85,
+  "lua_controls": 76,
+  "non_lua_controls": 9,
+  "source_commit": "49d598d8a49596721fe4a117a26e9b2320e5cc8b",
+  "execution_checkout_commit": "3d440f82631df737275b06302cdb3a0e181e69e3",
+  "repository_tree": "bd877a26144098d1da7066e1eafd60c2be43e105",
+  "checkout_tree_equals_source_tree": true,
+  "player_source_tree": "55a4e3440687f4e01bd7469e6834f4e4d12f3afc",
+  "command": "./tests/mir5/Test-MIR5HostControls.ps1 -LuaRuntimeDir $env:MIR5_LUA_RUNTIME",
+  "workflow": {
+    "conclusion": "success",
+    "event": "pull_request",
+    "headSha": "49d598d8a49596721fe4a117a26e9b2320e5cc8b",
+    "startedAt": "2026-10-24T08:57:38Z",
+    "status": "completed",
+    "updatedAt": "2026-10-24T09:01:36Z",
+    "url": "https://github.com/Julesc013/more-infinite-research/actions/runs/40080060215"
+  },
+  "runner": "GitHub windows-latest; Windows Server2025; Python3.14; pinned Lupa2.6 Lua5.2",
+  "runner_script_sha256": "716A1873034AE1497706944BE05433F6276F54D9797E7A4E9A839219FC5B55AD",
+  "log": {
+    "gzip": "spec/mir5/evidence/host-controls-49d598d8-85-github.log.gz",
+    "compressed_sha256": "303FBDAC2E3F5F63A7C2FB8E5FC929D5000881CF28948ECCA839D42FD6D48B8E",
+    "uncompressed_sha256": "2F3206B1CC97825AA030FFC798E14AB2E6DB1913497DCD38095E0464BBA141E7",
+    "origin": "UTF-8 gh run view --log projection; complete hosted job log preserved"
+  },
+  "plan": {
+    "gzip": "spec/mir5/evidence/host-plan-49d598d8-85.json.gz",
+    "compressed_sha256": "B64A0869B5FEF001AAB31AD2090BF0F8CCC9DD722BDBFE62F82A62CF0D5006C5",
+    "uncompressed_sha256": "BE14D6FA29134A49513BD1924A67E4DF82008A0CD0577BA2F4C964E42AE70BB8",
+    "materialized_before_run": false,
+    "provenance": "Reconstructed after execution from the exact consumed runner source, not an original pre-run artifact"
+  },
+  "skipped_cases": [
+    "test_f210_runtime_api_matches_only_the_public_witnesses (__main__.OverrideInteractionsFixtureTests.test_f210_runtime_api_matches_only_the_public_witnesses) ... skipped 'F210 runtime-api.json is not installed'",
+    "test_f200_force_field_schema_when_local_api_is_available (__main__.FullCatalogueUpgradeFixtureTests.test_f200_force_field_schema_when_local_api_is_available) ... skipped 'F200 runtime API documentation is not installed'",
+    "test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present (__main__.AutomaticFamilyNonEmissionTests.test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present) ... skipped 'developer-custody raw captures are optional; portable facts remain checked'",
+    "  test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path (__main__.NativeCreditDefinitionTests.test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path) (target='f200') ... skipped 'f200 native assets are unavailable on this host'",
+    "  test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path (__main__.NativeCreditDefinitionTests.test_carrier_icons_exist_in_f200_and_f210_base_assets_and_reject_the_missing_legacy_path) (target='f210') ... skipped 'f210 native assets are unavailable on this host'",
+    "test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present (__main__.FixedCompetingReferenceTests.test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present) ... skipped 'archive source verification requires --archive-library'",
+    "test_f200_documented_production_and_alpha_members_match_the_fixture_usage (__main__.FixtureControlHostStageTests.test_f200_documented_production_and_alpha_members_match_the_fixture_usage) ... skipped 'local Factorio 2.0 runtime API documentation is not installed'",
+    "  test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary (__main__.FixtureControlHostStageTests.test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary) (version='2.0.77') ... skipped 'local Factorio runtime API documentation is not installed'",
+    "  test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary (__main__.FixtureControlHostStageTests.test_lua_bootstrap_active_mods_is_the_pinned_runtime_dictionary) (version='2.1.23') ... skipped 'local Factorio runtime API documentation is not installed'"
+  ],
+  "scope": [
+    "All85 selected host commands completed successfully at the original PR792 synthetic merge checkout. Its entire tree equals the named head source; this receipt does not rename the checkout.",
+    "Hosted jobs lack local engines, API documentation, assets, archives and raw captures. Every optional skipped assertion/subtest remains listed rather than counted as executed. Black Glass focused native/API/asset observations retain their own identities.",
+    "This is historical host evidence, not native gameplay, saved-state/client, elapsed performance, canonical layout, current-package or release acceptance."
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}

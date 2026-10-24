@@ -61,6 +61,8 @@ Code should be concise enough to follow, not minified. Prefer ordinary arrays/ma
 
 Follow [verification](../../spec/mir5/verification.md). Run cheap affected checks first, native slices for changed gameplay, migrations/clients when state is affected, and the full relevant frozen-candidate campaign before release. A documentation typo is not a new native campaign. A new engine is not covered by an old native receipt.
 
+The ATAN, K2 and automatic-family controls read their historical selectors and automatic-family logs from published commit `bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1`, checking each original captured SHA256. They do not require editable MIR4 source or historical files in the current tree. A shallow checkout needs `git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1` before those controls; the hosted workflow performs that exact fetch. The reader has no network or current-file fallback. Current MIR5 settings/catalogue assertions continue to read current source.
+
 A test correction needs independent evidence. A resource refusal is not a pass, fail or timing sample. A path-only rename still needs package member equality and final-layout smoke, because import and package mistakes are real defects.
 
 ## Contribution completion

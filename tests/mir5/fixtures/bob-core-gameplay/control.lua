@@ -4,7 +4,7 @@
 -- fixture never assigns levels, research state, productivity, queues, or a
 -- foreign force state for a selected MIR material row.
 local KEY = "mir5_bob_core_gameplay"
-local SAVE = "mir5-bob-core-gameplay-complete"
+local SAVE = "mir5-native-complete"
 local INITIAL_PACKS = 64
 local DEADLINE_TICKS = 72000
 local LAB_ENERGY = 100000000

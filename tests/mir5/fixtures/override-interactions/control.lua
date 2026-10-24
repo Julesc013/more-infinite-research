@@ -141,7 +141,7 @@ script.on_event(defines.events.on_tick, function()
     assert_complete({machine=state.machine, saved=true, completed_tick=game.tick})
     state.phase, state.saved, state.completed_tick = "complete", true, game.tick
     marker("initial", state)
-    game.server_save("mir5-override-interactions-complete")
+    game.server_save("mir5-native-complete")
   elseif output and output.get_item_count("iron-gear-wheel") > 6 then
     fail("native productivity witness overproduced")
   end

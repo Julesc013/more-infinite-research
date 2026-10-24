@@ -4,6 +4,7 @@ from copy import deepcopy
 import hashlib
 import json
 from pathlib import Path
+from historical_sources import read_published_source
 import sys
 import unittest
 
@@ -104,8 +105,7 @@ class AtanProductivityTests(unittest.TestCase):
             raise AssertionError("ATAN captured-fact fixture kind drifted")
         cls.variants = {"base": cls.facts, "space_age": cls.facts["space_age"]}
         evidence = cls.facts["authored_evidence"]
-        if _sha256(ROOT / evidence["legacy_streams_path"]) != evidence["legacy_streams_sha256"]:
-            raise AssertionError("ATAN historical stream evidence changed")
+        read_published_source(ROOT, evidence["legacy_streams_path"], evidence["legacy_streams_sha256"])
         if _sha256(ROOT / evidence["historical_settings_path"]) != evidence["historical_settings_sha256"]:
             raise AssertionError("ATAN historical settings evidence changed")
 
