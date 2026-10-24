@@ -34,12 +34,27 @@
     "status": "passed-private-native-runtime-load-only"
   },
   "raw_evidence": {
-    "gzip_bytes": 27409,
-    "gzip_sha256": "B3053A425640B4EC822E9DC0574B7FDA810A49B097D91FD12303BF7A6A5EF549",
-    "members": 8,
+    "excluded_members": [
+      {
+        "bytes": 17920,
+        "path": "library-multiplayer-canonical/native/session/phase-server-initial.stdout.log",
+        "reason": "Original server command line contains a disposable RCON credential. The unchanged raw log remains in private native artifact custody and the primary Aero checkout; it is deliberately excluded from this public selection. Client logs retain the recorded late-import failure.",
+        "sha256": "6FC07983F55B51ADB36597F3F9575B8175B71DA78CA72CD96A8806B3BC837208"
+      }
+    ],
+    "gzip_bytes": 24375,
+    "gzip_sha256": "F0D790183B1A92B89F93E7078E82228D8F876373C9674DE3963CAD3D6DC5F632",
+    "members": 7,
     "path": "spec/evidence/library-multiplayer-canonical-late-require-adverse-receipts.json.gz",
-    "uncompressed_bytes": 140551,
-    "uncompressed_sha256": "06AD9B83DC95F19E61EBDF1602011740CFC80D20693E95EE01951ED57D36AE2C"
+    "supersedes_public_capsule": {
+      "gzip_bytes": 27409,
+      "gzip_sha256": "B3053A425640B4EC822E9DC0574B7FDA810A49B097D91FD12303BF7A6A5EF549",
+      "members": 8,
+      "uncompressed_bytes": 140551,
+      "uncompressed_sha256": "06AD9B83DC95F19E61EBDF1602011740CFC80D20693E95EE01951ED57D36AE2C"
+    },
+    "uncompressed_bytes": 116953,
+    "uncompressed_sha256": "F90DEB98DF7BE4BC08805D2FDE96F14149A2B9B530431E45B73A26B198A1C050"
   },
   "reproduced_failure": {
     "message": "Require cannot be used outside of control.lua parsing.",
