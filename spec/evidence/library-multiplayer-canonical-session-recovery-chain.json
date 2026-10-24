@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerCanonicalSessionRecoveryChainV1",
+  "status": "recovered-completed-private-f200-native-fixture-with-open-visual-finding",
+  "run": 40133428618,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40133428618",
+  "artifact_id": 12576360235,
+  "controller_commit": "610144a80ea0a0707e321f09d38256597e93a898",
+  "fixture_source_commit": "e23abaad5d4fdfa93b572d8481c0dcebd973e5f8",
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "player": {
+    "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "version": "5.0.20000",
+    "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+    "bytes": 547144
+  },
+  "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0",
+  "fixture": {
+    "archive_sha256": "0292606236ECCA886B78B9185B2359375DBF97DE525F65412810AD0D1270610B",
+    "archive_bytes": 10528,
+    "source_members": [
+      {
+        "source": "tests/fixtures/library-multiplayer/info.json",
+        "member": "info.json",
+        "sha256": "268818EA58DFEE57DD2BF30073BD6F557ECEB412730571ABE347604135446D4D",
+        "bytes": 383
+      },
+      {
+        "source": "tests/fixtures/library-multiplayer/control.lua",
+        "member": "control.lua",
+        "sha256": "E69EA5ADDF69E9403A2E6E0FBDFDAF31220210521154A440B802261BE3821D4A",
+        "bytes": 38698
+      },
+      {
+        "source": "tests/fixtures/library-multiplayer/settings-updates.lua",
+        "member": "settings-updates.lua",
+        "sha256": "659D9D74EA46394BB7E7FB8C17BFEDB0EAFFB63555B2284FDA35D44B6A23B2D1",
+        "bytes": 1137
+      }
+    ],
+    "raw_git_members_verified_with_observer": 5,
+    "active_mods_observer_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "active_mods_observer_repacked": false
+  },
+  "profile": {
+    "raw_git_path": "tests/profiles/library-multiplayer-f200-2077.json",
+    "raw_sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD",
+    "execution_sha256": "2189FC8533AF50599479592CA2E1381BF78DF766EE61245CB039D3AA6C11384D"
+  },
+  "harness": {
+    "git_lf_sha256": "C75E12AB88E95323585840CDCB132349D0D5D1C1BA2B9823DB56D31EC1D9BEAB",
+    "executed_crlf_sha256": "38A360A79746FE294FE866CD5F72E2300059A90FBC05E0676BB3F4CA955AA289",
+    "line_endings_only": true
+  },
+  "outer_controller": {
+    "status": "failed",
+    "failure": "Cannot find path 'C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40133428618-1\\library-multiplayer-canonical\\native\\result.json' because it does not exist.",
+    "original_sha256": "8FD28B1607BF90FB1C47FAB386CBDFAA9967779BD36C64A2203F237CD5FC23CD",
+    "finding": "The controller attempted native/result.json after the native fixture had written native/session/result.json. The original failed controller record is retained unchanged; its status is not rewritten."
+  },
+  "recovered_native": {
+    "status": "passed-private-two-client-fixture",
+    "result_artifact_path": "library-multiplayer-canonical/native/session/result.json",
+    "result_sha256": "450F25958D562DCDB6B418F661775CBA6797F725419B76A2B5A52D008D3030E5",
+    "session_status": "passed-private-two-client-session",
+    "session_sha256": "8CF9B884DC686F21BF5FF9F83DA077F850830FCDDE562D4DE6DD5009372DF802",
+    "server_stages": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "final_witnesses": {
+      "base_version": "2.0.77",
+      "mir_version": "5.0.20000",
+      "actual_join_events": 6,
+      "screenshot_calls": 8,
+      "first_open": true,
+      "search": true,
+      "refresh": true,
+      "reopen": true,
+      "measurement_output": "native-localised-profiler-log",
+      "timing_values_stored": false,
+      "two_connected_clients_required": true,
+      "locales_required": [
+        "en",
+        "de"
+      ],
+      "distinct_personal_query_and_selection": true,
+      "initial_native_snapshot_immutable": true,
+      "live_refresh": {
+        "real_lab_completions": 2,
+        "native_laboratory_completion_by_script": false,
+        "native_research_started_events": 3,
+        "queue_lengths_observed": [
+          2,
+          1,
+          0
+        ],
+        "native_research_cancelled_events": 1,
+        "native_foreign_force_created_events": 1,
+        "gear_level": 3,
+        "gear_productivity": 0.20000000298023224,
+        "science_consumed_per_named_pack": 2,
+        "fixture_accelerates_gear_count_and_time_only": true,
+        "ordinary_tuning_qualified": false,
+        "root_and_query_identity_preserved": true,
+        "cross_force_view_state_preserved": true
+      },
+      "availability_terminal_labels_checked": true,
+      "host_restart_observed": true,
+      "on_load_read_only": true,
+      "rendering_pending_external_png_readback": true,
+      "screenshot_requests_are_not_headless_rendering_proof": true
+    },
+    "original_seed_byte_identical": true,
+    "saves": {
+      "seed_sha256": {
+        "sha256": "09B896C60632C17E2BD6C8BAD33FCC0888F8E786BCD67A655C5FCF865EDA2C12",
+        "artifact_path": "library-multiplayer-canonical/native/preparation/write-data/saves/seed.zip"
+      },
+      "restart_save_sha256": {
+        "sha256": "C6EA0549DD28EBC5215307D9617F2632EBC04ED53C781D43AA658AF619D9803E",
+        "artifact_path": "library-multiplayer-canonical/native/session/server/saves/mir5-library-multiplayer-restart.zip"
+      },
+      "final_save_sha256": {
+        "sha256": "91DAA979CBB254B4BD7776BA0693FFEC691E6B5741A968F66A45BB1BD5BD0497",
+        "artifact_path": "library-multiplayer-canonical/native/session/server/saves/mir5-native-complete.zip"
+      }
+    },
+    "library_controls_restored": true,
+    "archive_controls_restored": true,
+    "dependency_payload_bytes_copied": 0,
+    "archive_links_created": 0,
+    "archive_extractions": 0
+  },
+  "visual_readback": {
+    "screenshots": [
+      {
+        "path": "library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/availability-1.png",
+        "sha256": "792A88429613698827AD17CAA2CA77E703B0C55A8FBD026769F576A3E94394D9",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+        "sha256": "AFFD2794A4C83AF3ABCD13731D07C66E1CF8FACFCEF2CB32878CB6A70C198C88",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+        "sha256": "FBCAAE5C8C0A80AAE809672BB8C8142B9254B765EF9F2A0B828241DAABAA2CE0",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+        "sha256": "1C43B5D42D2ECB23803E713B4045C86B3BD965E062D428681B6732B9DABD3069",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/availability-2.png",
+        "sha256": "B8BA6E056A904BF26EF3005D383A43B39E265A1D1BD16F9A88A5F88D96EF9B6C",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+        "sha256": "ED1F8512C39B00D7261E1C349E79E6F81A0B4B54776CA69B9D9045D217162A94",
+        "visual_observation": "German initial detail text cut horizontally near x195; cause unresolved."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+        "sha256": "106D9B18F90C9CFE36F76546A7A5E2A42E341E4A396A8B489DE9730192099B4C",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      },
+      {
+        "path": "library-multiplayer-canonical/native/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+        "sha256": "002528FCC862AC084C0A9021EC953651CD3BDEACECCF9ADF0A4ED634F1552650",
+        "visual_observation": "Expected distinct view visibly rendered in this1280x720image."
+      }
+    ],
+    "resolution": [
+      1280,
+      720
+    ],
+    "finding": "English availability/initial/rejoin/restart and German availability/rejoin/restart visibly render their expected distinct views. German initial-2.png cuts detail text near x195; later German views show these lines fully. Cause is unresolved; the evidence does not establish every captured view as unclipped.",
+    "all_views_unclipped": false,
+    "existing_fallbacks_observed": "Mixed English fallback and raw prototype identities remain visible; translation completeness is not established."
+  },
+  "profiler_readback": {
+    "phase_identities_preserved": true,
+    "finding": "Initial server log contains first_open/search/refresh/reopen; each initial client log contains first_open/search/refresh. Client reopen markers are in separate rejoin-process logs. A reader of only the three initial logs correctly reports incomplete-observation.",
+    "combined_performance_verdict": "none",
+    "performance_acceptance": false
+  },
+  "related_adverse": {
+    "path": "spec/evidence/library-multiplayer-canonical-lab-diagnostic-adverse-chain.json",
+    "run": 40130980860,
+    "disposition": "Earlier bulk-feed deadline remains a separate adverse. This staged-feed result does not identify the earlier cause or rewrite the earlier oracle."
+  },
+  "custody": {
+    "primary_artifact_path": "build/mir5/aero-library-mp-40133428618",
+    "artifact_manifest_sha256": "3BA1E0BEBEC1B003D6C91CDA9C50F5BA826F7B16D7B85B974A4A477E4500FA65",
+    "members_verified": 221,
+    "independent_review_sha256": "C7740F313C73E8FDF8FC13FAE2016CFA0337D843BCA66B1F731F6A780865CF61",
+    "original_private_payloads": "Full artifact retained in primary Aero and Black Glass custody. Public capsule excludes native credentials, full logs, saves, player data, third-party archives and PNG payloads."
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/library-multiplayer-canonical-session-recovery-receipts.json.gz",
+    "members": 7,
+    "uncompressed_bytes": 168097,
+    "uncompressed_sha256": "A3C89B35A96B8C27D497E94D78B816193C1F3306C24745D693D25F4AA186AEEB",
+    "gzip_bytes": 31103,
+    "gzip_sha256": "561238DCC05036D270C175DBA39648ED8A3165D1CA77E37994AEBFCBB026F0C0"
+  },
+  "limits": [
+    "This records the exact accelerated F200 two-client fixture only; ordinary tuning and broad engine/modpack coverage are not established.",
+    "The completed native session is recovered from existing immutable artifact bytes while the original outer controller remains failed.",
+    "Initial German clipping remains open. Full rendering, localization, latency/stress and release acceptance are not granted.",
+    "No menu speedup, full performance result, historical-save upgrade, API1.0 stabilization or complete product/release verdict follows.",
+    "No new native workload was launched for this recovery; native records are not relabelled as another execution."
+  ],
+  "next_step": "Adopt the existing native lab/rejoin/restart evidence without repeating gameplay merely to fix controller readback. Resolve the German initial layout finding and preserve phase provenance in any separate profiler qualification."
+}
