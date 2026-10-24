@@ -539,7 +539,7 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
                 [primary]=row(5, opponent == "source-enabled", 50000000),
                 ["laser-shooting-speed-8"]=row(8, true, "infinite"),
               },
-              recipes=readonly{fixture_recipe=true}, guns=readonly{bullet=.1},
+              recipes=readonly{fixture_recipe=.1}, guns=readonly{bullet=.1},
               fields=readonly{manual_mining_speed_modifier=0},
             }
             local function technology(name, level, enabled, maximum)
@@ -555,7 +555,8 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
                 ["laser-shooting-speed-8"]=technology("laser-shooting-speed-8", 8,
                   opponent ~= "other-enabled", "infinite"),
               },
-              recipes=readonly{fixture_recipe=readonly{valid=true, enabled=opponent ~= "recipe"}},
+              recipes=readonly{fixture_recipe=readonly{valid=true,
+                productivity_bonus=opponent == "recipe" and .2 or .1}},
               get_gun_speed_modifier=function() return opponent == "gun" and .2 or .1 end,
               manual_mining_speed_modifier=opponent == "force" and 1 or 0,
             }
