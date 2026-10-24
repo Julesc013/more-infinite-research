@@ -43,7 +43,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-false/later-switch/result.json",
       "result_sha256": "3628FDB53D483C58971DBA2BD2F826710511AA03715B69D4965CE732E3E1E1E4",
       "scenario": "later-switch",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 1,
+      "cold_reloads": 2
     },
     {
       "failure": null,
@@ -51,7 +53,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-false/published/result.json",
       "result_sha256": "A3CBB9317806EC733E55386D67EFC1B36489C0E89F27C228D5286E40472FFD3B",
       "scenario": "published",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 2,
+      "cold_reloads": 2
     },
     {
       "expected_refusal": {
@@ -75,7 +79,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-false/unchanged-upgrade/result.json",
       "result_sha256": "CCC36C87048AC7E30EEBA2C52C0BCF2FF7AD0EEDE565FEA627E0A5166A9CFA87",
       "scenario": "unchanged-upgrade",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 0,
+      "cold_reloads": 2
     },
     {
       "failure": null,
@@ -83,7 +89,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-true/later-switch/result.json",
       "result_sha256": "050E405FB537061666A66493A9B1EC8576364B931135801F1EA1331F86094E42",
       "scenario": "later-switch",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 1,
+      "cold_reloads": 2
     },
     {
       "failure": null,
@@ -91,7 +99,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-true/published/result.json",
       "result_sha256": "9792D97B28255A7AE3FFBFF67DDC034563BB78801862F1124438317457533740",
       "scenario": "published",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 2,
+      "cold_reloads": 2
     },
     {
       "expected_refusal": {
@@ -115,7 +125,9 @@
       "result_path": "legacy-preference-canonical/gameplay/from-true/unchanged-upgrade/result.json",
       "result_sha256": "9584E685C6C3D25D9D57A21F3E85A88CCD01CF89025EFBFC44524CBCD35718CF",
       "scenario": "unchanged-upgrade",
-      "status": "passed-private-native-fixture"
+      "status": "passed-private-native-fixture",
+      "independent_earned_labs": 0,
+      "cold_reloads": 2
     }
   ],
   "run": 40127907028,
@@ -124,12 +136,21 @@
   "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
   "status": "current333-f200-preference-transition-and-protected-refusals-pass",
   "summary": {
-    "all_successful_arms_use_real_labs_and_two_cold_reloads": true,
     "controls_restored": true,
     "later_switch_arms": 2,
     "passing_native_production_save_two_reload_arms": 6,
     "protected_expected_refusals": 2,
     "published_initial_preference_arms": 2,
-    "unchanged_upgrade_arms": 2
+    "unchanged_upgrade_arms": 2,
+    "all_successful_arms_preserve_lab_earnings_and_two_cold_reloads": true,
+    "independent_earned_labs": 6,
+    "unchanged_upgrade_new_labs_per_origin": 0,
+    "lab_count_semantics": "Two new completions per independent published origin and one per later switch; unchanged upgrades and cold reloads preserve earlier counters without earning additional labs."
+  },
+  "parallel_review": {
+    "source_commit": "ff5fab94db48db2b99c5f69c49ce565225123bca",
+    "source_branch": "docs/mir5-aero-current-preference-evidence-r01",
+    "adopted": "Precise per-stage independent laboratory counts and distinction from carried counters.",
+    "disposition": "Retain the accepted separate source333 authority and its 26-member capsule. Preserve the original Aero draft and its 29-member capsule on the review branch; do not duplicate that capsule or rewrite the earlier source19 chain."
   }
 }
