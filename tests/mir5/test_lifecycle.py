@@ -282,8 +282,12 @@ class LifecycleTests(unittest.TestCase):
             and type(api.get_capabilities) == "function" and type(api.get_research) == "function")
           assert(type(handlers.init) == "function" and type(handlers.configuration) == "function"
             and type(handlers.load) == "function")
-          for id = 1, 6 do assert(handlers.events[id] == nil) end
-          assert(handlers.events[7] == nil and handlers.events[8] == nil
+          -- F210 has native recipe-productivity credit ownership even with
+          -- every cap unlimited. Its force/reset callbacks are distinct from
+          -- the cap research callbacks, which remain absent.
+          for id = 1, 3 do assert(type(handlers.events[id]) == "function") end
+          for id = 4, 7 do assert(handlers.events[id] == nil) end
+          assert(type(handlers.events[8]) == "function"
             and remote.removed == false and next(storage) == nil)
           handlers.init(); handlers.configuration()
           assert(next(storage) == nil, "unlimited settings allocated cap storage")
@@ -309,43 +313,64 @@ class LifecycleTests(unittest.TestCase):
             "unlimited agricultural setting did not restore only its own cap transition")
         ''')
 
-    def test_policy_disabled_generated_prototype_cannot_restore_mir_owned_cap_state(self):
+    def test_policy_disabled_generated_prototype_reconciles_only_proven_mir_disablement(self):
         self.lua.execute('''
           local name = "recipe-prod-research_gears-1"
-          local policy_disabled = technology(name, 2, false)
-          policy_disabled.visible_when_disabled = true
+          -- An unlimited save still records the first real enabled-to-disabled
+          -- transition for a retained data-policy prototype.
+          local policy_disabled = technology(name, 2, true)
           policy_disabled.prototype.enabled = false
           local f = force(34, {[name] = policy_disabled}, {}, nil, nil)
-          local saved = {mir_caps = {schema = 1, owned_disabled = {
-            [34] = {[name] = {disabled = true, visible_when_disabled = false}}
-          }}}
-
-          -- Full reconciliation must discard a stale cap right rather than
-          -- turning a data-stage lab/science disablement back on.
-          boot({[34] = f}, 0, "", saved)
+          boot({[34] = f}, 0)
+          handlers.init()
+          assert(not policy_disabled.enabled and storage.mir_caps.owned_disabled[34][name].disabled,
+            "disabled prototype was not reconciled on an unlimited save")
+          policy_disabled.prototype.enabled = true
           handlers.configuration()
-          assert(not policy_disabled.enabled and policy_disabled.visible_when_disabled
-            and storage.mir_caps == nil)
+          assert(policy_disabled.enabled and storage.mir_caps == nil,
+            "admitted unlimited prototype did not restore only MIR's write")
 
-          -- The named research-event path applies the same admission rule.
-          saved = {mir_caps = {schema = 1, owned_disabled = {
-            [34] = {[name] = {disabled = true, visible_when_disabled = false}}
-          }}}
-          boot({[34] = f}, 2, "", saved)
-          policy_disabled.force = f
-          handlers.events[defines.events.on_research_reversed]({research = policy_disabled})
-          assert(not policy_disabled.enabled and storage.mir_caps == nil)
-
-          -- A true prototype default retains normal cap-right restoration.
-          local cap_owned = technology(name, 2, false)
-          cap_owned.visible_when_disabled = true
-          local true_default = force(35, {[name] = cap_owned}, {}, nil, nil)
-          saved = {mir_caps = {schema = 1, owned_disabled = {
-            [35] = {[name] = {disabled = true, visible_when_disabled = false}}
-          }}}
-          boot({[35] = true_default}, 0, "", saved)
+          -- A foreign pre-disablement never gains an enablement right, even
+          -- while its matching authored prototype is disabled.
+          local foreign_disabled = technology(name, 2, false)
+          foreign_disabled.prototype.enabled = false
+          local foreign_force = force(35, {[name] = foreign_disabled}, {}, nil, nil)
+          boot({[35] = foreign_force}, 0)
+          handlers.init()
+          assert(storage.mir_caps == nil and not foreign_disabled.enabled)
+          foreign_disabled.prototype.enabled = true
           handlers.configuration()
-          assert(cap_owned.enabled and not cap_owned.visible_when_disabled and storage.mir_caps == nil)
+          assert(storage.mir_caps == nil and not foreign_disabled.enabled,
+            "prototype admission re-enabled foreign disablement")
+
+          -- A finite cap right remains owned while the prototype is disabled;
+          -- once it is admitted at a non-over-cap level, normal cap recovery
+          -- restores that same recorded right.
+          local cap_owned = technology(name, 3, true)
+          local capped_force = force(36, {[name] = cap_owned}, {}, nil, nil)
+          boot({[36] = capped_force}, 2)
+          handlers.init()
+          assert(not cap_owned.enabled and storage.mir_caps.owned_disabled[36][name].disabled)
+          cap_owned.prototype.enabled = false
+          handlers.configuration()
+          assert(not cap_owned.enabled and storage.mir_caps.owned_disabled[36][name].disabled,
+            "disabled prototype discarded a positive cap's owned right")
+          cap_owned.force = capped_force
+          handlers.events[defines.events.on_research_reversed]({research = cap_owned})
+          assert(not cap_owned.enabled and storage.mir_caps.owned_disabled[36][name].disabled,
+            "named research reconciliation discarded disabled-prototype ownership")
+          cap_owned.level, cap_owned.prototype.enabled = 2, true
+          handlers.configuration()
+          assert(cap_owned.enabled and storage.mir_caps == nil,
+            "admitted below-cap research did not restore the retained cap right")
+
+          -- No force-enabled disabled prototype means no new durable state.
+          local normal = technology(name, 1, true)
+          local normal_force = force(37, {[name] = normal}, {}, nil, nil)
+          boot({[37] = normal_force}, 0)
+          handlers.init(); handlers.configuration()
+          assert(storage.mir_caps == nil and normal.enabled,
+            "ordinary unlimited technology allocated prototype-disablement state")
         ''')
 
     def test_full_base_limits_are_precomputed_and_research_callbacks_touch_only_the_named_family(self):
@@ -496,11 +521,15 @@ class LifecycleTests(unittest.TestCase):
           local saved_storage = storage
           local retained_handlers = handlers
           boot({[1] = f1, [2] = f2}, 0, "", saved_storage, retained_handlers)
-          for id = 1, 6 do
+          for id = 4, 7 do
             assert(handlers.events[id] == nil, "unlimited parse retained cap handler " .. id)
           end
-          assert(handlers.events[7] == nil and handlers.events[8] == nil,
-            "unlimited parse retained cap reversal handler")
+          for id = 1, 3 do
+            assert(type(handlers.events[id]) == "function",
+              "native-credit force callback was removed by an unlimited cap profile")
+          end
+          assert(type(handlers.events[8]) == "function",
+            "native-credit reset callback was removed by an unlimited cap profile")
           handlers.configuration()
           assert(second.enabled and not second.visible_when_disabled and storage.mir_caps == nil)
           handlers.init()

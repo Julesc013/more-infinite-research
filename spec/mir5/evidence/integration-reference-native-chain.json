@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "kind": "MIR5ArmorPyPublishedNativeReferenceChainV1",
+  "runs": [
+    {
+      "run": 40051640723,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40051640723",
+      "manifest_members_verified": 63,
+      "manifest_sha256": "3BE77F3D29D794E0665D5BF3849CA77DA9FA085DA241B4EDDC33DE9CCEF69EF9",
+      "source": "80e4d17c93e982b4f48f9f515ad9b29bc3f7a3dd",
+      "control_source": "cec14b8e4abe33482e3775ca5690d6ce07115766",
+      "cases": [
+        {
+          "profile": "armor-bobwarfare",
+          "arm": "published",
+          "path": "capture/armor-bobwarfare/published/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "4B8111E6E9083B78A3063151155E3CF1A9F1148CA16A3D60C303F5FA1DFE0D1B",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "name": "more-infinite-research",
+            "version": "4.7.20002",
+            "factorio_version": "2.0",
+            "root": "more-infinite-research_4.7.20002"
+          },
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 15853859,
+              "sha256": "B333769260B4D968CCFFF642DABFEA68BC707F6FE33789922E4F1C49A4FC36D4"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 1030913,
+              "sha256": "EB218614F0116DEADABD4762CB6665CDD9F2F052709916B8A293313E93AA40BE"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-armor-bobwarfare-published-native.json.gz",
+            "uncompressed_sha256": "AF64EC409E14B62F9D5916711499597A9EBE317D48FE04A56636F91A432A4B5B"
+          }
+        },
+        {
+          "profile": "armor-bobwarfare",
+          "arm": "upstream",
+          "path": "capture/armor-bobwarfare/upstream/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "4B8111E6E9083B78A3063151155E3CF1A9F1148CA16A3D60C303F5FA1DFE0D1B",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": null,
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 15740016,
+              "sha256": "9ECA3DD6159ED521F611A758AB9D87A16F4B84214BC925E237180BB09065B45B"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 1391,
+              "sha256": "86BE915B5571FCA7A497EB07781116A40E99932DD192560266C002204AC03267"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-armor-bobwarfare-upstream-native.json.gz",
+            "uncompressed_sha256": "32760329F54C37467C4374C9A0AB5F43E3AB93FF6566644C8406DF2331CB5BBF"
+          }
+        },
+        {
+          "profile": "py-alienlife-hightech",
+          "arm": "published",
+          "path": "capture/py-alienlife-hightech/published/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "2EA50433FB786C2B584016C56A45588F9F2A35BB66FA894965E6D36247049972",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "name": "more-infinite-research",
+            "version": "4.7.20002",
+            "factorio_version": "2.0",
+            "root": "more-infinite-research_4.7.20002"
+          },
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 57468149,
+              "sha256": "10D1FDD204C8AD61916899BD9BBC4A2BABF4B80945659AE9EC942C6F4AD35AF4"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 1030244,
+              "sha256": "BA8C89447F6316FF472DEB6AA198B95C75E05204FB62A5632CBC1484E8D6A8F4"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-py-alienlife-hightech-published-native.json.gz",
+            "uncompressed_sha256": "4F6884B937816DB2794ADA665C03F865767E92B60781173136C6A6D4B4901FF5"
+          }
+        },
+        {
+          "profile": "py-alienlife-hightech",
+          "arm": "upstream",
+          "path": "capture/py-alienlife-hightech/upstream/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "2EA50433FB786C2B584016C56A45588F9F2A35BB66FA894965E6D36247049972",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": null,
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 57249086,
+              "sha256": "59D3BD5F9F163CB1E27271E6688A427986AC808F80A1870A45B11E271472F6B8"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 2904,
+              "sha256": "C358129F24F0EAC6195047F603645CFDB59BC2126802C9C02EE17CCB882EA816"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-py-alienlife-hightech-upstream-native.json.gz",
+            "uncompressed_sha256": "622AEE1FB17F12C8A4FC120D8BA4FD51122BA64234ED52937C4F7C44AA5300B5"
+          }
+        },
+        {
+          "profile": "py-coal",
+          "arm": "published",
+          "path": "capture/py-coal/published/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "2C795BDAB42F46536EF412BE1BE637A9D6A9B86E5B78B4D52953AA4291723411",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip",
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "name": "more-infinite-research",
+            "version": "4.7.20002",
+            "factorio_version": "2.0",
+            "root": "more-infinite-research_4.7.20002"
+          },
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 16618562,
+              "sha256": "9673C6BBF3007EFA58CDC833F02493E2A9F048BC23BD756BCAC7CF8543467C9B"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 1030921,
+              "sha256": "E581AFA808C3EF5915C47105D3A0F40FB47C7C8AE8A1CCB5DDCBD2214275ACD5"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-py-coal-published-native.json.gz",
+            "uncompressed_sha256": "0306C7D14359A41874F2890C29D5D76037F4ACF237F01CC69E3628C99DEA9EEA"
+          }
+        },
+        {
+          "profile": "py-coal",
+          "arm": "upstream",
+          "path": "capture/py-coal/upstream/result.json",
+          "status": "completed-data-stage-observation-only",
+          "profile_sha256": "2C795BDAB42F46536EF412BE1BE637A9D6A9B86E5B78B4D52953AA4291723411",
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "base_version": "2.0.77",
+            "factorio_version": "2.0"
+          },
+          "mir_archive": null,
+          "dumps": {
+            "data_raw": {
+              "path": "write-data/script-output/data-raw-dump.json",
+              "bytes": 16508812,
+              "sha256": "D1DDDE2A2EC5A72EE9B5B61AD2E39E929885F5AAA9145343FB0899C36DBE276E"
+            },
+            "mod_settings": {
+              "path": "write-data/script-output/mod-settings-dump.json",
+              "bytes": 2195,
+              "sha256": "E55AAEB52512C6260305721D7CB7D2CDC8FC84F834B3B9BB80FDB853823D33A9"
+            }
+          },
+          "library_controls_restored": true,
+          "receipt": {
+            "gzip": "spec/mir5/evidence/integration-reference-40051640723-py-coal-upstream-native.json.gz",
+            "uncompressed_sha256": "DC0207BEC6C950286E21683152403A9BF1E51FD2CAAF823BD202D741D8CB3600"
+          }
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Three exact F2002.0.77 dependency-valid upstream/published4.7.20002 pairs: BobWarfare armor, PyCoal, and PyAlienLife/HighTech. Every selected archive pin, source profile blob and native receipt is verified; all63 artifact members match their complete manifest.",
+    "Each native process completes the actual data/settings dumps and restores prior direct-library controls. These are independent historical definitions/bindings, not MIR5 output.",
+    "No gameplay, save/migration, responsive-menu, multiplayer, arbitrary profile or release acceptance. The earlier private preflight failure is retained separately."
+  ],
+  "native_reference_execution": true,
+  "native_qualification": false,
+  "release_qualification": false
+}

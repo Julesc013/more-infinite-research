@@ -1513,6 +1513,146 @@
           "mir_rows": {}
         }
       },
+      "foreign_remaining_mir_rows": {
+        "recipe-prod-research_advanced_circuit-1": null,
+        "recipe-prod-research_copper-1": {
+          "name": "recipe-prod-research_copper-1",
+          "localised_name": [
+            "technology-name.more-infinite-research.research_copper",
+            [
+              "item-name.copper-plate"
+            ]
+          ],
+          "localised_description": [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "icons": [
+            {
+              "icon": "__base__/graphics/icons/copper-plate.png",
+              "icon_size": 64
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ],
+          "effects": [
+            {
+              "type": "change-recipe-productivity",
+              "recipe": "casting-copper",
+              "change": 0.1
+            }
+          ],
+          "prerequisites": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack"
+          ],
+          "unit": {
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ]
+            ],
+            "count_formula": "8000*2^(L-1)",
+            "time": 60
+          },
+          "max_level": "infinite",
+          "order": "p[research_copper]",
+          "level": 1,
+          "upgrade": true,
+          "type": "technology"
+        },
+        "recipe-prod-research_electronic_circuit-1": null,
+        "recipe-prod-research_iron-1": {
+          "name": "recipe-prod-research_iron-1",
+          "localised_name": [
+            "technology-name.more-infinite-research.research_iron",
+            [
+              "item-name.iron-plate"
+            ]
+          ],
+          "localised_description": [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "icons": [
+            {
+              "icon": "__base__/graphics/icons/iron-plate.png",
+              "icon_size": 64
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ],
+          "effects": [
+            {
+              "type": "change-recipe-productivity",
+              "recipe": "casting-iron",
+              "change": 0.1
+            }
+          ],
+          "prerequisites": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack"
+          ],
+          "unit": {
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ]
+            ],
+            "count_formula": "8000*2^(L-1)",
+            "time": 60
+          },
+          "max_level": "infinite",
+          "order": "p[research_iron]",
+          "level": 1,
+          "upgrade": true,
+          "type": "technology"
+        }
+      },
       "published_removed_ids": [
         "advanced-circuit-productivity",
         "basic-plate-productivity",
@@ -12610,6 +12750,9 @@
           "mir_rows": {}
         }
       },
+      "foreign_remaining_mir_rows": {
+        "recipe-prod-research_science_pack_productivity-1": null
+      },
       "published_removed_ids": [
         "agricultural-science-productivity-4",
         "automation-science-productivity-4",
@@ -13843,6 +13986,9 @@
           "mir_rows": {}
         }
       },
+      "foreign_remaining_mir_rows": {
+        "recipe-prod-research_bioflux-1": null
+      },
       "published_removed_ids": [
         "bioflux-productivity"
       ],
@@ -15040,6 +15186,91 @@
           "mir_row_count": 63,
           "mir_rows_scope": "Only complete native MIR rows covering at least one provider effect recipe; full raw input remains hash-bound in custody.",
           "mir_rows": {}
+        }
+      },
+      "foreign_remaining_mir_rows": {
+        "recipe-prod-research_breeding-1": {
+          "name": "recipe-prod-research_breeding-1",
+          "localised_name": [
+            "technology-name.more-infinite-research.research_breeding",
+            [
+              "technology-name.fish-breeding"
+            ]
+          ],
+          "localised_description": [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "icons": [
+            {
+              "icon": "__space-age__/graphics/technology/fish-breeding.png",
+              "icon_size": 256
+            },
+            {
+              "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+              "icon_size": 128,
+              "scale": 0.5,
+              "shift": [
+                50,
+                50
+              ],
+              "floating": true
+            }
+          ],
+          "effects": [
+            {
+              "type": "change-recipe-productivity",
+              "recipe": "biter-egg",
+              "change": 0.1
+            },
+            {
+              "type": "change-recipe-productivity",
+              "recipe": "pentapod-egg",
+              "change": 0.1
+            }
+          ],
+          "prerequisites": [
+            "automation-science-pack",
+            "logistic-science-pack",
+            "chemical-science-pack",
+            "production-science-pack",
+            "agricultural-science-pack",
+            "cryogenic-science-pack"
+          ],
+          "unit": {
+            "ingredients": [
+              [
+                "automation-science-pack",
+                1
+              ],
+              [
+                "logistic-science-pack",
+                1
+              ],
+              [
+                "chemical-science-pack",
+                1
+              ],
+              [
+                "production-science-pack",
+                1
+              ],
+              [
+                "agricultural-science-pack",
+                1
+              ],
+              [
+                "cryogenic-science-pack",
+                1
+              ]
+            ],
+            "count_formula": "8000*2^(L-1)",
+            "time": 60
+          },
+          "max_level": "infinite",
+          "order": "p[research_breeding]",
+          "level": 1,
+          "upgrade": true,
+          "type": "technology"
         }
       },
       "published_removed_ids": [

@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "mir5-py-alienlife-hightech-f200-native-reference-selection",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessinggraphics",
+      "version": "3.0.9",
+      "enabled": true
+    },
+    {
+      "name": "pypostprocessing",
+      "version": "3.0.42",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessing",
+      "version": "3.0.44",
+      "enabled": true
+    },
+    {
+      "name": "pyfusionenergygraphics",
+      "version": "3.0.4",
+      "enabled": true
+    },
+    {
+      "name": "pyfusionenergy",
+      "version": "3.0.17",
+      "enabled": true
+    },
+    {
+      "name": "pyindustrygraphics",
+      "version": "3.0.3",
+      "enabled": true
+    },
+    {
+      "name": "pyindustry",
+      "version": "3.0.21",
+      "enabled": true
+    },
+    {
+      "name": "pypetroleumhandlinggraphics",
+      "version": "3.0.5",
+      "enabled": true
+    },
+    {
+      "name": "pypetroleumhandling",
+      "version": "3.0.23",
+      "enabled": true
+    },
+    {
+      "name": "pyraworesgraphics",
+      "version": "3.0.4",
+      "enabled": true
+    },
+    {
+      "name": "pyrawores",
+      "version": "3.0.25",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics",
+      "version": "3.0.12",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics2",
+      "version": "3.0.3",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics3",
+      "version": "3.0.4",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlife",
+      "version": "3.0.67",
+      "enabled": true
+    },
+    {
+      "name": "pyhightechgraphics",
+      "version": "3.0.3",
+      "enabled": true
+    },
+    {
+      "name": "pyhightech",
+      "version": "3.0.19",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "pyalienlife_3.0.67.zip": "966C10C36C5ABE027FD745FADDCD4658DE1E7AD5DE8D6C3F68A69F9EA1A7AD03",
+    "pyalienlifegraphics_3.0.12.zip": "76CF9089B5BD50430F7C5E9208A8228E51F57C8BF56C14F4481594B8C9D9125B",
+    "pyalienlifegraphics2_3.0.3.zip": "E17907F187AF9804245B4D54E23803533AB0F507D7BB6600A73BC95E59FA03A2",
+    "pyalienlifegraphics3_3.0.4.zip": "79EAC9D6F541BA6A96153299F1292E4EC3B47D7FD9E44A48CB7E21EBD6E091E9",
+    "pycoalprocessing_3.0.44.zip": "E9E8C3B6385832A7B15BA4DE1EB37D0DCFAB42BE490BE88B6156463AA59EA9B2",
+    "pycoalprocessinggraphics_3.0.9.zip": "B154858EB935E21CA254E2C719D808D562EED15CCDAD2E2B905460018847671E",
+    "pyfusionenergy_3.0.17.zip": "0826FB05B90CA759739D5E6452493855A410AF8A33F3A9DDF40E7D2A1FE546D3",
+    "pyfusionenergygraphics_3.0.4.zip": "56CB48D5458717CCD145EE1FF7D6B255A9FEE9714D400D8AA6B6B839C24A25B3",
+    "pyhightech_3.0.19.zip": "11E9FF23E8C0E37912DEC3F7EBC0E5FD51482B303E20DE0C512F07EBBE85D6E6",
+    "pyhightechgraphics_3.0.3.zip": "BEFEE0BF707DD5679B9211A39ABA1D5904FF5784A4A4D343D977277E566570F4",
+    "pyindustry_3.0.21.zip": "C9EA8E877A1906FF8BF2BA1EBCE8B8E8B2962F10C9F4802B11EEC1FA95D0DB59",
+    "pyindustrygraphics_3.0.3.zip": "CD009909069DB19B75754FB55CC22C95FCB273AADF375B8695946A918B494C5D",
+    "pypetroleumhandling_3.0.23.zip": "C20B03A9EEE9A67355DE860D66FF4C6A673FBECEB3331FD18B7D1B8B2A847ABD",
+    "pypetroleumhandlinggraphics_3.0.5.zip": "8049CD729F8319024D77D1A02B30D04AEC8044D35A6010E35A75BB0FD8C96222",
+    "pypostprocessing_3.0.42.zip": "D5AF3599EB16247E669CCB029CCF710A238AFACA615E90AFBD73475FEE73E252",
+    "pyrawores_3.0.25.zip": "EDB00F09F3FB24FE2166E5A7676E589C53B97B3AA7C7489C5985A3DCC8DF7637",
+    "pyraworesgraphics_3.0.4.zip": "1715C790D6797E9354821726E9FB34E7589E885506C74CBD224A0626A810D79A"
+  },
+  "scope": "Independent upstream final-data reference for named Py AlienLife and HighTech material routes; no MIR5 admission, gameplay, save, or support qualification."
+}

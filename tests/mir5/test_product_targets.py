@@ -366,6 +366,52 @@ class ProductTargetTests(unittest.TestCase):
             place_result_entity_types={'loader','loader'}})}, {raw=raw}) end))
         ''')
 
+    def test_recipe_iteration_order_preserves_output_without_sorting_the_recipe_domain(self):
+        self.lua.execute(r'''
+          local context = targets.prepare({
+            binding('parts', .10, {{type='item', name='part'}}, {exclude_recipe_patterns={'^mixed$'}}),
+            binding('parts', .02, {{type='item', name='part'}}),
+            binding('water', .04, {{type='fluid', name='water'}}),
+          })
+          local recipes, names = {}, {'mixed', 'water', 'part'}
+          recipes.mixed = recipe({}, {product('item','part'), product('fluid','water')})
+          recipes.water = recipe({}, {product('fluid','water')})
+          recipes.part = recipe({}, {product('item','part')})
+          for index=1,1000 do
+            local name='unrelated-'..index
+            names[#names+1]=name
+            recipes[name]=recipe({}, {product('item','stone')})
+          end
+          -- Force opposite traversals independently of the host's hash order.
+          local function run(reverse)
+            setmetatable(recipes, {__pairs=function()
+              local index=reverse and #names+1 or 0
+              return function()
+                index=index+(reverse and -1 or 1)
+                local name=names[index]
+                if name then return name,recipes[name] end
+              end
+            end})
+            local original_sort=table.sort
+            table.sort=function(rows, compare)
+              assert(type(rows[1])~='string' or recipes[rows[1]]==nil,
+                'the whole recipe domain must not be sorted')
+              return original_sort(rows, compare)
+            end
+            local result=targets.collect(recipes,context)
+            table.sort=original_sort
+            return result
+          end
+          local forward, reverse=run(false), run(true)
+          assert(target_names(forward.targets)==target_names(reverse.targets))
+          assert(target_names(forward.by_family.parts)==target_names(reverse.by_family.parts))
+          assert(target_names(forward.by_family.water)==target_names(reverse.by_family.water))
+          assert(target_names(forward.targets)=='parts:mixed:item:part:0.02,parts:part:item:part:0.1,'
+            .. 'water:mixed:fluid:water:0.04,water:water:fluid:water:0.04')
+          for name,value in pairs(forward.work) do assert(reverse.work[name]==value) end
+          assert(forward.work.recipes==1003)
+        ''')
+
     def test_prepare_rejects_ambiguous_or_sparse_authored_bindings(self):
         self.lua.execute(r'''
           assert(not pcall(function() targets.prepare({binding("x", 0, {{type="item", name="x"}})}) end))

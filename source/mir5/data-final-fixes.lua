@@ -41,6 +41,15 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
     gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
     gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")
   end
+  if modern_selection.py_hightech then
+    require("compatibility.modern_catalogue.py").preflight(data.raw)
+  end
+  if modern_selection.bob_warfare then
+    require("compatibility.modern_catalogue.bob_warfare").preflight(data.raw)
+  end
+  if modern_selection.py_coal or modern_selection.py_hightech or modern_selection.bob_warfare then
+    require("compatibility.native_modded_continuations").preflight(mods, data.raw)
+  end
   -- Check every selected narrow patch before any intended technology write.
   modern.preflight_recipe_patches(modern_selection, data.raw)
   native_owner_patches = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
@@ -63,7 +72,13 @@ end
 -- Retain broad product targeting in one relevant recipe pass. This extends
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
-require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log})
+require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
+  required_product_targets=modern_selection and modern_selection.required_product_targets,
+  additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
+  exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
+  exact_product_target_families=modern_selection and modern_selection.exact_product_target_families,
+  replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
+  excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 
 if modern_catalogue.is_k2so(mods) then
   local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
@@ -75,11 +90,38 @@ if modern_selection and modern_selection.bob_angel then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+if modern_selection and modern_selection.py_coal then
+  local materials = require("compatibility.py_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
+-- The exact F210 BobTech plus Angel Smelting tuple has five separately
+-- captured material rows.  It deliberately stays outside the F200
+-- no-BobTech material selector and does not reconstruct other Bob/Angel
+-- routes from the installed prototype world.
+if require("compatibility.bob_tech_profile").applies(mods) then
+  local materials = require("compatibility.bob_tech_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {
   options=values.options, raw=data.raw, target=require("platform.target"), mods=mods, log=log,
 })
+if require("platform.target").id == "f200" and type(mods) == "table"
+    and (mods.ExpandedProductivityResearch or mods["plates-n-circuit-productivity"]
+      or mods.Science_packs_productivity or mods["bioflux-productivity"] or mods["fish-productivity"]
+      or mods["crafting-efficiency-2"] or mods.ProductivityResearch) then
+  require("compatibility.competing_productivity").retain_foreign_coverage(
+    technologies, data.raw, mods, require("platform.target"),
+    values.options["mir-prefer-this-mod-for-competing-techs"])
+end
+
+-- Stable native credit holders preserve already-earned partial overlaps when
+-- a provider or its ownership preference changes. They are explicit authored
+-- rows, independent of whether the provider is currently installed.
+require("research.native_credit_definitions").append(technologies, data.raw, values, require("platform.target"))
 generator.install(technologies, data)
 if modern then
   modern.apply_native_owner_patches(native_owner_patches)

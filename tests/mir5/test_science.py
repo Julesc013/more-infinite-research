@@ -643,14 +643,136 @@ class ScienceTests(unittest.TestCase):
           end
 
           for _, marker in ipairs(markers) do
-            local unknown = {}
-            for name, version in pairs(exact) do unknown[name] = version end
-            unknown[marker] = "unreviewed-version"
-            assert(bindings.select({id="f210"}, unknown).k2_phase == nil, "unknown K2SO phase selected for " .. marker)
+            local changed = {}
+            for name, version in pairs(exact) do changed[name] = version end
+            -- Exercise a concrete official patch as well as changed provider
+            -- versions. A complete predecessor must not fall back to the
+            -- ordinary vector and retain its basic card.
+            changed[marker] = marker == "base" and "2.1.24" or "unreviewed-version"
+            local ok, message = pcall(bindings.select, {id="f210"}, changed)
+            assert(not ok and tostring(message):find("unsupported F210 K2SO science%-phase saved%-profile transition"),
+              "changed K2SO tuple silently selected for " .. marker)
             row = technology({{"kr-basic-tech-card",3},{"production-science-pack",4}})
-            result = science.apply(row, {}, science.prepare({raw=raw, target={id="f210"}, mods=unknown, options={}}))
-            assert(result.enabled and names(row.unit.ingredients) == "kr-basic-tech-card:3,production-science-pack:4")
+            local before = names(row.unit.ingredients)
+            ok, message = pcall(function()
+              return science.apply(row, {}, science.prepare({raw=raw, target={id="f210"}, mods=changed, options={}}))
+            end)
+            assert(not ok and tostring(message):find("unsupported F210 K2SO science%-phase saved%-profile transition"))
+            assert(names(row.unit.ingredients) == before, "changed phase tuple mutated owned science")
           end
+        ''')
+
+    def test_prepared_context_reuses_lab_decisions_without_aliasing_current_rows(self):
+        self.lua.execute(r'''
+          local labs = {}
+          for index = 1, 64 do
+            local name = string.format("lab-%03d", index)
+            if index <= 2 then labs[name] = {"A", "B"}
+            elseif index % 3 == 0 then labs[name] = {"A"}
+            elseif index % 3 == 1 then labs[name] = {"B"}
+            else labs[name] = {"C"} end
+          end
+          local raw, options = raw_with({"A", "B", "C"}, labs), {}
+          local context = science.prepare({raw=raw, target={id="f210"}, options=options})
+
+          -- Seed a reduction before wrapping the collected lookup maps.  The
+          -- two first labs tie; canonical lab order must retain A,B.
+          local seed = technology({{"A",2},{"B",3},{"C",5}})
+          local result = science.apply(seed, {}, context)
+          assert(result.reason == "lab-reduced" and names(seed.unit.ingredients) == "A:2,B:3")
+          assert(context.lab_visits == 64)
+
+          -- `accepted` is private collector state.  Test-only metatables make
+          -- every compatibility lookup visible, distinguishing it from merely
+          -- reusing the raw-lab collector.
+          local accesses = 0
+          for _, lab in ipairs(context.collector.labs) do
+            local accepted = lab.accepted
+            lab.accepted = setmetatable({}, {__index=function(_, name)
+              accesses = accesses + 1
+              return accepted[name]
+            end})
+          end
+
+          -- Same ordered names, different amounts: the cached selection has
+          -- indices only, so all rows retain their own quantities and tables.
+          for index = 1, 96 do
+            local row = technology({{"A",index},{"B",index + 100},{"C",index + 200}})
+            result = science.apply(row, {}, context)
+            assert(result.reason == "lab-reduced")
+            assert(names(row.unit.ingredients) == "A:" .. index .. ",B:" .. (index + 100))
+            assert(row.unit.ingredients ~= seed.unit.ingredients)
+          end
+          assert(accesses == 0, "identical vectors repeated lab comparisons")
+
+          seed.unit.ingredients[1][2] = 999
+          local amounts = technology({{"A",17},{"B",19},{"C",23}})
+          result = science.apply(amounts, {}, context)
+          assert(result.reason == "lab-reduced" and names(amounts.unit.ingredients) == "A:17,B:19")
+          assert(amounts.unit.ingredients ~= seed.unit.ingredients
+            and amounts.unit.ingredients[1] ~= seed.unit.ingredients[1])
+          assert(accesses == 0, "cached indices retained a prior output")
+
+          -- Policy is part of the decision key. A strict pass must not reuse
+          -- the reduction, while returning to reduce reuses its earlier result.
+          accesses = 0
+          options["mir-lab-incompatibility-policy"] = "skip"
+          local skipped = technology({{"A",27},{"B",31},{"C",33}})
+          result = science.apply(skipped, {}, context)
+          assert(not result.enabled and result.reason == "lab-incompatible-skip")
+          assert(accesses > 0, "skip reused a reduce decision")
+          accesses = 0
+          options["mir-lab-incompatibility-policy"] = "reduce"
+          local reduced_again = technology({{"A",37},{"B",41},{"C",43}})
+          result = science.apply(reduced_again, {}, context)
+          assert(result.reason == "lab-reduced" and names(reduced_again.unit.ingredients) == "A:37,B:41")
+          assert(accesses == 0, "reduce did not reuse its earlier decision")
+
+          -- Full acceptance also retains only the decision. The second output
+          -- is a new row with its own amount and table identity.
+          accesses = 0
+          local full_seed = technology({{"A",71}})
+          result = science.apply(full_seed, {}, context)
+          assert(result.reason == "configured" and accesses > 0)
+          accesses = 0
+          local full_again = technology({{"A",73}})
+          result = science.apply(full_again, {}, context)
+          assert(result.reason == "configured" and names(full_again.unit.ingredients) == "A:73")
+          assert(full_again.unit.ingredients ~= full_seed.unit.ingredients and accesses == 0)
+
+          -- Authored duplicate positions remain positions: an accepted A,B
+          -- lab preserves both A entries in order and derives fresh amounts.
+          accesses = 0
+          local duplicate_seed = technology({{"A",79},{"B",83},{"A",89},{"C",97}})
+          result = science.apply(duplicate_seed, {}, context)
+          assert(result.reason == "lab-reduced" and names(duplicate_seed.unit.ingredients) == "A:79,B:83,A:89")
+          assert(accesses > 0)
+          accesses = 0
+          local duplicate_again = technology({{"A",101},{"B",103},{"A",107},{"C",109}})
+          result = science.apply(duplicate_again, {}, context)
+          assert(result.reason == "lab-reduced" and names(duplicate_again.unit.ingredients) == "A:101,B:103,A:107")
+          assert(duplicate_again.unit.ingredients ~= duplicate_seed.unit.ingredients and accesses == 0)
+
+          -- Ordered names and each constraint sequence form the bounded cache
+          -- key.  These new shapes must perform lab lookups, then retain the
+          -- same canonical reduction and current amounts.
+          accesses = 0
+          local reordered = technology({{"B",31},{"A",29},{"C",37}})
+          result = science.apply(reordered, {}, context)
+          assert(result.reason == "lab-reduced" and names(reordered.unit.ingredients) == "B:31,A:29")
+          assert(accesses > 0, "reordered science vector bypassed lab decision")
+
+          accesses = 0
+          local required = technology({{"A",41},{"B",43},{"C",47}})
+          result = science.apply(required, {required_science={"A"}}, context)
+          assert(result.reason == "lab-reduced" and names(required.unit.ingredients) == "A:41,B:43")
+          assert(accesses > 0, "required-science constraint bypassed lab decision")
+
+          accesses = 0
+          local phased = technology({{"A",53},{"B",59},{"C",61}})
+          result = science.apply(phased, {phase_any_science={"B"}}, context)
+          assert(result.reason == "lab-reduced" and names(phased.unit.ingredients) == "A:53,B:59")
+          assert(accesses > 0, "phase-science constraint bypassed lab decision")
         ''')
 
     def test_family_reuses_one_bounded_collector(self):

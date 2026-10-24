@@ -16,12 +16,14 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/historical-transition"
 RUNNER = ROOT / "tools/mir5/Invoke-NativeFixture.ps1"
+DIRECT_ORACLE = ROOT / "tests/mir5/fixtures/historical-direct-native-oracle.json"
 
 
 class HistoricalTransitionFixtureControls(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.metadata = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
+        cls.direct_oracle = json.loads(DIRECT_ORACLE.read_text(encoding="utf-8"))
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -78,6 +80,8 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertIn("historical fixtures require a fresh full run", source)
         self.assertIn("historical-transition", source)
         self.assertIn("transition_stage", source)
+        self.assertIn("$historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016'))", source)
+        self.assertIn("$activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')", source)
         self.assertIn("freeze_source_lab", (FIXTURE / "control.lua").read_text(encoding="utf-8"))
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)
 
@@ -197,11 +201,12 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}}
           messages,saves={},{}
           log=function(value)table.insert(messages,value)end
-          function install_target(stage, queue)
-            fixture_target={id=queue and "f017" or "f013",stage=stage,mir_version=stage == "published" and "4.7.01702" or "5.0.01700",
-              direct="recipe-prod-research_character_mining_speed-1",direct_effect=queue and .1 or .05,
+          function install_target(stage, queue, old_lab)
+            local id=queue and "f017" or (old_lab and "f015" or "f013")
+            fixture_target={id=id,stage=stage,mir_version=stage == "published" and (queue and "4.7.01702" or (old_lab and "4.7.01502" or "4.7.01302")) or (queue and "5.0.01700" or (old_lab and "5.0.01500" or "5.0.01300")),
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=.05,
               direct_science=queue and {"military-science-pack","utility-science-pack"} or {"alien-science-pack"},
-              successor_mode=queue and "lab" or "preservation-only",partial_progress=.42,
+              successor_mode=(queue or old_lab) and "lab" or "preservation-only",partial_progress=(queue or old_lab) and .42 or nil,
               queue_api=queue,queue_probe=queue and "braking-force-1" or nil}
             package.loaded.target=nil;package.loaded["target-literal"]=nil
             package.preload["target-literal"]=function()return fixture_target end
@@ -209,17 +214,27 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           function mock_world(queue)
             local direct={name="recipe-prod-research_character_mining_speed-1",level=1,researched=false,enabled=true,prerequisites={}}
             local braking={name="braking-force-1",level=1,researched=false,enabled=true,prerequisites={}}
-            local force={technologies={[direct.name]=direct,[braking.name]=braking},manual_mining_speed_modifier=0,research_progress=0}
+            local force={technologies={[direct.name]=direct,[braking.name]=braking},manual_mining_speed_modifier=0,research_progress=0,research_queue_enabled=not queue}
             setmetatable(force,{__index=function(t,key)
               if key == "current_research" then return rawget(t,"_current") end
               if key == "research_queue" then return rawget(t,"_queue") or {} end
               if key == "get_spawn_position" then return function()return {x=0,y=0}end end
             end,__newindex=function(t,key,value)
-              if key == "current_research" then rawset(t,"_current",type(value)=="string" and t.technologies[value] or value)
+              if key == "current_research" then
+                if queue then error("LuaForce::current_research is read only") end
+                rawset(t,"_current",type(value)=="string" and t.technologies[value] or value)
               elseif key == "research_queue" then
+                if queue and t.research_queue_enabled ~= true then error("LuaForce::research_queue is unavailable while disabled") end
                 local rows={};for index,item in ipairs(value) do rows[index]=type(item)=="string" and t.technologies[item] or item end;rawset(t,"_queue",rows);rawset(t,"_current",rows[1])
               else rawset(t,key,value) end
             end})
+            function force.add_research(value)
+              if type(value)=="string" then value=force.technologies[value] end
+              if queue and force.research_queue_enabled ~= true then return false end
+              if not value or force.current_research ~= nil then return false end
+              force.research_queue={value}
+              return true
+            end
             local function lab()
               local counts={};local inventory={insert=function(stack)counts[stack.name]=(counts[stack.name] or 0)+stack.count;return stack.count end,get_item_count=function(name)return counts[name] or 0 end}
               return {valid=true,active=true,energy=0,get_inventory=function()return inventory end},counts
@@ -230,41 +245,84 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
               server_save=function(name)table.insert(saves,name)end}
             return force,direct,braking
           end
-          function execute_transition(queue)
-            callbacks={events={}};install_target("published",queue);local force,direct,braking=mock_world(queue);global={}
+          function execute_transition(queue, old_lab)
+            callbacks={events={}};install_target("published",queue,old_lab);local force,direct,braking=mock_world(queue);global={}
+            if queue then
+              local readonly,message=pcall(function()force.current_research=direct end)
+              assert(not readonly and tostring(message):find("read only",1,true),"modern mock accepted a current_research write")
+              assert(force.research_queue_enabled == false and force.add_research(direct) == false
+                and force.current_research == nil and #force.research_queue == 0,"disabled queue admitted research")
+            end
             assert(loadfile(control,"t",_ENV))();callbacks.init()
             assert(force.current_research == direct)
+            if queue then assert(force.research_queue_enabled == true and #force.research_queue == 1 and force.research_queue[1] == direct) end
+            -- Factorio's initial --create path invokes on_load after on_init
+            -- while the published direct research is active.  It is not a
+            -- completed-save reload witness and must not change fixture state.
+            local before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before)
             force.manual_mining_speed_modifier=fixture_target.direct_effect
-            if queue then direct.level=2 else direct.researched=true;force.current_research=nil end
+            if queue or old_lab then direct.level=2 else direct.researched=true;force.current_research=nil end
             local source=global.mir5_historical_transition.source_lab
             for _,name in ipairs(fixture_target.direct_science) do source.get_inventory().insert{name=name,count=-1} end
             callbacks.events[defines.events.on_research_finished]({research=direct})
-            if queue then
+            if queue or old_lab then
+              assert(global.mir5_historical_transition.phase == "published-partial-pending" and force.current_research == direct)
+              callbacks.events[defines.events.on_tick]()
+              assert(global.mir5_historical_transition.phase == "published-partial-pending")
+              if queue then force.research_queue={} else force.current_research=nil end
+              callbacks.events[defines.events.on_tick]()
               assert(force.current_research == direct and math.abs(force.research_progress-.42)<.000001)
-              assert(#force.research_queue == 2 and force.research_queue[2] == braking)
+              if queue then assert(force.research_queue_enabled == true and #force.research_queue == 2 and force.research_queue[2] == braking) end
             else assert(force.current_research == nil and direct.researched) end
             callbacks.events[defines.events.on_tick]()
             assert(saves[#saves] == "mir5-native-complete")
-            local before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
-            callbacks={events={}};install_target("mir5",queue);assert(loadfile(control,"t",_ENV))();callbacks.configuration({})
-            if queue then
+            -- The initial source load above must not be mistaken for a cold
+            -- reload once the published save becomes ready.
+            callbacks.events[defines.events.on_tick]()
+            before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
+            -- Model the source save loading again immediately before the
+            -- successor configuration.  The configuration callback clears
+            -- its local witness latch before starting MIR5 research.
+            callbacks.load();assert(global.mir5_historical_transition.phase == before)
+            fixture_target.stage="mir5"
+            fixture_target.mir_version=queue and "5.0.01700" or (old_lab and "5.0.01500" or "5.0.01300")
+            callbacks.configuration({})
+            if queue or old_lab then
               assert(global.mir5_historical_transition.phase == "mir5-successor" and force.current_research == direct)
               direct.level=3;force.manual_mining_speed_modifier=2*fixture_target.direct_effect
-              force.research_queue={braking}
+              if queue then force.research_queue={braking} else force.current_research=nil end
               callbacks.events[defines.events.on_research_finished]({research=direct})
-              assert(force.current_research == braking and #force.research_queue == 1)
+              if queue then assert(force.current_research == braking and #force.research_queue == 1) else assert(force.current_research == nil) end
             else assert(global.mir5_historical_transition.phase == "mir5-complete" and direct.researched and force.current_research == nil) end
             callbacks.events[defines.events.on_tick]();assert(saves[#saves] == "mir5-native-complete")
+            -- A retained published-ready latch would reject this MIR5 tick.
+            -- Its absence proves configuration discarded the pre-successor
+            -- source-load observation before the successor started.
+            callbacks.events[defines.events.on_tick]()
             before=global.mir5_historical_transition.phase;callbacks.load();assert(global.mir5_historical_transition.phase == before);callbacks.events[defines.events.on_tick]()
             return table.concat(messages,"\n")
           end
         ''')
-        for queue in (False, True):
-            with self.subTest(queue_api=queue):
-                witness = self.lua.eval("execute_transition")(queue)
+        for queue, old_lab in ((False, False), (False, True), (True, False)):
+            with self.subTest(queue_api=queue, old_lab=old_lab):
+                witness = self.lua.eval("execute_transition")(queue, old_lab)
                 self.assertIn('"transition_stage":"published"', witness)
                 self.assertIn('"transition_stage":"mir5"', witness)
                 self.assertIn('"stage":"reload"', witness)
+                target = "f017" if queue else ("f015" if old_lab else "f013")
+                markers = [
+                    json.loads(line.split(" RESULT ", 1)[1])
+                    for line in witness.splitlines()
+                    if "[MIR5_NATIVE_FIXTURE] RESULT " in line
+                    and f'"target":"{target}"' in line
+                ]
+                self.assertTrue(markers, "fixture did not emit a parseable native result marker")
+                for marker in markers:
+                    self.assertEqual(marker["queue_api"], queue)
+                    if queue:
+                        self.assertIs(marker["research_queue_enabled"], True)
+                    else:
+                        self.assertIsNone(marker["research_queue_enabled"])
 
         self.lua.execute(r'''
           callbacks={events={}};install_target("mir5",true);mock_world(true);global={}
@@ -273,38 +331,123 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
           assert(not ok and tostring(message):find("lacks the published fixture state",1,true))
         ''')
 
+    def test_data_final_preflight_accepts_each_pinned_cost_shape_before_acceleration(self):
+        # This retained oracle characterizes earlier 4.2.2-era native inputs;
+        # it is deliberately not the default 4.7.2 source contract below.
+        self.assertEqual(self.direct_oracle["kind"], "MIR5HistoricalDirectNativeCharacterizationV1")
+        self.assertEqual(self.direct_oracle["status"], "historical-characterization-not-mir5-native-qualification")
+        expected_costs = {
+            "f013": (8000, None, None),
+            "f014": (8000, None, None),
+            "f015": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f016": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f017": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f100": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+            "f110": (None, "8000*2^(L-1)", "1*(8000*2^(L-1))"),
+        }
+        published_f017 = self.metadata["published_4_7_2_f017_preflight"]
+        self.assertEqual(published_f017, {
+            "kind": "published-4.7.2-native-data-stage-observation",
+            "native_run": 40024011863,
+            "unit_count_formula": "8000*2^(L-1)",
+            "unit_time": 60,
+            "direct_effect": .05,
+            "direct_science": ["utility-science-pack", "military-science-pack"],
+        })
+
+        self.lua.globals().fixture = FIXTURE.as_posix()
+        self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
+        self.lua.execute(r'''
+          package.path=fixture .. "/?.lua"
+          function data_final_row(id, stage, expected_effect, actual_effect, expected_science, actual_science, count, count_formula)
+            package.loaded.target=nil;package.loaded["target-literal"]=nil
+            package.preload["target-literal"]=function()return {id=id,stage=stage,mir_version="4.7." .. id:sub(2) .. "02",
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode=(id == "f013" and "preservation-only" or "lab"),partial_progress=.42,
+              direct_science=expected_science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
+            local ingredients={};for index,name in ipairs(actual_science) do ingredients[index]={name,1} end
+            local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
+              unit={count=count,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
+            data={raw={technology={[row.name]=row}}}
+            local diagnostics={};log=function(value)diagnostics[#diagnostics+1]=value end
+            local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
+            return ok,tostring(message),row,diagnostics[1]
+          end
+        ''')
+        for target, (count, published_formula, mir5_formula) in expected_costs.items():
+            fact = self.metadata["targets"][target]
+            for stage, formula in (("published", published_formula), ("mir5", mir5_formula)):
+                with self.subTest(target=target, stage=stage):
+                    observed_count = count if count is not None else 16000
+                    good = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                            self.lua.table_from(fact["direct_science"]), self.lua.table_from(fact["direct_science"]),
+                                                            observed_count, formula)
+                    self.assertTrue(good[0])
+                    self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["count_formula"], good[2]["unit"]["time"]),
+                                     (1, None, 1))
+                    self.assertIn(f"target={target}", good[3])
+                    self.assertIn(f"count={observed_count}", good[3])
+                    self.assertIn(f"count_formula={formula if formula is not None else 'nil'}", good[3])
+                    self.assertIn("time=60", good[3])
+                    self.assertIn("science=" + ",".join(f"{name}:1" for name in fact["direct_science"]), good[3])
+                    self.assertIn(f"effects=character-mining-speed:modifier={fact['direct_effect']}:recipe=nil:change=nil", good[3])
+
+                    alternate = mir5_formula if stage == "published" else published_formula
+                    wrong_formula = alternate if alternate != formula else "8000*1.5^(L-1)"
+                    bad_formula = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                   self.lua.table_from(fact["direct_science"]), self.lua.table_from(fact["direct_science"]),
+                                                                   observed_count, wrong_formula)
+                    self.assertFalse(bad_formula[0])
+                    self.assertIn("cost or time differs", bad_formula[1])
+                    self.assertEqual((bad_formula[2]["unit"]["count"], bad_formula[2]["unit"]["count_formula"], bad_formula[2]["unit"]["time"]),
+                                     (observed_count, wrong_formula, 60))
+                    self.assertIn(f"count_formula={wrong_formula}", bad_formula[3])
+
+                    reordered = list(reversed(fact["direct_science"]))
+                    same_science = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                      self.lua.table_from(fact["direct_science"]), self.lua.table_from(reordered),
+                                                                      observed_count, formula)
+                    self.assertTrue(same_science[0])
+                    repeated = [fact["direct_science"][0]] * len(fact["direct_science"])
+                    bad_science = self.lua.eval("data_final_row")(target, stage, fact["direct_effect"], fact["direct_effect"],
+                                                                     self.lua.table_from(fact["direct_science"]), self.lua.table_from(repeated),
+                                                                     observed_count, formula)
+                    self.assertEqual(len(fact["direct_science"]) == 1, bad_science[0])
+                    if len(fact["direct_science"]) != 1:
+                        self.assertIn("science differs", bad_science[1])
+
+        unknown = self.lua.eval("data_final_row")("f999", "published", .05, .05,
+                                                   self.lua.table_from(("military-science-pack", "utility-science-pack")),
+                                                   self.lua.table_from(("military-science-pack", "utility-science-pack")), 8000,
+                                                   expected_costs["f015"][1])
+        self.assertFalse(unknown[0])
+        self.assertIn("target cost family differs", unknown[1])
+
     def test_data_final_preflight_rejects_wrong_authored_effect_before_acceleration(self):
         self.lua.globals().fixture = FIXTURE.as_posix()
         self.lua.globals().data_final = (FIXTURE / "data-final-fixes.lua").as_posix()
         self.lua.execute(r'''
           package.path=fixture .. "/?.lua"
-          function data_final_row(id, expected_effect, actual_effect, science)
+          function data_final_effect_row(id, expected_effect, actual_effect, science, count_formula)
             package.loaded.target=nil;package.loaded["target-literal"]=nil
             package.preload["target-literal"]=function()return {id=id,stage="published",mir_version="4.7." .. id:sub(2) .. "02",
-              direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode=(id == "f013" and "preservation-only" or "lab"),partial_progress=.42,
+              direct="recipe-prod-research_character_mining_speed-1",direct_effect=expected_effect,successor_mode="lab",partial_progress=.42,
               direct_science=science,queue_api=id == "f017",queue_probe=id == "f017" and "braking-force-1" or nil}end
             local ingredients={};for index,name in ipairs(science) do ingredients[index]={name,1} end
             local row={type="technology",name="recipe-prod-research_character_mining_speed-1",level=1,upgrade=true,max_level="infinite",enabled=true,
-              unit={count=8000,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
+              unit={count=8000,count_formula=count_formula,time=60,ingredients=ingredients},effects={{type="character-mining-speed",modifier=actual_effect}}}
             data={raw={technology={[row.name]=row}}}
+            log=function() end
             local ok,message=pcall(function()assert(loadfile(data_final,"t",_ENV))()end)
             return ok,tostring(message),row
           end
         ''')
-        rows = (
-            ("f013", .05, ("alien-science-pack",)),
-            ("f015", .1, ("high-tech-science-pack", "military-science-pack")),
-            ("f017", .1, ("military-science-pack", "utility-science-pack")),
-        )
-        for target, effect, science in rows:
-            with self.subTest(target=target):
-                good = self.lua.eval("data_final_row")(target, effect, effect, self.lua.table_from(science))
-                self.assertTrue(good[0])
-                self.assertEqual((good[2]["unit"]["count"], good[2]["unit"]["time"]), (1, 1))
-        bad = self.lua.eval("data_final_row")("f017", .1, .05, self.lua.table_from(("military-science-pack", "utility-science-pack")))
+        bad = self.lua.eval("data_final_effect_row")("f017", .05, .1,
+                                                       self.lua.table_from(("utility-science-pack", "military-science-pack")),
+                                                       "8000*2^(L-1)")
         self.assertFalse(bad[0])
         self.assertIn("effect differs", bad[1])
-        self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["time"]), (8000, 60))
+        self.assertEqual((bad[2]["unit"]["count"], bad[2]["unit"]["count_formula"], bad[2]["unit"]["time"]),
+                         (8000, "8000*2^(L-1)", 60))
 
 
 def main():

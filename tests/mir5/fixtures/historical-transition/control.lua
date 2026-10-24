@@ -23,6 +23,45 @@ local function current_name(force)
   return value and value.name or nil
 end
 
+local function queue_names(queue)
+  local names = {}
+  for _, value in ipairs(queue or {}) do
+    names[#names + 1] = value and value.name or tostring(value)
+  end
+  return "[" .. table.concat(names, ",") .. "]"
+end
+
+local function queue_enabled(force)
+  return target.queue_api == true and force.research_queue_enabled == true
+end
+
+local function json_boolean_or_null(value)
+  if value == true then return "true" end
+  if value == false then return "false" end
+  return "null"
+end
+
+local function enable_research_queue(force)
+  if not target.queue_api then return end
+  if force.research_queue_enabled ~= true then force.research_queue_enabled = true end
+  if force.research_queue_enabled ~= true then
+    fail("could not enable the supported historical research queue")
+  end
+end
+
+-- 0.17 and later expose current_research as a read-only observation.  The
+-- established historical-native fixture uses add_research for those targets;
+-- the older targets retain their supported direct setter contract.
+local function start_research(force, name)
+  local value = technology(force, name)
+  if target.queue_api then
+    if force.add_research(value) ~= true then fail("could not queue research " .. name) end
+  else
+    force.current_research = name
+  end
+  if current_name(force) ~= name then fail("could not start research " .. name) end
+end
+
 local function unlock_prerequisites(value, seen)
   seen = seen or {}
   if seen[value.name] then return end
@@ -81,14 +120,25 @@ end
 
 local function assert_partial(force)
   if target.successor_mode ~= "lab" then return end
-  if current_name(force) ~= target.direct or not close(force.research_progress, target.partial_progress) then
-    fail("published direct partial research differs")
-  end
+  local current, progress = current_name(force), force.research_progress
+  local queue, expected_queue = {}, "unavailable"
   if target.queue_api then
-    local queue = force.research_queue
-    if #queue ~= 2 or queue[1].name ~= target.direct or queue[2].name ~= target.queue_probe then
-      fail("published supported research queue differs")
-    end
+    queue, expected_queue = force.research_queue or {}, "[" .. target.direct .. "," .. target.queue_probe .. "]"
+  end
+  local queue_matches = not target.queue_api
+  if target.queue_api then
+    queue_matches = queue_enabled(force) and #queue == 2
+      and queue[1].name == target.direct and queue[2].name == target.queue_probe
+  end
+  if current ~= target.direct or not close(progress, target.partial_progress) or not queue_matches then
+    fail("published direct partial research differs: expected_current=" .. target.direct
+      .. " actual_current=" .. tostring(current)
+      .. " expected_progress=" .. tostring(target.partial_progress)
+      .. " actual_progress=" .. tostring(progress)
+      .. " expected_queue=" .. expected_queue
+      .. " actual_queue=" .. queue_names(queue)
+      .. " expected_queue_enabled=" .. tostring(target.queue_api)
+      .. " actual_queue_enabled=" .. tostring(queue_enabled(force)))
   end
 end
 
@@ -100,14 +150,16 @@ local function configure_partial(state)
     state.phase = "published-ready"
     return
   end
+  if current_name(force) ~= nil then fail("published completion retained active research") end
   if target.queue_api then
+    enable_research_queue(force)
     local probe = technology(force, target.queue_probe)
     unlock_prerequisites(probe)
     probe.enabled = true
     if probe.researched then fail("queue probe was already researched") end
     force.research_queue = {technology(force, target.direct), probe}
   else
-    force.current_research = target.direct
+    start_research(force, target.direct)
   end
   force.research_progress = target.partial_progress
   assert_partial(force)
@@ -148,7 +200,7 @@ local function assert_candidate_complete(state)
   end
   if target.queue_api then
     local queue = force.research_queue
-    if current_name(force) ~= target.queue_probe or #queue ~= 1 or queue[1].name ~= target.queue_probe
+    if not queue_enabled(force) or current_name(force) ~= target.queue_probe or #queue ~= 1 or queue[1].name ~= target.queue_probe
         or technology(force, target.queue_probe).researched then
       fail("MIR5 changed the supported queued research")
     end
@@ -159,6 +211,10 @@ end
 
 local function marker(stage, state)
   local force = game.forces.player
+  -- Older target engines have no queue property. Preserve that capability
+  -- distinction as JSON null rather than emitting Lua's invalid JSON `nil`.
+  local marker_queue_enabled = nil
+  if target.queue_api == true then marker_queue_enabled = queue_enabled(force) end
   log("[MIR5_NATIVE_FIXTURE] RESULT {"
     .. "\"case\":\"historical-transition\","
     .. "\"stage\":\"" .. stage .. "\","
@@ -172,6 +228,7 @@ local function marker(stage, state)
     .. "\"current_research\":\"" .. tostring(current_name(force)) .. "\","
     .. "\"research_progress\":" .. tostring(force.research_progress) .. ","
     .. "\"queue_api\":" .. tostring(target.queue_api == true) .. ","
+    .. "\"research_queue_enabled\":" .. json_boolean_or_null(marker_queue_enabled) .. ","
     .. "\"two_cold_reload_witness\":" .. tostring(stage == "reload") .. ","
     .. "\"on_load_read_only\":" .. tostring(stage == "reload")
     .. "}")
@@ -192,8 +249,8 @@ local function initialize_published()
     source_lab=lab, source_lab_initial=initial, source_direct_finished=0,
     deadline=game.tick + DEADLINE_TICKS,
   }
-  force.current_research = target.direct
-  if current_name(force) ~= target.direct then fail("could not start published direct research") end
+  enable_research_queue(force)
+  start_research(force, target.direct)
 end
 
 local function initialize_mir5()
@@ -220,6 +277,10 @@ script.on_init(function()
 end)
 
 script.on_configuration_changed(function()
+  -- A source save can load immediately before its successor configuration.
+  -- Only a completed save is a cold-reload witness; never carry a source
+  -- witness into the successor stage.
+  loaded, reported = false, false
   if target.stage == "mir5" then initialize_mir5() end
 end)
 
@@ -231,7 +292,14 @@ script.on_event(defines.events.on_research_finished, function(event)
     state.source_direct_finished = state.source_direct_finished + 1
     if state.source_direct_finished ~= 1 then fail("published direct completed more than once") end
     assert_source_direct(state)
-    configure_partial(state)
+    if target.successor_mode == "lab" then
+      -- The historical queue clears its just-finished entry after the event.
+      -- Do not attempt to replace that entry from inside on_research_finished.
+      freeze_source_lab(state)
+      state.phase = "published-partial-pending"
+    else
+      configure_partial(state)
+    end
   elseif state.phase == "mir5-successor" then
     state.successor_direct_finished = state.successor_direct_finished + 1
     if state.successor_direct_finished ~= 1 then fail("MIR5 successor completed more than once") end
@@ -241,13 +309,22 @@ end)
 
 script.on_load(function()
   local state = global[KEY]
-  loaded = state and state.phase or nil
+  -- `--create` saves while the published direct research is still running.
+  -- That ordinary load must remain observational.  Cold-reload assertions
+  -- apply only after a stage wrote its completed save.
+  loaded = state and (state.phase == "published-ready" or state.phase == "mir5-complete") and state.phase or nil
   reported = false
 end)
 
 script.on_event(defines.events.on_tick, function()
   local state = global[KEY]
   if not state then fail("historical transition fixture state is absent") end
+  if target.stage == "published" and state.phase == "published-partial-pending" then
+    if game.tick > state.deadline then fail("published research queue did not settle") end
+    if current_name(game.forces.player) ~= nil then return end
+    configure_partial(state)
+    return
+  end
   if state.phase == "published-direct" or state.phase == "mir5-successor" then
     energize(state.source_lab)
     energize(state.successor_lab)

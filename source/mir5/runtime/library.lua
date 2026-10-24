@@ -8,6 +8,8 @@ local catalogue = require("research.catalogue")
 local settings_catalog = require("research.settings")
 local profile_codec = require("research.settings_profile")
 local library_model = require("presentation.library_model")
+local availability = require("presentation.availability")
+local target = require("platform.target")
 local translation_queue = require("runtime.library_translations")
 
 local M = {}
@@ -1117,12 +1119,27 @@ local function update_queue_content(content, player, view)
   if #items == 0 then add(content, {type = "label", name = PREFIX .. "queue_empty", caption = {"mir-browser.queue-empty"}}) end
 end
 
-local function update_availability_content(content)
+local function update_availability_content(content, player, view)
   if not valid(content) then return end
   content.clear()
-  -- MIR5 names every delivered current-profile technology before data stage.
-  -- There is no compiler/discovery omission ledger to infer or present here.
-  add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+  -- This bounded view has no compiler ledger and no native catalogue pass. It
+  -- presents only the authored terminal explanations selected by exact active
+  -- mod and named native-owner facts.
+  local active_mods = script and script.active_mods or {}
+  local rows = availability.rows(active_mods, target, player and player.force, view and view.query)
+  if #rows == 0 then
+    add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
+    return
+  end
+  for index, row in ipairs(rows) do
+    add(content, {
+      type = "label",
+      name = PREFIX .. "availability_" .. index,
+      caption = {"mir-browser.availability-entry",
+        {"technology-name.more-infinite-research." .. row.family},
+        {"mir-browser.availability-" .. row.reason}}
+    })
+  end
 end
 
 local function update_help_content(content)
@@ -1235,11 +1252,8 @@ local function render(player, view, context, preserve_query)
   if valid(tabs) then tabs.selected_tab_index = TAB_INDEX[view.tab] or 1 end
   local content = tab_content(frame, view.tab)
   if view.tab == "research" and view.visibility == 3 then
-    -- MIR5 has no compiler or discovery omission ledger. Retain the published
-    -- availability route without inventing rows, effect explanations, or a
-    -- native catalogue traversal.
     discard_translation_cache(player.index)
-    update_availability_content(content)
+    update_availability_content(content, player, view)
   elseif view.tab == "research" then
     local translations = open_translation_cache(player, view)
     update_research_content(content, player, view, context, translated_labels(translations))

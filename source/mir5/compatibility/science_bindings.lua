@@ -61,6 +61,14 @@ local function exact_profile(mods, expected)
   return true
 end
 
+local function complete_profile(mods, expected)
+  if type(mods) ~= "table" then return false end
+  for name in pairs(expected) do
+    if mods[name] == nil then return false end
+  end
+  return true
+end
+
 local function add_unique(out, seen, value)
   if not seen[value] then seen[value] = true; out[#out + 1] = value end
 end
@@ -351,13 +359,20 @@ function M.select(target, mods)
     space = name_for(aliases, "space-science-pack"),
     end_game = nil
   }
-  if target.id == "f210" and exact_profile(mods, K2SO_PHASE_V8.profile) then
-    selected.k2_phase = {
-      basic = K2SO_PHASE_V8.basic,
-      early = copy_list(K2SO_PHASE_V8.early),
-      phase_one = copy_list(K2SO_PHASE_V8.phase_one),
-      phase_two = copy_list(K2SO_PHASE_V8.phase_two)
-    }
+  if target.id == "f210" then
+    if exact_profile(mods, K2SO_PHASE_V8.profile) then
+      selected.k2_phase = {
+        basic = K2SO_PHASE_V8.basic,
+        early = copy_list(K2SO_PHASE_V8.early),
+        phase_one = copy_list(K2SO_PHASE_V8.phase_one),
+        phase_two = copy_list(K2SO_PHASE_V8.phase_two)
+      }
+    elseif complete_profile(mods, K2SO_PHASE_V8.profile) then
+      -- The published K2SO vector removes named early packs by phase. A full
+      -- changed closure may carry those owned identities, so ordinary science
+      -- is not a safe fallback until another vector is explicitly reviewed.
+      error("MIR unsupported F210 K2SO science-phase saved-profile transition: captured tuple changed", 2)
+    end
   end
   if has_space_age then
     selected.end_game = {pack = "promethium-science-pack", prerequisites = {"promethium-science-pack"}}

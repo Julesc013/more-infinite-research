@@ -7,6 +7,7 @@ package construction.
 import json
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -32,6 +33,10 @@ def invoke_as_json(arguments: str) -> dict:
         check=True,
     )
     return json.loads(completed.stdout)
+
+
+def powershell_literal(value: Path | str) -> str:
+    return "'" + str(value).replace("'", "''") + "'"
 
 
 def invoke_dispatch_as_json() -> dict:
@@ -148,6 +153,55 @@ class MenuComparisonTests(unittest.TestCase):
             "reason": "must-match-expected-engine-family",
             "expected_engine_version": "2.0.77",
         }])
+
+    def test_fully_present_preflight_accepts_an_empty_missing_collection(self):
+        """A valid preflight must not turn its empty diagnostic list into an error."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            library = root / "library"
+            library.mkdir()
+            files = {
+                "factorio": root / "factorio.exe",
+                "profile": root / "profile.json",
+                "published": root / "published.zip",
+                "replay": root / "replay.zip",
+                "candidate": root / "candidate.zip",
+                "ordinary": root / "player-config.ini",
+                "player_data": root / "player-data.json",
+            }
+            for path in files.values():
+                path.write_text("present", encoding="utf-8")
+            digest = "A" * 64
+            arguments = " ".join(
+                [
+                    "-Preflight",
+                    "-ExpectedEngineVersion 2.0.77",
+                    "-ExpectedFactorioLine 2.0",
+                    f"-FactorioBin {powershell_literal(files['factorio'])}",
+                    f"-ExpectedFactorioSha256 {digest}",
+                    f"-ArchiveLibrary {powershell_literal(library)}",
+                    f"-ProfilePath {powershell_literal(files['profile'])}",
+                    f"-ExpectedProfileSha256 {digest}",
+                    f"-PublishedArchive {powershell_literal(files['published'])}",
+                    f"-ExpectedPublishedSha256 {digest}",
+                    f"-ReplayArchive {powershell_literal(files['replay'])}",
+                    f"-ExpectedReplaySha256 {digest}",
+                    f"-CandidateArchive {powershell_literal(files['candidate'])}",
+                    f"-ExpectedCandidateSha256 {digest}",
+                    f"-OrdinaryPlayerConfigPath {powershell_literal(files['ordinary'])}",
+                    f"-ExpectedOrdinaryPlayerConfigSha256 {digest}",
+                    f"-PlayerDataPath {powershell_literal(files['player_data'])}",
+                    f"-ExpectedPlayerDataSha256 {digest}",
+                    f"-OutputRoot {powershell_literal(root / 'output')}",
+                    DECLARED_POLICY,
+                ]
+            )
+            record = invoke_as_json(arguments)
+
+        self.assertEqual(record["status"], "inputs-present-not-executed")
+        self.assertEqual(record["missing"], [])
+        self.assertEqual(record["tolerance_policy"]["status"], "declared-before-execution")
+        self.assertEqual(len(record["plan"]), 38)
 
     def test_candidate_and_control_use_direct_library_selection_while_only_replay_swaps(self):
         result = invoke_dispatch_as_json()

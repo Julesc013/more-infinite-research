@@ -4523,9 +4523,9 @@
     {
       "path": "tools/lib/validation/PackageIdentity.ps1",
       "classification": "canonical-internal",
-      "sha256": "4DA89A92C5F3180971A67B2FFEF2D1BC7B6360E8415888D9D48EC469571B0CB7",
+      "sha256": "CEAE139FEC078E90E790E2B310C5E4615586D06A6A10CC9F5FF8FCE31F78DCAF",
       "hash_mode": "canonical-text-v1",
-      "lines": 484,
+      "lines": 493,
       "package_visible": false
     },
     {
@@ -4555,7 +4555,7 @@
     {
       "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
       "classification": "canonical-internal",
-      "sha256": "021FEC5223A9F261FD712E1F6B95D42773D55500E11373572C7C84F1F2A50ABB",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55",
       "hash_mode": "canonical-text-v1",
       "lines": 64,
       "package_visible": false
@@ -4571,9 +4571,9 @@
     {
       "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
       "classification": "canonical-internal",
-      "sha256": "E2198E3419791E8BE16683EA2B2D792EE32C3A7A5D3D9AA17F8254084809713E",
+      "sha256": "047DCB1AD990905A209BCDC984BACEA886534B7C17E02F345C429A29677F2407",
       "hash_mode": "canonical-text-v1",
-      "lines": 160,
+      "lines": 284,
       "package_visible": false
     },
     {
@@ -6114,5 +6114,5 @@
     "sealing": false,
     "publication": false
   },
-  "digest": "sha256:33b5f23c6286609e7e487d1f127b249ee9191052a8691133445a203009d83ab1"
+  "digest": "sha256:640e9cec021f7431ab9e32bd0d3f9e2f834c4a9e6040f583071c256c2f0a3a0a"
 }

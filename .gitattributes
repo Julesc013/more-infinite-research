@@ -6,6 +6,9 @@ spec/mir5/evidence/*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-
 tests/mir5/fixtures/historical-direct-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tests/mir5/fixtures/historical-continuation-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tests/mir5/profiles/*.json text eol=lf
+# These portable facts are raw-hash referenced by the native evidence chains.
+tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json text eol=lf
+tests/mir5/fixtures/competing-dynamic-f200-sa-native-initial-levels.json text eol=lf
 tests/mir5/fixtures/create-research/* text eol=lf
 spec/mir5/inventory/*.json text eol=lf
 
@@ -220,6 +223,8 @@ tools/mir/** text eol=lf
 # The live composable player source is raw-byte hashed by the target
 # materializer. Pin all editable source bytes across checkout configurations.
 source/** text eol=lf
+# Factorio's root thumbnail is binary, including after the staging cutover.
+source/**/thumbnail.png -text
 # The editable target authority is raw-byte hashed by the deterministic
 # materializer. Pin every textual target source, including *.template and
 # target-specific Lua overlays, so Windows and hosted checkouts are identical.
@@ -239,3 +244,7 @@ fixtures/release-inputs/mir470-published-460-consolidated-construction.json -tex
 .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json text eol=lf
 # Native observer receipts bind these authored CRLF bytes exactly.
 fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/* -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# These native BobTech inputs are byte-hash-bound by the MIR5 recovery record.
+fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json -text -eol
+fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/data-final-fixes.lua -text -eol
+fixtures/assert-f210-current-bob-angel-tin-route-observer/data-final-fixes.lua -text -eol

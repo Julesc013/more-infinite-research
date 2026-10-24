@@ -62,13 +62,105 @@ local function eligible_family(row, values)
   return family, stream
 end
 
+local function selected_family_set(value, label)
+  if value == nil then return {} end
+  if type(value) ~= "table" then error("MIR product targets has invalid " .. label, 3) end
+  local out = {}
+  for family, selected in pairs(value) do
+    if type(family) ~= "string" or family == "" or selected ~= true then
+      error("MIR product targets has invalid " .. label, 3)
+    end
+    out[family] = true
+  end
+  return out
+end
+
+-- A profile can retain the same authored family while replacing its inherited
+-- Base recipe vector with the current, bounded collector result.  This is
+-- deliberately a family set, not a request to discover another family.
+local function replacement_family_set(value)
+  return selected_family_set(value, "replacement product target families")
+end
+
+-- Profile deltas sometimes withhold one known recipe from an otherwise shared
+-- product family.  Keep that decision as exact family/recipe data; patterns
+-- and broad post-collection classifiers would change the collector contract.
+local function excluded_target_recipes(value)
+  if value == nil then return {} end
+  if type(value) ~= "table" then error("MIR product targets has invalid excluded target recipes", 3) end
+  local out = {}
+  for family, names in pairs(value) do
+    if type(family) ~= "string" or family == "" or type(names) ~= "table" then
+      error("MIR product targets has invalid excluded target recipes", 3)
+    end
+    local selected, count = {}, 0
+    for index, name in ipairs(names) do
+      if type(name) ~= "string" or name == "" or selected[name] then
+        error("MIR product targets has invalid excluded target recipes", 3)
+      end
+      selected[name], count = true, count + 1
+    end
+    if count ~= #names or count == 0 then error("MIR product targets has invalid excluded target recipes", 3) end
+    out[family] = selected
+  end
+  return out
+end
+
+local function expected_target_lists(value)
+  if value == nil then return {} end
+  if type(value) ~= "table" then error("MIR product targets has invalid required targets", 3) end
+  local out = {}
+  for family, recipes in pairs(value) do
+    if type(family) ~= "string" or family == "" or type(recipes) ~= "table" then
+      error("MIR product targets has invalid required targets", 3)
+    end
+    local seen, names = {}, {}
+    for index, recipe in ipairs(recipes) do
+      if type(recipe) ~= "string" or recipe == "" or seen[recipe] then
+        error("MIR product targets has invalid required targets", 3)
+      end
+      seen[recipe], names[index] = true, recipe
+    end
+    if #names == 0 then error("MIR product targets has invalid required targets", 3) end
+    table.sort(names)
+    out[family] = names
+  end
+  return out
+end
+
+local function verify_required_targets(result, required)
+  for family, expected in pairs(required) do
+    local actual, names = result.by_family[family] or {}, {}
+    for _, row in ipairs(actual) do names[#names + 1] = row.recipe end
+    if #names ~= #expected then error("MIR product targets changed required family " .. family, 3) end
+    for index, name in ipairs(expected) do
+      if names[index] ~= name then error("MIR product targets changed required family " .. family, 3) end
+    end
+  end
+end
+
 function M.extend(technologies, values, context)
+  context = context or {}
+  local exact_families = selected_family_set(context.exact_product_target_families, "exact product target families")
+  local replacement_families = replacement_family_set(context.replacement_product_target_families)
+  local excluded_recipes = excluded_target_recipes(context.excluded_product_target_recipes)
+  local required_targets = expected_target_lists(context.required_product_targets)
   local selected, streams, count = {}, {}, 0
   for _, row in ipairs(technologies) do
     local family, stream = eligible_family(row, values)
     if family then
       assert(selected[family] == nil, "MIR duplicate product target family " .. family)
       selected[family], streams[family], count = row, stream, count + 1
+    end
+  end
+  for family in pairs(replacement_families) do
+    local technology = selected[family]
+    if technology then
+      -- `technologies` is the detached generated output.  Replacing this one
+      -- declared effect vector neither changes the input definitions nor starts
+      -- another recipe pass.  A partial consumer may intentionally omit an
+      -- unrelated declared family, so it has nothing to replace here.
+      technology.effects = {}
     end
   end
   local write = diagnostic_writer(values, context)
@@ -90,9 +182,9 @@ function M.extend(technologies, values, context)
   -- cache: this sole final-fixes call sees the current recipe tables.
   local bindings = require("compatibility.product_bindings")
   local rules = {}
-  local function admit(rows)
+  local function admit(rows, exact)
     for _, row in ipairs(rows) do
-      if selected[row.family] and (not row.structural_fallback
+      if selected[row.family] and (exact or not exact_families[row.family]) and (not row.structural_fallback
         or automatic) then
         rules[#rules + 1] = row
       end
@@ -100,6 +192,18 @@ function M.extend(technologies, values, context)
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
+  if context.additional_product_bindings ~= nil then
+    if type(context.additional_product_bindings) ~= "table" then
+      error("MIR selected product bindings are malformed", 2)
+    end
+    admit(context.additional_product_bindings)
+  end
+  if context.exact_product_bindings ~= nil then
+    if type(context.exact_product_bindings) ~= "table" then
+      error("MIR selected exact product bindings are malformed", 2)
+    end
+    admit(context.exact_product_bindings, true)
+  end
   if selected.research_science_pack_productivity and context.mods and context.mods.Krastorio2
     and require("compatibility.modern_catalogue").is_k2so(context.mods) then
     admit(require("compatibility.modern_catalogue.k2so").product_bindings)
@@ -118,18 +222,33 @@ function M.extend(technologies, values, context)
 
   local collector = require("compatibility.product_targets")
   local result = collector.collect(context.raw.recipe, collector.prepare(rules, {raw=context.raw}))
+  verify_required_targets(result, required_targets)
   report.work = result.work
   report.work.modules = module_count
   local dispositions = write and {} or nil
   for family, rows in pairs(result.by_family) do
     local technology = selected[family]
     local effects, seen = technology.effects, {}
+    if replacement_families[family] then
+      -- Published profile groups are ordered by their authored productivity
+      -- weight, then the named recipe.  The shared collector itself keeps a
+      -- recipe-global order for diagnostics; only a declared rebuilt vector
+      -- needs this presentation order.
+      table.sort(rows, function(left, right)
+        if left.weight ~= right.weight then return left.weight > right.weight end
+        if left.recipe ~= right.recipe then return left.recipe < right.recipe end
+        if left.product_type ~= right.product_type then return left.product_type < right.product_type end
+        return left.product_name < right.product_name
+      end)
+    end
     for _, effect in ipairs(effects) do seen[effect.recipe] = true end
     local added = false
     for _, row in ipairs(rows) do
       local key
       if write then key = family .. "\0" .. row.recipe .. "\0" .. row.product_type .. "\0" .. row.product_name end
-      if not seen[row.recipe] then
+      if excluded_recipes[family] and excluded_recipes[family][row.recipe] then
+        if write then dispositions[key] = "withheld" end
+      elseif not seen[row.recipe] then
         effects[#effects + 1] = {type="change-recipe-productivity", recipe=row.recipe,
           change=streams[family].effect_percent * row.weight / 100}
         seen[row.recipe], added = true, true

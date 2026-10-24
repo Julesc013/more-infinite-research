@@ -432,57 +432,54 @@ function M.collect(recipes, context)
   if type(context) ~= "table" or context.schema ~= 1 or type(context.interested) ~= "table" then
     error("MIR product targets requires a prepared context", 2)
   end
-  local names = {}
-  for name in pairs(recipes) do
-    if type(name) == "string" and name ~= "" then names[#names + 1] = name end
-  end
-  table.sort(names)
   local work = {recipes = 0, products = 0, ingredients = 0, matches = 0,
     items = context.items, pattern_tests = context.pattern_tests, recipe_pattern_tests = 0,
     owners = context.owners, entities = context.entities}
   local targets, by_family = {}, {}
-  for _, recipe_name in ipairs(names) do
-    work.recipes = work.recipes + 1
-    local summary = inspect_recipe(recipes[recipe_name], context, work)
-    if summary then
-      -- Exact alternatives use a direct lookup. The one retained breeding
-      -- name-pattern contract shares this same recipe pass, after local yield
-      -- inspection; a name alone never admits a zero/ignored output.
-      if summary.product_type then
-        local function match_rule(rule)
-          work.matches = work.matches + 1
-          if not summary.matches[rule.ordinal] then
-            summary.matches[rule.ordinal] = {rule=rule,
-              product_type=summary.product_type, product_name=summary.product_name}
+  for recipe_name, recipe in pairs(recipes) do
+    if type(recipe_name) == "string" and recipe_name ~= "" then
+      work.recipes = work.recipes + 1
+      local summary = inspect_recipe(recipe, context, work)
+      if summary then
+        -- Exact alternatives use a direct lookup. The one retained breeding
+        -- name-pattern contract shares this same recipe pass, after local yield
+        -- inspection; a name alone never admits a zero/ignored output.
+        if summary.product_type then
+          local function match_rule(rule)
+            work.matches = work.matches + 1
+            if not summary.matches[rule.ordinal] then
+              summary.matches[rule.ordinal] = {rule=rule,
+                product_type=summary.product_type, product_name=summary.product_name}
+            end
+          end
+          for _, rule in ipairs(context.by_recipe[recipe_name] or {}) do match_rule(rule) end
+          for _, rule in ipairs(context.recipe_pattern_rules) do
+            for _, pattern in ipairs(rule.recipe_name_patterns) do
+              work.recipe_pattern_tests = work.recipe_pattern_tests + 1
+              if string.find(recipe_name, pattern) then match_rule(rule); break end
+            end
           end
         end
-        for _, rule in ipairs(context.by_recipe[recipe_name] or {}) do match_rule(rule) end
-        for _, rule in ipairs(context.recipe_pattern_rules) do
-          for _, pattern in ipairs(rule.recipe_name_patterns) do
-            work.recipe_pattern_tests = work.recipe_pattern_tests + 1
-            if string.find(recipe_name, pattern) then match_rule(rule); break end
+        local admitted = {}
+        for _, match in pairs(summary.matches) do
+          local rule = match.rule
+          local prior = admitted[rule.family]
+          -- Published groups filter their own exclusions before claiming a
+          -- recipe. A blocked early group must not suppress a later valid one.
+          if not recipe_blocked(recipe_name, summary, rule)
+            and (prior == nil or rule.ordinal < prior.rule.ordinal) then
+            admitted[rule.family] = match
           end
         end
-      end
-      local admitted = {}
-      for _, match in pairs(summary.matches) do
-        local rule = match.rule
-        local prior = admitted[rule.family]
-        -- Published groups filter their own exclusions before claiming a
-        -- recipe. A blocked early group must not suppress a later valid one.
-        if not recipe_blocked(recipe_name, summary, rule)
-          and (prior == nil or rule.ordinal < prior.rule.ordinal) then
-          admitted[rule.family] = match
+        for family, match in pairs(admitted) do
+          local rule = match.rule
+          local target = {family = family, recipe = recipe_name, product_type = match.product_type,
+            product_name = match.product_name, weight = rule.weight}
+          targets[#targets + 1] = target
+          local rows = by_family[family]
+          if rows == nil then rows = {}; by_family[family] = rows end
+          rows[#rows + 1] = copy_target(target)
         end
-      end
-      for family, match in pairs(admitted) do
-        local rule = match.rule
-        local target = {family = family, recipe = recipe_name, product_type = match.product_type,
-          product_name = match.product_name, weight = rule.weight}
-        targets[#targets + 1] = target
-        local rows = by_family[family]
-        if rows == nil then rows = {}; by_family[family] = rows end
-        rows[#rows + 1] = copy_target(target)
       end
     end
   end

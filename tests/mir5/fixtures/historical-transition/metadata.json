@@ -3,6 +3,17 @@
   "kind": "MIR5HistoricalTransitionFixtureV1",
   "name": "mir-fixture-mir5-historical-transition",
   "version": "0.1.0",
+  "published_4_7_2_f017_preflight": {
+    "kind": "published-4.7.2-native-data-stage-observation",
+    "native_run": 40024011863,
+    "unit_count_formula": "8000*2^(L-1)",
+    "unit_time": 60,
+    "direct_effect": 0.05,
+    "direct_science": [
+      "utility-science-pack",
+      "military-science-pack"
+    ]
+  },
   "targets": {
     "f013": {
       "factorio_version": "0.13",
@@ -37,7 +48,7 @@
       "mir_version": "5.0.01500",
       "published_archive_sha256": "758AA85BF41A10188DEA914AC456F672BAC7D3430E646CBDB6D761BE5ECC7B8A",
       "direct": "recipe-prod-research_character_mining_speed-1",
-      "direct_effect": 0.1,
+      "direct_effect": 0.05,
       "direct_science": [
         "high-tech-science-pack",
         "military-science-pack"
@@ -52,7 +63,7 @@
       "mir_version": "5.0.01600",
       "published_archive_sha256": "00053C78EE854EB8AE0CB5318F7A41E3C81E62F29FEB6E6DCE317635743520DB",
       "direct": "recipe-prod-research_character_mining_speed-1",
-      "direct_effect": 0.1,
+      "direct_effect": 0.05,
       "direct_science": [
         "high-tech-science-pack",
         "military-science-pack"
@@ -67,10 +78,10 @@
       "mir_version": "5.0.01700",
       "published_archive_sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32",
       "direct": "recipe-prod-research_character_mining_speed-1",
-      "direct_effect": 0.1,
+      "direct_effect": 0.05,
       "direct_science": [
-        "military-science-pack",
-        "utility-science-pack"
+        "utility-science-pack",
+        "military-science-pack"
       ],
       "partial_progress": 0.42,
       "queue_api": true,
@@ -84,7 +95,7 @@
       "mir_version": "5.0.10000",
       "published_archive_sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0",
       "direct": "recipe-prod-research_character_mining_speed-1",
-      "direct_effect": 0.1,
+      "direct_effect": 0.05,
       "direct_science": [
         "military-science-pack",
         "utility-science-pack"
@@ -101,7 +112,7 @@
       "mir_version": "5.0.11000",
       "published_archive_sha256": "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91",
       "direct": "recipe-prod-research_character_mining_speed-1",
-      "direct_effect": 0.1,
+      "direct_effect": 0.05,
       "direct_science": [
         "military-science-pack",
         "utility-science-pack"

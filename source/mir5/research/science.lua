@@ -410,6 +410,98 @@ local function contains_one(ingredients, names)
   return false
 end
 
+-- Compatibility only inspects an ingredient's name.  The key deliberately
+-- omits amounts, because the cached result is a set of current-row positions;
+-- the result is rebuilt from the current row below.  Length prefixes make the
+-- dense authored sequences unambiguous without depending on a name delimiter.
+local function ordered_name_key(values, ingredient_rows)
+  local encoded = {}
+  for _, value in ipairs(values or {}) do
+    local name = ingredient_rows and value[1] or value
+    if type(name) ~= "string" then return nil end
+    encoded[#encoded + 1] = #name .. ":" .. name
+  end
+  return #encoded .. ";" .. table.concat(encoded)
+end
+
+local function lab_decision_key(ingredients, required, phase_any, policy)
+  local ingredient_key = ordered_name_key(ingredients, true)
+  local required_key = ordered_name_key(required, false)
+  local phase_key = ordered_name_key(phase_any, false)
+  if not ingredient_key or not required_key or not phase_key then return nil end
+  return policy .. "|" .. ingredient_key .. "|" .. required_key .. "|" .. phase_key
+end
+
+local function selected_indices(lab, ingredients)
+  local indices, selected = {}, {}
+  for index, row in ipairs(ingredients) do
+    if lab.accepted[row[1]] then
+      indices[#indices + 1] = index
+      selected[row[1]] = true
+    end
+  end
+  return indices, selected
+end
+
+local function selected_contains_all(selected, required)
+  for _, name in ipairs(required or {}) do if not selected[name] then return false end end
+  return true
+end
+
+local function selected_contains_one(selected, names)
+  if not names or #names == 0 then return true end
+  for _, name in ipairs(names) do if selected[name] then return true end end
+  return false
+end
+
+local function rebuild_selected_ingredients(ingredients, indices)
+  local out = {}
+  for _, index in ipairs(indices) do
+    local row = ingredients[index]
+    out[#out + 1] = {row[1], row[2]}
+  end
+  return out
+end
+
+-- A prepared context represents one fixed data-stage view.  Cache just the
+-- lab decision for a dense authored science vector in that view: either the
+-- whole vector is accepted, no lab can accept a valid reduction, or these
+-- current-vector indices are the canonical reduction.  It retains no caller
+-- ingredient tables and has no cross-context invalidation lifecycle.
+local function lab_decision(context, view, ingredients, required, phase_any, policy)
+  local key = lab_decision_key(ingredients, required, phase_any, policy)
+  local decisions = context.lab_decisions
+  if not decisions then decisions = {}; context.lab_decisions = decisions end
+  if key and decisions[key] then return decisions[key] end
+
+  local decision
+  if contains_all(ingredients, required) and contains_one(ingredients, phase_any) then
+    for _, lab in ipairs(view.labs) do
+      if accepts(lab, ingredients) then
+        decision = {kind = "full"}
+        break
+      end
+    end
+  end
+  if not decision and policy == "reduce" then
+    local best_indices, best_size
+    for _, lab in ipairs(view.labs) do
+      local indices, selected = selected_indices(lab, ingredients)
+      if #indices > 0 and selected_contains_all(selected, required)
+        and selected_contains_one(selected, phase_any)
+        and (not best_indices or #indices > best_size) then
+        -- Labs are collected in canonical name order.  Keeping the first
+        -- equally sized candidate preserves the historical tie-break.
+        best_indices, best_size = indices, #indices
+      end
+    end
+    if best_indices then decision = {kind = "reduced", indices = best_indices} end
+  end
+  decision = decision or {kind = "incompatible"}
+  if key then decisions[key] = decision end
+  return decision
+end
+
 local function policy_ingredients(source, binding, context, selected, view)
   local policy = option(context, "mir-science-pack-ingredient-policy", POLICY_DEFAULT)
   if not VALID_POLICIES[policy] then policy = POLICY_DEFAULT end
@@ -579,7 +671,7 @@ function M.prepare(environment)
   environment = environment or {}
   return {
     raw = environment.raw or {}, options = environment.options or {}, target = environment.target or {}, mods = environment.mods,
-    lab_visits = 0, mod_progression_unbound = {}, unbound_science_sources = {}
+    lab_visits = 0, lab_decisions = {}, mod_progression_unbound = {}, unbound_science_sources = {}
   }
 end
 
@@ -672,17 +764,10 @@ function M.apply(technology, binding, context)
     prerequisites = merge_prerequisites(prerequisites, gate.prerequisites)
   end
 
-  local compatible = false
-  for _, lab in ipairs(view.labs) do
-    if accepts(lab, ingredients) and contains_all(ingredients, required)
-      and contains_one(ingredients, phase_any) then
-      compatible = true
-      break
-    end
-  end
   local lab_policy = option(context, "mir-lab-incompatibility-policy", LAB_DEFAULT)
   if lab_policy ~= "skip" and lab_policy ~= "engine-default" then lab_policy = LAB_DEFAULT end
-  if compatible then
+  local decision = lab_decision(context, view, ingredients, required, phase_any, lab_policy)
+  if decision.kind == "full" then
     technology.unit.ingredients, technology.prerequisites = ingredients, prerequisites
     return {enabled = technology.enabled ~= false, reason = reported_policy(policy, context),
       ingredients = ingredients, prerequisites = prerequisites}
@@ -690,15 +775,8 @@ function M.apply(technology, binding, context)
   if lab_policy ~= "reduce" then
     return disable(technology, "lab-incompatible-" .. lab_policy, ingredients, prerequisites)
   end
-
-  local best
-  for _, lab in ipairs(view.labs) do
-    local candidate = {}
-    for _, row in ipairs(ingredients) do if lab.accepted[row[1]] then candidate[#candidate + 1] = {row[1], row[2]} end end
-    if #candidate > 0 and contains_all(candidate, required) and contains_one(candidate, phase_any)
-      and (not best or #candidate > #best) then best = candidate end
-  end
-  if not best then return disable(technology, "lab-incompatible-reduce", ingredients, prerequisites) end
+  if decision.kind ~= "reduced" then return disable(technology, "lab-incompatible-reduce", ingredients, prerequisites) end
+  local best = rebuild_selected_ingredients(ingredients, decision.indices)
   technology.unit.ingredients, technology.prerequisites = best, prerequisites
   return {enabled = technology.enabled ~= false, reason = "lab-reduced", ingredients = best, prerequisites = prerequisites}
 end

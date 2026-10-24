@@ -42,9 +42,9 @@ $beforeQpc=[Diagnostics.Stopwatch]::GetTimestamp()
 if(-not$process.Start()){throw '[mir-menu-launch-process]'}
 $afterQpc=[Diagnostics.Stopwatch]::GetTimestamp()
 $startUtc=$process.StartTime.ToUniversalTime()
-$result=$null;$failure='';$cleanup='not-started'
+$result=$null;$failure='';$cleanup='not-started';$observerDiagnostics=New-MIROwnedMenuObserverDiagnostics
 try{
-  $result=Wait-MIROwnedMenuResponse $process $startUtc $ocr $OutputRoot $beforeQpc -TimeoutSeconds ([int]$spec.timeout_seconds) -RequiredInitialisedLog ([string]$spec.engine_current_log)
+  $result=Wait-MIROwnedMenuResponse $process $startUtc $ocr $OutputRoot $beforeQpc -TimeoutSeconds ([int]$spec.timeout_seconds) -RequiredInitialisedLog ([string]$spec.engine_current_log) -Diagnostics $observerDiagnostics
 }catch{$failure=$_.Exception.Message;throw}
 finally{
   $endpointFinishedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
@@ -55,7 +55,7 @@ finally{
     }else{$cleanup='owned-process-already-exited'}
   }finally{
     $cleanupFinishedQpc=[Diagnostics.Stopwatch]::GetTimestamp()
-    $record=[ordered]@{kind='MIRDirectLibraryOwnedMenuObservationV1';status=$(if($failure){'failed'}else{'observed-response-awaiting-parent-selection-validation'});launch_spec_sha256=$LaunchSpecSha256;factorio_sha256=[string]$spec.factorio_sha256;process_id=$process.Id;process_start_utc=$startUtc.ToString('o');launch_before_qpc=$beforeQpc;launch_after_qpc=$afterQpc;clock_frequency=[Diagnostics.Stopwatch]::Frequency;process_start_bracket_seconds=($afterQpc-$beforeQpc)/[double][Diagnostics.Stopwatch]::Frequency;observation=$result;failure=$failure;cleanup=$cleanup;observation_finished_qpc=$endpointFinishedQpc;cleanup_finished_qpc=$cleanupFinishedQpc;shutdown_cleanup_seconds=($cleanupFinishedQpc-$endpointFinishedQpc)/[double][Diagnostics.Stopwatch]::Frequency;full_engine_cycle_seconds=($cleanupFinishedQpc-$beforeQpc)/[double][Diagnostics.Stopwatch]::Frequency;claims_library_selection_validation=$false;claims_final_acceptance=$false}
+    $record=[ordered]@{kind='MIRDirectLibraryOwnedMenuObservationV1';status=$(if($failure){'failed'}else{'observed-response-awaiting-parent-selection-validation'});launch_spec_sha256=$LaunchSpecSha256;factorio_sha256=[string]$spec.factorio_sha256;process_id=$process.Id;process_start_utc=$startUtc.ToString('o');launch_before_qpc=$beforeQpc;launch_after_qpc=$afterQpc;clock_frequency=[Diagnostics.Stopwatch]::Frequency;process_start_bracket_seconds=($afterQpc-$beforeQpc)/[double][Diagnostics.Stopwatch]::Frequency;observation=$result;observer_diagnostics=$observerDiagnostics;failure=$failure;cleanup=$cleanup;observation_finished_qpc=$endpointFinishedQpc;cleanup_finished_qpc=$cleanupFinishedQpc;shutdown_cleanup_seconds=($cleanupFinishedQpc-$endpointFinishedQpc)/[double][Diagnostics.Stopwatch]::Frequency;full_engine_cycle_seconds=($cleanupFinishedQpc-$beforeQpc)/[double][Diagnostics.Stopwatch]::Frequency;claims_library_selection_validation=$false;claims_final_acceptance=$false}
     $record|ConvertTo-Json -Depth 18|Set-Content -LiteralPath (Join-Path $OutputRoot 'actor-result.json') -Encoding UTF8
     $process.Dispose()
   }

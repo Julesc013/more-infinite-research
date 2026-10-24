@@ -388,20 +388,35 @@ class BobAngelMaterialTests(unittest.TestCase):
         self.assertEqual(2, min(2, useful_level_headroom(3)))
         self.assertEqual(40, min(40, useful_level_headroom(3)))
 
-    def test_gate_is_narrow_and_never_uses_bobtech_or_space_age(self):
+    def test_gate_admits_changed_versions_only_with_the_same_raw_contract(self):
         self.assertEqual(10, len(self.rows()))
         self.lua.execute("f210()")
         self.assertEqual(0, len(self.rows()))
         self.lua.execute("f200()")
 
-        for changed in ("base", "bobplates"):
+        baseline = _plain(self.rows())
+        for changed in ("base", "bobplates", "angelssmeltinggraphics"):
             mods = dict(self.facts["required_mods"])
             mods[changed] = "different"
-            self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, mods))))
+            self.assertEqual(baseline, _plain(self.rows(mods=_lua_value(self.lua, mods))))
+
+        changed = dict(self.facts["required_mods"])
+        changed["bobplates"] = "different"
+        drifted = self.raw_fixture()
+        drifted["recipe"]["angels-plate-gold"]["results"][1]["amount"] = 2
+        with self.assertRaisesRegex(Exception, "angels-plate-gold changed"):
+            self.rows(raw=drifted, mods=_lua_value(self.lua, changed))
         for forbidden in self.facts["forbidden_mods"]:
             mods = dict(self.facts["required_mods"])
             mods[forbidden] = "present"
-            self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, mods))))
+            with self.assertRaisesRegex(Exception, "unsupported F200 Bob/Angel saved-profile transition"):
+                self.rows(mods=_lua_value(self.lua, mods))
+
+        partial = dict(self.facts["required_mods"])
+        del partial["angelssmelting"]
+        self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, partial))))
+        unrelated = {**self.facts["required_mods"], "unrelated-observer": "0.1.0"}
+        self.assertEqual(10, len(self.rows(mods=_lua_value(self.lua, unrelated))))
 
     def test_named_preflight_rejects_drift_without_a_global_scan_or_write(self):
         poison = self.lua.eval(

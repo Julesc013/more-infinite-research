@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIR5RepairQueueNativeStressComparisonV1",
+  "runs": [
+    {
+      "run": 40049722069,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40049722069",
+      "manifest_members_verified": 66,
+      "manifest_sha256": "81CCDF844D5576E4D482B884DB98E9950F6471648FF8CEC8872205E6BB8DF672",
+      "cases": [
+        {
+          "path": "gameplay/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9f8dd8436b6e601c09b73f295b5050b8a21b01f4",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/repair-stress-native-40049722069-gameplay-mir5-native.json.gz",
+            "uncompressed_sha256": "E74FB9205493CAF2E6D8B75055A5EF48502C574247A81D07C34E50510A74309B"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "repair-stress",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "mode": "mir5-5.0.20000",
+              "total_eligible_walls": 1000,
+              "first_capacity_walls": 256,
+              "eligible_overflow_walls": 744,
+              "first_capacity_player_walls": 128,
+              "first_capacity_reciprocal_friend_walls": 128,
+              "quiet_ticks": 600,
+              "service_ticks": 60,
+              "repair_amount": 1,
+              "maximum_observed_repairs_per_service": 8,
+              "initial_first_repair_observed_tick": 601,
+              "initial_first_repair_service_tick": 600,
+              "reactivation_first_repair_observed_tick": 3121,
+              "reactivation_first_repair_service_tick": 3120,
+              "reactivation_count": 8,
+              "overflow_unchanged": true,
+              "nonfriendly_unchanged": true,
+              "nonwall_unchanged": true,
+              "native_damage_api": "LuaEntity.damage",
+              "native_damage_type": "electric",
+              "on_load_read_only": false,
+              "performance_qualified": false,
+              "runtime_elapsed_qualified": false,
+              "scope": "disposable-f200-passive-repair-queue-bound-only"
+            }
+          },
+          "player": {
+            "sha256": "D9B0265058B727B47B904E735DFE453F2E6C2589F8966CBD1106E92C81888253",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "9f8dd8436b6e601c09b73f295b5050b8a21b01f4",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/repair-stress-native-40049722069-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "756516C5DBD90597C7C4601BB23B7E451283D371A42E6A7A0C2BA9220CE3330B"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "repair-stress",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "mode": "published-4.7.20002",
+              "total_eligible_walls": 1000,
+              "first_capacity_walls": 256,
+              "eligible_overflow_walls": 744,
+              "first_capacity_player_walls": 128,
+              "first_capacity_reciprocal_friend_walls": 128,
+              "quiet_ticks": 600,
+              "service_ticks": 60,
+              "repair_amount": 1,
+              "maximum_observed_repairs_per_service": 8,
+              "initial_first_repair_observed_tick": 601,
+              "initial_first_repair_service_tick": 600,
+              "reactivation_first_repair_observed_tick": 3121,
+              "reactivation_first_repair_service_tick": 3120,
+              "reactivation_count": 8,
+              "overflow_unchanged": true,
+              "nonfriendly_unchanged": true,
+              "nonwall_unchanged": true,
+              "native_damage_api": "LuaEntity.damage",
+              "native_damage_type": "electric",
+              "on_load_read_only": false,
+              "performance_qualified": false,
+              "runtime_elapsed_qualified": false,
+              "scope": "disposable-f200-passive-repair-queue-bound-only"
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Exact F2002.0.77 Base published4.7.20002 and MIR5 fresh arms each damage1000 eligible native walls through LuaEntity.damage(1,enemy,electric). First256 split128player/128reciprocal friend heal;744 overflow walls remain damaged.",
+    "Both arms observe eight repairs per60tick service, first native service600 observed601, quiet600ticks, and one health per wall. Eight newly damaged drained entries reactivate at native service3120 observed3121.",
+    "Nonfriendly walls and nonwall sentinel remain unchanged. Both arms save and cold-reload twice with immutable completed saves. All66 artifact members are verified.",
+    "This establishes bounded native repair behavior, queue capacity and reactivation at the recorded source. It is not elapsed CPU/memory performance, multiplayer, feature removal, other scheduled-entity scaling or final-layout qualification."
+  ],
+  "release_qualification": false,
+  "control_source": "0ded92b74544090b4d82c1b262fbf939b2613790",
+  "observed_behavior_equal_except_version_label": true
+}

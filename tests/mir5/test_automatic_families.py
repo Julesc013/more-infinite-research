@@ -7,6 +7,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import verified_public_rows
+
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTS_PATH = ROOT / "tests/mir5/fixtures/automatic-families-f200-captured-facts.json"
@@ -28,6 +30,15 @@ def _lua_value(lua, value):
             result[index] = _lua_value(lua, nested)
         return result
     return value
+
+
+def _plain(value):
+    if not hasattr(value, "items"):
+        return value
+    values = dict(value.items())
+    if values and set(values) == set(range(1, len(values) + 1)):
+        return [_plain(values[index]) for index in range(1, len(values) + 1)]
+    return {key: _plain(nested) for key, nested in values.items()}
 
 
 def _load_generator_harness():
@@ -207,7 +218,6 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
           settings, helpers, log = {startup=startup}, nil, function() end
           assert(dofile(data_final_path) == nil)
           assert(data.writes == 1)
-          assert(#data.emitted == automatic_facts.published_raw.generated_technology_count)
           local emitted = {}
           for _, row in ipairs(data.emitted) do emitted[row.name] = true end
           for _, name in ipairs(automatic_facts.published_raw.absent_generated_ids) do
@@ -218,6 +228,15 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
               "Base route acquired a productivity permission: " .. route.recipe)
           end
         ''')
+        emitted = {
+            row["name"]: _plain(row)
+            for row in lua.globals().data.emitted.values()
+        }
+        public = verified_public_rows(
+            emitted,
+            {str(name) for name in lua.globals().data.raw.recipe.keys()},
+        )
+        self.assertEqual(len(public), self.facts["published_raw"]["generated_technology_count"])
 
 
 if __name__ == "__main__":

@@ -99,13 +99,24 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_k2_base_native_fixture.py",
             "tests/mir5/test_bob_angel_materials.py",
             "tests/mir5/test_bob_angel_catalogue.py",
+            "tests/mir5/test_bob_tech_materials.py",
+            "tests/mir5/test_armor_py_catalogue.py",
+            "tests/mir5/test_native_modded_continuations.py",
             "tests/mir5/test_bob_angel_native_fixture.py",
             "tests/mir5/test_bob_angel_prototype_caps.py",
             "tests/mir5/test_atan_productivity.py",
+            "tests/mir5/test_atan_gameplay_fixture.py",
+            "tests/mir5/test_full_catalogue_upgrade_fixture.py",
+            "tests/mir5/test_fixed_provider_removal_control_fixture.py",
             "tests/mir5/test_automatic_families.py",
             "tests/mir5/test_competing_productivity.py",
+            "tests/mir5/test_native_credit_definitions.py",
+            "tests/mir5/test_native_credits.py",
+            "tests/mir5/test_legacy_preference_transition_fixture.py",
             "tests/mir5/test_competing_epr_native_fixture.py",
             "tests/mir5/test_competing_fixed_reference.py",
+            "tests/mir5/test_competing_fixed_native_fixture.py",
+            "tests/mir5/test_competing_dynamic_native_fixture.py",
             "tests/mir5/test_science.py",
             "tests/mir5/test_cryogenic_native_fixture.py",
             "tests/mir5/test_material_catalogue.py",
@@ -120,6 +131,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_f200_legacy_cap_fixture.py",
             "tests/mir5/test_f200_legacy_worker_fixture.py",
             "tests/mir5/test_k2_imersite_migration.py",
+            "tests/mir5/test_k2_imersite_transition_fixture.py",
             "tests/mir5/test_api.py",
             "tests/mir5/test_runtime_api.py",
             "tests/mir5/test_sdk.py",
@@ -135,9 +147,12 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_bootstrap.py",
             "tests/mir5/test_library.py",
             "tests/mir5/test_library_multiplayer_fixture.py",
+            "tests/mir5/test_scripted_effects_multiplayer_fixture.py",
+            "tests/mir5/test_scripted_effects_toggle_fixture.py",
             "tests/mir5/test_library_model.py",
             "tests/mir5/test_library_translations.py",
             "tests/mir5/test_passive_repair.py",
+            "tests/mir5/test_repair_stress_fixture.py",
             "tests/mir5/test_agriculture.py",
             "tests/mir5/test_spoilage.py",
             "tests/mir5/test_scripted_effects_lifecycle.py",
@@ -146,6 +161,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_properties.py",
             "tests/mir5/test_replay.py",
             "tests/mir5/test_package.py",
+            "tests/mir5/test_release.py",
             "tests/mir5/test_compose_replay.py",
             "tests/mir5/test_compare_captures.py",
             "tests/mir5/test_recover_modern_catalogue.py",
@@ -154,7 +170,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 64)
+        self.assertEqual(len(paths), 80)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
@@ -173,8 +189,8 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:56]))
-        self.assertTrue(all(not row["lua"] for row in controls[56:]))
+        self.assertTrue(all(row["lua"] for row in controls[:71]))
+        self.assertTrue(all(not row["lua"] for row in controls[71:]))
 
     def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
         result = selections()

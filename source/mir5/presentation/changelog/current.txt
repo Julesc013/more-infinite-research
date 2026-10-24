@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------------------------------
+Version: @DISTRIBUTION_VERSION@
+  Changes:
+    - Construct authored research with a deterministic Generator and explicit compatibility bindings.
+    - Keep native effects separate from scripted agriculture, spoilage, passive repair and the Research Library.
+    - Provide the MIR API for immediate data-stage publication and read-only native research queries.
+  Bugfixes:
+    - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
+    - Preserve named native continuations and owned research state through the supported migration paths.
+

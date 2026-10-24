@@ -1,6 +1,6 @@
 """Compose an offline MIR 4.7 diagnostic replay archive without product imports.
 
-The composer starts from the exact published 4.7.21000 archive and replaces
+The composer starts from an explicitly selected exact published MIR 4.7 archive and replaces
 only the six Factorio data/settings entrypoints with files already rendered and
 hash-recorded by ``tools/mir5/replay.py``.  It writes a private diagnostic
 artifact and receipt; it neither executes Factorio nor creates a release
@@ -28,6 +28,7 @@ PUBLISHED_ARCHIVE_NAME = "more-infinite-research_4.7.21000.zip"
 ARCHIVE_ROOT = "more-infinite-research_4.7.21000"
 MOD_NAME = "more-infinite-research"
 MOD_VERSION = "4.7.21000"
+PUBLISHED_VERSIONS = tuple(f"4.7.{family}{patch:02d}" for family in (200, 210) for patch in range(3))
 STAGE_ENTRYPOINTS = (
     "data.lua",
     "data-updates.lua",
@@ -111,7 +112,7 @@ def _verify_recorded_file(root: Path, name: str, record: dict[str, Any], label: 
     return {"path": name, "sha256": digest, "bytes": size}
 
 
-def _validate_replay_root(replay_root: Path) -> dict[str, Any]:
+def _validate_replay_root(replay_root: Path, version: str = MOD_VERSION) -> dict[str, Any]:
     root = replay_root.resolve()
     if not root.is_dir():
         raise ComposeReplayError(f"replay output root is absent: {root}")
@@ -138,7 +139,7 @@ def _validate_replay_root(replay_root: Path) -> dict[str, Any]:
     published_mir = receipt.get("published_mir")
     if not isinstance(published_mir, dict):
         raise ComposeReplayError("replay comparison receipt lacks published MIR custody")
-    if published_mir.get("name") != MOD_NAME or published_mir.get("version") != MOD_VERSION:
+    if published_mir.get("name") != MOD_NAME or published_mir.get("version") != version:
         raise ComposeReplayError("replay comparison receipt has an unexpected published MIR identity")
     published_mir_sha256 = _normalise_sha256(
         published_mir.get("sha256"), "replay comparison receipt published MIR SHA-256")
@@ -184,10 +185,12 @@ def _is_symlink(info: zipfile.ZipInfo) -> bool:
     return info.create_system == 3 and ((info.external_attr >> 16) & 0o170000) == 0o120000
 
 
-def _validate_archive(archive_path: Path, expected_sha256: str) -> tuple[zipfile.ZipFile, list[zipfile.ZipInfo], dict[str, zipfile.ZipInfo]]:
+def _validate_archive(archive_path: Path, expected_sha256: str, version: str = MOD_VERSION) -> tuple[zipfile.ZipFile, list[zipfile.ZipInfo], dict[str, zipfile.ZipInfo]]:
+    archive_root = f"{MOD_NAME}_{version}"
+    filename = archive_root + ".zip"
     source = archive_path.resolve()
-    if source.name != PUBLISHED_ARCHIVE_NAME:
-        raise ComposeReplayError(f"published archive must use canonical filename: {PUBLISHED_ARCHIVE_NAME}")
+    if source.name != filename:
+        raise ComposeReplayError(f"published archive must use canonical filename: {filename}")
     if not source.is_file() or source.is_symlink():
         raise ComposeReplayError(f"published archive is absent or not a regular file: {source}")
     expected = _normalise_sha256(expected_sha256, "expected published archive SHA-256")
@@ -209,8 +212,8 @@ def _validate_archive(archive_path: Path, expected_sha256: str) -> tuple[zipfile
             parts = _member_parts(info.filename)
             if info.is_dir() or _is_symlink(info) or info.flag_bits & 0x1:
                 raise ComposeReplayError(f"published archive has an unsafe member: {info.filename}")
-            if parts[0] != ARCHIVE_ROOT:
-                raise ComposeReplayError(f"published archive root does not match {ARCHIVE_ROOT}: {info.filename}")
+            if parts[0] != archive_root:
+                raise ComposeReplayError(f"published archive root does not match {archive_root}: {info.filename}")
             if info.filename in by_name or info.filename.casefold() in casefolded:
                 raise ComposeReplayError(f"published archive duplicates member: {info.filename}")
             for index in range(1, len(parts)):
@@ -219,7 +222,7 @@ def _validate_archive(archive_path: Path, expected_sha256: str) -> tuple[zipfile
             paths.add(parts)
             by_name[info.filename] = info
             casefolded.add(info.filename.casefold())
-        info_member = by_name.get(f"{ARCHIVE_ROOT}/info.json")
+        info_member = by_name.get(f"{archive_root}/info.json")
         if info_member is None:
             raise ComposeReplayError("published archive lacks info.json")
         try:
@@ -227,7 +230,9 @@ def _validate_archive(archive_path: Path, expected_sha256: str) -> tuple[zipfile
                 info_json = json.load(io.TextIOWrapper(raw, encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, zipfile.BadZipFile) as error:
             raise ComposeReplayError("published archive info.json is not valid UTF-8 JSON") from error
-        if not isinstance(info_json, dict) or info_json.get("name") != MOD_NAME or info_json.get("version") != MOD_VERSION:
+        family = "2.0" if version.startswith("4.7.200") else "2.1"
+        if (not isinstance(info_json, dict) or info_json.get("name") != MOD_NAME
+                or info_json.get("version") != version or info_json.get("factorio_version") != family):
             raise ComposeReplayError("published archive info.json does not retain the expected MIR 4.7 identity")
         return archive, infos, by_name
     except Exception:
@@ -249,8 +254,8 @@ def _copy_info(info: zipfile.ZipInfo) -> zipfile.ZipInfo:
     return copied
 
 
-def _new_stage_info(relative: str) -> zipfile.ZipInfo:
-    created = zipfile.ZipInfo(f"{ARCHIVE_ROOT}/{relative}", date_time=(1980, 1, 1, 0, 0, 0))
+def _new_stage_info(relative: str, archive_root: str = ARCHIVE_ROOT) -> zipfile.ZipInfo:
+    created = zipfile.ZipInfo(f"{archive_root}/{relative}", date_time=(1980, 1, 1, 0, 0, 0))
     created.compress_type = zipfile.ZIP_DEFLATED
     return created
 
@@ -290,12 +295,17 @@ def _safe_output_root(output_root: Path) -> Path:
     return output
 
 
-def compose_replay(published_archive: Path, expected_sha256: str, replay_root: Path, output_root: Path) -> dict[str, Any]:
+def compose_replay(published_archive: Path, expected_sha256: str, replay_root: Path, output_root: Path,
+                   published_version: str = MOD_VERSION) -> dict[str, Any]:
     """Compose a private diagnostic ZIP and return its external custody receipt."""
+    if published_version not in PUBLISHED_VERSIONS:
+        raise ComposeReplayError("unsupported published diagnostic distribution")
+    archive_root = f"{MOD_NAME}_{published_version}"
+    filename = archive_root + ".zip"
     expected_archive_sha256 = _normalise_sha256(expected_sha256, "expected published archive SHA-256")
-    replay = _validate_replay_root(replay_root)
+    replay = _validate_replay_root(replay_root, published_version)
     output = _safe_output_root(output_root)
-    archive, infos, by_name = _validate_archive(published_archive, expected_archive_sha256)
+    archive, infos, by_name = _validate_archive(published_archive, expected_archive_sha256, published_version)
     if replay["published_mir"]["sha256"] != expected_archive_sha256:
         archive.close()
         raise ComposeReplayError(
@@ -303,13 +313,13 @@ def compose_replay(published_archive: Path, expected_sha256: str, replay_root: P
     source_path = published_archive.resolve()
     try:
         output.mkdir()
-        archive_output = output / PUBLISHED_ARCHIVE_NAME
+        archive_output = output / filename
         changed_members: list[dict[str, Any]] = []
         unchanged_members: list[dict[str, Any]] = []
         with zipfile.ZipFile(archive_output, "x") as destination:
             for info in infos:
                 member = info.filename
-                relative = member[len(ARCHIVE_ROOT) + 1:]
+                relative = member[len(archive_root) + 1:]
                 if relative in replay["stages"]:
                     prior_digest, prior_size = _hash_member(archive, info)
                     stage_path = replay["root"] / relative
@@ -331,12 +341,12 @@ def compose_replay(published_archive: Path, expected_sha256: str, replay_root: P
                         digest, size = _write_member(destination, info, source)
                     unchanged_members.append({"path": member, "sha256": digest, "bytes": size})
             for relative in STAGE_ENTRYPOINTS:
-                member = f"{ARCHIVE_ROOT}/{relative}"
+                member = f"{archive_root}/{relative}"
                 if member in by_name:
                     continue
                 stage_path = replay["root"] / relative
                 with stage_path.open("rb") as replacement:
-                    digest, size = _write_member(destination, _new_stage_info(relative), replacement)
+                    digest, size = _write_member(destination, _new_stage_info(relative, archive_root), replacement)
                 recorded = replay["stages"][relative]
                 if digest != recorded["sha256"] or size != recorded["bytes"]:
                     raise ComposeReplayError(f"generated stage changed while being composed: {relative}")
@@ -364,15 +374,15 @@ def compose_replay(published_archive: Path, expected_sha256: str, replay_root: P
                 "path": str(source_path),
                 "sha256": source_digest,
                 "bytes": source_size,
-                "root": ARCHIVE_ROOT,
+                "root": archive_root,
                 "name": MOD_NAME,
-                "version": MOD_VERSION,
+                "version": published_version,
             },
             "replay": {
                 "comparison_receipt": replay["comparison_receipt"],
                 "hash_inventory": replay["hash_inventory"],
             },
-            "output_archive": {"path": PUBLISHED_ARCHIVE_NAME, "sha256": output_digest, "bytes": output_size},
+            "output_archive": {"path": filename, "sha256": output_digest, "bytes": output_size},
             "changed_members": sorted(changed_members, key=lambda row: row["path"].encode("utf-8")),
             "unchanged_members": sorted(unchanged_members, key=lambda row: row["path"].encode("utf-8")),
         }
@@ -389,11 +399,13 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--published-archive", type=Path, required=True)
     parser.add_argument("--expected-sha256", required=True)
+    parser.add_argument("--published-version", choices=PUBLISHED_VERSIONS, default=MOD_VERSION)
     parser.add_argument("--replay-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
     args = parser.parse_args(argv)
     try:
-        receipt = compose_replay(args.published_archive, args.expected_sha256, args.replay_root, args.output_root)
+        receipt = compose_replay(args.published_archive, args.expected_sha256, args.replay_root,
+                                 args.output_root, args.published_version)
     except ComposeReplayError as error:
         print(f"[mir5-compose-replay] {error}", file=sys.stderr)
         return 2

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "kind": "mir5-native-credit-mechanism-control",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "archive_sha256": {},
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-native-credit-control",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "scope": "Private F200 Space Age native mechanism control: one real MIR breeding lab completion, two fixture-owned hidden disabled carriers, effect-reset consistency, save, and two cold-reload markers. It is not a MIR migration or save-continuity verdict."
+}

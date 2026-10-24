@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # Documentation index
 
-Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 468 pages as of 2026-10-23.
+Generated from Markdown front matter plus the immutable versioned-release-note custody sidecar for 468 pages as of 2026-10-24.
 
 | Path | Title | Status | Audience | Type | Owner | Reviewed |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -219,14 +219,14 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/mir5/cutover.md | Staging, adoption and mechanical cutover | draft | developer | how-to | mir-maintainers | 2026-10-22 |
 | docs/mir5/decisions.md | Source reconciliation for this proposal | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/design.md | Synthesized design and decisions | draft | developer | explanation | mir-maintainers | 2026-10-22 |
-| docs/mir5/development.md | Development guide | draft | developer | how-to | mir-maintainers | 2026-10-22 |
+| docs/mir5/development.md | Development guide | draft | developer | how-to | mir-maintainers | 2026-10-24 |
 | docs/mir5/diagrams/README.md | Diagram sources and rendered atlas | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/first-batch.md | First implementation batch — bounded assignment | draft | developer | how-to | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/blueprint.md | High-level implementation pseudocode | draft | developer | explanation | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/opposing-tests.md | Proposed opposing tests for the implementation draft | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/README.md | Implementation draft: reading order and boundaries | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/review.md | Implementation review: close decisions, do not expand architecture | draft | developer | explanation | mir-maintainers | 2026-10-22 |
-| docs/mir5/progress.md | MIR 5 release progress and continuation | current | maintainer | reference | mir-maintainers | 2026-10-23 |
+| docs/mir5/progress.md | MIR 5 release progress and continuation | current | maintainer | reference | mir-maintainers | 2026-10-24 |
 | docs/mir5/README.md | MIR documentation | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/support.md | Support and upgrade boundaries | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |

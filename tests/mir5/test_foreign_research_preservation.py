@@ -5,6 +5,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import verified_public_rows
+
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/foreign-research-preservation"
@@ -329,12 +331,22 @@ class ForeignResearchPreservationTests(unittest.TestCase):
           end})
           local original_effects, original_unit = foreign.effects,foreign.unit
           settings,mods,data,helpers,log={startup=defaults()},{},environment,nil,function() end
-          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 53)
+          assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 73)
+          foreign_output, foreign_recipes = environment.emitted, environment.raw.recipe
           assert(environment.raw.technology[foreign.name] == foreign)
           assert(foreign.effects == original_effects and foreign.effects[1] == foreign_effect
             and foreign_effect.modifier == .061 and foreign.unit == original_unit)
           assert(foreign.max_level == 61 and foreign.prerequisites[1] == "foreign-unfamiliar-frontier")
         ''')
+        actual = {
+            row["name"]: test_generator.plain_lua(row)
+            for row in host.lua.globals().foreign_output.values()
+        }
+        public = verified_public_rows(
+            actual,
+            {str(name) for name in host.lua.globals().foreign_recipes.keys()},
+        )
+        self.assertEqual(len(public), 53)
 
 
 if __name__ == "__main__":

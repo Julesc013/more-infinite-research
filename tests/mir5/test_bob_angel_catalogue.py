@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/mir5"))
 import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
+from native_credit_oracle import verified_public_rows
 
 
 def sha256(path):
@@ -80,9 +81,12 @@ class BobAngelCatalogueTests(unittest.TestCase):
         emitted = _plain(lua.globals().emitted)
         expected = deepcopy(self.expected_data)
         self.assertEqual(len(expected["technology"]), 67)
-        self.assertEqual(set(emitted["technology"]), set(expected["technology"]))
+        public = verified_public_rows(
+            emitted["technology"], self.inputs["raw"]["recipe"].keys()
+        )
+        self.assertEqual(set(public), set(expected["technology"]))
         for name, row in expected["technology"].items():
-            found = emitted["technology"][name]
+            found = public[name]
             self.assertTrue(catalogue._same(row, found), f"{name}: {catalogue._changed_paths(row, found)}")
         # Neither the ordinary adapter nor material emission may mutate the
         # source recipe/technology/item/lab tables used for this construction.

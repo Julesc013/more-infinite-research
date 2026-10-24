@@ -1,0 +1,296 @@
+{
+  "schema": 1,
+  "kind": "MIR5HistoricalPublishedUpgradeChainsV1",
+  "runs": [
+    {
+      "run": 40029636557,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40029636557",
+      "manifest_members_verified": 141,
+      "manifest_sha256": "66A81E751CECAC29B63303B645021BF24E194903AB9BA68A3AFE90B25AEDC4FC",
+      "cases": [
+        {
+          "path": "historical/f017/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "6ea1a3d0858cf6800f7e1f60f3806464394ba332",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40029636557-historical-f017-mir5-native.json.gz",
+            "uncompressed_sha256": "5015EA1B26B7E3F43672E6E20AC33E8AB2BF9C3B9B0AEB4A31C2D4F707E5B1D3"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f017",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "braking-force-1",
+            "research_progress": 0,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\0.17\\more-infinite-research_5.0.01700.zip",
+            "sha256": "6B815B5A374C5A5303177620302DA3FD98622918FD3CC5B2029262A56B5B3428"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+            "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+            "file_version": "0.17.79.47865",
+            "product_version": "0.17.79",
+            "base_version": "0.17.79"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f017/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "6ea1a3d0858cf6800f7e1f60f3806464394ba332",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40029636557-historical-f017-published-native.json.gz",
+            "uncompressed_sha256": "4B0374B78A3C288B538F169E6709D6F1D65BFEFFF7C1B1D79C520E62B5A5C7CF"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f017",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\0.17\\more-infinite-research_4.7.01702.zip",
+            "sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\0.17\\bin\\x64\\factorio.exe",
+            "sha256": "E699D376D100A428B95243507FDBB39C372921577C6D7593203EDF07CAA12D06",
+            "file_version": "0.17.79.47865",
+            "product_version": "0.17.79",
+            "base_version": "0.17.79"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": 40030381790,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40030381790",
+      "manifest_members_verified": 536,
+      "manifest_sha256": "B1D5CFD5F380D372DDE7F84B3AEE7496414EAACB3E89853AD8F383B2A67E3DB1",
+      "cases": [
+        {
+          "path": "historical/f013/published/result.json",
+          "status": "failed",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f013-published-native.json.gz",
+            "uncompressed_sha256": "92CBC51B7419E961BC7789D5CE02F2DFCDB711AF42FD92B97255559452A5F5A5"
+          },
+          "failure": "Conversion from JSON failed with error: Unexpected character encountered while parsing value: n. Path 'research_queue_enabled', line 1, position 353."
+        },
+        {
+          "path": "historical/f014/published/result.json",
+          "status": "failed",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f014-published-native.json.gz",
+            "uncompressed_sha256": "89C5AF9D987EEE1A0C8266992A54079FDF282250F30DF57DBDEDE6EAACACDAE1"
+          },
+          "failure": "Conversion from JSON failed with error: Unexpected character encountered while parsing value: n. Path 'research_queue_enabled', line 1, position 353."
+        },
+        {
+          "path": "historical/f015/published/result.json",
+          "status": "failed",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f015-published-native.json.gz",
+            "uncompressed_sha256": "A39A6A5B44FE3A4FEED185C1AA8C1F9103879B128BB3DF4988DF83CAA11906D9"
+          },
+          "failure": "Conversion from JSON failed with error: Unexpected character encountered while parsing value: n. Path 'research_queue_enabled', line 1, position 398."
+        },
+        {
+          "path": "historical/f016/published/result.json",
+          "status": "failed",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f016-published-native.json.gz",
+            "uncompressed_sha256": "37A5060B586695384748FC044D31C2BD896ED534EEF1C11892D3D9F0349744C5"
+          },
+          "failure": "Conversion from JSON failed with error: Unexpected character encountered while parsing value: n. Path 'research_queue_enabled', line 1, position 398."
+        },
+        {
+          "path": "historical/f100/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f100-mir5-native.json.gz",
+            "uncompressed_sha256": "9BEA90BAE3BF32BA25CB23AC491D503B827690DD6E6293B6BF737D52E62B9DDC"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f100",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "braking-force-1",
+            "research_progress": 0,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "7CA776B6EE6991D4F0E098CDD518472F196C7BDFB21E954A8B1F3E1DBAC30343",
+            "path": "D:\\Projects\\Factorio\\testmods\\1.0\\more-infinite-research_5.0.10000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+            "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+            "file_version": "1.0.0.54889",
+            "product_version": "1.0.0",
+            "base_version": "1.0.0"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f100/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f100-published-native.json.gz",
+            "uncompressed_sha256": "988FAE3B044A4D40ECC008908FC8F43E48F6CAE193F27485E41BB16AAA6F2006"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f100",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0",
+            "path": "D:\\Projects\\Factorio\\testmods\\1.0\\more-infinite-research_4.7.10002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.0\\bin\\x64\\factorio.exe",
+            "sha256": "99F1CE207A04296EF7D797E4A98AA98DDE4F02EE653C9DF736AC33A676FD4F70",
+            "file_version": "1.0.0.54889",
+            "product_version": "1.0.0",
+            "base_version": "1.0.0"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f110/mir5/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f110-mir5-native.json.gz",
+            "uncompressed_sha256": "A7D16259BDD8E9145B18C410F47C7B5C19B61DC27D63BE8B08F7E233FA3BD2BD"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "mir5",
+            "status": "passed",
+            "target": "f110",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 1,
+            "mining_bonus": 0.1,
+            "current_research": "braking-force-1",
+            "research_progress": 0,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "F0B6B3D638497D849DC7A0A5AED23E817573764A7748CE012F4A3ED73CC6E59F",
+            "path": "D:\\Projects\\Factorio\\testmods\\1.1\\more-infinite-research_5.0.11000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+            "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+            "file_version": "1.1.110.62357",
+            "product_version": "1.1.110",
+            "base_version": "1.1.110"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "historical/f110/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "ca6bc703e48cde157a8775f9fde59984a8400ddf",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/historical-transition-017-100-110-40030381790-historical-f110-published-native.json.gz",
+            "uncompressed_sha256": "371FCA7A8DABB71524AC4B4D9A566F0848AFE128208B57A1735C16F6F1361472"
+          },
+          "initial": {
+            "case": "historical-transition",
+            "stage": "initial",
+            "transition_stage": "published",
+            "status": "passed",
+            "target": "f110",
+            "direct": "recipe-prod-research_character_mining_speed-1",
+            "source_direct_lab_completions": 1,
+            "successor_direct_lab_completions": 0,
+            "mining_bonus": 0.05,
+            "current_research": "recipe-prod-research_character_mining_speed-1",
+            "research_progress": 0.42,
+            "queue_api": true,
+            "research_queue_enabled": true,
+            "two_cold_reload_witness": false,
+            "on_load_read_only": false
+          },
+          "player": {
+            "sha256": "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91",
+            "path": "D:\\Projects\\Factorio\\testmods\\1.1\\more-infinite-research_4.7.11002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\1.1\\bin\\x64\\factorio.exe",
+            "sha256": "B7B4B834FCA2E32AFA9D3476EB42CC09B02F1205BE97F688DC6FC6ACE7BA8FE1",
+            "file_version": "1.1.110.62357",
+            "product_version": "1.1.110",
+            "base_version": "1.1.110"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "F017/1.0/1.1 exact engines: actual published4.7.2 mining lab completion, earned0.05 bonus and queued42% work survive migration; MIR5 completes the next lab for0.10 bonus. Both stages save and cold-reload twice.",
+    "The same six-target run stops F013-F016 at JSON logger parsing before successor qualification. Those failed receipts remain preserved; literal nil is not valid JSON and was corrected to null only for absent queue APIs.",
+    "These are bounded disposable migration scenarios, not final package or complete historical catalogue/save acceptance."
+  ],
+  "release_qualification": false
+}

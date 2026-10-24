@@ -435,7 +435,14 @@ try{
     New-MIRDirectLibraryStartupConfig -Path $config -EngineDataDirectory $engineData -WriteDataDirectory $writeData
   }
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
-  $activation=Start-MIRLibraryActivation -LibraryDirectory $library -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $hashes -SettingsMode Defaults
+  $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
+  # Only the predecessor-to-successor transition on engines that parse
+  # disabled archive names needs the durable owned-version selection. Fresh
+  # historical runs retain their external direct-library path unchanged.
+  if($historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
+    $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
+  }
+  $activation=Start-MIRLibraryActivation @activationArguments
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   if($null -ne $activeModsObserverBinding){
     $actualObserver=@($activation.selected | Where-Object {[string]$_.name -ceq $activeModsObserverBinding.name})

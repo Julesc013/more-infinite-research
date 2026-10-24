@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "kind": "MIR5PublishedTargetPresentationRecoveryV1",
+  "published_source": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
+  "release_tag": "v4.7.2",
+  "sums_sha256": "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9",
+  "records": [
+    {
+      "target": "f210",
+      "published_archive": "more-infinite-research_4.7.21002.zip",
+      "archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+      "member": "more-infinite-research_4.7.21002/changelog.txt",
+      "history_sha256": "131F4241B428A81B4C4C8A15A8FAFBA547C5CE7F64CDE5BF943B73A586BBCC16",
+      "bytes": 91356,
+      "source": "source/mir5/presentation/changelog/f210.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04",
+      "LICENSE": {
+        "sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04",
+        "bytes": 16726
+      },
+      "thumbnail.png": {
+        "sha256": "65FDEC0B0B30967B0EDBC3B340D87B01D6A2E6D971A731734673023C02331FAB",
+        "bytes": 90975
+      }
+    },
+    {
+      "target": "f200",
+      "published_archive": "more-infinite-research_4.7.20002.zip",
+      "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "member": "more-infinite-research_4.7.20002/changelog.txt",
+      "history_sha256": "02F779A0962243CAC8FDBF780432F6F07E548924FE53AC14CC777877302A35E8",
+      "bytes": 89671,
+      "source": "source/mir5/presentation/changelog/f200.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f110",
+      "published_archive": "more-infinite-research_4.7.11002.zip",
+      "archive_sha256": "723159A24668E28EE70214CCCC727D5B104CAA0A9A7A7FD73B4938D55E5F3E91",
+      "member": "more-infinite-research_4.7.11002/changelog.txt",
+      "history_sha256": "F9CC22A3E387E7AF91CFE91A9853A0F8742E0FEED598D9B117089CBDADF51416",
+      "bytes": 58773,
+      "source": "source/mir5/presentation/changelog/f110.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f100",
+      "published_archive": "more-infinite-research_4.7.10002.zip",
+      "archive_sha256": "87A80EB76B30A73BC8F16A8F4B92AA59BA3CC400FF5921819CB5E9CEFAB745E0",
+      "member": "more-infinite-research_4.7.10002/changelog.txt",
+      "history_sha256": "87A719718580582EF027638ED1319F4BF76DE58EDCA9E613E5DA02164505AA26",
+      "bytes": 58783,
+      "source": "source/mir5/presentation/changelog/f100.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f017",
+      "published_archive": "more-infinite-research_4.7.01702.zip",
+      "archive_sha256": "3FB8750565526816C1C33B3ADD6B82165B5AA6D026D47CD242251455FE5CFE32",
+      "member": "more-infinite-research_4.7.01702/changelog.txt",
+      "history_sha256": "755494A237193ECFFB239ABEABF8E7EA12316B4AD97C84879F24D5B60BD991CE",
+      "bytes": 6719,
+      "source": "source/mir5/presentation/changelog/f017.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f016",
+      "published_archive": "more-infinite-research_4.7.01602.zip",
+      "archive_sha256": "00053C78EE854EB8AE0CB5318F7A41E3C81E62F29FEB6E6DCE317635743520DB",
+      "member": "more-infinite-research_4.7.01602/changelog.txt",
+      "history_sha256": "E3BDB6CFC431482AB2C97DA4F144263257F835E66D5AA7C5AA46A1235111F73F",
+      "bytes": 7069,
+      "source": "source/mir5/presentation/changelog/f016.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f015",
+      "published_archive": "more-infinite-research_4.7.01502.zip",
+      "archive_sha256": "758AA85BF41A10188DEA914AC456F672BAC7D3430E646CBDB6D761BE5ECC7B8A",
+      "member": "more-infinite-research_4.7.01502/changelog.txt",
+      "history_sha256": "D4AA51AE80F5FD0A022DA42C3B01A6864358641B0FD24A7446A8F5246D390AF5",
+      "bytes": 7078,
+      "source": "source/mir5/presentation/changelog/f015.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f014",
+      "published_archive": "more-infinite-research_4.7.01402.zip",
+      "archive_sha256": "D34B6281A3815CD52AD91CABD1E1669650F2A2A761D9109DEDC07268D78D2CDE",
+      "member": "more-infinite-research_4.7.01402/changelog.txt",
+      "history_sha256": "EECFCD3ED85B431165F8F5C65368EE5DBA42B694D99BDAF49F6EE1A99687BA75",
+      "bytes": 7187,
+      "source": "source/mir5/presentation/changelog/f014.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    },
+    {
+      "target": "f013",
+      "published_archive": "more-infinite-research_4.7.01302.zip",
+      "archive_sha256": "69D02F628F1278B5D161B61E39DB4E3D1A5978E31D01638E2AE23E28594637C8",
+      "member": "more-infinite-research_4.7.01302/changelog.txt",
+      "history_sha256": "EB0579180CBBAC0D5F683CA63633EC3A56288C4833DFED9410B26091EF0ABD83",
+      "bytes": 7187,
+      "source": "source/mir5/presentation/changelog/f013.txt",
+      "license_sha256": "3F3D9E0024B1921B067D6F7F88DEB4A60CBE7A78E76C64E3F1D7FC3B779B9D04"
+    }
+  ],
+  "scope": "Byte-identical published target history, license and thumbnail transfer only; not gameplay or release qualification."
+}

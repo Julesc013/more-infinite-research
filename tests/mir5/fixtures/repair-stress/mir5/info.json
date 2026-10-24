@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-repair-stress",
+  "version": "0.2.0",
+  "title": "MIR 5 passive-repair stress fixture",
+  "author": "MIR maintainers",
+  "description": "Private F200 native passive-repair queue-bound fixture.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 5.0.20000"
+  ]
+}

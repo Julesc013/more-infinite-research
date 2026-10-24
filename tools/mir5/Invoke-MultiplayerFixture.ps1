@@ -7,6 +7,7 @@ param(
   [Parameter(Mandatory)][string[]]$FixtureSources,
   [Parameter(Mandatory)][ValidatePattern('^[A-Fa-f0-9]{64}$')][string]$ExpectedMIRArchiveSha256,
   [Parameter(Mandatory)][string]$OutputRoot,
+  [ValidateSet('library-multiplayer','scripted-effects-multiplayer')][string]$FixtureCase='library-multiplayer',
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -26,14 +27,14 @@ Assert-Session ($selection.target -ceq 'f200' -and $selection.engine.version -ce
 Assert-Session ((Get-FileHash -LiteralPath $engine).Hash -ceq $selection.engine.sha256) 'engine hash differs'
 $engineData=Join-Path (Get-Item -LiteralPath $engine).Directory.Parent.Parent.FullName 'data'
 $preparation=Join-Path $output 'preparation'
-& (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $FixtureSources -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -ActiveModsObserver 'mir-fixture-mir5-active-mods-observer' -CaseName 'library-multiplayer' -OutputRoot $preparation -CreateOnly -ExpectedPeakMemoryMiB 4096 -TimeoutSeconds 180 -RepoRoot $repo | Out-Null
+& (Join-Path $PSScriptRoot 'Invoke-NativeFixture.ps1') -ArchiveLibrary $library -FactorioBin $engine -ProfilePath $profile -FixtureSources $FixtureSources -ExpectedMIRArchiveSha256 $ExpectedMIRArchiveSha256 -ActiveModsObserver 'mir-fixture-mir5-active-mods-observer' -CaseName $FixtureCase -OutputRoot $preparation -CreateOnly -ExpectedPeakMemoryMiB 4096 -TimeoutSeconds 180 -RepoRoot $repo | Out-Null
 $prepared=Get-Content -LiteralPath (Join-Path $preparation 'result.json') -Raw|ConvertFrom-Json
 Assert-Session ($prepared.status -ceq 'passed-private-native-runtime-load-only') 'native world preparation failed'
 $seed=Join-Path $preparation 'write-data/saves/seed.zip'
 Assert-Session ((Get-FileHash -LiteralPath $seed).Hash -ceq $prepared.seed_sha256) 'prepared seed differs'
 $activation=$null;$resources=$null;$failure=$null
 $record=[ordered]@{
-  kind='MIR5LibraryMultiplayerNativeResultV1';status='started';source_head=$prepared.source_head
+  kind=$(if($FixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerNativeResultV1'}else{'MIR5ScriptedEffectsMultiplayerNativeResultV1'});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;release_qualification=$false;visual_review=$false
 }
@@ -92,9 +93,10 @@ try {
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $activation
   # Validate the entire fixed launch set before starting the governed tree.
   Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$serverConfig,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--start-server',$seed,'--server-settings',$serverSettings,'--bind','127.0.0.1','--port',[string]$serverPort,'--rcon-bind',('127.0.0.1:'+ $rconPort),'--rcon-password',$rconPassword)
-  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)}
-  $screenshots=@(foreach($client in $clients){foreach($stage in @('initial','rejoin','restart')){Join-Path $client.write_data ('script-output/mir5-library-multiplayer/'+$stage+'-*.png')}})
-  $spec=[ordered]@{engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  $clientGraphics=@(if($FixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
+  foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)}
+  $screenshots=@(if($FixtureCase-ceq'library-multiplayer'){foreach($client in $clients){foreach($stage in @('availability','initial','rejoin','restart')){Join-Path $client.write_data ('script-output/mir5-library-multiplayer/'+$stage+'-*.png')}}})
+  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
   $specPath=Join-Path $resources.root 'session-spec.json'
   [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash

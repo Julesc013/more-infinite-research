@@ -1,0 +1,14 @@
+{
+  "name": "mir-fixture-mir5-k2-imersite-transition",
+  "version": "0.3.0",
+  "title": "MIR 5 K2 Imersite transition fixture",
+  "author": "MIR maintainers",
+  "description": "Private MIR5 K2SO observation of published hidden Imersite carrier recovery.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base >= 2.1.23",
+    "space-age",
+    "Krastorio2-spaced-out",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

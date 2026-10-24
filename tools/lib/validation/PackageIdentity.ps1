@@ -122,8 +122,17 @@ function Get-MIRPackageSourceFiles {
     return @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
   }
 
+  # A partial source/targets marker is not a materializer authority.  Keep
+  # the legacy player roots in the fallback fingerprint so small historical
+  # and synthetic layouts still observe their package-visible files.  The
+  # canonical branch above is the only path allowed to replace this closure.
+  $fallbackRoots = @($Roots)
+  if ($requestedRoots.Count -eq $defaultRoots.Count -and
+      ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n"))) {
+    $fallbackRoots = @($Roots + (Get-MIRLegacyRootPackageSourceRoots) | Sort-Object -Unique)
+  }
   $files = @()
-  foreach ($relative in @($Roots)) {
+  foreach ($relative in $fallbackRoots) {
     $path = Join-Path $repo $relative
     if (Test-Path -LiteralPath $path -PathType Leaf) {
       $files += $relative.Replace("\", "/")

@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "mir5-native-modded-continuations-f200-captured-facts",
+  "status": "hash-verified-published-data-stage-reference-only",
+  "limits": [
+    "These are selected fields from three F200 published data-stage captures, not serialized prototype-world snapshots.",
+    "They establish no native gameplay, save, multiplayer, or release qualification."
+  ],
+  "source": {
+    "capture_root": "build/mir5/black-glass/incoming/40051640723/black-glass-remaining-integrations-reference-40051640723-1/capture",
+    "artifact_manifest_sha256": "3BE77F3D29D794E0665D5BF3849CA77DA9FA085DA241B4EDDC33DE9CCEF69EF9",
+    "engine": {"target": "f200", "factorio_version": "2.0", "base_version": "2.0.77", "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"},
+    "published": {"version": "4.7.20002", "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"}
+  },
+  "common_published_rows": {
+    "braking-force-8": {
+      "type": "technology", "name": "braking-force-8", "localised_name": ["technology-name.braking-force"], "localised_description": ["technology-description.braking-force"],
+      "icons": [{"icon": "__base__/graphics/technology/braking-force.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-braking-force.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "train-braking-force-bonus", "modifier": 0.15}], "prerequisites": ["braking-force-6", "braking-force-7", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"],
+      "unit": {"count_formula": "861.51212960553*1.33333^(L-8)", "time": 60, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["utility-science-pack", 1]]},
+      "level": 8, "upgrade": true, "hidden": false, "max_level": "infinite"
+    },
+    "inserter-capacity-bonus-8": {
+      "type": "technology", "name": "inserter-capacity-bonus-8", "localised_name": ["technology-name.inserter-capacity-bonus"], "localised_description": ["", ["technology-description.inserter-capacity-bonus"], "\n\n", ["mod-setting-description.mir-note-inserter-capacity"]],
+      "icons": [{"icon": "__base__/graphics/technology/inserter-capacity.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-capacity.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "inserter-stack-size-bonus", "modifier": 2}, {"type": "bulk-inserter-capacity-bonus", "modifier": 4}], "prerequisites": ["inserter-capacity-bonus-6", "utility-science-pack", "inserter-capacity-bonus-7", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"],
+      "unit": {"count_formula": "914488.340211249*3.33333^(L-8)", "time": 60, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["utility-science-pack", 1]]},
+      "level": 8, "upgrade": true, "hidden": false, "max_level": "infinite"
+    },
+    "laser-shooting-speed-8": {
+      "type": "technology", "name": "laser-shooting-speed-8", "localised_name": ["technology-name.laser-shooting-speed"], "localised_description": ["technology-description.laser-shooting-speed"],
+      "icons": [{"icon": "__base__/graphics/technology/laser-shooting-speed.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-speed.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "gun-speed", "ammo_category": "laser", "modifier": 0.5}], "prerequisites": ["laser-shooting-speed-6", "laser-shooting-speed-7", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack", "utility-science-pack"],
+      "unit": {"count_formula": "1025.15625*1.5^(L-8)", "time": 120, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["military-science-pack", 1], ["utility-science-pack", 1]]},
+      "level": 8, "upgrade": true, "hidden": false, "max_level": "infinite"
+    },
+    "research-speed-7": {
+      "type": "technology", "name": "research-speed-7", "localised_name": ["technology-name.research-speed"], "localised_description": ["technology-description.research-speed"],
+      "icons": [{"icon": "__base__/graphics/technology/research-speed.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-speed.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "laboratory-speed", "modifier": 0.6}], "prerequisites": ["research-speed-5", "utility-science-pack", "research-speed-6", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack"],
+      "unit": {"count_formula": "683.4375*1.5^(L-7)", "time": 120, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["utility-science-pack", 1], ["military-science-pack", 1]]},
+      "level": 7, "upgrade": true, "hidden": false, "max_level": "infinite"
+    },
+    "weapon-shooting-speed-7": {
+      "type": "technology", "name": "weapon-shooting-speed-7", "localised_name": ["technology-name.weapon-shooting-speed"], "localised_description": ["technology-description.weapon-shooting-speed"],
+      "icons": [{"icon": "__base__/graphics/technology/weapon-shooting-speed-3.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-speed.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "gun-speed", "ammo_category": "bullet", "modifier": 0.4}, {"type": "gun-speed", "ammo_category": "shotgun-shell", "modifier": 0.4}], "prerequisites": ["weapon-shooting-speed-5", "utility-science-pack", "weapon-shooting-speed-6", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "military-science-pack"],
+      "unit": {"count_formula": "683.4375*1.5^(L-7)", "time": 120, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["military-science-pack", 1], ["utility-science-pack", 1]]},
+      "level": 7, "upgrade": true, "hidden": false, "max_level": "infinite"
+    },
+    "worker-robots-storage-4": {
+      "type": "technology", "name": "worker-robots-storage-4", "localised_name": ["technology-name.worker-robots-storage"], "localised_description": ["technology-description.worker-robots-storage"],
+      "icons": [{"icon": "__base__/graphics/technology/worker-robots-storage.png", "icon_size": 256}, {"icon": "__core__/graphics/icons/technology/constants/constant-capacity.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50], "floating": true}],
+      "effects": [{"type": "worker-robot-storage", "modifier": 1}], "prerequisites": ["worker-robots-storage-2", "utility-science-pack", "worker-robots-storage-3", "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"],
+      "unit": {"count_formula": "675*1.5^(L-4)", "time": 60, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["production-science-pack", 1], ["utility-science-pack", 1]]},
+      "level": 4, "upgrade": true, "hidden": false, "max_level": "infinite"
+    }
+  },
+  "profiles": [
+    {
+      "id": "armor-bobwarfare", "active_mods": {"base": "2.0.77", "boblibrary": "2.1.0", "bobwarfare": "2.1.0"},
+      "published_field_changes": {
+        "laser-shooting-speed-8": {"effects": [{"type": "gun-speed", "ammo_category": "laser", "modifier": 0.5}, {"type": "gun-speed", "ammo_category": "bob-laser-rifle", "modifier": 0.5}]}
+      },
+      "preflight": [{"tail": "laser-shooting-speed-8", "previous": {"name": "laser-shooting-speed-6", "count": 350}, "predecessor": {"name": "laser-shooting-speed-7", "count": 450, "time": 60, "ingredients": [["automation-science-pack", 1], ["logistic-science-pack", 1], ["chemical-science-pack", 1], ["military-science-pack", 1], ["utility-science-pack", 1]], "prerequisites": ["laser-shooting-speed-6"], "effects": [{"type": "gun-speed", "ammo_category": "laser", "modifier": 0.5}, {"type": "gun-speed", "ammo_category": "bob-laser-rifle", "modifier": 0.5}]}}]
+    },
+    {
+      "id": "py-coal", "active_mods": {"base": "2.0.77", "pycoalprocessing": "3.0.44"},
+      "published_field_changes": {
+        "braking-force-8": {"order": "autotech-[000235]-[braking-force-7]", "prerequisites": ["braking-force-6", "braking-force-7", "utility-science-pack", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}},
+        "inserter-capacity-bonus-8": {"order": "autotech-[000213]-[inserter-capacity-bonus-7]", "prerequisites": ["utility-science-pack", "inserter-capacity-bonus-6", "inserter-capacity-bonus-7", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}},
+        "laser-shooting-speed-8": {"order": "autotech-[000239]-[laser-shooting-speed-7]", "prerequisites": ["laser-shooting-speed-6", "laser-shooting-speed-7", "utility-science-pack", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}},
+        "research-speed-7": {"order": "autotech-[000217]-[research-speed-6]", "icon_size": 128, "icons": [{"icon": "__pycoalprocessinggraphics__/graphics/technology/energy-1.png", "icon_size": 128, "tint": {"r": 0, "g": 0, "b": 0, "a": 1}}, {"icon": "__pycoalprocessinggraphics__/graphics/technology/border.png", "icon_size": 128}, {"icon": "__pycoalprocessinggraphics__/graphics/technology/lab.png", "icon_size": 128, "scale": 0.8}, {"icon": "__core__/graphics/icons/technology/constants/constant-speed.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50]}], "prerequisites": ["utility-science-pack", "research-speed-5", "research-speed-6", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}},
+        "weapon-shooting-speed-7": {"order": "autotech-[000210]-[weapon-shooting-speed-6]", "prerequisites": ["utility-science-pack", "weapon-shooting-speed-5", "weapon-shooting-speed-6", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}},
+        "worker-robots-storage-4": {"order": "autotech-[000220]-[worker-robots-storage-3]", "prerequisites": ["utility-science-pack", "worker-robots-storage-2", "worker-robots-storage-3", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]}}
+      },
+      "preflight_counts": [["braking-force-6", 2250, "braking-force-7", 5000], ["inserter-capacity-bonus-6", 3600, "inserter-capacity-bonus-7", 2250], ["laser-shooting-speed-6", 5000, "laser-shooting-speed-7", 2750], ["research-speed-5", 1300, "research-speed-6", 2250], ["weapon-shooting-speed-5", 600, "weapon-shooting-speed-6", 2250], ["worker-robots-storage-2", 1300, "worker-robots-storage-3", 2250]],
+      "preflight_science": [["utility-science-pack", 1], ["production-science-pack", 2], ["chemical-science-pack", 3], ["logistic-science-pack", 6], ["automation-science-pack", 10], ["military-science-pack", 3]]
+    },
+    {
+      "id": "py-alienlife-hightech", "active_mods": {"base": "2.0.77", "pycoalprocessing": "3.0.44", "pyalienlife": "3.0.67", "pyhightech": "3.0.19"},
+      "published_field_changes": {
+        "braking-force-8": {"order": "autotech-[000770]-[braking-force-7]", "prerequisites": ["braking-force-6", "braking-force-7", "utility-science-pack", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack", "space-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20], ["space-science-pack", 1]]}},
+        "inserter-capacity-bonus-8": {"order": "autotech-[000719]-[inserter-capacity-bonus-7]", "prerequisites": ["utility-science-pack", "inserter-capacity-bonus-6", "inserter-capacity-bonus-7", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20]]}},
+        "laser-shooting-speed-8": {"order": "autotech-[000779]-[laser-shooting-speed-7]", "prerequisites": ["laser-shooting-speed-6", "laser-shooting-speed-7", "utility-science-pack", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack", "space-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20], ["space-science-pack", 1]]}},
+        "research-speed-7": {"order": "autotech-[000722]-[research-speed-6]", "icon_size": 128, "icons": [{"icon": "__pycoalprocessinggraphics__/graphics/technology/energy-1.png", "icon_size": 128, "tint": {"r": 0, "g": 0, "b": 0, "a": 1}}, {"icon": "__pycoalprocessinggraphics__/graphics/technology/border.png", "icon_size": 128}, {"icon": "__pycoalprocessinggraphics__/graphics/technology/lab.png", "icon_size": 128, "scale": 0.8}, {"icon": "__core__/graphics/icons/technology/constants/constant-speed.png", "icon_size": 128, "scale": 0.5, "shift": [50, 50]}], "prerequisites": ["utility-science-pack", "research-speed-5", "research-speed-6", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack", "space-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20], ["space-science-pack", 1]]}},
+        "weapon-shooting-speed-7": {"order": "autotech-[000716]-[weapon-shooting-speed-6]", "prerequisites": ["utility-science-pack", "weapon-shooting-speed-5", "weapon-shooting-speed-6", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack", "space-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20], ["space-science-pack", 1]]}},
+        "worker-robots-storage-4": {"order": "autotech-[000724]-[worker-robots-storage-3]", "prerequisites": ["utility-science-pack", "worker-robots-storage-2", "worker-robots-storage-3", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack"], "unit": {"ingredients": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20]]}}
+      },
+      "preflight_counts": [["braking-force-6", 3600, "braking-force-7", 4000], ["inserter-capacity-bonus-6", 1750, "inserter-capacity-bonus-7", 3600], ["laser-shooting-speed-6", 4000, "laser-shooting-speed-7", 4000], ["research-speed-5", 1300, "research-speed-6", 3600], ["weapon-shooting-speed-5", 750, "weapon-shooting-speed-6", 3600], ["worker-robots-storage-2", 1300, "worker-robots-storage-3", 3600]],
+      "preflight_science": [["utility-science-pack", 1], ["py-science-pack-4", 2], ["production-science-pack", 3], ["py-science-pack-3", 6], ["chemical-science-pack", 10], ["py-science-pack-2", 20], ["logistic-science-pack", 30], ["py-science-pack-1", 60], ["automation-science-pack", 100], ["military-science-pack", 20]]
+    }
+  ]
+}

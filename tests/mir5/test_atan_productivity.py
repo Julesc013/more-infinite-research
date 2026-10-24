@@ -332,12 +332,27 @@ class AtanProductivityTests(unittest.TestCase):
         self.lua.execute("f210()")
         self.assertEqual(0, len(self.select()))
         self.lua.execute("f200()")
+        self.lua.execute('target.minimum_base = "2.0.78"')
+        with self.assertRaisesRegex(Exception, "unsupported F200 ATAN saved-profile transition"):
+            self.select()
+        self.lua.execute('target.minimum_base = "2.0.77"')
 
         self.assertEqual(0, len(self.select(mods=self.active_mods(names={}))))
-        self.assertEqual(0, len(self.select(mods=self.active_mods(names={
+        base = _plain(self.emitted_rows("base"))
+        self.assertEqual(base, _plain(self.emitted_rows("base", mods=self.active_mods(names={
             "atan-air-scrubbing": "wrong", "atan-ash": "wrong",
         }))))
-        self.assertEqual(2, len(self.select("space_age")))
+        space_age = _plain(self.emitted_rows("space_age"))
+        self.assertEqual(space_age, _plain(self.emitted_rows("space_age", mods=self.active_mods(names={
+            "atan-air-scrubbing": "wrong", "atan-ash": "wrong", "space-age": "2.0.78",
+        }))))
+        changed_mods = self.active_mods(names={
+            "atan-air-scrubbing": "wrong", "atan-ash": "wrong", "space-age": "2.0.78",
+        })
+        drifted = self.raw_fixture("space_age")
+        drifted["technology"]["automation-3"]["unit"]["time"] = 61
+        with self.assertRaisesRegex(Exception, "automation-3 no longer owns atan-ash-seperation"):
+            self.emitted_rows("space_age", mods=changed_mods, raw=drifted)
         observer = {**self.facts["required_mods"], "unrelated-observer": "0.1.0"}
         self.assertEqual(2, len(self.select(mods=self.active_mods(names=observer))))
 
@@ -476,10 +491,10 @@ class AtanProductivityTests(unittest.TestCase):
 
     def test_space_age_gate_and_named_preflight_preserve_the_variant_boundary(self):
         expected = self.variant("space_age")
-        wrong_space_age = dict(expected["required_mods"])
-        wrong_space_age["space-age"] = "wrong"
-        self.assertEqual(0, len(self.select(
-            "space_age", mods=self.active_mods("space_age", wrong_space_age)
+        patched_space_age = dict(expected["required_mods"])
+        patched_space_age["space-age"] = "2.0.78"
+        self.assertEqual(expected["published_rows"], _plain(self.emitted_rows(
+            "space_age", mods=self.active_mods("space_age", patched_space_age)
         )))
         observer = {**expected["required_mods"], "unrelated-observer": "0.1.0"}
         self.assertEqual(2, len(self.select(

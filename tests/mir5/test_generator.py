@@ -6,6 +6,12 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import (
+    captured_public_productivity_recipes,
+    native_credit_carrier_rows,
+    split_public_and_native_credit_rows,
+)
+
 ROOT = Path(__file__).resolve().parents[2]
 
 MODERN_ORACLE = json.loads(
@@ -435,7 +441,7 @@ class GeneratorTests(unittest.TestCase):
     def test_data_stage_defers_inactive_binding_and_preflights_active_profile(self):
         self.lua.execute('''
           local ok, message, environment = disabled_data_final()
-          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 71 and environment.emitted[1].enabled == false)
+          assert(ok, message); assert(environment.writes == 1 and #environment.emitted == 95 and environment.emitted[1].enabled == false)
           ok, message, environment = missing_active_space_age_binding()
           assert(not ok and tostring(message):find("missing required recipe casting-iron-gear-wheel", 1, true), tostring(message))
           assert(environment.writes == 0, "active binding wrote before named preflight")
@@ -675,13 +681,21 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
           assert(reads == 1 and data.raw.technology["Space-Lab-Research-61"] == foreign)
           for _, row in ipairs(data.emitted) do
-            local pack, gate = false, false
-            for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
-            for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
-            assert(pack and gate and row.enabled ~= false, row.name)
+            if row.name:sub(1, 18) == "mir-native-credit-" then
+              -- Private signed carriers are not player research. They retain
+              -- their isolated one-pack mechanism unit rather than inheriting
+              -- the public science policy checked below.
+              assert(row.hidden and row.enabled == false and row.visible_when_disabled == false
+                and #row.unit.ingredients == 1 and row.unit.ingredients[1][1] == "automation-science-pack")
+            else
+              local pack, gate = false, false
+              for _, ingredient in ipairs(row.unit.ingredients) do pack = pack or ingredient[1] == "space-science-pack" end
+              for _, name in ipairs(row.prerequisites) do gate = gate or name == "space-science-pack" end
+              assert(pack and gate and row.enabled ~= false, row.name)
+            end
           end
         ''')
 
@@ -693,7 +707,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 53)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -950,6 +964,8 @@ class GeneratorTests(unittest.TestCase):
             and by_id["recipe-prod-research_mining_drill-1"].effects[4].change == .05)
           assert(early_holder.hidden and early_holder.enabled and not early_holder.upgrade and early_holder.level == 1
             and continuation_holder.hidden and continuation_holder.enabled and not continuation_holder.upgrade and continuation_holder.level == 4)
+          assert(early_holder.icon == "__base__/graphics/technology/automation-1.png" and early_holder.icon_size == 256
+            and continuation_holder.icon == "__base__/graphics/technology/automation-1.png" and continuation_holder.icon_size == 256)
           assert(early_holder.effects[1].recipe == "kr-imersite-powder" and early_holder.effects[1].change == .02
             and continuation_holder.effects[1].recipe == "kr-imersite-powder" and continuation_holder.effects[1].change == .02)
           local environment = full_world(k2mods)
@@ -958,13 +974,13 @@ class GeneratorTests(unittest.TestCase):
           environment = full_world(k2mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 78)
+          assert(environment.writes == 1 and #environment.emitted == 102)
           local final_ids, final_count = {}, 0
           for _, row in ipairs(environment.emitted) do
             assert(final_ids[row.name] == nil, "duplicate generated K2SO technology " .. row.name)
             final_ids[row.name], final_count = row, final_count + 1
           end
-          assert(final_count == 78)
+          assert(final_count == 102)
           assert(final_ids["recipe-prod-research_gears-1"] and final_ids["recipe-prod-research_agricultural_growth_speed-1"]
             and final_ids["recipe-prod-research_spoilage_preservation-1"] and final_ids["recipe-prod-research_material_imersite-4"])
           assert(final_ids["recipe-prod-research_material_rare_metals-1"]
@@ -1179,7 +1195,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 53)
+          assert(environment.writes == 1 and #environment.emitted == 73)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
@@ -1232,6 +1248,14 @@ class GeneratorTests(unittest.TestCase):
             }
             expected = dict(expected_profiles[profile])
             if profile == "k2so-f210":
+                # The immutable 4.7 inventory records the historical missing
+                # `automation.png` carrier icon. F210 AtlasBuilder rejects it;
+                # current hidden Imersite carriers deliberately use Base's
+                # verified `automation-1.png` asset instead.
+                for carrier_id in ("mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"):
+                    historical = expected[carrier_id]
+                    self.assertEqual("__base__/graphics/technology/automation.png", historical["icon"])
+                    expected[carrier_id] = {**historical, "icon": "__base__/graphics/technology/automation-1.png"}
                 self.assertEqual(
                     set(expected).intersection(K2SO_INTENDED_MATERIAL_ROWS), set(),
                     K2SO_MATERIAL_ADDITION_PROVENANCE["reason"],
@@ -1242,7 +1266,14 @@ class GeneratorTests(unittest.TestCase):
                     len(emitted), len(actual),
                     "K2SO output contains a duplicate technology ID; full expected rows must not hide it",
                 )
-            self.assertEqual(actual, expected, profile)
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            self.assertEqual(actual_public, expected, profile)
+            expected_credit = native_credit_carrier_rows(
+                expected,
+                captured_public_productivity_recipes(expected_profiles[profile]),
+            )
+            self.assertEqual(actual_credit, expected_credit, profile)
+            self.assertEqual(set(actual), set(expected) | set(expected_credit), profile)
             expected_patches = patch_profiles[profile]
             self.assertEqual(
                 set(self.lua.globals().published_raw.recipe.keys())
@@ -1280,7 +1311,13 @@ class GeneratorTests(unittest.TestCase):
             expected = {row["name"]: host_row(row["row"])
                         for row in profile["published_output"]["data"]["additions"] if row["type"] == "technology"}
             actual = {row["name"]: plain_lua(row) for row in self.lua.globals().data.emitted.values()}
-            self.assertEqual(actual, expected, profile["id"])
+            actual_public, actual_credit = split_public_and_native_credit_rows(actual)
+            self.assertEqual(actual_public, expected, profile["id"])
+            expected_credit = native_credit_carrier_rows(
+                expected, captured_public_productivity_recipes(expected)
+            )
+            self.assertEqual(actual_credit, expected_credit, profile["id"])
+            self.assertEqual(set(actual), set(expected) | set(expected_credit), profile["id"])
 
     def test_effective_global_option_lazily_activates_prototype_limits(self):
         self.lua.execute('''
@@ -1290,7 +1327,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 53)
+          assert(environment.writes == 1 and #environment.emitted == 73)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')
@@ -1306,7 +1343,7 @@ class GeneratorTests(unittest.TestCase):
           local environment = full_world(mods)
           settings, data, helpers, log = {startup = startup}, environment, nil, function() end
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 71)
+          assert(environment.writes == 1 and #environment.emitted == 95)
           local ids = {}
           for _, row in ipairs(environment.emitted) do ids[row.name] = row end
           assert(ids["recipe-prod-research_gears-1"] ~= nil)

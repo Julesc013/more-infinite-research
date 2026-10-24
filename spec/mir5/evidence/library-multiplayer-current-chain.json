@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentLibraryMultiplayerNativeChainV1",
+  "run": 40036857502,
+  "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40036857502",
+  "source": "e400d6c765cd25748241d24e3353ab8cb9c7ade5",
+  "status": "passed-private-two-client-fixture",
+  "manifest_members_verified": 220,
+  "manifest_sha256": "66FB25CE376BE11C7A7E762863B9FB93B76BA5F31967DA7F940BA20CA0C3DC1F",
+  "receipt": {
+    "gzip": "spec/mir5/evidence/library-multiplayer-current-40036857502-native.json.gz",
+    "uncompressed_sha256": "8C94D2E48C2A741009CE68DDE301E47CC1058602D04D9858068C973F1ABA00CF"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "sha256": "D7E914312D77E9B46ED90ECBDBEFEC57AF9BB5EDB89EBCB42164EF8EF92300DA",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "session": {
+    "schema": 1,
+    "kind": "MIR5LibraryMultiplayerSessionV1",
+    "status": "passed-private-two-client-session",
+    "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "seed_sha256": "231C6CDA977673A5209805501275FA3A1C33742C660CDC8691B89C6387A84528",
+    "restart_save_sha256": "BCBE17320D32410E7670791E4189F128052C7171C4A4E01EBDF35BEA712D9204",
+    "final_save_sha256": "A2621D82E3BA76C05FE600576E67A6C2C319C0E7AEC9DA91CC3F4BC0A363DD5C",
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "clients": [
+      {
+        "name": "MIR5English",
+        "locale": "en",
+        "port": 50062,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-en.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-en"
+      },
+      {
+        "name": "MIR5Deutsch",
+        "locale": "de",
+        "port": 50063,
+        "config": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-de.ini",
+        "write_data": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-de"
+      }
+    ],
+    "screenshots": [
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\initial-1.png",
+        "sha256": "FC31913B134C50DB01CD1258F572265FC706718998BB29E4E946FB9D8019C212",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\rejoin-1.png",
+        "sha256": "E91F9E7EAC3610BC59B3118E15ABEC926DC16305487EBB2345213BAC5F6BC587",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-en\\script-output\\mir5-library-multiplayer\\restart-1.png",
+        "sha256": "76F12709844D23B73C7B64C75112F1A445F535E6EB7E62C931B7586B5AE74BF8",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\initial-2.png",
+        "sha256": "51B931BF6ED3BF3434A89A86DD2A67A3109F88D33B87989FC9DA0F1A04CEA0AB",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\rejoin-2.png",
+        "sha256": "B17C10254F354A2C3A1E50641EABE512B00BF762AE6AB3D009A64FDAAF8B412E",
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40036857502-1\\multiplayer\\session\\client-de\\script-output\\mir5-library-multiplayer\\restart-2.png",
+        "sha256": "ABCBE087FCFDC056CEF9E983C1F0659046E0A975343B378A9FDCCC9B0F167FC7",
+        "width": 1280,
+        "height": 720
+      }
+    ]
+  },
+  "reviewed_screenshots": [
+    {
+      "path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/initial-2.png",
+      "sha256": "51B931BF6ED3BF3434A89A86DD2A67A3109F88D33B87989FC9DA0F1A04CEA0AB",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    },
+    {
+      "path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png",
+      "sha256": "B17C10254F354A2C3A1E50641EABE512B00BF762AE6AB3D009A64FDAAF8B412E",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    },
+    {
+      "path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/restart-2.png",
+      "sha256": "ABCBE087FCFDC056CEF9E983C1F0659046E0A975343B378A9FDCCC9B0F167FC7",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    },
+    {
+      "path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/initial-1.png",
+      "sha256": "FC31913B134C50DB01CD1258F572265FC706718998BB29E4E946FB9D8019C212",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    },
+    {
+      "path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png",
+      "sha256": "E91F9E7EAC3610BC59B3118E15ABEC926DC16305487EBB2345213BAC5F6BC587",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    },
+    {
+      "path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/restart-1.png",
+      "sha256": "76F12709844D23B73C7B64C75112F1A445F535E6EB7E62C931B7586B5AE74BF8",
+      "visual_review": "Readable distinct English gear and German mining personal views; no overlap or blocking error across initial/rejoin/restart. Translation fallbacks remain visible in the captured frames."
+    }
+  ],
+  "release_qualification": false,
+  "limitations": [
+    "Single-host loopback with actual distinct server/client processes, not cross-hardware evidence.",
+    "No numeric UI latency, all scripted-effect multiplayer stress, or final-layout/package acceptance."
+  ],
+  "adverse_run": {
+    "id": 40036029880,
+    "cause": "Actual rendered client rejected missing automation.png from hidden MIR carrier. Player source now uses the native automation-1.png asset.",
+    "receipt": {
+      "gzip": "spec/mir5/evidence/library-multiplayer-adverse-40036029880-native.json.gz",
+      "uncompressed_sha256": "82C61024A9F32B75CE1C29E3834C02A9DBAC4F0684384F480DE0B18E6C98A02D"
+    }
+  }
+}

@@ -4,6 +4,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import verified_public_rows
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -105,7 +107,8 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                   environment.raw.recipe["atan-ash-seperation"] = recipe
                   settings,mods,data,helpers,log={startup=defaults()},{base="2.1.23"},environment,nil,function() end
                   if selected then mods["atan-ash"]="2.2.1" else mods["atan-ash"]="2.2.2" end
-                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 53)
+                  assert(dofile(data_final_path) == nil and environment.writes == 1 and #environment.emitted == 73)
+                  schema_output, schema_recipes = environment.emitted, environment.raw.recipe
                   if selected then
                     assert(package.loaded["overrides.recipe_schema"] and recipe.category == nil)
                     assert(recipe.results[1].independent_probability == .25 and recipe.results[1].probability == nil)
@@ -114,6 +117,15 @@ class RecipeSchemaRepairTests(unittest.TestCase):
                     assert(recipe.results[1].probability == .25 and recipe.results[1].independent_probability == nil)
                   end
                 ''')
+                actual = {
+                    row["name"]: test_generator.plain_lua(row)
+                    for row in host.lua.globals().schema_output.values()
+                }
+                public = verified_public_rows(
+                    actual,
+                    {str(name) for name in host.lua.globals().schema_recipes.keys()},
+                )
+                self.assertEqual(len(public), 53)
 
 
 if __name__ == "__main__":

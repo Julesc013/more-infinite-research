@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "kind": "MIR5NativeSignedCreditMechanismControlV1",
+  "runs": [
+    {
+      "run": 40031156634,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40031156634",
+      "manifest_members_verified": 38,
+      "manifest_sha256": "C4541EF82DBE963713D06930972A08D3966DC9068C7EE5CE7D08FD7CFB5355BF",
+      "cases": [
+        {
+          "path": "gameplay/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "c171f5202fb279e5713ace2b9f1e1ebbad7d2205",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/native-credit-mechanism-40031156634-gameplay-native.json.gz",
+            "uncompressed_sha256": "596F308CD6B4A3A50614921F0B62384CFCE8631F499A137F34911426DD9366B7"
+          },
+          "initial": {
+            "case": "f200-space-age-native-credit-control",
+            "stage": "initial",
+            "status": "passed",
+            "qualification": "native-mechanism-control-only",
+            "witnesses": {
+              "main_next_level": 2,
+              "positive_next_level": 2,
+              "negative_next_level": 2,
+              "fish_bonus": 0.10000000149011612,
+              "egg_bonus": 0.10000000149011612,
+              "detail": "main-plus-positive-minus-negative"
+            }
+          },
+          "player": {
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip",
+            "sha256": "33C524114D55816099E9DBC70CA8618429CCF0719A6C5E2F673187F7649C52F2"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ],
+      "engine_diagnostic_log": {
+        "gzip": "spec/mir5/evidence/native-credit-mechanism-40031156634-production.factorio.log.gz",
+        "uncompressed_sha256": "48C930CEDE7B1E4F6966427EFC2947FAAADCF7C08BE5A9255C4507DE81D3325F"
+      }
+    }
+  ],
+  "scope": [
+    "F2002.0.77 Space Age: one actual MIR breeding lab yields0.1 fish/egg. Fixture-owned positive native holder level2 raises fish to0.2; negative level2 restores0.1. Both setters update effects before a force reset.",
+    "A deliberate global reset control preserves native bonus but re-enables completed holders; the fixture restores only its two own flags. Final hidden/disabled holder levels and0.1/0.1 bonus survive two cold reloads.",
+    "No recipe bonus writes. This mechanism control does not qualify MIR native-credit emission, lifecycle wiring or preference save transitions. Production must not reset global force effects."
+  ],
+  "release_qualification": false
+}

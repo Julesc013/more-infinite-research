@@ -6,6 +6,11 @@ from pathlib import Path
 import sys
 import unittest
 
+from native_credit_oracle import (
+    native_credit_carrier_rows,
+    split_public_and_native_credit_rows,
+)
+
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTS_PATH = ROOT / "tests/mir5/fixtures/k2-base-f200-captured-facts.json"
@@ -252,6 +257,16 @@ class K2BaseCatalogueTests(unittest.TestCase):
         rows = {row["name"]: row["row"] for row in expected["data"]["additions"]
                 if row["type"] == "technology"}
         actual = self.lua.globals().data.raw.technology
+        emitted_names = [str(name) for name in self.lua.globals().emitted.values()]
+        self.assertEqual(len(emitted_names), len(set(emitted_names)), "duplicate K2 Base output")
+        emitted_rows = {name: _plain(actual[name]) for name in emitted_names}
+        actual_public, actual_credit = split_public_and_native_credit_rows(emitted_rows)
+        expected_credit = native_credit_carrier_rows(
+            rows, set(self._captured_raw_subset()["recipe"])
+        )
+        self.assertEqual(actual_public, rows)
+        self.assertEqual(actual_credit, expected_credit)
+        self.assertEqual(set(emitted_rows), set(rows) | set(expected_credit))
         for name, wanted in rows.items():
             found = _plain(actual[name])
             self.assertTrue(compare_k2_base.catalogue._same(found, wanted),
@@ -274,9 +289,8 @@ class K2BaseCatalogueTests(unittest.TestCase):
           local expected, emitted_by_name = {}, {}
           for _, id in ipairs(expected_ids) do expected[id] = true end
           assert(#expected_ids == 54)
-          assert(#emitted == #expected_ids)
           for _, id in ipairs(emitted) do
-            assert(expected[id] and not emitted_by_name[id], "unexpected or duplicate output " .. id)
+            assert(not emitted_by_name[id], "duplicate output " .. id)
             emitted_by_name[id] = true
           end
           for id in pairs(expected) do assert(emitted_by_name[id], "missing expected output " .. id) end
@@ -297,7 +311,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
           for _, name in ipairs(facts.standard_science) do
             assert(raw.tool[name] and raw.technology[name] and lab_inputs[name], "missing standard science/lab fact " .. name)
           end
-          for _, technology_name in ipairs(emitted) do
+          for _, technology_name in ipairs(expected_ids) do
             local technology, recipes = raw.technology[technology_name], {}
             assert(technology and technology.enabled ~= false, "default K2 Base output disabled " .. technology_name)
             for _, ingredient in ipairs(technology.unit.ingredients) do
@@ -445,7 +459,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
           for _, fact in ipairs(facts.k2_product_target_additions) do
             expected_k2[fact.family .. ":" .. fact.recipe] = fact.weight
           end
-          for _, technology_name in ipairs(emitted) do
+          for _, technology_name in ipairs(expected_ids) do
             local family = technology_name == "recipe-prod-research_gears-1" and "research_gears"
               or by_key[technology_name:match("^recipe%-prod%-(.+)%-1$")]
             if family then

@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "kind": "MIR5IntegrationCatalogueUpgradeAdverseChainV1",
+  "status": "adverse-native-boundary-preserved",
+  "qualification": false,
+  "scope": "One F200 armor/bobwarfare predecessor-to-successor integration-catalogue upgrade chain. This records a candidate configuration-change blocker and the preceding passing published arm. It does not establish cause, universal startup safety, release acceptance, or qualification of any unexecuted Py profile.",
+  "candidate": {
+    "product_source_commit": "0ff32f7cedcaec2155e55636c4ba63320513a1e4",
+    "diagnostic_fixture_commit": "39297a4ccdb642caa18280f29e4df848484d8034",
+    "product_source_tree_changed_between_candidate_and_diagnostic": false,
+    "f200_player_archive": {
+      "name": "more-infinite-research_5.0.20000.zip",
+      "sha256": "3E00E98406DDD57FFA9C1FAD138BC965F51F05605EDF6B7D399E7DDBD0B90723",
+      "bytes": 532555
+    }
+  },
+  "engine": {
+    "target": "F200",
+    "product_version": "2.0.77",
+    "executable_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "direct_library": "D:/Projects/Factorio/testmods/2.0"
+  },
+  "execution_limits": {
+    "native_jobs_serial": true,
+    "expected_peak_memory_mib": 4096,
+    "timeout_seconds": 600,
+    "admission_wait_seconds": 30,
+    "library_controls_restored_required": true
+  },
+  "private_worker_control_iterations": [
+    {
+      "run_id": 40066147920,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40066147920",
+      "control_commit": "52c5a155ba75220a2ef4d0540d6c3e0c9d737d7e",
+      "input_source_commit": "0ff32f7cedcaec2155e55636c4ba63320513a1e4",
+      "outcome": "refused-before-Factorio: source profile omitted the required single pinned MIR selection",
+      "artifact": {
+        "members_verified": 24,
+        "manifest_sha256": "4595DA93195F22852774A34B59856DA84E15490F1E7D278E877E54B04D1AD6EE"
+      }
+    },
+    {
+      "run_id": 40066370691,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40066370691",
+      "control_commit": "9a7770fbefd8cf03f8d75aa591b609662f805dd8",
+      "input_source_commit": "0ff32f7cedcaec2155e55636c4ba63320513a1e4",
+      "outcome": "published armor arm ran and emitted its passed initial witness; harness then rejected a wrong worker CaseName before candidate execution",
+      "artifact": {
+        "members_verified": 92,
+        "manifest_sha256": "9B8F4EDC2738BE8CB23D60598D7C3E732C226F6F8F09FC4B8E3B528D97D939ED"
+      }
+    },
+    {
+      "run_id": 40066541113,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40066541113",
+      "control_commit": "1ee0a57b65da489e8ade50dd041ce562162fa020",
+      "input_source_commit": "0ff32f7cedcaec2155e55636c4ba63320513a1e4",
+      "outcome": "published armor arm passed; successor configuration-change arm stopped at the preserved foreign-technology assertion",
+      "artifact": {
+        "members_verified": 57,
+        "manifest_sha256": "3BCF8336584E2F426F8498C993C1FA6606B7F515F58330DF5AAFA70ABA976D92"
+      }
+    }
+  ],
+  "retained_published_arm": {
+    "run_id": 40066541113,
+    "profile": "armor-bobwarfare/published-4.7",
+    "status": "passed-private-native-fixture",
+    "published_archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "profile_sha256": "455487CA2F52F506A192F2F00382E0516AE9BEC68D9E87CAAF312F8DCA139D67",
+    "witness": {
+      "primary": "recipe-prod-research_armor_components-1",
+      "continuation": "laser-shooting-speed-8",
+      "source_labs": 2,
+      "two_cold_reloads": true,
+      "save_sha256": "0EF7A67E4920FDCA0A6E38193B799613904700242B05C12744187D0AFDB91E56"
+    },
+    "library_controls": "restored-direct-library-controls"
+  },
+  "diagnostic": {
+    "run_id": 40066862930,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40066862930",
+    "control_commit": "1ee0a57b65da489e8ade50dd041ce562162fa020",
+    "input_source_commit": "39297a4ccdb642caa18280f29e4df848484d8034",
+    "fixture_only_delta": "Five fixture-control logging lines; no source/mir5 player bytes changed.",
+    "profile": "armor-bobwarfare/mir5",
+    "profile_sha256": "1FD16D7AB72D09DFA80BED809FAEC30778F7666BF1749ECCB994BA6469CA3B31",
+    "fixture_archive_sha256": "4B6EE5CEC88EECFD94D0BF1D6E37E5E0EAF18822649CA9498F937C69A81D8B16",
+    "input_save_sha256": "71D9C5CFD448346333C029583C073F6A8CDCFA0C27A4400CA57FCA65F9FAB070",
+    "artifact": {
+      "members_verified": 57,
+      "manifest_sha256": "8C1E44216109BF98A0527C274B3CC18E741A340DBED012A114494C6FE98F1755"
+    },
+    "observation": {
+      "label": "pre-successor foreign",
+      "force": 5,
+      "technology": "recipe-prod-research_armor_components-1",
+      "expected": {
+        "level": 2,
+        "researched": false,
+        "enabled": false,
+        "visible": false,
+        "saved": 0,
+        "maximum": 4294967295
+      },
+      "actual": {
+        "level": 2,
+        "researched": false,
+        "enabled": true,
+        "visible": false,
+        "saved": 0,
+        "maximum": 4294967295
+      }
+    }
+  },
+  "attribution": {
+    "status": "undetermined",
+    "reason": "The logged assertion runs in the fixture configuration-change callback. It does not identify whether Factorio or a mod changed the enabled state. Fixture-local storage buckets are not product state and are not evidence about cap policy.",
+    "next_required_observation": "A pinned fixture migration that logs saved foreign state and actual force state before product configuration handling."
+  },
+  "compressed_native_receipt": {
+    "path": "spec/mir5/evidence/integration-catalogue-upgrade-adverse-native-receipts.json.gz",
+    "sha256": "F07161538EF82C4857B4BF4A202206D91F3F0010C4CF9E14C1269C20A6369861",
+    "bytes": 17793,
+    "uncompressed_sha256": "ED4E87CA7D8BDD3027A090E9B9527B8582C7938F024348412C527E681EE2AB6C",
+    "uncompressed_bytes": 176578,
+    "members": 8
+  }
+}

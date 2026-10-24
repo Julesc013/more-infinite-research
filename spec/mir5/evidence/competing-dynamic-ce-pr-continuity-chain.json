@@ -1,0 +1,306 @@
+{
+  "schema": 1,
+  "kind": "MIR5CompetingDynamicNativeContinuityChainsV1",
+  "runs": [
+    {
+      "run": 40029641488,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40029641488",
+      "manifest_members_verified": 89,
+      "manifest_sha256": "311789F09162BF8CFFCD76FF293408DAF96AB7CD3BF53A3F33E57B4BBF11958A",
+      "cases": [
+        {
+          "path": "gameplay/prefer-foreign/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "6ea1a3d0858cf6800f7e1f60f3806464394ba332",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029641488-gameplay-prefer-foreign-native.json.gz",
+            "uncompressed_sha256": "C9FDE0C64A3485F2D23FC395D97C71D78D43000E88FF5D62443789B444EEAACB"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-ce-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "ce",
+              "target": "ce-iron-gear-wheel-19",
+              "actual_lab_completions": 1,
+              "target_level": 20,
+              "target_bonus": 1.899999976158142,
+              "target_enabled": true,
+              "target_saved_progress": 0.27,
+              "named_predecessor": "ce-iron-gear-wheel-14",
+              "direct_prerequisite_count": 7,
+              "player_queue": [
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 28,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "33C524114D55816099E9DBC70CA8618429CCF0719A6C5E2F673187F7649C52F2",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/prefer-mir/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "6ea1a3d0858cf6800f7e1f60f3806464394ba332",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029641488-gameplay-prefer-mir-native.json.gz",
+            "uncompressed_sha256": "FDF9625B1CDECBFAE1F379E90F10749E517F0EE2260B4AA172B3006A2D494B75"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-ce-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "ce",
+              "target": "ce-iron-gear-wheel-19",
+              "actual_lab_completions": 1,
+              "target_level": 20,
+              "target_bonus": 1.899999976158142,
+              "target_enabled": false,
+              "target_saved_progress": 0.27,
+              "named_predecessor": "ce-iron-gear-wheel-14",
+              "direct_prerequisite_count": 7,
+              "player_queue": [
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 28,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "33C524114D55816099E9DBC70CA8618429CCF0719A6C5E2F673187F7649C52F2",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "6ea1a3d0858cf6800f7e1f60f3806464394ba332",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029641488-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "681F9B435AB37E533CF93E58F35FC52D620E344913951F9247F4D39159BCB671"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-ce-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "ce",
+              "target": "ce-iron-gear-wheel-19",
+              "actual_lab_completions": 1,
+              "target_level": 20,
+              "target_bonus": 1.899999976158142,
+              "target_enabled": true,
+              "target_saved_progress": 0,
+              "named_predecessor": "ce-iron-gear-wheel-14",
+              "direct_prerequisite_count": 7,
+              "player_queue": [
+                "ce-iron-gear-wheel-19",
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 28,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    },
+    {
+      "run": 40029080387,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40029080387",
+      "manifest_members_verified": 89,
+      "manifest_sha256": "DEB089DA4479094AE303CB8950CE516BF33D2031050CC40CFD5112F02060E853",
+      "cases": [
+        {
+          "path": "gameplay/prefer-foreign/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f74704bbfac49740749cb2a009908c2f3f4e3b0f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029080387-gameplay-prefer-foreign-native.json.gz",
+            "uncompressed_sha256": "BABF0BB93F297E8A563A47959EC69770468A1C9CD26FBE968DD223AD9A299857"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-pr-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "pr",
+              "target": "sem-prfe_iron-gear-wheel-productivity-1",
+              "actual_lab_completions": 1,
+              "target_level": 2,
+              "target_bonus": 0.10000000149011612,
+              "target_enabled": true,
+              "target_saved_progress": 0.27,
+              "named_predecessor": false,
+              "direct_prerequisite_count": 0,
+              "player_queue": [
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 43,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "33C524114D55816099E9DBC70CA8618429CCF0719A6C5E2F673187F7649C52F2",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/prefer-mir/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f74704bbfac49740749cb2a009908c2f3f4e3b0f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029080387-gameplay-prefer-mir-native.json.gz",
+            "uncompressed_sha256": "7A8974EAB08A24FCF7936C708784651C4406433FBD949C9DA59FECDCC74F8062"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-pr-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "pr",
+              "target": "sem-prfe_iron-gear-wheel-productivity-1",
+              "actual_lab_completions": 1,
+              "target_level": 2,
+              "target_bonus": 0.10000000149011612,
+              "target_enabled": false,
+              "target_saved_progress": 0.27,
+              "named_predecessor": false,
+              "direct_prerequisite_count": 0,
+              "player_queue": [
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 43,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "33C524114D55816099E9DBC70CA8618429CCF0719A6C5E2F673187F7649C52F2",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        },
+        {
+          "path": "gameplay/published/result.json",
+          "status": "passed-private-native-fixture",
+          "source": "f74704bbfac49740749cb2a009908c2f3f4e3b0f",
+          "receipt": {
+            "gzip": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-40029080387-gameplay-published-native.json.gz",
+            "uncompressed_sha256": "B33F36BBDCF2299B8CEF0BBB29D5B1ED48B4CB8949B6D5CDCED9E85DA05D0516"
+          },
+          "initial": {
+            "stage": "initial",
+            "case": "f200-competing-dynamic-pr-continuity",
+            "status": "passed",
+            "qualification": "native-runner-readback-required",
+            "witnesses": {
+              "provider": "pr",
+              "target": "sem-prfe_iron-gear-wheel-productivity-1",
+              "actual_lab_completions": 1,
+              "target_level": 2,
+              "target_bonus": 0.10000000149011612,
+              "target_enabled": true,
+              "target_saved_progress": 0,
+              "named_predecessor": false,
+              "direct_prerequisite_count": 0,
+              "player_queue": [
+                "sem-prfe_iron-gear-wheel-productivity-1",
+                "braking-force-1"
+              ],
+              "foreign_disabled": true,
+              "detached_partial_progress": 0.27,
+              "ownership_count": 43,
+              "successor_output_excluded": true,
+              "on_load_read_only": false
+            }
+          },
+          "player": {
+            "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+            "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_4.7.20002.zip"
+          },
+          "engine": {
+            "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+            "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+            "file_version": "2.0.77.84539",
+            "product_version": "2.0.77",
+            "base_version": "2.0.77"
+          },
+          "two_cold_reloads_byte_identical": true
+        }
+      ]
+    }
+  ],
+  "scope": [
+    "Separate CE and ProductivityResearch exact F200 Space Age profiles: published actual labs, MIR5 prefer true and false, retained earned foreign effects/identities/partial/current work and foreign disablement. Each stage saves and cold-reloads twice.",
+    "CE authored starting levels now match the engine-inferred published suffixes for all28 tails; ProductivityResearch43 tails remain level1.",
+    "These fixtures do not earn MIR overlap before preference changes and do not qualify the new native-credit implementation, mixed providers or final release."
+  ],
+  "release_qualification": false
+}

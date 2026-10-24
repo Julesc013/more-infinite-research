@@ -20,10 +20,40 @@ class BootstrapTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
 
-          function install_modules(caps_enabled, repair_enabled, scripted_active)
+          function install_modules(caps_enabled, repair_enabled, scripted_active, native_credit_active)
             CAP_ACTIVE = caps_enabled == true
             REPAIR_ACTIVE = repair_enabled == true
             SCRIPTED_ACTIVE = scripted_active == true
+            NATIVE_CREDIT_ACTIVE = native_credit_active == true
+            credit_calls = {}
+            configuration_order = {}
+            package.preload["platform.target"] = function()
+              local target = dofile(player_root .. "/platform/target.lua")
+              target.recipe_productivity = NATIVE_CREDIT_ACTIVE
+              return target
+            end
+            package.preload["runtime.native_credits"] = function()
+              local module = {}
+              module.preflight_legacy_preference_transition = function(event, provider_relevant)
+                credit_calls.preflight = (credit_calls.preflight or 0) + 1
+                credit_calls.last_preflight_event = event
+                credit_calls.last_preflight_provider_relevant = provider_relevant
+                table.insert(configuration_order, "native-credit-preflight")
+                if CREDIT_PREFLIGHT_ERROR then error(CREDIT_PREFLIGHT_ERROR) end
+              end
+              for _, name in ipairs({"on_init", "on_configuration_changed", "on_load",
+                  "on_force_created", "on_force_reset", "on_forces_merged", "on_technology_effects_reset"}) do
+                local callback = name
+                module[callback] = function(event)
+                  credit_calls[callback] = (credit_calls[callback] or 0) + 1
+                  credit_calls.last_event = event
+                  if callback == "on_configuration_changed" then
+                    table.insert(configuration_order, "native-credit-reconcile")
+                  end
+                end
+              end
+              return module
+            end
             lifecycle_calls = {}
             library_calls = {}
             scripted_calls = {}
@@ -53,6 +83,7 @@ class BootstrapTests(unittest.TestCase):
                 on_init = function() lifecycle_calls.init = (lifecycle_calls.init or 0) + 1 end,
                 on_configuration_changed = function(event)
                   lifecycle_calls.configuration = event
+                  table.insert(configuration_order, "lifecycle")
                 end,
                 on_load = function() lifecycle_calls.load = (lifecycle_calls.load or 0) + 1 end,
                 on_force_created = function(event) lifecycle_calls.force_created = event end,
@@ -162,6 +193,8 @@ class BootstrapTests(unittest.TestCase):
           function load_control()
             package.loaded["control"] = nil
             package.loaded["runtime.bootstrap"] = nil
+            package.loaded["platform.target"] = nil
+            package.loaded["runtime.native_credits"] = nil
             package.loaded["runtime.configuration"] = nil
             package.loaded["runtime.lifecycle"] = nil
             package.loaded["runtime.scripted_effects"] = nil
@@ -295,6 +328,67 @@ class BootstrapTests(unittest.TestCase):
           assert(handlers.events[19] == nil and handlers.events[20] == nil)
           for id = 7, 13 do assert(type(handlers.events[id]) == "function") end
           for id = 15, 18 do assert(type(handlers.events[id]) == "function") end
+        ''')
+
+    def test_native_credit_lifecycle_survives_provider_absence_without_research_callbacks(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime();
+          package.preload["platform.target"] = function()
+            return {id="f200", recipe_productivity=true}
+          end
+          load_control()
+          handlers.init(); handlers.configuration({mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'}}}); handlers.load()
+          assert(credit_calls.on_init == 1 and credit_calls.preflight == 1 and credit_calls.on_configuration_changed == 1
+            and credit_calls.on_load == 1)
+          assert(configuration_order[1] == "native-credit-preflight"
+            and configuration_order[2] == "lifecycle"
+            and configuration_order[3] == "native-credit-reconcile")
+          assert(credit_calls.last_preflight_provider_relevant == false,
+            "ordinary Base upgrade was marked as a competing-provider transition")
+          for _, id in ipairs({1, 2, 3, 20}) do assert(type(handlers.events[id]) == "function") end
+          for _, id in ipairs({4, 5, 6, 19}) do assert(handlers.events[id] == nil) end
+          for _, id in ipairs({1, 2, 3, 20}) do handlers.events[id]({force=player.force}) end
+          assert(credit_calls.on_force_created == 1 and credit_calls.on_force_reset == 1
+            and credit_calls.on_forces_merged == 1 and credit_calls.on_technology_effects_reset == 1)
+          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
+            and lifecycle_calls.forces_merged == nil and lifecycle_calls.effects_reset == nil)
+          assert(storage.mir_native_credits == nil and handlers.nth[60] == nil and handlers.nth[61] == nil)
+          install_modules(false, false, false, false); remote.interfaces = {}; load_control()
+          for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
+        ''')
+
+    def test_native_credit_preflight_marks_a_named_removed_provider_relevant(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime();
+          package.preload["platform.target"] = function()
+            return {id="f200", recipe_productivity=true}
+          end
+          load_control()
+          handlers.configuration({mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
+              ['fish-productivity']={old_version='1.0.0'}}})
+          assert(credit_calls.last_preflight_provider_relevant == true,
+            "removed named provider did not retain legacy-preflight relevance")
+          handlers.configuration({mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'},
+              unrelated={old_version='1.0.0'}}})
+          assert(credit_calls.last_preflight_provider_relevant == false,
+            "unrelated removed mod was marked as competing-provider relevance")
+        ''')
+
+    def test_native_credit_preflight_stops_configuration_before_lifecycle_writes(self):
+        self.lua.execute('''
+          install_modules(false, false, false, true); install_runtime();
+          package.preload["platform.target"] = function()
+            return {id="f200", recipe_productivity=true}
+          end
+          CREDIT_PREFLIGHT_ERROR = "ambiguous legacy preference"
+          load_control()
+          local ok, message = pcall(handlers.configuration, {mod_changes={}})
+          assert(not ok and tostring(message):find("ambiguous legacy preference", 1, true))
+          assert(credit_calls.preflight == 1 and lifecycle_calls.configuration == nil
+            and credit_calls.on_configuration_changed == nil and library_calls.configuration == nil)
         ''')
 
     def test_unlimited_scripted_effects_register_and_route_force_lifecycle_events(self):

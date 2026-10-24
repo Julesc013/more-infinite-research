@@ -1,0 +1,111 @@
+{
+  "schema": 1,
+  "kind": "MIR5DynamicCompetingProviderSourceInputsV1",
+  "scope": "Exact installed archives read in place. Derived technology IDs require independent native captures; no source-derived output invented.",
+  "native_execution": false,
+  "providers": [
+    {
+      "key": "crafting-efficiency",
+      "name": "crafting-efficiency-2",
+      "version": "0.2.20",
+      "archive": "crafting-efficiency-2_0.2.20.zip",
+      "sha256": "2ED4373DEB180E910D72EDE30C8FC1F71BFFCB5401F6092E87E365631D9A2AB1",
+      "dependencies": [
+        "base >= 2.0.0",
+        "?space-age >= 2.0.0",
+        "?vanilla_galore_continued",
+        "?space_age_galore",
+        "?bobplates",
+        "?ev-refining",
+        "?ev-machines",
+        "?extraplanetary-production",
+        "?pypostprocessing"
+      ],
+      "source_member_sha256": {
+        "crafting-efficiency-2/data-final-fixes.lua": "DBF540122848F976A1D5DC5DB7BD4E51F21F341F6C6CA859E7108F9B1234F6DC",
+        "crafting-efficiency-2/prototypes/expansions/bobs-mod.lua": "8C0A5E47E7425376553FF94E080F6572C7376686066850442BF1063781268559",
+        "crafting-efficiency-2/prototypes/expansions/ev-machines.lua": "A4D55BD27413389C53A6127211291AAD3240DF54163A42C6565A2B048A8C8996",
+        "crafting-efficiency-2/prototypes/expansions/ev-refining.lua": "6CA825C03C91B44E7FBEB259B837267586B59571441273AA48162FB2C1A835F1",
+        "crafting-efficiency-2/prototypes/expansions/extraplanetary-production.lua": "C5A72F2CC3E3F2A9539DBA8F9EF48D84524A14B70F03405AD7448EB92D294BCC",
+        "crafting-efficiency-2/prototypes/expansions/pyalienlife.lua": "4662FD82FC88FCC0BA51BEF902AFAA12E16AE49AEB11DF9F97C3D64F925E0DD1",
+        "crafting-efficiency-2/prototypes/expansions/space-age-galore.lua": "E64A55E9E60BD87415797AC2DE7596F037E65B289E9125D517AEACFC86EF27DB",
+        "crafting-efficiency-2/prototypes/expansions/space-age.lua": "F1B438D0532D2D59CD454E30EB967EDB3FB56835B1E846B42C340F8A1D01228A",
+        "crafting-efficiency-2/prototypes/expansions/vanilla-galore.lua": "608704FD3F6B7211595D99864C09E6CB40B08B1FA297B57E3BE1A5CCA965E42C",
+        "crafting-efficiency-2/prototypes/helper.lua": "787A0D71624AA762094E65C3DDE0746E1D616B5FE648E7DBF97C9E94C37D8D75",
+        "crafting-efficiency-2/prototypes/pypostprocessing.lua": "D558BB34F958FC15000E98B4957EB94D1E62E4364E7744245CCCD97FA2CB76A8",
+        "crafting-efficiency-2/prototypes/recipes.lua": "C98FA2D2A8A901A15C68BF1909F03413BFF94D0C9B15DA3DCB0CE955F22FA9F9",
+        "crafting-efficiency-2/settings-value.lua": "6C66A8D279AE9C7943DDFA3493C59912BAC43460FD73EB7218131207510CE9FF",
+        "crafting-efficiency-2/settings.lua": "45E19DE07BEB8AB7E561CB4B4E7B6F36D468E9F5319A2A7F5510C7911BD8DA2C"
+      },
+      "profile": "tests/mir5/profiles/competing-crafting-efficiency-f200-sa-2077.json"
+    },
+    {
+      "key": "productivity-research",
+      "name": "ProductivityResearch",
+      "version": "1.3.2",
+      "archive": "ProductivityResearch_1.3.2.zip",
+      "sha256": "4E1B609B6AB731E1C3A019B6C23250878B4188D3F3179B701BC977B306D10874",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) UnlimitedProductivityFork",
+        "(?) aai-industry",
+        "(?) modified-productivity-cap",
+        "(?) ev-refining",
+        "(?) planetaris-hyarion",
+        "(?) virentis",
+        "! ProductivityResearchForEveryone",
+        "! ProductivityResearchForEveryoneFG",
+        "! too-many-prods"
+      ],
+      "source_member_sha256": {
+        "ProductivityResearch_1.3.2/control.lua": "E6717D0C559A326CA1DB861D94EB81C4370300441D52AFBE8F4C69D47D9AF6E4",
+        "ProductivityResearch_1.3.2/data-final-fixes.lua": "7D551E0D452ADC58E421B50AF78707713C08BAC16E583B8B2A9DE90AE74A5714",
+        "ProductivityResearch_1.3.2/data.lua": "29490DA0B5084C153A25552E1C51F37362CA80BC9607510A1280C9F8C17A67F6",
+        "ProductivityResearch_1.3.2/functions.lua": "A3ED44FA0FE1D576EF655E26F6C5B781B746C6938FE9A670F741003E9994D7CF",
+        "ProductivityResearch_1.3.2/prototypes/shortcut.lua": "A08270EEED84072BD5B6D58DE9AE0D4BD66A97B5C9124BEF22F260D5A1CF8A65",
+        "ProductivityResearch_1.3.2/settings.lua": "9500594800DFDB79D6FA36B84BDABED8549DA9AC4FE59FFC8E4F13834C13972B"
+      },
+      "profile": "tests/mir5/profiles/competing-productivity-research-f200-sa-2077.json"
+    },
+    {
+      "key": "prfe",
+      "name": "ProductivityResearchForEveryone",
+      "version": "1.0.8",
+      "archive": "ProductivityResearchForEveryone_1.0.8.zip",
+      "sha256": "1E0AB7BA00D90651881F5D751656688A69A5E1A6E556D43CC1279567ED203469",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) UnlimitedProductivityFork",
+        "(?) aai-industry",
+        "(?) modified-productivity-cap",
+        "(?) Cerys-Moon-of-Fulgora"
+      ],
+      "source_member_sha256": {
+        "ProductivityResearchForEveryone/data-final-fixes.lua": "BF6787C51B815FA5F4E95B09A954AC7F6FD9F9F521C2FCE61661C087DCB03F3C",
+        "ProductivityResearchForEveryone/functions.lua": "C115673301F770CDE78896C869F8BF814AB5D299C48B3B59A1C140E44AF3C1D2",
+        "ProductivityResearchForEveryone/settings.lua": "311EB165142D8718CCE46AAEA77335260EBE1D1641B07DFEA4D96C5AB215C56B"
+      },
+      "profile": "tests/mir5/profiles/competing-prfe-f200-sa-2077.json"
+    },
+    {
+      "key": "prfe-fg",
+      "name": "ProductivityResearchForEveryoneFG",
+      "version": "1.2.0",
+      "archive": "ProductivityResearchForEveryoneFG_1.2.0.zip",
+      "sha256": "5FF87277B4CE238931967792BA4030A9BBDDEA8A5489A04DFC6CB2D172F50739",
+      "dependencies": [
+        "base >= 2.0",
+        "(?) UnlimitedProductivityFork",
+        "(?) aai-industry",
+        "(?) modified-productivity-cap",
+        "! ProductivityResearchForEveryone"
+      ],
+      "source_member_sha256": {
+        "ProductivityResearchForEveryoneFG/data-final-fixes.lua": "C1A9EC65AF0CF98C0C06B1A7072E66B296A4CFC6A4C0837581AD0B2BE9406E55",
+        "ProductivityResearchForEveryoneFG/functions.lua": "A3ED44FA0FE1D576EF655E26F6C5B781B746C6938FE9A670F741003E9994D7CF",
+        "ProductivityResearchForEveryoneFG/settings.lua": "C6459AE468ABB6FB2E172D28FCCB02A31AFAB4D1EC97B369CEAFC244D2759E40"
+      },
+      "profile": "tests/mir5/profiles/competing-prfe-fg-f200-sa-2077.json"
+    }
+  ]
+}

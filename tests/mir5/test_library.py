@@ -261,6 +261,67 @@ class LibraryTests(unittest.TestCase):
                     if line and not line.startswith((";", "#", "[")) and "=" in line}
             self.assertTrue(required <= keys, path)
 
+    def test_en_and_de_localize_the_authored_availability_reasons(self):
+        required = {
+            "availability-entry", "availability-requires-space-age", "availability-native-research-productivity"
+        }
+        for language in ("en", "de"):
+            path = ROOT / "source/mir5/locale" / language / "mir-library.cfg"
+            keys = {line.split("=", 1)[0] for line in path.read_text(encoding="utf-8").splitlines()
+                    if line and not line.startswith((";", "#", "[")) and "=" in line}
+            self.assertTrue(required <= keys, path)
+            names = ROOT / "source/mir5/locale" / language / "more-infinite-research.cfg"
+            name_keys = {line.split("=", 1)[0] for line in names.read_text(encoding="utf-8").splitlines()
+                         if line and not line.startswith((";", "#", "[")) and "=" in line}
+            self.assertTrue({
+                "more-infinite-research.research_agricultural_growth_speed",
+                "more-infinite-research.research_spoilage_preservation",
+                "more-infinite-research.research_lab_productivity",
+            } <= name_keys, names)
+
+    def test_availability_mode_searches_authored_rows_without_native_actions(self):
+        self.lua.execute(r'''
+          script = {active_mods = {}}
+          boot()
+          local native_queue, native_current, native_progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+
+          local root = library.open(player, {tab = "availability"})
+          local content = research_content(root)
+          assert(content["mir_library_availability_1"] ~= nil and content["mir_library_availability_2"] ~= nil
+            and content["mir_library_availability_empty"] == nil)
+          local query = root["mir_library_filters"]["mir_library_query"]
+          query.text = "spoilage-preservation"
+          library.on_gui_text_changed({player_index = 1, element = query})
+          assert(content["mir_library_availability_1"].caption[2][1]
+              == "technology-name.more-infinite-research.research_spoilage_preservation"
+            and content["mir_library_availability_2"] == nil)
+
+          script.active_mods = {["space-age"] = "2.1.23"}
+          query.text = ""
+          library.on_gui_text_changed({player_index = 1, element = query})
+          assert(content["mir_library_availability_empty"] ~= nil,
+            "Space Age must not show the two requires-Space-Age rows")
+
+          local owner = {valid = true, prototype = {effects = {
+            {type = "laboratory-productivity", modifier = .1}
+          }}}
+          player.force.technologies["research-productivity"] = owner
+          library.open(player, {tab = "availability", query = "lab"})
+          assert(content["mir_library_availability_1"].caption[2][1]
+              == "technology-name.more-infinite-research.research_lab_productivity"
+            and content["mir_library_availability_1"].caption[3][1]
+              == "mir-browser.availability-native-research-productivity")
+
+          owner.prototype.effects[1].modifier = .1001
+          library.open(player, {tab = "availability", query = ""})
+          assert(content["mir_library_availability_empty"] ~= nil
+            and content["mir_library_availability_1"] == nil,
+            "a malformed named native owner must not produce an explanation")
+          assert(player.force.research_queue == native_queue and player.force.current_research == native_current
+            and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
+        ''')
+
     def test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild(self):
         self.lua.execute('''
           boot()
@@ -855,8 +916,11 @@ class LibraryTests(unittest.TestCase):
           library.on_gui_selection_state_changed({player_index = 1, element = visibility})
           view = storage.mir_library.players[1]
           assert(view.visibility == 3 and view.page == 1)
-          assert(research_content(root)["mir_library_availability_empty"].caption[1]
-            == "mir-browser.availability-empty")
+          assert(research_content(root)["mir_library_availability_empty"] == nil)
+          assert(research_content(root)["mir_library_availability_1"].caption[2][1]
+              == "technology-name.more-infinite-research.research_agricultural_growth_speed"
+            and research_content(root)["mir_library_availability_2"].caption[2][1]
+              == "technology-name.more-infinite-research.research_spoilage_preservation")
           family.selected_index = 7
           library.on_gui_selection_state_changed({player_index = 1, element = family})
           view = storage.mir_library.players[1]
@@ -997,8 +1061,9 @@ class LibraryTests(unittest.TestCase):
           library.open(player, {tab = "availability"})
           assert(storage.mir_library.players[1].tab == "research"
             and storage.mir_library.players[1].visibility == 3)
-          assert(research_content(root)["mir_library_availability_empty"].caption[1]
-            == "mir-browser.availability-empty")
+          assert(research_content(root)["mir_library_availability_empty"] == nil)
+          assert(research_content(root)["mir_library_availability_1"] ~= nil
+            and research_content(root)["mir_library_availability_2"] ~= nil)
           tabs.selected_tab_index = 4
           library.on_gui_selected_tab_changed({player_index = 1, element = tabs})
           assert(tabs["mir_library_help_content"]["mir_library_help_summary"].caption[1]

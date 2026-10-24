@@ -123,7 +123,8 @@
     "Every stage saves and passes two independent cold reloads; original predecessor inputs remain byte-identical."
   ],
   "limitations": [
-    "Private non-final source/package; no other provider/engine, physical crafting, multiplayer or performance acceptance from this chain."
+    "Private non-final source/package; no other provider/engine, physical crafting, multiplayer or performance acceptance from this chain.",
+    "The false-preference stage proves release of owned foreign disablement and earned-state preservation only. Future overlapping MIR bonus exclusion is a separate unresolved parity blocker."
   ],
   "release_qualification": false
 }
