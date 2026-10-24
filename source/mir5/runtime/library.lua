@@ -45,9 +45,9 @@ local TRANSLATION_MAINTENANCE_TICKS = 61
 local TABS = {"research", "queue", "settings", "help"}
 local TAB_INDEX = {research = 1, queue = 2, settings = 3, help = 4}
 
--- Derived translated labels and catalogue order remain local to a currently
--- open view. The small issued-request ledger lives in the Library state so a
--- future Factorio callback can still release its bounded slot after a save.
+-- Open translation work is saved separately from personal preferences, so a
+-- joining client reconnects the same labels, cursor and issued window.
+-- Closing a view drops that working cache and retains only issued native IDs.
 local translation_caches = {}
 local declaration_cache
 
@@ -330,9 +330,9 @@ local function whole_number(value, minimum)
     and value == math.floor(value) and value >= minimum
 end
 
--- This sidecar intentionally holds only a monotonic lifetime epoch and
--- bounded issued-request records. Labels, catalogue IDs, retries, and any
--- LuaObjects remain in translation_caches while an owned view is open.
+-- The issued-request ledger retains its original schema. The optional working
+-- map adds schema-1 open-view caches containing plain bounded translation
+-- data only; no LuaObjects, native research facts or Generator state is saved.
 local function existing_translation_ledger(state)
   local value = type(state) == "table" and state.translations or nil
   if type(value) ~= "table" or value.schema ~= TRANSLATION_SCHEMA
@@ -358,6 +358,34 @@ local function ensure_translation_ledger(state)
   }
   state.translations = value
   return value
+end
+
+local function ordered_player_indices(rows)
+  local indices = {}
+  for index in pairs(rows) do
+    if whole_number(index, 1) then indices[#indices + 1] = index end
+  end
+  table.sort(indices)
+  return indices
+end
+
+local function reconnect_translation_caches()
+  translation_caches = {}
+  local state = type(storage) == "table" and storage[STORAGE_KEY] or nil
+  local ledger = existing_translation_ledger(state)
+  local working = ledger and ledger.working
+  if type(working) ~= "table" then return end
+  for index, saved in pairs(working) do
+    if whole_number(index, 1) and type(saved) == "table" and saved.schema == 1
+        and technology_id(saved.family) ~= nil and type(saved.scope) == "table"
+        and saved.scope.player_index == index
+        and translation_queue.labels(saved.cache, saved.scope) ~= nil then
+      translation_caches[index] = {
+        player_index = index, scope = saved.scope, family = saved.family,
+        cache = saved.cache, ledger = ledger
+      }
+    end
+  end
 end
 
 local function entry_pending(entry)
@@ -643,6 +671,18 @@ local function sync_issued_cache(record)
   if type(record) ~= "table" or type(record.ledger) ~= "table" then return false end
   local pending = translation_queue.export_pending(record.cache)
   if pending == nil then return false end
+  local working = record.ledger.working
+  if working == nil then
+    working = {}
+    record.ledger.working = working
+  end
+  if type(working) ~= "table" then return false end
+  local previous = working[record.player_index]
+  if previous ~= nil and (type(previous) ~= "table" or previous.schema ~= 1
+      or previous.cache ~= record.cache) then return false end
+  working[record.player_index] = {
+    schema = 1, scope = record.scope, family = record.family, cache = record.cache
+  }
   if #pending == 0 then
     record.ledger.active[record.player_index] = nil
   else
@@ -657,6 +697,17 @@ end
 local function discard_translation_cache(index)
   local record = translation_caches[index]
   if record then sync_issued_cache(record) end
+  local ledger = record and record.ledger
+  local working = ledger and ledger.working
+  if record and type(working) == "table" then
+    local saved = working[index]
+    if type(saved) ~= "table" or saved.schema ~= 1 or saved.cache ~= record.cache then
+      translation_caches[index] = nil
+      return
+    end
+    working[index] = nil
+    if next(working) == nil then ledger.working = nil end
+  end
   translation_caches[index] = nil
 end
 
@@ -694,6 +745,10 @@ local function open_translation_cache(player, view)
   local state = ensure_state()
   local ledger = ensure_translation_ledger(state)
   if ledger == nil then return nil end
+  if ledger.working ~= nil and type(ledger.working) ~= "table" then return nil end
+  -- A remaining record was not reconnected by this implementation. Preserve
+  -- that unknown working protocol rather than overwriting its issued rights.
+  if ledger.working and ledger.working[index] ~= nil then return nil end
   -- A removed player can have an old engine request in flight. Preserve an
   -- unfamiliar retired entry rather than deleting it and reusing this index.
   if ledger.retired[index] ~= nil then return nil end
@@ -1668,6 +1723,8 @@ function M.on_player_joined_game(event)
     -- A deferred native request may now be issued, but only because this
     -- player's tagged Library is actually open and connected.
     render(player, view_for(event.player_index), nil, true)
+  else
+    discard_translation_cache(event.player_index)
   end
 end
 
@@ -1691,6 +1748,7 @@ function M.on_native_state_changed(event)
       local player = player_for(index)
       if not player or player.connected ~= true or not valid(owned_root(player)) then
         view.open, view.refresh_pending = false, false
+        discard_translation_cache(index)
       elseif force == nil or (player.force and player.force.index == force.index) then
         view.refresh_pending = true
       end
@@ -1717,6 +1775,7 @@ function M.on_native_refresh_tick()
       render(player, view_for(index), nil, true)
     else
       view.open = false
+      discard_translation_cache(index)
     end
   end
 end
@@ -1765,7 +1824,8 @@ function M.on_translation_maintenance(event)
   local ledger = state and existing_translation_ledger(state) or nil
   if not ledger then return end
 
-  for index, entry in pairs(ledger.active) do
+  for _, index in ipairs(ordered_player_indices(ledger.active)) do
+    local entry = ledger.active[index]
     local record = translation_caches[index]
     local player = player_for(index)
     local rooted = player and player.connected == true and valid(owned_root(player))
@@ -1791,7 +1851,8 @@ function M.on_translation_maintenance(event)
       if handled then update_durable_entry(ledger, "active", index, entry, pending) end
     end
   end
-  for index, entry in pairs(ledger.retired) do
+  for _, index in ipairs(ordered_player_indices(ledger.retired)) do
+    local entry = ledger.retired[index]
     local pending, handled = expire_durable_entry(entry, tick)
     if handled then update_durable_entry(ledger, "retired", index, entry, pending) end
     -- A reused index receives no new request while its prior lifetime has an
@@ -1821,6 +1882,7 @@ end
 -- visits every saved player record (O(P)); it deliberately does not truncate
 -- migration candidates.
 function M.on_configuration_changed()
+  reconnect_translation_caches()
   declaration_cache = nil
   local legacy = legacy_browser_state()
   local legacy_players = legacy and legacy.players
@@ -1890,15 +1952,14 @@ function M.on_configuration_changed()
 
   -- Configuration may change the compact catalogue. Keep engine-issued IDs,
   -- but give every open view a new caller epoch before it can publish labels.
-  local open = {}
-  for index in pairs(translation_caches) do open[#open + 1] = index end
+  local open = ordered_player_indices(translation_caches)
   for _, index in ipairs(open) do invalidate_open_translation(index) end
 end
 
--- Load is intentionally read-only: it neither migrates, repairs, rebuilds a
--- view, nor allocates a translation cache. Bootstrap reads subscription_needs
--- below to reconnect the conditional 61-tick handler from durable requests.
+-- Reconnect plain working references only. No saved field, native object,
+-- authored catalogue, GUI or request is touched during load/client catch-up.
 function M.on_load()
+  reconnect_translation_caches()
 end
 
 -- Read-only on-load-safe decision. Do not call ensure_state here: malformed or

@@ -376,6 +376,20 @@ class LibraryTests(unittest.TestCase):
           native_handlers.events[5]({research=gear})
           assert(foreign_root.valid and screen["mir_research_browser"] == foreign_root)
           assert(native_ticks[1] == nil and native_handlers.events[1] == nil)
+          assert(storage.mir_library.translations.working == nil,
+            "lost owned frame retained its working cache")
+        ''')
+
+    def test_pending_view_refresh_retires_translation_work_after_the_owned_root_disappears(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local root=open_routed()
+          native_handlers.events[1]({research=gear})
+          root.destroy()
+          native_ticks[1]({tick=1})
+          assert(storage.mir_library.translations.working==nil and native_ticks[1]==nil)
+          assert(player.gui.screen["mir_research_browser"]==nil and #player.translation_requests==1)
+          assert(library.subscription_needs(),"issued ID was discarded with the working cache")
         ''')
 
     def test_native_refresh_orders_pending_players_independently_of_saved_map_iteration(self):
@@ -783,6 +797,7 @@ class LibraryTests(unittest.TestCase):
           local queue, current, progress = player.force.research_queue,
             player.force.current_research, player.force.research_progress
           library.close(player)
+          assert(storage.mir_library.translations.working == nil)
           package.loaded["runtime.library"] = nil
           library = require("runtime.library")
           library.on_load()
@@ -802,6 +817,154 @@ class LibraryTests(unittest.TestCase):
           assert(not library.subscription_needs())
           assert(player.force.research_queue == queue and player.force.current_research == current
             and player.force.research_progress == progress)
+        ''')
+
+    def test_warm_and_cold_translation_replies_produce_equal_saved_work_and_native_requests(self):
+        self.lua.execute(r'''
+          boot()
+          for index=1,18 do
+            local name="foreign-cold-probe-"..index
+            player.force.technologies[name]={valid=true,name=name,level=1,researched=false,
+              enabled=true,visible_when_disabled=false,localised_name=name,prototype={max_level=1}}
+          end
+          library.open(player,{family="all"})
+          assert(#player.translation_requests==16)
+          local function clone(value)
+            if type(value)~="table" then return value end
+            local copied={}; for key,child in pairs(value) do copied[key]=clone(child) end
+            return copied
+          end
+          local function equal(left,right)
+            if type(left)~=type(right) then return false end
+            if type(left)~="table" then return left==right end
+            for key,value in pairs(left) do if not equal(value,right[key]) then return false end end
+            for key in pairs(right) do if left[key]==nil then return false end end
+            return true
+          end
+          local before,requests,warm=clone(storage),clone(player.translation_requests),library
+          package.loaded["runtime.library"]=nil
+          local cold=require("runtime.library")
+          local function reply(module)
+            for index=1,8 do
+              module.on_string_translated{player_index=1,id=requests[index].id,
+                translated=true,result="translated-"..index}
+            end
+          end
+          player.translation_requests={}
+          reply(warm)
+          local warm_state,warm_requests=clone(storage),clone(player.translation_requests)
+          storage=clone(before)
+          player.translation_requests={}; player.next_translation_id=16
+          local available_game=game
+          game=nil
+          cold.on_load()
+          assert(equal(storage,before),"on_load changed saved translation work")
+          game=available_game
+          reply(cold)
+          assert(equal(storage,warm_state),"cache warmth changed durable translation work")
+          assert(equal(player.translation_requests,warm_requests),"cache warmth changed native requests")
+          assert(#player.translation_requests==4 and #storage.mir_library.translations.active[1].pending==12)
+        ''')
+
+    def test_completed_open_translation_work_survives_load_and_is_retired_on_close(self):
+        self.lua.execute(r'''
+          boot()
+          local root=library.open(player,{family="all"})
+          for index=1,2 do
+            library.on_string_translated{player_index=1,id=player.translation_requests[index].id,
+              translated=true,result=index==1 and "Zahnrad" or "Fremde Forschung"}
+          end
+          assert(not library.subscription_needs())
+          local ledger=storage.mir_library.translations
+          local saved_cache=ledger.working[1].cache
+          local epoch=ledger.next_epoch
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          local available_game=game; game=nil
+          library.on_load()
+          assert(ledger.working[1].cache==saved_cache and ledger.next_epoch==epoch)
+          game=available_game
+          assert(library.open(player)==root and #player.translation_requests==2 and ledger.next_epoch==epoch)
+          assert(research_content(root)["mir_library_results"].items[1]=="Zahnrad")
+          library.close(player)
+          assert(ledger.working==nil and ledger.active[1]==nil and not library.subscription_needs())
+        ''')
+
+    def test_issued_only_legacy_translation_sidecar_loads_read_only_and_drains_without_reissue(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player,{family="all"})
+          local ledger=storage.mir_library.translations
+          -- Pre-correction MIR5 saved only issued IDs, without a working map.
+          ledger.working=nil
+          local pending=ledger.active[1].pending
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          local available_game=game; game=nil
+          library.on_load()
+          assert(ledger.working==nil and ledger.active[1].pending==pending)
+          game=available_game
+          for index=1,2 do
+            library.on_string_translated{player_index=1,id=player.translation_requests[index].id,
+              translated=true,result="old-window"}
+          end
+          assert(ledger.working==nil and not library.subscription_needs() and #player.translation_requests==2)
+          library.open(player,{family="all"})
+          assert(#player.translation_requests==4 and ledger.working[1].schema==1)
+        ''')
+
+    def test_translation_maintenance_orders_open_players_before_issuing_native_retries(self):
+        self.lua.execute(r'''
+          boot()
+          local order,next_id={},100
+          player.request_translation=function() order[#order+1]=1;next_id=next_id+1;return next_id end
+          local second={valid=true,index=2,locale="de",connected=true,force=player.force,
+            gui={screen=gui_container(nil)},set_shortcut_toggled=function() end,
+            request_translation=function() order[#order+1]=2;next_id=next_id+1;return next_id end}
+          game.get_player=function(index) return index==1 and player or index==2 and second or nil end
+          library.open(player,{family="all"}); library.open(second,{family="all"})
+          setmetatable(storage.mir_library.translations.active,{__pairs=function(rows)
+            local index=3
+            return function() index=index-1;if index>0 then return index,rows[index] end end
+          end})
+          order={}
+          library.on_translation_maintenance{tick=1800}
+          assert(table.concat(order,",")=="1,1,2,2","native request order follows active-map traversal")
+        ''')
+
+    def test_configuration_invalidates_a_saved_open_working_cache_without_prior_on_load(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player,{family="all"})
+          for index=1,2 do
+            library.on_string_translated{player_index=1,id=player.translation_requests[index].id,
+              translated=true,result="old-configuration"}
+          end
+          local ledger=storage.mir_library.translations
+          local old_cache,epoch=ledger.working[1].cache,ledger.next_epoch
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          library.on_configuration_changed()
+          assert(ledger.working[1].cache~=old_cache and ledger.next_epoch>epoch)
+          assert(#player.translation_requests==4)
+          assert(research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items[1]
+            =="Iron gear wheel productivity","configuration retained old translated labels")
+        ''')
+
+    def test_unknown_saved_translation_work_is_preserved_and_cannot_issue_another_window(self):
+        self.lua.execute(r'''
+          boot()
+          library.open(player,{family="all"})
+          local ledger=storage.mir_library.translations
+          local unknown={schema=77,cache={pending={99}}}
+          ledger.working[1]=unknown
+          package.loaded["runtime.library"]=nil
+          library=require("runtime.library")
+          library.on_load()
+          library.open(player,{family="all"})
+          assert(ledger.working[1]==unknown and #player.translation_requests==2)
+          library.close(player)
+          assert(ledger.working[1]==unknown and library.subscription_needs())
         ''')
 
     def test_translation_stale_scope_reload_and_reused_index_never_publish_old_labels(self):
@@ -855,6 +1018,12 @@ class LibraryTests(unittest.TestCase):
             translated = true, result = "late"})
           assert(library.subscription_needs() == false)
 
+          assert(#player.translation_requests == 8
+            and research_content(player.gui.screen["mir_research_browser"])["mir_library_results"].items[1] == "late",
+            "same-scope callbacks were not restored consistently across load")
+          -- A later explicit close/open starts the separate request lifetime
+          -- used by the removed/reused-player regression below.
+          library.close(player)
           library.open(player)
           local removed_gear, removed_foreign = player.translation_requests[9].id, player.translation_requests[10].id
           library.on_player_removed({player_index = 1})
