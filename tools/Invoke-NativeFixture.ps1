@@ -436,10 +436,10 @@ try{
   }
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
-  # Only the predecessor-to-successor transition on engines that parse
-  # disabled archive names needs the durable owned-version selection. Fresh
-  # historical runs retain their external direct-library path unchanged.
-  if($historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
+  # F013--F016 inspect every owned archive name before applying mod-list.json.
+  # Pin the selected MIR version in the existing durable activation transaction
+  # for both fresh historical fixtures and predecessor-to-successor transitions.
+  if($historical -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
     $activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')
   }
   $activation=Start-MIRLibraryActivation @activationArguments
