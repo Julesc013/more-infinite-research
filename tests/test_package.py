@@ -208,6 +208,13 @@ class PackageTests(unittest.TestCase):
         recovered = json.loads((ROOT / "spec/inventory/package-presentation-472.json").read_bytes())
         self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
         self.assertEqual(len(recovered["records"]), 9)
+        latest = json.loads((ROOT / "spec/inventory/package-presentation-473.json").read_bytes())
+        self.assertEqual(latest["release_tag"], "v4.7.3")
+        self.assertEqual(latest["published_source"], "8643cc91bc915e008556a5315dbb0a743247e7ab")
+        self.assertEqual(latest["sums_sha256"], "D46F37750BAF0ED950E1F87EAC458726555171B10BE4562E0C90EFDB96D6CBFF")
+        latest_records = {record["target"]: record for record in latest["records"]}
+        self.assertEqual(len(latest["records"]), 9)
+        self.assertEqual(set(latest_records), {record["target"] for record in recovered["records"]})
         entry = (source / "presentation/changelog/current.txt").read_bytes()
         self.assertLessEqual(max(map(len, entry.splitlines())), 132)
         for record in recovered["records"]:
@@ -219,7 +226,21 @@ class PackageTests(unittest.TestCase):
                     historical_path.as_posix(),
                     f"source/mir5/presentation/changelog/{record['target']}.txt")
                 history = (source / historical_path.relative_to("source/mir5")).read_bytes()
-                self.assertEqual(hashlib.sha256(history).hexdigest().upper(), record["history_sha256"])
+                current = latest_records[record["target"]]
+                self.assertEqual(current["source"], f"source/presentation/changelog/{record['target']}.txt")
+                self.assertEqual(len(history), current["bytes"])
+                self.assertEqual(hashlib.sha256(history).hexdigest().upper(), current["history_sha256"])
+                self.assertEqual(current["previous_history_bytes"], record["bytes"])
+                self.assertEqual(current["previous_history_sha256"], record["history_sha256"])
+                self.assertGreater(len(history), record["bytes"])
+                previous = history[-record["bytes"]:]
+                prefix = history[:-record["bytes"]]
+                self.assertEqual(hashlib.sha256(previous).hexdigest().upper(), record["history_sha256"])
+                self.assertEqual(len(prefix), current["added_prefix_bytes"])
+                self.assertEqual(hashlib.sha256(prefix).hexdigest().upper(), current["added_prefix_sha256"])
+                self.assertTrue(prefix.startswith(
+                    ("-" * 99 + "\nVersion: 4.7." + record["target"][1:] + "03\n").encode()))
+                self.assertEqual(current["license_sha256"], record["license_sha256"])
                 self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()) + history)
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])
                 self.assertEqual(files["thumbnail.png"], (source / "thumbnail.png").read_bytes())

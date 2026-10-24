@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version: 4.7.01703
+  Bugfixes:
+    - Bind independently established direct recipe alternatives for unfamiliar lab inputs, including planetary-data with no same-name recipe.
+    - Preserve selected science amounts and the actual seed owner's prerequisites; reject disabled, zero-output and unseeded cyclic alternatives.
+  Info:
+    - Target package from source 4.7.3.
+    - Retain the published 4.7.2 changelog and earlier history.
+    - Require Factorio 0.17.79 or newer in this target line.
+---------------------------------------------------------------------------------------------------
 Version: 4.7.01702
   Bugfixes:
     - Preserve unambiguous native science sources and their unlock gates when acyclic transitive factory dependencies are unknown.
