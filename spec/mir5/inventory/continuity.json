@@ -325,6 +325,11 @@
           ],
           "evidence": "spec/mir5/evidence/settings-repair-chain.json",
           "scope": "Focused setting/lifecycle routes are covered independently."
+        },
+        {
+          "id": "scripted-effects-startup-toggle",
+          "evidence": "spec/mir5/evidence/scripted-effects-toggle-native-chain.json",
+          "scope": "Exact F2002.0.77 Space Age three-stage enable/disable/re-enable chain preserves actual earned levels2, foreign42% queue and external baseline2 then3. Native growth17821/18000/17821 and spoil1212/1200/1818 are witnessed; all87 members verified, protected source saves unchanged, save/two cold reloads each. Actual mod removal/readdition, scaling and final source remain unqualified."
         }
       ],
       "test_subjects": [
@@ -360,6 +365,11 @@
           ],
           "evidence": "spec/mir5/evidence/scripted-effects-native-chain.json",
           "scope": "Actual tower planting events and trained remaining growth ticks are observed for the named Space Age research."
+        },
+        {
+          "id": "scripted-effects-startup-toggle",
+          "evidence": "spec/mir5/evidence/scripted-effects-toggle-native-chain.json",
+          "scope": "Exact F2002.0.77 Space Age three-stage enable/disable/re-enable chain preserves actual earned levels2, foreign42% queue and external baseline2 then3. Native growth17821/18000/17821 and spoil1212/1200/1818 are witnessed; all87 members verified, protected source saves unchanged, save/two cold reloads each. Actual mod removal/readdition, scaling and final source remain unqualified."
         }
       ],
       "test_subjects": [
@@ -501,7 +511,7 @@
             "source/mir5/compatibility/competing_productivity.lua",
             "source/mir5/compatibility/science_bindings.lua"
           ],
-          "scope": "Complete known provider closures with changed captured versions or unsupported named mixes refuse before silent identity omission, ownership filtering loss or K2SO science fallback. Exact admitted outputs and unrelated mods remain unchanged. Partial provider removal remains ordinary inactivity; data stage cannot establish saved ownership. These guards do not establish arbitrary future-patch support."
+          "scope": "BobTech, Bob/Angel and ATAN select by relevant named closure/target and validate consumed native fields; unrelated version changes no longer trigger a blanket whole-profile refusal. Host controls compare complete same-input outputs after changed version strings and reject meaningful owner/route drift. Competing-provider and K2SO phase-specific captured-version restrictions remain under separate review. Unsupported named mixes still refuse. No arbitrary future-patch or current native qualification follows."
         },
         {
           "id": "bounded-competing-provider-contracts",
@@ -533,6 +543,17 @@
           "id": "fixed-provider-earned-removal-control",
           "evidence": "spec/mir5/evidence/competing-fixed-removal-control-native-chain.json",
           "scope": "Actual MIR overlaps survive MIR5 true/false and provider removal/readdition with137 artifact members verified. The separate first-upgrade ambiguity chain now qualifies the explicit refusal/two-step path for its exact F2004.7.2 closure; other dynamic/mixed owners remain unqualified."
+        },
+        {
+          "id": "armor-py-authored-catalogue-batch",
+          "source": [
+            "source/mir5/compatibility/modern_catalogue/bob_warfare.lua",
+            "source/mir5/compatibility/modern_catalogue/py.lua",
+            "source/mir5/compatibility/py_materials.lua",
+            "source/mir5/compatibility/native_modded_continuations.lua"
+          ],
+          "evidence": "spec/mir5/evidence/integration-reference-native-chain.json",
+          "scope": "Independent upstream/published F200 references recover armor and PyCoal/HighTech output. Authored batch at5e1018e303f578b3716d4bd0b0d37ff4be943c72 preserves all48/49 Py productivity rows in host comparison, broad armor/plating weights, log finite/tail identities, three HighTech groups, weighted six native tails and settings visibility. Focused host controls pass; current native candidate and earned/physical transitions remain pending."
         }
       ],
       "test_subjects": [
@@ -540,7 +561,7 @@
         "production"
       ],
       "remaining_implementation": [
-        "Admit Py/armor only after exact native identity and ownership facts are recovered; broad aliases are not an admission contract."
+        "Complete remaining applicable conditional material/profile bindings using the recovered native facts; preserve broad product-based coverage and historical identities rather than treating one captured pack as the entire contract."
       ],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
