@@ -552,8 +552,11 @@
             "source/mir5/compatibility/py_materials.lua",
             "source/mir5/compatibility/native_modded_continuations.lua"
           ],
-          "evidence": "spec/mir5/evidence/integration-reference-native-chain.json",
-          "scope": "Independent upstream/published F200 references recover armor and PyCoal/HighTech output. Authored batch at5e1018e303f578b3716d4bd0b0d37ff4be943c72 preserves all48/49 Py productivity rows in host comparison, broad armor/plating weights, log finite/tail identities, three HighTech groups, weighted six native tails and settings visibility. Focused host controls pass; current native candidate and earned/physical transitions remain pending."
+          "evidence": [
+            "spec/mir5/evidence/integration-reference-native-chain.json",
+            "spec/mir5/evidence/armor-py-candidate-native-chain.json"
+          ],
+          "scope": "Independent upstream/published F200 references recover armor and PyCoal/HighTech output. Authored batch at5e1018e303f578b3716d4bd0b0d37ff4be943c72 and recheck at0612af568aa76fd78ff492b527340fdc45214dc2 complete three exact native data/settings captures with verified manifests and restored direct-library controls. The authored rows preserve all48/49 Py productivity rows in host comparison, broad armor/plating weights, log finite/tail identities, three HighTech groups, weighted six native tails and settings visibility. A complete candidate/reference dump comparison is not run because its portable recovery oracle is absent; earned/physical transitions remain pending."
         }
       ],
       "test_subjects": [
