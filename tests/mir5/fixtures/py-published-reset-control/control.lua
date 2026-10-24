@@ -127,8 +127,8 @@ local function assert_snapshot(force, expected, primary)
   end
   for name, before in pairs(expected.recipes) do
     local recipe = force.recipes[name]
-    if recipe == nil or recipe.valid == false or recipe.enabled ~= before then
-      fail("post-callback foreign recipe changed: " .. name)
+    if recipe == nil or recipe.valid == false or not close(recipe.productivity_bonus, before) then
+      fail("post-callback foreign recipe productivity changed: " .. name)
     end
   end
   for category, before in pairs(expected.guns) do

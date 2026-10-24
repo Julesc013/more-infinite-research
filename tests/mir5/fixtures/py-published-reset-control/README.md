@@ -9,7 +9,7 @@ changes only the private fixture/actor versions, so Factorio runs migrations
 and configuration callbacks. The actor migration records that it restored its
 one owned foreign primary to `enabled=false` before callbacks. This successor
 then reads the stored full foreign-force snapshot and requires the named Py
-primary to be enabled while every other captured technology field, recipe,
+primary to be enabled while every other captured technology field, recipe productivity bonus,
 gun modifier and native force modifier remains unchanged. The marker records
 that before/after boundary together with the finite profile and primary. The
 controller must separately verify the actor's migration log for the same force
@@ -20,6 +20,12 @@ Run 40089321549 preserves the original observer isolation defect: the observer
 incorrectly expected actor storage inside its own mod. The actor's actual
 `observed_before=false` and `observed_after=false` prove disablement at migration;
 that failed observer establishes no later callback state or causal attribution.
+
+Run 40090561999 preserves a second observer schema defect: the source snapshot
+stores each recipe's numeric `productivity_bonus`, while the observer compared
+its boolean `enabled` field with that number. It establishes no recipe mutation.
+The corrected observer compares the same captured productivity field and keeps
+every other expectation unchanged.
 
 Only these exact F200 selections are admitted:
 
