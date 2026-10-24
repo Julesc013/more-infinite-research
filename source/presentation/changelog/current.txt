@@ -25,6 +25,7 @@ Version: @DISTRIBUTION_VERSION@
     - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.
     - Accept Factorio's default recipe productivity ceiling when BobTech and Angel omit the optional raw field.
     - Apply the existing growth-factor ceiling of 1000 to native setting bounds, preserving defaults and zero inheritance.
+    - Keep the first-upgrade preference safeguard when upgrading an earned Factorio 2.0 save from MIR 4.7.3.
     - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
     - Preserve in-flight Library translations across client load and retry expired requests in deterministic order.
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.

@@ -241,6 +241,38 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           assert(not ok and tostring(message):find("startup settings unchanged", 1, true))
         ''')
 
+    def test_473_first_upgrade_keeps_the_history_free_preference_safeguard(self):
+        # The inspected 4.7.3 hotfix leaves the published 4.7 runtime and
+        # migration producers unchanged. A new patch string cannot establish
+        # an old preference that was never recorded in that save.
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          for _, included in ipairs({true, false}) do
+            storage, game = {}, {forces={}}
+            local force = make_force(1, {[fish]=included}, {['recipe-prod-research_breeding-1']=2})
+            game.forces[1] = force
+            local event = {mod_startup_settings_changed=true,
+              mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.20000'}}}
+            local ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+            assert(not ok and tostring(message):find("startup settings unchanged", 1, true),
+              "4.7.3 patch string bypassed the earned-credit ambiguity guard")
+            assert(storage.mir_native_credits == nil)
+            for _, state in pairs(force._states) do
+              assert(state.writes.level == 0 and state.writes.enabled == 0,
+                "rejected upgrade changed native research")
+            end
+
+            -- A first unchanged-settings observation remains allowed. Once
+            -- that valid ledger exists, a later changed-settings event is
+            -- no longer an ambiguous history-free first observation.
+            event.mod_startup_settings_changed = false
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+            native_credits.on_init()
+            event.mod_startup_settings_changed = true
+            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+          end
+        ''')
+
     def test_legacy_preflight_allows_unearned_or_nonmatching_configuration_events(self):
         self.lua.execute(r'''
           local force = make_force(1)
