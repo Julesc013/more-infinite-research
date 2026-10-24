@@ -356,6 +356,7 @@ $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
 $markerPrefix=if($fixtureCase-ceq'library-multiplayer'){'MIR5_LIBRARY_MULTIPLAYER'}else{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}
+$clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
 foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
   Assert-Session $spec.ContainsKey($field) "session spec lacks $field"
 }
@@ -443,7 +444,7 @@ function Start-Clients([string]$Phase) {
   $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
   $started=[Collections.Generic.List[object]]::new()
   foreach($client in $clients){
-    $actor=Start-Native ("client-$Phase-$($client.locale)") @('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)
+    $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
     # until the first real join proves those startup writes finished before
@@ -503,6 +504,7 @@ try {
     engine_sha256=(Get-SessionHash $engine); seed_sha256=$seedHash; restart_save_sha256=$restartHash
     final_save_sha256=(Get-SessionHash $finalSave); markers=@('ready','rejoin-ready','restart-ready','completed')
     clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
+    client_graphics_arguments=$clientGraphics
     screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
   }
   [IO.File]::WriteAllText($sessionPath, ($result | ConvertTo-Json -Depth 10) + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))

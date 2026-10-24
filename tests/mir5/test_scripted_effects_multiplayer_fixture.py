@@ -136,14 +136,19 @@ class ScriptedEffectsMultiplayerFixtureTests(unittest.TestCase):
             local chunk, message=loadfile({path}, "t", environment); assert(chunk, message); chunk()
             callbacks.load()
             local ok, message=pcall(callbacks.events[5])
+              state.restart_wall.health=90
+              local later_ok, later_message=pcall(callbacks.events[5])
             return {{ok=ok, message=tostring(message), phase=state.phase,
-              restarted=state.host_restart_observed, readonly=state.on_load_read_only}}
+                restarted=state.host_restart_observed, readonly=state.on_load_read_only,
+                later_ok=later_ok, later_message=tostring(later_message), repair_baseline=state.restart_wall_post_load_health}}
             """
         )
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual(result["phase"], "awaiting-final-clients")
         self.assertTrue(result["restarted"])
         self.assertTrue(result["readonly"])
+        self.assertTrue(result["later_ok"], result["later_message"])
+        self.assertEqual(result["repair_baseline"], 50)
 
     def test_init_and_join_callbacks_reject_a_bad_closure_disconnected_client_and_wrong_locale(self):
         path = json.dumps(str(CONTROL))

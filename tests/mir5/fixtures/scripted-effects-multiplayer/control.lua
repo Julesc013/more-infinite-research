@@ -310,6 +310,10 @@ local function check_loaded_state(state)
     fail("on_load changed a durable scripted-effect multiplayer witness")
   end
   state.host_restart_observed, state.on_load_read_only = true, true
+  -- Observe repair from the first available host tick. Clients can take
+  -- longer than the repair interval to reconnect; never reset this baseline
+  -- after their startup and accidentally require health above a full wall.
+  state.restart_wall_post_load_health = state.restart_wall.health
   state.phase = "awaiting-final-clients"
   loaded = nil
 end
@@ -511,7 +515,6 @@ script.on_event(defines.events.on_tick, function()
   if state.phase == "awaiting-host-restart" then restart_wall_pending(state); return end
   if state.phase == "awaiting-final-clients" then
     if state.phase == "awaiting-final-clients" and state.join_events == 6 and two_connected_clients(state) then
-      state.restart_wall_post_load_health = state.restart_wall.health
       state.phase = "validating-after-restart"
     end
     return

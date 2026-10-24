@@ -12,6 +12,8 @@ planting, fixture-only shortened spoil clocks, wall damage and passive repair,
 and a created/merged offset force. It has no renderer, performance, or general
 multiplayer-stress claim.
 
+The gameplay runner uses the native low graphics preset and low video-memory usage for both clients. This keeps Space Age texture allocation within the governed process-tree budget; it is not an ordinary-menu or graphical-performance comparison. Pending repair is observed from the first host tick after reload, including repair while the real clients reconnect.
+
 The offset merge follows the F200 `LuaGameScript.merge_forces(source,
 destination)` contract: the destination retains its technologies and bonuses.
 The existing native destination-level observation in
