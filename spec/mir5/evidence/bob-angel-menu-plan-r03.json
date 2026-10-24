@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "kind": "MIR5PredeclaredResponsiveMenuExperimentV1",
+  "status": "frozen-before-execution-not-a-result",
+  "host": "BLACKGLASS-WIN1",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "profile": "tests/mir5/profiles/bob-angel-f200-2077.json",
+  "profile_checkout_sha256": "93EA20609F3EACDA4C8C1ABFCB5168BD82E89937A62824A2EB4140478262BE78",
+  "profile_git_blob_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+  "published": {
+    "version": "4.7.20002",
+    "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+  },
+  "candidate": {
+    "source_reference": "c4183a1b2a1c3346b734df182424dfc54f47a3e5",
+    "sha256": "D9B0265058B727B47B904E735DFE453F2E6C2589F8966CBD1106E92C81888253",
+    "scope": "Complete applicable current F200 Bob/Angel catalogue, native credits, runtime and Library, with recovered license/thumbnail and complete target changelog history. Known changed provider closures and ambiguous first published preference upgrades refuse explicitly. Later commits must preserve this exact player ZIP and the frozen observer blobs."
+  },
+  "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+  "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
+  "native_preparation": {
+    "run": 40038355586,
+    "artifact": "black-glass-bob-angel-menu-comparison-40038355586-1",
+    "manifest_sha256": "74E88CF317CB5150D99EEA99D232ECA06F6CE8E089DF456C92258C65D8D9F129",
+    "members": 50,
+    "scope": "Fresh control/published/replay native captures and complete replay equality passed. Timing did not start because the menu preflight rejected its empty diagnostics list. Reuse only after every artifact member and every consumed current external input is reverified."
+  },
+  "endpoint": "Process start to observed response to a harmless ordinary main-menu action",
+  "arms": [
+    "control-without-mir",
+    "published-4.7",
+    "replay",
+    "candidate-mir5"
+  ],
+  "design": {
+    "warmups_per_arm": 1,
+    "same_version_aa_observations": 2,
+    "counterbalanced_blocks": 8,
+    "primary_observations_per_arm": 8,
+    "extensions": "None. Preserve every refusal/error/adverse observation; any changed-input run requires a separately identified plan."
+  },
+  "tolerances": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_percent": 5,
+    "aa_rule": "Absolute A/A difference must not exceed max(0.5 seconds, 5 percent of their mean).",
+    "control_regression_seconds": 0.5,
+    "control_rule": "Mean late-cycle control startup must not exceed mean early-cycle control startup by more than 0.5 seconds. Report every sample and spread.",
+    "minimum_mir_added_time_reduction_percent": 50,
+    "improvement_rule": "Use paired block differences against the same control, report direct and incremental differences, sample spread and uncertainty. A nonpositive or unresolved baseline increment supports no percentage claim."
+  },
+  "preconditions": [
+    "The identified fresh exact-input published/control/replay captures and complete data/settings equality precede timings; reuse their original execution identity after exact external-input verification.",
+    "Existing archive library only, no dependency copies or engine updates, exclusive native custody and unchanged resource admission.",
+    "No other heavy jobs during timed launches; one shared cache policy and the same ordinary configuration and credential-free engine-created player data for all arms.",
+    "The owned-window control diagnostic must first reach the observed settings response with the desktop obstruction removed. No failed/refused diagnostic is an accepted timing sample."
+  ],
+  "limitations": [
+    "This is an engineering comparison, not final release qualification or a second-machine comparison.",
+    "Save, Library latency, runtime stress and retained/peak memory non-regression require their separate endpoints."
+  ],
+  "previous_plan": "spec/mir5/evidence/bob-angel-menu-plan-r02.json",
+  "changed_inputs": [
+    "Recovered published player assets, complete target changelog history and ordinary product metadata now ship.",
+    "Known changed provider tuples refuse before silent identity/science/ownership loss; the unchanged captured F200 closure remains admitted.",
+    "The first published4.7 competing-preference migration has an event-driven ambiguity guard; ordinary startup emission and native steady-state research have no added recurring work."
+  ],
+  "resources": {
+    "expected_peak_memory_mib": 6144,
+    "maximum_new_output_mib": 2048,
+    "per_launch_timeout_seconds": 300,
+    "worker_timeout_minutes": 45,
+    "governor_reserves_changed": false
+  },
+  "observer_source_reference": "c4183a1b2a1c3346b734df182424dfc54f47a3e5",
+  "observer_git_blobs": [
+    {
+      "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
+      "sha256": "047DCB1AD990905A209BCDC984BACEA886534B7C17E02F345C429A29677F2407"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/Invoke-MIRResponsiveMenuActor.ps1",
+      "sha256": "DC4816352962EC14ED443E5865F71FF3F2A989B47DCF4F45916048F1B5A55D55"
+    },
+    {
+      "path": "tools/lib/validation/responsive-menu/MenuObservation.ps1",
+      "sha256": "8423C41478F7AB329E7A385BBD13BB39490E42FB4F98B1D53AA508B583DEC2EC"
+    },
+    {
+      "path": "tools/mir5/Invoke-MenuComparison.ps1",
+      "sha256": "A6E639C4D4569E4F3B417DE3239CE532C765C1D36C18E64A7D951C03D9F3678B"
+    }
+  ],
+  "adverse_evidence": "spec/mir5/evidence/bob-angel-menu-preparation-and-adverse-chain.json"
+}
