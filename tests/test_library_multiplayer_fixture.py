@@ -415,6 +415,112 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             self.assertEqual(screenshot["resolution"], [1280, 720])
             self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
 
+    def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
+        result = self.run_case()
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual([marker["stage"] for marker in result["markers"]],
+                         ["ready", "rejoin-ready", "restart-ready", "completed"])
+
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $text=[IO.File]::ReadAllText($env:MIR_TEST_SESSION)
+          $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $allDefinitions=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.FunctionDefinitionAst]
+          },$true))
+          $names=@('Test-LibraryInteger','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
+            'Assert-LibraryLiveRefresh','Get-StageMarker')
+          $definitions=@{}
+          foreach($name in $names){
+            $matches=@($allDefinitions|Where-Object {$_.Name -ceq $name})
+            if($matches.Count -ne 1){throw "reader definition missing or ambiguous: $name"}
+            $definitions[$name]=$matches[0].Extent.Text
+          }
+          function Assert-Session([bool]$Condition,[string]$Message){
+            if(-not $Condition){throw $Message}
+          }
+          foreach($name in $names){Invoke-Expression $definitions[$name]}
+          $fixtureCase='library-multiplayer'
+          $markerPrefix='MIR5_LIBRARY_MULTIPLAYER'
+          $markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable)
+          $expectedJoins=@{ready=0;'rejoin-ready'=2;'restart-ready'=4;completed=6}
+          if($markers.Count -ne 4){throw 'actual fixture markers are incomplete'}
+          function ConvertTo-LibraryMarkerLine([hashtable]$Marker){
+            return '[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($Marker|ConvertTo-Json -Depth 20 -Compress)
+          }
+          function Copy-LibraryMarker([hashtable]$Marker){
+            return ($Marker|ConvertTo-Json -Depth 20|ConvertFrom-Json -AsHashtable)
+          }
+          function Assert-LibraryReaderAccepts([hashtable]$Marker){
+            $stage=[string]$Marker['stage']
+            if(-not $expectedJoins.ContainsKey($stage)){throw "unexpected actual fixture stage: $stage"}
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage])
+            if($null -eq $accepted -or $accepted.stage -cne $stage){throw "actual fixture marker rejected: $stage"}
+          }
+          function Assert-LibraryReaderRejects([hashtable]$Marker,[string]$ExpectedStage,[int]$ExpectedJoins,[string]$Name){
+            # Construct the candidate marker before validation so construction errors cannot count as rejection.
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            try{
+              $accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins
+            }catch{return}
+            if($null -ne $accepted){throw "reader accepted invalid marker: $Name"}
+          }
+          $byStage=@{}
+          foreach($marker in $markers){
+            Assert-LibraryReaderAccepts $marker
+            $byStage[[string]$marker['stage']]=$marker
+          }
+
+          $missingImmutable=Copy-LibraryMarker $byStage['ready']
+          $missingImmutable['witnesses'].Remove('initial_native_snapshot_immutable')
+          Assert-LibraryReaderRejects $missingImmutable 'ready' 0 'missing immutable snapshot'
+
+          $falseImmutable=Copy-LibraryMarker $byStage['ready']
+          $falseImmutable['witnesses']['initial_native_snapshot_immutable']=$false
+          Assert-LibraryReaderRejects $falseImmutable 'ready' 0 'false immutable snapshot'
+
+          $stringJoinCount=Copy-LibraryMarker $byStage['ready']
+          $stringJoinCount['witnesses']['actual_join_events']='0'
+          Assert-LibraryReaderRejects $stringJoinCount 'ready' 0 'string join count'
+
+          $wrongViews=Copy-LibraryMarker $byStage['ready']
+          $wrongViews['witnesses']['distinct_personal_query_and_selection']=$false
+          Assert-LibraryReaderRejects $wrongViews 'ready' 0 'cross-client view state'
+
+          $missingLiveRefresh=Copy-LibraryMarker $byStage['rejoin-ready']
+          $missingLiveRefresh['witnesses'].Remove('live_refresh')
+          Assert-LibraryReaderRejects $missingLiveRefresh 'rejoin-ready' 2 'missing live refresh'
+
+          $wrongLiveRefreshType=Copy-LibraryMarker $byStage['rejoin-ready']
+          $wrongLiveRefreshType['witnesses']['live_refresh']='not-a-table'
+          Assert-LibraryReaderRejects $wrongLiveRefreshType 'rejoin-ready' 2 'string live refresh'
+
+          $stringQueue=Copy-LibraryMarker $byStage['completed']
+          $stringQueue['witnesses']['live_refresh']['queue_lengths_observed']=@('2','1','0')
+          Assert-LibraryReaderRejects $stringQueue 'completed' 6 'string queue lengths'
+
+          $wrongCompletionCount=Copy-LibraryMarker $byStage['completed']
+          $wrongCompletionCount['witnesses']['live_refresh']['real_lab_completions']=1
+          Assert-LibraryReaderRejects $wrongCompletionCount 'completed' 6 'incomplete real labs'
+
+          $wrongStage=Copy-LibraryMarker $byStage['ready']
+          $wrongStage['stage']='unknown'
+          Assert-LibraryReaderRejects $wrongStage 'ready' 0 'wrong stage'
+          'PASS actual marker reader contract'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-library-marker-reader-") as work:
+            marker_path = Path(work) / "actual-fixture-markers.json"
+            marker_path.write_text(json.dumps(result["markers"]), encoding="utf-8")
+            reader = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION),
+                         MIR_TEST_LIBRARY_MARKERS=str(marker_path)), check=False)
+        self.assertEqual(reader.returncode, 0, reader.stdout + reader.stderr)
+
     def test_profiler_output_does_not_change_saved_witnesses(self):
         first, other = self.run_case(), self.run_case("profiler-variant")
         self.assertTrue(first["ok"], first["message"])
