@@ -179,3 +179,25 @@ jobs:
           $ErrorActionPreference = 'Stop'
           ./tests/mir5/Test-MIR5HostControls.ps1 -LuaRuntimeDir $env:MIR5_LUA_RUNTIME
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  native-tooling-controls:
+    name: native-tooling-controls
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Run current native tooling guards without an engine
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $controls = @(
+            'tests/tooling/Test-MIRNativeProbeResources.ps1',
+            'tests/tooling/Test-MIRImmutableInputStaging.ps1',
+            'tests/tooling/Test-MIRLibraryActivation.ps1',
+            'tests/tooling/Test-MIRDirectLibraryStartupMeasurement.ps1',
+            'tests/tooling/Test-MIRDevelopmentHealth.ps1',
+            'tests/tooling/Test-MIRArtifactStorageOptimization.ps1'
+          )
+          foreach ($control in $controls) {
+            & pwsh -NoLogo -NoProfile -File $control
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }

@@ -1,4 +1,4 @@
-# MIR4-CANONICAL-EXECUTABLE-TEST
+# MIR5-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 
