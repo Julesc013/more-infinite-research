@@ -56,7 +56,9 @@ local function ordinary_rows(actual, expected)
 end
 
 local function maximum_productivity_matches(actual, expected)
-  if expected == "omitted" then return actual == nil end
+  -- F200 RecipePrototype defaults to 3. Explicit 3 preserves the captured
+  -- omitted ceiling; admission must not repair or normalize upstream data.
+  if expected == "omitted" then return actual == nil or actual == 3 end
   -- F200 named routes can only bind the captured three-fold ceiling.  Do not
   -- accept an arbitrary foreign cap as though it described the same route.
   return expected == 3 and actual == 3
