@@ -1,10 +1,9 @@
 -- A published-4.7-only configuration-boundary observer.  Its paired actor
--- migration has already restored the exact foreign disabled flag before this
--- callback can run.  This fixture only reads the retained snapshot and saves
+-- migration log must be verified separately by the controller: Factorio gives
+-- each mod its own private storage. This fixture reads only its own snapshot and saves
 -- a runner completion boundary; it never writes technologies, forces, recipes,
 -- effects, research, queues, or actor storage.
 local KEY = "mir5_integration_catalogue_upgrade"
-local ACTOR_KEY = "mir5_integration_foreign_owner"
 local FIXTURE = "mir-fixture-mir5-integration-catalogue-upgrade"
 local ACTOR_MOD = "mir-fixture-mir5-integration-foreign-owner"
 local SAVE = "mir5-native-complete"
@@ -148,14 +147,9 @@ end
 local function observe()
   local profile_name, selected = profile()
   local state = storage[KEY]
-  local actor = storage[ACTOR_KEY]
   if type(state) ~= "table" or state.phase ~= "source-complete" or state.profile ~= profile_name
       or type(state.foreign_index) ~= "number" then
     fail("published source witness is absent or belongs to another profile")
-  end
-  if type(actor) ~= "table" or actor.disabled ~= true or actor.force_index ~= state.foreign_index
-      or actor.technology ~= selected.primary then
-    fail("foreign-owner migration witness differs")
   end
   local force = game.forces[state.foreign_index]
   if force == nil or force.valid == false or force.name ~= "mir5-integration-catalogue-upgrade-foreign" then
@@ -173,7 +167,7 @@ local function observe()
     force = state.foreign_index,
     primary = selected.primary,
     source_enabled = expected_primary.enabled,
-    migration_actor_disabled = actor.disabled,
+    migration_actor_log_required = true,
     post_configuration_enabled = actual.enabled,
     visibility = actual.visible,
     checked_technology_rows = rows,

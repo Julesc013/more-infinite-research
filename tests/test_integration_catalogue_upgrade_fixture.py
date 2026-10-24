@@ -508,6 +508,116 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertNotIn("require(\"research.", text)
         self.assertNotIn("__more-infinite-research__", text)
 
+    def _published_py_reset_control(self, identifier, opponent=None):
+        path = FIXTURE.parent / "py-published-reset-control"
+        mods = {"base": "2.0.77", "more-infinite-research": "4.7.20002",
+                "mir-fixture-mir5-integration-catalogue-upgrade": "0.2.0",
+                "mir-fixture-mir5-integration-foreign-owner": "0.2.0",
+                "mir-fixture-mir5-active-mods-observer": "0.1.0"}
+        profile = json.loads((FIXTURE.parents[1] / "profiles" /
+                              f"{identifier}-f200-2077.json").read_text(encoding="utf-8"))
+        mods.update({row["name"]: row["version"] for row in profile["mods"]
+                     if row.get("enabled", True)})
+        if opponent == "wrong-mir":
+            mods["more-infinite-research"] = "5.0.20000"
+        self.lua.execute(r'''
+          function run_published_py_control(path, active, profile, primary, opponent)
+            local callbacks, events, payloads, saves = {}, {}, {}, {}
+            local function readonly(fields)
+              return setmetatable({}, {
+                __index=fields,
+                __newindex=function() error("observer attempted a native or stored-state write") end,
+                __pairs=function() return next, fields, nil end,
+              })
+            end
+            local function row(level, enabled, maximum)
+              return readonly{level=level, researched=false, enabled=enabled,
+                visible=false, saved=0, maximum=maximum}
+            end
+            local before = readonly{
+              technologies=readonly{
+                [primary]=row(5, opponent == "source-enabled", 50000000),
+                ["laser-shooting-speed-8"]=row(8, true, "infinite"),
+              },
+              recipes=readonly{fixture_recipe=true}, guns=readonly{bullet=.1},
+              fields=readonly{manual_mining_speed_modifier=0},
+            }
+            local function technology(name, level, enabled, maximum)
+              return readonly{valid=true, name=name, level=level, researched=false,
+                enabled=enabled, visible_when_disabled=false, saved_progress=0,
+                prototype=readonly{max_level=maximum}}
+            end
+            local force = readonly{
+              valid=true, name="mir5-integration-catalogue-upgrade-foreign",
+              technologies=readonly{
+                [primary]=technology(primary, opponent == "primary-level" and 6 or 5,
+                  opponent ~= "primary-disabled", 50000000),
+                ["laser-shooting-speed-8"]=technology("laser-shooting-speed-8", 8,
+                  opponent ~= "other-enabled", "infinite"),
+              },
+              recipes=readonly{fixture_recipe=readonly{valid=true, enabled=opponent ~= "recipe"}},
+              get_gun_speed_modifier=function() return opponent == "gun" and .2 or .1 end,
+              manual_mining_speed_modifier=opponent == "force" and 1 or 0,
+            }
+            local state = readonly{phase="source-complete", profile=profile,
+              foreign_index=5, foreign_snapshot=before}
+            -- Factorio's storage belongs to this fixture alone. The actor's
+            -- private key is absent and any attempted cross-mod read must fail.
+            local own = {mir5_integration_catalogue_upgrade=state}
+            local env = {
+              storage=setmetatable({}, {
+                __index=function(_, key)
+                  if own[key] == nil then error("read outside fixture private storage: " .. key) end
+                  return own[key]
+                end,
+                __newindex=function() error("observer attempted a storage write") end,
+              }),
+              game={forces={[5]=force}, server_save=function(name) saves[#saves+1]=name end},
+              script={active_mods=active,
+                on_configuration_changed=function(fn) callbacks.config=fn end,
+                on_load=function(fn) callbacks.load=fn end,
+                on_event=function(id, fn) events[id]=fn end},
+              defines={events={on_tick=1}}, log=function() end,
+              helpers={table_to_json=function(value) payloads[#payloads+1]=value; return "{}" end},
+            }
+            setmetatable(env, {__index=_G})
+            local ok, message = pcall(function()
+              assert(loadfile(path .. "/data-final-fixes.lua", "t", {mods=active,
+                pairs=pairs, error=error}))()
+              assert(loadfile(path .. "/control.lua", "t", env))()
+              callbacks.config()
+              events[1]()
+              callbacks.load()
+              events[1]()
+            end)
+            return {ok=ok, message=tostring(message), payloads=payloads, saves=saves}
+          end
+        ''')
+        return py(self.lua.eval("run_published_py_control")(
+            path.as_posix(), lua(self.lua, mods), identifier,
+            self.plan["profiles"][identifier]["primary"], opponent))
+
+    def test_published_py_observer_uses_only_its_own_storage_and_read_only_native_objects(self):
+        for identifier in ("py-coal", "py-alienlife-hightech"):
+            with self.subTest(profile=identifier):
+                result = self._published_py_reset_control(identifier)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(["mir5-native-complete"], result["saves"])
+                witnesses = result["payloads"][0]
+                self.assertEqual(identifier, witnesses["profile"])
+                self.assertFalse(witnesses["source_enabled"])
+                self.assertTrue(witnesses["post_configuration_enabled"])
+                self.assertTrue(witnesses["migration_actor_log_required"])
+                self.assertEqual(2, witnesses["checked_technology_rows"])
+
+    def test_published_py_observer_rejects_changed_state_and_mir5_without_weakening_ownership(self):
+        for opponent in ("wrong-mir", "source-enabled", "primary-disabled", "primary-level",
+                         "other-enabled", "recipe", "gun", "force"):
+            with self.subTest(opponent=opponent):
+                result = self._published_py_reset_control("py-coal", opponent)
+                self.assertFalse(result["ok"], opponent)
+                self.assertEqual({}, result["saves"])
+
     def test_documented_force_fields_exist_in_exact_f200_api_when_installed(self):
         runtime_api = f200_runtime_api_path()
         if runtime_api is None:
