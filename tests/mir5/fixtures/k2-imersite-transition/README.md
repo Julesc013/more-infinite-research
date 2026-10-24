@@ -2,7 +2,7 @@
 
 This disposable F210 scenario qualifies the **published 4.7.2 to MIR5** handoff of the two hidden Imersite state carriers. A fresh 4.7.2 save cannot create an active carrier: published `on_init` clears default holders. The fixture therefore prepares the only reviewed input through the real chain:
 
-1. `predecessor-4.6` performs five sequential levels of the published infinite Imersite research under `4.6.21000`, then records detached 42% next-level progress.
+1. `predecessor-4.6` explicitly sets the source Imersite cap to `0`, performs five sequential levels of the published infinite Imersite research under `4.6.21000`, then records detached 42% next-level progress. Its setting preflight requires the observed published default `3` before writing `0`.
 2. `published-4.7` upgrades that save to `4.7.21002` with `ips-max-level-research_material_imersite = 3`. The 4.7 JSON migration renames the published infinite ID to its state holder; the withheld continuation leaves the level-6 tail as `mir-k2-imersite-continuation-state-4` while preserving the 10% powder bonus and 42% progress.
 3. `mir5` upgrades that published save with the fixture's explicit cap release (`0`). MIR5 re-adds the public continuation, moves the hidden state to it without changing the 10% bonus, performs one real successor lab, and verifies two cold reloads.
 
