@@ -293,7 +293,26 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
   Assert-Session ($witness.actual_join_events -eq $ExpectedJoins) "$Stage witness join count differs"
   Assert-Session ($witness.two_connected_clients_required -eq $true) "$Stage witness lacks native two-client checks"
   if($fixtureCase-ceq'library-multiplayer') {
-    Assert-Session ($witness.distinct_personal_query_and_selection -eq $true -and $witness.native_research_queue_and_effects_unchanged -eq $true) "$Stage witness lacks native Library checks"
+    Assert-Session ($witness.distinct_personal_query_and_selection -eq $true -and $witness.initial_native_snapshot_immutable -eq $true) "$Stage witness lacks native Library checks"
+    Assert-Session ($witness.base_version -ceq '2.0.77' -and $witness.mir_version -ceq '5.0.20000') "$Stage witness version differs"
+    $live=$witness.live_refresh
+    Assert-Session ($live.native_laboratory_completion_by_script -eq $false -and $live.science_consumed_per_named_pack -eq 2 -and
+      $live.fixture_accelerates_gear_count_and_time_only -eq $true -and $live.ordinary_tuning_qualified -eq $false -and
+      $live.root_and_query_identity_preserved -eq $true -and $live.cross_force_view_state_preserved -eq $true) "$Stage live Library contract differs"
+    if($Stage-ceq'ready') {
+      Assert-Session ($live.gear_level -eq 1 -and $live.gear_productivity -eq 0 -and $witness.screenshot_calls -eq 0) 'ready Library state differs'
+    } else {
+      # Live refresh deliberately earns research. Preserve the initial snapshot
+      # while requiring the independently authored lab/queue/event outcomes.
+      Assert-Session ($live.real_lab_completions -eq 2 -and $live.native_research_started_events -eq 3 -and
+        $live.native_research_cancelled_events -eq 1 -and $live.native_foreign_force_created_events -eq 1 -and
+        (@($live.queue_lengths_observed)-join',') -ceq '2,1,0' -and $live.gear_level -eq 3 -and
+        [Math]::Abs([double]$live.gear_productivity-.2) -le .0000001) "$Stage native Library refresh outcomes differ"
+      Assert-Session ($witness.first_open -eq $true -and $witness.search -eq $true -and $witness.refresh -eq $true) "$Stage lacks Library measurement witnesses"
+      $captures=if($Stage-ceq'rejoin-ready'){4}elseif($Stage-ceq'restart-ready'){6}else{8}
+      Assert-Session ($witness.screenshot_calls -eq $captures -and $witness.availability_terminal_labels_checked -eq $true) "$Stage Library capture witnesses differ"
+      if($Stage-cne'rejoin-ready'){Assert-Session ($witness.reopen -eq $true) "$Stage lacks Library reopen witness"}
+    }
   } else {
     foreach($field in @('runtime_owned_state_checked','physical_rates_checked','foreign_offsets_preserved')) {
       $expected=$Stage-cne'ready'

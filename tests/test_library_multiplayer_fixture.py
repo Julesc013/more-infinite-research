@@ -1,5 +1,6 @@
 """Host controls for the private F200 two-client Library fixture, not native evidence."""
 import argparse
+from copy import deepcopy
 import gzip
 import hashlib
 import json
@@ -423,6 +424,65 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual(first["measurements"], other["measurements"])
         self.assertEqual(first["markers"], other["markers"])
         self.assertEqual(first["saves"], other["saves"])
+
+    def test_session_reader_accepts_actual_fixture_markers_and_rejects_live_refresh_drift(self):
+        result = self.run_case()
+        self.assertTrue(result["ok"], result["message"])
+        cases = [{"label": row["stage"], "row": row, "accepted": True}
+                 for row in result["markers"]]
+        for row in result["markers"]:
+            for field, value in (("initial_native_snapshot_immutable", False),
+                                 ("actual_join_events", 99)):
+                changed = deepcopy(row)
+                changed["witnesses"][field] = value
+                cases.append({"label": row["stage"] + "/" + field,
+                              "row": changed, "accepted": False})
+            if row["stage"] == "ready":
+                continue
+            for field, value in (("real_lab_completions", 0),
+                                 ("native_laboratory_completion_by_script", True),
+                                 ("native_research_started_events", 0),
+                                 ("native_research_cancelled_events", 0),
+                                 ("native_foreign_force_created_events", 0),
+                                 ("queue_lengths_observed", [2, 0]),
+                                 ("gear_level", 1), ("gear_productivity", 0),
+                                 ("science_consumed_per_named_pack", 0),
+                                 ("root_and_query_identity_preserved", False),
+                                 ("cross_force_view_state_preserved", False)):
+                changed = deepcopy(row)
+                changed["witnesses"]["live_refresh"][field] = value
+                cases.append({"label": row["stage"] + "/" + field,
+                              "row": changed, "accepted": False})
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $functions=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq 'Get-StageMarker'
+          },$true))
+          if($functions.Count -ne 1){throw 'stage reader missing or ambiguous'}
+          . ([scriptblock]::Create($functions[0].Extent.Text))
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          $markerPrefix='MIR5_LIBRARY_MULTIPLAYER';$fixtureCase='library-multiplayer'
+          foreach($case in (Get-Content -LiteralPath $env:MIR_TEST_CASES -Raw|ConvertFrom-Json)){
+            $row=$case.row
+            $joins=switch -CaseSensitive ($row.stage){ready{0};rejoin-ready{2};restart-ready{4};completed{6}}
+            $line='[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($row|ConvertTo-Json -Depth 10 -Compress)
+            $accepted=$false;$reason=''
+            try{$actual=Get-StageMarker $line $row.stage $joins;$accepted=$null -ne $actual}
+            catch{$reason=$_.Exception.Message}
+            if($accepted -ne $case.accepted){throw ($case.label+': acceptance differs: '+$reason)}
+          }
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-mp-markers-") as work:
+            path = Path(work) / "cases.json"
+            path.write_text(json.dumps(cases), encoding="utf-8")
+            actual = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_CASES=str(path)), check=False)
+        self.assertEqual(actual.returncode, 0, actual.stdout + actual.stderr)
 
     def test_fixture_rejects_missing_clients_wrong_locale_cross_player_view_and_native_mutation(self):
         absent = self.run_case("absent-second-client")
