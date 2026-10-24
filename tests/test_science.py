@@ -214,6 +214,150 @@ class ScienceTests(unittest.TestCase):
           assert(all_result.reason == "all-unbound-sources" and all_context.unbound_science_sources["unbound-lab-card"] == "all")
         ''')
 
+    def test_sif_retires_space_from_only_the_two_level_seven_continuations_under_every_policy(self):
+        self.lua.execute(r'''
+          local policies = {
+            "configured", "space", "space-and-promethium", "space-age-progression",
+            "official-progression", "mod-progression", "all-official", "all"
+          }
+          local packs = {
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack",
+            "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"
+          }
+          local rows = {
+            {
+              id="research-speed-7", family="research-speed",
+              ingredients={{"automation-science-pack",2},{"logistic-science-pack",3},{"chemical-science-pack",5},
+                {"production-science-pack",7},{"utility-science-pack",11},{"military-science-pack",13}},
+              prerequisites={"research-speed-5","utility-science-pack","research-speed-6"},
+              expected={
+                configured="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13",
+                space="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13",
+                ["space-and-promethium"]="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13,promethium-science-pack:1",
+                ["space-age-progression"]="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13",
+                ["official-progression"]="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13",
+                ["mod-progression"]="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13",
+                ["all-official"]="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13,agricultural-science-pack:1,metallurgic-science-pack:1,electromagnetic-science-pack:1,cryogenic-science-pack:1,promethium-science-pack:1",
+                all="automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13,agricultural-science-pack:1,metallurgic-science-pack:1,electromagnetic-science-pack:1,cryogenic-science-pack:1,promethium-science-pack:1"
+              }
+            },
+            {
+              id="weapon-shooting-speed-7", family="weapon-shooting-speed",
+              ingredients={{"automation-science-pack",17},{"logistic-science-pack",19},{"chemical-science-pack",23},
+                {"military-science-pack",29},{"utility-science-pack",31}},
+              prerequisites={"weapon-shooting-speed-5","utility-science-pack","weapon-shooting-speed-6"},
+              expected={
+                configured="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31",
+                space="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31",
+                ["space-and-promethium"]="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31,promethium-science-pack:1",
+                ["space-age-progression"]="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31",
+                ["official-progression"]="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31,production-science-pack:1",
+                ["mod-progression"]="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31",
+                ["all-official"]="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31,production-science-pack:1,agricultural-science-pack:1,metallurgic-science-pack:1,electromagnetic-science-pack:1,cryogenic-science-pack:1,promethium-science-pack:1",
+                all="automation-science-pack:17,logistic-science-pack:19,chemical-science-pack:23,military-science-pack:29,utility-science-pack:31,production-science-pack:1,agricultural-science-pack:1,metallurgic-science-pack:1,electromagnetic-science-pack:1,cryogenic-science-pack:1,promethium-science-pack:1"
+              }
+            }
+          }
+          local function has_name(values, wanted)
+            for _, value in ipairs(values or {}) do if value == wanted then return true end end
+            return false
+          end
+          local function sif_raw()
+            local raw = raw_with(packs, {whole=packs})
+            install_sources(raw, true)
+            -- Exact archived SIF behavior replaces the selected source
+            -- technology's space-platform prerequisite. If policy expansion
+            -- reaches that retired source, source validation must not disable
+            -- either continuation before its own science exclusion applies.
+            raw.technology["space-science-pack"].prerequisites = {
+              "utility-science-pack", "production-science-pack"
+            }
+            return raw
+          end
+
+          -- This is the pre-fix diagnostic: without the named binding, the
+          -- archived prerequisite rewrite makes the policy-added space source
+          -- invalid before a continuation can be published.
+          local unbound = technology(rows[1].ingredients, rows[1].prerequisites)
+          unbound.name, unbound.family = rows[1].id, rows[1].family
+          local unbound_report = science.apply_family({unbound}, {[1]={}}, {raw=sif_raw(), target={id="f210"},
+            mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
+            options={["mir-science-pack-ingredient-policy"]="space"}})[1]
+          assert(not unbound_report.enabled and unbound_report.reason:match(
+            "^invalid%-science%-source:space%-science%-pack:"))
+
+          for _, target in ipairs({"f200", "f210"}) do
+            for _, definition in ipairs(rows) do
+              for _, policy in ipairs(policies) do
+                local row = technology(definition.ingredients, definition.prerequisites)
+                row.name, row.family = definition.id, definition.family
+                local context = science.prepare({raw=sif_raw(), target={id=target},
+                  mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
+                  options={["mir-science-pack-ingredient-policy"]=policy}})
+                local report = science.apply_family({row}, nil, context)[1]
+                assert(report.enabled, target .. ":" .. definition.id .. ":" .. policy .. ":" .. tostring(report.reason))
+                assert(names(row.unit.ingredients) == definition.expected[policy],
+                  target .. ":" .. definition.id .. ":" .. policy .. " changed the named remaining vector")
+                assert(not names(row.unit.ingredients):find("space-science-pack", 1, true))
+                assert(not has_name(row.prerequisites, "space-science-pack"))
+                for _, prerequisite in ipairs(definition.prerequisites) do
+                  assert(has_name(row.prerequisites, prerequisite), "lost finite anchor " .. prerequisite)
+                end
+              end
+            end
+          end
+
+          -- The activation is strictly SIF-scoped. An ordinary Space Age
+          -- selection retains the added space science and its named gate.
+          for _, target in ipairs({"f200", "f210"}) do
+            for _, definition in ipairs(rows) do
+              local raw = raw_with(packs, {whole=packs})
+              install_sources(raw, true)
+              local row = technology(definition.ingredients, definition.prerequisites)
+              row.name, row.family = definition.id, definition.family
+              local report = science.apply_family({row}, nil, science.prepare({raw=raw, target={id=target},
+                mods={["space-age"]="2.1.23"}, options={["mir-science-pack-ingredient-policy"]="space"}}))[1]
+              assert(report.enabled and names(row.unit.ingredients):find("space-science-pack:1", 1, true))
+              assert(has_name(row.prerequisites, "space-science-pack"))
+            end
+          end
+
+          -- Explicit required science and the selected Space Age end-game
+          -- gate remain hard requirements; only policy-selected retired space
+          -- science is excluded for the two named rows.
+          local raw = sif_raw()
+          local required = technology({{"automation-science-pack",37}}, {"finite-anchor"})
+          required.name, required.family = "unrelated-owned-row", "unrelated-owned-row"
+          local report = science.apply(required, {required_science={"space-science-pack"}}, science.prepare({raw=raw,
+            target={id="f210"}, mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
+            options={["mir-science-pack-ingredient-policy"]="configured"}}))
+          assert(report.enabled and names(required.unit.ingredients) == "automation-science-pack:37,space-science-pack:1")
+
+          -- Even on one of the two bound names, an explicit requirement is
+          -- appended after the finite policy exclusion.  The exclusion cannot
+          -- silently override a declared hard requirement.
+          local named_required = technology(rows[1].ingredients, rows[1].prerequisites)
+          named_required.name, named_required.family = rows[1].id, rows[1].family
+          local named_binding = bindings.conditions_for(rows[1].family, rows[1].id,
+            {["space-is-fake"]="observed"})
+          named_binding.required_science = {"space-science-pack"}
+          report = science.apply(named_required, named_binding, science.prepare({raw=sif_raw(), target={id="f210"},
+            mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
+            options={["mir-science-pack-ingredient-policy"]="space"}}))
+          assert(report.enabled and names(named_required.unit.ingredients) ==
+            "automation-science-pack:2,logistic-science-pack:3,chemical-science-pack:5,production-science-pack:7,utility-science-pack:11,military-science-pack:13,space-science-pack:1")
+
+          local gated = technology(rows[1].ingredients, rows[1].prerequisites)
+          gated.name, gated.family = rows[1].id, rows[1].family
+          report = science.apply_family({gated}, nil, {raw=sif_raw(), target={id="f210"},
+            mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"}, options={
+              ["mir-science-pack-ingredient-policy"]="space", ["ips-require-space-gate"]=true}})[1]
+          assert(report.enabled and not names(gated.unit.ingredients):find("space-science-pack", 1, true))
+          assert(has_name(gated.prerequisites, "promethium-science-pack"))
+        ''')
+
     def test_lab_policies_never_union_labs_and_disable_established_identity(self):
         self.lua.execute(r'''
           local raw = raw_with({"A","B","foreign"}, {a={"A"}, b={"B"}, pair={"A","B"}})

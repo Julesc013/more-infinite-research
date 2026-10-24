@@ -302,12 +302,26 @@ local FAMILY_CONDITIONS = {
   research_science_pack_productivity = {phase_all_selected = true}
 }
 
-function M.conditions_for(family)
+-- SIF's data-updates stage retires space science before MIR's final-stage
+-- continuations are emitted.  Keep the retained 4.2.1 correction to the two
+-- observed stable identities; no other family is inferred from the active
+-- mod name or from hidden prototype state.
+local SIF_CONTINUATION_EXCLUSIONS = {
+  ["research-speed-7"] = {"space-science-pack"},
+  ["weapon-shooting-speed-7"] = {"space-science-pack"}
+}
+
+function M.conditions_for(family, technology_name, mods)
   local source = FAMILY_CONDITIONS[family]
-  if not source then return {} end
   local out = {}
-  for key, value in pairs(source) do
-    out[key] = type(value) == "table" and copy_list(value) or value
+  if source then
+    for key, value in pairs(source) do
+      out[key] = type(value) == "table" and copy_list(value) or value
+    end
+  end
+  if type(mods) == "table" and mods["space-is-fake"] ~= nil then
+    local excluded = SIF_CONTINUATION_EXCLUSIONS[technology_name]
+    if excluded then out.excluded_science = copy_list(excluded) end
   end
   return out
 end
