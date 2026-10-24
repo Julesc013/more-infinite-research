@@ -47,12 +47,18 @@ end
 
 local function variants(recipe)
   if type(recipe.normal) == "table" or type(recipe.expensive) == "table" then
-    local out = {}
-    if type(recipe.normal) == "table" then out[#out + 1] = recipe.normal end
-    if type(recipe.expensive) == "table" then out[#out + 1] = recipe.expensive end
-    return out
+    local out, fields = {}, {}
+    if type(recipe.normal) == "table" then out[#out + 1], fields[#fields + 1] = recipe.normal, "normal" end
+    if type(recipe.expensive) == "table" then out[#out + 1], fields[#fields + 1] = recipe.expensive, "expensive" end
+    return out, fields
   end
   return {recipe}
+end
+
+local function copy_fields(value)
+  local out = {}
+  for key, field in pairs(value) do out[key] = field end
+  return out
 end
 
 local function item(entry)
@@ -65,13 +71,14 @@ local function recycling(recipes, chance, scope, probability_field)
   for _, recipe in pairs(recipes) do
     if type(recipe) == "table" and recipe.parameter ~= true and scope.is_recycling(recipe)
       and recipe.hidden == true and recipe.unlock_results == false then
-      local valid, rows = true, variants(recipe)
+      local valid, rows, fields = true, variants(recipe)
       for _, row in ipairs(rows) do
         if type(row.ingredients) ~= "table" or #row.ingredients ~= 1 or not item(row.ingredients[1]) then valid = false end
       end
       if valid then
-        for _, row in ipairs(rows) do
-          for _, result in ipairs(row.results or {}) do
+        for row_index, row in ipairs(rows) do
+          local detached
+          for result_index, result in ipairs(row.results or {}) do
             if item(result) and result.shared_probability == nil then
               local current = tonumber(result[probability_field])
               if current == nil then current = tonumber(result.probability) end
@@ -79,10 +86,24 @@ local function recycling(recipes, chance, scope, probability_field)
               local replacement = math.max(0, math.min(1, current * chance / 0.25))
               if math.abs(replacement - current) >= 0.0000001
                 or (probability_field ~= "probability" and result.probability ~= nil) then
-                result[probability_field] = replacement
-                if probability_field ~= "probability" then result.probability = nil end
+                -- Upstream recipes may share arrays, variants or products.
+                -- Change only this recipe's selected scalar, once per product.
+                if detached == nil then detached = copy_fields(row.results) end
+                local product = copy_fields(result)
+                product[probability_field] = replacement
+                if probability_field ~= "probability" then product.probability = nil end
+                detached[result_index] = product
                 changed = changed + 1
               end
+            end
+          end
+          if detached then
+            if fields then
+              local variant = copy_fields(row)
+              variant.results = detached
+              recipe[fields[row_index]] = variant
+            else
+              recipe.results = detached
             end
           end
         end

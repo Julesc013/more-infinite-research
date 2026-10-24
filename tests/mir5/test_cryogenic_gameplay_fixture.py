@@ -92,11 +92,38 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
               recipe="iron-gear-wheel",change=.1}}}}
           for _, name in ipairs(packs) do gear.research_unit_ingredients[#gear.research_unit_ingredients+1]={name=name,amount=1} end
           force.technologies[gear.name] = gear
-          local inventory = {}
+          local prototypes = {item={}}
+          for _, name in ipairs(packs) do
+            prototypes.item[name] = {science_capacity=1, lab_ignores_spoil_percent=false,
+              get_spoil_ticks=function() return 0 end}
+          end
+          prototypes.item["agricultural-science-pack"] = {science_capacity=1,
+            lab_ignores_spoil_percent=false, get_spoil_ticks=function() return 216000 end}
+          prototypes.item["mir5-cryogenic-native-science"] = {science_capacity=1,
+            lab_ignores_spoil_percent=false, get_spoil_ticks=function() return 0 end}
+          local inventory, stored = {}, {}
           local inserted = {}
-          inventory.insert = function(row) inserted[row.name]=(inserted[row.name] or 0)+row.count; return row.count end
+          local slots = {}
+          inventory.insert = function(row)
+            inserted[row.name]=(inserted[row.name] or 0)+row.count
+            local stack = slots[row.name]
+            if not stack then
+              stack = {valid_for_read=true, name=row.name, count=0, spoil_percent=0,
+                spoil_tick=0, prototype=prototypes.item[row.name]}
+              slots[row.name] = stack
+            end
+            stack.count=inserted[row.name]
+            return row.count
+          end
           inventory.get_item_count = function(name) return inserted[name] or 0 end
-          local lab = {valid=true, get_inventory=function() return inventory end}
+          setmetatable(inventory, {__len=function() return #packs + 1 end,
+            __index=function(_, index)
+              if type(index) ~= "number" then return nil end
+              local name = index <= #packs and packs[index] or "mir5-cryogenic-native-science"
+              return slots[name]
+            end})
+          local lab = {valid=true, get_inventory=function() return inventory end,
+            get_stored_durability=function(name) return stored[name] or {durability=0} end}
           local callbacks, events = {}, {}
           local env = {
             script={active_mods={base="2.1.23", ["space-age"]="2.1.23", ["more-infinite-research"]="5.0.21000"},
@@ -113,7 +140,11 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
           env.helpers = {table_to_json=function(row) reports[#reports+1]=row; return "fixture-json" end}
           env.log = function(message) logs[#logs+1]=message end
           return {env=env,callbacks=callbacks,events=events,force=force,lab=lab,inserted=inserted,
-            reports=reports,logs=logs}
+            reports=reports,logs=logs,stored=stored,set_count=function(name, count, spoil_percent)
+              inserted[name] = count
+              slots[name].count = count
+              slots[name].spoil_percent = spoil_percent or 0
+            end}
         ''')
 
     def test_registration_and_seed_do_not_earn_either_lab_witness(self):
@@ -131,7 +162,8 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
         self.assertEqual(0, runtime["env"]["storage"]["mir5_cryogenic_gameplay"]["finished"])
 
     def test_reload_checks_saved_native_completion_and_consumption_without_repairing_it(self):
-        for mutation in ("pass", "missing-completion", "wrong-input", "wrong-gear", "wrong-lab", "wrong-consumption"):
+        for mutation in ("pass", "missing-completion", "wrong-input", "wrong-gear", "wrong-lab", "wrong-consumption",
+                         "wrong-agricultural-remainder", "wrong-agricultural-freshness"):
             with self.subTest(mutation=mutation):
                 runtime = self.runtime()
                 runtime["callbacks"]["init"]()
@@ -142,12 +174,16 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
                 force["technologies"][GEAR]["level"] = 2
                 force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = EXPECTED_GEAR_PRODUCTIVITY
                 for name in PACKS + [FOREIGN]:
-                    runtime["inserted"][name] = 31
+                    runtime["set_count"](name, 31)
+                runtime["set_count"]("agricultural-science-pack", 30, 0.01)
+                runtime["stored"]["agricultural-science-pack"] = lua(self.lua, {"durability": 0.99})
                 if mutation == "missing-completion": state["finished"] = 1
                 if mutation == "wrong-input": force["technologies"][OWNER]["research_unit_ingredients"][1]["name"] = PACKS[0]
                 if mutation == "wrong-gear": force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = 0.02
                 if mutation == "wrong-lab": force["laboratory_productivity_bonus"] = 0.10
                 if mutation == "wrong-consumption": runtime["inserted"][FOREIGN] = 32
+                if mutation == "wrong-agricultural-remainder": runtime["stored"]["agricultural-science-pack"] = lua(self.lua, {"durability": 0})
+                if mutation == "wrong-agricultural-freshness": runtime["set_count"]("agricultural-science-pack", 30, 0)
                 runtime["callbacks"]["load"]()
                 if mutation == "pass":
                     runtime["events"][1]()
@@ -155,6 +191,11 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
                     self.assertEqual("reload", result["stage"])
                     self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, result["witnesses"]["native_gear_productivity"])
                     self.assertEqual(EXPECTED_LABORATORY_PRODUCTIVITY, result["witnesses"]["laboratory_productivity"])
+                    self.assertEqual(1, result["witnesses"]["each_nonperishable_official_science_consumed"])
+                    self.assertEqual(2, result["witnesses"]["agricultural_science_items_drawn"])
+                    self.assertEqual(30, result["witnesses"]["agricultural_science"]["inventory_count"])
+                    self.assertGreater(result["witnesses"]["agricultural_science"]["stored_durability"], 0)
+                    self.assertIsNone(result["witnesses"]["each_official_science_consumed"])
                     self.assertEqual(1, result["witnesses"]["gear"]["recipe_effect_matches"])
                     self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY,
                                      result["witnesses"]["gear"]["recipe_effect_change"])
@@ -177,6 +218,20 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
                         self.assertIsNotNone(failure["gear"]["researched"])
                         self.assertEqual(1, failure["gear"]["recipe_effect_matches"])
                         self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, failure["gear"]["recipe_effect_change"])
+                    if mutation in ("wrong-agricultural-remainder", "wrong-agricultural-freshness"):
+                        self.assertEqual("perishable agricultural science consumption differs", failure["error"])
+                        inputs = failure["official_input_consumption"]
+                        self.assertEqual(set(PACKS + [FOREIGN]), set(inputs.keys()))
+                        for name in PACKS + [FOREIGN]:
+                            self.assertIn("inventory_count", inputs[name])
+                            self.assertIn("stored_durability", inputs[name])
+                            self.assertIn("stacks", inputs[name])
+                        agricultural = inputs["agricultural-science-pack"]
+                        self.assertEqual(30, agricultural["inventory_count"])
+                        self.assertEqual(216000, agricultural["prototype_spoil_ticks"])
+                        self.assertFalse(agricultural["prototype_lab_ignores_spoil_percent"])
+                        self.assertEqual(0 if mutation == "wrong-agricultural-freshness" else 0.01,
+                                         agricultural["stacks"][1]["spoil_percent"])
                 self.assertEqual(1 if mutation == "missing-completion" else 2, state["finished"])
                 self.assertEqual(32 if mutation == "wrong-consumption" else 31, runtime["inserted"][FOREIGN])
                 if mutation == "wrong-gear":

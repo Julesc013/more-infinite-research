@@ -99,6 +99,27 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             local ok, value = pcall(chunk)
             return {ok=ok, message=tostring(value), rows=rows, setting=data.raw["int-setting"]["ips-max-level-research_material_imersite"]}
           end
+          function run_direct_cost_fixture(path, opponent)
+            local rows = rows_for("mir5")
+            if opponent == "early-identity" then rows[early].upgrade = false end
+            if opponent == "early-effect" then rows[early].effects[1].change = .03 end
+            if opponent == "early-science" then rows[early].unit.ingredients[1][1] = "military-science-pack" end
+            if opponent == "early-unit" then rows[early].unit.count_formula = "199" end
+            if opponent == "early-hidden" then rows[early].hidden = true end
+            if opponent == "holder-identity" then rows[holder].max_level = 3 end
+            if opponent == "holder-effect" then rows[holder].effects[1].change = .03 end
+            if opponent == "holder-science" then rows[holder].unit.ingredients[1][1] = "military-science-pack" end
+            if opponent == "holder-unit" then rows[holder].unit.count_formula = "199" end
+            if opponent == "holder-hidden" then rows[holder].hidden = false end
+            mods = {base="2.1.23", ["Krastorio2-spaced-out"]="2.0.19", ["more-infinite-research"]="5.0.21000",
+              ["mir-fixture-mir5-k2-imersite-transition"]="0.3.0",
+              ["mir-fixture-mir5-k2-imersite-direct-cost"]="0.1.0"}
+            data = {raw={technology=rows}}
+            local chunk, message = loadfile(path, "t", _G)
+            assert(chunk, message)
+            local ok, value = pcall(chunk)
+            return {ok=ok, message=tostring(value), rows=rows}
+          end
           function parse_k2_control(path)
             local callbacks, forbidden = {events={}}, {}
             local environment = {
@@ -131,6 +152,11 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             path, setting.as_posix() if setting.exists() else "", stage, opponent, setting_default
         )
 
+    def _direct_cost(self, opponent: str = ""):
+        return self.lua.eval("run_direct_cost_fixture")(
+            (FIXTURE / "direct-cost/data-final-fixes.lua").as_posix(), opponent
+        )
+
     def test_exact_profiles_pin_the_three_stage_k2so_closure(self):
         expected_external = {
             "flib_0.17.2.zip", "k2so-assets_1.0.7.zip", "Krastorio2_2.1.4.zip",
@@ -154,6 +180,75 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         readme = (FIXTURE / "README.md").read_text(encoding="utf-8")
         for digest in MIR_ARCHIVES.values():
             self.assertIn(digest, readme)
+
+    def test_direct_profile_adds_only_the_ordered_direct_cost_companion(self):
+        expected_external = {
+            "flib_0.17.2.zip", "k2so-assets_1.0.7.zip", "Krastorio2_2.1.4.zip",
+            "Krastorio2-spaced-out_2.0.19.zip", "Krastorio2Assets_2.1.0.zip",
+            "Krastorio2MenuSimulations_2.1.0.zip", "xy-k2so-enhancements-nulls-fork_0.8.3.zip",
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip",
+        }
+        direct = json.loads((PROFILES / "k2-imersite-transition-direct-f210.json").read_text(encoding="utf-8"))
+        self.assertEqual("mir5-k2-imersite-transition-direct-4.6-to-mir5", direct["kind"])
+        self.assertEqual(("2.1.23", ENGINE_SHA), (direct["engine"]["version"], direct["engine"]["sha256"]))
+        names = [row["name"] for row in direct["mods"]]
+        versions = {row["name"]: row["version"] for row in direct["mods"]}
+        self.assertEqual("5.0.21000", versions["more-infinite-research"])
+        self.assertEqual("0.3.0", versions["mir-fixture-mir5-k2-imersite-transition"])
+        self.assertEqual("0.1.0", versions["mir-fixture-mir5-k2-imersite-direct-cost"])
+        self.assertGreater(
+            names.index("mir-fixture-mir5-k2-imersite-direct-cost"),
+            names.index("mir-fixture-mir5-k2-imersite-transition"),
+        )
+        self.assertEqual(expected_external, set(direct["archive_sha256"]))
+
+        published = json.loads((PROFILES / "k2-imersite-transition-published-4.7-f210.json").read_text(encoding="utf-8"))
+        self.assertNotIn(
+            "mir-fixture-mir5-k2-imersite-direct-cost",
+            {row["name"] for row in published["mods"]},
+        )
+
+        info = json.loads((FIXTURE / "direct-cost/info.json").read_text(encoding="utf-8"))
+        self.assertEqual("mir-fixture-mir5-k2-imersite-direct-cost", info["name"])
+        self.assertIn("mir-fixture-mir5-k2-imersite-transition >= 0.3.0", info["dependencies"])
+        self.assertFalse((FIXTURE / "direct-cost/control.lua").exists())
+
+    def test_direct_cost_companion_preflights_both_rows_then_matches_the_source_fixture_cost(self):
+        result = self._direct_cost()
+        self.assertTrue(result["ok"], result["message"])
+        for name in (EARLY, HOLDER):
+            with self.subTest(name=name):
+                row = result["rows"][name]
+                self.assertIsNone(row["unit"]["count"])
+                self.assertEqual("1", row["unit"]["count_formula"])
+                self.assertEqual(1, row["unit"]["time"])
+        self.assertEqual(3, result["rows"][EARLY]["max_level"])
+        self.assertFalse(result["rows"][EARLY]["hidden"])
+        self.assertTrue(result["rows"][HOLDER]["hidden"])
+
+    def test_direct_cost_companion_refuses_each_preflight_before_either_cost_write(self):
+        checks = (
+            ("early-identity", "public early identity changed"),
+            ("early-effect", "public early effect changed"),
+            ("early-science", "public early science changed"),
+            ("early-unit", "public early unit changed"),
+            ("early-hidden", "public early identity changed"),
+            ("holder-identity", "JSON early holder identity changed"),
+            ("holder-effect", "JSON early holder effect changed"),
+            ("holder-science", "JSON early holder science changed"),
+            ("holder-unit", "JSON early holder unit changed"),
+            ("holder-hidden", "JSON early holder identity changed"),
+        )
+        for opponent, phrase in checks:
+            with self.subTest(opponent=opponent):
+                result = self._direct_cost(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn(phrase, result["message"])
+                for name in (EARLY, HOLDER):
+                    row = result["rows"][name]
+                    self.assertIsNone(row["unit"]["count"])
+                    self.assertNotEqual("1", row["unit"]["count_formula"])
+                    self.assertEqual(30, row["unit"]["time"])
 
     def test_data_preflight_keeps_published_input_and_accelerates_only_real_lab_rows(self):
         predecessor = self._data("predecessor-4.6", setting_default=3)

@@ -476,9 +476,6 @@ function M.collect(recipes, context)
           local target = {family = family, recipe = recipe_name, product_type = match.product_type,
             product_name = match.product_name, weight = rule.weight}
           targets[#targets + 1] = target
-          local rows = by_family[family]
-          if rows == nil then rows = {}; by_family[family] = rows end
-          rows[#rows + 1] = copy_target(target)
         end
       end
     end
@@ -489,12 +486,12 @@ function M.collect(recipes, context)
     if left.product_type ~= right.product_type then return left.product_type < right.product_type end
     return left.product_name < right.product_name
   end)
-  for _, rows in pairs(by_family) do
-    table.sort(rows, function(left, right)
-      if left.recipe ~= right.recipe then return left.recipe < right.recipe end
-      if left.product_type ~= right.product_type then return left.product_type < right.product_type end
-      return left.product_name < right.product_name
-    end)
+  -- The combined order already has each family's recipe/type/name order.
+  -- Group it once, retaining independent records for the two output owners.
+  for _, target in ipairs(targets) do
+    local rows = by_family[target.family]
+    if rows == nil then rows = {}; by_family[target.family] = rows end
+    rows[#rows + 1] = copy_target(target)
   end
   return {schema = 1, targets = targets, by_family = by_family, work = work}
 end

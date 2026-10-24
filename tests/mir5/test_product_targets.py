@@ -412,6 +412,47 @@ class ProductTargetTests(unittest.TestCase):
           assert(forward.work.recipes==1003)
         ''')
 
+    def test_family_lists_use_one_sorted_target_pass_and_keep_independent_records(self):
+        self.lua.execute(r'''
+          local context = targets.prepare({
+            binding('alpha', .10, {{type='item', name='part'}}),
+            binding('beta', .20, {{type='item', name='part'}}),
+          })
+          local recipes = {}
+          for index=1,32 do
+            recipes[string.format('part-%03d',index)] = recipe({}, {product('item','part')})
+          end
+          for index=1,64 do
+            recipes['unrelated-'..index] = recipe({}, {product('item','stone')})
+          end
+          local before = frozen_copy(recipes)
+          local original_sort, sorted_sizes, sorted_items = table.sort, {}, 0
+          table.sort = function(rows, compare)
+            sorted_sizes[#sorted_sizes+1] = #rows
+            sorted_items = sorted_items + #rows
+            return original_sort(rows, compare)
+          end
+          local ok, result = pcall(targets.collect, recipes, context)
+          table.sort = original_sort
+          assert(ok,result)
+          assert(#sorted_sizes == 1 and sorted_sizes[1] == 64,
+            'redundant target sorting: calls='..#sorted_sizes..'; items='..sorted_items)
+          assert(#result.targets == 64 and #result.by_family.alpha == 32 and #result.by_family.beta == 32)
+          for family_index, family in ipairs({'alpha','beta'}) do
+            for index, row in ipairs(result.by_family[family]) do
+              local combined = result.targets[(family_index-1)*32+index]
+              assert(row ~= combined and target_names({row}) == target_names({combined}))
+              assert(row.recipe == string.format('part-%03d',index))
+            end
+          end
+          result.by_family.alpha[1].weight = 99
+          assert(result.targets[1].weight == .10 and result.by_family.beta[1].weight == .20)
+          result.targets[33].recipe = 'changed-global-output'
+          assert(result.by_family.beta[1].recipe == 'part-001')
+          assert(frozen_copy(recipes) == before)
+          assert(result.work.recipes == 96 and result.work.products == 96 and result.work.matches == 64)
+        ''')
+
     def test_prepare_rejects_ambiguous_or_sparse_authored_bindings(self):
         self.lua.execute(r'''
           assert(not pcall(function() targets.prepare({binding("x", 0, {{type="item", name="x"}})}) end))
