@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from historical_sources import read_published_source
 import sys
 import unittest
 
@@ -66,8 +67,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         if cls.facts["captured_native_subset"]["source_sha256"] != cls.facts["raw"]["sha256"]:
             raise AssertionError("captured native subset has the wrong raw provenance")
         for source in (cls.facts["authored_selector_evidence"], cls.facts["direct_effect_evidence"]):
-            if _sha256(ROOT / source["path"]) != source["sha256"]:
-                raise AssertionError(f"authored selector evidence changed: {source['path']}")
+            read_published_source(ROOT, source["path"], source["sha256"])
         for name in ("base", "direct"):
             source = cls.facts["catalogue_evidence"]
             if _sha256(ROOT / source[f"{name}_path"]) != source[f"{name}_sha256"]:

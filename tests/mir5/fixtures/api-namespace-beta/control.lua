@@ -24,7 +24,7 @@ script.on_init(function()
     fail("native cable productivity technology differs")
   end
   log("[MIR5_API_NAMESPACE_BETA] RESULT " .. helpers.table_to_json({
-    case="api-namespace-collision", status="passed", consumer=private_target.owner,
+    case="api-namespace-collision", stage="init", status="passed", consumer=private_target.owner,
     technology=technology_name, recipe=recipe_name, change=expected_change
   }))
 end)

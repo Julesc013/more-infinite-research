@@ -1,0 +1,178 @@
+{
+  "data_stage": {
+    "accepted_capture": {
+      "artifact_manifest_members_verified": 16,
+      "artifact_manifest_sha256": "68B7C46CB5F085E4E872BAEFD79684812134DB05B7284C7D6AE9525645972A73",
+      "candidate_raw_sha256": "E5209F77DAB77951D0EE8D8BCAA48F3DAE0B2D46AC9C7C8F6875231FFF1F3EEC",
+      "candidate_settings_sha256": "1E18C16C25AC48D9CE2F56E1F3AFDB5B4503B29E2536DDF22687128398234CD7",
+      "full_intended_comparison": {
+        "bytes": 5454,
+        "differences": [],
+        "path": "build/mir5/recovery-historical/bob-core-f210-candidate/40080571341/bob-core-f210-full-intended-comparison.json",
+        "sha256": "53978DAD8853626DB8A1DE9C92205EFB3222D273601A32A1133189476EE8706F",
+        "status": "equal-intended-native-output"
+      },
+      "intended_differences": {
+        "path": "spec/mir5/inventory/bob-core-f210-intended-differences.json",
+        "sha256": "902D8D2AB97836DF9C654BC3D98425751F0AE7334316704F07B38C8098FA220B"
+      },
+      "inventory": {
+        "path": "spec/mir5/inventory/bob-core-f210-472.json",
+        "sha256": "85E6055FB5924AC35D3B58D67F6D87BA83DF36F82570494329DBFCB9CD38B47A"
+      },
+      "published_raw_difference_disposition": "The raw published-to-candidate document preserves 925 named differences; the companion full intended comparison has no unresolved differences. The raw comparison document itself retains its historical candidate_run field of 40078452675, while this artifact run/source/raw hash identify the actual 49 capture.",
+      "published_raw_difference_occurrences": 925,
+      "run": 40080571341,
+      "source_commit": "49d598d8a49596721fe4a117a26e9b2320e5cc8b"
+    },
+    "history": [
+      {
+        "manifest_members_verified": 16,
+        "manifest_sha256": "58D9D4C7FEA9D99F4827B1A0C509E79770DE199F31DDF39B56D18AD8ED48F550",
+        "raw_comparison_sha256": "26C66783A33B091FE45F234A6AEEDF68A3C9CB0BC6251CB8710E8C91D90A089C",
+        "raw_comparison_status": "different-complete-published-output",
+        "raw_difference_occurrences": 938,
+        "run": 40074011523,
+        "source_commit": "58159f246d17a24a724475118c51ac4600cf3ee7"
+      },
+      {
+        "manifest_members_verified": 16,
+        "manifest_sha256": "06859D6FF615CB2D3871DB89D500AFEBCD3E0B6A2CB54B415BA94F0429E2C4EF",
+        "raw_comparison_sha256": "C151293929EA31FAD861ABA3B7F11573484DA6D44CDC52D4C7C605410BE25175",
+        "raw_comparison_status": "different-complete-published-output",
+        "raw_difference_occurrences": 932,
+        "run": 40078452675,
+        "source_commit": "e4b6814cf70acac17a8b90552048b24023d64844"
+      },
+      {
+        "manifest_members_verified": 16,
+        "manifest_sha256": "68B7C46CB5F085E4E872BAEFD79684812134DB05B7284C7D6AE9525645972A73",
+        "raw_comparison_sha256": "9A8AE060150CA23E8CC89C68F1CEBA6CC045BE3EEA2D2F9F419FA4B0E1A6FB41",
+        "raw_comparison_status": "different-complete-published-output",
+        "raw_difference_occurrences": 925,
+        "run": 40080571341,
+        "source_commit": "49d598d8a49596721fe4a117a26e9b2320e5cc8b"
+      }
+    ],
+    "scope": "Complete F210 Bob-core raw data/settings comparison only. It does not establish gameplay, save migration, menu timing, performance, multiplayer, final package or release qualification."
+  },
+  "engine": {
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+    "version": "2.1.23"
+  },
+  "gameplay_stage": {
+    "accepted": {
+      "artifact_manifest": {
+        "bytes": 5827,
+        "members": 34,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40082096125/artifact-manifest.json",
+        "sha256": "2D8002CBECB99BC6B52DDA4AC21FDE011147BB1EC2EEC14FE8DA677107A595C5"
+      },
+      "controller_commit": "aedde1c92a6cac64afb70e03ea3f2a5562e7f6cd",
+      "fixture_archive_sha256": "7C5F05B4FF26650BBDA5400F897BEAAE2C41C6A926761EB0D5ED6686A50B0674",
+      "initial_witness": {
+        "actual_lab_completions": 28,
+        "candidate_full_catalogue_comparison_required": true,
+        "continuation_levels_completed_by_lab": 7,
+        "finite_levels_completed_by_lab": 21,
+        "fixture_accelerates_count_and_time": true,
+        "foreign_force_witness_not_claimed": true,
+        "named_technologies": 14,
+        "native_effect_per_completed_level": 0.02,
+        "native_recipe_productivity_per_route": 0.08,
+        "on_load_read_only": false,
+        "ordinary_tuning_qualified": false,
+        "profile": "f210-bob-core-no-angel",
+        "science_consumed": {
+          "automation-science-pack": 28,
+          "chemical-science-pack": 16,
+          "logistic-science-pack": 20,
+          "metallurgic-science-pack": 4,
+          "production-science-pack": 8,
+          "space-science-pack": 10
+        },
+        "selected_families": 7
+      },
+      "observer_archive_sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+      "player_archive_sha256": "BA853C9EA41D406C01FAFCD623B3F836AA42BB7BCC8103E92116BFE33F1DBE71",
+      "profile_sha256": "92C7E6EAAF4774F6FEDE1187833C9E671C20CEA6397E48DAA3CF9C95CFE23C82",
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_byte_identical": true,
+          "save_sha256": "C32713CBAE66223927643EC7585ADF617DC0F6C7663389F34D178BAA4D371F0C"
+        },
+        {
+          "ordinal": 2,
+          "save_byte_identical": true,
+          "save_sha256": "C32713CBAE66223927643EC7585ADF617DC0F6C7663389F34D178BAA4D371F0C"
+        }
+      ],
+      "result": {
+        "bytes": 50050,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40082096125/gameplay/result.json",
+        "sha256": "2FA52BD32F0E003BD19E2D94E819E47A18E125CDA379446B649A2D4FE0BAB43B"
+      },
+      "run": 40082096125,
+      "source_commit": "a031f09101d877d0558cd79e92a344a0a4315bfc",
+      "status": "passed-private-native-fixture",
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40082096125"
+    },
+    "adverse": {
+      "actual_nonstandard_save": {
+        "bytes": 845532,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40081293896/gameplay/write-data/saves/mir5-bob-core-gameplay-complete.zip",
+        "sha256": "2800DA229F3C48E36371906EB4208160EE7600B79977077252283AAEDC10E1A3"
+      },
+      "artifact_manifest": {
+        "bytes": 14770,
+        "members": 77,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40081293896/artifact-manifest.json",
+        "sha256": "3D8E822091F8CC11EEE666DA336CD64F94D3136FF267D813F7C97FC584AA367A"
+      },
+      "completion_marker_log": {
+        "bytes": 12864,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40081293896/gameplay/write-data/factorio-current.log",
+        "sha256": "005263DDC6B484492F726EF0286F469E562BE4707D65224A37B46A7A2A1AD73F"
+      },
+      "controller_commit": "ef779edba6d455a7c59a3ad25a42a2d4383e3dec",
+      "disposition": "The fixture wrote mir5-bob-core-gameplay-complete.zip while the frozen generic runner only observed mir5-native-complete.zip. The initial marker and archive are retained; this run does not establish a gameplay pass or cold reloads.",
+      "failure": "[mir441-process-timeout]",
+      "fixture_archive_sha256": "FD337985823816B8F7DE488ACAEF9D9003275D76FF633392CEDEDFDD8D98398A",
+      "player_archive_sha256": "AFCAF4532F6CAA85A623CAFD7D0CCC0D06A1BD934D206F0F6C99829A7B1A9D82",
+      "profile_sha256": "92C7E6EAAF4774F6FEDE1187833C9E671C20CEA6397E48DAA3CF9C95CFE23C82",
+      "result": {
+        "bytes": 19241,
+        "path": "build/mir5/recovery-historical/bob-core-gameplay/40081293896/gameplay/result.json",
+        "sha256": "DF204B417C1D2FE7359C369FF6C8C83A9725B926D153E523B135C3927DE695B1"
+      },
+      "run": 40081293896,
+      "source_commit": "49d598d8a49596721fe4a117a26e9b2320e5cc8b",
+      "status": "failed",
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40081293896"
+    },
+    "scope": "Exact F210 Bob-core fixture performs 28 real lab completions (21 finite and seven continuations) then two byte-identical cold reloads. The fixture accelerates count/time; it does not qualify ordinary tuning, foreign-force behavior, migration, performance, multiplayer or release.",
+    "source_identity_boundary": "Data/settings parity is the 49d598 capture with player archive AFCAF4532F6CAA85A623CAFD7D0CCC0D06A1BD934D206F0F6C99829A7B1A9D82. Gameplay is the later a031f091 source with independently recorded player archive BA853C9EA41D406C01FAFCD623B3F836AA42BB7BCC8103E92116BFE33F1DBE71. No whole-package byte-equivalence inference is made."
+  },
+  "kind": "MIR5BobCoreF210CandidateNativeChainV1",
+  "receipt_bundle": {
+    "compressed_sha256": "585331AA0A9B83BB4549B4E08F5604B3373810EF12BA1B9F1CCF4D87B267603D",
+    "members": 5,
+    "path": "spec/mir5/evidence/bob-core-f210-candidate-native-receipts.json.gz",
+    "uncompressed_sha256": "CE3268FB20AA9AA29748F0186B4DD2C44EC93FF1B744191D78894833CB989918"
+  },
+  "reference": {
+    "chain": {
+      "bytes": 3679,
+      "path": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
+      "sha256": "116F1C70118B4D95F347CE98B91E16023A53F7CAE6D41D2524A10828B54AB3E1"
+    },
+    "published_archive_sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F",
+    "published_tag": "v4.7.2",
+    "run": 40069301778,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40069301778"
+  },
+  "release_qualification": false,
+  "schema": 1,
+  "status": "candidate-data-parity-and-bounded-gameplay-pass"
+}
