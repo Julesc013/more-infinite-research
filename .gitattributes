@@ -220,6 +220,8 @@ tools/mir/** text eol=lf
 # The live composable player source is raw-byte hashed by the target
 # materializer. Pin all editable source bytes across checkout configurations.
 source/** text eol=lf
+# Factorio's root thumbnail is binary, including after the staging cutover.
+source/**/thumbnail.png -text
 # The editable target authority is raw-byte hashed by the deterministic
 # materializer. Pin every textual target source, including *.template and
 # target-specific Lua overlays, so Windows and hosted checkouts are identical.

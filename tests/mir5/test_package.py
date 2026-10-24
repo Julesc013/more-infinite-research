@@ -118,6 +118,10 @@ class PackageTests(unittest.TestCase):
                 file.write_text("return {}\n")
             (source / "info.json").write_text(json.dumps({"name":"more-infinite-research",
                 "version":"5.0.21000","factorio_version":"2.1","dependencies":["base >= 2.1.23"]}))
+            for name in ("LICENSE", "thumbnail.png", "presentation/changelog/current.txt", "presentation/changelog/f210.txt"):
+                destination = source / name
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / "source/mir5" / name, destination)
             edition = root / pack.TARGET_RECORD
             edition.parent.mkdir(parents=True)
             original = (ROOT / pack.TARGET_RECORD).read_bytes()
@@ -199,6 +203,35 @@ class PackageTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError, "Target record"):
                         pack.build(source, output, revision=commit, target="f200", target_record=value)
                     self.assertFalse(output.exists())
+
+    def test_every_edition_keeps_its_complete_published_history_and_player_assets(self):
+        source = ROOT / "source/mir5"
+        recovered = json.loads((ROOT / "spec/mir5/inventory/package-presentation-472.json").read_bytes())
+        self.assertEqual(recovered["sums_sha256"], "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9")
+        self.assertEqual(len(recovered["records"]), 9)
+        entry = (source / "presentation/changelog/current.txt").read_bytes()
+        self.assertLessEqual(max(map(len, entry.splitlines())), 132)
+        for record in recovered["records"]:
+            with self.subTest(target=record["target"]):
+                info, rows = pack.members(source, target=record["target"])
+                files = dict(rows)
+                history = (ROOT / record["source"]).read_bytes()
+                self.assertEqual(hashlib.sha256(history).hexdigest().upper(), record["history_sha256"])
+                self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()) + history)
+                self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])
+                self.assertEqual(files["thumbnail.png"], (source / "thumbnail.png").read_bytes())
+                self.assertFalse(any(name.startswith("presentation/changelog/") for name in files))
+
+    def test_missing_selected_history_or_asset_is_not_a_partial_player_package(self):
+        source = ROOT / "source/mir5"
+        files = {path.relative_to(source).as_posix(): path.read_bytes()
+                 for path in source.rglob("*") if path.is_file() and pack.admitted(path.relative_to(source).as_posix())}
+        for required in ("LICENSE", "thumbnail.png", "presentation/changelog/current.txt", "presentation/changelog/f200.txt"):
+            with self.subTest(missing=required):
+                broken = dict(files)
+                del broken[required]
+                with self.assertRaisesRegex(ValueError, "missing player presentation"):
+                    pack.members(source, committed_files=broken, target="f200")
 
     def test_committed_build_ignores_dirty_untracked_and_line_ending_worktree_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:

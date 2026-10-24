@@ -23,10 +23,11 @@ def admitted(relative):
     if any(part in {"tests", "tools", "docs", "sdk", "fixtures", "build", "dist"}
            or part.startswith(".") for part in path.parts):
         return False
-    return (relative in {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt"}
+    return (relative in {"info.json", "LICENSE", "LICENSE.txt", "changelog.txt", "thumbnail.png"}
             or path.suffix == ".lua"
             or (len(path.parts) == 2 and path.parts[0] == "migrations" and path.suffix == ".json")
             or (relative.startswith("locale/") and path.suffix == ".cfg")
+            or re.fullmatch(r"presentation/changelog/(?:current|f[0-9]{3})[.]txt", relative) is not None
             or (relative.startswith("graphics/") and path.suffix.lower() in {".png", ".jpg", ".ogg"}))
 
 
@@ -144,6 +145,21 @@ def read_editions(source, revision=None, target_record=TARGET_RECORD):
     return record["targets"], digest(data)
 
 
+def player_presentation(files, info, target):
+    current = "presentation/changelog/current.txt"
+    history = "presentation/changelog/" + target + ".txt"
+    for required in ("LICENSE", "thumbnail.png", current, history):
+        if not files.get(required):
+            raise ValueError("Selected edition has missing player presentation: " + required)
+    entry = files[current]
+    token = b"@DISTRIBUTION_VERSION@"
+    if entry.count(token) != 1:
+        raise ValueError("Current changelog needs exactly one distribution-version token")
+    out = {name: raw for name, raw in files.items() if not name.startswith("presentation/changelog/")}
+    out["changelog.txt"] = entry.replace(token, info["version"].encode("ascii")) + files[history]
+    return out
+
+
 def select_edition(files, info, target, editions):
     if info.get("name") != "more-infinite-research" or target not in editions:
         raise ValueError("Select a declared MIR player edition")
@@ -203,7 +219,8 @@ def select_edition(files, info, target, editions):
             if ".." in dependency or dependency.startswith("/"):
                 raise ValueError("Invalid player module dependency")
             pending.append(dependency)
-    return {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
+    selected_files = {name: data for name, data in files.items() if not name.endswith(".lua") or name in closure}
+    return player_presentation(selected_files, info, target)
 
 
 def members(source, version=None, committed_files=None, target=None, editions=None,
@@ -234,6 +251,11 @@ def members(source, version=None, committed_files=None, target=None, editions=No
         if editions is None:
             editions, _ = read_editions(source, target_record=selected_record)
         committed_files = select_edition(committed_files, info, target, editions)
+    elif "presentation/changelog/current.txt" in committed_files:
+        encoded = info["version"].rsplit(".", 1)[-1]
+        if not re.fullmatch(r"[0-9]{5}", encoded):
+            raise ValueError("Player presentation requires a distribution codec")
+        committed_files = player_presentation(committed_files, info, "f" + encoded[:3])
     rows = []
     for relative, contents in sorted(committed_files.items()):
         if admitted(relative):
