@@ -60,9 +60,10 @@ function M.preflight(raw)
   end
   local item, recipe, owner = raw.item["bob-mech-armor-plate"], raw.recipe["bob-mech-armor-plate"],
     raw.technology["bob-tankotron"]
-  if type(item) ~= "table" or item.icon ~= "__bobwarfare__/graphics/icons/spidertron/mech-armor-plate.png"
-      or item.icon_size ~= 128 then
-    error("MIR F200 Bob Warfare armor presentation changed", 2)
+  -- The research uses its authored Base icon, not this item's artwork.
+  -- Reskins do not change the named typed product or its recipe/owner binding.
+  if type(item) ~= "table" then
+    error("MIR F200 Bob Warfare armor item is unavailable", 2)
   end
   if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.hidden == true
       or recipe.allow_productivity ~= true
