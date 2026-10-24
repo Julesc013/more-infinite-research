@@ -32,6 +32,7 @@ local GEAR_PACKS = {
 local GEAR_EFFECT = .10
 local GEAR_LEVEL_AFTER_TWO_LABS = 3
 local LAB_PACKS = 2
+local LAB_PACKS_PER_RESEARCH = 1
 local LAB_ENERGY = 100000000
 local LIVE_DEADLINE_TICKS = 3600
 local FOREIGN_FORCE = "mir5-library-multiplayer-foreign"
@@ -297,6 +298,14 @@ local function research_inventory(state)
   return inventory
 end
 
+local function insert_gear_science(inventory, count, stage)
+  for _, name in ipairs(GEAR_PACKS) do
+    if inventory.insert{name=name, count=count} ~= count then
+      fail("actual Library refresh laboratory rejected " .. name .. " during " .. stage)
+    end
+  end
+end
+
 -- Two bounded read-only observations distinguish native lab stalls from GUI
 -- failures. Never repair state, complete research or relax the deadline here.
 local function lab_diagnostic(state, stage)
@@ -339,7 +348,8 @@ local function assert_completed_gear(state, force)
   if state.finished ~= 2 or state.started < 2
       or gear.level ~= GEAR_LEVEL_AFTER_TWO_LABS or gear.researched
       or force.current_research ~= nil or not exact_queue(force, {})
-      or not close(force.recipes["iron-gear-wheel"].productivity_bonus, 2 * GEAR_EFFECT) then
+      or not close(force.recipes["iron-gear-wheel"].productivity_bonus, 2 * GEAR_EFFECT)
+      or state.second_science_feed ~= true then
     fail("actual Library refresh research/queue state differs")
   end
   assert_lab_consumption(state)
@@ -524,13 +534,11 @@ local function restore_initial_views(state, english, german)
   if not valid(lab) then fail("could not create an actual Library refresh laboratory") end
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("actual Library refresh lab input is absent") end
-  for _, name in ipairs(GEAR_PACKS) do
-    if inventory.insert{name=name, count=LAB_PACKS} ~= LAB_PACKS then
-      fail("actual Library refresh laboratory rejected " .. name)
-    end
-  end
+  if inventory.is_empty() ~= true then fail("actual Library refresh lab input must start empty") end
+  insert_gear_science(inventory, LAB_PACKS_PER_RESEARCH, "initial science feed")
   lab.energy = LAB_ENERGY
   state.lab, state.finished, state.started, state.cancelled, state.force_created = lab, 0, 0, 0, 0
+  state.second_science_feed = false
   state.live_english_index, state.live_german_index = english.index, german.index
   state.live_deadline = game.tick + LIVE_DEADLINE_TICKS
   state.phase = "queueing-live-research"
@@ -793,6 +801,9 @@ script.on_event(defines.events.on_tick, function()
       end
       assert_live_queue_view(state, 2, 1, true)
       state.queue_after_first = #copy_queue(force)
+      if state.second_science_feed then fail("Library refresh laboratory repeated its second science feed") end
+      insert_gear_science(research_inventory(state), LAB_PACKS_PER_RESEARCH, "second science feed")
+      state.second_science_feed = true
       state.first_completion_seen = true
     elseif state.finished == 2 and game.tick >= (state.refresh_after_tick or game.tick) then
       state.phase = "awaiting-final-live-refresh"

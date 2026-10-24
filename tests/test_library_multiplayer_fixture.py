@@ -117,12 +117,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             game.get_player=function(index) return players[index] end
             force.get_spawn_position=function(surface) return {0,0} end
+            local insert_counts, rejected_bulk_inserts = {}, 0
             local inventory={counts={}}
             inventory.insert=function(spec)
+              insert_counts[#insert_counts+1]=spec.count
+              if opponent=="all-at-once-feeding" and spec.count~=1 then
+                rejected_bulk_inserts=rejected_bulk_inserts+1
+                return 0
+              end
+              if opponent=="second-feed-rejected" and #insert_counts>#gear_packs then return 0 end
               inventory.counts[spec.name]=(inventory.counts[spec.name] or 0)+spec.count
               return spec.count
             end
             inventory.get_item_count=function(name) return inventory.counts[name] or 0 end
+            inventory.is_empty=function()
+              for _,count in pairs(inventory.counts) do
+                if count~=0 then return false end
+              end
+              return true
+            end
             local lab={valid=true,energy=0,active=true,status=19,electric_network_id=7}
             lab.get_inventory=function(index) assert(index==1);return inventory end
             game.surfaces[1].create_entity=function(spec)
@@ -258,8 +271,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local function complete_mock_lab()
               local current=force.current_research
               if not current then return end
+              for _,name in ipairs(gear_packs) do
+                if inventory.get_item_count(name)<1 then return false end
+              end
               if opponent~="no-lab-consumption" then
-                for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
+                for _,name in ipairs(gear_packs) do
                   inventory.counts[name]=inventory.counts[name]-1
                 end
               end
@@ -269,6 +285,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               force.current_research=force.research_queue[1]
               fire(6,{research=current,by_script=opponent=="script-completion"})
               if force.current_research then fire(4,{research=force.current_research,last_research=current}) end
+              return true
             end
             local environment={
               script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
@@ -388,7 +405,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
-              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics}
+              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics,lab_insert_counts=insert_counts,
+              rejected_bulk_inserts=rejected_bulk_inserts}
           end
         ''')
 
@@ -472,7 +490,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "progress": .25, "queue_count": 2, "queue": ["recipe-prod-research_gears-1"] * 2})
         self.assertEqual(snapshot["gear"], {"level": 1, "enabled": True, "count": 1, "energy": 60})
         self.assertEqual(snapshot["science_counts"], result["inventory_counts"])
-        self.assertEqual(set(snapshot["science_counts"].values()), {2})
+        self.assertEqual(set(snapshot["science_counts"].values()), {1})
         self.assertEqual((result["energy"], result["active"], result["progress"], result["research_enabled"],
                           result["queue_count"], result["level"], result["finished"]),
                          (0, False, .25, False, 2, 1, 0))
@@ -693,6 +711,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "missing-queue": "native Library refresh queue differs before laboratory progress",
             "script-completion": "actual Library laboratory completion callback differs",
             "no-lab-consumption": "actual Library refresh lab science consumption differs",
+            "second-feed-rejected": "actual Library refresh laboratory rejected automation-science-pack during second science feed",
             "wrong-force-event": "native foreign-force callback differs",
             "foreign-force-gui": "native public browser GUI tree is incomplete",
             "missing-availability-label": "Availability terminal label differs",
@@ -733,6 +752,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertIn("[mir5-library-multiplayer]", result["message"])
                 self.assertIn("fixture gear science vector differs", result["message"])
                 self.assertIn(reason, result["message"])
+
+    def test_live_lab_stages_each_science_pack_until_the_first_native_completion(self):
+        source = CONTROL.read_text(encoding="utf-8")
+        initial = 'insert_gear_science(inventory, LAB_PACKS_PER_RESEARCH, "initial science feed")'
+        refill = 'insert_gear_science(research_inventory(state), LAB_PACKS_PER_RESEARCH, "second science feed")'
+        self.assertIn("inventory.is_empty() ~= true", source)
+        self.assertIn(initial, source)
+        self.assertIn(refill, source)
+        self.assertLess(source.index("assert_live_queue_view(state, 2, 1, true)"), source.index(refill))
+
+        staged = self.run_case("all-at-once-feeding")
+        self.assertTrue(staged["ok"], staged["message"])
+        self.assertEqual(staged["lab_insert_counts"], [1] * 8)
+        self.assertEqual(staged["rejected_bulk_inserts"], 0)
+
+        refill_rejected = self.run_case("second-feed-rejected")
+        self.assertFalse(refill_rejected["ok"])
+        self.assertIn("actual Library refresh laboratory rejected automation-science-pack during second science feed",
+                      refill_rejected["message"])
 
     def test_initial_native_locales_need_no_synthetic_locale_change_event(self):
         result = self.run_case("unchanged-locales")
