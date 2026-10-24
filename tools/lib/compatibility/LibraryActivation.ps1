@@ -311,7 +311,7 @@ function Start-MIRPackageLibraryActivation {
   )
   # A package smoke uses the same library transaction as progression/upgrade
   # consumers. Only this small selection document is generated for the run.
-  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   $profile=Resolve-MIR441RecoveryScratchPath -Path $ProfilePath
   $inventory=@(Get-MIRLibraryInventory -LibraryDirectory $LibraryDirectory -EngineDataDirectory $EngineDataDirectory)
   $disabledFixtures=@()
@@ -434,7 +434,7 @@ function Assert-MIRLibraryLoadedSelection {
 
 function Assert-MIRLibraryLaunch {
   param([Parameter(Mandatory)]$Activation,[string]$FactorioBin,[string[]]$Arguments,[object[]]$OwnedProcesses=@())
-  . (Join-Path $PSScriptRoot '../../mir/application/release/readiness/ResourceGovernor.ps1')
+  . (Join-Path $PSScriptRoot '../validation/ResourceGovernor.ps1')
   foreach($arg in $Arguments){
     if($arg -match '^(?:--(?:sync-mods|apply-update|download|update-mods)(?:=|$)|--(?:config|mod-directory)=|-c$)'){throw '[mir-library-acquisition-or-ambiguous-argument]'}
   }

@@ -1,4 +1,4 @@
-# MIR4-CANONICAL-EXECUTABLE-TEST
+# MIR5-CANONICAL-EXECUTABLE-TEST
 [CmdletBinding()]
 param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 
@@ -175,14 +175,12 @@ try{
   if(@(& $command -RepoRoot (Join-Path $fixture 'repo') -LibraryRoot $library -TestRunRoot $selectedScope -OlderThanDays 7 -MaxScannedEntries 3 -PassThru).Count-ne0){throw '[mir-storage-opt-scoped-fixed-point]'}
   $scopeControls++
 
-  # The public command must forward the selector to the real optimizer. This
-  # deliberately invalid selector fails before any primary-run discovery.
-  $publicProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') storage optimize --library-root $library --test-run-root 'build/tests/not-a-run' 2>&1|Out-String)
+  # The retained direct command must reject an invalid selector before any
+  # primary-run discovery, including when invoked in its own PowerShell host.
+  $publicProbe=(& pwsh -NoProfile -File $command -LibraryRoot $library -TestRunRoot 'build/tests/not-a-run' 2>&1|Out-String)
   if($LASTEXITCODE-eq0-or$publicProbe-notmatch'TestRunRoot'){throw "[mir-storage-opt-public-scope-forwarding] $publicProbe"}
   $global:LASTEXITCODE=0
-  $helpProbe=(& pwsh -NoProfile -File (Join-Path $repo 'tools/mir.ps1') help 2>&1|Out-String)
-  if($LASTEXITCODE-ne0-or$helpProbe-notmatch'storage optimize[^\r\n]*--test-run-root'){throw '[mir-storage-opt-public-scope-help]'}
-  $scopeControls+=2
+  $scopeControls++
 
   # Execute the current resolver function with controlled Git responses rather
   # than create another checkout. A real read-only common-directory query below

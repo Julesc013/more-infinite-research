@@ -1,1 +1,0 @@
--- Assertions run after MIR's data-final-fixes compiler transaction.

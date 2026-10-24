@@ -1,1 +1,0 @@
--- Deliberately inert: this exact F200 fixture marker selects scripted browser assertions.

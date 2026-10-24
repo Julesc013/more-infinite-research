@@ -2,12 +2,8 @@
 * @Julesc013
 
 /.github/ @Julesc013
-/.mir/ @Julesc013
-/governance/ @Julesc013
-/contracts/ @Julesc013
 /spec/ @Julesc013
-/releases/ @Julesc013
 /tools/ @Julesc013
-/validation/ @Julesc013
-/prototypes/ @Julesc013
-/migrations/ @Julesc013
+/source/ @Julesc013
+/targets/ @Julesc013
+/sdk/ @Julesc013
