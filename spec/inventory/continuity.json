@@ -414,51 +414,49 @@
         {
           "id": "real-host-personal-library-views",
           "source": [
-            "source/mir5/presentation/library_model.lua",
-            "source/mir5/runtime/library.lua"
+            "source/presentation/library_model.lua",
+            "source/runtime/library.lua"
           ],
-          "evidence": "spec/mir5/evidence/library-multiplayer-qualified-chain.json",
+          "evidence": "spec/evidence/library-multiplayer-qualified-chain.json",
           "scope": "Two F200 clients retain independent English/German views over join, rejoin and host restart with reviewed PNGs and unchanged research/queue witnesses."
         },
         {
           "id": "availability-negative-scope",
           "source": [
-            "source/mir5/presentation/availability.lua",
-            "source/mir5/runtime/library.lua"
+            "source/presentation/availability.lua",
+            "source/runtime/library.lua"
           ],
           "scope": "Visibility option three now renders bounded authored absent-expansion explanations; Base two-client English/German rendering is natively observed. A named valid Space Age native lab owner gets a host-tested terminal explanation. No compiler omission ledger or invented technology is reconstructed.",
-          "evidence": "spec/mir5/evidence/library-multiplayer-availability-native-chain.json"
+          "evidence": "spec/evidence/library-multiplayer-availability-native-chain.json"
         },
         {
           "id": "historical-availability-internal-representation",
           "source": [
             "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
-            "source/mir5/presentation/library_model.lua"
+            "source/presentation/library_model.lua"
           ],
           "scope": "Historical skip/excluded compiler-plan rows were terminal UI metadata, not earned technology identities. MIR5 retains native disabled-ID views and bounded authored absence facts; previews and unadmitted families do not become delivered technologies merely by appearing in the old ledger."
         },
         {
           "id": "current-rendered-client-carrier-regression",
-          "evidence": "spec/mir5/evidence/library-multiplayer-current-chain.json",
+          "evidence": "spec/evidence/library-multiplayer-current-chain.json",
           "scope": "Current native-credit/lifecycle player bytes pass real2client join/rejoin/host restart, with220 members and six reviewed PNGs. Missing hidden-carrier icon caught by real rendering was corrected; numeric latency/stress remain open."
         },
         {
           "id": "finite-captured-bob-material-availability",
           "source": [
-            "source/mir5/presentation/availability.lua",
-            "source/mir5/runtime/library.lua"
+            "source/presentation/availability.lua",
+            "source/runtime/library.lua"
           ],
-          "evidence": "spec/mir5/evidence/host-controls-5874000-chain.json",
-          "scope": "The complete80-command observation covers22 authored omission explanations across the two Angel closures, effective setting precedence and direct emitted-ID suppression. The later no-Angel Bob-core unit adds nine separately grounded explanations with focused host controls; none of these31 profile-specific rows is native rendering qualification or a reconstructed compiler ledger."
+          "evidence": "spec/evidence/host-controls-5874000-chain.json",
+          "scope": "The complete host observation covers 22 authored omission explanations across the two Angel closures, effective setting precedence and direct emitted-ID suppression. The no-Angel Bob-core unit adds nine separately grounded explanations: all 31 captured material omissions now have finite profile-specific Availability rows. None is native rendering qualification or a reconstructed compiler ledger; another row requires its own exact admitted profile and native terminal disposition."
         }
       ],
       "test_subjects": [
         "library",
         "two_clients"
       ],
-      "remaining_implementation": [
-        "Reconcile any remaining delivered terminal omission explanations against native disabled views or explicit preview/non-admission dispositions; the31 authored Bob material explanations do not establish every historical explanation."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
         "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained.",
         "Observe the named Space Age native lab explanation in a rendered client; Base absence rows are already observed. Preserve inherited locale fallback limitations."
@@ -520,10 +518,10 @@
         {
           "id": "named-modern-and-material-profiles",
           "source": [
-            "source/mir5/compatibility/modern_catalogue.lua",
-            "source/mir5/compatibility/bob_angel_materials.lua"
+            "source/compatibility/modern_catalogue.lua",
+            "source/compatibility/bob_angel_materials.lua"
           ],
-          "evidence": "spec/mir5/evidence/bob-angel-materials-lab-native-chain.json",
+          "evidence": "spec/evidence/bob-angel-materials-lab-native-chain.json",
           "scope": "Bob/Angel material labs, finite/tail boundary, cap relaxation and cold reloads are observed for the admitted profile."
         },
         {
@@ -538,78 +536,91 @@
         {
           "id": "known-profile-transition-guards",
           "source": [
-            "source/mir5/compatibility/bob_angel_profile.lua",
-            "source/mir5/compatibility/bob_tech_profile.lua",
-            "source/mir5/compatibility/atan_profile.lua",
-            "source/mir5/compatibility/competing_productivity.lua",
-            "source/mir5/compatibility/science_bindings.lua"
+            "source/compatibility/bob_angel_profile.lua",
+            "source/compatibility/bob_tech_profile.lua",
+            "source/compatibility/atan_profile.lua",
+            "source/compatibility/competing_productivity.lua",
+            "source/compatibility/science_bindings.lua"
           ],
           "scope": "BobTech, Bob/Angel and ATAN select by relevant named closure/target and validate consumed native fields; unrelated version changes no longer trigger a blanket whole-profile refusal. Host controls compare complete same-input outputs after changed version strings and reject meaningful owner/route drift. Competing-provider and K2SO phase-specific captured-version restrictions remain under separate review. Unsupported named mixes still refuse. No arbitrary future-patch or current native qualification follows."
         },
         {
           "id": "bounded-competing-provider-contracts",
           "source": [
-            "source/mir5/compatibility/competing_productivity.lua",
-            "source/mir5/runtime/competing_productivity.lua"
+            "source/compatibility/competing_productivity.lua",
+            "source/runtime/competing_productivity.lua"
           ],
-          "evidence": "spec/mir5/evidence/competing-epr-native-chain.json",
+          "evidence": "spec/evidence/competing-epr-native-chain.json",
           "scope": "EPR three-stage preference continuity is native-observed; fixed/dynamic provider bindings are authored from captured rows."
         },
         {
           "id": "separate-ce-pr-native-continuity",
-          "evidence": "spec/mir5/evidence/competing-dynamic-ce-pr-continuity-chain.json",
+          "evidence": "spec/evidence/competing-dynamic-ce-pr-continuity-chain.json",
           "source": [
-            "source/mir5/compatibility/competing_productivity.lua"
+            "source/compatibility/competing_productivity.lua"
           ],
           "scope": "Exact separate CE28 and PR43 foreign tails pass actual predecessor labs, MIR5 preference true/false and two reloads each. Earned MIR overlap and composed/mixed providers remain unqualified."
         },
         {
           "id": "published-first-preference-ambiguity",
           "source": [
-            "source/mir5/runtime/native_credits.lua",
-            "source/mir5/runtime/bootstrap.lua"
+            "source/runtime/native_credits.lua",
+            "source/runtime/bootstrap.lua"
           ],
-          "evidence": "spec/mir5/evidence/legacy-preference-transition-native-chain.json",
+          "evidence": "spec/evidence/legacy-preference-transition-native-chain.json",
           "scope": "Exact published4.7.20002 F200 SA/four providers: both source preferences earn two actual partial MIR labs; simultaneous first-switch branches refuse with unchanged source hashes/no successor save. Both unchanged upgrades report native startup-change=false, and later MIR5 switches report=true, preserve credit/foreign42% queue, earn one successor lab and save/cold-reload twice. All172 members verified. Guard covers three known4.7 versions at host level; other predecessor binaries and mixed/dynamic profiles are not native-qualified here."
         },
         {
           "id": "fixed-provider-earned-removal-control",
-          "evidence": "spec/mir5/evidence/competing-fixed-removal-control-native-chain.json",
+          "evidence": "spec/evidence/competing-fixed-removal-control-native-chain.json",
           "scope": "Actual MIR overlaps survive MIR5 true/false and provider removal/readdition with137 artifact members verified. The separate first-upgrade ambiguity chain now qualifies the explicit refusal/two-step path for its exact F2004.7.2 closure; other dynamic/mixed owners remain unqualified."
         },
         {
           "id": "armor-py-authored-catalogue-batch",
           "source": [
-            "source/mir5/compatibility/modern_catalogue/bob_warfare.lua",
-            "source/mir5/compatibility/modern_catalogue/py.lua",
-            "source/mir5/compatibility/py_materials.lua",
-            "source/mir5/compatibility/native_modded_continuations.lua"
+            "source/compatibility/modern_catalogue/bob_warfare.lua",
+            "source/compatibility/modern_catalogue/py.lua",
+            "source/compatibility/py_materials.lua",
+            "source/compatibility/native_modded_continuations.lua"
           ],
           "evidence": [
-            "spec/mir5/evidence/integration-reference-native-chain.json",
-            "spec/mir5/evidence/armor-py-candidate-native-chain.json"
+            "spec/evidence/integration-reference-native-chain.json",
+            "spec/evidence/armor-py-candidate-native-chain.json"
           ],
           "scope": "Independent upstream/published F200 references recover armor and PyCoal/HighTech output. Authored batch at5e1018e303f578b3716d4bd0b0d37ff4be943c72 and recheck at0612af568aa76fd78ff492b527340fdc45214dc2 complete three exact native data/settings captures with verified manifests and restored direct-library controls. An independently regenerated complete comparison against verified run40051640723 reference dumps finds48 retained native-credit carrier occurrences and zero other unresolved deltas; carrier additions remain unequal to intended published output. The authored rows preserve all48/49 Py productivity rows in host comparison, broad armor/plating weights, log finite/tail identities, three HighTech groups, weighted six native tails and settings visibility. Earned/physical transitions remain pending."
         },
         {
           "id": "f210-bob-core-separate-material-closure",
-          "evidence": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
+          "evidence": "spec/evidence/bob-core-f210-reference-native-chain.json",
           "source": [
-            "source/mir5/compatibility/bob_core_materials.lua",
-            "source/mir5/research/bob_core_materials.lua",
-            "source/mir5/research/material_stages.lua",
-            "tests/mir5/fixtures/bob-core-f210-captured-facts.json"
+            "source/compatibility/bob_core_materials.lua",
+            "source/research/bob_core_materials.lua",
+            "source/research/material_stages.lua",
+            "tests/fixtures/bob-core-f210-captured-facts.json"
           ],
           "scope": "Seven finite authored families retain14 independent published F210 no-Angel rows, tuning, direct native unlock gates and science. All16 captured material setting families remain visible; nine withheld families have bounded Availability facts. Focused default/tuned/opposing host controls pass. Complete candidate catalogue/native gameplay/save qualification remains open."
+        },
+        {
+          "id": "captured-bob-material-closure-dispositions",
+          "source": [
+            "source/presentation/availability.lua",
+            "source/research/bob_angel_materials.lua",
+            "source/research/bob_tech_materials.lua",
+            "source/research/bob_core_materials.lua"
+          ],
+          "evidence": [
+            "tests/fixtures/bob-angel-f200-captured-facts.json",
+            "tests/fixtures/bob-tech-f210-captured-facts.json",
+            "tests/fixtures/bob-core-f210-captured-facts.json"
+          ],
+          "scope": "The admitted F200 Bob/Angel, F210 BobTech/Angel and F210 no-Angel Bob-core closures now account for all 31 captured material absences through finite Availability rows. BA-06 Silver, BA-10 Zinc, BA-12 Brass and BA-15 Cobalt Steel are withheld in all three closures; no recovered compiler-plan declaration is a new route. A different exact admitted profile must provide its own captured route before a binding can be authored."
         }
       ],
       "test_subjects": [
         "compatibility",
         "production"
       ],
-      "remaining_implementation": [
-        "Complete remaining applicable conditional material/profile bindings using the recovered native facts; preserve broad product-based coverage and historical identities rather than treating one captured pack as the entire contract."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
         "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source."
@@ -722,7 +733,7 @@
           "source": [
             "spec/programmes/community-requests.json"
           ],
-          "scope": "The original ledger remains the sole request authority: 85 records, including 53 requested-not-qualified and 18 finite routes with open qualification."
+          "scope": "The original 85-record ledger remains the sole request authority. Additive mir5_route_disposition fields map finite current source decisions without changing any original ID, title, requester, decision, acceptance, provenance, status or history."
         },
         {
           "id": "distinct-open-science-reports",
@@ -732,52 +743,190 @@
           "scope": "SCI-UNLOCK-01 and SCI-RESEARCH-01 remain distinct retained IDs; representative evidence does not close either reporter-specific request."
         },
         {
+          "id": "representative-science-observation-retains-open-reports",
+          "source": [
+            "source/research/science.lua",
+            "source/api/v1/data.lua"
+          ],
+          "evidence": [
+            "spec/evidence/api-canonical-native-chain.json"
+          ],
+          "scope": "Exact F210 run40096782298 observes only a representative ambiguity fixture. It is linked to SCI-UNLOCK-01 and SCI-RESEARCH-01 as an observed boundary, not a reporter reproduction: it neither supplies the unknown automation-science reporter closure nor the named Space-Lab-Research-61 provider/save. Both original records remain open and unqualified."
+        },
+        {
           "id": "original-request-current-route-links",
           "source": [
             "spec/programmes/community-requests.json",
-            "source/mir5/research/catalogue.lua",
-            "source/mir5/research/k2_materials.lua",
-            "source/mir5/research/k2_imersite.lua",
-            "source/mir5/research/bob_angel_materials.lua",
-            "source/mir5/compatibility/modern_catalogue/py.lua",
-            "source/mir5/research/py_materials.lua",
-            "source/mir5/presentation/library_model.lua",
-            "source/mir5/runtime/library.lua",
-            "source/mir5/research/bob_core_materials.lua",
-            "source/mir5/compatibility/bob_core_materials.lua"
+            "source/research/k2_materials.lua",
+            "source/research/k2_imersite.lua",
+            "source/research/bob_angel_materials.lua",
+            "source/research/bob_tech_materials.lua",
+            "source/research/bob_core_materials.lua",
+            "source/compatibility/modern_catalogue/py.lua",
+            "source/research/py_materials.lua",
+            "source/presentation/library_model.lua",
+            "source/runtime/library.lua",
+            "source/runtime/passive_repair.lua",
+            "source/data.lua",
+            "source/presentation/shortcut.lua",
+            "source/research/science.lua",
+            "source/api/v1/data.lua"
           ],
           "routes": [
-            {"request_id": "K2-01", "route": "Exact K2SO science policy only; not all K2 installations"},
-            {"request_id": "K2-02", "route": "research_material_rare_metals"},
-            {"request_id": "K2-03", "route": "research_material_imersite"},
-            {"request_id": "K2-04", "route": "research_material_silicon"},
-            {"request_id": "K2-05", "route": "research_material_glass"},
-            {"request_id": "BA-01", "route": "research_material_aluminium"},
-            {"request_id": "BA-02", "route": "research_material_gold"},
-            {"request_id": "BA-07", "route": "research_material_tin; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
-            {"request_id": "BA-08", "route": "research_material_titanium"},
-            {"request_id": "BA-09", "route": "research_material_copper_tungsten; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
-            {"request_id": "BA-13", "route": "Exact F210 BobTech research_material_gunmetal; current native qualification pending; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
-            {"request_id": "BA-14", "route": "Exact F210 BobTech research_material_invar; current native qualification pending; also exact F210 Bob-core no-Angel authored stages, native qualification pending"},
-            {"request_id": "ECO-PY", "route": "Bounded F200 PyCoal and PyAlienLife/HighTech authored routes recovered from exact independent native references; physical/save qualification remains open and this is not full ecosystem support"},
-            {"request_id": "UI-01", "route": "Per-player finite/infinite presentation filter"},
-            {"request_id": "UI-02", "route": "Per-player finite/infinite presentation filter"},
-            {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"},
-            {"request_id": "BA-03", "route": "Exact F210 Bob-core no-Angel research_material_lead stages; native qualification pending"},
-            {"request_id": "BA-11", "route": "Exact F210 Bob-core no-Angel research_material_bronze stages; native qualification pending"},
-            {"request_id": "BA-16", "route": "Exact F210 Bob-core no-Angel research_material_nitinol stages; native qualification pending"}
+            {
+              "request_id": "UI-01",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "UI-02",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "UI-03",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "UI-04",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "REPAIR-02",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-01",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-02",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-03",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-04",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-05",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "K2-06",
+              "disposition": "withheld-current-k2so-closure"
+            },
+            {
+              "request_id": "K2-07",
+              "disposition": "withheld-current-k2so-closure"
+            },
+            {
+              "request_id": "BA-01",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-02",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-03",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-04",
+              "disposition": "withheld-in-all-three-admitted-bob-closures"
+            },
+            {
+              "request_id": "BA-05",
+              "disposition": "withheld-in-captured-f200-and-f210-bob-core-closures"
+            },
+            {
+              "request_id": "BA-06",
+              "disposition": "withheld-in-all-three-admitted-bob-closures"
+            },
+            {
+              "request_id": "BA-07",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-08",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-09",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-10",
+              "disposition": "withheld-in-all-three-admitted-bob-closures"
+            },
+            {
+              "request_id": "BA-11",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-12",
+              "disposition": "withheld-in-all-three-admitted-bob-closures"
+            },
+            {
+              "request_id": "BA-13",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-14",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "BA-15",
+              "disposition": "withheld-in-all-three-admitted-bob-closures"
+            },
+            {
+              "request_id": "BA-16",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "ECO-PY",
+              "disposition": "implemented-source-mapped"
+            },
+            {
+              "request_id": "DLC-01",
+              "disposition": "implemented-source-mapped-with-host-evidence"
+            },
+            {
+              "request_id": "SCI-UNLOCK-01",
+              "disposition": "representative-observed-not-reporter-qualified"
+            },
+            {
+              "request_id": "SCI-RESEARCH-01",
+              "disposition": "representative-observed-not-reporter-qualified"
+            }
           ],
-          "scope": "Reconciliation links retain original request IDs and do not change their decisions or qualification status. ECO-PY now links the bounded recovered routes, while its requested-not-qualified status remains accurate; armor has no original dedicated request ID. ATAN/provider contracts have no matching original request ID. No new IDs or automatic-preview delivery are invented; other retained historical material obligations remain open."
+          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. ECO-PLANETS, SIF-01 and other unmatched retained requests have no current MIR5 disposition here: their original decisions/statuses remain open and unchanged.",
+          "evidence": [
+            "spec/evidence/k2so-material-native-chain.json",
+            "spec/evidence/bob-angel-materials-lab-native-chain.json",
+            "spec/evidence/bob-core-f210-reference-native-chain.json",
+            "spec/evidence/integration-reference-native-chain.json",
+            "spec/evidence/library-multiplayer-current-chain.json",
+            "spec/evidence/repair-stress-native-chain.json",
+            "spec/evidence/api-canonical-native-chain.json"
+          ]
+        },
+        {
+          "id": "unmapped-retained-request-dispositions",
+          "source": [
+            "spec/programmes/community-requests.json"
+          ],
+          "scope": "ECO-PLANETS and SIF-01 retain their original requests without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage, and no current named source refers to the Space Is Fake selector; neither is inferred from historical changelog text or a general science policy."
         }
       ],
       "test_subjects": [
         "ledger_reconciliation"
       ],
-      "remaining_implementation": [
-        "Map each delivered bounded MIR5 route back to its original request ID without creating replacement IDs."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
-        "Close only records with named exact source/package/engine/profile evidence; leave unknown reporter closures unreconciled."
+        "Close only records with named exact source/package/engine/profile evidence. Current source mapping and historical native evidence do not by themselves qualify the final package; both unknown reporter closures remain unreconciled."
       ]
     },
     {
