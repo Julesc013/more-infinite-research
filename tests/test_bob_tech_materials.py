@@ -184,6 +184,30 @@ class BobTechMaterialTests(unittest.TestCase):
         self.assertEqual(1, stage["writes"])
         self.assertEqual(rows, _plain(stage["batch"]))
 
+    def test_omitted_native_productivity_ceiling_preserves_the_same_five_rows(self):
+        # RecipePrototype.maximum_productivity defaults to 3 in F210. The
+        # upstream Angel source omits it; native prototype dumps spell it out.
+        # Admission must inspect the effective value without editing raw input.
+        baseline = _plain(self.rows())
+        raw = self.raw_fixture()
+        names = [route["recipe"] for family in self.facts["families"]
+                 for route in family["routes"]]
+        for name in names:
+            raw["recipe"][name]["maximum_productivity"] = None
+        self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+        self.assertTrue(all(raw["recipe"][name]["maximum_productivity"] is None
+                            for name in names))
+
+    def test_explicit_nondefault_or_invalid_productivity_ceilings_still_refuse(self):
+        for family in self.facts["families"]:
+            for route in family["routes"]:
+                for value in (0, 2, 4, False, "3", float("nan"), float("inf")):
+                    with self.subTest(recipe=route["recipe"], value=value):
+                        raw = self.raw_fixture()
+                        raw["recipe"][route["recipe"]]["maximum_productivity"] = value
+                        with self.assertRaisesRegex(Exception, route["recipe"] + " changed"):
+                            self.rows(raw=raw)
+
     def test_settings_change_tuning_without_erasing_finite_or_tail_boundaries(self):
         values = self.values()
         gunmetal = values["streams"]["research_material_gunmetal"]
@@ -281,22 +305,7 @@ class BobTechMaterialTests(unittest.TestCase):
         settings = self.lua.execute('package.loaded["research.settings"] = nil; return require("research.settings")')
         self.assertIsNotNone(settings)
 
-    def test_omitted_native_maximum_is_three_without_accepting_changed_caps_or_denials(self):
-        baseline = _plain(self.rows())
-        raw = self.raw_fixture()
-        for family in self.facts["families"]:
-            for route in family["routes"]:
-                raw["recipe"][route["recipe"]]["maximum_productivity"] = None
-        self.assertEqual(baseline, _plain(self.rows(raw=raw)))
-        for family in self.facts["families"]:
-            for route in family["routes"]:
-                self.assertIsNone(raw["recipe"][route["recipe"]]["maximum_productivity"])
-                for maximum in (0, 2, 4, False, "3", float("nan"), float("inf")):
-                    with self.subTest(recipe=route["recipe"], maximum=maximum):
-                        changed = self.raw_fixture()
-                        changed["recipe"][route["recipe"]]["maximum_productivity"] = maximum
-                        with self.assertRaisesRegex(Exception, route["recipe"] + " changed: maximum_productivity"):
-                            self.rows(raw=changed)
+    def test_route_availability_and_productivity_flags_still_refuse(self):
         for field, value in (("allow_productivity", False), ("enabled", True), ("hidden", True)):
             changed = self.raw_fixture()
             changed["recipe"]["angels-plate-tin"][field] = value

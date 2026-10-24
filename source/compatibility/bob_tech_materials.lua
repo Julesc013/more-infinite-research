@@ -53,6 +53,13 @@ local function exact_names(actual, expected)
   return true
 end
 
+local function maximum_productivity_matches(actual, expected)
+  -- F210's omitted RecipePrototype ceiling is 3; native dumps materialize it.
+  -- Compare that effective value without mutating the upstream recipe.
+  if actual == nil then actual = 3 end
+  return actual == expected
+end
+
 local function owner_matches(owner, route)
   if type(owner) ~= "table" or owner.enabled == false
       or not exact_names(owner.prerequisites or {}, route.owner_prerequisites)
@@ -81,12 +88,7 @@ local function validate_raw(raw, definition)
   for _, route in ipairs(definition.routes) do
     local recipe = raw.recipe[route.recipe]
     if type(recipe) ~= "table" then fail(route.recipe .. " changed: recipe is absent") end
-    -- F210 RecipePrototype defaults an omitted maximum_productivity to 3.
-    -- The preserved native facts describe that effective ceiling, not whether
-    -- the optional field was explicitly authored in data.raw.
-    local maximum_productivity = recipe.maximum_productivity
-    if maximum_productivity == nil then maximum_productivity = 3 end
-    if maximum_productivity ~= route.maximum_productivity then
+    if not maximum_productivity_matches(recipe.maximum_productivity, route.maximum_productivity) then
       fail(route.recipe .. " changed: maximum_productivity is " .. tostring(recipe.maximum_productivity)
         .. ", expected effective " .. tostring(route.maximum_productivity))
     end
