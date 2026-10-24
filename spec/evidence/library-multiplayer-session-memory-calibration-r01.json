@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerSessionMemoryCalibrationV1",
+  "status": "calibrated-observation-not-native-qualification",
+  "profile": {
+    "path": "tests/profiles/library-multiplayer-f200-2077.json",
+    "sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD"
+  },
+  "engine": {
+    "path": "D:/Games/Factorio/2.0/bin/x64/factorio.exe",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "field_path": "process.result.peak_sampled_private_bytes",
+  "receipts": [
+    {
+      "run": 40011659409,
+      "gzip_path": "spec/evidence/library-multiplayer-qualified-native.json.gz",
+      "gzip_sha256": "762ED938ECE5A02112A426DA8A0856B3E84BC4590A2F42979E89B3050E6CC902",
+      "raw_sha256": "2A8D91308F1F9252C3B33A985B3F22321A16E66B4D0546A3B00EE044113BE8D1",
+      "source_commit": "700c4769452f3f49793411cffd3aa18664317f11",
+      "peak_sampled_private_bytes": 6280224768
+    },
+    {
+      "run": 40036857502,
+      "gzip_path": "spec/evidence/library-multiplayer-current-40036857502-native.json.gz",
+      "gzip_sha256": "889F384409C7CD32215F13B7D69712BC9F9F134B86055651FF5D913DB92EAF58",
+      "raw_sha256": "8C94D2E48C2A741009CE68DDE301E47CC1058602D04D9858068C973F1ABA00CF",
+      "source_commit": "e400d6c765cd25748241d24e3353ab8cb9c7ade5",
+      "peak_sampled_private_bytes": 6139015168
+    },
+    {
+      "run": 40041162053,
+      "gzip_path": "spec/evidence/library-multiplayer-availability-40041162053-session-native.json.gz",
+      "gzip_sha256": "8C48C3BB474FF0E23CF6F2F9C552709474C6AD1A25EBF8B1ADB62D583376432B",
+      "raw_sha256": "09DC9B5A1BAC875AD39BA83151A09B9C9E6E2A253D07E6628368CC08D057FCDA",
+      "source_commit": "fb37b7c0ad57cbbec5c254f39ef38548ed7645e7",
+      "peak_sampled_private_bytes": 6009344000
+    },
+    {
+      "run": 40008631354,
+      "gzip_path": "spec/evidence/library-multiplayer-join-render-observation-native.json.gz",
+      "gzip_sha256": "AB7225308B95616FCC3B810C097EAD8744BB91D63919467164EF27A92D4795F2",
+      "raw_sha256": "3AD2BBE01D3C2BA5D7B19FB0DA038E81483025323695B863FD865F0804BEC7E5",
+      "source_commit": "9e450aed8114c4b1e28a46af4e26863ee0dc0f7c",
+      "peak_sampled_private_bytes": 6414053376
+    },
+    {
+      "run": 40003932229,
+      "gzip_path": "spec/evidence/library-multiplayer-save-overlay-observation-native.json.gz",
+      "gzip_sha256": "53403D390E62E8AEF9E2398BBBBD20ED455D8585C9EF47295A7CC86A149EB993",
+      "raw_sha256": "0E7C5D11A7526931028A5AC939E1DC420BC4AEF07D07FF577F05015629BEDDA0",
+      "source_commit": "5bb4f3e3175e45597168c6b14eef220ac9ef9d45",
+      "peak_sampled_private_bytes": 6492467200
+    }
+  ],
+  "observed_max_private_bytes": 6492467200,
+  "override": {
+    "parameter": "SessionExpectedPeakMemoryMiB",
+    "default_mib": 8192,
+    "library_mib": 7168,
+    "allowed_mib": [7168, 8192],
+    "library_bytes": 7516192768,
+    "non_library_requires_default": true
+  },
+  "observed_headroom_bytes": 1023725568,
+  "observed_headroom_percent": 15.8,
+  "refused_current_library_attempt": {
+    "run": 40116691129,
+    "failure": "[mir441-resource-admission-memory]",
+    "receipt_artifact_manifest_sha256": "8DBB0E7E328F8C9B13078C2A01F18A7E7A80507CD773681D9878FD3D5DA67569",
+    "field_paths": {
+      "free_bytes": "resource_admission.snapshot.memory.free_bytes",
+      "physical_reserve_bytes": "resource_admission.limits.physical_bytes",
+      "expected_peak_bytes": "resource_admission.expected_peak_memory_bytes"
+    },
+    "free_bytes": 14700077056,
+    "physical_reserve_bytes": 6809196134,
+    "default_required_bytes": 15399130726,
+    "default_deficit_bytes": 699053670,
+    "calibrated_required_bytes": 14325388902,
+    "calibrated_snapshot_headroom_bytes": 374688154
+  },
+  "limits": [
+    "The 20 percent physical-memory governor reserve and every other governor limit remain unchanged.",
+    "This record calibrates a session ceiling from prior exact-profile F200 process observations; it does not qualify the current Library package or waive a fresh admission and process-budget check.",
+    "Only a coherent later Library dispatch may request 7168 MiB explicitly; all other multiplayer sessions retain 8192 MiB."
+  ]
+}
