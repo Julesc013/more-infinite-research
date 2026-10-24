@@ -1,0 +1,710 @@
+{
+  "baseline_envelope_changed_paths": [
+    "files.result.bytes",
+    "files.result.sha256",
+    "profile_input.path",
+    "profile_input.sha256"
+  ],
+  "candidate_derived_expectations": false,
+  "candidate_receipt": {
+    "engine": {
+      "base_version": "2.0.77",
+      "factorio_version": "2.0",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "files": {
+      "data_raw": {
+        "bytes": 25839000,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "119D3069205E59A13D6D4D14F2C7AC4AFBC3F7905E14DE78321223678C820ACF"
+      },
+      "mod_settings": {
+        "bytes": 748140,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "0D54F32197671EFB160A5007A4917B8B810FD422BA71F4F142F4EA46FFC761D6"
+      },
+      "result": {
+        "bytes": 22943,
+        "path": "result.json",
+        "sha256": "5F18612A6FB17390DEB2FF55820A2BCF6EF85694E74A316ECA44CC08942F0C74"
+      },
+      "selection": {
+        "bytes": 1638,
+        "path": "selection.json",
+        "sha256": "3067C3A8C7F965DE5D2287A644647134287B1CE7741DFD0439F3E1F52C970A93"
+      }
+    },
+    "loaded_without_mir": [
+      "angelsbioprocessing@2.0.3",
+      "angelsbioprocessinggraphics@2.0.0",
+      "angelspetrochem@2.0.3",
+      "angelspetrochemgraphics@2.0.1",
+      "angelsrefining@2.0.4",
+      "angelsrefininggraphics@2.0.0",
+      "angelssmelting@2.0.5",
+      "angelssmeltinggraphics@2.0.0",
+      "base@2.0.77",
+      "bobelectronics@2.1.1",
+      "boblibrary@2.1.0",
+      "bobores@2.1.2",
+      "bobplates@2.1.1",
+      "bobrevamp@2.1.1",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "profile_input": {
+      "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40085695793-1\\menu-preparation-r06-inputs\\profile.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "selected_archives_without_mir": [
+      {
+        "builtin": true,
+        "name": "base",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "version": "2.0.77"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessing",
+        "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessinggraphics",
+        "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochem",
+        "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochemgraphics",
+        "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+        "version": "2.0.1"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefining",
+        "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+        "version": "2.0.4"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefininggraphics",
+        "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmelting",
+        "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+        "version": "2.0.5"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmeltinggraphics",
+        "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobelectronics",
+        "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "boblibrary",
+        "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+        "version": "2.1.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobores",
+        "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+        "version": "2.1.2"
+      },
+      {
+        "builtin": false,
+        "name": "bobplates",
+        "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "bobrevamp",
+        "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "version": "0.1.0"
+      }
+    ],
+    "selection_without_mir": [
+      {
+        "enabled": true,
+        "name": "base",
+        "version": "2.0.77"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessing",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochem",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochemgraphics",
+        "version": "2.0.1"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefining",
+        "version": "2.0.4"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefininggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmelting",
+        "version": "2.0.5"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmeltinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobelectronics",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "boblibrary",
+        "version": "2.1.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobores",
+        "version": "2.1.2"
+      },
+      {
+        "enabled": true,
+        "name": "bobplates",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "bobrevamp",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "differences": [],
+  "historical_exact_receipt_comparator": "refused new result envelope identity; not relabelled as a pass",
+  "independent_inventory": {
+    "path": "spec/mir5/inventory/bob-angel-f200-472.json",
+    "sha256": "3AD7EA25EC20DD47AC55425E0C6ECAB204808C6BDAA43F7A7DBB93495CF992AC"
+  },
+  "intent": {
+    "complete_rows": 27,
+    "path": "spec/mir5/inventory/bob-angel-f200-intent-r02.json",
+    "sha256": "988823B4949D25FA5801CA93567090539877ECBB35DEEC6B8AE49134F9F350A7"
+  },
+  "kind": "MIR5BobAngelR06CompleteIntendedOutputReviewV1",
+  "native_custody": {
+    "candidate_manifest_members_verified": 75,
+    "candidate_manifest_sha256": "DC8F108AFE842806A0459408864FC1721184D14079228BBF335EB242A79B9AA1",
+    "candidate_run": 40085695793,
+    "candidate_workflow_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40085695793",
+    "control_published_replay_manifest_members_verified": 45,
+    "control_published_replay_manifest_sha256": "E8241CCF1CD58D52D09FA718460F12BD864D9965C45D76C506CCC7613C8BB177",
+    "control_published_replay_run": 40084669075,
+    "earlier_adverse_preserved": true,
+    "offline_r02_record_sha256": "4D56A11C987C8118190EC50191137CED158744CBFBD57E556DEAF71E0A13BECC",
+    "original_r01_comparison_sha256": "EC8E6378D452C319F0AE6E5F29161A9C52AF26B68017D5E88228B970F4EAE60B",
+    "packet_source": "a88c0ca01502454b74861422dd69a60e2723d609",
+    "source_reference": "840681abe18db97eab26c133a4ab03aa5792b797",
+    "timing_samples_accepted": 0
+  },
+  "new_baseline_receipt": {
+    "engine": {
+      "base_version": "2.0.77",
+      "factorio_version": "2.0",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "files": {
+      "data_raw": {
+        "bytes": 25694420,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "E278C678ADB7DB6080749474002874D1091EF65DAD8AF82898DAAF50660ECA44"
+      },
+      "mod_settings": {
+        "bytes": 13628,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "AFC8DF2869290CC801CFA9644FFA6E6FAF24B4376085B4D92F2E6D3CE116830B"
+      },
+      "result": {
+        "bytes": 21780,
+        "path": "result.json",
+        "sha256": "4F43A4CDD32A9DE44DEBECDDBB0DFBA58598219A47C5F60B3BF127A7CE71486C"
+      },
+      "selection": {
+        "bytes": 1528,
+        "path": "selection.json",
+        "sha256": "37F03254ED53521993CAC7AEEA03673D18468DF3662118EF7411DD1D979C9CFC"
+      }
+    },
+    "loaded_without_mir": [
+      "angelsbioprocessing@2.0.3",
+      "angelsbioprocessinggraphics@2.0.0",
+      "angelspetrochem@2.0.3",
+      "angelspetrochemgraphics@2.0.1",
+      "angelsrefining@2.0.4",
+      "angelsrefininggraphics@2.0.0",
+      "angelssmelting@2.0.5",
+      "angelssmeltinggraphics@2.0.0",
+      "base@2.0.77",
+      "bobelectronics@2.1.1",
+      "boblibrary@2.1.0",
+      "bobores@2.1.2",
+      "bobplates@2.1.1",
+      "bobrevamp@2.1.1",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "profile_input": {
+      "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40084669075-1\\menu-preparation-r06-inputs\\profile.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "selected_archives_without_mir": [
+      {
+        "builtin": true,
+        "name": "base",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "version": "2.0.77"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessing",
+        "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessinggraphics",
+        "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochem",
+        "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochemgraphics",
+        "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+        "version": "2.0.1"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefining",
+        "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+        "version": "2.0.4"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefininggraphics",
+        "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmelting",
+        "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+        "version": "2.0.5"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmeltinggraphics",
+        "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobelectronics",
+        "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "boblibrary",
+        "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+        "version": "2.1.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobores",
+        "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+        "version": "2.1.2"
+      },
+      {
+        "builtin": false,
+        "name": "bobplates",
+        "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "bobrevamp",
+        "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "version": "0.1.0"
+      }
+    ],
+    "selection_without_mir": [
+      {
+        "enabled": true,
+        "name": "base",
+        "version": "2.0.77"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessing",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochem",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochemgraphics",
+        "version": "2.0.1"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefining",
+        "version": "2.0.4"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefininggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmelting",
+        "version": "2.0.5"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmeltinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobelectronics",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "boblibrary",
+        "version": "2.1.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobores",
+        "version": "2.1.2"
+      },
+      {
+        "enabled": true,
+        "name": "bobplates",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "bobrevamp",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "original_baseline_receipt": {
+    "engine": {
+      "base_version": "2.0.77",
+      "factorio_version": "2.0",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "files": {
+      "data_raw": {
+        "bytes": 25694420,
+        "path": "write-data/script-output/data-raw-dump.json",
+        "sha256": "E278C678ADB7DB6080749474002874D1091EF65DAD8AF82898DAAF50660ECA44"
+      },
+      "mod_settings": {
+        "bytes": 13628,
+        "path": "write-data/script-output/mod-settings-dump.json",
+        "sha256": "AFC8DF2869290CC801CFA9644FFA6E6FAF24B4376085B4D92F2E6D3CE116830B"
+      },
+      "result": {
+        "bytes": 21688,
+        "path": "result.json",
+        "sha256": "48444A48A0AFA05AC1C493BC2A1BBAB4328A96D566FDE083406ABA6D737DB563"
+      },
+      "selection": {
+        "bytes": 1528,
+        "path": "selection.json",
+        "sha256": "37F03254ED53521993CAC7AEEA03673D18468DF3662118EF7411DD1D979C9CFC"
+      }
+    },
+    "loaded_without_mir": [
+      "angelsbioprocessing@2.0.3",
+      "angelsbioprocessinggraphics@2.0.0",
+      "angelspetrochem@2.0.3",
+      "angelspetrochemgraphics@2.0.1",
+      "angelsrefining@2.0.4",
+      "angelsrefininggraphics@2.0.0",
+      "angelssmelting@2.0.5",
+      "angelssmeltinggraphics@2.0.0",
+      "base@2.0.77",
+      "bobelectronics@2.1.1",
+      "boblibrary@2.1.0",
+      "bobores@2.1.2",
+      "bobplates@2.1.1",
+      "bobrevamp@2.1.1",
+      "mir-fixture-mir5-active-mods-observer@0.1.0"
+    ],
+    "profile_input": {
+      "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\tests\\mir5\\profiles\\bob-angel-f200-2077.json",
+      "sha256": "93EA20609F3EACDA4C8C1ABFCB5168BD82E89937A62824A2EB4140478262BE78"
+    },
+    "selected_archives_without_mir": [
+      {
+        "builtin": true,
+        "name": "base",
+        "sha256": "FE566A0B08B331D7CFBD13A5857D7F6F2414591EFA26723A6F8DBD3781AC4786",
+        "version": "2.0.77"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessing",
+        "sha256": "766B5784C3EB7A0B43D1B2C58ABCEC47EA69E4677129DC5C9255BEB66DC86B1B",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelsbioprocessinggraphics",
+        "sha256": "8C4DCBBF61772C4276A9B655FB9173A4D3B0FCE0872D8F60FD8600225A16AB66",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochem",
+        "sha256": "DFEBBC1F4E9F13016006071CBB064FF6289EFBAF92A7290D716C0D1E8C20430D",
+        "version": "2.0.3"
+      },
+      {
+        "builtin": false,
+        "name": "angelspetrochemgraphics",
+        "sha256": "B8D877865D50E1157EED80CCE56F21174A69D81453075A825A837AB375CF3262",
+        "version": "2.0.1"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefining",
+        "sha256": "8E78BA1FE453BA90999F6FECED81F9DBF41F1EF49EEB423BA6C4CE08C1DCDC42",
+        "version": "2.0.4"
+      },
+      {
+        "builtin": false,
+        "name": "angelsrefininggraphics",
+        "sha256": "0B09E4335640DC580F742B04F9C109ED544F74A685C11CB1878B33DB36D7AF25",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmelting",
+        "sha256": "6DDF5D7BAF4BACDE0398E47BF29EF3AECE41A34F33210439AD0C60C7ADE7FBB4",
+        "version": "2.0.5"
+      },
+      {
+        "builtin": false,
+        "name": "angelssmeltinggraphics",
+        "sha256": "D638AA7A67405811279F96370BF5FC026CCE476048FDF16D91261354A858C6EF",
+        "version": "2.0.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobelectronics",
+        "sha256": "BF11C8AB53F732564770DB0E7AAD24C07AF30196DA49394FA6E03E85939B38F3",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "boblibrary",
+        "sha256": "1CB971B7A39F0805F14DD0F27F17CC832B7FFC6608CB2234E182062FC8DBF62B",
+        "version": "2.1.0"
+      },
+      {
+        "builtin": false,
+        "name": "bobores",
+        "sha256": "BB0916DC28C1DD2E4A62E3F102298F7C47B5E07930FA5C84302B0879D983DF94",
+        "version": "2.1.2"
+      },
+      {
+        "builtin": false,
+        "name": "bobplates",
+        "sha256": "A6DBCA13C579E6E65E2A8E2D605AC97C789771F3C6E2660AA0F19AE1049FC77B",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "bobrevamp",
+        "sha256": "CF9AD291B6135125E29CDF452DC363101FDDAAB759DC9F713FE51DC29F1B9EEB",
+        "version": "2.1.1"
+      },
+      {
+        "builtin": false,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+        "version": "0.1.0"
+      }
+    ],
+    "selection_without_mir": [
+      {
+        "enabled": true,
+        "name": "base",
+        "version": "2.0.77"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessing",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelsbioprocessinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochem",
+        "version": "2.0.3"
+      },
+      {
+        "enabled": true,
+        "name": "angelspetrochemgraphics",
+        "version": "2.0.1"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefining",
+        "version": "2.0.4"
+      },
+      {
+        "enabled": true,
+        "name": "angelsrefininggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmelting",
+        "version": "2.0.5"
+      },
+      {
+        "enabled": true,
+        "name": "angelssmeltinggraphics",
+        "version": "2.0.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobelectronics",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "boblibrary",
+        "version": "2.1.0"
+      },
+      {
+        "enabled": true,
+        "name": "bobores",
+        "version": "2.1.2"
+      },
+      {
+        "enabled": true,
+        "name": "bobplates",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "bobrevamp",
+        "version": "2.1.1"
+      },
+      {
+        "enabled": true,
+        "name": "mir-fixture-mir5-active-mods-observer",
+        "version": "0.1.0"
+      }
+    ]
+  },
+  "profile_input_equivalence": {
+    "baseline": {
+      "capture_locator": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40084669075-1\\menu-preparation-r06-inputs\\profile.json",
+      "receipt_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+      "verified_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "candidate": {
+      "capture_locator": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\runner\\_work\\mir-native-worker\\mir-native-worker\\source\\build\\tmp\\black-glass-40085695793-1\\menu-preparation-r06-inputs\\profile.json",
+      "receipt_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+      "verified_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "canonical_full_document_sha256": "F3DC646B72D332BE99BBBFBFBAF6DCC8180DB7D93FE16CA5AE0265BC796F7529",
+    "status": "accepted-format-and-locator-equivalence"
+  },
+  "schema": 1,
+  "scope": "Offline full data/settings re-evaluation of retained native captures; no new native launch, menu timing, gameplay, save or release acceptance",
+  "status": "equal-complete-intended-native-output"
+}

@@ -1,0 +1,1341 @@
+{
+  "claims": {
+    "gameplay": false,
+    "native_qualification": false
+  },
+  "differences": [
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-aluminium",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-aluminium-2",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-aluminium.png",
+            "icon_size": 32
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 4,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-aluminium-plate"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_material_aluminium-4",
+        "order": "p[research_material_aluminium__continuation]",
+        "prerequisites": [
+          "angels-aluminium-casting-2",
+          "angels-aluminium-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_aluminium-1",
+          "utility-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "1600+200*(L-4)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ]
+          ],
+          "time": 30
+        },
+        "upgrade": true
+      },
+      "id": "BA-NONTRUNCATING-ALUMINIUM",
+      "name": "recipe-prod-research_material_aluminium-4",
+      "profile": "bob-angel-f200",
+      "reason": "Preserve earned levels when the useful 3x productivity headroom or configured cap changes. The native identity remains unbounded; runtime computes ceil(300/effect-percent) and the user cap without recurring maintenance. Native historical save transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.02,
+            "recipe": "bob-copper-tungsten-alloy",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__bobplates__/graphics/icons/plate/copper-tungsten-plate.png",
+            "icon_size": 32
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 4,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-copper-tungsten-alloy"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_material_copper_tungsten-4",
+        "order": "p[research_material_copper_tungsten__continuation]",
+        "prerequisites": [
+          "angels-tungsten-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_copper_tungsten-1",
+          "utility-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "1600+200*(L-4)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ]
+          ],
+          "time": 30
+        },
+        "upgrade": true
+      },
+      "id": "BA-NONTRUNCATING-COPPER_TUNGSTEN",
+      "name": "recipe-prod-research_material_copper_tungsten-4",
+      "profile": "bob-angel-f200",
+      "reason": "Preserve earned levels when the useful 3x productivity headroom or configured cap changes. The native identity remains unbounded; runtime computes ceil(300/effect-percent) and the user cap without recurring maintenance. Native historical save transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-gold",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-gold-2",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "angels-wire-gold-2",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-gold.png",
+            "icon_size": 32
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 4,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-gold-plate"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_material_gold-4",
+        "order": "p[research_material_gold__continuation]",
+        "prerequisites": [
+          "angels-gold-casting-2",
+          "angels-gold-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_gold-1",
+          "utility-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "1600+200*(L-4)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ]
+          ],
+          "time": 30
+        },
+        "upgrade": true
+      },
+      "id": "BA-NONTRUNCATING-GOLD",
+      "name": "recipe-prod-research_material_gold-4",
+      "profile": "bob-angel-f200",
+      "reason": "Preserve earned levels when the useful 3x productivity headroom or configured cap changes. The native identity remains unbounded; runtime computes ceil(300/effect-percent) and the user cap without recurring maintenance. Native historical save transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-tin",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-tin-2",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-tin.png",
+            "icon_size": 32
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 4,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-tin-plate"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_material_tin-4",
+        "order": "p[research_material_tin__continuation]",
+        "prerequisites": [
+          "angels-tin-casting-2",
+          "angels-tin-smelting-1",
+          "automation-science-pack",
+          "recipe-prod-research_material_tin-1",
+          "utility-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "1600+200*(L-4)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ]
+          ],
+          "time": 30
+        },
+        "upgrade": true
+      },
+      "id": "BA-NONTRUNCATING-TIN",
+      "name": "recipe-prod-research_material_tin-4",
+      "profile": "bob-angel-f200",
+      "reason": "Preserve earned levels when the useful 3x productivity headroom or configured cap changes. The native identity remains unbounded; runtime computes ceil(300/effect-percent) and the user cap without recurring maintenance. Native historical save transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-titanium",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "angels-plate-titanium-2",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__angelssmeltinggraphics__/graphics/icons/plate-titanium.png",
+            "icon_size": 32
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 4,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-titanium-plate"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_material_titanium-4",
+        "order": "p[research_material_titanium__continuation]",
+        "prerequisites": [
+          "angels-titanium-casting-2",
+          "angels-titanium-smelting-1",
+          "automation-science-pack",
+          "logistic-science-pack",
+          "recipe-prod-research_material_titanium-1",
+          "utility-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "1600+200*(L-4)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "utility-science-pack",
+              1
+            ]
+          ],
+          "time": 30
+        },
+        "upgrade": true
+      },
+      "id": "BA-NONTRUNCATING-TITANIUM",
+      "name": "recipe-prod-research_material_titanium-4",
+      "profile": "bob-angel-f200",
+      "reason": "Preserve earned levels when the useful 3x productivity headroom or configured cap changes. The native identity remains unbounded; runtime computes ceil(300/effect-percent) and the user cap without recurring maintenance. Native historical save transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "advanced-oil-processing",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "basic-oil-processing",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "coal-liquefaction",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/advanced-oil-processing.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_oil_processing_productivity"
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_oil_processing_productivity-1",
+        "order": "p[research_oil_processing_productivity]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "BA-BASE-IDENTITY-RESEARCH_OIL_PROCESSING_PRODUCTIVITY",
+      "name": "recipe-prod-research_oil_processing_productivity-1",
+      "profile": "bob-angel-f200",
+      "reason": "Retain the published Base identity disabled after Angel replaces its active routes, preserving earned state instead of silently dropping it. Fields derive from the independent published Base oracle and the captured Bob/Angel ordinary science vector. Native Base-to-overhaul transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "heavy-oil-cracking",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "light-oil-cracking",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/oil-processing.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_oil_cracking_productivity"
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_oil_cracking_productivity-1",
+        "order": "p[research_oil_cracking_productivity]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "BA-BASE-IDENTITY-RESEARCH_OIL_CRACKING_PRODUCTIVITY",
+      "name": "recipe-prod-research_oil_cracking_productivity-1",
+      "profile": "bob-angel-f200",
+      "reason": "Retain the published Base identity disabled after Angel replaces its active routes, preserving earned state instead of silently dropping it. Fields derive from the independent published Base oracle and the captured Bob/Angel ordinary science vector. Native Base-to-overhaul transition is still required.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "firearm-magazine",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_bullets-firearm-magazine-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-BULLETS-FIREARM-MAGAZINE-NEGATIVE",
+      "name": "mir-native-credit-research_bullets-firearm-magazine-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "firearm-magazine",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_bullets-firearm-magazine-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-BULLETS-FIREARM-MAGAZINE-POSITIVE",
+      "name": "mir-native-credit-research_bullets-firearm-magazine-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "stone-brick",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_concrete-stone-brick-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_concrete-stone-brick-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-CONCRETE-STONE-BRICK-NEGATIVE",
+      "name": "mir-native-credit-research_concrete-stone-brick-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "stone-brick",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_concrete-stone-brick-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_concrete-stone-brick-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-CONCRETE-STONE-BRICK-POSITIVE",
+      "name": "mir-native-credit-research_concrete-stone-brick-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "copper-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_copper-copper-plate-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_copper-copper-plate-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-COPPER-COPPER-PLATE-NEGATIVE",
+      "name": "mir-native-credit-research_copper-copper-plate-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "copper-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_copper-copper-plate-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_copper-copper-plate-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-COPPER-COPPER-PLATE-POSITIVE",
+      "name": "mir-native-credit-research_copper-copper-plate-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "grenade",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_grenades-grenade-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_grenades-grenade-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-GRENADES-GRENADE-NEGATIVE",
+      "name": "mir-native-credit-research_grenades-grenade-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "grenade",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_grenades-grenade-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_grenades-grenade-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-GRENADES-GRENADE-POSITIVE",
+      "name": "mir-native-credit-research_grenades-grenade-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "iron-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_iron-iron-plate-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_iron-iron-plate-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-IRON-IRON-PLATE-NEGATIVE",
+      "name": "mir-native-credit-research_iron-iron-plate-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "iron-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_iron-iron-plate-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_iron-iron-plate-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-IRON-IRON-PLATE-POSITIVE",
+      "name": "mir-native-credit-research_iron-iron-plate-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "lubricant",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-LUBRICANT-PRODUCTIVITY-LUBRICANT-NEGATIVE",
+      "name": "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "lubricant",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-LUBRICANT-PRODUCTIVITY-LUBRICANT-POSITIVE",
+      "name": "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "advanced-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-ADVANCED-OIL-PROCESSING-NEGATIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "advanced-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-ADVANCED-OIL-PROCESSING-POSITIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "basic-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-BASIC-OIL-PROCESSING-NEGATIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "basic-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-BASIC-OIL-PROCESSING-POSITIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "coal-liquefaction",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-COAL-LIQUEFACTION-NEGATIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "coal-liquefaction",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-OIL-PROCESSING-PRODUCTIVITY-COAL-LIQUEFACTION-POSITIVE",
+      "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "sulfuric-acid",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-SULFURIC-ACID-PRODUCTIVITY-SULFURIC-ACID-NEGATIVE",
+      "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "sulfuric-acid",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "BA-NATIVE-CREDIT-RESEARCH-SULFURIC-ACID-PRODUCTIVITY-SULFURIC-ACID-POSITIVE",
+      "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+      "profile": "bob-angel-f200",
+      "reason": "Finite dormant signed carrier for a named main and present recipe, at the captured ten-percent family default. Hidden/disabled pairs preserve only observed earned MIR contributions under the separate native-credit lifecycle; excluded recipes begin with false inclusion. Every descriptor field remains compared, including direction, scalar, icon, order, science and visibility. Unknown rows remain differences.",
+      "type": "technology"
+    }
+  ],
+  "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
+  "provenance": {
+    "additional_recipe_capture": {
+      "arm": "published-4.7.20002",
+      "data_raw_sha256": "5FDA1D83FA3BEB9E5A813B55319D7F893B8FA4F49F48F0468974D3FAE4C4F5E5",
+      "names": [
+        "lubricant",
+        "sulfuric-acid"
+      ],
+      "run": 40084669075
+    },
+    "excluded_named_recipes": "Angel main rows target their replacement recipes. Existing vanilla lubricant/sulfuric-acid receive dormant disabled pairs with false initial inclusion, not an earned native contribution. Their published family settings independently default to ten percent.",
+    "independent_credit_oracle": "tests/mir5/native_credit_oracle.py finite descriptors, published named mains, recipe presence and preserved ten-percent family settings; no candidate or player code constructs expected rows",
+    "prior_public_dispositions": {
+      "count": 7,
+      "path": "spec/mir5/inventory/bob-angel-f200-intent-r01.json",
+      "sha256": "5A8E79A85067639776FA31911CA1AE380D582D8802961142F9DCD3048C05A8E6"
+    },
+    "scope": "Full data/settings comparison intent; no gameplay, save, timing or release acceptance."
+  },
+  "schema": 2
+}

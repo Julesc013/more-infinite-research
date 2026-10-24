@@ -24,7 +24,13 @@ NATIVE_CREDIT_ICON = "__base__/graphics/technology/automation-1.png"
 
 
 def native_credit_carrier_rows(public_rows, captured_recipes):
-    """Build the exact hidden rows from captured public productivity routes."""
+    """Build exact dormant pairs for the finite named mains and present recipes.
+
+    A foreign provider or recipe replacement can exclude a named recipe from
+    its main row. The carrier still exists with a false initial inclusion;
+    runtime accounting cannot invent an earned contribution from that state.
+    A present effect must retain its exact default scalar and unique shape.
+    """
     expected = {}
     for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
         main = public_rows.get(main_id)
@@ -32,15 +38,13 @@ def native_credit_carrier_rows(public_rows, captured_recipes):
             continue
         effects = [
             effect for effect in main["effects"]
-            if effect == {
-                "type": "change-recipe-productivity",
-                "recipe": recipe,
-                "change": NATIVE_CREDIT_DEFAULT_SCALAR,
-            }
+            if effect.get("recipe") == recipe
         ]
-        if len(effects) != 1:
+        if effects and effects != [{
+                "type": "change-recipe-productivity", "recipe": recipe,
+                "change": NATIVE_CREDIT_DEFAULT_SCALAR}]:
             raise AssertionError(
-                f"native credit lacks one captured default route: {main_id}:{recipe}"
+                f"native credit has a conflicting captured default route: {main_id}:{recipe}"
             )
         for direction, change in (("positive", NATIVE_CREDIT_DEFAULT_SCALAR),
                                   ("negative", -NATIVE_CREDIT_DEFAULT_SCALAR)):
