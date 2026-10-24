@@ -52,7 +52,7 @@ Do not execute another local native job if the maintainer's worker already owns 
 
 ## Implementation status
 
-The companion case catalogue contains **not-run requirements**, not implemented tests. The archive's Python tests exercise only the layout exporter and documentation pack. A returned test count from that suite does not qualify the Generator, API examples, Factorio saves or speed.
+The companion case catalogue preserves the original acceptance requirements and their initial not-run status; it is not a native-result registry. The current ordered host driver exercises Generator, settings, compatibility, runtime, SDK, packaging and fixture controls, while exact native evidence and remaining gates are recorded in [progress](../docs/progress.md) and its named chains. The layout exporter was retired after canonical adoption. Host assertion counts, fixture controls and repository checks do not qualify native saves, clients or elapsed speed.
 
 Two independent API consumer mods must pass before API 1.0 stability. Keep the host-only mock run, native load and actual effect/state observations separate.
 
@@ -62,4 +62,4 @@ Two independent API consumer mods must pass before API 1.0 stability. Keep the h
 
 `VER-06` — A cached test result is reusable only when all consumed inputs are demonstrably unchanged: relevant source/package members, actual engine and mod bytes, settings, save/fixture bytes, harness, scenario and measurement endpoint. Shared path or uncertain impact widens coverage. A reused result retains its original execution identity. No candidate may revise its oracle or lower its threshold as part of claiming that it passed.
 
-These are product acceptance requirements. The included Python tests check the specification pack, its diagrams and the non-destructive cutover utility only.
+These remain product acceptance requirements. Current host tests and source/package checks cover their named boundaries; native acceptance requires the exact engine/profile/scenario evidence above. Canonical relocation preserves original receipt and fact bytes, resolving only former source/spec/tests root prefixes at consuming lookup boundaries.
