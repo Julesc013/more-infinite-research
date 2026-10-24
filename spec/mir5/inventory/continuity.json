@@ -343,6 +343,11 @@
       "status": "partial",
       "resolved_records": [
         {
+          "id": "native-repair-capacity-stress",
+          "evidence": "spec/mir5/evidence/repair-stress-native-chain.json",
+          "scope": "Exact F2002.0.77 Base published4.7.2 and MIR5 each receive1000 native electric-damaged eligible walls:256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600. Redamage of8 drained entries reactivates; foreign/nonwall exclusions and save/two reloads pass. All66 members verified. No elapsed/memory or agriculture scaling claim."
+        },
+        {
           "id": "combined-physical-rates-and-restart",
           "evidence": "spec/mir5/evidence/scripted-effects-multiplayer-native-chain.json",
           "scope": "Actual native planting timers17821 versus18000, physical spoilage at1800ticks and damaged player/friend walls repaired, including a pending repair across save/host restart. This is the bounded F200 Space Age scenario, not large-entity stress."
@@ -363,7 +368,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run removal/readdition, large scheduled-entity stress and final-package rate/lifecycle cases; combined actual planting, spoilage, repair and multiplayer restart pass at the recorded source."
+        "Run removal/readdition, agriculture entity scaling and final-package rate/lifecycle cases; repair queue capacity stress and combined physical multiplayer restart pass at their recorded sources."
       ]
     },
     {
@@ -477,6 +482,15 @@
           ],
           "evidence": "spec/mir5/evidence/bob-angel-materials-lab-native-chain.json",
           "scope": "Bob/Angel material labs, finite/tail boundary, cap relaxation and cold reloads are observed for the admitted profile."
+        },
+        {
+          "id": "conditional-py-armor-obligation",
+          "source": [
+            "source/prototypes/streams/productivity.lua",
+            "source/prototypes/mir/streams/registry.lua",
+            "source/prototypes/mir/planner/stream_compiler/qualify.lua"
+          ],
+          "scope": "Pinned published4.7 F200/F210 production retains conditional Py and armor emission. Py identity_state=stable-unreleased is metadata, not an emission gate:28 heads/continuations could emit when actual route/ownership/science/lab gates pass. No absence of a current test profile erases this obligation. Existing PowerArmorMK3 outputs do not match the historical armor-item patterns, so it is not a positive armor oracle. Exact native bindings remain open; MIR5 never imports these historical modules."
         },
         {
           "id": "known-profile-transition-guards",

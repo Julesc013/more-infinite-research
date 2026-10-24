@@ -1,0 +1,13 @@
+{
+  "kind": "MIR5ExistingPublicSignatureReadinessObservationV1",
+  "published_checksums": "MIR-4.7.2-SHA256SUMS.txt",
+  "signature_sha256": "373E47D22418DFE67C89D51E34DBCB7B25B739341579402CE28CBD84E4DC1535",
+  "namespace": "mir-release",
+  "identity": "30209022+Julesc013@users.noreply.github.com",
+  "fingerprint": "SHA256:N8Mase5PRBFQCu7UjhON4spjNoXmOdT0pvTmt8vNbUg",
+  "verification_exit_code": 0,
+  "verification_output": "Good \"mir-release\" signature for 30209022+Julesc013@users.noreply.github.com with ED25519 key SHA256:N8Mase5PRBFQCu7UjhON4spjNoXmOdT0pvTmt8vNbUg",
+  "private_key_or_passphrase_read": false,
+  "new_signature_created": false,
+  "release_qualification": false
+}
