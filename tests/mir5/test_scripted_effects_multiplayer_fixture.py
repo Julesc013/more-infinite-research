@@ -271,9 +271,9 @@ class ScriptedEffectsMultiplayerFixtureTests(unittest.TestCase):
                         source.index('if state.phase == "awaiting-host-restart" then restart_wall_pending(state); return end'))
         self.assertIn('native force merge did not retain the player spoilage research state', source)
         self.assertIn('player_spoilage_level_after_merge', source)
-        self.assertIn('LuaGameScript.merge_forces(source,\ndestination)', protocol)
+        self.assertIn('LuaGameScript.merge_forces(source, destination)', ' '.join(protocol.split()))
         self.assertIn('caps-api-current-native.json', protocol)
-        self.assertIn('source level 3 and\nretained destination level 1', protocol)
+        self.assertIn('source level 3 and retained destination level 1', ' '.join(protocol.split()))
 
 
 if __name__ == "__main__":

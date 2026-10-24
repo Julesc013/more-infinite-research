@@ -6,6 +6,9 @@ spec/mir5/evidence/*.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-
 tests/mir5/fixtures/historical-direct-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tests/mir5/fixtures/historical-continuation-native-oracle.json -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 tests/mir5/profiles/*.json text eol=lf
+# These portable facts are raw-hash referenced by the native evidence chains.
+tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json text eol=lf
+tests/mir5/fixtures/competing-dynamic-f200-sa-native-initial-levels.json text eol=lf
 tests/mir5/fixtures/create-research/* text eol=lf
 spec/mir5/inventory/*.json text eol=lf
 
