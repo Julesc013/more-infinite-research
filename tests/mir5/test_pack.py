@@ -67,7 +67,7 @@ class PackTests(unittest.TestCase):
     def test_player_package_admits_only_native_files_and_all_locale_assets(self):
         _, members = package.members(PLAYER)
         admitted = {path for path, _ in members}
-        expected = {"info.json"}
+        expected = {"info.json", "LICENSE", "changelog.txt", "thumbnail.png"}
         expected.update(
             name for name in {"LICENSE", "LICENSE.txt", "changelog.txt"}
             if (PLAYER / name).is_file()
@@ -113,6 +113,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/k2_base.lua",
                 "compatibility/modern_catalogue/bob_angel.lua",
                 "compatibility/bob_angel_profile.lua",
+                "compatibility/bob_tech_profile.lua",
                 "compatibility/atan_profile.lua",
                 "compatibility/modern_catalogue/space_age.lua",
                 "compatibility/modern_catalogue/k2so.lua",
@@ -138,11 +139,12 @@ class PackTests(unittest.TestCase):
                 self.assertNotRegex(lowered, r"(?:^|[./])(?:src|prototypes)(?:[./]|$)", f"{path}: {target}")
                 self.assertTrue(local_module(target).is_file(), f"{path}: {target}")
 
-    def test_player_identity_is_private_and_not_a_native_claim(self):
+    def test_player_identity_preserves_product_metadata_without_qualification_claims(self):
         info = json.loads((PLAYER / "info.json").read_text(encoding="utf-8"))
         self.assertEqual(info["name"], "more-infinite-research")
         self.assertEqual(info["factorio_version"], "2.1")
-        self.assertIn("Incomplete", info["description"])
+        self.assertEqual(info["title"], "More Infinite Research")
+        self.assertFalse(re.search(r"qualified|crash.free|50%|tested on all", info["description"], re.IGNORECASE))
         self.assertIn("disposable test worlds", (PLAYER / "README.md").read_text(encoding="utf-8"))
 
 
