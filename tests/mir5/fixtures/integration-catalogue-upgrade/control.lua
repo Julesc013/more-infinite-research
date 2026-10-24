@@ -147,6 +147,11 @@ local function assert_same_snapshot(force, plan, expected, label)
     local now = actual.technologies[name]
     if now == nil or now.level ~= before.level or now.researched ~= before.researched or now.enabled ~= before.enabled
         or now.visible ~= before.visible or now.maximum ~= before.maximum or not close(now.saved, before.saved) then
+      log("[MIR5_INTEGRATION_STATE_DIFFERENCE] " .. helpers.table_to_json({
+        label=label, force=force.index, technology=name, expected=before, actual=now,
+        legacy_caps=storage.mir and storage.mir.maximum_level_control,
+        current_caps=storage.mir_caps,
+      }))
       fail(label .. " technology state changed: " .. name)
     end
     if actual.effects[name] ~= expected.effects[name] then fail(label .. " technology effects changed: " .. name) end
