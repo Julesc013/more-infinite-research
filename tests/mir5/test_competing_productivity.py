@@ -301,15 +301,60 @@ class CompetingProductivityTests(unittest.TestCase):
 
         self.lua.execute('''
           local binding = require("compatibility.competing_productivity")
-          local changed = {base="2.0.77", ExpandedProductivityResearch="1.3.9"}
-          local ok, message = pcall(binding.select, changed, f200_target())
-          assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
-          -- The actual data boundary must fail before it can silently leave
-          -- an existing competing-owner row unfiltered.
-          local rows = {{name="untouched", marker=17, effects={}}}
-          ok, message = pcall(binding.retain_foreign_coverage, rows, {technology={}}, changed, f200_target(), true)
-          assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
-          assert(rows[1].marker == 17 and #rows == 1)
+          local captured = binding.select(exact_active(), f200_target())
+          local changed = {base="2.0.78", ExpandedProductivityResearch="1.3.9"}
+          local current = binding.select(changed, f200_target())
+          assert(#current.bindings == #captured.bindings)
+          for index, item in ipairs(captured.bindings) do
+            local actual = current.bindings[index]
+            assert(actual.id == item.id and actual.first_level == item.first_level
+              and #actual.effects == #item.effects)
+            for effect_index, effect in ipairs(item.effects) do
+              local observed = actual.effects[effect_index]
+              assert(observed.recipe == effect.recipe and observed.change == effect.change)
+            end
+          end
+
+          -- Version is evidence; the data boundary instead requires the
+          -- named technology identity, first level, predecessor and full
+          -- effect vector before it changes a MIR replacement row.
+          local item = captured.bindings[1]
+          local replacement = item.replacements[1]
+          local function native_effects(effects)
+            local out = {}
+            for index, effect in ipairs(effects) do
+              out[index] = {type="change-recipe-productivity", recipe=effect.recipe, change=effect.change}
+            end
+            return out
+          end
+          local function output(active, name)
+            local foreign = {type="technology", name=name or item.id, enabled=true,
+              max_level="infinite", level=item.first_level, prerequisites={item.predecessor}, effects=native_effects(item.effects)}
+            local row = {name=replacement.id, level=replacement.first_level,
+              max_level="infinite", enabled=true, effects=native_effects(replacement.effects), marker=17}
+            binding.retain_foreign_coverage({row}, {technology={[item.id]=foreign}}, active, f200_target(), false)
+            return row, foreign
+          end
+          local captured_output = output(exact_active())
+          local changed_output = output(changed)
+          assert(captured_output.enabled == false and changed_output.enabled == false)
+          assert(#captured_output.effects == #changed_output.effects and captured_output.marker == 17
+            and changed_output.marker == 17)
+
+          -- A renamed foreign owner is rejected by the direct identity
+          -- guard. Its MIR counterpart remains unchanged; no foreign row is
+          -- edited and no ownership is inferred from a provider version.
+          local rejected, foreign = output(changed, "epr-renamed-owner")
+          assert(rejected.enabled == true and #rejected.effects == #replacement.effects and rejected.marker == 17)
+          assert(foreign.name == "epr-renamed-owner")
+
+          local function rejected(mods)
+            local ok, message = pcall(binding.select, mods, f200_target())
+            assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
+          end
+          rejected({base="2.0.77", ExpandedProductivityResearch="1.3.8", ["space-age"]="2.0.77"})
+          rejected({base="2.0.77", ExpandedProductivityResearch=true})
+          rejected({ExpandedProductivityResearch="1.3.8"})
           assert(binding.select({base="2.0.77", unrelated="0.1.0"}, f200_target()) == nil)
           assert(binding.select(exact_active(), {id="f210", factorio_version="2.1"}) == nil)
           assert(binding.runtime_effects_match({{type="change-recipe-productivity",recipe="iron-plate",change=.10000000149}},
@@ -350,6 +395,15 @@ class CompetingProductivityTests(unittest.TestCase):
           assert(missing_predecessor.technologies[first.id].enabled == true
             and missing_predecessor.technologies[first.id].visible_when_disabled == false)
           assert(storage.mir_competing_productivity.owned_disabled[missing_predecessor.index][first.id] == nil)
+
+          local renamed_owner = force_from_contract(contract)
+          renamed_owner.technologies[first.id].name = "epr-renamed-owner"
+          storage = {}
+          malformed = install_competing(true, renamed_owner)
+          malformed.on_init()
+          assert(renamed_owner.technologies[first.id].enabled == true
+            and renamed_owner.technologies[first.id].visible_when_disabled == false)
+          assert(storage.mir_competing_productivity.owned_disabled[renamed_owner.index][first.id] == nil)
 
           storage = {}
           force.technologies[first.id].enabled = false
@@ -573,7 +627,8 @@ class CompetingProductivityTests(unittest.TestCase):
             local ok, message = pcall(binding.select, mods, target)
             assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
           end
-          rejected({base="2.0.77", ["space-age"]="2.0.77", ["plates-n-circuit-productivity"]="0.0.3"})
+          assert(binding.select({base="2.0.78", ["space-age"]="2.0.78",
+            ["plates-n-circuit-productivity"]="0.0.3"}, target) ~= nil)
           rejected({base="2.0.77", ["plates-n-circuit-productivity"]="0.0.2"})
           rejected({base="2.0.77", ["space-age"]="2.0.77",
             ExpandedProductivityResearch="1.3.8", ["fish-productivity"]="1.0.0"})
@@ -922,8 +977,8 @@ class CompetingProductivityTests(unittest.TestCase):
           rejected({base="2.0.77", ["space-age"]="2.0.77",
             ProductivityResearch="1.3.2", ExpandedProductivityResearch="1.3.8"})
           rejected({base="2.0.77", ["crafting-efficiency-2"]="0.2.20"})
-          rejected({base="2.0.77", ["space-age"]="2.0.77",
-            ["crafting-efficiency-2"]="0.2.21"})
+          assert(binding.select({base="2.0.78", ["space-age"]="2.0.78",
+            ["crafting-efficiency-2"]="0.2.21"}, target) ~= nil)
           assert(binding.select(dynamic_active("ProductivityResearch", "1.3.2"),
             {id="f210", factorio_version="2.1"}) == nil)
           assert(binding.select(dynamic_active("ProductivityResearchForEveryone", "1.0.8"), target) == nil)

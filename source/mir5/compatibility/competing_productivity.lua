@@ -6,8 +6,12 @@
 local M = {}
 
 local PROVIDER = "ExpandedProductivityResearch"
-local PROVIDER_VERSION = "1.3.8"
-local BASE_VERSION = "2.0.77"
+-- These versions identify the captures behind the flat declarations.  They
+-- are evidence, not whole-modpack activation fingerprints: selection below
+-- admits a current provider only through its named native rows and MIR
+-- replacement effects at the data/runtime boundaries.
+local CAPTURED_PROVIDER_VERSION = "1.3.8"
+local CAPTURED_BASE_VERSION = "2.0.77"
 local EFFECT = 0.1
 -- An explicit false keeps a captured no-prerequisite identity distinct from a
 -- missing authored field. It admits only a native/data row with no entries.
@@ -231,7 +235,7 @@ local UNQUALIFIED_DYNAMIC_PROVIDERS = {
 }
 
 local PROFILES = {
-  {key = "epr-base-f200", provider = PROVIDER, version = PROVIDER_VERSION, bindings = EPR_BINDINGS},
+  {key = "epr-base-f200", provider = PROVIDER, version = CAPTURED_PROVIDER_VERSION, bindings = EPR_BINDINGS},
   {key = "crafting-efficiency-f200-space-age", provider = "crafting-efficiency-2", version = "0.2.20", space_age = true, dynamic = true, bindings = CRAFTING_EFFICIENCY_BINDINGS},
   {key = "productivity-research-f200-space-age", provider = "ProductivityResearch", version = "1.3.2", space_age = true, dynamic = true, bindings = PRODUCTIVITY_RESEARCH_BINDINGS},
   {key = "plates-f200-space-age", provider = "plates-n-circuit-productivity", version = "0.0.2", space_age = true, bindings = PLATES_BINDINGS},
@@ -249,6 +253,15 @@ local function fail_transition(reason)
   error("MIR unsupported F200 competing-productivity saved-profile transition: " .. reason, 2)
 end
 
+local function active_version(active_mods, name)
+  local value = active_mods[name]
+  if value == nil then return nil end
+  if type(value) ~= "string" or value == "" then
+    fail_transition(name .. " has no usable active version")
+  end
+  return value
+end
+
 local function selected_profiles(active_mods, target)
   if type(active_mods) ~= "table" or type(target) ~= "table"
       or target.id ~= "f200" or target.factorio_version ~= "2.0" then
@@ -257,20 +270,17 @@ local function selected_profiles(active_mods, target)
   local epr, fixed, dynamic = nil, {}, {}
   local has_named_provider = false
   for _, profile in ipairs(PROFILES) do
-    local actual = active_mods[profile.provider]
+    local actual = active_version(active_mods, profile.provider)
     if actual ~= nil then
       has_named_provider = true
-      if actual ~= profile.version then
-        fail_transition(profile.provider .. " is " .. tostring(actual) .. ", expected " .. profile.version)
-      end
       if profile.dynamic == true then
-        if active_mods["space-age"] ~= BASE_VERSION then
-          fail_transition(profile.provider .. " requires captured Space Age " .. BASE_VERSION)
+        if active_version(active_mods, "space-age") == nil then
+          fail_transition(profile.provider .. " requires Space Age")
         end
         dynamic[#dynamic + 1] = profile
       elseif profile.space_age == true then
-        if active_mods["space-age"] ~= BASE_VERSION then
-          fail_transition(profile.provider .. " requires captured Space Age " .. BASE_VERSION)
+        if active_version(active_mods, "space-age") == nil then
+          fail_transition(profile.provider .. " requires Space Age")
         end
         fixed[#fixed + 1] = profile
       else
@@ -279,8 +289,8 @@ local function selected_profiles(active_mods, target)
     end
   end
   if not has_named_provider then return nil end
-  if active_mods.base ~= BASE_VERSION then
-    fail_transition("base is " .. tostring(active_mods.base) .. ", expected " .. BASE_VERSION)
+  if active_version(active_mods, "base") == nil then
+    fail_transition("base is unavailable")
   end
   if #dynamic ~= 0 then
     -- Each dynamic provider has only an individual captured profile. A mixed
@@ -298,6 +308,12 @@ local function selected_profiles(active_mods, target)
     return dynamic
   end
   if epr ~= nil then
+    -- EPR's named F200 capture is Base-only.  Unlike an official patch or a
+    -- provider revision, adding Space Age changes the counterpart catalogue;
+    -- direct per-row checks cannot establish that missing composition.
+    if active_mods["space-age"] ~= nil then
+      fail_transition("EPR has an unsupported Space Age mix")
+    end
     if #fixed ~= 0 then fail_transition("EPR has an unsupported fixed-provider mix") end
     return {epr}
   end
@@ -349,7 +365,7 @@ function M.select(active_mods, target)
     for _, item in ipairs(profile.bindings) do bindings[#bindings + 1] = item end
   end
   return {provider = providers[1].name, provider_version = providers[1].version,
-    providers = providers, base_version = BASE_VERSION, effect_change = EFFECT, bindings = bindings}
+    providers = providers, base_version = CAPTURED_BASE_VERSION, effect_change = EFFECT, bindings = bindings}
 end
 
 function M.active(active_mods, target)
