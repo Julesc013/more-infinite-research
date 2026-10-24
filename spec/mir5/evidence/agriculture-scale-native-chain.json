@@ -1,0 +1,571 @@
+{
+  "schema": 1,
+  "kind": "MIR5AgricultureScaleNativeChainV1",
+  "status": "candidate-only-bounded-native-scale-pass",
+  "release_qualification": false,
+  "native_run": {
+    "run": 40086764937,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40086764937",
+    "controller_commit": "92aa19e40486c1c37eee875032bb2ff536b3d91a"
+  },
+  "source": {
+    "commit": "397a919b9284ebad4a00c01ccd110fa40fc5ea05",
+    "player_archive_sha256": "380D3DDDABB7DF7E11C429B370BB0952E22D5FA5B7E403BB78B5424269B3BC0F",
+    "player_archive_bytes": 542771,
+    "target": "f210",
+    "version": "5.0.21000"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/artifact-manifest.json",
+    "sha256": "B46F6CE0959C9BAFC80AB64CA2102ECBE20EE82D7B70A775BC5A4AFD8523CE96",
+    "members": 119,
+    "verified_members": 119
+  },
+  "tiers": [
+    {
+      "tier": 1,
+      "profile": {
+        "path": "tests/mir5/profiles/agriculture-scale-1-f210-2123.json",
+        "sha256": "4130CDD87359865E881119AE7730AC2255F53F0F2CBBBC7245FF61D34A278E1B"
+      },
+      "fixtures": [
+        {
+          "name": "mir-fixture-mir5-agriculture-scale",
+          "sha256": "755DE15058BF260C8DE33AB84E4E19D5E4DE72DFF7EB8F6A2EFDC06529C70A33",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "02C23406417F103E11C468902A98D6A1F66457A072F3C063811B2AE2A3A321FF"
+            },
+            {
+              "member": "settings.lua",
+              "sha256": "DF55175F87AE5035AB0CF0B21944A28ADA7EA755C7CDDBCF9CDE2987D0C400E4"
+            },
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "51B4FFCC3CD7552472F63AEE108B1A9B51F4F8BBFEB3EF315ED7B82DBB5E47B7"
+            },
+            {
+              "member": "control.lua",
+              "sha256": "1F071A3B6060C37B07C3CC1A72512E2AE2E4505692905CBFFE60EF847AB283E6"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-agriculture-scale-tier-1",
+          "sha256": "218D3F5DE119316AA137A32983816942B85E2C9243417644FB4965F06F1BAA8B",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "861DA4B642375223FBF76048AD668CB6F8B523A78BF4B0F8D25A836AE7F65CA1"
+            },
+            {
+              "member": "settings-updates.lua",
+              "sha256": "C71032378E4DD910D3579314F7F6814BE00D6081E9231F786FB221292B01A638"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "members": [
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "member": "info.json",
+              "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+            }
+          ]
+        }
+      ],
+      "result": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/gameplay/result.json",
+        "sha256": "F3B37DE9C1F8E327B7FC202C70AC90B846A95DF8CAF5B7EC86BCCACF8657BEA2",
+        "status": "passed-private-native-fixture"
+      },
+      "chain_receipt": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/agriculture-scale-chain.json",
+        "sha256": "856FCF828F0BE9EB5AAEF9681CAC75C20E272B2CAED3191D93CDD556147CC298"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/gameplay/write-data/saves/mir5-native-complete.zip",
+        "sha256": "99EE22F4F470FC72AB40C22ACE7D0BF1B4BCBC45AE7D8A4586DD3D30D29BF99F"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "99EE22F4F470FC72AB40C22ACE7D0BF1B4BCBC45AE7D8A4586DD3D30D29BF99F",
+          "read_only_witness": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "99EE22F4F470FC72AB40C22ACE7D0BF1B4BCBC45AE7D8A4586DD3D30D29BF99F",
+          "read_only_witness": true
+        }
+      ],
+      "processes": [
+        {
+          "index": 1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 3.440072,
+          "peak_sampled_private_bytes": 415969280
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 2.57511,
+          "peak_sampled_private_bytes": 419139584
+        },
+        {
+          "index": 3,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.926604,
+          "peak_sampled_private_bytes": 188616704
+        },
+        {
+          "index": 4,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.930322,
+          "peak_sampled_private_bytes": 192712704
+        }
+      ],
+      "witness": {
+        "real_lab_agriculture_completions": 2,
+        "native_planting_events": {
+          "expected": 2,
+          "observed": 2
+        },
+        "trained_remaining_ticks": 17645,
+        "foreign_remaining_ticks": 18000,
+        "native_spoilable_stacks": 4,
+        "native_yumako_prototype_spoil_ticks": 216000,
+        "native_spoilage_baseline": 1,
+        "generated_chunk_radius": 3,
+        "native_yumako_soil_tiles": 242,
+        "all_official_science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack",
+          "military-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "metallurgic-science-pack",
+          "promethium-science-pack"
+        ],
+        "agricultural_science_physical_consumption": 3,
+        "initial_on_load_read_only": false,
+        "two_reload_on_load_read_only": true,
+        "profiled_timing_interpretation": "not-evaluated"
+      },
+      "logs": [
+        {
+          "stage": "production",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/gameplay/production.factorio.log",
+          "sha256": "F0E1064D9B1F493722A81BE3F87AA33E92FB4E090FADDDAE99D8CB215882FDEA",
+          "bytes": 12188
+        },
+        {
+          "stage": "reload-1",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/gameplay/reload-1.factorio.log",
+          "sha256": "CB2B26E319913F6F5C167593B0E99DEC86065E49B3C98DD892FAA0D03E673877",
+          "bytes": 10957
+        },
+        {
+          "stage": "reload-2",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-1/gameplay/reload-2.factorio.log",
+          "sha256": "ED355C338E8B2DF2F40079D8B8A7179F1B09FFA64A2D55A1E133F8E22B0FE76B",
+          "bytes": 10957
+        }
+      ],
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "tier": 32,
+      "profile": {
+        "path": "tests/mir5/profiles/agriculture-scale-32-f210-2123.json",
+        "sha256": "7ED71CB6DA77ACC5F53609594474500BFBEC78F3FD43C1E431492E3EF7F86DE6"
+      },
+      "fixtures": [
+        {
+          "name": "mir-fixture-mir5-agriculture-scale",
+          "sha256": "755DE15058BF260C8DE33AB84E4E19D5E4DE72DFF7EB8F6A2EFDC06529C70A33",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "02C23406417F103E11C468902A98D6A1F66457A072F3C063811B2AE2A3A321FF"
+            },
+            {
+              "member": "settings.lua",
+              "sha256": "DF55175F87AE5035AB0CF0B21944A28ADA7EA755C7CDDBCF9CDE2987D0C400E4"
+            },
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "51B4FFCC3CD7552472F63AEE108B1A9B51F4F8BBFEB3EF315ED7B82DBB5E47B7"
+            },
+            {
+              "member": "control.lua",
+              "sha256": "1F071A3B6060C37B07C3CC1A72512E2AE2E4505692905CBFFE60EF847AB283E6"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-agriculture-scale-tier-32",
+          "sha256": "655E3FFFF3D704EB79980555C5770D1FDC0609E340A06CD79005E760F65A5100",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "4D68C629BEFA83ADE7F1C7424DAE818B64B40CE8F30941A2479CAB135411404E"
+            },
+            {
+              "member": "settings-updates.lua",
+              "sha256": "9874F74E8B6EB91BE5E279BD7A6E98B97ABAC601606E60A71A003C4176D1622A"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "members": [
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "member": "info.json",
+              "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+            }
+          ]
+        }
+      ],
+      "result": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/gameplay/result.json",
+        "sha256": "B126224013F043E11428012EA9A8DBAD50B31F54DC2926CE5534E035506C748C",
+        "status": "passed-private-native-fixture"
+      },
+      "chain_receipt": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/agriculture-scale-chain.json",
+        "sha256": "532D22034E9A507528EC24DBB25F5149FE4D93F96CDCDAC86BA70C8AF66B402D"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/gameplay/write-data/saves/mir5-native-complete.zip",
+        "sha256": "83E9E386A17A4A88DF1D0B9F521E1E2EC3CFF25EB38EB8C4CB3703709945C0D1"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "83E9E386A17A4A88DF1D0B9F521E1E2EC3CFF25EB38EB8C4CB3703709945C0D1",
+          "read_only_witness": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "83E9E386A17A4A88DF1D0B9F521E1E2EC3CFF25EB38EB8C4CB3703709945C0D1",
+          "read_only_witness": true
+        }
+      ],
+      "processes": [
+        {
+          "index": 1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.991954,
+          "peak_sampled_private_bytes": 415784960
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 3.738096,
+          "peak_sampled_private_bytes": 432979968
+        },
+        {
+          "index": 3,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.922243,
+          "peak_sampled_private_bytes": 193781760
+        },
+        {
+          "index": 4,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.950739,
+          "peak_sampled_private_bytes": 188231680
+        }
+      ],
+      "witness": {
+        "real_lab_agriculture_completions": 2,
+        "native_planting_events": {
+          "expected": 64,
+          "observed": 64
+        },
+        "trained_remaining_ticks": 17645,
+        "foreign_remaining_ticks": 18000,
+        "native_spoilable_stacks": 4,
+        "native_yumako_prototype_spoil_ticks": 216000,
+        "native_spoilage_baseline": 1,
+        "generated_chunk_radius": 5,
+        "native_yumako_soil_tiles": 7744,
+        "all_official_science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack",
+          "military-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "metallurgic-science-pack",
+          "promethium-science-pack"
+        ],
+        "agricultural_science_physical_consumption": 3,
+        "initial_on_load_read_only": false,
+        "two_reload_on_load_read_only": true,
+        "profiled_timing_interpretation": "not-evaluated"
+      },
+      "logs": [
+        {
+          "stage": "production",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/gameplay/production.factorio.log",
+          "sha256": "D84B92EB93FCCF581C432332E98527E44DF66D74841B00692CEA5673FC2D5E1F",
+          "bytes": 12204
+        },
+        {
+          "stage": "reload-1",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/gameplay/reload-1.factorio.log",
+          "sha256": "7734913EFE3C4287F291C2D8E7711EB3519EDFCB7595A427C510F30C5BFBA2A0",
+          "bytes": 10973
+        },
+        {
+          "stage": "reload-2",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-32/gameplay/reload-2.factorio.log",
+          "sha256": "C505DB59FC6E6C3BC142FE7F0AB5AB3194B723251236DCAB88CA75667F878124",
+          "bytes": 10973
+        }
+      ],
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    },
+    {
+      "tier": 128,
+      "profile": {
+        "path": "tests/mir5/profiles/agriculture-scale-128-f210-2123.json",
+        "sha256": "E024FB441D7B68065A3576CA2E1D4EEF558D459C1FD599800BAB8293C0B2E303"
+      },
+      "fixtures": [
+        {
+          "name": "mir-fixture-mir5-agriculture-scale",
+          "sha256": "755DE15058BF260C8DE33AB84E4E19D5E4DE72DFF7EB8F6A2EFDC06529C70A33",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "02C23406417F103E11C468902A98D6A1F66457A072F3C063811B2AE2A3A321FF"
+            },
+            {
+              "member": "settings.lua",
+              "sha256": "DF55175F87AE5035AB0CF0B21944A28ADA7EA755C7CDDBCF9CDE2987D0C400E4"
+            },
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "51B4FFCC3CD7552472F63AEE108B1A9B51F4F8BBFEB3EF315ED7B82DBB5E47B7"
+            },
+            {
+              "member": "control.lua",
+              "sha256": "1F071A3B6060C37B07C3CC1A72512E2AE2E4505692905CBFFE60EF847AB283E6"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-agriculture-scale-tier-128",
+          "sha256": "D79971A9AB1C62687D4636E388C5D48B6418BACD4E8562A7393E72F2E297F30C",
+          "members": [
+            {
+              "member": "info.json",
+              "sha256": "0694C07209CEBB8BBA27B01AE59589EDA22D92E94CD6E97B80C7175C7B655067"
+            },
+            {
+              "member": "settings-updates.lua",
+              "sha256": "98F8100464DECBB6DBF16BB2D9CA4F5311CB0D72AB712995E0660F192B21F887"
+            }
+          ]
+        },
+        {
+          "name": "mir-fixture-mir5-active-mods-observer",
+          "sha256": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+          "members": [
+            {
+              "member": "data-final-fixes.lua",
+              "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"
+            },
+            {
+              "member": "info.json",
+              "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"
+            }
+          ]
+        }
+      ],
+      "result": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/gameplay/result.json",
+        "sha256": "0A75C4B03300C4B912C92DCA2E8F19E9444398116F1B84A49E63DE28795590DA",
+        "status": "passed-private-native-fixture"
+      },
+      "chain_receipt": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/agriculture-scale-chain.json",
+        "sha256": "25C00EE3B0E178E9A1B4F3041136A2610614B4B719A88C441DBB994B6D32FD40"
+      },
+      "completed_save": {
+        "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/gameplay/write-data/saves/mir5-native-complete.zip",
+        "sha256": "BBCF7C2EE8C35BF8AEE3845CA67500E7C057ABF7768C38AEFFA3B2E809A48BFD"
+      },
+      "reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "BBCF7C2EE8C35BF8AEE3845CA67500E7C057ABF7768C38AEFFA3B2E809A48BFD",
+          "read_only_witness": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "BBCF7C2EE8C35BF8AEE3845CA67500E7C057ABF7768C38AEFFA3B2E809A48BFD",
+          "read_only_witness": true
+        }
+      ],
+      "processes": [
+        {
+          "index": 1,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 2.969702,
+          "peak_sampled_private_bytes": 415371264
+        },
+        {
+          "index": 2,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": true,
+          "duration_seconds": 3.713769,
+          "peak_sampled_private_bytes": 430628864
+        },
+        {
+          "index": 3,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.917392,
+          "peak_sampled_private_bytes": 196415488
+        },
+        {
+          "index": 4,
+          "passed": true,
+          "timed_out": false,
+          "completion_predicate_observed": false,
+          "duration_seconds": 1.918415,
+          "peak_sampled_private_bytes": 193122304
+        }
+      ],
+      "witness": {
+        "real_lab_agriculture_completions": 2,
+        "native_planting_events": {
+          "expected": 256,
+          "observed": 256
+        },
+        "trained_remaining_ticks": 17645,
+        "foreign_remaining_ticks": 18000,
+        "native_spoilable_stacks": 4,
+        "native_yumako_prototype_spoil_ticks": 216000,
+        "native_spoilage_baseline": 1,
+        "generated_chunk_radius": 8,
+        "native_yumako_soil_tiles": 30976,
+        "all_official_science": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "agricultural-science-pack",
+          "electromagnetic-science-pack",
+          "cryogenic-science-pack",
+          "military-science-pack",
+          "utility-science-pack",
+          "space-science-pack",
+          "metallurgic-science-pack",
+          "promethium-science-pack"
+        ],
+        "agricultural_science_physical_consumption": 3,
+        "initial_on_load_read_only": false,
+        "two_reload_on_load_read_only": true,
+        "profiled_timing_interpretation": "not-evaluated"
+      },
+      "logs": [
+        {
+          "stage": "production",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/gameplay/production.factorio.log",
+          "sha256": "EA1A75222C9740F27A3660AA2C8556C9AF13450FDC7E1D3D12D356024BCF0869",
+          "bytes": 12317
+        },
+        {
+          "stage": "reload-1",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/gameplay/reload-1.factorio.log",
+          "sha256": "4E5A9E9A3FE562476EBB3D9F77F9B9D8C2D5C4ED83E677C6032ACA04B81DC160",
+          "bytes": 11084
+        },
+        {
+          "stage": "reload-2",
+          "path": "build/mir5/recovery-historical/agriculture-scale/40086764937/agriculture-scale/tier-128/gameplay/reload-2.factorio.log",
+          "sha256": "499241B7028BA4DC7AA5EC3404B96BA1CD55099D242462E1392912FED99A2CC2",
+          "bytes": 11084
+        }
+      ],
+      "library_restoration": {
+        "status": "restored-direct-library-controls",
+        "dependency_payload_bytes_copied": 0,
+        "archive_links_created": 0,
+        "archive_extractions": 0
+      }
+    }
+  ],
+  "receipt_bundle": {
+    "path": "spec/mir5/evidence/agriculture-scale-native-receipts.json.gz",
+    "compressed_sha256": "F6160789CEB0F91773B9D1EEF0CAF9D2147C60FBD3DC31C71F434DAAE3C771F4",
+    "uncompressed_sha256": "3A18E74551FCABC427A58182647F347B114FA6EC803DFE617751A9143F7778A1",
+    "members": 1
+  },
+  "scope": "Exact F210 candidate-only physical agriculture scale witness. Each frozen tier completes two accelerated real lab levels, observes native tower planting and spoilage facts, and passes two cold reloads. It establishes neither published 4.7 parity, an ordinary-tuning result, a timing/performance comparison, multiplayer, final package qualification, nor release qualification.",
+  "limits": [
+    "No published 4.7 F210 agriculture package comparison is captured.",
+    "The fixture records a profiler string but deliberately makes no timing decision.",
+    "The fixture accelerates research count/time; its result does not qualify ordinary tuning.",
+    "This is a fixed 1/32/128-tower-per-force candidate witness, not a generic workload or final release gate."
+  ]
+}
