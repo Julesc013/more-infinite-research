@@ -4,6 +4,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+from historical_sources import read_published_source
 import sys
 import unittest
 
@@ -78,6 +79,9 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
         ):
             record = cls.facts[group]
             for path_key, hash_key in paths:
+                if group != "observer_fixture" and path_key != "historical_settings_path":
+                    read_published_source(ROOT, record[path_key], record[hash_key])
+                    continue
                 path = ROOT / record[path_key]
                 if _sha256(path) != record[hash_key]:
                     raise AssertionError(f"automatic-family source evidence changed: {path}")
@@ -135,11 +139,11 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
 
     def test_portable_disposition_pins_old_explicit_gate_and_fixture_only_history(self):
         evidence = self.facts["historical_source_evidence"]
-        matcher = (ROOT / evidence["matcher_path"]).read_text(encoding="utf-8")
+        matcher = read_published_source(ROOT, evidence["matcher_path"], evidence["matcher_sha256"]).decode("utf-8")
         self.assertIn(evidence["matcher_required_literal"], matcher)
 
-        streams = (ROOT / evidence["streams_path"]).read_text(encoding="utf-8")
-        providers = (ROOT / evidence["providers_path"]).read_text(encoding="utf-8")
+        streams = read_published_source(ROOT, evidence["streams_path"], evidence["streams_sha256"]).decode("utf-8")
+        providers = read_published_source(ROOT, evidence["providers_path"], evidence["providers_sha256"]).decode("utf-8")
         settings = (ROOT / evidence["historical_settings_path"]).read_text(encoding="utf-8")
         for family in ("research_auto_assembling_machine", "research_auto_lab"):
             self.assertIn(family, streams)
@@ -148,7 +152,7 @@ class AutomaticFamilyNonEmissionTests(unittest.TestCase):
 
         history = self.facts["historical_fixture_only_evidence"]
         for key in ("create_path", "load_path"):
-            text = (ROOT / history[key]).read_text(encoding="utf-8")
+            text = read_published_source(ROOT, history[key], history[key.replace("_path", "_sha256")]).decode("utf-8")
             self.assertIn(history["emitted_identity"], text)
             self.assertIn(history["fixture_recipe"], text)
             self.assertIn(history["withheld_family_log"], text)

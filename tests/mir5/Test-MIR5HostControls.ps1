@@ -89,6 +89,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_compose_replay.py';lua=$false},
   [ordered]@{path='tests/mir5/test_compare_captures.py';lua=$false},
   [ordered]@{path='tests/mir5/test_recover_modern_catalogue.py';lua=$false},
+  [ordered]@{path='tests/mir5/test_historical_sources.py';lua=$false},
   [ordered]@{path='tests/mir5/test_menu_comparison.py';lua=$false},
   [ordered]@{path='tests/mir5/test_pack.py';lua=$false},
   [ordered]@{path='tests/mir5/test_host_controls.py';lua=$false},

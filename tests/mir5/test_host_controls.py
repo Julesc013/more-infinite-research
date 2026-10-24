@@ -170,12 +170,13 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_compose_replay.py",
             "tests/mir5/test_compare_captures.py",
             "tests/mir5/test_recover_modern_catalogue.py",
+            "tests/mir5/test_historical_sources.py",
             "tests/mir5/test_menu_comparison.py",
             "tests/mir5/test_pack.py",
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 85)
+        self.assertEqual(len(paths), 86)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
