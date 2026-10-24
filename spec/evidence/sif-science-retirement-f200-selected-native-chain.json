@@ -1,0 +1,312 @@
+{
+  "schema": 1,
+  "kind": "MIR5SifScienceRetirementF200SelectedNativeChainV1",
+  "status": "selected-f200-native-pass-with-f210-unrun",
+  "release_qualification": false,
+  "native_run": {
+    "run": 40135387054,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40135387054",
+    "controller_commit": "1641b32f57d9714f36415a2eb43cb428a8a20a32"
+  },
+  "source": {
+    "fixture_commit": "7341f54e8fc6641fbb6668c15bf9743c0d72e294",
+    "player_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "player": {
+      "target": "f200",
+      "version": "5.0.20000",
+      "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+      "bytes": 547144
+    },
+    "published_player": {
+      "version": "4.7.20002",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "bytes": 1449338
+    },
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0"
+  },
+  "engine": {
+    "target": "f200",
+    "base_version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/artifact-manifest.json",
+    "sha256": "82C2959725F87FE23E644C1245DE09C2FC2EDA1CF6576E478FBD546C8ADBE0B2",
+    "members": 171,
+    "verified_members": 171,
+    "readback_path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/manifest-readback.json",
+    "readback_sha256": "47ED6B1430DFE1DA5264057F6C0D552E17461AE042945FFE5360E97C225DA66D"
+  },
+  "selection": {
+    "kind": "selected-subset",
+    "full_matrix_contract": {
+      "target_execution_order": [
+        "f210",
+        "f200"
+      ],
+      "candidate_create_only_cases": 16,
+      "configured_transition_pairs": 2
+    },
+    "selected_targets": [
+      "f200"
+    ],
+    "unrun_targets": [
+      "f210"
+    ],
+    "executed_candidate_create_only_cases": 8,
+    "executed_configured_transition_pairs": 1,
+    "execution_order": [
+      "f200"
+    ],
+    "native_directory_contract": {
+      "exclusive_length_limit": 248,
+      "policy_leaves": [
+        {
+          "policy": "configured",
+          "leaf": "c1"
+        },
+        {
+          "policy": "space",
+          "leaf": "c2"
+        },
+        {
+          "policy": "space-and-promethium",
+          "leaf": "c3"
+        },
+        {
+          "policy": "space-age-progression",
+          "leaf": "c4"
+        },
+        {
+          "policy": "official-progression",
+          "leaf": "c5"
+        },
+        {
+          "policy": "mod-progression",
+          "leaf": "c6"
+        },
+        {
+          "policy": "all-official",
+          "leaf": "c7"
+        },
+        {
+          "policy": "all",
+          "leaf": "c8"
+        }
+      ],
+      "source_leaf": "p",
+      "successor_leaf": "s"
+    }
+  },
+  "create_only_policy_cases": [
+    {
+      "leaf": "c1",
+      "policy": "configured",
+      "case": "sif-science-retirement-f200-configured",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c1/result.json",
+        "sha256": "BCA806886AB3D79837543C04AA7C89451372E0CA85E693031023EA61A3E348D0"
+      },
+      "profile_sha256": "BD3586706DC42765A0469E3BE4B080CE37F3366606145A030329274595D728AE",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c2",
+      "policy": "space",
+      "case": "sif-science-retirement-f200-space",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c2/result.json",
+        "sha256": "D319898FCCC7C39D49ADAE55B7E9BE7EFDCB078651745164DCFE59F7F90F837C"
+      },
+      "profile_sha256": "D1BF8C033778D34022B7B492163798BA923CE88F413D02A60038C0BCAEDB85B7",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c3",
+      "policy": "space-and-promethium",
+      "case": "sif-science-retirement-f200-space-and-promethium",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c3/result.json",
+        "sha256": "70380662022408F7BCB7481ED0A8515CFB109269168F62CF1CBF5EB72B6CCE5D"
+      },
+      "profile_sha256": "25FA558248CBF979476121B7D1094818C4084ED3878DDDEF71151DFE6E69F0BA",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c4",
+      "policy": "space-age-progression",
+      "case": "sif-science-retirement-f200-space-age-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c4/result.json",
+        "sha256": "CCEAB36FFDABCE97F60B455E5A364CEA57E33B5A1BCF2CEB9B08E8EF4C68E07C"
+      },
+      "profile_sha256": "D833DAD981FD0BE651D76F71E517D4A98E951ADEAFE563A40D1B5669D2DCBBDE",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c5",
+      "policy": "official-progression",
+      "case": "sif-science-retirement-f200-official-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c5/result.json",
+        "sha256": "A361A12F85F36140BCEF86DC1DB56CF0429F8B8B68D158DA8C1471F35F1F487E"
+      },
+      "profile_sha256": "DF8B95C0790BFD5AA6988873EDC3E05DC611717BE78FB1ECB2ED95527BAE1774",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c6",
+      "policy": "mod-progression",
+      "case": "sif-science-retirement-f200-mod-progression",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c6/result.json",
+        "sha256": "CE0F833E847594A4BF3CB7AE1C2500531F67FB6774E5F07A02F9F5D9BE86DDAE"
+      },
+      "profile_sha256": "0D74A09E64DE2D82CA37931573EFEE27FB79C1BE2DCC68A8AA3D0791027FA0C6",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c7",
+      "policy": "all-official",
+      "case": "sif-science-retirement-f200-all-official",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c7/result.json",
+        "sha256": "B85BBF44ADF979B4E03B64BE5BA68D12B258CCDB09C239D5CE8E0C6DCF78F2DB"
+      },
+      "profile_sha256": "1DA4F6B8EA1CB9ECADE076F1553D030CC6258C9F2E95F7A0B1D0874E6CDC3F92",
+      "controls_restored": true
+    },
+    {
+      "leaf": "c8",
+      "policy": "all",
+      "case": "sif-science-retirement-f200-all",
+      "status": "passed-private-native-runtime-load-only",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/c8/result.json",
+        "sha256": "48F81F0D007B432DCEB33CA16BB329B89FBF3EE46FBF36BC6BA15290C3CDAD63"
+      },
+      "profile_sha256": "33632E1367AA5024C2F86DB9FDC6044A17273AA3FAC21BA1562832E6271D642A",
+      "controls_restored": true
+    }
+  ],
+  "configured_transition": {
+    "named_technologies": [
+      "research-speed-7",
+      "weapon-shooting-speed-7"
+    ],
+    "source_stage": {
+      "status": "passed-private-native-fixture",
+      "profile_sha256": "CB02A7597AC2BA21D8860123B816E2986A9A3DAB35C70B1898969A13507B868D",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/p/result.json",
+        "sha256": "643E05A9B42831D07A252EE6657FD74BC13A4BE888B6820235F1D8AF027DEA32"
+      },
+      "real_laboratory_completions": 2,
+      "partial_progress": {
+        "research-speed-7": 0.42000000000000004,
+        "weapon-shooting-speed-7": 0.27
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "DF546FD6306A719157A373B1ABA3B11F1703938EA0A6C2ED43F49405DAB009F7",
+          "save_byte_identical": true,
+          "on_load_read_only": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "DF546FD6306A719157A373B1ABA3B11F1703938EA0A6C2ED43F49405DAB009F7",
+          "save_byte_identical": true,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    },
+    "successor_stage": {
+      "status": "passed-private-native-fixture",
+      "profile_sha256": "BD3586706DC42765A0469E3BE4B080CE37F3366606145A030329274595D728AE",
+      "result": {
+        "path": "build/mir5/recovery-historical/sif-science-retirement/40135387054/sif-science-retirement-f200/native/f200/s/result.json",
+        "sha256": "71EC8E3039DBF4118A4D0A5E83880593903AC700F5616AA62DCCBE14A6DB05E9"
+      },
+      "real_laboratory_completions": 2,
+      "partial_progress_preserved": {
+        "research-speed-7": 0.42000000000000004,
+        "weapon-shooting-speed-7": 0.27
+      },
+      "physical_consumption_delta": {
+        "automation-science-pack": {
+          "before": 14,
+          "after": 13
+        },
+        "logistic-science-pack": {
+          "before": 14,
+          "after": 13
+        },
+        "chemical-science-pack": {
+          "before": 14,
+          "after": 13
+        },
+        "utility-science-pack": {
+          "before": 14,
+          "after": 13
+        },
+        "military-science-pack": {
+          "before": 14,
+          "after": 13
+        }
+      },
+      "cold_reloads": [
+        {
+          "ordinal": 1,
+          "save_sha256": "8823EB63862A15B319552FF85A2B6A99DF01627CBD52A73E06879351F1309177",
+          "save_byte_identical": true,
+          "on_load_read_only": true
+        },
+        {
+          "ordinal": 2,
+          "save_sha256": "8823EB63862A15B319552FF85A2B6A99DF01627CBD52A73E06879351F1309177",
+          "save_byte_identical": true,
+          "on_load_read_only": true
+        }
+      ],
+      "controls_restored": true
+    }
+  },
+  "retained_adverses": [
+    {
+      "run": 40132634285,
+      "classification": "windows-engine-temporary-locale-path-limit-before-the-selected-f200-case-completed",
+      "disposition": "preserved; corrected only by the explicit short c1..c8,p,s native-leaf controller input used by this run",
+      "source": "same fixture/player lineage before the selected-F200 execution",
+      "note": "This positive selected-F200 result does not relabel or erase the original path-limit workflow failure."
+    },
+    {
+      "path": "spec/evidence/sif-science-retirement-external-closure-adverse-chain.json",
+      "classification": "f210-external-closure-startup-before-marker",
+      "disposition": "preserved; F210 is explicitly unrun in this selected-F200 chain"
+    }
+  ],
+  "raw_evidence": {
+    "path": "spec/evidence/sif-science-retirement-f200-selected-native-receipts.json.gz",
+    "members": 14,
+    "gzip_bytes": 61704,
+    "gzip_sha256": "EBB4F8F771A2D88BD04C86EE862F483F823E9C1B8F795B6E16DC737650F0C875",
+    "uncompressed_bytes": 442375,
+    "uncompressed_sha256": "7E715F371C37BC064B296AE8DD96DC4509A0407DF0C77FFF7C29B24598C57A7A"
+  },
+  "scope": "Exact F200 selected-subset evidence: all eight candidate policy CreateOnly cases and the configured published-to-MIR5 transition completed with two actual labs on each transition stage and two cold reloads per stage. It is not the complete F210+F200 SIF matrix.",
+  "limits": [
+    "F210 is unrun; the complete 16-CreateOnly/two-transition-pair matrix is not qualified by this selected-F200 result.",
+    "The retained F210 external-closure startup adverse remains unresolved and is not attributed to MIR5 by this chain.",
+    "This is not performance, multiplayer, release, or final-package qualification.",
+    "The older Windows temporary-locale-path adverse remains preserved under its original run identity."
+  ]
+}
