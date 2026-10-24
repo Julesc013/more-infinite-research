@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-library-paired-browser-arm-published",
+  "version": "0.1.0",
+  "title": "MIR paired public Library published arm selector",
+  "author": "MIR maintainers",
+  "description": "Selects the exact published 4.7.20002 public Library arm for the shared paired browser fixture.",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.77",
+    "more-infinite-research = 4.7.20002",
+    "mir-fixture-mir5-library-paired-browser = 0.1.0"
+  ]
+}
