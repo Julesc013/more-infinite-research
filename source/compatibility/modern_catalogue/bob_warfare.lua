@@ -37,17 +37,22 @@ end
 local function row_name(row) return type(row) == "table" and (row.name or row[1]) or nil end
 local function row_amount(row) return type(row) == "table" and (row.amount or row[2]) or nil end
 
-local function ordinary(rows, expected)
+local function ordinary(rows, expected, product)
   if type(rows) ~= "table" or #rows ~= #expected then return false end
   for index, wanted in ipairs(expected) do
     local row = rows[index]
-    if type(row) ~= "table" or (row.type or "item") ~= wanted.type
+    if type(row) ~= "table" then return false end
+    local ignored = row.ignored_by_productivity
+    -- F200 item products inherit this exclusion from ignored_by_stats;
+    -- ingredient and science rows do not have that product default.
+    if product and ignored == nil then ignored = row.ignored_by_stats end
+    if (row.type or "item") ~= wanted.type
       or row_name(row) ~= wanted.name or row_amount(row) ~= wanted.amount
       or row.amount_min ~= nil or row.amount_max ~= nil
       or (row.probability ~= nil and row.probability ~= 1)
       or (row.independent_probability ~= nil and row.independent_probability ~= 1)
       or (row.catalyst_amount ~= nil and row.catalyst_amount ~= 0)
-      or (row.ignored_by_productivity ~= nil and row.ignored_by_productivity ~= 0)
+      or (ignored ~= nil and ignored ~= 0)
       or (row.extra_count_fraction ~= nil and row.extra_count_fraction ~= 0) then return false end
   end
   return true
@@ -70,7 +75,7 @@ function M.preflight(raw)
       or recipe.maximum_productivity ~= nil
       or not ordinary(recipe.ingredients, {{type="item",name="low-density-structure",amount=5},
         {type="item",name="steel-plate",amount=2}})
-      or not ordinary(recipe.results, {{type="item",name="bob-mech-armor-plate",amount=1}}) then
+      or not ordinary(recipe.results, {{type="item",name="bob-mech-armor-plate",amount=1}}, true) then
     error("MIR F200 Bob Warfare armor route changed", 2)
   end
   if type(owner) ~= "table" or owner.enabled == false

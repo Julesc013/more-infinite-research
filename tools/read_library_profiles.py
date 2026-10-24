@@ -78,8 +78,9 @@ def _read_bounded(path: Path, maximum_bytes: int, description: str) -> bytes:
     return data
 
 
-def _read_log(path: Path) -> tuple[bytes, list[str]]:
-    data = _read_bounded(path, MAX_LOG_BYTES, "log")
+def _read_log(path: Path, *, remaining_bytes: int | None = None) -> tuple[bytes, list[str]]:
+    maximum_bytes = MAX_LOG_BYTES if remaining_bytes is None else min(MAX_LOG_BYTES, remaining_bytes)
+    data = _read_bounded(path, maximum_bytes, "log")
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError as error:
@@ -120,10 +121,10 @@ def _read_profiles(inputs: Iterable[LogInput], *, manifest: dict[str, Any] | Non
         observations: dict[str, dict[str, Any]] = {}
         log_rows: list[dict[str, Any]] = []
         for entry in grouped[role]:
-            data, lines = _read_log(entry.path)
+            # Apply both budgets before reading or decoding the next log. The
+            # bounded reader requests one extra byte only to detect overflow.
+            data, lines = _read_log(entry.path, remaining_bytes=MAX_TOTAL_LOG_BYTES - total_bytes)
             total_bytes += len(data)
-            if total_bytes > MAX_TOTAL_LOG_BYTES:
-                raise LibraryProfileError(f"selected logs exceed {MAX_TOTAL_LOG_BYTES} byte total input limit")
             log_hash = _sha256(data)
             log_row = {
                 "process": entry.process,
