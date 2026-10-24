@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "kind": "mir5-agriculture-published-f210-prototype-capture-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Predeclared F210 published 4.7.21002 agricultural prototype data-stage capture only. Invoke-PrototypeCapture receives more-infinite-research_4.7.21002.zip separately as its sole explicit MIR selection and verifies SHA256 A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F. This profile retains only the exact 2.1.23 official closure, Defaults, and the hash-bound active-mods observer; it selects no agriculture core, tier selector, acceleration, gameplay, save/reload, or benchmark fixture. Its future dump may establish whether the published definition can share the candidate witness; it establishes neither equality nor paired 1/32/128 qualification."
+}
