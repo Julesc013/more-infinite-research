@@ -579,6 +579,33 @@ local function policy_ingredients(source, binding, context, selected, view)
   return out, policy, added, contracts
 end
 
+-- A compatibility binding can remove a finite, named retired science role
+-- from a known owned row.  This runs only after a policy has formed its
+-- selected vector, so broad policies cannot re-add the excluded pack.  It
+-- also removes that name from the policy additions before their source and
+-- prerequisite contracts are read.  Explicit required science is appended
+-- later and remains a hard constraint.
+local function exclude_science(ingredients, additions, contracts, excluded)
+  if type(excluded) ~= "table" or #excluded == 0 then return ingredients, additions, contracts end
+  local denied = {}
+  for _, name in ipairs(excluded) do
+    if type(name) == "string" and name ~= "" then denied[name] = true end
+  end
+  if next(denied) == nil then return ingredients, additions, contracts end
+  local selected = {}
+  for _, row in ipairs(ingredients or {}) do
+    if not denied[row[1]] then selected[#selected + 1] = row end
+  end
+  local selected_additions, selected_contracts = {}, {}
+  for _, name in ipairs(additions or {}) do
+    if not denied[name] then
+      selected_additions[#selected_additions + 1] = name
+      selected_contracts[name] = contracts and contracts[name] or nil
+    end
+  end
+  return selected, selected_additions, selected_contracts
+end
+
 -- This is the one retained K2 phase rule. It operates on the policy-selected
 -- vector, as the shipped planner did, and returns a required surviving phase
 -- trigger for subsequent lab reduction. It never probes foreign unlocks.
@@ -712,6 +739,8 @@ function M.apply(technology, binding, context)
     end
   end
   local ingredients, policy, additions, addition_contracts = policy_ingredients(source, binding, context, selected, view)
+  ingredients, additions, addition_contracts = exclude_science(
+    ingredients, additions, addition_contracts, binding.excluded_science)
   for _, name in ipairs(additions) do
     local valid, source_reason = validate_source_contract(raw, addition_contracts[name], name)
     if not valid then
@@ -793,7 +822,7 @@ function M.apply_family(rows, family_bindings, environment)
     end
     if binding == nil then
       local family = row.name:match("^recipe%-prod%-(.-)%-%d+$") or row.name:match("^(.-)%-%d+$")
-      binding = bindings.conditions_for(family)
+      binding = bindings.conditions_for(family, row.name, environment.mods)
       if row.name == "mir-k2-imersite-staged-state-1" or row.name == "mir-k2-imersite-continuation-state-4" then
         binding.preserve_identity, binding.space_gate = true, false
       end

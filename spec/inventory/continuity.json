@@ -902,7 +902,7 @@
               "disposition": "representative-observed-not-reporter-qualified"
             }
           ],
-          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. ECO-PLANETS, SIF-01 and other unmatched retained requests have no current MIR5 disposition here: their original decisions/statuses remain open and unchanged.",
+          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. SIF-01 additionally has a finite source/host-only disposition in its original ledger row; its exact native acceptance remains pending. ECO-PLANETS and other unmatched retained requests retain their original decisions/statuses without inferred coverage.",
           "evidence": [
             "spec/evidence/k2so-material-native-chain.json",
             "spec/evidence/bob-angel-materials-lab-native-chain.json",
@@ -918,7 +918,7 @@
           "source": [
             "spec/programmes/community-requests.json"
           ],
-          "scope": "ECO-PLANETS and SIF-01 retain their original requests without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage, and no current named source refers to the Space Is Fake selector; neither is inferred from historical changelog text or a general science policy."
+          "scope": "ECO-PLANETS retains its original request without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage; it is not inferred from historical changelog text or a general science policy. SIF-01 now has the explicit two-continuation source binding and host-only evidence named in its original ledger row; native final-emission and predecessor/save acceptance remain open."
         }
       ],
       "test_subjects": [

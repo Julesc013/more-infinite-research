@@ -4323,7 +4323,20 @@
       "source_ids": ["P5"],
       "feature_group": "science-retirement",
       "status": "requested-not-qualified",
-      "qualification": []
+      "qualification": [],
+      "mir5_route_disposition": {
+        "state": "implemented-source-host-controls-pass-native-pending",
+        "current_source": [
+          "source/compatibility/science_bindings.lua",
+          "source/research/science.lua"
+        ],
+        "evidence": [
+          "spec/evidence/sif-continuation-source-review.json"
+        ],
+        "limitations": [
+          "All eight policy expectations have host coverage on F200/F210. Exact current-package native emission and genuine published-predecessor upgrade/save/two-reload acceptance remain pending; the original decision, acceptance and requested-not-qualified status are unchanged."
+        ]
+      }
     },
     {
       "id": "DLC-01",
