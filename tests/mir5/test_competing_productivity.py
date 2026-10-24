@@ -301,7 +301,16 @@ class CompetingProductivityTests(unittest.TestCase):
 
         self.lua.execute('''
           local binding = require("compatibility.competing_productivity")
-          assert(binding.select({base="2.0.77", ExpandedProductivityResearch="1.3.9"}, f200_target()) == nil)
+          local changed = {base="2.0.77", ExpandedProductivityResearch="1.3.9"}
+          local ok, message = pcall(binding.select, changed, f200_target())
+          assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
+          -- The actual data boundary must fail before it can silently leave
+          -- an existing competing-owner row unfiltered.
+          local rows = {{name="untouched", marker=17, effects={}}}
+          ok, message = pcall(binding.retain_foreign_coverage, rows, {technology={}}, changed, f200_target(), true)
+          assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
+          assert(rows[1].marker == 17 and #rows == 1)
+          assert(binding.select({base="2.0.77", unrelated="0.1.0"}, f200_target()) == nil)
           assert(binding.select(exact_active(), {id="f210", factorio_version="2.1"}) == nil)
           assert(binding.runtime_effects_match({{type="change-recipe-productivity",recipe="iron-plate",change=.10000000149}},
             {{recipe="iron-plate",change=.1}}))
@@ -560,11 +569,14 @@ class CompetingProductivityTests(unittest.TestCase):
         self.lua.execute(r'''
           local binding = require("compatibility.competing_productivity")
           local target = f200_target()
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ["plates-n-circuit-productivity"]="0.0.3"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["plates-n-circuit-productivity"]="0.0.2"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ExpandedProductivityResearch="1.3.8", ["fish-productivity"]="1.0.0"}, target) == nil)
+          local function rejected(mods)
+            local ok, message = pcall(binding.select, mods, target)
+            assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
+          end
+          rejected({base="2.0.77", ["space-age"]="2.0.77", ["plates-n-circuit-productivity"]="0.0.3"})
+          rejected({base="2.0.77", ["plates-n-circuit-productivity"]="0.0.2"})
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ExpandedProductivityResearch="1.3.8", ["fish-productivity"]="1.0.0"})
           assert(binding.select(fixed_active(), {id="f210", factorio_version="2.1"}) == nil)
         ''')
 
@@ -897,17 +909,21 @@ class CompetingProductivityTests(unittest.TestCase):
         self.lua.execute(r'''
           local binding = require("compatibility.competing_productivity")
           local target = f200_target()
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ["crafting-efficiency-2"]="0.2.20", ProductivityResearch="1.3.2"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ["crafting-efficiency-2"]="0.2.20", ProductivityResearchForEveryone="1.0.8"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ["crafting-efficiency-2"]="0.2.20", ["fish-productivity"]="1.0.0"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ProductivityResearch="1.3.2", ExpandedProductivityResearch="1.3.8"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["crafting-efficiency-2"]="0.2.20"}, target) == nil)
-          assert(binding.select({base="2.0.77", ["space-age"]="2.0.77",
-            ["crafting-efficiency-2"]="0.2.21"}, target) == nil)
+          local function rejected(mods)
+            local ok, message = pcall(binding.select, mods, target)
+            assert(not ok and tostring(message):find("unsupported F200 competing%-productivity saved%-profile transition"))
+          end
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ProductivityResearch="1.3.2"})
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ProductivityResearchForEveryone="1.0.8"})
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.20", ["fish-productivity"]="1.0.0"})
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ProductivityResearch="1.3.2", ExpandedProductivityResearch="1.3.8"})
+          rejected({base="2.0.77", ["crafting-efficiency-2"]="0.2.20"})
+          rejected({base="2.0.77", ["space-age"]="2.0.77",
+            ["crafting-efficiency-2"]="0.2.21"})
           assert(binding.select(dynamic_active("ProductivityResearch", "1.3.2"),
             {id="f210", factorio_version="2.1"}) == nil)
           assert(binding.select(dynamic_active("ProductivityResearchForEveryone", "1.0.8"), target) == nil)

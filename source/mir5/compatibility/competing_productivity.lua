@@ -245,38 +245,60 @@ for _, profile in ipairs(PROFILES) do
   for _, item in ipairs(profile.bindings) do ALL_BINDINGS[#ALL_BINDINGS + 1] = item end
 end
 
+local function fail_transition(reason)
+  error("MIR unsupported F200 competing-productivity saved-profile transition: " .. reason, 2)
+end
+
 local function selected_profiles(active_mods, target)
   if type(active_mods) ~= "table" or type(target) ~= "table"
-      or target.id ~= "f200" or target.factorio_version ~= "2.0" or active_mods.base ~= BASE_VERSION then
+      or target.id ~= "f200" or target.factorio_version ~= "2.0" then
     return nil
   end
   local epr, fixed, dynamic = nil, {}, {}
+  local has_named_provider = false
   for _, profile in ipairs(PROFILES) do
     local actual = active_mods[profile.provider]
     if actual ~= nil then
-      if actual ~= profile.version then return nil end
+      has_named_provider = true
+      if actual ~= profile.version then
+        fail_transition(profile.provider .. " is " .. tostring(actual) .. ", expected " .. profile.version)
+      end
       if profile.dynamic == true then
-        if active_mods["space-age"] ~= BASE_VERSION then return nil end
+        if active_mods["space-age"] ~= BASE_VERSION then
+          fail_transition(profile.provider .. " requires captured Space Age " .. BASE_VERSION)
+        end
         dynamic[#dynamic + 1] = profile
       elseif profile.space_age == true then
-        if active_mods["space-age"] ~= BASE_VERSION then return nil end
+        if active_mods["space-age"] ~= BASE_VERSION then
+          fail_transition(profile.provider .. " requires captured Space Age " .. BASE_VERSION)
+        end
         fixed[#fixed + 1] = profile
       else
         epr = profile
       end
     end
   end
+  if not has_named_provider then return nil end
+  if active_mods.base ~= BASE_VERSION then
+    fail_transition("base is " .. tostring(active_mods.base) .. ", expected " .. BASE_VERSION)
+  end
   if #dynamic ~= 0 then
     -- Each dynamic provider has only an individual captured profile. A mixed
-    -- dynamic or fixed/EPR closure has no named native contract yet.
-    if #dynamic ~= 1 or epr ~= nil or #fixed ~= 0 then return nil end
+    -- dynamic or fixed/EPR closure has no named native contract yet. A saved
+    -- foreign tail may already be under MIR ownership, so fail before the
+    -- data boundary can silently stop filtering it.
+    if #dynamic ~= 1 or epr ~= nil or #fixed ~= 0 then
+      fail_transition("captured dynamic provider has an unsupported co-owner mix")
+    end
     for _, provider in ipairs(UNQUALIFIED_DYNAMIC_PROVIDERS) do
-      if active_mods[provider] ~= nil then return nil end
+      if active_mods[provider] ~= nil then
+        fail_transition("captured dynamic provider has unqualified co-owner " .. provider)
+      end
     end
     return dynamic
   end
   if epr ~= nil then
-    if #fixed ~= 0 then return nil end
+    if #fixed ~= 0 then fail_transition("EPR has an unsupported fixed-provider mix") end
     return {epr}
   end
   if #fixed == 0 then return nil end

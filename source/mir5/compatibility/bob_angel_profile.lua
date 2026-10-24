@@ -11,11 +11,33 @@ local REQUIRED = {
   bobplates="2.1.1", bobrevamp="2.1.1",
 }
 
+local function complete_closure(active)
+  for name in pairs(REQUIRED) do
+    if active[name] == nil then return false end
+  end
+  return true
+end
+
+local function fail_transition(reason)
+  error("MIR unsupported F200 Bob/Angel saved-profile transition: " .. reason, 2)
+end
+
 function M.applies(active)
-  if target.id ~= "f200" or target.factorio_version ~= "2.0" or type(active) ~= "table"
-    or active["space-age"] ~= nil or active.bobtech ~= nil
-    or active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then return false end
-  for name, version in pairs(REQUIRED) do if active[name] ~= version then return false end end
+  if target.id ~= "f200" or target.factorio_version ~= "2.0" or type(active) ~= "table" then return false end
+  -- The material constructor cannot reconstruct a changed Bob/Angel route.
+  -- Once every marker of this published closure is present, a version or
+  -- known incompatible-profile change must block rather than omit its ten
+  -- saved material identities.
+  if not complete_closure(active) then return false end
+  if active["space-age"] ~= nil or active.bobtech ~= nil
+    or active.Krastorio2 ~= nil or active["Krastorio2-spaced-out"] ~= nil then
+    fail_transition("captured Bob/Angel closure has an unsupported Space Age, BobTech, or Krastorio selection")
+  end
+  for name, version in pairs(REQUIRED) do
+    if active[name] ~= version then
+      fail_transition(name .. " is " .. tostring(active[name]) .. ", expected " .. version)
+    end
+  end
   return true
 end
 

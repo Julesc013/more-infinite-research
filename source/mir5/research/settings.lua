@@ -12,6 +12,7 @@ local active_mods = script and script.active_mods or mods or {}
 local space_age_active = type(active_mods) == "table" and active_mods["space-age"] ~= nil
 local k2so_active = modern_catalogue.is_k2so(active_mods)
 local bob_angel_active = modern_catalogue.is_bob_angel(active_mods)
+local bob_tech_active = require("compatibility.bob_tech_profile").applies(active_mods)
 local atan_active = (active_mods["atan-air-scrubbing"] or active_mods["atan-ash"])
   and require("compatibility.atan_profile").select(active_mods, require("platform.target")) ~= nil
 local native_owner_families = {}
@@ -60,6 +61,9 @@ for _, historical_stream in ipairs(historical.streams) do
       -- Published K2SO omits the hidden field instead of declaring false.
       if k2so_active and historical_stream.k2so_visible then field.hidden = nil end
       if bob_angel_active and require("compatibility.bob_angel_profile").setting_visible(historical_stream.key) then
+        field.hidden = nil
+      end
+      if bob_tech_active and require("compatibility.bob_tech_profile").setting_visible(historical_stream.key) then
         field.hidden = nil
       end
       if atan_active and (historical_stream.key == "research_air_scrubbing_clean_filter"

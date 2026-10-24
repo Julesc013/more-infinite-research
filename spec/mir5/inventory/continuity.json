@@ -27,6 +27,15 @@
           "scope": "Five F200/F210 Base, Space Age and K2SO profiles have exact generated technology/settings comparison with zero unexplained differences."
         },
         {
+          "id": "f210-bobtech-published-material-recovery",
+          "source": [
+            "source/mir5/compatibility/bob_tech_materials.lua",
+            "source/mir5/research/bob_tech_materials.lua",
+            "tests/mir5/fixtures/bob-tech-f210-captured-facts.json"
+          ],
+          "scope": "Five independently recovered published F210 BobTech rows preserve Tin finite1-3 and Gunmetal/Invar finite1-3 plus infinite4. Host checks cover output, tuning, detached arrays, named bindings and disabled identity retention. Exact current F210 native qualification is still pending; no Tin tail or other withheld material is invented."
+        },
+        {
           "id": "named-native-owner-patches",
           "source": [
             "source/mir5/research/native_owners.lua",
@@ -44,7 +53,8 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Complete affected gameplay, save/reload and nondefault policy outcomes for the full current catalogue.",
-        "Freeze and compare the final current-player package rather than earlier private packages."
+        "Freeze and compare the final current-player package rather than earlier private packages.",
+        "Qualify the five recovered F210 BobTech material rows on the exact supported native closure."
       ]
     },
     {
@@ -303,6 +313,11 @@
           "scope": "Global spoilage contribution and external baseline behavior are observed in an accelerated Space Age fixture."
         },
         {
+          "id": "combined-scripted-effects-multiplayer",
+          "evidence": "spec/mir5/evidence/scripted-effects-multiplayer-native-chain.json",
+          "scope": "Exact F2002.0.77 Space Age has two actual research labs, physical planting/spoilage/repair, independent external offset and force-merge/reset witnesses, six client joins and host restart;218 artifact members verified. Low graphics single-host loopback is not rendered UI, stress or final-package qualification."
+        },
+        {
           "id": "settings-and-passive-repair-lifecycle",
           "source": [
             "source/mir5/runtime/bootstrap.lua",
@@ -318,7 +333,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run combined feature, external-writer, stress and multiplayer scenarios."
+        "Run feature/mod removal-readdition, large scheduled-entity stress and final-package scenarios; combined effects/external-writer loopback multiplayer passes at its recorded source."
       ]
     },
     {
@@ -327,6 +342,11 @@
       "subject": "Planted-object and repair rate/lifecycle behavior",
       "status": "partial",
       "resolved_records": [
+        {
+          "id": "combined-physical-rates-and-restart",
+          "evidence": "spec/mir5/evidence/scripted-effects-multiplayer-native-chain.json",
+          "scope": "Actual native planting timers17821 versus18000, physical spoilage at1800ticks and damaged player/friend walls repaired, including a pending repair across save/host restart. This is the bounded F200 Space Age scenario, not large-entity stress."
+        },
         {
           "id": "agriculture-tower-and-planting-runtime",
           "source": [
@@ -343,7 +363,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run combined removal/readdition, stress and multiplayer rate/lifecycle cases."
+        "Run removal/readdition, large scheduled-entity stress and final-package rate/lifecycle cases; combined actual planting, spoilage, repair and multiplayer restart pass at the recorded source."
       ]
     },
     {
@@ -457,6 +477,17 @@
           ],
           "evidence": "spec/mir5/evidence/bob-angel-materials-lab-native-chain.json",
           "scope": "Bob/Angel material labs, finite/tail boundary, cap relaxation and cold reloads are observed for the admitted profile."
+        },
+        {
+          "id": "known-profile-transition-guards",
+          "source": [
+            "source/mir5/compatibility/bob_angel_profile.lua",
+            "source/mir5/compatibility/bob_tech_profile.lua",
+            "source/mir5/compatibility/atan_profile.lua",
+            "source/mir5/compatibility/competing_productivity.lua",
+            "source/mir5/compatibility/science_bindings.lua"
+          ],
+          "scope": "Complete known provider closures with changed captured versions or unsupported named mixes refuse before silent identity omission, ownership filtering loss or K2SO science fallback. Exact admitted outputs and unrelated mods remain unchanged. Partial provider removal remains ordinary inactivity; data stage cannot establish saved ownership. These guards do not establish arbitrary future-patch support."
         },
         {
           "id": "bounded-competing-provider-contracts",
@@ -622,6 +653,8 @@
             {"request_id": "BA-07", "route": "research_material_tin"},
             {"request_id": "BA-08", "route": "research_material_titanium"},
             {"request_id": "BA-09", "route": "research_material_copper_tungsten"},
+            {"request_id": "BA-13", "route": "Exact F210 BobTech research_material_gunmetal; current native qualification pending"},
+            {"request_id": "BA-14", "route": "Exact F210 BobTech research_material_invar; current native qualification pending"},
             {"request_id": "UI-01", "route": "Per-player finite/infinite presentation filter"},
             {"request_id": "UI-02", "route": "Per-player finite/infinite presentation filter"},
             {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"}
@@ -652,6 +685,17 @@
             "docs/compatibility/README.md"
           ],
           "scope": "Inactive Space Age artwork is deliberately not probed; the saved icon setting remains registered and Base uses a safe fallback."
+        },
+        {
+          "id": "complete-published-player-presentation",
+          "source": [
+            "source/mir5/LICENSE",
+            "source/mir5/thumbnail.png",
+            "source/mir5/presentation/changelog",
+            "tools/mir5/package.py"
+          ],
+          "evidence": "spec/mir5/inventory/package-presentation-472.json",
+          "scope": "License, thumbnail and all nine complete changelog histories are byte-recovered from checksum-verified published4.7.2 ZIPs. Packaging adds the shared5.0 entry with the correct target codec and ships only the selected root changelog. Twelve package controls include all-nine staged/canonical member and ZIP identity. Final native/package publication remains pending."
         },
         {
           "id": "library-localisation-rendering",

@@ -75,6 +75,15 @@ if modern_selection and modern_selection.bob_angel then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+-- The exact F210 BobTech plus Angel Smelting tuple has five separately
+-- captured material rows.  It deliberately stays outside the F200
+-- no-BobTech material selector and does not reconstruct other Bob/Angel
+-- routes from the installed prototype world.
+if require("compatibility.bob_tech_profile").applies(mods) then
+  local materials = require("compatibility.bob_tech_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {

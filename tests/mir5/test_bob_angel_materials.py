@@ -388,7 +388,7 @@ class BobAngelMaterialTests(unittest.TestCase):
         self.assertEqual(2, min(2, useful_level_headroom(3)))
         self.assertEqual(40, min(40, useful_level_headroom(3)))
 
-    def test_gate_is_narrow_and_never_uses_bobtech_or_space_age(self):
+    def test_gate_blocks_complete_changed_predecessors_without_admitting_them(self):
         self.assertEqual(10, len(self.rows()))
         self.lua.execute("f210()")
         self.assertEqual(0, len(self.rows()))
@@ -397,11 +397,19 @@ class BobAngelMaterialTests(unittest.TestCase):
         for changed in ("base", "bobplates"):
             mods = dict(self.facts["required_mods"])
             mods[changed] = "different"
-            self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, mods))))
+            with self.assertRaisesRegex(Exception, "unsupported F200 Bob/Angel saved-profile transition"):
+                self.rows(mods=_lua_value(self.lua, mods))
         for forbidden in self.facts["forbidden_mods"]:
             mods = dict(self.facts["required_mods"])
             mods[forbidden] = "present"
-            self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, mods))))
+            with self.assertRaisesRegex(Exception, "unsupported F200 Bob/Angel saved-profile transition"):
+                self.rows(mods=_lua_value(self.lua, mods))
+
+        partial = dict(self.facts["required_mods"])
+        del partial["angelssmelting"]
+        self.assertEqual(0, len(self.rows(mods=_lua_value(self.lua, partial))))
+        unrelated = {**self.facts["required_mods"], "unrelated-observer": "0.1.0"}
+        self.assertEqual(10, len(self.rows(mods=_lua_value(self.lua, unrelated))))
 
     def test_named_preflight_rejects_drift_without_a_global_scan_or_write(self):
         poison = self.lua.eval(
