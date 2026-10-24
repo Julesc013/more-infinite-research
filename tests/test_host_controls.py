@@ -48,6 +48,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_bob_angel_materials.py",
             "tests/test_bob_angel_catalogue.py",
             "tests/test_bob_tech_materials.py",
+            "tests/test_bob_tech_gameplay_fixture.py",
             "tests/test_bob_core_materials.py",
             "tests/test_bob_core_progression.py",
             "tests/test_bob_core_gameplay_fixture.py",
@@ -126,7 +127,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 88)
+        self.assertEqual(len(paths), 89)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
@@ -146,8 +147,9 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
         self.assertTrue(all(set(row) == {"path", "lua"} for row in controls))
-        self.assertTrue(all(row["lua"] for row in controls[:78]))
-        self.assertTrue(all(not row["lua"] for row in controls[78:]))
+        first_python_only = paths.index("tests/test_package.py")
+        self.assertTrue(all(row["lua"] for row in controls[:first_python_only]))
+        self.assertTrue(all(not row["lua"] for row in controls[first_python_only:]))
 
     def test_workflow_runs_the_full_host_gate_for_every_dev_main_change(self):
         workflow = WORKFLOW.read_text(encoding="utf-8")
