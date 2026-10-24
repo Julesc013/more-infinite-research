@@ -9,6 +9,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LibraryModelTests(unittest.TestCase):
+    def test_data_stage_identity_lookup_does_not_select_a_runtime_catalogue(self):
+        self.lua.execute('''
+          script, mods = nil, {}
+          package.loaded["research.catalogue"] = nil
+          local modern = require("compatibility.modern_catalogue")
+          modern.select = function() error("data identity lookup selected runtime metadata") end
+          local catalogue = require("research.catalogue")
+          assert(catalogue.gear_id() == "recipe-prod-research_gears-1")
+        ''')
+
     def test_real_catalogue_queries_need_no_imports_or_reselection_after_control_parse(self):
         editions = json.loads((ROOT / "targets/editions.json").read_text())["targets"]
         profiles = [

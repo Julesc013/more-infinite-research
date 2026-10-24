@@ -231,9 +231,12 @@ end
 -- Profile imports are legal only during control parsing. These authored rows
 -- have no live force/settings state; retain one compact private identity list
 -- rather than rebuilding the selected profile for each Library/cap query.
-local rows = static_rows()
+-- Data-stage consumers also import this module for stable IDs only; they do
+-- not need to construct runtime metadata before their own local preflights.
+local runtime_rows = script and static_rows() or nil
 
 function M.declared()
+  local rows = runtime_rows or static_rows()
   local out = {}
   for index = 1, #rows do out[index] = copy(rows[index]) end
   return out

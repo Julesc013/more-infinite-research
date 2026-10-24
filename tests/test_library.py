@@ -1181,6 +1181,7 @@ class LibraryTests(unittest.TestCase):
           package.preload["presentation.library_model"] = nil
           package.loaded["research.catalogue"] = nil
           package.loaded["presentation.library_model"] = nil
+          script = {active_mods={base="2.1.23"}}
           boot()
           -- Native callbacks cannot import modules, including cached ones.
           require = function(name) error("Library callback imported " .. name) end
