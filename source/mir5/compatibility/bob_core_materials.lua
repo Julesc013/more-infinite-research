@@ -131,7 +131,7 @@ local function continuation_description(definition, stream)
   local limit = stream.max_level > 0 and math.min(stream.max_level, useful) or useful
   return {"", {"technology-description.more-infinite-research.recipe_productivity"}, "\n",
     {"mod-setting-name.ips-max-level-stream", {"", {"description.productivity-bonus"}, ": ",
-      {"item-name." .. definition.item}}, ": ", tostring(limit)}}
+      {"item-name." .. definition.item}}}, ": ", tostring(limit)}
 end
 
 

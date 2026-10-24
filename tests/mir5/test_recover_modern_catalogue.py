@@ -1,6 +1,8 @@
 """Opposing controls for the package-excluded modern-catalogue oracle."""
+import contextlib
 from copy import deepcopy
 import hashlib
+import io
 import json
 from pathlib import Path
 import sys
@@ -27,6 +29,16 @@ def _record(root: Path, path: Path) -> dict:
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest().upper(),
         "bytes": path.stat().st_size,
     }
+
+
+def _set_profile_receipt(capture_root: Path, profile: Path) -> None:
+    receipt_path = capture_root / "result.json"
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    receipt["profile_input"] = {
+        "path": str(profile),
+        "sha256": hashlib.sha256(profile.read_bytes()).hexdigest().upper(),
+    }
+    _write_json(receipt_path, receipt)
 
 
 def _baseline_raw() -> dict:
@@ -244,6 +256,101 @@ class ModernCatalogueTests(unittest.TestCase):
             candidate = _capture(root / "k2so-candidate", expected_raw, expected_settings, published=True)
             self.assertEqual(catalogue.compare_candidate(path, "k2so-f210", base_no_mir, candidate)["status"],
                              "equal-intended-native-output")
+
+    def test_paired_profile_files_allow_only_hash_verified_full_document_equivalence(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            document = {
+                "schema": 1,
+                "kind": "synthetic-complete-profile",
+                "target": "f210",
+                "settings": {"mode": "Defaults", "all": [True, 1, "named"]},
+                "mods": [{"name": "base", "version": "2.1.23", "enabled": True}],
+            }
+            baseline_profile = root / "baseline-profile.json"
+            candidate_profile = root / "candidate-profile.json"
+            _write_json(baseline_profile, document)
+            candidate_profile.write_text(
+                json.dumps(document, ensure_ascii=False, separators=(",", ":")) + "\r\n", encoding="utf-8"
+            )
+            self.assertNotEqual(baseline_profile.read_bytes(), candidate_profile.read_bytes())
+
+            baseline, published, space_baseline, space_published = self._captures(root)
+            for capture in (baseline, published, space_baseline, space_published):
+                _set_profile_receipt(capture, baseline_profile)
+            inventory_path = root / "modern-catalogue.json"
+            catalogue._write_new_json(
+                inventory_path,
+                catalogue.recover_inventory(baseline, published, space_baseline, space_published),
+            )
+            expected_raw = _published_raw()
+            del expected_raw["mod-data"]["more-infinite-research-compiler-evidence"]
+            del expected_raw["mod-data"]["more-infinite-research-maximum-level-policy"]
+            candidate = _capture(root / "candidate", expected_raw, _published_settings(), published=True)
+            _set_profile_receipt(candidate, candidate_profile)
+
+            with self.assertRaisesRegex(catalogue.CatalogueError, "profile input receipts differ"):
+                catalogue.compare_candidate(inventory_path, "base-f210", baseline, candidate)
+            for kwargs in (
+                {"baseline_profile_file": baseline_profile},
+                {"candidate_profile_file": candidate_profile},
+            ):
+                with self.subTest(missing_pair=kwargs):
+                    with self.assertRaisesRegex(catalogue.CatalogueError, "requires both"):
+                        catalogue.compare_candidate(inventory_path, "base-f210", baseline, candidate, **kwargs)
+
+            result = catalogue.compare_candidate(
+                inventory_path, "base-f210", baseline, candidate,
+                baseline_profile_file=baseline_profile, candidate_profile_file=candidate_profile,
+            )
+            self.assertEqual(result["status"], "equal-intended-native-output")
+            equivalence = result["profile_input_equivalence"]
+            self.assertEqual(equivalence["status"], "accepted-format-and-locator-equivalence")
+            self.assertEqual(equivalence["baseline"]["verified_sha256"],
+                             hashlib.sha256(baseline_profile.read_bytes()).hexdigest().upper())
+            self.assertEqual(equivalence["candidate"]["verified_sha256"],
+                             hashlib.sha256(candidate_profile.read_bytes()).hexdigest().upper())
+            self.assertNotEqual(equivalence["baseline"]["verified_sha256"],
+                                equivalence["candidate"]["verified_sha256"])
+            self.assertEqual(equivalence["canonical_full_document_sha256"],
+                             hashlib.sha256(_json_bytes(document)).hexdigest().upper())
+
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                self.assertEqual(catalogue.main([
+                    "compare", "--inventory", str(inventory_path), "--profile", "base-f210",
+                    "--baseline", str(baseline), "--candidate", str(candidate),
+                    "--baseline-profile-file", str(baseline_profile),
+                    "--candidate-profile-file", str(candidate_profile),
+                ]), 0)
+
+            changed_document = deepcopy(document)
+            changed_document["settings"]["mode"] = "Changed"
+            changed_profile = root / "changed-profile.json"
+            _write_json(changed_profile, changed_document)
+            _set_profile_receipt(candidate, changed_profile)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "full parsed JSON documents"):
+                catalogue.compare_candidate(
+                    inventory_path, "base-f210", baseline, candidate,
+                    baseline_profile_file=baseline_profile, candidate_profile_file=changed_profile,
+                )
+
+            duplicate_key_profile = root / "duplicate-key-profile.json"
+            duplicate_key_profile.write_text('{"schema":1,"schema":1}\n', encoding="utf-8")
+            _set_profile_receipt(candidate, duplicate_key_profile)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "strict UTF-8 JSON"):
+                catalogue.compare_candidate(
+                    inventory_path, "base-f210", baseline, candidate,
+                    baseline_profile_file=baseline_profile, candidate_profile_file=duplicate_key_profile,
+                )
+
+            _set_profile_receipt(candidate, candidate_profile)
+            wrong_bytes = root / "wrong-profile.json"
+            wrong_bytes.write_text('{"not":"the captured profile"}\n', encoding="utf-8")
+            with self.assertRaisesRegex(catalogue.CatalogueError, "hash differs"):
+                catalogue.compare_candidate(
+                    inventory_path, "base-f210", baseline, candidate,
+                    baseline_profile_file=baseline_profile, candidate_profile_file=wrong_bytes,
+                )
 
     def test_settings_targets_retirement_is_exact_and_does_not_touch_captured_rows(self):
         records = {

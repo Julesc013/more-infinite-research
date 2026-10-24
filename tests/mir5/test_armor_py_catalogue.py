@@ -525,6 +525,41 @@ class ArmorPyCatalogueTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "breeding route changed"):
             self.py_hightech["preflight"](_lua_value(self.lua, high_raw))
 
+    def test_armor_item_artwork_is_unowned_and_does_not_change_emitted_research(self):
+        baseline, writes, preflights = self._data_final_rows("armor-bobwarfare")
+        self.assertEqual((1, 1), (writes, preflights))
+        for icon, size, layers in (
+            ("__fixture-art__/armor.png", 128, None),
+            ("__bobwarfare__/graphics/icons/spidertron/mech-armor-plate.png", 64, None),
+            (None, None, [{"icon": "__fixture-art__/armor-layer.png", "icon_size": 64}]),
+        ):
+            raw = self._raw("armor-bobwarfare")
+            item = raw["item"]["bob-mech-armor-plate"]
+            item.pop("icon", None)
+            item.pop("icon_size", None)
+            if icon is not None:
+                item["icon"] = icon
+            if size is not None:
+                item["icon_size"] = size
+            if layers is not None:
+                item["icons"] = layers
+            snapshot = deepcopy(raw)
+            emitted, writes, preflights = self._data_final_rows("armor-bobwarfare", raw)
+            self.assertEqual(baseline, emitted, "unconsumed item artwork changed MIR's authored research")
+            self.assertEqual((1, 1), (writes, preflights))
+            self.assertEqual(snapshot, raw)
+
+        missing_item = self._raw("armor-bobwarfare")
+        missing_item["item"].pop("bob-mech-armor-plate")
+        missing_item["fluid"] = {"bob-mech-armor-plate": {}}
+        with self.assertRaisesRegex(Exception, "armor item is unavailable"):
+            self._data_final_rows("armor-bobwarfare", missing_item)
+
+        missing_owner = self._raw("armor-bobwarfare")
+        missing_owner["technology"].pop("bob-tankotron")
+        with self.assertRaisesRegex(Exception, "armor owner changed"):
+            self._data_final_rows("armor-bobwarfare", missing_owner)
+
     def test_profile_absence_is_inactive_and_known_science_variant_is_refused(self):
         selection = self.catalogue["select"](_lua_value(self.lua, {"base": "2.0.77"}))
         names = {definition["key"] for definition in selection["definitions"].values()}

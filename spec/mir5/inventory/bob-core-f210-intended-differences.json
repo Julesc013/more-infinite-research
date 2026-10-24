@@ -1,0 +1,1397 @@
+{
+  "differences": [
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "carbon",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.05,
+            "recipe": "burnt-spoilage",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.02,
+            "recipe": "coal-synthesis",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-carbon-from-acid",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-carbon-from-wood",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__space-age__/graphics/icons/carbon.png",
+            "icon_size": 64
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_carbon",
+          [
+            "item-name.carbon"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_carbon-1",
+        "order": "p[research_carbon]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "space-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "space-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "bob-core-base-first-effect-order-carbon",
+      "name": "recipe-prod-research_carbon-1",
+      "profile": "bob-core-f210",
+      "reason": "Reviewed presentation-order difference: retain authored base routes before finite sorted Bob additions. Each distinct recipe keeps its complete independently captured additive effect, including weight; every other field remains published-exact. No global array sorting or set normalization is admitted.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "casting-copper",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "copper-plate",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-cobalt-oxide-from-copper",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/icons/copper-plate.png",
+            "icon_size": 64
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_copper",
+          [
+            "item-name.copper-plate"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_copper-1",
+        "order": "p[research_copper]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "bob-core-base-first-effect-order-copper",
+      "name": "recipe-prod-research_copper-1",
+      "profile": "bob-core-f210",
+      "reason": "Reviewed presentation-order difference: retain authored base routes before finite sorted Bob additions. Each distinct recipe keeps its complete independently captured additive effect, including weight; every other field remains published-exact. No global array sorting or set normalization is admitted.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "lithium-plate",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.05,
+            "recipe": "lithium",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-deuterium-fuel-reprocessing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__space-age__/graphics/technology/lithium-processing.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_lithium",
+          [
+            "technology-name.lithium-processing"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_lithium-1",
+        "order": "p[research_lithium]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "cryogenic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "cryogenic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "bob-core-base-first-effect-order-lithium",
+      "name": "recipe-prod-research_lithium-1",
+      "profile": "bob-core-f210",
+      "reason": "Reviewed presentation-order difference: retain authored base routes before finite sorted Bob additions. Each distinct recipe keeps its complete independently captured additive effect, including weight; every other field remains published-exact. No global array sorting or set normalization is admitted.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "biosulfur",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "sulfur",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-sulfur-2",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-sulfur-3",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/technology/sulfur-processing.png",
+            "icon_size": 256
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_sulfur",
+          [
+            "item-name.sulfur"
+          ]
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_sulfur-1",
+        "order": "p[research_sulfur]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "metallurgic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "bob-core-base-first-effect-order-sulfur",
+      "name": "recipe-prod-research_sulfur-1",
+      "profile": "bob-core-f210",
+      "reason": "Reviewed presentation-order difference: retain authored base routes before finite sorted Bob additions. Each distinct recipe keeps its complete independently captured additive effect, including weight; every other field remains published-exact. No global array sorting or set normalization is admitted.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "acid-neutralisation",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "sulfuric-acid",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-sulfuric-acid-2",
+            "type": "change-recipe-productivity"
+          },
+          {
+            "change": 0.1,
+            "recipe": "bob-sulfuric-acid-3",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "icons": [
+          {
+            "icon": "__base__/graphics/icons/fluid/sulfuric-acid.png",
+            "icon_size": 64
+          },
+          {
+            "floating": true,
+            "icon": "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png",
+            "icon_size": 128,
+            "scale": 0.5,
+            "shift": [
+              50,
+              50
+            ]
+          }
+        ],
+        "level": 1,
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ],
+        "localised_name": [
+          "technology-name.more-infinite-research.research_sulfuric_acid_productivity"
+        ],
+        "max_level": "infinite",
+        "name": "recipe-prod-research_sulfuric_acid_productivity-1",
+        "order": "p[research_sulfuric_acid_productivity]",
+        "prerequisites": [
+          "automation-science-pack",
+          "logistic-science-pack",
+          "chemical-science-pack",
+          "production-science-pack",
+          "metallurgic-science-pack"
+        ],
+        "type": "technology",
+        "unit": {
+          "count_formula": "8000*2^(L-1)",
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ],
+            [
+              "logistic-science-pack",
+              1
+            ],
+            [
+              "chemical-science-pack",
+              1
+            ],
+            [
+              "production-science-pack",
+              1
+            ],
+            [
+              "metallurgic-science-pack",
+              1
+            ]
+          ],
+          "time": 60
+        },
+        "upgrade": true
+      },
+      "id": "bob-core-base-first-effect-order-sulfuric_acid_productivity",
+      "name": "recipe-prod-research_sulfuric_acid_productivity-1",
+      "profile": "bob-core-f210",
+      "reason": "Reviewed presentation-order difference: retain authored base routes before finite sorted Bob additions. Each distinct recipe keeps its complete independently captured additive effect, including weight; every other field remains published-exact. No global array sorting or set normalization is admitted.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "copper-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_copper-copper-plate-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_copper-copper-plate-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_copper-copper-plate-positive",
+      "name": "mir-native-credit-research_copper-copper-plate-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "copper-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_copper-copper-plate-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_copper-copper-plate-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_copper-copper-plate-negative",
+      "name": "mir-native-credit-research_copper-copper-plate-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "iron-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_iron-iron-plate-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_iron-iron-plate-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_iron-iron-plate-positive",
+      "name": "mir-native-credit-research_iron-iron-plate-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "iron-plate",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_iron-iron-plate-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_iron-iron-plate-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_iron-iron-plate-negative",
+      "name": "mir-native-credit-research_iron-iron-plate-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "fish-breeding",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_breeding-fish-breeding-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_breeding-fish-breeding-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_breeding-fish-breeding-positive",
+      "name": "mir-native-credit-research_breeding-fish-breeding-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "fish-breeding",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_breeding-fish-breeding-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_breeding-fish-breeding-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_breeding-fish-breeding-negative",
+      "name": "mir-native-credit-research_breeding-fish-breeding-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "advanced-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+      "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "advanced-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+      "name": "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "basic-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+      "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "basic-oil-processing",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+      "name": "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "coal-liquefaction",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+      "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "coal-liquefaction",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+      "name": "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "firearm-magazine",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_bullets-firearm-magazine-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_bullets-firearm-magazine-positive",
+      "name": "mir-native-credit-research_bullets-firearm-magazine-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "firearm-magazine",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_bullets-firearm-magazine-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_bullets-firearm-magazine-negative",
+      "name": "mir-native-credit-research_bullets-firearm-magazine-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "grenade",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_grenades-grenade-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_grenades-grenade-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_grenades-grenade-positive",
+      "name": "mir-native-credit-research_grenades-grenade-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "grenade",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_grenades-grenade-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_grenades-grenade-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_grenades-grenade-negative",
+      "name": "mir-native-credit-research_grenades-grenade-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "lubricant",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_lubricant_productivity-lubricant-positive",
+      "name": "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "lubricant",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_lubricant_productivity-lubricant-negative",
+      "name": "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "pentapod-egg",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_breeding-pentapod-egg-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_breeding-pentapod-egg-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_breeding-pentapod-egg-positive",
+      "name": "mir-native-credit-research_breeding-pentapod-egg-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "pentapod-egg",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_breeding-pentapod-egg-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_breeding-pentapod-egg-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_breeding-pentapod-egg-negative",
+      "name": "mir-native-credit-research_breeding-pentapod-egg-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "stone-brick",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_concrete-stone-brick-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_concrete-stone-brick-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_concrete-stone-brick-positive",
+      "name": "mir-native-credit-research_concrete-stone-brick-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "stone-brick",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_concrete-stone-brick-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_concrete-stone-brick-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_concrete-stone-brick-negative",
+      "name": "mir-native-credit-research_concrete-stone-brick-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": 0.1,
+            "recipe": "sulfuric-acid",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+      "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    },
+    {
+      "domain": "data",
+      "expected_candidate": {
+        "effects": [
+          {
+            "change": -0.1,
+            "recipe": "sulfuric-acid",
+            "type": "change-recipe-productivity"
+          }
+        ],
+        "enabled": false,
+        "hidden": true,
+        "icon": "__base__/graphics/technology/automation-1.png",
+        "icon_size": 256,
+        "level": 1,
+        "max_level": "infinite",
+        "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "order": "zz[mir-native-credit]-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "type": "technology",
+        "unit": {
+          "count": 1,
+          "ingredients": [
+            [
+              "automation-science-pack",
+              1
+            ]
+          ],
+          "time": 1
+        },
+        "upgrade": true,
+        "visible_when_disabled": false
+      },
+      "id": "bob-core-native-credit-mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+      "name": "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+      "profile": "bob-core-f210",
+      "reason": "Explicit previously reviewed recipe-level migration-credit infrastructure: hidden, disabled, no selectable ownership and no new earned credit by publication. The exact signed effect equals the independent published main effect; runtime/provider native evidence retains its own source identity. This full descriptor admits no other added technology.",
+      "type": "technology"
+    }
+  ],
+  "independent_reference": {
+    "candidate_output_used": false,
+    "engine_family": "2.1",
+    "members_verified": 26,
+    "native_run": 40069301778,
+    "profiles": [
+      "bob-core-f210"
+    ],
+    "published_version": "4.7.21002",
+    "recovery_tool_source": "e4b6814cf70acac17a8b90552048b24023d64844",
+    "release_qualification": false
+  },
+  "kind": "MIR5ModernCatalogueReviewedDifferencesV1",
+  "schema": 2
+}
