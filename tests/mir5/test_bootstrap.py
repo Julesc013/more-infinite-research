@@ -115,6 +115,8 @@ class BootstrapTests(unittest.TestCase):
             package.preload["runtime.library"] = function()
               local module = {}
               module.translation_maintenance_ticks = 61
+              module.native_refresh_ticks = 1
+              module.native_subscription_needs = function() return false, false end
               module.set_cap_provider = function(provider) library_calls.provider = provider end
               module.subscription_needs = function() return library_pending == true end
               module.open = function(player, options)

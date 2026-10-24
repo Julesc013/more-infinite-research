@@ -1,4 +1,13 @@
 {
+  "additional_recipe_capture": {
+    "arm": "published-4.7.20002",
+    "data_raw_sha256": "5FDA1D83FA3BEB9E5A813B55319D7F893B8FA4F49F48F0468974D3FAE4C4F5E5",
+    "names": [
+      "lubricant",
+      "sulfuric-acid"
+    ],
+    "run": 40084669075
+  },
   "claims": {
     "candidate_derived_expectations": false,
     "native_qualification": false,
@@ -10284,6 +10293,60 @@
         ],
         "type": "recipe"
       },
+      "lubricant": {
+        "allow_productivity": true,
+        "category": "chemistry",
+        "crafting_machine_tint": {
+          "primary": {
+            "a": 1,
+            "b": 0.223,
+            "g": 0.723,
+            "r": 0.268
+          },
+          "quaternary": {
+            "a": 1,
+            "b": 0.127,
+            "g": 0.395,
+            "r": 1
+          },
+          "secondary": {
+            "a": 1,
+            "b": 0.386,
+            "g": 0.793,
+            "r": 0.43200000000000005
+          },
+          "tertiary": {
+            "a": 1,
+            "b": 0.396,
+            "g": 0.471,
+            "r": 0.647
+          }
+        },
+        "enabled": false,
+        "energy_required": 1,
+        "hidden": true,
+        "ingredients": [
+          {
+            "amount": 10,
+            "name": "angels-liquid-naphtha",
+            "type": "fluid"
+          }
+        ],
+        "localised_name": [
+          "item-name.angels-void"
+        ],
+        "name": "lubricant",
+        "order": "c[oil-products]-a[lubricant]",
+        "results": [
+          {
+            "amount": 10,
+            "name": "lubricant",
+            "type": "fluid"
+          }
+        ],
+        "subgroup": "fluid-recipes",
+        "type": "recipe"
+      },
       "military-science-pack": {
         "allow_productivity": true,
         "crafting_machine_tint": {
@@ -11010,6 +11073,70 @@
             "type": "item"
           }
         ],
+        "type": "recipe"
+      },
+      "sulfuric-acid": {
+        "allow_productivity": false,
+        "category": "chemistry",
+        "crafting_machine_tint": {
+          "primary": {
+            "a": 1,
+            "b": 0,
+            "g": 0.958,
+            "r": 1
+          },
+          "quaternary": {
+            "a": 1,
+            "b": 0.019,
+            "g": 1,
+            "r": 0.969
+          },
+          "secondary": {
+            "a": 1,
+            "b": 0.172,
+            "g": 0.852,
+            "r": 1
+          },
+          "tertiary": {
+            "a": 1,
+            "b": 0.597,
+            "g": 0.869,
+            "r": 0.876
+          }
+        },
+        "enabled": false,
+        "energy_required": 1,
+        "hidden": true,
+        "ingredients": [
+          {
+            "amount": 5,
+            "name": "sulfur",
+            "type": "item"
+          },
+          {
+            "amount": 1,
+            "name": "iron-plate",
+            "type": "item"
+          },
+          {
+            "amount": 100,
+            "name": "angels-water-purified",
+            "type": "fluid"
+          }
+        ],
+        "localised_name": [
+          "item-name.angels-void"
+        ],
+        "name": "sulfuric-acid",
+        "order": "c[oil-products]-b[sulfuric-acid]",
+        "results": [
+          {
+            "amount": 50,
+            "name": "sulfuric-acid",
+            "type": "fluid"
+          }
+        ],
+        "subgroup": "fluid-recipes",
         "type": "recipe"
       },
       "transport-belt": {
@@ -12867,8 +12994,8 @@
     }
   },
   "reviewed_intent": {
-    "path": "spec/mir5/inventory/bob-angel-f200-intent-r01.json",
-    "sha256": "5A8E79A85067639776FA31911CA1AE380D582D8802961142F9DCD3048C05A8E6"
+    "path": "spec/mir5/inventory/bob-angel-f200-intent-r02.json",
+    "sha256": "988823B4949D25FA5801CA93567090539877ECBB35DEEC6B8AE49134F9F350A7"
   },
   "schema": 1,
   "source": {

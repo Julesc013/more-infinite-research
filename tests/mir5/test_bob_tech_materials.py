@@ -8,6 +8,8 @@ import sys
 import unittest
 import zipfile
 
+from historical_sources import PUBLISHED_COMMIT, read_published_source
+
 
 ROOT = Path(__file__).resolve().parents[2]
 FACTS_PATH = ROOT / "tests/mir5/fixtures/bob-tech-f210-captured-facts.json"
@@ -44,13 +46,11 @@ class BobTechMaterialTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.facts = json.loads(FACTS_PATH.read_text(encoding="utf-8"))
-        profile = ROOT / cls.facts["profile"]
-        if _sha256(profile) != cls.facts["profile_sha256"]:
-            raise AssertionError(f"hash-locked F210 BobTech profile changed: {profile}")
+        if cls.facts["historical_input_source_commit"] != PUBLISHED_COMMIT:
+            raise AssertionError("F210 BobTech historical source identity changed")
+        read_published_source(ROOT, cls.facts["profile"], cls.facts["profile_sha256"])
         for evidence in cls.facts["qualification_evidence"]:
-            path = ROOT / evidence["path"]
-            if _sha256(path) != evidence["sha256"]:
-                raise AssertionError(f"F210 BobTech evidence changed: {path}")
+            read_published_source(ROOT, evidence["path"], evidence["sha256"])
 
         # The independent source package is retained with the repository. A
         # clean hosted checkout may omit distribution custody; semantic tests
