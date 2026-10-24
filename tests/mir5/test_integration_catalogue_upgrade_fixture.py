@@ -1,6 +1,7 @@
 import argparse
 import copy
 import json
+import os
 from pathlib import Path
 import sys
 import unittest
@@ -10,7 +11,20 @@ FIXTURE = ROOT / "tests/mir5/fixtures/integration-catalogue-upgrade"
 RECOVERED = ROOT / "tests/mir5/fixtures/armor-py-f200-472-recovered-facts.json"
 BASE_ORACLE = ROOT / "spec/mir5/inventory/modern-f200-470.json"
 CONTINUATIONS = ROOT / "tests/mir5/fixtures/native-modded-continuations-f200-captured-facts.json"
-F200_RUNTIME_API = Path("D:/Programs/Factorio/2.0/doc-html/runtime-api.json")
+F200_RUNTIME_API_CANDIDATES = (
+    os.environ.get("MIR_F200_RUNTIME_API"),
+    "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
+    "D:/Programs/Factorio/2.0/doc-html/runtime-api.json",
+)
+
+
+def f200_runtime_api_path():
+    for candidate in F200_RUNTIME_API_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_file():
+                return path
+    return None
 
 
 def py(value):
@@ -221,6 +235,95 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
                 self.assertIsNotNone(result["callbacks"]["events"][2])
                 self.assertIsNotNone(result["callbacks"]["init"] if source else result["callbacks"]["configuration"])
 
+    def _run_read_only_integration_migration(self, profile, expected, actual):
+        migration = FIXTURE / "migrations/0.2.0.lua"
+        self.lua.globals().migration_path = migration.as_posix()
+        self.lua.execute(r'''
+          function run_read_only_integration_migration(profile, expected, actual)
+            local function immutable(value)
+              if type(value) ~= "table" then return value end
+              local values = {}
+              for key, item in pairs(value) do values[key] = immutable(item) end
+              return setmetatable({}, {
+                __index=values,
+                __newindex=function(_, key) error("unexpected fixture write: " .. tostring(key)) end,
+                __pairs=function() return pairs(values) end,
+                __len=function() return #values end,
+              })
+            end
+            local marker, payload
+            local game
+            if actual == nil then
+              game=setmetatable({}, {
+                __index=function(_, key) error("unexpected nonarmor force lookup: " .. tostring(key)) end,
+                __newindex=function(_, key) error("unexpected nonarmor write: " .. tostring(key)) end,
+              })
+            else
+              local primary = immutable({
+                valid=true,
+                level=actual.level,
+                researched=actual.researched,
+                enabled=actual.enabled,
+                visible_when_disabled=actual.visible,
+                saved_progress=actual.saved,
+                prototype={max_level=actual.maximum},
+              })
+              local foreign = immutable({valid=true, technologies={
+                ["recipe-prod-research_armor_components-1"]=primary,
+              }})
+              game=immutable({forces={[71]=foreign}})
+            end
+            local state = {foreign_index=71, profile=profile}
+            if expected ~= nil then state.foreign_snapshot={technologies={
+              ["recipe-prod-research_armor_components-1"]=expected,
+            }} end
+            local env = {
+              storage=immutable({mir5_integration_catalogue_upgrade=state}),
+              game=game,
+              helpers={table_to_json=function(value) payload=value; return "<fixture-payload>" end},
+              log=function(value) marker=value end,
+            }
+            env._G=env
+            setmetatable(env, {__index=function(_, key) return _G[key] end,
+              __newindex=function(_, key) error("unexpected global write: " .. tostring(key)) end})
+            local ok, message=pcall(function() assert(loadfile(migration_path, "t", env))() end)
+            return {ok=ok, message=tostring(message), marker=marker, payload=payload}
+          end
+        ''')
+        return self.lua.eval("run_read_only_integration_migration")(
+            profile,
+            lua(self.lua, expected) if expected is not None else None,
+            lua(self.lua, actual) if actual is not None else None,
+        )
+
+    def test_successor_migration_observes_foreign_snapshot_before_callbacks_without_writes(self):
+        expected = {
+            "level": 2, "researched": False, "enabled": False, "visible": False,
+            "saved": 0.0, "maximum": 4_294_967_295,
+        }
+        actual = dict(expected, enabled=True)
+        result = self._run_read_only_integration_migration("armor-bobwarfare", expected, actual)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual("[MIR5_INTEGRATION_PRECONFIG_FOREIGN] <fixture-payload>", result["marker"])
+        payload = py(result["payload"])
+        self.assertEqual("0.2.0", payload["fixture_migration"])
+        self.assertEqual("recipe-prod-research_armor_components-1", payload["technology"])
+        self.assertEqual(71, payload["force"])
+        self.assertEqual(expected, payload["expected"])
+        self.assertEqual(actual, payload["actual"])
+        self.assertNotEqual(payload["expected"]["enabled"], payload["actual"]["enabled"])
+
+    def test_successor_migration_skips_nonarmor_profiles_without_force_lookup(self):
+        result = self._run_read_only_integration_migration("py-coal", None, None)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual("[MIR5_INTEGRATION_PRECONFIG_FOREIGN] <fixture-payload>", result["marker"])
+        self.assertEqual({
+            "fixture_migration": "0.2.0",
+            "profile": "py-coal",
+            "status": "not-applicable",
+            "reason": "foreign-armor-probe",
+        }, py(result["payload"]))
+
     def test_fixture_never_writes_effects_or_uses_a_generic_research_solver(self):
         text = "\n".join(path.read_text(encoding="utf-8") for path in FIXTURE.rglob("*.lua"))
         self.assertIn('local SAVE = "mir5-native-complete"', text)
@@ -237,9 +340,10 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertNotIn("__more-infinite-research__", text)
 
     def test_documented_force_fields_exist_in_exact_f200_api_when_installed(self):
-        if not F200_RUNTIME_API.is_file():
+        runtime_api = f200_runtime_api_path()
+        if runtime_api is None:
             self.skipTest("F200 runtime API documentation is not installed")
-        document = json.loads(F200_RUNTIME_API.read_text(encoding="utf-8"))
+        document = json.loads(runtime_api.read_text(encoding="utf-8"))
         lua_force = next(row for row in document["classes"] if row["name"] == "LuaForce")
         fields = {row["name"] for row in lua_force["attributes"]}
         self.assertTrue(set(self.plan["force_fields"]) <= fields)

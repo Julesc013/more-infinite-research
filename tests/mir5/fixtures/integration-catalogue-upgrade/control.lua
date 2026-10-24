@@ -149,8 +149,6 @@ local function assert_same_snapshot(force, plan, expected, label)
         or now.visible ~= before.visible or now.maximum ~= before.maximum or not close(now.saved, before.saved) then
       log("[MIR5_INTEGRATION_STATE_DIFFERENCE] " .. helpers.table_to_json({
         label=label, force=force.index, technology=name, expected=before, actual=now,
-        legacy_caps=storage.mir and storage.mir.maximum_level_control,
-        current_caps=storage.mir_caps,
       }))
       fail(label .. " technology state changed: " .. name)
     end
