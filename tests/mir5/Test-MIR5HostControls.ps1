@@ -80,6 +80,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_properties.py';lua=$true},
   [ordered]@{path='tests/mir5/test_replay.py';lua=$true},
   [ordered]@{path='tests/mir5/test_package.py';lua=$false},
+  [ordered]@{path='tests/mir5/test_release.py';lua=$false},
   [ordered]@{path='tests/mir5/test_compose_replay.py';lua=$false},
   [ordered]@{path='tests/mir5/test_compare_captures.py';lua=$false},
   [ordered]@{path='tests/mir5/test_recover_modern_catalogue.py';lua=$false},

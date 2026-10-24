@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -60,6 +60,19 @@ A test correction needs independent evidence. A resource refusal is not a pass, 
 Return exact changed files/responsibilities, real commands/results, active regressions covered, any measured seconds/uncertainty, unresolved gaps and next action. No generic 'all tests passed' when native tests were unavailable. Stop after the assigned batch; new work gets a new bounded assignment.
 
 Release and branch/control permissions remain explicit. Documentation adoption is not permission to publish or change repository security controls.
+
+## Offline player asset freeze
+
+The [release adapter](../../tools/mir5/release.py) builds the nine editions from one committed player tree and its tracked edition record. Select a full commit and a new output directory outside the checkout:
+
+```powershell
+python tools/mir5/release.py --source source/mir5 --revision <full-commit> --output ../mir5-freeze/<new-directory>
+python tools/mir5/release.py --source source/mir5 --output ../mir5-freeze/<new-directory> --verify
+```
+
+The output contains nine canonical player ZIPs, `SHA256SUMS.txt` and `MIR5ReleaseAssetInventoryV1.json`. The inventory binds the source commit/trees, edition blob, complete package members, archive bytes and separate local controller identity: both Python tools, Python/zlib versions and compression policy. Verification requires that same controller and rebuilds packages in temporary custody to compare exact bytes. It rejects existing freeze destinations and changed, absent, extra or misidentified assets. Preserve failed output for inspection.
+
+This command performs no signing, tagging or publication and grants no native-test acceptance. The final release still needs every applicable verdict in [verification](../../spec/mir5/verification.md), signing and administration checks, exact main/tag reconciliation and public download readback. Accepted packages must also reach the primary checkout's `dist` with verified hashes. The inventory is developer custody; public assets remain individual player ZIPs and useful integrity files.
 
 ## Determinism and visual context
 

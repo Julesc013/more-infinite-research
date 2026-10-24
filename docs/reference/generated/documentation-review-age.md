@@ -219,7 +219,7 @@ Ages are measured against the newest governed review date, 2026-10-24, so checko
 | docs/mir5/cutover.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/decisions.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/design.md | draft | 2026-10-22 | 2 | current-window |
-| docs/mir5/development.md | draft | 2026-10-22 | 2 | current-window |
+| docs/mir5/development.md | draft | 2026-10-24 | 0 | current-window |
 | docs/mir5/diagrams/README.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/first-batch.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/implementation/blueprint.md | draft | 2026-10-22 | 2 | current-window |

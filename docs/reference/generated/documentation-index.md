@@ -219,7 +219,7 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/mir5/cutover.md | Staging, adoption and mechanical cutover | draft | developer | how-to | mir-maintainers | 2026-10-22 |
 | docs/mir5/decisions.md | Source reconciliation for this proposal | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/design.md | Synthesized design and decisions | draft | developer | explanation | mir-maintainers | 2026-10-22 |
-| docs/mir5/development.md | Development guide | draft | developer | how-to | mir-maintainers | 2026-10-22 |
+| docs/mir5/development.md | Development guide | draft | developer | how-to | mir-maintainers | 2026-10-24 |
 | docs/mir5/diagrams/README.md | Diagram sources and rendered atlas | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/first-batch.md | First implementation batch — bounded assignment | draft | developer | how-to | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/blueprint.md | High-level implementation pseudocode | draft | developer | explanation | mir-maintainers | 2026-10-22 |
