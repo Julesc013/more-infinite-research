@@ -17,6 +17,7 @@
     "(?) Krastorio2-spaced-out",
     "(?) pypostprocessing",
     "(?) space-exploration",
-    "? space-age >= 2.1.18"
+    "? space-age >= 2.1.18",
+    "? space-is-fake"
   ]
 }
