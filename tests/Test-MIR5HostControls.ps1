@@ -88,6 +88,7 @@ $controls = @(
   [ordered]@{path='tests/test_settings_commands.py';lua=$true},
   [ordered]@{path='tests/test_properties.py';lua=$true},
   [ordered]@{path='tests/test_replay.py';lua=$true},
+  [ordered]@{path='tests/test_library_profile_reader.py';lua=$false},
   [ordered]@{path='tests/test_package.py';lua=$false},
   [ordered]@{path='tests/test_release.py';lua=$false},
   [ordered]@{path='tests/test_compose_replay.py';lua=$false},
