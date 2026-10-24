@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "kind": "mir5-sif-science-retirement-candidate-policy",
+  "target": "f200",
+  "factorio_line": "2.0",
+  "engine": {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.0.77",
+      "enabled": true
+    },
+    {
+      "name": "cr-commons",
+      "version": "1.0.27",
+      "enabled": true
+    },
+    {
+      "name": "space-is-fake",
+      "version": "1.0.60",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-sif-science-retirement-f200",
+      "version": "0.2.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-sif-policy-all-f200",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "space-is-fake_1.0.60.zip": "860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC",
+    "cr-commons_1.0.27.zip": "6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+  },
+  "scope": "Private F200 Space Is Fake candidate data-stage witness for the all science-policy default. It verifies both named level-seven continuations after exact SIF retirement; it does not qualify saved-game upgrade persistence for this non-configured policy."
+}
