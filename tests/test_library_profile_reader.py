@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 from pathlib import Path
 import subprocess
@@ -286,8 +287,63 @@ class LibraryProfileReaderTests(unittest.TestCase):
                 with self.assertRaisesRegex(reader.LibraryProfileError, "manifest exceeds"):
                     reader.read_manifest(manifest)
             with mock.patch.object(reader, "MAX_TOTAL_LOG_BYTES", 32):
-                with self.assertRaisesRegex(reader.LibraryProfileError, "selected logs exceed"):
+                with self.assertRaisesRegex(reader.LibraryProfileError, "log exceeds 32 byte input limit"):
                     reader.read_manifest(manifest)
+
+    def test_total_budget_bounds_each_stream_before_decoding(self):
+        class RecordingPath:
+            def __init__(self, payload: bytes):
+                self.payload = payload
+                self.requests = []
+                self.returned = []
+
+            def open(self, mode: str):
+                if mode != "rb":
+                    raise AssertionError(f"unexpected stream mode: {mode}")
+                owner = self
+
+                class RecordingStream(io.BytesIO):
+                    def read(self, amount: int) -> bytes:
+                        owner.requests.append(amount)
+                        data = super().read(amount)
+                        owner.returned.append(len(data))
+                        return data
+
+                return RecordingStream(self.payload)
+
+            def __str__(self):
+                return "recording.log"
+
+        cases = (
+            # Three full logs exhaust the total budget; only an empty final
+            # stream is admissible, with one byte requested to detect overflow.
+            (24, [b"x" * 8] * 3 + [b""], [9, 9, 9, 1], [8, 8, 8, 0], False),
+            (24, [b"x" * 8] * 3 + [b"\xff" * 8], [9, 9, 9, 1], [8, 8, 8, 1], True),
+            # A partially remaining budget admits its exact boundary and
+            # refuses overflow before attempting UTF-8 decoding.
+            (26, [b"x" * 8] * 3 + [b"xx"], [9, 9, 9, 3], [8, 8, 8, 2], False),
+            (26, [b"x" * 8] * 3 + [b"\xff" * 8], [9, 9, 9, 3], [8, 8, 8, 3], True),
+            # The per-log bound still applies when the aggregate has room.
+            (24, [b"x" * 9, b"", b"", b""], [9], [9], True),
+        )
+        for budget, payloads, requests, returned, overflow in cases:
+            with self.subTest(budget=budget, lengths=list(map(len, payloads)), overflow=overflow):
+                paths = [RecordingPath(payload) for payload in payloads]
+                inputs = [reader.LogInput(role, phase, path, str(path))
+                          for role, phase, path in zip(
+                              ("server", "server", "en", "de"),
+                              ("initial", "rejoin", "initial", "initial"), paths)]
+                with mock.patch.object(reader, "MAX_LOG_BYTES", 8), \
+                        mock.patch.object(reader, "MAX_TOTAL_LOG_BYTES", budget):
+                    if overflow:
+                        with self.assertRaisesRegex(reader.LibraryProfileError, "byte input limit"):
+                            reader._read_profiles(inputs)
+                    else:
+                        result = reader._read_profiles(inputs)
+                        self.assertFalse(result["complete"])
+                        self.assertFalse(result["performance_acceptance"])
+                self.assertEqual([size for path in paths for size in path.requests], requests)
+                self.assertEqual([size for path in paths for size in path.returned], returned)
 
     def test_cli_manifest_emits_phase_provenance_without_a_performance_verdict(self):
         with tempfile.TemporaryDirectory() as temporary:
