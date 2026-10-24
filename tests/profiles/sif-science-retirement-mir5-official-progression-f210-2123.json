@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "kind": "mir5-sif-science-retirement-candidate-policy",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "cr-commons",
+      "version": "1.0.33",
+      "enabled": true
+    },
+    {
+      "name": "cr-extras",
+      "version": "1.0.01",
+      "enabled": true
+    },
+    {
+      "name": "space-is-fake",
+      "version": "1.0.78",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-sif-science-retirement-f210",
+      "version": "0.2.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-sif-policy-official-progression-f210",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "space-is-fake_1.0.78.zip": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13",
+    "cr-commons_1.0.33.zip": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "cr-extras_1.0.01.zip": "874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82"
+  },
+  "scope": "Private F210 Space Is Fake candidate data-stage witness for the official-progression science-policy default. It verifies both named level-seven continuations after exact SIF retirement; it does not qualify saved-game upgrade persistence for this non-configured policy."
+}

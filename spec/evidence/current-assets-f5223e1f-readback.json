@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "nine-editions-rebuilt-byte-identical-not-native-acceptance",
+  "source": {
+    "commit": "f5223e1fb755a0fe3669551a51cc08f207b7e1df",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "dfb15b6152fd2fc44d232ff9729e716e25699494",
+    "tree": "48a44588e58cd15976c7735be7977c0f125b051f"
+  },
+  "inventory_sha256": "58FCB8871AB3F3F8AFE4B11B82E3404C98D2BCC79A67A0B247E98431FB4C2753",
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "commands": [
+    "python -B tools/release.py --source source --revision f5223e1fb755a0fe3669551a51cc08f207b7e1df --output ../mir5-current-assets-f5223e1f-r01",
+    "python -B tools/release.py --source source --output ../mir5-current-assets-f5223e1f-r01 --verify"
+  ],
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 344516,
+      "archive_sha256": "f0b46dd0c3ae33ff3ab1f0cf1591e24d0e5e3b39ad1b43e3046a04503d6f0e48"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 344516,
+      "archive_sha256": "0010804f4ecd39b575bb1c0dcf978d5d43dce73096306fab000ca26e48a9493a"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 344476,
+      "archive_sha256": "46a49b29f5fc38103fd95abbfb35f2c2c7be2c899a86d5d7dff67a58c3a624f0"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 344467,
+      "archive_sha256": "1105afd5f1478927e638c9233d7a1b3600ae37b620dac9ce5608ed67cc24d84e"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 344356,
+      "archive_sha256": "e7924b72946ba655ccabdf9a0bdd88a90f49b9f97aa01ee979ce4905fd2a2c1d"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 358148,
+      "archive_sha256": "d7c005deda166386565d29e8d2b7b833112c51b625aa7187b6b3eb02ba367444"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 358145,
+      "archive_sha256": "f6a68f62a7138bb837125a8008fddac60e04d1545ddb49bda73791c6bec3c0e0"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 546601,
+      "archive_sha256": "89df8c29d1e03cb4237ccdca61da4f2f4295de738db74b4a0452eaf72caa31a6"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 547137,
+      "archive_sha256": "d48cc28ac0c70b12d105fe935d33dc95ef2b5f27149f735fca7ebbdf9177f0f4"
+    }
+  ],
+  "limits": [
+    "These are frozen development candidates; acceptance, final main/tag identity, publication and primary dist delivery remain pending.",
+    "Earlier native executions and menu plan r09 retain their original exact package identities. No old result is relabelled as this freeze.",
+    "This source incorporates accepted Aero817 default-ceiling admission, Aero816 complete published4.7.3 histories, and the accepted818 SIF prerequisite correction."
+  ]
+}
