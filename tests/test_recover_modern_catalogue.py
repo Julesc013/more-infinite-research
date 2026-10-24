@@ -237,6 +237,39 @@ class ModernCatalogueTests(unittest.TestCase):
         catalogue._write_new_json(path, inventory)
         return path, no_mir, published
 
+    def test_identical_profile_bytes_compare_across_run_directories_but_changed_inputs_refuse(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            inventory_path, baseline, _ = self._inventory(root)
+            expected_raw = _published_raw()
+            del expected_raw["mod-data"]["more-infinite-research-compiler-evidence"]
+            del expected_raw["mod-data"]["more-infinite-research-maximum-level-policy"]
+            candidate = _capture(root / "candidate", expected_raw, _published_settings(), published=True)
+            relocated = root / "later-run" / "profile.json"
+            relocated.parent.mkdir()
+            relocated.write_bytes((root / "external" / "profile.json").read_bytes())
+            _set_profile_receipt(candidate, relocated)
+            receipt_path = candidate / "result.json"
+            receipt_bytes = receipt_path.read_bytes()
+
+            result = catalogue.compare_candidate(inventory_path, "base-f210", baseline, candidate)
+            self.assertEqual(result["status"], "equal-intended-native-output")
+            self.assertNotIn("profile_input_equivalence", result)
+            self.assertEqual(receipt_path.read_bytes(), receipt_bytes)
+
+            # Locator independence cannot excuse either a different engine or
+            # changed profile bytes, even when all output dumps are equal.
+            changed = json.loads(receipt_bytes)
+            changed["engine"]["sha256"] = "0" * 64
+            _write_json(receipt_path, changed)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "capture engines differ"):
+                catalogue.compare_candidate(inventory_path, "base-f210", baseline, candidate)
+            receipt_path.write_bytes(receipt_bytes)
+            relocated.write_bytes(b"different profile settings\n")
+            _set_profile_receipt(candidate, relocated)
+            with self.assertRaisesRegex(catalogue.CatalogueError, "profile input receipts differ"):
+                catalogue.compare_candidate(inventory_path, "base-f210", baseline, candidate)
+
     def test_optional_k2so_profile_requires_a_pair_and_compares_as_its_own_profile(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
