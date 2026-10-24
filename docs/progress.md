@@ -60,6 +60,8 @@ The [current startup chain](../spec/evidence/aero-startup-slices-native-chain.js
 
 ## Observed implementation and qualification
 
+The [current F200 API consumer chain](../spec/evidence/api-current-consumers-native-chain.json), run40112245000, passes against the exact frozenf522 player ZIP `89DF8C29D1E03CB4237CCDCA61DA4F2F4295DE738DB74B4A0452EAF72CAA31A6` and Factorio2.0.77. Both independent alpha/beta consumers produce public-query markers through production and two cold reloads; the native1% cable effect produces202 versus200 cables from equal100 copper plates with no modules or beacons. Completion uses explicit native research setters, with `laboratory_research_used=false`. Both reloads preserve save `EDECE791E52A85A17C88806A0CCCE816ACBBC25C1FEAF339DCFC11CD25F17489`, defer native checks from `on_load`, and restore controls. All46 original artifact members and the saved archive are independently rehashed and retained in primary custody, with31 exact raw receipt/log members in the portable capsule. The earlier canonical/API/lock adverse evidence retains its original identity. Optional-consumer absence, genuine joining clients, other editions and performance remain separate gates.
+
 Each linked chain states its exact frozen source, engine, mods/settings, harness, package hash and limits. These are private development results, not final-candidate acceptance. Do not relabel them as runs of current source.
 
 | Domain | Evidence and remaining boundary |
