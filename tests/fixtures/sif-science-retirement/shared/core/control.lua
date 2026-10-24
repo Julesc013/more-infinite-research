@@ -7,6 +7,9 @@ local NAMES = {"research-speed-7", "weapon-shooting-speed-7"}
 local KEY, SAVE, INITIAL, DEADLINE = "mir5_sif_science_retirement", "mir5-native-complete", 8, 18000
 local PARTIAL = { ["research-speed-7"] = .42, ["weapon-shooting-speed-7"] = .27 }
 local loaded, reload_logged, fresh_candidate = nil, false, false
+-- Factorio permits imports only while control.lua is being parsed. The
+-- staged contract is shared by callbacks without using game or saved state.
+local contract = require("__" .. script.mod_name .. "__/contract")
 
 local function fail(message) error("[mir5-sif] " .. message) end
 local function close(left, right) return type(left) == "number" and math.abs(left - right) <= 0.000001 end
@@ -260,9 +263,8 @@ local function finish_successor(state, contract)
   state.phase = "complete"; marker("initial", state); game.server_save(SAVE)
 end
 script.on_init(function()
-  local target, stage, fixture, exact = mode()
+  local target, stage, _, exact = mode()
   local policy = assert_active(target, stage, exact)
-  local contract = require("__" .. fixture .. "__/contract")
   local player = game.forces.player
   if stage == "successor" then
     -- Candidate policy matrix runs create a fresh map. This branch is a
@@ -285,13 +287,12 @@ script.on_init(function()
   fill(inventory, packs); state.source_before=snapshot_counts(inventory, packs); queue(player, NAMES[1])
 end)
 script.on_configuration_changed(function()
-  local target, stage, fixture, exact = mode()
+  local target, stage, _, exact = mode()
   if stage ~= "successor" then return end
   local policy = assert_active(target, stage, exact)
   local state = storage[KEY]
   if type(state) ~= "table" or state.phase ~= "source-complete" or state.source_mir ~= exact.source
       or state.policy ~= "configured" or policy ~= "configured" then fail("published configured source witness is absent") end
-  local contract = require("__" .. fixture .. "__/contract")
   local player = game.forces.player; assert_rows(player, contract, "successor", policy)
   for _, name in ipairs(NAMES) do same_status(status(player, name), state.source_rows[name], "successor restored " .. name) end
   if player.current_research ~= nil or #(player.research_queue or {}) ~= 0 then fail("successor restored detached progress is queued") end
@@ -327,7 +328,7 @@ script.on_event(defines.events.on_tick, function()
   if fresh_candidate then return end
   local state = storage[KEY]
   if type(state) ~= "table" then fail("fixture state is absent") end
-  local target, stage, fixture = mode(); local contract = require("__" .. fixture .. "__/contract")
+  mode()
   if state.phase == "source-complete" or state.phase == "complete" then
     if loaded and not reload_logged then
       if loaded.phase ~= state.phase or loaded.source_labs ~= state.source_labs or loaded.successor_labs ~= state.successor_labs then

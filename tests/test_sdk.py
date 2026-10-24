@@ -21,6 +21,50 @@ OPTIONAL_NAME = "mir-api-example-optional-cable-1"
 
 
 class SdkTests(unittest.TestCase):
+    def test_native_optional_absence_observer_checks_exact_read_only_closure(self):
+        path = ROOT / 'tests/fixtures/api-optional-absence/control.lua'
+        self.lua.execute(r'''
+          function optional_absence_observer(path, opponent)
+            local callback, report
+            local active = {base='2.0.77', ['mir-fixture-mir5-api-beta']='0.1.0',
+              ['mir-fixture-mir5-api-optional-absence']='0.1.0',
+              ['mir-fixture-mir5-active-mods-observer']='0.1.0'}
+            local interface, technology, productivity = nil, nil, 0
+            if opponent == 'mir' then active['more-infinite-research']='5.0.20000'
+            elseif opponent == 'consumer' then active['mir-fixture-mir5-api-beta']=nil
+            elseif opponent == 'interface' then interface={}
+            elseif opponent == 'technology' then technology={}
+            elseif opponent == 'effect' then productivity=.01 end
+            local function readonly(value)
+              return setmetatable({}, {__index=value,__newindex=function()error('native write')end})
+            end
+            local environment = {
+              script={active_mods=active,on_init=function(value)callback=value end},
+              remote={interfaces=readonly({['more-infinite-research.api.v1']=interface}),
+                call=function()error('unexpected remote call')end},
+              game={forces={player=readonly({valid=true,technologies=readonly({['mir-api-fixture-beta-cable-1']=technology}),
+                recipes=readonly({['copper-cable']=readonly({productivity_bonus=productivity})})})}},
+              helpers={table_to_json=function(value)report=value;return '{}' end},
+              log=function()end, storage=setmetatable({}, {__index=function()error('storage read')end,
+                __newindex=function()error('storage write')end})
+            }
+            environment._G=environment;setmetatable(environment,{__index=_G})
+            assert(loadfile(path,'t',environment))()
+            local ok, message = pcall(callback)
+            return {ok=ok,message=message,report=report}
+          end
+        ''')
+        for opponent in ('', 'mir', 'consumer', 'interface', 'technology', 'effect'):
+            with self.subTest(opponent=opponent):
+                result = self.lua.eval('optional_absence_observer')(path.as_posix(), opponent)
+                self.assertEqual(not opponent, result['ok'], result['message'])
+                if not opponent:
+                    self.assertFalse(result['report']['mir_present'])
+                    self.assertEqual(0, result['report']['cable_productivity_bonus'])
+        profile = json.loads((ROOT / 'tests/profiles/api-optional-absence-f200-2077.json').read_text())
+        self.assertEqual(4, len(profile['mods']))
+        self.assertNotIn('more-infinite-research', {row['name'] for row in profile['mods']})
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = PLAYER_ROOT.as_posix()
