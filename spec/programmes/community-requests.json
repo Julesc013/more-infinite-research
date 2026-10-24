@@ -4520,6 +4520,11 @@
           "member_sha256": "4DD512409652282179AE7E89DD9FBDF87EBA2C9EC6A6FC6D19B725D3A44F915A"
         },
         "local_provider_search": "Read-only scan of 579 F210 archive-library ZIPs, 20524 Lua members and 26869 textual members found no Space-Lab-Research spelling variant or verified provider. No archives were extracted, copied or changed.",
+        "provider_source_observation": {
+          "path": "spec/evidence/space-lab-research-provider-source.json",
+          "scope": "Exact upstream declaration found; reporter provider and native qualification remain unconfirmed. Earlier intake and representative evidence retain their original scope.",
+          "reporter_provider_confirmed": false
+        },
         "disposition": "Open report intake; matching thread and published guard source identified, but no verified provider, root cause, corrected native execution or save qualification yet."
       }
     }

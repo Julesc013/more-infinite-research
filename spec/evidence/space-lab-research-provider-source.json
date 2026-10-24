@@ -1,0 +1,277 @@
+{
+  "schema": 1,
+  "kind": "MIRForeignResearchProviderSourceObservationV1",
+  "observed_on": "2026-10-25",
+  "request": "SCI-RESEARCH-01",
+  "status": "upstream-source-declaration-verified-reporter-provider-unconfirmed",
+  "scope": "Read-only upstream source recovery. This identifies a declaration of the exact reported research ID, not the reporter's installed provider, final native prototypes or root cause.",
+  "source_repository": "https://github.com/Telkine2018/expanded-rocket-payloads-continued",
+  "source_versions": [
+    {
+      "commit": "d8c0d2f9fe813d3c1e462a8f52d3541c4f0d29f4",
+      "info_version": "2.0.5",
+      "factorio_version": "2.0",
+      "dependencies": [
+        "base >= 2.0.0"
+      ]
+    },
+    {
+      "commit": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "info_version": "2.1.0",
+      "factorio_version": "2.1",
+      "dependencies": [
+        "base >= 2.1.0"
+      ]
+    }
+  ],
+  "verified_files": [
+    {
+      "path": "info.json",
+      "ref": "d8c0d2f9fe813d3c1e462a8f52d3541c4f0d29f4",
+      "sha": "f00e6ecb2fc8c14f69c0a4677e9269bce9286c19",
+      "sha256": "B9B581123E2DE0A566794F3B3D713BD799404EF72B942C879D3EA3B850DF2ED6",
+      "bytes": 341,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/d8c0d2f9fe813d3c1e462a8f52d3541c4f0d29f4/info.json"
+    },
+    {
+      "path": "info.json",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "9b8fe1736f342b0f1bd23b1bb0685c5094eb9b47",
+      "sha256": "1E3FAD42DEC34BD4B04A7D983D24846CA69D9FB8AABFF2D99C654A3BD08C84DF",
+      "bytes": 341,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/info.json"
+    },
+    {
+      "path": "prototypes/technology/space-lab-research-tech.lua",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "ef26fd3167ac855f40caf921a960615dbd78c315",
+      "sha256": "63E62FBCC2874038F1BBA763197AA2EB7A6ED07FEDE01CFBE79C574E50966A87",
+      "bytes": 2318,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/prototypes/technology/space-lab-research-tech.lua"
+    },
+    {
+      "path": "data.lua",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "0158e7fd77f7c0349f1b895e10f4d314882531d9",
+      "sha256": "79E40B8B7630F642044D81F60529D671EB7958E5523FD337C5D193FA0BF6863E",
+      "bytes": 5868,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/data.lua"
+    },
+    {
+      "path": "prototypes/item/station-science.lua",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "79c8a570387cb28761cb50a96f448c9c5c510ba4",
+      "sha256": "C3EEA86DD8E54D7645912DFE0246726AFEBD3B069861A6B8C71C7BBB45E0EF1A",
+      "bytes": 534,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/prototypes/item/station-science.lua"
+    },
+    {
+      "path": "prototypes/item/space-lab.lua",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "6e42615840b430860e5c21c154956610b5ed3f67",
+      "sha256": "CC63AC49F2DD5C991E6022110C20E910A2E93C07ECB3210A13FA91B1C894E075",
+      "bytes": 421,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/prototypes/item/space-lab.lua"
+    },
+    {
+      "path": "LICENSE",
+      "ref": "84fdac8c35f692d2acc69b19dc8cc252ccf38f16",
+      "sha": "ee45e742d899a199754e82ca3e2ba7715676278d",
+      "sha256": "DB107DD38FF8778BC46338ED2FF7D7D6414CF07D7355BBA3E113A05B0BDEDC0F",
+      "bytes": 1068,
+      "url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued/blob/84fdac8c35f692d2acc69b19dc8cc252ccf38f16/LICENSE"
+    }
+  ],
+  "cross_version_identity": {
+    "commits": [
+      "d8c0d2f9fe813d3c1e462a8f52d3541c4f0d29f4",
+      "84fdac8c35f692d2acc69b19dc8cc252ccf38f16"
+    ],
+    "research_member": "prototypes/technology/space-lab-research-tech.lua",
+    "research_git_blob": "ef26fd3167ac855f40caf921a960615dbd78c315",
+    "entrypoint_member": "data.lua",
+    "entrypoint_git_blob": "0158e7fd77f7c0349f1b895e10f4d314882531d9",
+    "basis": "GitHub returned the same respective blob IDs at both exact commits; the preserved current bytes independently match those Git blob hashes."
+  },
+  "entrypoint": {
+    "path": "data.lua",
+    "line": 84,
+    "module": "prototypes.technology.space-lab-research-tech",
+    "operation": "direct require"
+  },
+  "authored_technology_rows": [
+    {
+      "name": "Space-Lab-Research-1",
+      "effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.01
+        }
+      ],
+      "prerequisites": [
+        "space-lab"
+      ],
+      "unit": {
+        "count_formula": "1",
+        "time": 120,
+        "ingredients": [
+          [
+            "station-science",
+            1
+          ]
+        ]
+      },
+      "max_level": 20,
+      "upgrade": true
+    },
+    {
+      "name": "Space-Lab-Research-21",
+      "effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.01
+        }
+      ],
+      "prerequisites": [
+        "Space-Lab-Research-1"
+      ],
+      "unit": {
+        "count_formula": "2",
+        "time": 120,
+        "ingredients": [
+          [
+            "station-science",
+            1
+          ]
+        ]
+      },
+      "max_level": 40,
+      "upgrade": true
+    },
+    {
+      "name": "Space-Lab-Research-41",
+      "effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.01
+        }
+      ],
+      "prerequisites": [
+        "Space-Lab-Research-21"
+      ],
+      "unit": {
+        "count_formula": "6",
+        "time": 240,
+        "ingredients": [
+          [
+            "station-science",
+            1
+          ]
+        ]
+      },
+      "max_level": 60,
+      "upgrade": true
+    },
+    {
+      "name": "Space-Lab-Research-61",
+      "effects": [
+        {
+          "type": "laboratory-productivity",
+          "modifier": 0.01
+        }
+      ],
+      "prerequisites": [
+        "Space-Lab-Research-41"
+      ],
+      "unit": {
+        "count_formula": "2(L-51)",
+        "time": 240,
+        "ingredients": [
+          [
+            "station-science",
+            1
+          ]
+        ]
+      },
+      "max_level": "infinite",
+      "upgrade": true
+    }
+  ],
+  "science_declaration": {
+    "type": "tool",
+    "name": "station-science",
+    "icon": "__expanded-rocket-payloads-continued__/graphic/data.png",
+    "durability_description_value": "description.science-pack-remaining-amount-value",
+    "subgroup": "satellite-data",
+    "localised_description": [
+      "item-description.science-pack"
+    ],
+    "durability": 1,
+    "durability_description_key": "description.science-pack-remaining-amount-key",
+    "stack_size": 10,
+    "order": "h",
+    "icon_size": 32
+  },
+  "declared_payload_output": {
+    "item": "space-lab",
+    "rocket_launch_products": [
+      {
+        "type": "item",
+        "amount": 1,
+        "name": "station-science"
+      }
+    ],
+    "scope": "One declared output relationship only; not a complete acquisition or researchability proof."
+  },
+  "public_archive_metadata": {
+    "url": "https://mods.factorio.com/api/mods/expanded-rocket-payloads-continued/full",
+    "response_sha256": "E031D637C5F4C69A5CDE62154C787C3CD7D7DB42D9B3A1F733DABFD534220008",
+    "source_url": "https://github.com/Telkine2018/expanded-rocket-payloads-continued",
+    "listed_versions": [
+      "1.1.0",
+      "1.1.1",
+      "2.0.4",
+      "2.0.5"
+    ],
+    "latest_listed_version": "2.0.5",
+    "release": {
+      "download_url": "/download/expanded-rocket-payloads-continued/6860d70d42b9e80afacbc71f",
+      "file_name": "expanded-rocket-payloads-continued_2.0.5.zip",
+      "info_json": {
+        "dependencies": [
+          "base >= 2.0.0"
+        ],
+        "factorio_version": "2.0"
+      },
+      "released_at": "2025-06-29T06:02:53.642000Z",
+      "sha1": "9f07c9096ce57b6304bdbbe265f6d85d9737f214",
+      "version": "2.0.5"
+    },
+    "scope": "Observed public API metadata only. No release ZIP was downloaded, installed or compared to Git source; no 2.1.0 archive is listed in this response."
+  },
+  "attribution": {
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025 Telkine2018",
+    "license_member": "LICENSE"
+  },
+  "validation": {
+    "git_blob_hashes_verified": 7,
+    "literal_declarations_observed": "Pinned Lua5.2 host data:extend capture: four technologies, one tool and one payload item. This is source-table inspection, not Factorio execution.",
+    "reporter_provider_confirmed": false,
+    "published_archive_examined": false,
+    "native_tests_run": false,
+    "source_custody": "build/mir5/aero-space-lab-provider-source-r01 (primary checkout, ignored exact source blobs and API response; not a populated mod library or native fixture)"
+  },
+  "existing_evidence_boundary": {
+    "fixture": "tests/fixtures/foreign-research-preservation",
+    "evidence": "spec/evidence/foreign-research-upgrade-native.json",
+    "scope": "Existing synthetic finite Space-Lab-Research-61/62 laboratory-speed preservation and unresolved-startup cases remain unchanged. They do not instantiate this upstream infinite laboratory-productivity continuation or certify its provider."
+  },
+  "remaining_qualification": [
+    "Confirm the reporter's provider archive, exact MIR archive, engine, full mod/settings closure and original log; the research ID alone does not establish a unique provider or an engine version.",
+    "Capture final affected technology, lab and science-source facts from a dependency-valid exact profile; the source tables do not establish final enablement, researchability or successful loading.",
+    "Reproduce the reported MIR4 rejection and qualify the affected MIR5 ownership path without deleting foreign research, losing applicable MIR coverage or adding duplicate effects.",
+    "Preserve foreign and MIR earned levels/effects, next continuation, active and suspended progress and queues through protected upgrade/save/two cold reloads on exact qualified inputs.",
+    "Keep SCI-RESEARCH-01 open. This source observation does not supersede or relabel earlier representative native receipts or close the reporter's failure."
+  ]
+}
