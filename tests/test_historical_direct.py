@@ -161,7 +161,7 @@ class HistoricalDirectTests(unittest.TestCase):
           for _, setting in ipairs(f015) do by_name[setting.name] = setting end
           local growth = by_name["ips-cost-growth-research_inventory_capacity"]
           assert(growth and growth.type == "double-setting" and growth.default_value == 1.1)
-          assert(growth.minimum_value == 1 and growth.maximum_value == nil)
+          assert(growth.minimum_value == 1 and growth.maximum_value == 1000)
           assert(by_name["ips-enable-research_cannon_shooting_speed"] ~= nil)
 
           for _, name in ipairs({"research_character_reach", "research_inventory_capacity"}) do
@@ -225,7 +225,7 @@ class HistoricalDirectTests(unittest.TestCase):
             assert(linear.type == "int-setting" and linear.default_value == 0
               and linear.minimum_value == 0 and linear.maximum_value == 2147483647)
             assert(growth.type == "double-setting" and growth.default_value == expected[2]
-              and growth.minimum_value == 0 and growth.maximum_value == nil)
+              and growth.minimum_value == 0 and growth.maximum_value == 1000)
             assert(maximum.type == "int-setting" and maximum.default_value == 0
               and maximum.minimum_value == 0 and maximum.maximum_value == 2147483647)
             assert(time.type == "int-setting" and time.default_value == expected[3]
@@ -281,6 +281,21 @@ class HistoricalDirectTests(unittest.TestCase):
             ["mir-lab-incompatibility-policy"] = {value="invented"},
           })
           assert(not ok and string.find(message, "mir-lab-incompatibility-policy", 1, true))
+
+          -- The direct setting cap rejects input before the selected target's
+          -- constructor can emit a formula, and the boundary value remains
+          -- available to the historical formula path.
+          ok, message = pcall(historical_settings.resolve, "f015", {
+            ["ips-cost-growth-research_inventory_capacity"] = {value=1001},
+          })
+          assert(not ok and string.find(message,
+            "MIR invalid historical direct setting ips-cost-growth-research_inventory_capacity", 1, true))
+          values = historical_settings.resolve("f015", {
+            ["ips-cost-growth-research_inventory_capacity"] = {value=1000},
+            ["mir-cost-growth-inserter-capacity-bonus"] = {value=0},
+          })
+          assert(values.streams.research_inventory_capacity.growth_factor == 1000)
+          assert(values.base_extensions["inserter-capacity-bonus"].growth_factor == 0)
         ''')
 
     def test_numeric_formula_maximum_visibility_and_constant_overlay_shapes(self):

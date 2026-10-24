@@ -413,9 +413,11 @@ Every generated stream receives:
 | `ips-enable-<stream-key>` | bool | stream/defaults/shared | Enables or disables generation for the stream. Scripted streams use the same checkbox for their runtime effect. |
 | `ips-cost-base-<stream-key>` | int, min `1` | stream/defaults/shared | First-level research unit base cost. |
 | `ips-cost-linear-increment-<stream-key>` | int, min `0` | stream/defaults/shared | Research units added per level before exponential multiplication. `0` preserves existing curves by default. |
-| `ips-cost-growth-<stream-key>` | double, min `1` | stream/defaults/shared | Exponential multiplier between levels. `1` selects fixed or linear behavior. The stable ID is unchanged. |
+| `ips-cost-growth-<stream-key>` | double, `1..1000` in MIR5 | stream/defaults/shared | Exponential multiplier between levels. `1` selects fixed or linear behavior. The stable ID is unchanged. |
 | `ips-max-level-<stream-key>` | int, min `0` | stream/defaults/shared | `0` means infinite; positive values cap the stream. |
 | `ips-research-time-<stream-key>` | int, min `0` | stream/defaults/shared | Seconds per research unit. `0` uses the configured default for that stream. |
+
+MIR5 exposes the existing cost-construction ceiling of `1000` in both `ips-cost-growth-*` and native `mir-cost-growth-*` setting bounds. Native `mir-*` growth retains `0` for inheritance. This deliberately tightens the earlier unbounded setting prototypes so they cannot offer a value that the cost builder rejects; names and defaults remain unchanged.
 
 Per-stream effective defaults and exceptions:
 

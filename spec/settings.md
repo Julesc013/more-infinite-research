@@ -37,6 +37,8 @@ Resolve effective values once per active definition/feature. No complete setting
 
 `SET-02` — Preserve numeric versus formula costs, initial-level offsets, rounding, time, stage boundaries and global/per-family scalar interactions. Do not replace all families with one illustrative formula. Compare native evaluated costs at boundary/high levels as well as formula text where relevant. Reject nonfinite values; do not conflate a literal zero with inherit or unlimited.
 
+MIR 5 deliberately gives every active `ips-cost-growth-*` and `mir-cost-growth-*` double-setting an explicit maximum of `1000`. This is the existing profile-import and authored formula ceiling, now enforced by the startup prototype as well as effective-value resolution. It preserves each setting's name, default, minimum, and the `mir-*` zero inheritance sentinel; input above the ceiling is refused before construction rather than reaching a formula constructor and failing startup. This safety correction does not rewrite or relabel captured historical setting evidence that observed an unbounded prototype.
+
 ## Disablement and caps
 
 A user-disabled new research, a hidden identity retained for saves, and a technology disabled by another mod are not interchangeable. The exact existing behavior needs its own expected result. Do not omit an established prototype merely to save load time.

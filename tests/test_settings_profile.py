@@ -76,11 +76,41 @@ class SettingsProfileTests(unittest.TestCase):
           for _, spec in ipairs(prototypes) do
             if spec.name == "ips-cost-growth-research_gears" then growth = spec end
           end
-          assert(growth and growth.maximum_value == nil and growth.minimum_value == 1)
+          assert(growth and growth.maximum_value == 1000 and growth.minimum_value == 1)
           assert(growth.localised_name[1] == "mod-setting-name.ips-cost-growth-stream")
           local valid, reason = config.validate_value("ips-cost-growth-research_gears", 1001)
           assert(not valid and reason == "above maximum")
           assert(config.validate_value("ips-cost-growth-research_gears", 1000))
+        ''')
+
+    def test_direct_growth_ceiling_refuses_before_construction_and_keeps_native_zero_inheritance(self):
+        self.lua.execute(r'''
+          local normal = "ips-cost-growth-research_gears"
+          local inherited = "mir-cost-growth-inserter-capacity-bonus"
+
+          settings.startup[normal].value = 1001
+          local ok, message = pcall(config.resolve, settings.startup)
+          assert(not ok and string.find(message, "MIR invalid effective setting: " .. normal, 1, true))
+          -- Resolution rejects the direct setting; it does not clamp or invoke
+          -- a constructor with a different value.
+          assert(settings.startup[normal].value == 1001)
+
+          settings.startup[normal].value = 1000
+          settings.startup[inherited].value = 0
+          local values = config.resolve(settings.startup)
+          assert(values.streams.research_gears.growth_factor == 1000)
+          local gears = require("research.productivity").gears(values)
+          assert(type(gears.unit.count_formula) == "string"
+            and gears.unit.count_formula:find("1000", 1, true))
+
+          -- Zero remains the named native-continuation inheritance sentinel.
+          local continuation
+          for _, row in ipairs(require("compatibility.modern_catalogue").continuations({})) do
+            if row.id == "inserter-capacity-bonus-8" then continuation = row end
+          end
+          assert(continuation and values.native_continuations[continuation.family].growth_factor == 0)
+          local output = require("research.modern").continuation(continuation, values)
+          assert(type(output.unit.count_formula) == "string" and not output.unit.count_formula:find("nan", 1, true))
         ''')
 
     def test_import_precedence_uses_profile_validation_before_consumer_normalization(self):

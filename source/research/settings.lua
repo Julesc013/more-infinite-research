@@ -24,7 +24,7 @@ local normal_fields = {
   {key="enabled", prefix="ips-enable-", type="bool-setting"},
   {key="base_cost", prefix="ips-cost-base-", type="int-setting", minimum_value=1, maximum_value=2147483647},
   {key="linear_increment", prefix="ips-cost-linear-increment-", type="int-setting", minimum_value=0, maximum_value=2147483647},
-  {key="growth_factor", prefix="ips-cost-growth-", type="double-setting", minimum_value=1, profile_maximum_value=1000},
+  {key="growth_factor", prefix="ips-cost-growth-", type="double-setting", minimum_value=1, maximum_value=1000, profile_maximum_value=1000},
   {key="max_level", prefix="ips-max-level-", type="int-setting", minimum_value=0, maximum_value=2147483647},
   {key="research_time", prefix="ips-research-time-", type="int-setting", minimum_value=0, maximum_value=2147483647},
   {key="effect_percent", prefix="ips-effect-per-level-", type="double-setting", minimum_value=0.01, maximum_value=1000000}
@@ -37,7 +37,7 @@ local native_fields = {
   {key="enabled", prefix="mir-enable-", type="bool-setting"},
   {key="base_cost", prefix="mir-cost-base-", type="int-setting", minimum_value=0, maximum_value=2147483647},
   {key="linear_increment", prefix="mir-cost-linear-increment-", type="int-setting", minimum_value=0, maximum_value=2147483647},
-  {key="growth_factor", prefix="mir-cost-growth-", type="double-setting", minimum_value=0, profile_maximum_value=1000},
+  {key="growth_factor", prefix="mir-cost-growth-", type="double-setting", minimum_value=0, maximum_value=1000, profile_maximum_value=1000},
   {key="max_level", prefix="mir-max-level-", type="int-setting", minimum_value=0, maximum_value=2147483647},
   {key="research_time", prefix="mir-research-time-", type="int-setting", minimum_value=0, maximum_value=2147483647},
   {key="effect_percent", prefix="mir-effect-per-level-", type="double-setting", minimum_value=0.01, maximum_value=1000000}

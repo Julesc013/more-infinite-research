@@ -10,6 +10,11 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
 FACTS = ROOT / "tests/fixtures/armor-py-f200-472-recovered-facts.json"
+GROWTH_SETTING_MAXIMUM = 1000
+GROWTH_SETTING_MINIMUMS = {
+    "ips-cost-growth-": 1,
+    "mir-cost-growth-": 0,
+}
 
 
 def _lua_value(lua, value):
@@ -39,6 +44,19 @@ def _entry(entry):
     if isinstance(entry, list):
         return {"type": "item", "name": entry[0], "amount": entry[1]}
     return deepcopy(entry)
+
+
+def _captured_setting_expectation(row, field):
+    """Retain captured fields except the reviewed startup growth safety cap."""
+    if field != "maximum_value":
+        return row.get(field), False
+    for prefix, minimum in GROWTH_SETTING_MINIMUMS.items():
+        if row["name"].startswith(prefix):
+            if (row.get("type") != "double-setting" or row.get("setting_type") != "startup"
+                    or row.get("minimum_value") != minimum or "maximum_value" in row):
+                raise AssertionError(f"captured growth setting is not the reviewed safety-cap input: {row['name']}")
+            return GROWTH_SETTING_MAXIMUM, True
+    return row.get(field), False
 
 
 class ArmorPyCatalogueTests(unittest.TestCase):
@@ -579,6 +597,7 @@ class ArmorPyCatalogueTests(unittest.TestCase):
         self.assertEqual(["moss-mk01"], incompatible["owner"]["prerequisites"])
 
     def test_settings_keep_identities_and_the_captured_py_sets_are_visible(self):
+        growth_corrections = 0
         for identifier in self.profiles:
             self.lua.globals().mods = _lua_value(self.lua, self.active(identifier))
             settings = self.lua.execute('package.loaded["research.settings"]=nil; return require("research.settings")')
@@ -591,7 +610,10 @@ class ArmorPyCatalogueTests(unittest.TestCase):
                         "type", "setting_type", "default_value", "minimum_value", "maximum_value",
                         "order", "hidden", "localised_name", "localised_description",
                     ):
-                        self.assertEqual(row.get(field), observed.get(field), f"{identifier} {row['name']} {field}")
+                        expected, corrected = _captured_setting_expectation(row, field)
+                        growth_corrections += int(corrected)
+                        self.assertEqual(expected, observed.get(field), f"{identifier} {row['name']} {field}")
+        self.assertEqual(5, growth_corrections)
         self.lua.globals().mods = _lua_value(self.lua, self.active("py-coal"))
         settings = self.lua.execute('package.loaded["research.settings"]=nil; return require("research.settings")')
         specs = {spec["name"]: _plain(spec) for spec in settings["prototypes"]().values()}

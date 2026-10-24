@@ -72,9 +72,18 @@ class ModernTargetTests(unittest.TestCase):
           assert(config.spec("ips-enable-research_cargo_landing_pad_count") == nil)
           assert(config.spec("ips-effect-per-level-research_cargo_bay_unloading_distance") == nil)
           assert(config.spec("ips-enable-research_platform") ~= nil)
+          local direct = config.spec("ips-cost-growth-research_gears")
+          local inherited = config.spec("mir-cost-growth-inserter-capacity-bonus")
+          assert(direct.minimum_value == 1 and direct.maximum_value == 1000)
+          assert(inherited.minimum_value == 0 and inherited.maximum_value == 1000)
+          local ok, message = pcall(config.resolve, { [direct.name] = {value=1001} })
+          assert(not ok and string.find(message, "MIR invalid effective setting: " .. direct.name, 1, true))
           local values = config.resolve({["ips-effect-per-level-research_gears"]={value=17},
-            ["mir-recycling-return-chance"]={value="percent-20"}})
+            ["mir-recycling-return-chance"]={value="percent-20"}, [direct.name]={value=1000},
+            [inherited.name]={value=0}})
           assert(values.effect_percent == 17 and values.options["mir-recycling-return-chance"] == "percent-20")
+          assert(values.streams.research_gears.growth_factor == 1000
+            and values.native_continuations["inserter-capacity-bonus"].growth_factor == 0)
         ''')
 
     def test_f200_api_rejects_unadmitted_cargo_effects_before_publication(self):

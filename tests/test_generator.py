@@ -205,14 +205,26 @@ def host_row(row):
     return output
 
 
+GROWTH_SETTING_MAXIMUM = 1000
+GROWTH_SETTING_MINIMUMS = {
+    "ips-cost-growth-": 1,
+    "mir-cost-growth-": 0,
+}
+GROWTH_SETTING_COUNTS = {
+    "base-f210": 123,
+    "space-age-f210": 123,
+    "k2so-f210": 123,
+}
+
+
 def intended_setting_rows(profile):
-    """Apply only the exact planner-field retirement named by the oracle."""
+    """Apply only named published-field retirements and the reviewed safety cap."""
     records = profile["published_output"]["settings"]["additions"]
     retirements = {
         (item["type"], item["name"], item["field"]): item
         for item in profile["intended_player_output"]["settings"]["remove_published_fields"]
     }
-    expected = {}
+    expected, growth_corrections = {}, 0
     for item in records:
         row = json.loads(json.dumps(item["row"]))
         key = (item["type"], item["name"], "targets")
@@ -226,9 +238,20 @@ def intended_setting_rows(profile):
             row.pop("targets")
         elif retirement is not None:
             raise AssertionError(f"oracle retires absent targets for {item['name']}")
+        for prefix, minimum in GROWTH_SETTING_MINIMUMS.items():
+            if item["name"].startswith(prefix):
+                if (item["type"] != "double-setting" or row.get("type") != "double-setting"
+                        or row.get("setting_type") != "startup" or row.get("minimum_value") != minimum
+                        or "maximum_value" in row):
+                    raise AssertionError(f"published growth setting is not the reviewed safety-cap input: {item['name']}")
+                row["maximum_value"] = GROWTH_SETTING_MAXIMUM
+                growth_corrections += 1
+                break
         expected[item["name"]] = row
     if retirements:
         raise AssertionError(f"oracle retires fields outside published settings: {sorted(retirements)}")
+    if growth_corrections != GROWTH_SETTING_COUNTS.get(profile["id"]):
+        raise AssertionError(f"unexpected reviewed growth-cap count for {profile['id']}: {growth_corrections}")
     return expected
 
 
@@ -1201,7 +1224,7 @@ class GeneratorTests(unittest.TestCase):
           assert(package.loaded["overrides.prototype_limits"] == nil)
         ''')
 
-    def test_full_published_setting_output_matches_oracle_without_retired_planner_metadata(self):
+    def test_full_published_setting_output_matches_oracle_with_explicit_growth_safety_cap(self):
         for profile in MODERN_ORACLE["profiles"]:
             active_mods = profile_mods(profile["id"])
             self.lua.globals().profile_setting_mods = lua_table(self.lua, active_mods)
