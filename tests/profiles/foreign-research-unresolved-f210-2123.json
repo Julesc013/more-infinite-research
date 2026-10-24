@@ -30,6 +30,7 @@
     "included_members": [
       "info.json",
       "data.lua",
+      "data-updates.lua",
       "data-final-fixes.lua",
       "control.lua"
     ]

@@ -216,7 +216,7 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         self.assertEqual(info['dependencies'], destination['dependencies'])
         self.assertEqual(info['version'], '0.3.0')
         self.assertEqual((UNRESOLVED / 'data.lua').read_bytes(), (DESTINATION / 'data.lua').read_bytes())
-        self.assertFalse((UNRESOLVED / 'data-updates.lua').exists())
+        self.assertTrue((UNRESOLVED / 'data-updates.lua').exists())
         profile = json.loads((ROOT / 'tests/profiles/foreign-research-unresolved-f210-2123.json').read_text())
         self.assertEqual(profile['engine'], {'version': '2.1.23',
                          'sha256': 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'})
@@ -233,7 +233,9 @@ class ForeignResearchPreservationTests(unittest.TestCase):
         from test_generator import plain_lua
         self.lua.execute(r'''
           function unresolved_data_context(rows, path, opponent)
-            local raw = {tool={},recipe={},technology={['recipe-prod-research_gears-1']={name='recipe-prod-research_gears-1'}}}
+            local raw = {tool={},recipe={},lab={lab={inputs={'automation-science-pack',
+              'chemical-science-pack','utility-science-pack','mir5-foreign-astral-insight-pack'}}},
+              technology={['recipe-prod-research_gears-1']={name='recipe-prod-research_gears-1'}}}
             for _, row in ipairs(rows) do raw[row.type][row.name] = row end
             local active = {base='2.1.23',['more-infinite-research']='5.0.21000',
               ['mir-fixture-mir5-foreign-research-preservation']='0.3.0'}
@@ -243,13 +245,15 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             elseif opponent=='effect' then foreign.effects[1].modifier=.1
             elseif opponent=='cost' then foreign.unit.count=1
             elseif opponent=='missing-gear' then raw.technology['recipe-prod-research_gears-1']=nil
+            elseif opponent=='lab-pack' then raw.lab.lab.inputs[4]=nil
+            elseif opponent=='lab-utility' then raw.lab.lab.inputs[3]='logistic-science-pack'
             elseif opponent=='version' then active['more-infinite-research']='5.0.20000' end
             local env={mods=active,data={raw=raw,extend=function()error('unexpected data write')end}}
             env._G=env;setmetatable(env,{__index=_G})
             return {raw=raw,run=function()return pcall(assert(loadfile(path,'t',env)))end}
           end
         ''')
-        for opponent in ('', 'producer', 'science', 'effect', 'cost', 'missing-gear', 'version'):
+        for opponent in ('', 'producer', 'science', 'effect', 'cost', 'missing-gear', 'lab-pack', 'lab-utility', 'version'):
             rows = self.lua.eval('foreign_fixture_data')((UNRESOLVED / 'data.lua').as_posix())
             context = self.lua.eval('unresolved_data_context')(
                 rows, (UNRESOLVED / 'data-final-fixes.lua').as_posix(), opponent)
@@ -258,6 +262,20 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             ok = returned[0] if isinstance(returned, tuple) else returned
             self.assertEqual(ok, not opponent, opponent)
             self.assertEqual(before, plain_lua(context['raw']), opponent)
+
+    def test_unresolved_pack_has_one_accepting_lab_without_a_producer(self):
+        self.lua.globals().unresolved_updates_path = (UNRESOLVED / 'data-updates.lua').as_posix()
+        self.lua.execute('''
+          local inputs = {'automation-science-pack','chemical-science-pack','utility-science-pack'}
+          data = {raw={lab={lab={inputs=inputs}},recipe={}},
+            extend=function()error('unresolved fixture must not add a pack recipe')end}
+          assert(dofile(unresolved_updates_path) == nil)
+          assert(dofile(unresolved_updates_path) == nil)
+          assert(data.raw.lab.lab.inputs == inputs and #inputs == 4)
+          assert(inputs[1] == 'automation-science-pack' and inputs[2] == 'chemical-science-pack'
+            and inputs[3] == 'utility-science-pack' and inputs[4] == 'mir5-foreign-astral-insight-pack')
+          assert(next(data.raw.recipe) == nil)
+        ''')
 
     def test_unresolved_init_witness_is_read_only_and_rejects_foreign_or_mir_drift(self):
         self.lua.execute(r'''
