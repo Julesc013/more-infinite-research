@@ -1723,6 +1723,8 @@ function M.on_player_joined_game(event)
     -- A deferred native request may now be issued, but only because this
     -- player's tagged Library is actually open and connected.
     render(player, view_for(event.player_index), nil, true)
+  else
+    discard_translation_cache(event.player_index)
   end
 end
 
@@ -1746,6 +1748,7 @@ function M.on_native_state_changed(event)
       local player = player_for(index)
       if not player or player.connected ~= true or not valid(owned_root(player)) then
         view.open, view.refresh_pending = false, false
+        discard_translation_cache(index)
       elseif force == nil or (player.force and player.force.index == force.index) then
         view.refresh_pending = true
       end
@@ -1772,6 +1775,7 @@ function M.on_native_refresh_tick()
       render(player, view_for(index), nil, true)
     else
       view.open = false
+      discard_translation_cache(index)
     end
   end
 end

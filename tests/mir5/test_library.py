@@ -376,6 +376,20 @@ class LibraryTests(unittest.TestCase):
           native_handlers.events[5]({research=gear})
           assert(foreign_root.valid and screen["mir_research_browser"] == foreign_root)
           assert(native_ticks[1] == nil and native_handlers.events[1] == nil)
+          assert(storage.mir_library.translations.working == nil,
+            "lost owned frame retained its working cache")
+        ''')
+
+    def test_pending_view_refresh_retires_translation_work_after_the_owned_root_disappears(self):
+        self.lua.execute(r'''
+          boot_native_events()
+          local root=open_routed()
+          native_handlers.events[1]({research=gear})
+          root.destroy()
+          native_ticks[1]({tick=1})
+          assert(storage.mir_library.translations.working==nil and native_ticks[1]==nil)
+          assert(player.gui.screen["mir_research_browser"]==nil and #player.translation_requests==1)
+          assert(library.subscription_needs(),"issued ID was discarded with the working cache")
         ''')
 
     def test_native_refresh_orders_pending_players_independently_of_saved_map_iteration(self):
