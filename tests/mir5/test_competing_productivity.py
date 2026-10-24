@@ -461,11 +461,15 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def test_bootstrap_registers_the_single_named_event_composition(self):
         self.lua.execute(r'''
-          local calls, handlers = {}, {events={}}
+          local calls, cleanup_calls, handlers = {}, {}, {events={}}
           package.preload["platform.target"] = function() return {id="f200", factorio_version="2.0"} end
           package.preload["runtime.lifecycle"] = function()
-            return {caps_active=function() return false end, cap_limits=function() return {} end,
+            local module = {caps_active=function() return false end, cap_limits=function() return {} end,
               on_init=function() end, on_configuration_changed=function() end, on_load=function() end}
+            for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged"}) do
+              module[name] = function(event) cleanup_calls[name] = (cleanup_calls[name] or 0) + 1 end
+            end
+            return module
           end
           package.preload["runtime.competing_productivity"] = function()
             local module = {active=function() return true end}
@@ -513,6 +517,9 @@ class CompetingProductivityTests(unittest.TestCase):
           for _, name in ipairs({"on_init", "on_configuration_changed", "on_load", "on_force_created", "on_force_reset",
             "on_forces_merged", "on_research_finished", "on_research_started", "on_research_cancelled",
             "on_research_reversed", "on_technology_effects_reset"}) do assert(calls[name] == 1, name) end
+          for _, name in ipairs({"on_force_created", "on_force_reset", "on_forces_merged"}) do
+            assert(cleanup_calls[name] == 1, "competing provider displaced force-ownership cleanup: " .. name)
+          end
 
           -- The same named callback composition loads for a fixed F200 Space
           -- Age provider; its row ID is irrelevant to bootstrap dispatch.
