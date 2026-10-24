@@ -9,3 +9,7 @@ For each selected tier, a real lab completes two agriculture levels. The fixture
 The completed world is saved as mir5-native-complete while plants remain in their native lifecycle. Two cold reloads must preserve research, force, tower-event, plant deadline, and spoil-stack deadline witnesses. on_load takes a local read-only snapshot and never repairs storage, technologies, effects, crop timers, or stacks.
 
 This is a candidate-only physical contract until a separately captured published 4.7 F210 package proves the same authored agriculture definition. It cannot claim a published-versus-candidate performance comparison, ordinary tuning qualification, or a generic agriculture workload. Host controls use only small runtime doubles; they do not claim a Factorio execution.
+
+## Published source capture
+
+[`agriculture-published-f210-2123.json`](../../../profiles/agriculture-published-f210-2123.json) predeclares an F210 2.1.23 Defaults `--dump-data` capture of the published 4.7.21002 archive. `Invoke-PrototypeCapture.ps1` receives that archive separately as its sole MIR selection; the profile binds only the exact official closure and active-mods observer. It selects no agriculture core or tier fixture, acceleration, gameplay, save/reload, or benchmark path, and does not change this candidate fixture or its oracle. The capture may determine whether the two definitions can share a witness; actual contract equality and paired 1/32/128 qualification remain pending.
