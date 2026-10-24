@@ -13,8 +13,11 @@ param(
   [Parameter(Mandatory)][string]$FactorioBin,
   [string]$OutputRoot='build/tmp/mir471-editions',
   [string]$ResumeSourceRun='',
-  [ValidateSet('4.7.1','4.7.2')][string]$SourceVersion='4.7.1',
+  [ValidateSet('4.7.1','4.7.2','4.7.3')][string]$SourceVersion='4.7.1',
   [switch]$CryogenicReproducer,
+  [switch]$PlanetaryDataReproducer,
+  [string]$ExternalProfilePath='',
+  [ValidateRange(768,4096)][int]$ExpectedPeakMemoryMiB=768,
   [switch]$CandidateOnly
 )
 $ErrorActionPreference='Stop'
@@ -30,7 +33,7 @@ $engineHash=(Get-FileHash -LiteralPath $FactorioBin).Hash
 foreach($pair in @(@($CandidateZip,$CandidateSha256),@($PublishedZip,$PublishedSha256))){if((Get-FileHash -LiteralPath $pair[0]).Hash-cne$pair[1]){throw 'Exact package bytes differ'}}
 # These bounded Base/Space Age cases measured at most 425 MiB in the accepted
 # 4.7.1 receipts. Keep 768 MiB of child headroom and the unchanged 4 GiB reserve.
-$nativePeakMiB=768
+$nativePeakMiB=$ExpectedPeakMemoryMiB
 $resources=New-MIRNativeProbeResourceContext -RepoRoot $RepoRoot -OutputRoot $OutputRoot -ExpectedPeakMemoryMiB $nativePeakMiB -MaxNewOutputMiB 100
 $root=$resources.root;[IO.Directory]::CreateDirectory($root)|Out-Null
 $userdata=Join-Path $root 'u';[IO.Directory]::CreateDirectory((Join-Path $userdata 'saves'))|Out-Null
@@ -42,13 +45,18 @@ $fixtureName='mir-fixture-471-edition-parity'
 $fixtures=@{}
 foreach($role in @('source','candidate')){
   $directory=Join-Path $root ('fixture-'+$role);[IO.Directory]::CreateDirectory($directory)|Out-Null
-  $fixtureEpoch=if($CryogenicReproducer){2470}elseif($Target-ceq'f210'-and$CandidateOnly){570}else{470}
-  $version=if($SourceVersion-ceq'4.7.1'-and-not$CryogenicReproducer){if($role-ceq'source'){'0.3.0'}else{'0.3.1'}}else{'0.'+($fixtureEpoch+$patch)+'.'+$(if($role-ceq'source'){0}elseif($CryogenicReproducer){2}else{1})}
+  $fixtureEpoch=if($PlanetaryDataReproducer){3470}elseif($CryogenicReproducer){2470}elseif($Target-ceq'f210'-and$CandidateOnly){570}else{470}
+  $version=if($SourceVersion-ceq'4.7.1'-and-not$CryogenicReproducer-and-not$PlanetaryDataReproducer){if($role-ceq'source'){'0.3.0'}else{'0.3.1'}}else{'0.'+($fixtureEpoch+$patch)+'.'+$(if($role-ceq'source'){0}elseif($CryogenicReproducer){2}else{1})}
   [ordered]@{name=$fixtureName;version=$version;title='MIR 4.7.1 focused edition acceptance';author='MIR maintainers';factorio_version=$line;dependencies=@("base >= $($engineInfo.version)","more-infinite-research >= $from")}|ConvertTo-Json -Depth 5|Set-Content (Join-Path $directory 'info.json')
   $observer=Get-Content (Join-Path $RepoRoot 'fixtures/assert-mir471-edition-parity/data-final-fixes.lua') -Raw
+  if($PlanetaryDataReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-planetary-data-473/data-final-fixes.lua') -Raw)}
   if($CryogenicReproducer){$observer+="`n"+(Get-Content (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-final-fixes.lua') -Raw)}
   Copy-Item -LiteralPath (Join-Path $RepoRoot 'source/prototypes/mir/core/fingerprint.lua') -Destination (Join-Path $directory 'mir471_fingerprint.lua')
   [IO.File]::WriteAllText((Join-Path $directory 'data-final-fixes.lua'),$observer,[Text.UTF8Encoding]::new($false))
+  if($PlanetaryDataReproducer){
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-planetary-data-473/data-updates.lua') -Destination (Join-Path $directory 'data-updates.lua')
+    Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-planetary-data-473/settings-updates.lua') -Destination (Join-Path $directory 'settings-updates.lua')
+  }
   if($CryogenicReproducer){
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/data-updates.lua') -Destination (Join-Path $directory 'data-updates.lua')
     Copy-Item -LiteralPath (Join-Path $RepoRoot 'fixtures/assert-startup-cryogenic-472/settings-updates.lua') -Destination (Join-Path $directory 'settings-updates.lua')
@@ -95,15 +103,24 @@ function Activate([string]$Role){
   $version=if($Role-ceq'source'){$from}else{$to};$hash=if($Role-ceq'source'){$PublishedSha256}else{$CandidateSha256};$fixture=$fixtures[$Role]
   $profile=Join-Path $root ($Role+'-selection.json')
   $selected=@(@{name='base';version=[string]$engineInfo.version;enabled=$true},@{name='more-infinite-research';version=$version;enabled=$true},@{name=$fixtureName;version=$fixture.version;enabled=$true})
-  if($Target-ceq'f210'-and(-not$CandidateOnly-or$CryogenicReproducer)){
+  if($Target-ceq'f210'-and(-not$CandidateOnly-or$CryogenicReproducer-or$PlanetaryDataReproducer)){
     $builtins=@('quality','elevated-rails','space-age')
     if(Test-Path (Join-Path $engineData 'recycler/info.json')){$builtins+='recycler'}
     foreach($builtin in $builtins){$selected+=@{name=$builtin;version=[string]$engineInfo.version;enabled=$true}}
   }
+  $extraHashes=@{}
+  if($ExternalProfilePath){
+    $external=Get-Content -LiteralPath $ExternalProfilePath -Raw|ConvertFrom-Json
+    if($external.engine_version-cne$engineInfo.version-or$external.engine_sha256-cne$engineHash){throw 'External profile engine identity differs'}
+    foreach($row in $external.mods){if($row.name-cnotin@($selected.name)){$selected+=$row}}
+    foreach($property in $external.archive_sha256.PSObject.Properties){$extraHashes[$property.Name]=[string]$property.Value}
+  }
   @{mods=$selected}|ConvertTo-Json -Depth 6|Set-Content $profile
   $fixtureFile=$fixtureName+'_'+$fixture.version+'.zip'
+  $extraHashes[("more-infinite-research_$version.zip")]=$hash
+  $extraHashes[$fixtureFile]=(Get-FileHash (Join-Path $LibraryDirectory $fixtureFile)).Hash
   $extra=if($Target-cin@('f013','f014','f015','f016')){@{PrePinMIROwnedArchiveNames=@('more-infinite-research',$fixtureName)}}else{@{}}
-  $script:activation=Start-MIRLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes @{("more-infinite-research_$version.zip")=$hash;$fixtureFile=(Get-FileHash (Join-Path $LibraryDirectory $fixtureFile)).Hash} @extra
+  $script:activation=Start-MIRLibraryActivation -LibraryDirectory $LibraryDirectory -EngineDataDirectory $engineData -ProfilePath $profile -ArchiveHashes $extraHashes @extra
   Add-MIRNativeProbeLibraryActivation -Context $resources -Activation $script:activation
 }
 function Run([string]$Phase,[string[]]$EngineArguments,[string]$Save=''){
@@ -126,6 +143,7 @@ function Run([string]$Phase,[string[]]$EngineArguments,[string]$Save=''){
   $null=Assert-MIRLibraryLoadedSelection -Activation $script:activation -LogPath $log
   $text=Get-Content -LiteralPath $log -Raw
   if($text-match '(?im)(Error Util|Error ModManager|Failed to load|stack traceback)'){throw 'Native log failure'}
+  if($PlanetaryDataReproducer-and-not$text.Contains('[mir473] planetary-data research, quantities and native seed prerequisites retained')){throw 'Planetary-data behavior proof did not execute'}
   if($CryogenicReproducer-and-not$text.Contains('[mir472] cryogenic science, native owner and generated prerequisite retained')){throw 'Cryogenic behavior proof did not execute'}
   Copy-Item -LiteralPath $log -Destination (Join-Path $root ($Phase+'.log'))
   $rows=[regex]::Matches($text,'\[MIR471_PROJECTION\] ([a-z]+)=([^\r\n]+)')

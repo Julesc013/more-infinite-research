@@ -19,6 +19,7 @@ M.shared = {
     -- alternatives and separately validated unlock owners; they never explore factories.
     named_pack_recipe = true,
     unique_direct_recipe = true,
+    direct_recipe_alternatives = true,
     unique_direct_unlock = true,
     direct_unlock_alternatives = true,
     -- DMR Reborn's specialist lab consumes this mined tool directly. Validate

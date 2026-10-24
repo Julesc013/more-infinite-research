@@ -378,12 +378,14 @@ local function declared_source(pack_name, shared)
   if native then return native end
   local declarations = shared.science_bindings or {}
   local named_declaration = false
+  local declaration_found = false
   local declared_roles = {}
   for role in pairs(declarations) do declared_roles[#declared_roles + 1] = role end
   table.sort(declared_roles)
   for _, role in ipairs(declared_roles) do
     local declaration = M.declaration_for_role(role, declarations)
     if declaration and declaration.pack == pack_name then
+      declaration_found = true
       named_declaration = declaration.recipe == pack_name
       local result, reason = binding(pack_name, declaration, true)
       if result then return with_retained_progression(shared, result) end
@@ -412,7 +414,9 @@ local function declared_source(pack_name, shared)
       return nil, "missing-approved-pack-source:" .. pack_name
     end
     if #producers ~= 1 then
-      return nil, "ambiguous-approved-pack-source:" .. pack_name, false, nil, named_declaration
+      local allow_alternatives = named_declaration or (not declaration_found
+        and (shared.science_binding_policy or {}).direct_recipe_alternatives == true)
+      return nil, "ambiguous-approved-pack-source:" .. pack_name, false, nil, allow_alternatives
     end
     recipe_name = producers[1]
     fact = recipe_facts.view(recipe_name)
@@ -631,12 +635,12 @@ local function build_reference_bindings(shared, labs)
   end
   local pack_names = pack_registry.pack_list_all()
   for _, pack in ipairs(pack_names) do
-    local source, reason, parameterized, primary_gates, named_declaration = declared_source(pack, shared)
+    local source, reason, parameterized, primary_gates, allow_recipe_alternatives = declared_source(pack, shared)
     local sources, competing_recipes
     local policy = shared.science_binding_policy or {}
     if policy.unique_direct_recipe and (parameterized
       or (not source and (reason == "ambiguous-approved-pack-unlock:" .. pack
-        or (named_declaration and reason == "ambiguous-approved-pack-source:" .. pack)
+        or (allow_recipe_alternatives and reason == "ambiguous-approved-pack-source:" .. pack)
         or reason == "missing-approved-pack-unlock:" .. pack
         or (reason and reason:find("rejected-approved-pack-unlock:" .. pack .. ":", 1, true) == 1))
         and policy.named_pack_recipe and policy.unique_direct_unlock and policy.direct_unlock_alternatives)) then

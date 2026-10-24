@@ -362,9 +362,14 @@ do
   Context.with_active(Context.new(), function()
     local index = bindings.compile_references(without_declaration,
       {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
-    check(index.packs[token] == nil
-        and string.find(index.issues[token], "ambiguous-approved-pack-source", 1, true),
-      "Removing the authored Angel token declaration reproduces the ambiguous-source refusal")
+    local status, gate = bindings.bound_pack_status(index, token)
+    check(status == "research" and gate == unlocker,
+      "An undeclared lab input can bind its independently established direct producer")
+    without_declaration.science_binding_policy.direct_recipe_alternatives = false
+    local strict = bindings.compile_references(without_declaration,
+      {{name = "lab", inputs = deepcopy(raw.lab.lab.inputs), sources = {{initial = true}}}})
+    check(strict.packs[token] == nil and strict.issues[token]:find("ambiguous-approved-pack-source", 1, true),
+      "Disabling direct recipe alternatives retains the explicit ambiguous-source diagnosis")
   end)
   Context.with_active(Context.new(), function()
     local index = bindings.compile_references(catalogue.shared,
@@ -529,10 +534,55 @@ for _, name in ipairs({"source-b", "source-a"}) do
 end
 Context.with_active(Context.new(), function()
   local science = require("prototypes.mir.capabilities.science_integration.science_packs")
-  local ok, reason = pcall(science.pack_production_status, "mod-science")
-  check(not ok and string.find(reason, "ambiguous-approved-pack-source", 1, true),
-    "Ambiguous unfamiliar pack sources produce an explicit diagnosis without route discovery")
+  check(science.pack_production_status("mod-science") == "initial",
+    "Several positive initially enabled producers establish an unfamiliar lab input without route discovery")
 end)
+
+-- Reported planetary-data shape: no same-name recipe, several direct recipes,
+-- and an early-sorting circular producer. Only an independently seeded route
+-- may bind; producer insertion order must not invent availability or gates.
+for _, reversed in ipairs({false, true}) do
+  for _, seed in ipairs({"research", "initial", "disabled", "circular", "zero", "fluid"}) do
+    local raw = world(0, false)
+    local pack = "planetary-data"
+    raw.tool[pack] = {type = "tool", name = pack}
+    raw.lab.lab.inputs[#raw.lab.lab.inputs + 1] = pack
+    local recipes = {"a-circular-planetary-data", "z-seeded-planetary-data"}
+    if reversed then recipes = {recipes[2], recipes[1]} end
+    for _, name in ipairs(recipes) do
+      raw.recipe[name] = {type = "recipe", name = name, enabled = name:sub(1, 1) == "z" and seed == "initial",
+        results = {{type = name:sub(1, 1) == "z" and seed == "fluid" and "fluid" or "item",
+          name = pack, amount = name:sub(1, 1) == "z" and seed == "zero" and 0 or 1}}}
+    end
+    raw.technology["circular-planetary-owner"] = {type = "technology", name = "circular-planetary-owner",
+      unit = {count = 1, ingredients = {{pack, 1}}},
+      effects = {{type = "unlock-recipe", recipe = "a-circular-planetary-data"}}}
+    raw.technology["seeded-planetary-owner"] = {type = "technology", name = "seeded-planetary-owner",
+      enabled = seed ~= "disabled", unit = {count = 1, ingredients = {{seed == "circular" and pack or roles[1], 1}}},
+      effects = {{type = "unlock-recipe", recipe = "z-seeded-planetary-data"}}}
+    local before = fingerprint.of(raw)
+    Context.with_active(Context.new(), function()
+      local ok, status = pcall(science_packs.pack_production_status, pack)
+      if seed == "research" or seed == "initial" then
+        check(ok and status == seed, "Planetary data uses the independently established " .. seed .. " source")
+        local source = science_packs.production_route_for_pack(pack)
+        check(source.recipe_name == "z-seeded-planetary-data" and source.acquisition_proof == false,
+          "A circular first producer cannot replace the actual planetary-data seed")
+        local gates = science_packs.prereq_techs_for_science_pack(pack)
+        check((seed == "initial" and #gates == 0) or (#gates == 1 and gates[1] == "seeded-planetary-owner"),
+          "Alternative planetary-data owners are never unioned into prerequisites")
+        local chosen = science_packs.best_lab_compatible_ingredients({{roles[1], 2}, {pack, 3}}, "planetary-data", {pack})
+        check(chosen and #chosen == 2 and chosen[2][2] == 3, "Planetary data and its selected amount remain in research")
+      else
+        check(not ok or (status ~= "research" and status ~= "initial"),
+          "A " .. seed .. " alternative cannot fabricate planetary-data availability")
+      end
+      check(science_packs.binding_snapshot().work.factory_acquisition_calls == 0,
+        "Planetary-data alternatives never invoke factory acquisition")
+    end)
+    check(fingerprint.of(raw) == before, "Planetary-data binding never mutates source prototypes")
+  end
+end
 local function launch_world()
   local value = world(0, false)
   value.tool["space-science-pack"] = {type = "tool", name = "space-science-pack"}
