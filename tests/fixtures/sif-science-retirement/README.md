@@ -186,6 +186,13 @@ for the other seven policy settings: startup-policy values are frozen when a
 save is created and need separate predecessor/successor runs to make that
 claim.
 
+An upgrade begins from a source cold-load snapshot. After the successor
+configuration has validated that source witness and successfully queued its
+first named lab, the fixture discards only that obsolete in-memory snapshot.
+It does not write saved state in `on_load`. A later cold reload captures the
+completed successor state anew and still rejects changed phase, lab count,
+technology, queue, effect, or inventory witnesses.
+
 The sixteen candidate data/runtime-load calls use `-CreateOnly` with
 `-ConsumerMarkers MIR5_SIF_CANDIDATE`. Their case names are exactly
 `sif-science-retirement-f200-<policy>` and
