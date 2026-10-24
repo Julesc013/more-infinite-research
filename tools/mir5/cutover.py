@@ -154,7 +154,13 @@ def final_path(value: str) -> str:
     value = path_name(value)
     if value == ".incomplete-layout-export":
         raise CutoverError("Reserved layout-export marker destination")
-    if any(VERSION_DIR.fullmatch(p) for p in PurePosixPath(value).parts[:-1]):
+    parts = PurePosixPath(value).parts
+    versioned = [i for i, part in enumerate(parts[:-1]) if VERSION_DIR.fullmatch(part)]
+    # Existing private native fixtures use product-labelled successor stages.
+    # Preserve those consumed identities under a named regression fixture;
+    # they are excluded from player source and are not architecture roots.
+    fixture_stage = parts[:2] == ("tests", "fixtures") and all(i >= 3 for i in versioned)
+    if versioned and not fixture_stage:
         raise CutoverError(f"Versioned architecture directory survives: {value}")
     return value
 

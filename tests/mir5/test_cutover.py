@@ -141,6 +141,14 @@ class CutoverTests(unittest.TestCase):
         p=self.approved(); self.row(p,'source/mir5/data.lua')['destination']='source/mir5/data.lua'
         with self.assertRaises(c.CutoverError): c.validate_plan(self.repo,p)
 
+    def test_native_fixture_successor_stage_identity_survives_without_architecture_roots(self):
+        for path in ('tests/fixtures/cap-transition/mir5/control.lua',
+                     'tests/fixtures/competing/ce/mir5-prefer-foreign/info.json'):
+            self.assertEqual(c.final_path(path), path)
+        for path in ('tests/mir5/control.lua', 'tests/fixtures/mir4/source/data.lua',
+                     'source/research/mir5/generator.lua', 'spec/mir5/generator.md'):
+            with self.assertRaises(c.CutoverError): c.final_path(path)
+
     def test_output_inside_repo_refused(self):
         with self.assertRaises(c.CutoverError): c.export_tree(self.repo,self.approved(),self.repo/'out')
 
