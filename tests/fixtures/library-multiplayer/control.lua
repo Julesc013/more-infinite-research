@@ -277,6 +277,34 @@ local function research_inventory(state)
   return inventory
 end
 
+-- Two bounded read-only observations distinguish native lab stalls from GUI
+-- failures. Never repair state, complete research or relax the deadline here.
+local function lab_diagnostic(state, stage)
+  local force, lab = game.forces.player, state.lab
+  local lab_valid = valid(lab)
+  local inventory = lab_valid and lab.get_inventory(defines.inventory.lab_input) or nil
+  local counts = {}
+  for _, name in ipairs(GEAR_PACKS) do
+    counts[name] = inventory and inventory.get_item_count(name) or nil
+  end
+  local current, pending = force.current_research, force.research_queue or {}
+  local queue = {}
+  for index = 1, math.min(#pending, 8) do queue[index] = named(pending[index]) end
+  local gear = force.technologies[GEAR]
+  log("[MIR5_LIBRARY_LAB_DIAGNOSTIC] " .. helpers.table_to_json({
+    schema=1, case=CASE, stage=stage, tick=game.tick, phase=state.phase,
+    started=state.started, finished=state.finished,
+    lab={valid=lab_valid, active=lab_valid and lab.active,
+      energy=lab_valid and lab.energy, status=lab_valid and lab.status,
+      electric_network_id=lab_valid and (lab.electric_network_id or false)},
+    research={enabled=force.research_enabled, current=named(current),
+      progress=current and force.research_progress, queue_count=#pending, queue=queue},
+    gear={level=gear and gear.level, enabled=gear and gear.enabled,
+      count=gear and gear.research_unit_count, energy=gear and gear.research_unit_energy},
+    science_counts=counts,
+  }))
+end
+
 local function assert_lab_consumption(state)
   local inventory = research_inventory(state)
   for _, name in ipairs(GEAR_PACKS) do
@@ -492,6 +520,7 @@ local function restore_initial_views(state, english, german)
   end
   state.queue_before_lab = #copy_queue(force)
   state.refresh_after_tick = game.tick + 2
+  lab_diagnostic(state, "queued")
 end
 
 local function live_players(state)
@@ -731,7 +760,10 @@ script.on_event(defines.events.on_tick, function()
       state.phase = "researching-live-research"
     end
   elseif state.phase == "researching-live-research" then
-    if game.tick >= state.live_deadline then fail("actual Library refresh laboratory exceeded deadline") end
+    if game.tick >= state.live_deadline then
+      lab_diagnostic(state, "deadline")
+      fail("actual Library refresh laboratory exceeded deadline")
+    end
     if not valid(state.lab) then fail("actual Library refresh laboratory was removed") end
     state.lab.energy = LAB_ENERGY
     if state.finished == 1 and game.tick >= (state.refresh_after_tick or game.tick) and not state.first_completion_seen then
