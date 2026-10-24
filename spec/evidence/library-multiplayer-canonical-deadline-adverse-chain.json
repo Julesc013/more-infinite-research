@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerCanonicalDeadlineAdverseChainV1",
+  "status": "current333-f200-library-deadline-adverse-before-durable-terminal-state",
+  "run": 40129169284,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40129169284",
+  "controller_commit": "1bd56ba3954f76e1cd1830840840e3efc0b5dea9",
+  "source_commit": "90960abf34ef8aa5e2fd363f16ba625db8013fea",
+  "engine": {
+    "target": "f200",
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+  },
+  "player": {
+    "version": "5.0.20000",
+    "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+    "bytes": 547144,
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0"
+  },
+  "fixture": {
+    "archive_sha256": "7306409CFCDA424B252038A97A4ABB48EB00060BAC038915DB3D726C1D1236E8",
+    "active_mods_observer_sha256": "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87",
+    "profile_sha256": "95CD24ADA1913E1CAE0E03F5A80E321FA447CEB3B6758FAF42C2019E49462B73"
+  },
+  "preparation": {
+    "status": "passed-private-native-runtime-load-only",
+    "result_sha256": "6AA0714958C3B05495A90D87A100B040FCD516C4B33783B68B77B27143A2F12C"
+  },
+  "session": {
+    "status": "failed",
+    "failure": "[mir441-process-exit] 1",
+    "result_sha256": "4F706C4D95EC0A5A6A631BFDEEED6D59903CFDC6EF271C961D9E83D6EDAF6091",
+    "input_save_byte_identical": true,
+    "controls_restored": true,
+    "release_qualification": false,
+    "visual_review": false
+  },
+  "observed_failure": {
+    "message": "[mir5-library-multiplayer] actual Library refresh laboratory exceeded deadline",
+    "classification": "bounded fixture deadline adverse; not a product diagnosis",
+    "diagnostic_provenance": "exact message observed in retained private server execution material; raw server logs are deliberately excluded from the public capsule"
+  },
+  "not_captured": [
+    "terminal laboratory completion count",
+    "current research and progress at deadline",
+    "queue state at deadline",
+    "laboratory inventory or power at deadline",
+    "initial/rejoin/restart terminal captures",
+    "durable completed marker or save"
+  ],
+  "related_caption_adverse": {
+    "path": "spec/evidence/library-multiplayer-canonical-caption-type-adverse-chain.json",
+    "run": 40126672429,
+    "artifact_manifest_sha256": "293FCBC6E0D69E6D64F13665D1794C64083FB1BD296C1759965F929A678C42F5"
+  },
+  "diagnostic_follow_up": {
+    "pending_public_commit": "14ec65e7",
+    "pull_request": 859,
+    "scope": "read-only deadline diagnostic; no oracle or product change is claimed by this evidence"
+  },
+  "custody": {
+    "primary_safe_path": "build/mir5/recovery-historical/library-multiplayer-canonical/40129169284",
+    "artifact_manifest_sha256": "4116A8003FF0E985B8FBB37802324EC57D9FD5180EA01BF74BB23B4D70C8D284",
+    "members_verified": 202,
+    "full_original_private_artifacts": "retained in Black Glass worker custody; public selection deliberately excludes private/credential-bearing classes"
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/library-multiplayer-canonical-deadline-adverse-receipts.json.gz",
+    "members": 10,
+    "uncompressed_bytes": 150432,
+    "uncompressed_sha256": "E4DFE4E02F3AF073A2CFF0E28336C6D1885DC508FA038F5172657755B862C6CE",
+    "gzip_bytes": 37694,
+    "gzip_sha256": "CCE30C91F26654FEE5C9B192D855CCCF1103893D87EE9DC496095568FD0B30C8"
+  },
+  "limits": [
+    "This adverse establishes no Library multiplayer pass, lab completion, save/reload, performance, broad compatibility or release result.",
+    "It does not establish a reason for the deadline or infer unrecorded terminal game state.",
+    "The earlier caption-type adverse remains separate; the corrected fixture and this deadline execution retain their own inputs and manifests."
+  ],
+  "next_step": "Review the bounded read-only deadline diagnostic before any changed-input retry; do not weaken the deadline or manufacture state from omitted terminal records."
+}
