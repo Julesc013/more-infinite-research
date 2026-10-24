@@ -210,11 +210,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               context["mir_library_context_not_queued"]=queued==0 and element("label","mir_library_context_not_queued") or nil
               context["mir_library_context_queue_count"]=queued>0 and element("label","mir_library_context_queue_count") or nil
               context["mir_library_context_queue_position"]=queued>0 and element("label","mir_library_context_queue_position") or nil
+              local level_key="mir-browser.level"
+              local level=tostring(force.technologies[gear].level)
+              local count,position=tostring(queued),tostring(1)
+              if opponent=="caption-wrong-level-key" then level_key="mir-browser.other-level"
+              elseif opponent=="caption-numeric-level" then level=force.technologies[gear].level
+              elseif opponent=="caption-wrong-level" then level="99"
+              elseif opponent=="caption-noncanonical-level" then level="0"..level
+              elseif opponent=="caption-wrong-queue-count" then count="99"
+              elseif opponent=="caption-noncanonical-queue-count" then count="0"..count
+              elseif opponent=="caption-wrong-queue-position" then position="99"
+              elseif opponent=="caption-noncanonical-queue-position" then position="0"..position end
               if queued>0 then
-                context["mir_library_context_queue_count"].caption={"mir-browser.context-queue-count",queued}
-                context["mir_library_context_queue_position"].caption={"mir-browser.context-queue-position",1}
+                context["mir_library_context_queue_count"].caption={"mir-browser.context-queue-count",count}
+                context["mir_library_context_queue_position"].caption={"mir-browser.context-queue-position",position}
               end
-              detail["mir_library_detail_level"].caption={"mir-browser.level",force.technologies[gear].level}
+              detail["mir_library_detail_level"].caption={level_key,level}
             end
             local remote={interfaces={["more-infinite-research-browser"]={open=true}}}
             remote.call=function(interface, method, index, options)
@@ -635,6 +646,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "foreign-force-gui": "native public browser GUI tree is incomplete",
             "missing-availability-label": "Availability terminal label differs",
             "extra-availability-label": "Availability terminal label count differs",
+            "caption-wrong-level-key": "native Library refresh level differs",
+            "caption-numeric-level": "native Library refresh level differs",
+            "caption-wrong-level": "native Library refresh level differs",
+            "caption-noncanonical-level": "native Library refresh level differs",
+            "caption-wrong-queue-count": "native Library refresh queue facts differ",
+            "caption-noncanonical-queue-count": "native Library refresh queue facts differ",
+            "caption-wrong-queue-position": "native Library refresh queue facts differ",
+            "caption-noncanonical-queue-position": "native Library refresh queue facts differ",
         }
         for opponent, message in expected.items():
             with self.subTest(opponent=opponent):
