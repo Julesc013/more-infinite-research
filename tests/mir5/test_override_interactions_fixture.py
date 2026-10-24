@@ -153,6 +153,45 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         result = self.lua.globals().stage_fixture("pass")
         self.assertTrue(result[0] if isinstance(result, tuple) else result)
 
+    def test_data_constructor_uses_f210_native_recipe_category_schema(self):
+        self.lua.execute(r'''
+          local function clone(value)
+            if type(value) ~= "table" then return value end
+            local result = {}
+            for key, item in pairs(value) do result[key] = clone(item) end
+            return result
+          end
+          local emitted = {}
+          local env = {table={deepcopy=clone},data={raw={
+            recipe={
+              ["iron-gear-wheel"]={type="recipe", categories={"crafting"}},
+              ["parameter-0"]={type="recipe", parameter=true},
+            },
+            module={["productivity-module-3"]={type="module"}},
+            ["assembling-machine"]={
+              ["assembling-machine-1"]={type="assembling-machine"},
+              ["chemical-plant"]={type="assembling-machine",fluid_boxes={{},{}}},
+            },
+          }}}
+          env.data.extend=function(_, rows)
+            for _, row in ipairs(rows) do
+              -- F210 removed both legacy recipe-category properties. This
+              -- engine boundary rejects them even when a later oracle passes.
+              if row.type == "recipe" then
+                assert(row.category == nil and row.additional_categories == nil,
+                  "F210 recipe must use categories, not removed category fields")
+              end
+              emitted[row.name] = row
+            end
+          end
+          setmetatable(env,{__index=_G})
+          assert(loadfile(data_path,"t",env))()
+          local recycled=assert(emitted["mir5-override-recycling"])
+          assert(#recycled.categories == 1 and recycled.categories[1] == "recycling")
+          assert(recycled.maximum_productivity == .5)
+          assert(recycled.results[1].probability == .25)
+        ''')
+
     def test_data_stage_rejects_each_exact_native_only_witness_difference(self):
         for opponent in ("ordinary-cap", "recycling-field", "parameter", "receiver", "pipeline", "power"):
             with self.subTest(opponent=opponent):

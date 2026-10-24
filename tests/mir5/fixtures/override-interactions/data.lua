@@ -16,7 +16,7 @@ ordinary.allow_quality = false
 ordinary.allowed_module_categories = {"speed"}
 
 local recycled = {
-  type="recipe", name=prefix .. "recycling", category="recycling", enabled=true,
+  type="recipe", name=prefix .. "recycling", categories={"recycling"}, enabled=true,
   hidden=true, unlock_results=false, maximum_productivity=0.5,
   ingredients={{type="item", name="iron-plate", amount=1}},
   results={{type="item", name="iron-plate", amount=1, probability=0.25}}
