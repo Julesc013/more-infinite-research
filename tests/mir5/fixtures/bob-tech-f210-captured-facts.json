@@ -2,6 +2,7 @@
   "schema": 1,
   "kind": "mir5-f210-bobtech-angel-smelting-three-material-source-contract",
   "evidence_kind": "published-4.7.2-source-and-preserved-f210-qualification-fixtures; not a MIR5 native result",
+  "historical_input_source_commit": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",
   "profile": "fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json",
   "profile_sha256": "5ABF93B0727247FA81C88628DAA1A436A53C7A442F0DAECD32DAA2980203B4C7",
   "published_source": {
