@@ -1,0 +1,16 @@
+{
+  "name": "mir-fixture-mir5-sif-science-retirement-f210",
+  "version": "0.2.0",
+  "title": "MIR 5 private SIF F210 successor fixture",
+  "author": "MIR maintainers",
+  "description": "Private Space Is Fake continuation-retirement fixture; never a player package.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "space-age = 2.1.23",
+    "space-is-fake = 1.0.78",
+    "cr-commons = 1.0.33",
+    "cr-extras = 1.0.01",
+    "more-infinite-research = 5.0.21000"
+  ]
+}
