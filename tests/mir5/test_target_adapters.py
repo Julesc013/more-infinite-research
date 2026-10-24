@@ -18,6 +18,9 @@ class TargetAdapterTests(unittest.TestCase):
           package.preload["__more-infinite-research__/research/generator"] = function()
             return require("research.generator")
           end
+          package.preload["__more-infinite-research__/platform/target"] = function()
+            return assert(loadfile(player_root .. "/platform/target.lua"))()
+          end
           package.preload["__more-infinite-research__.api.v1.data"] = function()
             return assert(loadfile(player_root .. "/api/v1/data.lua"))()
           end
@@ -32,8 +35,10 @@ class TargetAdapterTests(unittest.TestCase):
 
           function load_data_api(metadata)
             package.loaded["platform.target"] = nil
+            package.loaded["__more-infinite-research__/platform/target"] = nil
             package.loaded["__more-infinite-research__.api.v1.data"] = nil
             package.preload["platform.target"] = function() return metadata end
+            package.preload["__more-infinite-research__/platform/target"] = function() return metadata end
             return require("__more-infinite-research__.api.v1.data")
           end
 
