@@ -4,7 +4,7 @@
 # this script. Spec fields: engine, engine_sha256, archive_library, workroot,
 # seed_save, seed_sha256, server_config, server_settings, server_write_data,
 # port, rcon_port, rcon_password, clients, expected_screenshots. Screenshot
-# entries are absolute client write-data patterns: availability/initial/rejoin/restart-*.png
+# entries are absolute client write-data patterns: availability/initial/settled/rejoin/restart-*.png
 # for each locale.
 [CmdletBinding()]
 param(
@@ -328,6 +328,13 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
     Assert-LibraryWitnessBoolean $witness 'two_connected_clients_required' $true $Stage
     Assert-LibraryWitnessBoolean $witness 'distinct_personal_query_and_selection' $true $Stage
     Assert-LibraryWitnessBoolean $witness 'initial_native_snapshot_immutable' $true $Stage
+    Assert-LibraryWitnessBoolean $witness 'initial_settled_without_reopen' ($Stage -cne 'ready') $Stage
+    $settleTicks = $witness.PSObject.Properties['initial_settle_ticks']
+    if ($Stage -ceq 'ready') {
+      Assert-Session ($null -eq $settleTicks) "$Stage Library witness initial_settle_ticks must be omitted"
+    } else {
+      Assert-LibraryWitnessInteger $witness 'initial_settle_ticks' 60 $Stage
+    }
     $base = $witness.PSObject.Properties['base_version']
     $mir = $witness.PSObject.Properties['mir_version']
     Assert-Session ($null -ne $base -and $base.Value -is [string] -and $base.Value -ceq '2.0.77' -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq '5.0.20000') "$Stage Library witness version differs"
@@ -351,7 +358,7 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
       Assert-LibraryWitnessBoolean $witness 'first_open' $true $Stage
       Assert-LibraryWitnessBoolean $witness 'search' $true $Stage
       Assert-LibraryWitnessBoolean $witness 'refresh' $true $Stage
-      $captures=if($Stage-ceq'rejoin-ready'){4}elseif($Stage-ceq'restart-ready'){6}else{8}
+      $captures=if($Stage-ceq'rejoin-ready'){6}elseif($Stage-ceq'restart-ready'){8}else{10}
       Assert-LibraryWitnessInteger $witness 'screenshot_calls' $captures $Stage
       Assert-LibraryWitnessBoolean $witness 'availability_terminal_labels_checked' $true $Stage
       if($Stage-cne'rejoin-ready'){Assert-LibraryWitnessBoolean $witness 'reopen' $true $Stage}
@@ -385,7 +392,7 @@ function Find-Screenshots([string[]]$Stages) {
     if ($matches.Count -ne 1) { return $null }
     $path = Resolve-BuildInput $matches[0].FullName 'Leaf' 'captured screenshot'
     if (-not (Test-Png1280x720 $path)) { return $null }
-    $match = [regex]::Match($matches[0].Name, '^(availability|initial|rejoin|restart)-([12])[.]png$')
+    $match = [regex]::Match($matches[0].Name, '^(availability|initial|settled|rejoin|restart)-([12])[.]png$')
     Assert-Session $match.Success 'captured screenshot filename differs'
     if ($indices.ContainsKey($expected.client) -and $indices[$expected.client] -ne $match.Groups[2].Value) {
       throw "screenshot player index changed for $($expected.client)"
@@ -393,7 +400,7 @@ function Find-Screenshots([string[]]$Stages) {
     $indices[$expected.client] = $match.Groups[2].Value
     $files.Add($path)
   }
-  if ($Stages.Count -eq 4) {
+  if ($Stages.Count -eq 5) {
     Assert-Session ($indices.Count -eq 2 -and (@($indices.Values | Select-Object -Unique)).Count -eq 2) 'client screenshot player indexes are not distinct and stable'
   }
   return [pscustomobject]@{files=@($files);indexes=$indices}
@@ -470,16 +477,16 @@ $sessionPath = Resolve-BuildOutput (Join-Path $workroot 'session.json') 'session
 $screenshotPatterns = [Collections.Generic.List[object]]::new()
 $patterns = @($spec.expected_screenshots | ForEach-Object { Resolve-BuildOutput ([string]$_) 'expected screenshot pattern' })
 if($fixtureCase-ceq'library-multiplayer') {
- Assert-Session ($patterns.Count -eq 8 -and (@($patterns | Select-Object -Unique)).Count -eq 8) 'session requires eight distinct screenshot patterns'
+ Assert-Session ($patterns.Count -eq 10 -and (@($patterns | Select-Object -Unique)).Count -eq 10) 'session requires ten distinct screenshot patterns'
  foreach ($client in $clients) {
   $root = [IO.Path]::GetFullPath((Join-Path $client.write_data 'script-output/mir5-library-multiplayer'))
   $clientPatterns = @($patterns | Where-Object { Test-Within $root $_ })
-  Assert-Session ($clientPatterns.Count -eq 4) "client $($client.name) requires four local screenshot patterns"
+  Assert-Session ($clientPatterns.Count -eq 5) "client $($client.name) requires five local screenshot patterns"
   $stages = [Collections.Generic.List[string]]::new()
   foreach ($pattern in $clientPatterns) {
     $relative = [IO.Path]::GetRelativePath($root, $pattern)
     $leaf = [IO.Path]::GetFileName($pattern)
-    $name = [regex]::Match($leaf, '^(availability|initial|rejoin|restart)-[*][.]png$')
+    $name = [regex]::Match($leaf, '^(availability|initial|settled|rejoin|restart)-[*][.]png$')
     Assert-Session ($name.Success -and $relative -ceq $leaf) "screenshot pattern differs for $($client.name)"
     $null = $stages.Add($name.Groups[1].Value)
     $parent = [IO.Path]::GetDirectoryName($pattern)
@@ -488,9 +495,9 @@ if($fixtureCase-ceq'library-multiplayer') {
     }
     $screenshotPatterns.Add([pscustomobject]@{client=$client.name;stage=$name.Groups[1].Value;path=$pattern;leaf=$leaf})
   }
-  Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'availability,initial,rejoin,restart') "client $($client.name) screenshot stages differ"
+  Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'availability,initial,rejoin,restart,settled') "client $($client.name) screenshot stages differ"
  }
- Assert-Session ($screenshotPatterns.Count -eq 8) 'screenshot patterns do not map exactly to the two clients'
+ Assert-Session ($screenshotPatterns.Count -eq 10) 'screenshot patterns do not map exactly to the two clients'
 } else {
  Assert-Session ($patterns.Count-eq0) 'scripted-effects gameplay case must not claim Library screenshots'
 }
@@ -531,6 +538,7 @@ try {
   if($fixtureCase-ceq'library-multiplayer') {
     [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
     [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
+    [void](Wait-For 'complete settled client screenshots' { Find-Screenshots @('settled') })
   }
   # Stop our clients before clearing their server peers. A live kicked client
   # logs the expected disconnect as an engine Error, which must not be confused
@@ -558,13 +566,16 @@ try {
   $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 }
   Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true) 'completed witness lacks host-reload evidence'
   if($fixtureCase-ceq'library-multiplayer') {
-    Assert-Session ($completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 8) 'completed witness lacks Availability evidence'
+    Assert-Session ($completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 10) 'completed witness lacks Availability evidence'
   }
   $captures = Wait-For 'complete final save and client screenshots' {
-    $screens = if($fixtureCase-ceq'library-multiplayer'){Find-Screenshots @('availability','initial','rejoin','restart')}else{[pscustomobject]@{files=@()}}
+    $screens = if($fixtureCase-ceq'library-multiplayer'){Find-Screenshots @('availability','initial','settled','rejoin','restart')}else{[pscustomobject]@{files=@()}}
     if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }; return $false
   }
   $screenshots = @($captures.files)
+  if ($fixtureCase -ceq 'library-multiplayer') {
+    Assert-Session ($screenshots.Count -eq 10) 'final screenshot inventory differs'
+  }
   $result = [ordered]@{
     schema=1;kind=$(if($fixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerSessionV1'}else{'MIR5ScriptedEffectsMultiplayerSessionV1'});case=$fixtureCase;status='passed-private-two-client-session'
     engine_sha256=(Get-SessionHash $engine); seed_sha256=$seedHash; restart_save_sha256=$restartHash

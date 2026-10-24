@@ -416,6 +416,8 @@ local function marker(stage, state)
       mir_version=script.active_mods["more-infinite-research"],
       actual_join_events=state.join_events,
       screenshot_calls=state.screenshot_calls,
+      initial_settled_without_reopen=state.initial_settled_tick ~= nil,
+      initial_settle_ticks=state.initial_settled_tick and state.initial_settled_tick - state.initial_capture_tick,
       first_open=state.measurements.first_open,
       search=state.measurements.search,
       refresh=state.measurements.refresh,
@@ -624,6 +626,32 @@ local function complete_foreign_force_refresh(state)
   local english, german = live_players(state)
   screenshot(state, "initial", english)
   screenshot(state, "initial", german)
+  -- Preserve the original capture, then observe the same objects after the
+  -- native GUI has had time to settle. Reopening here would conceal an
+  -- initial-layout defect. This delay never changes the laboratory deadline.
+  state.initial_capture_tick = game.tick
+  state.phase = "settling-initial-view"
+  state.capture_after_tick = game.tick + 60
+end
+
+local function capture_settled_initial_view(state)
+  assert_completed_gear(state, game.forces.player)
+  assert_native(state, game.forces.player)
+  assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
+  local english, german = live_players(state)
+  screenshot(state, "settled", english)
+  screenshot(state, "settled", german)
+  state.initial_settled_tick = game.tick
+  -- Hold the view while the asynchronous screenshots render, before the
+  -- controller is allowed to disconnect either client for the rejoin stage.
+  state.phase = "capturing-settled-initial-view"
+  state.capture_after_tick = game.tick + 60
+end
+
+local function finish_initial_capture(state)
+  assert_native(state, game.forces.player)
+  assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
+  state.capture_after_tick = nil
   state.phase = "awaiting-rejoin"
   marker("rejoin-ready", state)
 end
@@ -816,6 +844,10 @@ script.on_event(defines.events.on_tick, function()
   elseif state.phase == "awaiting-foreign-force-refresh" then
     if game.tick >= state.live_deadline then fail("native foreign-force refresh exceeded deadline") end
     if game.tick >= (state.refresh_after_tick or game.tick) then complete_foreign_force_refresh(state) end
+  elseif state.phase == "settling-initial-view" and game.tick >= state.capture_after_tick then
+    capture_settled_initial_view(state)
+  elseif state.phase == "capturing-settled-initial-view" and game.tick >= state.capture_after_tick then
+    finish_initial_capture(state)
   elseif state.phase == "awaiting-rejoin" then
     local english, german = pair(state, 2)
     if english and german then run_rejoin(state, english, german) end
