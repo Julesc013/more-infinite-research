@@ -25,6 +25,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_override_interactions_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_armor_py_catalogue.py';lua=$true},
   [ordered]@{path='tests/mir5/test_native_modded_continuations.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_integration_catalogue_upgrade_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_angel_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_angel_prototype_caps.py';lua=$true},
   [ordered]@{path='tests/mir5/test_atan_productivity.py';lua=$true},

@@ -1,4 +1,10 @@
-"""Selection and wrapper controls for the private MIR 5 host lane only."""
+"""The authoritative MIR 5 host-plan and workflow contracts.
+
+The prior assertions exercised MIR 4 assurance classification and development
+routing.  Canonical cutover replaces that affected-path lane with this full,
+checkout-bound host gate for every dev/main change, so those assertions are no
+longer relevant to the delivered host controls.
+"""
 import json
 from pathlib import Path
 import subprocess
@@ -7,6 +13,8 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 WRAPPER = ROOT / "tests/mir5/Test-MIR5HostControls.ps1"
+WORKFLOW = ROOT / ".github/workflows/mir5.yml"
+VALIDATE_WORKFLOW = ROOT / ".github/workflows/validate.yml"
 
 
 def run_powershell(arguments: list[str]) -> subprocess.CompletedProcess[str]:
@@ -19,73 +27,13 @@ def run_powershell(arguments: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
-def selections() -> dict[str, dict]:
-    command = r'''
-      $ErrorActionPreference = 'Stop'
-      $repo = (Resolve-Path -LiteralPath '.').Path
-      $script:Args = @()
-      . ./tools/lib/assurance/Core.ps1
-      $assurance = Get-Content -Raw -LiteralPath .mir/assurance.json | ConvertFrom-Json -Depth 100
-      $paths = @(
-        'source/mir5/control.lua', 'targets/mir5/README.md', 'tests/mir5/test_generator.py',
-        'tools/mir5/package.py', 'spec/mir5/verification.md', 'sdk/mir5/README.md',
-        '.github/workflows/mir5.yml', 'docs/mir5/README.md', 'source/prototypes/mir/core/deepcopy.lua',
-        '.gitattributes', 'unowned/mir5-selection-opponent.txt'
-      )
-      $result = [ordered]@{}
-      foreach ($path in $paths) { $result[$path] = Get-MIRAssuranceClassification -Paths @($path) -Config $assurance }
-      $result | ConvertTo-Json -Depth 20 -Compress
-    '''
-    return json.loads(run_powershell(["-Command", command]).stdout)
-
-
-def development_routes() -> dict[str, dict]:
-    command = r'''
-      $ErrorActionPreference = 'Stop'
-      $repo = (Resolve-Path -LiteralPath '.').Path
-      . ./tools/mir/application/assurance/DevelopmentValidation.ps1
-      . ./tools/lib/assurance/Core.ps1
-      $catalog = Get-Content -Raw -LiteralPath validation/tests.yml | ConvertFrom-Json
-      $assurance = Get-Content -Raw -LiteralPath .mir/assurance.json | ConvertFrom-Json -Depth 100
-      $profile = 'mir4-development'
-      $local = Get-MIR4DevelopmentCISelection -RepoRoot $repo -Mode local-current-profile
-      $packageSourceFiles = @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
-      $paths = [ordered]@{
-        mir5 = 'source/mir5/control.lua'
-        docs = 'docs/mir5/README.md'
-        legacy = 'source/prototypes/mir/core/deepcopy.lua'
-        unknown = 'unowned/mir5-selection-opponent.txt'
-      }
-      $routes = [ordered]@{}
-      foreach ($entry in $paths.GetEnumerator()) {
-        $classification = Get-MIRAssuranceClassification -Paths @([string]$entry.Value) -Config $assurance
-        $rows = @(Select-MIR4DevelopmentAffectedStaticRows -Classification $classification -Catalog $catalog -Assurance $assurance -Profile $profile -PackageSourceFiles $packageSourceFiles)
-        $selection = [ordered]@{
-          baseline = ('a' * 40)
-          baseline_state = 'resolved'
-          classification = $classification
-          tests = @($rows | ForEach-Object { [string]$_.id })
-        }
-        $routes[[string]$entry.Key] = [ordered]@{
-          classification = $classification
-          selected_tests = @($selection.tests)
-          initial_plan = Get-MIR4DevelopmentInitialPlanProfile -Selection $selection
-        }
-      }
-      [ordered]@{
-        local = [ordered]@{ tests = @($local.tests); trust_scope = $local.trust_scope }
-        routes = $routes
-      } | ConvertTo-Json -Depth 30 -Compress
-    '''
-    return json.loads(run_powershell(["-Command", command]).stdout)
-
-
 class HostControlsTests(unittest.TestCase):
     def test_wrapper_has_one_explicit_current_host_control_plan(self):
         plan_command = "& { ./tests/mir5/Test-MIR5HostControls.ps1 -Plan } | ConvertTo-Json -Depth 20 -Compress"
         plan = json.loads(run_powershell(["-Command", plan_command]).stdout)
         self.assertEqual(plan["kind"], "MIR5HostControlsPlanV1")
         self.assertFalse(plan["native_execution"])
+        self.assertFalse(plan["release_qualification"])
         controls = plan["controls"]
         paths = [row["path"] for row in controls]
         self.assertEqual(paths, [
@@ -106,6 +54,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_override_interactions_fixture.py",
             "tests/mir5/test_armor_py_catalogue.py",
             "tests/mir5/test_native_modded_continuations.py",
+            "tests/mir5/test_integration_catalogue_upgrade_fixture.py",
             "tests/mir5/test_bob_angel_native_fixture.py",
             "tests/mir5/test_bob_angel_prototype_caps.py",
             "tests/mir5/test_atan_productivity.py",
@@ -177,7 +126,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/mir5/test_host_controls.py",
             "tools/mir5/check_pack.py",
         ])
-        self.assertEqual(len(paths), 87)
+        self.assertEqual(len(paths), 88)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/mir5/check_pack.py")
         self.assertIn("tests/mir5/test_sdk.py", paths)
@@ -196,77 +145,50 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("tests/mir5/test_settings_commands.py", paths)
         self.assertIn("tests/mir5/test_host_controls.py", paths)
         self.assertFalse(any("test_cutover.py" in path or "test_adoption.py" in path for path in paths))
-        self.assertTrue(all(row["lua"] for row in controls[:77]))
-        self.assertTrue(all(not row["lua"] for row in controls[77:]))
+        self.assertTrue(all(set(row) == {"path", "lua"} for row in controls))
+        self.assertTrue(all(row["lua"] for row in controls[:78]))
+        self.assertTrue(all(not row["lua"] for row in controls[78:]))
 
-    def test_mir5_is_narrow_while_docs_legacy_and_unknown_selection_remain_governed(self):
-        result = selections()
-        mir5_paths = [
-            "source/mir5/control.lua", "targets/mir5/README.md", "tests/mir5/test_generator.py",
-            "tools/mir5/package.py", "spec/mir5/verification.md", "sdk/mir5/README.md",
-            ".github/workflows/mir5.yml",
-        ]
-        for path in mir5_paths:
-            self.assertEqual(result[path]["classes"], ["mir5-host-controls"], path)
-            self.assertEqual(result[path]["tests"], ["static.mir5-host-controls"], path)
-            self.assertFalse(result[path]["escalated"], path)
+    def test_workflow_runs_the_full_host_gate_for_every_dev_main_change(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("name: MIR 5 host controls", workflow)
+        self.assertIn("push:\n    branches:\n      - dev\n      - main", workflow)
+        self.assertIn("pull_request:\n    branches:\n      - dev\n      - main", workflow)
+        self.assertNotIn("paths:", workflow)
+        self.assertIn("verification-plan:\n    name: verification-plan", workflow)
+        self.assertIn("host-controls:\n    name: host-controls\n    needs: verification-plan", workflow)
+        self.assertIn("git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1", workflow)
+        self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
+        self.assertIn("actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065", workflow)
+        self.assertIn("python-version: '3.14'", workflow)
+        self.assertIn("lupa==2.6 --hash=sha256:b74f944fe46c421e25d0f8692aef1e842192f6f7f68034201382ac440ef9ea67", workflow)
+        self.assertIn("lua52.cp314-win_amd64.pyd", workflow)
+        self.assertNotIn("PackageAuthority", workflow)
+        self.assertNotIn("TargetMaterializer", workflow)
+        self.assertNotIn("DevelopmentValidation", workflow)
+        self.assertNotIn("tools/lib/assurance", workflow)
 
-        docs = result["docs/mir5/README.md"]
-        self.assertEqual(docs["classes"], ["repository-docs"])
-        self.assertEqual(docs["tests"], ["docs.check"])
-        self.assertFalse(docs["escalated"])
+        # The legacy matrix no longer provisions a second MIR5 host campaign.
+        self.assertNotIn("static.mir5-host-controls", VALIDATE_WORKFLOW.read_text(encoding="utf-8"))
 
-        legacy_source = result["source/prototypes/mir/core/deepcopy.lua"]
-        self.assertIn("mir4-package-source-editable-materializer", legacy_source["classes"])
-        self.assertIn("mir4-package-source-authority-cutover", legacy_source["classes"])
-        self.assertNotIn("mir5-host-controls", legacy_source["classes"])
-
-        attributes = result[".gitattributes"]
-        self.assertIn("mir4-bootstrap", attributes["classes"])
-        self.assertNotIn("mir5-host-controls", attributes["classes"])
-
-        unknown = result["unowned/mir5-selection-opponent.txt"]
-        self.assertTrue(unknown["escalated"])
-        self.assertIn("unknown", unknown["classes"])
-        self.assertEqual(
-            unknown["tests"],
-            ["runtime.ecosystem", "runtime.full", "runtime.upgrade", "static.full"],
+    def test_workflow_binds_and_reads_back_the_exact_plan_before_controls_run(self):
+        workflow = WORKFLOW.read_text(encoding="utf-8")
+        self.assertIn("kind = 'MIR5HostGatePlanV1'", workflow)
+        self.assertIn("git rev-parse HEAD", workflow)
+        self.assertIn("git rev-parse 'HEAD^{tree}'", workflow)
+        self.assertIn("driver = [ordered]@{ path = $driver; sha256 = $driverHash }", workflow)
+        self.assertIn("controls = $controls", workflow)
+        self.assertIn("Get-FileHash -LiteralPath $outputPath -Algorithm SHA256", workflow)
+        self.assertIn("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a", workflow)
+        self.assertIn("actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c", workflow)
+        self.assertIn("needs.verification-plan.outputs.plan_sha256", workflow)
+        self.assertIn("Bound MIR5 host plan does not describe this checkout.", workflow)
+        self.assertIn("Bound MIR5 host driver hash differs.", workflow)
+        self.assertIn("Bound MIR5 host control differs at index", workflow)
+        self.assertLess(
+            workflow.index("Bind the exact ordered host-control plan"),
+            workflow.index("Run the bound MIR5 host controls"),
         )
-        self.assertNotIn("static.mir5-host-controls", unknown["tests"])
-
-    def test_development_selector_profile_and_initial_plan_keep_mir5_and_opponents_governed(self):
-        routes = development_routes()
-        local = routes["local"]
-        self.assertEqual(local["trust_scope"], "local-development-authoring")
-        self.assertEqual(local["tests"].count("static.mir5-host-controls"), 1)
-
-        mir5 = routes["routes"]["mir5"]
-        self.assertEqual(mir5["classification"]["tests"], ["static.mir5-host-controls"])
-        self.assertFalse(mir5["classification"]["escalated"])
-        self.assertEqual(mir5["selected_tests"], ["static.mir5-host-controls"])
-        self.assertEqual(mir5["initial_plan"]["profile"], "auto")
-        self.assertTrue(mir5["initial_plan"]["use_affected_selection"])
-        self.assertTrue(mir5["initial_plan"]["selection_rows_covered_by_auto"])
-
-        docs = routes["routes"]["docs"]
-        self.assertEqual(docs["classification"]["tests"], ["docs.check"])
-        self.assertFalse(docs["classification"]["escalated"])
-        self.assertIn("docs.check", docs["selected_tests"])
-        self.assertIn("static.mir5-host-controls", docs["selected_tests"])
-        self.assertEqual(docs["initial_plan"]["profile"], "mir4-development")
-
-        legacy = routes["routes"]["legacy"]
-        self.assertFalse(legacy["classification"]["escalated"])
-        self.assertIn("static.architecture", legacy["selected_tests"])
-        self.assertNotIn("static.mir5-host-controls", legacy["selected_tests"])
-        self.assertEqual(legacy["initial_plan"]["profile"], "mir4-development")
-
-        unknown = routes["routes"]["unknown"]
-        self.assertTrue(unknown["classification"]["escalated"])
-        self.assertEqual(unknown["selected_tests"], local["tests"])
-        self.assertIn("static.mir5-host-controls", unknown["selected_tests"])
-        self.assertEqual(unknown["initial_plan"]["profile"], "mir4-development")
-        self.assertFalse(unknown["initial_plan"]["use_affected_selection"])
 
 
 if __name__ == "__main__":

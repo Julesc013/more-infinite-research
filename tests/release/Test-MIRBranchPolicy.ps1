@@ -19,7 +19,7 @@ $branches = @{
   dev = @{
     FactorioVersion = "2.1"
     BaseDependencyPattern = "^base\s+>=\s+2\.1(\.|$)"
-    Description = "next-minor or next-major MIR 4 integration line"
+    Description = "next-minor or next-major MIR integration line"
   }
   "release/4.0" = @{
     FactorioVersion = "2.1"
@@ -53,7 +53,17 @@ function Test-GitRefExists {
 function Read-InfoJsonFromRef {
   param([string]$Ref)
   $rootInfo = 'info.json'
+  $nativeInfo = 'source/info.json'
+  $nativeTargets = 'targets/editions.json'
   $composedInfo = 'source/presentation/f210/info.json.template'
+  & git -C $repo cat-file -e "$Ref`:$nativeInfo" 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    & git -C $repo cat-file -e "$Ref`:$nativeTargets" 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "$Ref has native source without its edition record." }
+    $targets = ((Invoke-Git show "$Ref`:$nativeTargets") -join "`n") | ConvertFrom-Json
+    if ($null -eq $targets) { throw "$Ref has an unreadable native edition record." }
+    return ((Invoke-Git show "$Ref`:$nativeInfo") -join "`n") | ConvertFrom-Json
+  }
   & git -C $repo cat-file -e "$Ref`:$rootInfo" 2>$null
   $hasRootInfo = $LASTEXITCODE -eq 0
   if ($hasRootInfo) {

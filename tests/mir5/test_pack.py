@@ -49,21 +49,6 @@ def local_closure(roots):
 
 
 class PackTests(unittest.TestCase):
-    def test_frozen_import_custody_metadata_remains_well_formed(self):
-        current = json.loads((ROOT / "tools/mir5/adoption/pack_members.json").read_text(encoding="utf-8"))
-        frozen = json.loads((ROOT / "tools/mir5/adoption/base_members.json").read_text(encoding="utf-8"))
-        self.assertEqual(current["format"], 1)
-        self.assertEqual(frozen["format"], 1)
-        self.assertEqual(frozen["purpose"], "preimages-of-user-uploaded-pack-not-live-repo-authority")
-        self.assertEqual(len(current["files"]), len(set(current["files"])))
-        self.assertTrue(all((ROOT / path).is_file() for path in current["files"]))
-        self.assertIn("tools/mir5/adoption/base_members.json", current["files"])
-        self.assertIn("tools/mir5/adoption/pack_members.json", current["files"])
-        self.assertGreater(len(frozen["files"]), 0)
-        for path, digest in frozen["files"].items():
-            self.assertRegex(path, r"^(?!/)(?!.*(?:^|/)\.\.(?:/|$)).+")
-            self.assertRegex(digest, r"^[0-9a-f]{64}$")
-
     def test_player_package_admits_only_native_files_and_all_locale_assets(self):
         _, members = package.members(PLAYER)
         admitted = {path for path, _ in members}

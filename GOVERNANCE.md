@@ -8,11 +8,11 @@ MIR is governed by versioned machine authorities, independently reviewable evide
 - One change has one implementation.
 - One target has one explicit disposition.
 - One candidate has one complete certificate.
-- One mutation is planned, journalled, verified, and compensable.
+- One mutation has an explicit owner, bounded preflight and independently checked resulting behavior.
 - One proposition plus exact input set has one proof identity.
 - One published target is an independently qualified sealed package.
 
-The stable player compiler and emitter remain authoritative until a named cutover proves parity, records rollback, and is admitted. Preview, shadow, experimental, and omitted components cannot self-promote.
+The authored native-technology implementation and small Generator are the current player authority; the canonical source cutover requires complete package parity, current consumer closure and final native qualification. Preview, shadow, experimental, and omitted components cannot self-promote.
 
 ## Decision rights
 
@@ -22,10 +22,12 @@ Maintainers exclusively approve protected signing and recovery readiness, F210/F
 
 ## Change custody
 
-Branch roles are defined in [the branch authority](.mir/branches.yml) and explained in [Contributing](CONTRIBUTING.md). Next-minor and next-major implementation, feature work, and refactors target protected `dev` by pull request. Protected `main` serves the latest stable MIR 4.x line, bounded stable corrections, repository-governance maintenance, and exact qualified development promotions. MIR 4.0.x corrections target protected `release/4.0` under its patch contract.
+Current branch and publication roles are defined in [AGENTS.md](AGENTS.md) and explained in [Contributing](CONTRIBUTING.md). Next-minor and next-major implementation, feature work, and refactors target protected `dev` by pull request. Protected `main` serves the latest accepted stable line, bounded stable corrections, repository-governance maintenance, and exact qualified development promotions. MIR 4.0.x corrections target protected `release/4.0` under its patch contract.
 
 Routine implementation branches, public development pushes, pull requests, integration into `dev`, and primary-checkout synchronization are standing maintainer-authorized under [AGENTS.md](AGENTS.md). Required checks and enforced branch rules still apply; they are execution requirements, not a request for renewed routine permission. Source freeze, `main` promotion, signing and public release retain their separate acceptance and authorization requirements.
 
 Read back the protected target after integration and complete required forward-port dispositions. `main` and `dev` may intentionally differ during next-release development; `dev` is not a read-only mirror. Preserve dirty or uniquely valuable local work. Immutable release evidence is never rewritten; corrections are new events.
 
-See [Contributing](CONTRIBUTING.md), [Release runbook](docs/RELEASE-RUNBOOK.md), and [Project continuity](docs/PROJECT-CONTINUITY.md).
+See [Contributing](CONTRIBUTING.md), [Release runbook](docs/mir5/development.md#github-publication-after-acceptance), and [Project continuity](docs/mir5/progress.md).
+
+The maintainer explicitly authorizes MIR5 main promotion and GitHub publication only after complete acceptance, with unsigned canonical tagging when the enrolled key is unavailable. This does not authorize credential/control changes or substitute source checks for native evidence. The [MIR5 release procedure](docs/mir5/development.md#github-publication-after-acceptance) owns that route; original MIR4 seals and maintainer decisions remain historical evidence.
