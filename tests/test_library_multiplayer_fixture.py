@@ -56,8 +56,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local key="mir5_library_multiplayer"
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
-            local players, markers, screenshots, saves = {}, {}, {}, {}
-            local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0}
+            local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
+            local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
                 research_unit_count=1,research_unit_energy=60,
@@ -109,7 +109,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return spec.count
             end
             inventory.get_item_count=function(name) return inventory.counts[name] or 0 end
-            local lab={valid=true,energy=0}
+            local lab={valid=true,energy=0,active=true,status=19,electric_network_id=7}
             lab.get_inventory=function(index) assert(index==1);return inventory end
             game.surfaces[1].create_entity=function(spec)
               assert(spec.name=="lab" and spec.force==force)
@@ -263,7 +263,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3,on_research_started=4,
                 on_research_finished=6,on_research_cancelled=7,on_force_created=8},inventory={lab_input=1}},
               game=game,storage=storage,remote=remote,
-              helpers={table_to_json=function(value)markers[#markers+1]=value;return "{}" end},
+              helpers={table_to_json=function(value)
+                if value.science_counts then lab_diagnostics[#lab_diagnostics+1]=value
+                else markers[#markers+1]=value end
+                return "{}"
+              end},
               log=function(value)
                 if type(value)=="table" then
                   assert(value[1]=="" and value[2]=="[MIR5_LIBRARY_PROFILE] " and value[4]==" ")
@@ -274,7 +278,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 else
                   assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
                     or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_JOIN%] ")
-                    or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] "))
+                    or value:match("^%[MIR5_LIBRARY_MULTIPLAYER_LOCALE%] ")
+                    or value:match("^%[MIR5_LIBRARY_LAB_DIAGNOSTIC%] "))
                 end
               end,
             }
@@ -314,13 +319,24 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local live_ready=false
             for step=1,32 do
               game.tick=game.tick+1
-              if storage[key].phase=="researching-live-research" and force.current_research
+              if opponent~="lab-deadline" and storage[key].phase=="researching-live-research" and force.current_research
                   and (storage[key].finished==0 or (storage[key].finished==1 and storage[key].first_completion_seen)) then
                 ok,result=pcall(complete_mock_lab);if not ok then return {ok=false,message=tostring(result)} end
               end
               refresh_mock_gui(en);refresh_mock_gui(de)
               ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
               if storage[key].phase=="awaiting-rejoin" then live_ready=true;break end
+            end
+            if opponent=="lab-deadline" then
+              game.tick=storage[key].live_deadline
+              force.research_progress,force.research_enabled=.25,false
+              lab.energy,lab.active,lab.status=0,false,23
+              ok,result=call(callbacks.events[1])
+              return {ok=ok,message=result,lab_diagnostics=lab_diagnostics,
+                energy=lab.energy,active=lab.active,progress=force.research_progress,
+                research_enabled=force.research_enabled,queue_count=#force.research_queue,
+                level=force.technologies[gear].level,inventory_counts=inventory.counts,
+                finished=storage[key].finished}
             end
             if not live_ready then return {ok=false,message="actual Library refresh did not reach rejoin state"} end
             en.connected,de.connected=false,false
@@ -357,7 +373,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             return {ok=true,message="",phase=storage[key].phase,markers=markers,screenshots=screenshots,saves=saves,
               load_unchanged=load_unchanged,join_events=storage[key].join_events,measurements=storage[key].measurements,
-              profiler_logs=profiler_logs}
+              profiler_logs=profiler_logs,lab_diagnostics=lab_diagnostics}
           end
         ''')
 
@@ -414,6 +430,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual([row["label"] for row in result["profiler_logs"]],
                          ["first_open", "search", "refresh", "reopen"])
         self.assertEqual(len(result["screenshots"]), 8)
+        self.assertEqual([row["stage"] for row in result["lab_diagnostics"]], ["queued"])
         self.assertEqual(
             {stage: sum(f"/{stage}-" in item["path"] for item in result["screenshots"])
              for stage in ("availability", "initial", "rejoin", "restart")},
@@ -425,6 +442,25 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             self.assertTrue(screenshot["force_render"])
             self.assertEqual(screenshot["resolution"], [1280, 720])
             self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
+
+    def test_lab_deadline_logs_native_state_without_repair_or_success(self):
+        result = self.run_case("lab-deadline")
+        self.assertFalse(result["ok"])
+        self.assertIn("actual Library refresh laboratory exceeded deadline", result["message"])
+        self.assertEqual([row["stage"] for row in result["lab_diagnostics"]], ["queued", "deadline"])
+        snapshot = result["lab_diagnostics"][-1]
+        self.assertEqual(snapshot["phase"], "researching-live-research")
+        self.assertEqual((snapshot["started"], snapshot["finished"]), (1, 0))
+        self.assertEqual(snapshot["lab"], {"valid": True, "active": False, "energy": 0,
+                                         "status": 23, "electric_network_id": 7})
+        self.assertEqual(snapshot["research"], {"enabled": False, "current": "recipe-prod-research_gears-1",
+            "progress": .25, "queue_count": 2, "queue": ["recipe-prod-research_gears-1"] * 2})
+        self.assertEqual(snapshot["gear"], {"level": 1, "enabled": True, "count": 1, "energy": 60})
+        self.assertEqual(snapshot["science_counts"], result["inventory_counts"])
+        self.assertEqual(set(snapshot["science_counts"].values()), {2})
+        self.assertEqual((result["energy"], result["active"], result["progress"], result["research_enabled"],
+                          result["queue_count"], result["level"], result["finished"]),
+                         (0, False, .25, False, 2, 1, 0))
 
     def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
         result = self.run_case()
