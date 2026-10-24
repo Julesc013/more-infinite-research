@@ -446,50 +446,6 @@ class LibraryTests(unittest.TestCase):
             "metadata reuse changed native research state")
         ''')
 
-    def test_authored_catalogue_builds_lazily_once_until_configuration_changes(self):
-        self.lua.execute(r'''
-          local catalogue = require("research.catalogue")
-          local original, builds, family = catalogue.declared, 0, "mir"
-          catalogue.declared = function()
-            builds = builds + 1
-            local rows = original()
-            rows[1].family = family
-            return rows
-          end
-          boot()
-          library.on_init(); library.on_load()
-          assert(builds == 0, "closed Library constructed authored catalogue during parse/init/load")
-          local queue, current, progress = player.force.research_queue,
-            player.force.current_research, player.force.research_progress
-          local root = library.open(player, {selected=gear.name})
-          assert(builds == 1, "one Library open rebuilt authored catalogue "..builds.." times")
-          local model = require("presentation.library_model")
-          local original_rows, observed_level = model.rows, nil
-          model.rows = function(force, ...)
-            observed_level = force.technologies[gear.name].level
-            return original_rows(force, ...)
-          end
-          gear.level = 4
-          local query = root["mir_library_filters"]["mir_library_query"]
-          query.text = "gear"
-          library.on_gui_text_changed({player_index=1,element=query})
-          library.close(player)
-          library.open(player)
-          assert(builds == 1, "refresh/reopen rebuilt unchanged authored metadata")
-          assert(observed_level == 4, "metadata cache retained stale native research facts")
-
-          library.close(player)
-          family = "research_updated"
-          library.on_configuration_changed()
-          assert(builds == 1, "configuration rebuilt metadata for a closed Library")
-          library.open(player, {family=family})
-          assert(builds == 2 and storage.mir_library.players[1].family == family,
-            "configuration retained stale authored metadata")
-          assert(player.force.research_queue == queue and player.force.current_research == current
-            and player.force.research_progress == progress,
-            "metadata reuse changed native research state")
-        ''')
-
     def test_requested_view_fits_scaled_display_wraps_details_and_converts_native_ticks(self):
         self.lua.execute(r'''
           boot()
