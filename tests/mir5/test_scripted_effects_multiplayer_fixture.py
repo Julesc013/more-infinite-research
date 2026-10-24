@@ -21,6 +21,29 @@ class ScriptedEffectsMultiplayerFixtureTests(unittest.TestCase):
     def setUpClass(cls):
         cls.lua = LuaRuntime(unpack_returned_tuples=True)
 
+    def test_delayed_native_locale_is_waited_for_and_persistent_mismatch_rejects(self):
+        source = CONTROL.read_text(encoding="utf-8")
+        body = source.split("local function two_connected_clients(state)\n", 1)[1].split("\nend\n", 1)[0]
+        run = self.lua.execute('''
+          return function(body)
+            local clients = {
+              MIR5English={valid=true,index=1,connected=true,locale="en"},
+              MIR5Deutsch={valid=true,index=2,connected=true,locale="en"}}
+            local env={EXPECTED_CLIENTS={MIR5English="en",MIR5Deutsch="de"}, game={tick=10},
+              player_for_name=function(name)return clients[name]end, fail=function(message)error(message)end}
+            setmetatable(env,{__index=_G})
+            local check=assert(load("return function(state)\\n"..body.."\\nend", "locale", "t", env))()
+            local state={last_join_tick=10}
+            local pending=check(state)
+            clients.MIR5Deutsch.locale="de"
+            local delivered=check(state)
+            clients.MIR5Deutsch.locale="en";env.game.tick=611
+            local persistent_ok=pcall(check,state)
+            return pending,delivered,persistent_ok
+          end
+        ''')
+        self.assertEqual(run(body), (False, True, False))
+
     def test_profile_and_fixture_pin_the_exact_f200_space_age_closure(self):
         profile = json.loads(PROFILE.read_text(encoding="utf-8"))
         info = json.loads((FIXTURE / "info.json").read_text(encoding="utf-8"))
@@ -224,7 +247,6 @@ class ScriptedEffectsMultiplayerFixtureTests(unittest.TestCase):
                 self.assertNotIn(forbidden, source)
 
         self.assertIn('if not player or player.connected ~= true then return false end', source)
-        self.assertIn('if player.locale ~= locale then fail("client locale differs for " .. name) end', source)
         self.assertIn('if state.join_events == 4 and two_connected_clients(state) then seed_restart_repair(state) end', source)
         self.assertIn('if state.join_events ~= 6 or not two_connected_clients(state)', source)
         self.assertIn('comparison.set_friend(player, true)', source)

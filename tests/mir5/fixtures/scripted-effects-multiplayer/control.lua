@@ -61,7 +61,14 @@ local function two_connected_clients(state)
     local player = player_for_name(name)
     if not player or player.connected ~= true then return false end
     if player.locale == nil then return false end
-    if player.locale ~= locale then fail("client locale differs for " .. name) end
+    if player.locale ~= locale then
+      -- Native locale delivery can follow the actual join event. Wait for
+      -- that delivery, but reject a persistent mismatch within a fixed bound.
+      if state.last_join_tick and game.tick > state.last_join_tick + 600 then
+        fail("client locale differs for " .. name)
+      end
+      return false
+    end
     if first_index == player.index then fail("two clients reused one player index") end
     first_index = player.index
   end
@@ -373,6 +380,7 @@ script.on_event(defines.events.on_player_joined_game, function(event)
   end
   state.client_joins[player.name] = (state.client_joins[player.name] or 0) + 1
   state.join_events = state.join_events + 1
+  state.last_join_tick = game.tick
   log("[MIR5_SCRIPTED_EFFECTS_MULTIPLAYER_JOIN] " .. player.name .. " " .. tostring(state.client_joins[player.name]))
 end)
 
