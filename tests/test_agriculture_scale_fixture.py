@@ -36,6 +36,7 @@ PAIRED_PROFILES = {
     "published": ROOT / "tests/profiles/agriculture-paired-published-f210-2123.json",
 }
 PUBLISHED_ARCHIVE_SHA = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+CANDIDATE_DEFAULT_ARCHIVE_SHA = "7B693B1715C46984AEC48EA84E7AA33D1A6ABFEBC36D1612BFF1B951B1227FB7"
 OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 F210_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F210_RUNTIME_API"),
@@ -98,7 +99,12 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             if opponent == "formula" then technology.unit.count_formula = "broken" end
             if opponent == "time" then technology.unit.time = 91 end
             if opponent == "ingredient" then technology.unit.ingredients[#science] = {"broken-pack", 1} end
+            if opponent == "ingredient-string" then technology.unit.ingredients[#science] = science[#science] end
+            if opponent == "ingredient-missing-amount" then technology.unit.ingredients[#science] = {science[#science]} end
             if opponent == "prerequisite" then technology.prerequisites[#science] = "broken-prerequisite" end
+            if opponent == "prerequisite-table" then technology.prerequisites[1] = {science[1], 1} end
+            if opponent == "candidate-missing-gate" then technology.prerequisites[#science] = "space-science-pack" end
+            if opponent == "candidate-duplicate-gate" then technology.prerequisites[#science + 1] = "promethium-science-pack" end
             if opponent == "effect" then technology.effects[1].effect_description[2] = "2" end
             if opponent == "candidate-disabled" then technology.enabled = false end
             if opponent == "published-enabled" then technology.enabled = true end
@@ -476,6 +482,23 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                     self.assertNotIn("archive_sha256", profile)
                     self.assertIn("twelve-science", profile["scope"])
 
+        candidate_default = json.loads((ROOT / "tests/profiles/agriculture-candidate-default-f210-2123.json")
+                                       .read_text(encoding="utf-8-sig"))
+        self.assertEqual(("mir5-agriculture-candidate-default-f210-prototype-capture-selection",
+                          "f210", "2.1", "2.1.23", ENGINE_SHA, "Defaults"),
+                         (candidate_default["kind"], candidate_default["target"],
+                          candidate_default["factorio_line"], candidate_default["engine"]["version"],
+                          candidate_default["engine"]["sha256"], candidate_default["settings_mode"]))
+        self.assertEqual(official + [("mir-fixture-mir5-active-mods-observer", "0.1.0")],
+                         [(row["name"], row["version"]) for row in candidate_default["mods"]])
+        self.assertEqual({
+            "more-infinite-research_5.0.20000.zip": CANDIDATE_DEFAULT_ARCHIVE_SHA,
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA,
+        }, candidate_default["archive_sha256"])
+        self.assertIn("no agriculture core, paired arm, policy selector", candidate_default["scope"].lower())
+        self.assertFalse(any(row["name"].startswith("mir-fixture-mir5-agriculture")
+                             for row in candidate_default["mods"]))
+
         paired_info = json.loads((FIXTURE / "paired" / "info.json").read_text(encoding="utf-8-sig"))
         self.assertEqual(["base = 2.1.23", "mir-fixture-mir5-agriculture-scale >= 0.1.0"],
                          paired_info["dependencies"])
@@ -511,7 +534,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         for opponent, expected in (("formula", "default agricultural research tuning"),
                                    ("time", "default agricultural research tuning"),
                                    ("ingredient", "science vector differs"),
-                                   ("prerequisite", "prerequisite vector differs"),
+                                   ("prerequisite", "candidate promethium prerequisite gate differs"),
                                    ("effect", "effect contract differs"),
                                    ("tier", "not an authored fixed tier")):
             with self.subTest(legacy_opponent=opponent):
@@ -532,7 +555,12 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 self.assertEqual(1, result["selected_tier"])
                 technology = result["raw"]["technology"]["recipe-prod-research_agricultural_growth_speed-1"]
                 self.assertEqual(science, [row[1] for row in technology["unit"]["ingredients"].values()])
-                self.assertEqual(science, [row for row in technology["prerequisites"].values()])
+                if arm == "published":
+                    self.assertEqual(PUBLISHED_SCIENCE,
+                                     [row for row in technology["prerequisites"].values()])
+                else:
+                    self.assertEqual(1, [row for row in technology["prerequisites"].values()]
+                                     .count("promethium-science-pack"))
                 self.assertEqual((1, None, 1),
                                  (technology["unit"].get("count"), technology["unit"].get("count_formula"),
                                   technology["unit"]["time"]))
@@ -549,11 +577,18 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             ("candidate", "formula", "default agricultural research tuning"),
             ("candidate", "time", "default agricultural research tuning"),
             ("candidate", "ingredient", "science vector differs"),
-            ("candidate", "prerequisite", "prerequisite vector differs"),
+            ("candidate", "ingredient-string", "science vector row is not a table"),
+            ("candidate", "ingredient-missing-amount", "science vector differs"),
+            ("candidate", "candidate-missing-gate", "promethium prerequisite gate differs"),
+            ("candidate", "candidate-duplicate-gate", "promethium prerequisite gate differs"),
+            ("candidate", "prerequisite-table", "candidate-mir5 prerequisite is not a string"),
             ("candidate", "effect", "effect contract differs"),
             ("candidate", "candidate-disabled", "must not be disabled"),
             ("published", "ingredient", "science vector differs"),
+            ("published", "ingredient-string", "science vector row is not a table"),
+            ("published", "ingredient-missing-amount", "science vector differs"),
             ("published", "prerequisite", "prerequisite vector differs"),
+            ("published", "prerequisite-table", "prerequisite vector differs"),
             ("published", "effect", "effect contract differs"),
             ("published", "published-enabled", "enabled/hidden omission"),
             ("published", "published-hidden", "enabled/hidden omission"),
@@ -565,6 +600,8 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 technology = result["raw"]["technology"]["recipe-prod-research_agricultural_growth_speed-1"]
                 self.assertEqual(91 if opponent == "time" else 90, technology["unit"]["time"])
+                self.assertEqual("broken" if opponent == "formula" else "40000*1.5^(L-1)",
+                                 technology["unit"].get("count_formula"))
                 self.assertIsNone(technology["unit"].get("count"))
                 self.assertIn(expected, result["message"])
 

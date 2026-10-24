@@ -37,19 +37,42 @@ local function descriptor()
     requires_not_disabled = true, paired = false}
 end
 
-local function assert_exact_vector(actual, expected, label)
+local function assert_exact_science(actual, expected, label)
   assert(#(actual or {}) == #expected, "agriculture scale " .. label .. " cardinality differs")
   for index, name in ipairs(expected) do
     local row = actual[index]
-    local actual_name, actual_amount
-    if type(row) == "string" then
-      actual_name, actual_amount = row, 1
-    else
-      actual_name, actual_amount = row and (row.name or row[1]), row and (row.amount or row[2])
-    end
-    assert(actual_name == name and (actual_amount == nil or actual_amount == 1),
+    assert(type(row) == "table", "agriculture scale " .. label .. " row is not a table at " .. index)
+    local actual_name = row.name or row[1]
+    local actual_amount = row.amount or row[2]
+    assert(actual_name == name and actual_amount == 1,
       "agriculture scale " .. label .. " differs at " .. index)
   end
+end
+
+local function assert_exact_prerequisites(actual, expected, label)
+  assert(#(actual or {}) == #expected, "agriculture scale " .. label .. " cardinality differs")
+  for index, name in ipairs(expected) do
+    assert(type(actual[index]) == "string" and actual[index] == name,
+      "agriculture scale " .. label .. " differs at " .. index)
+  end
+end
+
+local function assert_string_prerequisites(actual, label)
+  for index, prerequisite in ipairs(actual or {}) do
+    assert(type(prerequisite) == "string",
+      "agriculture scale " .. label .. " is not a string at " .. index)
+  end
+end
+
+-- The candidate arm retains its pre-existing narrow gate contract.  Its complete
+-- prerequisite vector is not used as an oracle until an independent candidate
+-- capture binds that vector; only the named gate is asserted here.
+local function assert_candidate_promethium_gate(actual)
+  local count = 0
+  for _, prerequisite in ipairs(actual or {}) do
+    if prerequisite == "promethium-science-pack" then count = count + 1 end
+  end
+  assert(count == 1, "agriculture scale candidate promethium prerequisite gate differs")
 end
 
 local arm = descriptor()
@@ -79,8 +102,14 @@ assert(#(agriculture.effects or {}) == 1 and agriculture.effects[1].type == "not
   and agriculture.effects[1].effect_description[1] == "modifier-description.more-infinite-research.agricultural_growth_speed"
   and agriculture.effects[1].effect_description[2] == "1",
   "agriculture scale agricultural effect contract differs")
-assert_exact_vector(agriculture.unit.ingredients, arm.science, arm.name .. " science vector")
-assert_exact_vector(agriculture.prerequisites, arm.science, arm.name .. " prerequisite vector")
+assert_exact_science(agriculture.unit.ingredients, arm.science, arm.name .. " science vector")
+if arm.name == "published-4.7.21002" then
+  assert_exact_prerequisites(agriculture.prerequisites, published_science,
+    arm.name .. " prerequisite vector")
+else
+  assert_string_prerequisites(agriculture.prerequisites, arm.name .. " prerequisite")
+  assert_candidate_promethium_gate(agriculture.prerequisites)
+end
 
 local yumako = assert(data.raw.capsule and data.raw.capsule.yumako,
   "agriculture scale requires the native yumako item")
