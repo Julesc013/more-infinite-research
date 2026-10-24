@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR16PreparationAdverseChainV1",
+  "status": "control-prototype-capture-adverse-zero-timing-samples",
+  "run": 40142466246,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40142466246",
+  "controller_commit": "3f95ef40455cf665b15829bb7d28833d2c7b2d81",
+  "player": {
+    "source_commit": "8bfb0d99c5d489b0a4efc75d41422fc9caa816ee",
+    "source_tree": "01f9d36ebe269c7ba9c6e3a52dca547a39eb8a16",
+    "sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+    "bytes": 548011,
+    "asset_inventory_sha256": "28D1B9D1E8D1D539195438D51BA73B3A798D74673011FB17EA47A3464D53FE37"
+  },
+  "plan": {
+    "revision": "aebd5460ad2ca8420b9f839b2233a738585156a7",
+    "path": "spec/evidence/bob-angel-menu-plan-r16.json",
+    "sha256": "06080F4A030CC38DA97E5B703B9D0872A8CA019C45A14CB1D7CD57015503292B"
+  },
+  "control_capture": {
+    "arm": "control-without-mir",
+    "endpoint_class": "factorio-data-stage-dump-only",
+    "engine": {
+      "base_version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "mir_archive": null,
+    "profile_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
+    "selection_sha256": "37F03254ED53521993CAC7AEEA03673D18468DF3662118EF7411DD1D979C9CFC",
+    "selected_mods": 15,
+    "factorio_processes_started": 1,
+    "process_runs": 1,
+    "failure": "[mir441-process-exit] 1",
+    "engine_error": {
+      "raw_log_sha256": "6D09E77B22EB051E674FFC17CD38CE2E4D108E4F2772479075F611D1CE2AF44B",
+      "raw_log_bytes": 6703,
+      "class": "missing-owned-write-data-script-output-directory",
+      "filename": "mod-settings-dump.json",
+      "reason": "No such file or directory"
+    }
+  },
+  "observation": {
+    "single_job_status": "failed-retained",
+    "preparation_status": "failed-retained",
+    "native_preparation_completed": false,
+    "candidate_capture_started": false,
+    "published_replay_started": false,
+    "owned_window_diagnostic_started": false,
+    "timing_samples_started": 0,
+    "performance_qualification": false,
+    "release_qualification": false,
+    "library_controls_restored": true,
+    "dependency_archives_copied": 0
+  },
+  "custody": {
+    "workflow_artifact_manifest_sha256": "B6166C3C7785A93B6F0FBA6F7D5883E05E078C9FFD4F8A8AA590523B3CD2C1B3",
+    "workflow_manifest_members_verified": 46,
+    "downloaded_artifact_files": 48,
+    "primary_full_artifact_path": "build/mir5/recovery-historical/bob-angel-menu-r16/40142466246/artifact",
+    "primary_manifest_readback": "build/mir5/recovery-historical/bob-angel-menu-r16/40142466246/artifact-manifest-readback.json",
+    "primary_member_hash_manifest_sha256": "6E33EF530CD23D38DF16B14DC0A1CF6BF9BED0D60B4C09F552CA67FE7BA3D4AD"
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/bob-angel-menu-r16-preparation-adverse-receipts.json.gz",
+    "members": 6,
+    "uncompressed_bytes": 40832,
+    "uncompressed_sha256": "411FDF64207A025C9CEFEE20F40D6BE02616168AB55FEE3B7FD98BC4C0DE6A47",
+    "gzip_bytes": 11776,
+    "gzip_sha256": "2ED2D6573EDB313F5C9B0A82B727172BE4D29610A0D7022E79150EE0F4C94D31"
+  },
+  "limits": [
+    "The one Factorio control process failed during data-stage dumping because the owned script-output directory did not exist. No candidate, published, replay or owned-window capture started.",
+    "Zero responsive-menu timing samples exist. This result establishes no menu-performance, gameplay, save, release or product qualification.",
+    "The workflow result and all prior menu adverse observations retain their original execution identities. A helper correction needs a separately declared, reviewed input before any retry."
+  ],
+  "independent_readback": {
+    "reviewer": "root",
+    "result": "passed",
+    "verified_workflow_manifest_members": 46,
+    "verified_workflow_manifest_sha256": "B6166C3C7785A93B6F0FBA6F7D5883E05E078C9FFD4F8A8AA590523B3CD2C1B3",
+    "verified_source": "8bfb0d99c5d489b0a4efc75d41422fc9caa816ee",
+    "verified_controller": "3f95ef40455cf665b15829bb7d28833d2c7b2d81",
+    "verified_control_mir_archive": null,
+    "verified_control_status": "failed",
+    "verified_library_controls_restored": true,
+    "verified_timing_samples_started": 0,
+    "verified_performance_qualification": false,
+    "note": "Two distinct raw logs retain the missing mod-settings-dump parent error. The 142-byte checkout .git pointer remains explicitly excluded from the 46-member workflow evidence manifest."
+  }
+}
