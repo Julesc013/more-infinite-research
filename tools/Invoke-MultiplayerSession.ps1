@@ -457,6 +457,8 @@ function Start-Clients([string]$Phase) {
   $started.ToArray()
 }
 
+$sessionFailure = $null
+$result = $null
 try {
   $server = Start-Server 'server-initial' $seed
   [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 })
@@ -507,13 +509,24 @@ try {
     client_graphics_arguments=$clientGraphics
     screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
   }
-  [IO.File]::WriteAllText($sessionPath, ($result | ConvertTo-Json -Depth 10) + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
-  $result
 }
+catch { $sessionFailure = $_ }
 finally {
-  foreach ($record in @($records)) {
+  # Stop clients before their server, as in the explicit phase transitions.
+  # Continue closing other owned processes if one reports a late failure.
+  $closing = @($records)
+  [Array]::Reverse($closing)
+  foreach ($record in $closing) {
     if (-not $record.closed) {
-      try { Stop-Record $record } catch { Write-Warning "could not clean owned $($record.name): $($_.Exception.Message)" }
+      try { Stop-Record $record }
+      catch {
+        if ($null -eq $sessionFailure) { $sessionFailure = $_ }
+        Write-Warning "could not clean owned $($record.name): $($_.Exception.Message)"
+      }
     }
   }
 }
+if ($null -ne $sessionFailure) { throw $sessionFailure }
+# A passing receipt includes successful process shutdown and log draining.
+[IO.File]::WriteAllText($sessionPath, ($result | ConvertTo-Json -Depth 10) + [Environment]::NewLine, [Text.UTF8Encoding]::new($false))
+$result
