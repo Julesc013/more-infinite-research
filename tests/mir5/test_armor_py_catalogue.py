@@ -67,6 +67,17 @@ class ArmorPyCatalogueTests(unittest.TestCase):
             }
             if observed != names:
                 raise AssertionError(f"captured row set drifted for {identifier}")
+        bob = cls.profiles["armor-bobwarfare"]
+        vectors = bob.get("published_bob_warfare_effect_vectors")
+        if not isinstance(vectors, dict) or vectors.get("source", {}).get("capture") != "published":
+            raise AssertionError("Bob Warfare effect vectors lack their published-capture source")
+        if vectors["source"].get("data_raw") != bob["capture_receipts"]["published"]["files"]["data_raw"]:
+            raise AssertionError("Bob Warfare effect vectors do not bind the published raw receipt")
+        rows = vectors.get("rows")
+        if not isinstance(rows, list) or {row.get("name") for row in rows} != {
+            "recipe-prod-research_bullets-1", "recipe-prod-research_rockets-1",
+        } or any(not isinstance(row.get("effects"), list) or not row["effects"] for row in rows):
+            raise AssertionError("Bob Warfare captured effect vectors drifted")
 
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -361,8 +372,11 @@ class ArmorPyCatalogueTests(unittest.TestCase):
         self.assertEqual(0.02, armor["effects"][0]["change"])
         self.assertEqual(5, _plain(values)["streams"]["research_armor_components"]["effect_percent"])
         self.assertEqual({"research_armor_components": True}, _plain(selection["exact_product_target_families"]))
-        self.assertEqual({"research_armor_components": True},
-                         _plain(selection["replacement_product_target_families"]))
+        self.assertEqual({
+            "research_armor_components": True,
+            "research_bullets": True,
+            "research_rockets": True,
+        }, _plain(selection["replacement_product_target_families"]))
         raw["recipe"]["unreviewed-armor-plate"] = {
             "enabled": False, "ingredients": [], "results": [{"type": "item", "name": "unreviewed-armor-plate", "amount": 1}],
         }
@@ -427,6 +441,67 @@ class ArmorPyCatalogueTests(unittest.TestCase):
             {"type": "change-recipe-productivity", "recipe": "fixture-armor-plating", "change": 0.05},
             {"type": "change-recipe-productivity", "recipe": "bob-mech-armor-plate", "change": 0.02},
         ], _plain(broad[1]["effects"]))
+
+    def test_bob_warfare_rebuilds_the_two_captured_effect_vectors_in_published_order(self):
+        profile = self.profiles["armor-bobwarfare"]
+        captured = profile["published_bob_warfare_effect_vectors"]
+        expected = {row["name"]: deepcopy(row["effects"]) for row in captured["rows"]}
+        active = self.active("armor-bobwarfare")
+        values = self._values(active)
+        selection = self.catalogue["select"](_lua_value(self.lua, active))
+        selected_replacements = _plain(selection["replacement_product_target_families"])
+        self.assertEqual({
+            "research_armor_components": True,
+            "research_bullets": True,
+            "research_rockets": True,
+        }, selected_replacements)
+        self.assertEqual(10, values["streams"]["research_bullets"]["effect_percent"])
+        self.assertEqual(10, values["streams"]["research_rockets"]["effect_percent"])
+
+        rows = self.modern["technologies"](selection, values)
+        seeds = {
+            row["name"]: _plain(row["effects"])
+            for row in rows.values()
+            if row["name"] in expected
+        }
+        self.assertEqual({
+            "recipe-prod-research_bullets-1": [
+                {"type": "change-recipe-productivity", "recipe": "firearm-magazine", "change": 0.1},
+                {"type": "change-recipe-productivity", "recipe": "shotgun-shell", "change": 0.1},
+                {"type": "change-recipe-productivity", "recipe": "piercing-rounds-magazine", "change": 0.05},
+                {"type": "change-recipe-productivity", "recipe": "piercing-shotgun-shell", "change": 0.05},
+                {"type": "change-recipe-productivity", "recipe": "uranium-rounds-magazine", "change": 0.02},
+            ],
+            "recipe-prod-research_rockets-1": [
+                {"type": "change-recipe-productivity", "recipe": "rocket", "change": 0.1},
+                {"type": "change-recipe-productivity", "recipe": "explosive-rocket", "change": 0.05},
+                {"type": "change-recipe-productivity", "recipe": "atomic-bomb", "change": 0.02},
+            ],
+        }, seeds)
+
+        raw = {"item": {}, "recipe": {}, "technology": {}, "tool": {}, "lab": {}}
+        for effects in expected.values():
+            for effect in effects:
+                raw["recipe"][effect["recipe"]] = {
+                    "enabled": False,
+                    "ingredients": [],
+                    "results": [{"type": "item", "name": effect["recipe"], "amount": 1}],
+                }
+        report = _plain(self.extension["extend"](rows, values, _lua_value(self.lua, {
+            "raw": raw,
+            "mods": active,
+            "exact_product_target_families": _plain(selection["exact_product_target_families"]),
+            "exact_product_bindings": _plain(selection["exact_product_bindings"]),
+            "replacement_product_target_families": selected_replacements,
+        })))
+        observed = {
+            row["name"]: _plain(row["effects"])
+            for row in rows.values()
+            if row["name"] in expected
+        }
+        self.assertEqual(expected, observed)
+        self.assertEqual(33, report["work"]["recipes"])
+        self.assertEqual(33, report["extended_effects"])
 
     def test_preflight_rejects_named_field_drift_without_world_scans(self):
         armor_raw = self._raw("armor-bobwarfare")

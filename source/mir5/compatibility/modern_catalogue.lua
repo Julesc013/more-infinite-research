@@ -614,7 +614,16 @@ function M.select(active_mods)
     local delta = append_bob_warfare(definitions)
     exact_product_target_families.research_armor_components = true
     exact_product_bindings = delta.product_bindings()
-    copy_true_fields(replacement_product_target_families, {research_armor_components=true})
+    -- Bob Warfare's captured bullets and rockets add named recipes to the
+    -- ordinary Base families.  Rebuild each complete vector through the
+    -- existing one-pass product collector so its weight-descending, then
+    -- recipe-name presentation order matches the historical F200 output.
+    -- The authored Base seeds and ratios remain the inputs to that rebuild.
+    copy_true_fields(replacement_product_target_families, {
+      research_armor_components=true,
+      research_bullets=true,
+      research_rockets=true,
+    })
     profile = "bob-warfare-f200"
   end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),

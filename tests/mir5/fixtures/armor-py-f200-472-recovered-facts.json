@@ -652,7 +652,195 @@
           "patches": 0
         }
       },
-      "selected_archive_order_differs": false
+      "selected_archive_order_differs": false,
+      "published_bob_warfare_effect_vectors": {
+        "source": {
+          "capture": "published",
+          "data_raw": {
+            "bytes": 15853859,
+            "path": "write-data/script-output/data-raw-dump.json",
+            "sha256": "B333769260B4D968CCFFF642DABFEA68BC707F6FE33789922E4F1C49A4FC36D4"
+          },
+          "meaning": "Complete effect vectors copied from the original published F200 Bob Warfare data-stage capture."
+        },
+        "rows": [
+          {
+            "name": "recipe-prod-research_bullets-1",
+            "effects": [
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-better-shotgun-shell",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-bullet-magazine",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "firearm-magazine",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "shotgun-shell",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-ap-bullet-magazine",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-ap-shell",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "piercing-rounds-magazine",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "piercing-shotgun-shell",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-uranium-shell",
+                "change": 0.02
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "uranium-rounds-magazine",
+                "change": 0.02
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-acid-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-electric-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-flame-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-he-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-plasma-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-poison-bullet-magazine",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-acid-shell",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-electric-shell",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-explosive-shell",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-flame-shell",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-plasma-shell",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-shotgun-poison-shell",
+                "change": 0.01
+              }
+            ]
+          },
+          {
+            "name": "recipe-prod-research_rockets-1",
+            "effects": [
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-rocket",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "rocket",
+                "change": 0.1
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-explosive-rocket",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "explosive-rocket",
+                "change": 0.05
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "atomic-bomb",
+                "change": 0.02
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-acid-rocket",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-electric-rocket",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-flame-rocket",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-piercing-rocket",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-plasma-rocket",
+                "change": 0.01
+              },
+              {
+                "type": "change-recipe-productivity",
+                "recipe": "bob-poison-rocket",
+                "change": 0.01
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "capture_receipts": {
