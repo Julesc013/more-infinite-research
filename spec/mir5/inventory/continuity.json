@@ -507,9 +507,18 @@
           "scope": "Exact separate CE28 and PR43 foreign tails pass actual predecessor labs, MIR5 preference true/false and two reloads each. Earned MIR overlap and composed/mixed providers remain unqualified."
         },
         {
+          "id": "published-first-preference-ambiguity",
+          "source": [
+            "source/mir5/runtime/native_credits.lua",
+            "source/mir5/runtime/bootstrap.lua"
+          ],
+          "evidence": "spec/mir5/evidence/legacy-preference-transition-native-chain.json",
+          "scope": "Exact published4.7.20002 F200 SA/four providers: both source preferences earn two actual partial MIR labs; simultaneous first-switch branches refuse with unchanged source hashes/no successor save. Both unchanged upgrades report native startup-change=false, and later MIR5 switches report=true, preserve credit/foreign42% queue, earn one successor lab and save/cold-reload twice. All172 members verified. Guard covers three known4.7 versions at host level; other predecessor binaries and mixed/dynamic profiles are not native-qualified here."
+        },
+        {
           "id": "fixed-provider-earned-removal-control",
           "evidence": "spec/mir5/evidence/competing-fixed-removal-control-native-chain.json",
-          "scope": "Actual MIR overlaps survive MIR5 true/false and provider removal/readdition with137 artifact members verified. First MIR4 upgrade plus simultaneous preference change and other dynamic/mixed owners remain unqualified."
+          "scope": "Actual MIR overlaps survive MIR5 true/false and provider removal/readdition with137 artifact members verified. The separate first-upgrade ambiguity chain now qualifies the explicit refusal/two-step path for its exact F2004.7.2 closure; other dynamic/mixed owners remain unqualified."
         }
       ],
       "test_subjects": [
