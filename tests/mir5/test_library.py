@@ -527,6 +527,40 @@ class LibraryTests(unittest.TestCase):
           library.on_translation_maintenance({tick = 1800})
           assert(ledger.active[1] == malformed and #player.translation_requests == 0)
         ''')
+    def test_pending_translations_survive_locale_change_close_and_reload(self):
+        self.lua.execute('''
+          boot()
+          library.open(player, {family = "all"})
+          assert(#player.translation_requests == 2)
+          player.locale = "de"
+          library.on_player_locale_changed({player_index = 1})
+          assert(#player.translation_requests == 4)
+          local pending = storage.mir_library.translations.active[1].pending
+          assert(#pending == 4)
+          local queue, current, progress = player.force.research_queue,
+            player.force.current_research, player.force.research_progress
+          library.close(player)
+          package.loaded["runtime.library"] = nil
+          library = require("runtime.library")
+          library.on_load()
+          library.open(player, {family = "all"})
+          assert(#player.translation_requests == 6,
+            "valid old/current translation requests prevented a reopened Library from dispatching")
+          for index = 1, 4 do
+            library.on_string_translated({player_index = 1,
+              id = player.translation_requests[index].id, translated = true, result = "STALE"})
+          end
+          library.on_string_translated({player_index = 1, id = player.translation_requests[5].id,
+            translated = true, result = "Zahnrad"})
+          library.on_string_translated({player_index = 1, id = player.translation_requests[6].id,
+            translated = true, result = "Fremde Forschung"})
+          local root = player.gui.screen["mir_research_browser"]
+          assert(research_content(root)["mir_library_results"].items[1] == "Zahnrad")
+          assert(not library.subscription_needs())
+          assert(player.force.research_queue == queue and player.force.current_research == current
+            and player.force.research_progress == progress)
+        ''')
+
     def test_translation_stale_scope_reload_and_reused_index_never_publish_old_labels(self):
         self.lua.execute('''
           boot()

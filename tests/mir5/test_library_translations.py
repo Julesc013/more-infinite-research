@@ -120,6 +120,61 @@ class LibraryTranslationTests(unittest.TestCase):
           assert(assert(translations.export_pending(reopened))[1].scope.generation == 40)
         ''')
 
+    def test_pending_same_key_across_catalogue_generations_round_trips(self):
+        self.lua.execute('''
+          local active = scope(1, "en", 1, 40)
+          local cache = prepared(1, "en", 1, 40, {"gear"})
+          assert(translations.dispatch(cache, active, 0, function() return 11 end).issued == 1)
+          assert(translations.prepare(cache, active, {"gear", "other"}))
+          local request_id = 11
+          assert(translations.dispatch(cache, active, 1, function()
+            request_id = request_id + 1; return request_id
+          end).issued == 2)
+          local pending = assert(translations.export_pending(cache))
+          assert(#pending == 3 and pending[1].key == "gear" and pending[2].key == "gear")
+          assert(pending[1].cache_generation ~= pending[2].cache_generation)
+
+          local reopened_scope = scope(1, "en", 1, 41)
+          local reopened = prepared(1, "en", 1, 41, {"gear"})
+          assert(translations.hydrate_pending(reopened, pending), "own multi-generation export was rejected")
+          assert(translations.snapshot(reopened, reopened_scope).stats.outstanding == 3)
+          for _, record in ipairs(pending) do
+            local result = translations.complete(reopened, reopened_scope, record.request_id, "old")
+            assert(result.released and not result.published)
+          end
+          assert(translations.labels(reopened, reopened_scope).gear == nil)
+          assert(translations.dispatch(reopened, reopened_scope, 2, function() return 21 end).issued == 1)
+          assert(translations.complete(reopened, reopened_scope, 21, "Gear").published)
+          assert(translations.labels(reopened, reopened_scope).gear == "Gear")
+        ''')
+
+    def test_repeated_reopen_retains_same_key_from_distinct_scopes(self):
+        self.lua.execute('''
+          local original_scope = scope(1, "en", 1, 40)
+          local original = prepared(1, "en", 1, 40, {"gear"})
+          assert(translations.dispatch(original, original_scope, 0, function() return 31 end).issued == 1)
+          local second_scope = scope(1, "de", 1, 41)
+          local second = prepared(1, "de", 1, 41, {"gear"})
+          assert(translations.hydrate_pending(second, assert(translations.export_pending(original))))
+          assert(translations.dispatch(second, second_scope, 1, function() return 32 end).issued == 1)
+          local pending = assert(translations.export_pending(second))
+          assert(#pending == 2 and pending[1].key == pending[2].key)
+          assert(pending[1].cache_generation == pending[2].cache_generation,
+            "a fresh cache can reuse its local generation; the complete caller scope distinguishes requests")
+          local latest_scope = scope(1, "de", 1, 42)
+          local latest = prepared(1, "de", 1, 42, {"gear"})
+          assert(translations.hydrate_pending(latest, pending), "own multi-scope export was rejected")
+          assert(translations.snapshot(latest, latest_scope).stats.outstanding == 2)
+          for _, record in ipairs(pending) do
+            local result = translations.complete(latest, latest_scope, record.request_id, "stale")
+            assert(result.released and not result.published)
+          end
+          assert(not translations.needs_maintenance(latest))
+          assert(translations.dispatch(latest, latest_scope, 2, function() return 33 end).issued == 1)
+          assert(translations.complete(latest, latest_scope, 33, "Zahnrad").published)
+          assert(translations.labels(latest, latest_scope).gear == "Zahnrad")
+        ''')
+
     def test_pending_ledger_rejects_malformed_duplicate_and_uint32_records_without_mutation(self):
         self.lua.execute('''
           local active = scope(1, "en", 1, 0)
@@ -141,6 +196,7 @@ class LibraryTranslationTests(unittest.TestCase):
           reject({record(1, "gear", scope(-1, "en", 1, 0))})
           reject({record(1, "gear", active, 1, math.huge)})
           reject({record(1, "gear"), record(1, "other")})
+          reject({record(1, "gear"), record(1, "gear", scope(1, "de", 1, 1), 2)})
           reject({record(1, "gear"), record(2, "gear")})
           local oversized = {}
           for index = 1, translations.outstanding_limit + 1 do oversized[index] = record(index, "key-" .. index) end
