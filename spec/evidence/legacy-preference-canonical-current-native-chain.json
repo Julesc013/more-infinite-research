@@ -108,5 +108,156 @@
     "protected_expected_refusals": 2,
     "published_initial_preference_arms": 2,
     "unchanged_upgrade_arms": 2
+  },
+  "current_player_followup": {
+    "artifact_manifest": {
+      "members_verified": 173,
+      "path": "build/mir5/aero-preference-40127907028/artifact-manifest.json",
+      "sha256": "C9385A9F6C72BE452EFF1DB0423EE7BBCB33DA074F5A779712DCBBCB8BF47A77"
+    },
+    "controller_provenance": {
+      "artifact_attested": false,
+      "head_sha": "090dcb9aa7d3763bc5596541e64d7b3426f940e8",
+      "origin": "external GitHub Actions run projection",
+      "projection_bytes": 377,
+      "projection_path": "build/mir5/aero-preference-40127907028-github-run.json",
+      "projection_sha256": "54EF3632682A4BCD279577D1C59F066CEFFBD2AF940E5619C8430C7A1036CCED",
+      "run": 40127907028,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40127907028"
+    },
+    "engine": {
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+      "version": "2.0.77"
+    },
+    "fixture_source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "player": {
+      "bytes": 547144,
+      "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+      "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+      "target": "f200",
+      "version": "5.0.20000"
+    },
+    "published_predecessor": {
+      "sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+      "version": "4.7.20003"
+    },
+    "raw_evidence": {
+      "gzip_bytes": 126628,
+      "gzip_sha256": "1DA70C683065E391540440352F1ACDB054E887C7FFC9DFD2CCDD817153B32B4D",
+      "members": 29,
+      "path": "spec/evidence/legacy-preference-333-native-receipts.json.gz",
+      "uncompressed_bytes": 861729,
+      "uncompressed_sha256": "D2F1049CE19806C3B7FDED413EFBAE3FBBD7B938CEC0F86BD08C5D2850F3F84E"
+    },
+    "arms": [
+      {
+        "cold_reloads": 2,
+        "current_preference": false,
+        "independent_earned_labs": 2,
+        "initial_preference": false,
+        "player_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        "result_path": "legacy-preference-canonical/gameplay/from-false/published/result.json",
+        "result_sha256": "A3CBB9317806EC733E55386D67EFC1B36489C0E89F27C228D5286E40472FFD3B",
+        "scenario": "published",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "cold_reloads": 2,
+        "current_preference": false,
+        "independent_earned_labs": 0,
+        "initial_preference": false,
+        "player_sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+        "result_path": "legacy-preference-canonical/gameplay/from-false/unchanged-upgrade/result.json",
+        "result_sha256": "CCC36C87048AC7E30EEBA2C52C0BCF2FF7AD0EEDE565FEA627E0A5166A9CFA87",
+        "scenario": "unchanged-upgrade",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "cold_reloads": 2,
+        "current_preference": true,
+        "independent_earned_labs": 1,
+        "initial_preference": false,
+        "player_sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+        "result_path": "legacy-preference-canonical/gameplay/from-false/later-switch/result.json",
+        "result_sha256": "3628FDB53D483C58971DBA2BD2F826710511AA03715B69D4965CE732E3E1E1E4",
+        "scenario": "later-switch",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "failure": "[mir441-process-exit] 1",
+        "initial_preference": false,
+        "input_save_byte_identical": true,
+        "protection_reason": "ambiguous-published-first-upgrade",
+        "result_path": "legacy-preference-canonical/gameplay/from-false/simultaneous-refusal/result.json",
+        "result_sha256": "1BC6467E2541BCB2492E4C0822B047ABE21211F7C4F40C70E552BF5E39E55964",
+        "scenario": "simultaneous-refusal",
+        "status": "failed",
+        "successor_save_created": false
+      },
+      {
+        "cold_reloads": 2,
+        "current_preference": true,
+        "independent_earned_labs": 2,
+        "initial_preference": true,
+        "player_sha256": "FBBA844DD04011A12BB6DA885745B0733AD37FAB181EAAD9EE4346B9B0D32647",
+        "result_path": "legacy-preference-canonical/gameplay/from-true/published/result.json",
+        "result_sha256": "9792D97B28255A7AE3FFBFF67DDC034563BB78801862F1124438317457533740",
+        "scenario": "published",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "cold_reloads": 2,
+        "current_preference": true,
+        "independent_earned_labs": 0,
+        "initial_preference": true,
+        "player_sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+        "result_path": "legacy-preference-canonical/gameplay/from-true/unchanged-upgrade/result.json",
+        "result_sha256": "9584E685C6C3D25D9D57A21F3E85A88CCD01CF89025EFBFC44524CBCD35718CF",
+        "scenario": "unchanged-upgrade",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "cold_reloads": 2,
+        "current_preference": false,
+        "independent_earned_labs": 1,
+        "initial_preference": true,
+        "player_sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+        "result_path": "legacy-preference-canonical/gameplay/from-true/later-switch/result.json",
+        "result_sha256": "050E405FB537061666A66493A9B1EC8576364B931135801F1EA1331F86094E42",
+        "scenario": "later-switch",
+        "status": "passed-private-native-fixture"
+      },
+      {
+        "failure": "[mir441-process-exit] 1",
+        "initial_preference": true,
+        "input_save_byte_identical": true,
+        "protection_reason": "ambiguous-published-first-upgrade",
+        "result_path": "legacy-preference-canonical/gameplay/from-true/simultaneous-refusal/result.json",
+        "result_sha256": "172BA30259DE1269B506528CD5EE4AC2FE847E74A0348471BD36826F76FFE7C8",
+        "scenario": "simultaneous-refusal",
+        "status": "failed",
+        "successor_save_created": false
+      }
+    ],
+    "summary": {
+      "actual_structured_stage_markers": 18,
+      "cold_reloads": 12,
+      "foreign_queue_current": "braking-force-1",
+      "foreign_queue_progress": 0.42,
+      "marker_log_copies": 12,
+      "protected_expected_refusals": 2,
+      "published_arms": 2,
+      "saved_arms": 6,
+      "unchanged_upgrade_arms": 2,
+      "unchanged_upgrade_new_labs_per_origin": 0,
+      "write_data_reload_copies": 6,
+      "stdout_initial_copies": 6
+    },
+    "limits": [
+      "This follow-up binds only the recorded known-provider F200 2.0.77 current-player preference transition inputs and the finite published4.7.20003 predecessor.",
+      "The two simultaneous-change failures are protected refusals, not successful switch outcomes; laboratory earnings count only two per independent published origin and one per independent later switch, never carried completion counters.",
+      "It does not qualify a full release, all migration coverage, arbitrary profile coverage, multiplayer, performance, signing, publication, other engines, or broad compatibility."
+    ],
+    "status": "current-f200-player333-preference-transition-and-protected-refusals-private-native-followup"
   }
 }
