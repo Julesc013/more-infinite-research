@@ -994,6 +994,14 @@ local function update_research_content(content, player, view, context, translati
   if selected then view.selected = selected.id end
   local detail = selected and selected_detail(player, view, context, translations) or nil
   local detail_box = add(content, {type = "flow", name = PREFIX .. "detail", direction = "vertical"})
+  -- A maximum only caps growth: it does not prevent a vertical detail flow
+  -- from shrinking to the natural width of one short child. Give this one
+  -- owned detail flow the already-established research pane width before its
+  -- labels are added, so long native ingredient IDs can wrap in the pane.
+  local detail_width = content.style and content.style.maximal_width
+  if detail_box.style and type(detail_width) == "number" and detail_width > 0 then
+    detail_box.style.width = detail_width
+  end
   detail_lines(detail_box, selected, detail)
 
   local actions = add(content, {type = "flow", name = PREFIX .. "actions", direction = "horizontal"})
