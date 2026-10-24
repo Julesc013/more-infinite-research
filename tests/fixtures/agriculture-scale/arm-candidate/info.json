@@ -1,0 +1,13 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-arm-candidate",
+  "version": "0.1.0",
+  "title": "MIR agriculture candidate arm selector",
+  "author": "MIR maintainers",
+  "description": "Selects the MIR 5 twelve-science agricultural growth contract for the shared physical fixture.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000",
+    "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0"
+  ]
+}
