@@ -37,6 +37,7 @@ $record=[ordered]@{
   kind=$(if($FixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerNativeResultV1'}else{'MIR5ScriptedEffectsMultiplayerNativeResultV1'});case=$FixtureCase;status='started';source_head=$prepared.source_head
   engine=$prepared.engine;profile=$prepared.profile;fixtures=$prepared.fixtures;mir_archive=$prepared.mir_archive
   preparation=$prepared;release_qualification=$false;visual_review=$false
+  harness_sha256=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash
 }
 try {
   $resources=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $output 'session') -ExpectedPeakMemoryMiB 8192 -MaxNewOutputMiB 512 -UseExactOutputRoot
@@ -116,6 +117,27 @@ try {
     Assert-Session $record.input_save_byte_identical 'original disposable seed changed'
   } catch {if($null -eq $failure){$failure=$_;$record.status='failed';$record.failure=$_.Exception.Message}}
   if($null -ne $resources){$record.process_runs=@($resources.runs.ToArray());Write-MIRNativeProbeResult -Context $resources -Record $record}
+  elseif($null -ne $record.resource_admission){
+    # Admission precedes context allocation. Preserve only bounded refusal
+    # facts here; the full preparation/session record can contain secrets.
+    try{
+      $refusal=[ordered]@{
+        kind='MIR5MultiplayerAdmissionRefusalV1';status='refused-before-session';case=$record.case
+        source_head=$record.source_head;harness_sha256=$record.harness_sha256;engine=$record.engine
+        profile_sha256=$record.profile.sha256;mir_archive_sha256=$record.mir_archive.sha256
+        failure=$record.failure;resource_admission=$record.resource_admission
+        native_session_started=$false;release_qualification=$false
+      }
+      $bytes=[Text.UTF8Encoding]::new($false).GetBytes(($refusal|ConvertTo-Json -Depth 12 -Compress)+"`n")
+      Assert-Session ($bytes.Length -le 64KB) 'admission receipt exceeds diagnostic reserve'
+      $path=Join-Path $output 'session-admission-refusal.json'
+      $stream=[IO.File]::Open($path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::None)
+      try{$stream.Write($bytes,0,$bytes.Length)}finally{$stream.Dispose()}
+    }catch{
+      # A diagnostic failure must not overwrite the original admission error.
+      if($null -ne $failure){$failure.Exception.Data['admission_receipt_failure']=$_.Exception.Message}
+    }
+  }
 }
 if($null -ne $failure){throw $failure}
 [pscustomobject]$record
