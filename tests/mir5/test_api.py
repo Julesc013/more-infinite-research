@@ -239,11 +239,15 @@ class ApiTests(unittest.TestCase):
           local ok, message, alpha_result, alpha_log = run_namespace_control(
             namespace_alpha_control, alpha_private, "mir-api-namespace-alpha-gears-1", "iron-gear-wheel", .01)
           assert(ok, message)
+          assert(alpha_result.stage == "init" and alpha_result.status == "passed",
+            "alpha marker does not match native runner's init consumer protocol")
           assert(alpha_result.consumer == alpha_private.owner and alpha_result.change == .01
             and alpha_log:find("MIR5_API_NAMESPACE_ALPHA", 1, true))
           ok, message, beta_result, beta_log = run_namespace_control(
             namespace_beta_control, beta_private, "mir-api-namespace-beta-cable-1", "copper-cable", .02)
           assert(ok, message)
+          assert(beta_result.stage == "init" and beta_result.status == "passed",
+            "beta marker does not match native runner's init consumer protocol")
           assert(beta_result.consumer == beta_private.owner and beta_result.change == .02
             and beta_log:find("MIR5_API_NAMESPACE_BETA", 1, true))
 
