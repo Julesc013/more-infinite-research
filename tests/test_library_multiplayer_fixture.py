@@ -1,5 +1,7 @@
 """Host controls for the private F200 two-client Library fixture, not native evidence."""
 import argparse
+import gzip
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -11,6 +13,7 @@ CONTROL = FIXTURE / "control.lua"
 PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 WRAPPER = ROOT / "tools/Invoke-MultiplayerFixture.ps1"
 SESSION = ROOT / "tools/Invoke-MultiplayerSession.ps1"
+MEMORY_CALIBRATION = ROOT / "spec/evidence/library-multiplayer-session-memory-calibration-r01.json"
 
 
 def plain(value, seen=None):
@@ -546,6 +549,81 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn("@('availability','initial','rejoin','restart')", session)
         self.assertIn("$completed.witnesses.availability_terminal_labels_checked -eq $true", session)
         self.assertIn("$completed.witnesses.screenshot_calls -eq 8", session)
+
+    def test_library_session_memory_calibration_keeps_the_generic_ceiling(self):
+        wrapper = WRAPPER.read_text(encoding="utf-8")
+        calibration = json.loads(MEMORY_CALIBRATION.read_text(encoding="utf-8"))
+
+        self.assertIn("[ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192", wrapper)
+        self.assertIn(
+            "$FixtureCase -ceq 'library-multiplayer' -or $SessionExpectedPeakMemoryMiB -eq 8192",
+            wrapper,
+        )
+        self.assertIn(
+            "-ExpectedPeakMemoryMiB $SessionExpectedPeakMemoryMiB -MaxNewOutputMiB 512",
+            wrapper,
+        )
+        self.assertNotIn("-ExpectedPeakMemoryMiB 8192 -MaxNewOutputMiB 512", wrapper)
+        self.assertIn("session_expected_peak_memory_mib=$SessionExpectedPeakMemoryMiB", wrapper)
+
+        self.assertEqual(calibration["profile"]["path"], "tests/profiles/library-multiplayer-f200-2077.json")
+        self.assertEqual(
+            hashlib.sha256(PROFILE.read_bytes()).hexdigest().upper(),
+            calibration["profile"]["sha256"],
+        )
+        self.assertEqual(calibration["engine"]["sha256"], "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B")
+        self.assertEqual(calibration["override"]["parameter"], "SessionExpectedPeakMemoryMiB")
+        self.assertEqual(calibration["override"]["default_mib"], 8192)
+        self.assertEqual(calibration["override"]["library_mib"], 7168)
+        self.assertEqual(calibration["override"]["allowed_mib"], [7168, 8192])
+        self.assertEqual(calibration["field_path"], "process.result.peak_sampled_private_bytes")
+
+        peaks = []
+        for receipt in calibration["receipts"]:
+            with self.subTest(receipt=receipt["run"]):
+                path = ROOT / receipt["gzip_path"]
+                compressed = path.read_bytes()
+                self.assertEqual(hashlib.sha256(compressed).hexdigest().upper(), receipt["gzip_sha256"])
+                raw = gzip.decompress(compressed)
+                self.assertEqual(hashlib.sha256(raw).hexdigest().upper(), receipt["raw_sha256"])
+                captured = json.loads(raw)
+                self.assertEqual(captured["status"], "passed-private-two-client-fixture")
+                self.assertEqual(captured["source_head"], receipt["source_commit"])
+                self.assertEqual(captured["engine"]["sha256"], calibration["engine"]["sha256"])
+                self.assertEqual(captured["profile"]["sha256"], calibration["profile"]["sha256"])
+                peak = captured["process"]["result"]["peak_sampled_private_bytes"]
+                self.assertEqual(peak, receipt["peak_sampled_private_bytes"])
+                peaks.append(peak)
+
+        self.assertEqual(max(peaks), calibration["observed_max_private_bytes"])
+        self.assertEqual(
+            calibration["override"]["library_bytes"] - max(peaks),
+            calibration["observed_headroom_bytes"],
+        )
+        self.assertGreater(calibration["observed_headroom_bytes"], 0)
+        self.assertEqual(
+            calibration["observed_headroom_percent"],
+            round(calibration["observed_headroom_bytes"] * 100 / max(peaks), 1),
+        )
+
+        refusal = calibration["refused_current_library_attempt"]
+        default_bytes = calibration["override"]["default_mib"] * 1024 * 1024
+        self.assertEqual(
+            refusal["physical_reserve_bytes"] + default_bytes,
+            refusal["default_required_bytes"],
+        )
+        self.assertEqual(
+            refusal["default_required_bytes"] - refusal["free_bytes"],
+            refusal["default_deficit_bytes"],
+        )
+        self.assertEqual(
+            refusal["physical_reserve_bytes"] + calibration["override"]["library_bytes"],
+            refusal["calibrated_required_bytes"],
+        )
+        self.assertEqual(
+            refusal["free_bytes"] - refusal["calibrated_required_bytes"],
+            refusal["calibrated_snapshot_headroom_bytes"],
+        )
 
 
 if __name__ == "__main__":
