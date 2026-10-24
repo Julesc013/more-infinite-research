@@ -21,7 +21,8 @@ from typing import Any, Iterable
 KIND = "MIR5LibraryProfilerObservationV1"
 ROLES = ("server", "en", "de")
 ACTIONS = ("first_open", "search", "refresh", "reopen")
-MARKER = "[MIR5_LIBRARY_PROFILE] "
+MARKER_TOKEN = "[MIR5_LIBRARY_PROFILE]"
+MARKER = MARKER_TOKEN + " "
 MAX_LOG_BYTES = 8 * 1024 * 1024
 MAX_LINE_CHARACTERS = 16 * 1024
 
@@ -51,7 +52,12 @@ def _parse_log_argument(value: str) -> tuple[str, Path]:
 
 def _read_log(path: Path) -> tuple[bytes, list[str]]:
     try:
-        data = path.read_bytes()
+        # Do not use Path.read_bytes(): this reader must reject an oversized
+        # native log before allocating an unbounded input in the host process.
+        # A bounded read also handles a log which grows after any metadata
+        # observation.
+        with path.open("rb") as stream:
+            data = stream.read(MAX_LOG_BYTES + 1)
     except OSError as error:
         raise LibraryProfileError(f"log is unreadable: {path}") from error
     if len(data) > MAX_LOG_BYTES:
@@ -106,8 +112,12 @@ def read_profiles(logs: Iterable[tuple[str, Path]]) -> dict[str, Any]:
         data, lines = _read_log(path)
         observations: dict[str, dict[str, Any]] = {}
         for raw_line in lines:
-            if MARKER not in raw_line:
+            if MARKER_TOKEN not in raw_line:
                 continue
+            if raw_line.count(MARKER_TOKEN) != 1:
+                raise LibraryProfileError(f"{role} profiler marker is duplicated: {raw_line!r}")
+            if MARKER not in raw_line:
+                raise LibraryProfileError(f"{role} profiler marker lacks its required separator: {raw_line!r}")
             action, duration = _parse_marker(role, raw_line)
             if action in observations:
                 raise LibraryProfileError(f"{role} profiler action is duplicated: {action}")

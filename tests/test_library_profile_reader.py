@@ -149,6 +149,64 @@ class LibraryProfileReaderTests(unittest.TestCase):
                 with self.assertRaisesRegex(reader.LibraryProfileError, expected):
                     reader.read_profiles(self.write_logs(Path(temporary), rows))
 
+    def test_refuses_bare_missing_separator_and_doubled_marker_tokens(self):
+        opponents = (
+            ("bare", "server", " [MIR5_LIBRARY_PROFILE]", "lacks its required separator"),
+            ("missing-space", "en", " [MIR5_LIBRARY_PROFILE]search Duration: 1.0ms",
+             "lacks its required separator"),
+            ("doubled", "de", marker("search", "1.0", role="de") + " [MIR5_LIBRARY_PROFILE]",
+             "marker is duplicated"),
+        )
+        for label, role, extra, expected in opponents:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as temporary:
+                rows = self.complete_rows()
+                rows[role] = rows[role] + (extra,)
+                with self.assertRaisesRegex(reader.LibraryProfileError, expected):
+                    reader.read_profiles(self.write_logs(Path(temporary), rows))
+
+    def test_log_read_is_capped_and_enforces_exact_boundary_and_overflow(self):
+        class RecordingStream:
+            def __init__(self, payload: bytes):
+                self.payload = payload
+                self.requested = None
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+            def read(self, amount: int) -> bytes:
+                self.requested = amount
+                return self.payload[:amount]
+
+        class RecordingPath:
+            def __init__(self, payload: bytes):
+                self.stream = RecordingStream(payload)
+
+            def open(self, mode: str):
+                self.mode = mode
+                return self.stream
+
+            def __str__(self):
+                return "recording.log"
+
+        line = ("x" * (reader.MAX_LINE_CHARACTERS - 1) + "\n").encode("utf-8")
+        exact = RecordingPath(line * (reader.MAX_LOG_BYTES // len(line)))
+        # The final partial segment reaches the exact byte boundary while each
+        # decoded line remains inside the independently bounded line contract.
+        exact.stream.payload += b"x" * (reader.MAX_LOG_BYTES - len(exact.stream.payload))
+        data, lines = reader._read_log(exact)
+        self.assertEqual(exact.mode, "rb")
+        self.assertEqual(exact.stream.requested, reader.MAX_LOG_BYTES + 1)
+        self.assertEqual(len(data), reader.MAX_LOG_BYTES)
+        self.assertTrue(lines)
+
+        overflow = RecordingPath(b"x" * (reader.MAX_LOG_BYTES + 1))
+        with self.assertRaisesRegex(reader.LibraryProfileError, "exceeds"):
+            reader._read_log(overflow)
+        self.assertEqual(overflow.stream.requested, reader.MAX_LOG_BYTES + 1)
+
     def test_refuses_missing_role_and_rejects_nonfinite_or_negative_shapes(self):
         with tempfile.TemporaryDirectory() as temporary:
             logs = self.write_logs(Path(temporary), self.complete_rows())
