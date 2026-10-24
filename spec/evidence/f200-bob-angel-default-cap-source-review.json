@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "kind": "MIR5F200BobAngelDefaultCapSourceReviewV1",
+  "status": "implemented-host-controls-pass-native-variant-pending",
+  "requirement": "COMP-01",
+  "scope": "F200 Bob/Angel material routes whose immutable captured maximum_productivity field is omitted. Explicit numeric3 has the same native default ceiling; admit both representations without changing upstream prototypes. Existing numeric-cap branch and every other named route/owner guard remain unchanged.",
+  "native_schema": {
+    "application": "factorio",
+    "version": "2.0.77",
+    "member": "doc-html/prototype-api.json",
+    "sha256": "29772ECE6140B515D295A504C6F9AC5BC9E653D8B1470E8CD6DB825F93FCC756",
+    "prototype": "RecipePrototype",
+    "property": {
+      "name": "maximum_productivity",
+      "order": 11,
+      "description": "Must be >= 0.",
+      "override": false,
+      "type": "double",
+      "optional": true,
+      "default": {
+        "complex_type": "literal",
+        "value": 3.0
+      }
+    }
+  },
+  "immutable_capture": "tests/fixtures/bob-angel-f200-captured-facts.json",
+  "source": "source/compatibility/bob_angel_materials.lua",
+  "controls": "tests/test_bob_angel_materials.py",
+  "opposing_values": [
+    "0",
+    "2",
+    "4",
+    "false",
+    "string3",
+    "NaN",
+    "positive-infinity",
+    "negative-infinity"
+  ],
+  "oracle_correction": "The old drift opponent used explicit3, which equals the pinned native default. Use explicit2 to preserve an actual changed-ceiling opponent; neither the original native/captured facts nor emitted-technology expectations are rewritten.",
+  "qualification": "The explicit3 positive fails before the guard change. Host controls compare the complete emitted catalogue against the independent published rows and preserve upstream data; actual native execution of this new raw-form variant and coherent final-package qualification remain pending."
+}
