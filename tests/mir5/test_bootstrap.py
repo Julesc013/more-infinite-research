@@ -351,8 +351,11 @@ class BootstrapTests(unittest.TestCase):
           for _, id in ipairs({1, 2, 3, 20}) do handlers.events[id]({force=player.force}) end
           assert(credit_calls.on_force_created == 1 and credit_calls.on_force_reset == 1
             and credit_calls.on_forces_merged == 1 and credit_calls.on_technology_effects_reset == 1)
-          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
-            and lifecycle_calls.forces_merged == nil and lifecycle_calls.effects_reset == nil)
+          assert(lifecycle_calls.force_created.force == player.force
+            and lifecycle_calls.force_reset.force == player.force
+            and lifecycle_calls.forces_merged.force == player.force,
+            "registered force boundaries skipped retained cap-ownership cleanup")
+          assert(lifecycle_calls.effects_reset == nil)
           assert(storage.mir_native_credits == nil and handlers.nth[60] == nil and handlers.nth[61] == nil)
           install_modules(false, false, false, false); remote.interfaces = {}; load_control()
           for _, id in ipairs({1, 2, 3, 4, 5, 6, 19, 20}) do assert(handlers.events[id] == nil) end
@@ -412,10 +415,12 @@ class BootstrapTests(unittest.TestCase):
             and scripted_calls.force_reset.force == reset
             and scripted_calls.forces_merged.source_index == 31
             and scripted_calls.forces_merged.destination == destination)
-          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
-            and lifecycle_calls.forces_merged == nil and lifecycle_calls.research_reversed == nil
-            and lifecycle_calls.effects_reset == nil,
-            "unlimited cap lifecycle received a scripted-only force callback")
+          assert(lifecycle_calls.force_created.force == created
+            and lifecycle_calls.force_reset.force == reset
+            and lifecycle_calls.forces_merged.source_index == 31
+            and lifecycle_calls.forces_merged.destination == destination,
+            "scripted force callbacks skipped retained cap-ownership cleanup")
+          assert(lifecycle_calls.research_reversed == nil and lifecycle_calls.effects_reset == nil)
           assert(scripted_calls.research_reversed.research.name == "scripted"
             and scripted_calls.effects_reset.force == destination)
         ''')
@@ -673,8 +678,10 @@ class BootstrapTests(unittest.TestCase):
           game=nil
           handlers.load()
           assert(#initialized == 4 and #reconciled == 2)
-          assert(lifecycle_calls.force_created == nil and lifecycle_calls.force_reset == nil
-            and lifecycle_calls.forces_merged == nil)
+          assert(lifecycle_calls.force_created.force == two
+            and lifecycle_calls.force_reset.force == two
+            and lifecycle_calls.forces_merged.source_index == 1
+            and lifecycle_calls.forces_merged.destination == two)
         ''')
 
 
