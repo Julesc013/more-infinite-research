@@ -4,4 +4,6 @@ This private F210 2.1.23 fixture is for the exact no-Angel Bob-core closure capt
 
 On a new disposable world it marks only the explicit non-MIR prerequisites as researched, inserts the six independently named science packs into a real lab, and earns three finite levels plus one continuation level for every family. It requires 28 native `on_research_finished` events, exact 28/20/16/8/10/4 input consumption (automation/logistic/chemical/production/space/metallurgic), and a native 8% bonus on every named route. It saves after completion; the native runner must perform two cold reloads, where the fixture only reads the saved witness.
 
+The completed archive is `mir5-native-complete.zip`, as required by `Invoke-NativeFixture.ps1`. Run 40081293896 reached its initial completion marker and wrote the former case-specific archive, but that filename could not satisfy the runner's completion predicate. Preserve that adverse harness observation separately; the corrected fixture still requires a new production stage and two actual cold reloads.
+
 The fixture does not manufacture science, alter ordinary material tuning, seed selected MIR levels/effects/queues, inspect MIR private state, or make a foreign-force preservation claim. A current candidate full-catalogue capture and comparison remains required before native qualification or dispatch.

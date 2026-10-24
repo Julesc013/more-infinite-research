@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import unittest
 
@@ -37,6 +38,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         self.lua.globals().control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().settings_path = (FIXTURE / "settings-updates.lua").as_posix()
         self.lua.globals().data_path = (FIXTURE / "data.lua").as_posix()
+        runner = (ROOT / "tools/mir5/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
+        completed_save = re.findall(r"\$complete=Join-Path \$writeData 'saves/([^'/]+)\.zip'", runner)
+        self.assertEqual(1, len(completed_save), "native runner must have one completed-save contract")
+        self.lua.globals().expected_complete_save = completed_save[0]
         self.lua.execute(r'''
           function stage_fixture(opponent)
             local categories = {speed={}, ["mir5-override-module-category"]={}}
@@ -118,7 +123,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
             }
             env.game={tick=0, speed=1, forces={player={recipes={["mir5-override-ordinary"]={enabled=true}}}},
               surfaces={{create_entity=function(row) assert(row.name == "mir5-override-assembler"); return machine end}},
-              server_save=function(name) assert(name == "mir5-override-interactions-complete"); saves=saves+1 end}
+              server_save=function(name)
+                assert(name == expected_complete_save, "completed save does not match native runner")
+                saves=saves+1
+              end}
             env.helpers={table_to_json=function(row) markers[#markers+1]=row; return "fixture-json" end}
             if opponent == "legacy-probability" then
               local product=env.prototypes.recipe["mir5-override-recycling"].products[1]
