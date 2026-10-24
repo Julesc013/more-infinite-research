@@ -241,3 +241,7 @@ fixtures/release-inputs/mir470-published-460-consolidated-construction.json -tex
 .mir/control/MIR4-F210-Current-Engine-Cap-Harness-AdmissionV4.json text eol=lf
 # Native observer receipts bind these authored CRLF bytes exactly.
 fixtures/assert-f210-current-bob-angel-gunmetal-invar-observer/* -text -eol whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+# These native BobTech inputs are byte-hash-bound by the MIR5 recovery record.
+fixtures/run-profiles/f210-bob-angel-gunmetal-invar-2123.json -text -eol
+fixtures/assert-f210-current-bob-angel-gunmetal-invar-qualification/data-final-fixes.lua -text -eol
+fixtures/assert-f210-current-bob-angel-tin-route-observer/data-final-fixes.lua -text -eol
