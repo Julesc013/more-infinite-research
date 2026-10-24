@@ -54,6 +54,7 @@ def _entry(value):
             "shared_probability": None,
             "catalyst_amount": None,
             "ignored_by_productivity": None,
+            "ignored_by_stats": None,
             "extra_count_fraction": None,
         }
     if not isinstance(value, dict):
@@ -69,15 +70,19 @@ def _entry(value):
         "shared_probability": value.get("shared_probability"),
         "catalyst_amount": value.get("catalyst_amount"),
         "ignored_by_productivity": value.get("ignored_by_productivity"),
+        "ignored_by_stats": value.get("ignored_by_stats"),
         "extra_count_fraction": value.get("extra_count_fraction"),
     }
 
 
-def _ordinary_matches(actual, expected):
+def _ordinary_matches(actual, expected, product=False):
     if not isinstance(actual, list) or len(actual) != len(expected):
         return False
     for found, wanted in zip(actual, expected):
         found = _entry(found)
+        ignored = found["ignored_by_productivity"]
+        if product and ignored is None:
+            ignored = found["ignored_by_stats"]
         expected_probability = wanted.get("probability", "default")
         if (found["type"] != wanted["type"]
                 or found["name"] != wanted["name"]
@@ -89,7 +94,8 @@ def _ordinary_matches(actual, expected):
                     else found["probability"] != expected_probability)
                 or found["independent_probability"] not in (None, 1)
                 or found["catalyst_amount"] not in (None, 0)
-                or found["ignored_by_productivity"] not in (None, 0)
+                or isinstance(ignored, bool)
+                or ignored not in (None, 0)
                 or found["extra_count_fraction"] not in (None, 0)):
             return False
         shared = found["shared_probability"]
@@ -159,7 +165,7 @@ class AtanProductivityTests(unittest.TestCase):
                         if route["maximum_productivity"] == "omitted"
                         else recipe.get("maximum_productivity") != route["maximum_productivity"])
                     or not _ordinary_matches(recipe.get("ingredients"), route["ingredients"])
-                    or not _ordinary_matches(recipe.get("results"), route["results"])):
+                    or not _ordinary_matches(recipe.get("results"), route["results"], product=True)):
                 raise AssertionError(f"captured ATAN {variant_name} route drifted: {route['recipe']}")
 
             owner = raw.get("technology", {}).get(route["owner"])
@@ -201,7 +207,7 @@ class AtanProductivityTests(unittest.TestCase):
             target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
             target.distribution_version, target.cargo_research = "5.0.21000", true
             target.recipe_probability, target.receiver_limits = "independent_probability", true
-            target.productivity_ignores_stats = false
+            target.productivity_ignores_stats = true
           end
           f200()
         ''')
@@ -438,6 +444,29 @@ class AtanProductivityTests(unittest.TestCase):
         foreign_effect["technology"]["automation-3"]["effects"][1]["type"] = "change-recipe-productivity"
         with self.assertRaisesRegex(Exception, "automation-3 no longer owns atan-ash-seperation"):
             self.select(raw=foreign_effect)
+
+    def test_result_stats_inherit_productivity_exclusion_only_for_products(self):
+        for variant in ("base", "space_age"):
+            with self.subTest(variant=variant):
+                baseline = _plain(self.emitted_rows(variant))
+                for stats, productivity in ((0, None), (1, 0), (7, 0)):
+                    raw = self.raw_fixture(variant)
+                    result = raw["recipe"]["atan-pollution-filter"]["results"][1]
+                    result["ignored_by_stats"] = stats
+                    result["ignored_by_productivity"] = productivity
+                    self.assertEqual(baseline, _plain(self.emitted_rows(variant, raw=raw)))
+
+                raw = self.raw_fixture(variant)
+                raw["recipe"]["atan-pollution-filter"]["ingredients"][1]["ignored_by_stats"] = 5
+                self.assertEqual(baseline, _plain(self.emitted_rows(variant, raw=raw)))
+
+                for stats, productivity in ((1, None), (7, None), (0, 1), (False, None), (0, False)):
+                    raw = self.raw_fixture(variant)
+                    result = raw["recipe"]["atan-pollution-filter"]["results"][1]
+                    result["ignored_by_stats"] = stats
+                    result["ignored_by_productivity"] = productivity
+                    with self.assertRaisesRegex(Exception, "atan-pollution-filter changed"):
+                        self.select(variant, raw=raw)
 
     def test_selected_definitions_are_detached_and_preserve_the_withheld_effect_boundary(self):
         first = self.select()

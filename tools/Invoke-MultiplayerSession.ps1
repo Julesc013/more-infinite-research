@@ -19,12 +19,22 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'lib/validation/OwnedProcessMemorySampler.ps1')
 
 function Assert-Session([bool]$Condition, [string]$Message) {
   if (-not $Condition) { throw "[mir5-multiplayer-session] $Message" }
 }
 function Get-SessionHash([string]$Path) {
   (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()
+}
+function Get-ProcessMemoryObservationOptIn([hashtable]$Spec,[string]$FixtureCase) {
+  $collect = $false
+  if ($Spec.ContainsKey('process_memory_observations')) {
+    Assert-Session ($Spec.process_memory_observations -is [bool]) 'process memory observation flag must be Boolean'
+    $collect = [bool]$Spec.process_memory_observations
+  }
+  Assert-Session (-not $collect -or $FixtureCase -ceq 'library-multiplayer') 'process memory observations require the Library fixture'
+  return $collect
 }
 function Test-Within([string]$Root, [string]$Path) {
   $relative = [IO.Path]::GetRelativePath($Root, $Path)
@@ -98,8 +108,16 @@ function Assert-NoFatal([string]$Text, [string]$Label) {
   $fatal = [regex]::Match($Text, '(?im)^\s*\d+[.]\d+\s+Error\b|^Error while running event\b|\bException at tick\b|\bnon-recoverable error\b|^stack traceback:$|\bdesync(?:hronization)?\b')
   Assert-Session (-not $fatal.Success) "native fatal or desync in ${Label}: $($fatal.Value)"
 }
+function Close-ProcessMemoryObservation($Record) {
+  if ($null -eq $processMemorySampler) { return }
+  $property = $Record.PSObject.Properties['memory_observation']
+  if ($null -ne $property -and $null -ne $property.Value) {
+    Complete-MIROwnedProcessMemoryProcess -Sampler $processMemorySampler -Registration $property.Value
+  }
+}
 function Complete-Record($Record) {
   if ($Record.closed) { return }
+  Close-ProcessMemoryObservation $Record
   Assert-Session $Record.process.HasExited "cannot complete live process $($Record.name)"
   $Record.process.WaitForExit()
   $failure = $null
@@ -120,6 +138,7 @@ function Complete-Record($Record) {
 }
 function Stop-Record($Record) {
   if ($null -eq $Record -or $Record.closed) { return }
+  Close-ProcessMemoryObservation $Record
   $Record.expected_stop = $true
   if (-not $Record.process.HasExited) {
     try { $Record.process.Kill($true) } catch { $Record.process.Kill() }
@@ -155,6 +174,17 @@ function Start-Native([string]$Name, [string[]]$Arguments) {
     $record = [pscustomobject]@{
       name=$Name; process=$process; stdout=$stdout; stderr=$stderr
       copy_tasks=$copies; output_streams=$streams.ToArray(); expected_stop=$false; closed=$false; exit_code=$null
+    }
+    if ($null -ne $processMemorySampler) {
+      $match = [regex]::Match($Name, '^(?:server-(initial|restart)|client-(initial|rejoin|restart)-(en|de))$')
+      if (-not $match.Success) {
+        Set-MIROwnedProcessMemoryIncomplete -Sampler $processMemorySampler -Reason 'record-name-contract'
+      } else {
+        $phase = if ($match.Groups[1].Success) { [string]$match.Groups[1].Value } else { [string]$match.Groups[2].Value }
+        $role = if ($match.Groups[1].Success) { 'server' } else { 'client-' + [string]$match.Groups[3].Value }
+        $registration = Register-MIROwnedProcessMemoryProcess -Sampler $processMemorySampler -Phase $phase -Role $role -Process $process
+        $record | Add-Member -NotePropertyName memory_observation -NotePropertyValue $registration
+      }
     }
     [void]$records.Add($record)
     return $record
@@ -278,6 +308,7 @@ function Assert-Active {
       throw "native process exited unexpectedly: $($record.name), code $($record.exit_code)"
     }
   }
+  if ($null -ne $processMemorySampler) { Add-MIROwnedProcessMemorySample -Sampler $processMemorySampler }
   Assert-NoFatal (Read-LiveText) 'live native logs'
 }
 function Test-LibraryInteger([object]$Value) {
@@ -378,7 +409,11 @@ function Wait-For([string]$Description, [scriptblock]$Predicate) {
     Assert-Active
     $value = & $Predicate (Read-LiveText)
     if ($null -ne $value -and $value -ne $false) { return $value }
-    Start-Sleep -Milliseconds 200
+    $delayMilliseconds = 200
+    if ($null -ne $processMemorySampler) {
+      $delayMilliseconds = Get-MIROwnedProcessMemorySleepMilliseconds -Sampler $processMemorySampler -MaximumDelayMilliseconds $delayMilliseconds
+    }
+    Start-Sleep -Milliseconds $delayMilliseconds
   }
   throw "timed out waiting for $Description; native diagnostics are in $workroot"
 }
@@ -426,6 +461,7 @@ $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
+$collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
 $markerPrefix=if($fixtureCase-ceq'library-multiplayer'){'MIR5_LIBRARY_MULTIPLAYER'}else{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
 foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
@@ -503,6 +539,18 @@ if($fixtureCase-ceq'library-multiplayer') {
 }
 foreach ($output in @($restartSave,$finalSave,$sessionPath)) { Assert-Session (-not (Test-Path -LiteralPath $output)) "fresh output already exists: $output" }
 
+$processMemorySampler = $null
+$processMemoryObservationPath = $null
+if ($collectProcessMemoryObservations) {
+  $processMemoryObservationPath = Resolve-BuildOutput (Join-Path $workroot 'process-memory-observations.json') 'process memory observations'
+  Assert-Session (-not (Test-Path -LiteralPath $processMemoryObservationPath)) 'fresh process memory observation output already exists'
+  $slots = foreach ($phase in @('initial', 'rejoin', 'restart')) {
+    foreach ($role in @('server', 'client-en', 'client-de')) {
+      [pscustomobject]@{ phase=$phase; role=$role }
+    }
+  }
+  $processMemorySampler = New-MIROwnedProcessMemorySampler -ExpectedSlots @($slots)
+}
 $records = [Collections.Generic.List[object]]::new()
 $liveLogs = @((Join-Path $serverWriteData 'factorio-current.log')) + @($clients | ForEach-Object { Join-Path $_.write_data 'factorio-current.log' })
 $deadline = [DateTime]::UtcNow.AddSeconds(900)
@@ -545,6 +593,11 @@ try {
   # with a product failure or hidden by weakening native fatal checks.
   foreach ($client in $activeClients) { Stop-Record $client }
   Invoke-LoopbackRconKicks $rconPort $rconPassword
+  if ($null -ne $processMemorySampler) {
+    Close-ProcessMemoryObservation $server
+    $registration = Register-MIROwnedProcessMemoryProcess -Sampler $processMemorySampler -Phase 'rejoin' -Role 'server' -Process $server.process
+    $server | Add-Member -NotePropertyName memory_observation -NotePropertyValue $registration -Force
+  }
   $activeClients = Start-Clients 'rejoin'
   [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 })
   if($fixtureCase-ceq'library-multiplayer'){[void](Wait-For 'complete rejoin client screenshots' { Find-Screenshots @('rejoin') })}
@@ -598,6 +651,35 @@ finally {
         if ($null -eq $sessionFailure) { $sessionFailure = $_ }
         Write-Warning "could not clean owned $($record.name): $($_.Exception.Message)"
       }
+    }
+  }
+  $sampler = Get-Variable -Name processMemorySampler -ValueOnly -ErrorAction SilentlyContinue
+  if ($null -ne $sampler) {
+    if ($null -ne $sessionFailure) {
+      Set-MIROwnedProcessMemoryIncomplete -Sampler $sampler -Reason 'native-session-failure'
+    }
+    $memorySummary = $null
+    try {
+      $receipt = Write-MIROwnedProcessMemoryObservationReceipt -Sampler $sampler -Path $processMemoryObservationPath
+      $memorySummary = [ordered]@{
+        status = [string]$receipt.status
+        performance_acceptance = $false
+        artifact = [ordered]@{
+          leaf = [IO.Path]::GetFileName($processMemoryObservationPath)
+          sha256 = Get-SessionHash $processMemoryObservationPath
+          bytes = [int64](Get-Item -LiteralPath $processMemoryObservationPath).Length
+        }
+      }
+    }
+    catch {
+      $memorySummary = [ordered]@{
+        status = 'incomplete-observation'
+        performance_acceptance = $false
+        failure = 'memory-receipt-write-failure'
+      }
+    }
+    if ($null -ne $result) {
+      $result.process_memory_observations = $memorySummary
     }
   }
 }

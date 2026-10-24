@@ -3,6 +3,7 @@
 -- families, choose owners, or traverse a foreign research graph.
 local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_angel_materials")
+local target = require("platform.target")
 
 local M = {}
 
@@ -35,11 +36,16 @@ end
 
 -- A selected recipe has one fully named ordinary form. Return/coproduct,
 -- probability, catalyst, and productivity-stat changes are another route.
-local function ordinary_rows(actual, expected)
+local function ordinary_rows(actual, expected, product)
   if type(actual) ~= "table" or #actual ~= #expected then return false end
   for index, wanted in ipairs(expected) do
     local row = actual[index]
-    if type(row) ~= "table" or (row.type or "item") ~= wanted.type
+    if type(row) ~= "table" then return false end
+    local ignored = row.ignored_by_productivity
+    if product and ignored == nil and target.productivity_ignores_stats == true then
+      ignored = row.ignored_by_stats
+    end
+    if (row.type or "item") ~= wanted.type
       or entry_name(row) ~= wanted.name or entry_amount(row) ~= wanted.amount
       or row.amount_min ~= nil or row.amount_max ~= nil
       or (row.probability ~= nil and row.probability ~= 1)
@@ -47,7 +53,7 @@ local function ordinary_rows(actual, expected)
       or (row.shared_probability ~= nil and (type(row.shared_probability) ~= "table"
         or row.shared_probability.min ~= 0 or row.shared_probability.max ~= 1))
       or (entry_catalyst_amount(row) ~= nil and entry_catalyst_amount(row) ~= 0)
-      or (row.ignored_by_productivity ~= nil and row.ignored_by_productivity ~= 0)
+      or (ignored ~= nil and ignored ~= 0)
       or (row.extra_count_fraction ~= nil and row.extra_count_fraction ~= 0) then
       return false
     end
@@ -109,7 +115,7 @@ local function validate_raw(raw, definition)
       or recipe.allow_productivity ~= true
       or not maximum_productivity_matches(recipe.maximum_productivity, route.maximum_productivity)
       or not ordinary_rows(recipe.ingredients, route.ingredients)
-      or not ordinary_rows(recipe.results, route.results) then
+      or not ordinary_rows(recipe.results, route.results, true) then
       fail(route.recipe .. " changed")
     end
     if not route_owner_is_exact(raw.technology[route.owner], route) then

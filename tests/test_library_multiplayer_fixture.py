@@ -16,6 +16,7 @@ CONTROL = FIXTURE / "control.lua"
 PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 WRAPPER = ROOT / "tools/Invoke-MultiplayerFixture.ps1"
 SESSION = ROOT / "tools/Invoke-MultiplayerSession.ps1"
+SAMPLER = ROOT / "tools/lib/validation/OwnedProcessMemorySampler.ps1"
 MEMORY_CALIBRATION = ROOT / "spec/evidence/library-multiplayer-session-memory-calibration-r01.json"
 
 
@@ -940,6 +941,111 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertFalse(missing[0])
         self.assertIn("unexpected Library refresh fixture setting", missing[1])
 
+    def test_opt_in_owned_process_memory_sampler_is_bounded_identity_checked_and_read_only(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          function Get-Process { throw 'sampler must not rediscover a process' }
+          function Get-CimInstance { throw 'sampler must not traverse process trees' }
+          . $env:MIR_TEST_SAMPLER
+          $start=[Diagnostics.ProcessStartInfo]::new()
+          $start.FileName=(Get-Command pwsh -ErrorAction Stop).Source
+          $start.UseShellExecute=$false
+          [void]$start.ArgumentList.Add('-NoLogo')
+          [void]$start.ArgumentList.Add('-NoProfile')
+          [void]$start.ArgumentList.Add('-Command')
+          [void]$start.ArgumentList.Add('Start-Sleep -Seconds 20')
+          $child=[Diagnostics.Process]::new();$child.StartInfo=$start
+          if(-not$child.Start()){throw 'could not start bounded sampler child'}
+          try {
+            $slot=@([pscustomobject]@{phase='initial';role='server'})
+            $allSlots=@(foreach($phase in @('initial','rejoin','restart')){foreach($role in @('server','client-en','client-de')){[pscustomobject]@{phase=$phase;role=$role}}})
+            $bounded=New-MIROwnedProcessMemorySampler -ExpectedSlots $allSlots
+            if($bounded.expected_slots.Count -ne 9 -or $bounded.target_interval_milliseconds -ne 250 -or $bounded.maximum_duration_seconds -ne 900 -or $bounded.maximum_observations -ne 12000 -or $bounded.maximum_serialized_bytes -ne 8MB){throw 'sampler bounds differ'}
+            $rejected=$false;try{New-MIROwnedProcessMemorySampler -ExpectedSlots @($allSlots + $slot)|Out-Null}catch{$rejected=$true}
+            if(-not$rejected){throw 'sampler accepted more than the nine owned slots'}
+            $sampler=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
+            $registration=Register-MIROwnedProcessMemoryProcess -Sampler $sampler -Phase initial -Role server -Process $child
+            Add-MIROwnedProcessMemorySample -Sampler $sampler
+            Start-Sleep -Milliseconds 260
+            Add-MIROwnedProcessMemorySample -Sampler $sampler
+            if($sampler.observations.Count -lt 2 -or $sampler.observations[1].elapsed_monotonic_milliseconds -lt 250){throw 'fixed nominal sampler cadence was not observed'}
+            if((Get-MIROwnedProcessMemorySleepMilliseconds -Sampler $sampler -MaximumDelayMilliseconds 200) -gt 200){throw 'sampler delay exceeded session wait bound'}
+            Complete-MIROwnedProcessMemoryProcess -Sampler $sampler -Registration $registration
+            if($child.HasExited){throw 'sampler changed owned child lifetime'}
+            $receiptPath=[IO.Path]::GetTempFileName();Remove-Item -LiteralPath $receiptPath -Force
+            $receipt=Write-MIROwnedProcessMemoryObservationReceipt -Sampler $sampler -Path $receiptPath
+            $receiptBytes=[IO.File]::ReadAllBytes($receiptPath)
+            if($receipt.status -cne 'complete-observation' -or $receipt.performance_acceptance -ne $false -or $receipt.observations.Count -lt 2 -or $receiptBytes.Length -gt 8MB -or $receiptBytes.Length -ne (ConvertTo-MIROwnedProcessMemoryObservationBytes -Receipt $receipt).Length){throw 'sampler did not write its exact bounded non-acceptance observation'}
+            Remove-Item -LiteralPath $receiptPath -Force
+
+            $identity=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
+            $identityRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $identity -Phase initial -Role server -Process $child
+            $identityRegistration.start_utc='1970-01-01T00:00:00.0000000Z'
+            Add-MIROwnedProcessMemorySample -Sampler $identity
+            Complete-MIROwnedProcessMemoryProcess -Sampler $identity -Registration $identityRegistration
+            if((Get-MIROwnedProcessMemoryObservationReceipt -Sampler $identity).status -cne 'incomplete-observation'){throw 'identity drift did not make evidence incomplete'}
+
+            $overflow=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
+            $overflow.maximum_observations=1
+            $overflowRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $overflow -Phase initial -Role server -Process $child
+            Add-MIROwnedProcessMemorySample -Sampler $overflow
+            $overflow.next_due_monotonic_milliseconds=0
+            Add-MIROwnedProcessMemorySample -Sampler $overflow
+            Complete-MIROwnedProcessMemoryProcess -Sampler $overflow -Registration $overflowRegistration
+            if((Get-MIROwnedProcessMemoryObservationReceipt -Sampler $overflow).status -cne 'incomplete-observation'){throw 'observation limit did not make evidence incomplete'}
+
+            $serialized=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
+            $serializedRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $serialized -Phase initial -Role server -Process $child
+            Add-MIROwnedProcessMemorySample -Sampler $serialized
+            $serialized.observations.Add([pscustomobject]@{padding=('x'*(9MB))})
+            Complete-MIROwnedProcessMemoryProcess -Sampler $serialized -Registration $serializedRegistration
+            $serializedPath=[IO.Path]::GetTempFileName();Remove-Item -LiteralPath $serializedPath -Force
+            $serializedReceipt=Write-MIROwnedProcessMemoryObservationReceipt -Sampler $serialized -Path $serializedPath
+            if($serializedReceipt.status -cne 'incomplete-observation' -or $serializedReceipt.observations.Count -ne 0 -or $serializedReceipt.incomplete_reasons -notcontains 'serialized-output-limit' -or (Get-Item -LiteralPath $serializedPath).Length -gt 8MB){throw 'serialized byte cap was not enforced against the emitted artifact'}
+            Remove-Item -LiteralPath $serializedPath -Force
+          } finally {
+            if(-not$child.HasExited){$child.Kill($true);[void]$child.WaitForExit(5000)}
+            $child.Dispose()
+          }
+          'PASS owned process memory sampler'
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SAMPLER=str(SAMPLER)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_memory_observation_opt_in_is_strict_and_default_session_specs_remain_unchanged(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $definition=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Get-ProcessMemoryObservationOptIn'},$true))
+          if($definition.Count -ne 1){throw 'strict opt-in reader missing or ambiguous'}
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          Invoke-Expression $definition[0].Extent.Text
+          if(Get-ProcessMemoryObservationOptIn -Spec @{} -FixtureCase 'library-multiplayer'){throw 'absent opt-in created observations'}
+          if(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$false} -FixtureCase 'library-multiplayer'){throw 'false opt-in created observations'}
+          if(-not(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$true} -FixtureCase 'library-multiplayer')){throw 'true Library opt-in was ignored'}
+          foreach($wrong in @('true',1,1.0,$null)){
+            $rejected=$false;try{Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$wrong} -FixtureCase 'library-multiplayer'|Out-Null}catch{$rejected=$true}
+            if(-not$rejected){throw 'non-Boolean opt-in was accepted'}
+          }
+          $rejected=$false;try{Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$true} -FixtureCase 'scripted-effects-multiplayer'|Out-Null}catch{$rejected=$true}
+          if(-not$rejected){throw 'non-Library opt-in was accepted'}
+          $wrapper=[IO.File]::ReadAllText($env:MIR_TEST_WRAPPER)
+          if(-not$wrapper.Contains('if($CollectProcessMemoryObservations){') -or $wrapper.Contains('$spec.process_memory_observations=$false')){throw 'wrapper changed the default session spec'}
+          'PASS strict observation opt-in'
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_WRAPPER=str(WRAPPER)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_native_session_requires_ten_client_local_captures(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
         session = SESSION.read_text(encoding="utf-8")
@@ -1020,8 +1126,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Get-SessionHash([string]$Path){return ('a'*64)}
           function Read-LogText([string]$Path){return ''}
           function Invoke-LoopbackRconKicks {param($Port,$Password)}
+          $script:memoryWrites=0;$script:memoryReasons=[Collections.Generic.List[string]]::new()
+          function Set-MIROwnedProcessMemoryIncomplete {param($Sampler,[string]$Reason)$script:memoryReasons.Add($Reason)}
+          function Write-MIROwnedProcessMemoryObservationReceipt {
+            param($Sampler,[string]$Path)
+            $script:memoryWrites++
+            [IO.File]::WriteAllText($Path,'{}',[Text.UTF8Encoding]::new($false))
+            return [pscustomobject]@{status='complete-observation'}
+          }
+          function Close-ProcessMemoryObservation {param($Record)}
+          function Register-MIROwnedProcessMemoryProcess {param($Sampler,$Phase,$Role,$Process) return $null}
           function Start-Server([string]$Name,[string]$Save){
-            $record=[pscustomobject]@{name=$Name;closed=$false}
+            $record=[pscustomobject]@{name=$Name;closed=$false;process=$null}
             $script:records.Add($record);return $record
           }
           function Start-Clients([string]$Phase){
@@ -1066,6 +1182,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $script:records=[Collections.Generic.List[object]]::new()
               $script:stops=[Collections.Generic.List[string]]::new()
               $sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
+              $script:memoryWrites=0;$script:memoryReasons.Clear()
+              $processMemorySampler=if($fixtureCase -ceq 'library-multiplayer'){[pscustomobject]@{}}else{$null}
+              $processMemoryObservationPath=if($fixtureCase -ceq 'library-multiplayer'){Join-Path $output 'process-memory-observations.json'}else{$null}
               $serverWriteData=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
               $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password'
               $clients=@([pscustomobject]@{name='en';locale='en';port=2;config='en.ini';write_data='en'},
@@ -1079,6 +1198,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if($receipt.status -cne 'passed-private-two-client-session' -or $script:stops.Count -ne 8){
                   throw 'successful session lost completed teardown'
                 }
+                if($fixtureCase -ceq 'library-multiplayer' -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $receipt.process_memory_observations.status -cne 'complete-observation' -or $receipt.process_memory_observations.performance_acceptance -ne $false)){
+                  throw 'successful opt-in session lost its bounded memory receipt'
+                }
                 if($fixtureCase -ceq 'library-multiplayer' -and $receipt.screenshots.Count -ne 10){
                   throw 'successful teardown lost a required capture'
                 }
@@ -1088,6 +1210,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 if($null -eq $caught -or (Test-Path -LiteralPath $sessionPath)){throw 'failed session claimed success'}
                 $expected=if($script:mode -eq 'cleanup'){'late native cleanup failure'}else{'original session failure'}
                 if($caught.Exception.Message -cne $expected){throw 'original session/cleanup failure was replaced'}
+                if($fixtureCase -ceq 'library-multiplayer' -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $script:memoryReasons -notcontains 'native-session-failure')){
+                  throw 'failed opt-in session lost its incomplete memory receipt'
+                }
               }
             }
           }
