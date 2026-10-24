@@ -23,6 +23,7 @@ Version: @DISTRIBUTION_VERSION@
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
   Bugfixes:
     - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
+    - Preserve in-flight Library translations across client load and retry expired requests in deterministic order.
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
     - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an
       ordinary research unit.
