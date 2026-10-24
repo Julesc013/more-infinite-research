@@ -65,8 +65,7 @@
       "remaining_qualification": [
         "Complete affected gameplay, save/reload and nondefault policy outcomes for the full current catalogue.",
         "Freeze and compare the final current-player package rather than earlier private packages.",
-        "Qualify the five recovered F210 BobTech material rows on the exact supported native closure.",
-        "Compare the complete F210 Bob-core no-Angel candidate catalogue against its independent published capture, then qualify the seven material families natively."
+        "Exact earlier-source BobTech eleven-lab and Bob-core complete-catalogue/28-lab chains pass with save/two reloads; finish physical alloy output and coherent final-package checks rather than relabelling those executions."
       ]
     },
     {
@@ -232,7 +231,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run native nondefault science/lab policies, including the named cryogenic-unit case.",
+        "Finish remaining nondefault science/lab policies, including SIF all-eight-policy emission and two-target predecessor/save cases. The named cryogenic-unit lab/save/two-reload case passes at its recorded exact source.",
         "Keep SCI-UNLOCK-01 and SCI-RESEARCH-01 open until exact reporter closures are recovered or a bounded representative is accepted."
       ]
     },
@@ -663,9 +662,7 @@
         "targets",
         "package"
       ],
-      "remaining_implementation": [
-        "Complete the selected source-root and package materialization cutover for all nine editions after parity is accepted."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
         "Run final current-package and affected native checks for every delivered target subset."
       ]
@@ -970,7 +967,7 @@
         "root_transfer"
       ],
       "remaining_implementation": [
-        "Complete package-excluded repository documentation and final player-package asset/catalogue transfer at the approved source-root cutover."
+        "Complete final README/documentation/changelog acceptance against the current frozen packages. Canonical source-root asset/catalogue transfer is accepted in PR806 with actual nine-package parity; the complete authored README remains intact."
       ],
       "remaining_qualification": [
         "Verify all player package assets, locales, support/changelog content and source-root transfer against final target packages."
