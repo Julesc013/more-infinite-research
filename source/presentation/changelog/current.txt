@@ -17,6 +17,7 @@ Version: @DISTRIBUTION_VERSION@
     - Retain authored Armor, Py, ATAN, Bob/Angel and K2 bindings for their admitted engine and mod profiles.
     - Restore fourteen Tin, Lead, Bronze, Gunmetal, Invar, Nitinol and Copper Tungsten technologies for the Factorio 2.1 Bob-core
       profile without Angel mods.
+    - Restore five Tin, Gunmetal and Invar native material stages for the Factorio 2.1 BobTech and Angel profile.
     - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where
       supported.
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
