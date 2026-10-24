@@ -169,10 +169,18 @@ local function assert_rows(force, contract, stage, policy)
     local expected_science, expected_prerequisites = expected_row(contract.rows[name], stage, policy)
     local ingredients = value.research_unit_ingredients
     if #ingredients ~= #expected_science then fail(name .. " runtime science cardinality differs") end
-    for index, wanted in ipairs(expected_science) do
-      local got = ingredients[index]
-      if not got or got.name ~= wanted[1] or got.amount ~= wanted[2] or got.name == "space-science-pack" then
-        fail(name .. " runtime science differs at " .. index)
+    local actual_science = {}
+    for _, got in ipairs(ingredients) do
+      if actual_science[got.name] ~= nil then fail(name .. " duplicate runtime science: " .. got.name) end
+      if got.name == "space-science-pack" then fail(name .. " retained space science") end
+      actual_science[got.name] = got.amount
+    end
+    -- Native runtime array order is not part of the research cost. The
+    -- data-stage preflight separately checks authored declaration order.
+    for _, wanted in ipairs(expected_science) do
+      if actual_science[wanted[1]] ~= wanted[2] then
+        fail(name .. " runtime science differs for " .. wanted[1] .. ": expected "
+          .. tostring(wanted[2]) .. ", got " .. tostring(actual_science[wanted[1]]))
       end
     end
     local seen, count = {}, 0
