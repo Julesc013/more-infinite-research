@@ -606,6 +606,97 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER), MIR_TEST_WORK=work), check=False)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_session_success_waits_for_clients_first_teardown_and_preserves_failures(self):
+        script = r'''
+          $ErrorActionPreference='Stop';Set-StrictMode -Version Latest
+          $tokens=$null;$errors=$null
+          $text=[IO.File]::ReadAllText($env:MIR_TEST_SESSION)
+          $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $nodes=@($ast.EndBlock.Statements|Where-Object {
+            $_ -is [Management.Automation.Language.TryStatementAst] -and
+              $_.Body.Extent.Text.Contains("Start-Server 'server-initial'")
+          })
+          if($nodes.Count -ne 1){throw 'session execution tail missing or ambiguous'}
+          $execute=[scriptblock]::Create($text.Substring($nodes[0].Extent.StartOffset))
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Get-SessionHash([string]$Path){return ('a'*64)}
+          function Read-LogText([string]$Path){return ''}
+          function Invoke-LoopbackRconKicks {param($Port,$Password)}
+          function Start-Server([string]$Name,[string]$Save){
+            $record=[pscustomobject]@{name=$Name;closed=$false}
+            $script:records.Add($record);return $record
+          }
+          function Start-Clients([string]$Phase){
+            if($script:mode -eq 'primary-and-cleanup' -and $Phase -eq 'initial'){
+              throw 'original session failure'
+            }
+            foreach($locale in @('en','de')){
+              $record=[pscustomobject]@{name="client-$Phase-$locale";closed=$false}
+              $script:records.Add($record);$record
+            }
+          }
+          function Stop-Record($Record){
+            $script:stops.Add($Record.name)
+            if(Test-Path -LiteralPath $script:sessionPath){throw 'success receipt preceded teardown'}
+            if($Record.name -like 'server-*' -and @($script:records|Where-Object {
+                $_.name -like 'client-*' -and -not $_.closed}).Count){
+              throw 'server stopped before its live clients'
+            }
+            $Record.closed=$true
+            if(($script:mode -eq 'cleanup' -and $Record.name -eq 'client-restart-de') -or
+                ($script:mode -eq 'primary-and-cleanup' -and $Record.name -eq 'server-initial')){
+              throw 'late native cleanup failure'
+            }
+          }
+          function Wait-For([string]$Description,[scriptblock]$Predicate){
+            if($Description -eq 'completed marker'){
+              return [pscustomobject]@{witnesses=@{host_restart_observed=$true;on_load_read_only=$true;
+                availability_terminal_labels_checked=$true;screenshot_calls=8}}
+            }
+            if($Description -eq 'complete final save and client screenshots'){
+              return [pscustomobject]@{files=@()}
+            }
+            return $true
+          }
+          foreach($fixtureCase in @('library-multiplayer','scripted-effects-multiplayer')){
+            foreach($script:mode in @('success','cleanup','primary-and-cleanup')){
+              $output=Join-Path $env:MIR_TEST_WORK ($fixtureCase+'-'+$script:mode)
+              $null=New-Item -ItemType Directory -Path $output
+              $script:sessionPath=Join-Path $output 'session.json'
+              $script:records=[Collections.Generic.List[object]]::new()
+              $script:stops=[Collections.Generic.List[string]]::new()
+              $sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
+              $serverWriteData=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
+              $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password'
+              $clients=@([pscustomobject]@{name='en';locale='en';port=2;config='en.ini';write_data='en'},
+                [pscustomobject]@{name='de';locale='de';port=3;config='de.ini';write_data='de'})
+              $caught=$null
+              try{& $execute|Out-Null}catch{$caught=$_}
+              if(@($script:records|Where-Object {-not $_.closed}).Count){throw 'cleanup abandoned owned records'}
+              if($script:mode -eq 'success'){
+                if($null -ne $caught){throw $caught}
+                $receipt=Get-Content -LiteralPath $sessionPath -Raw|ConvertFrom-Json
+                if($receipt.status -cne 'passed-private-two-client-session' -or $script:stops.Count -ne 8){
+                  throw 'successful session lost completed teardown'
+                }
+                if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne
+                    'client-restart-de,client-restart-en,server-restart'){throw 'final teardown is not reversed'}
+              }else{
+                if($null -eq $caught -or (Test-Path -LiteralPath $sessionPath)){throw 'failed session claimed success'}
+                $expected=if($script:mode -eq 'cleanup'){'late native cleanup failure'}else{'original session failure'}
+                if($caught.Exception.Message -cne $expected){throw 'original session/cleanup failure was replaced'}
+              }
+            }
+          }
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-mp-teardown-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True, text=True,
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_WORK=work), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_library_session_memory_calibration_keeps_the_generic_ceiling(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
         calibration = json.loads(MEMORY_CALIBRATION.read_text(encoding="utf-8"))
