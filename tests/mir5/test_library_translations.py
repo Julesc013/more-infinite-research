@@ -301,6 +301,27 @@ class LibraryTranslationTests(unittest.TestCase):
           assert(translations.take_refresh(cache, active))
         ''')
 
+    def test_expired_requests_retry_in_stable_id_order_after_map_reconstruction(self):
+        self.lua.execute('''
+          local active = scope(1, "en", 1, 0)
+          local cache = prepared(1, "en", 1, 0, {"gear", "foreign"})
+          local initial = 0
+          translations.dispatch(cache, active, 0, function()
+            initial = initial + 1; return initial == 1 and 42 or 7
+          end)
+          setmetatable(cache.pending_by_id, {__pairs=function(rows)
+            local order, index = {42,7}, 0
+            return function() index=index+1; local id=order[index]; if id then return id,rows[id] end end
+          end})
+          assert(translations.maintain(cache, active, translations.expiry_ticks).expired == 2)
+          local retried = {}
+          translations.dispatch(cache, active, translations.expiry_ticks, function(key)
+            retried[#retried+1] = key; return 100+#retried
+          end)
+          assert(table.concat(retried,",") == "foreign,gear",
+            "native retry order follows transient pending-map traversal")
+        ''')
+
     def test_prepare_and_snapshot_do_not_alias_caller_data(self):
         self.lua.execute('''
           local active = scope(1, "en", 1, 0)
