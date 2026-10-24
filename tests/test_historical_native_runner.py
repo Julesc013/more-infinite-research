@@ -23,6 +23,53 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.metadata = json.loads((FIXTURE / "metadata.json").read_text(encoding="utf-8"))
 
+    def test_actual_owned_version_selector_covers_fresh_and_transition_old_engines(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile(
+            $env:MIR_TEST_RUNNER,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'runner parse failed'}
+          $nodes=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.IfStatementAst] -and
+            $node.Extent.Text.Contains('PrePinMIROwnedArchiveNames') -and
+            $node.Extent.Text.Contains('$historicalFixture.target -in')
+          },$true))
+          if($nodes.Count -ne 1){throw 'owned-version selector missing or ambiguous'}
+          $select=[scriptblock]::Create($nodes[0].Extent.Text)
+          foreach($id in @('f013','f014','f015','f016','f017','f100','f110')){
+            foreach($transition in @($false,$true)){
+             foreach($coexisting in @($false,$true)){
+              $historical=$true; $historicalTransition=$transition
+              $historicalFixture=@{target=$id}; $activationArguments=@{}
+              $mirRows=@(@{version='5.0.01300'})
+              $inventory=@(@{name='more-infinite-research';version='5.0.01300'})
+              if($coexisting){$inventory+=@{name='more-infinite-research';version='4.7.01303'}}
+              & $select
+              $expected=($id -in @('f013','f014','f015','f016')) -and ($transition -or $coexisting)
+              if($activationArguments.ContainsKey('PrePinMIROwnedArchiveNames') -ne $expected){
+                throw "owned version selection differs: $id transition=$transition coexisting=$coexisting"
+              }
+              if($expected){
+                $names=@($activationArguments.PrePinMIROwnedArchiveNames)
+                if($names.Count -ne 1 -or $names[0] -cne 'more-infinite-research'){
+                  throw 'selector included an unowned archive name'
+                }
+              }
+             }
+            }
+          }
+          $historical=$false; $historicalTransition=$false
+          $historicalFixture=$null; $activationArguments=@{}
+          & $select
+          if($activationArguments.Count){throw 'modern run gained owned-version selection'}
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_RUNNER=str(RUNNER)), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_all_seven_profiles_select_only_exact_base_mir_and_shared_fixture(self):
         expected = {
             "f013": ("0.13.20", "5.0.01300"),
