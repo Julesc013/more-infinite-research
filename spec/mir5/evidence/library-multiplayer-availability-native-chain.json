@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "kind": "MIR5LibraryMultiplayerAvailabilityNativeChainV1",
+  "run": {
+    "id": 40041162053,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40041162053",
+    "source": "fb37b7c0ad57cbbec5c254f39ef38548ed7645e7",
+    "source_dirty": false,
+    "manifest_members_verified": 222,
+    "manifest_sha256": "009F0E29E2A56A289587C88920695A2F87966C3F65DDCD28C8656D3942C1F693",
+    "custody": "build/mir5/black-glass/incoming/40041162053/black-glass-library-multiplayer-40041162053-1"
+  },
+  "engine": {
+    "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "file_version": "2.0.77.84539",
+    "product_version": "2.0.77",
+    "base_version": "2.0.77"
+  },
+  "player": {
+    "sha256": "69768BCF6B5439556C37AD4EC02EADBFC80465FD7445FADB2165EF60BBBEB440",
+    "path": "D:\\Projects\\Factorio\\testmods\\2.0\\more-infinite-research_5.0.20000.zip"
+  },
+  "profile_sha256": "4CDC1DED1FA6FF882C27BF0B86813718CA1C65F51D989448F2C6C174A3693DFD",
+  "receipts": {
+    "preparation": {
+      "gzip": "spec/mir5/evidence/library-multiplayer-availability-40041162053-preparation-native.json.gz",
+      "gzip_sha256": "B8CE35944C4C25D9F7558EA9E6272718021B4B620562B5EE3EC17D7535091372",
+      "uncompressed_sha256": "ED95E1076550C8AD1DFD61416B1680C2BC94A9821865F9CC3AF1010EA0876DEC",
+      "uncompressed_bytes": 14575,
+      "artifact_path": "multiplayer/preparation/result.json"
+    },
+    "session": {
+      "gzip": "spec/mir5/evidence/library-multiplayer-availability-40041162053-session-native.json.gz",
+      "gzip_sha256": "8C48C3BB474FF0E23CF6F2F9C552709474C6AD1A25EBF8B1ADB62D583376432B",
+      "uncompressed_sha256": "09DC9B5A1BAC875AD39BA83151A09B9C9E6E2A253D07E6628368CC08D057FCDA",
+      "uncompressed_bytes": 27473,
+      "artifact_path": "multiplayer/session/result.json"
+    }
+  },
+  "session": {
+    "status": "passed-private-two-client-session",
+    "input_seed_byte_identical": true,
+    "seed_sha256": "93C08A109B2B6AC35D449ECC12EC40171253798D2BF16CC1C3BD79F92284A849",
+    "restart_save_sha256": "92073A79FDD4EFC8A4E99A7437319468D870E75A9BF7830788FF5BCB34887087",
+    "final_save_sha256": "6C2109293F9BA466D988013252564711563BE78B43E24B83267F3E98EA3971B3",
+    "markers": [
+      "ready",
+      "rejoin-ready",
+      "restart-ready",
+      "completed"
+    ],
+    "clients": [
+      {
+        "name": "MIR5English",
+        "locale": "en"
+      },
+      {
+        "name": "MIR5Deutsch",
+        "locale": "de"
+      }
+    ],
+    "screenshots": [
+      {
+        "locale": "en",
+        "stage": "availability",
+        "sha256": "42A68E64D9B40AEBB4AE9964158D18883F0C7FBC2A83618D1AAF455F27215DF8",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Availability view is translated and readable in this locale.",
+        "artifact_path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/availability-1.png"
+      },
+      {
+        "locale": "en",
+        "stage": "initial",
+        "sha256": "0F1B9083CDC0F2609D73722D6DA6D24B7E08A96934C659626652B04DC62FF7B4",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary personal view is readable with no overlap; its stable-ID fallback is visible.",
+        "artifact_path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/initial-1.png"
+      },
+      {
+        "locale": "en",
+        "stage": "rejoin",
+        "sha256": "87FBA0504EDE1E2EDCCAD27C12AEF11CB46772075BD0539E3E7D5E93FA5E5F0D",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary personal view is readable with no overlap.",
+        "artifact_path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/rejoin-1.png"
+      },
+      {
+        "locale": "en",
+        "stage": "restart",
+        "sha256": "78AFE13A9CC236F8DBD53F8E33A6209E86352F310E914AC0D2C2CA621B4331C8",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary personal view is readable with no overlap.",
+        "artifact_path": "multiplayer/session/client-en/script-output/mir5-library-multiplayer/restart-1.png"
+      },
+      {
+        "locale": "de",
+        "stage": "availability",
+        "sha256": "018E2EE5CFF44E3E380992D1EFFB7A15B449F57F158628358777C9983A863D03",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Availability view is translated and readable in this locale.",
+        "artifact_path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/availability-2.png"
+      },
+      {
+        "locale": "de",
+        "stage": "initial",
+        "sha256": "103891AA496D1861E6D17C6A72C937629FF7CA40860782B1BE9D2747E0BC809F",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary mining personal view is readable with no overlap; inherited English detail fallback remains visible rather than being claimed as German translation.",
+        "artifact_path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/initial-2.png"
+      },
+      {
+        "locale": "de",
+        "stage": "rejoin",
+        "sha256": "8836E8C108892928D26979CFBAC27E27C57CADAF2CECC131FFBA899316C46898",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary personal view is readable with no overlap.",
+        "artifact_path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/rejoin-2.png"
+      },
+      {
+        "locale": "de",
+        "stage": "restart",
+        "sha256": "DD687585B4492A75F309277466253C7F77A5AA8624C0E544825A3314B5923F4F",
+        "width": 1280,
+        "height": 720,
+        "visual_review": "Ordinary personal view is readable with no overlap.",
+        "artifact_path": "multiplayer/session/client-de/script-output/mir5-library-multiplayer/restart-2.png"
+      }
+    ]
+  },
+  "scope": [
+    "One F2002.0.77 Base loopback server and two real graphical clients with distinct en/de personal views complete join, rejoin, host restart, second join, and final completion.",
+    "Availability opens for both locales and produces two additional client-local PNGs; the native fixture also keeps its research/effect/queue sentinels unchanged.",
+    "Root visual review of all eight captured 1280x720 frames found both Availability views translated and readable and the six ordinary views readable without overlap. The English initial stable-ID fallback and the German mining view are captured; inherited English fallback detail text remains visible rather than being claimed as translated."
+  ],
+  "limitations": [
+    "Single-host loopback only; no cross-hardware, numeric latency, stress, final-layout, or full production/package claim.",
+    "Base-only scenario; it does not qualify a Space Age lab view or unrelated Library/API behavior."
+  ],
+  "release_qualification": false
+}

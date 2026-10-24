@@ -271,6 +271,11 @@
           "id": "complete-f200-catalogue-saved-states",
           "evidence": "spec/mir5/evidence/full-catalogue-upgrade-chain.json",
           "scope": "All recovered54 Base/67 level-backed SA public states and five native owners preserve declared effects/current42%/paused27% through published4.7.2 upgrade and two reloads. Actual gear labs are separate from seeded states; scripted identities are not seeded."
+        },
+        {
+          "id": "fixed-provider-removal-owned-state",
+          "evidence": "spec/mir5/evidence/competing-fixed-removal-control-native-chain.json",
+          "scope": "Five stages preserve actual MIR-earned bioflux/breeding, signed credit levels, retained queues and foreign pre-disablement through two cold reloads each. Removed foreign-only prototypes have a separately observed engine boundary; their state is not invented."
         }
       ],
       "test_subjects": [
@@ -359,9 +364,11 @@
         {
           "id": "availability-negative-scope",
           "source": [
+            "source/mir5/presentation/availability.lua",
             "source/mir5/runtime/library.lua"
           ],
-          "scope": "Visibility option three currently renders the explicit no-omission-ledger state; it does not invent unavailable technologies or explanations."
+          "scope": "Visibility option three now renders bounded authored absent-expansion explanations; Base two-client English/German rendering is natively observed. A named valid Space Age native lab owner gets a host-tested terminal explanation. No compiler omission ledger or invented technology is reconstructed.",
+          "evidence": "spec/mir5/evidence/library-multiplayer-availability-native-chain.json"
         },
         {
           "id": "historical-availability-internal-representation",
@@ -369,7 +376,7 @@
             "source/prototypes/mir/runtime/research_browser_mir_provider.lua",
             "source/mir5/presentation/library_model.lua"
           ],
-          "scope": "Historical provider reads skip/excluded compiler generation-plan rows and hides entries whose technologies exist. MIR5 keeps existing disabled-ID views and technology_not_found for absent detail. Internal compiler ledgers have no authority to require another compiler; useful omission behavior still needs disposition."
+          "scope": "Historical skip/excluded compiler-plan rows were terminal UI metadata, not earned technology identities. MIR5 retains native disabled-ID views and bounded authored absence facts; previews and unadmitted families do not become delivered technologies merely by appearing in the old ledger."
         },
         {
           "id": "current-rendered-client-carrier-regression",
@@ -382,10 +389,11 @@
         "two_clients"
       ],
       "remaining_implementation": [
-        "Resolve useful historical omission explanations against actual authored disabled/absent identities and bounded binding/settings facts. Do not recreate a compiler-generation-plan snapshot or invent rows from missing evidence."
+        "Reconcile any remaining delivered terminal omission explanations against native disabled views or explicit preview/non-admission dispositions; two absent-expansion rows do not establish every historical explanation."
       ],
       "remaining_qualification": [
-        "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained."
+        "Run numeric UI timing, affected runtime interaction and final-candidate stress cases; second-host coverage is optional and must be reported if obtained.",
+        "Observe the named Space Age native lab explanation in a rendered client; Base absence rows are already observed. Preserve inherited locale fallback limitations."
       ]
     },
     {
@@ -466,6 +474,11 @@
             "source/mir5/compatibility/competing_productivity.lua"
           ],
           "scope": "Exact separate CE28 and PR43 foreign tails pass actual predecessor labs, MIR5 preference true/false and two reloads each. Earned MIR overlap and composed/mixed providers remain unqualified."
+        },
+        {
+          "id": "fixed-provider-earned-removal-control",
+          "evidence": "spec/mir5/evidence/competing-fixed-removal-control-native-chain.json",
+          "scope": "Actual MIR overlaps survive MIR5 true/false and provider removal/readdition with137 artifact members verified. First MIR4 upgrade plus simultaneous preference change and other dynamic/mixed owners remain unqualified."
         }
       ],
       "test_subjects": [
@@ -476,8 +489,8 @@
         "Admit Py/armor only after exact native identity and ownership facts are recovered; broad aliases are not an admission contract."
       ],
       "remaining_qualification": [
-        "Run composed fixed and dynamic provider true/false/true gameplay, including earned MIR overlaps and foreign rights.",
-        "Observe Bob/Angel physical recipe-cap output and remaining exact admitted integrations."
+        "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
+        "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source."
       ]
     },
     {
@@ -503,6 +516,14 @@
           ],
           "evidence": "spec/mir5/evidence/historical-native-chain.json",
           "scope": "Seven historical editions have fresh package lab/save/reload evidence, not successor migration proof."
+        },
+        {
+          "id": "frozen-target-record-layout-prerequisite",
+          "source": [
+            "tools/mir5/package.py",
+            "tests/mir5/test_package.py"
+          ],
+          "scope": "Temporary-Git F200 staged/canonical layouts with equivalent source and target records produce identical player member hashes and ZIP bytes; unsafe and dirty selected records reject before output. This is not the actual all-nine-target cutover or native qualification."
         }
       ],
       "test_subjects": [
