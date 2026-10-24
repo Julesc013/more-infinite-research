@@ -1,6 +1,6 @@
 local TARGETS = {
   f200 = {base="2.0.77", sif="1.0.60", commons="1.0.27", source="4.7.20002", successor="5.0.20000"},
-  f210 = {base="2.1.23", sif="1.0.78", commons="1.0.33", extras="1.0.01", source="4.7.21002", successor="5.0.21000"}
+  f210 = {base="2.1.23", sif="1.0.78", commons="1.0.33", extras="1.0.1", source="4.7.21002", successor="5.0.21000"}
 }
 local POLICIES = {"configured", "space", "space-and-promethium", "space-age-progression", "official-progression", "mod-progression", "all-official", "all"}
 local NAMES = {"research-speed-7", "weapon-shooting-speed-7"}

@@ -21,7 +21,7 @@ assert(mods.base == expected_engine and mods["elevated-rails"] == expected_engin
   and mods["space-is-fake"] == expected_sif and mods["cr-commons"] == expected_commons
   and mods["more-infinite-research"] == expected_mir, "[mir5-sif] exact engine or native archive closure differs")
 if target == "f210" then
-  assert(mods.recycler == expected_engine and mods["cr-extras"] == "1.0.01", "[mir5-sif] F210 closure differs")
+  assert(mods.recycler == expected_engine and mods["cr-extras"] == "1.0.1", "[mir5-sif] F210 closure differs")
 else
   assert(mods.recycler == nil and mods["cr-extras"] == nil, "[mir5-sif] F200 unexpectedly selects an F210-only component")
 end
