@@ -135,6 +135,8 @@ class LifecycleTests(unittest.TestCase):
         self.lua.execute('''
           local target = require("platform.target")
           target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          target.minimum_base, target.distribution_version = "2.0.77", "5.0.20000"
+          target.recipe_probability, target.receiver_limits = "probability", false
           local active = {
             base="2.0.77", angelsbioprocessing="2.0.3", angelsbioprocessinggraphics="2.0.0",
             angelspetrochem="2.0.3", angelspetrochemgraphics="2.0.1",
@@ -589,6 +591,83 @@ class LifecycleTests(unittest.TestCase):
           assert(second.enabled and not second.visible_when_disabled and storage.mir_caps == nil)
           handlers.init()
           assert(storage.mir_caps == nil, "unlimited callbacks allocated cap storage")
+        ''')
+
+    def test_unlimited_finished_gear_preserves_native_queue_and_progress_with_active_worker_cap(self):
+        self.lua.execute('''
+          -- This synthetic carry-over shape protects the runtime's read-only
+          -- boundary; it does not claim an engine cause for it.
+          local target = require("platform.target")
+          target.id, target.factorio_version, target.cargo_research = "f200", "2.0", false
+          local name = "recipe-prod-research_gears-1"
+          local gear = technology(name, 2, true)
+          local worker_probes = 0
+          local technologies = setmetatable({[name] = gear}, {
+            __index = function(value, key)
+              if type(key) == "string" and key:find("worker-robots-speed", 1, true) then
+                worker_probes = worker_probes + 1
+              end
+              return rawget(value, key)
+            end
+          })
+          local queue, progress = {gear, gear}, .9988888888888875
+          local state = {research_queue = queue, current_research = gear, research_progress = progress}
+          local native = {valid = true, index = 41, technologies = technologies, cancelled = 0}
+          native.cancel_current_research = function() native.cancelled = native.cancelled + 1 end
+          local writes, guard_writes = {}, false
+          local protected = setmetatable({}, {
+            __index = function(_, key)
+              if key == "research_queue" or key == "current_research" or key == "research_progress" then
+                return state[key]
+              end
+              return native[key]
+            end,
+            __newindex = function(_, key, replacement)
+              if key == "research_queue" or key == "current_research" or key == "research_progress" then
+                if guard_writes then
+                  writes[#writes + 1] = key
+                  error("unlimited finished gear assigned native " .. key)
+                end
+                state[key] = replacement
+                if key == "research_queue" then
+                  local retained = false
+                  for _, item in ipairs(replacement) do
+                    if item == state.current_research then retained = true; break end
+                  end
+                  if not retained then
+                    state.current_research = replacement[1]
+                    state.research_progress = replacement[1] and 0 or nil
+                  end
+                end
+                return
+              end
+              native[key] = replacement
+            end
+          })
+          gear.force = protected
+          -- Gear remains unlimited; only the unrelated finite worker setting
+          -- makes lifecycle callbacks active for this F200 control instance.
+          boot({[41] = protected}, 0, "", nil, nil, 2, {base = "2.0.77"})
+          local lifecycle = require("runtime.lifecycle")
+          assert(lifecycle.caps_active(), "finite worker cap did not activate lifecycle")
+          handlers.init()
+          local native_queue = protected.research_queue
+          local native_current, native_progress = protected.current_research, protected.research_progress
+          worker_probes = 0
+          local finished = handlers.events[defines.events.on_research_finished]
+          assert(type(finished) == "function", "active lifecycle did not bind research-finished")
+          guard_writes = true
+          lifecycle.on_research_finished({research = gear, by_script = false})
+          assert(#writes == 0, "unlimited completed gear rewrote native research state")
+          assert(worker_probes == 0, "unlimited gear completion probed unrelated worker tails")
+          assert(protected.research_queue == native_queue and #native_queue == 2
+              and native_queue[1] == gear and native_queue[2] == gear,
+            "unlimited native queue identity or entries changed")
+          assert(protected.current_research == native_current and protected.research_progress == native_progress,
+            "unlimited current research or fractional progress changed")
+          assert(gear.enabled and not gear.visible_when_disabled and gear.level == 2 and not gear.researched,
+            "unlimited gear visibility or native completion state changed")
+          assert(native.cancelled == 0, "unlimited completion used native cancellation")
         ''')
 
     def test_research_events_remove_queued_current_and_reject_unresolved_current(self):
