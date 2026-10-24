@@ -110,7 +110,9 @@ function Get-MIRPackageSourceFiles {
     $requestedRoots.Count -eq $defaultRoots.Count -and
     ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n")) -and
     (Test-Path -LiteralPath (Join-Path $repo 'source/package-source.json') -PathType Leaf) -and
-    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf)
+    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v2.schema.json') -PathType Leaf)
   )
   if ($canonicalLayout) {
     if (-not (Get-Command Get-MIR4CanonicalPackageSourceFiles -ErrorAction SilentlyContinue)) {
@@ -120,8 +122,17 @@ function Get-MIRPackageSourceFiles {
     return @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
   }
 
+  # A partial source/targets marker is not a materializer authority.  Keep
+  # the legacy player roots in the fallback fingerprint so small historical
+  # and synthetic layouts still observe their package-visible files.  The
+  # canonical branch above is the only path allowed to replace this closure.
+  $fallbackRoots = @($Roots)
+  if ($requestedRoots.Count -eq $defaultRoots.Count -and
+      ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n"))) {
+    $fallbackRoots = @($Roots + (Get-MIRLegacyRootPackageSourceRoots) | Sort-Object -Unique)
+  }
   $files = @()
-  foreach ($relative in @($Roots)) {
+  foreach ($relative in $fallbackRoots) {
     $path = Join-Path $repo $relative
     if (Test-Path -LiteralPath $path -PathType Leaf) {
       $files += $relative.Replace("\", "/")
@@ -304,8 +315,27 @@ function Get-MIRPackageSourceFingerprint {
   )
 
   $repo = (Resolve-Path -LiteralPath $RepoRoot).Path
+  $defaultRoots = @(Get-MIRPackageSourceRoots | ForEach-Object { ([string]$_).Replace('\','/') })
+  $requestedRoots = @($Roots | ForEach-Object { ([string]$_).Replace('\','/') })
+  $canonicalLayout = (
+    $requestedRoots.Count -eq $defaultRoots.Count -and
+    ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n")) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'source/package-source.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v2.schema.json') -PathType Leaf)
+  )
+  if ($canonicalLayout -and -not (Get-Command Get-MIR4CanonicalPackageSourceFiles -ErrorAction SilentlyContinue)) {
+    $authorityRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '../../..')).Path
+    . (Join-Path $authorityRoot 'tools/mir/application/package/PackageAuthority.ps1')
+  }
+  $files = if ($canonicalLayout) {
+    @(Get-MIR4CanonicalPackageSourceFiles -RepoRoot $repo)
+  } else {
+    @(Get-MIRPackageSourceFiles -RepoRoot $repo -Roots $Roots)
+  }
   $rows = @(
-    foreach ($relative in Get-MIRPackageSourceFiles -RepoRoot $repo -Roots $Roots) {
+    foreach ($relative in $files) {
       $path = Join-Path $repo $relative
       $identity = Get-MIRFileContentIdentity -Path $path -RelativePath $relative
       "{0}`t{1}`t{2}" -f $relative, $identity.Length, $identity.Sha256

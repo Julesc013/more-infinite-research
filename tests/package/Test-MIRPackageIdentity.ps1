@@ -68,6 +68,13 @@ try {
     Write-MIRTestText -Path (Join-Path $lfRoot $relative) -Text "one`ntwo`n"
     Write-MIRTestText -Path (Join-Path $crlfRoot $relative) -Text "one`r`ntwo`r`n"
   }
+  # These markers alone do not authorize canonical materializer selection.
+  # The synthetic fixture intentionally omits its implementation and schema,
+  # so PackageIdentity must retain the legacy-root fallback below.
+  foreach ($relative in @("source/package-source.json", "targets/package-authority.json")) {
+    Write-MIRTestText -Path (Join-Path $lfRoot $relative) -Text "{} `n"
+    Write-MIRTestText -Path (Join-Path $crlfRoot $relative) -Text "{} `r`n"
+  }
 
   $harnessFiles = @(
     "scripts/check.ps1",
