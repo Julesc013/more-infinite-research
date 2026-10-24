@@ -105,13 +105,21 @@
       "status": "not-retained"
     },
     "recovery": {
-      "gzip": "spec/mir5/evidence/armor-py-independent-published-recovery-40051640723.json.gz",
-      "gzip_sha256": "E7B1737018554CF1F51C919076A8BA916BE93C51C11D6A7477613622D3579EE0",
-      "uncompressed_sha256": "E9AD1855499C01E082AC0F12639C75EA2ECDFCA58F54DFF7F6C46C890FA3057E",
+      "gzip": "spec/mir5/evidence/armor-py-independent-published-recovery-40051640723-r02.json.gz",
+      "gzip_sha256": "004F27CCBCC2D16CBDCE08B56DDAF9DAD1B08A4A5B1E63A66974790860D425D2",
+      "uncompressed_sha256": "34ECC7FBA71C455EF7E62185D8F6495CD06039A577EDBBF51310415FF0A38296",
       "artifact_manifest_sha256": "3BE77F3D29D794E0665D5BF3849CA77DA9FA085DA241B4EDDC33DE9CCEF69EF9",
       "extractor": "committed tools/mir5/recover_modern_catalogue.py recovery primitives; the F200-absent optional maximum-level policy is omitted from this comparison-only recovery",
       "extractor_blob": "637c6cdeeb9190f0fd3cb03cd234025bd00b34bd",
       "candidate_output_used": false
+    },
+    "recovery_helper": {
+      "bytes": 5475,
+      "execution": "Decompress and verify original bytes in a disposable local script, then python <script.py> --repo . --reference-run-root <verified40051640723-artifact-root> --output <new-recovery.json>",
+      "gzip": "spec/mir5/evidence/armor-py-independent-recovery-helper.py.gz",
+      "gzip_sha256": "00BDA50C08C327F2492175258FF38623A1DBFF6DB6A82928477A8EF6C3A2AA71",
+      "uncompressed_sha256": "DD92A52DFFEFCFB428A5F6971095D9D3E541521FA981C74DCF866EF909055B83",
+      "original_path": "spec/mir5/evidence/armor-py-independent-recovery-helper.py"
     },
     "helper": {
       "gzip": "spec/mir5/evidence/integration-candidate-baseline-comparison-helper.py.gz",
@@ -119,14 +127,71 @@
       "uncompressed_sha256": "9534B49ED6B622937BC3078BBF1BB7CA5CB282307D870DA864D195474C24D3D5"
     },
     "result": {
-      "gzip": "spec/mir5/evidence/armor-py-independent-comparison-40051640723-40056021636.json.gz",
-      "gzip_sha256": "B46C0F04B6E78268FD1B844B51E5BC21573912BFEAD215B6D13C893C8C9FE1B4",
-      "uncompressed_sha256": "723C4F9BE520EE096AA4B129D3798C62BC30F0B79D3039ACB3DE29C39DCA3E64",
+      "gzip": "spec/mir5/evidence/armor-py-independent-comparison-40051640723-40056021636-r02.json.gz",
+      "gzip_sha256": "C725B94E8CBCFA96E0D03AE1C7FCF6CC0958DCB94C78196EE46AAE21F95E3341",
+      "uncompressed_sha256": "8C1638933689465278DDD4C5221979AF5B80B4F9A170D6435A1CF4C460D48E3C",
       "candidate_run": 40056021636,
       "complete_difference_occurrences": 48,
       "native_credit_carrier_occurrences": 48,
       "native_credit_carrier_unique_ids": 20,
       "unresolved_delta_occurrences": 0
+    },
+    "named_native_credit_carriers": {
+      "treatment": "These rows remain complete reported differences and are not a generic ignored technology/type allowance or an equality claim.",
+      "armor-bobwarfare": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-negative",
+        "mir-native-credit-research_oil_processing_productivity-advanced-oil-processing-positive",
+        "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-negative",
+        "mir-native-credit-research_oil_processing_productivity-basic-oil-processing-positive",
+        "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-negative",
+        "mir-native-credit-research_oil_processing_productivity-coal-liquefaction-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ],
+      "py-coal": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ],
+      "py-alienlife-hightech": [
+        "mir-native-credit-research_bullets-firearm-magazine-negative",
+        "mir-native-credit-research_bullets-firearm-magazine-positive",
+        "mir-native-credit-research_concrete-stone-brick-negative",
+        "mir-native-credit-research_concrete-stone-brick-positive",
+        "mir-native-credit-research_copper-copper-plate-negative",
+        "mir-native-credit-research_copper-copper-plate-positive",
+        "mir-native-credit-research_grenades-grenade-negative",
+        "mir-native-credit-research_grenades-grenade-positive",
+        "mir-native-credit-research_iron-iron-plate-negative",
+        "mir-native-credit-research_iron-iron-plate-positive",
+        "mir-native-credit-research_lubricant_productivity-lubricant-negative",
+        "mir-native-credit-research_lubricant_productivity-lubricant-positive",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-negative",
+        "mir-native-credit-research_sulfuric_acid_productivity-sulfuric-acid-positive"
+      ]
     },
     "regeneration_input": "The verified run40051640723 upstream and published data/settings dumps, processed only with committed extraction logic and independently captured published facts. Candidate output is not an input to the expected world."
   },
