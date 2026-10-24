@@ -197,6 +197,73 @@ class NativeCreditRuntimeTests(unittest.TestCase):
           assert(force._states[holder(force, fish, "positive").name].writes.level == 0)
         ''')
 
+    def test_ambiguous_published_first_upgrade_is_blocked_before_baseline_or_native_writes(self):
+        self.lua.execute(r'''
+          local fish = "fish-breeding"
+          local force = make_force(1, {}, {['recipe-prod-research_breeding-1']=2})
+          game.forces[force.index] = force
+          local event = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'}}}
+          local positive = holder(force, fish, "positive")
+          local ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+          assert(not ok and tostring(message):find("startup settings unchanged", 1, true))
+          assert(storage.mir_native_credits == nil and positive.level == 1
+            and force._states[positive.name].writes.level == 0,
+            "ambiguous first upgrade allocated a ledger or wrote a native holder")
+
+          -- A valid record is checked per force and recipe, not merely by the
+          -- presence of a schema-shaped root bucket. A stale carrier offset
+          -- cannot be used to bypass the migration block.
+          native_credits.on_init()
+          local record = ledger(force, fish)
+          record.offset = 1
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+          assert(not ok and tostring(message):find("startup settings unchanged", 1, true))
+          assert(positive.level == 1 and force._states[positive.name].writes.level == 0
+            and record.offset == 1, "stale ledger caused a native correction before rejection")
+
+          record.offset = 0
+          record.included = not record.included
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+          assert(not ok and tostring(message):find("startup settings unchanged", 1, true))
+          record.included = not record.included
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+          assert(ok, tostring(message))
+          assert(positive.level == 1 and force._states[positive.name].writes.level == 0)
+
+          -- All three published F200 4.7 distribution strings share the
+          -- absent-setting-history contract; this is not a 4.7.20002-only
+          -- exception.
+          local earlier = make_force(2, {}, {['recipe-prod-research_breeding-1']=2})
+          game.forces[earlier.index] = earlier
+          event.mod_changes['more-infinite-research'].old_version = '4.7.20001'
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+          assert(not ok and tostring(message):find("startup settings unchanged", 1, true))
+        ''')
+
+    def test_legacy_preflight_allows_unearned_or_nonmatching_configuration_events(self):
+        self.lua.execute(r'''
+          local force = make_force(1)
+          game.forces[force.index] = force
+          local exact = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'}}}
+          local ok, message = pcall(native_credits.preflight_legacy_preference_transition, exact, false)
+          assert(ok, tostring(message))
+          assert(storage.mir_native_credits == nil, "unearned overlap needed no historic ledger")
+
+          local fish = "fish-breeding"
+          force.technologies[descriptor_for(fish).main_id].level = 2
+          local unchanged = {mod_startup_settings_changed=false,
+            mod_changes={['more-infinite-research']={old_version='4.7.20002', new_version='5.0.20000'}}}
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, unchanged, true)
+          assert(ok, tostring(message))
+          local different = {mod_startup_settings_changed=true,
+            mod_changes={['more-infinite-research']={old_version='5.0.20000', new_version='5.0.20001'}}}
+          ok, message = pcall(native_credits.preflight_legacy_preference_transition, different, true)
+          assert(ok, tostring(message))
+          assert(storage.mir_native_credits == nil)
+        ''')
+
     def test_effect_reset_force_boundaries_and_merge_preserve_only_explicit_carrier_state(self):
         self.lua.execute(r'''
           local fish = "fish-breeding"

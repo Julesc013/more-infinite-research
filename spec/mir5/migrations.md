@@ -24,6 +24,8 @@ The principal predecessor is the exact published 4.7 package for the same engine
 
 Private incomplete slices use disposable worlds only. Do not load and resave a real full MIR factory with a one-technology replacement package. Full-save migration qualification starts only after all relevant definitions and runtime bridges exist.
 
+Published F2004.7 did not persist the old competing-productivity preference, and the configuration event reports only whether any startup setting changed. On the first4.7.20000/.20001/.20002→MIR5 upgrade, an earned named overlap without its own valid MIR5 credit ledger must refuse if startup settings changed and a known provider is current or being removed. Upgrade with startup settings unchanged and save once before changing the preference in a later MIR5 configuration. Ordinary provider-free upgrades are unaffected. This explicit guard preserves the original save instead of guessing an old effect mask; native qualification of both directions remains required.
+
 ## Migrations themselves
 
 `MIG-02` — Inventory existing JSON/Lua migrations by filename, purpose, required predecessor and imports. Factorio remembers applied names and runs JSON before Lua migrations. Do not rename filenames mechanically during repository cleanup. Decouple required historical logic from retired imports without retaining a whole old subsystem. [Migrations](https://lua-api.factorio.com/latest/auxiliary/migrations.html)

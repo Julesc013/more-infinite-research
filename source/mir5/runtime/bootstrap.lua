@@ -12,8 +12,9 @@ local settings_profile = require("runtime.settings_profile")
 local settings_commands = require("runtime.settings_commands")
 local passive_repair = require("runtime.passive_repair")
 local effective = require("runtime.configuration")
+local target = require("platform.target")
 local native_credits
-if require("platform.target").recipe_productivity == true then
+if target.recipe_productivity == true then
   native_credits = require("runtime.native_credits")
 end
 local spoilage_contribution = require("runtime.spoilage_contribution")
@@ -34,8 +35,33 @@ if type(active_mods) == "table" and (active_mods.ExpandedProductivityResearch ~=
     or active_mods["fish-productivity"] ~= nil
     or active_mods["crafting-efficiency-2"] ~= nil
     or active_mods.ProductivityResearch ~= nil)
-    and require("platform.target").id == "f200" then
+    and target.id == "f200" then
   competing_productivity = require("runtime.competing_productivity")
+end
+
+-- A removed provider is absent from script.active_mods by the time the
+-- configuration callback runs. Keep this list aligned with the exact
+-- F200 runtime adapters so the legacy migration guard can distinguish that
+-- meaningful removal from an ordinary Base startup-setting change.
+local COMPETING_PROVIDER_IDS = {
+  ExpandedProductivityResearch = true,
+  ["plates-n-circuit-productivity"] = true,
+  Science_packs_productivity = true,
+  ["bioflux-productivity"] = true,
+  ["fish-productivity"] = true,
+  ["crafting-efficiency-2"] = true,
+  ProductivityResearch = true,
+}
+
+local function relevant_competing_provider_transition(event)
+  if competing_productivity ~= nil then return true end
+  local changes = event and event.mod_changes
+  if type(changes) ~= "table" then return false end
+  for name in pairs(COMPETING_PROVIDER_IDS) do
+    local change = changes[name]
+    if type(change) == "table" and type(change.old_version) == "string" then return true end
+  end
+  return false
 end
 
 -- Historical JSON carrier recovery is independent of caps and scripted
@@ -287,6 +313,12 @@ local function discard_absent_competing_productivity_state()
 end
 
 local function on_configuration_changed(event)
+  -- The first published-MIR4 preference transition has no durable old setting.
+  -- This preflight must run before any lifecycle reconciler can write a level,
+  -- ownership record, queue state, or disablement flag.
+  if native_credits and target.id == "f200" then
+    native_credits.preflight_legacy_preference_transition(event, relevant_competing_provider_transition(event))
+  end
   reconcile_imersite()
   lifecycle.on_configuration_changed(event)
   if native_credits then native_credits.on_configuration_changed(event) end

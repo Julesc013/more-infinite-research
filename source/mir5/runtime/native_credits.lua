@@ -13,6 +13,12 @@ local SCHEMA = 1
 local UINT32_MAX = 4294967295
 local EFFECT_TOLERANCE = .00000001
 local PRODUCTIVITY_EFFECT = "change-recipe-productivity"
+local MIR_MOD = "more-infinite-research"
+local PUBLISHED_F200_M4_VERSIONS = {
+  ["4.7.20000"] = true,
+  ["4.7.20001"] = true,
+  ["4.7.20002"] = true,
+}
 local DESCRIPTORS = definitions.descriptors()
 
 local function close(left, right)
@@ -243,6 +249,50 @@ local function reconcile_all()
   -- This iterates only Factorio's force lifecycle collection.  Technology and
   -- prototype access stays direct and descriptor-named in inspect_with_mask.
   for _, force in pairs(game.forces) do reconcile_force(force) end
+end
+
+local function published_m4_startup_change(event)
+  if type(event) ~= "table" or event.mod_startup_settings_changed ~= true then return false end
+  local changes = event.mod_changes
+  local change = type(changes) == "table" and changes[MIR_MOD] or nil
+  return type(change) == "table" and PUBLISHED_F200_M4_VERSIONS[change.old_version] == true
+    and type(change.new_version) == "string" and change.new_version:match("^5%.") ~= nil
+end
+
+local function valid_record_for_observation(records, observation)
+  local record = records and records[observation.descriptor.recipe] or nil
+  -- A schema-shaped bucket is not proof that this exact force/recipe observed
+  -- an earlier MIR5 setting. The recorded carrier delta must still agree with
+  -- the direct named native holders before it can establish that baseline.
+  return type(record) == "table" and type(record.included) == "boolean"
+    and record.included == observation.included and integer(record.offset)
+    and record.offset == observation.offset
+end
+
+-- Published F200 MIR4.7 recorded no competing-preference history. Factorio reports
+-- only that *some* startup setting changed, not the old/new setting values.
+-- Block an earned partial overlap at that exact first transition rather than
+-- baseline it from the new data-stage preference and fabricate or lose credit.
+-- This has no writes: bootstrap calls it before every configuration reconciler.
+function M.preflight_legacy_preference_transition(event, competing_provider_relevant)
+  if competing_provider_relevant ~= true or not published_m4_startup_change(event)
+      or not game or not game.forces then return end
+  local current = existing_state()
+  for _, force in pairs(game.forces) do
+    if valid_force(force) then
+      local records = current and current.forces[force.index] or nil
+      validate_records(records)
+      for index = 1, #DESCRIPTORS do
+        local observation = inspect_with_mask(force, DESCRIPTORS[index])
+        if observation and observation.completed > 0
+            and not valid_record_for_observation(records, observation) then
+          error("MIR cannot safely migrate published 4.7 competing productivity while startup settings changed. "
+            .. "Upgrade once with startup settings unchanged and save, then change "
+            .. "mir-prefer-this-mod-for-competing-techs in a later MIR5 configuration.", 2)
+        end
+      end
+    end
+  end
 end
 
 function M.on_init()
