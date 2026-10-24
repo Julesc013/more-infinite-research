@@ -383,6 +383,9 @@ function M.maintain(cache, scope, tick)
       expired[#expired + 1] = request_id
     end
   end
+  -- At most sixteen issued IDs. A reloaded hash map must produce the same
+  -- retry order and subsequent native request IDs as the warm instance.
+  table.sort(expired)
   for _, request_id in ipairs(expired) do
     local request = release(cache, request_id)
     if request and same_scope(request.scope, cache.scope) and request.generation == cache.generation then
