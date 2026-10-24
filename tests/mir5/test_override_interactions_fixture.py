@@ -105,7 +105,7 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
               prototypes={module_category=category_map,
                 recipe={
                   ["mir5-override-ordinary"]={maximum_productivity=1,allowed_effects=recipe_effects,allowed_module_categories=category_map},
-                  ["mir5-override-recycling"]={maximum_productivity=.5,products={{type="item",name="iron-plate",probability=.2}}},
+                  ["mir5-override-recycling"]={maximum_productivity=.5,products={{type="item",name="iron-plate",independent_probability=.2}}},
                   ["mir5-override-parameter"]={allowed_effects={speed=false,productivity=false,consumption=false,pollution=false,quality=false},allowed_module_categories={speed=true}}
                 },
                 entity={
@@ -243,6 +243,19 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "runtime receiver witness differs"):
             runtime["callbacks"]["init"]()
 
+    def test_control_rejects_removed_or_changed_runtime_product_probability(self):
+        for opponent in ("removed-field", "changed-value"):
+            with self.subTest(opponent=opponent):
+                runtime = self.lua.globals().control_runtime()
+                product = runtime["env"]["prototypes"]["recipe"]["mir5-override-recycling"]["products"][1]
+                if opponent == "removed-field":
+                    product["independent_probability"] = None
+                    product["probability"] = .2
+                else:
+                    product["independent_probability"] = .3
+                with self.assertRaisesRegex(Exception, "runtime recycling prototype differs"):
+                    runtime["callbacks"]["init"]()
+
     def test_f210_runtime_api_matches_only_the_public_witnesses(self):
         path = f210_runtime_api_path()
         if path is None:
@@ -255,6 +268,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         self.assertTrue({"allowed_effects", "allowed_module_categories", "effect_receiver", "energy_usage"} <= entity_fields)
         self.assertNotIn("max_pipeline_extent", entity_fields)
         self.assertNotIn("independent_probability", recipe_fields)
+        concepts = {row["name"]: row for row in api["concepts"]}
+        product_fields = {row["name"] for row in concepts["ItemProduct"]["type"]["parameters"]}
+        self.assertIn("independent_probability", product_fields)
+        self.assertNotIn("probability", product_fields)
 
     def test_profile_binds_exact_current_official_closure_and_private_fixture(self):
         profile = json.loads(PROFILE.read_text(encoding="utf-8"))

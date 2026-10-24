@@ -46,7 +46,7 @@ local function prototype_witness()
   local machine, pipeline = prototypes.entity[MACHINE], prototypes.entity[PIPELINE]
   if not ordinary or not recycled or not parameter or not machine or not pipeline then fail("fixture prototype is absent") end
   if not near(ordinary.maximum_productivity, 1) then fail("runtime productivity cap differs") end
-  if not near(recycled.maximum_productivity, 0.5) or #recycled.products ~= 1 or not near(recycled.products[1].probability, 0.2) then
+  if not near(recycled.maximum_productivity, 0.5) or #recycled.products ~= 1 or not near(recycled.products[1].independent_probability, 0.2) then
     fail("runtime recycling prototype differs")
   end
   local expected_effects, expected_categories = {}, categories()
