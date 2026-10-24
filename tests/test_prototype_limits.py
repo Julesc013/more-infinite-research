@@ -385,8 +385,32 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(pipeline.multiplier("12.5") == .125 and pipeline.multiplier(100) == 1)
           assert(pipeline.multiplier(nil) == 1 and pipeline.multiplier("invalid") == 1)
           assert(pipeline.multiplier(0/0) == 1 and pipeline.multiplier(math.huge) == 1)
-          local raw = setmetatable({}, {__pairs=function() error("inactive pipeline traversal") end})
+          local raw = setmetatable({}, {__pairs=function() error("inactive pipeline traversal") end,
+            __index=function() error("inactive pipeline default read") end})
           assert(pipeline.apply(raw, "100") == 0 and pipeline.apply(raw, nil) == 0)
+        ''')
+
+    def test_pipeline_extent_scales_the_native_utility_default_without_changing_it(self):
+        self.lua.execute('''
+          local pipeline = require("overrides.pipeline_extent")
+          local implicit, explicit = {foreign="keep"}, {max_pipeline_extent=320}
+          local constants = {default_pipeline_extent=640, foreign="untouched"}
+          local raw = {
+            ["utility-constants"]={default=constants},
+            pipe={a={fluid_box=implicit}},
+            machine={b={fluid_boxes={implicit, explicit}}},
+          }
+          assert(pipeline.apply(raw, "100") == 0)
+          assert(implicit.max_pipeline_extent == nil and explicit.max_pipeline_extent == 320)
+          assert(pipeline.apply(raw, "150") == 2)
+          assert(implicit.max_pipeline_extent == 960 and explicit.max_pipeline_extent == 480)
+          assert(constants.default_pipeline_extent == 640 and constants.foreign == "untouched")
+          assert(implicit.foreign == "keep")
+          local shorter = {["utility-constants"]={default={default_pipeline_extent=128}},
+            pipe={a={fluid_box={}}}}
+          assert(pipeline.apply(shorter, "50") == 1)
+          assert(shorter.pipe.a.fluid_box.max_pipeline_extent == 64)
+          assert(shorter["utility-constants"].default.default_pipeline_extent == 128)
         ''')
 
     def test_pipeline_extent_scales_every_delivered_box_field_once_with_rounding_and_bounds(self):
