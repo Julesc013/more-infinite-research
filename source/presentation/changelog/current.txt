@@ -21,6 +21,7 @@ Version: @DISTRIBUTION_VERSION@
       supported.
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
   Bugfixes:
+    - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
     - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an
       ordinary research unit.
@@ -29,6 +30,7 @@ Version: @DISTRIBUTION_VERSION@
     - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
     - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
   Optimizations:
+    - Reuse authored Library declarations across views and coalesce relevant open-view refreshes on the next tick.
     - Publish each checked family once; native effects require no recurring research or tick maintenance.
     - Skip inactive adapters and default broad overrides before inspecting their prototype domains.
     - Collect retained product targets in bounded passes and reuse immutable lab-compatibility decisions within one construction
