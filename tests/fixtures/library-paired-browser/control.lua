@@ -287,7 +287,8 @@ local function run_action(state, label, players)
   open(players.en, views.en)
   open(players.de, views.de)
   profiler.stop()
-  log({"", "[MIR5_LIBRARY_PROFILE] ", label, " ", profiler})
+  local profiler_action = label == "first-open" and "first_open" or label
+  log({"", "[MIR5_LIBRARY_PROFILE] ", profiler_action, " ", profiler})
   state.action_call_count = 2
   assert_shape(players.en, ARMS[state.arm], views.en)
   assert_shape(players.de, ARMS[state.arm], views.de)
