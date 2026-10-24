@@ -53,6 +53,13 @@ local function exact_names(actual, expected)
   return true
 end
 
+local function maximum_productivity_matches(actual, expected)
+  -- F210's omitted RecipePrototype ceiling is 3; native dumps materialize it.
+  -- Compare that effective value without mutating the upstream recipe.
+  if actual == nil then actual = 3 end
+  return actual == expected
+end
+
 local function owner_matches(owner, route)
   if type(owner) ~= "table" or owner.enabled == false
       or not exact_names(owner.prerequisites or {}, route.owner_prerequisites)
@@ -81,7 +88,8 @@ local function validate_raw(raw, definition)
   for _, route in ipairs(definition.routes) do
     local recipe = raw.recipe[route.recipe]
     if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.hidden == true
-        or recipe.allow_productivity ~= true or recipe.maximum_productivity ~= route.maximum_productivity
+        or recipe.allow_productivity ~= true
+        or not maximum_productivity_matches(recipe.maximum_productivity, route.maximum_productivity)
         or not ordinary_rows(recipe.ingredients, route.ingredients)
         or not ordinary_rows(recipe.results, route.results) then
       fail(route.recipe .. " changed")
