@@ -76,12 +76,21 @@ if not near(receiver.speed_limits and receiver.speed_limits.low, -0.5)
 end
 
 local boxes = assert(pipeline.fluid_boxes, "pipeline boxes are absent")
-local count = 0
-for _, box in pairs(boxes) do
+local explicit, count = 0, 0
+for index, box in ipairs(boxes) do
   count = count + 1
-  if box.max_pipeline_extent ~= 480 then fail("pipeline extent differs") end
+  if index == 1 then
+    if box.max_pipeline_extent ~= 960 then fail("pipeline implicit extent differs") end
+  elseif box.max_pipeline_extent == 480 then explicit = explicit + 1
+  else fail("pipeline explicit extent differs") end
 end
-if count == 0 then fail("pipeline has no fluid boxes") end
+local utility = assert(data.raw["utility-constants"] and data.raw["utility-constants"].default,
+  "utility constants are absent")
+if utility.default_pipeline_extent ~= 640 then fail("pipeline utility default changed") end
+if count < 2 or explicit ~= count - 1 then
+  fail("pipeline extent positional contract differs")
+end
 
 log("[MIR5_OVERRIDE_INTERACTIONS_DATA] status=passed;ordinary-cap=1;recycling-probability=0.2;"
-  .. "pipeline-extent=480;receiver-speed=-0.5,2;self-recycling-classifier=inactive")
+  .. "pipeline-implicit-extent=960;pipeline-explicit-extent=480;pipeline-utility-default=640;"
+  .. "receiver-speed=-0.5,2;self-recycling-classifier=inactive")
