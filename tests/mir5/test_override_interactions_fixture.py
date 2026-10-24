@@ -6,6 +6,7 @@ Factorio process is launched here.
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -31,6 +32,13 @@ def f210_runtime_api_path():
 
 
 class OverrideInteractionsFixtureTests(unittest.TestCase):
+    def test_completed_save_name_matches_the_native_runner_endpoint(self):
+        runner = (ROOT / "tools/mir5/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
+        names = re.findall(r"\$complete\s*=\s*Join-Path\s+\$writeData\s+'saves/([^/']+)\.zip'", runner)
+        self.assertEqual(1, len(names))
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn('game.server_save("' + names[0] + '")', source)
+
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().stage_path = (FIXTURE / "data-final-fixes.lua").as_posix()
@@ -118,7 +126,7 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
             }
             env.game={tick=0, speed=1, forces={player={recipes={["mir5-override-ordinary"]={enabled=true}}}},
               surfaces={{create_entity=function(row) assert(row.name == "mir5-override-assembler"); return machine end}},
-              server_save=function(name) assert(name == "mir5-override-interactions-complete"); saves=saves+1 end}
+              server_save=function(name) assert(name == "mir5-native-complete"); saves=saves+1 end}
             env.helpers={table_to_json=function(row) markers[#markers+1]=row; return "fixture-json" end}
             if opponent == "legacy-probability" then
               local product=env.prototypes.recipe["mir5-override-recycling"].products[1]

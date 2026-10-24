@@ -7,6 +7,7 @@ candidate full-catalogue comparison.
 import argparse
 from copy import deepcopy
 import json
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -83,6 +84,13 @@ def fixture_spec(facts):
 
 
 class BobCoreGameplayFixtureTests(unittest.TestCase):
+    def test_completed_save_name_matches_the_native_runner_endpoint(self):
+        runner = (ROOT / "tools/mir5/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
+        names = re.findall(r"\$complete\s*=\s*Join-Path\s+\$writeData\s+'saves/([^/']+)\.zip'", runner)
+        self.assertEqual(1, len(names))
+        source = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn('local SAVE = "' + names[0] + '"', source)
+
     @classmethod
     def setUpClass(cls):
         cls.facts = json.loads(FACTS.read_text(encoding="utf-8"))
