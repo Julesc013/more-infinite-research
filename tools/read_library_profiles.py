@@ -213,21 +213,39 @@ def _manifest_path(manifest_path: Path, original_path: str) -> Path:
     return resolved
 
 
+def _strict_json_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, member in pairs:
+        if key in value:
+            raise LibraryProfileError(f"manifest contains duplicate JSON key: {key}")
+        value[key] = member
+    return value
+
+
+def _reject_json_constant(value: str) -> None:
+    raise LibraryProfileError(f"manifest contains nonfinite JSON constant: {value}")
+
+
 def read_manifest(manifest_path: Path) -> dict[str, Any]:
     """Read the fixed three-role phase manifest without selecting a latest log."""
     data = _read_bounded(manifest_path, MAX_MANIFEST_BYTES, "manifest")
     try:
-        value = json.loads(data.decode("utf-8"))
+        value = json.loads(
+            data.decode("utf-8"),
+            object_pairs_hook=_strict_json_object,
+            parse_constant=_reject_json_constant,
+        )
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         raise LibraryProfileError(f"manifest is not strict UTF-8 JSON: {manifest_path}") from error
     if not isinstance(value, dict) or set(value) != {"schema", "kind", "roles"}:
         raise LibraryProfileError("manifest keys differ")
-    if value["schema"] != 1 or value["kind"] != MANIFEST_KIND or not isinstance(value["roles"], dict):
+    if type(value["schema"]) is not int or value["schema"] != 1 or value["kind"] != MANIFEST_KIND or not isinstance(value["roles"], dict):
         raise LibraryProfileError("manifest schema differs")
     if set(value["roles"]) != set(ROLES):
         raise LibraryProfileError("manifest roles must be exactly server, en, and de")
 
     entries: list[LogInput] = []
+    seen_locators: set[str] = set()
     for role in ROLES:
         records = value["roles"][role]
         if not isinstance(records, list) or not records or len(records) > MAX_LOGS_PER_ROLE:
@@ -248,7 +266,12 @@ def read_manifest(manifest_path: Path) -> dict[str, Any]:
             if process in by_process:
                 record = by_process[process]
                 original_path = record["path"]
-                entries.append(LogInput(role, process, _manifest_path(manifest_path, original_path), original_path))
+                path = _manifest_path(manifest_path, original_path)
+                locator = str(path).casefold()
+                if locator in seen_locators:
+                    raise LibraryProfileError("manifest log locator is duplicated")
+                seen_locators.add(locator)
+                entries.append(LogInput(role, process, path, original_path))
 
     return _read_profiles(
         entries,

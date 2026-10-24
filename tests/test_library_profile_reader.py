@@ -242,6 +242,42 @@ class LibraryProfileReaderTests(unittest.TestCase):
             with self.assertRaisesRegex(reader.LibraryProfileError, "action is duplicated"):
                 reader.read_manifest(manifest)
 
+    def test_manifest_refuses_duplicate_json_keys_nonfinite_constants_and_noninteger_schema(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = self.write_actual_401334_manifest_excerpts(root)
+            valid = manifest.read_text(encoding="utf-8")
+            opponents = (
+                ("root-key", valid.replace('"schema": 1', '"schema": 1, "schema": 1', 1),
+                 "duplicate JSON key: schema"),
+                ("role-key", valid.replace('"server": [{', '"server": [], "server": [{', 1),
+                 "duplicate JSON key: server"),
+                ("entry-key", valid.replace('"process": "initial", "path"',
+                                                '"process": "initial", "process": "initial", "path"', 1),
+                 "duplicate JSON key: process"),
+                ("nonfinite", valid.replace('"schema": 1', '"schema": NaN', 1),
+                 "nonfinite JSON constant: NaN"),
+                ("boolean-schema", valid.replace('"schema": 1', '"schema": true', 1),
+                 "manifest schema differs"),
+                ("float-schema", valid.replace('"schema": 1', '"schema": 1.0', 1),
+                 "manifest schema differs"),
+            )
+            for label, raw, expected in opponents:
+                with self.subTest(label=label):
+                    manifest.write_text(raw, encoding="utf-8")
+                    with self.assertRaisesRegex(reader.LibraryProfileError, expected):
+                        reader.read_manifest(manifest)
+
+    def test_manifest_rejects_reused_resolved_log_locator(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            manifest = self.write_actual_401334_manifest_excerpts(root)
+            value = json.loads(manifest.read_text(encoding="utf-8"))
+            value["roles"]["en"][1]["path"] = value["roles"]["en"][0]["path"]
+            manifest.write_text(json.dumps(value), encoding="utf-8")
+            with self.assertRaisesRegex(reader.LibraryProfileError, "locator is duplicated"):
+                reader.read_manifest(manifest)
+
     def test_manifest_and_selected_log_byte_limits_reject_before_aggregation(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
