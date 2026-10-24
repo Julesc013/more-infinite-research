@@ -67,7 +67,6 @@ if major == 5 then
   local name = "mir-science-ambiguity-space-research"
   local published = api.add_technology({
     type = "technology", name = name,
-    icon = "__base__/graphics/technology/space-science-pack.png", icon_size = 256,
     prerequisites = {"space-science-pack"},
     unit = {count = 1, time = 1, ingredients = {{"space-science-pack", 1}}},
     effects = {{type = "character-crafting-speed", modifier = 0.01}}
@@ -75,7 +74,8 @@ if major == 5 then
   local research = data.raw.technology[name]
   if published ~= name or not research
       or research.prerequisites[1] ~= "space-science-pack"
-      or research.unit.ingredients[1][1] ~= "space-science-pack" then
+      or research.unit.ingredients[1][1] ~= "space-science-pack"
+      or research.icon ~= "__more-infinite-research__/thumbnail.png" or research.icon_size ~= 288 then
     fail("direct space-science declaration was not published intact")
   end
 elseif major ~= 4 then

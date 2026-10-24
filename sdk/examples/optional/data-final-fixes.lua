@@ -7,14 +7,10 @@ if not api.get_capabilities().recipe_productivity then return end
 api.add_productivity({
   type = "technology",
   name = "mir-api-example-optional-cable-1",
-  icon = "__base__/graphics/technology/automation.png",
-  icon_size = 256,
   prerequisites = {"automation"},
   unit = {
-    count_formula = "100 * 2^(L-1)",
+    count = 100,
     ingredients = {{"automation-science-pack", 1}},
     time = 30
-  },
-  max_level = "infinite",
-  upgrade = true
+  }
 }, {"copper-cable"}, 0.01)

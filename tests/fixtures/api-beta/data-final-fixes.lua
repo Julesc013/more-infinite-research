@@ -8,11 +8,8 @@ if data.raw.recipe["copper-cable"] == nil then error("MIR 5 API beta fixture: co
 local name = api.add_productivity({
   type = "technology",
   name = "mir-api-fixture-beta-cable-1",
-  icon = "__base__/graphics/technology/electronics.png",
-  icon_size = 256,
   prerequisites = {"electronics"},
   unit = {count = 50, ingredients = {{"automation-science-pack", 1}}, time = 20},
-  max_level = 1,
   effects = {}
 }, {"copper-cable"}, 0.01)
 

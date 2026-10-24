@@ -22,6 +22,7 @@ Version: @DISTRIBUTION_VERSION@
       supported.
     - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
   Bugfixes:
+    - Restrict public data declarations to checked native fields and MIR-owned presentation before publication.
     - Refresh relevant open Research Library views after native research, queue and force events without changing research state.
     - Preserve in-flight Library translations across client load and retry expired requests in deterministic order.
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.

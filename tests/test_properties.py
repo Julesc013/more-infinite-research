@@ -60,6 +60,24 @@ class PropertyTests(unittest.TestCase):
             return family
           end
 
+          function api_property_definition(name, prerequisites)
+            return {
+              type = "technology", name = name, prerequisites = prerequisites or {"automation"},
+              unit = {count = 10, ingredients = {{"automation-science-pack", 1}}, time = 15},
+              effects = {{type = "character-crafting-speed", modifier = .01}}
+            }
+          end
+
+          function api_property_family(prefix, count)
+            local family = {}
+            for index = 1, count do
+              local prerequisites = {}
+              if index < count then prerequisites = {prefix .. "-" .. (index + 1)} end
+              family[index] = api_property_definition(prefix .. "-" .. index, prerequisites)
+            end
+            return family
+          end
+
           function family_signature(stage)
             local parts = {tostring(stage.writes), tostring(#stage.emitted)}
             for index, prototype in ipairs(stage.emitted) do
@@ -142,25 +160,27 @@ class PropertyTests(unittest.TestCase):
           for _, count in ipairs({1, 3, 7}) do
             data = property_world()
             local prefix = "api-property-family-" .. count
-            local input = property_family(prefix, count)
+            local input = api_property_family(prefix, count)
             local names = api.add_technologies(input)
-            family_oracle(data, prefix, count)
+            assert(data.writes == 1 and #data.emitted == count)
             assert(#names == count, "API result size must equal input size")
-            for index = 1, count do assert(names[index] == prefix .. "-" .. index, "API order changed") end
+            for index = 1, count do
+              assert(names[index] == prefix .. "-" .. index, "API order changed")
+              assert(data.emitted[index].effects[1].type == "character-crafting-speed")
+            end
             input[1].unit.ingredients[1][2] = 99
             assert(data.emitted[1].unit.ingredients[1][2] == 1, "API output aliases caller input")
           end
 
           data = property_world()
-          local submitted = property_definition("api-property-productivity", {})
-          submitted.effects = {{type = "unlock-recipe", recipe = "steel-plate"}}
+          local submitted = api_property_definition("api-property-productivity", {})
+          submitted.effects = {}
           assert(api.add_productivity(submitted, {"iron-gear-wheel", "copper-cable"}, .02)
             == "api-property-productivity")
           local emitted = data.raw.technology["api-property-productivity"]
-          assert(#submitted.effects == 1 and #emitted.effects == 3, "productivity append changed input")
-          assert(emitted.effects[1].recipe == "steel-plate"
-            and emitted.effects[2].recipe == "iron-gear-wheel"
-            and emitted.effects[3].recipe == "copper-cable", "productivity recipe order changed")
+          assert(#submitted.effects == 0 and #emitted.effects == 2, "productivity append changed input")
+          assert(emitted.effects[1].recipe == "iron-gear-wheel"
+            and emitted.effects[2].recipe == "copper-cable", "productivity recipe order changed")
         ''')
 
     def test_public_api_uses_bounded_lookups_when_unrelated_prototypes_grow(self):
@@ -172,7 +192,7 @@ class PropertyTests(unittest.TestCase):
           setmetatable(data.raw.recipe, {__pairs = poison_pairs})
           setmetatable(data.raw.technology, {__pairs = poison_pairs})
           data.raw.fluid = setmetatable({}, {__pairs = poison_pairs})
-          assert(api.add_technology(property_definition("api-bounded-lookup")) == "api-bounded-lookup")
+          assert(api.add_technology(api_property_definition("api-bounded-lookup")) == "api-bounded-lookup")
           assert(data.writes == 1 and data.raw.technology["api-bounded-lookup"],
             "unrelated prototype growth changed publication")
         ''')

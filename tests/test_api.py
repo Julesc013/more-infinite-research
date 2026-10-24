@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+import struct
 import sys
 import unittest
 
@@ -95,6 +96,12 @@ class ApiTests(unittest.TestCase):
           assert(api.get_capabilities().recipe_productivity)
         ''')
 
+    def test_api_presentation_is_the_packaged_owned_288px_thumbnail(self):
+        thumbnail = (ROOT / "source/thumbnail.png").read_bytes()
+        self.assertEqual(thumbnail[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual(thumbnail[12:16], b"IHDR")
+        self.assertEqual(struct.unpack(">II", thumbnail[16:24]), (288, 288))
+
     def test_single_creation_is_immediate_and_detached(self):
         self.fresh()
         self.lua.execute('''
@@ -102,6 +109,8 @@ class ApiTests(unittest.TestCase):
           assert(api.add_technology(submitted) == "mir-api-single-1")
           local emitted = data.raw.technology[submitted.name]
           assert(data.writes == 1 and emitted and emitted ~= submitted)
+          assert(emitted.icon == "__more-infinite-research__/thumbnail.png" and emitted.icon_size == 288)
+          assert(submitted.icon == nil and submitted.icon_size == nil)
           submitted.unit.ingredients[1][2] = 99
           emitted.unit.ingredients[1][2] = 2
           assert(emitted.unit.ingredients[1][2] == 2 and submitted.unit.ingredients[1][2] == 99)
@@ -288,13 +297,14 @@ class ApiTests(unittest.TestCase):
         self.fresh()
         self.lua.execute('''
           local submitted = definition("mir-api-productivity-1")
-          submitted.effects = {{type = "unlock-recipe", recipe = "iron-gear-wheel"}}
           assert(api.add_productivity(submitted, {"iron-gear-wheel", "copper-cable"}, .02) == submitted.name)
           local emitted = data.raw.technology[submitted.name]
-          assert(#submitted.effects == 1 and #emitted.effects == 3)
-          assert(emitted.effects[2].type == "change-recipe-productivity"
-            and emitted.effects[2].recipe == "iron-gear-wheel" and emitted.effects[2].change == .02)
-          assert(emitted.effects[3].recipe == "copper-cable" and emitted.effects[3].change == .02)
+          assert(#submitted.effects == 0 and #emitted.effects == 2)
+          assert(emitted.effects[1].type == "change-recipe-productivity"
+            and emitted.effects[1].recipe == "iron-gear-wheel" and emitted.effects[1].change == .02)
+          assert(emitted.effects[2].recipe == "copper-cable" and emitted.effects[2].change == .02)
+          submitted.unit.ingredients[1][2] = 99
+          assert(emitted.unit.ingredients[1][2] == 1)
         ''')
 
     def test_invalid_cycles_metatables_and_sparse_inputs_fail_before_writes(self):
@@ -308,6 +318,90 @@ class ApiTests(unittest.TestCase):
           refused(function() api.add_technology(executable) end, "invalid_definition")
           refused(function() api.add_technologies({[1] = definition("mir-api-sparse-a"), [3] = definition("mir-api-sparse-b")}) end,
             "invalid_definition")
+        ''')
+
+    def test_admission_subset_rejects_native_schema_escapes_before_any_family_write(self):
+        self.fresh()
+        self.lua.execute('''
+          local bad_effect = definition("mir-api-bad-effect-1")
+          bad_effect.effects = {{type = "not-a-factorio-modifier"}}
+          refused(function() api.add_technology(bad_effect) end, "invalid_definition")
+          local bad_icon = definition("mir-api-bad-icon-1")
+          bad_icon.icon = "__foreign__/graphics/not-checked.png"
+          refused(function() api.add_technology(bad_icon) end, "invalid_definition")
+          local formula = definition("mir-api-formula-1")
+          formula.unit.count = nil
+          formula.unit.count_formula = "L +"
+          refused(function() api.add_technology(formula) end, "invalid_definition")
+          local incomplete = definition("mir-api-incomplete-unit-1")
+          incomplete.unit.time = nil
+          refused(function() api.add_technology(incomplete) end, "invalid_definition")
+          local sub_tick = definition("mir-api-sub-tick-1")
+          sub_tick.unit.time = 1e-300
+          refused(function() api.add_technology(sub_tick) end, "invalid_definition")
+          local excessive_time = definition("mir-api-excessive-time-1")
+          excessive_time.unit.time = 1e300
+          refused(function() api.add_technology(excessive_time) end, "invalid_definition")
+          local nonfinite_time = definition("mir-api-nonfinite-time-1")
+          nonfinite_time.unit.time = math.huge
+          refused(function() api.add_technology(nonfinite_time) end, "invalid_definition")
+          local malformed_ingredient = definition("mir-api-ingredient-1")
+          malformed_ingredient.unit.ingredients[1][3] = "unexpected"
+          refused(function() api.add_technology(malformed_ingredient) end, "invalid_definition")
+          local unsafe_modifier = definition("mir-api-modifier-1")
+          unsafe_modifier.effects = {{type = "character-crafting-speed", modifier = 2}}
+          refused(function() api.add_technology(unsafe_modifier) end, "invalid_definition")
+          local caller_productivity = definition("mir-api-caller-productivity-1")
+          caller_productivity.effects = {{type = "change-recipe-productivity",
+            recipe = "iron-gear-wheel", change = .01}}
+          refused(function() api.add_productivity(caller_productivity, {"copper-cable"}, .02) end,
+            "invalid_definition")
+          local first = definition("mir-api-family-safe-1")
+          local second = definition("mir-api-family-unsafe-1")
+          second.localised_name = {"bad", "native-shape"}
+          refused(function() api.add_technologies({first, second}) end, "invalid_definition")
+          assert(data.raw.technology[first.name] == nil,
+            "a later family rejection must not publish an earlier member")
+          local control_name = definition("mir-api-control-byte-1")
+          control_name.name = "mir-api-control-" .. string.char(1)
+          refused(function() api.add_technology(control_name) end, "invalid_definition")
+          local min_time = definition("mir-api-min-time-1")
+          min_time.unit.time = 1 / 60
+          assert(api.add_technology(min_time) == min_time.name)
+          local max_time = definition("mir-api-max-time-1")
+          max_time.unit.time = 3600000
+          assert(api.add_technology(max_time) == max_time.name)
+        ''')
+
+    def test_target_specific_science_item_types_and_duplicate_names_reject_before_writes(self):
+        self.fresh()
+        self.lua.execute('''
+          -- F210 ResearchIngredient accepts ItemPrototype, including the
+          -- generic item prototype that F200's older TechnologyUnit forbids.
+          data.raw.item = { ["mir-api-f210-generic-item"] = {} }
+          local f210_generic = definition("mir-api-f210-generic-item-1")
+          f210_generic.unit.ingredients = {{"mir-api-f210-generic-item", 1}}
+          assert(api.add_technology(f210_generic) == f210_generic.name)
+          local f210_duplicate = definition("mir-api-f210-duplicate-ingredient-1")
+          f210_duplicate.unit.ingredients = {
+            {"automation-science-pack", 1}, {"automation-science-pack", 1}
+          }
+          refused(function() api.add_technology(f210_duplicate) end, "invalid_definition")
+        ''')
+
+        self.fresh_f200()
+        self.lua.execute('''
+          data.raw.item = { ["mir-api-f200-generic-item"] = {} }
+          local f200_generic = definition("mir-api-f200-generic-item-1")
+          f200_generic.unit.ingredients = {{"mir-api-f200-generic-item", 1}}
+          refused(function() api.add_technology(f200_generic) end, "missing_target")
+          local f200_duplicate = definition("mir-api-f200-duplicate-ingredient-1")
+          f200_duplicate.unit.ingredients = {
+            {"automation-science-pack", 1}, {"automation-science-pack", 1}
+          }
+          refused(function() api.add_technology(f200_duplicate) end, "invalid_definition")
+          local f200_tool = definition("mir-api-f200-tool-item-1")
+          assert(api.add_technology(f200_tool) == f200_tool.name)
         ''')
 
     def test_scalar_wide_and_deep_inputs_stop_at_the_boundary_budget(self):
@@ -330,7 +424,7 @@ class ApiTests(unittest.TestCase):
           refused(function() api.add_technology(duplicate) end, "duplicate_identity")
           local existing = definition("mir-api-existing-productivity-1")
           existing.effects = {{type = "change-recipe-productivity", recipe = "iron-gear-wheel", change = .01}}
-          refused(function() api.add_productivity(existing, {"iron-gear-wheel"}, .02) end, "duplicate_identity")
+          refused(function() api.add_productivity(existing, {"iron-gear-wheel"}, .02) end, "invalid_definition")
           refused(function() api.add_productivity(definition("mir-api-duplicate-recipes-1"),
             {"iron-gear-wheel", "iron-gear-wheel"}, .02) end, "duplicate_identity")
           refused(function() api.add_productivity(definition("mir-api-missing-recipe-1"),

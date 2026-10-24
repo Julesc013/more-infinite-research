@@ -249,20 +249,21 @@ class TargetAdapterTests(unittest.TestCase):
           assert(calls == 0)
         ''')
 
-    def test_reduced_productivity_capability_rejects_all_direct_paths_before_writes(self):
+    def test_reduced_api_creation_and_productivity_reject_before_native_access(self):
         self.lua.execute(r'''
           local api = load_data_api(target("f013", false, false))
-          data = api_stage()
+          data = setmetatable({}, {__index=function() error("reduced API must not inspect data") end})
+          assert(not api.get_capabilities().technology_creation)
+          assert(not api.get_capabilities().technology_family)
           assert(not api.get_capabilities().recipe_productivity)
           local product = api_definition("reduced-productivity-effect")
           product.effects = {{type="change-recipe-productivity", recipe="iron-gear-wheel", change=.02}}
           local ok, message = pcall(api.add_technology, product)
           assert(not ok and tostring(message):find("MIR_API:unsupported_capability", 1, true))
-          assert(data.writes == 0)
           ok, message = pcall(api.add_productivity, api_definition("reduced-productivity-helper"), {"iron-gear-wheel"}, .02)
           assert(not ok and tostring(message):find("MIR_API:unsupported_capability", 1, true))
-          assert(data.writes == 0)
-          assert(api.add_technology(api_definition("reduced-ordinary")) == "reduced-ordinary" and data.writes == 1)
+          ok, message = pcall(api.add_technologies, {api_definition("reduced-family")})
+          assert(not ok and tostring(message):find("MIR_API:unsupported_capability", 1, true))
         ''')
 
     def test_all_reduced_targets_report_no_recipe_productivity_and_013_014_have_no_level_query(self):
@@ -270,6 +271,8 @@ class TargetAdapterTests(unittest.TestCase):
           local ids = {"f013", "f014", "f015", "f016", "f017", "f100", "f110"}
           for _, id in ipairs(ids) do
             local api = load_data_api(target(id, id ~= "f013" and id ~= "f014", false))
+            assert(not api.get_capabilities().technology_creation, id)
+            assert(not api.get_capabilities().technology_family, id)
             assert(not api.get_capabilities().recipe_productivity, id)
           end
           for _, id in ipairs({"f013", "f014"}) do

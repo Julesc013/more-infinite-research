@@ -77,22 +77,31 @@ class ModernTargetTests(unittest.TestCase):
           assert(values.effect_percent == 17 and values.options["mir-recycling-return-chance"] == "percent-20")
         ''')
 
-    def test_f200_api_rejects_unsupported_cargo_effects_before_native_access(self):
+    def test_f200_api_rejects_unadmitted_cargo_effects_before_publication(self):
         self.lua.execute('''
           f200()
           package.preload["__more-infinite-research__/research/generator"] = function()
             return require("research.generator")
           end
           local api = assert(loadfile(player_root .. "/api/v1/data.lua"))()
-          data = setmetatable({}, {__index=function() error("unsupported native access") end})
+          local writes = 0
+          data = {raw = {
+            technology = {automation = {}},
+            tool = {["automation-science-pack"] = {}},
+            recipe = {["iron-gear-wheel"] = {}}
+          }}
+          function data.extend() writes = writes + 1 end
           for _, kind in ipairs({"cargo-landing-pad-count", "max-cargo-bay-unloading-distance"}) do
             local ok, message = pcall(api.add_technology, {type="technology", name="consumer",
+              unit={count=1, ingredients={{"automation-science-pack", 1}}, time=1},
               effects={{type=kind, modifier=1}}})
-            assert(not ok and tostring(message):find("MIR_API:unsupported_capability",1,true), tostring(message))
+            assert(not ok and tostring(message):find("MIR_API:invalid_definition",1,true), tostring(message))
             ok, message = pcall(api.add_productivity, {type="technology", name="consumer",
+              unit={count=1, ingredients={{"automation-science-pack", 1}}, time=1},
               effects={{type=kind, modifier=1}}}, {"iron-gear-wheel"}, 0.1)
-            assert(not ok and tostring(message):find("MIR_API:unsupported_capability",1,true), tostring(message))
+            assert(not ok and tostring(message):find("MIR_API:invalid_definition",1,true), tostring(message))
           end
+          assert(writes == 0)
           assert(api.get_version().product == "5.0.20000" and api.get_capabilities().recipe_productivity)
         ''')
 
@@ -102,11 +111,22 @@ class ModernTargetTests(unittest.TestCase):
             return require("research.generator")
           end
           local api = assert(loadfile(player_root .. "/api/v1/data.lua"))()
-          data = setmetatable({}, {__index=function() error("malformed native access") end})
+          local writes = 0
+          data = {raw = {
+            technology = {automation = {}},
+            tool = {["automation-science-pack"] = {}},
+            recipe = {}
+          }}
+          function data.extend() writes = writes + 1 end
           for _, effects in ipairs({false, 5, "bad", {5}, {[2]={type="laboratory-speed",modifier=0.1}}}) do
-            local ok, message = pcall(api.add_technology, {type="technology",name="consumer",effects=effects})
+            local ok, message = pcall(api.add_technology, {
+              type="technology", name="consumer",
+              unit={count=1, ingredients={{"automation-science-pack", 1}}, time=1},
+              effects=effects
+            })
             assert(not ok and tostring(message):find("MIR_API:invalid_definition",1,true), tostring(message))
           end
+          assert(writes == 0)
         ''')
 
 

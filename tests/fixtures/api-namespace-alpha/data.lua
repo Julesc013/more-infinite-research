@@ -15,11 +15,8 @@ end
 local name = api.add_productivity({
   type = "technology",
   name = "mir-api-namespace-alpha-gears-1",
-  icon = "__base__/graphics/technology/automation-1.png",
-  icon_size = 256,
   prerequisites = {"automation"},
   unit = {count = 25, ingredients = {{"automation-science-pack", 1}}, time = 15},
-  max_level = 1,
   effects = {}
 }, {"iron-gear-wheel"}, 0.01)
 

@@ -33,16 +33,12 @@ assert(api.get_capabilities().recipe_productivity,
 api.add_productivity({
   type = "technology",
   name = "mir-api-example-gear-productivity-1",
-  icon = "__base__/graphics/technology/automation.png",
-  icon_size = 256,
   prerequisites = {"automation"},
   unit = {
-    count_formula = "100 * 2^(L-1)",
+    count = 100,
     ingredients = {{"automation-science-pack", 1}},
     time = 30
-  },
-  max_level = "infinite",
-  upgrade = true
+  }
 }, {"iron-gear-wheel"}, 0.01)
 ```
 
@@ -60,6 +56,6 @@ Exercise two independently named extensions in native Factorio, including option
 
 ## Draft revision and family creation
 
-The candidate examples follow **MIR API1.0.0-draft.2**. The module path is `__more-infinite-research__.api.v1.data`; the runtime remote interface is `more-infinite-research.api.v1`. These implemented MIR5 surfaces are absent from released MIR4. The product version and API version remain independent.
+The candidate examples follow **MIR API1.0.0-draft.3**. The module path is `__more-infinite-research__.api.v1.data`; the runtime remote interface is `more-infinite-research.api.v1`. These implemented MIR5 surfaces are absent from released MIR4. The product version and API version remain independent.
 
-Use `add_technologies(prototypes)` for an ordered finite family with internal forward references. All local preflight occurs before intended writes; an invalid family does not become a partially accepted pending registration. A later foreign target still requires calling in the proper later data-stage round. See [the API contract](../spec/api.md) and diagram 06 in the [atlas](diagrams/index.html).
+Data creation is implemented on F200/F210; native qualification remains separate. It accepts only the documented numeric-count technology subset: control-byte-free names, existing prerequisites, distinct science ingredients, time from `1/60` through `3600000` seconds, `character-crafting-speed` effects for ordinary creation, and API-created recipe-productivity effects. F200 science must be an existing `ToolPrototype`; F210 accepts the explicit `ItemPrototype` categories listed in the contract. MIR supplies the packaged thumbnail for every API result. Formula costs, caller assets, localization, triggers, arbitrary native fields and caller productivity effects reject before writes. Use `add_technologies(prototypes)` for an ordered finite family with internal forward references. All local preflight occurs before intended writes; an invalid family does not become a partially accepted pending registration. A later foreign target still requires calling in the proper later data-stage round. See [the API contract](../spec/api.md) and diagram 06 in the [atlas](diagrams/index.html).

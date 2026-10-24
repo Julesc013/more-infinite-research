@@ -114,8 +114,9 @@ class SdkTests(unittest.TestCase):
           assert(data.writes == 2)
           local required = assert(data.raw.technology["mir-api-example-required-gears-1"])
           local optional = assert(data.raw.technology["mir-api-example-optional-cable-1"])
-          assert(required ~= optional and required.unit.count_formula == "100 * 2^(L-1)")
-          assert(optional.unit.count_formula == "100 * 2^(L-1)")
+          assert(required ~= optional and required.unit.count == 100 and optional.unit.count == 100)
+          assert(required.icon == "__more-infinite-research__/thumbnail.png" and required.icon_size == 288)
+          assert(optional.icon == "__more-infinite-research__/thumbnail.png" and optional.icon_size == 288)
           assert(#required.effects == 1 and required.effects[1].type == "change-recipe-productivity"
             and required.effects[1].recipe == "iron-gear-wheel" and required.effects[1].change == .01)
           assert(#optional.effects == 1 and optional.effects[1].type == "change-recipe-productivity"
