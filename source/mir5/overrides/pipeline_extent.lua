@@ -28,20 +28,23 @@ function M.apply(raw, value)
     box.max_pipeline_extent = math.max(1, math.min(MAX_EXTENT, math.floor(extent * multiplier + 0.5)))
     count = count + 1
   end
-  local function visit(node)
-    if type(node) ~= "table" or nodes[node] then return end
-    nodes[node] = true
+  if type(raw) ~= "table" then return 0 end
+  local pending = {raw}
+  nodes[raw] = true
+  while #pending > 0 do
+    local node = pending[#pending]
+    pending[#pending] = nil
     for key, child in pairs(node) do
       if fields[key] then
         apply_box(child)
       elseif key == "fluid_boxes" and type(child) == "table" then
         for _, box in pairs(child) do apply_box(box) end
-      elseif type(child) == "table" then
-        visit(child)
+      elseif type(child) == "table" and not nodes[child] then
+        nodes[child] = true
+        pending[#pending + 1] = child
       end
     end
   end
-  visit(raw)
   return count
 end
 
