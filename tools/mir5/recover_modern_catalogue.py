@@ -220,11 +220,15 @@ def _assert_matching_inputs(before: Mapping[str, Any], after: Mapping[str, Any],
         ("selected", "selected upstream archive identities differ after removing MIR"),
         ("loaded", "loaded upstream selections differ after removing MIR"),
     )
-    if not allow_profile_receipt_difference:
-        fields += (("profile", "profile input receipts differ"),)
     for field, message in fields:
         if before[field] != after[field]:
             raise CatalogueError(message)
+    # Captures retained from another run keep their original machine-local
+    # profile locator. Exact bytes are identified by the recorded SHA-256;
+    # changing a directory must not require relaxing profile content equality.
+    if (not allow_profile_receipt_difference
+            and before["profile"]["sha256"] != after["profile"]["sha256"]):
+        raise CatalogueError("profile input receipts differ")
 
 
 def _same(left: Any, right: Any) -> bool:
