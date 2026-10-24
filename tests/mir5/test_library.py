@@ -294,6 +294,33 @@ class LibraryTests(unittest.TestCase):
           assert(queued_rows() == 0 and native_ticks[1] == nil)
         ''')
 
+    def test_native_events_refresh_the_actual_library_model_and_selected_detail(self):
+        self.lua.execute(r'''
+          -- Exercise the production query model as well as the actual GUI and
+          -- bootstrap; the other controls isolate their GUI boundary with a
+          -- small model double.
+          package.preload["presentation.library_model"] = nil
+          package.loaded["presentation.library_model"] = nil
+          boot_native_events()
+          local root = open_routed({status=4,selected=gear.name})
+          assert(queued_rows() == 1)
+          native_handlers.events[1]({research=gear})
+          gear.level, gear.researched, gear.enabled = 4,false,true
+          player.force.research_queue, player.force.current_research, player.force.research_progress = {},nil,0
+          local queue = player.force.research_queue
+          native_ticks[1]({tick=1})
+          assert(queued_rows() == 0 and native_ticks[1] == nil)
+          assert(open_routed({status=1,selected=gear.name}) == root)
+          local detail = research_content(root)["mir_library_detail"]
+          assert(detail["mir_library_detail_level"].caption[2] == 4)
+          native_handlers.events[5]({research=gear})
+          gear.level = 3
+          native_ticks[1]({tick=2})
+          assert(research_content(root)["mir_library_detail"]["mir_library_detail_level"].caption[2] == 3)
+          assert(player.force.research_queue == queue and player.force.current_research == nil
+            and player.force.research_progress == 0 and gear.level == 3 and not gear.researched)
+        ''')
+
     def test_closing_a_view_retains_independent_cap_research_callbacks(self):
         self.lua.execute(r'''
           boot_native_events()
