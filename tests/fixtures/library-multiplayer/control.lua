@@ -296,7 +296,7 @@ local function lab_diagnostic(state, stage)
     started=state.started, finished=state.finished,
     lab={valid=lab_valid, active=lab_valid and lab.active,
       energy=lab_valid and lab.energy, status=lab_valid and lab.status,
-      electric_network_id=lab_valid and lab.electric_network_id},
+      electric_network_id=lab_valid and (lab.electric_network_id or false)},
     research={enabled=force.research_enabled, current=named(current),
       progress=current and force.research_progress, queue_count=#pending, queue=queue},
     gear={level=gear and gear.level, enabled=gear and gear.enabled,

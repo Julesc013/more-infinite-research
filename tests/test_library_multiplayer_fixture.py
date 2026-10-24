@@ -331,6 +331,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               game.tick=storage[key].live_deadline
               force.research_progress,force.research_enabled=.25,false
               lab.energy,lab.active,lab.status=0,false,23
+              lab.electric_network_id=nil
               ok,result=call(callbacks.events[1])
               return {ok=ok,message=result,lab_diagnostics=lab_diagnostics,
                 energy=lab.energy,active=lab.active,progress=force.research_progress,
@@ -452,7 +453,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertEqual(snapshot["phase"], "researching-live-research")
         self.assertEqual((snapshot["started"], snapshot["finished"]), (1, 0))
         self.assertEqual(snapshot["lab"], {"valid": True, "active": False, "energy": 0,
-                                         "status": 23, "electric_network_id": 7})
+                                         "status": 23, "electric_network_id": False})
         self.assertEqual(snapshot["research"], {"enabled": False, "current": "recipe-prod-research_gears-1",
             "progress": .25, "queue_count": 2, "queue": ["recipe-prod-research_gears-1"] * 2})
         self.assertEqual(snapshot["gear"], {"level": 1, "enabled": True, "count": 1, "energy": 60})
