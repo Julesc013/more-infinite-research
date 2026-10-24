@@ -50,8 +50,8 @@ The maintainer has selected `source/` as the single canonical editable product-s
 
 ## Local Factorio engine authority
 
-- Use `C:\Program Files\Steam\steamapps\common\Factorio` only for the current Factorio 2.1 engine.
-- Use `D:\Programs\Factorio\<version>` for Factorio 2.0 and every older engine; Factorio 2.0 is `D:\Programs\Factorio\2.0\bin\x64\factorio.exe`.
+- On Black Glass, use the existing Steam installation `D:\Games\Steam\steamapps\common\Factorio` for the current Factorio 2.1 engine. The maintainer installed stable 2.1 through Steam after Aero became unavailable; verify its actual version and executable hash before native admission. The former Aero `C:\Program Files\Steam` locator is not an engine requirement on Black Glass.
+- On Black Glass, historical engines are existing installations under `D:\Games\Factorio\<version>`; Factorio 2.0 is `D:\Games\Factorio\2.0\bin\x64\factorio.exe`. The maintainer identified the transferred installations as local Programs/Games inputs. Preserve historical engine bytes and verify each actual version/hash; do not substitute Steam for a historical engine.
 - Never download, replace, retarget, or mutate Steam depots for historical engines without explicit maintainer authority.
 
 ## Required reading by task
