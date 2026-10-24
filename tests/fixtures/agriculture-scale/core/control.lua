@@ -1,10 +1,24 @@
 local KEY = "mir5_agriculture_scale"
 local AGRICULTURE = "recipe-prod-research_agricultural_growth_speed-1"
-local SCIENCE = {
+local PAIRED = "mir-fixture-mir5-agriculture-scale-paired"
+local CANDIDATE = "mir-fixture-mir5-agriculture-scale-arm-candidate"
+local PUBLISHED = "mir-fixture-mir5-agriculture-scale-arm-published"
+local CANDIDATE_SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
   "cryogenic-science-pack", "military-science-pack", "utility-science-pack",
   "space-science-pack", "metallurgic-science-pack", "promethium-science-pack"
+}
+-- This list is bound to the independent published 4.7.21002 capture
+-- (95B1A1FC…67B536C / 27FBC90D…7888072), never inferred from MIR 5.
+local PUBLISHED_SCIENCE = {
+  "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+  "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
+  "cryogenic-science-pack"
+}
+local ARMS = {
+  ["candidate-mir5"] = {name = "candidate-mir5", version = "5.0.21000", science = CANDIDATE_SCIENCE},
+  ["published-4.7.21002"] = {name = "published-4.7.21002", version = "4.7.21002", science = PUBLISHED_SCIENCE}
 }
 local TIERS = { [1] = true, [32] = true, [128] = true }
 local SELECTOR_FOR_TIER = {
@@ -39,16 +53,31 @@ local function tier()
   return value
 end
 
-local function selected_selector(value)
-  local expected = SELECTOR_FOR_TIER[value]
-  if script.active_mods[expected] ~= "0.1.0" then
-    fail("selected agriculture scale tier lacks its selector")
-  end
-  for other, name in pairs(SELECTOR_FOR_TIER) do
-    if other ~= value and script.active_mods[name] ~= nil then
-      fail("multiple agriculture scale selectors are active")
+local function selected_arm(value)
+  local paired = script.active_mods[PAIRED] == "0.1.0"
+  local candidate = script.active_mods[CANDIDATE] == "0.1.0"
+  local published = script.active_mods[PUBLISHED] == "0.1.0"
+  if paired then
+    if candidate == published then fail("paired agriculture fixture requires exactly one arm selector") end
+    if value ~= 1 then fail("paired agriculture fixture requires the fixed single-tower tier") end
+    for _, name in pairs(SELECTOR_FOR_TIER) do
+      if script.active_mods[name] ~= nil then fail("paired agriculture fixture cannot combine a scale tier selector") end
     end
+    return candidate and ARMS["candidate-mir5"] or ARMS["published-4.7.21002"], true
   end
+  if candidate or published then fail("agriculture arm selector requires the paired selector") end
+  local expected = SELECTOR_FOR_TIER[value]
+  if script.active_mods[expected] ~= "0.1.0" then fail("selected agriculture scale tier lacks its selector") end
+  for other, name in pairs(SELECTOR_FOR_TIER) do
+    if other ~= value and script.active_mods[name] ~= nil then fail("multiple agriculture scale selectors are active") end
+  end
+  return ARMS["candidate-mir5"], false
+end
+
+local function state_arm(state)
+  local arm = ARMS[state.arm]
+  if not arm then fail("fixture state has no recognized agriculture arm") end
+  return arm
 end
 
 local function technology(force)
@@ -57,11 +86,12 @@ local function technology(force)
   return value
 end
 
-local function assert_startup_contract()
+local function assert_startup_contract(arm)
   if script.active_mods.base ~= "2.1.23" or script.active_mods["space-age"] ~= "2.1.23"
-      or script.active_mods["more-infinite-research"] ~= "5.0.21000" then
+      or script.active_mods["more-infinite-research"] ~= arm.version then
     fail("unexpected engine, Space Age, or MIR package")
   end
+  if arm.name == "published-4.7.21002" then return end
   local expected = {
     ["mir-science-pack-ingredient-policy"] = "all-official",
     ["ips-require-space-gate"] = true,
@@ -229,7 +259,7 @@ local function assert_lab_research(state)
   local inventory = state.lab and state.lab.valid and state.lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("real lab input inventory is absent") end
   local consumed = {}
-  for _, name in ipairs(SCIENCE) do
+  for _, name in ipairs(state_arm(state).science) do
     consumed[name] = INITIAL_SCIENCE_PACKS - inventory.get_item_count(name)
     if name ~= "agricultural-science-pack" and consumed[name] ~= AGRICULTURE_LEVELS then
       fail("real lab consumed an unexpected nominal input count for " .. name, {
@@ -245,7 +275,7 @@ local function assert_lab_research(state)
     })
   end
   if state.lab_consumption then
-    for _, name in ipairs(SCIENCE) do
+    for _, name in ipairs(state_arm(state).science) do
       if state.lab_consumption[name] ~= consumed[name] then
         fail("real lab input consumption changed after completion for " .. name)
       end
@@ -320,7 +350,10 @@ local function marker(stage, state)
       profile = "space-age-f210",
       tier = state.tier,
       real_lab_agriculture_completions = state.research_finished,
-      all_official_science = SCIENCE,
+      -- Keep the original witness key for the existing scale controller. The
+      -- paired descriptor makes clear that only the candidate arm is all-official.
+      all_official_science = state_arm(state).science,
+      science_contract = {arm = state.arm, packs = state_arm(state).science},
       nominal_nonperishable_science_consumed_each = AGRICULTURE_LEVELS,
       agricultural_science_physical_consumption = state.lab_consumption
         and state.lab_consumption["agricultural-science-pack"],
@@ -337,7 +370,9 @@ local function marker(stage, state)
       native_spoilage_baseline = state.spoilage_baseline,
       seed_insertion_profiler = state.seed_insertion_profiler,
       profiler_timing_decision = "not-evaluated",
-      published_4_7_contract = "unresolved",
+      published_4_7_contract = state.arm == "published-4.7.21002"
+        and "independently-captured-95B1A1FC-27FBC90D"
+        or (state.paired and "not-selected" or "unresolved"),
       cold_reload_witness = stage == "reload",
       on_load_read_only = stage == "reload",
       ordinary_tuning_qualified = false,
@@ -349,6 +384,8 @@ end
 local function loaded_snapshot(state)
   return {
     tier = state.tier,
+    arm = state.arm,
+    paired = state.paired,
     research_finished = state.research_finished,
     planted_events = state.planted_events,
     spoilage_baseline = state.spoilage_baseline,
@@ -364,9 +401,9 @@ local function assert_loaded(state)
 end
 
 script.on_init(function()
-  assert_startup_contract()
   local value = tier()
-  selected_selector(value)
+  local arm, paired = selected_arm(value)
+  assert_startup_contract(arm)
   game.speed = 16
   local surface = assert(game.surfaces.nauvis)
   local player = game.forces.player
@@ -388,7 +425,7 @@ script.on_init(function()
   if not lab or not lab.valid then fail("could not create real Space Age lab") end
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("real lab input inventory is absent") end
-  for _, name in ipairs(SCIENCE) do
+  for _, name in ipairs(arm.science) do
     if inventory.insert{name = name, count = INITIAL_SCIENCE_PACKS} ~= INITIAL_SCIENCE_PACKS then
       fail("lab rejected " .. name)
     end
@@ -399,6 +436,8 @@ script.on_init(function()
   storage[KEY] = {
     phase = "researching",
     tier = value,
+    arm = arm.name,
+    paired = paired,
     grid_columns = columns,
     research_finished = 0,
     foreign_force_index = foreign.index,

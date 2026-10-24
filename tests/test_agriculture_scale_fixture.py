@@ -26,6 +26,17 @@ SCIENCE = [
     "cryogenic-science-pack", "military-science-pack", "utility-science-pack",
     "space-science-pack", "metallurgic-science-pack", "promethium-science-pack",
 ]
+PUBLISHED_SCIENCE = [
+    "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+    "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
+    "cryogenic-science-pack",
+]
+PAIRED_PROFILES = {
+    "candidate": ROOT / "tests/profiles/agriculture-paired-candidate-f210-2123.json",
+    "published": ROOT / "tests/profiles/agriculture-paired-published-f210-2123.json",
+}
+PUBLISHED_ARCHIVE_SHA = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+OBSERVER_SHA = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 F210_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F210_RUNTIME_API"),
     "D:/Games/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
@@ -55,41 +66,79 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.lua.globals().core_settings = (CORE / "settings.lua").as_posix()
         self.lua.globals().data_final = (CORE / "data-final-fixes.lua").as_posix()
         self.lua.globals().control = (CORE / "control.lua").as_posix()
+        self.lua.globals().candidate_arm_settings = (FIXTURE / "arm-candidate" / "settings-updates.lua").as_posix()
+        self.lua.globals().published_arm_settings = (FIXTURE / "arm-published" / "settings-updates.lua").as_posix()
         self.lua.execute(r'''
-          function scale_data(selector_path, opponent)
-            local science = {
+          function scale_data(selector_path, opponent, arm)
+            arm = arm or "legacy"
+            local candidate_science = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
               "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
               "cryogenic-science-pack", "military-science-pack", "utility-science-pack",
               "space-science-pack", "metallurgic-science-pack", "promethium-science-pack"
             }
-            local ingredients = {}
-            for index, name in ipairs(science) do ingredients[index] = {name, 1} end
+            local published_science = {
+              "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+              "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
+              "cryogenic-science-pack"
+            }
+            local science = arm == "published" and published_science or candidate_science
+            local ingredients, prerequisites = {}, {}
+            for index, name in ipairs(science) do
+              ingredients[index], prerequisites[index] = {name, 1}, name
+            end
             local technology = {
-              enabled=true, level=1, max_level="infinite", upgrade=true,
-              prerequisites={"automation-science-pack", "promethium-science-pack"},
-              effects={{type="nothing", effect_description={"fixture-effect", "1"}}},
+              level=1, max_level="infinite", upgrade=true,
+              prerequisites=prerequisites,
+              effects={{type="nothing", effect_description={
+                "modifier-description.more-infinite-research.agricultural_growth_speed", "1"}}},
               unit={count_formula="40000*1.5^(L-1)", time=90, ingredients=ingredients}
             }
+            if arm ~= "published" then technology.enabled=true end
             if opponent == "formula" then technology.unit.count_formula = "broken" end
-            if opponent == "ingredient" then technology.unit.ingredients[12] = {"broken-pack", 1} end
+            if opponent == "time" then technology.unit.time = 91 end
+            if opponent == "ingredient" then technology.unit.ingredients[#science] = {"broken-pack", 1} end
+            if opponent == "prerequisite" then technology.prerequisites[#science] = "broken-prerequisite" end
+            if opponent == "effect" then technology.effects[1].effect_description[2] = "2" end
+            if opponent == "candidate-disabled" then technology.enabled = false end
+            if opponent == "published-enabled" then technology.enabled = true end
+            if opponent == "published-hidden" then technology.hidden = false end
             local raw = {
               ["int-setting"] = {},
-              ["string-setting"] = {["mir-science-pack-ingredient-policy"]={setting_type="startup", default_value="progression"}},
-              ["bool-setting"] = {["ips-require-space-gate"]={setting_type="startup", default_value=false}},
+              ["string-setting"] = { ["mir-science-pack-ingredient-policy"]={setting_type="startup", default_value="progression"}},
+              ["bool-setting"] = { ["ips-require-space-gate"]={setting_type="startup", default_value=false}},
               technology = {["recipe-prod-research_agricultural_growth_speed-1"]=technology},
               capsule = {yumako={spoil_ticks=216000, spoil_result="spoilage"}}
             }
+            local active = {}
+            if arm == "candidate" or arm == "published" then
+              active["mir-fixture-mir5-agriculture-scale-paired"] = "0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-" .. arm] = "0.1.0"
+            end
+            if opponent == "zero-arm" then
+              active["mir-fixture-mir5-agriculture-scale-paired"] = "0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-candidate"] = nil
+              active["mir-fixture-mir5-agriculture-scale-arm-published"] = nil
+            end
+            if opponent == "both-arm" then
+              active["mir-fixture-mir5-agriculture-scale-paired"] = "0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-candidate"] = "0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-published"] = "0.1.0"
+            end
             local data = {raw=raw}
             function data:extend(rows)
               for _, row in ipairs(rows) do raw[row.type][row.name] = row end
             end
-            local env = {data=data}
+            local env = {data=data, mods=active}
             setmetatable(env, {__index=_G})
             local settings_chunk = assert(loadfile(core_settings, "t", env))
             settings_chunk()
-            local selector_chunk = assert(loadfile(selector_path, "t", env))
-            selector_chunk()
+            if selector_path and selector_path ~= "" then
+              local selector_chunk = assert(loadfile(selector_path, "t", env))
+              selector_chunk()
+            end
+            if arm == "candidate" then assert(loadfile(candidate_arm_settings, "t", env))() end
+            if arm == "published" then assert(loadfile(published_arm_settings, "t", env))() end
             local selected_tier = raw["int-setting"]["mir5-agriculture-scale-tier"].default_value
             if opponent == "tier" then selected_tier = 2 end
             env.settings = {startup={
@@ -99,7 +148,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             }}
             local final_chunk = assert(loadfile(data_final, "t", env))
             local ok, message = pcall(final_chunk)
-            return {ok=ok, message=tostring(message), raw=raw, selected_tier=selected_tier}
+            return {ok=ok, message=tostring(message), raw=raw, selected_tier=selected_tier, active=active}
           end
 
           function parse_scale_control(path)
@@ -129,13 +178,20 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
             return {ok=ok,message=tostring(result),reads=reads,callbacks=callbacks}
           end
 
-          function scale_runtime(path, tier, opponent)
-            local packs = {
+          function scale_runtime(path, tier, opponent, arm)
+            arm = arm or "legacy"
+            local candidate_packs = {
               "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
               "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
               "cryogenic-science-pack", "military-science-pack", "utility-science-pack",
               "space-science-pack", "metallurgic-science-pack", "promethium-science-pack"
             }
+            local published_packs = {
+              "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+              "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
+              "cryogenic-science-pack"
+            }
+            local packs = arm == "published" and published_packs or candidate_packs
             local callbacks, reports, saves = {events={}}, {}, 0
             local player, foreign
             local player_agriculture = {
@@ -212,10 +268,26 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
               error("unexpected entity " .. tostring(row.name))
             end
             local active = {
-              base="2.1.23", ["space-age"]="2.1.23", ["more-infinite-research"]="5.0.21000",
-              ["mir-fixture-mir5-agriculture-scale"]="0.1.0",
-              ["mir-fixture-mir5-agriculture-scale-tier-" .. tostring(tier)]="0.1.0"
+              base="2.1.23", ["space-age"]="2.1.23",
+              ["more-infinite-research"] = arm == "published" and "4.7.21002" or "5.0.21000",
+              ["mir-fixture-mir5-agriculture-scale"]="0.1.0"
             }
+            if arm == "candidate" or arm == "published" then
+              active["mir-fixture-mir5-agriculture-scale-paired"]="0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-" .. arm]="0.1.0"
+            else
+              active["mir-fixture-mir5-agriculture-scale-tier-" .. tostring(tier)]="0.1.0"
+            end
+            if opponent == "zero-arm" then
+              active["mir-fixture-mir5-agriculture-scale-paired"]="0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-candidate"]=nil
+              active["mir-fixture-mir5-agriculture-scale-arm-published"]=nil
+            end
+            if opponent == "both-arm" then
+              active["mir-fixture-mir5-agriculture-scale-paired"]="0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-candidate"]="0.1.0"
+              active["mir-fixture-mir5-agriculture-scale-arm-published"]="0.1.0"
+            end
             local env = {
               script={active_mods=active,
                 on_init=function(callback) callbacks.init=callback end,
@@ -351,10 +423,10 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.assertEqual(("mir-fixture-mir5-agriculture-scale", "0.1.0", "2.1"),
                          (core_info["name"], core_info["version"], core_info["factorio_version"]))
         self.assertEqual([
-            "base = 2.1.23", "space-age = 2.1.23", "more-infinite-research = 5.0.21000"
+            "base = 2.1.23", "space-age = 2.1.23", "more-infinite-research >= 4.7.21002"
         ], core_info["dependencies"])
         for tier, profile_path in PROFILES.items():
-            with self.subTest(tier=tier):
+            with self.subTest(legacy_tier=tier):
                 profile = json.loads(profile_path.read_text(encoding="utf-8-sig"))
                 selector = f"mir-fixture-mir5-agriculture-scale-tier-{tier}"
                 actual = [(row["name"], row["version"]) for row in profile["mods"]]
@@ -372,10 +444,57 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 self.assertEqual(["base = 2.1.23", "mir-fixture-mir5-agriculture-scale >= 0.1.0"],
                                  info["dependencies"])
 
+        official = [
+            ("base", "2.1.23"), ("elevated-rails", "2.1.23"), ("quality", "2.1.23"),
+            ("recycler", "2.1.23"), ("space-age", "2.1.23"),
+        ]
+        for arm, version in (("candidate", "5.0.21000"), ("published", "4.7.21002")):
+            with self.subTest(paired_arm=arm):
+                profile = json.loads(PAIRED_PROFILES[arm].read_text(encoding="utf-8-sig"))
+                actual = [(row["name"], row["version"]) for row in profile["mods"]]
+                self.assertEqual(official + [
+                    ("more-infinite-research", version),
+                    ("mir-fixture-mir5-agriculture-scale", "0.1.0"),
+                    ("mir-fixture-mir5-agriculture-scale-paired", "0.1.0"),
+                    (f"mir-fixture-mir5-agriculture-scale-arm-{arm}", "0.1.0"),
+                    ("mir-fixture-mir5-active-mods-observer", "0.1.0"),
+                ], actual)
+                self.assertEqual(("mir5-agriculture-paired-native-selection", "f210", "2.1",
+                                  "2.1.23", ENGINE_SHA, "Defaults"),
+                                 (profile["kind"], profile["target"], profile["factorio_line"],
+                                  profile["engine"]["version"], profile["engine"]["sha256"],
+                                  profile["settings_mode"]))
+                self.assertIn("two real labs", profile["scope"])
+                self.assertIn("performance", profile["scope"])
+                if arm == "published":
+                    self.assertEqual({
+                        "more-infinite-research_4.7.21002.zip": PUBLISHED_ARCHIVE_SHA,
+                        "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA,
+                    }, profile["archive_sha256"])
+                    self.assertIn("seven-science/raw-omission", profile["scope"])
+                else:
+                    self.assertNotIn("archive_sha256", profile)
+                    self.assertIn("twelve-science", profile["scope"])
+
+        paired_info = json.loads((FIXTURE / "paired" / "info.json").read_text(encoding="utf-8-sig"))
+        self.assertEqual(["base = 2.1.23", "mir-fixture-mir5-agriculture-scale >= 0.1.0"],
+                         paired_info["dependencies"])
+        for arm, version in (("candidate", "5.0.21000"), ("published", "4.7.21002")):
+            arm_root = FIXTURE / f"arm-{arm}"
+            info = json.loads((arm_root / "info.json").read_text(encoding="utf-8-sig"))
+            self.assertEqual(["base = 2.1.23", f"more-infinite-research = {version}",
+                              "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0"],
+                             info["dependencies"])
+            self.assertTrue((arm_root / "settings-updates.lua").is_file())
+            self.assertFalse((arm_root / "control.lua").exists())
+        self.assertTrue((FIXTURE / "paired" / "settings-updates.lua").is_file())
+        self.assertFalse((FIXTURE / "paired" / "control.lua").exists())
+        self.assertEqual([CORE / "control.lua"], list(FIXTURE.glob("*/control.lua")))
+
     def test_selector_and_data_preflight_accept_only_fixed_authored_tiers(self):
         run = self.lua.eval("scale_data")
         for tier in PROFILES:
-            with self.subTest(tier=tier):
+            with self.subTest(legacy_tier=tier):
                 result = plain(run((FIXTURE / f"tier-{tier}" / "settings-updates.lua").as_posix(), ""))
                 self.assertTrue(result["ok"], result["message"])
                 self.assertEqual(tier, result["selected_tier"])
@@ -390,14 +509,64 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                                   agriculture["unit"]["time"]))
         selector = (FIXTURE / "tier-1" / "settings-updates.lua").as_posix()
         for opponent, expected in (("formula", "default agricultural research tuning"),
-                                   ("ingredient", "science vector differs"), ("tier", "not an authored fixed tier")):
-            with self.subTest(opponent=opponent):
+                                   ("time", "default agricultural research tuning"),
+                                   ("ingredient", "science vector differs"),
+                                   ("prerequisite", "prerequisite vector differs"),
+                                   ("effect", "effect contract differs"),
+                                   ("tier", "not an authored fixed tier")):
+            with self.subTest(legacy_opponent=opponent):
                 result = plain(run(selector, opponent))
                 self.assertFalse(result["ok"])
                 self.assertIn(expected, result["message"])
                 agriculture = result["raw"]["technology"]["recipe-prod-research_agricultural_growth_speed-1"]
-                self.assertEqual(90, agriculture["unit"]["time"])
+                self.assertEqual(91 if opponent == "time" else 90, agriculture["unit"]["time"])
                 self.assertIsNone(agriculture["unit"].get("count"))
+
+    def test_paired_data_preflight_binds_independent_science_arms_and_refuses_ambiguous_selection(self):
+        run = self.lua.eval("scale_data")
+        selector = (FIXTURE / "paired" / "settings-updates.lua").as_posix()
+        for arm, science in (("candidate", SCIENCE), ("published", PUBLISHED_SCIENCE)):
+            with self.subTest(arm=arm):
+                result = plain(run(selector, "", arm))
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(1, result["selected_tier"])
+                technology = result["raw"]["technology"]["recipe-prod-research_agricultural_growth_speed-1"]
+                self.assertEqual(science, [row[1] for row in technology["unit"]["ingredients"].values()])
+                self.assertEqual(science, [row for row in technology["prerequisites"].values()])
+                self.assertEqual((1, None, 1),
+                                 (technology["unit"].get("count"), technology["unit"].get("count_formula"),
+                                  technology["unit"]["time"]))
+                if arm == "candidate":
+                    self.assertTrue(technology["enabled"])
+                    self.assertEqual("all-official", result["raw"]["string-setting"]
+                                     ["mir-science-pack-ingredient-policy"]["default_value"])
+                    self.assertTrue(result["raw"]["bool-setting"]["ips-require-space-gate"]["default_value"])
+                else:
+                    self.assertNotIn("enabled", technology)
+                    self.assertNotIn("hidden", technology)
+
+        for arm, opponent, expected in (
+            ("candidate", "formula", "default agricultural research tuning"),
+            ("candidate", "time", "default agricultural research tuning"),
+            ("candidate", "ingredient", "science vector differs"),
+            ("candidate", "prerequisite", "prerequisite vector differs"),
+            ("candidate", "effect", "effect contract differs"),
+            ("candidate", "candidate-disabled", "must not be disabled"),
+            ("published", "ingredient", "science vector differs"),
+            ("published", "prerequisite", "prerequisite vector differs"),
+            ("published", "effect", "effect contract differs"),
+            ("published", "published-enabled", "enabled/hidden omission"),
+            ("published", "published-hidden", "enabled/hidden omission"),
+            ("candidate", "zero-arm", "exactly one arm selector"),
+            ("candidate", "both-arm", "exactly one arm selector"),
+        ):
+            with self.subTest(arm=arm, opponent=opponent):
+                result = plain(run(selector, opponent, arm))
+                self.assertFalse(result["ok"])
+                technology = result["raw"]["technology"]["recipe-prod-research_agricultural_growth_speed-1"]
+                self.assertEqual(91 if opponent == "time" else 90, technology["unit"]["time"])
+                self.assertIsNone(technology["unit"].get("count"))
+                self.assertIn(expected, result["message"])
 
     def test_control_registers_before_native_state_and_imports_nothing(self):
         parsed = plain(self.lua.eval("parse_scale_control")(str(CORE / "control.lua")))
@@ -458,6 +627,44 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
                 result = run(str(CORE / "control.lua"), 1, opponent)
                 self.assertFalse(result["ok"])
                 self.assertIn(expected, result["message"])
+
+    def test_paired_arms_share_physical_crop_protocol_without_claiming_definition_equality(self):
+        run = self.lua.eval("scale_runtime")
+        for arm, science, published_contract in (
+            ("candidate", SCIENCE, "not-selected"),
+            ("published", PUBLISHED_SCIENCE, "independently-captured-95B1A1FC-27FBC90D"),
+        ):
+            with self.subTest(arm=arm):
+                result = run(str(CORE / "control.lua"), 1, "", arm)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(1, result["saves"])
+                self.assertEqual(2, len(result["towers"]))
+                self.assertEqual(4, len(result["chests"]))
+                self.assertEqual(3, result["player"]["technologies"]
+                                 ["recipe-prod-research_agricultural_growth_speed-1"]["level"])
+                self.assertEqual(1, result["foreign"]["technologies"]
+                                 ["recipe-prod-research_agricultural_growth_speed-1"]["level"])
+                state = result["state"]
+                self.assertTrue(state["paired"])
+                self.assertEqual("candidate-mir5" if arm == "candidate" else "published-4.7.21002",
+                                 state["arm"])
+                reports = [result["reports"][index] for index in range(1, len(result["reports"]) + 1)]
+                self.assertEqual(["initial", "reload"], [row["stage"] for row in reports])
+                witness = reports[-1]["witnesses"]
+                self.assertEqual(science, [witness["science_contract"]["packs"][index]
+                                           for index in range(1, len(science) + 1)])
+                self.assertEqual(published_contract, witness["published_4_7_contract"])
+                self.assertTrue(witness["cold_reload_witness"])
+                self.assertTrue(witness["on_load_read_only"])
+                self.assertEqual(2, state["research_finished"])
+                self.assertEqual(2, state["planted_events"])
+                self.assertEqual(set(science), set(plain(state["lab_consumption"])))
+
+        for opponent in ("zero-arm", "both-arm"):
+            with self.subTest(opponent=opponent):
+                result = run(str(CORE / "control.lua"), 1, opponent, "candidate")
+                self.assertFalse(result["ok"])
+                self.assertIn("exactly one arm selector", result["message"])
 
     def test_exact_f210_api_declares_the_fixture_runtime_surface(self):
         api_path = f210_runtime_api_path()
