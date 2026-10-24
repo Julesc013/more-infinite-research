@@ -75,11 +75,16 @@ def _entry(value):
         "shared_probability": value.get("shared_probability"),
         "catalyst_amount": value.get("catalyst_amount"),
         "ignored_by_productivity": value.get("ignored_by_productivity"),
+        "ignored_by_stats": value.get("ignored_by_stats"),
         "extra_count_fraction": value.get("extra_count_fraction"),
     }
 
 
-def _ordinary_matches(actual, expected):
+def _zero_or_none(value):
+    return value is None or (not isinstance(value, bool) and value == 0)
+
+
+def _ordinary_matches(actual, expected, product=False):
     if not isinstance(actual, list) or len(actual) != len(expected):
         return False
     for found, wanted in zip(actual, expected):
@@ -92,9 +97,15 @@ def _ordinary_matches(actual, expected):
                 or found.get("probability") not in (None, 1)
                 or found.get("independent_probability") not in (None, 1)
                 or found.get("catalyst_amount") not in (None, 0)
-                or found.get("ignored_by_productivity") not in (None, 0)
+                or not _zero_or_none(found.get("ignored_by_productivity"))
                 or found.get("extra_count_fraction") not in (None, 0)):
             return False
+        if product:
+            effective_ignored = found.get("ignored_by_productivity")
+            if effective_ignored is None:
+                effective_ignored = found.get("ignored_by_stats")
+            if not _zero_or_none(effective_ignored):
+                return False
         shared = found.get("shared_probability")
         if shared is not None and shared != {"min": 0, "max": 1}:
             return False
@@ -179,7 +190,7 @@ class BobAngelMaterialTests(unittest.TestCase):
                             if route["maximum_productivity"] == "omitted"
                             else recipe.get("maximum_productivity") != route["maximum_productivity"])
                         or not _ordinary_matches(recipe.get("ingredients"), route["ingredients"])
-                        or not _ordinary_matches(recipe.get("results"), route["results"])):
+                        or not _ordinary_matches(recipe.get("results"), route["results"], product=True)):
                     raise AssertionError(f"captured route drifted: {route['recipe']}")
 
                 owner = raw.get("technology", {}).get(route["owner"])
@@ -238,7 +249,7 @@ class BobAngelMaterialTests(unittest.TestCase):
             target.id, target.factorio_version, target.minimum_base = "f210", "2.1", "2.1.23"
             target.distribution_version, target.cargo_research = "5.0.21000", true
             target.recipe_probability, target.receiver_limits = "independent_probability", true
-            target.productivity_ignores_stats = false
+            target.productivity_ignores_stats = true
           end
           f200()
         ''')
@@ -496,6 +507,29 @@ class BobAngelMaterialTests(unittest.TestCase):
             self.rows(raw=late_route)
         for row in self.expected_rows:
             self.assertIsNone(late_route["technology"][row["name"]])
+
+    def test_effective_productivity_exclusion_distinguishes_products_from_inputs(self):
+        route = self.facts["selected_families"][0]["routes"][0]
+        baseline = _plain(self.rows())
+
+        for field, value in (("ignored_by_stats", 1), ("ignored_by_productivity", False),
+                             ("ignored_by_stats", False)):
+            with self.subTest(field=field, value=value):
+                excluded = self.raw_fixture()
+                excluded["recipe"][route["recipe"]]["results"][1][field] = value
+                excluded_before = _plain(excluded)
+                with self.assertRaisesRegex(Exception, route["recipe"] + " changed"):
+                    self.rows(raw=excluded)
+                self.assertEqual(excluded_before, _plain(excluded))
+
+        explicit_override = self.raw_fixture()
+        recipe = explicit_override["recipe"][route["recipe"]]
+        recipe["results"][1]["ignored_by_stats"] = 1
+        recipe["results"][1]["ignored_by_productivity"] = 0
+        recipe["ingredients"][1]["ignored_by_stats"] = 1
+        explicit_before = _plain(explicit_override)
+        self.assertEqual(baseline, _plain(self.rows(raw=explicit_override)))
+        self.assertEqual(explicit_before, _plain(explicit_override))
 
     def test_outputs_are_detached_and_withheld_families_cannot_arrive_by_name(self):
         first = self.rows()

@@ -4,6 +4,7 @@
 -- foreign technology graph.
 local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_tech_materials")
+local target = require("platform.target")
 
 local M = {}
 
@@ -27,11 +28,16 @@ local function entry_amount(entry)
   return type(entry) == "table" and (entry.amount or entry[2]) or nil
 end
 
-local function ordinary_rows(actual, expected)
+local function ordinary_rows(actual, expected, product)
   if type(actual) ~= "table" or #actual ~= #expected then return false end
   for index, wanted in ipairs(expected) do
     local row = actual[index]
-    if type(row) ~= "table" or (row.type or "item") ~= wanted.type
+    if type(row) ~= "table" then return false end
+    local ignored = row.ignored_by_productivity
+    if product and ignored == nil and target.productivity_ignores_stats == true then
+      ignored = row.ignored_by_stats
+    end
+    if (row.type or "item") ~= wanted.type
         or entry_name(row) ~= wanted.name or entry_amount(row) ~= wanted.amount
         or row.amount_min ~= nil or row.amount_max ~= nil
         or (row.probability ~= nil and row.probability ~= 1)
@@ -39,7 +45,7 @@ local function ordinary_rows(actual, expected)
         or (row.shared_probability ~= nil and (type(row.shared_probability) ~= "table"
           or row.shared_probability.min ~= 0 or row.shared_probability.max ~= 1))
         or (row.catalyst_amount ~= nil and row.catalyst_amount ~= 0)
-        or (row.ignored_by_productivity ~= nil and row.ignored_by_productivity ~= 0)
+        or (ignored ~= nil and ignored ~= 0)
         or (row.extra_count_fraction ~= nil and row.extra_count_fraction ~= 0) then
       return false
     end
@@ -98,7 +104,7 @@ local function validate_raw(raw, definition)
     if not ordinary_rows(recipe.ingredients, route.ingredients) then
       fail(route.recipe .. " changed: ingredients")
     end
-    if not ordinary_rows(recipe.results, route.results) then
+    if not ordinary_rows(recipe.results, route.results, true) then
       fail(route.recipe .. " changed: results")
     end
     if not owner_matches(raw.technology[route.owner], route) then
