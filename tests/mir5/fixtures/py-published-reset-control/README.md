@@ -11,7 +11,15 @@ one owned foreign primary to `enabled=false` before callbacks. This successor
 then reads the stored full foreign-force snapshot and requires the named Py
 primary to be enabled while every other captured technology field, recipe,
 gun modifier and native force modifier remains unchanged. The marker records
-that before/after boundary together with the finite profile and primary.
+that before/after boundary together with the finite profile and primary. The
+controller must separately verify the actor's migration log for the same force
+and primary, with `expected_disabled=true` and `observed_after=false`, before
+accepting the control. The fixture cannot read another mod's private storage.
+
+Run 40089321549 preserves the original observer isolation defect: the observer
+incorrectly expected actor storage inside its own mod. The actor's actual
+`observed_before=false` and `observed_after=false` prove disablement at migration;
+that failed observer establishes no later callback state or causal attribution.
 
 Only these exact F200 selections are admitted:
 
