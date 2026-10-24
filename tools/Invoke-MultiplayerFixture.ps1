@@ -11,6 +11,7 @@ param(
   # The lower value is calibrated solely for the bounded F200 Library session.
   # Other multiplayer fixtures retain the existing 8 GiB process-tree ceiling.
   [ValidateSet(7168,8192)][int]$SessionExpectedPeakMemoryMiB=8192,
+  [switch]$CollectProcessMemoryObservations,
   [string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 )
 $ErrorActionPreference='Stop'
@@ -102,6 +103,10 @@ try {
   foreach($client in $clients){Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $engine -Arguments (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)}
   $screenshots=@(if($FixtureCase-ceq'library-multiplayer'){foreach($client in $clients){foreach($stage in @('availability','initial','settled','rejoin','restart')){Join-Path $client.write_data ('script-output/mir5-library-multiplayer/'+$stage+'-*.png')}}})
   $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  if($CollectProcessMemoryObservations){
+    Assert-Session ($FixtureCase -ceq 'library-multiplayer') 'process memory observations require the Library fixture'
+    $spec.process_memory_observations=$true
+  }
   $specPath=Join-Path $resources.root 'session-spec.json'
   [IO.File]::WriteAllText($specPath,($spec|ConvertTo-Json -Depth 8),[Text.UTF8Encoding]::new($false))
   $record.session_spec_sha256=(Get-FileHash -LiteralPath $specPath).Hash
