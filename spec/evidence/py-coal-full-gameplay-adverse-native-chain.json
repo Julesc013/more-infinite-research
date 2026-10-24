@@ -82,7 +82,7 @@
   "actor_marker_precedes_configuration": true,
   "rejection": {
     "gate": "observed_before == false",
-    "disposition": "Unsupported controller gate added during root review; it is not the existing actor contract. Corrected-reader reconciliation remains a distinct pending observation.",
+    "disposition": "Unsupported controller gate added during root review; it is not the existing actor contract. A separately identified corrected-reader reconciliation now passes the required Coal checks on the original exact execution, without relabelling the workflow or repeating native work.",
     "independent_preexisting_contracts": [
       {
         "source_commit": "f5c48aa26d63c6a80a6e33079a753684fae7d7e5",
@@ -111,8 +111,60 @@
   },
   "primary_custody": "build/mir5/recovery-historical/py-full-gameplay/40102551597/black-glass-py-foreign-owner-gameplay-40102551597-1",
   "limits": [
-    "The original workflow stays failed and PyAlienLife/HighTech was not launched. No two-profile or final-current-package acceptance is claimed.",
+    "The original workflow stays failed. A separate offline reader reconciliation passes the required Coal checks on those original source/candidate receipts. PyAlienLife/HighTech remains a distinct pending native scenario; no two-profile or final-current-package acceptance is claimed.",
     "The actor records a before-state different from published-only400916, which consumed a different source save and fixture closure. This evidence assigns no callback cause and does not silently replace the historical tuple.",
     "Only the two independently declared named Py foreign enablement exceptions are admitted; all remaining catalogue, effects, queue, progress, visibility, laboratory and save checks stay strict."
-  ]
+  ],
+  "offline_reader_reconciliation": {
+    "status": "required-Coal-gameplay-and-save-checks-pass-on-original-execution",
+    "reader_controller_commit": "86ab5b7d7789415b6d3dec042ef1e829a73e0263",
+    "raw_receipt_sha256": "A11638DD8DCB56BE74CFDD05BA9709FBBD5DB9C680C378F20684B227CA86B534",
+    "primary_custody": "build/mir5/recovery-historical/py-full-gameplay/40102551597/py-coal-reader-reconciliation-86ab5b7.json",
+    "original_workflow_conclusion_unchanged": "failure",
+    "native_reruns": 0,
+    "readback": {
+      "schema": 1,
+      "kind": "MIR5PyForeignOwnerCoalOfflineReaderReconciliationV1",
+      "status": "reconciled-offline-no-native-execution",
+      "original_workflow": {
+        "run": 40102551597,
+        "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40102551597",
+        "source_head": "3771b88b2fb835fe116dbe98c5cffe786ed6c57f",
+        "controller_commit": "188ff6e903e9b38f80f5a9508dd6795a8985a2b7",
+        "status": "failed",
+        "failure": "[py-foreign-owner-gameplay] actor migration tuple differs: py-coal"
+      },
+      "reader_controller_commit": "86ab5b7d7789415b6d3dec042ef1e829a73e0263",
+      "artifact_manifest": {
+        "path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\receipts\\40102551597\\black-glass-py-foreign-owner-gameplay-40102551597-1\\artifact-manifest.json",
+        "sha256": "FB0C8B3FE9D6EBD6559E366B33D84D5C3C3DD6545B9D21081F580E4049571CE4",
+        "members_verified": 77
+      },
+      "profile": "py-coal",
+      "source": {
+        "result_sha256": "16C62D36045A0DF8BD6367DA9467F44986566505B3991E98A456B46B22E97880",
+        "save_sha256": "C4ABF76A84C641E9D69CEF3987F9BCF4EEC74C6E582A0FC7C8ED33BADA8EF700"
+      },
+      "candidate": {
+        "result_sha256": "5B4CB749DD3D385751301F20E2B914105C47D47FF1EAF112FAE6BB632844C978",
+        "save_sha256": "EB6AF248E5EC7A33D767B3AAD8A0789F4EFD2333F56CB7B1E549248EC242AD28",
+        "actor_observed_before": true,
+        "actor_expected_disabled": true,
+        "actor_observed_after": false,
+        "configuration_post_enabled": true,
+        "initial_marker_status": "passed"
+      },
+      "limitations": [
+        "This is a corrected offline interpretation of the retained Coal execution; it does not relabel the failed workflow or launch a native process.",
+        "The observed-before value is recorded, not used as a product-state or causal attribution gate.",
+        "PyAlien source and candidate stages were not executed in the original failed workflow."
+      ]
+    },
+    "independent_root_execution": {
+      "reader_controller_commit": "8eadf9d267668aaf66e80efba3c1016c6d55b713",
+      "raw_receipt_sha256": "EA7C18B22D8DE9226E1C005047EFE085536D31A2CAA4544EB312045155D43388",
+      "primary_custody": "build/mir5/recovery-historical/py-full-gameplay/40102551597/py-coal-root-reader-reconciliation-8eadf9d.json",
+      "scope": "Actual corrected reader executed against independently rehashed primary custody. No native process launched; original workflow identity unchanged."
+    }
+  }
 }
