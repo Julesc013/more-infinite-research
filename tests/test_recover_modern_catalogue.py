@@ -187,6 +187,28 @@ def _capture(root: Path, raw: dict, settings: dict, *, published: bool,
 
 
 class ModernCatalogueTests(unittest.TestCase):
+    def test_bob_angel_growth_review_retains_data_and_changes_only_exact_published_ceiling_fields(self):
+        inventory = json.loads((ROOT / "spec/inventory/bob-angel-f200-472.json").read_text(encoding="utf-8"))
+        profile = catalogue._inventory_profile(inventory, "bob-angel-f200")
+        independent = catalogue._intended_domain(profile, "settings")["additions"]
+        expected = {row["name"]: row["row"] for row in independent
+                    if row["type"] == "double-setting"
+                    and row["name"].startswith(("ips-cost-growth-", "mir-cost-growth-"))}
+        prior = json.loads((ROOT / "spec/inventory/bob-angel-f200-intent-r02.json").read_text(encoding="utf-8"))
+        current = json.loads((ROOT / "spec/inventory/bob-angel-f200-intent-r03.json").read_text(encoding="utf-8"))
+        self.assertEqual(current["differences"][:27], prior["differences"])
+        reviewed = catalogue._reviewed_differences(ROOT / "spec/inventory/bob-angel-f200-intent-r03.json", "bob-angel-f200")
+        changes = [row for row in reviewed if row["domain"] == "settings"]
+        self.assertEqual((len(expected), len(changes), len(reviewed)), (121, 121, 148))
+        self.assertEqual({row["name"] for row in changes}, set(expected))
+        for row in changes:
+            before = expected[row["name"]]
+            after = deepcopy(row["expected_candidate"])
+            self.assertNotIn("maximum_value", before)
+            self.assertEqual(after.pop("maximum_value"), 1000)
+            self.assertEqual(after, before, row["name"])
+            self.assertEqual((row["type"], before["setting_type"]), ("double-setting", "startup"))
+
     def test_f200_recovery_compares_complete_output_and_rejects_wrong_engine_or_oracle(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
