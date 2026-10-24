@@ -127,8 +127,24 @@ class LibraryTests(unittest.TestCase):
             }
           end
 
+          function gui_style()
+            local values = {}
+            return setmetatable({}, {
+              __index = function(_, key) return values[key] end,
+              __newindex = function(_, key, value)
+                if key == "width" then
+                  -- LuaStyle.width writes both bounds. Keep this host double
+                  -- aligned with the native 2.0 GUI contract.
+                  values.minimal_width, values.maximal_width = value, value
+                else
+                  values[key] = value
+                end
+              end
+            })
+          end
+
           function gui_container(parent)
-            local value = {valid = true, parent = parent, _parent = parent, _children = {}, style = {}}
+            local value = {valid = true, parent = parent, _parent = parent, _children = {}, style = gui_style()}
             value.auto_center = function() value.auto_centered = true end
             value.add = function(spec)
               if spec.type == "tabbed-pane" and spec.name == "mir_library_tabs" then
@@ -466,29 +482,37 @@ class LibraryTests(unittest.TestCase):
           boot()
           player.display_resolution, player.display_scale = {width=1280,height=720}, 1.25
           local model = require("presentation.library_model")
+          local long_ingredient = "very-long-native-science-ingredient-identifier-for-detail-width"
           model.detail = function()
-            return {cost={count=8000,energy=3600},prerequisites={},
+            return {cost={count=8000,energy=3600,ingredients={{name=long_ingredient,amount=1}}},prerequisites={},
               effects={{type="change-recipe-productivity",change=.10000000149}}}
           end
           local root = library.open(player,{selected=gear.name,query="gear"})
-          assert(root.style.width <= 1280/1.25 and root.style.height <= 720/1.25)
+          local root_width = root.style.maximal_width
+          assert(root.style.minimal_width == root_width and root_width <= 1280/1.25 and root.style.height <= 720/1.25)
           assert(root.auto_centered == true)
           local filters = root["mir_library_filters"]
           assert(filters.type == "table" and filters.column_count == 4)
-          assert(filters["mir_library_family"].style.width <= 280)
+          local family_style = filters["mir_library_family"].style
+          assert(family_style.minimal_width == family_style.maximal_width and family_style.maximal_width <= 280)
           local content = research_content(root)
           assert(content.type == "scroll-pane" and content.horizontal_scroll_policy == "never")
-          assert(content.style.height < root.style.height and content.style.maximal_width < root.style.width)
+          assert(content.style.height < root.style.height and content.style.maximal_width < root_width)
+          local detail = content["mir_library_detail"]
+          assert(detail.style.minimal_width == content.style.maximal_width
+            and detail.style.maximal_width == content.style.maximal_width)
           local cost = content["mir_library_detail"]["mir_library_detail_cost"]
           assert(cost.caption[1] == "mir-browser.research-cost" and tonumber(cost.caption[3]) == 60)
-          assert(cost.style.single_line == false and cost.style.maximal_width < root.style.width)
+          assert(cost.style.single_line == false and cost.style.maximal_width == detail.style.maximal_width)
+          local science = detail["mir_library_science_1"]
+          assert(science.caption[2] == long_ingredient and science.style.maximal_width == detail.style.maximal_width)
           assert(content["mir_library_detail"]["mir_library_effect_1"].caption[2] == "10")
           assert(filters["mir_library_family_label"].caption[1] == "mir-browser.filter-scope")
           library.close(player)
           player.display_resolution, player.display_scale = {width=1280,height=720}, 2
           root = library.open(player,{selected=gear.name})
           assert(root["mir_library_filters"].column_count == 2)
-          assert(root.style.width <= 640 and root.style.height <= 360)
+          assert(root.style.minimal_width == root.style.maximal_width and root.style.maximal_width <= 640 and root.style.height <= 360)
         ''')
 
     def test_pure_prototype_constructor_preserves_published_shortcut_identity(self):
