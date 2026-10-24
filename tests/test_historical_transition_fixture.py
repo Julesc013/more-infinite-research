@@ -80,7 +80,7 @@ class HistoricalTransitionFixtureControls(unittest.TestCase):
         self.assertIn("historical fixtures require a fresh full run", source)
         self.assertIn("historical-transition", source)
         self.assertIn("transition_stage", source)
-        self.assertIn("($historicalFixture.target -in @('f013','f014','f015','f016'))", source)
+        self.assertIn("$historical -and ($historicalFixture.target -in @('f013','f014','f015','f016'))", source)
         self.assertIn("$activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')", source)
         self.assertIn("freeze_source_lab", (FIXTURE / "control.lua").read_text(encoding="utf-8"))
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)

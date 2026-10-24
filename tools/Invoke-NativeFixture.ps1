@@ -436,7 +436,7 @@ try{
   }
   $hashes=Get-MIRDirectLibraryStartupArchiveHashes -LibraryDirectory $library -EngineDataDirectory $engineData -BaseRows $rows -MirArchive $null
   $activationArguments=@{LibraryDirectory=$library;EngineDataDirectory=$engineData;ProfilePath=$profile;ArchiveHashes=$hashes;SettingsMode='Defaults'}
-  # These engines also parse disabled archive versions in a fresh world.
+  # F013--F016 inspect every owned archive name before applying mod-list.json.
   # Preserve single-version external libraries. Coexisting owned versions
   # use the existing checkout-local selector and identity/hash restoration.
   if($historical -and ($historicalFixture.target -in @('f013','f014','f015','f016'))){
