@@ -578,6 +578,46 @@ class ArmorPyCatalogueTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "armor owner changed"):
             self._data_final_rows("armor-bobwarfare", missing_owner)
 
+    def test_armor_preflight_uses_native_inherited_productivity_exclusion(self):
+        baseline, _, _ = self._data_final_rows("armor-bobwarfare")
+        # Pinned F200 ItemProductPrototype defaults ignored_by_productivity to
+        # ignored_by_stats. An explicit zero overrides that inherited value.
+        for stats, productivity in ((0, None), (1, 0), (7, 0)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self._raw("armor-bobwarfare")
+                result = raw["recipe"]["bob-mech-armor-plate"]["results"][0]
+                result["ignored_by_stats"] = stats
+                result.pop("ignored_by_productivity", None)
+                if productivity is not None:
+                    result["ignored_by_productivity"] = productivity
+                snapshot = deepcopy(raw)
+                emitted, writes, preflights = self._data_final_rows("armor-bobwarfare", raw)
+                self.assertEqual(baseline, emitted)
+                self.assertEqual((1, 1), (writes, preflights))
+                self.assertEqual(snapshot, raw)
+
+        # Input statistics are independent of the result's productivity.
+        raw = self._raw("armor-bobwarfare")
+        raw["recipe"]["bob-mech-armor-plate"]["ingredients"][0]["ignored_by_stats"] = 5
+        emitted, writes, preflights = self._data_final_rows("armor-bobwarfare", raw)
+        self.assertEqual(baseline, emitted)
+        self.assertEqual((1, 1), (writes, preflights))
+
+        for stats, productivity in ((1, None), (7, None), (0, 1)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self._raw("armor-bobwarfare")
+                result = raw["recipe"]["bob-mech-armor-plate"]["results"][0]
+                result["ignored_by_stats"] = stats
+                result.pop("ignored_by_productivity", None)
+                if productivity is not None:
+                    result["ignored_by_productivity"] = productivity
+                snapshot = deepcopy(raw)
+                with self.assertRaisesRegex(Exception, "armor route changed"):
+                    self.armor["preflight"](_lua_value(self.lua, raw))
+                with self.assertRaisesRegex(Exception, "armor route changed"):
+                    self._data_final_rows("armor-bobwarfare", raw)
+                self.assertEqual(snapshot, raw)
+
     def test_profile_absence_is_inactive_and_known_science_variant_is_refused(self):
         selection = self.catalogue["select"](_lua_value(self.lua, {"base": "2.0.77"}))
         names = {definition["key"] for definition in selection["definitions"].values()}
