@@ -97,12 +97,36 @@
     "scope": "Bounded authored-row and preflight checks; not a comparison of the complete native dumps."
   },
   "comparison": {
-    "status": "pending-independent-regeneration-from-verified-reference",
+    "status": "different-intended-native-output",
     "historical_scratch": {
       "path": "remaining-integrations-40051640723-recovery.json",
       "kind": "MIR5RemainingIntegrationsF200RecoveryScratchV1",
       "sha256": "0D967AB39F48331FBDF4AEA48C2E53476A787AC6A69246E1539B947A98A067F1",
       "status": "not-retained"
+    },
+    "recovery": {
+      "gzip": "spec/mir5/evidence/armor-py-independent-published-recovery-40051640723.json.gz",
+      "gzip_sha256": "E7B1737018554CF1F51C919076A8BA916BE93C51C11D6A7477613622D3579EE0",
+      "uncompressed_sha256": "E9AD1855499C01E082AC0F12639C75EA2ECDFCA58F54DFF7F6C46C890FA3057E",
+      "artifact_manifest_sha256": "3BE77F3D29D794E0665D5BF3849CA77DA9FA085DA241B4EDDC33DE9CCEF69EF9",
+      "extractor": "committed tools/mir5/recover_modern_catalogue.py recovery primitives; the F200-absent optional maximum-level policy is omitted from this comparison-only recovery",
+      "extractor_blob": "637c6cdeeb9190f0fd3cb03cd234025bd00b34bd",
+      "candidate_output_used": false
+    },
+    "helper": {
+      "gzip": "spec/mir5/evidence/integration-candidate-baseline-comparison-helper.py.gz",
+      "gzip_sha256": "B5661DAF89D72F40E1F1AC846058AEE6927E2343968ADCC0FCEC7FD3C13F21B8",
+      "uncompressed_sha256": "9534B49ED6B622937BC3078BBF1BB7CA5CB282307D870DA864D195474C24D3D5"
+    },
+    "result": {
+      "gzip": "spec/mir5/evidence/armor-py-independent-comparison-40051640723-40056021636.json.gz",
+      "gzip_sha256": "B46C0F04B6E78268FD1B844B51E5BC21573912BFEAD215B6D13C893C8C9FE1B4",
+      "uncompressed_sha256": "723C4F9BE520EE096AA4B129D3798C62BC30F0B79D3039ACB3DE29C39DCA3E64",
+      "candidate_run": 40056021636,
+      "complete_difference_occurrences": 48,
+      "native_credit_carrier_occurrences": 48,
+      "native_credit_carrier_unique_ids": 20,
+      "unresolved_delta_occurrences": 0
     },
     "regeneration_input": "The verified run40051640723 upstream and published data/settings dumps, processed only with committed extraction logic and independently captured published facts. Candidate output is not an input to the expected world."
   },
@@ -112,7 +136,7 @@
     "The direct-native duration measurements have a changed scope from historical governed wrapper measurements and establish no product speedup or latency claim."
   ],
   "limits": [
-    "The complete candidate-versus-reference output comparison is pending independent regeneration from verified reference dumps; the historical scratch file is absent and is not reconstructed from candidate output.",
+    "The independent complete comparison records 48 carrier occurrences and no other unresolved delta. Carrier additions remain unequal to the independently derived intended output and retain their separate native-credit preservation obligation.",
     "No gameplay, save or migration, menu, performance, multiplayer, arbitrary-modpack or release qualification follows from these data-stage observations."
   ],
   "native_qualification": false,
