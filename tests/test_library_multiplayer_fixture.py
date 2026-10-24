@@ -1,6 +1,5 @@
 """Host controls for the private F200 two-client Library fixture, not native evidence."""
 import argparse
-from copy import deepcopy
 import gzip
 import hashlib
 import json
@@ -416,102 +415,23 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             self.assertEqual(screenshot["resolution"], [1280, 720])
             self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
 
-    def test_session_reader_accepts_actual_fixture_markers_and_rejects_live_refresh_drift(self):
+    def test_native_session_reader_accepts_actual_library_markers_and_rejects_mutations(self):
         result = self.run_case()
         self.assertTrue(result["ok"], result["message"])
-        expected_joins = {"ready": 0, "rejoin-ready": 2, "restart-ready": 4, "completed": 6}
-        self.assertEqual([marker["stage"] for marker in result["markers"]], list(expected_joins))
-
-        cases = []
-
-        def add_rejection(label, marker, expected_stage, expected_count):
-            cases.append({"label": label, "row": marker, "expected_stage": expected_stage,
-                          "expected_joins": expected_count, "accepted": False})
-
-        for row in result["markers"]:
-            stage = row["stage"]
-            cases.append({"label": f"actual/{stage}", "row": row, "expected_stage": stage,
-                          "expected_joins": expected_joins[stage], "accepted": True})
-
-            missing_immutable = deepcopy(row)
-            del missing_immutable["witnesses"]["initial_native_snapshot_immutable"]
-            add_rejection(f"{stage}/missing-immutable", missing_immutable, stage, expected_joins[stage])
-
-            for field, value in (("initial_native_snapshot_immutable", False),
-                                 ("two_connected_clients_required", False),
-                                 ("distinct_personal_query_and_selection", False),
-                                 ("actual_join_events", str(expected_joins[stage])),
-                                 ("base_version", "2.0.78")):
-                changed = deepcopy(row)
-                changed["witnesses"][field] = value
-                add_rejection(f"{stage}/{field}", changed, stage, expected_joins[stage])
-
-            if stage == "ready":
-                wrong_stage = deepcopy(row)
-                wrong_stage["stage"] = "unknown"
-                add_rejection("ready/wrong-stage", wrong_stage, stage, expected_joins[stage])
-                continue
-
-            missing_live_refresh = deepcopy(row)
-            del missing_live_refresh["witnesses"]["live_refresh"]
-            add_rejection(f"{stage}/missing-live-refresh", missing_live_refresh, stage, expected_joins[stage])
-
-            wrong_live_refresh_type = deepcopy(row)
-            wrong_live_refresh_type["witnesses"]["live_refresh"] = "not-a-table"
-            add_rejection(f"{stage}/string-live-refresh", wrong_live_refresh_type, stage, expected_joins[stage])
-
-            for field, value in (("real_lab_completions", 0),
-                                 ("native_laboratory_completion_by_script", True),
-                                 ("native_research_started_events", 0),
-                                 ("native_research_cancelled_events", 0),
-                                 ("native_foreign_force_created_events", 0),
-                                 ("queue_lengths_observed", [2, 0]),
-                                 ("gear_level", 1),
-                                 ("gear_productivity", 0),
-                                 ("science_consumed_per_named_pack", 0),
-                                 ("fixture_accelerates_gear_count_and_time_only", False),
-                                 ("ordinary_tuning_qualified", True),
-                                 ("root_and_query_identity_preserved", False),
-                                 ("cross_force_view_state_preserved", False)):
-                changed = deepcopy(row)
-                changed["witnesses"]["live_refresh"][field] = value
-                add_rejection(f"{stage}/{field}", changed, stage, expected_joins[stage])
-
-            string_queue = deepcopy(row)
-            string_queue["witnesses"]["live_refresh"]["queue_lengths_observed"] = ["2", "1", "0"]
-            add_rejection(f"{stage}/string-queue", string_queue, stage, expected_joins[stage])
-
-            boundary_productivity = deepcopy(row)
-            boundary_productivity["witnesses"]["live_refresh"]["gear_productivity"] = 0.2000005
-            add_rejection(f"{stage}/productivity-boundary", boundary_productivity, stage, expected_joins[stage])
-
-            string_productivity = deepcopy(row)
-            string_productivity["witnesses"]["live_refresh"]["gear_productivity"] = "0.2"
-            add_rejection(f"{stage}/string-productivity", string_productivity, stage, expected_joins[stage])
-
-            for field, value in (("first_open", False),
-                                 ("screenshot_calls", 0),
-                                 ("availability_terminal_labels_checked", False)):
-                changed = deepcopy(row)
-                changed["witnesses"][field] = value
-                add_rejection(f"{stage}/{field}", changed, stage, expected_joins[stage])
-            if stage != "rejoin-ready":
-                missing_reopen = deepcopy(row)
-                missing_reopen["witnesses"]["reopen"] = False
-                add_rejection(f"{stage}/reopen", missing_reopen, stage, expected_joins[stage])
+        self.assertEqual([marker["stage"] for marker in result["markers"]],
+                         ["ready", "rejoin-ready", "restart-ready", "completed"])
 
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
           $tokens=$null; $errors=$null
-          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          $text=[IO.File]::ReadAllText($env:MIR_TEST_SESSION)
+          $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
           if($errors.Count){throw 'session parse failed'}
           $allDefinitions=@($ast.FindAll({param($node)
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
-          $names=@('Test-LibraryInteger','Test-LibraryNumber','Assert-LibraryWitnessBoolean',
-            'Assert-LibraryWitnessInteger','Assert-LibraryWitnessNumber','Assert-LibraryWitnessString',
-            'Get-LibraryLiveRefresh','Assert-LibraryLiveRefreshCommon','Assert-LibraryLiveRefreshOutcome',
-            'Get-StageMarker')
+          $names=@('Test-LibraryInteger','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
+            'Assert-LibraryLiveRefresh','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
             $matches=@($allDefinitions|Where-Object {$_.Name -ceq $name})
@@ -524,28 +444,166 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           foreach($name in $names){Invoke-Expression $definitions[$name]}
           $fixtureCase='library-multiplayer'
           $markerPrefix='MIR5_LIBRARY_MULTIPLAYER'
-          $cases=@(Get-Content -LiteralPath $env:MIR_TEST_CASES -Raw|ConvertFrom-Json -AsHashtable)
-          foreach($case in $cases){
-            # Build the JSON before the validator try: setup failures cannot pass an adverse case.
-            $line='[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($case['row']|ConvertTo-Json -Depth 20 -Compress)
-            $accepted=$false;$reason=''
-            try{
-              $actual=Get-StageMarker $line ([string]$case['expected_stage']) ([int]$case['expected_joins'])
-              $accepted=$null -ne $actual
-            }catch{$reason=$_.Exception.Message}
-            if($accepted -ne [bool]$case['accepted']){
-              throw ($case['label']+': reader acceptance differs: '+$reason)
-            }
+          $markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable)
+          $expectedJoins=@{ready=0;'rejoin-ready'=2;'restart-ready'=4;completed=6}
+          if($markers.Count -ne 4){throw 'actual fixture markers are incomplete'}
+          function ConvertTo-LibraryMarkerLine([hashtable]$Marker){
+            return '[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($Marker|ConvertTo-Json -Depth 20 -Compress)
           }
+          function Copy-LibraryMarker([hashtable]$Marker){
+            return ($Marker|ConvertTo-Json -Depth 20|ConvertFrom-Json -AsHashtable)
+          }
+          function Assert-LibraryReaderAccepts([hashtable]$Marker){
+            $stage=[string]$Marker['stage']
+            if(-not $expectedJoins.ContainsKey($stage)){throw "unexpected actual fixture stage: $stage"}
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            $accepted=Get-StageMarker $line $stage ([int]$expectedJoins[$stage])
+            if($null -eq $accepted -or $accepted.stage -cne $stage){throw "actual fixture marker rejected: $stage"}
+          }
+          function Assert-LibraryReaderRejects([hashtable]$Marker,[string]$ExpectedStage,[int]$ExpectedJoins,[string]$Name){
+            # Construct the candidate marker before validation so construction errors cannot count as rejection.
+            $line=ConvertTo-LibraryMarkerLine $Marker
+            try{
+              $accepted=Get-StageMarker $line $ExpectedStage $ExpectedJoins
+            }catch{return}
+            if($null -ne $accepted){throw "reader accepted invalid marker: $Name"}
+          }
+          $byStage=@{}
+          foreach($marker in $markers){
+            Assert-LibraryReaderAccepts $marker
+            $byStage[[string]$marker['stage']]=$marker
+          }
+
+          $minimumStarted=Copy-LibraryMarker $byStage['completed']
+          $minimumStarted['witnesses']['live_refresh']['native_research_started_events']=2
+          Assert-LibraryReaderAccepts $minimumStarted
+
+          $tooFewStarted=Copy-LibraryMarker $byStage['completed']
+          $tooFewStarted['witnesses']['live_refresh']['native_research_started_events']=1
+          Assert-LibraryReaderRejects $tooFewStarted 'completed' 6 'too few native research starts'
+
+          $missingImmutable=Copy-LibraryMarker $byStage['ready']
+          $missingImmutable['witnesses'].Remove('initial_native_snapshot_immutable')
+          Assert-LibraryReaderRejects $missingImmutable 'ready' 0 'missing immutable snapshot'
+
+          $falseImmutable=Copy-LibraryMarker $byStage['ready']
+          $falseImmutable['witnesses']['initial_native_snapshot_immutable']=$false
+          Assert-LibraryReaderRejects $falseImmutable 'ready' 0 'false immutable snapshot'
+
+          $stringJoinCount=Copy-LibraryMarker $byStage['ready']
+          $stringJoinCount['witnesses']['actual_join_events']='0'
+          Assert-LibraryReaderRejects $stringJoinCount 'ready' 0 'string join count'
+
+          $wrongViews=Copy-LibraryMarker $byStage['ready']
+          $wrongViews['witnesses']['distinct_personal_query_and_selection']=$false
+          Assert-LibraryReaderRejects $wrongViews 'ready' 0 'cross-client view state'
+
+          $stringTwoClients=Copy-LibraryMarker $byStage['ready']
+          $stringTwoClients['witnesses']['two_connected_clients_required']='true'
+          Assert-LibraryReaderRejects $stringTwoClients 'ready' 0 'string two-client witness'
+
+          foreach($stage in @('ready','rejoin-ready','restart-ready','completed')){
+            $wrongBase=Copy-LibraryMarker $byStage[$stage]
+            $wrongBase['witnesses']['base_version']='2.0.76'
+            Assert-LibraryReaderRejects $wrongBase $stage ([int]$expectedJoins[$stage]) "$stage base version"
+            $wrongMir=Copy-LibraryMarker $byStage[$stage]
+            $wrongMir['witnesses']['mir_version']='5.0.19999'
+            Assert-LibraryReaderRejects $wrongMir $stage ([int]$expectedJoins[$stage]) "$stage MIR version"
+            $wrongCaptures=Copy-LibraryMarker $byStage[$stage]
+            $wrongCaptures['witnesses']['screenshot_calls']=99
+            Assert-LibraryReaderRejects $wrongCaptures $stage ([int]$expectedJoins[$stage]) "$stage capture count"
+          }
+
+          $wrongReadyGear=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyGear['witnesses']['live_refresh']['gear_level']=2
+          Assert-LibraryReaderRejects $wrongReadyGear 'ready' 0 'ready gear level'
+          $wrongReadyProductivity=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyProductivity['witnesses']['live_refresh']['gear_productivity']=1
+          Assert-LibraryReaderRejects $wrongReadyProductivity 'ready' 0 'ready gear productivity'
+          $wrongReadyAvailability=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyAvailability['witnesses']['availability_terminal_labels_checked']=$true
+          Assert-LibraryReaderRejects $wrongReadyAvailability 'ready' 0 'ready Availability witness'
+          foreach($field in @('native_laboratory_completion_by_script','science_consumed_per_named_pack',
+              'fixture_accelerates_gear_count_and_time_only','ordinary_tuning_qualified',
+              'root_and_query_identity_preserved','cross_force_view_state_preserved')){
+            $wrong=Copy-LibraryMarker $byStage['ready']
+            switch($field){
+              'native_laboratory_completion_by_script' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'science_consumed_per_named_pack' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'fixture_accelerates_gear_count_and_time_only' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'ordinary_tuning_qualified' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'root_and_query_identity_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'cross_force_view_state_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+            }
+            Assert-LibraryReaderRejects $wrong 'ready' 0 "ready $field"
+          }
+
+          $missingLiveRefresh=Copy-LibraryMarker $byStage['rejoin-ready']
+          $missingLiveRefresh['witnesses'].Remove('live_refresh')
+          Assert-LibraryReaderRejects $missingLiveRefresh 'rejoin-ready' 2 'missing live refresh'
+
+          $wrongLiveRefreshType=Copy-LibraryMarker $byStage['rejoin-ready']
+          $wrongLiveRefreshType['witnesses']['live_refresh']='not-a-table'
+          Assert-LibraryReaderRejects $wrongLiveRefreshType 'rejoin-ready' 2 'string live refresh'
+
+          $stringQueue=Copy-LibraryMarker $byStage['completed']
+          $stringQueue['witnesses']['live_refresh']['queue_lengths_observed']=@('2','1','0')
+          Assert-LibraryReaderRejects $stringQueue 'completed' 6 'string queue lengths'
+
+          $wrongCompletionCount=Copy-LibraryMarker $byStage['completed']
+          $wrongCompletionCount['witnesses']['live_refresh']['real_lab_completions']=1
+          Assert-LibraryReaderRejects $wrongCompletionCount 'completed' 6 'incomplete real labs'
+
+          foreach($field in @('native_laboratory_completion_by_script','native_research_cancelled_events',
+              'native_foreign_force_created_events','gear_level','science_consumed_per_named_pack',
+              'fixture_accelerates_gear_count_and_time_only','ordinary_tuning_qualified',
+              'root_and_query_identity_preserved','cross_force_view_state_preserved')){
+            $wrong=Copy-LibraryMarker $byStage['completed']
+            switch($field){
+              'native_laboratory_completion_by_script' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'native_research_cancelled_events' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'native_foreign_force_created_events' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'gear_level' {$wrong['witnesses']['live_refresh'][$field]=1}
+              'science_consumed_per_named_pack' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'fixture_accelerates_gear_count_and_time_only' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'ordinary_tuning_qualified' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'root_and_query_identity_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'cross_force_view_state_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+            }
+            Assert-LibraryReaderRejects $wrong 'completed' 6 "completed $field"
+          }
+
+          $stringStarted=Copy-LibraryMarker $byStage['completed']
+          $stringStarted['witnesses']['live_refresh']['native_research_started_events']='2'
+          Assert-LibraryReaderRejects $stringStarted 'completed' 6 'string native research starts'
+          $shortQueue=Copy-LibraryMarker $byStage['completed']
+          $shortQueue['witnesses']['live_refresh']['queue_lengths_observed']=@(2,0)
+          Assert-LibraryReaderRejects $shortQueue 'completed' 6 'short queue lengths'
+          $wrongProductivity=Copy-LibraryMarker $byStage['completed']
+          $wrongProductivity['witnesses']['live_refresh']['gear_productivity']=.2000005
+          Assert-LibraryReaderRejects $wrongProductivity 'completed' 6 'gear productivity tolerance'
+          $stringProductivity=Copy-LibraryMarker $byStage['completed']
+          $stringProductivity['witnesses']['live_refresh']['gear_productivity']='0.2'
+          Assert-LibraryReaderRejects $stringProductivity 'completed' 6 'string gear productivity'
+          foreach($field in @('first_open','search','refresh','availability_terminal_labels_checked','reopen')){
+            $wrong=Copy-LibraryMarker $byStage['completed']
+            $wrong['witnesses'][$field]=$false
+            Assert-LibraryReaderRejects $wrong 'completed' 6 "completed $field"
+          }
+
+          $wrongStage=Copy-LibraryMarker $byStage['ready']
+          $wrongStage['stage']='unknown'
+          Assert-LibraryReaderRejects $wrongStage 'ready' 0 'wrong stage'
           'PASS actual marker reader contract'
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-library-marker-reader-") as work:
-            case_path = Path(work) / "actual-fixture-marker-cases.json"
-            case_path.write_text(json.dumps(cases), encoding="utf-8")
+            marker_path = Path(work) / "actual-fixture-markers.json"
+            marker_path.write_text(json.dumps(result["markers"]), encoding="utf-8")
             reader = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,
-                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_CASES=str(case_path)), check=False)
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION),
+                         MIR_TEST_LIBRARY_MARKERS=str(marker_path)), check=False)
         self.assertEqual(reader.returncode, 0, reader.stdout + reader.stderr)
 
     def test_profiler_output_does_not_change_saved_witnesses(self):
