@@ -334,6 +334,11 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message} end
             ok, message = tick()
             if not ok then return {ok=false,message=message} end
+            -- Match the engine sequence after the successor completion save:
+            -- the next tick runs before a subsequent cold reload can replace
+            -- its local on_load snapshot.
+            ok, message = tick()
+            if not ok then return {ok=false,message=message} end
             local completed_state = storage.mir5_sif_science_retirement
             local completed_consumption = completed_state.successor_consumption
             local completed_after = completed_consumption.after
@@ -347,7 +352,9 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             elseif bad == 'reload-inventory' then inventory.counts['automation-science-pack'] = -1
             elseif bad == 'reload-bonus' then completed_state.successor_bonus.lab = -1
             elseif bad == 'reload-missing-rows' then completed_state.successor_rows = nil
-            elseif bad == 'reload-missing-consumption' then completed_state.successor_consumption = nil end
+            elseif bad == 'reload-missing-consumption' then completed_state.successor_consumption = nil
+            elseif bad == 'reload-successor-labs' then completed_state.successor_labs = 1
+            elseif bad == 'reload-phase' then completed_state.phase = 'source-complete' end
             for _=1,2 do
               lab.energy = 17
               ok, message = invoke(callbacks.load)
@@ -540,6 +547,8 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             'reload-bonus': 'successor durable native effects differ',
             'reload-missing-rows': 'successor durable witness is absent',
             'reload-missing-consumption': 'successor durable witness is absent',
+            'reload-successor-labs': 'successor did not complete two named labs',
+            'reload-phase': 'research-speed-7 published level differs',
         }
         for target in TARGETS:
             for opponent, expected in opponents.items():
