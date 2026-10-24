@@ -334,12 +334,12 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if not ok then return {ok=false,message=message} end
             ok, message = tick()
             if not ok then return {ok=false,message=message} end
-            -- Match the engine sequence after the successor completion save:
-            -- the next tick runs before a subsequent cold reload can replace
-            -- its local on_load snapshot.
+            local completed_state = storage.mir5_sif_science_retirement
+            -- A native server keeps ticking after its completion marker/save.
+            -- Do not immediately replace the pre-configuration load snapshot
+            -- with another on_load callback and hide an ordinary-tick failure.
             ok, message = tick()
             if not ok then return {ok=false,message=message} end
-            local completed_state = storage.mir5_sif_science_retirement
             local completed_consumption = completed_state.successor_consumption
             local completed_after = completed_consumption.after
             local completed_rows = completed_state.successor_rows

@@ -312,12 +312,10 @@ script.on_configuration_changed(function()
   fill(inventory, packs); state.successor_before=snapshot_counts(inventory, packs)
   state.policy, state.successor_labs, state.phase, state.deadline = policy, 0, "successor-first", game.tick+DEADLINE
   queue(player, NAMES[1], PARTIAL[NAMES[1]])
-  -- This callback replaces the completed source state with a successor
-  -- workflow.  A preceding source cold load may have captured the completed
-  -- source witness locally; it is obsolete only after the validated
-  -- successor queue is established.  The next actual cold load captures and
-  -- checks the successor witness without writing saved state.
-  loaded = nil
+  -- on_load observed the source save before this intentional configuration
+  -- transition. It is no longer a cold-reload snapshot of the successor.
+  -- A later real load captures and checks the completed successor afresh.
+  loaded, reload_logged = nil, false
 end)
 script.on_event(defines.events.on_research_finished, function(event)
   if event.by_script ~= false then return end
