@@ -28,9 +28,10 @@ function M.accelerate(spec)
     and mods.Science_packs_productivity == "0.0.1"
     and mods["bioflux-productivity"] == "0.1.0" and mods["fish-productivity"] == "1.0.0",
     "unexpected legacy-preference fixture closure")
-  local setting = assert(data.raw["bool-setting"] and data.raw["bool-setting"]["mir-prefer-this-mod-for-competing-techs"],
+  local setting = assert(settings.startup and settings.startup["mir-prefer-this-mod-for-competing-techs"],
     "MIR competing preference setting is absent")
-  assert(setting.default_value == spec.preference, "fixture preference setting differs")
+  assert(type(setting.value) == "boolean" and setting.value == spec.preference,
+    "fixture preference setting differs")
   local row = assert(data.raw.technology and data.raw.technology[ROW], "captured MIR breeding row is absent")
   assert(row.type == "technology" and row.name == ROW and row.level == 1 and row.max_level == "infinite"
     and row.upgrade == true, "captured MIR breeding identity changed")

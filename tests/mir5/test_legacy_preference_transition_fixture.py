@@ -57,13 +57,15 @@ class LegacyPreferenceTransitionFixtureTests(unittest.TestCase):
         fixture_path = str(FIXTURE.resolve()).replace('\\', '/')
         self.lua.execute(f'package.path = "{fixture_path}/?.lua;" .. package.path')
         self.lua.execute(r'''
-function legacy_fixture_data(path, common_path, row, mir, fixture, preference)
+function legacy_fixture_data(path, common_path, row, mir, fixture, preference, runtime_preference)
+  if runtime_preference == nil then runtime_preference = preference end
   local raw={technology={['recipe-prod-research_breeding-1']=row},
     ['bool-setting']={['mir-prefer-this-mod-for-competing-techs']={default_value=not preference}}}
   local env={mods={base='2.0.77',['space-age']='2.0.77',['more-infinite-research']=mir,
     ['mir-fixture-mir5-legacy-preference-transition']=fixture,
     ['plates-n-circuit-productivity']='0.0.2',Science_packs_productivity='0.0.1',
-    ['bioflux-productivity']='0.1.0',['fish-productivity']='1.0.0'},data={raw=raw}}
+    ['bioflux-productivity']='0.1.0',['fish-productivity']='1.0.0'},data={raw=raw},
+    settings={startup={['mir-prefer-this-mod-for-competing-techs']={value=runtime_preference}}}}
   local common
   env.require=function(name)
     if name ~= 'data-final-common' then error('unexpected fixture module: ' .. tostring(name)) end
@@ -74,8 +76,10 @@ function legacy_fixture_data(path, common_path, row, mir, fixture, preference)
   local update=path:gsub('data%-final%-fixes%.lua$','settings-updates.lua')
   local chunk,message=loadfile(update,'t',env);assert(chunk,message);local ok,result=pcall(chunk)
   if not ok then return {ok=false,message=tostring(result),raw=raw} end
+  local setting_default=raw['bool-setting']['mir-prefer-this-mod-for-competing-techs'].default_value
+  raw['bool-setting']=nil
   chunk,message=loadfile(path,'t',env);assert(chunk,message);ok,result=pcall(chunk)
-  return {ok=ok,message=tostring(result),raw=raw}
+  return {ok=ok,message=tostring(result),raw=raw,setting_default=setting_default}
 end
 function legacy_fixture_parse(path, mir, fixture, preference)
   local callbacks,reads={events={}},{ }
@@ -191,7 +195,8 @@ end
                     lua_value(self.lua, self.row(preference)), mir, fixture, preference)
                 self.assertTrue(result['ok'], result['message'])
                 row = plain(result['raw']['technology']['recipe-prod-research_breeding-1'])
-                self.assertEqual(preference, result['raw']['bool-setting']['mir-prefer-this-mod-for-competing-techs']['default_value'])
+                self.assertEqual(preference, result['setting_default'])
+                self.assertNotIn('bool-setting', plain(result['raw']))
                 self.assertEqual((1, None, 1), (row['unit'].get('count'), row['unit'].get('count_formula'), row['unit']['time']))
                 expected = [effect['recipe'] for effect in self.row(preference)['effects']]
                 self.assertEqual(expected, [effect['recipe'] for effect in row['effects']])
@@ -201,6 +206,13 @@ end
             lua_value(self.lua, changed), '4.7.20002', '0.1.1', True)
         self.assertFalse(result['ok'])
         self.assertIn('captured MIR breeding effect changed', result['message'])
+        wrong_runtime = self.lua.eval('legacy_fixture_data')(str(FIXTURE / 'published-true' / 'data-final-fixes.lua'),
+            str(FIXTURE / 'data-final-common.lua'), lua_value(self.lua, self.row(True)), '4.7.20002', '0.1.1', True, False)
+        self.assertFalse(wrong_runtime['ok'])
+        self.assertIn('fixture preference setting differs', wrong_runtime['message'])
+        untouched = plain(wrong_runtime['raw']['technology']['recipe-prod-research_breeding-1'])
+        self.assertEqual((None, '8000*2^(L-1)', 60),
+            (untouched['unit'].get('count'), untouched['unit'].get('count_formula'), untouched['unit']['time']))
 
     def test_controls_are_parse_time_only_and_source_to_switch_flow_is_bounded(self):
         source = (FIXTURE / 'control.lua').read_text(encoding='utf-8')
