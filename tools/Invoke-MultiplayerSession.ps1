@@ -540,7 +540,10 @@ if($fixtureCase-ceq'library-multiplayer') {
 foreach ($output in @($restartSave,$finalSave,$sessionPath)) { Assert-Session (-not (Test-Path -LiteralPath $output)) "fresh output already exists: $output" }
 
 $processMemorySampler = $null
+$processMemoryObservationPath = $null
 if ($collectProcessMemoryObservations) {
+  $processMemoryObservationPath = Resolve-BuildOutput (Join-Path $workroot 'process-memory-observations.json') 'process memory observations'
+  Assert-Session (-not (Test-Path -LiteralPath $processMemoryObservationPath)) 'fresh process memory observation output already exists'
   $slots = foreach ($phase in @('initial', 'rejoin', 'restart')) {
     foreach ($role in @('server', 'client-en', 'client-de')) {
       [pscustomobject]@{ phase=$phase; role=$role }
@@ -651,8 +654,33 @@ finally {
     }
   }
   $sampler = Get-Variable -Name processMemorySampler -ValueOnly -ErrorAction SilentlyContinue
-  if ($null -ne $sampler -and $null -ne $result) {
-    $result.process_memory_observations = Get-MIROwnedProcessMemoryObservationReceipt -Sampler $sampler
+  if ($null -ne $sampler) {
+    if ($null -ne $sessionFailure) {
+      Set-MIROwnedProcessMemoryIncomplete -Sampler $sampler -Reason 'native-session-failure'
+    }
+    $memorySummary = $null
+    try {
+      $receipt = Write-MIROwnedProcessMemoryObservationReceipt -Sampler $sampler -Path $processMemoryObservationPath
+      $memorySummary = [ordered]@{
+        status = [string]$receipt.status
+        performance_acceptance = $false
+        artifact = [ordered]@{
+          leaf = [IO.Path]::GetFileName($processMemoryObservationPath)
+          sha256 = Get-SessionHash $processMemoryObservationPath
+          bytes = [int64](Get-Item -LiteralPath $processMemoryObservationPath).Length
+        }
+      }
+    }
+    catch {
+      $memorySummary = [ordered]@{
+        status = 'incomplete-observation'
+        performance_acceptance = $false
+        failure = 'memory-receipt-write-failure'
+      }
+    }
+    if ($null -ne $result) {
+      $result.process_memory_observations = $memorySummary
+    }
   }
 }
 if ($null -ne $sessionFailure) { throw $sessionFailure }
