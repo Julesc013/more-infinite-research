@@ -485,8 +485,9 @@
     "run": 40115160168,
     "artifact_manifest_sha256": "9E9D96F46C499D07DE6EFFA186A39565E32167310AC7178E4AEDC861E02AB7A7",
     "verified_members": 16,
-    "native_launches": 0,
-    "disposition": "pre-engine duplicate MIR archive refusal retained; it is not this passing execution"
+    "engine_processes_started": 1,
+    "completed_gameplay_stages": 0,
+    "disposition": "startup duplicate-MIR archive failure before map creation retained; it is not this passing execution"
   },
   "limits": [
     "Fresh current-package behavior on seven installed historical engines only.",
