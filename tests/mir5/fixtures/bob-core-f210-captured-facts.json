@@ -16,7 +16,8 @@
     "upstream_rows": 0,
     "candidate_output_used": false,
     "release_qualification": false,
-    "evidence_chain": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json"
+    "evidence_chain": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
+    "presentation_raw_sha256": "A5F1BCDF17656D43F481DD41A534BBA0B0573BD2837EB1B1B76E2AB9FD186263"
   },
   "profile": "tests/mir5/profiles/bob-core-f210-2123.json",
   "profile_sha256": "74B91D91B65109FC5FCD252C406301EF292B79F1F5BD2B7474E6C5BB1DBA4F76",
@@ -99,7 +100,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-tin-plate"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_tin-4",
@@ -118,7 +132,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-tin-plate"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-tin-plate"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -165,7 +211,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-lead-plate"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_lead-4",
@@ -188,7 +247,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-lead-plate"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-lead-plate"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -239,7 +330,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-bronze-alloy"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_bronze-4",
@@ -259,7 +363,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-bronze-alloy"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-bronze-alloy"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -317,7 +453,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-gunmetal-alloy"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_gunmetal-4",
@@ -339,7 +488,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-gunmetal-alloy"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-gunmetal-alloy"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -394,7 +575,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-invar-alloy"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_invar-4",
@@ -418,7 +612,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-invar-alloy"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-invar-alloy"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -475,7 +701,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-nitinol-alloy"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_nitinol-4",
@@ -501,7 +740,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-nitinol-alloy"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-nitinol-alloy"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     },
     {
@@ -562,7 +833,20 @@
         "count_formula": "200*2^(L-1)",
         "time": 30,
         "show_levels_info": null,
-        "visible_when_disabled": null
+        "visible_when_disabled": null,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-copper-tungsten-alloy"
+          ]
+        ],
+        "localised_description": [
+          "technology-description.more-infinite-research.recipe_productivity"
+        ]
       },
       "continuation": {
         "id": "recipe-prod-research_material_copper_tungsten-4",
@@ -590,7 +874,39 @@
         "count_formula": "1600+200*(L-4)",
         "time": 30,
         "show_levels_info": false,
-        "visible_when_disabled": true
+        "visible_when_disabled": true,
+        "localised_name": [
+          "",
+          [
+            "description.productivity-bonus"
+          ],
+          ": ",
+          [
+            "item-name.bob-copper-tungsten-alloy"
+          ]
+        ],
+        "localised_description": [
+          "",
+          [
+            "technology-description.more-infinite-research.recipe_productivity"
+          ],
+          "\n",
+          [
+            "mod-setting-name.ips-max-level-stream",
+            [
+              "",
+              [
+                "description.productivity-bonus"
+              ],
+              ": ",
+              [
+                "item-name.bob-copper-tungsten-alloy"
+              ]
+            ]
+          ],
+          ": ",
+          "150"
+        ]
       }
     }
   ],

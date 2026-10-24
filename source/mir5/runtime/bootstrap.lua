@@ -458,7 +458,9 @@ end
 local function on_force_created(event)
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_created(event) end
-  if lifecycle.caps_active() then lifecycle.on_force_created(event) end
+  -- Authored prototype disablement may retain restoration rights even when
+  -- all caps are unlimited. Clear those rights at existing force boundaries.
+  lifecycle.on_force_created(event)
   if competing_productivity then competing_productivity.on_force_created(event) end
   if scripted_effects then scripted_effects.on_force_created(event) end
 end
@@ -466,7 +468,7 @@ end
 local function on_force_reset(event)
   if event and event.force then initialize_imersite(event.force) end
   if native_credits then native_credits.on_force_reset(event) end
-  if lifecycle.caps_active() then lifecycle.on_force_reset(event) end
+  lifecycle.on_force_reset(event)
   if competing_productivity then competing_productivity.on_force_reset(event) end
   if scripted_effects then scripted_effects.on_force_reset(event) end
 end
@@ -482,7 +484,7 @@ local function on_forces_merged(event)
     initialize_imersite(event.destination)
     reconcile_imersite(event.destination)
   end
-  if lifecycle.caps_active() then lifecycle.on_forces_merged(event) end
+  lifecycle.on_forces_merged(event)
   if competing_productivity then competing_productivity.on_forces_merged(event) end
   if scripted_effects then scripted_effects.on_forces_merged(event) end
 end

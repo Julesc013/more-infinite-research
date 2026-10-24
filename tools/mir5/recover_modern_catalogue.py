@@ -212,14 +212,17 @@ def read_capture(root: Path, *, require_mir: bool | None) -> dict[str, Any]:
     }
 
 
-def _assert_matching_inputs(before: Mapping[str, Any], after: Mapping[str, Any]) -> None:
-    for field, message in (
+def _assert_matching_inputs(before: Mapping[str, Any], after: Mapping[str, Any],
+                            *, allow_profile_receipt_difference: bool = False) -> None:
+    fields = (
         ("engine", "capture engines differ"),
         ("selection", "generated upstream selections differ after removing MIR"),
         ("selected", "selected upstream archive identities differ after removing MIR"),
         ("loaded", "loaded upstream selections differ after removing MIR"),
-        ("profile", "profile input receipts differ"),
-    ):
+    )
+    if not allow_profile_receipt_difference:
+        fields += (("profile", "profile input receipts differ"),)
+    for field, message in fields:
         if before[field] != after[field]:
             raise CatalogueError(message)
 
@@ -491,7 +494,7 @@ def recover_inventory(base_no_mir: Path, base_published: Path,
     for profile in profiles:
         if profile["capture_receipts"]["published_470"]["engine"]["factorio_version"] != family:
             raise CatalogueError("recovery target differs from the actual captured engine family")
-    return {
+    result = {
         "schema": SCHEMA,
         "kind": KIND if target == "f210" else GENERAL_KIND,
         "status": "hash-verified-published-modern-catalogue-oracle",
@@ -513,6 +516,7 @@ def recover_inventory(base_no_mir: Path, base_published: Path,
             "rule": "Only an exact named entry can change the independent intended output; omissions are null.",
         },
     }
+    return result
 
 
 def _write_new_json(path: Path, value: Any) -> None:
@@ -669,8 +673,90 @@ def _difference_summary(expected: Mapping[str, Any], actual: Mapping[str, Any], 
     return differences
 
 
+def _strict_profile_json(content: bytes, label: str) -> Mapping[str, Any]:
+    def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        output: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in output:
+                raise ValueError(f"duplicate JSON key {key!r}")
+            output[key] = value
+        return output
+
+    def reject_non_json_number(token: str) -> None:
+        raise ValueError(f"invalid JSON number {token}")
+
+    try:
+        text = content.decode("utf-8")
+        value = json.loads(
+            text,
+            object_pairs_hook=reject_duplicate_keys,
+            parse_constant=reject_non_json_number,
+        )
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError) as error:
+        raise CatalogueError(f"{label} is not strict UTF-8 JSON") from error
+    return _mapping(value, label)
+
+
+def _same_profile_document(before: Any, after: Any) -> bool:
+    if isinstance(before, Mapping) or isinstance(after, Mapping):
+        return (isinstance(before, Mapping) and isinstance(after, Mapping)
+                and set(before) == set(after)
+                and all(_same_profile_document(before[key], after[key]) for key in before))
+    if isinstance(before, list) or isinstance(after, list):
+        return (isinstance(before, list) and isinstance(after, list) and len(before) == len(after)
+                and all(_same_profile_document(left, right) for left, right in zip(before, after)))
+    return type(before) is type(after) and before == after
+
+
+def _verified_profile_file(path: Path, receipt: Mapping[str, Any], label: str) -> tuple[Mapping[str, Any], str]:
+    locator, recorded = receipt.get("path"), receipt.get("sha256")
+    if not isinstance(locator, str) or not locator:
+        raise CatalogueError(f"{label} capture profile receipt lacks a locator")
+    if (not isinstance(recorded, str) or len(recorded) != 64
+            or any(char not in "0123456789abcdefABCDEF" for char in recorded)):
+        raise CatalogueError(f"{label} capture profile receipt lacks a valid SHA-256")
+    try:
+        content = path.read_bytes()
+    except OSError as error:
+        raise CatalogueError(f"{label} profile file cannot be read: {path}") from error
+    actual = hashlib.sha256(content).hexdigest().upper()
+    if actual != recorded.upper():
+        raise CatalogueError(f"{label} profile file hash differs from its capture receipt")
+    return _strict_profile_json(content, f"{label} profile file {path}"), actual
+
+
+def _paired_profile_equivalence(baseline: Mapping[str, Any], candidate: Mapping[str, Any],
+                                baseline_file: Path | None, candidate_file: Path | None) -> dict[str, Any] | None:
+    if (baseline_file is None) != (candidate_file is None):
+        raise CatalogueError("paired profile comparison requires both baseline and candidate profile files")
+    if baseline_file is None:
+        return None
+    baseline_receipt = _mapping(baseline["profile"], "baseline profile receipt")
+    candidate_receipt = _mapping(candidate["profile"], "candidate profile receipt")
+    baseline_document, baseline_hash = _verified_profile_file(baseline_file, baseline_receipt, "baseline")
+    candidate_document, candidate_hash = _verified_profile_file(candidate_file, candidate_receipt, "candidate")
+    if not _same_profile_document(baseline_document, candidate_document):
+        raise CatalogueError("paired profile files differ as full parsed JSON documents")
+    return {
+        "status": "accepted-format-and-locator-equivalence",
+        "baseline": {
+            "capture_locator": baseline_receipt.get("path"),
+            "receipt_sha256": baseline_receipt["sha256"],
+            "verified_sha256": baseline_hash,
+        },
+        "candidate": {
+            "capture_locator": candidate_receipt.get("path"),
+            "receipt_sha256": candidate_receipt["sha256"],
+            "verified_sha256": candidate_hash,
+        },
+        "canonical_full_document_sha256": hashlib.sha256(_json_bytes(baseline_document)).hexdigest().upper(),
+    }
+
+
 def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path,
-                      candidate_root: Path, reviewed_path: Path | None = None) -> dict[str, Any]:
+                      candidate_root: Path, reviewed_path: Path | None = None, *,
+                      baseline_profile_file: Path | None = None,
+                      candidate_profile_file: Path | None = None) -> dict[str, Any]:
     inventory = _mapping(_load_json(inventory_path, "modern catalogue inventory"), "modern catalogue inventory")
     profile = _inventory_profile(inventory, profile_id)
     baseline = read_capture(baseline_root, require_mir=False)
@@ -678,7 +764,9 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
     required_receipt = _mapping(_mapping(profile.get("capture_receipts"), "profile receipts").get("no_mir"), "no-MIR receipt")
     if _capture_receipt(baseline) != required_receipt:
         raise CatalogueError("candidate baseline does not match the inventory's independent no-MIR receipt")
-    _assert_matching_inputs(baseline, candidate)
+    profile_equivalence = _paired_profile_equivalence(
+        baseline, candidate, baseline_profile_file, candidate_profile_file)
+    _assert_matching_inputs(baseline, candidate, allow_profile_receipt_difference=profile_equivalence is not None)
     expected_data = _overlay_domain(baseline["raw"], _intended_domain(profile, "data"), "data")
     expected_settings = _overlay_domain(baseline["settings"], _intended_domain(profile, "settings"), "settings")
     reviewed = _reviewed_differences(reviewed_path, profile_id)
@@ -686,7 +774,7 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
     _apply_reviewed(expected_settings, reviewed, "settings")
     differences = (_difference_summary(expected_data, candidate["raw"], "data")
                    + _difference_summary(expected_settings, candidate["settings"], "settings"))
-    return {
+    result = {
         "schema": SCHEMA,
         "kind": "MIR5ModernF210CandidateComparisonV1" if profile_id.endswith("f210") else "MIR5ModernCandidateComparisonV1",
         "status": "equal-intended-native-output" if not differences else "different-intended-native-output",
@@ -698,6 +786,9 @@ def compare_candidate(inventory_path: Path, profile_id: str, baseline_root: Path
         "reviewed_differences": [row["id"] for row in reviewed],
         "differences": differences,
     }
+    if profile_equivalence is not None:
+        result["profile_input_equivalence"] = profile_equivalence
+    return result
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -714,10 +805,12 @@ def main(argv: list[str] | None = None) -> int:
     recover.add_argument("--target", choices=("f200", "f210"), default="f210")
     compare = commands.add_parser("compare", help="compare a candidate capture with the independent oracle")
     compare.add_argument("--inventory", type=Path, required=True)
-    compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210",
+    compare.add_argument("--profile", choices=("base-f210", "space-age-f210", "k2so-f210", "bob-core-f210",
         "base-f200", "space-age-f200", "k2so-f200"), required=True)
     compare.add_argument("--baseline", type=Path, required=True)
     compare.add_argument("--candidate", type=Path, required=True)
+    compare.add_argument("--baseline-profile-file", type=Path)
+    compare.add_argument("--candidate-profile-file", type=Path)
     compare.add_argument("--reviewed-differences", type=Path)
     compare.add_argument("--output", type=Path)
     args = parser.parse_args(argv)
@@ -729,8 +822,10 @@ def main(argv: list[str] | None = None) -> int:
             _write_new_json(args.output, result)
             print(json.dumps({"status": result["status"], "output": str(args.output.resolve())}, sort_keys=True))
             return 0
-        result = compare_candidate(args.inventory, args.profile, args.baseline, args.candidate,
-                                   args.reviewed_differences)
+        result = compare_candidate(
+            args.inventory, args.profile, args.baseline, args.candidate, args.reviewed_differences,
+            baseline_profile_file=args.baseline_profile_file,
+            candidate_profile_file=args.candidate_profile_file)
         if args.output is not None:
             _write_new_json(args.output, result)
         print(json.dumps(result, sort_keys=True))
