@@ -53,11 +53,11 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
             return {type="technology", name=name, level=level, upgrade=true, max_level=maximum, enabled=true,
               effects=effect(), unit={count_formula=formula, time=30, ingredients=ingredients(packs)}, prerequisites={}}
           end
-          local function carrier_row(name, level)
+          local function carrier_row(name, level, packs)
             return {type="technology", name=name, level=level, upgrade=false, hidden=true, enabled=true,
               max_level="infinite", effects=effect(), prerequisites={},
               unit={count_formula=level == 1 and "200*2^(L-1)" or "1600+200*(L-4)", time=30,
-                ingredients=ingredients(level == 1 and science_early or science_tail)}}
+                ingredients=ingredients(packs)}}
           end
           local function rows_for(stage)
             local rows = {}
@@ -66,14 +66,14 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
               rows[early].prerequisites = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "kr-quarry-minerals-extraction"}
             elseif stage == "published-4.7" then
               rows[early] = public(early, 1, 3, "200*2^(L-1)", science_early)
-              rows[holder], rows[carrier] = carrier_row(holder, 1), carrier_row(carrier, 4)
+              rows[holder], rows[carrier] = carrier_row(holder, 1, science_early), carrier_row(carrier, 4, science_early)
             else
               rows[early] = public(early, 1, 3, "200*2^(L-1)", science_early)
               rows[early].prerequisites = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "kr-quarry-minerals-extraction"}
               rows[tail] = public(tail, 4, "infinite", "1600+200*(L-4)", science_tail)
               rows[tail].visible_when_disabled, rows[tail].show_levels_info = true, false
               rows[tail].prerequisites = {"kr-quarry-minerals-extraction", "production-science-pack", early, "space-science-pack"}
-              rows[holder], rows[carrier] = carrier_row(holder, 1), carrier_row(carrier, 4)
+              rows[holder], rows[carrier] = carrier_row(holder, 1, science_early), carrier_row(carrier, 4, science_tail)
             end
             return rows
           end
@@ -174,6 +174,10 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertTrue(published["rows"][CARRIER]["hidden"])
         self.assertEqual("1600+200*(L-4)", published["rows"][CARRIER]["unit"]["count_formula"])
         self.assertEqual(30, published["rows"][CARRIER]["unit"]["time"])
+        self.assertEqual(
+            ["automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"],
+            [published["rows"][CARRIER]["unit"]["ingredients"][index][1] for index in range(1, 5)],
+        )
 
         successor = self._data("mir5")
         self.assertTrue(successor["ok"], successor["message"])
