@@ -183,7 +183,13 @@ end
 local live_views = {}
 
 local function localized_number(caption, key, value)
-  return type(caption) == "table" and caption[1] == key and caption[2] == value
+  -- Native LocalisedString parameters use their textual representation.
+  return type(caption) == "table" and caption[1] == key and caption[2] == tostring(value)
+end
+
+local function localized_caption_shape(caption, key)
+  if type(caption) ~= "table" then return "caption-type=" .. type(caption) end
+  return "key-matches=" .. tostring(caption[1] == key) .. ", argument-type=" .. type(caption[2])
 end
 
 local function live_detail(player, retained, expected)
@@ -195,7 +201,7 @@ local function live_detail(player, retained, expected)
   if not valid(context) then fail("native Library refresh removed the detail context") end
   local level = detail["mir_library_detail_level"]
   if not valid(level) or not localized_number(level.caption, "mir-browser.level", expected.level) then
-    fail("native Library refresh level differs")
+    fail("native Library refresh level differs (" .. localized_caption_shape(valid(level) and level.caption, "mir-browser.level") .. ")")
   end
   local current, queued = context["mir_library_context_current"], context["mir_library_context_queued"]
   if expected.current and not valid(current) then fail("native Library refresh lost current research context") end
@@ -213,7 +219,9 @@ local function live_detail(player, retained, expected)
     local count, position = context["mir_library_context_queue_count"], context["mir_library_context_queue_position"]
     if not valid(count) or not localized_number(count.caption, "mir-browser.context-queue-count", expected.count)
         or not valid(position) or not localized_number(position.caption, "mir-browser.context-queue-position", 1) then
-      fail("native Library refresh queue facts differ")
+      fail("native Library refresh queue facts differ (count "
+        .. localized_caption_shape(valid(count) and count.caption, "mir-browser.context-queue-count") .. "; position "
+        .. localized_caption_shape(valid(position) and position.caption, "mir-browser.context-queue-position") .. ")")
     end
   end
 end
