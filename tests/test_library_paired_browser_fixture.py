@@ -1,8 +1,8 @@
 """Host controls for the bounded F200 paired public-browser fixture.
 
-They exercise fixture-owned Lua with small native-shaped doubles.  They do not
-launch Factorio, parse profiler durations, or establish a timing/memory/native
-result.
+They exercise fixture-owned Lua with small native-shaped doubles and check
+profiler action tokens against synthetic reader examples. They do not launch
+Factorio, measure native durations, or establish a timing/memory/native result.
 """
 import argparse
 import json
@@ -12,6 +12,9 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+import read_library_profiles as profile_reader
+
 FIXTURE = ROOT / "tests/fixtures/library-paired-browser"
 CONTROL = FIXTURE / "control.lua"
 SETTINGS = FIXTURE / "settings.lua"
@@ -342,7 +345,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 self.assertEqual(result["state"]["phase"], "completed")
                 self.assertEqual(result["state"]["action_call_count"], 2)
                 self.assertEqual(result["state"]["screenshot_calls"], 8)
-                self.assertEqual(result["profiler_labels"], ["first-open", "search", "refresh", "reopen"])
+                self.assertEqual(result["profiler_labels"], ["first_open", "search", "refresh", "reopen"])
                 self.assertEqual([(row["player"], row["query"], row["selected"], row["tab"], row["sort"])
                                   for row in result["calls"]], [
                     (1, "gears", "recipe-prod-research_gears-1", "research", "progression"),
@@ -370,6 +373,21 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 ])
                 self.assertTrue(all(row["show_gui"] and row["force_render"] and row["resolution"] == [1280, 720]
                                     for row in result["screenshots"]))
+
+    def test_emitted_profiler_actions_match_the_shared_reader_contract(self):
+        for arm in ARMS:
+            with self.subTest(arm=arm):
+                result = self.runtime_result(arm)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(result["profiler_labels"], list(profile_reader.ACTIONS))
+                for action in result["profiler_labels"]:
+                    # These durations are grammar examples, not observations.
+                    for role, rendered in (("server", "Duration: 1.000000ms"),
+                                           ("en", "Duration: 1.000000ms"),
+                                           ("de", "Dauer: 1.000000\u202fms")):
+                        marker = f"{profile_reader.MARKER}{action} {rendered}"
+                        parsed, _ = profile_reader._parse_marker(role, marker)
+                        self.assertEqual(parsed, action)
 
     def test_runtime_rejects_malformed_closure_seed_public_call_shape_and_restart_boundary(self):
         cases = (
