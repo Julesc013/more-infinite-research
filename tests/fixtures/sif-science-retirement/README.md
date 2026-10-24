@@ -210,3 +210,33 @@ The Python host control validates the packet's independent expectations,
 preflight atomicity, selector boundaries, profile/archive closure, shared
 staging authorities, fresh candidate zero-write branch, and fixture-control
 protocol. It uses doubles only and never launches Factorio.
+
+## Upstream-only F210 diagnostic control
+
+`tests/profiles/sif-upstream-f210-2123.json` retains the exact configured
+candidate's official mods, SIF, cr-commons, cr-extras, observer, hashes and
+default settings. It excludes MIR and the MIR-dependent core/selector mods.
+This isolates the upstream closure without changing or patching any archive.
+The raw archive identity remains cr-extras `1.0.01`; Factorio reports its
+runtime version as `1.0.1`.
+
+From the Black Glass repository checkout, the existing capture tool can use
+this selection without supplying `-MIRArchive`:
+
+```powershell
+$captureRoot = Join-Path (Get-Location) 'build/tmp/sif-upstream-f210-2123-r01'
+.\tools\Invoke-PrototypeCapture.ps1 `
+  -ArchiveLibrary 'D:\Projects\Factorio\testmods\2.1' `
+  -FactorioBin 'D:\Games\Steam\steamapps\common\Factorio\bin\x64\factorio.exe' `
+  -ProfilePath 'tests/profiles/sif-upstream-f210-2123.json' `
+  -OutputRoot $captureRoot `
+  -ActiveModsObserver 'mir-fixture-mir5-active-mods-observer' `
+  -ExpectedPeakMemoryMiB 2048
+```
+
+Use a new output directory and the existing exclusive native lane. Retain the
+actual result, loaded-mod observer, engine log and restored library controls
+even if the engine rejects the upstream prototypes. A failed dump is adverse
+evidence, not a passing MIR or upstream compatibility result. Match its exact
+failure and inputs to the candidate observation before assigning cause; this
+profile and command alone establish no native outcome or release acceptance.
