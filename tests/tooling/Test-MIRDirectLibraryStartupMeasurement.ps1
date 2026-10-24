@@ -4,7 +4,6 @@ param([string]$RepoRoot=(Resolve-Path (Join-Path $PSScriptRoot '../..')).Path)
 $ErrorActionPreference='Stop'
 Set-StrictMode -Version Latest
 $repo=(Resolve-Path -LiteralPath $RepoRoot).Path
-. (Join-Path $repo 'tools/lib/compatibility/FactorioRunner.ps1')
 . (Join-Path $repo 'tools/lib/validation/DirectLibraryStartupMeasurement.ps1')
 $root=Join-Path $repo ('build/tmp/mir5-direct-library-controls-'+[guid]::NewGuid().ToString('N'))
 $checks=0
