@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/mir5"))
 import recover_modern_catalogue as catalogue
 from test_k2_base_catalogue import _lua_value, _plain
-from native_credit_oracle import verified_public_rows
+from native_credit_oracle import NATIVE_CREDIT_DEFAULT_SCALAR, NATIVE_CREDIT_DESCRIPTORS, native_credit_carrier_rows, verified_public_rows
 
 
 def sha256(path):
@@ -43,9 +43,24 @@ class BobAngelCatalogueTests(unittest.TestCase):
         cls.expected_data = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "data"), "data")
         cls.expected_settings = catalogue._overlay_domain({}, catalogue._intended_domain(profile, "settings"), "settings")
         reviewed = catalogue._reviewed_differences(ROOT / cls.inputs["reviewed_intent"]["path"], "bob-angel-f200")
-        if len(reviewed) != 7:
-            raise AssertionError("Bob/Angel intent requires exactly five nontruncating tails and two retained Base identities")
-        catalogue._apply_reviewed(cls.expected_data, reviewed, "data")
+        # Derive every dormant carrier from the published public rows and
+        # captured recipes, independently of candidate or player code.
+        public_review = [row for row in reviewed if not row["name"].startswith("mir-native-credit-")]
+        catalogue._apply_reviewed(cls.expected_data, public_review, "data")
+        credits = native_credit_carrier_rows(cls.expected_data["technology"], cls.inputs["raw"]["recipe"])
+        credit_review = {row["name"]: row["expected_candidate"] for row in reviewed
+                         if row["name"].startswith("mir-native-credit-")}
+        if len(reviewed) != 27 or len(public_review) != 7 or len(credits) != 20:
+            raise AssertionError("Bob/Angel intent requires seven public dispositions and twenty exact dormant carriers")
+        if not catalogue._same(credit_review, credits):
+            raise AssertionError("Bob/Angel native comparison credit descriptors differ from independent published routes")
+        for family, main_id, recipe in NATIVE_CREDIT_DESCRIPTORS:
+            if main_id in cls.expected_data["technology"] and recipe in cls.inputs["raw"]["recipe"]:
+                setting = cls.expected_settings["double-setting"]["ips-effect-per-level-" + family]
+                if setting["default_value"] != 100 * NATIVE_CREDIT_DEFAULT_SCALAR:
+                    raise AssertionError("Credit scalar lacks its independent captured setting default: " + family)
+        cls.expected_complete_data = deepcopy(cls.expected_data)
+        catalogue._apply_reviewed(cls.expected_complete_data, reviewed, "data")
         cls.mods = {row["name"]: row["version"] for row in json.loads(
             (ROOT / "tests/mir5/profiles/bob-angel-f200-2077.json").read_text())["mods"] if row["enabled"]}
 
@@ -79,6 +94,8 @@ class BobAngelCatalogueTests(unittest.TestCase):
     def test_complete_native_definitions_and_foreign_inputs(self):
         lua = self.stage()
         emitted = _plain(lua.globals().emitted)
+        self.assertTrue(catalogue._same(self.expected_complete_data, emitted),
+                        f"complete native output: {catalogue._changed_paths(self.expected_complete_data, emitted)}")
         expected = deepcopy(self.expected_data)
         self.assertEqual(len(expected["technology"]), 67)
         public = verified_public_rows(
@@ -112,6 +129,25 @@ class BobAngelCatalogueTests(unittest.TestCase):
             for name, row in rows.items():
                 self.assertTrue(catalogue._same(row, actual[kind][name]),
                                 f"{kind}/{name}: {catalogue._changed_paths(row, actual[kind][name])}")
+
+    def test_dormant_credit_oracle_retains_excluded_routes_and_rejects_conflicting_effects(self):
+        rows = deepcopy(self.expected_data["technology"])
+        recipes = self.inputs["raw"]["recipe"]
+        name = "recipe-prod-research_lubricant_productivity-1"
+        self.assertFalse(any(effect.get("recipe") == "lubricant" for effect in rows[name]["effects"]))
+        dormant = native_credit_carrier_rows(rows, recipes)
+        for direction in ("positive", "negative"):
+            row = dormant["mir-native-credit-research_lubricant_productivity-lubricant-" + direction]
+            self.assertFalse(row["enabled"])
+            self.assertTrue(row["hidden"])
+        wrong = {"type": "change-recipe-productivity", "recipe": "lubricant", "change": 0.2}
+        rows[name]["effects"].append(wrong)
+        with self.assertRaisesRegex(AssertionError, "conflicting captured default route"):
+            native_credit_carrier_rows(rows, recipes)
+        wrong["change"] = NATIVE_CREDIT_DEFAULT_SCALAR
+        rows[name]["effects"].append(deepcopy(wrong))
+        with self.assertRaisesRegex(AssertionError, "conflicting captured default route"):
+            native_credit_carrier_rows(rows, recipes)
 
 
 if __name__ == "__main__":
