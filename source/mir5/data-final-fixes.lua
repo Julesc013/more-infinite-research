@@ -41,6 +41,15 @@ if ordinary_profile or modern_catalogue.is_k2_base(mods) or modern_catalogue.is_
     gear.unit.ingredients = modern_catalogue.science_ingredients("science_automation_logistic")
     gear.prerequisites = modern_catalogue.science_names("science_automation_logistic")
   end
+  if modern_selection.py_hightech then
+    require("compatibility.modern_catalogue.py").preflight(data.raw)
+  end
+  if modern_selection.bob_warfare then
+    require("compatibility.modern_catalogue.bob_warfare").preflight(data.raw)
+  end
+  if modern_selection.py_coal or modern_selection.py_hightech or modern_selection.bob_warfare then
+    require("compatibility.native_modded_continuations").preflight(mods, data.raw)
+  end
   -- Check every selected narrow patch before any intended technology write.
   modern.preflight_recipe_patches(modern_selection, data.raw)
   native_owner_patches = modern.preflight_native_owner_patches(modern_selection, data.raw, values)
@@ -63,7 +72,13 @@ end
 -- Retain broad product targeting in one relevant recipe pass. This extends
 -- detached authored effects without discovering families or inspecting
 -- foreign research. Existing named routes and weights retain precedence.
-require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log})
+require("research.product_target_extension").extend(technologies, values, {raw=data.raw, mods=mods, log=log,
+  required_product_targets=modern_selection and modern_selection.required_product_targets,
+  additional_product_bindings=modern_selection and modern_selection.additional_product_bindings,
+  exact_product_bindings=modern_selection and modern_selection.exact_product_bindings,
+  exact_product_target_families=modern_selection and modern_selection.exact_product_target_families,
+  replacement_product_target_families=modern_selection and modern_selection.replacement_product_target_families,
+  excluded_product_target_recipes=modern_selection and modern_selection.excluded_product_target_recipes})
 
 if modern_catalogue.is_k2so(mods) then
   local materials = require("compatibility.material_catalogue").technologies(values, data.raw, mods)
@@ -72,6 +87,11 @@ end
 
 if modern_selection and modern_selection.bob_angel then
   local materials = require("compatibility.bob_angel_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
+if modern_selection and modern_selection.py_coal then
+  local materials = require("compatibility.py_materials").technologies(values, data.raw, mods)
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 

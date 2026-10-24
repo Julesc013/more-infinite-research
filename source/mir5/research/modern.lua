@@ -197,14 +197,22 @@ function M.continuation(definition, values)
   local stream = require_stream(values, definition.family)
   local time = stream.research_time
   if time == 0 then time = definition.inheritance.research_time end
+  if definition.order ~= nil and (type(definition.order) ~= "string" or definition.order == "") then
+    error("MIR continuation order is invalid", 2)
+  end
+  if definition.icon_size ~= nil and (not finite(definition.icon_size) or definition.icon_size <= 0
+      or definition.icon_size ~= math.floor(definition.icon_size)) then
+    error("MIR continuation icon size is invalid", 2)
+  end
   local output = {
     type = "technology", name = definition.id, icons = icons(definition),
     localised_name = localized(definition.localised_name), localised_description = localized(definition.localised_description),
-    level = definition.level, upgrade = true, hidden = false, max_level = "infinite",
+    level = definition.level, upgrade = true, hidden = false, max_level = "infinite", order = definition.order,
     prerequisites = continuation_prerequisites(definition), effects = continuation_effects(definition, stream),
     unit = {count_formula = continuation_formula(definition, stream), time = time,
-      ingredients = catalogue.science_ingredients(definition.science)}
+      ingredients = catalogue.science_ingredients(definition.science, definition.science_amounts)}
   }
+  if definition.icon_size ~= nil then output.icon_size = definition.icon_size end
   if stream.enabled == false then output.enabled = false end
   return output
 end

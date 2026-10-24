@@ -67,7 +67,15 @@ local SCIENCE = {
   science_automation_logistic_chemical_production_space_agricultural = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack", "agricultural-science-pack"},
   science_automation_logistic_chemical_production_utility = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack"},
   science_automation_logistic_chemical_production_military_utility = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack"},
+  science_automation_logistic_military_chemical_production_utility_space = {"automation-science-pack", "logistic-science-pack", "military-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
   science_automation_logistic_chemical_production_utility_space = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "space-science-pack"},
+  science_automation_logistic_chemical_production_military_utility_space_py = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack", "py-science-pack-1", "py-science-pack-2", "py-science-pack-3", "py-science-pack-4"},
+  -- The named Py continuation bindings retain their captured order and
+  -- nonuniform ingredient counts.  They remain vector identities so science
+  -- policy can remove or add packs against the generated native row.
+  science_py_coal = {"utility-science-pack", "production-science-pack", "chemical-science-pack", "logistic-science-pack", "automation-science-pack", "military-science-pack"},
+  science_py_hightech = {"utility-science-pack", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack"},
+  science_py_hightech_space = {"utility-science-pack", "py-science-pack-4", "production-science-pack", "py-science-pack-3", "chemical-science-pack", "py-science-pack-2", "logistic-science-pack", "py-science-pack-1", "automation-science-pack", "military-science-pack", "space-science-pack"},
   science_automation_logistic_chemical_production_utility_agricultural = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "agricultural-science-pack"},
   science_automation_logistic_chemical_production_utility_military_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"},
   science_automation_logistic_chemical_production_military_utility_space = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack"},
@@ -469,6 +477,55 @@ local function apply_bob_angel(definitions)
   end
 end
 
+local function apply_py_profile(definitions, delta, hightech)
+  local selected, by_key = {}, {}
+  for _, definition in ipairs(definitions) do
+    if not delta.omitted_base_families[definition.key] then
+      local changed = hightech and delta.hightech_definition_overrides[definition.key] or nil
+      if changed then
+        for field, value in pairs(changed) do definition[field] = copy(value) end
+      end
+      selected[#selected + 1], by_key[definition.key] = definition, definition
+    end
+  end
+  return selected, by_key
+end
+
+local function apply_py_coal(definitions)
+  local delta = require("compatibility.modern_catalogue.py")
+  local selected = apply_py_profile(definitions, delta, false)
+  return selected, copy(delta.coal_replacement_families), copy(delta.coal_excluded_recipes)
+end
+
+local function append_py_hightech(definitions)
+  local delta = require("compatibility.modern_catalogue.py")
+  local selected, known = apply_py_profile(definitions, delta, true)
+  for _, definition in ipairs(delta.definitions()) do
+    if known[definition.key] then error("MIR duplicate Py HighTech catalogue key " .. definition.key, 3) end
+    selected[#selected + 1], known[definition.key] = copy(definition), true
+  end
+  return selected, delta.required_targets(), delta.product_bindings(), copy(delta.hightech_replacement_families),
+    copy(delta.hightech_excluded_recipes)
+end
+
+local function append_bob_warfare(definitions)
+  local delta = require("compatibility.modern_catalogue.bob_warfare")
+  for _, definition in ipairs(definitions) do
+    if definition.key == delta.definition.key then
+      error("MIR duplicate Bob Warfare catalogue key " .. delta.definition.key, 3)
+    end
+  end
+  definitions[#definitions + 1] = copy(delta.definition)
+  return delta
+end
+
+local function copy_true_fields(destination, source)
+  for key, value in pairs(source or {}) do
+    if value ~= true then error("MIR modern catalogue has invalid selected family " .. tostring(key), 3) end
+    destination[key] = true
+  end
+end
+
 function M.science_names(key)
   local vector = SCIENCE[key]
   if type(vector) ~= "table" then error("MIR unknown authored science vector " .. tostring(key), 2) end
@@ -477,10 +534,29 @@ function M.science_names(key)
   return out
 end
 
-function M.science_ingredients(key)
+local function valid_science_amount(value)
+  return type(value) == "number" and value == value and value >= 1
+    and value == math.floor(value) and value < math.huge
+end
+
+-- Keep amounts coupled to the selected science vector.  An adapter may supply
+-- weights for a broader sibling vector (for example its optional space pack),
+-- but only names selected for this technology are emitted.  Policy later sees
+-- ordinary native ingredients and retains these authored amounts.
+function M.science_ingredients(key, amounts)
   local names = M.science_names(key)
+  if amounts ~= nil and type(amounts) ~= "table" then
+    error("MIR authored science amounts must be a table", 2)
+  end
   local out = {}
-  for index = 1, #names do out[index] = {names[index], 1} end
+  for index = 1, #names do
+    local name = names[index]
+    local amount = amounts and amounts[name] or 1
+    if not valid_science_amount(amount) then
+      error("MIR authored science amount is invalid for " .. name, 2)
+    end
+    out[index] = {name, amount}
+  end
   return out
 end
 
@@ -488,6 +564,11 @@ function M.select(active_mods)
   local definitions = copy_definitions(BASE.definitions)
   local recipe_patches = {}
   local profile, k2so = "base", nil
+  local py = require("compatibility.py_profile").select(active_mods)
+  local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  local required_product_targets, additional_product_bindings, exact_product_target_families = nil, nil, {}
+  local exact_product_bindings = nil
+  local replacement_product_target_families, excluded_product_target_recipes = {}, {}
   if M.is_k2_base(active_mods) then profile = "k2-base-f200" end
   if target.id == "f200" and not active_space_age(active_mods) then
     -- Published 2.0 Base includes the six craftable science recipes. There is
@@ -520,9 +601,31 @@ function M.select(active_mods)
   end
   local bob_angel = M.is_bob_angel(active_mods)
   if bob_angel then apply_bob_angel(definitions); profile = "bob-angel-f200" end
+  if py.coal then
+    definitions, replacement_product_target_families, excluded_product_target_recipes = apply_py_coal(definitions)
+    profile = "py-coal-f200"
+  end
+  if py.hightech then
+    definitions, required_product_targets, additional_product_bindings,
+      replacement_product_target_families, excluded_product_target_recipes = append_py_hightech(definitions)
+    profile = "py-hightech-f200"
+  end
+  if bob_warfare then
+    local delta = append_bob_warfare(definitions)
+    exact_product_target_families.research_armor_components = true
+    exact_product_bindings = delta.product_bindings()
+    copy_true_fields(replacement_product_target_families, {research_armor_components=true})
+    profile = "bob-warfare-f200"
+  end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel}
+    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel,
+    py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
+    required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
+    exact_product_bindings = exact_product_bindings,
+    exact_product_target_families = exact_product_target_families,
+    replacement_product_target_families = replacement_product_target_families,
+    excluded_product_target_recipes = excluded_product_target_recipes}
 end
 
 -- Settings preserve their historical names across target selection. Space Age
@@ -537,13 +640,32 @@ function M.setting_definitions(active_mods)
   return supported_definitions(definitions)
 end
 
+local function native_modded_continuations(active_mods)
+  local py = require("compatibility.py_profile").select(active_mods)
+  local bob_warfare = require("compatibility.bob_warfare_profile").applies(active_mods)
+  if not py.coal and not py.hightech and not bob_warfare then return nil end
+  return require("compatibility.native_modded_continuations")
+end
+
+local function merge_continuation_fields(destination, source, known_ids)
+  if type(source) ~= "table" then error("MIR native continuation overrides are invalid", 3) end
+  for id, fields in pairs(source) do
+    if type(id) ~= "string" or known_ids[id] ~= true or type(fields) ~= "table" then
+      error("MIR native continuation override names an unknown tail", 3)
+    end
+    local changed = destination[id] or {}
+    for key, value in pairs(fields) do changed[key] = copy(value) end
+    destination[id] = changed
+  end
+end
+
 function M.continuations(active_mods)
   local rows = copy(CONTINUATIONS)
   if M.is_bob_angel(active_mods) then
     local science = require("compatibility.modern_catalogue.bob_angel").science
     for _, row in ipairs(rows) do row.science = assert(science[row.science]) end
   end
-  local overrides = {}
+  local overrides, overrides_by_id = {}, {}
   if active_space_age(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.space_age").continuation_overrides or {}) do
       overrides[key] = value
@@ -559,9 +681,18 @@ function M.continuations(active_mods)
       overrides[key] = value
     end
   end
+  local adapter = native_modded_continuations(active_mods)
+  if adapter then
+    local known_ids = {}
+    for _, row in ipairs(rows) do known_ids[row.id] = true end
+    merge_continuation_fields(overrides_by_id, adapter.continuation_overrides(active_mods), known_ids)
+  end
   for index = 1, #rows do
-    local changed = overrides[rows[index].key]
-    if changed then for key, value in pairs(changed) do rows[index][key] = copy(value) end end
+    local row = rows[index]
+    local changed = overrides[row.key]
+    if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
+    changed = overrides_by_id[row.id]
+    if changed then for key, value in pairs(changed) do row[key] = copy(value) end end
   end
   return rows
 end

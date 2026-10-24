@@ -118,6 +118,19 @@ local function bob_tech_rows()
   return rows
 end
 
+local function py_material_rows()
+  local rows = {}
+  for _, definition in ipairs(require("research.py_materials")) do
+    for _, stage in ipairs({definition.early, definition.continuation}) do
+      local row = generated_row(stage.id, definition.key, stage.order,
+        "description.productivity-bonus", definition.routes[1].recipe)
+      row.progression = stage.first_level or 1
+      rows[#rows + 1] = row
+    end
+  end
+  return rows
+end
+
 local function static_rows()
   local rows = {generated_row(GEAR_ID, "research_gears", "p[research_gears]",
     "technology-name.more-infinite-research.research_gears", "iron-gear-wheel")}
@@ -154,7 +167,7 @@ local function static_rows()
   end
   for _, continuation in ipairs(selected.continuations) do
     rows[#rows + 1] = {id=continuation.id, family=continuation.family, progression=continuation.level,
-      native_order="", setting="mir-enable-" .. continuation.setting_key,
+      native_order=continuation.order or "", setting="mir-enable-" .. continuation.setting_key,
       cap_setting="mir-max-level-" .. continuation.setting_key, settings=continuation_settings(continuation.setting_key),
       locale_key=locale_key(continuation.localised_name), ownership_kind="authored_generated",
       legacy_binding=historical_binding(continuation.source, continuation.operation)}
@@ -181,6 +194,9 @@ local function static_rows()
         rows[#rows + 1] = row
       end
     end
+  end
+  if selected.py_coal then
+    for _, row in ipairs(py_material_rows()) do rows[#rows + 1] = row end
   end
   if space_age_active then
     for _, owner in ipairs(modern_catalogue.native_owners(active_mods)) do
