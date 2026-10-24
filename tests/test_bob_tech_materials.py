@@ -353,6 +353,29 @@ class BobTechMaterialTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "recipe-prod-research_material_gunmetal-4 has missing prerequisite space-science-pack"):
             self.rows(raw=missing_tail_gate)
 
+    def test_effective_productivity_exclusion_distinguishes_products_from_inputs(self):
+        route = self.facts["families"][0]["routes"][0]
+        baseline = _plain(self.rows())
+
+        for field, value in (("ignored_by_stats", 1), ("ignored_by_productivity", False),
+                             ("ignored_by_stats", False)):
+            with self.subTest(field=field, value=value):
+                excluded = self.raw_fixture()
+                excluded["recipe"][route["recipe"]]["results"][1][field] = value
+                excluded_before = _plain(excluded)
+                with self.assertRaisesRegex(Exception, route["recipe"] + " changed"):
+                    self.rows(raw=excluded)
+                self.assertEqual(excluded_before, _plain(excluded))
+
+        explicit_override = self.raw_fixture()
+        recipe = explicit_override["recipe"][route["recipe"]]
+        recipe["results"][1]["ignored_by_stats"] = 1
+        recipe["results"][1]["ignored_by_productivity"] = 0
+        recipe["ingredients"][1]["ignored_by_stats"] = 1
+        explicit_before = _plain(explicit_override)
+        self.assertEqual(baseline, _plain(self.rows(raw=explicit_override)))
+        self.assertEqual(explicit_before, _plain(explicit_override))
+
     def test_outputs_are_detached_and_catalogue_metadata_names_exact_routes_and_boundaries(self):
         first = self.rows()
         first[1]["effects"][1]["recipe"] = "corrupted"

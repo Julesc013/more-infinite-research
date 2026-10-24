@@ -603,7 +603,7 @@ class ArmorPyCatalogueTests(unittest.TestCase):
         self.assertEqual(baseline, emitted)
         self.assertEqual((1, 1), (writes, preflights))
 
-        for stats, productivity in ((1, None), (7, None), (0, 1)):
+        for stats, productivity in ((1, None), (7, None), (0, 1), (False, None), (0, False)):
             with self.subTest(stats=stats, productivity=productivity):
                 raw = self._raw("armor-bobwarfare")
                 result = raw["recipe"]["bob-mech-armor-plate"]["results"][0]
@@ -616,6 +616,43 @@ class ArmorPyCatalogueTests(unittest.TestCase):
                     self.armor["preflight"](_lua_value(self.lua, raw))
                 with self.assertRaisesRegex(Exception, "armor route changed"):
                     self._data_final_rows("armor-bobwarfare", raw)
+                self.assertEqual(snapshot, raw)
+
+    def test_py_preflight_uses_native_inherited_productivity_exclusion(self):
+        active = self.active("py-coal")
+        values = self._values(active)
+        baseline, _, _ = self._data_final_rows("py-coal")
+        # The F200 item-product default is inherited only by a recipe result;
+        # an explicit zero remains an allowed override.
+        for stats, productivity in ((0, None), (1, 0), (7, 0)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self._raw("py-coal")
+                result = raw["recipe"]["log1"]["results"][0]
+                result["ignored_by_stats"] = stats
+                result.pop("ignored_by_productivity", None)
+                if productivity is not None:
+                    result["ignored_by_productivity"] = productivity
+                snapshot = deepcopy(raw)
+                emitted, writes, preflights = self._data_final_rows("py-coal", raw)
+                self.assertEqual(baseline, emitted)
+                self.assertEqual((1, 1), (writes, preflights))
+                self.assertEqual(snapshot, raw)
+
+        for stats, productivity in ((1, None), (7, None), (0, 1), (False, None), (0, False)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self._raw("py-coal")
+                result = raw["recipe"]["log1"]["results"][0]
+                result["ignored_by_stats"] = stats
+                result.pop("ignored_by_productivity", None)
+                if productivity is not None:
+                    result["ignored_by_productivity"] = productivity
+                snapshot = deepcopy(raw)
+                with self.assertRaisesRegex(Exception, "log1 changed"):
+                    self.py_materials["technologies"](
+                        values, _lua_value(self.lua, raw), _lua_value(self.lua, active)
+                    )
+                with self.assertRaisesRegex(Exception, "log1 changed"):
+                    self._data_final_rows("py-coal", raw)
                 self.assertEqual(snapshot, raw)
 
     def test_profile_absence_is_inactive_and_known_science_variant_is_refused(self):

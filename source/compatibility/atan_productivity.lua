@@ -42,12 +42,16 @@ end
 -- A target has one captured ordered typed recipe form. Non-default catalyst,
 -- range, probability, productivity-stat, and result-sharing fields describe a
 -- different route even when the recipe name remains the same.
-local function rows_match(actual, expected)
+local function rows_match(actual, expected, product)
   if type(actual) ~= "table" or #actual ~= #expected then return false end
   for index, wanted in ipairs(expected) do
     local found = actual[index]
-    if type(found) ~= "table"
-      or (found.type or "item") ~= wanted.type
+    if type(found) ~= "table" then return false end
+    local ignored = found.ignored_by_productivity
+    if product and ignored == nil and target.productivity_ignores_stats == true then
+      ignored = found.ignored_by_stats
+    end
+    if (found.type or "item") ~= wanted.type
       or row_name(found) ~= wanted.name
       or row_amount(found) ~= wanted.amount
       or found.amount_min ~= nil or found.amount_max ~= nil
@@ -56,7 +60,7 @@ local function rows_match(actual, expected)
       or (found.shared_probability ~= nil and (type(found.shared_probability) ~= "table"
         or found.shared_probability.min ~= 0 or found.shared_probability.max ~= 1))
       or (found.catalyst_amount ~= nil and found.catalyst_amount ~= 0)
-      or (found.ignored_by_productivity ~= nil and found.ignored_by_productivity ~= 0)
+      or (ignored ~= nil and ignored ~= 0)
       or (found.extra_count_fraction ~= nil and found.extra_count_fraction ~= 0) then
       return false
     end
@@ -90,7 +94,7 @@ local function recipe_matches(recipe, binding)
     and ((binding.maximum_productivity == "omitted" and recipe.maximum_productivity == nil)
       or (binding.maximum_productivity ~= "omitted" and recipe.maximum_productivity == binding.maximum_productivity))
     and rows_match(recipe.ingredients, binding.ingredients)
-    and rows_match(recipe.results, binding.results)
+    and rows_match(recipe.results, binding.results, true)
 end
 
 local function owner_matches(owner, binding)

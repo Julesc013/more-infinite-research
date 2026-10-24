@@ -24,6 +24,15 @@ def lua_table(lua, value):
     return value
 
 
+def _plain(value):
+    if not hasattr(value, "items"):
+        return value
+    values = dict(value.items())
+    if values and set(values) == set(range(1, len(values) + 1)):
+        return [_plain(values[index]) for index in range(1, len(values) + 1)]
+    return {key: _plain(nested) for key, nested in values.items()}
+
+
 class MaterialCatalogueTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
@@ -294,6 +303,29 @@ class MaterialCatalogueTests(unittest.TestCase):
                                    "zero-owner": 0, "invalid-owner": float("nan")}[label],
                     })
                 with self.assertRaisesRegex(Exception, "kr-silicon changed|already supplies productivity"):
+                    self.rows(raw=raw)
+
+    def test_result_stats_inherit_productivity_exclusion_only_for_products(self):
+        baseline = _plain(self.rows())
+        for stats, productivity in ((0, None), (1, 0), (7, 0)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self.raw_fixture()
+                result = raw["recipe"]["kr-silicon"]["results"][1]
+                result["ignored_by_stats"] = stats
+                result["ignored_by_productivity"] = productivity
+                self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+
+        raw = self.raw_fixture()
+        raw["recipe"]["kr-silicon"]["ingredients"][1]["ignored_by_stats"] = 5
+        self.assertEqual(baseline, _plain(self.rows(raw=raw)))
+
+        for stats, productivity in ((1, None), (7, None), (0, 1), (False, None), (0, False)):
+            with self.subTest(stats=stats, productivity=productivity):
+                raw = self.raw_fixture()
+                result = raw["recipe"]["kr-silicon"]["results"][1]
+                result["ignored_by_stats"] = stats
+                result["ignored_by_productivity"] = productivity
+                with self.assertRaisesRegex(Exception, "kr-silicon changed"):
                     self.rows(raw=raw)
 
     def test_runtime_metadata_never_imports_the_material_constructor(self):
