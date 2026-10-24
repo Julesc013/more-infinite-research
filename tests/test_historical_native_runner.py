@@ -384,6 +384,9 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn("cold reload changed completed save bytes", source)
         self.assertIn('\"stage\":\"reload\"', source)
         self.assertNotIn("New-MIR4HistoricalArchiveStage", source)
+        self.assertIn("if($historical -and ($historicalFixture.target -in @('f013','f014','f015','f016')))", source)
+        self.assertIn("$activationArguments.PrePinMIROwnedArchiveNames=@('more-infinite-research')", source)
+        self.assertNotIn("if($historicalTransition -and ($historicalFixture.target -in @('f013','f014','f015','f016')))", source)
 
     def test_historical_server_settings_are_private_unpaused_and_use_supported_bind_flags(self):
         script = r'''
