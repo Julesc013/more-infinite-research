@@ -92,6 +92,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local storage={}
             local callbacks={events={}}
             local next_profiler=0
+            local open_calls=0
             local profiler_logs={}
             local game={forces={player=force},surfaces={[1]={valid=true,index=1}},tick=0}
             local function fire(name,event)
@@ -162,7 +163,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             end
             game.take_screenshot=function(spec)
               screenshots[#screenshots+1]={by_player=spec.by_player,player_matches=spec.player==players[spec.by_player],show_gui=spec.show_gui,
-                force_render=spec.force_render,path=spec.path,resolution={spec.resolution[1],spec.resolution[2]}}
+                force_render=spec.force_render,path=spec.path,resolution={spec.resolution[1],spec.resolution[2]},
+                tick=game.tick,open_calls=open_calls}
             end
             local last_screenshot_tick=nil
             local take_screenshot=game.take_screenshot
@@ -257,6 +259,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local remote={interfaces={["more-infinite-research-browser"]={open=true}}}
             remote.call=function(interface, method, index, options)
               assert(interface=="more-infinite-research-browser" and method=="open")
+              open_calls=open_calls+1
               local client=players[index]
               assert(client and client.connected==true)
               build_gui(client,options)
@@ -348,13 +351,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             game.tick=game.tick+1
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             local live_ready=false
-            for step=1,32 do
+            for step=1,256 do
               game.tick=game.tick+1
               if opponent~="lab-deadline" and storage[key].phase=="researching-live-research" and force.current_research
                   and (storage[key].finished==0 or (storage[key].finished==1 and storage[key].first_completion_seen)) then
                 ok,result=pcall(complete_mock_lab);if not ok then return {ok=false,message=tostring(result)} end
               end
               refresh_mock_gui(en);refresh_mock_gui(de)
+              if storage[key].phase=="settling-initial-view" and game.tick>=storage[key].capture_after_tick then
+                if opponent=="settled-root-rebuilt" then
+                  local replacement={}
+                  for name,value in pairs(en.gui.screen[ROOT_NAME]) do replacement[name]=value end
+                  en.gui.screen[ROOT_NAME]=replacement
+                elseif opponent=="settled-native-mutation" then
+                  force.recipes["burner-mining-drill"].productivity_bonus=.5
+                end
+              end
               ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
               if storage[key].phase=="awaiting-rejoin" then live_ready=true;break end
             end
@@ -442,7 +454,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         completed = result["markers"][-1]["witnesses"]
         self.assertTrue(completed["on_load_read_only"])
         self.assertTrue(completed["availability_terminal_labels_checked"])
-        self.assertEqual(completed["screenshot_calls"], 8)
+        self.assertEqual(completed["screenshot_calls"], 10)
+        self.assertTrue(completed["initial_settled_without_reopen"])
+        self.assertEqual(completed["initial_settle_ticks"], 60)
         self.assertEqual(result["saves"], ["mir5-library-multiplayer-restart", "mir5-native-complete"])
         live_refresh = completed["live_refresh"]
         self.assertEqual(live_refresh["real_lab_completions"], 2)
@@ -462,19 +476,42 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(all(value is True for value in result["measurements"].values()))
         self.assertEqual([row["label"] for row in result["profiler_logs"]],
                          ["first_open", "search", "refresh", "reopen"])
-        self.assertEqual(len(result["screenshots"]), 8)
+        self.assertEqual(len(result["screenshots"]), 10)
         self.assertEqual([row["stage"] for row in result["lab_diagnostics"]], ["queued"])
         self.assertEqual(
             {stage: sum(f"/{stage}-" in item["path"] for item in result["screenshots"])
-             for stage in ("availability", "initial", "rejoin", "restart")},
-            {"availability": 2, "initial": 2, "rejoin": 2, "restart": 2},
+             for stage in ("availability", "initial", "settled", "rejoin", "restart")},
+            {"availability": 2, "initial": 2, "settled": 2, "rejoin": 2, "restart": 2},
         )
         for screenshot in result["screenshots"]:
             self.assertTrue(screenshot["player_matches"])
             self.assertTrue(screenshot["show_gui"])
             self.assertTrue(screenshot["force_render"])
             self.assertEqual(screenshot["resolution"], [1280, 720])
-            self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|rejoin|restart)-[12]\.png$")
+            self.assertRegex(screenshot["path"], r"^mir5-library-multiplayer/(availability|initial|settled|rejoin|restart)-[12]\.png$")
+
+    def test_settled_capture_keeps_original_views_and_checks_native_state_before_rejoin(self):
+        result = self.run_case()
+        self.assertTrue(result["ok"], result["message"])
+        captures = {item["path"]: item for item in result["screenshots"]}
+        for player in (1, 2):
+            initial = captures[f"mir5-library-multiplayer/initial-{player}.png"]
+            settled = captures[f"mir5-library-multiplayer/settled-{player}.png"]
+            self.assertEqual(settled["tick"] - initial["tick"], 60)
+            self.assertEqual(settled["open_calls"], initial["open_calls"])
+        self.assertFalse(result["markers"][0]["witnesses"]["initial_settled_without_reopen"])
+        self.assertNotIn("initial_settle_ticks", result["markers"][0]["witnesses"])
+        for marker in result["markers"][1:]:
+            self.assertTrue(marker["witnesses"]["initial_settled_without_reopen"])
+            self.assertEqual(marker["witnesses"]["initial_settle_ticks"], 60)
+        for opponent, error in (
+            ("settled-root-rebuilt", "native Library refresh replaced the owned root or query"),
+            ("settled-native-mutation", "public Library browsing mutated native research, queue, or recipe effects"),
+        ):
+            with self.subTest(opponent=opponent):
+                failed = self.run_case(opponent)
+                self.assertFalse(failed["ok"])
+                self.assertIn(error, failed["message"])
 
     def test_lab_deadline_logs_native_state_without_repair_or_success(self):
         result = self.run_case("lab-deadline")
@@ -603,6 +640,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $wrongReadyAvailability=Copy-LibraryMarker $byStage['ready']
           $wrongReadyAvailability['witnesses']['availability_terminal_labels_checked']=$true
           Assert-LibraryReaderRejects $wrongReadyAvailability 'ready' 0 'ready Availability witness'
+          $prematureSettled=Copy-LibraryMarker $byStage['ready']
+          $prematureSettled['witnesses']['initial_settled_without_reopen']=$true
+          Assert-LibraryReaderRejects $prematureSettled 'ready' 0 'premature settled capture'
+          $prematureDelay=Copy-LibraryMarker $byStage['ready']
+          $prematureDelay['witnesses']['initial_settle_ticks']=60
+          Assert-LibraryReaderRejects $prematureDelay 'ready' 0 'premature settled delay'
+          foreach($stage in @('rejoin-ready','restart-ready','completed')){
+            $unsettled=Copy-LibraryMarker $byStage[$stage]
+            $unsettled['witnesses']['initial_settled_without_reopen']=$false
+            Assert-LibraryReaderRejects $unsettled $stage ([int]$expectedJoins[$stage]) "$stage unsettled capture"
+            foreach($delay in @(0,59,61,'60')){
+              $wrongDelay=Copy-LibraryMarker $byStage[$stage]
+              $wrongDelay['witnesses']['initial_settle_ticks']=$delay
+              Assert-LibraryReaderRejects $wrongDelay $stage ([int]$expectedJoins[$stage]) "$stage wrong settled delay"
+            }
+          }
           foreach($field in @('native_laboratory_completion_by_script','science_consumed_per_named_pack',
               'fixture_accelerates_gear_count_and_time_only','ordinary_tuning_qualified',
               'root_and_query_identity_preserved','cross_force_view_state_preserved')){
@@ -863,15 +916,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertFalse(missing[0])
         self.assertIn("unexpected Library refresh fixture setting", missing[1])
 
-    def test_native_session_requires_eight_client_local_captures(self):
+    def test_native_session_requires_ten_client_local_captures(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
         session = SESSION.read_text(encoding="utf-8")
-        self.assertIn("@('availability','initial','rejoin','restart')", wrapper)
-        self.assertIn("$patterns.Count -eq 8", session)
-        self.assertIn("$clientPatterns.Count -eq 4", session)
-        self.assertIn("@('availability','initial','rejoin','restart')", session)
+        self.assertIn("@('availability','initial','settled','rejoin','restart')", wrapper)
+        self.assertIn("$patterns.Count -eq 10", session)
+        self.assertIn("$clientPatterns.Count -eq 5", session)
+        self.assertIn("@('availability','initial','settled','rejoin','restart')", session)
         self.assertIn("$completed.witnesses.availability_terminal_labels_checked -eq $true", session)
-        self.assertIn("$completed.witnesses.screenshot_calls -eq 8", session)
+        self.assertIn("$completed.witnesses.screenshot_calls -eq 10", session)
 
     def test_pre_session_admission_refusal_is_preserved_without_launch_or_secrets(self):
         script = r'''
@@ -972,10 +1025,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Wait-For([string]$Description,[scriptblock]$Predicate){
             if($Description -eq 'completed marker'){
               return [pscustomobject]@{witnesses=@{host_restart_observed=$true;on_load_read_only=$true;
-                availability_terminal_labels_checked=$true;screenshot_calls=8}}
+                availability_terminal_labels_checked=$true;screenshot_calls=10}}
             }
             if($Description -eq 'complete final save and client screenshots'){
-              return [pscustomobject]@{files=@()}
+              return [pscustomobject]@{files=@(if($fixtureCase -ceq 'library-multiplayer'){
+                1..10 | ForEach-Object {Join-Path $output ("capture-"+$_+".png")}
+              })}
             }
             return $true
           }
@@ -999,6 +1054,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 $receipt=Get-Content -LiteralPath $sessionPath -Raw|ConvertFrom-Json
                 if($receipt.status -cne 'passed-private-two-client-session' -or $script:stops.Count -ne 8){
                   throw 'successful session lost completed teardown'
+                }
+                if($fixtureCase -ceq 'library-multiplayer' -and $receipt.screenshots.Count -ne 10){
+                  throw 'successful teardown lost a required capture'
                 }
                 if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne
                     'client-restart-de,client-restart-en,server-restart'){throw 'final teardown is not reversed'}
