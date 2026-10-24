@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-foreign-research-preservation",
+  "version": "0.3.0",
+  "title": "MIR 5 unresolved foreign research startup fixture",
+  "author": "MIR maintainers",
+  "description": "Private SCI-RESEARCH-01 representative startup case without a pack producer; no exact reporter or migration qualification.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "more-infinite-research = 5.0.21000"
+  ]
+}

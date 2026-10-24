@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/foreign-research-preservation"
 SOURCE = FIXTURE / "published-4.7"
 DESTINATION = FIXTURE / "mir5"
+UNRESOLVED = FIXTURE / "mir5-unresolved"
 PROFILE = ROOT / "tests/profiles/foreign-research-preservation-f210.json"
 
 
@@ -207,6 +208,106 @@ class ForeignResearchPreservationTests(unittest.TestCase):
             return pcall(callbacks.changed)
           end
         ''')
+
+    def test_unresolved_startup_role_is_distinct_and_keeps_playable_roles_unchanged(self):
+        info = json.loads((UNRESOLVED / 'info.json').read_text())
+        destination = json.loads((DESTINATION / 'info.json').read_text())
+        self.assertEqual(info['name'], destination['name'])
+        self.assertEqual(info['dependencies'], destination['dependencies'])
+        self.assertEqual(info['version'], '0.3.0')
+        self.assertEqual((UNRESOLVED / 'data.lua').read_bytes(), (DESTINATION / 'data.lua').read_bytes())
+        self.assertFalse((UNRESOLVED / 'data-updates.lua').exists())
+        profile = json.loads((ROOT / 'tests/profiles/foreign-research-unresolved-f210-2123.json').read_text())
+        self.assertEqual(profile['engine'], {'version': '2.1.23',
+                         'sha256': 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060'})
+        self.assertEqual(profile['mods'], [
+            {'name': 'base', 'version': '2.1.23', 'enabled': True},
+            {'name': 'more-infinite-research', 'version': '5.0.21000', 'enabled': True},
+            {'name': info['name'], 'version': '0.3.0', 'enabled': True},
+        ])
+        self.assertEqual(set(profile['fixture']['included_members']),
+                         {path.name for path in UNRESOLVED.iterdir() if path.is_file()})
+        self.assertEqual(profile['consumer_markers'], ['MIR5_FOREIGN_UNRESOLVED'])
+
+    def test_unresolved_data_preflight_rejects_drift_without_repairing_inputs(self):
+        from test_generator import plain_lua
+        self.lua.execute(r'''
+          function unresolved_data_context(rows, path, opponent)
+            local raw = {tool={},recipe={},technology={['recipe-prod-research_gears-1']={name='recipe-prod-research_gears-1'}}}
+            for _, row in ipairs(rows) do raw[row.type][row.name] = row end
+            local active = {base='2.1.23',['more-infinite-research']='5.0.21000',
+              ['mir-fixture-mir5-foreign-research-preservation']='0.3.0'}
+            local foreign = raw.technology['Space-Lab-Research-61']
+            if opponent=='producer' then raw.recipe['mir5-foreign-astral-insight-pack']={name='producer'}
+            elseif opponent=='science' then foreign.unit.ingredients[3][1]='automation-science-pack'
+            elseif opponent=='effect' then foreign.effects[1].modifier=.1
+            elseif opponent=='cost' then foreign.unit.count=1
+            elseif opponent=='missing-gear' then raw.technology['recipe-prod-research_gears-1']=nil
+            elseif opponent=='version' then active['more-infinite-research']='5.0.20000' end
+            local env={mods=active,data={raw=raw,extend=function()error('unexpected data write')end}}
+            env._G=env;setmetatable(env,{__index=_G})
+            return {raw=raw,run=function()return pcall(assert(loadfile(path,'t',env)))end}
+          end
+        ''')
+        for opponent in ('', 'producer', 'science', 'effect', 'cost', 'missing-gear', 'version'):
+            rows = self.lua.eval('foreign_fixture_data')((UNRESOLVED / 'data.lua').as_posix())
+            context = self.lua.eval('unresolved_data_context')(
+                rows, (UNRESOLVED / 'data-final-fixes.lua').as_posix(), opponent)
+            before = plain_lua(context['raw'])
+            returned = context['run']()
+            ok = returned[0] if isinstance(returned, tuple) else returned
+            self.assertEqual(ok, not opponent, opponent)
+            self.assertEqual(before, plain_lua(context['raw']), opponent)
+
+    def test_unresolved_init_witness_is_read_only_and_rejects_foreign_or_mir_drift(self):
+        self.lua.execute(r'''
+          function unresolved_runtime(path, opponent)
+            local function readonly(value)
+              return setmetatable({}, {__index=value,__newindex=function()error('unexpected native write')end})
+            end
+            local technologies = {}
+            for _, level in ipairs({61,62}) do
+              local modifier = level/1000
+              if level==61 and opponent=='rounding' then modifier=.061000000685453 end
+              if level==61 and opponent=='effect' then modifier=.062 end
+              local prototype=readonly({max_level=level,effects={readonly({type='laboratory-speed',modifier=modifier})}})
+              technologies['Space-Lab-Research-'..level]=readonly({valid=true,name='Space-Lab-Research-'..level,
+                level=(level==61 and opponent=='level')and 60 or level,
+                researched=opponent=='researched',enabled=opponent~='disabled',prototype=prototype})
+            end
+            technologies['recipe-prod-research_gears-1']=readonly({valid=true,level=1,researched=false})
+            if opponent=='missing-gear' then technologies['recipe-prod-research_gears-1']=nil end
+            local recipes={['iron-gear-wheel']=readonly({productivity_bonus=opponent=='gear-bonus'and .1 or 0})}
+            if opponent=='producer' then recipes['mir5-foreign-astral-insight-pack']=readonly({valid=true})end
+            local force=readonly({valid=true,technologies=readonly(technologies),recipes=readonly(recipes),
+              laboratory_speed_modifier=opponent=='lab-bonus'and .061 or 0})
+            local active={base='2.1.23',['more-infinite-research']=opponent=='version'and'5.0.20000'or'5.0.21000',
+              ['mir-fixture-mir5-foreign-research-preservation']='0.3.0'}
+            local init,payload,logs
+            logs=0
+            local env={script={active_mods=active,on_init=function(callback)assert(init==nil);init=callback end},
+              game=setmetatable({},{__index=function()error('parse read game')end}),
+              storage=setmetatable({},{__index=function()error('read storage')end,__newindex=function()error('write storage')end}),
+              helpers={table_to_json=function(value)payload=value;return '{}'end},
+              log=function(value)assert(value=='[MIR5_FOREIGN_UNRESOLVED] RESULT {}');logs=logs+1 end}
+            env._G=env;setmetatable(env,{__index=_G})
+            local parsed,message=pcall(assert(loadfile(path,'t',env)))
+            if not parsed then return {ok=false,message=tostring(message),parsed=false}end
+            assert(type(init)=='function');env.game=readonly({forces=readonly({player=force})})
+            local ok,reason=pcall(init)
+            return {ok=ok,message=tostring(reason),parsed=true,logs=logs,payload=payload}
+          end
+        ''')
+        for opponent in ('', 'rounding', 'effect', 'level', 'researched', 'disabled',
+                         'producer', 'missing-gear', 'gear-bonus', 'lab-bonus', 'version'):
+            result = self.lua.eval('unresolved_runtime')((UNRESOLVED / 'control.lua').as_posix(), opponent)
+            self.assertTrue(result['parsed'], result['message'])
+            self.assertEqual(result['ok'], opponent in ('', 'rounding'), result['message'])
+            self.assertEqual(result['logs'], 1 if result['ok'] else 0)
+            if result['ok']:
+                self.assertEqual(result['payload']['case'], 'SCI-RESEARCH-01-unresolved')
+                self.assertEqual(result['payload']['qualification'], 'representative-unresolved-source-startup-only')
+                self.assertTrue(result['payload']['named_pack_recipe_absent'])
 
     def test_versioned_fixture_identity_and_destination_profile_are_pinned(self):
         source = json.loads((SOURCE / "info.json").read_text(encoding="utf-8"))
