@@ -103,6 +103,8 @@ local function matching_entries(actual, expected, label)
         or (value.type or "item") ~= wanted_row.type or entry_amount(value) ~= wanted_row.amount
         or value.amount_min ~= nil or value.amount_max ~= nil
         or (value.probability ~= nil and value.probability ~= 1)
+        or (value.independent_probability ~= nil and value.independent_probability ~= 1)
+        or (value.extra_count_fraction ~= nil and value.extra_count_fraction ~= 0)
         or (value.ignored_by_productivity ~= nil and value.ignored_by_productivity ~= 0) then
       fail(label .. " changed at " .. tostring(index) .. ": actual="
         .. tostring(type(value) == "table" and entry_name(value)) .. "/"
@@ -222,7 +224,6 @@ local function alloy_inventories(machine, label)
       or machine.prototype.crafting_categories["bob-mixing-furnace"] ~= true then
     fail(label .. " native alloy machine differs")
   end
-  machine.energy = ALLOY_ENERGY
   local input = machine.get_inventory(defines.inventory.crafter_input)
   local output = machine.get_inventory(defines.inventory.crafter_output)
   local modules = machine.get_inventory(defines.inventory.crafter_modules)
@@ -298,6 +299,7 @@ local function tick_alloy(state)
   assert_alloy_route(game.forces.player, route, production.earned, label)
   local machine = state.alloy_machines[route.recipe]
   local input, output = alloy_inventories(machine, label)
+  machine.energy = ALLOY_ENERGY
   refill_alloy(production, input, label)
   local made = output.get_item_count(route.result.name)
   if made > 0 then
