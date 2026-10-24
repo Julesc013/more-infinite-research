@@ -16,11 +16,19 @@ MIR 5 is being built and qualified for the nine supported Factorio families, inc
 
 The historical release, recovery, catalogue and settings detail below remains intact while the replacement is completed. The MIR4 implementation descriptions are retained baseline context, not the MIR5 construction algorithm.
 
+For the MIR5 candidate, select the edition for your Factorio family. F210 targets Factorio2.1 stable with `base >= 2.1.23`; F200 requires `base >= 2.0.77`. The seven historical editions retain their actual supported subsets. The [edition and upgrade guide](docs/mir5/support.md#candidate-editions) lists all nine exact engine minimums and distribution versions. A larger distribution number does not make another engine family's ZIP compatible.
+
+The modern candidate retains recipe productivity, direct bonuses, native research extensions, staged material research, the Research Library, settings profiles and the supported scripted effects. Space Age research requires the relevant official mods, science and accepting labs. Native bonuses remain Factorio technologies; the Generator does not plan routes or run during gameplay. The Library provides personal search/filter views, native queue actions, settings export and availability explanations.
+
+Use a copy of an original save for the first upgrade, with its matching mod archives and inherited startup settings. Check earned bonuses and current, queued or suspended research, then save under a new name and cold-reload the copy. Lowering a configured cap preserves earned research. Hidden migration carriers preserve named historical investment. The [support guide](docs/mir5/support.md#first-upgrade) explains these boundaries and the diagnostic inputs needed for a reported problem.
+
+Extensions can use the implemented candidate [MIR API and SDK](docs/mir5/api.md). Data-stage calls publish immediately after local preflight; runtime queries return detached read-only native state. The linked exact-source consumer evidence remains distinct from final API and release acceptance.
+
 ## Historical 4.4.1 publication and 4.4.2 development
 
 **[MIR 4.4.1](https://github.com/Julesc013/more-infinite-research/releases/tag/v4.4.1)** is published with the emergency correction for a load-only `on_tick` registration that prevented multiplayer joins. Its original packages and disclosed qualification limits remain unchanged; publication did not establish a completed native multiplayer test. The separate 4.3.1 publication was cancelled and its retained repairs were incorporated into 4.4.0.
 
-MIR 4.4.2 development continues performance and maintenance work in that single research-generation path. It uses the existing research catalogue and one emitter, with approved static and parameterized bindings replacing startup factory-acquisition discovery. Old Full and Classic setting values are retained as compatibility inputs to the same generator. Development packages are not yet qualified releases: current-package research, upgrade/reload, runtime/client and performance checks remain required. See the [active campaign and 4.4.x sequence](docs/releases/mir4-post-4.0-roadmap.md#active-campaign-mir-440-unified-research-generation). The 4.2 material below retains its historical release and recovery context.
+MIR 4.4.2 was a performance and maintenance development baseline in that single research-generation path. It used the existing research catalogue and one emitter, with approved static and parameterized bindings replacing startup factory-acquisition discovery. Old Full and Classic setting values were retained as compatibility inputs to the same generator. Its development packages did not establish current-package research, upgrade/reload, runtime/client or performance acceptance. See the historical [campaign and 4.4.x sequence](docs/releases/mir4-post-4.0-roadmap.md#active-campaign-mir-440-unified-research-generation). MIR5 is the active replacement; the 4.2 material below retains its historical release and recovery context.
 
 ## MIR 4.0 Whole-Platform Genesis
 

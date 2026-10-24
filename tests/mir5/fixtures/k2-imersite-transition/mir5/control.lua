@@ -51,17 +51,42 @@ local function assert_holder_cleared(force, name, first)
     fail("MIR5 did not clear consumed hidden carrier: " .. name)
   end
 end
-local function assert_recovered(state, label)
-  if type(state) ~= "table" or state.phase ~= "published-ready" or state.published_mir ~= "4.7.21002"
-      or type(state.published) ~= "table" or state.published.carrier_level ~= 6 or not close(state.published.carrier_progress, 0.42)
-      or not close(state.published.bonus, 0.10) then
+local function source_kind(state, label)
+  if type(state) ~= "table" or state.source_mir ~= "4.6.21000" or state.actual_lab_completions ~= 5
+      or type(state.completed_legacy) ~= "table" or state.completed_legacy.level ~= 6
+      or not close(state.completed_legacy.saved_progress, 0.42)
+      or not close(state.completed_legacy.bonus, 0.10) then
+    fail(label .. " five-lab predecessor witness is absent")
+  end
+  if state.phase == "complete" and state.published_mir == nil and state.published == nil then
+    return "direct-4.6"
+  end
+  if state.phase ~= "published-ready" or state.published_mir ~= "4.7.21002"
+      or type(state.published) ~= "table" or state.published.carrier_level ~= 6
+      or not close(state.published.carrier_progress, 0.42) or not close(state.published.bonus, 0.10) then
     fail(label .. " published hidden-carrier witness is absent")
   end
+  return "published-4.7"
+end
+local function assert_recovered(state, label)
+  local source = source_kind(state, label)
   local force = game.forces.player
   local early, tail = status(force, EARLY), status(force, TAIL)
   if early.level ~= 3 or not early.researched or tail.level ~= 6 or tail.researched
       or not close(tail.saved_progress, 0.42) or tail.maximum ~= 4294967295
       or not close(powder_bonus(force), 0.10) then
+    local queue = {}
+    for _, value in ipairs(force.research_queue or {}) do queue[#queue + 1] = value.name end
+    log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json({
+      case=CASE, checkpoint=label, handoff_source=source,
+      expected={early_level=3, early_researched=true, tail_level=6,
+        tail_researched=false, tail_saved_progress=0.42, tail_maximum=4294967295,
+        powder_productivity=0.10, queue_count=0},
+      actual={early=early, tail=tail, holder=status(force, HOLDER), carrier=status(force, CARRIER),
+        powder_productivity=powder_bonus(force), queue=queue,
+        current_research=force.current_research and force.current_research.name or nil,
+        research_progress=force.research_progress},
+    }))
     fail(label .. " recovered public Imersite state differs")
   end
   assert_effect(technology(force, EARLY), label .. " early")
@@ -69,7 +94,7 @@ local function assert_recovered(state, label)
   assert_holder_cleared(force, HOLDER, 1)
   assert_holder_cleared(force, CARRIER, 4)
   if force.current_research ~= nil or #force.research_queue ~= 0 then fail(label .. " recovery invented a queue") end
-  return tail
+  return technology(force, TAIL), source
 end
 local function prerequisites(value)
   for _, prerequisite in pairs(value.prerequisites or {}) do prerequisite.research_recursive() end
@@ -110,10 +135,13 @@ local function marker(stage, state)
     case=CASE, stage=stage, status="passed", qualification="native-runner-readback-required",
     witnesses={source_mir=state.source_mir, published_mir=state.published_mir,
       destination_mir=script.active_mods["more-infinite-research"],
-      source_actual_lab_completions=state.actual_lab_completions, hidden_tail_level_before=6,
+      source_actual_lab_completions=state.actual_lab_completions, retained_source_next_level=6,
+      handoff_source=state.handoff_source,
+      hidden_tail_level_before=state.handoff_source == "published-4.7" and 6 or nil,
       recovered_tail_saved_progress_before_lab=0.42, destination_actual_lab_completions=state.destination_lab_completions,
       tail_next_level=tail.level, powder_productivity=powder_bonus(game.forces.player),
-      public_continuation_readded=true, on_load_read_only=stage == "reload"},
+      public_continuation_readded=state.handoff_source == "published-4.7",
+      direct_predecessor_handoff=state.handoff_source == "direct-4.6", on_load_read_only=stage == "reload"},
   }))
 end
 
@@ -126,12 +154,13 @@ script.on_configuration_changed(function()
     fail("MIR5 successor must release the published bounded cap")
   end
   local state = storage[KEY]
-  local tail = assert_recovered(state, "MIR5 configuration")
+  local tail, handoff_source = assert_recovered(state, "MIR5 configuration")
   prerequisites(tail)
   if tail.enabled ~= true then fail("MIR5 re-added continuation is not enabled after its named prerequisites") end
   local entity = game.surfaces[1].create_entity{name="lab", position={2, 0}, force=game.forces.player}
   if entity == nil or entity.valid == false then fail("could not create real MIR5 successor lab") end
   state.destination_lab, state.destination_lab_completions = entity, 0
+  state.handoff_source = handoff_source
   state.phase, state.deadline_tick = "await-successor-lab", game.tick + DEADLINE
   fill(lab(state), tail)
   if game.forces.player.add_research(tail) ~= true then fail("could not start real MIR5 continuation research") end

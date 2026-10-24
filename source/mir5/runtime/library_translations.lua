@@ -198,8 +198,16 @@ local function copy_pending_ledger(ledger)
   for index, record in pairs(ledger) do
     if not finite_integer(index, 1) or index > count then return nil end
     local value = exact_pending_record(record)
-    if value == nil or ids[value.request_id] or keys[value.key] then return nil end
-    copied[index], ids[value.request_id], keys[value.key] = value, true, true
+    if value == nil or ids[value.request_id] then return nil end
+    -- Invalidation/reopen retains older issued IDs while a new scope can
+    -- request the same key. Only a duplicate within the same complete request
+    -- generation is malformed. This list is bounded by outstanding_limit=16.
+    local same_key = keys[value.key] or {}
+    for _, prior in ipairs(same_key) do
+      if prior.cache_generation == value.cache_generation and same_scope(prior.scope, value.scope) then return nil end
+    end
+    same_key[#same_key + 1] = value
+    copied[index], ids[value.request_id], keys[value.key] = value, true, same_key
   end
   for index = 1, count do
     if copied[index] == nil then return nil end

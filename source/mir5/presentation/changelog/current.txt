@@ -1,10 +1,40 @@
 ---------------------------------------------------------------------------------------------------
 Version: @DISTRIBUTION_VERSION@
   Changes:
-    - Construct authored research with a deterministic Generator and explicit compatibility bindings.
-    - Keep native effects separate from scripted agriculture, spoilage, passive repair and the Research Library.
-    - Provide the MIR API for immediate data-stage publication and read-only native research queries.
+    - Replace discovery and global research planning with authored native technologies, explicit compatibility bindings and a
+      deterministic Generator.
+    - Validate each submitted family before publication, including duplicate identities, missing references, invalid numeric
+      values and local prerequisite cycles.
+    - Preserve technology and setting identities, finite stages, native continuations, cost formulas and target-specific
+      capability subsets.
+    - Resolve startup settings and imported profiles once, preserving inherited defaults and explicit overrides.
+    - Keep native bonuses separate from event-driven agriculture, spoilage and bounded passive repair.
+    - Provide the MIR API for immediate data-stage publication and detached read-only runtime queries, with bounded copying of
+      external definitions.
+    - Retain the Research Library, personal views, settings export and translations; explain named unavailable features without
+      reconstructing research at runtime.
+  Compatibility:
+    - Retain authored Armor, Py, ATAN, Bob/Angel and K2 bindings for their admitted engine and mod profiles.
+    - Restore fourteen Tin, Lead, Bronze, Gunmetal, Invar, Nitinol and Copper Tungsten technologies for the Factorio 2.1 Bob-core
+      profile without Angel mods.
+    - Preserve separate finite and infinite material stages, native recipe ownership and hidden Imersite migration carriers where
+      supported.
+    - Keep two historical runtime interfaces available; unconsumed developer previews do not become player APIs.
   Bugfixes:
     - Avoid global science-unlock and foreign-research discovery during ordinary research construction.
-    - Preserve named native continuations and owned research state through the supported migration paths.
+    - Retain selected cryogenic science and its native unlock prerequisite when a mod replaces the native research trigger with an
+      ordinary research unit.
+    - Preserve earned-above-cap research, suspended work and queues through admitted save transitions; restore only disablement
+      owned by MIR.
+    - Reconcile scripted contributions against external baselines rather than overwrite aggregate foreign bonuses.
+    - Walk nested pipeline and receiver prototype fields without recursive Lua stack growth.
+  Optimizations:
+    - Publish each checked family once; native effects require no recurring research or tick maintenance.
+    - Skip inactive adapters and default broad overrides before inspecting their prototype domains.
+    - Collect retained product targets in bounded passes and reuse immutable lab-compatibility decisions within one construction
+      stage.
+  Info:
+    - Supply nine separate target editions from one player-source tree, retaining each target's complete published changelog
+      history.
+    - Exact engine minimums and available features depend on the selected target; Factorio 2.1 requires base 2.1.23.
 

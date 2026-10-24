@@ -51,6 +51,11 @@ class ImersiteMigrationTests(unittest.TestCase):
                 if key == "research_queue" then
                   if values.reject_once then values.reject_once=false; error("opposing native queue refusal") end
                   values.research_queue=value; values.current_research=value[1]
+                  if value[1] == nil then values.research_progress=0 end
+                elseif key == "research_progress" then
+                  if values.current_research == nil then error("No research in progress") end
+                  values.progress_writes=(values.progress_writes or 0)+1
+                  values.research_progress=value
                 else values[key]=value end
               end})
             total()
@@ -96,6 +101,42 @@ class ImersiteMigrationTests(unittest.TestCase):
           assert(not ok and tostring(message):find("opposing native queue refusal",1,true))
           assert(rows[H].level == 8 and rows[H].enabled and rows[E].level == 1 and rows[T].level == 4)
           assert(force.current_research.name == H and force.research_progress == .42 and next(records) == nil)
+          assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
+        ''')
+
+    def test_detached_work_handoff_never_sets_force_progress_without_current_research(self):
+        self.lua.execute('''
+          for _,completed in ipairs({0,2,3,5,7}) do
+            local force,rows,values = world(completed)
+            force.research_queue = {}
+            local bonus,records = force.recipes["kr-imersite-powder"].productivity_bonus,{}
+            assert(migration.reconcile_force(force,.02,records))
+            assert(force.current_research == nil and #force.research_queue == 0)
+            assert(force.research_progress == 0 and values.progress_writes == nil)
+            local destination = completed < 3 and E or T
+            assert(rows[destination].saved_progress == .42)
+            assert(rows[destination].level == (completed < 3 and completed+1 or math.max(4,completed+1)))
+            assert(rows[H].level == 1 and rows[H].saved_progress == 0 and not rows[H].enabled)
+            assert(rows[C].level == 4 and rows[C].saved_progress == 0 and not rows[C].enabled)
+            assert(records[1].earned == completed)
+            assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
+            assert(not migration.reconcile_force(force,.02,records))
+            assert(values.progress_writes == nil)
+          end
+        ''')
+
+    def test_detached_queue_refusal_preserves_original_error_and_carrier_work(self):
+        self.lua.execute('''
+          local force,rows,values = world(5)
+          force.research_queue = {}
+          local bonus,records = force.recipes["kr-imersite-powder"].productivity_bonus,{}
+          values.reject_once = true
+          local ok,message = pcall(migration.reconcile_force,force,.02,records)
+          assert(not ok and tostring(message):find("opposing native queue refusal",1,true))
+          assert(force.current_research == nil and #force.research_queue == 0 and force.research_progress == 0)
+          assert(values.progress_writes == nil and next(records) == nil)
+          assert(rows[H].level == 6 and rows[H].saved_progress == .42 and rows[H].enabled)
+          assert(rows[E].level == 1 and rows[T].level == 4)
           assert(math.abs(force.recipes["kr-imersite-powder"].productivity_bonus-bonus) < 1e-9)
         ''')
 

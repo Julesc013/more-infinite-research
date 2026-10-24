@@ -43,6 +43,14 @@ Make a native family work end to end, then exercise a different native effect, a
 
 Use one implementer, one independent review responsibility and one test worker within the existing three-slot capacity. Workers must have nonoverlapping edits. Reuse running native campaigns; at most one heavy scenario per admitted machine. Exact archive libraries/settings are preserved and restored by existing qualified tools.
 
+## Coordinate Black Glass and Aero through GitHub
+
+Black Glass owns the current integration branch, the sole native-test lane and release coordination. The current branch and frozen test inputs are named in [progress](progress.md). Aero15X independently reviews pushed commits and may prepare corrections on separate branches and PRs. Use a bounded file responsibility in each task/PR, fetch remote changes before integration, and reconcile overlapping edits explicitly. Never reset another worker's changes, force-push a shared review branch or substitute a moving branch head for a test's full source commit.
+
+Push each reviewable unit promptly. Commit bodies and PR descriptions record the concrete defect or outcome, changed behavior, independent expected result, actual commands and results, exact source/package identities where applicable, and remaining limitations. Finish required checks and merge completed units into `dev` while later qualification continues. Merge updated `dev` into an already published work branch when needed; preserve the commit identities that Aero reviews and native workers consume. Keep frozen-input custody branches reachable until their jobs and evidence readback finish.
+
+After accepted MIR5.0.0 publication and verified local delivery, continue with5.0.1 bug fixes, measured performance improvements and further stress qualification. Use actual review findings and observed failures to select that work. This follow-up authorization does not waive any5.0.0 acceptance gate or permit an untested release.
+
 ## Before creating an abstraction
 
 Show the real repeated code or concrete safety boundary, why native Factorio behavior is insufficient, what new state it retains, and which tests protect its removal/replacement. Do not create an adapter for an imagined future engine or an API function without a consumer.
@@ -91,4 +99,4 @@ This MIR5 procedure uses the maintainer's explicit publication authorization. It
 
 Read [the architecture explainer](architecture.md) once, then only the relevant spec/diagram. For ordering, runtime, migration or package work, include [determinism](../../spec/mir5/determinism.md) in the task packet. Do not supply all diagrams or old transcripts to every task.
 
-Tests of this pack are tool/document tests. The product case catalogue stays `not_run` until actual implementation commands and native evidence exist. Do not modify its expected assertion to copy a candidate's unexpected output.
+The imported pack's original case catalogue remains a set of requirement examples rather than an execution receipt. Current host controls exercise implemented player behavior and tooling; exact native results live in the linked evidence chains and [progress](progress.md). Do not infer product acceptance from the old case statuses, rename an earlier execution, or copy a candidate's unexpected output into its oracle.

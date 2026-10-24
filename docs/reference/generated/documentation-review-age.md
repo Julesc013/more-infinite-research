@@ -214,8 +214,8 @@ Ages are measured against the newest governed review date, 2026-10-24, so checko
 | docs/maintainer/triage-playbook.md | current | 2026-07-07 | 109 | review-soon |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | archived | 2026-08-08 | 77 | current-window |
 | docs/maintainer/validation.md | current | 2026-07-12 | 104 | review-soon |
-| docs/mir5/api.md | draft | 2026-10-22 | 2 | current-window |
-| docs/mir5/architecture.md | draft | 2026-10-22 | 2 | current-window |
+| docs/mir5/api.md | draft | 2026-10-24 | 0 | current-window |
+| docs/mir5/architecture.md | draft | 2026-10-24 | 0 | current-window |
 | docs/mir5/cutover.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/decisions.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/design.md | draft | 2026-10-22 | 2 | current-window |
@@ -227,8 +227,8 @@ Ages are measured against the newest governed review date, 2026-10-24, so checko
 | docs/mir5/implementation/README.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/implementation/review.md | draft | 2026-10-22 | 2 | current-window |
 | docs/mir5/progress.md | current | 2026-10-24 | 0 | current-window |
-| docs/mir5/README.md | draft | 2026-10-22 | 2 | current-window |
-| docs/mir5/support.md | draft | 2026-10-22 | 2 | current-window |
+| docs/mir5/README.md | draft | 2026-10-24 | 0 | current-window |
+| docs/mir5/support.md | draft | 2026-10-24 | 0 | current-window |
 | docs/PROJECT-CONTINUITY.md | current | 2026-09-15 | 39 | current-window |
 | docs/README.md | current | 2026-08-31 | 54 | current-window |
 | docs/reference/asset-sources.md | current | 2026-07-23 | 93 | review-soon |

@@ -32,6 +32,9 @@ class SdkTests(unittest.TestCase):
           package.preload["__more-infinite-research__/research/generator"] = function()
             return require("research.generator")
           end
+          package.preload["__more-infinite-research__/platform/target"] = function()
+            return assert(loadfile(player_root .. "/platform/target.lua"))()
+          end
           package.preload["__more-infinite-research__.api.v1.data"] = function()
             return assert(loadfile(data_source))()
           end

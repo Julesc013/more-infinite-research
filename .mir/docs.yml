@@ -1696,7 +1696,7 @@ docs:
   - path: docs/mir5/support.md
     title: "Support and upgrade boundaries"
     status: draft
-    audience: developer
+    audience: maintainer
     doc_type: reference
     owner: mir-maintainers
     source_of_truth_for:

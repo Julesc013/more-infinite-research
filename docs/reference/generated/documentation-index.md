@@ -214,8 +214,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/maintainer/triage-playbook.md | Triage Playbook | current | maintainer | how-to | mir-maintainers | 2026-07-07 |
 | docs/maintainer/ultimate-convergence-follow-up-prompt.md | Ultimate Convergence Follow-Up Audit Prompt | archived | maintainer | archive | mir-maintainers | 2026-08-08 |
 | docs/maintainer/validation.md | Validation | current | maintainer | how-to | mir-maintainers | 2026-07-12 |
-| docs/mir5/api.md | MIR API guide | draft | developer | reference | mir-maintainers | 2026-10-22 |
-| docs/mir5/architecture.md | How MIR fits together | draft | developer | explanation | mir-maintainers | 2026-10-22 |
+| docs/mir5/api.md | MIR API guide | draft | developer | reference | mir-maintainers | 2026-10-24 |
+| docs/mir5/architecture.md | How MIR fits together | draft | developer | explanation | mir-maintainers | 2026-10-24 |
 | docs/mir5/cutover.md | Staging, adoption and mechanical cutover | draft | developer | how-to | mir-maintainers | 2026-10-22 |
 | docs/mir5/decisions.md | Source reconciliation for this proposal | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/design.md | Synthesized design and decisions | draft | developer | explanation | mir-maintainers | 2026-10-22 |
@@ -227,8 +227,8 @@ Generated from Markdown front matter plus the immutable versioned-release-note c
 | docs/mir5/implementation/README.md | Implementation draft: reading order and boundaries | draft | developer | reference | mir-maintainers | 2026-10-22 |
 | docs/mir5/implementation/review.md | Implementation review: close decisions, do not expand architecture | draft | developer | explanation | mir-maintainers | 2026-10-22 |
 | docs/mir5/progress.md | MIR 5 release progress and continuation | current | maintainer | reference | mir-maintainers | 2026-10-24 |
-| docs/mir5/README.md | MIR documentation | draft | developer | reference | mir-maintainers | 2026-10-22 |
-| docs/mir5/support.md | Support and upgrade boundaries | draft | developer | reference | mir-maintainers | 2026-10-22 |
+| docs/mir5/README.md | MIR documentation | draft | developer | reference | mir-maintainers | 2026-10-24 |
+| docs/mir5/support.md | Support and upgrade boundaries | draft | maintainer | reference | mir-maintainers | 2026-10-24 |
 | docs/PROJECT-CONTINUITY.md | Project Continuity | current | maintainer | reference | mir-maintainers | 2026-09-15 |
 | docs/README.md | More Infinite Research 4 documentation | current | maintainer | reference | mir-maintainers | 2026-08-31 |
 | docs/reference/asset-sources.md | Asset Sources | current | developer | reference | mir-maintainers | 2026-07-23 |

@@ -294,6 +294,12 @@ class LifecycleTests(unittest.TestCase):
           local before = next(storage)
           handlers.load()
           assert(before == next(storage), "on_load initialized or changed storage")
+          local fresh = force(40, {}, {}, nil, nil)
+          game.forces[40] = fresh
+          handlers.events[defines.events.on_force_created]({force = fresh})
+          handlers.events[defines.events.on_force_reset]({force = fresh})
+          handlers.events[defines.events.on_forces_merged]({source_index = 41, destination = fresh})
+          assert(next(storage) == nil, "unlimited force cleanup allocated cap storage")
         ''')
 
     def test_space_age_caps_have_independent_named_ownership(self):
@@ -372,6 +378,55 @@ class LifecycleTests(unittest.TestCase):
           assert(storage.mir_caps == nil and normal.enabled,
             "ordinary unlimited technology allocated prototype-disablement state")
         ''')
+
+    def test_inactive_caps_discard_restoration_rights_at_force_boundaries(self):
+        for boundary in ("created", "reset", "merged"):
+            with self.subTest(boundary=boundary):
+                self.lua.globals().boundary = boundary
+                self.lua.execute('''
+                  local name = "recipe-prod-research_gears-1"
+                  local original = technology(name, 2, true)
+                  original.prototype.enabled = false
+                  local old_force = force(34, {[name] = original}, {}, nil, nil)
+                  boot({[34] = old_force}, 0)
+                  handlers.init()
+                  assert(not require("runtime.lifecycle").caps_active())
+                  assert(storage.mir_caps.owned_disabled[34][name].disabled,
+                    "fixture did not retain an actual prototype-disablement write")
+
+                  -- A new/reset force's foreign disablement does not inherit
+                  -- the old force's restoration right at the same index.
+                  local foreign = technology(name, 2, false)
+                  foreign.prototype.enabled = false
+                  local current = technology("unrelated", 1, true)
+                  local replacement = force(34, {[name] = foreign}, {current}, current, .75)
+                  if boundary == "merged" then
+                    -- The engine retains the destination force's research.
+                    local destination = force(35, {}, {}, nil, nil)
+                    old_force.valid = false
+                    game.forces = {[35] = destination}
+                    handlers.events[defines.events.on_forces_merged](
+                      {source_index = 34, destination = destination})
+                    -- Model later index reuse without a second callback that
+                    -- could hide a missing merged-source cleanup.
+                    game.forces[34] = replacement
+                  else
+                    game.forces[34] = replacement
+                    local id = boundary == "created" and defines.events.on_force_created
+                      or defines.events.on_force_reset
+                    handlers.events[id]({force = replacement})
+                  end
+                  foreign.prototype.enabled = true
+                  handlers.configuration()
+                  assert(not foreign.enabled,
+                    boundary .. " transferred old ownership to foreign disablement")
+                  assert(storage.mir_caps == nil, boundary .. " retained stale ownership")
+                  assert(replacement.current_research == current
+                    and replacement.research_progress == .75
+                    and #replacement.research_queue == 1
+                    and replacement.research_queue[1] == current,
+                    boundary .. " changed unrelated research progress")
+                ''')
 
     def test_full_base_limits_are_precomputed_and_research_callbacks_touch_only_the_named_family(self):
         self.lua.execute('''

@@ -2,10 +2,10 @@
 title: "Support and upgrade boundaries"
 status: draft
 applies_to: "MIR replacement development"
-audience: developer
+audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -21,6 +21,32 @@ The replacement is under development. This documentation does not announce a rel
 Stable replacement scope must retain delivered applicable research, settings, effects, native continuations, prototype overrides, scripted features, the Library, bundled integrations and each supported engine edition's actual subset. New unimplemented ideas remain the original backlog; they are not silently marked complete.
 
 An ecosystem name is not a test result. Support records should identify exact Factorio and upstream versions/settings, whether the technology is present, researchable, effective, physically productive, upgrade-safe, reload-safe, multiplayer-tested and performance-measured. Load-only evidence is labelled load-only.
+
+## Candidate editions
+
+The [tracked edition record](../../targets/mir5/editions.json) selects one self-contained player ZIP for each engine family. The following minimums come from the exact engines used by the qualification campaigns; they do not announce completed final-package acceptance. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
+
+| Target | Factorio family | Minimum base | MIR5 distribution |
+|---|---|---|---|
+| F210 | 2.1 | 2.1.23 | 5.0.21000 |
+| F200 | 2.0 | 2.0.77 | 5.0.20000 |
+| F110 | 1.1 | 1.1.110 | 5.0.11000 |
+| F100 | 1.0 | 1.0.0 | 5.0.10000 |
+| F017 | 0.17 | 0.17.79 | 5.0.01700 |
+| F016 | 0.16 | 0.16.51 | 5.0.01600 |
+| F015 | 0.15 | 0.15.40 | 5.0.01500 |
+| F014 | 0.14 | 0.14.23 | 5.0.01400 |
+| F013 | 0.13 | 0.13.20 | 5.0.01300 |
+
+Modern targets expose recipe productivity and the Research Library. Expansion research requires its actual official mods and available science/labs. Historical editions retain their supported direct-effect subset; they do not acquire modern recipe productivity, Library or expansion capabilities. F013/F014 lack the later numeric infinite-level readback, and F013–F016 lack native research queues. The [research and settings reference](../../README.md#research-catalog) retains the complete authored catalogue detail; exact profile admissions and omissions are named in the qualification records.
+
+## First upgrade
+
+Keep the original save, its pre-update backup, the selected mod archives and startup settings. Test a copy with the matching edition first. Preserve inherited settings for the first load; configuration changes and productivity-provider changes have separate transition requirements. Load, inspect earned research and bonuses, inspect current/queued or suspended work, save under a new name and cold-reload that copy before adopting it.
+
+A cap below earned research limits future work without erasing earned levels. MIR restores only disablement it owns; another mod's configuration callback can independently reset technology state. Hidden migration carriers preserve named historical investments and must not be removed as cosmetic clutter. The retained [recovery guidance](../../README.md#save-compatibility) and original incident records remain relevant to previously resaved factories: restoring a missing definition cannot reconstruct history already erased from a save.
+
+Use the Research Library shortcut on modern targets to inspect research, queues, settings and availability. Its search/filter and language preferences belong to each player. Queue actions use native research behavior; the Library is not a second research planner. Startup settings take effect on the appropriate restart, and exporting a settings profile does not silently change the active game configuration.
 
 ## Safe diagnosis
 

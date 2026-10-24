@@ -1,6 +1,6 @@
 # Host controls for the private K2SO published-carrier transition fixture.
 #
-# Native Factorio must qualify the three saved-game stages. These controls
+# Native Factorio must qualify each selected saved-game path. These controls
 # validate explicit closure, data preflights, fixture-only acceleration, and
 # read-only control registration without launching the engine.
 import argparse
@@ -247,10 +247,118 @@ class K2ImersiteTransitionFixtureTests(unittest.TestCase):
         self.assertIn("state.published_mir", published)
         self.assertNotIn("CARRIER].enabled = true", published)
         successor = (FIXTURE / "mir5/control.lua").read_text(encoding="utf-8")
-        self.assertIn("public_continuation_readded=true", successor)
+        self.assertIn('direct_predecessor_handoff=state.handoff_source == "direct-4.6"', successor)
         self.assertIn("recovered_tail_saved_progress_before_lab=0.42", successor)
         self.assertIn("state.published_mir ~= \"4.7.21002\"", successor)
         self.assertIn("destination_lab_completions ~= 1", successor)
+
+    def _successor_configuration(self, kind, opponent=""):
+        self.lua.globals().successor_path = (FIXTURE / "mir5/control.lua").as_posix()
+        self.lua.globals().source_kind_fixture = kind
+        self.lua.globals().source_opponent = opponent
+        return self.lua.execute(r'''
+          local callbacks, calls = {}, {created=0, inserted=0, added=0, prerequisites=0}
+          local diagnostics = {}
+          local early, tail = "recipe-prod-research_material_imersite-1", "recipe-prod-research_material_imersite-4"
+          local holder, carrier = "mir-k2-imersite-staged-state-1", "mir-k2-imersite-continuation-state-4"
+          local powder = "kr-imersite-powder"
+          local function technology(name, level, researched, maximum, hidden, enabled)
+            local values = {name=name,valid=true,level=level,researched=researched,
+              enabled=enabled,visible_when_disabled=false,saved_progress=name == tail and .42 or 0,
+              research_unit_count=1,research_unit_energy=60,
+              research_unit_ingredients={{name="production-science-pack",amount=1},{name="space-science-pack",amount=1}},
+              prerequisites={{research_recursive=function() calls.prerequisites=calls.prerequisites+1 end}},
+              prototype={max_level=maximum,hidden=hidden,
+                effects={{type="change-recipe-productivity",recipe=powder,change=.02}}}}
+            return setmetatable({}, {__index=values,__newindex=function() error("fixture wrote selected technology") end})
+          end
+          local rows = {
+            [early]=technology(early,3,true,3,false,true),
+            [tail]=technology(tail,6,false,4294967295,false,true),
+            [holder]=technology(holder,1,false,4294967295,true,false),
+            [carrier]=technology(carrier,4,false,4294967295,true,false),
+          }
+          local force = {technologies=rows,recipes={[powder]={productivity_bonus=.10}},research_queue={}}
+          force.add_research=function(value)
+            assert(value == rows[tail], "successor passed a detached snapshot instead of LuaTechnology")
+            calls.added=calls.added+1
+            force.current_research=value; force.research_queue={value}; force.research_progress=value.saved_progress
+            return true
+          end
+          local witness = {phase="complete",source_mir="4.6.21000",actual_lab_completions=5,
+            completed_legacy={level=6,saved_progress=.42,bonus=.10}}
+          if source_kind_fixture == "published" then
+            witness.phase="published-ready"; witness.published_mir="4.7.21002"
+            witness.published={carrier_level=6,carrier_progress=.42,bonus=.10}
+          end
+          if source_opponent == "lab-count" then witness.actual_lab_completions=4 end
+          if source_opponent == "progress" then witness.completed_legacy.saved_progress=.25 end
+          if source_opponent == "bonus" then witness.completed_legacy.bonus=.12 end
+          if source_opponent == "source-version" then witness.source_mir="4.5.21000" end
+          if source_opponent == "mixed-published" then witness.published_mir="4.7.21002" end
+          if source_opponent == "published-progress" then witness.published.carrier_progress=.25 end
+          if source_opponent == "native-bonus" then force.recipes[powder].productivity_bonus=.12 end
+          helpers = {table_to_json=function(value) diagnostics[#diagnostics+1]=value; return "readback-json" end}
+          log = function(value) assert(value == "[MIR5_NATIVE_FIXTURE] DIAGNOSTIC readback-json") end
+          local inventory = {insert=function(value)
+            assert((value.name == "production-science-pack" or value.name == "space-science-pack") and value.count == 8)
+            calls.inserted=calls.inserted+1; return value.count
+          end}
+          local entity = {valid=true,get_inventory=function() return inventory end}
+          game = {tick=100,forces={player=force},surfaces={{create_entity=function()
+            calls.created=calls.created+1; return entity
+          end}}}
+          storage = {mir5_k2_imersite_transition=witness}
+          settings = {startup={["ips-max-level-research_material_imersite"]={value=0}}}
+          defines = {inventory={lab_input=1},events={on_tick=1,on_research_finished=2}}
+          script = {active_mods={base="2.1.23",["Krastorio2-spaced-out"]="2.0.19",
+            ["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-k2-imersite-transition"]="0.3.0"},
+            on_configuration_changed=function(callback) callbacks.configuration=callback end,
+            on_load=function(callback) callbacks.load=callback end,
+            on_event=function() end}
+          assert(loadfile(successor_path))()
+          local ok,message=pcall(callbacks.configuration)
+          return {ok=ok,message=tostring(message),calls=calls,route=witness.handoff_source,
+            phase=witness.phase,progress=force.research_progress,real_tail=force.current_research == rows[tail],
+            diagnostics=diagnostics,bonus=force.recipes[powder].productivity_bonus}
+        ''')
+
+    def test_successor_accepts_both_exact_source_witnesses_and_starts_the_actual_native_tail(self):
+        for kind, route in (("direct", "direct-4.6"), ("published", "published-4.7")):
+            with self.subTest(kind=kind):
+                result = self._successor_configuration(kind)
+                self.assertTrue(result["ok"], result["message"])
+                self.assertEqual(route, result["route"])
+                self.assertEqual("await-successor-lab", result["phase"])
+                self.assertEqual(0.42, result["progress"])
+                self.assertTrue(result["real_tail"])
+                self.assertEqual((1, 2, 1, 1), tuple(result["calls"][key] for key in
+                                                  ("created", "inserted", "added", "prerequisites")))
+
+    def test_successor_refuses_changed_or_mixed_source_witnesses_before_lab_or_research_writes(self):
+        for kind, opponent in (("direct", "lab-count"), ("direct", "progress"), ("direct", "bonus"),
+                               ("direct", "source-version"), ("direct", "mixed-published"),
+                               ("published", "published-progress")):
+            with self.subTest(kind=kind, opponent=opponent):
+                result = self._successor_configuration(kind, opponent)
+                self.assertFalse(result["ok"], result["message"])
+                self.assertEqual((0, 0, 0, 0), tuple(result["calls"][key] for key in
+                                                  ("created", "inserted", "added", "prerequisites")))
+
+    def test_failed_native_readback_reports_values_without_repair_or_successor_writes(self):
+        result = self._successor_configuration("direct", "native-bonus")
+        self.assertFalse(result["ok"])
+        self.assertIn("recovered public Imersite state differs", result["message"])
+        self.assertEqual((0, 0, 0, 0), tuple(result["calls"][key] for key in
+                                          ("created", "inserted", "added", "prerequisites")))
+        self.assertEqual(0.12, result["bonus"])
+        diagnostic = result["diagnostics"][1]
+        self.assertEqual("direct-4.6", diagnostic["handoff_source"])
+        self.assertEqual(0.10, diagnostic["expected"]["powder_productivity"])
+        self.assertEqual(0.12, diagnostic["actual"]["powder_productivity"])
+        self.assertEqual(6, diagnostic["actual"]["tail"]["level"])
+        self.assertEqual(0.42, diagnostic["actual"]["tail"]["saved_progress"])
+        self.assertIsNone(result["diagnostics"][2])
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: explanation
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -103,6 +103,6 @@ Specs constrain source; tests compare against independent expected behavior; too
 
 History supplies obligations and regression evidence, not an excuse to retain the former compiler. AIDE remains optional assistance. No model agreement, line-count target or archive checksum replaces native proof.
 
-## What is ready now?
+## Implementation and qualification
 
-The architectural contract and diagrams are supplied. The Generator, API, full continuity inventory and target-native validation are **not implemented or executed by this pack**. Start with one recovered historical contract in a disposable fixture, then exercise a difficult continuation/cap/runtime case and an independent API consumer before mass-porting.
+The [player source](../../source/mir5/README.md) implements the Generator, authored modern and historical catalogues, compatibility bindings, settings, runtime effects, migrations, Library and API. The [continuity inventory](../../spec/mir5/inventory/continuity.json) records retained obligations and remaining qualification. Exact native catalogue, lab, save and client observations are linked from [progress](progress.md); earlier receipts retain their original source identities. The diagrams describe responsibilities, while final-source, performance, layout and publication acceptance remain separate work.

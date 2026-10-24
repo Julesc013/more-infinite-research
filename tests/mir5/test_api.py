@@ -1,5 +1,6 @@
 """Pure Lua 5.2 controls for the MIR 5 data API, not native Factorio evidence."""
 import argparse
+import json
 from pathlib import Path
 import sys
 import unittest
@@ -17,6 +18,9 @@ class ApiTests(unittest.TestCase):
           package.cpath = ""
           package.preload["__more-infinite-research__/research/generator"] = function()
             return require("research.generator")
+          end
+          package.preload["__more-infinite-research__/platform/target"] = function()
+            return assert(loadfile(player_root .. "/platform/target.lua"))()
           end
           package.preload["__more-infinite-research__.api.v1.data"] = function()
             return assert(loadfile(player_root .. "/api/v1/data.lua"))()
@@ -70,6 +74,7 @@ class ApiTests(unittest.TestCase):
             productivity_ignores_stats = true, receiver_limits = true,
             cargo_research = false
           }
+          package.loaded["__more-infinite-research__/platform/target"] = package.loaded["platform.target"]
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           api = require("__more-infinite-research__.api.v1.data")
           data = world()
@@ -100,6 +105,169 @@ class ApiTests(unittest.TestCase):
           submitted.unit.ingredients[1][2] = 99
           emitted.unit.ingredients[1][2] = 2
           assert(emitted.unit.ingredients[1][2] == 2 and submitted.unit.ingredients[1][2] == 99)
+        ''')
+
+    def test_external_consumer_target_namespace_cannot_replace_mir_capabilities(self):
+        self.fresh()
+        self.lua.execute('''
+          for _, consumer in ipairs({"alpha", "beta"}) do
+            local private_target = {distribution_version=consumer .. "-private",
+              recipe_productivity=false, cargo_research=false}
+            package.loaded["platform.target"] = private_target
+            package.loaded["__more-infinite-research__/platform/target"] = nil
+            package.loaded["__more-infinite-research__.api.v1.data"] = nil
+            local external_api = require("__more-infinite-research__.api.v1.data")
+            assert(external_api.get_version().product == "5.0.21000",
+              "external API consumed " .. consumer .. "'s private target metadata")
+            assert(external_api.get_capabilities().recipe_productivity)
+            local name = "mir-api-namespace-" .. consumer
+            assert(external_api.add_productivity(definition(name), {"iron-gear-wheel"}, .01) == name)
+            assert(data.raw.technology[name].effects[1].change == .01)
+            assert(package.loaded["platform.target"] == private_target
+              and private_target.recipe_productivity == false,
+              "MIR must neither load nor rewrite the consumer's private module")
+          end
+          assert(data.writes == 2)
+        ''')
+
+    def test_native_namespace_collision_fixtures_keep_private_targets_and_publish_distinct_effects(self):
+        fixture_root = ROOT / "tests/mir5/fixtures"
+        profile = json.loads(
+            (ROOT / "tests/mir5/profiles/api-namespace-collision-f210-2123.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(profile["kind"], "mir5-api-namespace-collision-f210-native-selection")
+        self.assertEqual((profile["target"], profile["factorio_line"], profile["engine"]["version"]),
+                         ("f210", "2.1", "2.1.23"))
+        self.assertEqual(profile["settings_mode"], "Defaults")
+        self.assertEqual(
+            [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+            [
+                ("base", "2.1.23", True),
+                ("more-infinite-research", "5.0.21000", True),
+                ("mir-fixture-mir5-api-namespace-alpha", "0.1.0", True),
+                ("mir-fixture-mir5-api-namespace-beta", "0.1.0", True),
+                ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ],
+        )
+
+        alpha_root = fixture_root / "api-namespace-alpha"
+        beta_root = fixture_root / "api-namespace-beta"
+        for root, consumer in ((alpha_root, "alpha"), (beta_root, "beta")):
+            info = json.loads((root / "info.json").read_text(encoding="utf-8"))
+            self.assertEqual(info["name"], f"mir-fixture-mir5-api-namespace-{consumer}")
+            self.assertEqual(info["factorio_version"], "2.1")
+            self.assertEqual(info["dependencies"], [
+                "base >= 2.1.23", "more-infinite-research = 5.0.21000",
+            ])
+
+        self.lua.globals().namespace_alpha_data = (alpha_root / "data.lua").as_posix()
+        self.lua.globals().namespace_alpha_target = (alpha_root / "platform/target.lua").as_posix()
+        self.lua.globals().namespace_alpha_control = (alpha_root / "control.lua").as_posix()
+        self.lua.globals().namespace_beta_data = (beta_root / "data-final-fixes.lua").as_posix()
+        self.lua.globals().namespace_beta_target = (beta_root / "platform/target.lua").as_posix()
+        self.lua.globals().namespace_beta_control = (beta_root / "control.lua").as_posix()
+        legacy_source = (ROOT / "source/mir5/api/v1/data.lua").read_text(encoding="utf-8")
+        old_import = 'local target = require("__more-infinite-research__/platform/target")'
+        self.assertIn(old_import, legacy_source)
+        self.lua.globals().legacy_namespace_api_source = legacy_source.replace(
+            old_import, 'local target = require("platform.target")', 1
+        )
+        self.lua.execute(r'''
+          function namespace_target(path)
+            return assert(loadfile(path))()
+          end
+
+          function run_namespace_data(path, private_target, public_api)
+            local environment = {
+              data = data,
+              require = function(name)
+                if name == "platform.target" then return private_target end
+                if name == "__more-infinite-research__.api.v1.data" then return public_api end
+                error("namespace fixture imported unexpected module " .. tostring(name))
+              end
+            }
+            setmetatable(environment, {__index = _G})
+            return assert(loadfile(path, "t", environment))()
+          end
+
+          function run_namespace_control(path, private_target, technology_name, recipe_name, change)
+            local callbacks, reports, messages = {}, {}, {}
+            local environment = {
+              require = function(name)
+                assert(name == "platform.target")
+                return private_target
+              end,
+              script = {on_init = function(callback) callbacks.init = callback end},
+              game = {forces = {player = {technologies = {
+                [technology_name] = {prototype = {effects = {{
+                  type = "change-recipe-productivity", recipe = recipe_name, change = change
+                }}}}
+              }}}},
+              helpers = {table_to_json = function(row) reports[#reports + 1] = row; return "fixture-json" end},
+              log = function(message) messages[#messages + 1] = message end
+            }
+            setmetatable(environment, {__index = _G})
+            assert(loadfile(path, "t", environment))()
+            local ok, message = pcall(callbacks.init)
+            return ok, tostring(message), reports[1], messages[1]
+          end
+
+          function legacy_namespace_api(private_target)
+            package.loaded["platform.target"] = nil
+            package.preload["platform.target"] = function() return private_target end
+            return assert(load(legacy_namespace_api_source, "legacy-mir-api-data"))()
+          end
+        ''')
+
+        self.fresh()
+        self.lua.execute(r'''
+          local alpha_private = namespace_target(namespace_alpha_target)
+          local beta_private = namespace_target(namespace_beta_target)
+          assert(alpha_private ~= beta_private and alpha_private.owner ~= beta_private.owner)
+          assert(run_namespace_data(namespace_alpha_data, alpha_private, api) == nil)
+          assert(run_namespace_data(namespace_beta_data, beta_private, api) == nil)
+
+          local alpha = assert(data.raw.technology["mir-api-namespace-alpha-gears-1"])
+          local beta = assert(data.raw.technology["mir-api-namespace-beta-cable-1"])
+          assert(data.writes == 2 and alpha ~= beta)
+          assert(alpha.effects[1].recipe == "iron-gear-wheel" and alpha.effects[1].change == .01)
+          assert(beta.effects[1].recipe == "copper-cable" and beta.effects[1].change == .02)
+          assert(alpha_private.distribution_version == "private-alpha-target"
+            and beta_private.distribution_version == "private-beta-target")
+          assert(api.get_version().product == "5.0.21000" and api.get_capabilities().recipe_productivity)
+
+          local ok, message, alpha_result, alpha_log = run_namespace_control(
+            namespace_alpha_control, alpha_private, "mir-api-namespace-alpha-gears-1", "iron-gear-wheel", .01)
+          assert(ok, message)
+          assert(alpha_result.consumer == alpha_private.owner and alpha_result.change == .01
+            and alpha_log:find("MIR5_API_NAMESPACE_ALPHA", 1, true))
+          ok, message, beta_result, beta_log = run_namespace_control(
+            namespace_beta_control, beta_private, "mir-api-namespace-beta-cable-1", "copper-cable", .02)
+          assert(ok, message)
+          assert(beta_result.consumer == beta_private.owner and beta_result.change == .02
+            and beta_log:find("MIR5_API_NAMESPACE_BETA", 1, true))
+
+          local wrong_effect_ok, wrong_effect = run_namespace_control(
+            namespace_alpha_control, alpha_private, "mir-api-namespace-alpha-gears-1", "iron-gear-wheel", .02)
+          assert(not wrong_effect_ok and wrong_effect:find("native gear productivity technology differs", 1, true))
+          local wrong_target = {owner = "wrong", recipe_productivity = false}
+          local wrong_target_ok, wrong_target_error = run_namespace_control(
+            namespace_beta_control, wrong_target, "mir-api-namespace-beta-cable-1", "copper-cable", .02)
+          assert(not wrong_target_ok and wrong_target_error:find("private target identity differs", 1, true))
+        ''')
+
+        self.fresh()
+        self.lua.execute(r'''
+          for _, row in ipairs({
+            {data = namespace_alpha_data, target = namespace_alpha_target},
+            {data = namespace_beta_data, target = namespace_beta_target}
+          }) do
+            local private_target = namespace_target(row.target)
+            local legacy = legacy_namespace_api(private_target)
+            local ok, message = pcall(run_namespace_data, row.data, private_target, legacy)
+            assert(not ok and tostring(message):find("public target metadata differs", 1, true), tostring(message))
+            assert(data.writes == 0, "unqualified legacy import emitted a technology")
+          end
         ''')
 
     def test_family_keeps_order_and_permits_local_forward_references(self):

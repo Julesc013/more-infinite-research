@@ -132,6 +132,10 @@ function M.apply(raw, options)
       end
     end
   end
+  -- Several limits may change one receiver. Keep only the detached receivers
+  -- written during this invocation so later fields reuse that owned table;
+  -- distinct prototypes sharing an upstream receiver still get separate copies.
+  local detached_receivers = {}
   for _, limit in ipairs(limits) do
     local value = selected(options["mir-prototype-" .. limit[1] .. (limit[1] == "speed-floor" and "" or "-cap")])
     if value ~= nil and target.receiver_limits ~= true then
@@ -145,12 +149,13 @@ function M.apply(raw, options)
             local old = prototype.effect_receiver or {}
             local range = type(old[limit[2]]) == "table" and old[limit[2]] or nil
             if not range or range[limit[3]] ~= value then
-              local receiver = clone(old)
+              local receiver = detached_receivers[prototype] == old and old or clone(old)
               range = type(receiver[limit[2]]) == "table" and receiver[limit[2]] or {}
               if range.low == nil then range.low = limit[4] end
               if range.high == nil then range.high = 1000 end
               range[limit[3]] = value
               receiver[limit[2]], prototype.effect_receiver = range, receiver
+              detached_receivers[prototype] = receiver
               facts.receivers = facts.receivers + 1
             end
           end

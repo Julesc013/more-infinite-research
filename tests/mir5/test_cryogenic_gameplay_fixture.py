@@ -17,6 +17,8 @@ PACKS = [
 OWNER = "cryogenic-science-pack"
 GEAR = "recipe-prod-research_gears-1"
 FOREIGN = "mir5-cryogenic-native-science"
+EXPECTED_GEAR_PRODUCTIVITY = 0.10
+EXPECTED_LABORATORY_PRODUCTIVITY = 0
 
 
 def lua(runtime, value):
@@ -86,7 +88,8 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
           local owner = force.technologies["cryogenic-science-pack"]
           owner.research_unit_ingredients = {{name="mir5-cryogenic-native-science", amount=1}}
           local gear = {valid=true, name="recipe-prod-research_gears-1", enabled=true, researched=false,
-            level=1, research_unit_ingredients={}}
+            level=1, research_unit_ingredients={}, prototype={effects={{type="change-recipe-productivity",
+              recipe="iron-gear-wheel",change=.1}}}}
           for _, name in ipairs(packs) do gear.research_unit_ingredients[#gear.research_unit_ingredients+1]={name=name,amount=1} end
           force.technologies[gear.name] = gear
           local inventory = {}
@@ -106,10 +109,11 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
           assert(loadfile(control_path, "t", env))()
           env.storage = {}
           env.game = {tick=0, forces={player=force}, surfaces={{create_entity=function() return lab end}}}
-          local markers = {}
-          env.helpers = {table_to_json=function(row) markers[#markers+1]=row; return "fixture-json" end}
-          env.log = function() end
-          return {env=env,callbacks=callbacks,events=events,force=force,lab=lab,inserted=inserted,markers=markers}
+          local reports, logs = {}, {}
+          env.helpers = {table_to_json=function(row) reports[#reports+1]=row; return "fixture-json" end}
+          env.log = function(message) logs[#logs+1]=message end
+          return {env=env,callbacks=callbacks,events=events,force=force,lab=lab,inserted=inserted,
+            reports=reports,logs=logs}
         ''')
 
     def test_registration_and_seed_do_not_earn_either_lab_witness(self):
@@ -127,7 +131,7 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
         self.assertEqual(0, runtime["env"]["storage"]["mir5_cryogenic_gameplay"]["finished"])
 
     def test_reload_checks_saved_native_completion_and_consumption_without_repairing_it(self):
-        for mutation in ("pass", "missing-completion", "wrong-input", "wrong-bonus", "wrong-consumption"):
+        for mutation in ("pass", "missing-completion", "wrong-input", "wrong-gear", "wrong-lab", "wrong-consumption"):
             with self.subTest(mutation=mutation):
                 runtime = self.runtime()
                 runtime["callbacks"]["init"]()
@@ -136,22 +140,49 @@ class CryogenicGameplayFixtureTests(unittest.TestCase):
                 state["phase"], state["finished"] = "complete", 2
                 force["technologies"][OWNER]["researched"] = True
                 force["technologies"][GEAR]["level"] = 2
-                force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = 0.02
+                force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = EXPECTED_GEAR_PRODUCTIVITY
                 for name in PACKS + [FOREIGN]:
                     runtime["inserted"][name] = 31
                 if mutation == "missing-completion": state["finished"] = 1
                 if mutation == "wrong-input": force["technologies"][OWNER]["research_unit_ingredients"][1]["name"] = PACKS[0]
-                if mutation == "wrong-bonus": force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = 0.04
+                if mutation == "wrong-gear": force["recipes"]["iron-gear-wheel"]["productivity_bonus"] = 0.02
+                if mutation == "wrong-lab": force["laboratory_productivity_bonus"] = 0.10
                 if mutation == "wrong-consumption": runtime["inserted"][FOREIGN] = 32
                 runtime["callbacks"]["load"]()
                 if mutation == "pass":
                     runtime["events"][1]()
-                    self.assertEqual("reload", runtime["markers"][1]["stage"])
+                    result = runtime["reports"][1]
+                    self.assertEqual("reload", result["stage"])
+                    self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, result["witnesses"]["native_gear_productivity"])
+                    self.assertEqual(EXPECTED_LABORATORY_PRODUCTIVITY, result["witnesses"]["laboratory_productivity"])
+                    self.assertEqual(1, result["witnesses"]["gear"]["recipe_effect_matches"])
+                    self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY,
+                                     result["witnesses"]["gear"]["recipe_effect_change"])
                 else:
                     with self.assertRaises(Exception): runtime["events"][1]()
-                    self.assertIsNone(runtime["markers"][1])
+                    failure = runtime["reports"][1]
+                    self.assertEqual("failed", failure["status"])
+                    self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, failure["expected_recipe_productivity"])
+                    self.assertEqual(EXPECTED_LABORATORY_PRODUCTIVITY, failure["expected_laboratory_productivity"])
+                    if mutation == "wrong-gear":
+                        self.assertEqual("native gear productivity differs", failure["error"])
+                        self.assertEqual(0.02, failure["actual_recipe_productivity"])
+                        self.assertEqual(0, failure["actual_laboratory_productivity"])
+                    elif mutation == "wrong-lab":
+                        self.assertEqual("native laboratory productivity differs", failure["error"])
+                        self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, failure["actual_recipe_productivity"])
+                        self.assertEqual(0.10, failure["actual_laboratory_productivity"])
+                    if mutation in ("wrong-gear", "wrong-lab"):
+                        self.assertEqual(2, failure["gear"]["level"])
+                        self.assertIsNotNone(failure["gear"]["researched"])
+                        self.assertEqual(1, failure["gear"]["recipe_effect_matches"])
+                        self.assertEqual(EXPECTED_GEAR_PRODUCTIVITY, failure["gear"]["recipe_effect_change"])
                 self.assertEqual(1 if mutation == "missing-completion" else 2, state["finished"])
                 self.assertEqual(32 if mutation == "wrong-consumption" else 31, runtime["inserted"][FOREIGN])
+                if mutation == "wrong-gear":
+                    self.assertEqual(0.02, force["recipes"]["iron-gear-wheel"]["productivity_bonus"])
+                if mutation == "wrong-lab":
+                    self.assertEqual(0.10, force["laboratory_productivity_bonus"])
 
     def test_profile_binds_both_fixtures_current_engine_and_observer(self):
         profile = json.loads((ROOT / "tests/mir5/profiles/cryogenic-gameplay-space-age-f210.json").read_text())
