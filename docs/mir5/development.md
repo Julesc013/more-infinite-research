@@ -91,4 +91,4 @@ This MIR5 procedure uses the maintainer's explicit publication authorization. It
 
 Read [the architecture explainer](architecture.md) once, then only the relevant spec/diagram. For ordering, runtime, migration or package work, include [determinism](../../spec/mir5/determinism.md) in the task packet. Do not supply all diagrams or old transcripts to every task.
 
-Tests of this pack are tool/document tests. The product case catalogue stays `not_run` until actual implementation commands and native evidence exist. Do not modify its expected assertion to copy a candidate's unexpected output.
+The imported pack's original case catalogue remains a set of requirement examples rather than an execution receipt. Current host controls exercise implemented player behavior and tooling; exact native results live in the linked evidence chains and [progress](progress.md). Do not infer product acceptance from the old case statuses, rename an earlier execution, or copy a candidate's unexpected output into its oracle.

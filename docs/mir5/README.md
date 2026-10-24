@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-22
+last_reviewed: 2026-10-24
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -14,7 +14,7 @@ source_of_truth_for:
 
 # MIR documentation
 
-This is the current replacement-development documentation set. It explains the proposed product and development process; it does not claim that the new mod or API already exists.
+This is the MIR5 implementation and qualification documentation. Authored research, the Generator, settings, migrations, scripted effects, Library and API are implemented in the [player-source tree](../../source/mir5/README.md). The [progress record](progress.md) distinguishes exact-source host and native observations from remaining release work. MIR5.0.0 is not yet released.
 
 | Need | Read |
 |---|---|
@@ -22,7 +22,7 @@ This is the current replacement-development documentation set. It explains the p
 | Editable/rendered diagrams | [Diagram index](diagrams/README.md) |
 | Why this design and what was changed | [Design summary](design.md) |
 | Implement a bounded change | [Development](development.md) |
-| Use the proposed public integration | [API guide](api.md) |
+| Use the implemented candidate integration | [API guide](api.md) and [SDK](../../sdk/mir5/README.md) |
 | Understand support and safe upgrades | [Support](support.md) |
 | Find normative requirements | [Specification index](../../spec/mir5/README.md) |
 

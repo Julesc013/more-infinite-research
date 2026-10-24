@@ -1,6 +1,6 @@
 # MIR 5 API v1 draft SDK
 
-This is developer material for the current MIR API v1 draft. It is not loaded by the player package and is not yet a released compatibility promise. Exact native consumer evidence is linked below; multiplayer, optional-absence and final-candidate API qualification remain separate.
+This is developer material for the current MIR API v1 draft. It is not loaded by the player package and is not yet a released compatibility promise. Exact native consumer evidence is linked below; affected multiplayer and final-candidate API qualification remain separate. The [optional-absence native chain](../../spec/mir5/evidence/api-optional-absence-chain.json) proves CreateOnly loading without MIR, without a save or gameplay claim.
 
 The annotation-only [Lua surface](api-v1.lua) follows the implemented data module `__more-infinite-research__.api.v1.data` and the runtime remote interface `more-infinite-research.api.v1`. It has no implementation code, registration, storage, or callbacks.
 
@@ -29,7 +29,7 @@ The snapshot exposes native `name`, `force_index`, `researched`, `level`, `enabl
 
 ## Draft target and validation limits
 
-The canonical fixtures use Factorio 2.1 metadata (`base >= 2.1.23`); each `info-f200.json` supplies the exact Factorio 2.0.77 variant while sharing the same Lua consumer. [The F200 selection](../../tests/mir5/profiles/api-consumers-f200-2077.json) runs required alpha, optional late beta and the physical-production observer together. [Exact native evidence](../../spec/mir5/evidence/api-consumers-f200-chain.json) at source `86a9babd4462b5967f56bcc57669c22de26474fb` proves immediate data publication, independent detached runtime queries, alpha’s native crafting bonus, 200 then 202 cables from equal 100-plate inputs, save and two cold reloads. Research in that scenario uses native setters, not labs. Optional absence, joining clients, other modpacks, historical consumer targets and final released API acceptance remain separate. Use disposable test worlds while the product is incomplete.
+The canonical fixtures use Factorio 2.1 metadata (`base >= 2.1.23`); each `info-f200.json` supplies the exact Factorio 2.0.77 variant while sharing the same Lua consumer. [The F200 selection](../../tests/mir5/profiles/api-consumers-f200-2077.json) runs required alpha, optional late beta and the physical-production observer together. [Exact native evidence](../../spec/mir5/evidence/api-consumers-f200-chain.json) at source `86a9babd4462b5967f56bcc57669c22de26474fb` proves immediate data publication, independent detached runtime queries, alpha’s native crafting bonus, 200 then 202 cables from equal 100-plate inputs, save and two cold reloads. Research in that scenario uses native setters, not labs. Joining clients, other modpacks, historical consumer targets and final released API acceptance remain separate. Use disposable test worlds while the product is incomplete.
 
 Run the current host controls with the explicit private Lua 5.2 runtime input:
 
