@@ -1,0 +1,54 @@
+{
+  "absence_witness": {
+    "cable_productivity_bonus": 0,
+    "case": "api-optional-absence",
+    "consumer": "mir-fixture-mir5-api-beta",
+    "mir_present": false,
+    "optional_technology_present": false,
+    "qualification": "optional-consumer-absence-startup-only",
+    "runtime_interface_present": false,
+    "stage": "init",
+    "status": "passed"
+  },
+  "artifact_manifest": {
+    "members_verified": 25,
+    "path": "build/mir5/recovery-historical/api-optional-absence-canonical/40122806486/artifact-manifest.json",
+    "sha256": "5BE44D069349613E2F871E964E50E4B82EB7B5F57E903B73FC63B90A44550027"
+  },
+  "controller_commit": "1a485f7e4f74e61cfb3ef29a1caba66ec7e61508",
+  "controls_restored": true,
+  "engine": {
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "kind": "MIR5APIOptionalAbsenceCurrentNativeChainV1",
+  "limits": [
+    "This is a CreateOnly F200 absence check: MIR, its runtime interface, and the optional technology are absent while the optional consumer starts with cable productivity bonus zero.",
+    "It does not establish API behavior with MIR present, research, real-lab consumption, saves, reloads, multiplayer, performance, signing, publication, or release."
+  ],
+  "native_result": {
+    "observation": "native-create-runtime-load-only",
+    "path": "api-optional-absence-canonical/native/result.json",
+    "sha256": "F551E0552F0E2D28DBDF3D1525D269B18D63B308368900555E53232A6163C26C",
+    "status": "passed-private-native-runtime-load-only"
+  },
+  "player": {
+    "bytes": 546923,
+    "sha256": "5E0934A488EAB7510C58D0E0303295F804B60D7CECAD8F47F8E709A90EF8BC2C",
+    "target": "f200",
+    "version": "5.0.20000"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 13103,
+    "gzip_sha256": "FE805BE079D42145525C4D03DC771664B15AF2580678C78BA5A321CDB00032CC",
+    "members": 5,
+    "path": "spec/evidence/api-optional-absence-current-native-receipts.json.gz",
+    "uncompressed_bytes": 46641,
+    "uncompressed_sha256": "05D8555A6FDE7E9C696CB72F603743F50D17A6CF864175836AEDCE95730FB42F"
+  },
+  "run": 40122806486,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40122806486",
+  "schema": 1,
+  "source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+  "status": "old-freeze-f200-optional-api-absence-create-only-pass"
+}

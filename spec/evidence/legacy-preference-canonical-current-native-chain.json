@@ -1,0 +1,112 @@
+{
+  "artifact_manifest": {
+    "members_verified": 175,
+    "path": "build/mir5/recovery-historical/legacy-preference-canonical/40123069500/artifact-manifest.json",
+    "sha256": "2C39472328D3C79C012A1FB82230FAD2631F1DE0A71A83B07A101A1A10C3E34F"
+  },
+  "controller_commit": "1a485f7e4f74e61cfb3ef29a1caba66ec7e61508",
+  "engine": {
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+    "version": "2.0.77"
+  },
+  "kind": "MIR5LegacyPreferenceCanonicalCurrentNativeChainV1",
+  "limits": [
+    "This qualifies only the recorded F200 source19 package and the finite published4.7.20003 preference transition fixtures.",
+    "The two simultaneous-switch failures are required protected refusals, not gameplay failures or successful switch outcomes.",
+    "It does not qualify later package freezes, other engines, broad compatibility, performance, multiplayer, signing, publication, or release."
+  ],
+  "player": {
+    "bytes": 546923,
+    "sha256": "5E0934A488EAB7510C58D0E0303295F804B60D7CECAD8F47F8E709A90EF8BC2C",
+    "target": "f200",
+    "version": "5.0.20000"
+  },
+  "raw_evidence": {
+    "gzip_bytes": 83167,
+    "gzip_sha256": "29DF27C16818618C79B9788D02C188E8CDAE96455CE417D7D7D9B3AE92553B19",
+    "members": 11,
+    "path": "spec/evidence/legacy-preference-canonical-current-native-receipts.json.gz",
+    "uncompressed_bytes": 521969,
+    "uncompressed_sha256": "0773E02839B534B70701619360E9B1F9526A08EEC08F9A3E7CC8F0944218ED9A"
+  },
+  "results": [
+    {
+      "failure": null,
+      "initial_preference": false,
+      "result_path": "legacy-preference-canonical/gameplay/from-false/published/result.json",
+      "result_sha256": "0FD1CAD8970868F6C4A3309317D5E64AB4C0EF0F17E948CC2BBE6303846BD6B8",
+      "scenario": "published",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": null,
+      "initial_preference": false,
+      "result_path": "legacy-preference-canonical/gameplay/from-false/unchanged-upgrade/result.json",
+      "result_sha256": "F5C4D31A5D3B160517667F2F20CEA752655E2BE51162C13198823F94C3459FF8",
+      "scenario": "unchanged-upgrade",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": null,
+      "initial_preference": false,
+      "result_path": "legacy-preference-canonical/gameplay/from-false/later-switch/result.json",
+      "result_sha256": "1230025909B789BD831AC6FED1A01742F0DE3A9BFBBB0DDEC5C1D014EDE2B535",
+      "scenario": "later-switch",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "initial_preference": false,
+      "result_path": "legacy-preference-canonical/gameplay/from-false/simultaneous-refusal/result.json",
+      "result_sha256": "7C5E019AB09A55DC64EE8352AF6271DD3FAADD7D1EB8703816B17112E1FBB594",
+      "scenario": "simultaneous-refusal",
+      "status": "failed"
+    },
+    {
+      "failure": null,
+      "initial_preference": true,
+      "result_path": "legacy-preference-canonical/gameplay/from-true/published/result.json",
+      "result_sha256": "1AC65FE7E2074C624D68DE7D43576D16412DE71C266C1F68B3F0F6D37D8BE038",
+      "scenario": "published",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": null,
+      "initial_preference": true,
+      "result_path": "legacy-preference-canonical/gameplay/from-true/unchanged-upgrade/result.json",
+      "result_sha256": "8CE2DC2C9A243454858EDBFE8E8C6F1921BFE6DAC5067F7D52EA6BAA142C8F87",
+      "scenario": "unchanged-upgrade",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": null,
+      "initial_preference": true,
+      "result_path": "legacy-preference-canonical/gameplay/from-true/later-switch/result.json",
+      "result_sha256": "0D2B091A25B577FDE534C54A04E716AD32FE59C5FD19D070CF50F4720357B90E",
+      "scenario": "later-switch",
+      "status": "passed-private-native-fixture"
+    },
+    {
+      "failure": "[mir441-process-exit] 1",
+      "initial_preference": true,
+      "result_path": "legacy-preference-canonical/gameplay/from-true/simultaneous-refusal/result.json",
+      "result_sha256": "1CA0F8FC60DA923DF130A1FCA5DE4CB85355B858E6960C24C74CD4E4E70266F6",
+      "scenario": "simultaneous-refusal",
+      "status": "failed"
+    }
+  ],
+  "run": 40123069500,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40123069500",
+  "schema": 1,
+  "source_commit": "19a65f532757fda8f7db79e169e931a4530141d2",
+  "status": "old-freeze-f200-preference-transition-and-protected-refusals-pass",
+  "summary": {
+    "all_successful_arms_use_real_labs_and_two_cold_reloads": true,
+    "controls_restored": true,
+    "later_switch_arms": 2,
+    "passing_native_production_save_two_reload_arms": 6,
+    "protected_expected_refusals": 2,
+    "published_initial_preference_arms": 2,
+    "unchanged_upgrade_arms": 2
+  }
+}
