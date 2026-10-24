@@ -1,5 +1,6 @@
 """Pure controls for dormant, explicit native recipe-productivity credit carriers."""
 import argparse
+import os
 from pathlib import Path
 import sys
 import unittest
@@ -9,6 +10,34 @@ from native_credit_oracle import NATIVE_CREDIT_ICON
 
 ROOT = Path(__file__).resolve().parents[2]
 PLAYER = ROOT / "source/mir5"
+F200_BASE_ASSET_CANDIDATES = (
+    os.environ.get("MIR_F200_BASE_ASSETS"),
+    "D:/Games/Factorio/2.0/data/base",
+    "D:/Programs/Factorio/2.0/data/base",
+)
+F210_BASE_ASSET_CANDIDATES = (
+    os.environ.get("MIR_F210_BASE_ASSETS"),
+    "D:/Games/Steam/steamapps/common/Factorio/data/base",
+    "C:/Program Files/Steam/steamapps/common/Factorio/data/base",
+)
+
+
+def f200_base_assets_path():
+    for candidate in F200_BASE_ASSET_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_dir():
+                return path
+    return None
+
+
+def f210_base_assets_path():
+    for candidate in F210_BASE_ASSET_CANDIDATES:
+        if candidate:
+            path = Path(candidate)
+            if path.is_dir():
+                return path
+    return None
 
 
 class NativeCreditDefinitionTests(unittest.TestCase):
@@ -158,12 +187,12 @@ class NativeCreditDefinitionTests(unittest.TestCase):
         relative = Path("graphics/technology/automation-1.png")
         legacy = Path("graphics/technology/automation.png")
         engines = {
-            "f200": Path(r"D:/Programs/Factorio/2.0/data/base"),
-            "f210": Path(r"C:/Program Files/Steam/steamapps/common/Factorio/data/base"),
+            "f200": f200_base_assets_path(),
+            "f210": f210_base_assets_path(),
         }
         for target, base in engines.items():
             with self.subTest(target=target):
-                if not base.is_dir():
+                if base is None:
                     self.skipTest(f"{target} native assets are unavailable on this host")
                 self.assertTrue((base / relative).is_file(), f"{target} missing {relative.as_posix()}")
                 self.assertFalse((base / legacy).exists(), f"{target} unexpectedly restored the invalid legacy icon")
