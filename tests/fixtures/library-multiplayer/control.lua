@@ -246,6 +246,25 @@ local function exact_queue(force, expected)
   return true
 end
 
+local function assert_gear_science_vector(gear)
+  local ingredients = gear.research_unit_ingredients
+  if type(ingredients) ~= "table" then fail("fixture gear science vector differs: ingredients are absent") end
+  local expected, seen = {}, {}
+  for _, name in ipairs(GEAR_PACKS) do expected[name] = true end
+  for _, ingredient in ipairs(ingredients) do
+    local name = type(ingredient) == "table" and ingredient.name or nil
+    if type(name) ~= "string" or expected[name] ~= true then
+      fail("fixture gear science vector differs: unexpected ingredient")
+    end
+    if seen[name] then fail("fixture gear science vector differs: duplicate ingredient") end
+    if ingredient.amount ~= 1 then fail("fixture gear science vector differs: ingredient amount") end
+    seen[name] = true
+  end
+  for _, name in ipairs(GEAR_PACKS) do
+    if not seen[name] then fail("fixture gear science vector differs: required ingredient is missing") end
+  end
+end
+
 local function gear_definition(force)
   local gear = technology(force, GEAR)
   if gear.level ~= 1 or gear.researched or gear.enabled ~= true
@@ -260,6 +279,7 @@ local function gear_definition(force)
     end
   end
   if matches ~= 1 then fail("native gear effect differs") end
+  assert_gear_science_vector(gear)
   return gear
 end
 
@@ -498,8 +518,8 @@ local function restore_initial_views(state, english, german)
   if force.current_research ~= nil or not exact_queue(force, {}) then
     fail("fresh Library refresh world retained research before the real lab run")
   end
-  seed_gear_prerequisites(force)
   local gear = gear_definition(force)
+  seed_gear_prerequisites(force)
   local lab = surface.create_entity{name="lab", position=force.get_spawn_position(surface), force=force}
   if not valid(lab) then fail("could not create an actual Library refresh laboratory") end
   local inventory = lab.get_inventory(defines.inventory.lab_input)

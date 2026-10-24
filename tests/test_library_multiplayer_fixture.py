@@ -56,12 +56,26 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local key="mir5_library_multiplayer"
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
+            local gear_packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
+            local gear_ingredients={
+              {name=gear_packs[1],amount=1},{name=gear_packs[2],amount=1},
+              {name=gear_packs[3],amount=1},{name=gear_packs[4],amount=1},
+            }
             local players, markers, screenshots, saves, lab_diagnostics = {}, {}, {}, {}, {}
             local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,research_enabled=true}
             for _,name in ipairs({gear,mining}) do
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
                 research_unit_count=1,research_unit_energy=60,
+                research_unit_ingredients=name==gear and gear_ingredients or nil,
                 prototype={effects={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}}}
+            end
+            local ingredients=force.technologies[gear].research_unit_ingredients
+            if opponent=="science-missing" then table.remove(ingredients,4)
+            elseif opponent=="science-duplicate" then ingredients[5]={name=gear_packs[1],amount=1}
+            elseif opponent=="science-extra" then ingredients[5]={name="military-science-pack",amount=1}
+            elseif opponent=="science-wrong-amount" then ingredients[3].amount=2
+            elseif opponent=="science-reordered" then
+              force.technologies[gear].research_unit_ingredients={ingredients[4],ingredients[2],ingredients[1],ingredients[3]}
             end
             for _,name in ipairs({"iron-gear-wheel","burner-mining-drill","electric-mining-drill"}) do
               force.recipes[name]={valid=true,name=name,productivity_bonus=0}
@@ -698,6 +712,27 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertIn("[mir5-library-multiplayer]", result["message"])
                 self.assertIn(message, result["message"])
+
+    def test_fixture_preflights_the_exact_unordered_gear_science_vector(self):
+        source = CONTROL.read_text(encoding="utf-8")
+        self.assertIn("local gear = gear_definition(force)\n  seed_gear_prerequisites(force)", source)
+
+        reordered = self.run_case("science-reordered")
+        self.assertTrue(reordered["ok"], reordered["message"])
+
+        expected = {
+            "science-missing": "required ingredient is missing",
+            "science-duplicate": "duplicate ingredient",
+            "science-extra": "unexpected ingredient",
+            "science-wrong-amount": "ingredient amount",
+        }
+        for opponent, reason in expected.items():
+            with self.subTest(opponent=opponent):
+                result = self.run_case(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn("[mir5-library-multiplayer]", result["message"])
+                self.assertIn("fixture gear science vector differs", result["message"])
+                self.assertIn(reason, result["message"])
 
     def test_initial_native_locales_need_no_synthetic_locale_change_event(self):
         result = self.run_case("unchanged-locales")
