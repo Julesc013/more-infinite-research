@@ -15,6 +15,21 @@ local SPACE_AGE = {
   "promethium-science-pack"
 }
 
+-- The two admitted engine lines use different native promethium gates.
+-- Space Is Fake retains that target-specific owner and recipe while moving
+-- the owner through its finite Nauvis progression. These are source contracts
+-- for one selected pack, not a reconstruction of SIF's technology graph.
+local F200_PROMETHIUM_OWNER_PREREQUISITES = {"biter-egg-handling", "fusion-reactor"}
+local F210_PROMETHIUM_OWNER_PREREQUISITES = {"biter-egg-handling", "stellar-discovery-solar-system-edge"}
+local SIF_F200_PROMETHIUM_OWNER_PREREQUISITES = {
+  "agricultural-science-pack", "metallurgic-science-pack",
+  "electromagnetic-science-pack", "quantum-processor", "fusion-reactor"
+}
+local SIF_F210_PROMETHIUM_OWNER_PREREQUISITES = {
+  "agricultural-science-pack", "metallurgic-science-pack",
+  "electromagnetic-science-pack", "quantum-processor"
+}
+
 local KNOWN_TARGETS = {
   f013 = true, f014 = true, f015 = true, f016 = true, f017 = true,
   f100 = true, f110 = true, f200 = true, f210 = true
@@ -51,6 +66,16 @@ local function copy_list(source)
   local out = {}
   for index, value in ipairs(source or {}) do out[index] = value end
   return out
+end
+
+local function promethium_owner_prerequisites(target, mods)
+  local sif_active = type(mods) == "table" and mods["space-is-fake"] ~= nil
+  if type(target) == "table" and target.id == "f200" then
+    return copy_list(sif_active and SIF_F200_PROMETHIUM_OWNER_PREREQUISITES
+      or F200_PROMETHIUM_OWNER_PREREQUISITES)
+  end
+  return copy_list(sif_active and SIF_F210_PROMETHIUM_OWNER_PREREQUISITES
+    or F210_PROMETHIUM_OWNER_PREREQUISITES)
 end
 
 local function exact_profile(mods, expected)
@@ -220,7 +245,7 @@ local function initial_recipe(pack)
   return {kind = "initial-recipe", pack = pack, recipe = pack}
 end
 
-local function source_contracts(target, has_space_age)
+local function source_contracts(target, has_space_age, mods)
   local out = {}
   local function put(pack, contract) out[pack] = contract end
 
@@ -282,7 +307,7 @@ local function source_contracts(target, has_space_age)
     -- this does not certify the foreign pack's transitive researchability.
     out["cryogenic-science-pack"].owner_unit_alternative = true
     put("promethium-science-pack", recipe_unlock("promethium-science-pack", "promethium-science-pack",
-      {"biter-egg-handling", "stellar-discovery-solar-system-edge"}))
+      promethium_owner_prerequisites(target, mods)))
   end
   return out
 end
@@ -349,7 +374,7 @@ function M.select(target, mods)
       aliases = aliases, official = official, official_roles = official_roles,
       progression = progression(aliases, target, false),
       pack_prerequisites = pack_prerequisites(target, false),
-      source_contracts = source_contracts(target, false),
+      source_contracts = source_contracts(target, false, mods),
       space = "alien-science-pack",
       end_game = {pack = "alien-science-pack", prerequisites = {"alien-technology"}}
     }
@@ -372,7 +397,7 @@ function M.select(target, mods)
     official_roles = official_roles,
     progression = progression(aliases, target, has_space_age),
     pack_prerequisites = pack_prerequisites(target, has_space_age),
-    source_contracts = source_contracts(target, has_space_age),
+    source_contracts = source_contracts(target, has_space_age, mods),
     space = name_for(aliases, "space-science-pack"),
     end_game = nil
   }
