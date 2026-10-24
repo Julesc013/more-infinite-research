@@ -188,7 +188,15 @@
             "spec/mir5/evidence/armor-py-candidate-native-chain.json",
             "spec/mir5/evidence/integration-catalogue-upgrade-adverse-chain.json"
           ],
-          "scope": "The recovered F200 Armor/BobWarfare, PyCoal and PyAlienLife/HighTech contracts preserve broad armor/plating weights and named Py routes. Their complete independent data/settings comparison retains 48 native-credit carrier occurrences as explicit differences and has zero other unresolved deltas. This admits no generic alias/discovery rule or future pack. Physical output and save qualification remain open; the first save chain currently stops on a foreign-enable mismatch whose cause is under investigation."
+          "scope": "The recovered F200 Armor/BobWarfare, PyCoal and PyAlienLife/HighTech contracts preserve broad armor/plating weights and named Py routes. Their complete independent data/settings comparison retains 48 native-credit carrier occurrences as explicit differences and has zero other unresolved deltas. This admits no generic alias/discovery rule or future pack. The original foreign-enable adverse remains preserved; the later named Py source/candidate boundary qualification is recorded separately below. Physical output and final-current-package qualification remain open."
+        },
+        {
+          "id": "py-source-candidate-foreign-owner-gameplay",
+          "evidence": [
+            "spec/evidence/py-coal-full-gameplay-adverse-native-chain.json",
+            "spec/evidence/py-alien-full-gameplay-native-chain.json"
+          ],
+          "scope": "Frozen source377 F200 PyCoal and PyAlienLife/HighTech complete two actual source and two successor labs, preserve54/55 protected rows plus42% queued and27% paused work, and save/cold-reload twice per stage. Coal's failed workflow has a separately reviewed passing offline interpretation from the predeclared actor contract. PyAlien reuses the exact59-member source artifact after its profile-specific finite-log controller rejection, then passes a candidate-only run with54 independently verified members. Both actual actors observe before=true and restore false before configuration observes the published false-to-true reset. These are named boundary results, not attribution of a callback cause, generic foreign restoration, physical product qualification or a current-package rerun."
         }
       ],
       "test_subjects": [

@@ -1,0 +1,156 @@
+{
+  "actor_migration": {
+    "actor": "mir5-integration-foreign-owner",
+    "expected_disabled": true,
+    "force": 5,
+    "observed_after": false,
+    "observed_before": true,
+    "technology": "recipe-prod-research_breeding-1"
+  },
+  "candidate": {
+    "artifact_manifest_sha256": "49029DCD1A9375B46FB34B04E7711D0D3C1DC8A15B7F2E32207330E3A7EF1AFE",
+    "artifact_members_verified": 54,
+    "controller_commit": "463539d25804a1879a2d14206c0c9267c88abdda",
+    "native_stage": {
+      "input_source_save_byte_identical": true,
+      "input_source_save_sha256": "043D74E75454052CD9835BD6479648280BAEF63E9FF9FB54BB9F29A12774A658",
+      "profile_sha256": "9C34B987A895A742DC0BB5F34F86FB681BD4DC7AC5D3F49F36BECD37681FDAFE",
+      "result_sha256": "C605396F95ED66840E1E5A3A5CF9DA9BE0217EFC1605044DA41574079CFE552D",
+      "save_sha256": "3F40D9D726ED6E9E0F0458045DC4A3CE73AF52A876F48A2A3EE6751FF95A8D9D",
+      "status": "passed-private-native-fixture",
+      "two_cold_reload_save_bytes_identical": true,
+      "witnesses": {
+        "continuation": "laser-shooting-speed-8",
+        "finite_log": false,
+        "foreign_disablement_checked": true,
+        "on_load_read_only": false,
+        "paused_progress": 0.27,
+        "primary": "recipe-prod-research_breeding-1",
+        "public_rows": 55,
+        "queued_progress": 0.42000000000000004,
+        "save_name": "mir5-native-complete",
+        "source_labs": 2,
+        "successor_labs": 2
+      }
+    },
+    "player": {
+      "archive_sha256": "9BF94CC7729F61B62E9135784AA0FD2292893A66DEDFFF875614968A8C59317A",
+      "bytes": 545632,
+      "source_commit": "3771b88b2fb835fe116dbe98c5cffe786ed6c57f"
+    },
+    "run": 40107736191,
+    "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40107736191",
+    "source_commit": "3771b88b2fb835fe116dbe98c5cffe786ed6c57f",
+    "workflow_conclusion": "success"
+  },
+  "kind": "MIR5PyAlienFullGameplayNativeChainV1",
+  "limitations": [
+    "This covers only the named F200 PyAlienLife/HighTech force-5 primary recipe-prod-research_breeding-1 and its declared continuation. It is not a full Py modpack claim.",
+    "The source arm is immutable evidence reused from a workflow that remains failed. This record does not claim a source rerun, reclassify its workflow, or combine the two execution identities into a single workflow pass.",
+    "The finite exception is the independently declared actor-owned enabled state. The record assigns no upstream callback cause, adds no generic foreign-state restoration claim, and retains all other catalogue, effects, queue, laboratory, visibility, save, and reload checks.",
+    "No final-current-package, multiplayer, performance, release, or whole-modpack qualification is claimed."
+  ],
+  "portable_raw_capsule": {
+    "compressed_bytes": 295772,
+    "compressed_sha256": "BACE654885BB67454AC50CD24941B327A7A04CC7438C839BB468CF15758188B5",
+    "encoding": "deterministic gzip JSON of raw base64 bytes",
+    "files": 31,
+    "path": "spec/evidence/py-alien-full-gameplay-native-receipts.json.gz",
+    "uncompressed_bytes": 2058516,
+    "uncompressed_sha256": "8CC76A01870EE01738191CE65AAB0DDE5DDF954F55476F5BCDB153112F32D87D"
+  },
+  "post_configuration": {
+    "actor": "mir5-integration-foreign-owner",
+    "actor_migration_log_required": true,
+    "checked_technology_rows": 55,
+    "expected_disabled": true,
+    "force": 5,
+    "post_configuration_enabled": true,
+    "source_enabled": false,
+    "technology": "recipe-prod-research_breeding-1",
+    "visibility": false
+  },
+  "primary_custody": {
+    "candidate_artifact": "build/mir5/recovery-historical/py-full-gameplay/40107736191/black-glass-py-foreign-owner-gameplay-py-alien-reuse-40107736191-1",
+    "retained_source": "build/mir5/recovery-historical/py-full-gameplay/40104185303/black-glass-py-foreign-owner-gameplay-40104185303-1"
+  },
+  "profile": {
+    "candidate_profile_sha256": "9C34B987A895A742DC0BB5F34F86FB681BD4DC7AC5D3F49F36BECD37681FDAFE",
+    "engine": {
+      "base_version": "2.0.77",
+      "file_version": "2.0.77.84539",
+      "path": "D:\\Games\\Factorio\\2.0\\bin\\x64\\factorio.exe",
+      "product_version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "id": "py-alienlife-hightech",
+    "published_mir4_archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+    "source_profile_sha256": "BEBEFAB9F3377E771A5452B840A342ECA69444DB9748BAB6492E70D9E97619F8",
+    "target": "f200"
+  },
+  "retained_adverses": [
+    {
+      "disposition": "Source-stage native fixture evidence is retained, while the complete original workflow remains failed at the source initial-marker reader; candidate did not launch in that workflow.",
+      "run": 40104185303
+    },
+    {
+      "disposition": "Retained strict MIR5 PyCoal adverse.",
+      "run": 40073440776,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40073440776"
+    },
+    {
+      "disposition": "Retained observer-storage-isolation adverse.",
+      "run": 40089321549,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40089321549"
+    },
+    {
+      "disposition": "Retained observer recipe-schema adverse.",
+      "run": 40090561999,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40090561999"
+    }
+  ],
+  "schema": 1,
+  "source": {
+    "artifact_manifest_sha256": "EC92AB53D1E463432A8AC10EAE7F9072C74A210EDC6524981A61DCCF1C5A7BBD",
+    "artifact_members_verified": 59,
+    "controller_commit": "8eadf9d267668aaf66e80efba3c1016c6d55b713",
+    "failure": "[py-foreign-owner-gameplay] fixture witness differs: py-alienlife-hightech/initial",
+    "native_stage": {
+      "profile_sha256": "BEBEFAB9F3377E771A5452B840A342ECA69444DB9748BAB6492E70D9E97619F8",
+      "result_sha256": "6C1D082851DCD333DBFD7B29BFFC985D147CCB502DAB229CF211C311B236040A",
+      "save_sha256": "043D74E75454052CD9835BD6479648280BAEF63E9FF9FB54BB9F29A12774A658",
+      "status": "passed-private-native-fixture",
+      "two_cold_reload_save_bytes_identical": true,
+      "witnesses": {
+        "continuation": "laser-shooting-speed-8",
+        "finite_log": false,
+        "foreign_disablement_checked": true,
+        "on_load_read_only": false,
+        "paused_progress": 0.27,
+        "primary": "recipe-prod-research_breeding-1",
+        "public_rows": 55,
+        "queued_progress": 0.42000000000000004,
+        "save_name": "mir5-native-complete",
+        "source_labs": 2,
+        "successor_labs": 0
+      }
+    },
+    "run": 40104185303,
+    "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40104185303",
+    "source_commit": "3771b88b2fb835fe116dbe98c5cffe786ed6c57f",
+    "source_native_reexecution": false,
+    "workflow_conclusion": "failure"
+  },
+  "status": "candidate-native-gameplay-passed-with-retained-source-workflow-failure",
+  "strict_witnesses": {
+    "candidate_successor_labs": 2,
+    "candidate_two_cold_reloads": true,
+    "checked_technology_rows": 55,
+    "direct_library_controls_restored": true,
+    "finite_log": false,
+    "foreign_disablement_checked": true,
+    "paused_progress": 0.27,
+    "queued_progress": 0.42,
+    "source_labs": 2
+  }
+}
