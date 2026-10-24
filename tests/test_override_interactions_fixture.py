@@ -38,6 +38,7 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         self.lua.globals().control_path = (FIXTURE / "control.lua").as_posix()
         self.lua.globals().settings_path = (FIXTURE / "settings-updates.lua").as_posix()
         self.lua.globals().data_path = (FIXTURE / "data.lua").as_posix()
+        self.lua.globals().pipeline_path = (ROOT / "source/overrides/pipeline_extent.lua").as_posix()
         runner = (ROOT / "tools/Invoke-NativeFixture.ps1").read_text(encoding="utf-8")
         completed_save = re.findall(r"\$complete=Join-Path \$writeData 'saves/([^'/]+)\.zip'", runner)
         self.assertEqual(1, len(completed_save), "native runner must have one completed-save contract")
@@ -62,14 +63,25 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
             local machine = {allowed_effects={"speed", "productivity", "consumption", "pollution", "quality"},
               allowed_module_categories={"mir5-override-module-category", "speed"},
               module_slots=2, crafting_speed=1, energy_usage="1W", effect_receiver=receiver}
-            local pipeline = {fluid_boxes={{max_pipeline_extent=480}, {max_pipeline_extent=480}}}
+            local utility = {default_pipeline_extent=640}
+            local pipeline = {fluid_boxes={{max_pipeline_extent=960}, {max_pipeline_extent=480}}}
+            if opponent == "production-pipeline" then
+              pipeline.fluid_boxes={{}, {max_pipeline_extent=320}}
+            end
             if opponent == "ordinary-cap" then ordinary.maximum_productivity=.5 end
             if opponent == "recycling-field" then recycled.results[1].probability=.2; recycled.results[1].independent_probability=nil end
             if opponent == "parameter" then parameter.allow_productivity=true end
             if opponent == "receiver" then receiver.speed_limits.high=3 end
             if opponent == "pipeline" then pipeline.fluid_boxes[2].max_pipeline_extent=320 end
+            if opponent == "pipeline-implicit" then pipeline.fluid_boxes[1].max_pipeline_extent=480 end
+            if opponent == "pipeline-swapped" then
+              pipeline.fluid_boxes[1].max_pipeline_extent=480
+              pipeline.fluid_boxes[2].max_pipeline_extent=960
+            end
+            if opponent == "pipeline-default" then utility.default_pipeline_extent=320 end
             if opponent == "power" then machine.energy_usage="0kW" end
             local env = {data={raw={
+              ["utility-constants"]={default=utility},
               ["module-category"]=categories,
               module={fixture={category="mir5-override-module-category"}},
               recipe={["mir5-override-ordinary"]=ordinary, ["mir5-override-recycling"]=recycled,
@@ -77,6 +89,9 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
               ["assembling-machine"]={["mir5-override-assembler"]=machine,
                 ["mir5-override-pipeline"]=pipeline}
             }}, log=function() end}
+            if opponent == "production-pipeline" then
+              assert(assert(loadfile(pipeline_path))().apply(env.data.raw, "150") == 2)
+            end
             setmetatable(env, {__index=_G})
             local chunk, message = loadfile(stage_path, "t", env)
             assert(chunk, message)
@@ -166,6 +181,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         result = self.lua.globals().stage_fixture("pass")
         self.assertTrue(result[0] if isinstance(result, tuple) else result)
 
+    def test_real_pipeline_override_meets_the_independent_native_stage_oracle(self):
+        result = self.lua.globals().stage_fixture("production-pipeline")
+        self.assertTrue(result[0] if isinstance(result, tuple) else result)
+
     def test_data_constructor_uses_f210_native_recipe_category_schema(self):
         self.lua.execute(r'''
           local function clone(value)
@@ -181,6 +200,7 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
               ["parameter-0"]={type="recipe", parameter=true},
             },
             module={["productivity-module-3"]={type="module"}},
+            ["utility-constants"]={default={default_pipeline_extent=320,foreign="keep"}},
             ["assembling-machine"]={
               ["assembling-machine-1"]={type="assembling-machine"},
               ["chemical-plant"]={type="assembling-machine",fluid_boxes={{},{}}},
@@ -203,10 +223,16 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
           assert(#recycled.categories == 1 and recycled.categories[1] == "recycling")
           assert(recycled.maximum_productivity == .5)
           assert(recycled.results[1].probability == .25)
+          local pipeline = assert(emitted["mir5-override-pipeline"])
+          assert(#pipeline.fluid_boxes == 2 and pipeline.fluid_boxes[1].max_pipeline_extent == nil)
+          assert(pipeline.fluid_boxes[2].max_pipeline_extent == 320)
+          local utility = env.data.raw["utility-constants"].default
+          assert(utility.default_pipeline_extent == 640 and utility.foreign == "keep")
         ''')
 
     def test_data_stage_rejects_each_exact_native_only_witness_difference(self):
-        for opponent in ("ordinary-cap", "recycling-field", "parameter", "receiver", "pipeline", "power"):
+        for opponent in ("ordinary-cap", "recycling-field", "parameter", "receiver", "pipeline", "pipeline-implicit",
+                         "pipeline-swapped", "pipeline-default", "power"):
             with self.subTest(opponent=opponent):
                 result = self.lua.globals().stage_fixture(opponent)
                 self.assertFalse(result[0] if isinstance(result, tuple) else result)

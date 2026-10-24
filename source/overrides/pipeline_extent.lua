@@ -20,15 +20,20 @@ end
 function M.apply(raw, value)
   local multiplier = M.multiplier(value)
   if multiplier == 1 then return 0 end
+  if type(raw) ~= "table" then return 0 end
+  -- Omitted box extents inherit this native constant, which another mod may
+  -- change. Preserve explicit extents and leave the constant itself alone.
+  local utilities = raw["utility-constants"]
+  local defaults = type(utilities) == "table" and utilities.default
+  local default_extent = type(defaults) == "table" and tonumber(defaults.default_pipeline_extent) or DEFAULT_EXTENT
   local nodes, boxes, count = {}, {}, 0
   local function apply_box(box)
     if type(box) ~= "table" or boxes[box] then return end
     boxes[box] = true
-    local extent = tonumber(box.max_pipeline_extent) or DEFAULT_EXTENT
+    local extent = tonumber(box.max_pipeline_extent) or default_extent
     box.max_pipeline_extent = math.max(1, math.min(MAX_EXTENT, math.floor(extent * multiplier + 0.5)))
     count = count + 1
   end
-  if type(raw) ~= "table" then return 0 end
   local pending = {raw}
   nodes[raw] = true
   while #pending > 0 do
