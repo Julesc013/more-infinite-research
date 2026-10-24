@@ -51,14 +51,17 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
             local players, markers, screenshots, saves = {}, {}, {}, {}
-            local force={valid=true,index=1,technologies={},recipes={},research_queue={},research_progress=.42}
+            local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0}
             for _,name in ipairs({gear,mining}) do
-              force.technologies[name]={valid=true,name=name,level=1,researched=false,enabled=true,visible_when_disabled=false}
+              force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
+                research_unit_count=1,research_unit_energy=60,
+                prototype={effects={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}}}
             end
-            force.research_queue={force.technologies[gear]}
-            force.current_research=force.technologies[gear]
             for _,name in ipairs({"iron-gear-wheel","burner-mining-drill","electric-mining-drill"}) do
               force.recipes[name]={valid=true,name=name,productivity_bonus=0}
+            end
+            for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
+              force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false}
             end
             local function player(index, locale)
               local value={valid=true,index=index,name=index==1 and "MIR5English" or "MIR5Deutsch",locale=locale,connected=false,force=force,gui={screen={valid=true,type="screen"}}}
@@ -70,7 +73,52 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local callbacks={events={}}
             local next_profiler=0
             local game={forces={player=force},surfaces={[1]={valid=true,index=1}},tick=0}
+            local function fire(name,event)
+              local callback=callbacks.events[name]
+              if callback then
+                local ok,message=pcall(callback,event)
+                if not ok then error(message,0) end
+              end
+            end
+            force.add_research=function(technology)
+              if opponent=="missing-queue" and #force.research_queue>=1 then return true end
+              force.research_queue[#force.research_queue+1]=technology
+              if force.current_research==nil then
+                force.current_research=technology
+                fire(4,{research=technology})
+              end
+              return true
+            end
+            force.cancel_current_research=function()
+              local cancelled=force.current_research
+              force.current_research=nil;force.research_queue={};force.research_progress=0
+              fire(7,{force=force,research={[gear]=cancelled and 1 or 0}})
+            end
             game.get_player=function(index) return players[index] end
+            force.get_spawn_position=function(surface) return {0,0} end
+            local inventory={counts={}}
+            inventory.insert=function(spec)
+              inventory.counts[spec.name]=(inventory.counts[spec.name] or 0)+spec.count
+              return spec.count
+            end
+            inventory.get_item_count=function(name) return inventory.counts[name] or 0 end
+            local lab={valid=true,energy=0}
+            lab.get_inventory=function(index) assert(index==1);return inventory end
+            game.surfaces[1].create_entity=function(spec)
+              assert(spec.name=="lab" and spec.force==force)
+              return lab
+            end
+            game.create_force=function(name)
+              local foreign={valid=true,index=2,name=name,technologies={},recipes={},research_queue={},research_progress=0}
+              for _,tech_name in ipairs({gear,mining}) do
+                foreign.technologies[tech_name]={valid=true,name=tech_name,force=foreign,level=1,researched=false,enabled=true,
+                  visible_when_disabled=false}
+              end
+              foreign.recipes["iron-gear-wheel"]={valid=true,name="iron-gear-wheel",productivity_bonus=0}
+              fire(8,{force=opponent=="wrong-force-event" and force or foreign})
+              if opponent=="foreign-force-gui" then en.gui.screen[ROOT_NAME]={valid=true,type="frame",visible=true} end
+              return foreign
+            end
             game.create_profiler=function(stopped)
               next_profiler=next_profiler+1
               local result={valid=true,stopped=stopped,ordinal=next_profiler}
@@ -131,8 +179,35 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local detail=element("flow",DETAIL)
               detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
               detail[DETAIL_TITLE].caption=options.selected
+              local context=element("flow","mir_library_detail_context")
+              detail["mir_library_detail_context"]=context
+              context["mir_library_context_status"]=element("label","mir_library_context_status")
+              detail["mir_library_detail_level"]=element("label","mir_library_detail_level")
               content[DETAIL]=detail
               target.gui.screen[ROOT_NAME]=root
+            end
+            local function refresh_mock_gui(client)
+              local root=client.gui.screen[ROOT_NAME]
+              local filters=root and root[FILTERS]
+              local query=filters and filters[QUERY]
+              local tabs=root and root[TABS]
+              local content=tabs and tabs[CONTENT]
+              local detail=content and content[DETAIL]
+              if not (root and query and detail) or query.text~=gear then return end
+              local context=detail["mir_library_detail_context"]
+              local queued=#force.research_queue
+              local current=force.current_research~=nil
+              context["mir_library_context_status"].caption={"mir-browser.context-status",{current or queued>0 and "mir-browser.status-queued" or "mir-browser.status-ready"}}
+              context["mir_library_context_current"]=current and element("label","mir_library_context_current") or nil
+              context["mir_library_context_queued"]=(not current and queued>0) and element("label","mir_library_context_queued") or nil
+              context["mir_library_context_not_queued"]=queued==0 and element("label","mir_library_context_not_queued") or nil
+              context["mir_library_context_queue_count"]=queued>0 and element("label","mir_library_context_queue_count") or nil
+              context["mir_library_context_queue_position"]=queued>0 and element("label","mir_library_context_queue_position") or nil
+              if queued>0 then
+                context["mir_library_context_queue_count"].caption={"mir-browser.context-queue-count",queued}
+                context["mir_library_context_queue_position"].caption={"mir-browser.context-queue-position",1}
+              end
+              detail["mir_library_detail_level"].caption={"mir-browser.level",force.technologies[gear].level}
             end
             local remote={interfaces={["more-infinite-research-browser"]={open=true}}}
             remote.call=function(interface, method, index, options)
@@ -140,18 +215,35 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               local client=players[index]
               assert(client and client.connected==true)
               build_gui(client,options)
+              refresh_mock_gui(client)
               if opponent=="gameplay-mutation" then force.recipes["iron-gear-wheel"].productivity_bonus=.1 end
               if opponent=="native-witness-overwritten" then
-                local witness=storage[key] and storage[key].native
+                local witness=storage[key] and storage[key].native_initial
                 if witness then witness.recipes["iron-gear-wheel"]=.1 end
               end
               return true
+            end
+            local function complete_mock_lab()
+              local current=force.current_research
+              if not current then return end
+              if opponent~="no-lab-consumption" then
+                for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
+                  inventory.counts[name]=inventory.counts[name]-1
+                end
+              end
+              table.remove(force.research_queue,1)
+              current.level=current.level+1
+              force.recipes["iron-gear-wheel"].productivity_bonus=force.recipes["iron-gear-wheel"].productivity_bonus+.1
+              force.current_research=force.research_queue[1]
+              fire(6,{research=current,by_script=opponent=="script-completion"})
+              if force.current_research then fire(4,{research=force.current_research,last_research=current}) end
             end
             local environment={
               script={active_mods={base="2.0.77",["more-infinite-research"]="5.0.20000",["mir-fixture-mir5-library-multiplayer"]="0.1.0",["mir-fixture-mir5-active-mods-observer"]="0.1.0"},
                 on_init=function(callback)callbacks.init=callback end,on_load=function(callback)callbacks.load=callback end,
                 on_event=function(event,callback)callbacks.events[event]=callback end},
-              defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3}},
+              defines={events={on_tick=1,on_player_joined_game=2,on_player_locale_changed=3,on_research_started=4,
+                on_research_finished=6,on_research_cancelled=7,on_force_created=8},inventory={lab_input=1}},
               game=game,storage=storage,remote=remote,
               helpers={table_to_json=function(value)markers[#markers+1]=value;return "{}" end},
               log=function(value)assert(value:match("^%[MIR5_LIBRARY_MULTIPLAYER%] RESULT ")
@@ -191,7 +283,18 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if storage[key].phase~="capturing-availability" then return {ok=false,message="Availability view restored before render grace"} end
             game.tick=game.tick+1
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
-            if storage[key].phase~="awaiting-rejoin" then return {ok=false,message="initial client phase did not await an actual rejoin"} end
+            local live_ready=false
+            for step=1,32 do
+              game.tick=game.tick+1
+              if storage[key].phase=="researching-live-research" and force.current_research
+                  and (storage[key].finished==0 or (storage[key].finished==1 and storage[key].first_completion_seen)) then
+                ok,result=pcall(complete_mock_lab);if not ok then return {ok=false,message=tostring(result)} end
+              end
+              refresh_mock_gui(en);refresh_mock_gui(de)
+              ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+              if storage[key].phase=="awaiting-rejoin" then live_ready=true;break end
+            end
+            if not live_ready then return {ok=false,message="actual Library refresh did not reach rejoin state"} end
             en.connected,de.connected=false,false
             ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
             en.connected,de.connected=true,true
@@ -263,6 +366,20 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(completed["availability_terminal_labels_checked"])
         self.assertEqual(completed["screenshot_calls"], 8)
         self.assertEqual(result["saves"], ["mir5-library-multiplayer-restart", "mir5-native-complete"])
+        live_refresh = completed["live_refresh"]
+        self.assertEqual(live_refresh["real_lab_completions"], 2)
+        self.assertFalse(live_refresh["native_laboratory_completion_by_script"])
+        self.assertGreaterEqual(live_refresh["native_research_started_events"], 2)
+        self.assertEqual(live_refresh["queue_lengths_observed"], [2, 1, 0])
+        self.assertEqual(live_refresh["native_research_cancelled_events"], 1)
+        self.assertEqual(live_refresh["native_foreign_force_created_events"], 1)
+        self.assertEqual(live_refresh["gear_level"], 3)
+        self.assertAlmostEqual(live_refresh["gear_productivity"], .2)
+        self.assertEqual(live_refresh["science_consumed_per_named_pack"], 2)
+        self.assertTrue(live_refresh["fixture_accelerates_gear_count_and_time_only"])
+        self.assertFalse(live_refresh["ordinary_tuning_qualified"])
+        self.assertTrue(live_refresh["root_and_query_identity_preserved"])
+        self.assertTrue(live_refresh["cross_force_view_state_preserved"])
         self.assertEqual(set(result["measurements"]), {"first_open", "search", "refresh", "reopen"})
         self.assertTrue(all(isinstance(value, str) and value.startswith("mock-profiler-") for value in result["measurements"].values()))
         self.assertEqual(len(result["screenshots"]), 8)
@@ -290,7 +407,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             "locale": "actual en/de locales",
             "view-crosspollution": "Availability browser GUI tree is incomplete",
             "gameplay-mutation": "mutated native research, queue, or recipe effects",
-            "native-witness-overwritten": "stored native witness was overwritten",
+            "native-witness-overwritten": "stored initial native witness was overwritten",
+            "missing-queue": "native Library refresh queue differs before laboratory progress",
+            "script-completion": "actual Library laboratory completion callback differs",
+            "no-lab-consumption": "actual Library refresh lab science consumption differs",
+            "wrong-force-event": "native foreign-force callback differs",
+            "foreign-force-gui": "native public browser GUI tree is incomplete",
             "missing-availability-label": "Availability terminal label differs",
             "extra-availability-label": "Availability terminal label count differs",
         }
@@ -316,12 +438,81 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertIn('"research_spoilage_preservation"', source)
         self.assertIn("on_player_locale_changed", source)
         self.assertIn("on_player_joined_game", source)
+        self.assertIn("force.add_research(gear)", source)
+        self.assertIn("force.cancel_current_research()", source)
+        self.assertIn("on_research_started", source)
+        self.assertIn("queue_lengths_observed", source)
+        self.assertIn("on_research_finished", source)
+        self.assertIn("on_research_cancelled", source)
+        self.assertIn("on_force_created", source)
+        self.assertIn("event.by_script ~= false", source)
+        self.assertIn("state.native_initial_guard", source)
+        self.assertIn("state.native_after_lab", source)
         self.assertIn("game.create_profiler(true)", source)
         self.assertIn("rendering_pending_external_png_readback=true", source)
         self.assertNotIn("game.create_player", source)
         self.assertNotIn("require(", source)
         self.assertNotIn("storage.mir_library", source)
+        self.assertNotIn("script.raise_event", source)
         self.assertNotIn("research_queue_enabled", source)
+
+    def test_live_refresh_acceleration_is_fixture_owned_and_limited(self):
+        updates_path = (FIXTURE / "settings-updates.lua").as_posix()
+        updates = Path(updates_path).read_text(encoding="utf-8")
+        self.assertIn('"ips-cost-base-research_gears"', updates)
+        self.assertIn('"ips-cost-linear-increment-research_gears"', updates)
+        self.assertIn('"ips-cost-growth-research_gears"', updates)
+        self.assertIn('"ips-research-time-research_gears"', updates)
+        self.assertNotIn("require(", updates)
+        self.lua.globals().updates_path = updates_path
+        values = plain(self.lua.execute(r"""
+          data = {raw={
+            ["int-setting"]={
+              ["ips-cost-base-research_gears"]={setting_type="startup",default_value=8000},
+              ["ips-cost-linear-increment-research_gears"]={setting_type="startup",default_value=0},
+              ["ips-research-time-research_gears"]={setting_type="startup",default_value=60},
+            },
+            ["double-setting"]={
+              ["ips-cost-growth-research_gears"]={setting_type="startup",default_value=2},
+            }
+          }}
+          assert(loadfile(updates_path))()
+          return {
+            base=data.raw["int-setting"]["ips-cost-base-research_gears"].default_value,
+            increment=data.raw["int-setting"]["ips-cost-linear-increment-research_gears"].default_value,
+            growth=data.raw["double-setting"]["ips-cost-growth-research_gears"].default_value,
+            time=data.raw["int-setting"]["ips-research-time-research_gears"].default_value,
+          }
+        """))
+        self.assertEqual(values, {"base": 1, "increment": 0, "growth": 1, "time": 1})
+        wrong_default = plain(self.lua.execute(r"""
+          data = {raw={
+            ["int-setting"]={
+              ["ips-cost-base-research_gears"]={setting_type="startup",default_value=7999},
+              ["ips-cost-linear-increment-research_gears"]={setting_type="startup",default_value=0},
+              ["ips-research-time-research_gears"]={setting_type="startup",default_value=60},
+            },
+            ["double-setting"]={
+              ["ips-cost-growth-research_gears"]={setting_type="startup",default_value=2},
+            }
+          }}
+          local ok, message = pcall(function() assert(loadfile(updates_path))() end)
+          return {ok=ok, message=tostring(message), defaults={
+            base=data.raw["int-setting"]["ips-cost-base-research_gears"].default_value,
+            increment=data.raw["int-setting"]["ips-cost-linear-increment-research_gears"].default_value,
+            growth=data.raw["double-setting"]["ips-cost-growth-research_gears"].default_value,
+            time=data.raw["int-setting"]["ips-research-time-research_gears"].default_value,
+          }}
+        """))
+        self.assertFalse(wrong_default["ok"])
+        self.assertIn("unexpected Library refresh fixture setting ips-cost-base-research_gears", wrong_default["message"])
+        self.assertEqual(wrong_default["defaults"], {"base": 7999, "increment": 0, "growth": 2, "time": 60})
+        missing = self.lua.execute(r"""
+          data = {raw={ ["int-setting"]={}, ["double-setting"]={} }}
+          return pcall(function() assert(loadfile(updates_path))() end)
+        """)
+        self.assertFalse(missing[0])
+        self.assertIn("unexpected Library refresh fixture setting", missing[1])
 
     def test_native_session_requires_eight_client_local_captures(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")

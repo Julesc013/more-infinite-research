@@ -26,6 +26,15 @@ local GEAR = "recipe-prod-research_gears-1"
 local MINING = "recipe-prod-research_mining_drill-1"
 local TECHNOLOGIES = {GEAR, MINING}
 local RECIPES = {"iron-gear-wheel", "burner-mining-drill", "electric-mining-drill"}
+local GEAR_PACKS = {
+  "automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack",
+}
+local GEAR_EFFECT = .10
+local GEAR_LEVEL_AFTER_TWO_LABS = 3
+local LAB_PACKS = 2
+local LAB_ENERGY = 100000000
+local LIVE_DEADLINE_TICKS = 3600
+local FOREIGN_FORCE = "mir5-library-multiplayer-foreign"
 local VIEWS = {
   en = {query=GEAR, selected=GEAR, sort="progression", sort_index=1},
   de = {query=MINING, selected=MINING, sort="native", sort_index=2},
@@ -105,7 +114,12 @@ local function same_snapshot(left, right)
 end
 
 local function assert_native(state, force)
-  if not same_snapshot(state.native_initial, state.native) then fail("stored native witness was overwritten") end
+  if not same_snapshot(state.native_initial, state.native_initial_guard) then
+    fail("stored initial native witness was overwritten")
+  end
+  if state.native_after_lab and not same_snapshot(state.native_after_lab, state.native) then
+    fail("stored post-lab native witness was overwritten")
+  end
   if force.index ~= state.force_index then fail("client force differs from disposable world force") end
   if not same_snapshot(native_snapshot(force), state.native) then
     fail("public Library browsing mutated native research, queue, or recipe effects")
@@ -143,7 +157,7 @@ local function frame_parts(player)
       or not valid(detail) or not valid(detail[DETAIL_TITLE]) then
     fail("native public browser GUI tree is incomplete")
   end
-  return root, query, sort, results
+  return root, query, sort, results, detail
 end
 
 local function assert_view(player, locale)
@@ -162,6 +176,117 @@ local function assert_personal_views(english, german)
   if en_root == de_root or en_query == de_query or en_query.text == de_query.text then
     fail("two clients share a browser root or query")
   end
+end
+
+-- LuaObjects remain process-local evidence only. The durable fixture state
+-- keeps scalar/native witnesses, never GUI objects or MIR-owned state.
+local live_views = {}
+
+local function localized_number(caption, key, value)
+  return type(caption) == "table" and caption[1] == key and caption[2] == value
+end
+
+local function live_detail(player, retained, expected)
+  local root, query, _, _, detail = frame_parts(player)
+  if root ~= retained.root or query ~= retained.query then
+    fail("native Library refresh replaced the owned root or query")
+  end
+  local context = detail["mir_library_detail_context"]
+  if not valid(context) then fail("native Library refresh removed the detail context") end
+  local level = detail["mir_library_detail_level"]
+  if not valid(level) or not localized_number(level.caption, "mir-browser.level", expected.level) then
+    fail("native Library refresh level differs")
+  end
+  local current, queued = context["mir_library_context_current"], context["mir_library_context_queued"]
+  if expected.current and not valid(current) then fail("native Library refresh lost current research context") end
+  if not expected.current and valid(current) then fail("native Library refresh retained stale current research context") end
+  if expected.current and valid(queued) then fail("native Library refresh mixed current and queued context") end
+  if not expected.current and expected.count > 0 and not valid(queued) then
+    fail("native Library refresh lost queued research context")
+  end
+  if expected.count == 0 then
+    if valid(context["mir_library_context_queue_count"]) or valid(context["mir_library_context_queue_position"])
+        or not valid(context["mir_library_context_not_queued"]) then
+      fail("native Library refresh retained stale queue labels")
+    end
+  else
+    local count, position = context["mir_library_context_queue_count"], context["mir_library_context_queue_position"]
+    if not valid(count) or not localized_number(count.caption, "mir-browser.context-queue-count", expected.count)
+        or not valid(position) or not localized_number(position.caption, "mir-browser.context-queue-position", 1) then
+      fail("native Library refresh queue facts differ")
+    end
+  end
+end
+
+local function remember_live_views(english, german)
+  local en_root, en_query = assert_view(english, "en")
+  local de_root, de_query = assert_view(german, "de")
+  live_views[english.index] = {root=en_root, query=en_query}
+  live_views[german.index] = {root=de_root, query=de_query}
+end
+
+local function technology(force, name)
+  local value = force and force.technologies and force.technologies[name]
+  if not valid(value) then fail("required native technology is absent: " .. tostring(name)) end
+  return value
+end
+
+local function exact_queue(force, expected)
+  local queue = copy_queue(force)
+  if #queue ~= #expected then return false end
+  for index, name in ipairs(expected) do if queue[index] ~= name then return false end end
+  return true
+end
+
+local function gear_definition(force)
+  local gear = technology(force, GEAR)
+  if gear.level ~= 1 or gear.researched or gear.enabled ~= true
+      or gear.research_unit_count ~= 1 or gear.research_unit_energy ~= 60 then
+    fail("fixture gear acceleration or native initial state differs")
+  end
+  local effects, matches = gear.prototype and gear.prototype.effects or {}, 0
+  for _, effect in ipairs(effects) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == "iron-gear-wheel"
+        and close(effect.change, GEAR_EFFECT) then
+      matches = matches + 1
+    end
+  end
+  if matches ~= 1 then fail("native gear effect differs") end
+  return gear
+end
+
+local function seed_gear_prerequisites(force)
+  for _, name in ipairs(GEAR_PACKS) do
+    local prerequisite = technology(force, name)
+    prerequisite.researched = true
+  end
+end
+
+local function research_inventory(state)
+  if not valid(state.lab) then fail("actual Library refresh lab is absent") end
+  local inventory = state.lab.get_inventory(defines.inventory.lab_input)
+  if not inventory then fail("actual Library refresh lab input is absent") end
+  return inventory
+end
+
+local function assert_lab_consumption(state)
+  local inventory = research_inventory(state)
+  for _, name in ipairs(GEAR_PACKS) do
+    if inventory.get_item_count(name) ~= 0 then
+      fail("actual Library refresh lab science consumption differs: " .. name)
+    end
+  end
+end
+
+local function assert_completed_gear(state, force)
+  local gear = technology(force, GEAR)
+  if state.finished ~= 2 or state.started < 2
+      or gear.level ~= GEAR_LEVEL_AFTER_TWO_LABS or gear.researched
+      or force.current_research ~= nil or not exact_queue(force, {})
+      or not close(force.recipes["iron-gear-wheel"].productivity_bonus, 2 * GEAR_EFFECT) then
+    fail("actual Library refresh research/queue state differs")
+  end
+  assert_lab_consumption(state)
 end
 
 local function localized_key(value)
@@ -231,7 +356,22 @@ local function marker(stage, state)
       two_connected_clients_required=true,
       locales_required={"en", "de"},
       distinct_personal_query_and_selection=true,
-      native_research_queue_and_effects_unchanged=true,
+      initial_native_snapshot_immutable=true,
+      live_refresh={
+        real_lab_completions=state.finished,
+        native_laboratory_completion_by_script=false,
+        native_research_started_events=state.started,
+        queue_lengths_observed={state.queue_before_lab, state.queue_after_first, state.queue_after_labs},
+        native_research_cancelled_events=state.cancelled,
+        native_foreign_force_created_events=state.force_created,
+        gear_level=state.native and state.native.technologies[GEAR].level,
+        gear_productivity=state.native and state.native.recipes["iron-gear-wheel"],
+        science_consumed_per_named_pack=LAB_PACKS,
+        fixture_accelerates_gear_count_and_time_only=true,
+        ordinary_tuning_qualified=false,
+        root_and_query_identity_preserved=true,
+        cross_force_view_state_preserved=true,
+      },
       availability_terminal_labels_checked=state.availability_checked == true,
       host_restart_observed=stage == "completed",
       on_load_read_only=stage == "completed",
@@ -313,6 +453,107 @@ local function restore_initial_views(state, english, german)
   measure(state, "refresh", function() open(english, VIEWS.en) end)
   assert_personal_views(english, german)
   assert_native(state, english.force)
+  remember_live_views(english, german)
+
+  local force, surface = english.force, game.surfaces[1]
+  if force.current_research ~= nil or not exact_queue(force, {}) then
+    fail("fresh Library refresh world retained research before the real lab run")
+  end
+  seed_gear_prerequisites(force)
+  local gear = gear_definition(force)
+  local lab = surface.create_entity{name="lab", position=force.get_spawn_position(surface), force=force}
+  if not valid(lab) then fail("could not create an actual Library refresh laboratory") end
+  local inventory = lab.get_inventory(defines.inventory.lab_input)
+  if not inventory then fail("actual Library refresh lab input is absent") end
+  for _, name in ipairs(GEAR_PACKS) do
+    if inventory.insert{name=name, count=LAB_PACKS} ~= LAB_PACKS then
+      fail("actual Library refresh laboratory rejected " .. name)
+    end
+  end
+  lab.energy = LAB_ENERGY
+  state.lab, state.finished, state.started, state.cancelled, state.force_created = lab, 0, 0, 0, 0
+  state.live_english_index, state.live_german_index = english.index, german.index
+  state.live_deadline = game.tick + LIVE_DEADLINE_TICKS
+  state.phase = "queueing-live-research"
+  if force.add_research(gear) ~= true or force.add_research(gear) ~= true
+      or not exact_queue(force, {GEAR, GEAR}) or named(force.current_research) ~= GEAR then
+    fail("native Library refresh queue differs before laboratory progress")
+  end
+  state.queue_before_lab = #copy_queue(force)
+  state.refresh_after_tick = game.tick + 2
+end
+
+local function live_players(state)
+  local english, german = game.get_player(state.live_english_index), game.get_player(state.live_german_index)
+  if not valid(english) or not valid(german) or not english.connected or not german.connected then
+    fail("live Library refresh lost an owned connected view")
+  end
+  return english, german
+end
+
+local function assert_live_queue_view(state, level, count, current)
+  local english, german = live_players(state)
+  live_detail(english, live_views[english.index], {level=level, count=count, current=current})
+  local german_root, german_query = assert_view(german, "de")
+  local retained = live_views[german.index]
+  if german_root ~= retained.root or german_query ~= retained.query then
+    fail("native Library refresh replaced the second owned root or query")
+  end
+  assert_personal_views(english, german)
+end
+
+local function begin_native_cancellation(state)
+  local force, gear = game.forces.player, technology(game.forces.player, GEAR)
+  state.phase = "cancelling-live-research"
+  if force.add_research(gear) ~= true or not exact_queue(force, {GEAR}) or named(force.current_research) ~= GEAR then
+    fail("native Library cancellation did not start a bounded third queue entry")
+  end
+  force.cancel_current_research()
+  if state.cancelled ~= 1 or force.current_research ~= nil or not exact_queue(force, {}) then
+    fail("native Library cancellation event or queue cleanup differs")
+  end
+end
+
+local function complete_live_refresh(state)
+  local force = game.forces.player
+  assert_completed_gear(state, force)
+  assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
+  state.queue_after_labs = #copy_queue(force)
+  if state.queue_after_first ~= 1 or state.queue_after_labs ~= 0 then
+    fail("native Library queue state differs after laboratory progress")
+  end
+  state.native = native_snapshot(force)
+  state.native_after_lab = copy_snapshot(state.native)
+  begin_native_cancellation(state)
+end
+
+local function complete_cancellation_refresh(state)
+  local force = game.forces.player
+  if state.cancelled ~= 1 then fail("native Library cancellation callback differs") end
+  assert_completed_gear(state, force)
+  assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
+  state.phase = "creating-foreign-force"
+  state.foreign = game.create_force(FOREIGN_FORCE)
+  if not valid(state.foreign) or state.force_created ~= 1 then
+    fail("native foreign force creation event differs")
+  end
+  state.phase = "awaiting-foreign-force-refresh"
+  state.refresh_after_tick = game.tick + 2
+end
+
+local function complete_foreign_force_refresh(state)
+  local force = game.forces.player
+  if state.foreign == force or state.foreign.name ~= FOREIGN_FORCE then
+    fail("native foreign force identity differs")
+  end
+  local foreign_gear = technology(state.foreign, GEAR)
+  if foreign_gear.level ~= 1 or foreign_gear.researched
+      or not close(state.foreign.recipes["iron-gear-wheel"].productivity_bonus, 0) then
+    fail("foreign force inherited player Library research state")
+  end
+  assert_completed_gear(state, force)
+  assert_live_queue_view(state, GEAR_LEVEL_AFTER_TWO_LABS, 0, false)
+  local english, german = live_players(state)
   screenshot(state, "initial", english)
   screenshot(state, "initial", german)
   state.phase = "awaiting-rejoin"
@@ -366,7 +607,7 @@ script.on_init(function()
   local native = native_snapshot(force)
   storage[KEY] = {
     phase="waiting-initial-clients", world={force_index=force.index, surface_index=surface.index}, force_index=force.index,
-    native=native, native_initial=copy_snapshot(native), clients={}, join_events=0,
+    native=native, native_initial=copy_snapshot(native), native_initial_guard=copy_snapshot(native), clients={}, join_events=0,
     screenshot_calls=0, measurements={}, availability_checked=false
   }
   marker("ready", storage[KEY])
@@ -409,6 +650,51 @@ script.on_event(defines.events.on_player_locale_changed, function(event)
   record.locale_events = record.locale_events + 1
 end)
 
+script.on_event(defines.events.on_research_started, function(event)
+  local state = storage[KEY]
+  if not state or (state.phase ~= "queueing-live-research" and state.phase ~= "researching-live-research"
+      and state.phase ~= "cancelling-live-research") then return end
+  local research = event and event.research
+  if not valid(research) or research.name ~= GEAR or research.force ~= game.forces.player then
+    fail("native Library research-start callback differs")
+  end
+  state.started = state.started + 1
+end)
+
+script.on_event(defines.events.on_research_finished, function(event)
+  local state = storage[KEY]
+  if not state or state.phase ~= "researching-live-research" then return end
+  local research = event and event.research
+  if not valid(research) or research.name ~= GEAR or research.force ~= game.forces.player or event.by_script ~= false then
+    fail("actual Library laboratory completion callback differs")
+  end
+  state.finished = state.finished + 1
+  if state.finished > 2 then fail("Library refresh lab completed an unexpected third level") end
+  state.refresh_after_tick = game.tick + 2
+end)
+
+script.on_event(defines.events.on_research_cancelled, function(event)
+  local state = storage[KEY]
+  if not state or state.phase ~= "cancelling-live-research" then return end
+  if event.force ~= game.forces.player or type(event.research) ~= "table" or event.research[GEAR] ~= 1 then
+    fail("native Library cancellation callback differs")
+  end
+  state.cancelled = state.cancelled + 1
+  if state.cancelled > 1 then fail("Library refresh cancellation callback duplicated") end
+  state.refresh_after_tick = game.tick + 2
+end)
+
+script.on_event(defines.events.on_force_created, function(event)
+  local state = storage[KEY]
+  if not state or state.phase ~= "creating-foreign-force" then return end
+  local force = event and event.force
+  if not valid(force) or force.name ~= FOREIGN_FORCE or force == game.forces.player then
+    fail("native foreign-force callback differs")
+  end
+  state.force_created = state.force_created + 1
+  if state.force_created > 1 then fail("native foreign-force callback duplicated") end
+end)
+
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("multiplayer fixture state is absent") end
@@ -424,6 +710,38 @@ script.on_event(defines.events.on_tick, function()
       state.capture_after_tick = nil
       restore_initial_views(state, english, german)
     end
+  elseif state.phase == "queueing-live-research" then
+    if game.tick >= state.live_deadline then fail("native Library refresh queue did not settle") end
+    if game.tick >= (state.refresh_after_tick or game.tick) then
+      if state.started < 1 or state.queue_before_lab ~= 2 then
+        fail("native Library queue state or research-start callback differs")
+      end
+      assert_live_queue_view(state, 1, 2, true)
+      state.phase = "researching-live-research"
+    end
+  elseif state.phase == "researching-live-research" then
+    if game.tick >= state.live_deadline then fail("actual Library refresh laboratory exceeded deadline") end
+    if not valid(state.lab) then fail("actual Library refresh laboratory was removed") end
+    state.lab.energy = LAB_ENERGY
+    if state.finished == 1 and game.tick >= (state.refresh_after_tick or game.tick) and not state.first_completion_seen then
+      local force = game.forces.player
+      if technology(force, GEAR).level ~= 2 or not exact_queue(force, {GEAR}) or named(force.current_research) ~= GEAR then
+        fail("first native Library laboratory completion differs")
+      end
+      assert_live_queue_view(state, 2, 1, true)
+      state.queue_after_first = #copy_queue(force)
+      state.first_completion_seen = true
+    elseif state.finished == 2 and game.tick >= (state.refresh_after_tick or game.tick) then
+      state.phase = "awaiting-final-live-refresh"
+    end
+  elseif state.phase == "awaiting-final-live-refresh" then
+    complete_live_refresh(state)
+  elseif state.phase == "cancelling-live-research" then
+    if game.tick >= state.live_deadline then fail("native Library cancellation refresh exceeded deadline") end
+    if game.tick >= (state.refresh_after_tick or game.tick) then complete_cancellation_refresh(state) end
+  elseif state.phase == "awaiting-foreign-force-refresh" then
+    if game.tick >= state.live_deadline then fail("native foreign-force refresh exceeded deadline") end
+    if game.tick >= (state.refresh_after_tick or game.tick) then complete_foreign_force_refresh(state) end
   elseif state.phase == "awaiting-rejoin" then
     local english, german = pair(state, 2)
     if english and german then run_rejoin(state, english, german) end
