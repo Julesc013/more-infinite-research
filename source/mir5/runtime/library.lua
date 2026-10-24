@@ -6,6 +6,10 @@
 -- recurring subscription by itself.
 local catalogue = require("research.catalogue")
 local settings_catalog = require("research.settings")
+-- Configuration resolves MIRSET1 precedence once at control parse time. The
+-- Availability view receives its compact stream map rather than resolving a
+-- profile while the player opens or filters the Library.
+local effective_configuration = require("runtime.configuration")
 local profile_codec = require("research.settings_profile")
 local library_model = require("presentation.library_model")
 local availability = require("presentation.availability")
@@ -1126,7 +1130,8 @@ local function update_availability_content(content, player, view)
   -- presents only the authored terminal explanations selected by exact active
   -- mod and named native-owner facts.
   local active_mods = script and script.active_mods or {}
-  local rows = availability.rows(active_mods, target, player and player.force, view and view.query)
+  local effective_streams = type(effective_configuration) == "table" and effective_configuration.streams or nil
+  local rows = availability.rows(active_mods, target, player and player.force, view and view.query, effective_streams)
   if #rows == 0 then
     add(content, {type = "label", name = PREFIX .. "availability_empty", caption = {"mir-browser.availability-empty"}})
     return

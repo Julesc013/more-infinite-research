@@ -168,6 +168,7 @@ class LibraryTests(unittest.TestCase):
 
           function boot()
             storage = {}
+            settings = {startup = {}}
             screen = gui_container(nil)
             gear = {valid = true, name = "recipe-prod-research_gears-1", level = 3,
               researched = true, enabled = false, visible_when_disabled = true,
@@ -263,7 +264,8 @@ class LibraryTests(unittest.TestCase):
 
     def test_en_and_de_localize_the_authored_availability_reasons(self):
         required = {
-            "availability-entry", "availability-requires-space-age", "availability-native-research-productivity"
+            "availability-entry", "availability-requires-space-age", "availability-native-research-productivity",
+            "availability-not-available-in-bob-angel-profile", "availability-not-available-in-bobtech-angel-profile",
         }
         for language in ("en", "de"):
             path = ROOT / "source/mir5/locale" / language / "mir-library.cfg"
@@ -320,6 +322,35 @@ class LibraryTests(unittest.TestCase):
             "a malformed named native owner must not produce an explanation")
           assert(player.force.research_queue == native_queue and player.force.current_research == native_current
             and player.force.research_progress == native_progress and gear.level == 3 and gear.enabled == false)
+        ''')
+
+    def test_availability_uses_parse_time_effective_streams_without_profile_resolution_on_refresh(self):
+        self.lua.execute(r'''
+          local loads, rows_calls = 0, 0
+          local streams = {research_material_lead = {enabled = false}}
+          package.preload["runtime.configuration"] = function()
+            loads = loads + 1
+            return {streams = streams}
+          end
+          package.preload["presentation.availability"] = function()
+            return {
+              rows = function(active_mods, selected_target, force, query, supplied_streams)
+                rows_calls = rows_calls + 1
+                assert(supplied_streams == streams and supplied_streams.research_material_lead.enabled == false)
+                return {}
+              end
+            }
+          end
+          package.loaded["runtime.configuration"] = nil
+          package.loaded["presentation.availability"] = nil
+          boot()
+
+          local root = library.open(player, {tab = "availability"})
+          local query = root["mir_library_filters"]["mir_library_query"]
+          query.text = "lead"
+          library.on_gui_text_changed({player_index = 1, element = query})
+          assert(loads == 1 and rows_calls >= 2,
+            "Availability must reuse one parse-time effective configuration across refreshes")
         ''')
 
     def test_default_closed_then_query_selection_location_native_navigation_and_reload_rebuild(self):
