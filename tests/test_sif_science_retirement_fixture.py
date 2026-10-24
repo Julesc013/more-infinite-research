@@ -14,7 +14,9 @@ PROFILES = ROOT / 'tests/profiles'
 POLICIES = ('configured','space','space-and-promethium','space-age-progression','official-progression','mod-progression','all-official','all')
 TARGETS = {
  'f200': {'engine':'2.0.77','line':'2.0','engine_sha':'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B','sif':'1.0.60','sif_sha':'860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC','commons':'1.0.27','commons_sha':'6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92','observer_sha':'723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87','published':'4.7.20002','candidate':'5.0.20000'},
- 'f210': {'engine':'2.1.23','line':'2.1','engine_sha':'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060','sif':'1.0.78','sif_sha':'3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13','commons':'1.0.33','commons_sha':'378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB','extras':'1.0.01','extras_sha':'874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82','observer_sha':'2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C','published':'4.7.21002','candidate':'5.0.21000'},
+ # The F210 profile/archive is named 1.0.01, but Factorio normalizes the
+ # active_mods value parsed from that archive's info.json to 1.0.1.
+ 'f210': {'engine':'2.1.23','line':'2.1','engine_sha':'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060','sif':'1.0.78','sif_sha':'3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13','commons':'1.0.33','commons_sha':'378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB','extras':'1.0.01','runtime_extras':'1.0.1','extras_sha':'874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82','observer_sha':'2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C','published':'4.7.21002','candidate':'5.0.21000'},
 }
 
 # Independent published continuation rows and the separately derived corrected
@@ -140,7 +142,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if target == 'f200' then
               exact = {base='2.0.77', sif='1.0.60', commons='1.0.27', source='4.7.20002', successor='5.0.20000'}
             else
-              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.01', source='4.7.21002', successor='5.0.21000'}
+              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.1', source='4.7.21002', successor='5.0.21000'}
             end
             local contract = assert(loadfile(source_contract))()
             local callbacks, storage, reports, saves = {events={}}, {}, {}, 0
@@ -217,7 +219,11 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
                 ['more-infinite-research']=stage == 'source' and exact.source or exact.successor,
                 [core]=stage == 'source' and '0.1.0' or '0.2.0', [selector]='0.1.0'
               }
-              if exact.extras then rows.recycler, rows['cr-extras'] = exact.base, exact.extras end
+               if exact.extras then
+                 rows.recycler, rows['cr-extras'] = exact.base, exact.extras
+                 if bad == 'extras-version-under' then rows['cr-extras'] = '1.0.0'
+                 elseif bad == 'extras-version-over' then rows['cr-extras'] = '1.0.2' end
+               end
               return rows
             end
             local function load(path, contract_path, stage)
@@ -381,7 +387,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if target == 'f200' then
               exact = {base='2.0.77', sif='1.0.60', commons='1.0.27', successor='5.0.20000'}
             else
-              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.01', successor='5.0.21000'}
+              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.1', successor='5.0.21000'}
             end
             local contract = assert(loadfile(contract_path))()
             local core = 'mir-fixture-mir5-sif-science-retirement-' .. target
@@ -391,7 +397,11 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
               ['space-is-fake']=exact.sif, ['cr-commons']=exact.commons,
               ['more-infinite-research']=exact.successor, [core]='0.2.0', [selector]='0.1.0'
             }
-            if exact.extras then active.recycler, active['cr-extras'] = exact.base, exact.extras end
+             if exact.extras then
+               active.recycler, active['cr-extras'] = exact.base, exact.extras
+               if bad == 'extras-version-under' then active['cr-extras'] = '1.0.0'
+               elseif bad == 'extras-version-over' then active['cr-extras'] = '1.0.2' end
+             end
             local player = {
               name='player', index=1, valid=true, technologies={}, research_queue={},
               laboratory_speed_modifier=bad == 'bonus' and .1 or 0, bullet=0, shotgun=0
@@ -470,7 +480,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
     def data(self,target,stage,policy,raw=None,mods=None):
         meta=TARGETS[target];core=self.core(target,stage);fixture=f'mir-fixture-mir5-sif-science-retirement-{target}'
         expected_mods={'base':meta['engine'],'elevated-rails':meta['engine'],'quality':meta['engine'],'space-age':meta['engine'],'space-is-fake':meta['sif'],'cr-commons':meta['commons'],'more-infinite-research':meta['published' if stage=='published' else 'candidate'],fixture:'0.1.0' if stage=='published' else '0.2.0',f'mir-fixture-mir5-sif-policy-{policy}-{target}':'0.1.0'}
-        if target=='f210':expected_mods.update({'recycler':meta['engine'],'cr-extras':meta['extras']})
+        if target=='f210':expected_mods.update({'recycler':meta['engine'],'cr-extras':meta['runtime_extras']})
         raw=raw or {'technology':raw_rows(policy, 'published' if stage=='published' else 'mir5')}
         raw.setdefault('lab',{}).setdefault('biolab',{'science_pack_drain_rate_percent':50})
         return plain(self.lua.eval('sif_data')(str(self.core_lua('data-final-fixes.lua')),str(self.core_lua('contract.lua')),lua_value(self.lua,mods or expected_mods),lua_value(self.lua,raw),policy))
@@ -509,9 +519,22 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
         f200_missing_quality={'base':'2.0.77','elevated-rails':'2.0.77','space-age':'2.0.77','space-is-fake':'1.0.60','cr-commons':'1.0.27','more-infinite-research':'5.0.20000','mir-fixture-mir5-sif-science-retirement-f200':'0.2.0','mir-fixture-mir5-sif-policy-configured-f200':'0.1.0'}
         raw={'technology':raw_rows('configured')};missing=self.data('f200','mir5','configured',raw,f200_missing_quality);self.assertFalse(missing['ok']);self.assertIn('exact engine or native archive closure differs',missing['message'])
         for name in BASE:self.assertEqual((None,FORMULA,120),(missing['raw']['technology'][name]['unit'].get('count'),missing['raw']['technology'][name]['unit'].get('count_formula'),missing['raw']['technology'][name]['unit']['time']))
-        f210_missing_recycler={'base':'2.1.23','elevated-rails':'2.1.23','quality':'2.1.23','space-age':'2.1.23','space-is-fake':'1.0.78','cr-commons':'1.0.33','cr-extras':'1.0.01','more-infinite-research':'5.0.21000','mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
+        f210_missing_recycler={'base':'2.1.23','elevated-rails':'2.1.23','quality':'2.1.23','space-age':'2.1.23','space-is-fake':'1.0.78','cr-commons':'1.0.33','cr-extras':'1.0.1','more-infinite-research':'5.0.21000','mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
         raw={'technology':raw_rows('configured')};missing=self.data('f210','mir5','configured',raw,f210_missing_recycler);self.assertFalse(missing['ok']);self.assertIn('F210 closure differs',missing['message'])
         for name in BASE:self.assertEqual((None,FORMULA,120),(missing['raw']['technology'][name]['unit'].get('count'),missing['raw']['technology'][name]['unit'].get('count_formula'),missing['raw']['technology'][name]['unit']['time']))
+    def test_f210_engine_runtime_version_is_canonical_and_rejects_fixed_opponents(self):
+        meta=TARGETS['f210']
+        self.assertEqual(('1.0.01','1.0.1'),(meta['extras'],meta['runtime_extras']))
+        for wrong in ('1.0.0','1.0.01','1.0.2'):
+            mods={'base':meta['engine'],'elevated-rails':meta['engine'],'quality':meta['engine'],'space-age':meta['engine'],'recycler':meta['engine'],'space-is-fake':meta['sif'],'cr-commons':meta['commons'],'cr-extras':wrong,'more-infinite-research':meta['candidate'],'mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
+            raw={'technology':raw_rows('configured')};result=self.data('f210','mir5','configured',raw,mods)
+            self.assertFalse(result['ok']);self.assertIn('F210 closure differs',result['message'])
+            for name in BASE:self.assertEqual((None,FORMULA,120),(result['raw']['technology'][name]['unit'].get('count'),result['raw']['technology'][name]['unit'].get('count_formula'),result['raw']['technology'][name]['unit']['time']))
+        for opponent in ('extras-version-under','extras-version-over'):
+            result=plain(self.lua.eval('sif_transition')(str(self.core_lua('control.lua')),str(self.core_lua('control.lua')),str(self.core_lua('contract.lua')),str(self.core_lua('contract.lua')),'f210',opponent))
+            self.assertFalse(result['ok']);self.assertIn('F210 closure differs',result['message'])
+            result=plain(self.lua.eval('sif_candidate_create')(str(self.core_lua('control.lua')),str(self.core_lua('contract.lua')),'f210','configured',opponent))
+            self.assertFalse(result['ok']);self.assertIn('F210 closure differs',result['message']);self.assertEqual((0,0),(result['writes'],result['markers']))
     def test_selectors_are_single_startup_value_mutations(self):
         for target in TARGETS:
             for policy in POLICIES:
