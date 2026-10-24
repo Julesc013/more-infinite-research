@@ -9,6 +9,8 @@ local PACKS = {
   "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack",
 }
 local INITIAL = 32
+local AGRICULTURAL = "agricultural-science-pack"
+local AGRICULTURAL_SPOIL_TICKS = 60 * 60 * 60
 -- `research_gears` defaults to ten percent. The fixture accelerates count
 -- and time only, leaving the authored effect intact for this native witness.
 local EXPECTED_GEAR_PRODUCTIVITY = 0.10
@@ -73,6 +75,53 @@ local function bonus_witness(force, gear)
   }
 end
 
+local function item_input_witness(lab, inventory, name)
+  local stacks, prototype = {}, nil
+  for index = 1, #inventory do
+    local stack = inventory[index]
+    if stack.valid_for_read and stack.name == name then
+      prototype = stack.prototype
+      stacks[#stacks + 1] = {
+        slot=index, count=stack.count, spoil_percent=stack.spoil_percent,
+        spoil_tick=stack.spoil_tick,
+      }
+    end
+  end
+  prototype = prototype or (prototypes and prototypes.item and prototypes.item[name])
+  local stored = lab.get_stored_durability(name)
+  local observed = {
+    inventory_count=inventory.get_item_count(name),
+    stored_durability=stored and stored.durability or nil,
+    prototype_science_capacity=prototype and prototype.science_capacity or nil,
+    prototype_spoil_ticks=prototype and prototype.get_spoil_ticks() or nil,
+    stacks=stacks,
+  }
+  if prototype ~= nil then observed.prototype_lab_ignores_spoil_percent = prototype.lab_ignores_spoil_percent end
+  return observed
+end
+
+local function all_input_witnesses(lab, inventory)
+  local inputs = {}
+  for _, name in ipairs(PACKS) do inputs[name] = item_input_witness(lab, inventory, name) end
+  inputs[FOREIGN] = item_input_witness(lab, inventory, FOREIGN)
+  return inputs
+end
+
+local function agricultural_consumption_is_valid(observed)
+  local capacity, durability = observed.prototype_science_capacity, observed.stored_durability
+  if observed.prototype_spoil_ticks ~= AGRICULTURAL_SPOIL_TICKS
+      or observed.prototype_lab_ignores_spoil_percent ~= false
+      or type(capacity) ~= "number" or capacity <= 0
+      or observed.inventory_count ~= INITIAL - 2
+      or type(durability) ~= "number" or durability <= 0 or durability >= capacity then
+    return false
+  end
+  for _, stack in ipairs(observed.stacks) do
+    if type(stack.spoil_percent) ~= "number" or stack.spoil_percent <= 0 then return false end
+  end
+  return #observed.stacks > 0
+end
+
 local function assert_complete(state)
   local force = game.forces.player
   local owner, gear = research(force, OWNER), research(force, GEAR)
@@ -89,10 +138,21 @@ local function assert_complete(state)
   check_inputs(gear, PACKS)
   if not state.lab or not state.lab.valid then fail("actual laboratory is absent") end
   local inventory = state.lab.get_inventory(defines.inventory.lab_input)
+  local inputs = all_input_witnesses(state.lab, inventory)
   for _, name in ipairs(PACKS) do
-    if inventory.get_item_count(name) ~= INITIAL - 1 then fail("official input consumption differs: " .. name) end
+    if name ~= AGRICULTURAL and inputs[name].inventory_count ~= INITIAL - 1 then
+      fail("official input consumption differs: " .. name, {official_input_consumption=inputs})
+    end
   end
-  if inventory.get_item_count(FOREIGN) ~= INITIAL - 1 then fail("foreign cryogenic input consumption differs") end
+  if inputs[FOREIGN].inventory_count ~= INITIAL - 1 then
+    fail("foreign cryogenic input consumption differs", {official_input_consumption=inputs})
+  end
+  -- Space Age declares this science pack spoilable. Its value falls with
+  -- freshness, so the lab has already drawn a second pack and retains its
+  -- partial science durability outside the inventory after this one-unit run.
+  if not agricultural_consumption_is_valid(inputs[AGRICULTURAL]) then
+    fail("perishable agricultural science consumption differs", {official_input_consumption=inputs})
+  end
 end
 
 local function marker(stage, state)
@@ -100,7 +160,10 @@ local function marker(stage, state)
     case="cryogenic-gameplay", stage=stage, status="passed",
     witnesses={actual_lab_completions=state.finished, foreign_owner_input=FOREIGN,
       foreign_owner_science_consumed=1, official_science_inputs=PACKS,
-      each_official_science_consumed=1, native_gear_productivity=EXPECTED_GEAR_PRODUCTIVITY,
+      each_nonperishable_official_science_consumed=1, agricultural_science_items_drawn=2,
+      agricultural_science=item_input_witness(state.lab,
+        state.lab.get_inventory(defines.inventory.lab_input), AGRICULTURAL),
+      native_gear_productivity=EXPECTED_GEAR_PRODUCTIVITY,
       laboratory_productivity=EXPECTED_LABORATORY_PRODUCTIVITY,
       gear=gear_effect_witness(game.forces.player.technologies[GEAR]),
       policy="all-official", on_load_read_only=stage == "reload",
