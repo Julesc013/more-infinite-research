@@ -154,6 +154,12 @@ class BobCoreMaterialTests(unittest.TestCase):
                 self.assertEqual(family["icon_size"], row["icons"][0]["icon_size"])
                 self.assertEqual(stage["show_levels_info"], row.get("show_levels_info"))
                 self.assertEqual(stage["visible_when_disabled"], row.get("visible_when_disabled"))
+                if stage_name == "continuation":
+                    self.assertEqual([
+                        "", ["technology-description.more-infinite-research.recipe_productivity"], "\n",
+                        ["mod-setting-name.ips-max-level-stream", ["", ["description.productivity-bonus"], ": ",
+                         [f"item-name.{family['item']}"]], ": ", str(self.facts["material_tail_default_cap"])]
+                    ], row["localised_description"])
 
         for family in self.facts["withheld_families"]:
             self.assertNotIn(f"recipe-prod-{family}-1", by_id)
@@ -202,6 +208,11 @@ class BobCoreMaterialTests(unittest.TestCase):
         self.assertFalse(rows["recipe-prod-research_material_tin-1"]["enabled"])
         self.assertEqual(3, rows["recipe-prod-research_material_lead-1"]["max_level"])
         self.assertEqual("infinite", rows["recipe-prod-research_material_lead-4"]["max_level"])
+        self.assertEqual("100", rows["recipe-prod-research_material_lead-4"]["localised_description"][-1][-1])
+
+        values["streams"]["research_material_lead"]["max_level"] = 70
+        bounded = {row["name"]: row for row in _plain(self.rows(values=values))}
+        self.assertEqual("70", bounded["recipe-prod-research_material_lead-4"]["localised_description"][-1][-1])
 
     def test_named_preflight_rejects_safety_drift_without_scanning_raw_tables(self):
         poison = self.lua.eval('function(value) return setmetatable(value, {__pairs=function() error("global scan") end}) end')

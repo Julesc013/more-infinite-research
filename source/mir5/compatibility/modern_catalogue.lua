@@ -91,7 +91,14 @@ local SCIENCE = {
   science_production_utility_space = {"production-science-pack", "utility-science-pack", "space-science-pack"},
   science_utility_space = {"utility-science-pack", "space-science-pack"},
   science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"},
-  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium_k2 = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "kr-advanced-tech-card", "kr-matter-tech-card", "kr-singularity-tech-card"}
+  science_production_utility_space_agricultural_metallurgic_electromagnetic_cryogenic_promethium_k2 = {"production-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "kr-advanced-tech-card", "kr-matter-tech-card", "kr-singularity-tech-card"},
+  -- Exact F210 no-Angel Bob Core vectors.  Each names the captured pack
+  -- directly; no installed science-pack or lab pass decides this progression.
+  science_bob_core_braking_force = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "space-science-pack"},
+  science_bob_core_inserter_capacity = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "agricultural-science-pack"},
+  science_bob_core_research_speed = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "bob-advanced-logistic-science-pack"},
+  science_bob_core_worker_robots_storage = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "utility-science-pack", "bob-advanced-logistic-science-pack", "electromagnetic-science-pack"},
+  science_bob_core_science_pack_productivity = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack", "military-science-pack", "utility-science-pack", "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack", "bob-advanced-logistic-science-pack"},
 }
 
 -- These are declared continuations of the six named native chains. They are
@@ -462,6 +469,10 @@ function M.is_bob_angel(active_mods)
   return require("compatibility.bob_angel_profile").applies(active_mods)
 end
 
+function M.is_bob_core(active_mods)
+  return require("compatibility.bob_core_profile").applies(active_mods)
+end
+
 local function apply_bob_angel(definitions)
   local delta = require("compatibility.modern_catalogue.bob_angel")
   for _, definition in ipairs(delta.additions) do definitions[#definitions + 1] = copy(definition) end
@@ -475,6 +486,18 @@ local function apply_bob_angel(definitions)
       table.insert(definition.prerequisites, 1, "angels-water-treatment")
     end
   end
+end
+
+local function apply_bob_core(definitions)
+  local delta = require("compatibility.modern_catalogue.bob_core")
+  local selected_by_key = {}
+  for index = 1, #definitions do selected_by_key[definitions[index].key] = definitions[index] end
+  for key, changed in pairs(delta.definition_overrides) do
+    local definition = selected_by_key[key]
+    if not definition then error("MIR Bob Core catalogue lacks declared key " .. key, 3) end
+    for field, value in pairs(changed) do definition[field] = copy(value) end
+  end
+  return delta
 end
 
 local function apply_py_profile(definitions, delta, hightech)
@@ -601,6 +624,8 @@ function M.select(active_mods)
   end
   local bob_angel = M.is_bob_angel(active_mods)
   if bob_angel then apply_bob_angel(definitions); profile = "bob-angel-f200" end
+  local bob_core, bob_core_delta = M.is_bob_core(active_mods), nil
+  if bob_core then bob_core_delta = apply_bob_core(definitions); profile = "bob-core-f210" end
   if py.coal then
     definitions, replacement_product_target_families, excluded_product_target_recipes = apply_py_coal(definitions)
     profile = "py-coal-f200"
@@ -628,12 +653,13 @@ function M.select(active_mods)
   end
   return {profile = profile, definitions = supported_definitions(definitions), continuations = M.continuations(active_mods),
     native_owners = M.native_owners(active_mods), recipe_patches = recipe_patches,
-    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel,
+    k2_imersite = k2so and k2so.imersite or false, bob_angel = bob_angel, bob_core = bob_core,
     py_coal = py.coal, py_hightech = py.hightech, bob_warfare = bob_warfare,
     required_product_targets = required_product_targets, additional_product_bindings = additional_product_bindings,
     exact_product_bindings = exact_product_bindings,
     exact_product_target_families = exact_product_target_families,
     replacement_product_target_families = replacement_product_target_families,
+    bob_core_progression = bob_core_delta ~= nil,
     excluded_product_target_recipes = excluded_product_target_recipes}
 end
 
@@ -687,6 +713,11 @@ function M.continuations(active_mods)
   end
   if M.is_k2so(active_mods) then
     for key, value in pairs(require("compatibility.modern_catalogue.k2so").continuation_overrides or {}) do
+      overrides[key] = value
+    end
+  end
+  if M.is_bob_core(active_mods) then
+    for key, value in pairs(require("compatibility.modern_catalogue.bob_core").continuation_overrides or {}) do
       overrides[key] = value
     end
   end

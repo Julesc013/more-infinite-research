@@ -57,6 +57,7 @@
     "research_time": 30,
     "effect_percent": 2
   },
+  "material_tail_default_cap": 150,
   "families": [
     {
       "key": "research_material_tin",

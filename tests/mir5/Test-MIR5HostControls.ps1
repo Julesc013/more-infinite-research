@@ -20,6 +20,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_bob_angel_catalogue.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_tech_materials.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_core_materials.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_bob_core_progression.py';lua=$true},
   [ordered]@{path='tests/mir5/test_bob_core_gameplay_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_override_interactions_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_armor_py_catalogue.py';lua=$true},
