@@ -400,17 +400,23 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
         }))
 
     def test_foreign_owner_actor_records_and_disables_only_named_integration_primaries(self):
-        good = self._run_foreign_owner_source("recipe-prod-research_armor_components-1")
-        self.assertTrue(good["loaded"], good["message"])
-        self.assertTrue(good["ok"], good["message"])
-        self.assertEqual("mir5-integration-foreign-owner", good["interface"])
-        self.assertFalse(good["enabled"])
-        self.assertEqual(["enabled"], py(good["writes"]))
-        self.assertEqual({
-            "force_index": 71,
-            "technology": "recipe-prod-research_armor_components-1",
-            "disabled": True,
-        }, py(good["witness"]))
+        for primary in (
+            "recipe-prod-research_armor_components-1",
+            "recipe-prod-research_material_py_log-4",
+            "recipe-prod-research_breeding-1",
+        ):
+            with self.subTest(primary=primary):
+                good = self._run_foreign_owner_source(primary)
+                self.assertTrue(good["loaded"], good["message"])
+                self.assertTrue(good["ok"], good["message"])
+                self.assertEqual("mir5-integration-foreign-owner", good["interface"])
+                self.assertFalse(good["enabled"])
+                self.assertEqual(["enabled"], py(good["writes"]))
+                self.assertEqual({
+                    "force_index": 71,
+                    "technology": primary,
+                    "disabled": True,
+                }, py(good["witness"]))
 
         opponents = (
             ("non-actor technology", "laser-shooting-speed-8", {}, "outside the integration primary set"),
@@ -429,24 +435,28 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
                 self.assertIsNone(result["witness"])
 
     def test_foreign_owner_successor_migration_restores_only_its_saved_disabled_flag(self):
-        state = {
-            "force_index": 71,
-            "technology": "recipe-prod-research_armor_components-1",
-            "disabled": True,
-        }
-        result = self._run_foreign_owner_migration(state, enabled=True)
-        self.assertTrue(result["ok"], result["message"])
-        self.assertFalse(result["enabled"])
-        self.assertEqual(["enabled"], py(result["writes"]))
-        self.assertEqual("[MIR5_FOREIGN_OWNER_MIGRATION] <fixture-payload>", result["marker"])
-        self.assertEqual({
-            "actor": "mir5-integration-foreign-owner",
-            "force": 71,
-            "technology": "recipe-prod-research_armor_components-1",
-            "expected_disabled": True,
-            "observed_before": True,
-            "observed_after": False,
-        }, py(result["payload"]))
+        for primary in (
+            "recipe-prod-research_armor_components-1",
+            "recipe-prod-research_material_py_log-4",
+            "recipe-prod-research_breeding-1",
+        ):
+            with self.subTest(primary=primary):
+                state = {"force_index": 71, "technology": primary, "disabled": True}
+                result = self._run_foreign_owner_migration(
+                    state, technology_name=primary, enabled=True
+                )
+                self.assertTrue(result["ok"], result["message"])
+                self.assertFalse(result["enabled"])
+                self.assertEqual(["enabled"], py(result["writes"]))
+                self.assertEqual("[MIR5_FOREIGN_OWNER_MIGRATION] <fixture-payload>", result["marker"])
+                self.assertEqual({
+                    "actor": "mir5-integration-foreign-owner",
+                    "force": 71,
+                    "technology": primary,
+                    "expected_disabled": True,
+                    "observed_before": True,
+                    "observed_after": False,
+                }, py(result["payload"]))
 
     def test_foreign_owner_successor_refuses_bad_witnesses_before_writing(self):
         valid = {"force_index": 71, "technology": "recipe-prod-research_armor_components-1", "disabled": True}

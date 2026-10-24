@@ -5,7 +5,7 @@ local INTERFACE = "mir5-integration-foreign-owner"
 local FOREIGN_FORCE = "mir5-integration-catalogue-upgrade-foreign"
 local PRIMARY = {
   ["recipe-prod-research_armor_components-1"] = true,
-  ["recipe-prod-research_material_py_log-1"] = true,
+  ["recipe-prod-research_material_py_log-4"] = true,
   ["recipe-prod-research_breeding-1"] = true,
 }
 

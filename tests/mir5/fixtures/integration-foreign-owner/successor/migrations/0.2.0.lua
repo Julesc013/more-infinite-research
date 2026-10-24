@@ -4,7 +4,7 @@ local KEY = "mir5_integration_foreign_owner"
 local FOREIGN_FORCE = "mir5-integration-catalogue-upgrade-foreign"
 local PRIMARY = {
   ["recipe-prod-research_armor_components-1"] = true,
-  ["recipe-prod-research_material_py_log-1"] = true,
+  ["recipe-prod-research_material_py_log-4"] = true,
   ["recipe-prod-research_breeding-1"] = true,
 }
 local state = storage[KEY]
