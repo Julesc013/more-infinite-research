@@ -83,10 +83,13 @@ class ScienceTests(unittest.TestCase):
                 {type="craft-item", item="cryogenic-plant"}, {"cryogenic-plant"})
               raw.technology["cryogenic-plant"] = {}
               source_recipe(raw, "promethium-science-pack", false)
+              local promethium_prerequisites = target == "f200"
+                and {"biter-egg-handling", "fusion-reactor"}
+                or {"biter-egg-handling", "stellar-discovery-solar-system-edge"}
               source_owner(raw, "promethium-science-pack", "promethium-science-pack", nil,
-                {"biter-egg-handling", "stellar-discovery-solar-system-edge"})
+                promethium_prerequisites)
               raw.technology["biter-egg-handling"] = {}
-              raw.technology["stellar-discovery-solar-system-edge"] = {}
+              raw.technology[promethium_prerequisites[2]] = {}
             elseif target == "f017" or target == "f100" or target == "f110" then
               raw.technology["space-science-pack"] = {name="space-science-pack",
                 effects={{type="unlock-recipe", recipe="satellite"}}}
@@ -264,9 +267,18 @@ class ScienceTests(unittest.TestCase):
             for _, value in ipairs(values or {}) do if value == wanted then return true end end
             return false
           end
-          local function sif_raw()
+          local function sif_promethium_prerequisites(target)
+            if target == "f200" then
+              return {"agricultural-science-pack", "metallurgic-science-pack",
+                "electromagnetic-science-pack", "quantum-processor", "fusion-reactor"}
+            end
+            return {"agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "quantum-processor"}
+          end
+          local function sif_raw(target)
+            target = target or "f210"
             local raw = raw_with(packs, {whole=packs})
-            install_sources(raw, true)
+            install_sources(raw, true, target)
             -- Exact archived SIF behavior replaces the selected source
             -- technology's space-platform prerequisite. If policy expansion
             -- reaches that retired source, source validation must not disable
@@ -274,6 +286,8 @@ class ScienceTests(unittest.TestCase):
             raw.technology["space-science-pack"].prerequisites = {
               "utility-science-pack", "production-science-pack"
             }
+            raw.technology["promethium-science-pack"].prerequisites = sif_promethium_prerequisites(target)
+            raw.technology["quantum-processor"] = {}
             return raw
           end
 
@@ -293,7 +307,7 @@ class ScienceTests(unittest.TestCase):
               for _, policy in ipairs(policies) do
                 local row = technology(definition.ingredients, definition.prerequisites)
                 row.name, row.family = definition.id, definition.family
-                local context = science.prepare({raw=sif_raw(), target={id=target},
+                local context = science.prepare({raw=sif_raw(target), target={id=target},
                   mods={["space-age"]="2.1.23", ["space-is-fake"]="observed"},
                   options={["mir-science-pack-ingredient-policy"]=policy}})
                 local report = science.apply_family({row}, nil, context)[1]
@@ -314,7 +328,7 @@ class ScienceTests(unittest.TestCase):
           for _, target in ipairs({"f200", "f210"}) do
             for _, definition in ipairs(rows) do
               local raw = raw_with(packs, {whole=packs})
-              install_sources(raw, true)
+              install_sources(raw, true, target)
               local row = technology(definition.ingredients, definition.prerequisites)
               row.name, row.family = definition.id, definition.family
               local report = science.apply_family({row}, nil, science.prepare({raw=raw, target={id=target},
@@ -358,6 +372,90 @@ class ScienceTests(unittest.TestCase):
           assert(has_name(gated.prerequisites, "promethium-science-pack"))
         ''')
 
+    def test_sif_promethium_contract_preserves_native_validation_and_accepts_only_the_captured_owner_shape(self):
+        self.lua.execute(r'''
+          local packs = {
+            "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "military-science-pack", "utility-science-pack",
+            "space-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+            "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"
+          }
+          local function native_prerequisites(target)
+            return target == "f200" and {"biter-egg-handling", "fusion-reactor"}
+              or {"biter-egg-handling", "stellar-discovery-solar-system-edge"}
+          end
+          local function sif_prerequisites(target)
+            return target == "f200" and {
+              "agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "quantum-processor", "fusion-reactor"
+            } or {
+              "agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "quantum-processor"
+            }
+          end
+          local function sif_owner_raw(target)
+            local raw = raw_with(packs, {whole=packs})
+            install_sources(raw, true, target)
+            raw.technology["promethium-science-pack"].prerequisites = sif_prerequisites(target)
+            raw.technology["quantum-processor"] = {}
+            return raw
+          end
+          for _, target in ipairs({"f200", "f210"}) do
+            local native_raw = raw_with(packs, {whole=packs})
+            install_sources(native_raw, true, target)
+            local native = bindings.select({id=target}, { ["space-age"]="observed" })
+            local native_contract = native.source_contracts["promethium-science-pack"]
+            assert(same(native_contract.owner_prerequisites, native_prerequisites(target)))
+            assert(science.validate_source_contract(native_raw, native_contract, "promethium-science-pack"))
+
+            local raw = sif_owner_raw(target)
+            -- This is the f522 rejection: the native contract cannot accept
+            -- the actual archived SIF owner facts.
+            local valid, reason = science.validate_source_contract(raw, native_contract, "promethium-science-pack")
+            assert(not valid and reason == "owner-prerequisites:promethium-science-pack")
+
+            local mods = { ["space-age"]="observed", ["space-is-fake"]="observed" }
+            local selected = bindings.select({id=target}, mods)
+            local contract = selected.source_contracts["promethium-science-pack"]
+            assert(contract.kind == "recipe-unlock" and contract.owner == "promethium-science-pack"
+              and contract.recipe == "promethium-science-pack")
+            assert(same(contract.owner_prerequisites, sif_prerequisites(target)))
+            assert(science.validate_source_contract(raw, contract, "promethium-science-pack"))
+
+            local row = technology({{"automation-science-pack", 17}}, {"finite-anchor"})
+            row.name = "weapon-shooting-speed-7"
+            local report = science.apply_family({row}, nil, {raw=raw, target={id=target}, mods=mods,
+              options={ ["mir-science-pack-ingredient-policy"]="space-and-promethium" }})[1]
+            assert(report.enabled and names(row.unit.ingredients) ==
+              "automation-science-pack:17,promethium-science-pack:1")
+            assert(row.prerequisites[1] == "finite-anchor" and row.prerequisites[2] == "promethium-science-pack")
+
+            raw.technology["promethium-science-pack"].effects = {}
+            local no_unlock = technology({{"automation-science-pack", 17}}, {"finite-anchor"})
+            no_unlock.name = "weapon-shooting-speed-7"
+            report = science.apply_family({no_unlock}, nil, {raw=raw, target={id=target}, mods=mods,
+              options={ ["mir-science-pack-ingredient-policy"]="space-and-promethium" }})[1]
+            assert(not report.enabled and report.reason ==
+              "invalid-science-source:promethium-science-pack:missing-owner-unlock:promethium-science-pack")
+            raw.technology["promethium-science-pack"].effects = {
+              {type="unlock-recipe", recipe="promethium-science-pack"}
+            }
+
+            raw.technology["promethium-science-pack"].prerequisites[4] = "wrong-sif-owner-prerequisite"
+            local blocked = technology({{"automation-science-pack", 17}}, {"finite-anchor"})
+            blocked.name = "weapon-shooting-speed-7"
+            report = science.apply_family({blocked}, nil, {raw=raw, target={id=target}, mods=mods,
+              options={ ["mir-science-pack-ingredient-policy"]="space-and-promethium" }})[1]
+            assert(not report.enabled and report.reason ==
+              "invalid-science-source:promethium-science-pack:owner-prerequisites:promethium-science-pack")
+            assert(names(blocked.unit.ingredients) == "automation-science-pack:17")
+
+            contract.owner_prerequisites[1] = "caller-mutation"
+            assert(bindings.select({id=target}, mods).source_contracts["promethium-science-pack"].owner_prerequisites[1]
+              == "agricultural-science-pack")
+          end
+        ''')
+
     def test_sif_real_space_age_continuations_keep_the_full_vector_and_retire_only_the_named_gate(self):
         self.lua.execute(r'''
           local catalogue = require("compatibility.modern_catalogue")
@@ -389,14 +487,24 @@ class ScienceTests(unittest.TestCase):
             all = {"production-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
               "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"}
           }
+          local function sif_promethium_prerequisites(id)
+            if id == "f200" then
+              return {"agricultural-science-pack", "metallurgic-science-pack",
+                "electromagnetic-science-pack", "quantum-processor", "fusion-reactor"}
+            end
+            return {"agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "quantum-processor"}
+          end
           for _, id in ipairs({"f200", "f210"}) do
             target.id = id
             for _, policy in ipairs(policies) do
               local mods = {["space-age"]="observed", ["space-is-fake"]="observed"}
               local raw = raw_with(packs, {whole=packs})
-              install_sources(raw, true)
+              install_sources(raw, true, id)
               raw.technology["space-science-pack"].prerequisites = {
                 "utility-science-pack", "production-science-pack"}
+              raw.technology["promethium-science-pack"].prerequisites = sif_promethium_prerequisites(id)
+              raw.technology["quantum-processor"] = {}
               local checked = 0
               for _, definition in ipairs(catalogue.continuations(mods)) do
                 local wanted = expected[definition.id]
@@ -426,7 +534,7 @@ class ScienceTests(unittest.TestCase):
                       local opponent_mods = opponent == "no-sif" and {["space-age"]="observed"} or mods
                       if opponent == "adjacent-name" then unchanged.name = definition.id .. "-unbound" end
                       local ordinary_raw = raw_with(packs, {whole=packs})
-                      install_sources(ordinary_raw, true)
+                      install_sources(ordinary_raw, true, id)
                       local ordinary_report = science.apply_family({unchanged}, nil, {raw=ordinary_raw,
                         target={id=id}, mods=opponent_mods,
                         options={["mir-science-pack-ingredient-policy"]="configured"}})[1]

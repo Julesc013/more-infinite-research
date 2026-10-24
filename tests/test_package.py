@@ -48,6 +48,7 @@ class PackageTests(unittest.TestCase):
         source = ROOT / "source"
         published = json.loads((ROOT / "spec/inventory/target-load-order-470.json").read_text())
         dependencies = {row["target"]: row["dependencies"] for row in published["records"]}
+        sif_ordering = "? space-is-fake"
         for target, family, minimum in [
             ("f013", "0.13", "0.13.20"), ("f014", "0.14", "0.14.23"),
             ("f015", "0.15", "0.15.40"), ("f016", "0.16", "0.16.51"),
@@ -57,8 +58,16 @@ class PackageTests(unittest.TestCase):
             with self.subTest(target=target):
                 info, rows = pack.members(source, target=target)
                 files = dict(rows)
+                expected_dependencies = [*dependencies[target]]
+                if target in ("f200", "f210"):
+                    # The retained 4.7 inventory predates this MIR5 ordering
+                    # correction. Current modern packages must run after SIF
+                    # when it is active, so their final-stage source checks
+                    # see SIF's authored promethium owner.
+                    self.assertNotIn(sif_ordering, dependencies[target])
+                    expected_dependencies.append(sif_ordering)
                 self.assertEqual(info["factorio_version"], family)
-                self.assertEqual(info["dependencies"], dependencies[target])
+                self.assertEqual(info["dependencies"], expected_dependencies)
                 self.assertEqual(info["dependencies"][0], "base >= " + minimum)
                 self.assertEqual(info["version"], "5.0." + target[1:] + "00")
                 self.assertEqual(json.loads(files["info.json"])["version"], info["version"])
