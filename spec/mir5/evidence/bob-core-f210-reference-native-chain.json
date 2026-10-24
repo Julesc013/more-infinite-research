@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobCoreF210NativeReferenceObservationV1",
+  "status": "completed-data-stage-reference-only",
+  "source_commit": "f3db1c086d66d408bd07d29b0962b03a8f5cd3fd",
+  "native_run": {
+    "id": 40069301778,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40069301778",
+    "artifact_id": 12550447321,
+    "manifest_sha256": "A8325DC1A41D8F72A710D8BF2FB840844F1C9EE435485C769F3CE9A55157D70A",
+    "members_verified": 26,
+    "controller_commit": "adbc9ab4ee56fbe7ecdf5ace4c6b97db8e7447d8"
+  },
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "profile": {
+    "path": "tests/mir5/profiles/bob-core-f210-2123.json",
+    "git_content_sha256": "74B91D91B65109FC5FCD252C406301EF292B79F1F5BD2B7474E6C5BB1DBA4F76",
+    "scope": "Five exact Bob archives without Angel, with official Space Age and canonical F210 observer; complete input closure retained in receipt bundle."
+  },
+  "published": {
+    "tag": "v4.7.2",
+    "archive": "more-infinite-research_4.7.21002.zip",
+    "sha256": "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+  },
+  "observed": {
+    "upstream_status": "completed-data-stage-observation-only",
+    "published_status": "completed-data-stage-observation-only",
+    "material_prefix": "recipe-prod-research_material_",
+    "upstream_material_rows": 0,
+    "published_material_rows": 14,
+    "families": [
+      "tin",
+      "lead",
+      "bronze",
+      "gunmetal",
+      "invar",
+      "nitinol",
+      "copper_tungsten"
+    ],
+    "routes": "Tin/Lead are initially enabled by native default; the five alloy recipes begin disabled and each has its named native unlock owner.",
+    "all_profile_controls_restored": true
+  },
+  "raw_capture_hashes": {
+    "upstream_raw": "BA5AC0732E0DB51EC13089F2F7728882B45BCB247A9DC3A9F9582D0CAD88D6E3",
+    "upstream_settings": "50786C334AA6B4540F6A2A1A149A630585A84F8B2F288FAC1104EA03920FBB6B",
+    "published_raw": "A5F1BCDF17656D43F481DD41A534BBA0B0573BD2837EB1B1B76E2AB9FD186263",
+    "published_settings": "603C4651278A2108A36CD4E40E43AA380A75AF0928F86B727822F66B0ED40B5C"
+  },
+  "receipt_bundle": {
+    "path": "spec/mir5/evidence/bob-core-f210-reference-receipts.json.gz",
+    "compressed_sha256": "FA2F384638D5FFA8C6F47651A4C84D6F5D1CCA20C5BAE3B2379FA5783838B68B",
+    "uncompressed_sha256": "DFEE6EF83EBC1799CC53DC2E55A214884AC187BA98A8E05DC38F1E4766087EDD",
+    "members": 20
+  },
+  "derivation_dispositions": [
+    "Original r01 invalid JSON and r02 omitted string laboratory inputs are retained byte-exact and not accepted as facts.",
+    "Original r03 was a valid six-route projection, later locally overwritten. Its bytes are deterministically reconstructed against previously recorded hashes and explicitly labelled reconstructed custody; the restoration note is retained.",
+    "r04 independently projects every material-prefix technology from verified raw dumps (14 published, zero upstream). It is not a whole-catalogue comparison.",
+    "r05 separately expands the named route facts to include Tin. No corrected derivation required another Factorio launch or used candidate output."
+  ],
+  "local_raw_custody": "build/mir5/recovery-historical/bob-core-f210-reference/40069301778/capture",
+  "limitations": [
+    "No MIR5 native candidate, whole-catalogue parity, laboratory gameplay, physical output, save migration, performance or release acceptance follows from this reference.",
+    "The two prior profile-text CRLF pre-native refusals retain their separate run identities; this successful input uses canonical LF content."
+  ],
+  "release_qualification": false
+}

@@ -114,6 +114,7 @@ class PackTests(unittest.TestCase):
                 "compatibility/modern_catalogue/bob_angel.lua",
                 "compatibility/bob_angel_profile.lua",
                 "compatibility/bob_tech_profile.lua",
+                "compatibility/bob_core_profile.lua",
                 "compatibility/bob_warfare_profile.lua",
                 "compatibility/py_profile.lua",
                 "compatibility/modern_catalogue/bob_warfare.lua",

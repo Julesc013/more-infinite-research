@@ -2,11 +2,10 @@
 -- published rows and their direct owner bindings before returning fresh MIR
 -- technologies.  It neither discovers alternative routes nor inspects a
 -- foreign technology graph.
-local cost = require("research.cost")
+local stages = require("research.material_stages")
 local DEFINITIONS = require("research.bob_tech_materials")
 
 local M = {}
-local OVERLAY = "__core__/graphics/icons/technology/constants/constant-recipe-productivity.png"
 
 local function fail(message)
   error("MIR5 F210 BobTech material catalogue: " .. message, 3)
@@ -116,58 +115,6 @@ local function stream_for(values, definition)
   return stream
 end
 
-local function copy_names(names)
-  local output = {}
-  for index, name in ipairs(names) do output[index] = name end
-  return output
-end
-
-local function ingredients(science)
-  local output = {}
-  for index, pack in ipairs(science) do output[index] = {pack, 1} end
-  return output
-end
-
-local function effects(routes, effect_percent)
-  local output = {}
-  for index, route in ipairs(routes) do
-    output[index] = {type="change-recipe-productivity", recipe=route.recipe, change=effect_percent / 100}
-  end
-  return output
-end
-
-local function continuation_cost(stream, stage)
-  local first = (stream.base_cost + 3 * stream.linear_increment) * (stream.growth_factor ^ 3)
-  if not finite(first) then fail("material continuation cost is not finite") end
-  return cost.continuation({base_cost=first, linear_increment=stream.base_cost, growth_factor=1},
-    stage.first_level, stage.predecessor_count, stage.previous_count)
-end
-
-local function technology(definition, stage, stream)
-  local output = {
-    type = "technology", name = stage.id,
-    icons = {
-      {icon=definition.icon, icon_size=definition.icon_size},
-      {icon=OVERLAY, icon_size=128, scale=0.5, shift={50, 50}, floating=true},
-    },
-    localised_name = {"", {"description.productivity-bonus"}, ": ", {"item-name." .. definition.item}},
-    localised_description = {"technology-description.more-infinite-research.recipe_productivity"},
-    level = stage.first_level or 1,
-    upgrade = true,
-    max_level = stage.max_level,
-    order = stage.order,
-    prerequisites = copy_names(stage.prerequisites),
-    effects = effects(definition.routes, stream.effect_percent),
-    unit = {
-      count_formula = stage.first_level and continuation_cost(stream, stage)
-        or cost.cost(stream.base_cost, stream.linear_increment, stream.growth_factor),
-      time = stream.research_time,
-      ingredients = ingredients(stage.science),
-    },
-  }
-  if stream.enabled == false then output.enabled = false end
-  return output
-end
 
 function M.technologies(values, raw, active_mods)
   if not M.applies(active_mods) then return {} end
@@ -179,9 +126,9 @@ function M.technologies(values, raw, active_mods)
   local output = {}
   for index, definition in ipairs(DEFINITIONS) do
     local stream = streams[index]
-    output[#output + 1] = technology(definition, definition.early, stream)
+    output[#output + 1] = stages.technology(definition, definition.early, stream, fail)
     if definition.continuation then
-      output[#output + 1] = technology(definition, definition.continuation, stream)
+      output[#output + 1] = stages.technology(definition, definition.continuation, stream, fail)
     end
   end
   return output

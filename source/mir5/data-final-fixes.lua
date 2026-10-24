@@ -104,6 +104,14 @@ if require("compatibility.bob_tech_profile").applies(mods) then
   for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
 end
 
+-- The independent F210 Bob Core capture has no Angel modules.  Its seven
+-- named routes are separate from the BobTech-plus-Angel material adapter;
+-- neither profile derives routes from the other.
+if require("compatibility.bob_core_profile").applies(mods) then
+  local materials = require("compatibility.bob_core_materials").technologies(values, data.raw, mods)
+  for index = 1, #materials do technologies[#technologies + 1] = materials[index] end
+end
+
 -- One lab/science view serves this complete owned catalogue. Native owners
 -- and foreign research are outside this detached publication boundary.
 require("research.science").apply_family(technologies, nil, {

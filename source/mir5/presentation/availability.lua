@@ -26,6 +26,17 @@ local F210_BOBTECH_ANGEL_REQUIRED = {
   "angelssmelting", "angelssmeltinggraphics",
 }
 
+local F210_BOB_CORE_REQUIRED = {
+  "base", "space-age", "boblibrary", "bobores", "bobplates", "bobelectronics", "bobtech",
+}
+
+local F210_BOB_CORE_EXCLUDED = {
+  "angelsbioprocessing", "angelsbioprocessinggraphics", "angelsrefining", "angelsrefininggraphics",
+  "angelspetrochem", "angelspetrochemgraphics", "angelssmelting", "angelssmeltinggraphics",
+  "Krastorio2", "Krastorio2Assets", "Krastorio2-spaced-out", "k2so-assets",
+  "pycoalprocessing", "pyalienlife", "pyhightech",
+}
+
 local function withheld_material(family, reason)
   return {
     family = family,
@@ -61,6 +72,18 @@ local F210_BOBTECH_ANGEL_WITHHELD = {
   withheld_material("research_material_nitinol", "not-available-in-bobtech-angel-profile"),
   withheld_material("research_material_silver", "not-available-in-bobtech-angel-profile"),
   withheld_material("research_material_titanium", "not-available-in-bobtech-angel-profile"),
+}
+
+local F210_BOB_CORE_WITHHELD = {
+  withheld_material("research_material_aluminium", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_brass", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_cobalt_steel", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_gold", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_nickel", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_platinum", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_silver", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_titanium", "not-available-in-bob-core-profile"),
+  withheld_material("research_material_zinc", "not-available-in-bob-core-profile"),
 }
 
 local BASE_WITHOUT_SPACE_AGE = {
@@ -119,6 +142,17 @@ local function is_f210_bobtech_angel(active_mods, target)
   end
   return active_mods.Krastorio2 == nil and active_mods.Krastorio2Assets == nil
     and active_mods["Krastorio2-spaced-out"] == nil and active_mods["k2so-assets"] == nil
+end
+
+local function is_f210_bob_core(active_mods, target)
+  if type(target) ~= "table" or target.id ~= "f210" or target.factorio_version ~= "2.1"
+      or target.minimum_base ~= "2.1.23" or not has_every(active_mods, F210_BOB_CORE_REQUIRED) then
+    return false
+  end
+  for _, name in ipairs(F210_BOB_CORE_EXCLUDED) do
+    if active_mods[name] ~= nil then return false end
+  end
+  return true
 end
 
 -- Only a direct lookup by the exact authored early-stage identity is allowed.
@@ -227,6 +261,8 @@ function M.rows(active_mods, target, force, query, effective_streams)
     append_withheld(rows, F200_BOB_ANGEL_WITHHELD, force, query, effective_streams)
   elseif is_f210_bobtech_angel(active_mods, target) then
     append_withheld(rows, F210_BOBTECH_ANGEL_WITHHELD, force, query, effective_streams)
+  elseif is_f210_bob_core(active_mods, target) then
+    append_withheld(rows, F210_BOB_CORE_WITHHELD, force, query, effective_streams)
   end
   return rows
 end

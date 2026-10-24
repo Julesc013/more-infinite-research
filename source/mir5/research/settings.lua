@@ -13,6 +13,7 @@ local space_age_active = type(active_mods) == "table" and active_mods["space-age
 local k2so_active = modern_catalogue.is_k2so(active_mods)
 local bob_angel_active = modern_catalogue.is_bob_angel(active_mods)
 local bob_tech_active = require("compatibility.bob_tech_profile").applies(active_mods)
+local bob_core_active = require("compatibility.bob_core_profile").applies(active_mods)
 local py_profile = require("compatibility.py_profile")
 local atan_active = (active_mods["atan-air-scrubbing"] or active_mods["atan-ash"])
   and require("compatibility.atan_profile").select(active_mods, require("platform.target")) ~= nil
@@ -65,6 +66,9 @@ for _, historical_stream in ipairs(historical.streams) do
         field.hidden = nil
       end
       if bob_tech_active and require("compatibility.bob_tech_profile").setting_visible(historical_stream.key) then
+        field.hidden = nil
+      end
+      if bob_core_active and require("compatibility.bob_core_profile").setting_visible(historical_stream.key) then
         field.hidden = nil
       end
       if py_profile.setting_visible(historical_stream.key, active_mods) then field.hidden = nil end
