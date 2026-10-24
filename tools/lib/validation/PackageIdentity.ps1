@@ -110,7 +110,9 @@ function Get-MIRPackageSourceFiles {
     $requestedRoots.Count -eq $defaultRoots.Count -and
     ((@($requestedRoots | Sort-Object -Unique) -join "`n") -ceq (@($defaultRoots | Sort-Object -Unique) -join "`n")) -and
     (Test-Path -LiteralPath (Join-Path $repo 'source/package-source.json') -PathType Leaf) -and
-    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf)
+    (Test-Path -LiteralPath (Join-Path $repo 'targets/package-authority.json') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'tools/mir/application/package/PackageAuthority.ps1') -PathType Leaf) -and
+    (Test-Path -LiteralPath (Join-Path $repo 'spec/schemas/mir4-canonical-package-authority-v2.schema.json') -PathType Leaf)
   )
   if ($canonicalLayout) {
     if (-not (Get-Command Get-MIR4CanonicalPackageSourceFiles -ErrorAction SilentlyContinue)) {
