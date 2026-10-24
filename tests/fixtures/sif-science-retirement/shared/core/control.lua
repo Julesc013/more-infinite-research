@@ -83,10 +83,10 @@ local function assert_accelerated(value, name)
     fail(name .. " fixture acceleration differs")
   end
 end
-local function lab(state)
+local function lab(state, recharge)
   local value = state.lab
   if not value or value.valid == false then fail("real lab is absent") end
-  value.energy = 100000000
+  if recharge then value.energy = 100000000 end
   local modules = value.get_module_inventory()
   if not modules or modules.is_empty() ~= true then fail("real lab modules differ") end
   local inventory = value.get_inventory(defines.inventory.lab_input)
@@ -230,11 +230,31 @@ local function assert_successor_complete(state, contract)
     if technology(game.forces.player, name).level ~= 9 then fail(name .. " successor level differs") end
   end
   same_bonus(bonus(game.forces.player), expected_bonus(state.source_bonus, 1), "successor")
-  state.successor_consumption = {before=state.successor_before,
-    after=snapshot_counts(lab(state), configured_packs(contract, "successor"))}
+  if state.phase == "complete" then
+    local force = game.forces.player
+    if force.current_research ~= nil or #(force.research_queue or {}) ~= 0 then
+      fail("successor completed research is queued")
+    end
+    if type(state.successor_rows) ~= "table" or type(state.successor_bonus) ~= "table"
+        or type(state.successor_consumption) ~= "table" or type(state.successor_consumption.after) ~= "table" then
+      fail("successor durable witness is absent")
+    end
+    for _, name in ipairs(NAMES) do
+      same_status(status(force, name), state.successor_rows[name], "successor durable " .. name)
+    end
+    same_bonus(bonus(force), state.successor_bonus, "successor durable")
+    local inventory = lab(state)
+    for _, name in ipairs(configured_packs(contract, "successor")) do
+      if inventory.get_item_count(name) ~= state.successor_consumption.after[name] then
+        fail("successor durable science inventory differs: " .. name)
+      end
+    end
+  end
 end
 local function finish_successor(state, contract)
   assert_successor_complete(state, contract)
+  state.successor_consumption = {before=state.successor_before,
+    after=snapshot_counts(lab(state), configured_packs(contract, "successor"))}
   state.successor_rows, state.successor_bonus = {}, bonus(game.forces.player)
   for _, name in ipairs(NAMES) do state.successor_rows[name] = copy_status(status(game.forces.player, name)) end
   state.phase = "complete"; marker("initial", state); game.server_save(SAVE)
@@ -261,7 +281,7 @@ script.on_init(function()
     lab=entity, phase="source-first", source_labs=0, successor_labs=0, deadline=game.tick+DEADLINE,
     bonus_before=bonus(player)}
   storage[KEY] = state
-  local inventory, packs = lab(state), configured_packs(contract, "source")
+  local inventory, packs = lab(state, true), configured_packs(contract, "source")
   fill(inventory, packs); state.source_before=snapshot_counts(inventory, packs); queue(player, NAMES[1])
 end)
 script.on_configuration_changed(function()
@@ -279,7 +299,7 @@ script.on_configuration_changed(function()
     if not close(status(player, name).progress, PARTIAL[name]) then fail(name .. " successor detached progress differs") end
   end
   same_bonus(bonus(player), state.source_bonus, "successor restored")
-  local inventory, packs = lab(state), configured_packs(contract, "successor")
+  local inventory, packs = lab(state, true), configured_packs(contract, "successor")
   fill(inventory, packs); state.successor_before=snapshot_counts(inventory, packs)
   state.policy, state.successor_labs, state.phase, state.deadline = policy, 0, "successor-first", game.tick+DEADLINE
   queue(player, NAMES[1], PARTIAL[NAMES[1]])
@@ -318,7 +338,7 @@ script.on_event(defines.events.on_tick, function()
     return
   end
   if game.tick > state.deadline then fail("real named research did not meet the fixture deadline") end
-  lab(state)
+  lab(state, true)
   if state.phase == "source-queue-second" then queue(game.forces.player, NAMES[2]); state.phase="source-second"
   elseif state.phase == "source-observe" then finish_source(state, contract)
   elseif state.phase == "successor-queue-second" then queue(game.forces.player, NAMES[2], PARTIAL[NAMES[2]]); state.phase="successor-second"
