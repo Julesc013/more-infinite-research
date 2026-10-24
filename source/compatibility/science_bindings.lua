@@ -321,7 +321,10 @@ function M.conditions_for(family, technology_name, mods)
   end
   if type(mods) == "table" and mods["space-is-fake"] ~= nil then
     local excluded = SIF_CONTINUATION_EXCLUSIONS[technology_name]
-    if excluded then out.excluded_science = copy_list(excluded) end
+    if excluded then
+      out.excluded_science = copy_list(excluded)
+      out.excluded_prerequisites = copy_list(excluded)
+    end
   end
   return out
 end
