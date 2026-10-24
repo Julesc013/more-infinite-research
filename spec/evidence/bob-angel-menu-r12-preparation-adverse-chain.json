@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR12PreparationAdverseChainV1",
+  "status": "pre-engine-preparation-adverse-zero-timing-samples",
+  "run": 40135043874,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40135043874",
+  "controller_commit": "1641b32f57d9714f36415a2eb43cb428a8a20a32",
+  "player": {
+    "source_commit": "333fb9f94d4e48d07455154e22129c5c765b7ef9",
+    "sha256": "5B00EDE316CDC139085EBF274E8CDF02CD96F8961242E2942A2A55F55C9BB76D",
+    "bytes": 547144,
+    "asset_inventory_sha256": "2C48DE548DED0BDC2B2F01AD1B851D58158E25916A02BD8AAAD281A52C28CBC0"
+  },
+  "plan": {
+    "revision": "2a1b053b6406935664830385625d2daa50503769",
+    "path": "spec/evidence/bob-angel-menu-plan-r12.json",
+    "sha256": "B734E85FE0011C69F71514FB1B3D738D3BE2CD1416EDC4B106C94A3E36158DDE"
+  },
+  "observation": {
+    "single_job_status": "failed-retained",
+    "preparation_status": "failed-retained",
+    "failure": "[mir5-menu-r12-preparation-sparse-worktree]",
+    "factorio_processes_started": 0,
+    "native_preparation_completed": false,
+    "timing_samples_started": 0,
+    "performance_qualification": false,
+    "release_qualification": false,
+    "candidate_master_prior_bytes_preserved": true,
+    "dependency_archives_copied": 0
+  },
+  "controller_review": {
+    "finding": "Preparation supplied the r12 candidate but omitted PlanRevision, PlanPath, PlanSha256 and RunLabel from its three comparison invocations. Their unchanged r11 defaults select source19, and the r12 sparse-source guard refuses that mismatch. Offline invocation-list execution reproduces this binding defect; the original failure remains unchanged.",
+    "correction_original_commit": "a5f4f744f2291d3848c87fdb67194458ec7398ff",
+    "correction_accepted_commit": "64077dd30fc4cdda72b3d8c732c7caba617cd4ec",
+    "correction_pr": "https://github.com/Julesc013/mir-native-worker/pull/42",
+    "validation": "Both real r11/r12 Git plan bindings execute through the actual three AST-extracted argument lists; omission mutants reproduce stale-source selection for each call. r11/r12 dispatch and binding controls pass.",
+    "native_retry": "not run by this evidence"
+  },
+  "custody": {
+    "artifact_manifest_sha256": "F6AB04CF63E6E9FD6422C226FCDB4C1BE3202B570C4027459DEF8D8042CA70DB",
+    "members_verified": 26,
+    "artifact_bytes": 355334,
+    "private_original_path": "C:\\Users\\Jules\\AppData\\Local\\MIRWorker\\downloads\\40135043874-menu-r12-adverse",
+    "primary_safe_path": "build/mir5/recovery-historical/bob-angel-menu-r12/40135043874",
+    "safe_original_members": 3
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/bob-angel-menu-r12-preparation-adverse-receipts.json.gz",
+    "members": 3,
+    "uncompressed_bytes": 10395,
+    "uncompressed_sha256": "ED43D4360B22A89620E139552BDB2858A772903EF7653BC6BC8DB43EF004A51B",
+    "gzip_bytes": 4105,
+    "gzip_sha256": "41A6A82C91B26D006821853420CCF362A5BFE06FF2CEEADCA8F40ACA50C8887A"
+  },
+  "limits": [
+    "No Factorio startup, responsive-menu sample, native preparation pass, speedup or release acceptance is established.",
+    "The controller correction does not change the frozen r12 player, 38-launch design, helper hashes, intent, thresholds or resources.",
+    "Any changed player package needs its own exact declaration and qualification; this failure and plan retain their original identities."
+  ]
+}
