@@ -16,10 +16,10 @@
     "upstream_rows": 0,
     "candidate_output_used": false,
     "release_qualification": false,
-    "evidence_chain": "spec/evidence/bob-core-f210-reference-native-chain.json",
+    "evidence_chain": "spec/mir5/evidence/bob-core-f210-reference-native-chain.json",
     "presentation_raw_sha256": "A5F1BCDF17656D43F481DD41A534BBA0B0573BD2837EB1B1B76E2AB9FD186263"
   },
-  "profile": "tests/profiles/bob-core-f210-2123.json",
+  "profile": "tests/mir5/profiles/bob-core-f210-2123.json",
   "profile_sha256": "74B91D91B65109FC5FCD252C406301EF292B79F1F5BD2B7474E6C5BB1DBA4F76",
   "required_mods": {
     "base": "2.1.23",

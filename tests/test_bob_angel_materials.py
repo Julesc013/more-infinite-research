@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import unittest
 from historical_sources import read_published_source
+from repository_paths import reference_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -146,7 +147,7 @@ class BobAngelMaterialTests(unittest.TestCase):
         if captured_tail_ids != set(REVIEWED_UNBOUNDED_TAILS):
             raise AssertionError("reviewed MIR5 tails no longer match captured material continuations")
 
-        profile = ROOT / cls.facts["profile"]
+        profile = reference_path(cls.facts["profile"])
         if _sha256(profile) != cls.facts["profile_sha256"]:
             raise AssertionError(f"hash-locked Bob/Angel input changed: {profile}")
         source = cls.facts["authored_selector_evidence"]

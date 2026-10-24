@@ -9,11 +9,11 @@
     "minimum_base": "2.0.77"
   },
   "profile": {
-    "path": "tests/profiles/competing-epr-f200-2077.json",
+    "path": "tests/mir5/profiles/competing-epr-f200-2077.json",
     "sha256": "D53A27C78690B1592898E081160F0F74021E4BB66E35D1BC2B33E648D24C5B58"
   },
   "foreign_preference_profile": {
-    "path": "tests/profiles/competing-epr-foreign-f200-2077.json",
+    "path": "tests/mir5/profiles/competing-epr-foreign-f200-2077.json",
     "sha256": "FA4017B0FDC1812C99AEAF2B49685ED00A2A5B4AE95B0AA277D187B6DCD33829"
   },
   "required_mods": {

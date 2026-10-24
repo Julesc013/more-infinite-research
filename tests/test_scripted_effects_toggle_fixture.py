@@ -14,7 +14,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests" / "mir5" / "fixtures" / "scripted-effects-toggle"
+FIXTURE = ROOT / "tests" / "fixtures" / "scripted-effects-toggle"
 CONTROL = FIXTURE / "control.lua"
 NAME = "mir-fixture-mir5-scripted-effects-toggle"
 ENGINE_SHA = "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
@@ -180,7 +180,7 @@ end
         ]
         for stage, (version, enabled) in STAGES.items():
             with self.subTest(stage=stage):
-                profile = json.loads((ROOT / "tests" / "mir5" / "profiles" /
+                profile = json.loads((ROOT / "tests" / "profiles" /
                                       f"scripted-effects-toggle-{stage}-f200-sa-2077.json").read_text(encoding="utf-8"))
                 info = json.loads((FIXTURE / stage / "info.json").read_text(encoding="utf-8"))
                 self.assertEqual((profile["target"], profile["factorio_line"], profile["engine"]["version"],

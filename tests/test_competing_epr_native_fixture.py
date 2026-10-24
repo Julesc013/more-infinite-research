@@ -14,6 +14,8 @@ import re
 import sys
 import unittest
 
+from repository_paths import reference_path
+
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/competing-epr"
 FACTS_PATH = ROOT / "tests/fixtures/competing-epr-f200-captured-facts.json"
@@ -287,7 +289,7 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
             info = json.loads((FIXTURE / {"0.1.0": "published", "0.2.0": "mir5-prefer-mir", "0.3.0": "mir5-prefer-foreign"}[fixture_version] / "info.json").read_text())
             self.assertEqual((NAME, fixture_version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
         chain = json.loads(CHAIN_PATH.read_text(encoding="utf-8"))
-        receipt_path = ROOT / chain["raw_reference_receipt"]["path"]
+        receipt_path = reference_path(chain["raw_reference_receipt"]["path"])
         compressed = receipt_path.read_bytes()
         self.assertEqual(chain["raw_reference_receipt"]["sha256"], hashlib.sha256(compressed).hexdigest().upper())
         raw = gzip.decompress(compressed)
@@ -295,10 +297,10 @@ class CompetingEprNativeFixtureTests(unittest.TestCase):
         receipt = json.loads(raw)
         self.assertEqual(39999658774, receipt["run"]["id"])
         self.assertEqual(30, receipt["observed_transition"]["removed_epr_infinite_tail_count"])
-        self.assertEqual([str(path.relative_to(ROOT)).replace("\\", "/") for path in PROFILES],
-                         [entry["path"] for entry in chain["profiles"]])
+        self.assertEqual(list(PROFILES),
+                         [reference_path(entry["path"]) for entry in chain["profiles"]])
         for entry in chain["profiles"]:
-            self.assertEqual(entry["sha256"], hashlib.sha256((ROOT / entry["path"]).read_bytes()).hexdigest().upper())
+            self.assertEqual(entry["sha256"], hashlib.sha256((reference_path(entry["path"])).read_bytes()).hexdigest().upper())
         self.assertFalse(chain["claims"]["native_save_chain_passed"])
 
     def test_captured_tail_preflight_precedes_the_only_disposable_count_time_mutation(self):

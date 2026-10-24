@@ -10,10 +10,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests" / "mir5" / "fixtures" / "scripted-effects-multiplayer"
+FIXTURE = ROOT / "tests" / "fixtures" / "scripted-effects-multiplayer"
 CONTROL = FIXTURE / "control.lua"
 DATA_FINAL = FIXTURE / "data-final-fixes.lua"
-PROFILE = ROOT / "tests" / "mir5" / "profiles" / "scripted-effects-multiplayer-f200-sa-2077.json"
+PROFILE = ROOT / "tests" / "profiles" / "scripted-effects-multiplayer-f200-sa-2077.json"
 
 
 class ScriptedEffectsMultiplayerFixtureTests(unittest.TestCase):

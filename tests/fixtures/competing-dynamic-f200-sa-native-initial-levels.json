@@ -1,6 +1,6 @@
 {
   "adverse_receipt": {
-    "path": "spec/evidence/competing-dynamic-native-initial-levels-adverse-receipt.json.gz",
+    "path": "spec/mir5/evidence/competing-dynamic-native-initial-levels-adverse-receipt.json.gz",
     "sha256": "4D689D4507AB1290AE58C13CAE6F2793146FB0E2057961A2BF635BE1E31D466F",
     "uncompressed_sha256": "99AA64E6021C355773250055566FE71BB6035DB3B68B86391C8CF91A210F9322"
   },
@@ -422,7 +422,7 @@
   ],
   "raw_reference": {
     "note": "Raw capture levels are deliberately retained unchanged: their omitted level field did not establish the native prototype starting level.",
-    "path": "tests/fixtures/competing-dynamic-f200-sa-captured-facts.json",
+    "path": "tests/mir5/fixtures/competing-dynamic-f200-sa-captured-facts.json",
     "sha256": "56963D4B04EC1F5770AF8C20587D8D594D0A9ACC2784EAEA3210E744EFCDCFA8"
   },
   "schema": 1,

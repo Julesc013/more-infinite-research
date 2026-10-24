@@ -11,6 +11,8 @@ from pathlib import Path
 import sys
 import unittest
 
+from repository_paths import reference_path
+
 ROOT = Path(__file__).resolve().parents[1]
 PLAYER = ROOT / "source"
 FACTS_PATH = ROOT / "tests/fixtures/competing-epr-f200-captured-facts.json"
@@ -241,12 +243,12 @@ class CompetingProductivityTests(unittest.TestCase):
     def verify_local_capture_subset(self, facts):
         """Compare every committed selected row when the ignored raw captures exist."""
         captures = facts["captures"]
-        raw_paths = {name: ROOT / entry["path"] for name, entry in captures.items()}
+        raw_paths = {name: reference_path(entry["path"]) for name, entry in captures.items()}
         if not all(path.is_file() for path in raw_paths.values()):
             return
         for name, path in raw_paths.items():
             self.assertEqual(captures[name]["sha256"], hashlib.sha256(path.read_bytes()).hexdigest().upper())
-            settings = ROOT / captures[name]["mod_settings_path"]
+            settings = reference_path(captures[name]["mod_settings_path"])
             self.assertTrue(settings.is_file())
             self.assertEqual(captures[name]["mod_settings_sha256"], hashlib.sha256(settings.read_bytes()).hexdigest().upper())
 
@@ -278,7 +280,7 @@ class CompetingProductivityTests(unittest.TestCase):
             self.assertEqual(coverage["mir_replacements"], actual_replacements)
 
         for name, expected_value in (("published", True), ("foreign", False)):
-            setting = json.loads((ROOT / captures[name]["mod_settings_path"]).read_text(encoding="utf-8"))
+            setting = json.loads((reference_path(captures[name]["mod_settings_path"])).read_text(encoding="utf-8"))
             actual = setting["bool-setting"]["mir-prefer-this-mod-for-competing-techs"]["default_value"]
             self.assertEqual(expected_value, actual)
 
@@ -862,7 +864,7 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertEqual("MIR5DynamicCompetingF200SANativeInitialLevelsChainV1", native_chain["kind"])
         self.assertEqual(hashlib.sha256(DYNAMIC_NATIVE_INITIAL_FACTS_PATH.read_bytes()).hexdigest().upper(),
                          native_chain["facts"]["sha256"])
-        receipt = ROOT / native_chain["receipt"]["path"]
+        receipt = reference_path(native_chain["receipt"]["path"])
         self.assertTrue(receipt.is_file())
         self.assertEqual(native_chain["receipt"]["sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest().upper())
         self.assertEqual(native_chain["receipt"]["uncompressed_sha256"],
@@ -871,7 +873,7 @@ class CompetingProductivityTests(unittest.TestCase):
         self.assertTrue(all(run["status"] == "failed" and run["release_qualification"] is False
                             for run in native_chain["runs"]))
         for observation in native["observations"]:
-            artifact = ROOT / observation["local_artifact_path"]
+            artifact = reference_path(observation["local_artifact_path"])
             if not artifact.is_dir():
                 continue
             manifest = artifact / "artifact-manifest.json"
@@ -894,7 +896,7 @@ class CompetingProductivityTests(unittest.TestCase):
                          chain["facts"]["sha256"])
         for provider in chain["providers"]:
             for arm in provider["arms"].values():
-                receipt = ROOT / arm["gzip"]
+                receipt = reference_path(arm["gzip"])
                 self.assertTrue(receipt.is_file())
                 self.assertEqual(arm["gzip_sha256"], hashlib.sha256(receipt.read_bytes()).hexdigest().upper())
                 self.assertEqual(arm["uncompressed_sha256"],
@@ -996,7 +998,7 @@ class CompetingProductivityTests(unittest.TestCase):
 
     def test_dynamic_capture_facts_match_each_selected_row_when_raw_captures_are_available(self):
         facts = self.dynamic_facts()
-        paths = [ROOT / arm["raw_path"] for provider in facts["providers"]
+        paths = [reference_path(arm["raw_path"]) for provider in facts["providers"]
                  for arm in provider["arms"].values()]
         if not all(path.is_file() for path in paths):
             self.skipTest("optional dynamic raw captures are absent")
@@ -1009,7 +1011,7 @@ class CompetingProductivityTests(unittest.TestCase):
             with self.subTest(provider=provider["key"]):
                 raw = {}
                 for arm_name, arm in provider["arms"].items():
-                    path = ROOT / arm["raw_path"]
+                    path = reference_path(arm["raw_path"])
                     self.assertEqual(arm["raw_sha256"], hashlib.sha256(path.read_bytes()).hexdigest().upper())
                     raw[arm_name] = json.loads(path.read_text(encoding="utf-8"))["technology"]
                 if not provider["bindings"]:

@@ -7,7 +7,7 @@
     "factorio_version": "2.0",
     "minimum_base": "2.0.77"
   },
-  "profile": "tests/profiles/bob-angel-f200-2077.json",
+  "profile": "tests/mir5/profiles/bob-angel-f200-2077.json",
   "profile_sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90",
   "upstream_raw": {
     "path": "build/mir5/black-glass/incoming/39974658753/black-glass-bob-angel-upstream-39974658753-1/capture/write-data/script-output/data-raw-dump.json",

@@ -88,7 +88,7 @@
             "mir-fixture-mir5-active-mods-observer@0.1.0"
           ],
           "profile_input": {
-            "path": "tests/profiles/armor-bobwarfare-f200-2077.json",
+            "path": "tests/mir5/profiles/armor-bobwarfare-f200-2077.json",
             "sha256": "4B8111E6E9083B78A3063151155E3CF1A9F1148CA16A3D60C303F5FA1DFE0D1B"
           },
           "selected_archives_without_mir": [
@@ -186,7 +186,7 @@
             "mir-fixture-mir5-active-mods-observer@0.1.0"
           ],
           "profile_input": {
-            "path": "tests/profiles/armor-bobwarfare-f200-2077.json",
+            "path": "tests/mir5/profiles/armor-bobwarfare-f200-2077.json",
             "sha256": "4B8111E6E9083B78A3063151155E3CF1A9F1148CA16A3D60C303F5FA1DFE0D1B"
           },
           "selected_archives_without_mir": [
@@ -626,7 +626,7 @@
       },
       "not_emitted_selector_ids": [],
       "profile": {
-        "path": "tests/profiles/armor-bobwarfare-f200-2077.json",
+        "path": "tests/mir5/profiles/armor-bobwarfare-f200-2077.json",
         "settings_mode": "Defaults",
         "sha256": "4B8111E6E9083B78A3063151155E3CF1A9F1148CA16A3D60C303F5FA1DFE0D1B"
       },
@@ -923,7 +923,7 @@
             "pypostprocessing@3.0.42"
           ],
           "profile_input": {
-            "path": "tests/profiles/py-coal-f200-2077.json",
+            "path": "tests/mir5/profiles/py-coal-f200-2077.json",
             "sha256": "2C795BDAB42F46536EF412BE1BE637A9D6A9B86E5B78B4D52953AA4291723411"
           },
           "selected_archives_without_mir": [
@@ -1033,7 +1033,7 @@
             "pypostprocessing@3.0.42"
           ],
           "profile_input": {
-            "path": "tests/profiles/py-coal-f200-2077.json",
+            "path": "tests/mir5/profiles/py-coal-f200-2077.json",
             "sha256": "2C795BDAB42F46536EF412BE1BE637A9D6A9B86E5B78B4D52953AA4291723411"
           },
           "selected_archives_without_mir": [
@@ -1631,7 +1631,7 @@
         "recipe-prod-research_material_py_treated_wood-1"
       ],
       "profile": {
-        "path": "tests/profiles/py-coal-f200-2077.json",
+        "path": "tests/mir5/profiles/py-coal-f200-2077.json",
         "settings_mode": "Defaults",
         "sha256": "2C795BDAB42F46536EF412BE1BE637A9D6A9B86E5B78B4D52953AA4291723411"
       },
@@ -1831,7 +1831,7 @@
             "pyraworesgraphics@3.0.4"
           ],
           "profile_input": {
-            "path": "tests/profiles/py-alienlife-hightech-f200-2077.json",
+            "path": "tests/mir5/profiles/py-alienlife-hightech-f200-2077.json",
             "sha256": "2EA50433FB786C2B584016C56A45588F9F2A35BB66FA894965E6D36247049972"
           },
           "selected_archives_without_mir": [
@@ -2109,7 +2109,7 @@
             "pyraworesgraphics@3.0.4"
           ],
           "profile_input": {
-            "path": "tests/profiles/py-alienlife-hightech-f200-2077.json",
+            "path": "tests/mir5/profiles/py-alienlife-hightech-f200-2077.json",
             "sha256": "2EA50433FB786C2B584016C56A45588F9F2A35BB66FA894965E6D36247049972"
           },
           "selected_archives_without_mir": [
@@ -7125,7 +7125,7 @@
       },
       "not_emitted_selector_ids": [],
       "profile": {
-        "path": "tests/profiles/py-alienlife-hightech-f200-2077.json",
+        "path": "tests/mir5/profiles/py-alienlife-hightech-f200-2077.json",
         "settings_mode": "Defaults",
         "sha256": "2EA50433FB786C2B584016C56A45588F9F2A35BB66FA894965E6D36247049972"
       },
@@ -7207,7 +7207,7 @@
       "factorio_version": "2.0",
       "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
     },
-    "existing_native_receipt_chain": "spec/evidence/integration-reference-native-chain.json",
+    "existing_native_receipt_chain": "spec/mir5/evidence/integration-reference-native-chain.json",
     "published_mir": {
       "archive_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
       "source": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1",

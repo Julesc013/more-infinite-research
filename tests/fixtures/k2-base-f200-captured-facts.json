@@ -2,7 +2,7 @@
   "schema": 1,
   "kind": "mir5-k2-base-f200-captured-facts",
   "status": "developer-only-source-test-input",
-  "profile": "tests/profiles/k2-base-f200-2077.json",
+  "profile": "tests/mir5/profiles/k2-base-f200-2077.json",
   "profile_sha256": "664835819E0895AADA7426A777DAA9D046CB443603BF35EE0D047337E2E9C4F0",
   "engine": {
     "target": "f200",
@@ -145,9 +145,9 @@
     "role": "MIR4-authored-product-target-selector"
   },
   "catalogue_evidence": {
-    "base_path": "source/compatibility/modern_catalogue/base.lua",
+    "base_path": "source/mir5/compatibility/modern_catalogue/base.lua",
     "base_sha256": "48448C8BF3B6ED64B6DAF03D8C4E4CB2DCE04762D2255AB1D9F03C668F76B2CF",
-    "direct_path": "source/research/native_direct_definitions.lua",
+    "direct_path": "source/mir5/research/native_direct_definitions.lua",
     "direct_sha256": "A954E044434783685A92D61E23C49712A31FD0FABC5929FE10667BF43AF16369"
   },
   "standard_science": [

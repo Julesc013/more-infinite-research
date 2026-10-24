@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from historical_sources import read_published_source
+from repository_paths import reference_path
 import sys
 import unittest
 
@@ -50,7 +51,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.facts = json.loads(FACTS_PATH.read_text(encoding="utf-8"))
-        profile = ROOT / cls.facts["profile"]
+        profile = reference_path(cls.facts["profile"])
         if _sha256(profile) != cls.facts["profile_sha256"]:
             raise AssertionError(f"hash-locked K2 Base input changed: {profile}")
         # The complete dump is retained as developer custody rather than a
@@ -70,7 +71,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
             read_published_source(ROOT, source["path"], source["sha256"])
         for name in ("base", "direct"):
             source = cls.facts["catalogue_evidence"]
-            if _sha256(ROOT / source[f"{name}_path"]) != source[f"{name}_sha256"]:
+            if _sha256(reference_path(source[f"{name}_path"])) != source[f"{name}_sha256"]:
                 raise AssertionError(f"catalogue evidence changed: {source[f'{name}_path']}")
 
     @staticmethod
@@ -219,7 +220,7 @@ class K2BaseCatalogueTests(unittest.TestCase):
         ''')
 
     def _run_captured_subset_data_stage(self, startup=None):
-        profile = json.loads((ROOT / self.facts["profile"]).read_text(encoding="utf-8"))
+        profile = json.loads(reference_path(self.facts["profile"]).read_text(encoding="utf-8"))
         self.assertEqual(profile["target"], "f200")
         self.assertEqual(profile["engine"]["version"], self.facts["engine"]["version"])
         mods = {entry["name"]: entry["version"] for entry in profile["mods"] if entry["enabled"]}

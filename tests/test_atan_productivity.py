@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 from historical_sources import read_published_source
+from repository_paths import reference_path
 import sys
 import unittest
 
@@ -106,7 +107,7 @@ class AtanProductivityTests(unittest.TestCase):
         cls.variants = {"base": cls.facts, "space_age": cls.facts["space_age"]}
         evidence = cls.facts["authored_evidence"]
         read_published_source(ROOT, evidence["legacy_streams_path"], evidence["legacy_streams_sha256"])
-        if _sha256(ROOT / evidence["historical_settings_path"]) != evidence["historical_settings_sha256"]:
+        if _sha256(reference_path(evidence["historical_settings_path"])) != evidence["historical_settings_sha256"]:
             raise AssertionError("ATAN historical settings evidence changed")
 
         expected_ids = [
@@ -118,7 +119,7 @@ class AtanProductivityTests(unittest.TestCase):
                 raise AssertionError(f"F200 ATAN {variant_name} must retain two technology identities")
             if [row["name"] for row in variant["published_rows"]] != expected_ids:
                 raise AssertionError(f"ATAN {variant_name} published identities drifted")
-            profile = ROOT / variant["profile"]
+            profile = reference_path(variant["profile"])
             if _sha256(profile) != variant["profile_sha256"]:
                 raise AssertionError(f"hash-locked ATAN {variant_name} input changed: {profile}")
 

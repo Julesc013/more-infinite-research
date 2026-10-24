@@ -154,7 +154,7 @@ class PackageTests(unittest.TestCase):
             staged_repository.mkdir()
             canonical_repository.mkdir()
             staged_commit = self._write_layout_repository(
-                staged_repository, Path("source"), Path("targets/editions.json"))
+                staged_repository, Path("source/mir5"), Path("targets/mir5/editions.json"))
             canonical_commit = self._write_layout_repository(
                 canonical_repository, Path("source"), Path("targets/editions.json"))
             editions = json.loads((ROOT / pack.TARGET_RECORD).read_bytes())["targets"]
@@ -165,12 +165,12 @@ class PackageTests(unittest.TestCase):
                     member_root = "more-infinite-research_" + version
                     filename = member_root + ".zip"
                     staged = pack.build(
-                        staged_repository / "source", staged_repository / "out" / filename,
-                        revision=staged_commit, target=target_id, target_record="targets/editions.json")
+                        staged_repository / "source/mir5", staged_repository / "out" / filename,
+                        revision=staged_commit, target=target_id, target_record="targets/mir5/editions.json")
                     canonical = pack.build(
                         canonical_repository / "source", canonical_repository / "out" / filename,
                         revision=canonical_commit, target=target_id, target_record="targets/editions.json")
-                    self.assertEqual(staged["target_record"], "targets/editions.json")
+                    self.assertEqual(staged["target_record"], "targets/mir5/editions.json")
                     self.assertEqual(canonical["target_record"], "targets/editions.json")
                     self.assertEqual(staged["edition_record_sha256"], canonical["edition_record_sha256"])
                     self.assertEqual(staged["members"], canonical["members"])
@@ -189,14 +189,13 @@ class PackageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             source = root / "source"
-            source.parent.mkdir(parents=True)
             commit = self._write_layout_repository(root, Path("source"), Path(pack.TARGET_RECORD))
             for value in (
                 root.parent / "external-editions.json",
                 "../targets/editions.json",
                 "targets/../targets/editions.json",
                 "source/editions.json",
-                "targets//mir5/editions.json",
+                "targets//editions.json",
             ):
                 with self.subTest(target_record=str(value)):
                     output = root / ("out-" + str(len(str(value)))) / "more-infinite-research_5.0.20000.zip"
@@ -215,7 +214,11 @@ class PackageTests(unittest.TestCase):
             with self.subTest(target=record["target"]):
                 info, rows = pack.members(source, target=record["target"])
                 files = dict(rows)
-                history = (ROOT / record["source"]).read_bytes()
+                historical_path = Path(record["source"])
+                self.assertEqual(
+                    historical_path.as_posix(),
+                    f"source/mir5/presentation/changelog/{record['target']}.txt")
+                history = (source / historical_path.relative_to("source/mir5")).read_bytes()
                 self.assertEqual(hashlib.sha256(history).hexdigest().upper(), record["history_sha256"])
                 self.assertEqual(files["changelog.txt"], entry.replace(b"@DISTRIBUTION_VERSION@", info["version"].encode()) + history)
                 self.assertEqual(hashlib.sha256(files["LICENSE"]).hexdigest().upper(), record["license_sha256"])

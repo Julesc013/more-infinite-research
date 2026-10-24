@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from repository_paths import reference_path
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,7 +52,7 @@ class BobCoreMaterialTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.facts = json.loads(FACTS_PATH.read_text(encoding="utf-8"))
-        cls.profile = ROOT / cls.facts["profile"]
+        cls.profile = reference_path(cls.facts["profile"])
         if _canonical_lf_sha256(cls.profile) != cls.facts["profile_sha256"]:
             raise AssertionError(f"hash-locked F210 Bob Core profile changed: {cls.profile}")
         reference = cls.facts["independent_reference"]

@@ -6,7 +6,7 @@ import sys
 import unittest
 
 TESTS = Path(__file__).resolve().parent
-ROOT = TESTS.parents[1]
+ROOT = TESTS.parent
 PLAYER = ROOT / "source"
 ORACLE = TESTS / "fixtures/historical-continuation-native-oracle.json"
 

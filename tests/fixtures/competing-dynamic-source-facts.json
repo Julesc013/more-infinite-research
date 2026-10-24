@@ -37,7 +37,7 @@
         "crafting-efficiency-2/settings-value.lua": "6C66A8D279AE9C7943DDFA3493C59912BAC43460FD73EB7218131207510CE9FF",
         "crafting-efficiency-2/settings.lua": "45E19DE07BEB8AB7E561CB4B4E7B6F36D468E9F5319A2A7F5510C7911BD8DA2C"
       },
-      "profile": "tests/profiles/competing-crafting-efficiency-f200-sa-2077.json"
+      "profile": "tests/mir5/profiles/competing-crafting-efficiency-f200-sa-2077.json"
     },
     {
       "key": "productivity-research",
@@ -65,7 +65,7 @@
         "ProductivityResearch_1.3.2/prototypes/shortcut.lua": "A08270EEED84072BD5B6D58DE9AE0D4BD66A97B5C9124BEF22F260D5A1CF8A65",
         "ProductivityResearch_1.3.2/settings.lua": "9500594800DFDB79D6FA36B84BDABED8549DA9AC4FE59FFC8E4F13834C13972B"
       },
-      "profile": "tests/profiles/competing-productivity-research-f200-sa-2077.json"
+      "profile": "tests/mir5/profiles/competing-productivity-research-f200-sa-2077.json"
     },
     {
       "key": "prfe",
@@ -85,7 +85,7 @@
         "ProductivityResearchForEveryone/functions.lua": "C115673301F770CDE78896C869F8BF814AB5D299C48B3B59A1C140E44AF3C1D2",
         "ProductivityResearchForEveryone/settings.lua": "311EB165142D8718CCE46AAEA77335260EBE1D1641B07DFEA4D96C5AB215C56B"
       },
-      "profile": "tests/profiles/competing-prfe-f200-sa-2077.json"
+      "profile": "tests/mir5/profiles/competing-prfe-f200-sa-2077.json"
     },
     {
       "key": "prfe-fg",
@@ -105,7 +105,7 @@
         "ProductivityResearchForEveryoneFG/functions.lua": "A3ED44FA0FE1D576EF655E26F6C5B781B746C6938FE9A670F741003E9994D7CF",
         "ProductivityResearchForEveryoneFG/settings.lua": "C6459AE468ABB6FB2E172D28FCCB02A31AFAB4D1EC97B369CEAFC244D2759E40"
       },
-      "profile": "tests/profiles/competing-prfe-fg-f200-sa-2077.json"
+      "profile": "tests/mir5/profiles/competing-prfe-fg-f200-sa-2077.json"
     }
   ]
 }

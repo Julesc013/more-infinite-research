@@ -14,7 +14,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURE = ROOT / "tests" / "mir5" / "fixtures" / "repair-stress"
+FIXTURE = ROOT / "tests" / "fixtures" / "repair-stress"
 CONTROL = FIXTURE / "control.lua"
 SETTINGS_UPDATE = FIXTURE / "settings-updates.lua"
 NAME = "mir-fixture-mir5-repair-stress"

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "kind": "mir5-atan-f200-productivity-captured-facts",
-  "profile": "tests/profiles/atan-base-f200-2077.json",
+  "profile": "tests/mir5/profiles/atan-base-f200-2077.json",
   "profile_sha256": "2EF300249FF27F54925E40518D1EB52E31F6B71DB7CF4C71C11EBB6A5CBE712E",
   "target": {
     "id": "f200",
@@ -27,7 +27,7 @@
   "authored_evidence": {
     "legacy_streams_path": "source/prototypes/streams/productivity.lua",
     "legacy_streams_sha256": "EA66B64C03943A99B877847FD6E3903A099C83AB0333A441A29957C1C2142853",
-    "historical_settings_path": "source/research/historical_settings.lua",
+    "historical_settings_path": "source/mir5/research/historical_settings.lua",
     "historical_settings_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7"
   },
   "routes": [
@@ -390,7 +390,7 @@
     }
   ],
   "space_age": {
-    "profile": "tests/profiles/atan-space-age-f200-2077.json",
+    "profile": "tests/mir5/profiles/atan-space-age-f200-2077.json",
     "profile_sha256": "66722FA85FE52717ED2A1AED7BE0CB706F050F86B9DB09310A1E80C31725F560",
     "target": {
       "id": "f200",

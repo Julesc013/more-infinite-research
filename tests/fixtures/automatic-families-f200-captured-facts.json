@@ -7,12 +7,12 @@
     "factorio_version": "2.0",
     "minimum_base": "2.0.77"
   },
-  "profile": "tests/profiles/base-create-research-f200-2077.json",
+  "profile": "tests/mir5/profiles/base-create-research-f200-2077.json",
   "profile_sha256": "D1D2CCC00EB9F6D97161CDC7582440E037C1309ED57627B7CBEA66FF89C14C65",
   "observer_fixture": {
-    "info_path": "tests/fixtures/create-research/info.json",
+    "info_path": "tests/mir5/fixtures/create-research/info.json",
     "info_sha256": "BFFA9A944AD71CC1CEC1BAD286CA65897121B38ED75F8CD72F67F999FA11E145",
-    "settings_path": "tests/fixtures/create-research/settings-updates.lua",
+    "settings_path": "tests/mir5/fixtures/create-research/settings-updates.lua",
     "settings_sha256": "C8D9991BEFCFC223E330163F8423E0013875B831B37C619985095A2594258AFF",
     "resolved_startup_defaults": {
       "mir-automatic-create-research": true,
@@ -48,7 +48,7 @@
     "matcher_path": "source/prototypes/mir/capabilities/recipe_productivity/recipe_matching.lua",
     "matcher_sha256": "D886DA1618ABF85D6ACC5C1620ABB9BD6883E884FB74796461052A202F4A2F1B",
     "matcher_required_literal": "recipe.allow_productivity ~= true",
-    "historical_settings_path": "source/research/historical_settings.lua",
+    "historical_settings_path": "source/mir5/research/historical_settings.lua",
     "historical_settings_sha256": "F23AABE1910B6624C7B885E127AE5390063FB3E0381BA0EC71BB5829F3D0DBB7"
   },
   "native_routes": [
