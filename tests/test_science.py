@@ -358,6 +358,90 @@ class ScienceTests(unittest.TestCase):
           assert(has_name(gated.prerequisites, "promethium-science-pack"))
         ''')
 
+    def test_sif_real_space_age_continuations_keep_the_full_vector_and_retire_only_the_named_gate(self):
+        self.lua.execute(r'''
+          local catalogue = require("compatibility.modern_catalogue")
+          local modern = require("research.modern")
+          local target = require("platform.target")
+          local policies = {"configured", "space", "space-and-promethium", "space-age-progression",
+            "official-progression", "mod-progression", "all-official", "all"}
+          local packs = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+            "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack",
+            "agricultural-science-pack", "metallurgic-science-pack", "electromagnetic-science-pack",
+            "cryogenic-science-pack", "promethium-science-pack"}
+          -- Independent retained Space Age/SIF expectations, not a snapshot
+          -- of the current builder's result. Only retired space is removed.
+          local expected = {
+            ["research-speed-7"] = {
+              science = "automation-science-pack:1,logistic-science-pack:1,chemical-science-pack:1,production-science-pack:1,utility-science-pack:1,military-science-pack:1,agricultural-science-pack:1,metallurgic-science-pack:1,electromagnetic-science-pack:1,cryogenic-science-pack:1,promethium-science-pack:1",
+              prerequisites = "research-speed-5,utility-science-pack,research-speed-6,automation-science-pack,logistic-science-pack,chemical-science-pack,production-science-pack,military-science-pack,agricultural-science-pack,metallurgic-science-pack,electromagnetic-science-pack,cryogenic-science-pack,promethium-science-pack"
+            },
+            ["weapon-shooting-speed-7"] = {
+              science = "automation-science-pack:1,logistic-science-pack:1,chemical-science-pack:1,military-science-pack:1,utility-science-pack:1",
+              prerequisites = "weapon-shooting-speed-5,utility-science-pack,weapon-shooting-speed-6,automation-science-pack,logistic-science-pack,chemical-science-pack,military-science-pack"
+            }
+          }
+          local weapon_additions = {
+            ["space-and-promethium"] = {"promethium-science-pack"},
+            ["official-progression"] = {"production-science-pack"},
+            ["all-official"] = {"production-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"},
+            all = {"production-science-pack", "agricultural-science-pack", "metallurgic-science-pack",
+              "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack"}
+          }
+          for _, id in ipairs({"f200", "f210"}) do
+            target.id = id
+            for _, policy in ipairs(policies) do
+              local mods = {["space-age"]="observed", ["space-is-fake"]="observed"}
+              local raw = raw_with(packs, {whole=packs})
+              install_sources(raw, true)
+              raw.technology["space-science-pack"].prerequisites = {
+                "utility-science-pack", "production-science-pack"}
+              local checked = 0
+              for _, definition in ipairs(catalogue.continuations(mods)) do
+                local wanted = expected[definition.id]
+                if wanted then
+                  local row = modern.continuation(definition, {streams={[definition.family]=definition.defaults}})
+                  local authored = row.prerequisites
+                  local before = table.concat(authored, ",")
+                  assert(before:find("space-science-pack", 1, true), "missing real pre-policy gate")
+                  local report = science.apply_family({row}, nil, {raw=raw, target={id=id}, mods=mods,
+                    options={["mir-science-pack-ingredient-policy"]=policy}})[1]
+                  assert(report.enabled, id .. ":" .. policy .. ":" .. definition.id .. ":" .. tostring(report.reason))
+                  local wanted_science, wanted_prerequisites = wanted.science, wanted.prerequisites
+                  if definition.id == "weapon-shooting-speed-7" then
+                    for _, pack in ipairs(weapon_additions[policy] or {}) do
+                      wanted_science = wanted_science .. "," .. pack .. ":1"
+                      wanted_prerequisites = wanted_prerequisites .. "," .. pack
+                    end
+                  end
+                  assert(names(row.unit.ingredients) == wanted_science,
+                    id .. ":" .. policy .. ":" .. definition.id .. " full Space Age science changed: " .. names(row.unit.ingredients))
+                  assert(table.concat(row.prerequisites, ",") == wanted_prerequisites,
+                    id .. ":" .. policy .. ":" .. definition.id .. " retained retired gate or lost an anchor")
+                  assert(table.concat(authored, ",") == before, "mutated the original prerequisite array")
+                  if policy == "configured" then
+                    for _, opponent in ipairs({"no-sif", "adjacent-name"}) do
+                      local unchanged = modern.continuation(definition, {streams={[definition.family]=definition.defaults}})
+                      local opponent_mods = opponent == "no-sif" and {["space-age"]="observed"} or mods
+                      if opponent == "adjacent-name" then unchanged.name = definition.id .. "-unbound" end
+                      local ordinary_raw = raw_with(packs, {whole=packs})
+                      install_sources(ordinary_raw, true)
+                      local ordinary_report = science.apply_family({unchanged}, nil, {raw=ordinary_raw,
+                        target={id=id}, mods=opponent_mods,
+                        options={["mir-science-pack-ingredient-policy"]="configured"}})[1]
+                      assert(ordinary_report.enabled and table.concat(unchanged.prerequisites, ",") == before,
+                        "named SIF prerequisite exclusion escaped its activation boundary")
+                    end
+                  end
+                  checked = checked + 1
+                end
+              end
+              assert(checked == 2)
+            end
+          end
+        ''')
+
     def test_lab_policies_never_union_labs_and_disable_established_identity(self):
         self.lua.execute(r'''
           local raw = raw_with({"A","B","foreign"}, {a={"A"}, b={"B"}, pair={"A","B"}})
