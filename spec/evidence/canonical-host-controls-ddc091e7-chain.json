@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "MIR5CanonicalHostControlsChainV1",
+  "status": "passed",
+  "source_commit": "ddc091e7b41f7716d8246a743c9996c84bc44ad8",
+  "source_tree": "debaecc8b2ad863db0ac2996f066f46930a4bb19",
+  "plan_before_execution": true,
+  "clean_tracked_checkout_before_and_after": true,
+  "host_commands": 88,
+  "tooling_suites": [
+    "NativeProbeResources16",
+    "ImmutableInputStaging10",
+    "LibraryActivation10",
+    "DirectLibraryStartupMeasurement11",
+    "DevelopmentHealth41",
+    "ArtifactStorageOptimization21"
+  ],
+  "host_log_sha256": "6BA85C26423719AD3038DA5B591761EBE9F317870AA3F7D47A0493C7115F02B9",
+  "raw_receipt": {
+    "path": "spec/evidence/canonical-host-controls-ddc091e7.json.gz",
+    "sha256": "17A431E2F4D4C4E9CB07EA7061459C38F517389692E2FAB08BE3C5A252A7FB41",
+    "bytes": 44263,
+    "uncompressed_sha256": "D0F9ABBBD02A87177E169CD27012D84B9C5D5DFFEC7D55D8C3A02D96E4C60A21",
+    "uncompressed_bytes": 194376
+  },
+  "optional_skip_lines": [
+    "test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present (__main__.AutomaticFamilyNonEmissionTests.test_local_matched_capture_proves_opt_in_and_no_generated_auto_ids_when_present) ... skipped 'developer-custody raw captures are optional; portable facts remain checked'",
+    "OK (skipped=1)",
+    "OK (skipped=1)",
+    "test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present (__main__.FixedCompetingReferenceTests.test_local_archive_source_matches_portable_facts_when_the_pinned_library_is_present) ... skipped 'archive source verification requires --archive-library'",
+    "OK (skipped=1)"
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "limits": [
+    "Host/tooling execution only; no Factorio process, gameplay, save, client or elapsed performance qualification."
+  ],
+  "optional_checks": [
+    {
+      "check": "automatic-family original developer raw captures",
+      "status": "not-available-optional",
+      "portable_facts_checked": true
+    },
+    {
+      "check": "dynamic provider original developer raw captures",
+      "status": "not-available-optional",
+      "portable_facts_checked": true
+    },
+    {
+      "check": "fixed-provider local archive source",
+      "status": "passed-separately-with-exact-library",
+      "command": "python -B tests/test_competing_fixed_reference.py --lua-runtime-dir <pinned-lua52> --archive-library D:/Projects/Factorio/testmods/2.0",
+      "tests": 5
+    }
+  ]
+}
