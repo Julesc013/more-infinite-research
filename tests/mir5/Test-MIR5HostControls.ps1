@@ -29,6 +29,7 @@ $controls = @(
   [ordered]@{path='tests/mir5/test_competing_productivity.py';lua=$true},
   [ordered]@{path='tests/mir5/test_native_credit_definitions.py';lua=$true},
   [ordered]@{path='tests/mir5/test_native_credits.py';lua=$true},
+  [ordered]@{path='tests/mir5/test_legacy_preference_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_epr_native_fixture.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_fixed_reference.py';lua=$true},
   [ordered]@{path='tests/mir5/test_competing_fixed_native_fixture.py';lua=$true},
