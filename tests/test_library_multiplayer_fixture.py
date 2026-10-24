@@ -173,8 +173,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               assert(last_screenshot_tick~=nil and game.tick-last_screenshot_tick>=60,"save overlapped pending GUI captures")
               saves[#saves+1]=name
             end
+            local function native_style()
+              local values={}
+              return setmetatable({}, {
+                __index=function(_,name) return values[name] end,
+                __newindex=function(_,name,value)
+                  if name=="width" then
+                    values.minimal_width = value
+                    values.maximal_width = value
+                  else
+                    values[name]=value
+                  end
+                end
+              })
+            end
             local function element(kind,name)
-              return {valid=true,type=kind,name=name}
+              return {valid=true,type=kind,name=name,style=native_style()}
             end
             local function build_gui(client, options)
               local target=client
@@ -190,6 +204,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               root[TABS]=tabs
               local content=element("flow",CONTENT)
               content.children={}
+              content.style.width=760
               tabs[CONTENT]=content
               if options.tab=="availability" then
                 if opponent~="missing-availability-label" then
@@ -213,6 +228,8 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               results.items={options.selected};results.selected_index=1
               content[RESULTS]=results
               local detail=element("flow",DETAIL)
+              detail.style.width=content.style.maximal_width
+              if opponent=="detail-width-narrow" then detail.style.width=180 end
               detail[DETAIL_TITLE]=element("label",DETAIL_TITLE)
               detail[DETAIL_TITLE].caption=options.selected
               local context=element("flow","mir_library_detail_context")
@@ -512,6 +529,13 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 failed = self.run_case(opponent)
                 self.assertFalse(failed["ok"])
                 self.assertIn(error, failed["message"])
+
+    def test_native_detail_width_must_match_the_research_content_before_captures(self):
+        result = self.run_case()
+        self.assertTrue(result["ok"], result["message"])
+        failed = self.run_case("detail-width-narrow")
+        self.assertFalse(failed["ok"])
+        self.assertIn("native public browser detail width differs", failed["message"])
 
     def test_lab_deadline_logs_native_state_without_repair_or_success(self):
         result = self.run_case("lab-deadline")

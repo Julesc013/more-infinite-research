@@ -158,6 +158,12 @@ local function frame_parts(player)
       or not valid(detail) or not valid(detail[DETAIL_TITLE]) then
     fail("native public browser GUI tree is incomplete")
   end
+  local content_width = content.style and content.style.maximal_width
+  local detail_style = detail.style
+  if type(content_width) ~= "number" or content_width <= 0 or detail_style == nil
+      or detail_style.minimal_width ~= content_width or detail_style.maximal_width ~= content_width then
+    fail("native public browser detail width differs")
+  end
   return root, query, sort, results, detail
 end
 
