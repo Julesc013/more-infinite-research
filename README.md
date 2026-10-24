@@ -717,7 +717,7 @@ Retained overnight sweep example; its native audit stage requires conversion bef
 
 Run local-library tiers in priority order: `LocalLibraryScenarios` covers curated high-value combinations, `GeneratedLocalScenarios` creates generated mega and metadata-cluster stress cases, and `LocalModZips` tests each local root zip as an individual scenario. Add `-IncludeGeneratedLocalPairwise -GeneratedLocalPairwiseLimit 40` when you want capped pairwise cluster coverage. Add `-ShardLocalModZips -StartIndex N -ShardSize M` to resume local-root sweeps in chunks.
 
-The `LocalLibraryScenarios` tier selects curated local combinations through the line-specific [2.1 audit profile](fixtures/run-profiles/local-audit-2.1.json) or [2.0 audit profile](fixtures/run-profiles/local-audit-2.0.json). `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with a Factorio `2.1.x` MIR package and binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
+The `LocalLibraryScenarios` tier selects curated local combinations through the line-specific [2.1 audit profile](https://github.com/Julesc013/more-infinite-research/blob/c9d5febda9230111f29ece9d97a0f224fbc07528/fixtures/run-profiles/local-audit-2.1.json) or [2.0 audit profile](https://github.com/Julesc013/more-infinite-research/blob/c9d5febda9230111f29ece9d97a0f224fbc07528/fixtures/run-profiles/local-audit-2.0.json). `GeneratedLocalScenarios` builds all-local, planet, resource, Bob, Krastorio, production/fluid, and logistics/transport clusters from local zip metadata. Factorio `2.0` archives should be tested with a matching Factorio/mod line; with a Factorio `2.1.x` MIR package and binary, `2.0`-only archives are useful as inventory evidence but are not a substitute for a true `2.0` runtime gate.
 
 Use `-CollectAll` for overnight exploration so one failing modset does not stop the run. Use `-FailFast -FailOnAuditFailures` for strict CI-style gates; that mode fails when grouped unexpected audit failures remain after the converter runs.
 
@@ -750,6 +750,8 @@ The validation script checks:
 - **Pipeline extent:** a post-MIR fixture proves the opt-in startup multiplier dropdown mutates common fluid boxes when enabled.
 
 ## Documentation Map
+
+This retained MIR3/MIR4 map is historical. Retired files remain available in the [exact pre-cutover source](https://github.com/Julesc013/more-infinite-research/tree/c9d5febda9230111f29ece9d97a0f224fbc07528). Current MIR5 uses the [documentation index](docs/mir5/README.md), [specification](spec/mir5/README.md) and [development commands](docs/mir5/development.md).
 
 - **`TODO.md`:** root executable future-work ledger. Keep the durable task list, release gates, future plans, recurring checklist, companion backlog, and rejected/deferred work here so the plan survives even if derivative docs are reorganized.
 - **`docs/architecture/README.md`:** data-stage flow, utility modules, stream config, compatibility profiles, diagnostics, and validation.
@@ -816,6 +818,8 @@ No generated prototype IDs were renamed for **`v2.0.0`**. **No migration is requ
 `v2.1.0` includes a JSON migration from `recipe-prod-research_stone_products-1` to `recipe-prod-research_landfill-1` so old stone-product progress moves to the closest successor after landfill, artificial soil, and molten metals become *separate research lines*.
 
 ## Contributing and License
+
+For current MIR5 documentation, edit the source page/front matter and run the repository checker described in [Development](docs/mir5/development.md); historical generated MIR4 indexes are preserved by their original Git refs.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before changing source or generated references. Preserve the README’s badges, research catalog, settings explanations, and troubleshooting detail when updating it. Documentation under `docs` uses governed front matter; regenerate indexes and reference tables through their owning commands.
 
