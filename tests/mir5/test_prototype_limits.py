@@ -245,11 +245,64 @@ class PrototypeLimitsTests(unittest.TestCase):
           local visible = {category="recycling",ingredients={{"component",1}},results={{name="component",amount=1}}}
           local facts = limits.apply({recipe={generated=generated,visible=visible}},
             options("percent-400",false,"match-productivity-cap"))
-          assert(facts.recycling_products == 1 and original.independent_probability == 0.2)
-          assert(original.probability == nil and original.amount == 8 and original.foreign == 9)
+          local output = generated.results[1]
+          assert(facts.recycling_products == 1 and output.independent_probability == 0.2)
+          assert(output.probability == nil and output.amount == 8 and output.foreign == 9)
+          assert(original.probability == .25 and original.independent_probability == nil)
           assert(generated.maximum_productivity == 0.5 and visible.maximum_productivity == nil)
           assert(generated.results[2].probability == 0.5 and generated.results[3].independent_probability == nil)
           assert(visible.results[1].independent_probability == nil)
+        ''')
+
+    def test_recycling_shared_results_do_not_compound_or_change_excluded_recipes(self):
+        self.lua.execute('''
+          local target = require("platform.target")
+          for _, field in ipairs({"probability", "independent_probability"}) do
+            target.recipe_probability = field
+            local product = {name="component",amount=8,probability=.25,foreign=17}
+            local shared = {product}
+            local function recycling_recipe(results)
+              return {category="recycling",hidden=true,unlock_results=false,
+                ingredients={{"component",1}},results=results}
+            end
+            local first, second = recycling_recipe(shared), recycling_recipe({product})
+            local visible, parameter = recycling_recipe(shared), recycling_recipe(shared)
+            visible.hidden, parameter.parameter = false, true
+            local ordinary = {ingredients={{"component",1}},results=shared}
+            local raw = {recipe={first=first,second=second,visible=visible,
+              parameter=parameter,ordinary=ordinary}}
+            local facts = limits.apply(raw, options("engine-default",false,"percent-20"))
+            assert(facts.recycling_products == 2)
+            for _, recipe in ipairs({first,second}) do
+              assert(math.abs(recipe.results[1][field] - .2) < 1e-12,
+                "shared recycling product compounded the return multiplier")
+              assert(recipe.results[1].amount == 8 and recipe.results[1].foreign == 17)
+            end
+            assert(first.results ~= shared and second.results[1] ~= product)
+            assert(first.results[1] ~= second.results[1])
+            assert(product.probability == .25 and product.independent_probability == nil,
+              "recycling override modified an excluded recipe's shared product")
+            assert(visible.results == shared and parameter.results == shared and ordinary.results == shared)
+          end
+        ''')
+
+    def test_recycling_shared_difficulty_variants_keep_excluded_owner_unchanged(self):
+        self.lua.execute('''
+          local variant = {ingredients={{"component",1}},
+            results={{name="component",amount=8,probability=.25}},foreign=17}
+          local selected = {category="recycling",hidden=true,unlock_results=false,
+            normal=variant,expensive=variant}
+          local excluded = {category="recycling",normal=variant,expensive=variant}
+          local facts = limits.apply({recipe={selected=selected,excluded=excluded}},
+            options("engine-default",false,"percent-20"))
+          assert(facts.recycling_products == 2)
+          for _, row in ipairs({selected.normal,selected.expensive}) do
+            assert(math.abs(row.results[1].independent_probability - .2) < 1e-12,
+              "shared difficulty variant compounded the return multiplier")
+            assert(row ~= variant and row.foreign == 17)
+          end
+          assert(excluded.normal == variant and excluded.expensive == variant)
+          assert(variant.results[1].probability == .25 and variant.results[1].independent_probability == nil)
         ''')
 
     def test_power_floor_touches_only_explicit_zero_watts(self):
@@ -272,8 +325,9 @@ class PrototypeLimitsTests(unittest.TestCase):
           local recipe = {category="recycling", hidden=true, unlock_results=false,
             ingredients={{"component",1}}, results={result,zero}}
           local facts = limits.apply({recipe={back=recipe}}, options("engine-default",false,"percent-20"))
-          assert(facts.recycling_products == 1 and result.probability == 0.2)
-          assert(result.independent_probability == nil and result.foreign == 9)
+          assert(facts.recycling_products == 1 and recipe.results[1].probability == 0.2)
+          assert(recipe.results[1].independent_probability == nil and recipe.results[1].foreign == 9)
+          assert(result.probability == .25 and result.independent_probability == nil)
           assert(zero.probability == 0 and zero.independent_probability == nil)
           assert(limits.apply({recipe={back=recipe}}, options(nil,false,"percent-25")).recycling_products == 0)
         ''')
