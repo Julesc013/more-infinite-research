@@ -2,6 +2,7 @@
 -- not a route, owner, or progression discovery mechanism.
 local cost = require("research.cost")
 local catalogue = require("compatibility.modern_catalogue")
+local target = require("platform.target")
 
 local M = {}
 
@@ -19,18 +20,23 @@ end
 
 -- Compare only the four named ordinary routes. Additional return/catalyst
 -- outputs are not admitted by sharing a material's name.
-local function ordinary_rows(actual, expected)
+local function ordinary_rows(actual, expected, product)
   if type(actual) ~= "table" or #actual ~= #expected then return false end
   for index, wanted in ipairs(expected) do
     local row = actual[index]
-    if type(row) ~= "table" or (row.type or "item") ~= wanted.type
+    if type(row) ~= "table" then return false end
+    local ignored = row.ignored_by_productivity
+    if product and ignored == nil and target.productivity_ignores_stats == true then
+      ignored = row.ignored_by_stats
+    end
+    if (row.type or "item") ~= wanted.type
       or row.name ~= wanted.name or row.amount ~= wanted.amount
       or row.amount_min ~= nil or row.amount_max ~= nil
       or (row.probability ~= nil and row.probability ~= 1)
       or (row.independent_probability ~= nil and row.independent_probability ~= 1)
       or (row.shared_probability ~= nil and (type(row.shared_probability) ~= "table"
         or row.shared_probability.min ~= 0 or row.shared_probability.max ~= 1))
-      or (row.ignored_by_productivity ~= nil and row.ignored_by_productivity ~= 0)
+      or (ignored ~= nil and ignored ~= 0)
       or (row.extra_count_fraction ~= nil and row.extra_count_fraction ~= 0) then return false end
   end
   return true
@@ -44,7 +50,7 @@ local function validate_raw(raw, definition)
     local recipe = raw.recipe[route.recipe]
     if type(recipe) ~= "table" or recipe.enabled ~= false or recipe.allow_productivity ~= true
       or not ordinary_rows(recipe.ingredients, route.ingredients)
-      or not ordinary_rows(recipe.results, route.results) then fail(route.recipe .. " changed") end
+      or not ordinary_rows(recipe.results, route.results, true) then fail(route.recipe .. " changed") end
     local owner = raw.technology[route.owner]
     local unlock = false
     for _, effect in ipairs(type(owner) == "table" and owner.effects or {}) do
