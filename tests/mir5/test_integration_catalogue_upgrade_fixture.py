@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "tests/mir5/fixtures/integration-catalogue-upgrade"
+FOREIGN_OWNER = ROOT / "tests/mir5/fixtures/integration-foreign-owner"
 RECOVERED = ROOT / "tests/mir5/fixtures/armor-py-f200-472-recovered-facts.json"
 BASE_ORACLE = ROOT / "spec/mir5/inventory/modern-f200-470.json"
 CONTINUATIONS = ROOT / "tests/mir5/fixtures/native-modded-continuations-f200-captured-facts.json"
@@ -323,6 +324,164 @@ class IntegrationCatalogueUpgradeFixtureTests(unittest.TestCase):
             "status": "not-applicable",
             "reason": "foreign-armor-probe",
         }, py(result["payload"]))
+
+    def _run_foreign_owner_source(self, technology_name, *, force_name="mir5-integration-catalogue-upgrade-foreign",
+                                  call_force_index=71, present=True, initially_enabled=True):
+        control = FOREIGN_OWNER / "source" / "control.lua"
+        self.lua.globals().foreign_owner_source_path = control.as_posix()
+        self.lua.execute(r'''
+          function run_foreign_owner_source(technology_name, options)
+            local interface, methods
+            local storage, writes = {}, {}
+            local values = {valid=true, name=technology_name, enabled=options.initially_enabled}
+            local primary = setmetatable({}, {
+              __index=values,
+              __newindex=function(_, key, value) writes[#writes + 1]=key; values[key]=value end,
+            })
+            local technologies = {}
+            if options.present then technologies[technology_name]=primary end
+            local foreign = {valid=true, name=options.force_name, technologies=technologies}
+            local env = {
+              storage=storage,
+              game={forces={[71]=foreign}},
+              remote={add_interface=function(name, value)
+                if interface ~= nil then error("duplicate interface") end
+                interface, methods = name, value
+              end},
+            }
+            env._G=env
+            setmetatable(env, {__index=function(_, key) return _G[key] end})
+            local loaded, message = pcall(function() assert(loadfile(foreign_owner_source_path, "t", env))() end)
+            if not loaded then return {loaded=false, message=tostring(message)} end
+            local ok, call_message = pcall(function() methods.record_and_disable(options.call_force_index, technology_name) end)
+            return {loaded=true, ok=ok, message=tostring(call_message), interface=interface,
+              enabled=values.enabled, writes=writes, witness=storage.mir5_integration_foreign_owner}
+          end
+        ''')
+        return self.lua.eval("run_foreign_owner_source")(technology_name, lua(self.lua, {
+            "force_name": force_name, "call_force_index": call_force_index, "present": present,
+            "initially_enabled": initially_enabled,
+        }))
+
+    def _run_foreign_owner_migration(self, state, *, technology_name="recipe-prod-research_armor_components-1",
+                                     force_name="mir5-integration-catalogue-upgrade-foreign", force_index=71,
+                                     present=True, enabled=True):
+        migration = FOREIGN_OWNER / "successor" / "migrations" / "0.2.0.lua"
+        self.lua.globals().foreign_owner_migration_path = migration.as_posix()
+        self.lua.execute(r'''
+          function run_foreign_owner_migration(state, options)
+            local writes, marker, payload = {}, nil, nil
+            local values = {valid=true, name=options.technology_name, enabled=options.enabled}
+            local primary=setmetatable({}, {
+              __index=values,
+              __newindex=function(_, key, value)
+                writes[#writes + 1]=key
+                values[key]=value
+              end,
+            })
+            local technologies={}
+            if options.present then technologies[options.technology_name]=primary end
+            local foreign={valid=true, name=options.force_name, technologies=technologies}
+            local env={
+              storage={mir5_integration_foreign_owner=state},
+              game={forces={[options.force_index]=foreign}},
+              helpers={table_to_json=function(value) payload=value; return "<fixture-payload>" end},
+              log=function(value) marker=value end,
+            }
+            env._G=env
+            setmetatable(env, {__index=function(_, key) return _G[key] end})
+            local ok,message=pcall(function() assert(loadfile(foreign_owner_migration_path, "t", env))() end)
+            return {ok=ok,message=tostring(message),enabled=values.enabled,writes=writes,marker=marker,payload=payload}
+          end
+        ''')
+        return self.lua.eval("run_foreign_owner_migration")(lua(self.lua, state), lua(self.lua, {
+            "technology_name": technology_name, "force_name": force_name, "force_index": force_index,
+            "present": present, "enabled": enabled,
+        }))
+
+    def test_foreign_owner_actor_records_and_disables_only_named_integration_primaries(self):
+        good = self._run_foreign_owner_source("recipe-prod-research_armor_components-1")
+        self.assertTrue(good["loaded"], good["message"])
+        self.assertTrue(good["ok"], good["message"])
+        self.assertEqual("mir5-integration-foreign-owner", good["interface"])
+        self.assertFalse(good["enabled"])
+        self.assertEqual(["enabled"], py(good["writes"]))
+        self.assertEqual({
+            "force_index": 71,
+            "technology": "recipe-prod-research_armor_components-1",
+            "disabled": True,
+        }, py(good["witness"]))
+
+        opponents = (
+            ("non-actor technology", "laser-shooting-speed-8", {}, "outside the integration primary set"),
+            ("wrong force", "recipe-prod-research_armor_components-1", {"force_name": "other-foreign-force"}, "foreign force differs"),
+            ("missing technology", "recipe-prod-research_armor_components-1", {"present": False}, "named primary technology is absent"),
+            ("invalid force index", "recipe-prod-research_armor_components-1", {"call_force_index": 0}, "foreign force identity differs"),
+            ("already disabled", "recipe-prod-research_armor_components-1", {"initially_enabled": False}, "not initially enabled"),
+        )
+        for label, name, options, expected in opponents:
+            with self.subTest(opponent=label):
+                result = self._run_foreign_owner_source(name, **options)
+                self.assertTrue(result["loaded"], result["message"])
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+                self.assertFalse(py(result["writes"]))
+                self.assertIsNone(result["witness"])
+
+    def test_foreign_owner_successor_migration_restores_only_its_saved_disabled_flag(self):
+        state = {
+            "force_index": 71,
+            "technology": "recipe-prod-research_armor_components-1",
+            "disabled": True,
+        }
+        result = self._run_foreign_owner_migration(state, enabled=True)
+        self.assertTrue(result["ok"], result["message"])
+        self.assertFalse(result["enabled"])
+        self.assertEqual(["enabled"], py(result["writes"]))
+        self.assertEqual("[MIR5_FOREIGN_OWNER_MIGRATION] <fixture-payload>", result["marker"])
+        self.assertEqual({
+            "actor": "mir5-integration-foreign-owner",
+            "force": 71,
+            "technology": "recipe-prod-research_armor_components-1",
+            "expected_disabled": True,
+            "observed_before": True,
+            "observed_after": False,
+        }, py(result["payload"]))
+
+    def test_foreign_owner_successor_refuses_bad_witnesses_before_writing(self):
+        valid = {"force_index": 71, "technology": "recipe-prod-research_armor_components-1", "disabled": True}
+        opponents = (
+            ("absent witness", None, {}, "absent or malformed"),
+            ("malformed witness", {"force_index": 71, "technology": valid["technology"], "disabled": False}, {}, "absent or malformed"),
+            ("wrong force", valid, {"force_name": "other-foreign-force"}, "stored foreign force differs"),
+            ("missing technology", valid, {"present": False}, "stored primary technology is absent"),
+            ("non-actor technology", {"force_index": 71, "technology": "laser-shooting-speed-8", "disabled": True},
+             {"technology_name": "laser-shooting-speed-8"}, "outside the integration primary set"),
+            ("invalid stored index", {"force_index": 0, "technology": valid["technology"], "disabled": True}, {}, "absent or malformed"),
+        )
+        for label, state, options, expected in opponents:
+            with self.subTest(opponent=label):
+                result = self._run_foreign_owner_migration(state, **options)
+                self.assertFalse(result["ok"])
+                self.assertIn(expected, result["message"])
+                self.assertFalse(py(result["writes"]))
+                self.assertIsNone(result["marker"])
+                self.assertIsNone(result["payload"])
+
+    def test_foreign_owner_actor_stages_are_bound_and_successor_has_no_configuration_handler(self):
+        source_info = json.loads((FOREIGN_OWNER / "source" / "info.json").read_text(encoding="utf-8"))
+        successor_info = json.loads((FOREIGN_OWNER / "successor" / "info.json").read_text(encoding="utf-8"))
+        self.assertEqual("0.1.0", source_info["version"])
+        self.assertEqual("0.2.0", successor_info["version"])
+        self.assertIn("mir-fixture-mir5-integration-catalogue-upgrade = 0.1.0", source_info["dependencies"])
+        self.assertIn("mir-fixture-mir5-integration-catalogue-upgrade = 0.2.0", successor_info["dependencies"])
+        successor = (FOREIGN_OWNER / "successor" / "control.lua").read_text(encoding="utf-8")
+        self.assertNotIn("on_configuration_changed", successor)
+        integration = (FIXTURE / "control.lua").read_text(encoding="utf-8")
+        self.assertIn('remote.call(FOREIGN_OWNER, "record_and_disable", foreign.index, plan.primary)', integration)
+        self.assertNotIn("foreign_primary.enabled, foreign_primary.visible_when_disabled", integration)
+        self.assertNotIn("foreign_primary.enabled =", integration)
+        self.assertIn("foreign_primary.visible_when_disabled = false", integration)
 
     def test_fixture_never_writes_effects_or_uses_a_generic_research_solver(self):
         text = "\n".join(path.read_text(encoding="utf-8") for path in FIXTURE.rglob("*.lua"))
