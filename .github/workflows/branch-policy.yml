@@ -108,7 +108,7 @@ jobs:
             -OutputPath "build/results/terminal-promotion/$($env:MIR_TERMINAL_RELEASE).json"
       - name: Preserve exact promotion verification
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir3-terminal-promotion-${{ inputs.terminal_release }}-${{ inputs.terminal_candidate_sha }}
           path: candidate/build/results/terminal-promotion/${{ inputs.terminal_release }}.json

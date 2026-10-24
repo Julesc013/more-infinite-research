@@ -58,26 +58,26 @@ jobs:
           "zip_sha256=$((Get-FileHash -LiteralPath (Join-Path $root 'payload.zip') -Algorithm SHA256).Hash)" >> $env:GITHUB_OUTPUT
       - name: Upload ordinary directory
         id: upload_directory
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir-action-transport-directory
           path: build/action-transport/plain
           if-no-files-found: error
       - name: Upload exact ZIP
         id: upload_zip
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir-action-transport-zip
           path: build/action-transport/payload.zip
           if-no-files-found: error
       - name: Upload worker A evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir-action-transport-worker-a
           path: build/action-transport/worker-a
           if-no-files-found: error
       - name: Upload worker B evidence
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: mir-action-transport-worker-b
           path: build/action-transport/worker-b
