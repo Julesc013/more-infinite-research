@@ -164,15 +164,27 @@
             "source/mir5/research/product_target_extension.lua"
           ],
           "scope": "The old automatic preview deliberately emits no automatic research identities and logs that structural fallbacks are withheld."
+        },
+        {
+          "id": "named-armor-py-product-bindings",
+          "source": [
+            "source/mir5/compatibility/modern_catalogue/bob_warfare.lua",
+            "source/mir5/compatibility/modern_catalogue/py.lua",
+            "source/mir5/compatibility/py_materials.lua"
+          ],
+          "evidence": [
+            "spec/mir5/evidence/integration-reference-native-chain.json",
+            "spec/mir5/evidence/armor-py-candidate-native-chain.json",
+            "spec/mir5/evidence/integration-catalogue-upgrade-adverse-chain.json"
+          ],
+          "scope": "The recovered F200 Armor/BobWarfare, PyCoal and PyAlienLife/HighTech contracts preserve broad armor/plating weights and named Py routes. Their complete independent data/settings comparison retains 48 native-credit carrier occurrences as explicit differences and has zero other unresolved deltas. This admits no generic alias/discovery rule or future pack. Physical output and save qualification remain open; the first save chain currently stops on a foreign-enable mismatch whose cause is under investigation."
         }
       ],
       "test_subjects": [
         "coverage",
         "unrelated_growth"
       ],
-      "remaining_implementation": [
-        "Recover only named, exact native admission contracts for the Py/armor broad aliases; current evidence does not authorize a generic alias or discovery rule."
-      ],
+      "remaining_implementation": [],
       "remaining_qualification": [
         "Observe physical product outcomes and exclusions for each admitted profile/binding class."
       ]
@@ -686,6 +698,8 @@
             "source/mir5/research/k2_materials.lua",
             "source/mir5/research/k2_imersite.lua",
             "source/mir5/research/bob_angel_materials.lua",
+            "source/mir5/compatibility/modern_catalogue/py.lua",
+            "source/mir5/research/py_materials.lua",
             "source/mir5/presentation/library_model.lua",
             "source/mir5/runtime/library.lua"
           ],
@@ -702,11 +716,12 @@
             {"request_id": "BA-09", "route": "research_material_copper_tungsten"},
             {"request_id": "BA-13", "route": "Exact F210 BobTech research_material_gunmetal; current native qualification pending"},
             {"request_id": "BA-14", "route": "Exact F210 BobTech research_material_invar; current native qualification pending"},
+            {"request_id": "ECO-PY", "route": "Bounded F200 PyCoal and PyAlienLife/HighTech authored routes recovered from exact independent native references; physical/save qualification remains open and this is not full ecosystem support"},
             {"request_id": "UI-01", "route": "Per-player finite/infinite presentation filter"},
             {"request_id": "UI-02", "route": "Per-player finite/infinite presentation filter"},
             {"request_id": "UI-03", "route": "Library native navigation/queue surface; full queue-mod interoperability remains unqualified"}
           ],
-          "scope": "Reconciliation links retain original request IDs and do not change their decisions or qualification status. ECO-PY remains unadmitted without exact native bindings; armor has no original dedicated request ID. ATAN/provider contracts have no matching original request ID. No new IDs or automatic-preview delivery are invented; other retained historical material obligations remain open."
+          "scope": "Reconciliation links retain original request IDs and do not change their decisions or qualification status. ECO-PY now links the bounded recovered routes, while its requested-not-qualified status remains accurate; armor has no original dedicated request ID. ATAN/provider contracts have no matching original request ID. No new IDs or automatic-preview delivery are invented; other retained historical material obligations remain open."
         }
       ],
       "test_subjects": [
