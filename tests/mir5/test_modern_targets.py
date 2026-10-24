@@ -15,6 +15,7 @@ class ModernTargetTests(unittest.TestCase):
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
           target = require("platform.target")
+          package.preload["__more-infinite-research__/platform/target"] = function() return target end
           catalogue = require("compatibility.modern_catalogue")
           function f200()
             target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"

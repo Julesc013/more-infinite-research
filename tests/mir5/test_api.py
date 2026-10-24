@@ -18,6 +18,9 @@ class ApiTests(unittest.TestCase):
           package.preload["__more-infinite-research__/research/generator"] = function()
             return require("research.generator")
           end
+          package.preload["__more-infinite-research__/platform/target"] = function()
+            return assert(loadfile(player_root .. "/platform/target.lua"))()
+          end
           package.preload["__more-infinite-research__.api.v1.data"] = function()
             return assert(loadfile(player_root .. "/api/v1/data.lua"))()
           end
@@ -70,6 +73,7 @@ class ApiTests(unittest.TestCase):
             productivity_ignores_stats = true, receiver_limits = true,
             cargo_research = false
           }
+          package.loaded["__more-infinite-research__/platform/target"] = package.loaded["platform.target"]
           package.loaded["__more-infinite-research__.api.v1.data"] = nil
           api = require("__more-infinite-research__.api.v1.data")
           data = world()
@@ -100,6 +104,29 @@ class ApiTests(unittest.TestCase):
           submitted.unit.ingredients[1][2] = 99
           emitted.unit.ingredients[1][2] = 2
           assert(emitted.unit.ingredients[1][2] == 2 and submitted.unit.ingredients[1][2] == 99)
+        ''')
+
+    def test_external_consumer_target_namespace_cannot_replace_mir_capabilities(self):
+        self.fresh()
+        self.lua.execute('''
+          for _, consumer in ipairs({"alpha", "beta"}) do
+            local private_target = {distribution_version=consumer .. "-private",
+              recipe_productivity=false, cargo_research=false}
+            package.loaded["platform.target"] = private_target
+            package.loaded["__more-infinite-research__/platform/target"] = nil
+            package.loaded["__more-infinite-research__.api.v1.data"] = nil
+            local external_api = require("__more-infinite-research__.api.v1.data")
+            assert(external_api.get_version().product == "5.0.21000",
+              "external API consumed " .. consumer .. "'s private target metadata")
+            assert(external_api.get_capabilities().recipe_productivity)
+            local name = "mir-api-namespace-" .. consumer
+            assert(external_api.add_productivity(definition(name), {"iron-gear-wheel"}, .01) == name)
+            assert(data.raw.technology[name].effects[1].change == .01)
+            assert(package.loaded["platform.target"] == private_target
+              and private_target.recipe_productivity == false,
+              "MIR must neither load nor rewrite the consumer's private module")
+          end
+          assert(data.writes == 2)
         ''')
 
     def test_family_keeps_order_and_permits_local_forward_references(self):

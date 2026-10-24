@@ -1,7 +1,7 @@
 -- Draft MIR API v1 data-stage surface. Calls publish immediately in the
 -- caller's current data stage; no contributions are retained for a finalizer.
 local generator = require("__more-infinite-research__/research/generator")
-local target = require("platform.target")
+local target = require("__more-infinite-research__/platform/target")
 
 local M = {}
 local MAX_FAMILY = 64
