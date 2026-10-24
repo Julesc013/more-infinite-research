@@ -105,7 +105,8 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
               prototypes={module_category=category_map,
                 recipe={
                   ["mir5-override-ordinary"]={maximum_productivity=1,allowed_effects=recipe_effects,allowed_module_categories=category_map},
-                  ["mir5-override-recycling"]={maximum_productivity=.5,products={{type="item",name="iron-plate",probability=.2}}},
+                  ["mir5-override-recycling"]={maximum_productivity=.5,products={{type="item",name="iron-plate",amount=1,
+                    independent_probability=opponent == "runtime-probability" and .3 or .2}}},
                   ["mir5-override-parameter"]={allowed_effects={speed=false,productivity=false,consumption=false,pollution=false,quality=false},allowed_module_categories={speed=true}}
                 },
                 entity={
@@ -119,6 +120,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
               surfaces={{create_entity=function(row) assert(row.name == "mir5-override-assembler"); return machine end}},
               server_save=function(name) assert(name == "mir5-override-interactions-complete"); saves=saves+1 end}
             env.helpers={table_to_json=function(row) markers[#markers+1]=row; return "fixture-json" end}
+            if opponent == "legacy-probability" then
+              local product=env.prototypes.recipe["mir5-override-recycling"].products[1]
+              product.independent_probability=nil; product.probability=.2
+            end
             env.log=function() end
             env._G=env
             setmetatable(env,{__index=_G})
@@ -243,6 +248,27 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         with self.assertRaisesRegex(Exception, "runtime receiver witness differs"):
             runtime["callbacks"]["init"]()
 
+    def test_control_rejects_old_or_changed_runtime_product_probability_without_repair(self):
+        for opponent in ("legacy-probability", "runtime-probability"):
+            with self.subTest(opponent=opponent):
+                runtime = self.lua.globals().control_runtime(opponent)
+                with self.assertRaisesRegex(Exception, "runtime recycling prototype differs"):
+                    runtime["callbacks"]["init"]()
+                diagnostic = runtime["markers"][1]
+                self.assertEqual("failed", diagnostic["status"])
+                self.assertEqual(0.2, diagnostic["expected"]["independent_probability"])
+                actual = diagnostic["actual"]
+                self.assertEqual(1, actual["product_count"])
+                self.assertEqual(0.5, actual["maximum_productivity"])
+                if opponent == "legacy-probability":
+                    self.assertIsNone(actual["independent_probability"])
+                    self.assertEqual(0.2, actual["legacy_probability"])
+                else:
+                    self.assertEqual(0.3, actual["independent_probability"])
+                    product = runtime["env"]["prototypes"]["recipe"]["mir5-override-recycling"]["products"][1]
+                    self.assertEqual(0.3, product["independent_probability"])
+                self.assertEqual(0, runtime["saves"]())
+
     def test_f210_runtime_api_matches_only_the_public_witnesses(self):
         path = f210_runtime_api_path()
         if path is None:
@@ -255,6 +281,10 @@ class OverrideInteractionsFixtureTests(unittest.TestCase):
         self.assertTrue({"allowed_effects", "allowed_module_categories", "effect_receiver", "energy_usage"} <= entity_fields)
         self.assertNotIn("max_pipeline_extent", entity_fields)
         self.assertNotIn("independent_probability", recipe_fields)
+        item_product = next(row for row in api["concepts"] if row["name"] == "ItemProduct")
+        product_fields = {row["name"] for row in item_product["type"]["parameters"]}
+        self.assertIn("independent_probability", product_fields)
+        self.assertNotIn("probability", product_fields)
 
     def test_profile_binds_exact_current_official_closure_and_private_fixture(self):
         profile = json.loads(PROFILE.read_text(encoding="utf-8"))

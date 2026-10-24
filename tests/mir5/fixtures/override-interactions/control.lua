@@ -12,7 +12,13 @@ local MODULE = PREFIX .. "module"
 local EFFECTS = {"speed", "productivity", "consumption", "pollution", "quality"}
 local loaded, reported = false, false
 
-local function fail(message) error("[mir5-override-interactions] " .. message) end
+local function fail(message, fields)
+  if fields then
+    fields.case, fields.status, fields.error = "override-interactions", "failed", message
+    log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json(fields))
+  end
+  error("[mir5-override-interactions] " .. message)
+end
 local function near(actual, expected)
   return type(actual) == "number" and math.abs(actual - expected) <= 0.0000001
 end
@@ -46,8 +52,19 @@ local function prototype_witness()
   local machine, pipeline = prototypes.entity[MACHINE], prototypes.entity[PIPELINE]
   if not ordinary or not recycled or not parameter or not machine or not pipeline then fail("fixture prototype is absent") end
   if not near(ordinary.maximum_productivity, 1) then fail("runtime productivity cap differs") end
-  if not near(recycled.maximum_productivity, 0.5) or #recycled.products ~= 1 or not near(recycled.products[1].probability, 0.2) then
-    fail("runtime recycling prototype differs")
+  local products = recycled.products or {}
+  local product = products[1] or {}
+  if not near(recycled.maximum_productivity, 0.5) or #products ~= 1
+      or product.type ~= "item" or product.name ~= "iron-plate" or product.amount ~= 1
+      or not near(product.independent_probability, 0.2) then
+    fail("runtime recycling prototype differs", {
+      expected={maximum_productivity=0.5, product_count=1, type="item", name="iron-plate",
+        amount=1, independent_probability=0.2},
+      actual={maximum_productivity=recycled.maximum_productivity, product_count=#products,
+        type=product.type, name=product.name, amount=product.amount,
+        independent_probability=product.independent_probability, legacy_probability=product.probability,
+        extra_count_fraction=product.extra_count_fraction},
+    })
   end
   local expected_effects, expected_categories = {}, categories()
   for _, name in ipairs(EFFECTS) do expected_effects[name] = true end
