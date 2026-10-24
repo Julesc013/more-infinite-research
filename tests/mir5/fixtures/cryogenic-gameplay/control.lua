@@ -9,9 +9,24 @@ local PACKS = {
   "electromagnetic-science-pack", "cryogenic-science-pack", "promethium-science-pack",
 }
 local INITIAL = 32
+-- `research_gears` defaults to ten percent. The fixture accelerates count
+-- and time only, leaving the authored effect intact for this native witness.
+local EXPECTED_GEAR_PRODUCTIVITY = 0.10
+local EXPECTED_LABORATORY_PRODUCTIVITY = 0
 local loaded, reported
 
-local function fail(message)
+local function diagnostic(message, fields)
+  local payload = {
+    case="cryogenic-gameplay", status="failed", error=message,
+    expected_recipe_productivity=EXPECTED_GEAR_PRODUCTIVITY,
+    expected_laboratory_productivity=EXPECTED_LABORATORY_PRODUCTIVITY,
+  }
+  for key, value in pairs(fields or {}) do payload[key] = value end
+  log("[MIR5_NATIVE_FIXTURE] DIAGNOSTIC " .. helpers.table_to_json(payload))
+end
+
+local function fail(message, fields)
+  if helpers and helpers.table_to_json and log then diagnostic(message, fields) end
   error("[mir5-cryogenic-gameplay] " .. message)
 end
 
@@ -39,18 +54,39 @@ local function check_inputs(value, names)
   if next(expected) ~= nil then fail(value.name .. " lost a native ingredient") end
 end
 
+local function gear_effect_witness(gear)
+  local prototype, matches, change = gear.prototype, 0, nil
+  for _, effect in ipairs(prototype and prototype.effects or {}) do
+    if effect.type == "change-recipe-productivity" and effect.recipe == "iron-gear-wheel" then
+      matches, change = matches + 1, effect.change
+    end
+  end
+  return {technology=gear.name, level=gear.level, researched=gear.researched,
+    recipe_effect_matches=matches, recipe_effect_change=change}
+end
+
+local function bonus_witness(force, gear)
+  return {
+    actual_recipe_productivity=force.recipes["iron-gear-wheel"].productivity_bonus,
+    actual_laboratory_productivity=force.laboratory_productivity_bonus,
+    gear=gear_effect_witness(gear),
+  }
+end
+
 local function assert_complete(state)
   local force = game.forces.player
-  if state.finished ~= 2 or not research(force, OWNER).researched
-      or research(force, GEAR).level ~= 2 or force.current_research ~= nil then
+  local owner, gear = research(force, OWNER), research(force, GEAR)
+  if state.finished ~= 2 or not owner.researched or gear.level ~= 2 or force.current_research ~= nil then
     fail("both actual laboratory completions were not retained")
   end
-  if not near(force.recipes["iron-gear-wheel"].productivity_bonus, 0.02)
-      or not near(force.laboratory_productivity_bonus, 0) then
-    fail("native gear or laboratory productivity differs")
+  if not near(force.recipes["iron-gear-wheel"].productivity_bonus, EXPECTED_GEAR_PRODUCTIVITY) then
+    fail("native gear productivity differs", bonus_witness(force, gear))
   end
-  check_inputs(research(force, OWNER), {FOREIGN})
-  check_inputs(research(force, GEAR), PACKS)
+  if not near(force.laboratory_productivity_bonus, EXPECTED_LABORATORY_PRODUCTIVITY) then
+    fail("native laboratory productivity differs", bonus_witness(force, gear))
+  end
+  check_inputs(owner, {FOREIGN})
+  check_inputs(gear, PACKS)
   if not state.lab or not state.lab.valid then fail("actual laboratory is absent") end
   local inventory = state.lab.get_inventory(defines.inventory.lab_input)
   for _, name in ipairs(PACKS) do
@@ -64,7 +100,9 @@ local function marker(stage, state)
     case="cryogenic-gameplay", stage=stage, status="passed",
     witnesses={actual_lab_completions=state.finished, foreign_owner_input=FOREIGN,
       foreign_owner_science_consumed=1, official_science_inputs=PACKS,
-      each_official_science_consumed=1, native_gear_productivity=0.02,
+      each_official_science_consumed=1, native_gear_productivity=EXPECTED_GEAR_PRODUCTIVITY,
+      laboratory_productivity=EXPECTED_LABORATORY_PRODUCTIVITY,
+      gear=gear_effect_witness(game.forces.player.technologies[GEAR]),
       policy="all-official", on_load_read_only=stage == "reload",
       fixture_accelerates_gear_count_and_time=true, ordinary_tuning_qualified=false,
       resource_mining_observed=false, exact_reporter_modpack=false},
