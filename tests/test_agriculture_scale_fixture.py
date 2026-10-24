@@ -492,7 +492,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         self.assertEqual(official + [("mir-fixture-mir5-active-mods-observer", "0.1.0")],
                          [(row["name"], row["version"]) for row in candidate_default["mods"]])
         self.assertEqual({
-            "more-infinite-research_5.0.20000.zip": CANDIDATE_DEFAULT_ARCHIVE_SHA,
+            "more-infinite-research_5.0.21000.zip": CANDIDATE_DEFAULT_ARCHIVE_SHA,
             "mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER_SHA,
         }, candidate_default["archive_sha256"])
         self.assertIn("no agriculture core, paired arm, policy selector", candidate_default["scope"].lower())
