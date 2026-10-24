@@ -80,6 +80,48 @@ class PrototypeLimitsTests(unittest.TestCase):
           assert(raw.recipe.a.maximum_productivity == 2.5 and raw.recipe.e.maximum_productivity == 2.5)
         ''')
 
+    def test_combined_receiver_limits_copy_each_changed_receiver_once(self):
+        self.lua.execute('''
+          local shared = {copy_work_marker=true, foreign={sentinel=17}}
+          shared.self, shared.alias = shared, shared.foreign
+          local assembler, lab = {effect_receiver=shared}, {effect_receiver=shared}
+          local raw = {["assembling-machine"]={assembler}, lab={lab},
+            unrelated=setmetatable({}, {__pairs=function() error("unrelated scan") end})}
+          local options = {["mir-prototype-efficiency-cap"]="saving-90",
+            ["mir-prototype-pollution-cap"]="saving-95",
+            ["mir-prototype-speed-floor"]="saving-999",
+            ["mir-prototype-speed-cap"]="bonus-400",
+            ["mir-prototype-quality-cap"]="bonus-250"}
+          local original_pairs, copies = pairs, 0
+          pairs = function(value)
+            if type(value) == "table" and rawget(value, "copy_work_marker") then
+              copies = copies + 1
+            end
+            return original_pairs(value)
+          end
+          local ok, facts = pcall(limits.apply, raw, options)
+          pairs = original_pairs
+          assert(ok, facts)
+          assert(copies == 2, "receiver copied " .. copies .. " times for two changed prototypes")
+          assert(facts.receivers == 10, "retain the count of changed limit fields")
+          assert(shared.speed_limits == nil and shared.foreign.sentinel == 17)
+          for _, prototype in ipairs({assembler, lab}) do
+            local receiver = prototype.effect_receiver
+            assert(receiver ~= shared and receiver.self == receiver)
+            assert(receiver.foreign ~= shared.foreign and receiver.foreign == receiver.alias)
+            assert(receiver.consumption_limits.low == -.9 and receiver.consumption_limits.high == 1000)
+            assert(receiver.pollution_limits.low == -.95 and receiver.pollution_limits.high == 1000)
+            assert(receiver.speed_limits.low == -.999 and receiver.speed_limits.high == 4)
+            assert(receiver.quality_limits.low == 0 and receiver.quality_limits.high == 2.5)
+          end
+          assert(assembler.effect_receiver ~= lab.effect_receiver
+            and assembler.effect_receiver.foreign ~= lab.effect_receiver.foreign)
+          local current = assembler.effect_receiver
+          facts = limits.apply(raw, options)
+          assert(facts.receivers == 0 and assembler.effect_receiver == current,
+            "unchanged receivers must retain their identity on repeated application")
+        ''')
+
     def test_foreign_receiver_cycles_aliases_and_scalar_ranges(self):
         self.lua.execute('''
           local foreign = {}; foreign.self = foreign
