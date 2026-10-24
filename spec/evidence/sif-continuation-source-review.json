@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "kind": "MIR5SIFContinuationSourceReviewV1",
+  "request": "SIF-01",
+  "status": "implemented-source-host-controls-pass-native-pending",
+  "scope": ["research-speed-7", "weapon-shooting-speed-7"],
+  "retired_science": "space-science-pack",
+  "boundary": "Only the two named continuations while space-is-fake is active. Filter the selected science vector and corresponding policy additions before source and prerequisite validation. Explicit required science is appended later and remains mandatory. No Generator change, foreign-prototype mutation or traversal.",
+  "current_source": ["source/compatibility/science_bindings.lua", "source/research/science.lua"],
+  "host_control": "tests/test_science.py",
+  "host_expectations": [
+    "Both named rows on F200 and F210 under all eight policies preserve independently declared ordered ingredient amounts and finite anchors while excluding retired space science.",
+    "The same inputs without SIF preserve ordinary space-science policy behavior.",
+    "Explicit required science, unrelated rows and mandatory endgame gates remain intact.",
+    "The pre-fix unbound policy is rejected by SIF's changed native space-source contract rather than accepted as a valid continuation."
+  ],
+  "available_native_inputs": [
+    {"target": "f200", "engine": "2.0.77", "mods": [
+      {"name": "space-is-fake", "version": "1.0.60", "sha256": "860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC"},
+      {"name": "cr-commons", "version": "1.0.27", "sha256": "6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92"}
+    ]},
+    {"target": "f210", "engine": "2.1.23", "mods": [
+      {"name": "space-is-fake", "version": "1.0.78", "sha256": "3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13"},
+      {"name": "cr-commons", "version": "1.0.33", "sha256": "378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB"},
+      {"name": "cr-extras", "version": "1.0.01", "sha256": "874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82"}
+    ]}
+  ],
+  "remaining_qualification": [
+    "Actual emitted current-package definitions and reachable science on both exact target closures, including expanded policies.",
+    "Genuine published-predecessor upgrade preserving earned research/progress, save and two actual cold reloads on F200 and F210.",
+    "Coherent final-package qualification; the archive inventory above is an input observation, not a native pass."
+  ]
+}
