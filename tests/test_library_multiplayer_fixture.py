@@ -474,6 +474,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $byStage[[string]$marker['stage']]=$marker
           }
 
+          $minimumStarted=Copy-LibraryMarker $byStage['completed']
+          $minimumStarted['witnesses']['live_refresh']['native_research_started_events']=2
+          Assert-LibraryReaderAccepts $minimumStarted
+
+          $tooFewStarted=Copy-LibraryMarker $byStage['completed']
+          $tooFewStarted['witnesses']['live_refresh']['native_research_started_events']=1
+          Assert-LibraryReaderRejects $tooFewStarted 'completed' 6 'too few native research starts'
+
           $missingImmutable=Copy-LibraryMarker $byStage['ready']
           $missingImmutable['witnesses'].Remove('initial_native_snapshot_immutable')
           Assert-LibraryReaderRejects $missingImmutable 'ready' 0 'missing immutable snapshot'
@@ -490,6 +498,46 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $wrongViews['witnesses']['distinct_personal_query_and_selection']=$false
           Assert-LibraryReaderRejects $wrongViews 'ready' 0 'cross-client view state'
 
+          $stringTwoClients=Copy-LibraryMarker $byStage['ready']
+          $stringTwoClients['witnesses']['two_connected_clients_required']='true'
+          Assert-LibraryReaderRejects $stringTwoClients 'ready' 0 'string two-client witness'
+
+          foreach($stage in @('ready','rejoin-ready','restart-ready','completed')){
+            $wrongBase=Copy-LibraryMarker $byStage[$stage]
+            $wrongBase['witnesses']['base_version']='2.0.76'
+            Assert-LibraryReaderRejects $wrongBase $stage ([int]$expectedJoins[$stage]) "$stage base version"
+            $wrongMir=Copy-LibraryMarker $byStage[$stage]
+            $wrongMir['witnesses']['mir_version']='5.0.19999'
+            Assert-LibraryReaderRejects $wrongMir $stage ([int]$expectedJoins[$stage]) "$stage MIR version"
+            $wrongCaptures=Copy-LibraryMarker $byStage[$stage]
+            $wrongCaptures['witnesses']['screenshot_calls']=99
+            Assert-LibraryReaderRejects $wrongCaptures $stage ([int]$expectedJoins[$stage]) "$stage capture count"
+          }
+
+          $wrongReadyGear=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyGear['witnesses']['live_refresh']['gear_level']=2
+          Assert-LibraryReaderRejects $wrongReadyGear 'ready' 0 'ready gear level'
+          $wrongReadyProductivity=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyProductivity['witnesses']['live_refresh']['gear_productivity']=1
+          Assert-LibraryReaderRejects $wrongReadyProductivity 'ready' 0 'ready gear productivity'
+          $wrongReadyAvailability=Copy-LibraryMarker $byStage['ready']
+          $wrongReadyAvailability['witnesses']['availability_terminal_labels_checked']=$true
+          Assert-LibraryReaderRejects $wrongReadyAvailability 'ready' 0 'ready Availability witness'
+          foreach($field in @('native_laboratory_completion_by_script','science_consumed_per_named_pack',
+              'fixture_accelerates_gear_count_and_time_only','ordinary_tuning_qualified',
+              'root_and_query_identity_preserved','cross_force_view_state_preserved')){
+            $wrong=Copy-LibraryMarker $byStage['ready']
+            switch($field){
+              'native_laboratory_completion_by_script' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'science_consumed_per_named_pack' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'fixture_accelerates_gear_count_and_time_only' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'ordinary_tuning_qualified' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'root_and_query_identity_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'cross_force_view_state_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+            }
+            Assert-LibraryReaderRejects $wrong 'ready' 0 "ready $field"
+          }
+
           $missingLiveRefresh=Copy-LibraryMarker $byStage['rejoin-ready']
           $missingLiveRefresh['witnesses'].Remove('live_refresh')
           Assert-LibraryReaderRejects $missingLiveRefresh 'rejoin-ready' 2 'missing live refresh'
@@ -505,6 +553,40 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $wrongCompletionCount=Copy-LibraryMarker $byStage['completed']
           $wrongCompletionCount['witnesses']['live_refresh']['real_lab_completions']=1
           Assert-LibraryReaderRejects $wrongCompletionCount 'completed' 6 'incomplete real labs'
+
+          foreach($field in @('native_laboratory_completion_by_script','native_research_cancelled_events',
+              'native_foreign_force_created_events','gear_level','science_consumed_per_named_pack',
+              'fixture_accelerates_gear_count_and_time_only','ordinary_tuning_qualified',
+              'root_and_query_identity_preserved','cross_force_view_state_preserved')){
+            $wrong=Copy-LibraryMarker $byStage['completed']
+            switch($field){
+              'native_laboratory_completion_by_script' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'native_research_cancelled_events' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'native_foreign_force_created_events' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'gear_level' {$wrong['witnesses']['live_refresh'][$field]=1}
+              'science_consumed_per_named_pack' {$wrong['witnesses']['live_refresh'][$field]=0}
+              'fixture_accelerates_gear_count_and_time_only' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'ordinary_tuning_qualified' {$wrong['witnesses']['live_refresh'][$field]=$true}
+              'root_and_query_identity_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+              'cross_force_view_state_preserved' {$wrong['witnesses']['live_refresh'][$field]=$false}
+            }
+            Assert-LibraryReaderRejects $wrong 'completed' 6 "completed $field"
+          }
+
+          $stringStarted=Copy-LibraryMarker $byStage['completed']
+          $stringStarted['witnesses']['live_refresh']['native_research_started_events']='2'
+          Assert-LibraryReaderRejects $stringStarted 'completed' 6 'string native research starts'
+          $shortQueue=Copy-LibraryMarker $byStage['completed']
+          $shortQueue['witnesses']['live_refresh']['queue_lengths_observed']=@(2,0)
+          Assert-LibraryReaderRejects $shortQueue 'completed' 6 'short queue lengths'
+          $wrongProductivity=Copy-LibraryMarker $byStage['completed']
+          $wrongProductivity['witnesses']['live_refresh']['gear_productivity']=.2000005
+          Assert-LibraryReaderRejects $wrongProductivity 'completed' 6 'gear productivity tolerance'
+          foreach($field in @('first_open','search','refresh','availability_terminal_labels_checked','reopen')){
+            $wrong=Copy-LibraryMarker $byStage['completed']
+            $wrong['witnesses'][$field]=$false
+            Assert-LibraryReaderRejects $wrong 'completed' 6 "completed $field"
+          }
 
           $wrongStage=Copy-LibraryMarker $byStage['ready']
           $wrongStage['stage']='unknown'
