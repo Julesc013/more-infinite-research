@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "kind": "MIR5PyPublishedResetCausalControlChainV1",
+  "status": "published-only-configuration-boundary-observation-completed",
+  "release_qualification": false,
+  "accepted_observation": {
+    "run": 40091620986,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40091620986",
+    "artifact_root": "build/mir5/recovery-historical/py-published-reset-control/40091620986/black-glass-py-published-reset-control-40091620986-1",
+    "artifact_manifest": {
+      "path": "artifact-manifest.json",
+      "sha256": "7F68925E7DEAB974B32F136C8A08DD09C47304E3E2A0E20FBA0AB933B062CEE1",
+      "members": 90,
+      "verified_members": 90
+    },
+    "controller_commit": "4e73fdceffe7e37df85e95c62969d3bf451fbf55",
+    "source_commit": "8f0695fcc36ec41243906f541c0643396959b2ea",
+    "chain_receipt": {
+      "path": "py-published-reset-causal-control-chain.json",
+      "sha256": "A7246371327841B495A45E9E3C0CA761631663045BC3206F36E4C7A1805451BB",
+      "bytes": 79801
+    },
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "published_mir4": {
+      "tag": "v4.7.2",
+      "archive": "more-infinite-research_4.7.20002.zip",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "sums_sha256": "5DF0282024F4CA376CBA56E6E848F8512D768E1520D47E1C6AD257567BC561A9",
+      "source": "bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1"
+    },
+    "pypostprocessing_source_hypothesis": {
+      "archive": "pypostprocessing_3.0.42.zip",
+      "sha256": "D5AF3599EB16247E669CCB029CCF710A238AFACA615E90AFBD73475FEE73E252",
+      "member": "pypostprocessing/control.lua",
+      "member_sha256": "7D3D66D0EDBAA60C08C071B083431224C383C68ED49D3BCC073D67D222347152",
+      "lines": "120-125",
+      "status": "source-review-hypothesis-only; this observation does not attribute a writer to that callback"
+    },
+    "profiles": [
+      {
+        "id": "py-coal",
+        "primary": "recipe-prod-research_material_py_log-4",
+        "force": 5,
+        "source_profile_sha256": "1468EE9C02537CD0A8D61A11FB45A776FF6EDF75E4F9DBA8EAE488AEAA40E3D2",
+        "control_profile_sha256": "65F03BDD02A704B5130705CEB4AAFA2E7411B63936B2AD65BBED8EACC9C036F1",
+        "source_stage": {
+          "result_sha256": "9639897D2D98AEE36D2651DC848E5150A6109F5F1E669CE03F8572B817401ACC",
+          "save_sha256": "60ADC55D9D7D6B7AC6C43A0EAFC400599B6EB46A9F5D0DC015371791CF740D6D",
+          "reused_from_run": 40089321549
+        },
+        "published_control": {
+          "result_sha256": "4E449783E6563ED4D21A96671864AEA812B1D129CF22C649F5EFB3A6BB48A516",
+          "initial_and_two_reload_markers": "passed"
+        },
+        "correlated_actor_migration": {
+          "actor": "mir5-integration-foreign-owner",
+          "force": 5,
+          "technology": "recipe-prod-research_material_py_log-4",
+          "expected_disabled": true,
+          "observed_before": false,
+          "observed_after": false
+        },
+        "observed_configuration_boundary": {
+          "source_primary_enabled": false,
+          "post_configuration_primary_enabled": true,
+          "primary_visible_when_disabled": false,
+          "checked_technology_rows": 54
+        }
+      },
+      {
+        "id": "py-alienlife-hightech",
+        "primary": "recipe-prod-research_breeding-1",
+        "force": 5,
+        "source_profile_sha256": "B949A9A04D46708D1A5795A7A63B54FA6E0EB7F1638526E18D9E643BC74FB19A",
+        "control_profile_sha256": "3DB51DB571C1D4F0F76734BEBD578BE6ED0B96D0B5F33FCBECA4F856464E2906",
+        "source_stage": {
+          "result_sha256": "018ECEC8B25430CD845F9CF97FB0FF1B6ED2750D7A670CF3A4EE03B7D5C53FDD",
+          "save_sha256": "CB09A894FE9201DEABA63A1FD7DEF0A9AF2BAACF271B78C15023B1AB5A064FF2",
+          "reused_from_run": null
+        },
+        "published_control": {
+          "result_sha256": "AD1A6B3D5035EE7A0618EDF9E2C33CC6F2FD2DB2EAF9C4B3ED85EF2CDEB03689",
+          "initial_and_two_reload_markers": "passed"
+        },
+        "correlated_actor_migration": {
+          "actor": "mir5-integration-foreign-owner",
+          "force": 5,
+          "technology": "recipe-prod-research_breeding-1",
+          "expected_disabled": true,
+          "observed_before": false,
+          "observed_after": false
+        },
+        "observed_configuration_boundary": {
+          "source_primary_enabled": false,
+          "post_configuration_primary_enabled": true,
+          "primary_visible_when_disabled": false,
+          "checked_technology_rows": 55
+        }
+      }
+    ]
+  },
+  "adverse_history": [
+    {
+      "run": 40089321549,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40089321549",
+      "artifact_root": "build/mir5/recovery-historical/py-published-reset-control/40089321549/black-glass-py-published-reset-control-40089321549-1",
+      "artifact_manifest": {
+        "path": "artifact-manifest.json",
+        "sha256": "53D042DFD125BEAB283AF753BBC8FD82B49C466306D309CC379E3C4C4EF73622",
+        "members": 62,
+        "verified_members": 62
+      },
+      "controller_commit": "427f8fc22e3c7f753ba0ec44fefb41deaaf4f59f",
+      "source_commit": "f7ae4d5011db5db16915b43d62bd0c6e2a870fe3",
+      "chain_receipt": {
+        "path": "py-published-reset-causal-control-chain.json",
+        "sha256": "74145E2BCA4BCC720B7FE3AABEEAB044003AEC194ED42ABC1B1C9B9B0992F82B",
+        "bytes": 16671
+      },
+      "status": "failed",
+      "failure": "[mir441-process-exit] 1",
+      "disposition": "Observer attempted to read another mod’s private storage. Storage isolation invalidated the observer; this run establishes neither callback order nor a Py state transition."
+    },
+    {
+      "run": 40090561999,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40090561999",
+      "artifact_root": "build/mir5/recovery-historical/py-published-reset-control/40090561999/black-glass-py-published-reset-control-40090561999-1",
+      "artifact_manifest": {
+        "path": "artifact-manifest.json",
+        "sha256": "B6C0CACA93D7DA440D5D860AB6449CACB778FDE63A41F3A1A35432E0C79DD460",
+        "members": 39,
+        "verified_members": 39
+      },
+      "controller_commit": "dde9e3e30bdec7a4de376f3b8af5c5cb736c81da",
+      "source_commit": "baaee9e5b735b65a3b3bb830311562c56a149a9a",
+      "chain_receipt": {
+        "path": "py-published-reset-causal-control-chain.json",
+        "sha256": "2DDD013FFA95CF6C1E5F04B01808BAA62239724D0B64D2C1F47ADCC5006FE480",
+        "bytes": 74868
+      },
+      "status": "failed",
+      "failure": "fatal native production diagnostic",
+      "disposition": "Observer compared a Boolean recipe.enabled field with the numeric source recipe.productivity_bonus snapshot. This schema mismatch establishes no recipe state mutation."
+    },
+    {
+      "run": 40073440776,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40073440776",
+      "artifact_root": "build/mir5/recovery-historical/integration-catalogue-upgrade-foreign-owner-py/40073440776/black-glass-integration-catalogue-upgrade-foreign-owner-py-40073440776-1",
+      "artifact_manifest": {
+        "path": "artifact-manifest.json",
+        "sha256": "5E853F51D42F0B1C6E13B79A58FD8FC554FB9F364339B14DCFA52E7609F5798F",
+        "members": 65,
+        "verified_members": 65
+      },
+      "source_commit": "6cbce3bf45ccc714b6043562e3d4053f4012793d",
+      "player_archive_sha256": "5dc8ce3286ab439d9dacf933b643040101b03399a9e2ff15094cab1a309ec910",
+      "mir5_result": {
+        "path": "gameplay/py-coal/mir5/result.json",
+        "sha256": "1A26503C045E0060F0C0C126F4D2279C75B342E9380E131B6D3F2336186E5AEE",
+        "status": "failed",
+        "failure": "fatal native production diagnostic"
+      },
+      "disposition": "Original strict MIR5 persistent-foreign-owner adverse remains unresolved: the named PyCoal technology was already re-enabled before gameplay/save. This published-only control does not waive, replace, or pass that MIR5 scenario."
+    }
+  ],
+  "interpretation": {
+    "direct_observation": "With published MIR 4.7.2, the fixed PyCoal and PyAlienLife/HighTech closures reached the observed configuration boundary after the actor migration marker. In each control the named primary began disabled and was observed enabled after configuration; the fixture kept its captured visibility and other checked snapshot fields.",
+    "correlation_boundary": "The actor migration marker is correlated by actor identity, force, primary name, expected_disabled=true and observed_after=false before the observer configuration marker. observed_before=false is a fact about that migration, not evidence of a prior re-enable.",
+    "not_established": [
+      "No MIR5 behavior, save migration, gameplay, performance, multiplayer, broad modpack, final-package, or release qualification.",
+      "No isolated attribution of the transition to pypostprocessing or any particular callback.",
+      "No authority for generic MIR foreign-state restoration or for weakening the original strict MIR5 oracle."
+    ]
+  },
+  "next_mir5_oracle_requirement": "A separate, exact MIR5 fixture/controller binding must retain the original named primary and force, correlate the actor marker externally, assert only the primary enabled false-to-true configuration transition and all other captured fields unchanged, and preserve the existing strict source save/fixtures. It requires its own reviewed input and native result.",
+  "selected_exact_receipt_capsule": {
+    "path": "spec/evidence/py-published-reset-control-native-receipts.json.gz",
+    "sha256": "4069B13BAB7ABC794B9E73CE59E4A109E28CE0F42E26DFD038F278D0C11857D8",
+    "bytes": 394011,
+    "uncompressed_sha256": "31E1FD05B01E908B966149FBBD117848CD87FE73A97926B83591B0CB35C31338",
+    "uncompressed_bytes": 3187212,
+    "records": 27,
+    "scope": "Selected exact manifests/controller chains/native results/Factorio logs, including both observer adverses and the reused original PyCoal source. Save/archive bytes remain in primary native custody; this is not the complete run artifact or an MIR5 pass."
+  }
+}
