@@ -56,12 +56,27 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local key="mir5_library_multiplayer"
             local gear="recipe-prod-research_gears-1"
             local mining="recipe-prod-research_mining_drill-1"
+            local gear_packs={"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}
             local players, markers, screenshots, saves = {}, {}, {}, {}
-            local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0}
+            local force={valid=true,index=1,name="player",technologies={},recipes={},research_queue={},research_progress=0,
+              research_enabled=true,laboratory_speed_modifier=0}
+            local gear_ingredients={
+              {name=gear_packs[1],amount=1},{name=gear_packs[2],amount=1},
+              {name=gear_packs[3],amount=1},{name=gear_packs[4],amount=1},
+            }
             for _,name in ipairs({gear,mining}) do
               force.technologies[name]={valid=true,name=name,force=force,level=1,researched=false,enabled=true,visible_when_disabled=false,
                 research_unit_count=1,research_unit_energy=60,
+                research_unit_ingredients=name==gear and gear_ingredients or nil,
                 prototype={effects={{type="change-recipe-productivity",recipe="iron-gear-wheel",change=.1}}}}
+            end
+            local ingredients=force.technologies[gear].research_unit_ingredients
+            if opponent=="science-missing" then table.remove(ingredients,4)
+            elseif opponent=="science-duplicate" then ingredients[5]={name=gear_packs[1],amount=1}
+            elseif opponent=="science-extra" then ingredients[5]={name="military-science-pack",amount=1}
+            elseif opponent=="science-wrong-amount" then ingredients[3].amount=2
+            elseif opponent=="science-reordered" then
+              force.technologies[gear].research_unit_ingredients={ingredients[4],ingredients[2],ingredients[1],ingredients[3]}
             end
             for _,name in ipairs({"iron-gear-wheel","burner-mining-drill","electric-mining-drill"}) do
               force.recipes[name]={valid=true,name=name,productivity_bonus=0}
@@ -109,7 +124,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               return spec.count
             end
             inventory.get_item_count=function(name) return inventory.counts[name] or 0 end
-            local lab={valid=true,energy=0}
+            local lab={valid=true,active=true,status=1,energy=0}
             lab.get_inventory=function(index) assert(index==1);return inventory end
             game.surfaces[1].create_entity=function(spec)
               assert(spec.name=="lab" and spec.force==force)
@@ -244,8 +259,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             local function complete_mock_lab()
               local current=force.current_research
               if not current then return end
+              if opponent=="stalled-lab" then return end
               if opponent~="no-lab-consumption" then
-                for _,name in ipairs({"automation-science-pack","logistic-science-pack","chemical-science-pack","production-science-pack"}) do
+                for _,name in ipairs(gear_packs) do
                   inventory.counts[name]=inventory.counts[name]-1
                 end
               end
@@ -320,6 +336,20 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               end
               refresh_mock_gui(en);refresh_mock_gui(de)
               ok,result=call(callbacks.events[1]);if not ok then return {ok=false,message=result} end
+              if opponent=="stalled-lab" and storage[key].phase=="researching-live-research" then
+                game.tick=storage[key].live_deadline
+                refresh_mock_gui(en);refresh_mock_gui(de)
+                ok,result=call(callbacks.events[1])
+                local remaining={}
+                for _,name in ipairs(gear_packs) do remaining[name]=inventory.get_item_count(name) end
+                return {ok=ok,message=result,phase=storage[key].phase,tick=game.tick,deadline=storage[key].live_deadline,
+                  finished=storage[key].finished,started=storage[key].started,gear_level=force.technologies[gear].level,
+                  gear_researched=force.technologies[gear].researched,gear_bonus=force.recipes["iron-gear-wheel"].productivity_bonus,
+                  current_research=force.current_research and force.current_research.name or nil,
+                  research_progress=force.research_progress,research_enabled=force.research_enabled,
+                  laboratory_speed_modifier=force.laboratory_speed_modifier,
+                  lab={valid=lab.valid,active=lab.active,status=lab.status,energy=lab.energy},remaining=remaining}
+              end
               if storage[key].phase=="awaiting-rejoin" then live_ready=true;break end
             end
             if not live_ready then return {ok=false,message="actual Library refresh did not reach rejoin state"} end
@@ -661,6 +691,67 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertIn("[mir5-library-multiplayer]", result["message"])
                 self.assertIn(message, result["message"])
+
+    def test_fixture_preflights_the_exact_unordered_gear_science_vector(self):
+        source = CONTROL.read_text(encoding="utf-8")
+        self.assertIn("local gear = gear_definition(force)\n  seed_gear_prerequisites(force)", source)
+
+        reordered = self.run_case("science-reordered")
+        self.assertTrue(reordered["ok"], reordered["message"])
+
+        expected = {
+            "science-missing": "required ingredient is missing",
+            "science-duplicate": "duplicate ingredient",
+            "science-extra": "unexpected ingredient",
+            "science-wrong-amount": "ingredient amount",
+        }
+        for opponent, reason in expected.items():
+            with self.subTest(opponent=opponent):
+                result = self.run_case(opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn("[mir5-library-multiplayer]", result["message"])
+                self.assertIn("fixture gear science vector differs", result["message"])
+                self.assertIn(reason, result["message"])
+
+    def test_stalled_lab_reaches_the_original_deadline_with_bounded_diagnostics(self):
+        result = self.run_case("stalled-lab")
+        source = CONTROL.read_text(encoding="utf-8")
+        self.assertFalse(result["ok"])
+        self.assertIn("[mir5-library-multiplayer] actual Library refresh laboratory exceeded deadline;", result["message"])
+        self.assertIn("local LIVE_DEADLINE_TICKS = 3600", source)
+        self.assertEqual((result["tick"], result["deadline"]), (3780, 3780))
+        self.assertEqual(result["phase"], "researching-live-research")
+        self.assertEqual((result["finished"], result["started"]), (0, 1))
+        self.assertEqual((result["gear_level"], result["gear_bonus"]), (1, 0))
+        self.assertFalse(result["gear_researched"])
+        self.assertEqual((result["current_research"], result["research_progress"]),
+                         ("recipe-prod-research_gears-1", 0))
+        self.assertTrue(result["research_enabled"])
+        self.assertEqual(result["laboratory_speed_modifier"], 0)
+        self.assertEqual(result["lab"], {"valid": True, "active": True, "status": 1, "energy": 100000000})
+        self.assertEqual(result["remaining"], {
+            "automation-science-pack": 2,
+            "logistic-science-pack": 2,
+            "chemical-science-pack": 2,
+            "production-science-pack": 2,
+        })
+        for field in (
+            "finished=0", "started=1", "gearlevel=1", "currentresearch=recipe-prod-research_gears-1",
+            "progress=0", "research_enabled=true", "laboratory_speed_modifier=0", "labvalid=true",
+            "labactive=true", "labstatus=1", "labenergy=100000000",
+            "automation-science-pack=2", "logistic-science-pack=2", "chemical-science-pack=2",
+            "production-science-pack=2",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, result["message"])
+
+        start = source.index("local function deadline_lab_diagnostic")
+        end = source.index("local function localized_key", start)
+        diagnostic = source[start:end]
+        self.assertIn("pcall(lab.get_inventory", diagnostic)
+        self.assertIn("pcall(inventory.get_item_count", diagnostic)
+        self.assertNotIn("helpers.table_to_json", diagnostic)
+        self.assertNotIn("log(", diagnostic)
 
     def test_initial_native_locales_need_no_synthetic_locale_change_event(self):
         result = self.run_case("unchanged-locales")

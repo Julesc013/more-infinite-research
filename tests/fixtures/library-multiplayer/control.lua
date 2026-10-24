@@ -246,6 +246,25 @@ local function exact_queue(force, expected)
   return true
 end
 
+local function assert_gear_science_vector(gear)
+  local ingredients = gear.research_unit_ingredients
+  if type(ingredients) ~= "table" then fail("fixture gear science vector differs: ingredients are absent") end
+  local expected, seen = {}, {}
+  for _, name in ipairs(GEAR_PACKS) do expected[name] = true end
+  for _, ingredient in ipairs(ingredients) do
+    local name = type(ingredient) == "table" and ingredient.name or nil
+    if type(name) ~= "string" or expected[name] ~= true then
+      fail("fixture gear science vector differs: unexpected ingredient")
+    end
+    if seen[name] then fail("fixture gear science vector differs: duplicate ingredient") end
+    if ingredient.amount ~= 1 then fail("fixture gear science vector differs: ingredient amount") end
+    seen[name] = true
+  end
+  for _, name in ipairs(GEAR_PACKS) do
+    if not seen[name] then fail("fixture gear science vector differs: required ingredient is missing") end
+  end
+end
+
 local function gear_definition(force)
   local gear = technology(force, GEAR)
   if gear.level ~= 1 or gear.researched or gear.enabled ~= true
@@ -260,6 +279,7 @@ local function gear_definition(force)
     end
   end
   if matches ~= 1 then fail("native gear effect differs") end
+  assert_gear_science_vector(gear)
   return gear
 end
 
@@ -295,6 +315,46 @@ local function assert_completed_gear(state, force)
     fail("actual Library refresh research/queue state differs")
   end
   assert_lab_consumption(state)
+end
+
+local function diagnostic_scalar(value)
+  local kind = type(value)
+  if kind == "number" or kind == "boolean" then return tostring(value) end
+  return "nil"
+end
+
+local function deadline_lab_diagnostic(state)
+  local force = game and game.forces and game.forces.player or nil
+  local gear = valid(force) and force.technologies and force.technologies[GEAR] or nil
+  local lab = state and state.lab or nil
+  local inventory = nil
+  if valid(lab) and type(lab.get_inventory) == "function" then
+    local ok, value = pcall(lab.get_inventory, defines.inventory.lab_input)
+    if ok and valid(value) then inventory = value end
+  end
+  local current = valid(force) and named(force.current_research) or nil
+  if current ~= nil and current ~= GEAR then current = "other" end
+  local remaining = {}
+  for _, name in ipairs(GEAR_PACKS) do
+    local count = nil
+    if valid(inventory) and type(inventory.get_item_count) == "function" then
+      local ok, value = pcall(inventory.get_item_count, name)
+      if ok then count = value end
+    end
+    remaining[#remaining + 1] = name .. "=" .. diagnostic_scalar(count)
+  end
+  return "finished=" .. diagnostic_scalar(state and state.finished)
+    .. ",started=" .. diagnostic_scalar(state and state.started)
+    .. ",gearlevel=" .. diagnostic_scalar(valid(gear) and gear.level)
+    .. ",currentresearch=" .. (current or "nil")
+    .. ",progress=" .. diagnostic_scalar(valid(force) and force.research_progress)
+    .. ",research_enabled=" .. diagnostic_scalar(valid(force) and force.research_enabled)
+    .. ",laboratory_speed_modifier=" .. diagnostic_scalar(valid(force) and force.laboratory_speed_modifier)
+    .. ",labvalid=" .. tostring(valid(lab))
+    .. ",labactive=" .. diagnostic_scalar(valid(lab) and lab.active)
+    .. ",labstatus=" .. diagnostic_scalar(valid(lab) and lab.status)
+    .. ",labenergy=" .. diagnostic_scalar(valid(lab) and lab.energy)
+    .. ",remaining=" .. table.concat(remaining, ";")
 end
 
 local function localized_key(value)
@@ -470,8 +530,8 @@ local function restore_initial_views(state, english, german)
   if force.current_research ~= nil or not exact_queue(force, {}) then
     fail("fresh Library refresh world retained research before the real lab run")
   end
-  seed_gear_prerequisites(force)
   local gear = gear_definition(force)
+  seed_gear_prerequisites(force)
   local lab = surface.create_entity{name="lab", position=force.get_spawn_position(surface), force=force}
   if not valid(lab) then fail("could not create an actual Library refresh laboratory") end
   local inventory = lab.get_inventory(defines.inventory.lab_input)
@@ -731,7 +791,9 @@ script.on_event(defines.events.on_tick, function()
       state.phase = "researching-live-research"
     end
   elseif state.phase == "researching-live-research" then
-    if game.tick >= state.live_deadline then fail("actual Library refresh laboratory exceeded deadline") end
+    if game.tick >= state.live_deadline then
+      fail("actual Library refresh laboratory exceeded deadline; " .. deadline_lab_diagnostic(state))
+    end
     if not valid(state.lab) then fail("actual Library refresh laboratory was removed") end
     state.lab.energy = LAB_ENERGY
     if state.finished == 1 and game.tick >= (state.refresh_after_tick or game.tick) and not state.first_completion_seen then
