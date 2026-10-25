@@ -102,6 +102,7 @@ $controls = @(
   [ordered]@{path='tests/test_historical_sources.py';lua=$false},
   [ordered]@{path='tests/test_menu_comparison.py';lua=$false},
   [ordered]@{path='tests/test_menu_comparison_analysis.py';lua=$false},
+  [ordered]@{path='tests/test_runtime_benchmark_analysis.py';lua=$false},
   [ordered]@{path='tests/test_pack.py';lua=$false},
   [ordered]@{path='tests/test_host_controls.py';lua=$false},
   [ordered]@{path='tools/check_repository.py';lua=$false}
