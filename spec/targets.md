@@ -56,7 +56,7 @@ A pure directory cutover must produce identical package **member paths and bytes
 
 `TGT-04` — Promote accepted development through `dev` then `main` using the existing permissions and required checks. This specification does not authorize changing branch protection, signing, release immutability settings or credentials. Preserve prior releases and provenance; repository cleanup must not rewrite tags.
 
-Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, nine applicable player ZIPs plus useful checksum/signature files, and no redundant downloads table. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full history in packaged changelogs. Verify anonymous downloads and local delivery by bytes; GitHub publication is distinct from Mod Portal publication.
+Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, nine applicable player ZIPs plus useful checksum/signature files, and no redundant downloads table. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full history in packaged changelogs. Verify anonymous downloads and local delivery by bytes. Agent-managed publication is GitHub-only for all releases; the maintainer handles Mod Portal publication, credentials and readback, which are not agent completion gates.
 
 Cryptographic identity and successful CI do not prove gameplay correctness. Release requires the separate parity, native/migration and performance outcomes in [Verification](verification.md).
 
