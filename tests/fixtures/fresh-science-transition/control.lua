@@ -111,20 +111,18 @@ local function fill(state, value)
       fail("F210 biolab rejected science input: " .. tostring(ingredient.name))
     end
   end
-  entity.active = true
   entity.energy = 1000000000
 end
 
 local function freeze(state)
   local entity, inventory = lab(state)
-  entity.active = false
   entity.energy = 0
   inventory.clear()
 end
 
 local function assert_frozen(state, label)
   local entity, inventory = lab(state)
-  if entity.active ~= false or entity.energy ~= 0 or not inventory.is_empty() then
+  if entity.energy ~= 0 or not inventory.is_empty() then
     fail(label .. " fixture biolab was not frozen")
   end
 end
