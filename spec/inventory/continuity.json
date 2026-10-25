@@ -766,7 +766,7 @@
           "source": [
             "spec/programmes/community-requests.json"
           ],
-          "scope": "The original 85-record ledger remains the sole request authority. Additive mir5_route_disposition fields map finite current source decisions without changing any original ID, title, requester, decision, acceptance, provenance, status or history."
+          "scope": "The original 85 records remain unchanged in ID, title, requester, decision, acceptance, provenance, status and history; SCI-UNLOCK-01 receives only additive public-source follow-ups. Two additive public bug intakes bring the sole ledger to87 records. MIR5 source-route mappings and these intakes do not close unresolved reporter configurations."
         },
         {
           "id": "distinct-open-science-reports",
@@ -952,6 +952,17 @@
             "spec/programmes/community-requests.json"
           ],
           "scope": "ECO-PLANETS retains its original request without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage; it is not inferred from historical changelog text or a general science policy. SIF-01 now has the explicit two-continuation source binding and host-only evidence named in its original ledger row; native final-emission and predecessor/save acceptance remain open."
+        },
+        {
+          "id": "additive-public-crash-intakes-2026-10-25",
+          "source": [
+            "spec/programmes/community-requests.json"
+          ],
+          "request_ids": [
+            "COMP-TRUE-NUKES-01",
+            "MP-JOIN-01"
+          ],
+          "scope": "Retain the True Nukes enabling/nuclear-test report and the post-update second-client join failure as new unqualified records. The original screenshot error and exact engine/archive/mod/settings/save inputs remain missing. SCI-UNLOCK-01 separately gains verified cached public links for its original thread, the cryogenic pack variant and the historical Angel silver repair. No historical fix claim or representative test is relabelled as reporter closure."
         }
       ],
       "test_subjects": [
@@ -959,7 +970,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Close only records with named exact source/package/engine/profile evidence. Current source mapping and historical native evidence do not by themselves qualify the final package; both unknown reporter closures remain unreconciled."
+        "Close only records with named exact source/package/engine/profile evidence. Current source mapping and historical native evidence do not by themselves qualify the final package; both unknown reporter closures remain unreconciled. COMP-TRUE-NUKES-01 and MP-JOIN-01 also retain incomplete original reporter inputs and no current qualified route."
       ]
     },
     {
