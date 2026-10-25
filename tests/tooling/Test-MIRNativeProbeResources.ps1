@@ -167,8 +167,15 @@ try {
   }
   $defaultBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'default-budget') -ExpectedPeakMemoryMiB 1024 -UseExactOutputRoot
   Assert-Probe ([int64]$defaultBudget.max_new_output_bytes -eq [int64]120MB) 'default-output-budget'
-  $eightGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'eight-gib-budget') -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8192 -UseExactOutputRoot
-  Assert-Probe ([int64]$eightGiBBudget.max_new_output_bytes -eq [int64]8192MB) 'eight-gib-output-budget-admitted'
+  $boundarySnapshot.work_volume.free_bytes=$requiredDisk;$boundarySnapshot.system_volume.free_bytes=$requiredDisk
+  $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
+  try {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot}.GetNewClosure()
+    $eightGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'eight-gib-budget') -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8192 -UseExactOutputRoot
+    Assert-Probe ([int64]$eightGiBBudget.max_new_output_bytes -eq [int64]8192MB) 'eight-gib-output-budget-admitted'
+  } finally {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value $priorSnapshot
+  }
   $run=Join-Path $root 'run'
   $context=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $run -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8 -UseExactOutputRoot
   [IO.Directory]::CreateDirectory($context.root)|Out-Null
