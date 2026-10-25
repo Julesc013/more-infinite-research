@@ -4,8 +4,8 @@
   "status": "predeclared-active-save-capture-required-not-a-result",
   "host": "BLACKGLASS-WIN1",
   "plan_source": {
-    "commit": "e1edabf39bbe75f424695b2ea05487dbb7247579",
-    "tree": "d6e97094ca83f04dfb2e8495d94daa29a6d13d99"
+    "commit": "672191d62be58e4463e6e31e75f76bb608966d0b",
+    "tree": "b2da67977751d4ee193fb09fb765626e7b67f2cd"
   },
   "supersedes_nothing": "runtime-benchmark-plan-r01.json remains the retained completed-idle/steady-state declaration and is not an active-work result.",
   "candidate": {
@@ -27,9 +27,9 @@
     "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
   },
   "public_harness": {
-    "source_reference": "e1edabf39bbe75f424695b2ea05487dbb7247579",
+    "source_reference": "672191d62be58e4463e6e31e75f76bb608966d0b",
     "git_blob_sha256": [
-      {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "2C9E0470ED0C6B79F3EA65AD31508B35E6616C013353BDAFC145B172FF988418"},
+      {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "24DD5DF6B7E504AF75703B056F68D98B8CF820F7657CCFCADB54BA6D98650328"},
       {"path": "tools/lib/validation/NativeProbeResources.ps1", "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"},
       {"path": "tools/lib/validation/ResourceGovernor.ps1", "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"},
       {"path": "tools/lib/validation/OwnedProcessMemorySampler.ps1", "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"},
@@ -97,10 +97,11 @@
     }
   },
   "execution_admission": {
-    "required_before_prepare_or_timing": [
-      "A native CreateOnly capture for every selected published/candidate active profile, with exact active-save hashes and fixture archive hashes.",
-      "Independent reader evidence that the exact raw benchmark log contains one start and one complete active marker for the selected arm/tier.",
-      "Fresh private controller binding to this plan, its raw helper bytes, the active save receipts and the current direct libraries."
+    "preparation_outside_scored_timing": [
+      "Native active-seed preparation, not generic CreateOnly: the selected repair or agriculture fixture must reach one unique prepared marker and write a closed mir5-native-active save before the benchmark loads it. Agriculture preparation includes its two real lab completions; repair preparation stops before its first post-load physical damage.",
+      "The prepared-save receipt must bind the exact selected profile, fixture archives, player archive, active-save hash and marker raw log. It is a seed-preparation observation, not a timing result.",
+      "An unscored post-load marker pilot must retain one unique start and one unique complete active marker for the selected arm/tier before any scored benchmark sample. The pilot is not a performance acceptance sample.",
+      "Fresh private controller binding to this plan, its raw helper bytes, the active-save receipts and the current direct libraries is required before scored timing. A source/profile staging read may occur before active saves exist, but must refuse timing without them."
     ],
     "missing_inputs_refuse": true,
     "results": []
