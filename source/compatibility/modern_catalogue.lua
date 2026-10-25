@@ -389,10 +389,10 @@ local function active_space_age(active_mods)
 end
 
 -- K2 Base has a retained F200 admission and two independently captured F210
--- inputs: ordinary K2 Base and K2 plus Space Exploration.  Both F210 inputs
--- share this exact K2 core; neither is a K2SO tuple or a Space Age profile.
--- Keep the F210 versions explicit rather than treating an arbitrary current
--- Krastorio installation as a catalogue selector.
+-- inputs: ordinary K2 Base and K2 plus Space Exploration. Both F210 inputs
+-- share the named K2 and K2 Assets sources; neither is a K2SO tuple or a
+-- Space Age profile. Version strings are not consumed by this selector: the
+-- named recipe and icon source are preflighted at data stage instead.
 function M.is_k2_base(active_mods)
   if type(active_mods) ~= "table" or active_space_age(active_mods)
       or active_mods["Krastorio2-spaced-out"] ~= nil or active_mods["k2so-assets"] ~= nil then
@@ -402,9 +402,7 @@ function M.is_k2_base(active_mods)
     return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
   end
   if target.id == "f210" then
-    return active_mods.base == "2.1.23" and active_mods.Krastorio2 == "2.1.4"
-      and active_mods.Krastorio2Assets == "2.1.0" and active_mods.Krastorio2MenuSimulations == "2.1.0"
-      and active_mods.flib == "0.17.2"
+    return active_mods.Krastorio2 ~= nil and active_mods.Krastorio2Assets ~= nil
   end
   return false
 end

@@ -234,9 +234,9 @@ class K2BaseCatalogueTests(unittest.TestCase):
         raw["lab"]["kr-advanced-lab"] = {"inputs": science["advanced_lab_inputs"]}
         return raw
 
-    def _run_f210_pipeline(self, case):
+    def _run_f210_pipeline(self, case, active_mods=None):
         profile = json.loads(reference_path(case["profile"]).read_text(encoding="utf-8"))
-        mods = {row["name"]: row["version"] for row in profile["mods"] if row["enabled"]}
+        mods = active_mods or {row["name"]: row["version"] for row in profile["mods"] if row["enabled"]}
         self.lua.globals().captured_raw = _lua_value(self.lua, self._f210_pipeline_raw(case))
         self.lua.globals().captured_mods = _lua_value(self.lua, mods)
         self.lua.execute(r'''
@@ -621,8 +621,10 @@ class K2BaseCatalogueTests(unittest.TestCase):
           f210()
           local catalogue = require("compatibility.modern_catalogue")
           local gears = require("compatibility.gear_bindings")
-          local raw = {recipe = {["iron-gear-wheel"] = {}}}
           local expected = f210_facts.gear
+          local raw = {recipe = {["iron-gear-wheel"] = {
+            ingredients = expected.ingredients, results = expected.results,
+          }}, item = {["iron-gear-wheel"] = {icon = expected.item_icon}}}
           for _, case in ipairs(f210_facts.cases) do
             local active = case.mods
             assert(catalogue.is_k2_base(active) and not catalogue.is_k2so(active),
@@ -663,12 +665,20 @@ class K2BaseCatalogueTests(unittest.TestCase):
           local base = f210_facts.cases[1].mods
           local altered = {}
           for key, value in pairs(base) do altered[key] = value end
-          altered.Krastorio2 = "2.1.5"
-          assert(not catalogue.is_k2_base(altered), "future K2 version silently admitted")
+          altered.base = "2.1.24"
+          altered.flib = "0.17.3"
+          altered.Krastorio2MenuSimulations = "2.1.1"
+          assert(catalogue.is_k2_base(altered),
+            "unconsumed Base/flib/menu-simulation version drift rejected the same K2 source")
+          local shifted = gears.select(altered, raw)
+          assert(shifted.profile == expected.binding_profile and shifted.icon == expected.item_icon,
+            "unconsumed version drift changed the K2 gear binding")
           altered = {}
           for key, value in pairs(base) do altered[key] = value end
           altered.Krastorio2MenuSimulations = nil
-          assert(not catalogue.is_k2_base(altered), "missing required K2 menu dependency admitted")
+          assert(catalogue.is_k2_base(altered), "unconsumed K2 menu dependency changed selector admission")
+          altered.Krastorio2Assets = nil
+          assert(not catalogue.is_k2_base(altered), "missing consumed K2 asset source admitted")
           altered = {}
           for key, value in pairs(base) do altered[key] = value end
           altered["space-age"] = "2.1.23"
@@ -682,7 +692,28 @@ class K2BaseCatalogueTests(unittest.TestCase):
           ok, message = pcall(gears.select, f210_facts.cases[1].mods, {recipe = {}})
           assert(not ok and tostring(message):find("missing required recipe iron%-gear%-wheel"),
             "K2 binding accepted an absent captured gear recipe")
+
+          local changed_recipe = {recipe = { ["iron-gear-wheel"] = {
+            ingredients = {{type = "item", name = "iron-plate", amount = 1}},
+            results = {{type = "item", name = "not-an-iron-gear", amount = 1}},
+          }}, item = { ["iron-gear-wheel"] = {icon = expected.item_icon} }}
+          ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_recipe)
+          assert(not ok and tostring(message):find("F210 K2 gear binding source recipe changed", 1, true),
+            "K2 binding accepted a changed native gear recipe source")
+          local changed_icon = {recipe = { ["iron-gear-wheel"] = {
+            ingredients = expected.ingredients, results = expected.results,
+          }}, item = { ["iron-gear-wheel"] = {icon = "__base__/graphics/icons/iron-gear-wheel.png"} }}
+          ok, message = pcall(gears.select, f210_facts.cases[1].mods, changed_icon)
+          assert(not ok and tostring(message):find("F210 K2 gear binding source icon changed", 1, true),
+            "K2 binding accepted a changed native gear icon source")
         ''')
+
+        original = dict(self.f210_facts["cases"][0]["mods"])
+        shifted = dict(original, base="2.1.24", flib="0.17.3", Krastorio2MenuSimulations="2.1.1")
+        expected_output, _ = self._run_f210_pipeline(self.f210_facts["cases"][0], original)
+        shifted_output, _ = self._run_f210_pipeline(self.f210_facts["cases"][0], shifted)
+        self.assertEqual(expected_output["technology"]["recipe-prod-research_gears-1"],
+                         shifted_output["technology"]["recipe-prod-research_gears-1"])
 
     def test_f210_captured_raw_rows_match_the_portable_facts_when_custody_is_present(self):
         checked = 0
