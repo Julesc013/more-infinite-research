@@ -37,13 +37,13 @@ local function require_lab_packs(inventory, items)
   end
 end
 
-local function create_lab(surface, position, force, packs)
+local function create_lab(surface, position, force, packs, initial_energy)
   local lab = surface.create_entity{name="lab", position=position, force=force}
   if not lab or not lab.valid then fail("could not create a real base lab") end
   local inventory = lab.get_inventory(defines.inventory.lab_input)
   if not inventory then fail("real lab input inventory is absent") end
   require_lab_packs(inventory, packs)
-  lab.energy = 100000000
+  lab.energy = initial_energy == nil and 100000000 or initial_energy
   local initial = {}
   for _, name in ipairs(packs) do initial[name] = inventory.get_item_count(name) end
   return lab, initial
@@ -67,6 +67,23 @@ end
 
 local function energize(lab)
   if lab and lab.valid then lab.energy = 100000000 end
+end
+
+local function energize_active_lab(state)
+  if target.science_policy ~= "all" or target.continuation_mode ~= "lab" then
+    energize(state.direct_lab)
+    energize(state.continuation_lab)
+    return
+  end
+
+  if state.phase == "continuation-pending" or state.phase == "continuation"
+      or state.phase == "continuation-consumption-pending" then
+    state.direct_lab.energy = 0
+    energize(state.continuation_lab)
+  else
+    energize(state.direct_lab)
+    state.continuation_lab.energy = 0
+  end
 end
 
 local function assert_direct(state)
@@ -173,7 +190,8 @@ local function initialize()
   local continuation_lab, continuation_initial
   if target.continuation_mode == "lab" then
     continuation_lab, continuation_initial = create_lab(
-      surface, {x=position.x + 4, y=position.y}, force, target.continuation_science)
+      surface, {x=position.x + 4, y=position.y}, force, target.continuation_science,
+      target.science_policy == "all" and 0 or nil)
   end
 
   global[KEY] = {
@@ -265,8 +283,7 @@ script.on_event(defines.events.on_tick, function()
     state.phase = "complete"
   end
   if state.phase ~= "complete" then
-    energize(state.direct_lab)
-    energize(state.continuation_lab)
+    energize_active_lab(state)
     if game.tick > state.deadline then fail("real historical lab research missed its deadline") end
     if state.phase == "continuation-pending" then
       if game.forces.player.current_research ~= nil then return end
