@@ -246,30 +246,45 @@ class NativeCreditRuntimeTests(unittest.TestCase):
         # migration producers unchanged. A new patch string cannot establish
         # an old preference that was never recorded in that save.
         self.lua.execute(r'''
-          local fish = "fish-breeding"
-          for _, included in ipairs({true, false}) do
-            storage, game = {}, {forces={}}
-            local force = make_force(1, {[fish]=included}, {['recipe-prod-research_breeding-1']=2})
-            game.forces[1] = force
-            local event = {mod_startup_settings_changed=true,
-              mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version='5.0.20000'}}}
-            local ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
-            assert(not ok and tostring(message):find("startup settings unchanged", 1, true),
-              "4.7.3 patch string bypassed the earned-credit ambiguity guard")
-            assert(storage.mir_native_credits == nil)
-            for _, state in pairs(force._states) do
-              assert(state.writes.level == 0 and state.writes.enabled == 0,
-                "rejected upgrade changed native research")
-            end
+          local cases = {
+            {name="F200 fish", recipe="fish-breeding", main="recipe-prod-research_breeding-1", new_version="5.0.20000"},
+            {name="F210 Base copper", recipe="copper-plate", main="recipe-prod-research_copper-1", new_version="5.0.21000"},
+          }
+          for _, case in ipairs(cases) do
+            for _, included in ipairs({true, false}) do
+              storage, game = {}, {forces={}}
+              local force = make_force(1, {[case.recipe]=included}, {[case.main]=2})
+              game.forces[1] = force
+              local event = {mod_startup_settings_changed=true,
+                mod_changes={['more-infinite-research']={old_version='4.7.20003', new_version=case.new_version}}}
+              local function no_preflight_writes(label)
+                assert(storage.mir_native_credits == nil, label .. " allocated a native-credit ledger")
+                for _, state in pairs(force._states) do
+                  assert(state.writes.level == 0 and state.writes.enabled == 0,
+                    label .. " changed native research")
+                end
+              end
 
-            -- A first unchanged-settings observation remains allowed. Once
-            -- that valid ledger exists, a later changed-settings event is
-            -- no longer an ambiguous history-free first observation.
-            event.mod_startup_settings_changed = false
-            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
-            native_credits.on_init()
-            event.mod_startup_settings_changed = true
-            assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+              local ok, message = pcall(native_credits.preflight_legacy_preference_transition, event, true)
+              assert(not ok and tostring(message):find("startup settings unchanged", 1, true),
+                case.name .. " 4.7.3 patch string bypassed the earned-credit ambiguity guard")
+              no_preflight_writes(case.name .. " rejection")
+
+              assert(pcall(native_credits.preflight_legacy_preference_transition, event, false))
+              no_preflight_writes(case.name .. " unrelated-provider transition")
+
+              event.mod_startup_settings_changed = false
+              assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+              no_preflight_writes(case.name .. " unchanged-settings transition")
+
+              -- A first unchanged-settings observation remains allowed. Once
+              -- that valid ledger exists, a later changed-settings event is
+              -- no longer an ambiguous history-free first observation.
+              native_credits.on_init()
+              assert(ledger(force, case.recipe) ~= nil, case.name .. " did not establish a valid ledger")
+              event.mod_startup_settings_changed = true
+              assert(pcall(native_credits.preflight_legacy_preference_transition, event, true))
+            end
           end
         ''')
 
