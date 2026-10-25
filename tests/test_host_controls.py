@@ -103,6 +103,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_bootstrap.py",
             "tests/test_library.py",
             "tests/test_library_multiplayer_fixture.py",
+            "tests/test_library_paired_browser_fixture.py",
             "tests/test_scripted_effects_multiplayer_fixture.py",
             "tests/test_scripted_effects_toggle_fixture.py",
             "tests/test_library_model.py",
@@ -129,7 +130,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 91)
+        self.assertEqual(len(paths), 92)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

@@ -1,0 +1,9 @@
+{
+  "name": "mir-fixture-mir5-library-paired-browser",
+  "version": "0.1.0",
+  "title": "MIR paired public Library browser fixture",
+  "author": "MIR maintainers",
+  "description": "Private F200 fixture for paired public Research Library open/search observations.",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0.77"]
+}

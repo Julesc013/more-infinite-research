@@ -74,6 +74,7 @@ $controls = @(
   [ordered]@{path='tests/test_bootstrap.py';lua=$true},
   [ordered]@{path='tests/test_library.py';lua=$true},
   [ordered]@{path='tests/test_library_multiplayer_fixture.py';lua=$true},
+  [ordered]@{path='tests/test_library_paired_browser_fixture.py';lua=$true},
   [ordered]@{path='tests/test_scripted_effects_multiplayer_fixture.py';lua=$true},
   [ordered]@{path='tests/test_scripted_effects_toggle_fixture.py';lua=$true},
   [ordered]@{path='tests/test_library_model.py';lua=$true},
