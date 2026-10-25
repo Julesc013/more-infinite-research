@@ -35,6 +35,20 @@ def invoke_as_json(arguments: str) -> dict:
     return json.loads(completed.stdout)
 
 
+def invoke_failure(arguments: str) -> subprocess.CompletedProcess[str]:
+    command = (
+        "$ErrorActionPreference = 'Stop'; & { . ./tools/Invoke-MenuComparison.ps1 "
+        f"{arguments} }}"
+    )
+    return subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", command],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+
 def powershell_literal(value: Path | str) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
@@ -173,9 +187,69 @@ if($null-ne$clear-or[MIROwnedMenuNative]::FixtureIdentityReads-ne0){throw 'clear
         self.assertEqual([row["arm"] for row in pilot], ["published-4.7", "published-4.7"])
         primary = [row for row in rows if row["phase"] == "counterbalanced-comparison"]
         self.assertEqual(len(primary), 32)
+        expected_cycle = [
+            ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
+            ["published-4.7", "replay", "candidate-mir5", "control-without-mir"],
+            ["replay", "candidate-mir5", "control-without-mir", "published-4.7"],
+            ["candidate-mir5", "control-without-mir", "published-4.7", "replay"],
+        ]
+        self.assertEqual(
+            [[row["arm"] for row in primary[index:index + 4]] for index in range(0, 32, 4)],
+            expected_cycle * 2,
+        )
+        expected_primary = []
+        for block, arms_in_block in enumerate(expected_cycle * 2, start=1):
+            for position, arm in enumerate(arms_in_block, start=1):
+                ordinal = 6 + len(expected_primary) + 1
+                expected_primary.append({
+                    "phase": "counterbalanced-comparison",
+                    "arm": arm,
+                    "block": block,
+                    "position": position,
+                    "label": f"{ordinal:02d}-counterbalanced-comparison-{arm}",
+                })
+        self.assertEqual(
+            [{field: row[field] for field in expected_primary[0]} for row in primary],
+            expected_primary,
+        )
         for arm in arms:
             self.assertEqual(sorted(row["block"] for row in primary if row["arm"] == arm), list(range(1, 9)))
             self.assertEqual(sorted(row["position"] for row in primary if row["arm"] == arm), [1, 1, 2, 2, 3, 3, 4, 4])
+
+    def test_sixty_four_block_plan_repeats_the_fixed_latin_cycle_with_balanced_positions(self):
+        record = invoke_as_json(f"-PlanOnly -CounterbalancedBlocks 64 -MaxNewOutputMiB 8192 {DECLARED_POLICY}")
+        self.assertEqual(record["tolerance_policy"]["counterbalanced_blocks"], 64)
+        self.assertEqual(record["tolerance_policy"]["primary_samples_per_arm"], 64)
+        rows = record["samples"]
+        self.assertEqual(len(rows), 262)
+        self.assertEqual([row["ordinal"] for row in rows], list(range(1, 263)))
+        self.assertEqual(len({row["label"] for row in rows}), 262)
+        self.assertEqual([row["arm"] for row in rows if row["phase"] == "warmup"], [
+            "control-without-mir", "published-4.7", "replay", "candidate-mir5",
+        ])
+        self.assertEqual([row["arm"] for row in rows if row["phase"] == "aa-pilot"], ["published-4.7", "published-4.7"])
+        primary = [row for row in rows if row["phase"] == "counterbalanced-comparison"]
+        self.assertEqual(len(primary), 256)
+        cycle = [
+            ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
+            ["published-4.7", "replay", "candidate-mir5", "control-without-mir"],
+            ["replay", "candidate-mir5", "control-without-mir", "published-4.7"],
+            ["candidate-mir5", "control-without-mir", "published-4.7", "replay"],
+        ]
+        self.assertEqual(
+            [[row["arm"] for row in primary[index:index + 4]] for index in range(0, 256, 4)],
+            cycle * 16,
+        )
+        for arm in ("control-without-mir", "published-4.7", "replay", "candidate-mir5"):
+            arm_rows = [row for row in primary if row["arm"] == arm]
+            self.assertEqual(sorted(row["block"] for row in arm_rows), list(range(1, 65)))
+            self.assertEqual(sorted(row["position"] for row in arm_rows), [1] * 16 + [2] * 16 + [3] * 16 + [4] * 16)
+
+    def test_counterbalanced_block_count_refuses_undeclared_values(self):
+        for blocks in (0, 7, 9, 63, 65):
+            refused = invoke_failure(f"-PlanOnly -CounterbalancedBlocks {blocks} {DECLARED_POLICY}")
+            self.assertNotEqual(refused.returncode, 0)
+            self.assertIn("CounterbalancedBlocks", refused.stderr + refused.stdout)
 
     def test_plan_marks_undeclared_tolerances_and_preflight_requires_them(self):
         plan = invoke_as_json("-PlanOnly")
