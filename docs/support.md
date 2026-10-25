@@ -24,7 +24,7 @@ An ecosystem name is not a test result. Support records should identify exact Fa
 
 ## Candidate editions
 
-Factorio **2.1.23 stable (F210)** is the primary design and release target. Earlier MIR4 engine families retain best-effort editions with their actual supported subsets and the existing version encoding. Qualification records distinguish each edition's observed results and remaining gaps.
+Factorio **2.1 with minimum base 2.1.23 (F210)** is the primary design target. All nine editions retain their actual delivered capability subsets and the existing version encoding, composed from shared source and narrow adapters. Every delivered edition requires final current-package and affected native qualification; records distinguish each edition's observed results and remaining gaps. Primary-target priority does not qualify an earlier edition or remove its release obligations.
 
 The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following minimums come from the exact engines used by the qualification campaigns; they do not announce completed final-package acceptance. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
 
