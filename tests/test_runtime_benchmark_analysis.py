@@ -31,85 +31,25 @@ def _encode(value: object) -> bytes:
     return (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
 
 
-def _profile(path: str, token: str) -> dict[str, str]:
-    return {"path": path, "sha256": token * 64}
+def _accepted_pilot_payload() -> bytes:
+    capsule = json.loads(gzip.decompress((ROOT / MODULE.ACTIVE_PREREQUISITES_CAPSULE).read_bytes()))
+    return next(
+        base64.b64decode(entry["base64"])
+        for entry in capsule["files"]
+        if entry["path"] == "original/active-marker-pilots.json"
+    )
+
+
+def _pilot_start_utc_values(record: dict[str, object]) -> list[str]:
+    return [
+        row["start_utc"]
+        for observation in record["observations"]
+        for row in observation["native_result"]["process_memory"]["observations"]
+    ]
 
 
 def _plan() -> dict[str, object]:
-    helpers = [
-        {"path": f"tools/helper-{index}.ps1", "sha256": f"{index:X}" * 64}
-        for index in range(1, 13)
-    ]
-    repair_profiles = [
-        _profile("tests/profiles/repair-stress-active-published-f210-2123.json", "A"),
-        _profile("tests/profiles/repair-stress-active-mir5-f210-2123.json", "B"),
-    ]
-    agriculture_profiles = [
-        _profile(f"tests/profiles/agriculture-active-matched-{arm}-{tier}-f210-2123.json", token)
-        for tier, token_pair in ((1, ("C", "D")), (32, ("E", "F")), (128, ("1", "2")))
-        for arm, token in zip(("published", "candidate-defaults"), token_pair, strict=True)
-    ]
-    return {
-        "schema": 1,
-        "kind": MODULE.PLAN_KIND,
-        "status": "predeclared-active-save-capture-required-not-a-result",
-        "plan_source": {"commit": MODULE.PLAN_SOURCE, "tree": MODULE.PLAN_TREE},
-        "candidate": {
-            "source_commit": MODULE.SOURCE,
-            "source_tree": MODULE.SOURCE_TREE,
-            "asset_root": "D:/Projects/Factorio/mir5-current-assets-b2cf4c2d-r01",
-            "asset_inventory_file_sha256": MODULE.INVENTORY_SHA256,
-            "asset_inventory_content_sha256": MODULE.INVENTORY_CONTENT_SHA256,
-            "f210_archive": {"name": "more-infinite-research_5.0.21000.zip", "bytes": 553767, "sha256": MODULE.CANDIDATE_SHA256},
-        },
-        "published": {"f210_archive": {"name": "more-infinite-research_4.7.21002.zip", "sha256": MODULE.PUBLISHED_SHA256}},
-        "engine": {"version": "2.1.23", "sha256": MODULE.ENGINE_SHA256},
-        "public_harness": {"source_reference": MODULE.PLAN_SOURCE, "git_blob_sha256": helpers},
-        "benchmark_command": {
-            "arguments": ["--benchmark", "<fresh-owned-active-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
-        },
-        "process_memory_observation": {
-            "context": "benchmark",
-            "expected_slot": {"phase": "benchmark", "role": "factorio"},
-            "target_interval_milliseconds": 250,
-            "maximum_duration_seconds": 900,
-            "maximum_observations": 12000,
-            "maximum_serialized_bytes": 8 * 1024 * 1024,
-        },
-        "comparison_rules": {
-            "candidate_time_per_tick_limit": {"relative_fraction": 0.1, "absolute_milliseconds_per_tick": 0.25},
-            "candidate_memory_limits": {"relative_fraction": 0.1, "absolute_bytes": 64 * 1024 * 1024, "metrics": ["operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"]},
-            "agriculture_within_arm_increment_128_minus_1": {
-                "metrics": ["engine_reported_average_ms_per_tick", "operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"],
-                "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
-            },
-        },
-        "resources": {
-            "expected_peak_memory_mib_per_factorio": 4096,
-            "maximum_new_output_mib_per_launch": 120,
-            "exclusive_native_lock": True,
-            "direct_existing_archive_library_only": True,
-            "no_dependency_copy_hardlink_or_extraction": True,
-        },
-        "schedule": {
-            "repair_active": {"warmups_per_arm": 2, "scored_pairs": 8, "arms": ["published", "candidate"]},
-            "agriculture_active": {"warmups_per_arm_per_tier": 2, "scored_pairs_per_tier": 6, "tiers": [1, 32, 128], "arms": ["published", "candidate-defaults"]},
-            "total_launches": 68,
-        },
-        "active_fixture_contract": {
-            "repair": {"profiles": repair_profiles, "required_markers": ["prepared", "start", "complete"]},
-            "agriculture": {"profiles": agriculture_profiles, "required_markers": ["prepared", "start", "complete"]},
-        },
-        "active_seed_capture": {
-            "repair": {"count": 2},
-            "agriculture": {"count": 6},
-            "closed_save_name": "mir5-native-active.zip",
-            "preparation_outside_timed_benchmark": True,
-        },
-        "unscored_marker_pilot": {"count": 8, "ticks": 25000, "not_in_schedule_total": True, "not_a_timing_or_acceptance_result": True},
-        "performance_acceptance": False,
-        "release_qualification": False,
-    }
+    return json.loads((ROOT / MODULE.PLAN_PATH).read_bytes())
 
 
 def _marker(kind: str, stage: str, status: str, witnesses: dict[str, object]) -> dict[str, object]:
@@ -177,58 +117,23 @@ def _independent_schedule() -> list[dict[str, object]]:
 
 
 def _capture_and_pilot(plan: dict[str, object], plan_sha: str) -> tuple[dict[str, object], dict[str, object]]:
-    captures: list[dict[str, object]] = []
-    pilots: list[dict[str, object]] = []
-    for index, active in enumerate(MODULE._active_rows(), start=1):
-        scenario = "repair-active" if active["kind"] == "repair-stress" else "agriculture-active"
-        profile = _profile_for(plan, scenario, int(active["tier"]), str(active["arm"]))
-        staged_profile = {**profile, "path": "D:/owned/pinned-source/" + profile["path"]}
-        seed_hash = f"{index:X}" * 64
-        prepared = _marker(str(active["kind"]), "prepared", "pending", _prepared_witness(active))
-        capture = {
-            **active,
-            "profile": staged_profile,
-            "active_seed": {"path": f"D:/custody/{active['id']}/mir5-native-active.zip", "sha256": seed_hash, "bytes": 99 + index},
-            "prepared_marker": prepared,
-            "native_result_path": f"D:/custody/{active['id']}/result.json",
-            "native_result_sha256": ("A" if index % 2 else "B") * 64,
-        }
-        captures.append(capture)
-        pilots.append({
-            "id": active["id"],
-            "kind": active["kind"],
-            "arm": active["arm"],
-            "tier": active["tier"],
-            "prepared_marker": prepared,
-            "start_marker": _marker(str(active["kind"]), "start", "pending", _pilot_witness(active, False)),
-            "complete_marker": _marker(str(active["kind"]), "complete", "passed", _pilot_witness(active, True)),
-            "stdout": f"{active['id']}/factorio-current.log",
-            "stdout_sha256": ("C" if index % 2 else "D") * 64,
-        })
-    capture_record = {
-        "schema": 1,
-        "kind": MODULE.CAPTURE_KIND,
-        "status": "prepared-active-saves-not-a-benchmark-result",
-        "plan": {"sha256": plan_sha, "source_revision": MODULE.PLAN_SOURCE},
-        "public_harness": {"source_reference": MODULE.PLAN_SOURCE},
-        "captures": captures,
-        "preparation_outside_timed_benchmark": True,
-        "performance_acceptance": False,
-        "release_qualification": False,
+    if plan_sha != MODULE.PLAN_SHA256:
+        raise AssertionError("synthetic result must retain the frozen R06 plan")
+    capture_record, pilot_record = MODULE._frozen_active_prerequisites()
+    capture_reference = {
+        "path": "original/active-seed-captures.json",
+        "sha256": MODULE.ACTIVE_SEED_CAPTURE_SHA256,
+        "kind": capture_record["kind"],
+        "status": capture_record["status"],
+        "record": copy.deepcopy(capture_record),
     }
-    capture_reference = {"path": "D:/custody/active-seeds.json", "sha256": MODULE.ACTIVE_SEED_CAPTURE_SHA256, "kind": MODULE.CAPTURE_KIND, "status": capture_record["status"], "record": capture_record}
-    pilot_record = {
-        "schema": 1,
-        "kind": MODULE.PILOT_KIND,
-        "status": "complete-unscored-not-a-performance-result",
-        "plan_sha256": plan_sha,
-        "active_seed_receipt": {"path": capture_reference["path"], "sha256": capture_reference["sha256"]},
-        "observations": pilots,
-        "schedule_launches": 0,
-        "performance_acceptance": False,
-        "release_qualification": False,
+    return capture_reference, {
+        "path": "original/active-marker-pilots.json",
+        "sha256": MODULE.MARKER_PILOT_SHA256,
+        "kind": pilot_record["kind"],
+        "status": pilot_record["status"],
+        "record": copy.deepcopy(pilot_record),
     }
-    return capture_reference, {"path": "D:/custody/marker-pilot.json", "sha256": MODULE.MARKER_PILOT_SHA256, "kind": MODULE.PILOT_KIND, "status": pilot_record["status"], "record": pilot_record}
 
 
 def _value(schedule: dict[str, object]) -> float:
@@ -249,11 +154,10 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
     staged_profile = {**profile, "path": "D:/owned/pinned-source/" + profile["path"]}
     capture_id = f"repair-{arm}" if scenario == "repair-active" else f"agriculture-{arm}-{tier}"
     capture = next(item for item in captures["record"]["captures"] if item["id"] == capture_id)
+    pilot = next(item for item in MODULE._frozen_active_prerequisites()[1]["observations"] if item["id"] == capture_id)
     value = _value(schedule)
     working = 1000 + int(value * 10)
     private = 5000 if scenario == "agriculture-active" else 500 + int(value * 10)
-    selected = MODULE.PUBLISHED_SHA256 if arm == "published" else MODULE.CANDIDATE_SHA256
-    selected_leaf = "more-infinite-research_4.7.21002.zip" if arm == "published" else "more-infinite-research_5.0.21000.zip"
     active = {"kind": "repair-stress" if scenario == "repair-active" else "agriculture-scale", "arm": arm, "tier": tier}
     return {
         "kind": MODULE.SAMPLE_KIND,
@@ -265,7 +169,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
         "arm": arm,
         "engine": {"version": "2.1.23", "sha256": MODULE.ENGINE_SHA256},
         "profile": staged_profile,
-        "archives": {selected_leaf: selected},
+        "archives": copy.deepcopy(pilot["native_result"]["archives"]),
         "seed": {
             "source_path": capture["active_seed"]["path"],
             "source_sha256": capture["active_seed"]["sha256"],
@@ -301,14 +205,21 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
             "stdout": f"D:/owned/{schedule['id']}/process-1.stdout.txt",
             "stdout_sha256": "A" * 64,
         },
-        "library_control_restoration": {"status": "restored-direct-library-controls", "profile_sha256": profile["sha256"], "dependency_payload_bytes_copied": 0, "archive_links_created": 0, "archive_extractions": 0, "selected": []},
+        "library_control_restoration": {
+            "status": "restored-direct-library-controls",
+            "profile_sha256": profile["sha256"],
+            "dependency_payload_bytes_copied": 0,
+            "archive_links_created": 0,
+            "archive_extractions": 0,
+            "selected": copy.deepcopy(pilot["native_result"]["library_control_restoration"]["selected"]),
+        },
         "performance_acceptance": False,
         "release_qualification": False,
     }
 
 
 def _result(plan: dict[str, object]) -> tuple[dict[str, object], str]:
-    plan_sha = _hash(_encode(plan))
+    plan_sha = MODULE.PLAN_SHA256
     schedule = _independent_schedule()
     captures, pilot = _capture_and_pilot(plan, plan_sha)
     members = [
@@ -335,6 +246,18 @@ def _result(plan: dict[str, object]) -> tuple[dict[str, object], str]:
 
 
 def _prepared_inputs(result: dict[str, object]) -> bytes:
+    capture, _ = MODULE._frozen_active_prerequisites()
+    binding_contracts = MODULE._active_binding_contracts(capture)
+    bindings = {
+        identifier: {
+            "engine": {"path": "D:/owned/factorio/bin/x64/factorio.exe", "version": "2.1.23", "sha256": MODULE.ENGINE_SHA256},
+            "library": {"path": "D:/owned/factorio/mods"},
+            "profile": {"path": "D:/owned/pinned-source/profile.json", "sha256": fields["profile_sha256"]},
+            "archives": fields["archives"],
+            "seed": {"path": "D:/owned/active-seeds/" + identifier + ".zip", "sha256": fields["seed_sha256"], "bytes": fields["seed_bytes"]},
+        }
+        for identifier, fields in binding_contracts.items()
+    }
     return _encode({
         "schema": 1,
         "kind": "MIR5ActiveRuntimeBenchmarkPreparedInputsV1",
@@ -345,6 +268,7 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
         "active_seed_capture": result["active_seed_capture"],
         "unscored_marker_pilot": result["unscored_marker_pilot"],
         "schedule": result["schedule"],
+        "bindings": bindings,
         "native_launches": 0,
         "performance_qualification": False,
         "release_qualification": False,
@@ -354,15 +278,15 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
     def test_accepts_exact_frozen_r06_plan_metric_labels(self) -> None:
         payload = (ROOT / "spec/evidence/runtime-benchmark-active-plan-r06.json").read_bytes()
-        self.assertEqual(_hash(payload), "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F")
+        self.assertEqual(_hash(payload), MODULE.PLAN_SHA256)
         plan = json.loads(payload)
-        contract = MODULE._validate_plan(plan)
+        contract = MODULE._validate_plan(plan, MODULE.PLAN_SHA256)
         self.assertEqual(len(contract["profiles"]), 8)
         self.assertEqual(len(contract["helpers"]), 12)
         wrong_label = copy.deepcopy(plan)
         wrong_label["comparison_rules"]["agriculture_within_arm_increment_128_minus_1"]["metrics"][0] = "engine_reported_average_milliseconds_per_tick"
         with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "agriculture increment metrics"):
-            MODULE._validate_plan(wrong_label)
+            MODULE._validate_plan(wrong_label, MODULE.PLAN_SHA256)
 
     def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
         capsule_path = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
@@ -387,7 +311,7 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
         self.assertEqual(_hash(capture_bytes), MODULE.ACTIVE_SEED_CAPTURE_SHA256)
         self.assertEqual(_hash(pilot_bytes), MODULE.MARKER_PILOT_SHA256)
         plan_bytes = read_tracked(plan_path)
-        self.assertEqual(_hash(plan_bytes), "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F")
+        self.assertEqual(_hash(plan_bytes), MODULE.PLAN_SHA256)
         plan = json.loads(plan_bytes)
         plan_sha = _hash(plan_bytes)
         capture = json.loads(capture_bytes)
@@ -399,7 +323,8 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "status": capture["status"],
             "record": capture,
         }
-        captures = MODULE._validate_capture_reference(capture_reference, plan_sha, MODULE._profiles(plan))
+        frozen_capture, frozen_pilot = MODULE._frozen_active_prerequisites()
+        captures = MODULE._validate_capture_reference(capture_reference, plan_sha, MODULE._profiles(plan), frozen_capture)
         pilot_reference = {
             "path": "original/active-marker-pilots.json",
             "sha256": MODULE.MARKER_PILOT_SHA256,
@@ -407,8 +332,68 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "status": pilot["status"],
             "record": pilot,
         }
-        MODULE._validate_pilot_reference(pilot_reference, plan_sha, capture_reference, captures)
+        MODULE._validate_pilot_reference(pilot_reference, plan_sha, capture_reference, captures, frozen_pilot)
         MODULE._validate_process_memory(pilot["observations"][0]["native_result"]["process_memory"], pilot["observations"][0]["native_result"]["native_process"])
+
+    def test_accepts_only_producer_datetime_zero_elision_in_the_frozen_pilot(self) -> None:
+        payload = _accepted_pilot_payload()
+        self.assertEqual(_hash(payload), MODULE.MARKER_PILOT_SHA256)
+        frozen_pilot = json.loads(payload)
+        command = (
+            "$ErrorActionPreference = 'Stop'; "
+            "[Console]::InputEncoding = [Text.UTF8Encoding]::new($false); "
+            "[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false); "
+            "$text = [Console]::In.ReadToEnd(); $text | ConvertFrom-Json | ConvertTo-Json -Depth 50"
+        )
+        roundtrip = subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", command],
+            input=payload,
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(roundtrip.returncode, 0, roundtrip.stderr.decode("utf-8", errors="replace"))
+        producer_pilot = json.loads(roundtrip.stdout)
+        original_times = _pilot_start_utc_values(frozen_pilot)
+        producer_times = _pilot_start_utc_values(producer_pilot)
+        self.assertEqual(len(original_times), 102)
+        changed = [(before, after) for before, after in zip(original_times, producer_times, strict=True) if before != after]
+        self.assertEqual(len(changed), 11)
+        for before, after in changed:
+            self.assertTrue(before.endswith("0Z"))
+            self.assertFalse(after.endswith("0Z"))
+            self.assertEqual(MODULE._canonical_pilot_start_utc(before, "before"), MODULE._canonical_pilot_start_utc(after, "after"))
+        plan = _plan()
+        capture_reference, pilot_reference = _capture_and_pilot(plan, MODULE.PLAN_SHA256)
+        pilot_reference["record"] = producer_pilot
+        frozen_capture, expected_pilot = MODULE._frozen_active_prerequisites()
+        captures = MODULE._validate_capture_reference(capture_reference, MODULE.PLAN_SHA256, MODULE._profiles(plan), frozen_capture)
+        MODULE._validate_pilot_reference(pilot_reference, MODULE.PLAN_SHA256, capture_reference, captures, expected_pilot)
+
+        same_instant = copy.deepcopy(frozen_pilot)
+        target = next(
+            row
+            for observation in same_instant["observations"]
+            for row in observation["native_result"]["process_memory"]["observations"]
+            if row["start_utc"].endswith("0Z")
+        )
+        target["start_utc"] = target["start_utc"][:-2] + "Z"
+        MODULE._same_pilot_record(same_instant, frozen_pilot, "marker pilot record")
+
+        changed_instant = copy.deepcopy(frozen_pilot)
+        changed_target = next(
+            row
+            for observation in changed_instant["observations"]
+            for row in observation["native_result"]["process_memory"]["observations"]
+            if row["start_utc"].endswith("0Z")
+        )
+        changed_target["start_utc"] = changed_target["start_utc"][:-2] + "1Z"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "marker pilot record differs"):
+            MODULE._same_pilot_record(changed_instant, frozen_pilot, "marker pilot record")
+        non_time = copy.deepcopy(frozen_pilot)
+        non_time["observations"][0]["complete_marker"]["status"] = "altered"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "marker pilot record differs"):
+            MODULE._same_pilot_record(non_time, frozen_pilot, "marker pilot record")
 
     def test_complete_r06_result_reports_known_medians_and_increment_rules(self) -> None:
         plan = _plan()
@@ -431,9 +416,33 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
         self.assertFalse(output["claims"]["release_qualification"])
         self.assertFalse(output["claims"]["equivalence_claim"])
 
+    def test_refuses_posthoc_profile_or_helper_plan_with_its_new_caller_hash(self) -> None:
+        plan = _plan()
+        result, _ = _result(plan)
+        mutations: dict[str, callable] = {
+            "profile": lambda item: item["active_fixture_contract"]["repair"]["profiles"][0].__setitem__("sha256", "0" * 64),
+            "helper": lambda item: item["public_harness"]["git_blob_sha256"][0].__setitem__("sha256", "0" * 64),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(label=label):
+                changed = copy.deepcopy(plan)
+                mutate(changed)
+                changed_sha = _hash(_encode(changed))
+                self.assertNotEqual(changed_sha, MODULE.PLAN_SHA256)
+                with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "raw R06 plan SHA-256"):
+                    MODULE.analyze(changed, changed_sha, result, _hash(_encode(result)))
+
     def test_refuses_schedule_seed_pilot_restoration_and_identity_opponents(self) -> None:
         plan = _plan()
         result, plan_sha = _result(plan)
+
+        def add_mixed_memory_identity(item: dict[str, object]) -> None:
+            observation = item["observations"][0]
+            duplicate = copy.deepcopy(observation["process_memory"]["observations"][0])
+            duplicate["pid"] = 101
+            observation["process_memory"]["observations"].append(duplicate)
+            observation["native_process"]["sampled_observation_count"] = 2
+
         opponents: dict[str, callable] = {
             "wrong-odd-arm-order": lambda item: item["schedule"].__setitem__(4, {**item["schedule"][4], "arm": "candidate"}),
             "wrong-canonical-id": lambda item: item["schedule"].__setitem__(0, {**item["schedule"][0], "id": "not-the-r06-first-warmup"}),
@@ -451,6 +460,9 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "escaped-native-stdout": lambda item: item["observations"][0]["native_process"].__setitem__("stdout", "../process-1.stdout.txt"),
             "cross-sample-fixture-log": lambda item: item["observations"][0]["physical_markers"].__setitem__("fixture_log", "D:/owned/another-sample/write-data/factorio-current.log"),
             "cross-sample-owned-seed": lambda item: item["observations"][0]["seed"].__setitem__("owned_path", "D:/owned/another-sample/input/fresh-owned-active-seed.zip"),
+            "extra-sample-archive": lambda item: item["observations"][0]["archives"].__setitem__("unreviewed_0.1.0.zip", "0" * 64),
+            "extra-restored-selection": lambda item: item["observations"][0]["library_control_restoration"]["selected"].append(copy.deepcopy(item["observations"][0]["library_control_restoration"]["selected"][0])),
+            "mixed-process-memory-identity": add_mixed_memory_identity,
             "nonrestored-library": lambda item: item["observations"][0]["library_control_restoration"].__setitem__("status", "not-restored"),
             "wrong-engine": lambda item: item["observations"][0]["engine"].__setitem__("sha256", "0" * 64),
             "nonfinite-timing": lambda item: item["observations"][0]["timing"].__setitem__("average_milliseconds_per_tick", float("nan")),
@@ -471,7 +483,7 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             plan_path = root / "plan.json"
             result_path = root / "result.json"
             output_path = root / "analysis.json"
-            plan_bytes = _encode(plan)
+            plan_bytes = (ROOT / MODULE.PLAN_PATH).read_bytes()
             prepared_bytes = _prepared_inputs(result)
             result["prepared_inputs_sha256"] = _hash(prepared_bytes)
             result_bytes = _encode(result)
@@ -487,9 +499,25 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             )
             self.assertEqual(success.returncode, 0, success.stderr)
             self.assertTrue(output_path.is_file())
+            bad_binding = json.loads(prepared_bytes)
+            bad_binding["bindings"]["repair-published"]["archives"]["more-infinite-research_4.7.21002.zip"] = "0" * 64
+            bad_binding_bytes = _encode(bad_binding)
+            result["prepared_inputs_sha256"] = _hash(bad_binding_bytes)
+            bad_binding_result_bytes = _encode(result)
+            result_path.write_bytes(bad_binding_result_bytes)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(bad_binding_bytes)
+            binding_refusal = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(bad_binding_result_bytes), "--output", str(root / "bad-binding.json")],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(binding_refusal.returncode, 1)
+            self.assertIn("prepared inputs sidecar binding archive closure differs", binding_refusal.stderr)
             for argument in ("--expected-plan-sha256", "--expected-result-sha256"):
                 failed = subprocess.run(
-                    [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", "0" * 64 if argument == "--expected-plan-sha256" else _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", "0" * 64 if argument == "--expected-result-sha256" else _hash(result_bytes), "--output", str(root / (argument[2:] + ".json"))],
+                    [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", "0" * 64 if argument == "--expected-plan-sha256" else _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", "0" * 64 if argument == "--expected-result-sha256" else _hash(bad_binding_result_bytes), "--output", str(root / (argument[2:] + ".json"))],
                     cwd=ROOT,
                     text=True,
                     capture_output=True,
@@ -523,6 +551,41 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             )
             self.assertEqual(invalid_sidecar.returncode, 1)
             self.assertIn("prepared inputs sidecar SHA-256 differs", invalid_sidecar.stderr)
+
+    def test_cli_refuses_changed_profile_or_helper_with_matching_caller_plan_hash(self) -> None:
+        original = _plan()
+        mutations: dict[str, callable] = {
+            "profile": lambda item: item["active_fixture_contract"]["repair"]["profiles"][0].__setitem__("sha256", "0" * 64),
+            "helper": lambda item: item["public_harness"]["git_blob_sha256"][0].__setitem__("sha256", "0" * 64),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for label, mutate in mutations.items():
+                with self.subTest(label=label):
+                    plan = copy.deepcopy(original)
+                    mutate(plan)
+                    plan_bytes = _encode(plan)
+                    plan_sha = _hash(plan_bytes)
+                    result, _ = _result(original)
+                    result["plan"]["sha256"] = plan_sha
+                    prepared_bytes = _prepared_inputs(result)
+                    result["prepared_inputs_sha256"] = _hash(prepared_bytes)
+                    result_bytes = _encode(result)
+                    plan_path = root / (label + "-plan.json")
+                    result_path = root / (label + "-result.json")
+                    output_path = root / (label + "-analysis.json")
+                    plan_path.write_bytes(plan_bytes)
+                    result_path.write_bytes(result_bytes)
+                    (root / "runtime-benchmark-active-prepared.json").write_bytes(prepared_bytes)
+                    refused = subprocess.run(
+                        [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", plan_sha, "--result", str(result_path), "--expected-result-sha256", _hash(result_bytes), "--output", str(output_path)],
+                        cwd=ROOT,
+                        text=True,
+                        capture_output=True,
+                        check=False,
+                    )
+                    self.assertEqual(refused.returncode, 1)
+                    self.assertIn("expected R06 plan SHA-256 differs", refused.stderr)
 
 
 if __name__ == "__main__":
