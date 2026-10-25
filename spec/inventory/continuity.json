@@ -231,6 +231,15 @@
           ],
           "evidence": "spec/mir5/evidence/cryogenic-native-chain.json",
           "scope": "Cryogenic has a named source alternative; the current native evidence is data-only."
+        },
+        {
+          "id": "sif-current-eight-policy-and-two-target-upgrade-native",
+          "source": [
+            "source/compatibility/science_bindings.lua",
+            "source/research/science.lua"
+          ],
+          "evidence": "spec/evidence/sif-science-fa114-native-chain.json",
+          "scope": "Space Is Fake run40185834442 verifies current fa114/tree41b F20076D4/F2104D5E: sixteen CreateOnly policy cases, four configured published/successor gameplay stages, eight actual labs and eight separate cold reloads. Retains queued/detached work and both exact published save handoffs. Original predecessor packages are4.7.20002/4.7.21002, not4.7.3. No client, performance, arbitrary-modpack or release qualification follows."
         }
       ],
       "test_subjects": [
@@ -239,7 +248,7 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Finish remaining nondefault science/lab policies, including SIF all-eight-policy emission and two-target predecessor/save cases. The named cryogenic-unit lab/save/two-reload case passes at its recorded exact source.",
+        "Finish other affected nondefault science/lab policies and coherent final-candidate checks. SIF all-eight-policy native emission and both named configured predecessor/save/two-reload chains now pass at their recorded exact current inputs; the cryogenic-unit lab/save/two-reload case retains its separate recorded source.",
         "Keep SCI-UNLOCK-01 and SCI-RESEARCH-01 open until exact reporter closures are recovered or a bounded representative is accepted."
       ]
     },
@@ -935,7 +944,7 @@
               "disposition": "representative-observed-not-reporter-qualified"
             }
           ],
-          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. SIF-01 additionally has a finite source/host-only disposition in its original ledger row; its exact native acceptance remains pending. ECO-PLANETS and other unmatched retained requests retain their original decisions/statuses without inferred coverage.",
+          "scope": "Each listed original request carries an additive mir5_route_disposition with its finite canonical source mapping, named evidence and limitations. Historical native evidence remains at its recorded identity unless a record expressly says otherwise; source mapping does not assert final-package qualification. SCI-UNLOCK-01 and SCI-RESEARCH-01 are representative observations only. SIF-01 additionally records current all-eight-policy native emission and both configured predecessor/save/two-reload chains in its original ledger row; no client, performance or release verdict follows. ECO-PLANETS and other unmatched retained requests retain their original decisions/statuses without inferred coverage.",
           "evidence": [
             "spec/evidence/k2so-material-native-chain.json",
             "spec/evidence/bob-angel-materials-lab-native-chain.json",
@@ -943,7 +952,8 @@
             "spec/evidence/integration-reference-native-chain.json",
             "spec/evidence/library-multiplayer-current-chain.json",
             "spec/evidence/repair-stress-native-chain.json",
-            "spec/evidence/api-canonical-native-chain.json"
+            "spec/evidence/api-canonical-native-chain.json",
+            "spec/evidence/sif-science-fa114-native-chain.json"
           ]
         },
         {
@@ -951,7 +961,7 @@
           "source": [
             "spec/programmes/community-requests.json"
           ],
-          "scope": "ECO-PLANETS retains its original request without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage; it is not inferred from historical changelog text or a general science policy. SIF-01 now has the explicit two-continuation source binding and host-only evidence named in its original ledger row; native final-emission and predecessor/save acceptance remain open."
+          "scope": "ECO-PLANETS retains its original request without a MIR5 current-route disposition. No current named source/evidence maps broad planet-mod coverage; it is not inferred from historical changelog text or a general science policy. SIF-01 has the explicit two-continuation binding and exact current native policy/upgrade evidence named in its original ledger row; client, performance and release acceptance remain separate."
         },
         {
           "id": "additive-public-crash-intakes-2026-10-25",
