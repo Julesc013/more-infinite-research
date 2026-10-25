@@ -189,6 +189,27 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
         }, profile["archive_sha256"])
         self.assertIn("CreateOnly comparator", profile["scope"])
 
+    def test_current_profile_is_the_exact_f210_createonly_comparator(self):
+        profile = json.loads((PROFILES / "named-science-replacement-mir5-f210-2123.json").read_text(encoding="utf-8"))
+        self.assertEqual((1, "mir5-named-science-replacement-f210-native-selection", "f210", "2.1", "Defaults"),
+                         (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"],
+                          profile["settings_mode"]))
+        self.assertEqual({"version": "2.1.23",
+                          "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+                         profile["engine"])
+        self.assertEqual([(name, "2.1.23", True) for name in ("base", "elevated-rails", "quality", "recycler", "space-age")] + [
+            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+            ("more-infinite-research", "5.0.21000", True),
+            ("mir-fixture-mir5-named-science-replacement", "0.1.0", True),
+        ], [(row["name"], row["version"], row["enabled"]) for row in profile["mods"]])
+        self.assertEqual({
+            "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+            "more-infinite-research_5.0.21000.zip":
+                "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A",
+        }, profile["archive_sha256"])
+        self.assertIn("CreateOnly comparator", profile["scope"])
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
