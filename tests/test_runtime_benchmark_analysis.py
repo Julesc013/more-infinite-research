@@ -185,7 +185,7 @@ def _capture_and_pilot(plan: dict[str, object], plan_sha: str) -> tuple[dict[str
         "performance_acceptance": False,
         "release_qualification": False,
     }
-    capture_reference = {"path": "D:/custody/active-seeds.json", "sha256": "E" * 64, "kind": MODULE.CAPTURE_KIND, "status": capture_record["status"], "record": capture_record}
+    capture_reference = {"path": "D:/custody/active-seeds.json", "sha256": MODULE.ACTIVE_SEED_CAPTURE_SHA256, "kind": MODULE.CAPTURE_KIND, "status": capture_record["status"], "record": capture_record}
     pilot_record = {
         "schema": 1,
         "kind": MODULE.PILOT_KIND,
@@ -197,7 +197,7 @@ def _capture_and_pilot(plan: dict[str, object], plan_sha: str) -> tuple[dict[str
         "performance_acceptance": False,
         "release_qualification": False,
     }
-    return capture_reference, {"path": "D:/custody/marker-pilot.json", "sha256": "F" * 64, "kind": MODULE.PILOT_KIND, "status": pilot_record["status"], "record": pilot_record}
+    return capture_reference, {"path": "D:/custody/marker-pilot.json", "sha256": MODULE.MARKER_PILOT_SHA256, "kind": MODULE.PILOT_KIND, "status": pilot_record["status"], "record": pilot_record}
 
 
 def _value(schedule: dict[str, object]) -> float:
@@ -330,6 +330,8 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "wrong-odd-arm-order": lambda item: item["schedule"].__setitem__(4, {**item["schedule"][4], "arm": "candidate"}),
             "duplicate-schedule-id": lambda item: item["schedule"].__setitem__(1, {**item["schedule"][1], "id": item["schedule"][0]["id"]}),
             "wrong-seed-capture": lambda item: item["observations"][0]["seed"].__setitem__("source_sha256", "0" * 64),
+            "wrong-accepted-capture-receipt": lambda item: item["active_seed_capture"].__setitem__("sha256", "0" * 64),
+            "wrong-accepted-pilot-receipt": lambda item: item["unscored_marker_pilot"].__setitem__("sha256", "0" * 64),
             "pilot-complete-witness": lambda item: item["unscored_marker_pilot"]["record"]["observations"][0]["complete_marker"]["witnesses"].__setitem__("initial_changed", 1),
             "sample-complete-witness": lambda item: item["observations"][0]["physical_markers"]["complete"]["witnesses"].__setitem__("initial_changed", 1),
             "nonrestored-library": lambda item: item["observations"][0]["library_control_restoration"].__setitem__("status", "not-restored"),

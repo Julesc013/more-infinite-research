@@ -37,6 +37,8 @@ PUBLISHED_SHA256 = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579
 CANDIDATE_SHA256 = "4F5BEE023930666FC0F921136A69B59861741BE44C311E03D46347D42018ECBC"
 INVENTORY_SHA256 = "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498"
 INVENTORY_CONTENT_SHA256 = "D84635E67886182989AA958024CAF619F0E832CC47A3BF0533BA047C42F0E7D5"
+ACTIVE_SEED_CAPTURE_SHA256 = "883DF556BEB4D845929CD9FDAEA867FD01DAB72952CD70A849C17310249C28DB"
+MARKER_PILOT_SHA256 = "89329DE94C32E1C9A5C0EDE13AE112C008172FFBB7E13928C203BA1974E50A47"
 MAX_PLAN_BYTES = 1024 * 1024
 # R06 permits a bounded 8 MiB serialized memory receipt per one of 68 samples.
 # The result normally stores far less, but this bound does not reject the
@@ -401,7 +403,7 @@ def _validate_prepared_witness(witnesses: dict[str, Any], row: dict[str, Any]) -
 def _validate_capture_reference(value: Any, plan_sha256: str, profiles: dict[tuple[str, int, str], dict[str, str]]) -> dict[str, dict[str, Any]]:
     reference = _mapping(value, "active seed capture reference")
     _string(reference.get("path"), "active seed capture path")
-    _sha256(reference.get("sha256"), "active seed capture SHA-256")
+    _expect_hash(reference.get("sha256"), ACTIVE_SEED_CAPTURE_SHA256, "active seed capture SHA-256")
     _same(_string(reference.get("kind"), "active seed capture kind"), CAPTURE_KIND, "active seed capture kind")
     _same(_string(reference.get("status"), "active seed capture status"), "prepared-active-saves-not-a-benchmark-result", "active seed capture status")
     record = _mapping(reference.get("record"), "active seed capture record")
@@ -452,7 +454,7 @@ def _validate_capture_reference(value: Any, plan_sha256: str, profiles: dict[tup
 def _validate_pilot_reference(value: Any, plan_sha256: str, capture_reference: dict[str, Any], captures: dict[str, dict[str, Any]]) -> None:
     reference = _mapping(value, "marker pilot reference")
     _string(reference.get("path"), "marker pilot path")
-    _sha256(reference.get("sha256"), "marker pilot SHA-256")
+    _expect_hash(reference.get("sha256"), MARKER_PILOT_SHA256, "marker pilot SHA-256")
     _same(_string(reference.get("kind"), "marker pilot kind"), PILOT_KIND, "marker pilot kind")
     _same(_string(reference.get("status"), "marker pilot status"), "complete-unscored-not-a-performance-result", "marker pilot status")
     record = _mapping(reference.get("record"), "marker pilot record")
