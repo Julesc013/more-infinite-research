@@ -108,6 +108,27 @@
     "agriculture": {
       "control_path": "tests/fixtures/agriculture-scale/core/control.lua",
       "control_sha256": "A77890C76B13D622B9990274EEB28577767C1A776B9F773EDB9A5C31727F6816",
+      "fixture_source_members": [
+        {"source": "tests/fixtures/agriculture-scale/core/info.json", "fixture": "agriculture-core", "member": "info.json", "sha256": "8061E2A277A5888A64B5BA9CC19655994F1BDA3C829A4FB875F2D81BC61F1CA4"},
+        {"source": "tests/fixtures/agriculture-scale/core/settings.lua", "fixture": "agriculture-core", "member": "settings.lua", "sha256": "DF55175F87AE5035AB0CF0B21944A28ADA7EA755C7CDDBCF9CDE2987D0C400E4"},
+        {"source": "tests/fixtures/agriculture-scale/core/data-final-fixes.lua", "fixture": "agriculture-core", "member": "data-final-fixes.lua", "sha256": "3C1AB9C9243A076B60A5527AFB703BC3406A8AE0B009ACB63B983D0C43CAC291"},
+        {"source": "tests/fixtures/agriculture-scale/core/control.lua", "fixture": "agriculture-core", "member": "control.lua", "sha256": "A77890C76B13D622B9990274EEB28577767C1A776B9F773EDB9A5C31727F6816"},
+        {"source": "tests/fixtures/active-mods-observer/info.json", "fixture": "active-mods-observer", "member": "info.json", "sha256": "C37A55C4776F1B4DABA7E4D5C98CF22FD0E978A461D3E6FD8A95E238B97908BD"},
+        {"source": "tests/fixtures/active-mods-observer/data-final-fixes.lua", "fixture": "active-mods-observer", "member": "data-final-fixes.lua", "sha256": "89D364F0033A7EE036998E6C29A3558099C25AD2707CB24914790C49FB21555C"},
+        {"source": "tests/fixtures/agriculture-scale/paired/info.json", "fixture": "agriculture-paired", "member": "info.json", "sha256": "F0E57FE8EBFDB4B9D6091E8471B1F2B84A28EDBD8122EB374ED13F14BFFB2D8A"},
+        {"source": "tests/fixtures/agriculture-scale/paired/settings-updates.lua", "fixture": "agriculture-paired", "member": "settings-updates.lua", "sha256": "AE3C7991CAE29C55677154B9B3A6EAFA0E7E8E5BD2FF18E7C1B80D6AF264DF05"},
+        {"source": "tests/fixtures/agriculture-scale/arm-published/info.json", "fixture": "agriculture-arm-published", "member": "info.json", "sha256": "2C55941A4EDB1EF13882BF88FA9C6B4C075664F1D58848CBEAF80A043D6959A2"},
+        {"source": "tests/fixtures/agriculture-scale/arm-published/settings-updates.lua", "fixture": "agriculture-arm-published", "member": "settings-updates.lua", "sha256": "3A0B671A4CAFBD7EF04BA51C3C4DBF8C4B513B89C07FD91F2309AF6450792D55"},
+        {"source": "tests/fixtures/agriculture-scale/arm-candidate-defaults/info.json", "fixture": "agriculture-arm-candidate-defaults", "member": "info.json", "sha256": "67AFB46C38F1E92D07DA343C5FE3A34DA26CC93DF93EBBE7D4A28BA4CC94FA10"},
+        {"source": "tests/fixtures/agriculture-scale/arm-candidate-defaults/settings-updates.lua", "fixture": "agriculture-arm-candidate-defaults", "member": "settings-updates.lua", "sha256": "B3B4B2416F2A15EA2F48742E5F57146448F1E215247040FD4E63BA0AD5D4997B"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-1/info.json", "fixture": "agriculture-tier-1", "member": "info.json", "sha256": "851F09E2127B6F31690EC363A55E4AD6F0152D65ED9A7BA328A57CC8A6182522"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-1/settings-updates.lua", "fixture": "agriculture-tier-1", "member": "settings-updates.lua", "sha256": "F759721FD3313B796DBBF2972972CD443B2C38A06B4BF2F085AE84881DE793D0"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-32/info.json", "fixture": "agriculture-tier-32", "member": "info.json", "sha256": "50A914A304243577005E87812B28C321A6210BBFAFC17D58271281A7D5133AE9"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-32/settings-updates.lua", "fixture": "agriculture-tier-32", "member": "settings-updates.lua", "sha256": "A50C16056D243F6D7D186C7ED80DCDF68B98B488778948EDD2B0CD7D3FA6C757"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-128/info.json", "fixture": "agriculture-tier-128", "member": "info.json", "sha256": "82C31674F7BE0B941CB86707333CFA6AF89004EF4A725B62FA867F603330512A"},
+        {"source": "tests/fixtures/agriculture-scale/matched-tier-128/settings-updates.lua", "fixture": "agriculture-tier-128", "member": "settings-updates.lua", "sha256": "AF3F9A10E9BE75FE862A551533A31E02DD55658E0226FE123F3B7B6646FDD7DD"},
+        {"source": "tests/fixtures/agriculture-scale/active/info.json", "fixture": "agriculture-active", "member": "info.json", "sha256": "1D625757C47770146905792541A8FA987D85F91A62197F6E3CD5FCC974FD84EB"}
+      ],
       "profiles": [
         {"path": "tests/profiles/agriculture-active-matched-published-1-f210-2123.json", "sha256": "8E7403F4B3E625103F6D88706F6B2AE1118F367D8F31A363CD4C44369624D2A6"},
         {"path": "tests/profiles/agriculture-active-matched-candidate-defaults-1-f210-2123.json", "sha256": "4634550528E075D8D9601B80739914EE60BDC937D2F30E6F27ABDBA161512934"},
