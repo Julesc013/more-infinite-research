@@ -8,7 +8,7 @@
     "tree": "0dd2670887647b1794b29a25773147f86f564662"
   },
   "retains_historical_plan": {
-    "path": "spec/evidence/runtime-benchmark-active-plan-r04.json",
+    "path": "spec/evidence/runtime-benchmark-active-plan-r05.json",
     "candidate_source_commit": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
     "candidate_source_tree": "25442a5bd7838f124952507854426e3b8e868475",
     "disposition": "r01 remains the predeclared FA cohort, r02 remains the separate 143346 cohort, r03 remains the corrected 089 cohort, and r04 remains the final B2 cohort held before capture because repair ActiveSeedOnly had no single-player producer for mir5-native-active.zip. Their preparation and refusal receipts retain their original scope. r05 keeps the identical B2 player, schedule, fixture, profile, and pilot contract while binding the repaired active-save helper; its partial r03 native output remains an adverse because the agriculture completion predicate lost its script helpers in the ResourceGovernor caller scope. r06 retains the same B2 player, schedule, fixture, profile, and pilot contract while binding the closure-safe helper."
