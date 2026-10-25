@@ -1,4 +1,5 @@
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,7 @@ PROFILES = ROOT / "tests/profiles"
 ORACLE = ROOT / "spec/inventory/modern-f210-470.json"
 F210_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F210_RUNTIME_API"),
+    "C:/Program Files/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
     "D:/Games/Steam/steamapps/common/Factorio/doc-html/runtime-api.json",
     "D:/Games/Factorio/2.1/doc-html/runtime-api.json",
     "D:/Programs/Factorio/2.1/doc-html/runtime-api.json",
@@ -21,6 +23,7 @@ F210_RUNTIME_API_CANDIDATES = (
 OBSERVER = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 PUBLISHED = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
 CANDIDATE = "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A"
+GEAR_SCIENCE = [[name, 1] for name in ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack")]
 OWNERS = {
     "low-density-structure-productivity",
     "plastic-bar-productivity",
@@ -124,6 +127,9 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
         self.assertEqual(OWNERS, owners)
 
     def test_stage_data_guard_accelerates_only_exact_f210_gear(self):
+        for profile in ("base-f210", "space-age-f210"):
+            gear = next(row for row in self.oracle[profile]["technology_owner_progression_facts"] if row["name"] == "recipe-prod-research_gears-1")
+            self.assertEqual(GEAR_SCIENCE, gear["science"])
         self.lua.execute("""
           function run_data(path, common, catalogue, f210_catalogue, raw, mods)
             local env = {data={raw=raw}, mods=mods}
@@ -149,7 +155,7 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                 effects = [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]
                 if space:
                     effects.insert(0, {"type": "change-recipe-productivity", "recipe": "casting-iron-gear-wheel", "change": .1})
-                gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 60}, "effects": effects}
+                gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 60, "ingredients": GEAR_SCIENCE}, "effects": effects}
                 raw = {"technology": {"recipe-prod-research_gears-1": gear}, "unchanged": {"value": 17}}
                 mods = {"base": "2.1.23", "more-infinite-research": mir, "mir-fixture-mir5-full-catalogue-upgrade": "0.1.0" if stage == "published-4.7" else "0.2.0"}
                 if space:
@@ -160,12 +166,29 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                     actual = py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]
                     self.assertEqual((None, "1", 1), (actual.get("count"), actual["count_formula"], actual["time"]))
                     self.assertEqual(17, py(result["raw"])["unchanged"]["value"])
+                    self.assertEqual(GEAR_SCIENCE, actual["ingredients"])
+                wrong_amount = copy.deepcopy(GEAR_SCIENCE)
+                wrong_amount[0][1] = 2
+                wrong_name = copy.deepcopy(GEAR_SCIENCE)
+                wrong_name[0][0] = "foreign-science-pack"
+                duplicate = copy.deepcopy(GEAR_SCIENCE)
+                duplicate[1] = duplicate[0][:]
+                for ingredients in (None, [], GEAR_SCIENCE[:-1], wrong_amount, wrong_name, duplicate):
+                    altered = copy.deepcopy(gear)
+                    altered["unit"]["ingredients"] = ingredients
+                    with self.subTest(stage=stage, space=space, ingredients=ingredients):
+                        raw_input = lua(self.lua, {"technology": {"recipe-prod-research_gears-1": altered}})
+                        before = py(raw_input)
+                        result = self.lua.eval("run_data")((F210 / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / stage / "catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
+                        self.assertFalse(result["ok"])
+                        self.assertIn("gear science", str(result["message"]))
+                        self.assertEqual(before, py(result["raw"]))
         gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 61}, "effects": [{"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]}
         result = self.lua.eval("run_data")((F210 / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "mir5/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "more-infinite-research": "5.0.21000", "mir-fixture-mir5-full-catalogue-upgrade": "0.2.0"}))
         self.assertFalse(result["ok"])
         self.assertIn("workload differs", str(result["message"]))
         self.assertEqual(61, py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]["time"])
-        gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 60}, "effects": [{"type": "change-recipe-productivity", "recipe": "casting-iron-gear-wheel", "change": .1}, {"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]}
+        gear = {"max_level": "infinite", "unit": {"count_formula": "8000*2^(L-1)", "time": 60, "ingredients": GEAR_SCIENCE}, "effects": [{"type": "change-recipe-productivity", "recipe": "casting-iron-gear-wheel", "change": .1}, {"type": "change-recipe-productivity", "recipe": "iron-gear-wheel", "change": .1}]}
         result = self.lua.eval("run_data")((F210 / "published-4.7/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (F210 / "published-4.7/catalogue.lua").as_posix(), (SHARED / "f210-catalogue.lua").as_posix(), lua(self.lua, {"technology": {"recipe-prod-research_gears-1": gear}}), lua(self.lua, {"base": "2.1.23", "elevated-rails": "2.1.23", "quality": "2.1.23", "space-age": "2.1.23", "more-infinite-research": "4.7.21002", "mir-fixture-mir5-full-catalogue-upgrade": "0.1.0"}))
         self.assertFalse(result["ok"])
         self.assertIn("Space Age closure differs", str(result["message"]))
@@ -267,6 +290,7 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                 ])
                 with self.subTest(profile=profile, stage=stage):
                     self.assertEqual(("f210", "2.1"), (data["target"], data["factorio_line"]))
+                    self.assertEqual("Defaults", data["settings_mode"])
                     self.assertEqual({"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"}, data["engine"])
                     self.assertEqual(expected_mods, data["mods"])
                     self.assertEqual({"mir-fixture-mir5-active-mods-observer_0.1.0.zip": OBSERVER, f"more-infinite-research_{mir}.zip": archive}, data["archive_sha256"])
