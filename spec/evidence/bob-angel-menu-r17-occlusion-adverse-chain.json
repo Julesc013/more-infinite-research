@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "kind": "MIR5R17OcclusionAdverseChainV1",
+  "status": "failed-owned-window-zero-timing-samples",
+  "run": 40154539422,
+  "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40154539422",
+  "source": "eccbf09463db409abade3756bb93ca4cfe544a21",
+  "controller_commit": "39603fa185abc74d2d34a4b0e8a31d4bf54c2cd4",
+  "plan_commit": "97a0750b842136355feb6e0038c4ebb790008120",
+  "plan_sha256": "D1B2093CBC0E47130C91789D8359981D5D11AB5E5B0BF51D4A344FDE2543D790",
+  "candidate_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+  "manifest": {
+    "members_verified": 104,
+    "sha256": "57E6F69DC910B9084714C27A1426925F9D7756B70A8E269EEB2ACB869A0DFD96"
+  },
+  "completed_data_capture_processes": 4,
+  "candidate_intent": "equal-intended-native-output",
+  "replay_equality": "equal-complete-native-output",
+  "actor": {
+    "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/owned-window/control/responsive-menu-actor/actor-result.json",
+    "sha256": "57D3BCA88C17E3164FE198C881375FDAA9740FE908C5546BF31B4B454A410FDD",
+    "status": "failed",
+    "failure": "[mir-menu-main-menu-not-observed]",
+    "diagnostics": {
+      "schema": 1,
+      "capture_requests": 2403,
+      "captured_frames": 0,
+      "no_main_window": 0,
+      "not_visible_or_minimized": 0,
+      "foreground_mismatch": 0,
+      "foreground_request_attempts": 0,
+      "foreground_request_refused": 0,
+      "foreground_request_not_acquired": 0,
+      "client_geometry_unavailable": 0,
+      "offscreen": 0,
+      "occluded": 2403,
+      "last_occlusion": {
+        "probe_index": 4,
+        "probe_x": 1280,
+        "probe_y": 720,
+        "owned_x": 0,
+        "owned_y": 0,
+        "owned_width": 2560,
+        "owned_height": 1440,
+        "hit": "other-window"
+      },
+      "last_rejection": "occluded"
+    },
+    "cleanup": "owned-process-closed",
+    "full_engine_cycle_seconds": 300.3053234
+  },
+  "timing_samples_started": 0,
+  "raw_evidence": {
+    "path": "spec/evidence/bob-angel-menu-r17-occlusion-adverse-receipts.json.gz",
+    "exact_original_members": 10,
+    "derived_members": 0,
+    "gzip_bytes": 33517,
+    "gzip_sha256": "4CC96A365B6458AE02E9EFEEB5E7237F37CB617DE57F7D97D506CCC013F5717B",
+    "uncompressed_bytes": 191720,
+    "uncompressed_sha256": "02B60945A792F271D1DA9341A42026AF8584D8799EB84355FCDCDC8CFB48CC76"
+  },
+  "independent_readback": {
+    "reviewer": "root",
+    "original_members_verified": 104
+  },
+  "required_next_step": "Use the accepted Aero909 equality-only process relation in a separately frozen untimed actor diagnostic. Preserve every original occlusion rejection; do not repeat unchanged four-arm preparation or infer the unknown historical window identity.",
+  "limits": [
+    "The four data/settings captures and complete comparisons pass; the owned-window prerequisite fails and no responsive-menu timing sample starts.",
+    "Temporary hiding of the known notification during the final portion did not produce a frame. This does not identify the other root, establish a coordinate/focus cause, or justify accepting an occluded capture.",
+    "Earlier R17 attempts retain their separate failures. No performance or release qualification follows."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}
