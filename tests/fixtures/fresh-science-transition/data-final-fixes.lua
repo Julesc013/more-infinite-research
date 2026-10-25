@@ -21,6 +21,7 @@ local PREREQUISITES = {
 
 local function exact_names(rows, expected, label, row_value)
   assert(type(rows) == "table", label .. " is absent")
+  assert(#rows == #expected, label .. " is not a dense sequence")
   local wanted, seen, count = {}, {}, 0
   for _, name in ipairs(expected) do wanted[name] = true end
   for key, row in pairs(rows) do

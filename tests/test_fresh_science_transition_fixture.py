@@ -55,6 +55,10 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
             elseif opponent == "zero-input" then row.unit.ingredients[13].amount = 0
             elseif opponent == "fluid-input" then row.unit.ingredients[13].type = "fluid"
             elseif opponent == "wrong-effect" then row.effects[1].change = .02
+            elseif opponent == "sparse-gate" then
+              row.prerequisites[14], row.prerequisites[1] = row.prerequisites[1], nil
+            elseif opponent == "sparse-input" then
+              row.unit.ingredients[14], row.unit.ingredients[1] = row.unit.ingredients[1], nil
             end
             data = {raw={technology={[TARGET]=row, [untouched.name]=untouched}}}
             local ok, message = pcall(dofile, path)
@@ -246,6 +250,17 @@ class FreshScienceTransitionFixtureTests(unittest.TestCase):
                 # retain their supplied, nonempty gate witness.
                 self.assertEqual(12 if opponent == "missing-gate" else 13, len(result["prerequisites"]))
                 if opponent not in ("missing-gate", "circular-gate"):
+                    self.assertEqual(expected, tuple(result["prerequisites"][index] for index in range(1, 14)))
+        for opponent in ("sparse-gate", "sparse-input"):
+            with self.subTest(opponent=opponent):
+                result = self.lua.eval("run_transition_final")(path, opponent)
+                self.assertFalse(result["ok"])
+                self.assertIn("dense sequence", result["message"])
+                self.assertEqual("unrelated-gate", result["untouched_prerequisites"][1])
+                if opponent == "sparse-gate":
+                    self.assertIsNone(result["prerequisites"][1])
+                    self.assertEqual("automation-science-pack", result["prerequisites"][14])
+                else:
                     self.assertEqual(expected, tuple(result["prerequisites"][index] for index in range(1, 14)))
 
     def test_control_uses_actual_source_and_successor_lab_events_then_read_only_reload(self):
