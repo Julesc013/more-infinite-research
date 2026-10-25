@@ -18,9 +18,17 @@ class PrerequisiteRepairTests(unittest.TestCase):
     def setUp(self):
         self.lua = LuaRuntime(unpack_returned_tuples=True)
         self.lua.globals().player_root = (ROOT / "source").as_posix()
+        published_cycle = subprocess.run(
+            ["git", "show", f"{PUBLISHED_473}:source/prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua"],
+            cwd=ROOT, check=True, text=True, capture_output=True,
+        ).stdout
+        self.lua.globals().published_cycle_source = published_cycle
         self.lua.execute('''
           package.path = player_root .. "/?.lua;" .. player_root .. "/?/init.lua"
           package.cpath = ""
+          package.preload["prototypes.mir.platform.factorio.data_raw"] = function() return {} end
+          package.preload["prototypes.mir.report.diagnostics_sink"] = function() return {} end
+          published_cycle = assert(load(published_cycle_source, "@published-4.7.3-cycle-repair"))()
           repair = require("overrides.prerequisite_repairs")
         ''')
 
@@ -119,7 +127,7 @@ class PrerequisiteRepairTests(unittest.TestCase):
           assert(repair.apply(raw, {}, target, function() error("inactive Angel repair reported") end) == 0)
         ''')
 
-    def test_astroponics_repairs_only_the_known_three_edge_path_on_both_targets(self):
+    def test_astroponics_repairs_the_published_three_edge_path_on_both_targets(self):
         self.lua.execute('''
           for _, base in ipairs({"2.0.77", "2.1.23"}) do
             local astro_list = {"landfill", "space-science-pack", "foreign"}
@@ -166,6 +174,88 @@ class PrerequisiteRepairTests(unittest.TestCase):
           local raw = {technology={astroponics={prerequisites={"space-science-pack"}},
             ["space-science-pack"]={prerequisites={"muluna-alice-propellant"}}}}
           assert(repair.apply(raw, mods, target, function() error("no-op Astroponics repair reported") end) == 0)
+        ''')
+
+    def test_astroponics_matches_published_reachability_on_finite_independent_graphs(self):
+        self.lua.execute('''
+          local mods, target = {astroponics="1.7.3", ["planet-muluna"]="2.3.18"}, {id="f210"}
+          local function historical_result(technologies)
+            return #published_cycle.plan(technologies, mods) == 1
+          end
+          local function current_result(technologies)
+            return repair.apply({technology=technologies}, mods, target) == 1
+          end
+          local function graph(edges)
+            local technologies = {astroponics={prerequisites={"landfill", "space-science-pack"}}}
+            for name, prerequisites in pairs(edges) do technologies[name] = {prerequisites=prerequisites} end
+            return technologies
+          end
+          local cases = {
+            {"direct", true, { ["space-science-pack"]={"astroponics"} }},
+            {"longer", true, { ["space-science-pack"]={"middle"}, middle={"end"}, ["end"]={"astroponics"} }},
+            {"branched", true, { ["space-science-pack"]={"dead", "branch"}, dead={}, branch={"loop", "middle"}, loop={"branch"}, middle={"astroponics"} }},
+            {"self-cyclic", true, { ["space-science-pack"]={"space-science-pack", "astroponics"} }},
+            {"unreachable", false, { ["space-science-pack"]={"dead"}, dead={"dead"} }},
+          }
+          for _, case in ipairs(cases) do
+            local name, expected, edges = case[1], case[2], case[3]
+            local historical = graph(edges)
+            assert(historical_result(historical) == expected, name .. " historical result")
+            local current = graph(edges)
+            local original = current.astroponics.prerequisites
+            assert(current_result(current) == historical_result(graph(edges)), name .. " current parity")
+            if expected then
+              assert(current.astroponics.prerequisites ~= original and #current.astroponics.prerequisites == 1
+                and current.astroponics.prerequisites[1] == "landfill", name .. " only declared edge removed")
+            else
+              assert(current.astroponics.prerequisites == original, name .. " no proof leaves declared edge")
+            end
+          end
+        ''')
+
+    def test_astroponics_reachability_is_deterministic_and_visits_only_the_reached_graph_once(self):
+        self.lua.execute('''
+          local mods, target = {astroponics="1.7.3", ["planet-muluna"]="2.3.18"}, {id="f210"}
+          local function graph(space_edges, branch_edges)
+            return {
+              astroponics={prerequisites={"landfill", "space-science-pack"}},
+              ["space-science-pack"]={prerequisites=space_edges},
+              alpha={prerequisites={"shared"}},
+              branch={prerequisites=branch_edges},
+              shared={prerequisites={"astroponics"}},
+              cycle={prerequisites={"branch"}},
+            }
+          end
+          local first = graph({"alpha", "branch"}, {"cycle", "shared"})
+          local second = graph({"branch", "alpha"}, {"shared", "cycle"})
+          assert(#published_cycle.plan(first, mods) == 1 and #published_cycle.plan(second, mods) == 1)
+          assert(repair.apply({technology=first}, mods, target) == 1)
+          assert(repair.apply({technology=second}, mods, target) == 1)
+          assert(#first.astroponics.prerequisites == 1 and first.astroponics.prerequisites[1] == "landfill")
+          assert(#second.astroponics.prerequisites == 1 and second.astroponics.prerequisites[1] == "landfill")
+
+          local backing = {
+            astroponics={prerequisites={"landfill", "space-science-pack"}},
+            ["space-science-pack"]={prerequisites={"alpha", "branch"}},
+            alpha={prerequisites={"shared"}},
+            branch={prerequisites={"shared", "cycle"}},
+            shared={prerequisites={"astroponics"}},
+            cycle={prerequisites={"branch"}},
+          }
+          local reads = {}
+          local technologies = setmetatable({}, {
+            __index=function(_, name)
+              if name == "poison" then error("unrelated world inspected") end
+              reads[name] = (reads[name] or 0) + 1
+              return backing[name]
+            end,
+            __pairs=function() error("prototype world enumerated") end,
+          })
+          assert(repair.apply({technology=technologies}, mods, target) == 1)
+          for _, name in ipairs({"astroponics", "space-science-pack", "alpha", "branch", "shared", "cycle"}) do
+            assert(reads[name] == 1, name .. " inspected more than once")
+          end
+          assert(reads.poison == nil)
         ''')
 
     def test_data_final_imports_the_repair_only_for_an_active_supported_named_input(self):
