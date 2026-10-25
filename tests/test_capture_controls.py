@@ -181,6 +181,77 @@ function Invoke-TargetCase([bool]$Active,[string]$Kind) {{
     return json.loads(result.stdout)
 
 
+def native_fixture_agriculture_completion_guard_cases() -> dict:
+    """Invoke the actual active-seed predicate through a separate caller scope."""
+    escaped = str(NATIVE_FIXTURE).replace("'", "''")
+    command = rf"""
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw ($errors | ForEach-Object {{$_.ToString()}})}}
+$definitions=@($ast.FindAll({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Test-HistoricalFixtureSaveComplete'}},$true))
+$assignments=@($ast.FindAll({{param($node) $node -is [System.Management.Automation.Language.AssignmentStatementAst]}},$true))
+$activeSaveCompleteAssignment=@($assignments | Where-Object {{ $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Left.VariablePath.UserPath -ceq 'activeSaveComplete' }})
+$completion=@($assignments | Where-Object {{ $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Left.VariablePath.UserPath -ceq 'activeCompletion' }})
+if($definitions.Count -ne 1 -or $activeSaveCompleteAssignment.Count -ne 1 -or $completion.Count -ne 1){{throw 'active agriculture completion nodes missing or ambiguous'}}
+. ([scriptblock]::Create($definitions[0].Extent.Text))
+function Invoke-GovernorStylePredicate([scriptblock]$Predicate) {{
+  try {{
+    $decision=@(& $Predicate)
+    if($decision.Count -ne 1 -or $decision[0] -isnot [bool]){{throw 'completion predicate did not return one bool'}}
+    [ordered]@{{valid=$true;result=$decision[0]}}
+  }} catch {{[ordered]@{{valid=$false;message=$_.Exception.Message}}}}
+}}
+function Write-ClosedFixtureSave([string]$Path,[bool]$Complete) {{
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  $stream=$null;$zip=$null
+  try {{
+    $stream=[IO.File]::Open($Path,[IO.FileMode]::CreateNew,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)
+    $zip=[IO.Compression.ZipArchive]::new($stream,[IO.Compression.ZipArchiveMode]::Create,$false)
+    if($Complete){{
+      $root=[IO.Path]::GetFileNameWithoutExtension($Path)
+      $entry=$zip.CreateEntry($root+'/level.dat')
+      $writer=[IO.StreamWriter]::new($entry.Open())
+      try {{$writer.Write('fixture')}} finally {{$writer.Dispose()}}
+    }}
+  }} finally {{if($null-ne$zip){{$zip.Dispose()}};if($null-ne$stream){{$stream.Dispose()}}}}
+}}
+function Invoke-ActiveCompletionCase([string]$Name,[AllowNull()][string]$Text,[bool]$SavePresent,[bool]$SaveComplete) {{
+  $caseRoot=Join-Path $root $Name
+  [IO.Directory]::CreateDirectory($caseRoot)|Out-Null
+  $live=Join-Path $caseRoot 'factorio-current.log'
+  $activeSave=Join-Path $caseRoot 'mir5-native-active.zip'
+  if($null-ne$Text){{[IO.File]::WriteAllText($live,$Text,[Text.UTF8Encoding]::new($false))}}
+  if($SavePresent){{Write-ClosedFixtureSave $activeSave $SaveComplete}}
+  . ([scriptblock]::Create($activeSaveCompleteAssignment[0].Extent.Text))
+  . ([scriptblock]::Create($completion[0].Extent.Text))
+  Invoke-GovernorStylePredicate $activeCompletion
+}}
+$root=Join-Path ([IO.Path]::GetTempPath()) ('mir5-active-completion-'+[Guid]::NewGuid().ToString('N'))
+$marker='[MIR5_RUNTIME_ACTIVE] {{"kind":"agriculture-scale","stage":"prepared","status":"pending"}}'
+try {{
+  $cases=[ordered]@{{
+    no_log=(Invoke-ActiveCompletionCase 'no-log' $null $true $true)
+    missing_marker=(Invoke-ActiveCompletionCase 'missing-marker' 'Saving finished' $true $true)
+    valid=(Invoke-ActiveCompletionCase 'valid' ($marker+"`nSaving finished") $true $true)
+    fatal=(Invoke-ActiveCompletionCase 'fatal' ($marker+"`n0.001 Error native failure") $true $true)
+    duplicate_marker=(Invoke-ActiveCompletionCase 'duplicate-marker' ($marker+"`n"+$marker+"`nSaving finished") $true $true)
+    malformed_marker=(Invoke-ActiveCompletionCase 'malformed-marker' (('[MIR5_RUNTIME_ACTIVE] {{not-json}}')+"`nSaving finished") $true $true)
+    unclosed_save=(Invoke-ActiveCompletionCase 'unclosed-save' ($marker+"`nSaving finished") $true $false)
+    absent_save=(Invoke-ActiveCompletionCase 'absent-save' ($marker+"`nSaving finished") $false $false)
+  }}
+  $cases | ConvertTo-Json -Compress -Depth 6
+}} finally {{if(Test-Path -LiteralPath $root){{Remove-Item -LiteralPath $root -Recurse -Force}}}}
+"""
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", command],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    return json.loads(result.stdout)
+
+
 class CaptureControlTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -306,7 +377,8 @@ class CaptureControlTests(unittest.TestCase):
             "physical_work='deferred until the benchmark loads this exact active save'",
             source,
         )
-        self.assertIn("Read-ActiveFixtureMarker $text 'agriculture-scale' 'prepared'", source)
+        self.assertIn("$activeSaveComplete=${function:Test-HistoricalFixtureSaveComplete}", source)
+        self.assertIn("fatal native active preparation diagnostic", source)
 
     def test_active_repair_forwards_create_to_its_closed_active_save_only(self):
         cases = native_fixture_active_create_target_cases()
@@ -330,6 +402,19 @@ class CaptureControlTests(unittest.TestCase):
             with self.subTest(name=name):
                 self.assertFalse(cases[name]["valid"])
                 self.assertIn("active", cases[name]["message"])
+
+    def test_agriculture_active_completion_is_self_contained_across_governor_scope(self):
+        cases = native_fixture_agriculture_completion_guard_cases()
+
+        for name in ("no_log", "missing_marker", "duplicate_marker", "malformed_marker", "unclosed_save", "absent_save"):
+            with self.subTest(name=name):
+                self.assertTrue(cases[name]["valid"])
+                self.assertFalse(cases[name]["result"])
+
+        self.assertTrue(cases["valid"]["valid"])
+        self.assertTrue(cases["valid"]["result"])
+        self.assertFalse(cases["fatal"]["valid"])
+        self.assertIn("fatal native active preparation diagnostic", cases["fatal"]["message"])
 
     def test_active_repair_selection_allows_candidate_fixture_v020_and_refuses_drift(self):
         cases = native_fixture_active_selection_guard_cases()
