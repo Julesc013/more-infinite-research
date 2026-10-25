@@ -1,0 +1,232 @@
+{
+  "kind": "MIR5AeroAcceptedAssetFreezeReadbackV1",
+  "source": {
+    "commit": "5658246a7b8ea213d84496c420042c2ea9ad2eaa",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "b1d04b99e1988d76de2ea09f869020dc986982a6",
+    "tree": "c08053b39fa4caff9d00414585024e77bdc9ee42"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "original_review_head": "0ce1772655daca4f3557753b04b53ad6e8285f66",
+  "original_review_player_tree_equal": true,
+  "inventory_file_sha256": "77dbb02d2cd9122056ea493bc12ecb57296733461c18e0b05935057dbdb4e3f7",
+  "inventory_content_sha256": "3663fedd19481123ef4d1c34a3de23e9462d0b3a64fa955f45ad6e48ad6ad620",
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "bytes": 347271,
+      "archive_sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91",
+      "minimum_base": "0.13.20",
+      "factorio_version": "0.13",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "bytes": 347271,
+      "archive_sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a",
+      "minimum_base": "0.14.23",
+      "factorio_version": "0.14",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "bytes": 347231,
+      "archive_sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309",
+      "minimum_base": "0.15.40",
+      "factorio_version": "0.15",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "bytes": 347222,
+      "archive_sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176",
+      "minimum_base": "0.16.51",
+      "factorio_version": "0.16",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "bytes": 347111,
+      "archive_sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555",
+      "minimum_base": "0.17.79",
+      "factorio_version": "0.17",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "bytes": 360903,
+      "archive_sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6",
+      "minimum_base": "1.0.0",
+      "factorio_version": "1.0",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "bytes": 360900,
+      "archive_sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41",
+      "minimum_base": "1.1.110",
+      "factorio_version": "1.1",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "bytes": 552716,
+      "archive_sha256": "b42baeb83233ba82c231c2162986c8d7ae19ad73c13196aa050f6ca06ad83982",
+      "minimum_base": "2.0.77",
+      "factorio_version": "2.0",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "bytes": 553252,
+      "archive_sha256": "428a789ca03828d2f7f93ec65c49fd3157fd6d547cc569dda2c0129d6504647a",
+      "minimum_base": "2.1.23",
+      "factorio_version": "2.1",
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    }
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "limits": [
+    "Offline committed-source build and exact nine-package rebuild only; no new native, migration, client, elapsed-time or release result.",
+    "All nine archives change the two shared science modules. Older fa114/41b receipts retain their original identities and require explicit affected-input applicability review.",
+    "Generator, runtime, API, settings identities, technology identities and all other package members are unchanged."
+  ],
+  "offline_rebuild_verification": {
+    "command": "python tools/release.py --source source --output ../mir5-freeze/aero-5658246a-r01 --verify",
+    "exit_code": 0,
+    "archives_rebuilt_byte_identically": 9
+  },
+  "primary_custody": {
+    "path": "build/qualification/aero-assets-5658246a-r01",
+    "verified_files": [
+      {
+        "name": "MIR5ReleaseAssetInventoryV1.json",
+        "bytes": 175369,
+        "sha256": "77dbb02d2cd9122056ea493bc12ecb57296733461c18e0b05935057dbdb4e3f7"
+      },
+      {
+        "name": "more-infinite-research_5.0.01300.zip",
+        "bytes": 347271,
+        "sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91"
+      },
+      {
+        "name": "more-infinite-research_5.0.01400.zip",
+        "bytes": 347271,
+        "sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a"
+      },
+      {
+        "name": "more-infinite-research_5.0.01500.zip",
+        "bytes": 347231,
+        "sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309"
+      },
+      {
+        "name": "more-infinite-research_5.0.01600.zip",
+        "bytes": 347222,
+        "sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176"
+      },
+      {
+        "name": "more-infinite-research_5.0.01700.zip",
+        "bytes": 347111,
+        "sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555"
+      },
+      {
+        "name": "more-infinite-research_5.0.10000.zip",
+        "bytes": 360903,
+        "sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6"
+      },
+      {
+        "name": "more-infinite-research_5.0.11000.zip",
+        "bytes": 360900,
+        "sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41"
+      },
+      {
+        "name": "more-infinite-research_5.0.20000.zip",
+        "bytes": 552716,
+        "sha256": "b42baeb83233ba82c231c2162986c8d7ae19ad73c13196aa050f6ca06ad83982"
+      },
+      {
+        "name": "more-infinite-research_5.0.21000.zip",
+        "bytes": 553252,
+        "sha256": "428a789ca03828d2f7f93ec65c49fd3157fd6d547cc569dda2c0129d6504647a"
+      },
+      {
+        "name": "SHA256SUMS.txt",
+        "bytes": 927,
+        "sha256": "c7cba71e6d9da1a03bd97440264414108a552cf304cdb632aa9c1c44da6ffdd8"
+      }
+    ]
+  }
+}
