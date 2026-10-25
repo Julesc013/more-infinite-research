@@ -393,6 +393,9 @@ script.on_event(defines.events.on_tick, function()
   if type(state) ~= "table" or state.schema ~= 1 then return end
   emit_pending_ready(state)
   if state.phase == "awaiting-clients" or state.phase == "awaiting-cold-restart" then
+    -- The original server keeps ticking while the controller observes the
+    -- save marker. Only the two new client joins can attempt a reopen.
+    if state.phase == "awaiting-cold-restart" and (state.join_events or 0) < 4 then return end
     if state.clients_ready_tick == nil or game.tick < state.clients_ready_tick then return end
     if state.phase == "awaiting-clients" then
       start_initial(state)
