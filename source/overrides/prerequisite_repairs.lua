@@ -1,12 +1,11 @@
 -- Explicit external prerequisite repairs recovered from the published 4.7.3
--- compatibility registry. These are named F200/F210 edges, never a graph
--- traversal or a general external-mod repair mechanism.
+-- compatibility registry. These are named F200/F210 edges, never a general
+-- external-mod repair mechanism.
 local M = {}
 
 local SILVER = "angels-silver-smelting-1"
 local ASTROPONICS = "astroponics"
 local SPACE = "space-science-pack"
-local PROPELLANT = "muluna-alice-propellant"
 local ANGEL_REPAIR_ID = "angels-disabled-silver-modules-prerequisite"
 local ASTROPONICS_REPAIR_ID = "muluna-astroponics-space-science-cycle"
 
@@ -49,12 +48,33 @@ local function repair_angel(technologies)
   return true
 end
 
+-- The published repair accepted every finite prerequisite path from the
+-- named space technology back to Astroponics. Keep that one proof local: no
+-- raw-table scan, recursive walk, sort, researchability check or planner.
+local function reaches_astroponics(technologies)
+  local queue, visited, head = {SPACE}, {[SPACE] = true}, 1
+  while head <= #queue do
+    local name = queue[head]
+    head = head + 1
+    if name == ASTROPONICS then return true end
+    local technology = technologies[name]
+    local prerequisites = type(technology) == "table" and technology.prerequisites or nil
+    if type(prerequisites) == "table" then
+      for _, prerequisite in ipairs(prerequisites) do
+        if type(prerequisite) == "string" and not visited[prerequisite] then
+          visited[prerequisite] = true
+          queue[#queue + 1] = prerequisite
+        end
+      end
+    end
+  end
+  return false
+end
+
 local function repair_astroponics(technologies)
-  local astroponics, space, propellant = technologies[ASTROPONICS], technologies[SPACE], technologies[PROPELLANT]
-  if type(astroponics) ~= "table" or type(space) ~= "table" or type(propellant) ~= "table"
-      or not contains(astroponics.prerequisites, SPACE)
-      or not contains(space.prerequisites, PROPELLANT)
-      or not contains(propellant.prerequisites, ASTROPONICS) then return false end
+  local astroponics = technologies[ASTROPONICS]
+  if type(astroponics) ~= "table" or not contains(astroponics.prerequisites, SPACE)
+      or not reaches_astroponics(technologies) then return false end
   local prerequisites = without(astroponics.prerequisites, SPACE)
   if prerequisites == nil then return false end
   astroponics.prerequisites = prerequisites or nil
