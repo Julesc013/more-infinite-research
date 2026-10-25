@@ -293,6 +293,109 @@ class FixtureControlHostStageTests(unittest.TestCase):
             }
           end
 
+          function run_beta_load_tick(path, native_researched, returned_researched)
+            local callbacks = {}
+            local logged = 0
+            local marker = nil
+            local force_writes = {}
+            local storage_writes = {}
+            local native_writes = {}
+            local native_state = {
+              researched = native_researched,
+              level = 1,
+              enabled = true,
+              prototype = {
+                effects = {{type = "change-recipe-productivity", recipe = "copper-cable", change = 0.01}}
+              }
+            }
+            local native = setmetatable({}, {
+              __index = function(_, key) return native_state[key] end,
+              __newindex = function(_, key, value)
+                native_writes[key] = value
+                error("fixture wrote native technology " .. tostring(key))
+              end
+            })
+            local force_state = {
+              valid = true,
+              index = 1,
+              manual_crafting_speed_modifier = 0,
+              technologies = {["mir-api-fixture-beta-cable-1"] = native}
+            }
+            local force = setmetatable({}, {
+              __index = function(_, key) return force_state[key] end,
+              __newindex = function(_, key, value)
+                force_writes[key] = value
+                error("fixture wrote force " .. tostring(key))
+              end
+            })
+            local storage = setmetatable({}, {
+              __newindex = function(_, key, value)
+                storage_writes[key] = value
+                error("fixture wrote storage " .. tostring(key))
+              end
+            })
+            local environment = {
+              script = {
+                active_mods = {
+                  base = "2.1.23",
+                  ["more-infinite-research"] = "5.0.21000",
+                  ["mir-fixture-mir5-api-beta"] = "0.1.0"
+                },
+                on_init = function(callback) callbacks.on_init = callback end,
+                on_load = function(callback) callbacks.on_load = callback end,
+                on_configuration_changed = function(callback) callbacks.on_configuration_changed = callback end,
+                on_event = function(event, callback) callbacks.on_event = {event = event, callback = callback} end
+              },
+              defines = {events = {on_tick = 1}},
+              remote = {
+                interfaces = {["more-infinite-research.api.v1"] = true},
+                call = function(interface, method, force_index, technology_name)
+                  assert(interface == "more-infinite-research.api.v1")
+                  assert(method == "get_research")
+                  assert(force_index == force.index)
+                  assert(technology_name == "mir-api-fixture-beta-cable-1")
+                  return {
+                    name = technology_name,
+                    force_index = force_index,
+                    researched = returned_researched,
+                    level = 1,
+                    max_level = 1,
+                    enabled = true
+                  }
+                end
+              },
+              helpers = {table_to_json = function(row)
+                marker = {
+                  stage = row.stage,
+                  reload_researched = row.reload_researched,
+                  reload_level = row.reload_level,
+                  reload_manual_crafting_speed_modifier = row.reload_manual_crafting_speed_modifier
+                }
+                return "{}"
+              end},
+              log = function() logged = logged + 1 end,
+              game = {tick = 2, forces = {player = force}},
+              storage = storage
+            }
+            environment._G = environment
+            setmetatable(environment, {__index = function(_, key) return _G[key] end})
+            local chunk, message = loadfile(path, "t", environment)
+            assert(chunk ~= nil, message)
+            assert(pcall(chunk))
+            assert(type(callbacks.on_load) == "function")
+            assert(type(callbacks.on_event) == "table" and callbacks.on_event.event == 1)
+            local loaded, load_message = pcall(callbacks.on_load)
+            if not loaded then return false, load_message, {force_writes = force_writes, storage_writes = storage_writes} end
+            local emitted, emit_message = pcall(callbacks.on_event.callback)
+            return emitted, emit_message, {
+              marker = marker,
+              markers = logged,
+              force_writes = force_writes,
+              storage_writes = storage_writes,
+              native_writes = native_writes
+            }
+          end
+
           function run_module_permissions_init(path, omit_quality, enable_parameter_quality)
             local callbacks = {}
             local logged = 0
@@ -549,6 +652,31 @@ class FixtureControlHostStageTests(unittest.TestCase):
         passed, message = run(self.control("api-beta"), 0.02)
         self.assertFalse(passed)
         self.assertIn("native cable productivity effect differs", message)
+
+    def test_beta_load_tick_records_the_native_researched_state_without_writes(self):
+        run = self.lua.globals().run_beta_load_tick
+        path = self.control("api-beta")
+        for researched in (False, True):
+            with self.subTest(researched=researched):
+                passed, message, state = run(path, researched, researched)
+                self.assertTrue(passed, message)
+                self.assertEqual(state.markers, 1)
+                self.assertEqual(state.marker.stage, "load")
+                self.assertEqual(state.marker.reload_researched, researched)
+                self.assertEqual(state.marker.reload_level, 1)
+                self.assertEqual(state.marker.reload_manual_crafting_speed_modifier, 0)
+                self.assertEqual(len(state.force_writes), 0)
+                self.assertEqual(len(state.storage_writes), 0)
+                self.assertEqual(len(state.native_writes), 0)
+
+        passed, message, state = run(path, False, True)
+        self.assertFalse(passed)
+        self.assertIn("tick research status differs", message)
+        self.assertEqual(state.markers, 0)
+        self.assertIsNone(state.marker)
+        self.assertEqual(len(state.force_writes), 0)
+        self.assertEqual(len(state.storage_writes), 0)
+        self.assertEqual(len(state.native_writes), 0)
 
     def test_beta_production_accepts_f200_closure_and_rejects_an_unsupported_target(self):
         self.lua.globals().fixture_control = self.control("api-beta-production")

@@ -452,6 +452,46 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins, [ob
   }
   return $rows[0]
 }
+function Test-ApiClientNumber([object]$Value) {
+  return $Value -is [int] -or $Value -is [long] -or $Value -is [double]
+}
+function Assert-ApiClientLoadMarker([object]$Row,[string]$Marker,[bool]$ExpectedResearched,[string]$Phase,[string]$Client) {
+  $expected=@('stage','tick','reload_researched','reload_level','reload_manual_crafting_speed_modifier')
+  $properties=@($Row.PSObject.Properties.Name)
+  Assert-Session ($properties.Count -eq $expected.Count -and ((@($properties|Sort-Object)-join '|') -ceq (@($expected|Sort-Object)-join '|'))) "$Phase $Client $Marker marker shape differs"
+  Assert-Session ($Row.stage -is [string] -and $Row.stage -ceq 'load') "$Phase $Client $Marker marker stage differs"
+  Assert-Session ((Test-LibraryInteger $Row.tick) -and [int64]$Row.tick -ge 0) "$Phase $Client $Marker marker tick differs"
+  Assert-Session ($Row.reload_researched -is [bool] -and $Row.reload_researched -eq $ExpectedResearched) "$Phase $Client $Marker marker researched state differs"
+  Assert-Session ((Test-LibraryInteger $Row.reload_level) -and [int64]$Row.reload_level -eq 1) "$Phase $Client $Marker marker level differs"
+  Assert-Session ((Test-ApiClientNumber $Row.reload_manual_crafting_speed_modifier) -and [Math]::Abs([double]$Row.reload_manual_crafting_speed_modifier - .05) -le .000001) "$Phase $Client $Marker marker modifier differs"
+}
+function Get-ApiClientLoadMarkers([string]$Text,[string]$Phase,[string]$Client) {
+  $markers=@(
+    [ordered]@{name='MIR5_API_ALPHA';researched=$true},
+    [ordered]@{name='MIR5_API_BETA';researched=$false}
+  )
+  $result=[ordered]@{phase=$Phase;client=$Client}
+  foreach($expected in $markers){
+    $rows=[Collections.Generic.List[object]]::new()
+    foreach($match in [regex]::Matches($Text,('\['+[regex]::Escape([string]$expected.name)+'\] RESULT (\{[^\r\n]+\})'))){
+      try{$row=$match.Groups[1].Value|ConvertFrom-Json}catch{return $null}
+      $rows.Add($row)
+    }
+    if($rows.Count -eq 0){return $null}
+    Assert-Session ($rows.Count -eq 1) "$Phase $Client $($expected.name) marker count differs"
+    Assert-ApiClientLoadMarker $rows[0] ([string]$expected.name) ([bool]$expected.researched) $Phase $Client
+    $result[[string]$expected.name]=$rows[0]
+  }
+  [pscustomobject]$result
+}
+function Get-ClientLogDelta([string]$Before,[string]$Path) {
+  $current=Read-LogText $Path
+  if([string]::IsNullOrEmpty($current) -or $current -ceq $Before){return $null}
+  if(-not [string]::IsNullOrEmpty($Before) -and $current.StartsWith($Before,[StringComparison]::Ordinal)){
+    return $current.Substring($Before.Length)
+  }
+  return $current
+}
 function Assert-PairedBrowserInteger([object]$Value, [int]$Expected, [string]$Field, [string]$Stage) {
   Assert-Session ((Test-LibraryInteger $Value) -and [int64]$Value -eq $Expected) "$Stage paired Browser $Field differs"
 }
@@ -571,6 +611,11 @@ $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
+$apiClientConsumers=$false
+if($spec.ContainsKey('api_client_consumers')){
+  Assert-Session ($fixtureCase-ceq'library-multiplayer' -and $spec.api_client_consumers -is [bool] -and $spec.api_client_consumers) 'API client consumer mode differs'
+  $apiClientConsumers=$true
+}
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
@@ -583,6 +628,7 @@ $engineSha=Get-SessionHash $engine
 Assert-Session ($engineSha -ceq ([string]$spec.engine_sha256).ToUpperInvariant()) 'engine hash differs'
 $libraryWitnessTarget=$null
 if($fixtureCase-ceq'library-multiplayer'){$libraryWitnessTarget=Get-LibraryWitnessTarget $spec $engineSha}
+Assert-Session (-not $apiClientConsumers -or ($libraryWitnessTarget.base -ceq '2.1.23' -and $libraryWitnessTarget.mir -ceq '5.0.21000')) 'API client consumer target differs'
 $library = Resolve-Existing ([string]$spec.archive_library) 'Container' 'archive library'
 $workroot = Resolve-BuildInput ([string]$spec.workroot) 'Container' 'workroot'
 $seed = Resolve-BuildInput ([string]$spec.seed_save) 'Leaf' 'seed save'
@@ -690,6 +736,7 @@ if ($collectProcessMemoryObservations) {
   $processMemorySampler = New-MIROwnedProcessMemorySampler -ExpectedSlots @($slots)
 }
 $records = [Collections.Generic.List[object]]::new()
+$apiClientLoadMarkers = [Collections.Generic.List[object]]::new()
 $liveLogs = @((Join-Path $serverWriteData 'factorio-current.log')) + @($clients | ForEach-Object { Join-Path $_.write_data 'factorio-current.log' })
 $deadline = [DateTime]::UtcNow.AddSeconds(900)
 $server = $null; $activeClients = @()
@@ -700,7 +747,10 @@ function Start-Server([string]$Name, [string]$Save) {
 function Start-Clients([string]$Phase) {
   $expectedJoin=switch -CaseSensitive ($Phase){initial{1};rejoin{2};restart{3};default{throw 'unknown client phase'}}
   $started=[Collections.Generic.List[object]]::new()
+  $clientLogBaselines=@{}
   foreach($client in $clients){
+    $clientLogPath=Join-Path $client.write_data 'factorio-current.log'
+    $clientLogBaselines[[string]$client.name]=Read-LogText $clientLogPath
     $actor=Start-Native ("client-$Phase-$($client.locale)") (@('--config',$client.config,'--mod-directory',$library,'--disable-audio','--no-log-rotation','--window-size','1280x720','--mp-connect',('127.0.0.1:'+ $serverPort),'--port',[string]$client.port)+$clientGraphics)
     $started.Add($actor)
     # Each native startup writes the shared library's settings cache. Wait
@@ -712,6 +762,16 @@ function Start-Clients([string]$Phase) {
     })
     # The paired fixture counts all joins; the functional fixtures count per player.
     if($fixtureCase -ceq 'library-paired-browser'){$expectedJoin++}
+  }
+  if($apiClientConsumers){
+    foreach($client in $clients){
+      $clientLogPath=Join-Path $client.write_data 'factorio-current.log'
+      $baseline=[string]$clientLogBaselines[[string]$client.name]
+      $markers=Wait-For ("$Phase API load markers for "+$client.name) {
+        Get-ApiClientLoadMarkers (Get-ClientLogDelta $baseline $clientLogPath) $Phase ([string]$client.name)
+      }
+      $apiClientLoadMarkers.Add($markers)
+    }
   }
   $started.ToArray()
 }
@@ -836,6 +896,15 @@ try {
     if ($fixtureCase -ceq 'library-multiplayer') {
       Assert-Session ($screenshots.Count -eq 10) 'final screenshot inventory differs'
     }
+    if($apiClientConsumers){
+      Assert-Session ($apiClientLoadMarkers.Count -eq 6) 'API client load marker inventory differs'
+      foreach($phase in @('initial','rejoin','restart')){
+        foreach($client in $clients){
+          $rows=@($apiClientLoadMarkers|Where-Object {$_.phase -ceq $phase -and $_.client -ceq [string]$client.name})
+          Assert-Session ($rows.Count -eq 1) "API client load marker lifecycle differs: $phase/$($client.name)"
+        }
+      }
+    }
     $result = [ordered]@{
       schema=1;kind=$(if($fixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerSessionV1'}else{'MIR5ScriptedEffectsMultiplayerSessionV1'});case=$fixtureCase;status='passed-private-two-client-session'
       engine_sha256=(Get-SessionHash $engine); seed_sha256=$seedHash; restart_save_sha256=$restartHash
@@ -844,6 +913,7 @@ try {
       client_graphics_arguments=$clientGraphics
       screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
     }
+    if($apiClientConsumers){$result.api_client_load_markers=@($apiClientLoadMarkers)}
   }
 }
 catch { $sessionFailure = $_ }
