@@ -9,6 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/fixtures/named-science-replacement"
 PROFILES = ROOT / "tests/profiles"
+FREEZE = ROOT / "spec/evidence/current-assets-5658246a-readback.json"
 PACKS = (
     "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
     "production-science-pack", "military-science-pack", "utility-science-pack",
@@ -188,6 +189,42 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
                 "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
         }, profile["archive_sha256"])
         self.assertIn("CreateOnly comparator", profile["scope"])
+
+    def test_mir5_profile_changes_only_the_frozen_mir_arm_and_matches_accepted_565_assets(self):
+        published = json.loads((PROFILES / "named-science-replacement-published-f210-2123.json").read_text(encoding="utf-8"))
+        candidate = json.loads((PROFILES / "named-science-replacement-mir5-f210-2123.json").read_text(encoding="utf-8"))
+        freeze = json.loads(FREEZE.read_text(encoding="utf-8"))
+        self.assertEqual({key: value for key, value in published.items() if key not in ("mods", "archive_sha256", "scope")},
+                         {key: value for key, value in candidate.items() if key not in ("mods", "archive_sha256", "scope")})
+        self.assertEqual([row for row in published["mods"] if row["name"] != "more-infinite-research"],
+                         [row for row in candidate["mods"] if row["name"] != "more-infinite-research"])
+        published_mods = {row["name"]: row for row in published["mods"]}
+        candidate_mods = {row["name"]: row for row in candidate["mods"]}
+        self.assertEqual(1, sum(row["name"] == "more-infinite-research" for row in published["mods"]))
+        self.assertEqual(1, sum(row["name"] == "more-infinite-research" for row in candidate["mods"]))
+        self.assertEqual(("4.7.21003", True),
+                         (published_mods["more-infinite-research"]["version"], published_mods["more-infinite-research"]["enabled"]))
+        self.assertEqual(("5.0.21000", True),
+                         (candidate_mods["more-infinite-research"]["version"], candidate_mods["more-infinite-research"]["enabled"]))
+        self.assertEqual(set(published["archive_sha256"]),
+                         {"mir-fixture-mir5-active-mods-observer_0.1.0.zip", "more-infinite-research_4.7.21003.zip"})
+        self.assertEqual(set(candidate["archive_sha256"]),
+                         {"mir-fixture-mir5-active-mods-observer_0.1.0.zip", "more-infinite-research_5.0.21000.zip"})
+        self.assertEqual({key: value for key, value in published["archive_sha256"].items()
+                          if key.startswith("mir-fixture-")},
+                         {key: value for key, value in candidate["archive_sha256"].items()
+                          if key.startswith("mir-fixture-")})
+        self.assertEqual("B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
+                         published["archive_sha256"]["more-infinite-research_4.7.21003.zip"])
+        f210 = next(asset for asset in freeze["assets"] if asset["target"] == "f210")
+        self.assertEqual(("5658246a7b8ea213d84496c420042c2ea9ad2eaa", "b1d04b99e1988d76de2ea09f869020dc986982a6"),
+                         (freeze["source"]["commit"], freeze["source"]["source_tree"]))
+        self.assertEqual(("more-infinite-research_5.0.21000.zip", 553252,
+                          "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A"),
+                         (f210["name"], f210["bytes"], f210["archive_sha256"].upper()))
+        self.assertEqual(f210["archive_sha256"].upper(),
+                         candidate["archive_sha256"]["more-infinite-research_5.0.21000.zip"])
+        self.assertIn("CreateOnly comparator", candidate["scope"])
 
 
 if __name__ == "__main__":
