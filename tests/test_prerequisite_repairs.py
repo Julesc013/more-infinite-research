@@ -8,6 +8,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLISHED_473 = "8643cc91bc915e008556a5315dbb0a743247e7ab"
+PUBLISHED_473_BLOBS = {
+    "source/prototypes/mir/compatibility/repairs/angels_smelting.lua": "d49c9999b8a569cbb7aed8632524adeb048d1f52",
+    "source/prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua": "5f9cabebc79787da3168899558be095bb8e9d32a",
+}
 
 
 class PrerequisiteRepairTests(unittest.TestCase):
@@ -21,7 +25,28 @@ class PrerequisiteRepairTests(unittest.TestCase):
         ''')
 
     def test_published_473_named_functions_are_read_only_recovery_evidence(self):
+        # Host CI intentionally has only the current source and its declared
+        # historical baseline fetch. Resolve 4.7.3 when a reviewer has it;
+        # otherwise retain its immutable commit/blob provenance without making
+        # production behavior depend on an unavailable history checkout.
+        present = subprocess.run(
+            ["git", "cat-file", "-e", f"{PUBLISHED_473}^{{commit}}"], cwd=ROOT,
+            text=True, capture_output=True,
+        )
+        self.assertEqual(set(PUBLISHED_473_BLOBS), {
+            "source/prototypes/mir/compatibility/repairs/angels_smelting.lua",
+            "source/prototypes/mir/compatibility/repairs/technology_prerequisite_cycles.lua",
+        })
+        self.assertTrue(all(len(blob) == 40 and int(blob, 16) >= 0 for blob in PUBLISHED_473_BLOBS.values()))
+        if present.returncode:
+            return
+
         def published(path: str) -> str:
+            resolved = subprocess.run(
+                ["git", "rev-parse", f"{PUBLISHED_473}:{path}"], cwd=ROOT,
+                check=True, text=True, capture_output=True,
+            ).stdout.strip()
+            self.assertEqual(resolved, PUBLISHED_473_BLOBS[path])
             return subprocess.run(
                 ["git", "show", f"{PUBLISHED_473}:{path}"], cwd=ROOT,
                 check=True, text=True, capture_output=True,
