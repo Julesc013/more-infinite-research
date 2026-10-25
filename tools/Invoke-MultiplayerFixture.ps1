@@ -36,7 +36,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='library-multiplayer';target='f200'
       kind='mir5-library-multiplayer-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
@@ -44,7 +44,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='library-multiplayer';target='f200'
       kind='mir5-library-multiplayer-current-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
@@ -52,7 +52,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='library-multiplayer';target='f210'
       kind='mir5-library-multiplayer-f210-native-selection';factorio_line='2.1';base='2.1.23'
-      engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000'
+      engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000';build_version=87750
       observer_sha256='2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'
       fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
@@ -60,7 +60,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='library-paired-browser';target='f200'
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-published@0.1.0')
       optional_archives=@('more-infinite-research_4.7.20002.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip')
@@ -68,7 +68,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='library-paired-browser';target='f200'
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
@@ -76,7 +76,7 @@ function Assert-MultiplayerFixtureSelection {
     [ordered]@{
       fixture_case='scripted-effects-multiplayer';target='f200'
       kind='mir5-scripted-effects-multiplayer-f200-space-age-native-selection';factorio_line='2.0';base='2.0.77'
-      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000';build_version=84539
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
       fixture_mods=@('elevated-rails@2.0.77','quality@2.0.77','space-age@2.0.77','mir-fixture-mir5-scripted-effects-multiplayer@0.1.0')
       optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
@@ -175,7 +175,7 @@ try {
     [IO.File]::WriteAllText($config,$text,[Text.UTF8Encoding]::new($false))
     $name=if($locale -ceq 'en'){'MIR5English'}else{'MIR5Deutsch'}
     # Isolated disposable identities contain no online token or personal data.
-    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=84539;build_mode='full';platform='win64'}}
+    $player=@{'service-username'=$name;'service-token'='';'last-played-version'=@{game_version=$target.base;build_version=$target.build_version;build_mode='full';platform='win64'}}
     [IO.File]::WriteAllText((Join-Path $write 'player-data.json'),($player|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
     $clients+=@{name=$name;locale=$locale;config=$config;write_data=$write;port=$udpPorts[$clientIndex]};$clientIndex++
   }
@@ -206,7 +206,9 @@ try {
       foreach($client in $clients){foreach($stage in @('first-open','search','refresh','reopen')){Join-Path $client.write_data ('script-output/mir5-library-paired-browser/'+$stage+'-*.png')}}
     }
   )
-  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword};if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
+  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  if($FixtureCase -ceq 'library-multiplayer'){$spec.library_witness_target=[ordered]@{engine_sha256=[string]$target.engine_sha256;base=[string]$target.base;mir=[string]$target.mir}}
+  if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){
     Assert-Session ($FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
     $spec.process_memory_observations=$true
