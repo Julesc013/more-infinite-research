@@ -15,13 +15,13 @@
     "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
   },
   "candidate": {
-    "source_reference": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
-    "source_tree": "e5044b712537c0a2f3edec71d935ddea4b994964",
-    "sha256": "87C0D71391B66B6BE608E1F0E9B2D638BA762CCF0D26CFE3F74BEC680B97A444",
-    "bytes": 551761,
+    "source_reference": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+    "source_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+    "sha256": "76D4D21B12EA8EA939DFFC599EC0746A1D9E13656326CACF5CB4A6D0303EB663",
+    "bytes": 551960,
     "scope": "Current canonical F200 edition including recovered named prerequisite repairs outside the Generator. The exact nine-edition freeze is independently rebuilt and read back; fresh complete intended-output/default equality remains required, with separate save/client/runtime and release verdicts. This retains the predeclared high-cost F200 comparison; F210 qualification keeps scheduling priority.",
-    "asset_inventory_sha256": "216AA8B8F7F846357DF2DFF106F88111DDF37F899731ADEACABB46077DD605B1",
-    "asset_root": "D:/Projects/Factorio/mir5-current-assets-12c5d21f-r01"
+    "asset_inventory_sha256": "2481424C07F55E86EA16EBA10769B3AB988B6AED47AB35717BA261FBA66BFA2F",
+    "asset_root": "D:/Projects/Factorio/mir5-current-assets-fa1146e9-r01"
   },
   "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
   "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9",
@@ -84,11 +84,11 @@
   ],
   "previous_plan": "spec/evidence/bob-angel-menu-plan-r19.json",
   "changed_inputs": [
-    "Advance exact player source to12c5d21f/player treee504. The nine-edition freeze and primary readback are independently verified; F200 is87C0D713/551761 bytes, inventory216AA8B8 at D:/Projects/Factorio/mir5-current-assets-12c5d21f-r01. Earlier package executions retain their own identities.",
-    "Reverify all fourteen raw-Git helpers at12c5d21f: thirteen remain byte-identical toR19; LibraryActivation.ps1 adds the accepted bounded prelaunch idle wait. No process is exempted or killed and ownership, obstruction, governor and cleanup predicates remain enforced.",
-    "Preserve the complete Bob/Angel profile, independent148-record intent, published4.7 archive, four arms,38 launches, A/A0.5 seconds and5 percent, control0.5 seconds,50 percent MIR-added improvement objective, cache policy, ordinary configuration and resource reserves.",
-    "Require fresh current-candidate/default intent equality, complete published/replay equality and a current successful owned-window diagnostic before timings. This provenance update adds no preparation result or timing sample.",
-    "R19 passed only the read-only PlanOnly path and has zero accepted timing samples. Preserve all earlier native preparation failures/refusals under their original revisions."
+    "Advance the unexecuted R20 declaration from12c tofa1146e9/player tree41b78703 before any native preparation or timing. F200 is76D4D21B/551960 bytes with inventory2481424C at D:/Projects/Factorio/mir5-current-assets-fa1146e9-r01. Exact nine-edition rebuild/readback is retained; seven historical ZIPs are unchanged.",
+    "Aero942 restores published finite reached-prerequisite semantics only inside the named Astroponics repair outside Generator. Its visited nonrecursive walk reads each reached technology once. Earlier12c native runs remain under their original package identities.",
+    "All fourteen raw-Git helpers atfa114 are byte-identical to the first R20 declaration atb0a0e428; thirteen remain identical toR19 and the one bounded LibraryActivation idle-wait change is retained. No measurement, ownership, obstruction, governor or cleanup predicate changes.",
+    "Preserve complete Bob/Angel selection, independent148-record intent, published archive, four arms,38 launches, A/A0.5 seconds and5 percent, control0.5 seconds,50 percent MIR-added-time improvement objective, cache/configuration and resources. Fresh complete candidate/default and published/replay equality plus current owned-window diagnostic still precede timings.",
+    "The first R20 declaration b0/B9 passed only read-only exact12c PlanOnly validation and created no staging/native preparation/timing samples. Preserve that original readback and all older adverses; no old result is renamed."
   ],
   "resources": {
     "expected_peak_memory_mib": 6144,
@@ -97,7 +97,7 @@
     "worker_timeout_minutes": 45,
     "governor_reserves_changed": false
   },
-  "observer_source_reference": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+  "observer_source_reference": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
   "observer_git_blobs": [
     {
       "path": "tools/lib/validation/responsive-menu/OwnedMenuWindow.ps1",
@@ -117,7 +117,7 @@
     }
   ],
   "adverse_evidence": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
-  "shared_harness_source_reference": "12c5d21fd7466299e7c3c7e316f2bae693145c20",
+  "shared_harness_source_reference": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
   "shared_harness_git_blobs": [
     {
       "path": "tools/lib/validation/NativeProbeCommon.ps1",
@@ -160,12 +160,12 @@
       "sha256": "34E513C43EFEB5CAC93843CA9AA9CD5E70E385825BD8C155783C3542A3E8FB07"
     }
   ],
-  "prior_predeclaration_commit": "abfe86b58ad86fbd238ec35bf371709c024cfd61",
+  "prior_predeclaration_commit": "b0a0e4287fd08d30027d94961b30f7db7a26f731",
   "preparation_or_timing_started_for_prior_revision": false,
   "prior_revision_observation": {
-    "scope": "R19 passed read-only PlanOnly validation with fourteen helpers and38 planned launches; it did not create staging or run Factorio/timings. Earlier native preparation adverses remain separately bound.",
+    "scope": "Initial R20 b0/B9 passed read-only exact12c PlanOnly with14 helper hashes and38 planned launches, without creating staging or launching Factorio. The source-check refusal against the advanced primary HEAD remains a local input-selection refusal, not native evidence.",
+    "offline_custody": "C:/Users/Jules/AppData/Local/MIRWorker/control-worktrees/menu-r11-dispatch/build/menu-r20-validation-readback-r01.json",
     "native_adverse": "spec/evidence/bob-angel-menu-preparation-and-adverse-chain.json",
-    "offline_custody": "C:/Users/Jules/AppData/Local/MIRWorker/control-worktrees/menu-r11-dispatch/build/menu-r19-validation-readback-r01.json",
     "earlier_r12_adverse": "spec/evidence/bob-angel-menu-r12-preparation-adverse-chain.json"
   }
 }
