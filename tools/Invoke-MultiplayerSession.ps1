@@ -225,17 +225,37 @@ function Read-LogText([string]$Path) {
   if ($null -eq $text) { return '' }
   return $text
 }
-function Save-PairedBrowserServerPhaseLog([string]$Source, [ValidateSet('initial','restart')][string]$Phase) {
+function Test-PairedBrowserBytePrefix([byte[]]$Prefix, [byte[]]$Value) {
+  if ($Prefix.Length -gt $Value.Length) { return $false }
+  for ($index = 0; $index -lt $Prefix.Length; $index++) {
+    if ($Prefix[$index] -ne $Value[$index]) { return $false }
+  }
+  return $true
+}
+function Save-PairedBrowserServerPhaseLog([string]$Source, [ValidateSet('initial','restart')][string]$Phase, [string]$InitialLog = '') {
   $sourcePath = Resolve-BuildInput $Source 'Leaf' "paired Browser $Phase server log"
   $sourceItem = Get-Item -LiteralPath $sourcePath
   $maximumBytes = 8MB
   Assert-Session ($sourceItem.Length -le $maximumBytes) "paired Browser $Phase server log exceeds 8 MiB"
   $destination = Resolve-BuildOutput (Join-Path $workroot ("paired-browser-server-" + $Phase + ".factorio-current.log")) "paired Browser $Phase server log snapshot"
   Assert-Session (-not (Test-Path -LiteralPath $destination)) "paired Browser $Phase server log snapshot already exists"
-  Copy-Item -LiteralPath $sourcePath -Destination $destination -ErrorAction Stop
+  [byte[]]$sourceBytes = [IO.File]::ReadAllBytes($sourcePath)
+  [byte[]]$phaseBytes = $sourceBytes
+  if ($Phase -ceq 'restart' -and -not [string]::IsNullOrWhiteSpace($InitialLog)) {
+    $initialPath = Resolve-BuildInput $InitialLog 'Leaf' 'paired Browser initial server log snapshot'
+    [byte[]]$initialBytes = [IO.File]::ReadAllBytes($initialPath)
+    Assert-Session ($initialBytes.Length -le $maximumBytes) 'paired Browser retained initial server log exceeds 8 MiB'
+    if (Test-PairedBrowserBytePrefix $initialBytes $sourceBytes) {
+      Assert-Session ($sourceBytes.Length -gt $initialBytes.Length) 'paired Browser restart server log has no post-initial bytes'
+      $phaseBytes = [byte[]]::new($sourceBytes.Length - $initialBytes.Length)
+      [Array]::Copy($sourceBytes, $initialBytes.Length, $phaseBytes, 0, $phaseBytes.Length)
+    }
+  }
+  [IO.File]::WriteAllBytes($destination, $phaseBytes)
   $copied = Resolve-BuildInput $destination 'Leaf' "paired Browser $Phase server log snapshot"
-  Assert-Session ((Get-Item -LiteralPath $copied).Length -eq $sourceItem.Length) "paired Browser $Phase server log snapshot length differs"
-  Assert-Session ((Get-SessionHash $copied) -ceq (Get-SessionHash $sourcePath)) "paired Browser $Phase server log snapshot hash differs"
+  Assert-Session ((Get-Item -LiteralPath $copied).Length -eq $phaseBytes.Length) "paired Browser $Phase server log snapshot length differs"
+  [byte[]]$copiedBytes = [IO.File]::ReadAllBytes($copied)
+  Assert-Session (Test-PairedBrowserBytePrefix $phaseBytes $copiedBytes) "paired Browser $Phase server log snapshot bytes differ"
   return $copied
 }
 function Write-RconInt32([IO.Stream]$Stream, [int]$Value) {
@@ -727,7 +747,7 @@ try {
     $activeClients = @()
     Stop-Record $server
     $server = $null
-    $restartServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'restart'
+    $restartServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'restart' $initialServerLog
     $restartText = Read-LogText $restartServerLog
     foreach ($stage in @('reopen','completed')) {
       $phaseMarker = Get-PairedBrowserStageMarker $restartText $stage $pairedArm
