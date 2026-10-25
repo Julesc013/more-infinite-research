@@ -33,7 +33,7 @@ function Get-ProcessMemoryObservationOptIn([hashtable]$Spec,[string]$FixtureCase
     Assert-Session ($Spec.process_memory_observations -is [bool]) 'process memory observation flag must be Boolean'
     $collect = [bool]$Spec.process_memory_observations
   }
-  Assert-Session (-not $collect -or $FixtureCase -ceq 'library-multiplayer') 'process memory observations require the Library fixture'
+  Assert-Session (-not $collect -or $FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
   return $collect
 }
 function Test-Within([string]$Root, [string]$Path) {
@@ -225,6 +225,19 @@ function Read-LogText([string]$Path) {
   if ($null -eq $text) { return '' }
   return $text
 }
+function Save-PairedBrowserServerPhaseLog([string]$Source, [ValidateSet('initial','restart')][string]$Phase) {
+  $sourcePath = Resolve-BuildInput $Source 'Leaf' "paired Browser $Phase server log"
+  $sourceItem = Get-Item -LiteralPath $sourcePath
+  $maximumBytes = 8MB
+  Assert-Session ($sourceItem.Length -le $maximumBytes) "paired Browser $Phase server log exceeds 8 MiB"
+  $destination = Resolve-BuildOutput (Join-Path $workroot ("paired-browser-server-" + $Phase + ".factorio-current.log")) "paired Browser $Phase server log snapshot"
+  Assert-Session (-not (Test-Path -LiteralPath $destination)) "paired Browser $Phase server log snapshot already exists"
+  Copy-Item -LiteralPath $sourcePath -Destination $destination -ErrorAction Stop
+  $copied = Resolve-BuildInput $destination 'Leaf' "paired Browser $Phase server log snapshot"
+  Assert-Session ((Get-Item -LiteralPath $copied).Length -eq $sourceItem.Length) "paired Browser $Phase server log snapshot length differs"
+  Assert-Session ((Get-SessionHash $copied) -ceq (Get-SessionHash $sourcePath)) "paired Browser $Phase server log snapshot hash differs"
+  return $copied
+}
 function Write-RconInt32([IO.Stream]$Stream, [int]$Value) {
   $bytes = [BitConverter]::GetBytes($Value)
   if (-not [BitConverter]::IsLittleEndian) { [Array]::Reverse($bytes) }
@@ -404,6 +417,67 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
   }
   return $rows[0]
 }
+function Assert-PairedBrowserInteger([object]$Value, [int]$Expected, [string]$Field, [string]$Stage) {
+  Assert-Session ((Test-LibraryInteger $Value) -and [int64]$Value -eq $Expected) "$Stage paired Browser $Field differs"
+}
+function Assert-PairedBrowserBoolean([object]$Value, [bool]$Expected, [string]$Field, [string]$Stage) {
+  Assert-Session ($Value -is [bool] -and $Value -eq $Expected) "$Stage paired Browser $Field differs"
+}
+function Get-PairedBrowserStageMarker([string]$Text, [string]$Stage, [string]$ExpectedArm) {
+  $expectations = @{
+    'ready' = @{ status='ready'; joins=0; actions=0; screenshots=0 }
+    'first-open' = @{ status='observed'; joins=2; actions=2; screenshots=2 }
+    'search' = @{ status='observed'; joins=2; actions=2; screenshots=4 }
+    'refresh' = @{ status='observed'; joins=2; actions=2; screenshots=6 }
+    'restart-ready' = @{ status='ready'; joins=2; actions=2; screenshots=6 }
+    'reopen' = @{ status='observed'; joins=4; actions=2; screenshots=8 }
+    'completed' = @{ status='passed'; joins=4; actions=2; screenshots=8 }
+  }
+  Assert-Session $expectations.ContainsKey($Stage) "unsupported paired Browser stage: $Stage"
+  $rows = [Collections.Generic.List[object]]::new()
+  $matches = [regex]::Matches($Text, '\[MIR5_LIBRARY_PAIRED_BROWSER\] ([^\r\n]+)(?:\r?\n|$)')
+  foreach ($match in $matches) {
+    $raw = $match.Groups[1].Value
+    try { $row = $raw | ConvertFrom-Json }
+    catch {
+      $atEnd = $match.Index + $match.Length -eq $Text.Length
+      if ($atEnd -and -not $Text.EndsWith("`n")) { continue }
+      throw '[mir5-multiplayer-session] paired Browser marker is malformed'
+    }
+    Assert-Session (($row.schema -is [long] -or $row.schema -is [int]) -and [int64]$row.schema -eq 1 -and $row.case -ceq 'library-paired-browser') 'paired Browser marker identity differs'
+    Assert-Session ($row.stage -is [string] -and $expectations.ContainsKey($row.stage)) 'paired Browser marker stage differs'
+    if ($row.stage -ceq $Stage) { $rows.Add($row) }
+  }
+  if ($rows.Count -eq 0) { return $null }
+  Assert-Session ($rows.Count -eq 1) "paired Browser marker is duplicated: $Stage"
+  $row = $rows[0]
+  $expected = $expectations[$Stage]
+  Assert-Session ($row.status -is [string] -and $row.status -ceq $expected.status) "$Stage paired Browser status differs"
+  Assert-Session ($row.arm -is [string] -and $row.arm -ceq $ExpectedArm) "$Stage paired Browser arm differs"
+  Assert-PairedBrowserInteger $row.join_events $expected.joins 'join_events' $Stage
+  Assert-PairedBrowserInteger $row.action_call_count $expected.actions 'action_call_count' $Stage
+  Assert-PairedBrowserInteger $row.screenshot_calls $expected.screenshots 'screenshot_calls' $Stage
+  Assert-PairedBrowserBoolean $row.native_snapshot_unchanged $true 'native_snapshot_unchanged' $Stage
+  Assert-PairedBrowserBoolean $row.profiler_observation_only $true 'profiler_observation_only' $Stage
+  Assert-PairedBrowserBoolean $row.performance_acceptance $false 'performance_acceptance' $Stage
+  return $row
+}
+function Get-PairedBrowserProfilerMarkers([string]$Text, [string[]]$ExpectedActions) {
+  $allowed = @('first_open','search','refresh','reopen')
+  $rows = [Collections.Generic.List[object]]::new()
+  foreach ($match in [regex]::Matches($Text, '\[MIR5_LIBRARY_PROFILE\] ([^\r\n]+)(?:\r?\n|$)')) {
+    $raw = $match.Groups[1].Value
+    $parsed = [regex]::Match($raw, '^(first_open|search|refresh|reopen)\s+.+$')
+    Assert-Session $parsed.Success 'paired Browser profiler marker grammar differs'
+    $rows.Add([pscustomobject]@{ action=[string]$parsed.Groups[1].Value; raw_line=$match.Value.TrimEnd("`r","`n") })
+  }
+  foreach ($action in $allowed) {
+    $count = @($rows | Where-Object { $_.action -ceq $action }).Count
+    $expected = if ($action -in $ExpectedActions) { 1 } else { 0 }
+    Assert-Session ($count -eq $expected) "paired Browser profiler action differs: $action"
+  }
+  return @($rows)
+}
 function Wait-For([string]$Description, [scriptblock]$Predicate) {
   while ([DateTime]::UtcNow -lt $deadline) {
     Assert-Active
@@ -427,7 +501,8 @@ function Find-Screenshots([string[]]$Stages) {
     if ($matches.Count -ne 1) { return $null }
     $path = Resolve-BuildInput $matches[0].FullName 'Leaf' 'captured screenshot'
     if (-not (Test-Png1280x720 $path)) { return $null }
-    $match = [regex]::Match($matches[0].Name, '^(availability|initial|settled|rejoin|restart)-([12])[.]png$')
+    $filenamePattern = if($fixtureCase -ceq 'library-paired-browser'){'^(first-open|search|refresh|reopen)-([12])[.]png$'}else{'^(availability|initial|settled|rejoin|restart)-([12])[.]png$'}
+    $match = [regex]::Match($matches[0].Name, $filenamePattern)
     Assert-Session $match.Success 'captured screenshot filename differs'
     if ($indices.ContainsKey($expected.client) -and $indices[$expected.client] -ne $match.Groups[2].Value) {
       throw "screenshot player index changed for $($expected.client)"
@@ -435,7 +510,7 @@ function Find-Screenshots([string[]]$Stages) {
     $indices[$expected.client] = $match.Groups[2].Value
     $files.Add($path)
   }
-  if ($Stages.Count -eq 5) {
+  if (($fixtureCase -ceq 'library-multiplayer' -and $Stages.Count -eq 5) -or ($fixtureCase -ceq 'library-paired-browser' -and $Stages.Count -eq 4)) {
     Assert-Session ($indices.Count -eq 2 -and (@($indices.Values | Select-Object -Unique)).Count -eq 2) 'client screenshot player indexes are not distinct and stable'
   }
   return [pscustomobject]@{files=@($files);indexes=$indices}
@@ -460,9 +535,9 @@ if ($RconSelfCheck) {
 $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
-Assert-Session ($fixtureCase-cin@('library-multiplayer','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
+Assert-Session ($fixtureCase-cin@('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
-$markerPrefix=if($fixtureCase-ceq'library-multiplayer'){'MIR5_LIBRARY_MULTIPLAYER'}else{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}
+$markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})
 foreach ($field in @('engine','engine_sha256','archive_library','workroot','seed_save','seed_sha256','server_config','server_settings','server_write_data','port','rcon_port','rcon_password','clients','expected_screenshots')) {
   Assert-Session $spec.ContainsKey($field) "session spec lacks $field"
@@ -507,6 +582,11 @@ foreach ($client in $clients) {
 }
 Assert-Session (($clients.locale | Sort-Object) -join ',' -ceq 'de,en') 'two client locales must be en and de'
 Assert-Session ((@($names | Sort-Object) -join ',') -ceq 'MIR5Deutsch,MIR5English') 'two client identities must be MIR5English and MIR5Deutsch'
+$pairedArm=$null
+if($fixtureCase -ceq 'library-paired-browser'){
+  Assert-Session ($spec.ContainsKey('paired_arm') -and $spec.paired_arm -is [string] -and $spec.paired_arm -cin @('published','mir5')) 'paired Browser session arm differs'
+  $pairedArm=[string]$spec.paired_arm
+}
 $restartSave = Resolve-BuildOutput (Join-Path $serverWriteData ('saves/mir5-'+$fixtureCase+'-restart.zip')) 'restart save'
 $finalSave = Resolve-BuildOutput (Join-Path $serverWriteData 'saves/mir5-native-complete.zip') 'final save'
 $sessionPath = Resolve-BuildOutput (Join-Path $workroot 'session.json') 'session output'
@@ -534,6 +614,26 @@ if($fixtureCase-ceq'library-multiplayer') {
   Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'availability,initial,rejoin,restart,settled') "client $($client.name) screenshot stages differ"
  }
  Assert-Session ($screenshotPatterns.Count -eq 10) 'screenshot patterns do not map exactly to the two clients'
+} elseif($fixtureCase-ceq'library-paired-browser') {
+  Assert-Session ($patterns.Count -eq 8 -and (@($patterns | Select-Object -Unique)).Count -eq 8) 'paired Browser session requires eight distinct screenshot patterns'
+  foreach ($client in $clients) {
+    $root = [IO.Path]::GetFullPath((Join-Path $client.write_data 'script-output/mir5-library-paired-browser'))
+    $clientPatterns = @($patterns | Where-Object { Test-Within $root $_ })
+    Assert-Session ($clientPatterns.Count -eq 4) "client $($client.name) requires four local paired Browser screenshot patterns"
+    $stages = [Collections.Generic.List[string]]::new()
+    foreach ($pattern in $clientPatterns) {
+      $relative = [IO.Path]::GetRelativePath($root, $pattern)
+      $leaf = [IO.Path]::GetFileName($pattern)
+      $name = [regex]::Match($leaf, '^(first-open|search|refresh|reopen)-[*][.]png$')
+      Assert-Session ($name.Success -and $relative -ceq $leaf) "paired Browser screenshot pattern differs for $($client.name)"
+      $null = $stages.Add($name.Groups[1].Value)
+      $parent = [IO.Path]::GetDirectoryName($pattern)
+      if(Test-Path -LiteralPath $parent -PathType Container){Assert-Session (@(Get-ChildItem -LiteralPath $parent -File | Where-Object { $_.Name -like $leaf }).Count -eq 0) "fresh paired Browser screenshot output already exists: $pattern"}
+      $screenshotPatterns.Add([pscustomobject]@{client=$client.name;stage=$name.Groups[1].Value;path=$pattern;leaf=$leaf})
+    }
+    Assert-Session ((@($stages | Sort-Object) -join ',') -ceq 'first-open,refresh,reopen,search') "client $($client.name) paired Browser screenshot stages differ"
+  }
+  Assert-Session ($screenshotPatterns.Count -eq 8) 'paired Browser screenshot patterns do not map exactly to two clients'
 } else {
  Assert-Session ($patterns.Count-eq0) 'scripted-effects gameplay case must not claim Library screenshots'
 }
@@ -544,7 +644,7 @@ $processMemoryObservationPath = $null
 if ($collectProcessMemoryObservations) {
   $processMemoryObservationPath = Resolve-BuildOutput (Join-Path $workroot 'process-memory-observations.json') 'process memory observations'
   Assert-Session (-not (Test-Path -LiteralPath $processMemoryObservationPath)) 'fresh process memory observation output already exists'
-  $slots = foreach ($phase in @('initial', 'rejoin', 'restart')) {
+  $slots = foreach ($phase in $(if($fixtureCase -ceq 'library-paired-browser'){@('initial','restart')}else{@('initial','rejoin','restart')})) {
     foreach ($role in @('server', 'client-en', 'client-de')) {
       [pscustomobject]@{ phase=$phase; role=$role }
     }
@@ -572,6 +672,8 @@ function Start-Clients([string]$Phase) {
     [void](Wait-For ("native join of "+$client.name) {
       return [regex]::IsMatch((Read-LogText (Join-Path $serverWriteData 'factorio-current.log')),$joined)
     })
+    # The paired fixture counts all joins; the functional fixtures count per player.
+    if($fixtureCase -ceq 'library-paired-browser'){$expectedJoin++}
   }
   $started.ToArray()
 }
@@ -579,63 +681,131 @@ function Start-Clients([string]$Phase) {
 $sessionFailure = $null
 $result = $null
 try {
-  $server = Start-Server 'server-initial' $seed
-  [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 })
-  $activeClients = Start-Clients 'initial'
-  [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 })
-  if($fixtureCase-ceq'library-multiplayer') {
-    [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
-    [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
-    [void](Wait-For 'complete settled client screenshots' { Find-Screenshots @('settled') })
-  }
-  # Stop our clients before clearing their server peers. A live kicked client
-  # logs the expected disconnect as an engine Error, which must not be confused
-  # with a product failure or hidden by weakening native fatal checks.
-  foreach ($client in $activeClients) { Stop-Record $client }
-  Invoke-LoopbackRconKicks $rconPort $rconPassword
-  if ($null -ne $processMemorySampler) {
-    Close-ProcessMemoryObservation $server
-    $registration = Register-MIROwnedProcessMemoryProcess -Sampler $processMemorySampler -Phase 'rejoin' -Role 'server' -Process $server.process
-    $server | Add-Member -NotePropertyName memory_observation -NotePropertyValue $registration -Force
-  }
-  $activeClients = Start-Clients 'rejoin'
-  [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 })
-  if($fixtureCase-ceq'library-multiplayer'){[void](Wait-For 'complete rejoin client screenshots' { Find-Screenshots @('rejoin') })}
-  [void](Wait-For 'complete restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
-  $restartHash = Get-SessionHash $restartSave
-  Assert-Session ((Get-SessionHash $seed) -ceq $seedHash) 'initial server changed protected seed save'
-  foreach ($client in $activeClients) { Stop-Record $client }; $activeClients = @()
-  Stop-Record $server; $server = $null
-  Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
-  $beforeRestartServerLog = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
-  $server = Start-Server 'server-restart' $restartSave
-  [void](Wait-For 'restarted server listener log' {
-    $current = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
-    if ($current -ceq $beforeRestartServerLog) { return $false }
-    $delta = if ($current.StartsWith($beforeRestartServerLog, [StringComparison]::Ordinal)) { $current.Substring($beforeRestartServerLog.Length) } else { $current }
-    return [regex]::IsMatch($delta, '(?im)Hosting game at|Starting server')
-  })
-  $activeClients = Start-Clients 'restart'
-  $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 }
-  Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true) 'completed witness lacks host-reload evidence'
-  if($fixtureCase-ceq'library-multiplayer') {
-    Assert-Session ($completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 10) 'completed witness lacks Availability evidence'
-  }
-  $captures = Wait-For 'complete final save and client screenshots' {
-    $screens = if($fixtureCase-ceq'library-multiplayer'){Find-Screenshots @('availability','initial','settled','rejoin','restart')}else{[pscustomobject]@{files=@()}}
-    if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }; return $false
-  }
-  $screenshots = @($captures.files)
-  if ($fixtureCase -ceq 'library-multiplayer') {
-    Assert-Session ($screenshots.Count -eq 10) 'final screenshot inventory differs'
-  }
-  $result = [ordered]@{
-    schema=1;kind=$(if($fixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerSessionV1'}else{'MIR5ScriptedEffectsMultiplayerSessionV1'});case=$fixtureCase;status='passed-private-two-client-session'
-    engine_sha256=(Get-SessionHash $engine); seed_sha256=$seedHash; restart_save_sha256=$restartHash
-    final_save_sha256=(Get-SessionHash $finalSave); markers=@('ready','rejoin-ready','restart-ready','completed')
-    clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
-    client_graphics_arguments=$clientGraphics
-    screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
+  if ($fixtureCase -ceq 'library-paired-browser') {
+    $server = Start-Server 'server-initial' $seed
+    [void](Wait-For 'paired Browser ready marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' $pairedArm })
+    $activeClients = Start-Clients 'initial'
+    foreach ($stage in @('first-open','search','refresh')) {
+      [void](Wait-For ("paired Browser $stage marker") { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) $stage $pairedArm })
+    }
+    [void](Wait-For 'paired Browser initial client screenshots' { Find-Screenshots @('first-open','search','refresh') })
+    [void](Wait-For 'paired Browser restart-ready marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' $pairedArm })
+    [void](Wait-For 'paired Browser restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
+    $restartHash = Get-SessionHash $restartSave
+    Assert-Session ((Get-SessionHash $seed) -ceq $seedHash) 'initial server changed protected seed save'
+    foreach ($client in $activeClients) { Stop-Record $client }
+    $activeClients = @()
+    Stop-Record $server
+    $server = $null
+    $initialServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'initial'
+    $initialText = Read-LogText $initialServerLog
+    foreach ($stage in @('ready','first-open','search','refresh','restart-ready')) {
+      $phaseMarker = Get-PairedBrowserStageMarker $initialText $stage $pairedArm
+      Assert-Session ($null -ne $phaseMarker) "paired Browser initial phase log lacks $stage stage"
+    }
+    $initialProfiler = Get-PairedBrowserProfilerMarkers $initialText @('first_open','search','refresh')
+    Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
+    $beforeRestartServerLog = $initialText
+    $server = Start-Server 'server-restart' $restartSave
+    [void](Wait-For 'paired Browser restarted server listener log' {
+      $current = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
+      if ($current -ceq $beforeRestartServerLog) { return $false }
+      $delta = if ($current.StartsWith($beforeRestartServerLog, [StringComparison]::Ordinal)) { $current.Substring($beforeRestartServerLog.Length) } else { $current }
+      return [regex]::IsMatch($delta, '(?im)Hosting game at|Starting server')
+    })
+    $activeClients = Start-Clients 'restart'
+    [void](Wait-For 'paired Browser reopen marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'reopen' $pairedArm })
+    $completed = Wait-For 'paired Browser completed marker' { param($ignored) Get-PairedBrowserStageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' $pairedArm }
+    $captures = Wait-For 'paired Browser final save and client screenshots' {
+      $screens = Find-Screenshots @('first-open','search','refresh','reopen')
+      if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }
+      return $false
+    }
+    $screenshots = @($captures.files)
+    Assert-Session ($screenshots.Count -eq 8) 'paired Browser final screenshot inventory differs'
+    foreach ($client in $activeClients) { Stop-Record $client }
+    $activeClients = @()
+    Stop-Record $server
+    $server = $null
+    $restartServerLog = Save-PairedBrowserServerPhaseLog (Join-Path $serverWriteData 'factorio-current.log') 'restart'
+    $restartText = Read-LogText $restartServerLog
+    foreach ($stage in @('reopen','completed')) {
+      $phaseMarker = Get-PairedBrowserStageMarker $restartText $stage $pairedArm
+      Assert-Session ($null -ne $phaseMarker) "paired Browser restart phase log lacks $stage stage"
+    }
+    $restartProfiler = Get-PairedBrowserProfilerMarkers $restartText @('reopen')
+    $result = [ordered]@{
+      schema=1;kind='MIR5LibraryPairedBrowserSessionV1';case=$fixtureCase;status='passed-private-two-client-session';paired_arm=$pairedArm
+      engine_sha256=(Get-SessionHash $engine);seed_sha256=$seedHash;restart_save_sha256=$restartHash;final_save_sha256=(Get-SessionHash $finalSave)
+      markers=@('ready','first-open','search','refresh','restart-ready','reopen','completed')
+      profiler_observations=@(
+        [ordered]@{phase='initial';role='server';log_path=$initialServerLog;log_sha256=(Get-SessionHash $initialServerLog);markers=@($initialProfiler)}
+        [ordered]@{phase='restart';role='server';log_path=$restartServerLog;log_sha256=(Get-SessionHash $restartServerLog);markers=@($restartProfiler)}
+      )
+      clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
+      client_graphics_arguments=$clientGraphics
+      screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
+    }
+  } else {
+
+    $server = Start-Server 'server-initial' $seed
+    [void](Wait-For 'ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'ready' 0 })
+    $activeClients = Start-Clients 'initial'
+    [void](Wait-For 'rejoin-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'rejoin-ready' 2 })
+    if($fixtureCase-ceq'library-multiplayer') {
+      [void](Wait-For 'complete Availability client screenshots' { Find-Screenshots @('availability') })
+      [void](Wait-For 'complete initial client screenshots' { Find-Screenshots @('initial') })
+      [void](Wait-For 'complete settled client screenshots' { Find-Screenshots @('settled') })
+    }
+    # Stop our clients before clearing their server peers. A live kicked client
+    # logs the expected disconnect as an engine Error, which must not be confused
+    # with a product failure or hidden by weakening native fatal checks.
+    foreach ($client in $activeClients) { Stop-Record $client }
+    Invoke-LoopbackRconKicks $rconPort $rconPassword
+    if ($null -ne $processMemorySampler) {
+      Close-ProcessMemoryObservation $server
+      $registration = Register-MIROwnedProcessMemoryProcess -Sampler $processMemorySampler -Phase 'rejoin' -Role 'server' -Process $server.process
+      $server | Add-Member -NotePropertyName memory_observation -NotePropertyValue $registration -Force
+    }
+    $activeClients = Start-Clients 'rejoin'
+    [void](Wait-For 'restart-ready marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'restart-ready' 4 })
+    if($fixtureCase-ceq'library-multiplayer'){[void](Wait-For 'complete rejoin client screenshots' { Find-Screenshots @('rejoin') })}
+    [void](Wait-For 'complete restart save' { if (Test-SaveReady $restartSave) { return $true }; return $false })
+    $restartHash = Get-SessionHash $restartSave
+    Assert-Session ((Get-SessionHash $seed) -ceq $seedHash) 'initial server changed protected seed save'
+    foreach ($client in $activeClients) { Stop-Record $client }; $activeClients = @()
+    Stop-Record $server; $server = $null
+    Assert-Session ((Get-SessionHash $restartSave) -ceq $restartHash -and (Get-SessionHash $seed) -ceq $seedHash) 'protected restart or seed save changed before host reload'
+    $beforeRestartServerLog = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
+    $server = Start-Server 'server-restart' $restartSave
+    [void](Wait-For 'restarted server listener log' {
+      $current = Read-LogText (Join-Path $serverWriteData 'factorio-current.log')
+      if ($current -ceq $beforeRestartServerLog) { return $false }
+      $delta = if ($current.StartsWith($beforeRestartServerLog, [StringComparison]::Ordinal)) { $current.Substring($beforeRestartServerLog.Length) } else { $current }
+      return [regex]::IsMatch($delta, '(?im)Hosting game at|Starting server')
+    })
+    $activeClients = Start-Clients 'restart'
+    $completed = Wait-For 'completed marker' { param($ignored) Get-StageMarker (Read-LogText (Join-Path $serverWriteData 'factorio-current.log')) 'completed' 6 }
+    Assert-Session ($completed.witnesses.host_restart_observed -eq $true -and $completed.witnesses.on_load_read_only -eq $true) 'completed witness lacks host-reload evidence'
+    if($fixtureCase-ceq'library-multiplayer') {
+      Assert-Session ($completed.witnesses.availability_terminal_labels_checked -eq $true -and $completed.witnesses.screenshot_calls -eq 10) 'completed witness lacks Availability evidence'
+    }
+    $captures = Wait-For 'complete final save and client screenshots' {
+      $screens = if($fixtureCase-ceq'library-multiplayer'){Find-Screenshots @('availability','initial','settled','rejoin','restart')}else{[pscustomobject]@{files=@()}}
+      if ((Test-SaveReady $finalSave) -and $null -ne $screens) { return $screens }; return $false
+    }
+    $screenshots = @($captures.files)
+    if ($fixtureCase -ceq 'library-multiplayer') {
+      Assert-Session ($screenshots.Count -eq 10) 'final screenshot inventory differs'
+    }
+    $result = [ordered]@{
+      schema=1;kind=$(if($fixtureCase-ceq'library-multiplayer'){'MIR5LibraryMultiplayerSessionV1'}else{'MIR5ScriptedEffectsMultiplayerSessionV1'});case=$fixtureCase;status='passed-private-two-client-session'
+      engine_sha256=(Get-SessionHash $engine); seed_sha256=$seedHash; restart_save_sha256=$restartHash
+      final_save_sha256=(Get-SessionHash $finalSave); markers=@('ready','rejoin-ready','restart-ready','completed')
+      clients=@($clients | ForEach-Object {[ordered]@{name=$_.name;locale=$_.locale;port=$_.port;config=$_.config;write_data=$_.write_data}})
+      client_graphics_arguments=$clientGraphics
+      screenshots=@($screenshots | ForEach-Object {[ordered]@{path=$_;sha256=(Get-SessionHash $_);width=1280;height=720}})
+    }
   }
 }
 catch { $sessionFailure = $_ }

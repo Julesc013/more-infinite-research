@@ -1028,7 +1028,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Invoke-Expression $definition[0].Extent.Text
           if(Get-ProcessMemoryObservationOptIn -Spec @{} -FixtureCase 'library-multiplayer'){throw 'absent opt-in created observations'}
           if(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$false} -FixtureCase 'library-multiplayer'){throw 'false opt-in created observations'}
-          if(-not(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$true} -FixtureCase 'library-multiplayer')){throw 'true Library opt-in was ignored'}
+          if(-not(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$true} -FixtureCase 'library-multiplayer')){throw 'true functional Library opt-in was ignored'}
+          if(-not(Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$true} -FixtureCase 'library-paired-browser')){throw 'true paired Browser opt-in was ignored'}
+          if(Get-ProcessMemoryObservationOptIn -Spec @{} -FixtureCase 'library-paired-browser'){throw 'absent paired Browser opt-in created observations'}
           foreach($wrong in @('true',1,1.0,$null)){
             $rejected=$false;try{Get-ProcessMemoryObservationOptIn -Spec @{process_memory_observations=$wrong} -FixtureCase 'library-multiplayer'|Out-Null}catch{$rejected=$true}
             if(-not$rejected){throw 'non-Boolean opt-in was accepted'}
@@ -1045,6 +1047,136 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_WRAPPER=str(WRAPPER)), check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_paired_browser_session_reader_requires_exact_server_protocol(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $text=[IO.File]::ReadAllText($env:MIR_TEST_SESSION)
+          $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $names=@('Test-LibraryInteger','Assert-PairedBrowserInteger','Assert-PairedBrowserBoolean','Get-PairedBrowserStageMarker','Get-PairedBrowserProfilerMarkers')
+          $definitions=@{}
+          foreach($name in $names){
+            $found=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$true))
+            if($found.Count-ne1){throw "missing paired reader definition: $name"}
+            $definitions[$name]=$found[0].Extent.Text
+          }
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          foreach($name in $names){Invoke-Expression $definitions[$name]}
+          $rows=@(
+            @{schema=1;case='library-paired-browser';stage='ready';status='ready';arm='published';join_events=0;action_call_count=0;screenshot_calls=0;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='first-open';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=2;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='search';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=4;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='refresh';status='observed';arm='published';join_events=2;action_call_count=2;screenshot_calls=6;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='restart-ready';status='ready';arm='published';join_events=2;action_call_count=2;screenshot_calls=6;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='reopen';status='observed';arm='published';join_events=4;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false},
+            @{schema=1;case='library-paired-browser';stage='completed';status='passed';arm='published';join_events=4;action_call_count=2;screenshot_calls=8;native_snapshot_unchanged=$true;profiler_observation_only=$true;performance_acceptance=$false}
+          )
+          function MarkerText($InputRows){return (($InputRows|ForEach-Object {'[MIR5_LIBRARY_PAIRED_BROWSER] '+($_|ConvertTo-Json -Compress)})-join "`n")+"`n"}
+          $text=MarkerText $rows
+          foreach($row in $rows){$accepted=Get-PairedBrowserStageMarker $text $row.stage 'published';if($accepted.stage-cne$row.stage){throw 'valid paired stage rejected'}}
+          $profiles="[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms`n[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms`n[MIR5_LIBRARY_PROFILE] refresh Duration: 1.000000ms`n[MIR5_LIBRARY_PROFILE] reopen Duration: 1.000000ms`n"
+          $observations=@(Get-PairedBrowserProfilerMarkers $profiles @('first_open','search','refresh','reopen'))
+          if($observations.Count-ne4 -or $observations[0].raw_line -cne '[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms'){throw 'paired profiler provenance differs'}
+          function Assert-Rejects([scriptblock]$Block,[string]$Name){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "paired reader accepted invalid $Name"}}
+          $duplicate=@($rows)+@($rows[-1]);Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $duplicate) 'completed' 'published'|Out-Null} 'duplicate stage'
+          $wrongArm=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$wrongArm[1].arm='mir5';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $wrongArm) 'first-open' 'published'|Out-Null} 'wrong arm'
+          $stringJoin=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$stringJoin[2].join_events='2';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $stringJoin) 'search' 'published'|Out-Null} 'string join count'
+          $unknownStage=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$unknownStage[3].stage='unexpected';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $unknownStage) 'ready' 'published'|Out-Null} 'unknown stage'
+          Assert-Rejects {Get-PairedBrowserProfilerMarkers ($profiles+'[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms'+"`n") @('first_open','search','refresh','reopen')|Out-Null} 'duplicate profiler action'
+          Assert-Rejects {Get-PairedBrowserProfilerMarkers '[MIR5_LIBRARY_PROFILE] first-open Duration: 1.000000ms' @('first_open')|Out-Null} 'hyphen profiler token'
+          'PASS paired Browser reader'
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_actual_client_starter_matches_each_fixture_join_protocol(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $nodes=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Start-Clients'
+          },$true))
+          if($nodes.Count-ne1){throw 'actual client starter missing or ambiguous'}
+          Invoke-Expression $nodes[0].Extent.Text
+          $clients=@(
+            @{name='MIR5English';locale='en';config='en.ini';port=1001;ordinal=1},
+            @{name='MIR5Deutsch';locale='de';config='de.ini';port=1002;ordinal=2}
+          )
+          $library='unused';$serverPort=1000;$clientGraphics=@();$serverWriteData='unused'
+          function Start-Native([string]$Name,$NativeArguments){
+            $index=$script:launches.Count
+            $script:launches.Add($Name);$script:order.Add('start')
+            $playerName=$clients[$index].name
+            $ordinal=$script:ordinals[$index]
+            $script:logText+="[$markerPrefix`_JOIN] $playerName $ordinal`n"
+            return [pscustomobject]@{name=$Name}
+          }
+          function Read-LogText([string]$Path){return $script:logText}
+          function Wait-For([string]$Description,[scriptblock]$Predicate){
+            $script:order.Add('wait')
+            if(-not(&$Predicate)){throw 'expected client join absent'}
+            return $true
+          }
+          $cases=@(
+            @{fixture='library-paired-browser';phase='initial';ordinals=@(1,2);prefix='MIR5_LIBRARY_PAIRED_BROWSER'},
+            @{fixture='library-paired-browser';phase='restart';ordinals=@(3,4);prefix='MIR5_LIBRARY_PAIRED_BROWSER'},
+            @{fixture='library-multiplayer';phase='initial';ordinals=@(1,1);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='library-multiplayer';phase='rejoin';ordinals=@(2,2);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='library-multiplayer';phase='restart';ordinals=@(3,3);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='initial';ordinals=@(1,1);prefix='MIR5_SCRIPTED_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='rejoin';ordinals=@(2,2);prefix='MIR5_SCRIPTED_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='restart';ordinals=@(3,3);prefix='MIR5_SCRIPTED_MP'}
+          )
+          foreach($case in $cases){
+            foreach($opponent in @('valid','wrong-second-ordinal')){
+              $fixtureCase=$case.fixture;$markerPrefix=$case.prefix
+              $script:ordinals=@($case.ordinals)
+              if($opponent-ceq'wrong-second-ordinal'){$script:ordinals[1]=9}
+              $script:logText=''
+              $script:launches=[Collections.Generic.List[string]]::new()
+              $script:order=[Collections.Generic.List[string]]::new()
+              $failure=$null;$actors=@()
+              try{$actors=@(Start-Clients $case.phase)}catch{$failure=$_.Exception.Message}
+              if($opponent-ceq'valid'){
+                if($null-ne$failure){throw "valid $($case.fixture)/$($case.phase) joins rejected: $failure"}
+                if($actors.Count-ne2 -or $actors[0].name-cne"client-$($case.phase)-en" -or $actors[1].name-cne"client-$($case.phase)-de"){
+                  throw 'client starter lost ordered actor records'
+                }
+              }elseif($failure-cne'expected client join absent'){throw 'incorrect second join ordinal accepted'}
+              if(($script:order-join',')-cne'start,wait,start,wait'){throw 'client startups lost serialized join waits'}
+            }
+          }
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_paired_browser_session_is_explicit_and_keeps_existing_ten_capture_path(self):
+        wrapper = WRAPPER.read_text(encoding="utf-8")
+        session = SESSION.read_text(encoding="utf-8")
+        self.assertIn("'library-paired-browser'", wrapper)
+        self.assertIn("'MIR5LibraryPairedBrowserNativeResultV1'", wrapper)
+        self.assertIn("@('first-open','search','refresh','reopen')", wrapper)
+        self.assertIn("MIR5LibraryPairedBrowserSessionV1", session)
+        self.assertIn("Get-PairedBrowserStageMarker", session)
+        self.assertIn("Get-PairedBrowserProfilerMarkers", session)
+        self.assertIn("@('initial','restart')", session)
+        self.assertIn("$screenshots.Count -eq 8", session)
+        self.assertIn("Start-Clients 'initial'", session)
+        self.assertIn("Start-Clients 'restart'", session)
+        self.assertIn("Invoke-LoopbackRconKicks", session)
+        self.assertIn("$patterns.Count -eq 10", session)
+        self.assertIn("$clientPatterns.Count -eq 5", session)
 
     def test_native_session_requires_ten_client_local_captures(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
@@ -1123,8 +1255,37 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           if($nodes.Count -ne 1){throw 'session execution tail missing or ambiguous'}
           $execute=[scriptblock]::Create($text.Substring($nodes[0].Extent.StartOffset))
           function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
-          function Get-SessionHash([string]$Path){return ('a'*64)}
-          function Read-LogText([string]$Path){return ''}
+          function Get-SessionHash([string]$Path){
+            if(Test-Path -LiteralPath $Path){return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+            return ('a'*64)
+          }
+          function Read-LogText([string]$Path){if(Test-Path -LiteralPath $Path){return [IO.File]::ReadAllText($Path,[Text.UTF8Encoding]::new($false))};return ''}
+          function Save-PairedBrowserServerPhaseLog([string]$Source,[string]$Phase){
+            if(-not(Test-Path -LiteralPath $Source -PathType Leaf)){throw 'paired Browser phase log source is absent'}
+            $destination=Join-Path $workroot ("paired-browser-server-$Phase.factorio-current.log")
+            if(Test-Path -LiteralPath $destination){throw 'paired Browser phase log snapshot already exists'}
+            [IO.File]::Copy($Source,$destination,$false)
+            return $destination
+          }
+          function Get-PairedBrowserStageMarker {
+            param([string]$Text,[string]$Stage,[string]$ExpectedArm)
+            if($Text -notmatch [regex]::Escape("stage=$Stage arm=$ExpectedArm")){return $null}
+            return [pscustomobject]@{stage=$Stage}
+          }
+          function Get-PairedBrowserProfilerMarkers {
+            param([string]$Text,[string[]]$ExpectedActions)
+            $rows=@()
+            foreach($action in $ExpectedActions){
+              $matches=@([regex]::Matches($Text,[regex]::Escape("[MIR5_LIBRARY_PROFILE] $action ")))
+              if($matches.Count-ne1){throw "profiler action $action differs in phase log"}
+              $rows += [pscustomobject]@{action=$action;raw_line=$matches[0].Value.TrimEnd()}
+            }
+            return @($rows)
+          }
+          function Find-Screenshots([string[]]$Stages){
+            $count=if($Stages.Count-eq4){8}else{6}
+            return [pscustomobject]@{files=@(1..$count|ForEach-Object {Join-Path $output ("paired-capture-"+$_.ToString()+'.png')})}
+          }
           function Invoke-LoopbackRconKicks {param($Port,$Password)}
           $script:memoryWrites=0;$script:memoryReasons=[Collections.Generic.List[string]]::new()
           function Set-MIROwnedProcessMemoryIncomplete {param($Sampler,[string]$Reason)$script:memoryReasons.Add($Reason)}
@@ -1137,6 +1298,27 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           function Close-ProcessMemoryObservation {param($Record)}
           function Register-MIROwnedProcessMemoryProcess {param($Sampler,$Phase,$Role,$Process) return $null}
           function Start-Server([string]$Name,[string]$Save){
+            $live=Join-Path $serverWriteData 'factorio-current.log'
+            $text=if($Name-ceq'server-initial'){
+              @(
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=ready arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=first-open arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=search arm=published',
+                $(if($script:mode -ceq 'missing-phase') { } else { '[MIR5_LIBRARY_PAIRED_BROWSER] stage=refresh arm=published' }),
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=restart-ready arm=published',
+                '[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms',
+                '[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms',
+                '[MIR5_LIBRARY_PROFILE] refresh Duration: 1.000000ms'
+              ) -join "`n"
+            }else{
+              @(
+                'Hosting game at 127.0.0.1',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=reopen arm=published',
+                '[MIR5_LIBRARY_PAIRED_BROWSER] stage=completed arm=published',
+                '[MIR5_LIBRARY_PROFILE] reopen Duration: 1.000000ms'
+              ) -join "`n"
+            }
+            [IO.File]::WriteAllText($live,$text+"`n",[Text.UTF8Encoding]::new($false))
             $record=[pscustomobject]@{name=$Name;closed=$false;process=$null}
             $script:records.Add($record);return $record
           }
@@ -1144,7 +1326,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             if($script:mode -eq 'primary-and-cleanup' -and $Phase -eq 'initial'){
               throw 'original session failure'
             }
+            $ordinal=if($Phase-ceq'initial'){0}else{2}
             foreach($locale in @('en','de')){
+              $ordinal++
+              $name=if($locale-ceq'en'){'MIR5English'}else{'MIR5Deutsch'}
+              [IO.File]::AppendAllText((Join-Path $serverWriteData 'factorio-current.log'),"[MIR5_LIBRARY_PAIRED_BROWSER_JOIN] $name $ordinal`n",[Text.UTF8Encoding]::new($false))
               $record=[pscustomobject]@{name="client-$Phase-$locale";closed=$false}
               $script:records.Add($record);$record
             }
@@ -1157,6 +1343,9 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               throw 'server stopped before its live clients'
             }
             $Record.closed=$true
+            if($Record.name -like 'server-*'){
+              [IO.File]::AppendAllText((Join-Path $serverWriteData 'factorio-current.log'),("shutdown $($Record.name)`n"),[Text.UTF8Encoding]::new($false))
+            }
             if(($script:mode -eq 'cleanup' -and $Record.name -eq 'client-restart-de') -or
                 ($script:mode -eq 'primary-and-cleanup' -and $Record.name -eq 'server-initial')){
               throw 'late native cleanup failure'
@@ -1172,10 +1361,14 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 1..10 | ForEach-Object {Join-Path $output ("capture-"+$_+".png")}
               })}
             }
+            if($Description -eq 'paired Browser final save and client screenshots'){
+              return Find-Screenshots @('first-open','search','refresh','reopen')
+            }
             return $true
           }
-          foreach($fixtureCase in @('library-multiplayer','scripted-effects-multiplayer')){
-            foreach($script:mode in @('success','cleanup','primary-and-cleanup')){
+          foreach($fixtureCase in @('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')){
+            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','cleanup','primary-and-cleanup','missing-phase')}else{@('success','cleanup','primary-and-cleanup')}
+            foreach($script:mode in $modes){
               $output=Join-Path $env:MIR_TEST_WORK ($fixtureCase+'-'+$script:mode)
               $null=New-Item -ItemType Directory -Path $output
               $script:sessionPath=Join-Path $output 'session.json'
@@ -1183,34 +1376,65 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $script:stops=[Collections.Generic.List[string]]::new()
               $sessionFailure=$null;$result=$null;$server=$null;$activeClients=@()
               $script:memoryWrites=0;$script:memoryReasons.Clear()
-              $processMemorySampler=if($fixtureCase -ceq 'library-multiplayer'){[pscustomobject]@{}}else{$null}
-              $processMemoryObservationPath=if($fixtureCase -ceq 'library-multiplayer'){Join-Path $output 'process-memory-observations.json'}else{$null}
-              $serverWriteData=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
-              $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password'
-              $clients=@([pscustomobject]@{name='en';locale='en';port=2;config='en.ini';write_data='en'},
-                [pscustomobject]@{name='de';locale='de';port=3;config='de.ini';write_data='de'})
+              $processMemorySampler=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){[pscustomobject]@{}}else{$null}
+              $processMemoryObservationPath=if($fixtureCase -cin @('library-multiplayer','library-paired-browser')){Join-Path $output 'process-memory-observations.json'}else{$null}
+              $serverWriteData=$output;$workroot=$output;$engine='unused';$seed='seed';$restartSave='restart';$finalSave='final'
+              $seedHash=('a'*64);$clientGraphics=@();$rconPort=1;$rconPassword='not-a-real-password';$pairedArm='published'
+              $clients=@([pscustomobject]@{name='MIR5English';locale='en';port=2;config='en.ini';write_data='en'},
+                [pscustomobject]@{name='MIR5Deutsch';locale='de';port=3;config='de.ini';write_data='de'})
               $caught=$null
               try{& $execute|Out-Null}catch{$caught=$_}
               if(@($script:records|Where-Object {-not $_.closed}).Count){throw 'cleanup abandoned owned records'}
               if($script:mode -eq 'success'){
                 if($null -ne $caught){throw $caught}
                 $receipt=Get-Content -LiteralPath $sessionPath -Raw|ConvertFrom-Json
-                if($receipt.status -cne 'passed-private-two-client-session' -or $script:stops.Count -ne 8){
+                $expectedStops=if($fixtureCase -ceq 'library-paired-browser'){6}else{8}
+                if($receipt.status -cne 'passed-private-two-client-session' -or $script:stops.Count -ne $expectedStops){
                   throw 'successful session lost completed teardown'
                 }
-                if($fixtureCase -ceq 'library-multiplayer' -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $receipt.process_memory_observations.status -cne 'complete-observation' -or $receipt.process_memory_observations.performance_acceptance -ne $false)){
+                if($fixtureCase -cin @('library-multiplayer','library-paired-browser') -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $receipt.process_memory_observations.status -cne 'complete-observation' -or $receipt.process_memory_observations.performance_acceptance -ne $false)){
                   throw 'successful opt-in session lost its bounded memory receipt'
                 }
-                if($fixtureCase -ceq 'library-multiplayer' -and $receipt.screenshots.Count -ne 10){
+                $expectedCaptures=switch($fixtureCase){'library-multiplayer'{10};'library-paired-browser'{8};default{0}}
+                if($receipt.screenshots.Count -ne $expectedCaptures){
                   throw 'successful teardown lost a required capture'
                 }
-                if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne
-                    'client-restart-de,client-restart-en,server-restart'){throw 'final teardown is not reversed'}
+                if($fixtureCase -ceq 'library-paired-browser'){
+                  $phaseObservations=@($receipt.profiler_observations)
+                  if($receipt.kind -cne 'MIR5LibraryPairedBrowserSessionV1' -or $receipt.paired_arm -cne 'published' -or $phaseObservations.Count-ne2){
+                    throw 'successful paired Browser session lost its phase protocol evidence'
+                  }
+                  $initial=$phaseObservations|Where-Object {$_.phase-ceq'initial'}
+                  $restart=$phaseObservations|Where-Object {$_.phase-ceq'restart'}
+                  if(@($initial).Count-ne1 -or @($restart).Count-ne1 -or @($initial.markers).Count-ne3 -or @($restart.markers).Count-ne1){
+                    throw 'paired Browser profiler phase/action counts differ'
+                  }
+                  foreach($phase in @($initial,$restart)){
+                    if($phase.role-cne'server' -or -not(Test-Path -LiteralPath $phase.log_path) -or $phase.log_sha256-cne(Get-SessionHash $phase.log_path)){
+                      throw 'paired Browser retained phase log provenance differs'
+                    }
+                  }
+                  $initialText=Get-Content -LiteralPath $initial.log_path -Raw
+                  $restartText=Get-Content -LiteralPath $restart.log_path -Raw
+                  if($initialText-notmatch'first_open' -or $initialText-notmatch'shutdown server-initial' -or $initialText-match'reopen' -or $restartText-notmatch'reopen' -or $restartText-notmatch'shutdown server-restart' -or $restartText-match'first_open'){
+                    throw 'paired Browser phase snapshots did not survive a replaced server log'
+                  }
+                }
+                $expectedTail=if($fixtureCase-ceq'library-paired-browser'){
+                  'client-restart-en,client-restart-de,server-restart'
+                }else{
+                  'client-restart-de,client-restart-en,server-restart'
+                }
+                if(($script:stops.ToArray()|Select-Object -Last 3) -join ',' -cne $expectedTail){throw 'final teardown is not reversed'}
               }else{
                 if($null -eq $caught -or (Test-Path -LiteralPath $sessionPath)){throw 'failed session claimed success'}
-                $expected=if($script:mode -eq 'cleanup'){'late native cleanup failure'}else{'original session failure'}
+                $expected=switch($script:mode){
+                  'cleanup'{'late native cleanup failure'}
+                  'missing-phase'{'paired Browser initial phase log lacks refresh stage'}
+                  default{'original session failure'}
+                }
                 if($caught.Exception.Message -cne $expected){throw 'original session/cleanup failure was replaced'}
-                if($fixtureCase -ceq 'library-multiplayer' -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $script:memoryReasons -notcontains 'native-session-failure')){
+                if($fixtureCase -cin @('library-multiplayer','library-paired-browser') -and ($script:memoryWrites -ne 1 -or -not(Test-Path -LiteralPath $processMemoryObservationPath) -or $script:memoryReasons -notcontains 'native-session-failure')){
                   throw 'failed opt-in session lost its incomplete memory receipt'
                 }
               }

@@ -255,6 +255,7 @@ local function marker(stage, state, status)
     arm = state.arm,
     action_call_count = state.action_call_count or 0,
     screenshot_calls = state.screenshot_calls or 0,
+    join_events = state.join_events or 0,
     native_snapshot_unchanged = true,
     profiler_observation_only = true,
     performance_acceptance = false
@@ -323,25 +324,64 @@ local function complete(state)
 end
 
 local loaded_for_restart = false
+local pending_ready = false
+local ready_emitted = false
+
+local function emit_ready(state)
+  if ready_emitted then return end
+  marker("ready", state, "ready")
+  ready_emitted = true
+end
+
+local function emit_pending_ready(state)
+  if pending_ready then
+    pending_ready = false
+    emit_ready(state)
+  end
+end
+
+local function record_join(state, event)
+  local player = game.players[event.player_index]
+  local ordinal = (state.join_events or 0) + 1
+  local expected_names = {"MIR5English", "MIR5Deutsch", "MIR5English", "MIR5Deutsch"}
+  if ordinal > #expected_names or not valid(player) or player.name ~= expected_names[ordinal] then
+    fail("fixture join identity or ordinal differs")
+  end
+  state.join_events = ordinal
+  log("[MIR5_LIBRARY_PAIRED_BROWSER_JOIN] " .. player.name .. " " .. ordinal)
+end
 
 script.on_init(function()
   if storage[KEY] ~= nil then fail("fixture state already exists") end
   local arm = selected_arm()
   assert_closure(arm)
-  storage[KEY] = {schema = 1, arm = arm.key, phase = "awaiting-clients", screenshot_calls = 0, action_call_count = 0}
-  marker("ready", storage[KEY], "ready")
+  storage[KEY] = {
+    schema = 1,
+    arm = arm.key,
+    phase = "awaiting-clients",
+    screenshot_calls = 0,
+    action_call_count = 0,
+    join_events = 0
+  }
+  emit_ready(storage[KEY])
 end)
 
 script.on_load(function()
   local state = storage[KEY]
-  if type(state) == "table" and state.schema == 1 and state.phase == "awaiting-cold-restart" then
-    loaded_for_restart = true
+  if type(state) == "table" and state.schema == 1 then
+    if state.phase == "awaiting-clients" then
+      pending_ready = true
+    elseif state.phase == "awaiting-cold-restart" then
+      loaded_for_restart = true
+    end
   end
 end)
 
-script.on_event(defines.events.on_player_joined_game, function()
+script.on_event(defines.events.on_player_joined_game, function(event)
   local state = storage[KEY]
   if type(state) ~= "table" or state.schema ~= 1 then fail("fixture state is absent") end
+  emit_pending_ready(state)
+  record_join(state, event)
   if state.phase == "awaiting-clients" then
     start_initial(state)
   elseif state.phase == "awaiting-cold-restart" then
@@ -356,7 +396,9 @@ end)
 
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
-  if type(state) ~= "table" or state.capture_after_tick == nil or game.tick < state.capture_after_tick then return end
+  if type(state) ~= "table" or state.schema ~= 1 then return end
+  emit_pending_ready(state)
+  if state.capture_after_tick == nil or game.tick < state.capture_after_tick then return end
   local players = connected_players()
   if players == nil then return end
   if players.en.force.index ~= state.force_index then fail("client force changed during Browser observation") end
