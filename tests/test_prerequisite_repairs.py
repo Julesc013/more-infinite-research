@@ -47,7 +47,9 @@ class PrerequisiteRepairTests(unittest.TestCase):
             {{astroponics="1.7.3"}, {id="f210"}},
             {{["planet-muluna"]="2.3.18"}, {id="f210"}},
           }
-          for _, case in ipairs(cases) do assert(repair.apply(raw, case[1], case[2]) == 0) end
+          for _, case in ipairs(cases) do
+            assert(repair.apply(raw, case[1], case[2], function() error("inactive repair reported") end) == 0)
+          end
         ''')
 
     def test_angel_removes_only_disabled_silver_from_a_fresh_prerequisite_list_on_both_targets(self):
@@ -60,14 +62,19 @@ class PrerequisiteRepairTests(unittest.TestCase):
             local foreign = {enabled=true,prerequisites=foreign_list,foreign={marker=31}}
             local raw = {technology={modules=modules,["angels-silver-smelting-1"]=silver,foreign=foreign}}
             local target = {id=base == "2.0.77" and "f200" or "f210"}
-            assert(repair.apply(raw,{angelssmelting="1.0.0"},target) == 1)
+            local messages = {}
+            assert(repair.apply(raw,{angelssmelting="1.0.0"},target,
+              function(message) messages[#messages + 1] = message end) == 1)
+            assert(#messages == 1 and messages[1] == "[more-infinite-research] Repaired "
+              .. "angels-disabled-silver-modules-prerequisite: removed modules -> angels-silver-smelting-1.")
             assert(modules.prerequisites ~= original and #modules.prerequisites == 2)
             assert(modules.prerequisites[1] == "automation" and modules.prerequisites[2] == "foreign")
             assert(modules.enabled and modules.foreign.marker == 17)
             assert(silver.prerequisites == silver_list and silver.foreign.marker == 23)
             assert(foreign.prerequisites == foreign_list and foreign.foreign.marker == 31)
             local repaired = modules.prerequisites
-            assert(repair.apply(raw,{angelssmelting="1.0.0"},target) == 0)
+            assert(repair.apply(raw,{angelssmelting="1.0.0"},target,
+              function() error("no-op Angel repair reported") end) == 0)
             assert(modules.prerequisites == repaired)
             local single = {enabled=true,prerequisites={"angels-silver-smelting-1"}}
             local single_raw = {technology={modules=single,["angels-silver-smelting-1"]={enabled=false}}}
@@ -80,7 +87,7 @@ class PrerequisiteRepairTests(unittest.TestCase):
           local function untouched(modules, silver, mods, target)
             local original = modules.prerequisites
             local raw = {technology={modules=modules,["angels-silver-smelting-1"]=silver}}
-            assert(repair.apply(raw, mods, target) == 0)
+            assert(repair.apply(raw, mods, target, function() error("no-op Angel repair reported") end) == 0)
             assert(modules.prerequisites == original)
           end
           local active, target = {angelssmelting="1.0.0"}, {id="f210"}
@@ -89,7 +96,7 @@ class PrerequisiteRepairTests(unittest.TestCase):
           untouched({enabled=true,prerequisites={"foreign"}}, {enabled=false}, active, target)
           untouched({enabled=true,prerequisites={"angels-silver-smelting-1"}}, nil, active, target)
           local raw = setmetatable({}, {__index=function() error("inactive Angel read") end})
-          assert(repair.apply(raw, {}, target) == 0)
+          assert(repair.apply(raw, {}, target, function() error("inactive Angel repair reported") end) == 0)
         ''')
 
     def test_astroponics_repairs_only_the_known_three_edge_path_on_both_targets(self):
@@ -105,13 +112,17 @@ class PrerequisiteRepairTests(unittest.TestCase):
               ["muluna-alice-propellant"]=propellant,foreign=foreign}}
             local mods = {astroponics="1.7.3",["planet-muluna"]="2.3.18"}
             local target = {id=base == "2.0.77" and "f200" or "f210"}
-            assert(repair.apply(raw, mods, target) == 1)
+            local messages = {}
+            assert(repair.apply(raw, mods, target, function(message) messages[#messages + 1] = message end) == 1)
+            assert(#messages == 1 and messages[1] == "[more-infinite-research] Repaired "
+              .. "muluna-astroponics-space-science-cycle: removed astroponics -> space-science-pack.")
             assert(astroponics.prerequisites ~= astro_list and #astroponics.prerequisites == 2)
             assert(astroponics.prerequisites[1] == "landfill" and astroponics.prerequisites[2] == "foreign")
             assert(space.prerequisites == space_list and propellant.prerequisites == propellant_list)
             assert(foreign.prerequisites == foreign_list and astroponics.foreign.marker == 41)
             local repaired = astroponics.prerequisites
-            assert(repair.apply(raw, mods, target) == 0 and astroponics.prerequisites == repaired)
+            assert(repair.apply(raw, mods, target,
+              function() error("no-op Astroponics repair reported") end) == 0 and astroponics.prerequisites == repaired)
           end
         ''')
 
@@ -127,14 +138,14 @@ class PrerequisiteRepairTests(unittest.TestCase):
           local mods, target = {astroponics="1.7.3",["planet-muluna"]="2.3.18"}, {id="f210"}
           for _, space_prerequisites in ipairs({{"different-edge"}, {}}) do
             local raw, astro_list, propellant_list, foreign_list = raw_for(space_prerequisites)
-            assert(repair.apply(raw, mods, target) == 0)
+            assert(repair.apply(raw, mods, target, function() error("no-op Astroponics repair reported") end) == 0)
             assert(raw.technology.astroponics.prerequisites == astro_list)
             assert(raw.technology["muluna-alice-propellant"].prerequisites == propellant_list)
             assert(raw.technology.foreign.prerequisites == foreign_list)
           end
           local raw = {technology={astroponics={prerequisites={"space-science-pack"}},
             ["space-science-pack"]={prerequisites={"muluna-alice-propellant"}}}}
-          assert(repair.apply(raw, mods, target) == 0)
+          assert(repair.apply(raw, mods, target, function() error("no-op Astroponics repair reported") end) == 0)
         ''')
 
     def test_data_final_imports_the_repair_only_for_an_active_supported_named_input(self):
@@ -151,13 +162,18 @@ class PrerequisiteRepairTests(unittest.TestCase):
           environment.raw.technology.astroponics = astroponics
           environment.raw.technology["space-science-pack"] = {prerequisites={"muluna-alice-propellant"}}
           environment.raw.technology["muluna-alice-propellant"] = {prerequisites={"astroponics"}}
+          local messages = {}
           settings, mods, data, helpers, log = {startup=defaults()}, {
             base="2.1.23",angelssmelting="1.0.0",astroponics="1.7.3",["planet-muluna"]="2.3.18"
-          }, environment, nil, function() end
+          }, environment, nil, function(message) messages[#messages + 1] = message end
           package.loaded["overrides.prerequisite_repairs"] = nil
           assert(dofile(data_final_path) == nil and package.loaded["overrides.prerequisite_repairs"] ~= nil)
           assert(#modules.prerequisites == 1 and modules.prerequisites[1] == "automation")
           assert(#astroponics.prerequisites == 1 and astroponics.prerequisites[1] == "landfill")
+          assert(#messages == 2 and messages[1] == "[more-infinite-research] Repaired "
+            .. "angels-disabled-silver-modules-prerequisite: removed modules -> angels-silver-smelting-1.")
+          assert(messages[2] == "[more-infinite-research] Repaired "
+            .. "muluna-astroponics-space-science-cycle: removed astroponics -> space-science-pack.")
         ''')
 
         inactive = test_generator.GeneratorTests("runTest")

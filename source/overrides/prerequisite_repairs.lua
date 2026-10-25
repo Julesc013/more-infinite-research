@@ -7,6 +7,8 @@ local SILVER = "angels-silver-smelting-1"
 local ASTROPONICS = "astroponics"
 local SPACE = "space-science-pack"
 local PROPELLANT = "muluna-alice-propellant"
+local ANGEL_REPAIR_ID = "angels-disabled-silver-modules-prerequisite"
+local ASTROPONICS_REPAIR_ID = "muluna-astroponics-space-science-cycle"
 
 local function supported_target(target)
   return type(target) == "table" and (target.id == "f200" or target.id == "f210")
@@ -59,7 +61,13 @@ local function repair_astroponics(technologies)
   return true
 end
 
-function M.apply(raw, active_mods, target)
+local function report_applied(report, id, technology, prerequisite)
+  if type(report) == "function" then
+    report("[more-infinite-research] Repaired " .. id .. ": removed " .. technology .. " -> " .. prerequisite .. ".")
+  end
+end
+
+function M.apply(raw, active_mods, target, report)
   -- Historical editions and inactive optional contributions do not inspect
   -- data.raw or load this module from the data-stage entry point.
   if not supported_target(target) then return 0 end
@@ -69,8 +77,14 @@ function M.apply(raw, active_mods, target)
   if type(raw) ~= "table" or type(raw.technology) ~= "table" then return 0 end
 
   local repaired = 0
-  if angel_active and repair_angel(raw.technology) then repaired = repaired + 1 end
-  if astroponics_active and repair_astroponics(raw.technology) then repaired = repaired + 1 end
+  if angel_active and repair_angel(raw.technology) then
+    repaired = repaired + 1
+    report_applied(report, ANGEL_REPAIR_ID, "modules", SILVER)
+  end
+  if astroponics_active and repair_astroponics(raw.technology) then
+    repaired = repaired + 1
+    report_applied(report, ASTROPONICS_REPAIR_ID, ASTROPONICS, SPACE)
+  end
   return repaired
 end
 
