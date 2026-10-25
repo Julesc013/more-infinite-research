@@ -41,6 +41,34 @@ try {
     $factorio=Join-Path $root 'engine/bin/x64/factorio.exe';[IO.File]::WriteAllText($factorio,'controlled binary',[Text.UTF8Encoding]::new($false))
     Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $factorio -Arguments @('--config',$config,'--mod-directory',$library)
     Refuses-Library {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $factorio -Arguments @('--config',$config,'--mod-directory',$library,'--sync-mods')} '[mir-library-acquisition-or-ambiguous-argument]'
+    # Exercise the actual launch guard, not a replacement idle implementation.
+    # A transient enumeration may clear; a persistent client must still refuse
+    # before the shared controls are rewritten. No engine process is created.
+    $priorGetProcess=Get-Item Function:Get-Process -ErrorAction SilentlyContinue
+    $script:libraryProcessPolls=0
+    $script:libraryProcessPersistent=$false
+    $controlPath=Join-Path $library 'mod-list.json'
+    $script:libraryControlBefore=(Get-Item -LiteralPath $controlPath).LastWriteTimeUtc.Ticks
+    function Get-Process {
+      param([string]$Name,$ErrorAction)
+      if($Name -cne 'factorio'){throw '[mir5-library-unexpected-process-query]'}
+      $script:libraryProcessPolls++
+      if((Get-Item -LiteralPath $controlPath).LastWriteTimeUtc.Ticks -ne $script:libraryControlBefore){throw '[mir5-library-controls-written-before-idle]'}
+      if($script:libraryProcessPersistent -or $script:libraryProcessPolls -eq 1){[pscustomobject]@{ProcessName='factorio'}}
+    }
+    try {
+      Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $factorio -Arguments @('--config',$config,'--mod-directory',$library)
+      Assert-Library ($script:libraryProcessPolls -ge 2) 'launch-waits-for-transient-process'
+      $script:libraryProcessPolls=0
+      $script:libraryProcessPersistent=$true
+      $script:libraryControlBefore=(Get-Item -LiteralPath $controlPath).LastWriteTimeUtc.Ticks
+      Refuses-Library {Assert-MIRLibraryLaunch -Activation $activation -FactorioBin $factorio -Arguments @('--config',$config,'--mod-directory',$library)} '[mir-library-factorio-active]'
+      Assert-Library ($script:libraryProcessPolls -ge 2) 'persistent-process-remains-refused'
+      Assert-Library ((Get-Item -LiteralPath $controlPath).LastWriteTimeUtc.Ticks -eq $script:libraryControlBefore) 'busy-launch-preserves-controls'
+    } finally {
+      Remove-Item Function:Get-Process
+      if($null -ne $priorGetProcess){Set-Item Function:Get-Process $priorGetProcess.ScriptBlock}
+    }
   } finally {if($null-ne$activation-and-not$activation.closed){$completion=Complete-MIRLibraryActivation -Activation $activation}}
   Assert-Library ($completion.status-ceq'restored-direct-library-controls'-and-not(Test-Path -LiteralPath (Join-Path $library '.mir-active-profile.json'))) 'completion'
   Assert-Library ((Get-Content -Raw -LiteralPath (Join-Path $library 'mod-list.json'))-ceq$originalList-and([IO.File]::ReadAllBytes((Join-Path $library 'mod-settings.dat'))-join',')-ceq($originalSettings-join',')) 'restoration'
