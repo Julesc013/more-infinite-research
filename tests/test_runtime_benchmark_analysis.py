@@ -146,6 +146,30 @@ def _profile_for(plan: dict[str, object], scenario: str, tier: int, arm: str) ->
     return MODULE._profiles(plan)[(scenario, tier, arm)]
 
 
+def _independent_schedule() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+
+    def append(identifier: str, phase: str, scenario: str, tier: int, arm: str, block: int | None) -> None:
+        rows.append({"ordinal": len(rows) + 1, "id": identifier, "phase": phase, "scenario": scenario, "tier": tier, "arm": arm, "block": block})
+
+    for arm in ("published", "candidate"):
+        for number in range(1, 3):
+            append(f"repair-warmup-{arm}-{number}", "warmup", "repair-active", 0, arm, None)
+    for block in range(1, 9):
+        for position, arm in enumerate(("published", "candidate") if block % 2 else ("candidate", "published"), start=1):
+            append(f"repair-b{block}-{position}-{arm}", "scored", "repair-active", 0, arm, block)
+    for tier in (1, 32, 128):
+        for arm in ("published", "candidate-defaults"):
+            for number in range(1, 3):
+                append(f"agriculture-{tier}-warmup-{arm}-{number}", "warmup", "agriculture-active", tier, arm, None)
+        for block in range(1, 7):
+            for position, arm in enumerate(("published", "candidate-defaults") if block % 2 else ("candidate-defaults", "published"), start=1):
+                append(f"agriculture-{tier}-b{block}-{position}-{arm}", "scored", "agriculture-active", tier, arm, block)
+    if len(rows) != 68:
+        raise AssertionError("independent schedule size differs")
+    return rows
+
+
 def _capture_and_pilot(plan: dict[str, object], plan_sha: str) -> tuple[dict[str, object], dict[str, object]]:
     captures: list[dict[str, object]] = []
     pilots: list[dict[str, object]] = []
@@ -277,7 +301,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
 
 def _result(plan: dict[str, object]) -> tuple[dict[str, object], str]:
     plan_sha = _hash(_encode(plan))
-    schedule = MODULE._schedule_template()
+    schedule = _independent_schedule()
     captures, pilot = _capture_and_pilot(plan, plan_sha)
     members = [
         {"path": row["path"], "raw_git_sha256": row["sha256"], "executed_sha256": row["sha256"], "bytes": 1}
@@ -328,6 +352,7 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
         result, plan_sha = _result(plan)
         opponents: dict[str, callable] = {
             "wrong-odd-arm-order": lambda item: item["schedule"].__setitem__(4, {**item["schedule"][4], "arm": "candidate"}),
+            "wrong-canonical-id": lambda item: item["schedule"].__setitem__(0, {**item["schedule"][0], "id": "not-the-r06-first-warmup"}),
             "duplicate-schedule-id": lambda item: item["schedule"].__setitem__(1, {**item["schedule"][1], "id": item["schedule"][0]["id"]}),
             "wrong-seed-capture": lambda item: item["observations"][0]["seed"].__setitem__("source_sha256", "0" * 64),
             "wrong-accepted-capture-receipt": lambda item: item["active_seed_capture"].__setitem__("sha256", "0" * 64),
