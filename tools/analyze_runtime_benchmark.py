@@ -97,6 +97,11 @@ def _read_json(path: Path, maximum: int, label: str) -> tuple[dict[str, Any], st
     return value, hashlib.sha256(payload).hexdigest().upper()
 
 
+def _same_json(actual: Any, expected: Any, label: str) -> None:
+    if json.dumps(actual, sort_keys=True, separators=(",", ":"), allow_nan=False) != json.dumps(expected, sort_keys=True, separators=(",", ":"), allow_nan=False):
+        raise RuntimeBenchmarkAnalysisError(label + " differs from the raw result")
+
+
 def _validate_prepared_inputs_sidecar(result_path: Path, result: dict[str, Any]) -> None:
     leaf = _string(result.get("prepared_inputs_path"), "prepared inputs path")
     _same(leaf, "runtime-benchmark-active-prepared.json", "prepared inputs path")
@@ -112,6 +117,8 @@ def _validate_prepared_inputs_sidecar(result_path: Path, result: dict[str, Any])
     _same(_integer(sidecar.get("native_launches"), "prepared inputs sidecar native launches"), 0, "prepared inputs sidecar native launches")
     _same(_boolean(sidecar.get("performance_qualification"), "prepared inputs sidecar performance flag"), False, "prepared inputs sidecar performance flag")
     _same(_boolean(sidecar.get("release_qualification"), "prepared inputs sidecar release flag"), False, "prepared inputs sidecar release flag")
+    for key in ("plan", "private_controller", "raw_helper_source", "active_seed_capture", "unscored_marker_pilot", "schedule"):
+        _same_json(sidecar.get(key), result.get(key), "prepared inputs sidecar " + key)
 
 
 def _mapping(value: Any, label: str) -> dict[str, Any]:

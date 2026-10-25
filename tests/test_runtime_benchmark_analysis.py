@@ -339,6 +339,12 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
         "schema": 1,
         "kind": "MIR5ActiveRuntimeBenchmarkPreparedInputsV1",
         "status": "validated-accepted-active-inputs-no-new-native",
+        "plan": result["plan"],
+        "private_controller": result["private_controller"],
+        "raw_helper_source": result["raw_helper_source"],
+        "active_seed_capture": result["active_seed_capture"],
+        "unscored_marker_pilot": result["unscored_marker_pilot"],
+        "schedule": result["schedule"],
         "native_launches": 0,
         "performance_qualification": False,
         "release_qualification": False,
@@ -472,9 +478,25 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
                 )
                 self.assertEqual(failed.returncode, 1)
                 self.assertIn("mir5-runtime-benchmark-analysis-refused", failed.stderr)
+            stale_sidecar = json.loads(prepared_bytes)
+            stale_sidecar["schedule"][0]["id"] = "stale-schedule-row"
+            stale_bytes = _encode(stale_sidecar)
+            result["prepared_inputs_sha256"] = _hash(stale_bytes)
+            stale_result_bytes = _encode(result)
+            result_path.write_bytes(stale_result_bytes)
+            (root / "runtime-benchmark-active-prepared.json").write_bytes(stale_bytes)
+            stale = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(stale_result_bytes), "--output", str(root / "stale-sidecar.json")],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(stale.returncode, 1)
+            self.assertIn("prepared inputs sidecar schedule differs", stale.stderr)
             (root / "runtime-benchmark-active-prepared.json").write_bytes(b"{}\n")
             invalid_sidecar = subprocess.run(
-                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(result_bytes), "--output", str(root / "invalid-sidecar.json")],
+                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan_path), "--expected-plan-sha256", _hash(plan_bytes), "--result", str(result_path), "--expected-result-sha256", _hash(stale_result_bytes), "--output", str(root / "invalid-sidecar.json")],
                 cwd=ROOT,
                 text=True,
                 capture_output=True,
