@@ -9,7 +9,11 @@
     "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40198978389",
     "workflow_conclusion": "failure",
     "frozen_controller_ref": "test/current143-r21-named-r01",
-    "controller_commit": "683bc6a8e6429dddaf6072afd5fa16c6ada2459e"
+    "controller_commit": "683bc6a8e6429dddaf6072afd5fa16c6ada2459e",
+    "controller_provenance": {
+      "source": "External workflow/controller Git readback; not attested by the 31 native artifact members.",
+      "artifact_attested": false
+    }
   },
   "inputs": {
     "fixture_source_commit": "ed4858f43cb7dda5b0d62f2d9c7f6e0749219108",
@@ -38,7 +42,8 @@
     "sha256": "D9BA8CA66C792208B81E4AA6A8D8AFC0FDE40D42129E240743AD3BF0695A500A",
     "members": 31,
     "verified_members": 31,
-    "file_set": "All declared member paths, byte counts, and hashes match; artifact-manifest.json is the expected self-excluded file."
+    "file_set": "All declared member paths, byte counts, and hashes match; artifact-manifest.json is the expected self-excluded file.",
+    "path_owner": "Black Glass retained custody; Aero independently verified the identical manifest in the separate custody entry below."
   },
   "published_stage": {
     "status": "passed-private-native-runtime-load-only",
@@ -71,5 +76,9 @@
     "The current143/428 stage reached engine data-final loading but failed before its fixture marker; it establishes no current named-science pass.",
     "The accepted565 source is recorded only as a checked repository-tree and player-byte equivalence bridge to the actual143 asset input; this chain does not relabel either identity.",
     "No gameplay, real laboratory, save, reload, client, timing, performance, catalogue parity, or release result follows."
-  ]
+  ],
+  "custody_by_host": {
+    "black_glass": "build/mir5/recovery-historical/named-science-replacement-f210/40198978389",
+    "aero": "build/mir5/aero-named-science-40198978389"
+  }
 }
