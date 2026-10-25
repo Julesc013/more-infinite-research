@@ -44,6 +44,7 @@ $controls = @(
   [ordered]@{path='tests/test_competing_fixed_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_competing_dynamic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_science.py';lua=$true},
+  [ordered]@{path='tests/test_fresh_science_transition_fixture.py';lua=$true},
   [ordered]@{path='tests/test_sif_science_retirement_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_native_fixture.py';lua=$true},
   [ordered]@{path='tests/test_cryogenic_gameplay_fixture.py';lua=$true},
