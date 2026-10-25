@@ -497,6 +497,110 @@ class ProductTargetExtensionTests(unittest.TestCase):
           end
         ''')
 
+    def test_science_productivity_discards_only_missing_owned_targets_before_generator_publication(self):
+        self.lua.execute(r'''
+          local modern=require('research.modern')
+          local generator=require('research.generator')
+          local declaration
+          for _, candidate in ipairs(require('compatibility.modern_catalogue.space_age').additions) do
+            if candidate.key=='research_science_pack_productivity' then declaration=candidate end
+          end
+          assert(declaration and declaration.family=='research_science_pack_productivity')
+
+          local function stream(enabled)
+            return {effect_percent=10,base_cost=8000,linear_increment=0,growth_factor=2,
+              research_time=120,enabled=enabled}
+          end
+          local function build(kind, enabled, exact)
+            local values={effect_percent=10,options={},streams={
+              research_science_pack_productivity=stream(enabled)}}
+            local row=modern.technology(declaration,values)
+            local raw=raw_with_recipes({})
+            raw.tool,raw.technology,raw.lab={}, {}, {fixture={inputs={}}}
+            for _, effect in ipairs(declaration.effects) do
+              local name=effect.recipe
+              raw.tool[name]={};raw.technology[name]={};raw.lab.fixture.inputs[#raw.lab.fixture.inputs+1]=name
+              if name~='electromagnetic-science-pack' or kind=='healthy' then
+                raw.recipe[name]=recipe({}, {product('item',name)})
+              end
+            end
+            if kind=='seeded' then
+              raw.recipe.aCircular=recipe({{'electromagnetic-science-pack',1}},
+                {product('item','electromagnetic-science-pack')},{enabled=false})
+              raw.recipe.zSeeded=recipe({}, {product('item','electromagnetic-science-pack')},{enabled=false})
+            elseif kind=='fluid' then
+              raw.recipe.zFluid=recipe({}, {product('fluid','electromagnetic-science-pack')})
+            elseif kind=='denied' then
+              raw.recipe.zDenied=recipe({}, {product('item','electromagnetic-science-pack')},
+                {allow_productivity=false})
+            elseif kind=='recycling' then
+              raw.recipe.zRecycling=recipe({}, {product('item','electromagnetic-science-pack')},
+                {category='recycling'})
+            end
+            local stage={raw=raw,writes=0}
+            function stage:extend(rows) self.writes=self.writes+1;self.rows=rows end
+            local context={raw=raw,mods={['space-age']='2.1.23'}}
+            if exact then context.exact_product_target_families={research_science_pack_productivity=true} end
+            return row,values,context,stage,raw
+          end
+          local function has_effect(row,name)
+            for _, effect in ipairs(row.effects) do if effect.recipe==name then return true end end
+            return false
+          end
+          local function install(row,stage)
+            local ok,message=pcall(generator.install,{row},stage)
+            return ok,tostring(message)
+          end
+          local function expected_without_electromagnetic()
+            local out={}
+            for _, effect in ipairs(declaration.effects) do
+              if effect.recipe~='electromagnetic-science-pack' then
+                out[#out+1]='change-recipe-productivity:'..effect.recipe..':0.10000'
+              end
+            end
+            return out
+          end
+          local function assert_missing_target_case(kind, enabled)
+            local row,values,context,stage,raw=build(kind,enabled,false)
+            local recipes_before,labs_before=frozen_copy(raw.recipe),frozen_copy(raw.lab)
+            local result=extension.extend({row},values,context)
+            local expected=expected_without_electromagnetic()
+            if kind=='seeded' then expected[#expected+1]='change-recipe-productivity:zSeeded:0.10000' end
+            assert(effect_rows(row.effects)==table.concat(expected,','),kind..' retained a detached target or widened a rejected producer: '..effect_rows(row.effects))
+            assert(not has_effect(row,'electromagnetic-science-pack') and not has_effect(row,'aCircular')
+              and not has_effect(row,'zFluid') and not has_effect(row,'zDenied') and not has_effect(row,'zRecycling'))
+            assert((enabled==false and row.enabled==false or enabled~=false and row.enabled==nil)
+              and frozen_copy(raw.recipe)==recipes_before and frozen_copy(raw.lab)==labs_before)
+            local ok,message=install(row,stage)
+            assert(ok,message);assert(stage.writes==1)
+            return result.work.recipes
+          end
+
+          local healthy,healthy_values,healthy_context,healthy_stage=build('healthy',true,false)
+          local healthy_before=frozen_copy(healthy.effects)
+          local healthy_result=extension.extend({healthy},healthy_values,healthy_context)
+          assert(healthy_result.extended_effects==0 and frozen_copy(healthy.effects)==healthy_before,
+            'healthy authored science targets changed')
+          local healthy_ok,healthy_message=install(healthy,healthy_stage)
+          assert(healthy_ok,healthy_message and healthy_message);assert(healthy_stage.writes==1)
+
+          local visited=assert_missing_target_case('seeded',true)
+          assert(visited==13,'science target replacement must use the existing single recipe pass')
+          assert(assert_missing_target_case('none',true)==11)
+          assert(assert_missing_target_case('fluid',true)==12)
+          assert(assert_missing_target_case('denied',true)==12)
+          assert(assert_missing_target_case('recycling',false)==12)
+
+          local exact,exact_values,exact_context,exact_stage=build('seeded',true,true)
+          local exact_before=frozen_copy(exact.effects)
+          local exact_result=extension.extend({exact},exact_values,exact_context)
+          assert(exact_result.rules==0 and frozen_copy(exact.effects)==exact_before
+            and has_effect(exact,'electromagnetic-science-pack') and not has_effect(exact,'zSeeded'))
+          local exact_ok,exact_message=install(exact,exact_stage)
+          assert(not exact_ok and exact_message:match('missing recipe effect target'),
+            'an exact-bound family was silently rebuilt')
+        ''')
+
     def test_dynamic_science_inputs_respect_selection_exact_bindings_and_empty_inputs(self):
         self.lua.execute(r'''
           local function guarded_raw()

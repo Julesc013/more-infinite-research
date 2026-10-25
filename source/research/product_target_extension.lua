@@ -166,6 +166,28 @@ local function lab_science_binding(raw)
     reject_explicit_productivity_denial=true, products=products}, lab_count, input_count
 end
 
+-- The modern science family's literal seeds represent current lab-input item
+-- identities. Its one collector pass below owns additional producers. Remove
+-- only such a seed whose named recipe was actually removed; a present malformed
+-- target remains for Generator's strict preflight rather than being hidden here.
+-- Exact and declared replacement families retain their caller-owned vectors.
+local function remove_missing_science_effects(technology, raw, products)
+  local recipes = type(raw) == "table" and raw.recipe or nil
+  if type(recipes) ~= "table" then return end
+  local inputs = {}
+  for _, product in ipairs(products or {}) do
+    if type(product) == "table" and product.type == "item" and type(product.name) == "string"
+      and product.name ~= "" then inputs[product.name] = true end
+  end
+  local effects = technology.effects
+  for index = #effects, 1, -1 do
+    local recipe = effects[index].recipe
+    if type(recipe) == "string" and recipe ~= "" and inputs[recipe] and recipes[recipe] == nil then
+      table.remove(effects, index)
+    end
+  end
+end
+
 function M.extend(technologies, values, context)
   context = context or {}
   local exact_families = selected_family_set(context.exact_product_target_families, "exact product target families")
@@ -219,11 +241,10 @@ function M.extend(technologies, values, context)
   end
   admit(bindings.base.bindings)
   if context.mods and context.mods["space-age"] then admit(bindings.space_age.bindings) end
-  local lab_count, input_count = 0, 0
+  local lab_count, input_count, lab_rule = 0, 0, nil
   if selected.research_science_pack_productivity and not exact_families.research_science_pack_productivity then
-    local rule
-    rule, lab_count, input_count = lab_science_binding(context.raw)
-    if rule then admit({rule}) end
+    lab_rule, lab_count, input_count = lab_science_binding(context.raw)
+    if lab_rule then admit({lab_rule}) end
   end
   if context.additional_product_bindings ~= nil then
     if type(context.additional_product_bindings) ~= "table" then
@@ -263,6 +284,10 @@ function M.extend(technologies, values, context)
   local dispositions = write and {} or nil
   for family, rows in pairs(result.by_family) do
     local technology = selected[family]
+    if family == "research_science_pack_productivity" and not exact_families[family]
+      and not replacement_families[family] and lab_rule then
+      remove_missing_science_effects(technology, context.raw, lab_rule.products)
+    end
     local effects, seen = technology.effects, {}
     if replacement_families[family] then
       -- Published profile groups are ordered by their authored productivity
