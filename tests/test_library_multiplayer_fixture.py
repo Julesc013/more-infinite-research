@@ -1095,6 +1095,72 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_actual_client_starter_matches_each_fixture_join_protocol(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_SESSION,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $nodes=@($ast.FindAll({param($node)
+            $node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Start-Clients'
+          },$true))
+          if($nodes.Count-ne1){throw 'actual client starter missing or ambiguous'}
+          Invoke-Expression $nodes[0].Extent.Text
+          $clients=@(
+            @{name='MIR5English';locale='en';config='en.ini';port=1001;ordinal=1},
+            @{name='MIR5Deutsch';locale='de';config='de.ini';port=1002;ordinal=2}
+          )
+          $library='unused';$serverPort=1000;$clientGraphics=@();$serverWriteData='unused'
+          function Start-Native([string]$Name,$NativeArguments){
+            $index=$script:launches.Count
+            $script:launches.Add($Name);$script:order.Add('start')
+            $playerName=$clients[$index].name
+            $ordinal=$script:ordinals[$index]
+            $script:logText+="[$markerPrefix`_JOIN] $playerName $ordinal`n"
+            return [pscustomobject]@{name=$Name}
+          }
+          function Read-LogText([string]$Path){return $script:logText}
+          function Wait-For([string]$Description,[scriptblock]$Predicate){
+            $script:order.Add('wait')
+            if(-not(&$Predicate)){throw 'expected client join absent'}
+            return $true
+          }
+          $cases=@(
+            @{fixture='library-paired-browser';phase='initial';ordinals=@(1,2);prefix='MIR5_LIBRARY_PAIRED_BROWSER'},
+            @{fixture='library-paired-browser';phase='restart';ordinals=@(3,4);prefix='MIR5_LIBRARY_PAIRED_BROWSER'},
+            @{fixture='library-multiplayer';phase='initial';ordinals=@(1,1);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='library-multiplayer';phase='rejoin';ordinals=@(2,2);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='library-multiplayer';phase='restart';ordinals=@(3,3);prefix='MIR5_LIBRARY_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='initial';ordinals=@(1,1);prefix='MIR5_SCRIPTED_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='rejoin';ordinals=@(2,2);prefix='MIR5_SCRIPTED_MP'},
+            @{fixture='scripted-effects-multiplayer';phase='restart';ordinals=@(3,3);prefix='MIR5_SCRIPTED_MP'}
+          )
+          foreach($case in $cases){
+            foreach($opponent in @('valid','wrong-second-ordinal')){
+              $fixtureCase=$case.fixture;$markerPrefix=$case.prefix
+              $script:ordinals=@($case.ordinals)
+              if($opponent-ceq'wrong-second-ordinal'){$script:ordinals[1]=9}
+              $script:logText=''
+              $script:launches=[Collections.Generic.List[string]]::new()
+              $script:order=[Collections.Generic.List[string]]::new()
+              $failure=$null;$actors=@()
+              try{$actors=@(Start-Clients $case.phase)}catch{$failure=$_.Exception.Message}
+              if($opponent-ceq'valid'){
+                if($null-ne$failure){throw "valid $($case.fixture)/$($case.phase) joins rejected: $failure"}
+                if($actors.Count-ne2 -or $actors[0].name-cne"client-$($case.phase)-en" -or $actors[1].name-cne"client-$($case.phase)-de"){
+                  throw 'client starter lost ordered actor records'
+                }
+              }elseif($failure-cne'expected client join absent'){throw 'incorrect second join ordinal accepted'}
+              if(($script:order-join',')-cne'start,wait,start,wait'){throw 'client startups lost serialized join waits'}
+            }
+          }
+        '''
+        result = subprocess.run(
+            ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+            capture_output=True, text=True,
+            env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_paired_browser_session_is_explicit_and_keeps_existing_ten_capture_path(self):
         wrapper = WRAPPER.read_text(encoding="utf-8")
         session = SESSION.read_text(encoding="utf-8")

@@ -672,6 +672,8 @@ function Start-Clients([string]$Phase) {
     [void](Wait-For ("native join of "+$client.name) {
       return [regex]::IsMatch((Read-LogText (Join-Path $serverWriteData 'factorio-current.log')),$joined)
     })
+    # The paired fixture counts all joins; the functional fixtures count per player.
+    if($fixtureCase -ceq 'library-paired-browser'){$expectedJoin++}
   }
   $started.ToArray()
 }
