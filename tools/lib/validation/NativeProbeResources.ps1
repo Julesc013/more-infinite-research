@@ -120,6 +120,9 @@ function Invoke-MIRNativeProbeProcess {
     [Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
     [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [ValidateSet(0,250)][int]$SampleMilliseconds=0,
+    [scriptblock]$OwnedProcessSampleCallback=$null,
+    [scriptblock]$OwnedProcessExitCallback=$null,
     [switch]$FactorioSteamIdentity,
     $PreStartAdmissionWait=$null,
     [scriptblock]$CompletionPredicate
@@ -138,6 +141,9 @@ function Invoke-MIRNativeProbeProcess {
     # actors. Only the direct Factorio actor opts into fixed child Steam IDs.
     if($FactorioSteamIdentity){$governorArguments.FactorioSteamIdentity=$true}
     if($null -ne $PreStartAdmissionWait){$governorArguments.PreStartAdmissionWait=$PreStartAdmissionWait}
+    if($SampleMilliseconds -ne 0){$governorArguments.SampleMilliseconds=$SampleMilliseconds}
+    if($null -ne $OwnedProcessSampleCallback){$governorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
+    if($null -ne $OwnedProcessExitCallback){$governorArguments.OwnedProcessExitCallback=$OwnedProcessExitCallback}
     # Library validation builds temporary archive inventories. Release those
     # completed host allocations before admission measures the native child.
     # The active lease, inventories and process/machine reserves remain live.
@@ -172,6 +178,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
     [Parameter(Mandatory)]$Context,[Parameter(Mandatory)][string]$FilePath,
     [Parameter(Mandatory)][string[]]$Arguments,
     [ValidateRange(1,3600)][int]$TimeoutSeconds=120,
+    [ValidateSet(0,250)][int]$SampleMilliseconds=0,
+    [scriptblock]$OwnedProcessSampleCallback=$null,
+    [scriptblock]$OwnedProcessExitCallback=$null,
     [ValidateRange(0,300)][int]$AdmissionWaitSeconds=0,
     [string]$AdmissionPhase='',
     [scriptblock]$CompletionPredicate
@@ -188,6 +197,9 @@ function Invoke-MIRNativeProbeFactorioProcess {
   # the historical PowerShell-wrapper tree duration. This clock-scope repair
   # removes developer harness work; it is not product-speedup evidence.
   $actorArguments=@{Context=$Context;FilePath=$FilePath;Arguments=$Arguments;TimeoutSeconds=$TimeoutSeconds;FactorioSteamIdentity=$true;CompletionPredicate=$CompletionPredicate}
+  if($SampleMilliseconds -ne 0){$actorArguments.SampleMilliseconds=$SampleMilliseconds}
+  if($null -ne $OwnedProcessSampleCallback){$actorArguments.OwnedProcessSampleCallback=$OwnedProcessSampleCallback}
+  if($null -ne $OwnedProcessExitCallback){$actorArguments.OwnedProcessExitCallback=$OwnedProcessExitCallback}
   if($AdmissionWaitSeconds -gt 0){
     if([string]::IsNullOrWhiteSpace($AdmissionPhase)){throw '[mir-native-probe-admission-phase]'}
     $actorArguments.PreStartAdmissionWait=New-MIR441PreStartAdmissionWait -AdmissionWaitSeconds $AdmissionWaitSeconds -Phase $AdmissionPhase
