@@ -1,0 +1,109 @@
+{
+  "schema": 1,
+  "kind": "MIR5BobAngelMenuR23PreparationAdverseChainV1",
+  "status": "native-preparation-complete-reader-schema-adverse-before-timing",
+  "native_capture_execution": true,
+  "timing_native_execution": false,
+  "performance_qualification": false,
+  "release_qualification": false,
+  "run": {
+    "id": 40206608163,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40206608163",
+    "workflow_conclusion": "failure",
+    "frozen_controller_ref": "test/coherent-b2-r23-named-r01",
+    "controller_commit": "3c7c363fc0a28028af57ed0171bba1322a050e33",
+    "controller_provenance": {
+      "source": "Workflow-ref readback; the controller identity is external to the 111 native artifact members.",
+      "artifact_attested": false
+    }
+  },
+  "inputs": {
+    "plan_revision": "0d40bc72a43c0cb7dee394d38b2f7d00a3f8c85f",
+    "plan_sha256": "5E4B44DBC8B0C8F9F102CE4B6C08C4C2E9F549D25C8151A07D9C6F3A44528970",
+    "actual_player_source": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
+    "actual_player_source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498",
+    "current_f200": {
+      "version": "5.0.20002",
+      "bytes": 553231,
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD"
+    },
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    }
+  },
+  "artifact_manifest": {
+    "path": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163/black-glass-bob-angel-menu-comparison-r23-40206608163-1/artifact-manifest.json",
+    "sha256": "398BCA0EF5704C970C803800F96F360BFB08F0B54EB984C76D41B39CDBB07C99",
+    "members": 111,
+    "verified_members": 111,
+    "file_set": "All declared member paths, byte counts, and SHA-256 values match; artifact-manifest.json is the expected self-excluded file."
+  },
+  "preparation": {
+    "status": "passed-native-preparation-not-timing",
+    "result_path": "bob-angel-menu-r23/preparation/preparation-result.json",
+    "result_sha256": "681B674B125B49964F179230CE847C3F3754BD9AB403400FE52FF397B6EBFA66",
+    "timing_samples_started": 0,
+    "performance_qualification": false
+  },
+  "captures": [
+    {
+      "arm": "control",
+      "result_path": "bob-angel-menu-r23/preparation/s/build/tmp/captures/control/result.json",
+      "result_sha256": "E6B146AD7578B8E650305AB95693F513D2ABBFEC9AA1F1A1FF3D5825B5D2F64F",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "published",
+      "result_path": "bob-angel-menu-r23/preparation/s/build/tmp/captures/published/result.json",
+      "result_sha256": "B46A41EA1913B3416B70DCD8072A754EA68762DB7FBEED7631550F134CAB60D0",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "replay",
+      "result_path": "bob-angel-menu-r23/preparation/s/build/tmp/captures/replay/result.json",
+      "result_sha256": "2C78707944CA1734F5E1A0991B8D4E5650FA5D3D5E9D7773F2A9A64086E1E31E",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "candidate",
+      "result_path": "bob-angel-menu-r23/preparation/s/build/tmp/captures/candidate/result.json",
+      "result_sha256": "3C444B93F404FA1CF88EC414E31B44280A9A526C1EEE38D23CBF26AA8840A4AE",
+      "status": "completed-data-stage-observation-only"
+    }
+  ],
+  "preparation_equality": {
+    "candidate_intent": {
+      "path": "bob-angel-menu-r23/preparation/candidate-intent.json",
+      "sha256": "670D53DB05BC3B4D0D582142D4D5CE0CBD24895BB170A7318D17B076F345D6BE",
+      "schema": 2,
+      "status": "equal-intended-native-output"
+    },
+    "replay": {
+      "path": "bob-angel-menu-r23/preparation/replay-equality.json",
+      "sha256": "3AB5FC87C9A9E04145F08C64D5AB993EB4360C38BA08411644611880AEB767E9",
+      "schema": 1,
+      "status": "equal-complete-native-output",
+      "differences": 0
+    }
+  },
+  "owned_window_diagnostic": {
+    "path": "bob-angel-menu-r23/preparation/s/build/tmp/owned-window/result.json",
+    "sha256": "90E568C7ADC87A91701C56D1F9FD55EC2C439267A9C0D1E38381E9646EABC652",
+    "status": "observed-owned-menu-response-diagnostic-only",
+    "timing_sample": false
+  },
+  "adverse": {
+    "single_job_result_path": "bob-angel-menu-r23/single-job-result.json",
+    "single_job_result_sha256": "D8BC846E6F4821C0AC655A33409D98D3C4FCBFA6D8D5B6AF189E7DB20EDD99C8",
+    "worker_failure_sha256": "85130D925C1CF4AC660EB6DC6E6ECE5A15233CB41A2398F2208CF7117397DBD3",
+    "failure_disposition": "The frozen reader expected an older candidate-intent schema and later older receipt shapes after native preparation completed. Timing did not begin."
+  },
+  "primary_custody": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163",
+  "limits": [
+    "The four capture receipts, equality receipts, and owned-window diagnostic are completed preparation evidence, not timing observations.",
+    "No timing sample, timing comparison, performance result, gameplay, save, client, release qualification, or publication result follows.",
+    "The exact packet and clean execution sparse worktree remain in private primary custody for read-only validation under a repaired reader; complete raw configurations, logs, and other sensitive outputs are not embedded here."
+  ]
+}
