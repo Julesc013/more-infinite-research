@@ -4360,16 +4360,19 @@
       "status": "requested-not-qualified",
       "qualification": [],
       "mir5_route_disposition": {
-        "state": "implemented-source-host-controls-pass-native-pending",
+        "state": "implemented-current-native-policy-and-upgrade-passed-release-open",
         "current_source": [
           "source/compatibility/science_bindings.lua",
           "source/research/science.lua"
         ],
         "evidence": [
-          "spec/evidence/sif-continuation-source-review.json"
+          "spec/evidence/sif-continuation-source-review.json",
+          "spec/evidence/sif-science-fa114-native-chain.json"
         ],
         "limitations": [
-          "All eight policy expectations have host coverage on F200/F210. Exact current-package native emission and genuine published-predecessor upgrade/save/two-reload acceptance remain pending; the original decision, acceptance and requested-not-qualified status are unchanged."
+          "Run40185834442 at sourcefa114/player tree41b passes native CreateOnly final-emission/runtime-load checks for all eight policies on exact2.0.77 and2.1.23, using candidate76D4/4D5E and published4.7.20002/4.7.21002. Space Is Fake is1.0.60/1.0.78 respectively.",
+          "The configured-policy published/successor stages complete eight actual labs and eight separate unchanged-save cold reloads across both targets, retaining42-percent queued and27-percent detached work. Published stages create their own actual predecessor saves; no pre-existing external player save is claimed.",
+          "The sixteen policy startup arms are not sixteen gameplay runs. No client, multiplayer, elapsed-time, memory, arbitrary-modpack or release verdict follows. Original request ID, text, decision, acceptance, status and historical qualification fields remain unchanged; this additive MIR5 route records the exact completed native scope."
         ]
       }
     },
