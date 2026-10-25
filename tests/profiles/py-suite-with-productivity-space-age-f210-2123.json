@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "kind": "mir5-independent-mod-f210-native-reference-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "elevated-rails",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "quality",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "recycler",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "space-age",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "py_productivity",
+      "version": "1.4.0",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlife",
+      "version": "3.1.5",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics2",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyalienlifegraphics3",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyalternativeenergy",
+      "version": "3.2.6",
+      "enabled": true
+    },
+    {
+      "name": "pyalternativeenergygraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessing",
+      "version": "3.1.4",
+      "enabled": true
+    },
+    {
+      "name": "pycoalprocessinggraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyfusionenergy",
+      "version": "3.1.3",
+      "enabled": true
+    },
+    {
+      "name": "pyfusionenergygraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyhightech",
+      "version": "3.1.3",
+      "enabled": true
+    },
+    {
+      "name": "pyhightechgraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pyindustry",
+      "version": "3.1.3",
+      "enabled": true
+    },
+    {
+      "name": "pyindustrygraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pymodpack",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pypetroleumhandling",
+      "version": "3.1.2",
+      "enabled": true
+    },
+    {
+      "name": "pypetroleumhandlinggraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "pypostprocessing",
+      "version": "3.1.3",
+      "enabled": true
+    },
+    {
+      "name": "pyrawores",
+      "version": "3.1.3",
+      "enabled": true
+    },
+    {
+      "name": "pyraworesgraphics",
+      "version": "3.1.0",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "py_productivity_1.4.0.zip": "89859F91FE7204F391B7B63FCF9DB01A9B7AC83C7CFD29D2B902BD1C502C1CE4",
+    "pyalienlife_3.1.5.zip": "6C0DDAB3694EB130DE10353AF5FD4075AE1B9F7945A6BA2E5254748B0E99D474",
+    "pyalienlifegraphics_3.1.0.zip": "E09CC0B8F64456263EF07CA9B0B846F9805335FCAE6C6FB8C37693D932D628CA",
+    "pyalienlifegraphics2_3.1.0.zip": "AF240AB03FD46A5266511648B56C1BFE9CD9576FAC3B2FAEAB9EF88EB7BE30EF",
+    "pyalienlifegraphics3_3.1.0.zip": "6DBA347CAA017DF4A16391680AD932AB9C0C97CC0561AE7390C21C399AE9C35A",
+    "pyalternativeenergy_3.2.6.zip": "BC0137E96B7F96584F112BBEF735E311303DCEA7AE2616C5F0300180D88C1A9C",
+    "pyalternativeenergygraphics_3.1.0.zip": "30E97A4EFDFECA62D0ABB24F8C95770038337F984823AE0885136CAC7D4BA88C",
+    "pycoalprocessing_3.1.4.zip": "3B6BC138DB314B4CECC50558E53F7569ECA3DB217FED9267495ACC9046146C07",
+    "pycoalprocessinggraphics_3.1.0.zip": "FBFC18F0F5374EC9AA8670308A280DE3C40F83AA547C5752ACCE7B7B96736563",
+    "pyfusionenergy_3.1.3.zip": "D459AC8248A37472B1BB5B0B48E0AD7FE9425B9CDA96C99DF71694850D7E0F0D",
+    "pyfusionenergygraphics_3.1.0.zip": "918216B066269F1119E9D6EF9F1E87835C2B4B7F868DAC7ACD3BBBD156D34454",
+    "pyhightech_3.1.3.zip": "884FC3046A9918AEB662C7C1D32EA7B86CD3998936BF9B74E3A26EE9C2DF005D",
+    "pyhightechgraphics_3.1.0.zip": "41DC5876271A3D2C4A84081BEE4C9536A0C9C9A63FD7C4C75A522727E37AC903",
+    "pyindustry_3.1.3.zip": "9ED54953FCC6AE5CD7C5D692BF8F6A6BAAC53B3A13B39D594230CBBC2D078E7A",
+    "pyindustrygraphics_3.1.0.zip": "90606A5B2E89BC3EF53865746473299176144388675A7676AEDE734922C633EF",
+    "pymodpack_3.1.0.zip": "417E2A85C65FABCFEA8CE23FC7320367E30E075B0FF3328566651EB872D7B182",
+    "pypetroleumhandling_3.1.2.zip": "DC0D10EFE7E5347C4803263A707BAB8B53AB93A9644D78AC7C6BEBC7F1D41BCA",
+    "pypetroleumhandlinggraphics_3.1.0.zip": "0741BFE9615AD05D58DD7C591EBBF7CD1FB0A8E8DA99A3B843888B6475B8B3AD",
+    "pypostprocessing_3.1.3.zip": "8B6CDFEC41F4D62D6F61F5181058FA8D144610F8F64FDC97302A7CB006853964",
+    "pyrawores_3.1.3.zip": "EA1ACE0AC408F291C5F5D6E5A8B4A50EF5DCB925CE077785727A88D0DECD8258",
+    "pyraworesgraphics_3.1.0.zip": "A360A0B6367D38FB41AAE7A6ACF956EAFBCAA01AF81914F756FD50212DDF6519",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+  },
+  "scope": "Exact local py-suite-with-productivity space-age mandatory-closure input for independent upstream/published4.7.3/current data/settings captures. Latest numerically selected local archives require actual engine admission; these inputs establish no startup, research/physical, migration, client or support result."
+}

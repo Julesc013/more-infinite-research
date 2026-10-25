@@ -17,6 +17,9 @@ ROOT = Path(__file__).resolve().parents[1]
 MODERN_ORACLE = json.loads(
     (ROOT / "spec/inventory/modern-f210-470.json").read_text(encoding="utf-8")
 )
+F200_MODERN_ORACLE = json.loads(
+    (ROOT / "spec/inventory/modern-f200-470.json").read_text(encoding="utf-8")
+)
 SCIENCE_SOURCE_ORACLE = json.loads(
     (ROOT / "tests/fixtures/science-source-native-oracle.json").read_text(encoding="utf-8")
 )
@@ -477,10 +480,10 @@ class GeneratorTests(unittest.TestCase):
           package.loaded[space_body] = nil
           package.preload[space_body] = function() error("base selection loaded Space Age catalogue") end
           local base = modern_catalogue.select({})
-          assert(base.profile == "base" and #base.definitions == 46
+          assert(base.profile == "base" and #base.definitions == 47
             and #base.continuations == 6 and #base.recipe_patches == 0)
           local base_rows = modern.technologies(base, config.resolve(defaults()))
-          assert(#base_rows == 52 and package.loaded[space_body] == nil)
+          assert(#base_rows == 53 and package.loaded[space_body] == nil)
           local ids = {}; for _, row in ipairs(base_rows) do ids[row.name] = row end
           assert(ids["recipe-prod-research_advanced_circuit-1"].effects[1].recipe == "advanced-circuit")
           assert(ids["braking-force-8"].unit.count_formula == "861.51212960553*1.33333^(L-8)")
@@ -510,7 +513,7 @@ class GeneratorTests(unittest.TestCase):
           mods = {}
           package.loaded["research.catalogue"] = nil
           local base_declared = require("research.catalogue").declared()
-          assert(#base_declared == 53)
+          assert(#base_declared == 54)
           for _, row in ipairs(base_declared) do
             assert(config.resolve(defaults()).streams[row.family] ~= nil)
             assert(row.legacy_binding and row.legacy_binding.source and row.legacy_binding.operation)
@@ -811,8 +814,11 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = setmetatable({}, {__pairs=function()
             reads = reads + 1; return next,labs,nil
           end})
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
-          assert(reads == 1 and data.raw.technology["Space-Lab-Research-61"] == foreign)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 74)
+          -- The retained science-pack family uses its existing bounded
+          -- lab-input product binding plus the policy pass: no foreign
+          -- technology read is introduced.
+          assert(reads == 2 and data.raw.technology["Space-Lab-Research-61"] == foreign)
           for _, row in ipairs(data.emitted) do
             if row.name:sub(1, 18) == "mir-native-credit-" then
               -- Private signed carriers are not player research. They retain
@@ -837,7 +843,7 @@ class GeneratorTests(unittest.TestCase):
           data.raw.lab = {restricted={inputs={"automation-science-pack"}}}
           local foreign = {enabled=true,foreign=77}
           data.raw.technology["foreign"] = foreign
-          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 73)
+          assert(dofile(data_final_path) == nil and data.writes == 1 and #data.emitted == 74)
           for _, row in ipairs(data.emitted) do assert(row.enabled == false and #row.unit.ingredients > 0) end
           assert(data.raw.technology.foreign == foreign and foreign.enabled and foreign.foreign == 77)
         ''')
@@ -1325,7 +1331,7 @@ class GeneratorTests(unittest.TestCase):
           package.preload["research.scripted_effects"] = nil
           package.preload["overrides.prototype_limits"] = nil
           assert(ok, message)
-          assert(environment.writes == 1 and #environment.emitted == 73)
+          assert(environment.writes == 1 and #environment.emitted == 74)
           assert(package.loaded["compatibility.space_age_scripted_effects"] == nil)
           assert(package.loaded["research.scripted_effects"] == nil)
           assert(package.loaded["overrides.prototype_limits"] == nil)
@@ -1355,6 +1361,11 @@ class GeneratorTests(unittest.TestCase):
             }
             for profile in MODERN_ORACLE["profiles"]
         }
+        f200_base = next(profile for profile in F200_MODERN_ORACLE["profiles"] if profile["id"] == "base-f200")
+        f200_science_pack_productivity = next(
+            row for row in f200_base["published_output"]["data"]["additions"]
+            if row["type"] == "technology" and row["name"] == "recipe-prod-research_science_pack_productivity-1"
+        )
         patch_profiles = {
             profile["id"]: profile["published_output"]["data"]["patches"]
             for profile in MODERN_ORACLE["profiles"]
@@ -1377,6 +1388,10 @@ class GeneratorTests(unittest.TestCase):
                 for row in self.lua.globals().published_emitted.values()
             }
             expected = dict(expected_profiles[profile])
+            if profile == "base-f210":
+                # F210 Base deliberately carries the exact F200 Base public row
+                # so engine loading retains an earned cross-target technology.
+                expected[f200_science_pack_productivity["name"]] = host_row(f200_science_pack_productivity["row"])
             if profile == "k2so-f210":
                 # The immutable 4.7 inventory records the historical missing
                 # `automation.png` carrier icon. F210 AtlasBuilder rejects it;
@@ -1399,8 +1414,7 @@ class GeneratorTests(unittest.TestCase):
             actual_public, actual_credit = split_public_and_native_credit_rows(actual)
             self.assertEqual(actual_public, expected, profile)
             expected_credit = native_credit_carrier_rows(
-                expected,
-                captured_public_productivity_recipes(expected_profiles[profile]),
+                expected, captured_public_productivity_recipes(expected)
             )
             self.assertEqual(actual_credit, expected_credit, profile)
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile)
@@ -1420,13 +1434,12 @@ class GeneratorTests(unittest.TestCase):
                 )
 
     def test_f200_complete_technology_output_matches_its_own_published_oracle(self):
-        oracle = json.loads((ROOT / "spec/inventory/modern-f200-470.json").read_text(encoding="utf-8"))
         self.lua.execute('''
           local target = require("platform.target")
           target.id, target.factorio_version, target.minimum_base = "f200", "2.0", "2.0.77"
           target.cargo_research, target.receiver_limits, target.recipe_probability = false, false, "probability"
         ''')
-        for profile in oracle["profiles"]:
+        for profile in F200_MODERN_ORACLE["profiles"]:
             active_mods = {"base": "2.0.77"}
             if profile["id"] == "space-age-f200":
                 active_mods["space-age"] = "2.0.77"
@@ -1449,6 +1462,63 @@ class GeneratorTests(unittest.TestCase):
             self.assertEqual(actual_credit, expected_credit, profile["id"])
             self.assertEqual(set(actual), set(expected) | set(expected_credit), profile["id"])
 
+    def test_f210_base_science_pack_continuity_row_preserves_scalar_cap_and_enablement(self):
+        self.lua.execute('''
+          local family = "research_science_pack_productivity"
+          local id = "recipe-prod-" .. family .. "-1"
+          local function published_row(rows)
+            for _, row in ipairs(rows) do if row.name == id then return row end end
+            error("missing F210 Base science-pack continuity row")
+          end
+          local function exact_six(row)
+            local effects = {"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+              "military-science-pack", "production-science-pack", "utility-science-pack"}
+            local science = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack",
+              "production-science-pack", "military-science-pack", "utility-science-pack"}
+            assert(#row.effects == #effects and #row.unit.ingredients == #science and #row.prerequisites == #science)
+            for index, name in ipairs(effects) do
+              assert(row.effects[index].type == "change-recipe-productivity" and row.effects[index].recipe == name)
+            end
+            for index, name in ipairs(science) do
+              assert(row.unit.ingredients[index][1] == name and row.unit.ingredients[index][2] == 1)
+              assert(row.prerequisites[index] == name)
+            end
+          end
+
+          mods = {}
+          local startup = defaults()
+          startup["ips-effect-per-level-" .. family].value = 17
+          startup["ips-max-level-" .. family].value = 7
+          local values = config.resolve(startup)
+          assert(values.streams[family].enabled == true and values.streams[family].effect_percent == 17
+            and values.streams[family].max_level == 7)
+          settings, data, helpers, log = {startup=startup}, full_world(mods), nil, function() end
+          assert(dofile(data_final_path) == nil and data.writes == 1)
+          local row = published_row(data.emitted)
+          assert(row.enabled ~= false and row.max_level == "infinite", "enabled finite-cap row became unavailable")
+          exact_six(row)
+          for _, effect in ipairs(row.effects) do assert(effect.change == .17) end
+
+          local declaration
+          for _, candidate in ipairs(require("research.catalogue").declared()) do
+            if candidate.id == id then declaration = candidate end
+          end
+          assert(declaration and declaration.family == family and declaration.setting == "ips-enable-" .. family
+            and declaration.cap_setting == "ips-max-level-" .. family
+            and #declaration.settings == 7, "runtime cap/enable declaration is absent")
+
+          startup = defaults()
+          startup["ips-enable-" .. family].value = false
+          values = config.resolve(startup)
+          assert(values.streams[family].enabled == false and values.streams[family].max_level == 0)
+          settings, data, helpers, log = {startup=startup}, full_world(mods), nil, function() end
+          assert(dofile(data_final_path) == nil and data.writes == 1)
+          row = published_row(data.emitted)
+          assert(row.enabled == false and row.max_level == "infinite")
+          exact_six(row)
+          for _, effect in ipairs(row.effects) do assert(effect.change == .1) end
+        ''')
+
     def test_effective_global_option_lazily_activates_prototype_limits(self):
         self.lua.execute('''
           local startup, environment = defaults(), full_world({})
@@ -1457,7 +1527,7 @@ class GeneratorTests(unittest.TestCase):
           settings, mods, data, helpers, log = {startup = startup}, {}, environment, nil, function() end
           package.loaded["overrides.prototype_limits"] = nil
           assert(dofile(data_final_path) == nil)
-          assert(environment.writes == 1 and #environment.emitted == 73)
+          assert(environment.writes == 1 and #environment.emitted == 74)
           assert(package.loaded["overrides.prototype_limits"] ~= nil)
           assert(environment.raw["fixture-receiver"].zero.energy_usage == "1W")
         ''')

@@ -276,6 +276,44 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
 
 
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def test_actual_r06_capsule_replays_exact_analysis_through_hardened_reader(self) -> None:
+        capsule_path = ROOT / "spec/evidence/runtime-active-r06-observation-analysis-receipts.json.gz"
+        payload = capsule_path.read_bytes()
+        self.assertEqual(_hash(payload), "7DCC75B907377193FF08C88C3BD6A26469FB7D00031B3E454AC9142B14EB4CEE")
+        capsule = json.loads(gzip.decompress(payload))
+        files: dict[str, bytes] = {}
+        for row in capsule["files"]:
+            value = base64.b64decode(row["base64"], validate=True)
+            self.assertEqual(len(value), row["bytes"])
+            self.assertEqual(_hash(value), row["sha256"])
+            self.assertNotIn(row["path"], files)
+            files[row["path"]] = value
+        self.assertEqual(len(files), 9)
+        raw = files["original/runtime-benchmark-active-observed.json"]
+        self.assertEqual(_hash(raw), "F231BD7AB5167101DDD0215D05B0CF397338F3CEBC236795D89FC0B42EF3B2F3")
+        expected = files["derived/analysis-result.json"]
+        self.assertEqual(_hash(expected), "8838D3D71129876B44598B2800DDC2271F0CA326F38A5E5FEDBC554577333A43")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            plan = root / "plan.json"
+            result = root / "runtime-benchmark-active-observed.json"
+            sidecar = root / "runtime-benchmark-active-prepared.json"
+            output = root / "analysis.json"
+            plan.write_bytes(files["original/runtime-benchmark-active-plan-r06.json"])
+            result.write_bytes(raw)
+            sidecar.write_bytes(files["original/runtime-benchmark-active-prepared.json"])
+            completed = subprocess.run(
+                [sys.executable, str(TOOL_PATH), "--raw-plan", str(plan),
+                 "--expected-plan-sha256", MODULE.PLAN_SHA256, "--result", str(result),
+                 "--expected-result-sha256", _hash(raw), "--output", str(output)],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(output.read_bytes(), expected)
+        analysis = json.loads(expected)
+        self.assertEqual(analysis["analysis_verdict"]["status"], "within-predeclared-limits")
+        self.assertFalse(analysis["claims"]["release_qualification"])
+
     def test_accepts_exact_frozen_r06_plan_metric_labels(self) -> None:
         payload = (ROOT / "spec/evidence/runtime-benchmark-active-plan-r06.json").read_bytes()
         self.assertEqual(_hash(payload), MODULE.PLAN_SHA256)
