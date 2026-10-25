@@ -58,6 +58,16 @@ function Assert-MultiplayerFixtureSelection {
       optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
     }
     [ordered]@{
+      fixture_case='library-multiplayer';target='f210'
+      kind='mir5-library-api-consumers-f210-native-selection';factorio_line='2.1';base='2.1.23'
+      engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000';build_version=87750
+      observer_sha256='2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'
+      mir_archive_sha256='428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0','mir-fixture-mir5-api-alpha@0.1.0','mir-fixture-mir5-api-beta@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip','mir-fixture-mir5-api-alpha_0.1.0.zip','mir-fixture-mir5-api-beta_0.1.0.zip')
+      api_client_consumers=$true
+    }
+    [ordered]@{
       fixture_case='library-paired-browser';target='f200'
       kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002';build_version=84539
@@ -103,6 +113,10 @@ function Assert-MultiplayerFixtureSelection {
   $archives=$Selection['archive_sha256'];$observer='mir-fixture-mir5-active-mods-observer_0.1.0.zip'
   $allowedArchives=@($observer)+@($target.optional_archives)
   Assert-Session ($archives.Contains($observer) -and $archives[$observer] -ceq $target.observer_sha256) 'multiplayer fixture observer archive differs'
+  if($target.Contains('mir_archive_sha256')){
+    $mirArchive='more-infinite-research_'+$target.mir+'.zip'
+    Assert-Session ($target.mir_archive_sha256 -is [string] -and $target.mir_archive_sha256 -cmatch '^[A-F0-9]{64}$' -and $archives.Contains($mirArchive) -and $archives[$mirArchive] -ceq $target.mir_archive_sha256) 'multiplayer fixture MIR archive differs'
+  }
   foreach($entry in $archives.GetEnumerator()){
     Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
   }
@@ -207,7 +221,13 @@ try {
     }
   )
   $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
-  if($FixtureCase -ceq 'library-multiplayer'){$spec.library_witness_target=[ordered]@{engine_sha256=[string]$target.engine_sha256;base=[string]$target.base;mir=[string]$target.mir}}
+  if($FixtureCase -ceq 'library-multiplayer'){
+    $spec.library_witness_target=[ordered]@{engine_sha256=[string]$target.engine_sha256;base=[string]$target.base;mir=[string]$target.mir}
+    if($target.PSObject.Properties['api_client_consumers']){
+      Assert-Session ($target.api_client_consumers -is [bool] -and $target.api_client_consumers) 'API client consumer target differs'
+      $spec.api_client_consumers=$true
+    }
+  }
   if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){
     Assert-Session ($FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
