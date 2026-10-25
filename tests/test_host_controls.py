@@ -100,6 +100,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_module_permissions_override.py",
             "tests/test_prototype_limits.py",
             "tests/test_recipe_schema_repairs.py",
+            "tests/test_prerequisite_repairs.py",
             "tests/test_module_permissions_activation.py",
             "tests/test_bootstrap.py",
             "tests/test_library.py",
@@ -131,7 +132,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 93)
+        self.assertEqual(len(paths), 94)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)

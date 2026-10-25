@@ -71,6 +71,7 @@ $controls = @(
   [ordered]@{path='tests/test_module_permissions_override.py';lua=$true},
   [ordered]@{path='tests/test_prototype_limits.py';lua=$true},
   [ordered]@{path='tests/test_recipe_schema_repairs.py';lua=$true},
+  [ordered]@{path='tests/test_prerequisite_repairs.py';lua=$true},
   [ordered]@{path='tests/test_module_permissions_activation.py';lua=$true},
   [ordered]@{path='tests/test_bootstrap.py';lua=$true},
   [ordered]@{path='tests/test_library.py';lua=$true},
