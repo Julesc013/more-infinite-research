@@ -165,6 +165,7 @@ class HostControlsTests(unittest.TestCase):
         self.assertIn("verification-plan:\n    name: verification-plan", workflow)
         self.assertIn("host-controls:\n    name: host-controls\n    needs: verification-plan", workflow)
         self.assertIn("git fetch --no-tags --depth=1 origin bd9774f323b6eb1561c1d9ff0c91ecc3f7acd1d1", workflow)
+        self.assertIn("git fetch --no-tags --depth=1 origin 8643cc91bc915e008556a5315dbb0a743247e7ab", workflow)
         self.assertIn("actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1", workflow)
         self.assertIn("actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065", workflow)
         self.assertIn("python-version: '3.14'", workflow)
