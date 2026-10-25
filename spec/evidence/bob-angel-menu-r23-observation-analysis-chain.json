@@ -14,8 +14,12 @@
     "release_qualification": false
   },
   "execution": {
-    "run_id": 40206608163,
-    "controller_commit": "2eac983c278027bb11227472b1252c878b0f3edd",
+    "original_workflow_run_id": 40206608163,
+    "original_workflow_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40206608163",
+    "original_workflow_status": "failure-before-direct-successor",
+    "execution_kind": "direct-frozen-controller-successor",
+    "direct_execution_id": "successor-2eac983c-r02",
+    "direct_controller_commit": "2eac983c278027bb11227472b1252c878b0f3edd",
     "source_reference": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
     "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
     "engine": {
@@ -170,15 +174,23 @@
     "result": "No R23 50-percent objective pass is claimed. The direct candidate-minus-published interval is reported independently and does not repair the unresolved percentage denominator or q criterion."
   },
   "retained_prior_adverse": {
-    "chain": "spec/evidence/bob-angel-menu-r23-preparation-adverse-chain.json",
-    "disposition": "The original workflow schema-1 reader refusal after native preparation and the later 7b successor's zero-native resolved-worktree-property refusal remain separate adverse custody. Neither is rewritten as an R23 timing observation or superseded by this completed analysis."
+    "original_workflow_preparation_chain": "spec/evidence/bob-angel-menu-r23-preparation-adverse-chain.json",
+    "original_workflow_disposition": "The original workflow reader refused actual schema 2 after native preparation. Its adverse chain predates the later direct-successor refusal and is retained without alteration.",
+    "successor_7b_zero_native_refusal": {
+      "path": "build/mir5/recovery-historical/bob-angel-menu-comparison-r23/40206608163/successor-7b9698fc-r01/execution-refusal.json",
+      "sha256": "2F14944A49AB2580977B883460CC47DF0E3A84588A51EF1EB5C2111CDC3C73DA",
+      "bytes": 1308,
+      "status": "refused-after-packet-validation-before-native-wrapper",
+      "factorio_processes_started": 0
+    },
+    "disposition": "Neither prior refusal is rewritten as an R23 timing observation or superseded by this completed direct-successor analysis."
   },
   "next_campaign_proposal": {
     "status": "proposal-only-not-an-r23-extension",
     "campaign": "R24",
     "design": "A separately frozen R24 may retain the same four arms, configuration, workload, tolerances and 50-percent objective while using 64 counterbalanced scored blocks: 64 scored observations per arm and 262 total launches after four warmups and two same-version A/A records.",
     "inference": "Use df=63 and a two-sided 95-percent Student-t critical value fixed in the R24 declaration (approximately 1.99834); no R23 value is appended, relabelled or reused as an R24 sample.",
-    "budget": "Plan a bounded governed 70-to-90-minute same-host run only after a new exact plan/controller review. This proposal is motivated by R23's d4 interval spanning zero and q upper bound remaining positive, not by any changed threshold or post-hoc rule."
+    "budget": "Plan a bounded governed 70-to-90-minute same-host run only after a new exact plan/controller review, with a new explicit output budget of approximately 8 GiB. R23's 436-member artifact occupies 1,056,422,548 bytes, so R24 must not inherit a 2 GiB output allowance. This proposal is motivated by R23's d4 interval spanning zero and q upper bound remaining positive, not by any changed threshold or post-hoc rule."
   },
   "limits": [
     "This chain records an endpoint-only R23 observation analysis. It does not qualify release, runtime, memory, active work, client fidelity, saves or general UI behavior.",
