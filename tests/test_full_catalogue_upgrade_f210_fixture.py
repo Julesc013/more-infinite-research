@@ -244,6 +244,122 @@ class FullCatalogueUpgradeF210FixtureTests(unittest.TestCase):
                 else:
                     self.assertIsNotNone(result["callbacks"]["configuration"])
 
+    def test_f210_source_callbacks_fill_and_freeze_read_only_active_lab(self):
+        self.lua.globals().control_path = (F210 / "published-4.7" / "control.lua").as_posix()
+        self.lua.globals().catalogue_path = (F210 / "published-4.7" / "catalogue.lua").as_posix()
+        self.lua.globals().f210_catalogue_path = (SHARED / "f210-catalogue.lua").as_posix()
+        self.lua.globals().common_control_path = (SHARED / "control.lua").as_posix()
+        self.lua.execute("""
+          function run_f210_source_with_read_only_active()
+            local callbacks, storage = {events={}}, {}
+            local plan = assert(loadfile(f210_catalogue_path))().base
+            local inserted, contents, clears, energy = {}, {}, 0, 0
+            local inventory = {}
+            function inventory.clear()
+              clears, contents = clears + 1, {}
+            end
+            function inventory.insert(stack)
+              inserted[stack.name] = (inserted[stack.name] or 0) + stack.count
+              contents[stack.name] = (contents[stack.name] or 0) + stack.count
+              return stack.count
+            end
+            local entity_values = {}
+            local entity = setmetatable({}, {
+              __index=function(_, key)
+                if key == "valid" then return true end
+                if key == "active" then return true end
+                if key == "energy" then return energy end
+                if key == "get_inventory" then
+                  return function(slot) assert(slot == 1); return inventory end
+                end
+                return entity_values[key]
+              end,
+              __newindex=function(_, key, value)
+                if key == "active" then error("active is read only") end
+                if key == "energy" then energy = value else entity_values[key] = value end
+              end,
+            })
+            local function make_force(index)
+              local force = {index=index, technologies={}, recipes={}}
+              setmetatable(force, {__newindex=function(target, key, value)
+                rawset(target, key, value)
+                if key == "research_queue" then rawset(target, "current_research", value[1]) end
+              end})
+              local function add_technology(name)
+                if force.technologies[name] ~= nil then return force.technologies[name] end
+                local value = {
+                  valid=true, name=name, prototype={max_level=4294967295, level=1},
+                  level=1, researched=false, enabled=true, visible_when_disabled=true,
+                  saved_progress=0, prerequisites={},
+                }
+                force.technologies[name] = value
+                return value
+              end
+              for _, row in ipairs(plan.state) do add_technology(row.name) end
+              local gear = add_technology("recipe-prod-research_gears-1")
+              add_technology("braking-force-1")
+              gear.research_unit_ingredients = {
+                {name="automation-science-pack", amount=1}, {name="logistic-science-pack", amount=1},
+                {name="chemical-science-pack", amount=1}, {name="production-science-pack", amount=1},
+              }
+              for _, recipe in ipairs(plan.recipes) do force.recipes[recipe] = {valid=true, productivity_bonus=0} end
+              for _, field in ipairs(assert(loadfile(f210_catalogue_path))().force_fields) do force[field] = 0 end
+              function force.enable_all_prototypes() end
+              function force.reset_technology_effects() end
+              function force.get_gun_speed_modifier() return 0 end
+              function force.add_research(value) return value == gear end
+              for _, technology in pairs(force.technologies) do technology.force = force end
+              return force
+            end
+            local player = make_force(1)
+            local game = {tick=0, forces={player=player}, surfaces={[1]={create_entity=function() return entity end}}}
+            function game.create_force()
+              local paused = make_force(2); game.forces[paused.index] = paused; return paused
+            end
+            function game.server_save() game.saved = true end
+            local env = {
+              script={on_init=function(fn) callbacks.init=fn end, on_load=function(fn) callbacks.load=fn end,
+                on_configuration_changed=function(fn) callbacks.configuration=fn end,
+                on_event=function(event, fn) callbacks.events[event]=fn end,
+                active_mods={base="2.1.23", ["more-infinite-research"]="4.7.21002",
+                  ["mir-fixture-mir5-full-catalogue-upgrade"]="0.1.0"}},
+              defines={events={on_research_finished=1,on_tick=2},inventory={lab_input=1}},
+              game=game, storage=storage, helpers={table_to_json=function() return "{}" end}, log=function() end,
+            }
+            env.require=function(name)
+              if name == "__mir-fixture-mir5-full-catalogue-upgrade__/fixture_control" then
+                return assert(loadfile(common_control_path, "t", env))()
+              end
+              if name == "__mir-fixture-mir5-full-catalogue-upgrade__/catalogue" then
+                return assert(loadfile(catalogue_path, "t", env))()
+              end
+              assert(name == "__mir-fixture-mir5-full-catalogue-upgrade__/f210_catalogue")
+              return assert(loadfile(f210_catalogue_path, "t", env))()
+            end
+            setmetatable(env, {__index=_G})
+            local ok, message = pcall(function()
+              assert(loadfile(control_path, "t", env))()
+              callbacks.init()
+              callbacks.events[1]{research=player.technologies["recipe-prod-research_gears-1"]}
+              callbacks.events[2]()
+            end)
+            local paused = game.forces[2]
+            return {ok=ok, message=tostring(message), energy=energy, inserted=inserted, contents=contents,
+              clears=clears, phase=storage.mir5_full_catalogue_upgrade and storage.mir5_full_catalogue_upgrade.phase,
+              source_labs=storage.mir5_full_catalogue_upgrade and storage.mir5_full_catalogue_upgrade.source_labs,
+              paused_progress=paused and paused.technologies["recipe-prod-research_gears-1"].saved_progress,
+              paused_current_absent=paused and paused.current_research == nil,
+              paused_queue_size=paused and #(paused.research_queue or {}), saved=game.saved}
+          end
+        """)
+        result = py(self.lua.eval("run_f210_source_with_read_only_active")())
+        self.assertTrue(result["ok"], result["message"])
+        self.assertEqual(0, result["energy"])
+        self.assertEqual(2, result["clears"])
+        self.assertEqual({}, result["contents"])
+        self.assertEqual({name: 64 for name, _ in GEAR_SCIENCE}, result["inserted"])
+        self.assertEqual(("completed", 1, .27, True, 0, True), (result["phase"], result["source_labs"], result["paused_progress"], result["paused_current_absent"], result["paused_queue_size"], result["saved"]))
+
     def test_f210_runtime_force_schema_when_local_api_is_available(self):
         runtime_api = f210_runtime_api_path()
         if runtime_api is None:
