@@ -16,6 +16,9 @@ CONTROL = FIXTURE / "control.lua"
 F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-f200-2077.json"
 CURRENT_F200_PROFILE = ROOT / "tests/profiles/library-multiplayer-current-f200-2077.json"
 F210_PROFILE = ROOT / "tests/profiles/library-multiplayer-f210-2123.json"
+PAIRED_PUBLISHED_PROFILE = ROOT / "tests/profiles/library-paired-browser-published-f200-2077.json"
+PAIRED_MIR5_PROFILE = ROOT / "tests/profiles/library-paired-browser-mir5-f200-2077.json"
+SCRIPTED_EFFECTS_PROFILE = ROOT / "tests/profiles/scripted-effects-multiplayer-f200-sa-2077.json"
 WRAPPER = ROOT / "tools/Invoke-MultiplayerFixture.ps1"
 SESSION = ROOT / "tools/Invoke-MultiplayerSession.ps1"
 SAMPLER = ROOT / "tools/lib/validation/OwnedProcessMemorySampler.ps1"
@@ -490,7 +493,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 self.assertEqual(info["dependencies"], [base_dependency, f"more-infinite-research = {mir}"])
                 self.assertNotIn("space-age", {entry["name"] for entry in profile["mods"]})
 
-    def test_multiplayer_wrapper_admits_only_the_three_exact_functional_profiles(self):
+    def test_multiplayer_wrapper_admits_only_the_exact_case_bound_profiles(self):
         script = r'''
           $tokens=$null;$errors=$null
           $ast=[Management.Automation.Language.Parser]::ParseFile($env:MIR_TEST_WRAPPER,[ref]$tokens,[ref]$errors)
@@ -502,12 +505,33 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $f200=Get-Content -LiteralPath $env:MIR_TEST_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
            $f200Current=Get-Content -LiteralPath $env:MIR_TEST_CURRENT_F200_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $f210=Get-Content -LiteralPath $env:MIR_TEST_F210_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $pairedPublished=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $pairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $scriptedEffects=Get-Content -LiteralPath $env:MIR_TEST_SCRIPTED_EFFECTS_PROFILE -Raw|ConvertFrom-Json -AsHashtable
           $selected=Assert-MultiplayerFixtureSelection -Selection $f200 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
           if($selected.base -cne '2.0.77'){throw 'F200 selection changed'}
            $selected=Assert-MultiplayerFixtureSelection -Selection $f200Current -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-multiplayer'
            if($selected.kind -cne 'mir5-library-multiplayer-current-f200-native-selection'){throw 'current F200 selection changed'}
           $selected=Assert-MultiplayerFixtureSelection -Selection $f210 -EngineSha256 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' -FixtureCase 'library-multiplayer'
           if($selected.base -cne '2.1.23'){throw 'F210 selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedPublished -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          if($selected.mir -cne '4.7.20002'){throw 'published paired selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $pairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          if($selected.mir -cne '5.0.20000'){throw 'MIR5 paired selection changed'}
+          $selected=Assert-MultiplayerFixtureSelection -Selection $scriptedEffects -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'scripted-effects-multiplayer'
+          if($selected.kind -cne 'mir5-scripted-effects-multiplayer-f200-space-age-native-selection'){throw 'scripted effects selection changed'}
+          $preparedPaired=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $preparedPaired['archive_sha256']['more-infinite-research_4.7.20002.zip']=('A'*64)
+          $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('B'*64)
+          $preparedPaired['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip']=('C'*64)
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPaired -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          if($selected.kind -cne 'mir5-library-paired-browser-f200-native-selection'){throw 'prepared paired archive shape changed'}
+          $preparedPairedMir5=Get-Content -LiteralPath $env:MIR_TEST_PAIRED_MIR5_PROFILE -Raw|ConvertFrom-Json -AsHashtable
+          $preparedPairedMir5['archive_sha256']['more-infinite-research_5.0.20000.zip']=('D'*64)
+          $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser_0.1.0.zip']=('E'*64)
+          $preparedPairedMir5['archive_sha256']['mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip']=('F'*64)
+          $selected=Assert-MultiplayerFixtureSelection -Selection $preparedPairedMir5 -EngineSha256 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' -FixtureCase 'library-paired-browser'
+          if($selected.mir -cne '5.0.20000'){throw 'prepared MIR5 paired archive shape changed'}
           function Assert-Rejected([string]$Name,[string]$ProfilePath,[string]$Engine,[string]$Case,[scriptblock]$Mutate){
             $selection=Get-Content -LiteralPath $ProfilePath -Raw|ConvertFrom-Json -AsHashtable
             & $Mutate $selection
@@ -521,6 +545,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           Assert-Rejected 'untyped-enabled' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['mods'][0]['enabled']='true'}
           Assert-Rejected 'wrong-observer' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-multiplayer' {param($s)$s['archive_sha256']['mir-fixture-mir5-active-mods-observer_0.1.0.zip']='A'*64}
           Assert-Rejected 'f210-paired' $env:MIR_TEST_F210_PROFILE 'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060' 'library-paired-browser' {param($s)}
+          Assert-Rejected 'paired-as-functional' $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' 'library-multiplayer' {param($s)}
+          Assert-Rejected 'scripted-as-functional' $env:MIR_TEST_SCRIPTED_EFFECTS_PROFILE 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' 'library-multiplayer' {param($s)}
+          Assert-Rejected 'paired-unlisted-archive' $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' 'library-paired-browser' {param($s)$s['archive_sha256']['foreign_1.0.0.zip']=('A'*64)}
+          Assert-Rejected 'paired-untyped-archive' $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' 'library-paired-browser' {param($s)$s['archive_sha256']['more-infinite-research_4.7.20002.zip']=$true}
+          Assert-Rejected 'paired-arm-version' $env:MIR_TEST_PAIRED_PUBLISHED_PROFILE 'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B' 'library-paired-browser' {param($s)$s['mods'][2]['version']='5.0.20000'}
         '''
         result = subprocess.run(
             ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
@@ -529,7 +558,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             env=dict(os.environ, MIR_TEST_WRAPPER=str(WRAPPER),
                      MIR_TEST_F200_PROFILE=str(F200_PROFILE),
                      MIR_TEST_CURRENT_F200_PROFILE=str(CURRENT_F200_PROFILE),
-                     MIR_TEST_F210_PROFILE=str(F210_PROFILE)),
+                     MIR_TEST_F210_PROFILE=str(F210_PROFILE),
+                     MIR_TEST_PAIRED_PUBLISHED_PROFILE=str(PAIRED_PUBLISHED_PROFILE),
+                     MIR_TEST_PAIRED_MIR5_PROFILE=str(PAIRED_MIR5_PROFILE),
+                     MIR_TEST_SCRIPTED_EFFECTS_PROFILE=str(SCRIPTED_EFFECTS_PROFILE)),
             check=False,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

@@ -306,7 +306,9 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.lua.execute(r'''
           package.path = fixture_root .. "/?.lua"
 
-          function exercise_direct_completion(id, expected_effect, actual_effect)
+          function exercise_direct_completion(id, expected_effect, actual_effect, missing_direct_pack, missing_continuation_pack,
+              restored_lab, actual_continuation_effect, direct_unit_count, direct_unit_energy,
+              continuation_unit_count, continuation_unit_energy)
             local ok, value = pcall(function()
               package.loaded["target"] = nil
               package.loaded["target-literal"] = nil
@@ -317,6 +319,18 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                     direct_effect=expected_effect, direct_science={"alien-science-pack"},
                     continuation="inserter-capacity-bonus-8", continuation_mode="numeric-witness",
                     continuation_count=914489, continuation_energy_ticks=3600,
+                  }
+                end
+                if id == "f017" then
+                  return {
+                    id=id, mir_version="5.0.01700", science_policy="all",
+                    direct="recipe-prod-research_character_mining_speed-1", direct_effect=expected_effect,
+                    direct_science={"military-science-pack", "utility-science-pack", "automation-science-pack",
+                      "logistic-science-pack", "chemical-science-pack", "production-science-pack", "space-science-pack"},
+                    continuation="inserter-capacity-bonus-8", continuation_mode="lab",
+                    continuation_science={"automation-science-pack", "chemical-science-pack", "logistic-science-pack",
+                      "production-science-pack", "utility-science-pack", "military-science-pack", "space-science-pack"},
+                    queue_api=true,
                   }
                 end
                 return {
@@ -363,10 +377,18 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
                 prerequisites={}, enabled=true, researched=false}
               local continuation = {name="inserter-capacity-bonus-8", force=force, prerequisites={}, enabled=true,
                 researched=false, research_unit_count=914489, research_unit_energy=3600}
+              if id == "f017" then
+                direct.research_unit_count = direct_unit_count == nil and 1 or direct_unit_count
+                direct.research_unit_energy = direct_unit_energy == nil and 60 or direct_unit_energy
+                continuation.research_unit_count = continuation_unit_count == nil and 1 or continuation_unit_count
+                continuation.research_unit_energy = continuation_unit_energy == nil and 60 or continuation_unit_energy
+              end
               force.technologies[direct.name], force.technologies[continuation.name] = direct, continuation
+               force.add_research = function(value) current_research = value; return true end
               force.get_spawn_position = function() return {x=0, y=0} end
 
               callbacks, global = {}, {}
+              local messages, saves = {}, {}
               script = {
                 on_init=function(callback) callbacks.init=callback end,
                 on_load=function(callback) callbacks.load=callback end,
@@ -375,13 +397,85 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               defines = {inventory={lab_input=1}, events={on_research_finished=2, on_tick=3}}
               game = {
                 active_mods={["more-infinite-research"]="5.0"}, forces={player=force}, surfaces={[1]=surface},
-                tick=0, server_save=function() end,
+                tick=0, server_save=function(name) saves[#saves + 1] = name end,
               }
-              log=function() end
+              log=function(value) messages[#messages + 1] = value end
               assert(loadfile(control_path, "t", _ENV))()
               callbacks.init()
 
               local direct_input = global.mir5_historical_native.direct_lab.get_inventory(defines.inventory.lab_input)
+              if id == "f017" then
+                local function only_powered(expected)
+                  local powered = {}
+                  for _, lab in ipairs(created) do
+                    if lab == expected then
+                      assert(lab.energy == 100000000, "fixture active lab energy differs")
+                    else
+                      assert(lab.energy == 0, "fixture inactive lab retained energy")
+                    end
+                    if lab.energy > 0 then powered[#powered + 1] = lab end
+                  end
+                  assert(#powered == 1 and powered[1] == expected, "fixture lab power budget differs")
+                end
+                local state = global.mir5_historical_native
+                only_powered(state.direct_lab)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "direct" and force.current_research == direct)
+                only_powered(state.direct_lab)
+                direct.researched, force.manual_mining_speed_modifier, force.current_research = true, actual_effect, nil
+                callbacks[defines.events.on_research_finished]({research=direct})
+                assert(state.phase == "direct-consumption-pending")
+                assert(state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "direct-consumption-pending")
+                assert(state.direct_next_tick_counts == nil and force.current_research == nil
+                  and state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
+                for _, pack in ipairs(package.loaded.target.direct_science) do
+                  if pack ~= missing_direct_pack then direct_input.consume(pack, 1) end
+                end
+                game.tick = 1
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "continuation" and force.current_research == continuation)
+                only_powered(state.continuation_lab)
+                assert(state.direct_lab.energy == 0)
+
+                local continuation_input = state.continuation_lab.get_inventory(defines.inventory.lab_input)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "continuation" and force.current_research == continuation)
+                only_powered(state.continuation_lab)
+                continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true,
+                  actual_continuation_effect or 1, nil
+                callbacks[defines.events.on_research_finished]({research=continuation})
+                assert(state.phase == "continuation-consumption-pending")
+                assert(state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "continuation-consumption-pending")
+                assert(state.continuation_next_tick_counts == nil and force.current_research == nil
+                  and state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
+                for _, pack in ipairs(package.loaded.target.continuation_science) do
+                  if pack ~= missing_continuation_pack then continuation_input.consume(pack, 1) end
+                end
+                game.tick = 2
+                callbacks[defines.events.on_tick]()
+                assert(state.phase == "complete" and state.saved == true and saves[1] == "mir5-native-complete")
+                assert(state.direct_lab.energy == 0 and state.continuation_lab.energy == 0)
+                if restored_lab == "direct" then
+                  direct_input.insert{name="military-science-pack", count=1}
+                elseif restored_lab == "continuation" then
+                  continuation_input.insert{name="automation-science-pack", count=1}
+                end
+                callbacks.load()
+                game.tick = 3
+                callbacks[defines.events.on_tick]()
+                return {phase=state.phase, saved=state.saved == true, modifier=force.manual_mining_speed_modifier,
+                  stack_bonus=force.stack_inserter_capacity_bonus, direct_event=state.direct_event_counts["military-science-pack"],
+                  direct_next=state.direct_next_tick_counts["military-science-pack"],
+                  continuation_event=state.continuation_event_counts["automation-science-pack"],
+                  continuation_next=state.continuation_next_tick_counts["automation-science-pack"],
+                  direct_unit_marker=messages[1], continuation_unit_marker=messages[2],
+                  saves=#saves, final_marker=messages[#messages]}
+              end
+
               for _, pack in ipairs(package.loaded.target.direct_science) do direct_input.consume(pack, 1) end
               direct.researched, force.manual_mining_speed_modifier, force.current_research = true, actual_effect, nil
               callbacks[defines.events.on_research_finished]({research=direct})
@@ -398,7 +492,8 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
               assert(force.current_research == continuation)
               local continuation_input = global.mir5_historical_native.continuation_lab.get_inventory(defines.inventory.lab_input)
               for _, pack in ipairs(package.loaded.target.continuation_science) do continuation_input.consume(pack, 1) end
-              continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true, 1, nil
+              continuation.researched, force.stack_inserter_capacity_bonus, force.current_research = true,
+                actual_continuation_effect or 1, nil
               callbacks[defines.events.on_research_finished]({research=continuation})
               game.tick = 2
               callbacks[defines.events.on_tick]()
@@ -426,6 +521,65 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         wrong_old = self.lua.eval("exercise_direct_completion")("f013", 0.05, 0.10)
         self.assertFalse(wrong_old[0])
         self.assertIn("mining bonus", wrong_old[1])
+
+        all_science = self.lua.eval("exercise_direct_completion")("f017", 0.10, 0.10)
+        self.assertTrue(all_science[0])
+        self.assertEqual(
+            (all_science[1]["phase"], all_science[1]["saved"], all_science[1]["modifier"],
+             all_science[1]["stack_bonus"], all_science[1]["direct_event"], all_science[1]["direct_next"],
+             all_science[1]["continuation_event"], all_science[1]["continuation_next"], all_science[1]["saves"]),
+            ("complete", True, 0.10, 1, 32, 31, 32, 31, 1),
+        )
+        self.assertIn('"stage":"reload"', all_science[1]["final_marker"])
+        self.assertIn("direct_unit count=1,energy=60", all_science[1]["direct_unit_marker"])
+        self.assertIn("continuation_unit count=1,energy=60", all_science[1]["continuation_unit_marker"])
+
+        missing_all_science = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, "military-science-pack"
+        )
+        self.assertFalse(missing_all_science[0])
+        self.assertIn("real direct lab did not consume military-science-pack", missing_all_science[1])
+
+        missing_continuation_all_science = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, "automation-science-pack"
+        )
+        self.assertFalse(missing_continuation_all_science[0])
+        self.assertIn("real continuation lab did not consume automation-science-pack", missing_continuation_all_science[1])
+
+        wrong_all_science_effect = self.lua.eval("exercise_direct_completion")("f017", 0.10, 0.05)
+        self.assertFalse(wrong_all_science_effect[0])
+        self.assertIn("mining bonus", wrong_all_science_effect[1])
+
+        wrong_all_science_continuation_effect = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, None, None, 0.5
+        )
+        self.assertFalse(wrong_all_science_continuation_effect[0])
+        self.assertIn("inserter effect", wrong_all_science_continuation_effect[1])
+
+        restored_direct_after_snapshot = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, None, "direct"
+        )
+        self.assertFalse(restored_direct_after_snapshot[0])
+        self.assertIn("real direct lab did not consume military-science-pack", restored_direct_after_snapshot[1])
+
+        restored_continuation_after_snapshot = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, None, "continuation"
+        )
+        self.assertFalse(restored_continuation_after_snapshot[0])
+        self.assertIn("real continuation lab did not consume automation-science-pack",
+                      restored_continuation_after_snapshot[1])
+
+        zero_direct_unit = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, None, None, None, 0
+        )
+        self.assertFalse(zero_direct_unit[0])
+        self.assertIn("real direct lab research unit differs", zero_direct_unit[1])
+
+        malformed_continuation_unit = self.lua.eval("exercise_direct_completion")(
+            "f017", 0.10, 0.10, None, None, None, None, 1, 60, 1, "60"
+        )
+        self.assertFalse(malformed_continuation_unit[0])
+        self.assertIn("real continuation lab research unit differs", malformed_continuation_unit[1])
 
     def test_settings_only_accelerate_direct_and_gate_continuation_on_its_actual_surface(self):
         self.lua.globals().fixture_root = FIXTURE.as_posix()
@@ -807,6 +961,25 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
         self.assertIn("game.server_save(\"mir5-native-complete\")", source)
         self.assertIn("script.on_load", source)
         self.assertIn('state.phase = "continuation-pending"', source)
+        self.assertIn('state.phase = "direct-consumption-pending"', source)
+        self.assertIn('state.phase = "continuation-consumption-pending"', source)
+        self.assertIn("state.direct_event_tick = game.tick", source)
+        self.assertIn("state.continuation_event_tick = game.tick", source)
+        self.assertIn("if game.tick <= state.direct_event_tick then return end", source)
+        self.assertIn("if game.tick <= state.continuation_event_tick then return end", source)
+        self.assertIn('report_lab_pack_counts("direct_lab", "event", target.direct_science', source)
+        self.assertIn('report_lab_pack_counts("direct_lab", "next_tick", target.direct_science', source)
+        self.assertIn('report_lab_pack_counts("continuation_lab", "event", target.continuation_science', source)
+        self.assertIn('report_lab_pack_counts("continuation_lab", "next_tick", target.continuation_science', source)
+        self.assertNotIn("state.direct_next_tick_counts or", source)
+        self.assertNotIn("state.continuation_next_tick_counts or", source)
+        self.assertIn("lab.energy = 0", source)
+        self.assertIn("power_direct_lab(global[KEY])", source)
+        self.assertIn("freeze_labs(state)", source)
+        self.assertIn('assert_lab_research_unit("direct", direct)', source)
+        self.assertIn('assert_lab_research_unit("continuation", continuation)', source)
+        self.assertNotIn("lab.active", source)
+        self.assertNotIn("energize(", source)
         self.assertIn('if state.phase == "continuation-pending" then', source)
         self.assertIn('create_lab(surface, position, force, target.direct_science)', source)
         self.assertIn('target.continuation_science)', source)
@@ -814,6 +987,11 @@ class HistoricalNativeFixtureControls(unittest.TestCase):
             "script.on_load", 1
         )[0]
         self.assertNotIn("start_research(game.forces.player, target.continuation)", completed_handler)
+        all_science_completion = completed_handler.split('if target.science_policy == "all" then', 1)[1].split(
+            "end\n    assert_direct(state)", 1
+        )[0]
+        self.assertNotIn("assert_direct(state)", all_science_completion)
+        self.assertIn("return", all_science_completion)
         self.assertNotIn("raise_event", source)
         self.assertNotIn("remote.call", source)
 
