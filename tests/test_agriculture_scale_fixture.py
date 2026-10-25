@@ -813,7 +813,7 @@ class AgricultureScaleFixtureTests(unittest.TestCase):
         ], active_info["dependencies"])
         for tier in (1, 32, 128):
             for arm, version, archive in (
-                ("candidate-defaults", "5.0.21000", "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1"),
+                ("candidate-defaults", "5.0.21000", "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A"),
                 ("published", "4.7.21002", PUBLISHED_ARCHIVE_SHA),
             ):
                 with self.subTest(active_tier=tier, active_arm=arm):
