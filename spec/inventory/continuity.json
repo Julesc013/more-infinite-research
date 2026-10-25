@@ -1094,9 +1094,9 @@
     "scope": "Reconcile this named science-binding delta explicitly. Older broad comparisons retain their exact predecessor/package/source scope; reuse requires a reviewed unaffected-input argument, not relabelling as4.7.3 execution."
   },
   "current_candidate": {
-    "source": "071627bbb5ff37eaf724adb78ba1ece1b139e228",
+    "source": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
     "player_tree": "25442a5bd7838f124952507854426e3b8e868475",
-    "offline_package_evidence": "spec/evidence/current-assets-071627bb-readback.json",
+    "offline_package_evidence": "spec/evidence/current-assets-b2cf4c2d-readback.json",
     "native_qualification_complete": false,
     "release_qualification": false
   },
