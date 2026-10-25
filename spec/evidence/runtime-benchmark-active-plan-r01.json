@@ -68,7 +68,7 @@
     "agriculture_within_arm_increment_128_minus_1": {"metrics": ["engine_reported_average_ms_per_tick", "operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"], "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise."}
   },
   "schedule": {
-    "repair_active": {"warmups_per_arm": 2, "scored_pairs": 8, "arms": ["published", "candidate"], "physical_work": "First post-load tick damages exactly 1000 walls; 256 eligible player/reciprocal-friendly walls await native passive repair, while 744 overflow walls, foreign walls and a non-wall remain unchanged."},
+    "repair_active": {"warmups_per_arm": 2, "scored_pairs": 8, "arms": ["published", "candidate"], "physical_work": "First post-load tick damages exactly1000 eligible walls plus two foreign-wall sentinels and one non-wall sentinel.256 eligible player/reciprocal-friendly walls await native passive repair; the744 eligible overflow walls and intentionally damaged foreign/non-wall sentinels remain unrepaired."},
     "agriculture_active": {"tiers": [1, 32, 128], "warmups_per_arm_per_tier": 2, "scored_pairs_per_tier": 6, "arms": ["published", "candidate-defaults"], "physical_work": "Two real lab completions and N towers per player/zero-research foreign force are prepared before saving. The first post-load tick performs one native seed insertion per tower and requires exactly 2N on_tower_planted_seed events."},
     "total_launches": 68
   },
