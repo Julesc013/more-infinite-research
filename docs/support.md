@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: maintainer
 doc_type: reference
 owner: mir-maintainers
-last_reviewed: 2026-10-24
+last_reviewed: 2026-10-25
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -23,6 +23,8 @@ Stable replacement scope must retain delivered applicable research, settings, ef
 An ecosystem name is not a test result. Support records should identify exact Factorio and upstream versions/settings, whether the technology is present, researchable, effective, physically productive, upgrade-safe, reload-safe, multiplayer-tested and performance-measured. Load-only evidence is labelled load-only.
 
 ## Candidate editions
+
+Factorio **2.1.23 stable (F210)** is the primary design and release target. Earlier MIR4 engine families retain best-effort editions with their actual supported subsets and the existing version encoding. Qualification records distinguish each edition's observed results and remaining gaps.
 
 The [tracked edition record](../targets/editions.json) selects one self-contained player ZIP for each engine family. The following minimums come from the exact engines used by the qualification campaigns; they do not announce completed final-package acceptance. Select the same engine family when upgrading, rather than install another target's ZIP because its distribution number is larger.
 
