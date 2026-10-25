@@ -996,6 +996,12 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmark
             if($benchmarkReceipt.status -cne 'complete-observation' -or $benchmarkReceipt.context -cne 'benchmark' -or $benchmarkReceipt.observations.Count -ne 1 -or $benchmarkReceipt.observations[0].phase -cne 'benchmark' -or $benchmarkReceipt.observations[0].role -cne 'factorio'){throw 'benchmark sampler receipt was not narrowly identified'}
 
+            $naturalZero=New-MIROwnedProcessMemorySampler -Context benchmark -ExpectedSlots $benchmarkSlot
+            $naturalZeroRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $naturalZero -Phase benchmark -Role factorio -Process $child
+            Complete-MIROwnedProcessMemoryProcess -Sampler $naturalZero -Registration $naturalZeroRegistration -NaturalExit
+            $naturalZeroReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $naturalZero
+            if($naturalZeroReceipt.status -cne 'incomplete-observation' -or $naturalZeroReceipt.incomplete_reasons -notcontains 'missing-process-observation'){throw 'natural exit accepted a process without a prior observation'}
+
             $identity=New-MIROwnedProcessMemorySampler -ExpectedSlots $slot
             $identityRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $identity -Phase initial -Role server -Process $child
             $identityRegistration.start_utc='1970-01-01T00:00:00.0000000Z'
