@@ -1,0 +1,12 @@
+{
+  "name": "mir-fixture-mir5-agriculture-scale-active",
+  "version": "0.1.0",
+  "title": "MIR active agriculture selector",
+  "author": "MIR maintainers",
+  "description": "Selects the shared paired agriculture fixture's pre-measurement native seed-event save; it writes no player settings.",
+  "factorio_version": "2.1",
+  "dependencies": [
+    "base = 2.1.23",
+    "mir-fixture-mir5-agriculture-scale-paired >= 0.1.0"
+  ]
+}

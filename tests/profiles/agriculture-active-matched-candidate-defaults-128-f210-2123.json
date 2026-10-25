@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "kind": "mir5-active-agriculture-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {"version": "2.1.23", "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"},
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name":"base","version":"2.1.23","enabled":true}, {"name":"elevated-rails","version":"2.1.23","enabled":true}, {"name":"quality","version":"2.1.23","enabled":true}, {"name":"recycler","version":"2.1.23","enabled":true}, {"name":"space-age","version":"2.1.23","enabled":true},
+    {"name":"more-infinite-research","version":"5.0.21000","enabled":true}, {"name":"mir-fixture-mir5-agriculture-scale","version":"0.1.0","enabled":true}, {"name":"mir-fixture-mir5-agriculture-scale-paired","version":"0.1.0","enabled":true}, {"name":"mir-fixture-mir5-agriculture-scale-arm-candidate-defaults","version":"0.1.0","enabled":true}, {"name":"mir-fixture-mir5-agriculture-scale-matched-tier-128","version":"0.1.0","enabled":true}, {"name":"mir-fixture-mir5-agriculture-scale-active","version":"0.1.0","enabled":true}, {"name":"mir-fixture-mir5-active-mods-observer","version":"0.1.0","enabled":true}
+  ],
+  "archive_sha256": {"more-infinite-research_5.0.21000.zip":"4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1","mir-fixture-mir5-active-mods-observer_0.1.0.zip":"2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"},
+  "scope":"Pre-measurement F210 active agriculture seed only, frozen fa114 Defaults candidate arm and exactly 128 towers per player and foreign force. After load, one native seed insertion per tower must emit exactly 2N planting events. No benchmark result is implied."
+}

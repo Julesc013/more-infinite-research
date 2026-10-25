@@ -4,8 +4,10 @@
 local KEY = "mir5_repair_stress"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-repair-stress"
+local ACTIVE = "mir-fixture-mir5-repair-stress-active"
 local FRIENDLY = "mir5-repair-stress-friendly"
 local FOREIGN = "mir5-repair-stress-foreign"
+local ACTIVE_SAVE = "mir5-native-active"
 
 local TOTAL = 1000
 local CAPACITY = 256
@@ -20,7 +22,7 @@ local DAMAGE_AMOUNT = 1
 local DAMAGE_TYPE = "electric"
 local REACTIVATE_COUNT = 8
 
-local loaded_snapshot, reload_logged = nil, false
+local loaded_snapshot, reload_logged, active_loaded = nil, false, false
 
 local function fail(message) error("[mir5-repair-stress] " .. message) end
 local function close(actual, expected)
@@ -37,11 +39,18 @@ local function mode()
   if not f200 and not f210 then
     fail("fixture requires exact F200 Base 2.0.77 or F210 2.1.23 official closure")
   end
+  local selected_active = active[ACTIVE]
+  if selected_active ~= nil and selected_active ~= "0.1.0" then
+    fail("active repair selector version differs")
+  end
+  if selected_active ~= nil and not f210 then
+    fail("active repair selector requires the exact F210 closure")
+  end
   local mir, fixture = active["more-infinite-research"], active[FIXTURE]
-  if f200 and mir == "4.7.20002" and fixture == "0.1.0" then return "published-4.7.20002", "repair-stress" end
-  if f200 and mir == "5.0.20000" and fixture == "0.2.0" then return "mir5-5.0.20000", "repair-stress" end
-  if f210 and mir == "4.7.21002" and fixture == "0.1.0" then return "f210-published-4.7.21002", "repair-stress-f210" end
-  if f210 and mir == "5.0.21000" and fixture == "0.2.0" then return "f210-mir5-5.0.21000", "repair-stress-f210" end
+  if f200 and mir == "4.7.20002" and fixture == "0.1.0" then return "published-4.7.20002", "repair-stress", false end
+  if f200 and mir == "5.0.20000" and fixture == "0.2.0" then return "mir5-5.0.20000", "repair-stress", false end
+  if f210 and mir == "4.7.21002" and fixture == "0.1.0" then return "f210-published-4.7.21002", "repair-stress-f210", selected_active ~= nil end
+  if f210 and mir == "5.0.21000" and fixture == "0.2.0" then return "f210-mir5-5.0.21000", "repair-stress-f210", selected_active ~= nil end
   fail("fixture requires target-matched published or MIR5 identity")
 end
 
@@ -195,6 +204,32 @@ local function marker(stage, state)
   }))
 end
 
+local function active_marker(stage, state)
+  log("[MIR5_RUNTIME_ACTIVE] " .. helpers.table_to_json({
+    kind = "repair-stress",
+    stage = stage,
+    status = stage == "complete" and "passed" or "pending",
+    case = state.case,
+    witnesses = {
+      total_eligible_walls = TOTAL,
+      first_capacity_walls = CAPACITY,
+      eligible_overflow_walls = OVERFLOW,
+      first_capacity_player_walls = state.player_primary,
+      first_capacity_reciprocal_friend_walls = state.friendly_primary,
+      quiet_ticks = QUIET_TICKS,
+      service_ticks = SERVICE_TICKS,
+      repair_amount = REPAIR_AMOUNT,
+      native_damage_api = "LuaEntity.damage",
+      native_damage_type = DAMAGE_TYPE,
+      pending_physical_work = stage ~= "complete",
+      initial_changed = state.initial_record.changed,
+      reactivation_changed = state.reactivation_record and state.reactivation_record.changed or 0,
+      performance_qualified = false,
+      runtime_elapsed_qualified = false
+    }
+  }))
+end
+
 local function complete_witness(state)
   assert_record(state.initial_record, CAPACITY, "initial 256-wall")
   assert_record(state.reactivation_record, REACTIVATE_COUNT, "reactivated")
@@ -219,8 +254,30 @@ local function redamage_drained_queue(state)
   state.deadline_tick = game.tick + QUIET_TICKS + SERVICE_TICKS * 4
 end
 
+local function damage_fixture_entities(state)
+  for index, entry in ipairs(state.eligible) do
+    local damaged_health, maximum = damage_one(entry.entity, "eligible wall " .. tostring(index))
+    entry.damaged_health, entry.observed_health, entry.maximum = damaged_health, damaged_health, maximum
+  end
+  for index, entry in ipairs(state.foreign_walls) do
+    local damaged_health, maximum = damage_one(entry.entity, "nonfriendly wall sentinel " .. tostring(index))
+    entry.damaged_health, entry.maximum = damaged_health, maximum
+  end
+  local damaged_health, maximum = damage_sentinel(state.nonwall.entity, "non-wall sentinel")
+  state.nonwall.damaged_health, state.nonwall.maximum = damaged_health, maximum
+  state.damage_tick = game.tick
+  state.initial_record = {changed = 0, services = 0, maximum_batch = 0}
+  state.deadline_tick = game.tick + QUIET_TICKS + SERVICE_TICKS * (CAPACITY / BUDGET + 4)
+end
+
+local function begin_active_repair(state)
+  damage_fixture_entities(state)
+  state.phase = "await-initial"
+  active_marker("start", state)
+end
+
 script.on_init(function()
-  local selected, selected_case = mode()
+  local selected, selected_case, selected_active = mode()
   if settings.startup["mir-enable-passive-repair"] == nil
       or settings.startup["mir-enable-passive-repair"].value ~= true then
     fail("passive-repair runtime setting is not enabled")
@@ -246,8 +303,7 @@ script.on_init(function()
     local owner = index % 2 == 0 and friendly or player
     local entity = create(surface, "stone-wall", {x = 20 + (index - 1) % 40 * 2, y = 20 + math.floor((index - 1) / 40) * 2},
       owner, "eligible wall " .. tostring(index))
-    local damaged_health, maximum = damage_one(entity, "eligible wall " .. tostring(index))
-    eligible[index] = {entity = entity, damaged_health = damaged_health, observed_health = damaged_health, maximum = maximum}
+    eligible[index] = {entity = entity}
     if index <= CAPACITY then
       if owner == player then player_primary = player_primary + 1 else friendly_primary = friendly_primary + 1 end
     end
@@ -260,23 +316,27 @@ script.on_init(function()
   for index = 1, 2 do
     local entity = create(surface, "stone-wall", {x = 104 + index * 2, y = 20}, foreign,
       "nonfriendly wall sentinel " .. tostring(index))
-    local damaged_health, maximum = damage_one(entity, "nonfriendly wall sentinel " .. tostring(index))
-    foreign_walls[index] = {entity = entity, damaged_health = damaged_health, maximum = maximum}
+    foreign_walls[index] = {entity = entity}
   end
   local nonwall_entity = create(surface, "wooden-chest", {x = 114, y = 24}, player, "non-wall sentinel")
-  local nonwall_health, nonwall_maximum = damage_sentinel(nonwall_entity, "non-wall sentinel")
-
-  storage[KEY] = {
-    phase = "await-initial", mode = selected, case = selected_case, eligible = eligible, foreign_walls = foreign_walls,
-    nonwall = {entity = nonwall_entity, damaged_health = nonwall_health, maximum = nonwall_maximum},
-    player_primary = player_primary, friendly_primary = friendly_primary, damage_tick = game.tick,
-    initial_record = {changed = 0, services = 0, maximum_batch = 0},
-    deadline_tick = game.tick + QUIET_TICKS + SERVICE_TICKS * (CAPACITY / BUDGET + 4)
+  local state = {
+    phase = selected_active and "active-pending" or "await-initial", mode = selected, case = selected_case,
+    active = selected_active, eligible = eligible, foreign_walls = foreign_walls, nonwall = {entity = nonwall_entity},
+    player_primary = player_primary, friendly_primary = friendly_primary,
+    initial_record = {changed = 0, services = 0, maximum_batch = 0}
   }
+  storage[KEY] = state
+  if selected_active then
+    active_marker("prepared", state)
+    game.server_save(ACTIVE_SAVE)
+  else
+    damage_fixture_entities(state)
+  end
 end)
 
 script.on_load(function()
   local state = storage[KEY]
+  active_loaded = type(state) == "table" and state.phase == "active-pending"
   if type(state) == "table" and state.phase == "completed" then
     -- This callback reads fixture-owned scalar facts only.  Native entities
     -- and durable storage are checked on the first game-available tick.
@@ -295,6 +355,13 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = storage[KEY]
   if type(state) ~= "table" then fail("fixture state is absent") end
+  if state.phase == "active-pending" then
+    if active_loaded then
+      active_loaded = false
+      begin_active_repair(state)
+    end
+    return
+  end
   if state.phase ~= "completed" and game.tick > state.deadline_tick then
     fail("native passive-repair queue did not settle before its bounded deadline")
   end
@@ -312,6 +379,7 @@ script.on_event(defines.events.on_tick, function()
     if observe_range(state, 1, REACTIVATE_COUNT, state.reactivation_record, state.reactivation_tick, "reactivated queue") then
       complete_witness(state)
       state.phase = "completed"
+      if state.active then active_marker("complete", state) end
       marker("initial", state)
       game.server_save(SAVE)
     end

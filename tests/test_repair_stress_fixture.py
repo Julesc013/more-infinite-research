@@ -30,6 +30,7 @@ F210_ENGINE = {
 F200_OBSERVER = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
 F210_OBSERVER = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
 F210_PUBLISHED = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
+F210_CANDIDATE = "4D5E32CE2E74C65259E5D3E085CE7BE3BC37DC0A739308C6379BF621F7B5BDA1"
 VARIANTS = {
     "f200": {
         "published": {
@@ -174,8 +175,8 @@ function repair_stress_load(path)
   return {ok = ok, message = tostring(result), writes = writes}
 end
 
-function repair_stress_observer_opponent(path, opponent)
-  local callbacks, storage = {}, {}
+function repair_stress_observer_opponent(path, opponent, active)
+  local callbacks, storage, reports, saves = {}, {}, {}, {}
   local next_unit, next_force = 0, 10
   local function make_force(name, index)
     local friends = {}
@@ -187,13 +188,14 @@ function repair_stress_observer_opponent(path, opponent)
   local player, enemy = make_force('player', 1), make_force('enemy', 2)
   local forces = {player = player, enemy = enemy, [1] = player, [2] = enemy}
   local game = {tick = 0, forces = forces, surfaces = {}}
-  game.server_save = function(name) assert(name == 'mir5-native-complete') end
+  game.server_save = function(name) saves[#saves + 1] = name end
   game.create_force = function(name)
     next_force = next_force + 1
     local value = make_force(name, next_force)
     forces[name], forces[value.index] = value, value
     return value
   end
+  local damage_calls = 0
   local surface = {valid = true}
   surface.create_entity = function(spec)
     next_unit = next_unit + 1
@@ -203,29 +205,54 @@ function repair_stress_observer_opponent(path, opponent)
     }
     entity.damage = function(amount, force, kind)
       assert(amount == 1 and force == enemy and kind == 'electric')
+      damage_calls = damage_calls + 1
       entity.health = entity.health - 1
       return 1
     end
     return entity
   end
   game.surfaces[1] = surface
+  local active_mods = active and {
+    base = '2.1.23', ['elevated-rails'] = '2.1.23', quality = '2.1.23', recycler = '2.1.23',
+    ['space-age'] = '2.1.23', ['more-infinite-research'] = '5.0.21000',
+    ['mir-fixture-mir5-repair-stress'] = '0.2.0',
+    ['mir-fixture-mir5-repair-stress-active'] = '0.1.0'
+  } or {
+    base = '2.0.77', ['more-infinite-research'] = '5.0.20000',
+    ['mir-fixture-mir5-repair-stress'] = '0.2.0'
+  }
   local env = {
     script = {
-      active_mods = {base = '2.0.77', ['more-infinite-research'] = '5.0.20000',
-        ['mir-fixture-mir5-repair-stress'] = '0.2.0'},
+      active_mods = active_mods,
       on_init = function(callback) callbacks.init = callback end,
       on_load = function(callback) callbacks.load = callback end,
       on_event = function(event, callback) callbacks.tick = callback end
     },
     defines = {events = {on_tick = 1}}, game = game, storage = storage,
     settings = {startup = {['mir-enable-passive-repair'] = {value = true}}},
-    helpers = {table_to_json = function() return '{}' end}, log = function() end
+    helpers = {table_to_json = function(row) reports[#reports + 1] = row; return '{}' end}, log = function() end
   }
   env._G = env
   setmetatable(env, {__index = function(_, key) return _G[key] end})
   local chunk, message = loadfile(path, 't', env)
   assert(chunk, message); assert(pcall(chunk)); assert(pcall(callbacks.init))
   local state = storage.mir5_repair_stress
+  if active then
+    local before = damage_calls
+    if opponent == 'active-before-load' then
+      game.tick = 1
+      local pending_ok, pending_message = pcall(callbacks.tick)
+      return {ok = pending_ok, message = tostring(pending_message), phase = state.phase,
+        damage_before_load = before, damage_after_start = damage_calls, saves = saves, reports = reports}
+    end
+    local load_ok, load_message = pcall(callbacks.load)
+    game.tick = 1
+    local start_ok, start_message = pcall(callbacks.tick)
+    return {ok = load_ok and start_ok, message = load_ok and tostring(start_message) or tostring(load_message),
+      phase = state.phase, entities = next_unit, damage_before_load = before, damage_after_start = damage_calls,
+      saves = saves, reports = reports, total = #state.eligible, player = state.player_primary,
+      friendly = state.friendly_primary, overflow = #state.eligible - 256}
+  end
   if opponent == 'reactivation-alignment' then
     for index = 1, 256 do
       state.eligible[index].entity.health = state.eligible[index].maximum
@@ -254,7 +281,7 @@ function repair_stress_observer_opponent(path, opponent)
   local ok, result = pcall(callbacks.tick)
   return {ok = ok, message = tostring(result), total = #state.eligible,
     player = state.player_primary, friendly = state.friendly_primary,
-    overflow = #state.eligible - 256, damage_calls = next_unit}
+    overflow = #state.eligible - 256, damage_calls = damage_calls}
 end
 ''')
 
@@ -287,13 +314,38 @@ end
                         mods,
                     )
 
+        active_selector = FIXTURE / "active" / "info-f210.json"
+        self.assertEqual(
+            ("mir-fixture-mir5-repair-stress-active", "0.1.0", "2.1"),
+            tuple(json.loads(active_selector.read_text(encoding="utf-8"))[key]
+                  for key in ("name", "version", "factorio_version")),
+        )
+        for arm, mir, fixture, archive in (
+            ("published", "4.7.21002", "0.1.0", F210_PUBLISHED),
+            ("mir5", "5.0.21000", "0.2.0", F210_CANDIDATE),
+        ):
+            with self.subTest(active_arm=arm):
+                profile = json.loads((PROFILE_ROOT / f"repair-stress-active-{arm}-f210-2123.json")
+                                     .read_text(encoding="utf-8"))
+                self.assertEqual("mir5-active-repair-stress-f210-native-selection", profile["kind"])
+                self.assertEqual(F210_ENGINE, profile["engine"])
+                self.assertEqual(archive, profile["archive_sha256"]
+                                 [f"more-infinite-research_{mir}.zip"])
+                self.assertEqual(
+                    ["base", "elevated-rails", "quality", "recycler", "space-age",
+                     "mir-fixture-mir5-active-mods-observer", "more-infinite-research",
+                     NAME, "mir-fixture-mir5-repair-stress-active"],
+                    [row["name"] for row in profile["mods"]],
+                )
+
         # A single shared runtime body must expose both accepted target arms;
         # the engine-specific info adapters choose the active-mod closure.
         source = CONTROL.read_text(encoding="utf-8")
         for token in (
             'active.base == "2.0.77"', 'active.base == "2.1.23"',
             'active["space-age"] == "2.1.23"', '"f210-published-4.7.21002"',
-            '"f210-mir5-5.0.21000"', '"repair-stress-f210"',
+            '"f210-mir5-5.0.21000"', '"repair-stress-f210"', '"active-pending"',
+            '"mir5-native-active"', '"[MIR5_RUNTIME_ACTIVE] "',
         ):
             with self.subTest(token=token):
                 self.assertIn(token, source)
@@ -382,6 +434,34 @@ end
         self.assertTrue(aligned["ok"], aligned["message"])
         self.assertEqual(("completed", 3120, 3121),
                          (aligned["phase"], aligned["reactivation_service"], aligned["reactivation_observed"]))
+
+    def test_active_f210_seed_defers_all_damage_until_the_first_post_load_tick(self):
+        run = self.lua.eval("repair_stress_observer_opponent")
+        observed = run(str(CONTROL), "active-start", True)
+        self.assertTrue(observed["ok"], observed["message"])
+        self.assertEqual((1000, 128, 128, 744),
+                         (observed["total"], observed["player"], observed["friendly"], observed["overflow"]))
+        self.assertEqual(1003, observed["entities"])
+        self.assertEqual(0, observed["damage_before_load"])
+        self.assertEqual(1003, observed["damage_after_start"])
+        self.assertEqual("await-initial", observed["phase"])
+        self.assertEqual(["mir5-native-active"], [observed["saves"][index]
+                                                   for index in range(1, len(observed["saves"]) + 1)])
+        reports = [observed["reports"][index] for index in range(1, len(observed["reports"]) + 1)]
+        self.assertEqual(["prepared", "start"], [row["stage"] for row in reports])
+        self.assertTrue(reports[-1]["witnesses"]["pending_physical_work"])
+        self.assertEqual(0, reports[-1]["witnesses"]["initial_changed"])
+
+        before_load = run(str(CONTROL), "active-before-load", True)
+        self.assertTrue(before_load["ok"], before_load["message"])
+        self.assertEqual("active-pending", before_load["phase"])
+        self.assertEqual(0, before_load["damage_before_load"])
+        self.assertEqual(0, before_load["damage_after_start"])
+        self.assertEqual(["mir5-native-active"], [before_load["saves"][index]
+                                                    for index in range(1, len(before_load["saves"]) + 1)])
+        pending_reports = [before_load["reports"][index]
+                           for index in range(1, len(before_load["reports"]) + 1)]
+        self.assertEqual(["prepared"], [row["stage"] for row in pending_reports])
 
     def test_load_callback_is_scalar_read_only_and_fixture_keeps_the_bounded_contract_visible(self):
         loaded = self.lua.eval("repair_stress_load")(str(CONTROL))

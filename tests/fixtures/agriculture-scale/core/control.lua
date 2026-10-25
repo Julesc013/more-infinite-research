@@ -4,6 +4,7 @@ local PAIRED = "mir-fixture-mir5-agriculture-scale-paired"
 local CANDIDATE = "mir-fixture-mir5-agriculture-scale-arm-candidate"
 local DEFAULTS = "mir-fixture-mir5-agriculture-scale-arm-candidate-defaults"
 local PUBLISHED = "mir-fixture-mir5-agriculture-scale-arm-published"
+local ACTIVE = "mir-fixture-mir5-agriculture-scale-active"
 local CANDIDATE_SCIENCE = {
   "automation-science-pack", "logistic-science-pack", "chemical-science-pack",
   "production-science-pack", "agricultural-science-pack", "electromagnetic-science-pack",
@@ -37,8 +38,9 @@ local SPOIL_STACKS_PER_FORCE = 2
 local GRID_SPACING = 16
 local DEADLINE_TICKS = 18000
 local SAVE = "mir5-native-complete"
+local ACTIVE_SAVE = "mir5-native-active"
 
-local loaded, reported
+local loaded, reported, active_seed_pending
 
 local function fail(message, fields)
   if fields then
@@ -57,6 +59,10 @@ end
 
 local function selected_arm(value)
   local paired = script.active_mods[PAIRED] == "0.1.0"
+  local active = script.active_mods[ACTIVE]
+  if active ~= nil and active ~= "0.1.0" then
+    fail("active agriculture selector version differs")
+  end
   local candidate = script.active_mods[CANDIDATE] == "0.1.0"
   local defaults = script.active_mods[DEFAULTS] == "0.1.0"
   local published = script.active_mods[PUBLISHED] == "0.1.0"
@@ -75,6 +81,9 @@ local function selected_arm(value)
       end
     end
     if selectors > 1 then fail("agriculture matched fixture requires one tier selector") end
+    if active ~= nil and selectors ~= 1 then
+      fail("active agriculture fixture requires exactly one matched tier selector")
+    end
     if selectors == 0 then
       if value ~= 1 then fail("paired agriculture fixture requires the fixed single-tower tier") end
       if defaults then fail("agriculture Defaults arm requires a matched tier selector") end
@@ -85,9 +94,11 @@ local function selected_arm(value)
       if script.active_mods[name] ~= nil then fail("paired agriculture fixture cannot combine a scale tier selector") end
     end
     return ARMS[candidate and "candidate-mir5" or defaults and "candidate-defaults-mir5"
-      or "published-4.7.21002"], true
+      or "published-4.7.21002"], true, active ~= nil
   end
-  if candidate or defaults or published then fail("agriculture arm selector requires the paired selector") end
+  if candidate or defaults or published or active ~= nil then
+    fail("agriculture arm selector requires the paired selector")
+  end
   for _, selected in ipairs({1, 32, 128}) do
     if script.active_mods["mir-fixture-mir5-agriculture-scale-matched-tier-" .. selected] ~= nil then
       fail("agriculture matched tier selector requires a paired arm")
@@ -98,7 +109,7 @@ local function selected_arm(value)
   for other, name in pairs(SELECTOR_FOR_TIER) do
     if other ~= value and script.active_mods[name] ~= nil then fail("multiple agriculture scale selectors are active") end
   end
-  return ARMS["candidate-mir5"], false
+  return ARMS["candidate-mir5"], false, false
 end
 
 local function state_arm(state)
@@ -248,16 +259,14 @@ local function begin_spoilage(state)
   end
 end
 
-local function begin_tower_burst(state)
+local function prepare_tower_burst(state)
   local surface, player, foreign = game.surfaces.nauvis, game.forces.player, assert_foreign(state)
   if not surface or surface.get_property("pressure") ~= 1000 then
     fail("Nauvis does not meet the native agricultural tower pressure contract")
   end
   prepare_native_ground(surface, state)
-  state.phase = "planting"
   state.player_towers, state.foreign_towers, state.plants = {}, {}, {player = {}, foreign = {}}
   state.tower_owner = {}
-  local profiler = helpers.create_profiler()
   for _, kind in ipairs({"player", "foreign"}) do
     local force, target = kind == "player" and player or foreign,
       kind == "player" and state.player_towers or state.foreign_towers
@@ -265,11 +274,23 @@ local function begin_tower_burst(state)
       local tower = create_tower(surface, grid_position(state, kind, index), force)
       target[index] = tower
       state.tower_owner[tower.unit_number] = {kind = kind, index = index, force_index = force.index}
-      insert_seed(tower)
     end
+  end
+end
+
+local function plant_prepared_towers(state)
+  state.phase = "planting"
+  local profiler = helpers.create_profiler()
+  for _, towers in ipairs({state.player_towers, state.foreign_towers}) do
+    for _, tower in ipairs(towers) do insert_seed(tower) end
   end
   profiler.stop()
   state.seed_insertion_profiler = tostring(profiler)
+end
+
+local function begin_tower_burst(state)
+  prepare_tower_burst(state)
+  plant_prepared_towers(state)
 end
 
 local function expected_remaining(kind)
@@ -410,6 +431,27 @@ local function marker(stage, state)
   }))
 end
 
+local function active_marker(stage, state)
+  log("[MIR5_RUNTIME_ACTIVE] " .. helpers.table_to_json({
+    kind = "agriculture-scale",
+    stage = stage,
+    status = stage == "complete" and "passed" or "pending",
+    witnesses = {
+      tier = state.tier,
+      arm = state.arm,
+      real_lab_agriculture_completions = state.research_finished,
+      native_towers = {player = state.player_towers and #state.player_towers or 0,
+        foreign_zero_research = state.foreign_towers and #state.foreign_towers or 0},
+      native_planting_events = {expected = 2 * state.tier, observed = state.planted_events or 0},
+      native_growth_ticks = GROWTH_TICKS,
+      pending_physical_work = stage ~= "complete",
+      planting_event_api = "on_tower_planted_seed",
+      performance_qualified = false,
+      runtime_elapsed_qualified = false
+    }
+  }))
+end
+
 local function loaded_snapshot(state)
   return {
     tier = state.tier,
@@ -431,7 +473,7 @@ end
 
 script.on_init(function()
   local value = tier()
-  local arm, paired = selected_arm(value)
+  local arm, paired, active = selected_arm(value)
   assert_startup_contract(arm)
   game.speed = 16
   local surface = assert(game.surfaces.nauvis)
@@ -467,6 +509,7 @@ script.on_init(function()
     tier = value,
     arm = arm.name,
     paired = paired,
+    active = active,
     grid_columns = columns,
     research_finished = 0,
     foreign_force_index = foreign.index,
@@ -489,7 +532,14 @@ script.on_event(defines.events.on_research_finished, function(event)
   if state.research_finished < AGRICULTURE_LEVELS then
     state.next_research = true
   else
-    begin_tower_burst(state)
+    if state.active then
+      prepare_tower_burst(state)
+      state.phase = "active-pending"
+      active_marker("prepared", state)
+      game.server_save(ACTIVE_SAVE)
+    else
+      begin_tower_burst(state)
+    end
   end
 end)
 
@@ -529,6 +579,7 @@ end)
 script.on_load(function()
   local state = storage[KEY]
   loaded = state and state.phase == "complete" and loaded_snapshot(state) or nil
+  active_seed_pending = state and state.phase == "active-pending" or false
   reported = false
 end)
 
@@ -558,6 +609,16 @@ script.on_event(defines.events.on_tick, function()
     end
     return
   end
+  if state.phase == "active-pending" then
+    if active_seed_pending then
+      active_seed_pending = false
+      assert_lab_research(state)
+      assert_foreign(state)
+      active_marker("start", state)
+      plant_prepared_towers(state)
+    end
+    return
+  end
   if state.phase == "planting" then
     for _, towers in ipairs({state.player_towers, state.foreign_towers}) do
       for _, tower in ipairs(towers) do
@@ -569,6 +630,7 @@ script.on_event(defines.events.on_tick, function()
       begin_spoilage(state)
       assert_complete(state)
       state.phase = "complete"
+      if state.active then active_marker("complete", state) end
       marker("initial", state)
       game.server_save(SAVE)
     end
