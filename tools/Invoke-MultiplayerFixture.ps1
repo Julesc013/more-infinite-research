@@ -28,54 +28,85 @@ function Assert-MultiplayerFixtureSelection {
     [Parameter(Mandatory)][string]$EngineSha256,
     [Parameter(Mandatory)][string]$FixtureCase
   )
-  # These are the only native Library multiplayer selections that this shared
-  # two-client harness admits.  The F210 row remains base-only: Space Age or
-  # any other companion is not an implicit dependency of this fixture.
-  $targets=[ordered]@{
-    'f200-legacy'=[ordered]@{
-      target='f200'
+  # These are the only fixed two-client selections admitted by this harness.
+  # Profile kind and fixture case bind each row: F210 remains functional
+  # Library-only, while F200 keeps the named paired Browser and Space Age
+  # scripted closures distinct from the four-mod Library selections.
+  $targets=@(
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f200'
       kind='mir5-library-multiplayer-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
     }
-    'f200-current'=[ordered]@{
-      target='f200'
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f200'
       kind='mir5-library-multiplayer-current-f200-native-selection';factorio_line='2.0';base='2.0.77'
       engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
       observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
     }
-    f210=[ordered]@{
-      target='f210'
+    [ordered]@{
+      fixture_case='library-multiplayer';target='f210'
       kind='mir5-library-multiplayer-f210-native-selection';factorio_line='2.1';base='2.1.23'
       engine_sha256='FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060';mir='5.0.21000'
       observer_sha256='2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C'
+      fixture_mods=@('mir-fixture-mir5-library-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.21000.zip','mir-fixture-mir5-library-multiplayer_0.1.0.zip')
     }
-  }
-  Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $Selection.Contains('kind') -and $Selection['kind'] -is [string]) 'requires an admitted F200 or F210 Library fixture target'
-  $matches=@($targets.Values|Where-Object { $_.target -ceq [string]$Selection['target'] -and $_.kind -ceq [string]$Selection['kind'] })
-  Assert-Session ($matches.Count -eq 1) 'requires an admitted F200 or F210 Library fixture target'
+    [ordered]@{
+      fixture_case='library-paired-browser';target='f200'
+      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='4.7.20002'
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-published@0.1.0')
+      optional_archives=@('more-infinite-research_4.7.20002.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-published_0.1.0.zip')
+    }
+    [ordered]@{
+      fixture_case='library-paired-browser';target='f200'
+      kind='mir5-library-paired-browser-f200-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      fixture_mods=@('mir-fixture-mir5-library-paired-browser@0.1.0','mir-fixture-mir5-library-paired-browser-arm-mir5@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-library-paired-browser_0.1.0.zip','mir-fixture-mir5-library-paired-browser-arm-mir5_0.1.0.zip')
+    }
+    [ordered]@{
+      fixture_case='scripted-effects-multiplayer';target='f200'
+      kind='mir5-scripted-effects-multiplayer-f200-space-age-native-selection';factorio_line='2.0';base='2.0.77'
+      engine_sha256='D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B';mir='5.0.20000'
+      observer_sha256='723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87'
+      fixture_mods=@('elevated-rails@2.0.77','quality@2.0.77','space-age@2.0.77','mir-fixture-mir5-scripted-effects-multiplayer@0.1.0')
+      optional_archives=@('more-infinite-research_5.0.20000.zip','mir-fixture-mir5-scripted-effects-multiplayer_0.1.0.zip')
+    }
+  )
+  Assert-Session ($Selection.Contains('target') -and $Selection['target'] -is [string] -and $Selection.Contains('kind') -and $Selection['kind'] -is [string]) 'requires an admitted multiplayer fixture target'
+  $mirRows=@($Selection['mods']|Where-Object { $_ -is [System.Collections.IDictionary] -and $_['name'] -is [string] -and $_['name'] -ceq 'more-infinite-research' -and $_['version'] -is [string] })
+  $matches=@($targets|Where-Object { $_.fixture_case -ceq $FixtureCase -and $_.target -ceq [string]$Selection['target'] -and $_.kind -ceq [string]$Selection['kind'] -and $mirRows.Count -eq 1 -and $mirRows[0]['version'] -ceq $_.mir })
+  Assert-Session ($matches.Count -eq 1) 'requires an admitted multiplayer fixture target'
   $target=$matches[0]
-  Assert-Session (($Selection['schema'] -is [int] -or $Selection['schema'] -is [long]) -and [int64]$Selection['schema'] -eq 1 -and $Selection['kind'] -ceq $target.kind -and $Selection['factorio_line'] -ceq $target.factorio_line -and $Selection['settings_mode'] -ceq 'Defaults') 'Library fixture profile identity differs'
-  Assert-Session ($Selection.Contains('engine') -and $Selection['engine'] -is [System.Collections.IDictionary]) 'Library fixture profile engine is absent'
+  Assert-Session (($Selection['schema'] -is [int] -or $Selection['schema'] -is [long]) -and [int64]$Selection['schema'] -eq 1 -and $Selection['kind'] -ceq $target.kind -and $Selection['factorio_line'] -ceq $target.factorio_line -and $Selection['settings_mode'] -ceq 'Defaults') 'multiplayer fixture profile identity differs'
+  Assert-Session ($Selection.Contains('engine') -and $Selection['engine'] -is [System.Collections.IDictionary]) 'multiplayer fixture profile engine is absent'
   $engine=$Selection['engine']
-  Assert-Session ($engine.Count -eq 2 -and $engine['version'] -ceq $target.base -and $engine['sha256'] -ceq $target.engine_sha256 -and $EngineSha256 -ceq $target.engine_sha256) 'Library fixture engine differs'
-  Assert-Session ($Selection.Contains('mods') -and @($Selection['mods']).Count -eq 4) 'Library fixture mod closure count differs'
+  Assert-Session ($engine.Count -eq 2 -and $engine['version'] -ceq $target.base -and $engine['sha256'] -ceq $target.engine_sha256 -and $EngineSha256 -ceq $target.engine_sha256) 'multiplayer fixture engine differs'
+  $expectedMods=@(('base@'+$target.base),'mir-fixture-mir5-active-mods-observer@0.1.0',('more-infinite-research@'+$target.mir))+@($target.fixture_mods)
+  Assert-Session ($Selection.Contains('mods') -and @($Selection['mods']).Count -eq $expectedMods.Count) 'multiplayer fixture mod closure count differs'
   $mods=[Collections.Generic.List[string]]::new()
   foreach($mod in @($Selection['mods'])){
-    Assert-Session ($mod -is [System.Collections.IDictionary] -and $mod.Count -eq 3 -and $mod['name'] -is [string] -and $mod['version'] -is [string] -and $mod['enabled'] -is [bool] -and $mod['enabled'] -eq $true) 'Library fixture mod row differs'
+    Assert-Session ($mod -is [System.Collections.IDictionary] -and $mod.Count -eq 3 -and $mod['name'] -is [string] -and $mod['version'] -is [string] -and $mod['enabled'] -is [bool] -and $mod['enabled'] -eq $true) 'multiplayer fixture mod row differs'
     [void]$mods.Add(([string]$mod['name'])+'@'+([string]$mod['version']))
   }
-  $expectedMods=@(
-    ('base@'+$target.base),
-    'mir-fixture-mir5-active-mods-observer@0.1.0',
-    ('more-infinite-research@'+$target.mir),
-    'mir-fixture-mir5-library-multiplayer@0.1.0'
-  )
-  Assert-Session ((@($mods|Sort-Object)-join '|') -ceq (@($expectedMods|Sort-Object)-join '|')) 'Library fixture mod closure differs'
-  Assert-Session ($Selection.Contains('archive_sha256') -and $Selection['archive_sha256'] -is [System.Collections.IDictionary]) 'Library fixture archive binding is absent'
+  Assert-Session ((@($mods|Sort-Object)-join '|') -ceq (@($expectedMods|Sort-Object)-join '|')) 'multiplayer fixture mod closure differs'
+  Assert-Session ($Selection.Contains('archive_sha256') -and $Selection['archive_sha256'] -is [System.Collections.IDictionary]) 'multiplayer fixture archive binding is absent'
   $archives=$Selection['archive_sha256'];$observer='mir-fixture-mir5-active-mods-observer_0.1.0.zip'
-  Assert-Session ($archives.Count -eq 1 -and $archives.Contains($observer) -and $archives[$observer] -ceq $target.observer_sha256) 'Library fixture observer archive differs'
-  Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $target.base -ceq '2.0.77') 'only F200 admits non-functional Library fixture cases'
+  $allowedArchives=@($observer)+@($target.optional_archives)
+  Assert-Session ($archives.Contains($observer) -and $archives[$observer] -ceq $target.observer_sha256) 'multiplayer fixture observer archive differs'
+  foreach($entry in $archives.GetEnumerator()){
+    Assert-Session ($allowedArchives -ccontains [string]$entry.Key -and $entry.Value -is [string] -and $entry.Value -cmatch '^[A-F0-9]{64}$') 'multiplayer fixture archive binding differs'
+  }
+  Assert-Session ($FixtureCase -ceq 'library-multiplayer' -or $target.target -ceq 'f200') 'only F200 admits non-functional fixture cases'
   return [pscustomobject]$target
 }
 $output=Resolve-MIR441RecoveryScratchPath -Path $OutputRoot

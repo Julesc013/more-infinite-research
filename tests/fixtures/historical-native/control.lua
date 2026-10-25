@@ -57,12 +57,12 @@ local function capture_lab_packs(lab, items)
   return counts
 end
 
-local function report_direct_pack_counts(stage, counts)
+local function report_lab_pack_counts(label, stage, items, counts)
   local rows = {}
-  for _, name in ipairs(target.direct_science) do
+  for _, name in ipairs(items) do
     rows[#rows + 1] = name .. "=" .. tostring(counts[name])
   end
-  log("[MIR5_HISTORICAL_NATIVE] direct_lab_" .. stage .. " " .. table.concat(rows, ","))
+  log("[MIR5_HISTORICAL_NATIVE] " .. label .. "_" .. stage .. " " .. table.concat(rows, ","))
 end
 
 local function energize(lab)
@@ -75,7 +75,7 @@ local function assert_direct(state)
   if not direct.researched or not close(force.manual_mining_speed_modifier, state.before_mining + target.direct_effect) then
     fail("real direct lab completion did not apply its mining bonus")
   end
-  local counts = state.direct_next_tick_counts or capture_lab_packs(state.direct_lab, target.direct_science)
+  local counts = capture_lab_packs(state.direct_lab, target.direct_science)
   for _, name in ipairs(target.direct_science) do
     if state.direct_lab_initial[name] - counts[name] < 1 then
       fail("real direct lab did not consume " .. name)
@@ -97,9 +97,9 @@ local function assert_lab_continuation(state)
   if not value.researched or not close(force.stack_inserter_capacity_bonus, state.before_stack_bonus + 1) then
     fail("real continuation lab completion did not retain its generated inserter effect")
   end
-  local inventory = state.continuation_lab.get_inventory(defines.inventory.lab_input)
+  local counts = capture_lab_packs(state.continuation_lab, target.continuation_science)
   for _, name in ipairs(target.continuation_science) do
-    if state.continuation_lab_initial[name] - inventory.get_item_count(name) < 1 then
+    if state.continuation_lab_initial[name] - counts[name] < 1 then
       fail("real continuation lab did not consume " .. name)
     end
   end
@@ -204,8 +204,9 @@ script.on_event(defines.events.on_research_finished, function(event)
     state.direct_finished = state.direct_finished + 1
     if state.direct_finished ~= 1 then fail("direct research completed more than once") end
     if target.science_policy == "all" then
+      state.direct_event_tick = game.tick
       state.direct_event_counts = capture_lab_packs(state.direct_lab, target.direct_science)
-      report_direct_pack_counts("event", state.direct_event_counts)
+      report_lab_pack_counts("direct_lab", "event", target.direct_science, state.direct_event_counts)
       state.phase = "direct-consumption-pending"
       return
     end
@@ -218,6 +219,13 @@ script.on_event(defines.events.on_research_finished, function(event)
   elseif target.continuation_mode == "lab" and event.research.name == target.continuation then
     state.continuation_finished = state.continuation_finished + 1
     if state.continuation_finished ~= 1 then fail("continuation research completed more than once") end
+    if target.science_policy == "all" then
+      state.continuation_event_tick = game.tick
+      state.continuation_event_counts = capture_lab_packs(state.continuation_lab, target.continuation_science)
+      report_lab_pack_counts("continuation_lab", "event", target.continuation_science, state.continuation_event_counts)
+      state.phase = "continuation-consumption-pending"
+      return
+    end
     assert_lab_continuation(state)
     state.phase = "complete"
   end
@@ -238,22 +246,28 @@ script.on_event(defines.events.on_tick, function()
   local state = global[KEY]
   if not state then fail("fixture state is absent") end
   if state.phase == "direct-consumption-pending" then
+    if game.tick <= state.direct_event_tick then return end
     state.direct_next_tick_counts = capture_lab_packs(state.direct_lab, target.direct_science)
-    report_direct_pack_counts("next_tick", state.direct_next_tick_counts)
+    report_lab_pack_counts("direct_lab", "next_tick", target.direct_science, state.direct_next_tick_counts)
+    assert_direct(state)
+    if target.continuation_mode == "lab" then
+      state.phase = "continuation-pending"
+    else
+      state.phase = "complete"
+      return
+    end
+  elseif state.phase == "continuation-consumption-pending" then
+    if game.tick <= state.continuation_event_tick then return end
+    state.continuation_next_tick_counts = capture_lab_packs(state.continuation_lab, target.continuation_science)
+    report_lab_pack_counts("continuation_lab", "next_tick", target.continuation_science,
+      state.continuation_next_tick_counts)
+    assert_lab_continuation(state)
+    state.phase = "complete"
   end
   if state.phase ~= "complete" then
     energize(state.direct_lab)
     energize(state.continuation_lab)
     if game.tick > state.deadline then fail("real historical lab research missed its deadline") end
-    if state.phase == "direct-consumption-pending" then
-      assert_direct(state)
-      if target.continuation_mode == "lab" then
-        state.phase = "continuation-pending"
-      else
-        state.phase = "complete"
-        return
-      end
-    end
     if state.phase == "continuation-pending" then
       if game.forces.player.current_research ~= nil then return end
       state.phase = "continuation"
