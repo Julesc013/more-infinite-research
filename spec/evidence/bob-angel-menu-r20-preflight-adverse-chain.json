@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "kind": "MIR5MenuR20PreparationAndPreflightAdverseReadbackV1",
+  "derived": true,
+  "status": "completed-old-candidate-preparation-packet-rejected-before-timing",
+  "player_source_commit": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+  "player_sha256": "76D4D21B12EA8EA939DFFC599EC0746A1D9E13656326CACF5CB4A6D0303EB663",
+  "attempts": [
+    {
+      "run": 40192524065,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40192524065",
+      "controller_commit": "7ac8d758babe9bc7b13cd00e94862a8f3988d32d",
+      "manifest_sha256": "A5338D955B09046EC0B16F3A9625B7955C763AAE07DC722E474E6078745F932F",
+      "verified_members": 0,
+      "artifact_bytes": 0,
+      "primary_custody": "build/mir5/recovery-historical/bob-angel-menu-comparison-r20/40192524065/black-glass-bob-angel-menu-comparison-r20-40192524065-1"
+    },
+    {
+      "run": 40193047957,
+      "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40193047957",
+      "controller_commit": "7ac8d758babe9bc7b13cd00e94862a8f3988d32d",
+      "manifest_sha256": "CFF46C22EA55E67551AC8E90DF0CE4858743BA56DFD79F9C2B5676AE5B06D5C8",
+      "verified_members": 111,
+      "artifact_bytes": 146053006,
+      "primary_custody": "build/mir5/recovery-historical/bob-angel-menu-comparison-r20/40193047957/black-glass-bob-angel-menu-comparison-r20-40193047957-1"
+    }
+  ],
+  "first_attempt_scope": "Trusted dev ancestry refusal before execution; source was preserved on approved stress branch. Zero native captures.",
+  "second_attempt_scope": "Four native data-stage captures, complete equality checks and owned-window diagnostic finished. The later packet reader rejected a stale health-script hash before any timing launch.",
+  "native_preparation_receipt_sha256": "CE80146975E886D9821184D011F94C837BDAB31E161447B6CD73354C2FB63198",
+  "captures": [
+    {
+      "arm": "control",
+      "receipt_sha256": "4FF035641924B3213B1BFC460A570B2B443ACB632187CCDC89295A692B9E9FBE",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "published",
+      "receipt_sha256": "CC90A6A2941BA5082BF5F99A0E327DB2B4F88FACC3B613479DB11494D908E5EE",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "replay",
+      "receipt_sha256": "033E2BBA07FE4688D41E7C60FC0E14B138EA552284AAF69FEE3F4E321BD70286",
+      "status": "completed-data-stage-observation-only"
+    },
+    {
+      "arm": "candidate",
+      "receipt_sha256": "62C98C5E0D1C0B441260CA7282845F12B76444AE27C0987A3A35FB34C5BFBCDB",
+      "status": "completed-data-stage-observation-only"
+    }
+  ],
+  "equalities": [
+    {
+      "path": "preparation/candidate-intent.json",
+      "sha256": "DE5E27383DA4DD4C0E0C2B555C068F87FC485D3A52A6C4AB7D4C185FF3DF72DE",
+      "status": "equal-intended-native-output",
+      "scope": "data-and-settings-only"
+    },
+    {
+      "path": "preparation/replay-equality.json",
+      "sha256": "AAAE57CF47352C6857787B6BD92F310F0FC4D61349BC014269B417F305F12579",
+      "status": "equal-complete-native-output",
+      "scope": "data-and-settings-only"
+    }
+  ],
+  "owned_window_diagnostic": {
+    "sha256": "71B24B47A13A3DED0BAFB410DBE947C0185237FBF8727D0FDF08348BF80D1F09",
+    "status": "observed-owned-menu-response-diagnostic-only",
+    "timing_sample": false
+  },
+  "health_binding": {
+    "path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1",
+    "declared_sha256": "1419A9965FD53D6CECEBD2CAB419B7756B0177D5A3503A1BC362AE37275A5CE5",
+    "actual_raw_git_sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1",
+    "accepted_private_fix": "77cccc206d8cf9e16e5fa76d754103592ba0d15d",
+    "original_fix_commit": "984891737d5e7e0fcb408a8607c2ae538509ca4e"
+  },
+  "accepted_timing_samples": 0,
+  "performance_qualification": false,
+  "release_qualification": false,
+  "limits": [
+    "Outer native_execution=null is not evidence of zero native work: the four original capture receipts and separate diagnostic remain authoritative.",
+    "These preparations consume oldfa114/76D4. They are never relabelled as current143346ec/B42B or gameplay/save/client qualification.",
+    "Configs, full native outputs and complete logs remain in primary custody."
+  ]
+}
