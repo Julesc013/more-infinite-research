@@ -355,6 +355,20 @@ function Assert-LibraryWitnessInteger([object]$Witness, [string]$Field, [int]$Ex
   $property = $Witness.PSObject.Properties[$Field]
   Assert-Session ($null -ne $property -and (Test-LibraryInteger $property.Value) -and [int64]$property.Value -eq $Expected) "$Stage Library witness $Field differs"
 }
+function Get-LibraryWitnessVersionTarget([hashtable]$Spec, [string]$FixtureCase) {
+  if ($FixtureCase -cne 'library-multiplayer') { return $null }
+  Assert-Session ($Spec.ContainsKey('library_target') -and $Spec.library_target -is [string]) 'functional Library session target is absent or malformed'
+  switch ([string]$Spec.library_target) {
+    'f200' { return [pscustomobject]@{ base='2.0.77'; mir='5.0.20000' } }
+    'f210' { return [pscustomobject]@{ base='2.1.23'; mir='5.0.21000' } }
+    default { throw '[mir5-multiplayer-session] unsupported functional Library session target' }
+  }
+}
+function Assert-LibraryWitnessVersion([object]$Witness, [object]$Expected, [string]$Stage) {
+  $base = $Witness.PSObject.Properties['base_version']
+  $mir = $Witness.PSObject.Properties['mir_version']
+  Assert-Session ($null -ne $Expected -and $null -ne $base -and $base.Value -is [string] -and $base.Value -ceq $Expected.base -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq $Expected.mir) "$Stage Library witness version differs"
+}
 function Assert-LibraryLiveRefresh([object]$Witness, [string]$Stage) {
   $property = $Witness.PSObject.Properties['live_refresh']
   Assert-Session ($null -ne $property -and $property.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
@@ -399,9 +413,7 @@ function Get-StageMarker([string]$Text, [string]$Stage, [int]$ExpectedJoins) {
     } else {
       Assert-LibraryWitnessInteger $witness 'initial_settle_ticks' 60 $Stage
     }
-    $base = $witness.PSObject.Properties['base_version']
-    $mir = $witness.PSObject.Properties['mir_version']
-    Assert-Session ($null -ne $base -and $base.Value -is [string] -and $base.Value -ceq '2.0.77' -and $null -ne $mir -and $mir.Value -is [string] -and $mir.Value -ceq '5.0.20000') "$Stage Library witness version differs"
+    Assert-LibraryWitnessVersion $witness $libraryWitnessVersionTarget $Stage
     $liveProperty = $witness.PSObject.Properties['live_refresh']
     Assert-Session ($null -ne $liveProperty -and $liveProperty.Value -is [pscustomobject]) "$Stage Library live refresh is absent or malformed"
     $live = $liveProperty.Value
@@ -556,6 +568,7 @@ $specPath = Resolve-BuildInput $SpecPath 'Leaf' 'session spec'
 $spec = Get-Content -LiteralPath $specPath -Raw | ConvertFrom-Json -AsHashtable
 $fixtureCase=if($spec.ContainsKey('case')){[string]$spec.case}else{'library-multiplayer'}
 Assert-Session ($fixtureCase-cin@('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')) 'unsupported multiplayer fixture case'
+$libraryWitnessVersionTarget=Get-LibraryWitnessVersionTarget $spec $fixtureCase
 $collectProcessMemoryObservations = Get-ProcessMemoryObservationOptIn -Spec $spec -FixtureCase $fixtureCase
 $markerPrefix=switch($fixtureCase){'library-multiplayer'{'MIR5_LIBRARY_MULTIPLAYER'};'library-paired-browser'{'MIR5_LIBRARY_PAIRED_BROWSER'};default{'MIR5_SCRIPTED_EFFECTS_MULTIPLAYER'}}
 $clientGraphics=@(if($fixtureCase-ceq'scripted-effects-multiplayer'){'--force-graphics-preset';'low';'--video-memory-usage';'low'})

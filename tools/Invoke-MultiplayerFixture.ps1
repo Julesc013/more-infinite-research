@@ -206,7 +206,15 @@ try {
       foreach($client in $clients){foreach($stage in @('first-open','search','refresh','reopen')){Join-Path $client.write_data ('script-output/mir5-library-paired-browser/'+$stage+'-*.png')}}
     }
   )
-  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword};if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
+  $spec=[ordered]@{case=$FixtureCase;engine=$engine;engine_sha256=$selection.engine.sha256;archive_library=$library;workroot=$resources.root;seed_save=$seed;seed_sha256=$prepared.seed_sha256;server_config=$serverConfig;server_settings=$serverSettings;server_write_data=$serverWrite;port=$serverPort;clients=$clients;expected_screenshots=$screenshots;rcon_port=$rconPort;rcon_password=$rconPassword}
+  if($FixtureCase-ceq'library-multiplayer'){
+    # $target was returned only after the fixed profile/engine/archive closure
+    # passed Assert-MultiplayerFixtureSelection.  Session readers receive this
+    # finite identity, not caller-selected version strings.
+    Assert-Session ($target.target -cin @('f200','f210')) 'functional Library target differs'
+    $spec.library_target=[string]$target.target
+  }
+  if($null -ne $pairedArm){$spec.paired_arm=$pairedArm}
   if($CollectProcessMemoryObservations){
     Assert-Session ($FixtureCase -cin @('library-multiplayer','library-paired-browser')) 'process memory observations require a named Library fixture'
     $spec.process_memory_observations=$true

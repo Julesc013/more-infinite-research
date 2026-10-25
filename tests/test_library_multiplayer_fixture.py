@@ -676,6 +676,10 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         self.assertTrue(result["ok"], result["message"])
         self.assertEqual([marker["stage"] for marker in result["markers"]],
                          ["ready", "rejoin-ready", "restart-ready", "completed"])
+        f210_result = self.run_case(target="f210")
+        self.assertTrue(f210_result["ok"], f210_result["message"])
+        self.assertEqual([marker["stage"] for marker in f210_result["markers"]],
+                         ["ready", "rejoin-ready", "restart-ready", "completed"])
 
         script = r'''
           $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
@@ -687,7 +691,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $node -is [Management.Automation.Language.FunctionDefinitionAst]
           },$true))
           $names=@('Test-LibraryInteger','Assert-LibraryWitnessBoolean','Assert-LibraryWitnessInteger',
-            'Assert-LibraryLiveRefresh','Get-StageMarker')
+            'Get-LibraryWitnessVersionTarget','Assert-LibraryWitnessVersion','Assert-LibraryLiveRefresh','Get-StageMarker')
           $definitions=@{}
           foreach($name in $names){
             $matches=@($allDefinitions|Where-Object {$_.Name -ceq $name})
@@ -700,9 +704,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           foreach($name in $names){Invoke-Expression $definitions[$name]}
           $fixtureCase='library-multiplayer'
           $markerPrefix='MIR5_LIBRARY_MULTIPLAYER'
-          $markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable)
+          $markerSets=@(
+            [pscustomobject]@{target='f200';markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_MARKERS -Raw|ConvertFrom-Json -AsHashtable)},
+            [pscustomobject]@{target='f210';markers=@(Get-Content -LiteralPath $env:MIR_TEST_LIBRARY_F210_MARKERS -Raw|ConvertFrom-Json -AsHashtable)}
+          )
           $expectedJoins=@{ready=0;'rejoin-ready'=2;'restart-ready'=4;completed=6}
-          if($markers.Count -ne 4){throw 'actual fixture markers are incomplete'}
           function ConvertTo-LibraryMarkerLine([hashtable]$Marker){
             return '[MIR5_LIBRARY_MULTIPLAYER] RESULT '+($Marker|ConvertTo-Json -Depth 20 -Compress)
           }
@@ -724,11 +730,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             }catch{return}
             if($null -ne $accepted){throw "reader accepted invalid marker: $Name"}
           }
-          $byStage=@{}
-          foreach($marker in $markers){
-            Assert-LibraryReaderAccepts $marker
-            $byStage[[string]$marker['stage']]=$marker
+          $markerSetsByTarget=@{}
+          foreach($markerSet in $markerSets){
+            $spec=@{library_target=$markerSet.target}
+            $libraryWitnessVersionTarget=Get-LibraryWitnessVersionTarget $spec 'library-multiplayer'
+            $markers=@($markerSet.markers)
+            if($markers.Count -ne 4){throw ('actual fixture markers are incomplete: '+$markerSet.target)}
+            $byStage=@{}
+            foreach($marker in $markers){
+              Assert-LibraryReaderAccepts $marker
+              $byStage[[string]$marker['stage']]=$marker
+            }
+            $markerSetsByTarget[$markerSet.target]=$byStage
           }
+
+          $libraryWitnessVersionTarget=Get-LibraryWitnessVersionTarget @{library_target='f200'} 'library-multiplayer'
+          $byStage=$markerSetsByTarget['f200']
 
           $minimumStarted=Copy-LibraryMarker $byStage['completed']
           $minimumStarted['witnesses']['live_refresh']['native_research_started_events']=2
@@ -769,6 +786,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             $wrongCaptures['witnesses']['screenshot_calls']=99
             Assert-LibraryReaderRejects $wrongCaptures $stage ([int]$expectedJoins[$stage]) "$stage capture count"
           }
+
+          $crossTarget=Copy-LibraryMarker $markerSetsByTarget['f210']['completed']
+          Assert-LibraryReaderRejects $crossTarget 'completed' 6 'cross-target F210 marker under F200 selection'
+          $libraryWitnessVersionTarget=Get-LibraryWitnessVersionTarget @{library_target='f210'} 'library-multiplayer'
+          $crossTarget=Copy-LibraryMarker $markerSetsByTarget['f200']['completed']
+          Assert-LibraryReaderRejects $crossTarget 'completed' 6 'cross-target F200 marker under F210 selection'
+          foreach($invalidTarget in @('f200 ', 'f210 ', 'f220', 210, $null)){
+            $rejected=$false
+            try{Get-LibraryWitnessVersionTarget @{library_target=$invalidTarget} 'library-multiplayer'|Out-Null}catch{$rejected=$true}
+            if(-not $rejected){throw 'unsupported functional Library target was accepted'}
+          }
+          $rejected=$false
+          try{Get-LibraryWitnessVersionTarget @{} 'library-multiplayer'|Out-Null}catch{$rejected=$true}
+          if(-not $rejected){throw 'missing functional Library target was accepted'}
+          if($null -ne (Get-LibraryWitnessVersionTarget @{} 'library-paired-browser')){throw 'paired Browser received a functional Library target'}
+          $libraryWitnessVersionTarget=Get-LibraryWitnessVersionTarget @{library_target='f200'} 'library-multiplayer'
 
           $wrongReadyGear=Copy-LibraryMarker $byStage['ready']
           $wrongReadyGear['witnesses']['live_refresh']['gear_level']=2
@@ -870,12 +903,15 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
         '''
         with tempfile.TemporaryDirectory(prefix="mir5-library-marker-reader-") as work:
             marker_path = Path(work) / "actual-fixture-markers.json"
+            f210_marker_path = Path(work) / "actual-fixture-f210-markers.json"
             marker_path.write_text(json.dumps(result["markers"]), encoding="utf-8")
+            f210_marker_path.write_text(json.dumps(f210_result["markers"]), encoding="utf-8")
             reader = subprocess.run(
                 ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
                 capture_output=True, text=True,
                 env=dict(os.environ, MIR_TEST_SESSION=str(SESSION),
-                         MIR_TEST_LIBRARY_MARKERS=str(marker_path)), check=False)
+                         MIR_TEST_LIBRARY_MARKERS=str(marker_path),
+                         MIR_TEST_LIBRARY_F210_MARKERS=str(f210_marker_path)), check=False)
         self.assertEqual(reader.returncode, 0, reader.stdout + reader.stderr)
 
     def test_profiler_output_does_not_change_saved_witnesses(self):
