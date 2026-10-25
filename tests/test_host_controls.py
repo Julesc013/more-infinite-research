@@ -61,6 +61,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_atan_productivity.py",
             "tests/test_atan_gameplay_fixture.py",
             "tests/test_full_catalogue_upgrade_fixture.py",
+            "tests/test_full_catalogue_upgrade_f210_fixture.py",
             "tests/test_fixed_provider_removal_control_fixture.py",
             "tests/test_automatic_families.py",
             "tests/test_competing_productivity.py",
@@ -130,7 +131,7 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 92)
+        self.assertEqual(len(paths), 93)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
