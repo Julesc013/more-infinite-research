@@ -1,0 +1,113 @@
+{
+  "kind": "MIR5CandidateAssetReadbackV1",
+  "status": "verified-offline-candidate-not-native-qualified",
+  "source": {
+    "commit": "9fc0580031f052c2336c2cea9f2d4ea421fc69f6",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "df9ab048fd16fe6411ea0311bd616521f9453329",
+    "tree": "fda507860b9737722eef700827f9c3c726378c2b"
+  },
+  "baseline": "8bfb0d99c5d489b0a4efc75d41422fc9caa816ee",
+  "inventory_file_sha256": "6F04926367DCF4F923E8BE18BF3A342C4D2C792E908C5E50555D4FF9DA34EAF1",
+  "inventory_embedded_sha256": "688A0461146EA571BC686912BC0D789D5DA1686DC229A7B0753BA39AAC060D7E",
+  "primary_custody": "build\\qualification\\aero-equivalent-assets-9fc05800-r01",
+  "all_11_files_hash_verified": true,
+  "all_nine_member_sets_unchanged": true,
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "sha256": "D16DFEE374D17A7B03C85FFE2A7CE5FB91CFE641B3A735A5E0CFE01C4CB82424",
+      "bytes": 346515,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "sha256": "D5592982DBB16718727174C16D977A7B0FBE9C037F9A29BCC961E664EE9DE150",
+      "bytes": 346515,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "sha256": "59D07B6187DDB46F0692878A9980738F2BAF34588C4F4B84868C81E815D3C5E5",
+      "bytes": 346475,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "sha256": "6300F09B6A272F23501DF7659584684A98D0BAE54D0536DB91947F1A0A5806BE",
+      "bytes": 346466,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "sha256": "04777CDDF04B57FF97E94E4CC3B9C8C721C7AFA66D5500F92E74D0C4E02D8EB3",
+      "bytes": 346355,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "sha256": "1AF8CF9B83FE17AEEC35218F21AFD5CE5E77ADACD9FC6D6C61FC0D4BB7431A37",
+      "bytes": 360147,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "sha256": "9FAD85CB25A2741254AD897BCB671CBEE21ADC96DD99D86DFB30B34D9A3B1FAB",
+      "bytes": 360144,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "sha256": "116D03DA199D23FD06C13AF84C45420EF07B0852484C3E90AAD69F8FD50A8037",
+      "bytes": 549696,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "sha256": "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A",
+      "bytes": 550232,
+      "changed_members": [
+        "compatibility/science_bindings.lua",
+        "research/science.lua"
+      ]
+    }
+  ],
+  "native_execution": false,
+  "release_qualification": false
+}
