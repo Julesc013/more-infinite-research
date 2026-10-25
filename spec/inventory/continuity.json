@@ -690,7 +690,7 @@
             "spec/targets.md",
             "docs/support.md"
           ],
-          "scope": "Maintainer direction2026-10-25: Factorio2.1.23 stable is the primary design, implementation, qualification and release target. Earlier MIR4 engine families retain best-effort builds/support through shared capability adapters and unchanged nine-edition version encoding. This records target priority, not new native qualification."
+          "scope": "Maintainer direction2026-10-25: Factorio2.1 with minimum base2.1.23 is the primary design target and has implementation/qualification scheduling priority. All nine delivered editions retain their capability subsets, common feature/settings/presentation semantics, shared source, narrow adapters and existing version encoding. Final current-package and affected native qualification remain required for every delivered target subset. This records target priority, not new native qualification."
         }
       ],
       "test_subjects": [
@@ -699,8 +699,8 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Complete exact current F2102.1.23 native, migration/client, performance and package acceptance before primary release.",
-        "Retain best-effort earlier-edition builds and available exact-engine qualification; report each tested subset and remaining gaps without relabelling earlier receipts."
+        "Run final current-package and affected native checks for every delivered target subset.",
+        "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts."
       ]
     },
     {

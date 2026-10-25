@@ -14,13 +14,13 @@ source_of_truth_for:
 
 # Engine targets, packaging and delivery
 
-`TGT-01` — One shared source, small actual engine adapters, one selected adapter per distribution. Do not retain parallel complete modern/legacy products. Historical editions keep their own delivered capability subsets; unsupported modifiers/UI cannot be manufactured by a generic runtime shim.
+`TGT-01` â€” One shared source, small actual engine adapters, one selected adapter per distribution. Do not retain parallel complete modern/legacy products. Historical editions keep their own delivered capability subsets; unsupported modifiers/UI cannot be manufactured by a generic runtime shim.
 
 ## Primary target and earlier editions
 
-The maintainer's 2026-10-25 direction makes **Factorio 2.1.23 stable (F210)** the primary MIR5 design, implementation, qualification and release target. Design new behavior against its actual native APIs and capabilities. Keep the small deterministic Generator and shared semantic implementations, with narrowly selected adapters for earlier engines.
+The maintainer's 2026-10-25 direction makes **Factorio 2.1 with minimum base 2.1.23 (F210)** the primary MIR5 design target and gives its implementation and qualification scheduling priority. Design new behavior against its actual native APIs and capabilities. Keep the small deterministic Generator and shared semantic implementations, with narrowly selected adapters for earlier engines.
 
-The earlier MIR4 engine families retain **best-effort builds and support** for their delivered subsets, using the same nine-edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Qualify F200 for2.0.77 and the seven historical editions with available exact-engine evidence, stating remaining gaps by edition. F210 acceptance takes priority over further earlier-engine campaigns; existing historical receipts retain their real inputs and verdicts. The primary F210 package still requires its exact native, upgrade/save/client, performance and delivery evidence.
+Build F200 for 2.0.77 and the seven historical editions from the same shared implementation, retaining their delivered capability subsets, nine-edition version encoding and stable mod/technology/migration identities. Keep common feature behavior, setting identities and meanings, and presentation consistent where native capabilities permit; isolate engine differences in the selected adapters. Run final current-package and affected native checks for every delivered target subset before release, reusing exact unchanged evidence under its original inputs and verdicts. Earlier editions remain best-effort ports within their real native capabilities; F210 priority does not authorize an unqualified earlier edition or silently narrow the release scope. State unresolved gaps by edition; all applicable native, upgrade/save/client, performance and delivery requirements remain binding.
 
 ## Baseline targets, not new qualification
 
@@ -40,13 +40,13 @@ The previous release records identify these nine target editions. Their identifi
 
 Verify each current executable, official mods and consumed API against the actual local environment. The inherited source recorded 2.1.14 documentation; this revision observed official latest pages labelled 2.1.23. Neither observation is native qualification. Exact-version URL retrieval was unavailable; native work must pin and record the consumed target documentation. Do not silently chase a newer experimental binary during a frozen comparison.
 
-`TGT-02` — `factorio_version` is the family and the `base >= x.y.z` dependency is the declared patch minimum. Preserve the distribution codec `100 * target_code + source_patch`, padded to five digits, unless deliberately replaced with full migration/release review. Patch digits are not RC/build counters. Check internal root, archive filename, info metadata, changelog and release label together. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
+`TGT-02` â€” `factorio_version` is the family and the `base >= x.y.z` dependency is the declared patch minimum. Preserve the distribution codec `100 * target_code + source_patch`, padded to five digits, unless deliberately replaced with full migration/release review. Patch digits are not RC/build counters. Check internal root, archive filename, info metadata, changelog and release label together. [Mod structure](https://lua-api.factorio.com/latest/auxiliary/mod-structure.html)
 
 ## Package contract
 
 A packager copies known player source/assets, selects actual adapter files, applies explicit metadata and creates a deterministic ZIP. It does not infer research. Keep the Factorio mod identity unchanged. Package member paths are **relative to the selected player root**; they never contain repository prefixes such as `source/` or the staging directory.
 
-`TGT-03` — Player ZIP membership is an allowlist: necessary Lua, locale, graphics, migration files, metadata, license and complete applicable changelog. Exclude tests, docs, SDK, schemas, plans, inventories, evidence, local caches and agent tools. A working development root is not automatically a package boundary.
+`TGT-03` â€” Player ZIP membership is an allowlist: necessary Lua, locale, graphics, migration files, metadata, license and complete applicable changelog. Exclude tests, docs, SDK, schemas, plans, inventories, evidence, local caches and agent tools. A working development root is not automatically a package boundary.
 
 Keep case-correct portable paths, LF Lua/Markdown where appropriate, tested CRLF host fixtures, no absolute machine paths in player data, and no unavailable syntax/API imports on old targets. Preserve required asset licenses and attribution. Reuse base/expansion icons only when that asset is guaranteed available for the profile or a verified fallback exists.
 
@@ -54,7 +54,7 @@ A pure directory cutover must produce identical package **member paths and bytes
 
 ## Release
 
-`TGT-04` — Promote accepted development through `dev` then `main` using the existing permissions and required checks. This specification does not authorize changing branch protection, signing, release immutability settings or credentials. Preserve prior releases and provenance; repository cleanup must not rewrite tags.
+`TGT-04` â€” Promote accepted development through `dev` then `main` using the existing permissions and required checks. This specification does not authorize changing branch protection, signing, release immutability settings or credentials. Preserve prior releases and provenance; repository cleanup must not rewrite tags.
 
 Use title `MIR MAJOR.MINOR.PATCH`, exact tested patch labels without `+`, nine applicable player ZIPs plus useful checksum/signature files, and no redundant downloads table. Keep bundles, upload instructions and developer artifacts out of public player downloads unless expressly requested. Preserve full history in packaged changelogs. Verify anonymous downloads and local delivery by bytes; GitHub publication is distinct from Mod Portal publication.
 
@@ -62,4 +62,4 @@ Cryptographic identity and successful CI do not prove gameplay correctness. Rele
 
 ## Reproducible source is not a wall-clock promise
 
-`TGT-05` — Apply the package boundary in [Determinism](determinism.md). Compare member bytes independently from ZIP headers/compression. Keep rendered diagrams and optional diagram tooling out of player packages. The operating-system/runtime needed by developer tools does not determine which historical Factorio editions the mod supports.
+`TGT-05` â€” Apply the package boundary in [Determinism](determinism.md). Compare member bytes independently from ZIP headers/compression. Keep rendered diagrams and optional diagram tooling out of player packages. The operating-system/runtime needed by developer tools does not determine which historical Factorio editions the mod supports.
