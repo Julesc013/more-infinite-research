@@ -16,12 +16,18 @@ ordinary `Defaults` setting mode is read:
 
 The published arm is pinned to archive `F3943EB4…1010B7`. The candidate arm is pinned to the F200 package from source `8bfb0d99`, archive `2BBDBA9A…F9E842`. These are selected inputs, not matched performance results.
 
-After two real `en` and `de` clients join one fresh Base F200 force, each of
-`first-open`, `search`, and `refresh` wraps exactly two public open calls in one
-native profiler record, then requests one screenshot per client. The fixture
-saves a restart point, requires an actual cold host restart and rejoin, then
-performs `reopen` the same way. This yields exactly eight requested PNGs under
-`script-output/mir5-library-paired-browser/` and four raw profiler markers.
+A post-load server emits its one `ready` marker on its first runtime event; the
+create-only seed's `on_init` marker is not reused as readiness for the ordinary
+host. Each real client join is recorded as the bounded ordered sequence
+`MIR5English 1`, `MIR5Deutsch 2`, then after the cold restart `MIR5English 3`,
+`MIR5Deutsch 4`. After the first two clients join one fresh Base F200 force,
+each of `first-open`, `search`, and `refresh` wraps exactly two public open
+calls in one native profiler record, then requests one screenshot per client.
+The fixture saves a restart point, requires an actual cold host restart and
+rejoin, then performs `reopen` the same way. This yields exactly eight requested
+PNGs under `script-output/mir5-library-paired-browser/` and four raw profiler
+markers. The capture labels remain `first-open`, `search`, `refresh`, and
+`reopen`; the shared profiler reader's first action token is `first_open`.
 
 At every action boundary it compares a bounded public snapshot of two named
 technologies, two recipes, the current research/progress, and an at-most-eight

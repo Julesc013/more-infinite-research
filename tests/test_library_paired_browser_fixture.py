@@ -105,7 +105,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
           end
 
           function paired_browser_runtime(path, arm, opponent)
-            local callbacks, markers, profiler_labels, screenshots, saves, calls = {events = {}}, {}, {}, {}, {}, {}
+            local callbacks, markers, profiler_labels, screenshots, saves, calls, joins = {events = {}}, {}, {}, {}, {}, {}, {}
             local gear = "recipe-prod-research_gears-1"
             local mining = "recipe-prod-research_mining_drill-1"
             local force = {
@@ -170,8 +170,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               player.gui.screen["mir_research_browser"] = root
             end
 
-            local en = {valid=true, index=1, locale="en", connected=false, force=force, gui={screen={}}}
-            local de = {valid=true, index=2, locale="de", connected=false, force=force, gui={screen={}}}
+            local en = {valid=true, index=1, name="MIR5English", locale="en", connected=false, force=force, gui={screen={}}}
+            local de = {valid=true, index=2, name="MIR5Deutsch", locale="de", connected=false, force=force, gui={screen={}}}
+            if opponent == "bad-join-name" then en.name = "WrongPlayer" end
             local players = {[1]=en, [2]=de}
             local active = {
               base="2.0.77", ["more-infinite-research"]=(arm == "published" and "4.7.20002" or "5.0.20000"),
@@ -196,6 +197,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               log=function(value)
                 if type(value) == "table" and value[2] == "[MIR5_LIBRARY_PROFILE] " then
                   profiler_labels[#profiler_labels+1]=value[3]
+                elseif type(value) == "string" then
+                  local name, ordinal = string.match(value, "^%[MIR5_LIBRARY_PAIRED_BROWSER_JOIN%] ([A-Za-z0-9_%-]+) ([0-9]+)$")
+                  if name then joins[#joins+1] = {name=name, ordinal=tonumber(ordinal)} end
                 end
               end
             }
@@ -219,23 +223,53 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             }
             env._G=env
             setmetatable(env,{__index=function(_, key) return _G[key] end})
-            local chunk, message=loadfile(path,"t",env)
-            assert(chunk,message)
             local function invoke(callback, event)
               local ok, result=pcall(callback,event)
               return ok,tostring(result)
             end
-            local ok, message=invoke(chunk)
+            local function register_control()
+              callbacks = {events = {}}
+              local chunk, message=loadfile(path,"t",env)
+              if not chunk then return false, tostring(message) end
+              return invoke(chunk)
+            end
+            local ok, message=register_control()
             if not ok then return {ok=false,message=message} end
             ok, message=invoke(callbacks.init)
             if not ok then return {ok=false,message=message,markers=markers} end
+
+            -- The prepared seed was created by on_init.  The ordinary initial
+            -- host is a new Lua state, so re-register callbacks before its
+            -- read-only on_load and first runtime tick.
+            local durable, original_storage = env.storage["mir5_library_paired_browser"], env.storage
+            local load_writes=0
+            local function invoke_load_read_only()
+              env.storage=setmetatable({}, {
+                __index=function(_, key) return original_storage[key] end,
+                __newindex=function() load_writes=load_writes+1; error("on_load wrote fixture storage") end
+              })
+              local loaded_ok, loaded_message=invoke(callbacks.load)
+              env.storage=original_storage
+              return loaded_ok, loaded_message
+            end
+            ok, message=register_control()
+            if not ok then return {ok=false,message=message,markers=markers} end
+            ok, message=invoke_load_read_only()
+            if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
+            if env.storage["mir5_library_paired_browser"] ~= durable then return {ok=false,message="on_load replaced fixture state",markers=markers} end
+            local ready_markers_before_tick=#markers
+            env.game.tick=1
+            ok,message=invoke(callbacks.events[2],{tick=1})
+            if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
+            local ready_markers_after_tick=#markers
+
             en.connected=true
             ok, message=invoke(callbacks.events[1],{player_index=1})
             if not ok then return {ok=false,message=message,markers=markers} end
             de.connected=true
             ok, message=invoke(callbacks.events[1],{player_index=2})
             if not ok then return {ok=false,message=message,markers=markers} end
-            for _, tick in ipairs({60,120,180}) do
+            for _, tick in ipairs({60,120,180,240}) do
               env.game.tick=tick
               ok,message=invoke(callbacks.events[2],{tick=tick})
               if not ok then return {ok=false,message=message,markers=markers,calls=calls} end
@@ -249,14 +283,9 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
               ok,message=invoke(callbacks.events[1],{player_index=2})
               return {ok=ok,message=message,markers=markers}
             end
-            local durable, original_storage = env.storage["mir5_library_paired_browser"], env.storage
-            local load_writes=0
-            env.storage=setmetatable({}, {
-              __index=function(_, key) return original_storage[key] end,
-              __newindex=function() load_writes=load_writes+1; error("on_load wrote fixture storage") end
-            })
-            ok,message=invoke(callbacks.load)
-            env.storage=original_storage
+            ok,message=register_control()
+            if not ok then return {ok=false,message=message,markers=markers} end
+            ok,message=invoke_load_read_only()
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
             if env.storage["mir5_library_paired_browser"] ~= durable then return {ok=false,message="on_load replaced fixture state",markers=markers} end
             en.connected=false; de.connected=false
@@ -266,11 +295,14 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             de.connected=true
             ok,message=invoke(callbacks.events[1],{player_index=2})
             if not ok then return {ok=false,message=message,markers=markers,load_writes=load_writes} end
-            env.game.tick=240
-            ok,message=invoke(callbacks.events[2],{tick=240})
+            env.game.tick=300
+            ok,message=invoke(callbacks.events[2],{tick=300})
             return {
               ok=ok,message=message,markers=markers,profiler_labels=profiler_labels,screenshots=screenshots,
-              saves=saves,calls=calls,load_writes=load_writes,state=env.storage["mir5_library_paired_browser"]
+              saves=saves,calls=calls,joins=joins,load_writes=load_writes,
+              ready_markers_before_tick=ready_markers_before_tick,
+              ready_markers_after_tick=ready_markers_after_tick,
+              state=env.storage["mir5_library_paired_browser"]
             }
           end
         ''')
@@ -359,8 +391,17 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
                 ])
                 self.assertEqual(result["saves"], ["mir5-library-paired-browser-restart", "mir5-native-complete"])
                 self.assertEqual(result["load_writes"], 0)
+                self.assertEqual(result["ready_markers_before_tick"], 1)
+                self.assertEqual(result["ready_markers_after_tick"], 2)
                 self.assertEqual([row["stage"] for row in result["markers"]], [
-                    "ready", "first-open", "search", "refresh", "restart-ready", "reopen", "completed",
+                    "ready", "ready", "first-open", "search", "refresh", "restart-ready", "reopen", "completed",
+                ])
+                self.assertEqual([row["join_events"] for row in result["markers"]], [0, 0, 2, 2, 2, 2, 4, 4])
+                self.assertEqual(result["joins"], [
+                    {"name": "MIR5English", "ordinal": 1},
+                    {"name": "MIR5Deutsch", "ordinal": 2},
+                    {"name": "MIR5English", "ordinal": 3},
+                    {"name": "MIR5Deutsch", "ordinal": 4},
                 ])
                 self.assertTrue(all(row["native_snapshot_unchanged"] for row in result["markers"]))
                 action_markers = [row for row in result["markers"] if row["stage"] in {"first-open", "search", "refresh", "reopen"}]
@@ -397,6 +438,7 @@ class LibraryPairedBrowserFixtureTests(unittest.TestCase):
             ("remote-false", "public browser interface did not open"),
             ("bad-shape", "public browser detail differs"),
             ("native-mutation", "public Browser actions mutated named native research, queue, or recipes"),
+            ("bad-join-name", "fixture join identity or ordinal differs"),
             ("no-cold-load", "reopen requires the requested cold host restart"),
         )
         for arm in ARMS:
