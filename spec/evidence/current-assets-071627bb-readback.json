@@ -1,0 +1,220 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentAssetFreezeReadbackV1",
+  "status": "rebuilt-verified-not-native-qualified",
+  "source": {
+    "commit": "071627bbb5ff37eaf724adb78ba1ece1b139e228",
+    "mod_name": "more-infinite-research",
+    "mod_title": "More Infinite Research",
+    "path": "source",
+    "source_distribution_version": "5.0.21000",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "tree": "adf4203abefe09f99529b5133a8d37f5b90a303c"
+  },
+  "controller": {
+    "package_tool": {
+      "path": "tools/package.py",
+      "sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f"
+    },
+    "release_tool": {
+      "path": "tools/release.py",
+      "sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27"
+    },
+    "runtime": {
+      "implementation": "cpython",
+      "version": [
+        3,
+        14,
+        7
+      ],
+      "zlib_build_version": "1.3.1.zlib-ng",
+      "zlib_runtime_version": "1.3.1.zlib-ng"
+    },
+    "zip_policy": {
+      "compression": "ZIP_DEFLATED",
+      "compresslevel": 9,
+      "member_create_system": 3,
+      "member_external_attr": 2175008768,
+      "member_timestamp": [
+        1980,
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "controller_byte_provenance": [
+    {
+      "path": "tools/package.py",
+      "raw_git_sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f",
+      "executed_sha256": "2aba8264d3527226c02fe4f9da70c8b253e3c1b7a202b5e1a4545bebe03d674f",
+      "executed_bytes": "Exact raw Git bytes"
+    },
+    {
+      "path": "tools/release.py",
+      "raw_git_sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27",
+      "executed_sha256": "95b8cbd6b2852cb81170f85842f38e3f5e9afe669127b4e64ae44b79fcb72e27",
+      "executed_bytes": "Exact raw Git bytes"
+    }
+  ],
+  "release": {
+    "source_label": "source5.0.0",
+    "source_version": "5.0.0",
+    "tag": "v5.0.0",
+    "title": "MIR 5.0.0"
+  },
+  "asset_root": "C:/Projects/Factorio/mir5-freeze/aero-071627bb-r01",
+  "asset_inventory_file_sha256": "4a089a6788d17963a6168174e869a55c542fce3263e2b76e7b2e42cf10b95b43",
+  "asset_inventory_content_sha256": "9844a86a752b00e9a27fe0d9ac71eeb7b6c17fb7c0affc3f23ef2fe14d07a7ad",
+  "readback": {
+    "nine_archives_independently_rebuilt": true,
+    "primary_copy_files": 11,
+    "primary_custody": "build/qualification/aero-assets-071627bb-r01",
+    "comparison_source": "5658246a7b8ea213d84496c420042c2ea9ad2eaa",
+    "member_changes": [
+      {
+        "target": "f013",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f014",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f015",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f016",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f017",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f100",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f110",
+        "changed_members": [],
+        "archive_identical": true
+      },
+      {
+        "target": "f200",
+        "changed_members": [
+          "data-final-fixes.lua"
+        ],
+        "archive_identical": false
+      },
+      {
+        "target": "f210",
+        "changed_members": [
+          "data-final-fixes.lua"
+        ],
+        "archive_identical": false
+      }
+    ]
+  },
+  "assets": [
+    {
+      "target": "f013",
+      "name": "more-infinite-research_5.0.01300.zip",
+      "version": "5.0.01300",
+      "factorio_version": "0.13",
+      "minimum_base": "0.13.20",
+      "bytes": 347271,
+      "archive_sha256": "3c12694e1bbf1b23d1d09b19652725546a72099c81684556bb9272cc62ccdb91"
+    },
+    {
+      "target": "f014",
+      "name": "more-infinite-research_5.0.01400.zip",
+      "version": "5.0.01400",
+      "factorio_version": "0.14",
+      "minimum_base": "0.14.23",
+      "bytes": 347271,
+      "archive_sha256": "37c007dc19f3337ce952495f0ee045f8ed70016016e704f977daee439f27f86a"
+    },
+    {
+      "target": "f015",
+      "name": "more-infinite-research_5.0.01500.zip",
+      "version": "5.0.01500",
+      "factorio_version": "0.15",
+      "minimum_base": "0.15.40",
+      "bytes": 347231,
+      "archive_sha256": "9d048e07f0c1a87e36c5e725331315e23055fdc44c53343437ebf7d2bac3b309"
+    },
+    {
+      "target": "f016",
+      "name": "more-infinite-research_5.0.01600.zip",
+      "version": "5.0.01600",
+      "factorio_version": "0.16",
+      "minimum_base": "0.16.51",
+      "bytes": 347222,
+      "archive_sha256": "a1a01c00928b8f641215b3211d2150509ceda91086404225b36d253eae218176"
+    },
+    {
+      "target": "f017",
+      "name": "more-infinite-research_5.0.01700.zip",
+      "version": "5.0.01700",
+      "factorio_version": "0.17",
+      "minimum_base": "0.17.79",
+      "bytes": 347111,
+      "archive_sha256": "d37bf4a1c52a4e14cc4746fd021bcfe20f6868bec76b662b9c72c0471e56e555"
+    },
+    {
+      "target": "f100",
+      "name": "more-infinite-research_5.0.10000.zip",
+      "version": "5.0.10000",
+      "factorio_version": "1.0",
+      "minimum_base": "1.0.0",
+      "bytes": 360903,
+      "archive_sha256": "f440eb67bded09d91b16f4f9cebdd01fcfe3d16b9e368a167f932294381f88f6"
+    },
+    {
+      "target": "f110",
+      "name": "more-infinite-research_5.0.11000.zip",
+      "version": "5.0.11000",
+      "factorio_version": "1.1",
+      "minimum_base": "1.1.110",
+      "bytes": 360900,
+      "archive_sha256": "d846237b678c4d34bdfd46f2eaa503893e5c8db74653c0512e465144db807a41"
+    },
+    {
+      "target": "f200",
+      "name": "more-infinite-research_5.0.20000.zip",
+      "version": "5.0.20000",
+      "factorio_version": "2.0",
+      "minimum_base": "2.0.77",
+      "bytes": 553231,
+      "archive_sha256": "b67ff048860f2707579cf582c933ed46d7bf52769f5abe1b0279ddcc2a0323bd"
+    },
+    {
+      "target": "f210",
+      "name": "more-infinite-research_5.0.21000.zip",
+      "version": "5.0.21000",
+      "factorio_version": "2.1",
+      "minimum_base": "2.1.23",
+      "bytes": 553767,
+      "archive_sha256": "4f5bee023930666fc0f921136a69b59861741be44c311e03d46347d42018ecbc"
+    }
+  ],
+  "native_execution": false,
+  "release_qualification": false,
+  "limits": [
+    "Seven historical archives are byte-identical to the565/143 cohort; retained native evidence keeps its exact original source and scope.",
+    "Only F200/F210 data-final-fixes.lua differs from565; Generator, runtime, API, settings, migrations and every other package member remain identical.",
+    "The source071 guard preserves malformed rows for Generator rejection;36 host pipeline controls pass, but current-package native successor and performance acceptance remain required.",
+    "The inventory binds Aero execution bytes separately from raw Git bytes; another host may have different local controller/inventory identities even when player ZIPs are identical.",
+    "Packages are retained in primary build custody pending qualification; this is neither a tag nor a publication."
+  ]
+}
