@@ -743,6 +743,11 @@ def analyze(plan: dict[str, Any], plan_sha256: str, result: dict[str, Any], resu
         _expect_hash(actual.get("raw_git_sha256"), expected_hash, "result raw helper Git SHA-256")
         _expect_hash(actual.get("executed_sha256"), expected_hash, "result raw helper executed SHA-256")
         _integer(actual.get("bytes"), "result raw helper bytes", minimum=1)
+    _same(
+        _string(result.get("prepared_inputs_path"), "prepared inputs path"),
+        "runtime-benchmark-active-prepared.json",
+        "prepared inputs path",
+    )
     _sha256(result.get("prepared_inputs_sha256"), "prepared inputs SHA-256")
     capture_reference = _mapping(result.get("active_seed_capture"), "active seed capture reference")
     pilot_reference = _mapping(result.get("unscored_marker_pilot"), "marker pilot reference")
