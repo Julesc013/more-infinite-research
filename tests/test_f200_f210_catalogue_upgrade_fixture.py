@@ -170,7 +170,7 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
             "common_control_path": SHARED / "control.lua", "f210_catalogue_path": SHARED / "f210-catalogue.lua",
         }.items(): self.lua.globals()[name] = path.as_posix()
         self.lua.execute("""
-          function run_cross_callbacks()
+          function run_cross_callbacks(mutate_snapshot)
             local f210_plan = assert(loadfile(f210_catalogue_path))()
             local source_env = {}
             source_env.require=function(name)
@@ -252,21 +252,63 @@ class F200F210CatalogueUpgradeFixtureTests(unittest.TestCase):
             local science_before=player.technologies["recipe-prod-research_science_pack_productivity-1"].level
             local successor=load_stage(cross_control_path,cross_catalogue_path,{base="2.1.23",["more-infinite-research"]="5.0.21000",["mir-fixture-mir5-full-catalogue-upgrade"]="0.3.0"})
             successor.configuration(); gear.level=gear.level+1; gear.saved_progress=0; player.recipes["iron-gear-wheel"].productivity_bonus=.2
-            successor.events[1]{research=gear}; successor.events[2](); successor.load(); successor.events[2]()
+            successor.events[1]{research=gear}; successor.events[2]()
             local paused, state=game.forces[2],storage.mir5_full_catalogue_upgrade
+            if mutate_snapshot then
+              state.source_snapshot.technologies["recipe-prod-research_science_pack_productivity-1"].level = state.source_snapshot.technologies["recipe-prod-research_science_pack_productivity-1"].level + 1
+              successor.load()
+              local ok, message = pcall(successor.events[2])
+              return {ok=ok, message=tostring(message)}
+            end
+            local function copy(value, seen)
+              if type(value) ~= "table" then return value end
+              seen = seen or {}
+              if seen[value] then return seen[value] end
+              local out = {}; seen[value] = out
+              for key, item in pairs(value) do out[copy(key, seen)] = copy(item, seen) end
+              return out
+            end
+            local function same(left, right, seen)
+              if type(left) ~= type(right) then return false end
+              if type(left) ~= "table" then return left == right end
+              seen = seen or {}
+              if seen[left] == right then return true end
+              seen[left] = right
+              for key, value in pairs(left) do if not same(value, right[key], seen) then return false end end
+              for key, _ in pairs(right) do if left[key] == nil then return false end end
+              return true
+            end
+            local function native_view()
+              return {gear_level=gear.level, gear_saved=gear.saved_progress,
+                science_level=player.technologies["recipe-prod-research_science_pack_productivity-1"].level,
+                science_researched=player.technologies["recipe-prod-research_science_pack_productivity-1"].researched,
+                progress=player.research_progress, gear_bonus=player.recipes["iron-gear-wheel"].productivity_bonus,
+                paused_progress=paused.technologies["recipe-prod-research_gears-1"].saved_progress}
+            end
+            local storage_before, native_before = copy(state), native_view()
+            successor.load(); successor.events[2]()
+            local storage_after_first, native_after_first = copy(state), native_view()
+            successor.load(); successor.events[2]()
+            local storage_after_second, native_after_second = copy(state), native_view()
             return {phase=state.phase,source_labs=state.source_labs,successor_labs=state.successor_labs,saved=game.saved,
               current=player.current_research and player.current_research.name,queue={player.research_queue[1].name,player.research_queue[2].name},progress=player.research_progress,
               paused_progress=paused.technologies["recipe-prod-research_gears-1"].saved_progress,science_before=science_before,
               science_after=player.technologies["recipe-prod-research_science_pack_productivity-1"].level,
               science_researched=player.technologies["recipe-prod-research_science_pack_productivity-1"].researched,
-              probe_researched=player.technologies["braking-force-1"].researched,gear_bonus=player.recipes["iron-gear-wheel"].productivity_bonus}
+              probe_researched=player.technologies["braking-force-1"].researched,gear_bonus=player.recipes["iron-gear-wheel"].productivity_bonus,
+              first_storage_read_only=same(storage_before, storage_after_first), second_storage_read_only=same(storage_before, storage_after_second),
+              first_native_read_only=same(native_before, native_after_first), second_native_read_only=same(native_before, native_after_second)}
           end
         """)
-        result = py(self.lua.eval("run_cross_callbacks")())
+        result = py(self.lua.eval("run_cross_callbacks")(False))
         self.assertEqual("successor-completed", result["phase"])
         self.assertEqual((1, 1, "mir5-native-complete"), (result["source_labs"], result["successor_labs"], result["saved"]))
         self.assertEqual(("recipe-prod-research_gears-1", ["recipe-prod-research_gears-1", "braking-force-1"], .42), (result["current"], result["queue"], result["progress"]))
         self.assertEqual((.27, 1, 1, False, False, .2), (result["paused_progress"], result["science_before"], result["science_after"], result["science_researched"], result["probe_researched"], result["gear_bonus"]))
+        self.assertEqual((True, True, True, True), (result["first_storage_read_only"], result["second_storage_read_only"], result["first_native_read_only"], result["second_native_read_only"]))
+        drift = py(self.lua.eval("run_cross_callbacks")(True))
+        self.assertFalse(drift["ok"])
+        self.assertIn("successor cold reload technology state changed", drift["message"])
 
     def test_cross_fixture_staging_is_explicit_and_does_not_import_player_source(self):
         info = json.loads(CROSS.joinpath("info.json").read_text(encoding="utf-8"))
