@@ -285,10 +285,10 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
     _expect_hash(factorio.get("sha256"), expected_engine.get("sha256"), "result Factorio SHA-256")
     profile = _mapping(inputs.get("profile"), "result profile")
     expected_profile = _mapping(identity.get("profile"), "analysis profile")
-    # The runner copies the canonical profile to an owned execution
-    # `selection.json`.  The raw plan binds its canonical repository path;
-    # the result binds only this typed, non-empty execution locator plus the
-    # exact canonical profile hash, rather than inventing a source suffix.
+    # The runner records the original packet's owned `inputs/profile.json`
+    # locator here; its per-launch selection is separate. The raw plan binds
+    # the canonical repository profile path, while this result binds only a
+    # typed execution locator and the exact canonical profile hash.
     _string(profile.get("path"), "result profile execution locator")
     _expect_hash(profile.get("sha256"), expected_profile.get("sha256"), "result profile SHA-256")
     published = _mapping(inputs.get("published"), "result published archive")

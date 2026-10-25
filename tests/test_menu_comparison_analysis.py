@@ -6,7 +6,9 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 from pathlib import Path
+import statistics
 import tempfile
 import unittest
 
@@ -206,6 +208,48 @@ class MenuComparisonAnalysisTests(unittest.TestCase):
         self.assertEqual(drift["control_drift"]["late_minus_early_seconds"], 1.0)
         self.assertEqual(drift["control_drift"]["status"], "adverse-outside-predeclared-tolerance")
         self.assertIn("late-control-drift-outside-predeclared-tolerance", drift["menu_verdict"]["adverse_or_unresolved"])
+
+    def test_nonconstant_paired_summaries_report_hand_checked_student_t_interval(self) -> None:
+        plan, raw, raw_hash = _prepared()
+        d4 = [1.0, 3.0] * 4
+        d5 = [0.25, 0.75] * 4
+        replay = [0.5, 1.5] * 4
+        output = ANALYZER.analyze(
+            plan,
+            "A" * 64,
+            raw,
+            raw_hash,
+            _result(plan, published_offsets=d4, candidate_offsets=d5, replay_offsets=replay),
+            "9" * 64,
+        )
+        summary = output["summaries"]["published_added_time_d4_seconds"]
+        expected_mean = statistics.mean(d4)
+        expected_variance = statistics.variance(d4)
+        expected_standard_deviation = statistics.stdev(d4)
+        expected_half_width = ANALYZER.T95_N8_DF7 * expected_standard_deviation / math.sqrt(8)
+        self.assertEqual(expected_mean, 2.0)
+        self.assertEqual(expected_variance, 8.0 / 7.0)
+        self.assertTrue(math.isclose(summary["arithmetic_mean_seconds"], expected_mean, rel_tol=0.0, abs_tol=1e-12))
+        self.assertTrue(math.isclose(summary["sample_standard_deviation_seconds"], expected_standard_deviation, rel_tol=0.0, abs_tol=1e-12))
+        self.assertTrue(math.isclose(summary["student_t_95_mean_interval_seconds"]["lower"], expected_mean - expected_half_width, rel_tol=0.0, abs_tol=1e-12))
+        self.assertTrue(math.isclose(summary["student_t_95_mean_interval_seconds"]["upper"], expected_mean + expected_half_width, rel_tol=0.0, abs_tol=1e-12))
+        self.assertEqual(output["summaries"]["direct_candidate_minus_published_seconds"]["arithmetic_mean_seconds"], -1.5)
+        self.assertEqual(output["summaries"]["candidate_replay_gap_seconds"]["arithmetic_mean_seconds"], -0.5)
+
+    def test_positive_point_reduction_does_not_bypass_q_interval_gate(self) -> None:
+        plan, raw, raw_hash = _prepared()
+        output = ANALYZER.analyze(
+            plan,
+            "A" * 64,
+            raw,
+            raw_hash,
+            _result(plan, published_offsets=[4.0] * 8, candidate_offsets=[0.0, 3.0] * 4),
+            "B" * 64,
+        )
+        self.assertEqual(output["objective"]["reduction_percent"], 62.5)
+        self.assertGreater(output["objective"]["q_95_percent_upper_seconds"], 0.0)
+        self.assertEqual(output["objective"]["status"], "point-estimate-not-credible-at-95-percent")
+        self.assertIn("at-least-50-percent-objective-not-credible-at-95-percent", output["menu_verdict"]["adverse_or_unresolved"])
 
     def test_row_badness_and_identity_mismatch_are_refused(self) -> None:
         plan, raw, raw_hash = _prepared()
