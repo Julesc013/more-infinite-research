@@ -551,7 +551,8 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Complete full relevant earned/current/queued catalogue-state and migration reconciliation beyond the seven passing bounded predecessor chains.",
-        "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation."
+        "Qualify Imersite hidden carriers through removal/readdition and complete migration filename/state reconciliation.",
+        "Reconcile separate MIR-version, Factorio-version, Base/Space Age and modset-change migration axes for the exact named/popular profiles; existing same-engine predecessor tests do not cover the other axes."
       ]
     },
     {
@@ -672,8 +673,680 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Finish affected mixed/dynamic earned MIR overlap boundaries; composed fixed true/false/true and the independent fixed-provider removal/readdition controls already pass.",
-        "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source."
-      ]
+        "Observe remaining exact admitted integrations and setting interactions; Bob/Angel physical125%/400% recipe-cap output is already qualified at its recorded source.",
+        "Complete the explicit named/popular individual and dependency-valid combined profile campaign above. New AAI inputs are pinned; BZ, SE, K2SE and IR still have no active profile, and their native outcomes remain unqualified.",
+        "Complete full-suite Py and broad Bob/Angel coverage separately from the existing narrow selections, with actual useful effects and migration/state outcomes."
+      ],
+      "qualification_campaign": {
+        "status": "required-broad-coverage-incomplete",
+        "maintainer_direction_date": "2026-10-26",
+        "authority": "Existing COMP-03/VER-03 and explicit maintainer direction to test popular individual mods, valid combinations, historical failures and migrations; this is a qualification expansion inside the existing continuity inventory, not a second request ledger.",
+        "priority": "Factorio2.1.23 first; select exact supported earlier engines where an upstream release requires them. Preserve all nine edition obligations.",
+        "selection": "Top50 returned non-internal Portal mods by downloads_count for each of2.1.23,2.0.77,1.1.110, excluding MIR itself, plus every named family and retained incident regardless of rank. Archive metadata and actual engine admission still decide each exact executable profile.",
+        "popularity_sources": [
+          {
+            "engine_filter": "2.1.23",
+            "retrieved_utc": "2026-10-25T21:48:43.508360+00:00",
+            "source_url": "https://mods.factorio.com/api/mods?page_size=max&hide_deprecated=true&version=2.1.23",
+            "original_response_sha256": "CE4D613506A36C6455107DECB91D179BDCAF8244F30722D28B93E09D6B462249",
+            "selected_snapshot_primary_path": "build/mir5/recovery/popular-mod-coverage-audit-r01/top50-2.1.23.json",
+            "selected_snapshot_sha256": "C955810846FD29969D542287EFD2A8D54629729CC7D11DEDEF204ACA8C418A71",
+            "selected_count": 50
+          },
+          {
+            "engine_filter": "2.0.77",
+            "retrieved_utc": "2026-10-25T21:48:50.473588+00:00",
+            "source_url": "https://mods.factorio.com/api/mods?page_size=max&hide_deprecated=true&version=2.0.77",
+            "original_response_sha256": "7F7A44B5B37201CF8FCAB6A5190420683A412288067215E8203D02C56D3E999C",
+            "selected_snapshot_primary_path": "build/mir5/recovery/popular-mod-coverage-audit-r01/top50-2.0.77.json",
+            "selected_snapshot_sha256": "5679B7291FEDB21E31A004512E1C0684331958AED9B472C4EA3190D0FADAEFCE",
+            "selected_count": 50
+          },
+          {
+            "engine_filter": "1.1.110",
+            "retrieved_utc": "2026-10-25T21:48:56.244063+00:00",
+            "source_url": "https://mods.factorio.com/api/mods?page_size=max&hide_deprecated=true&version=1.1.110",
+            "original_response_sha256": "A8689F5D78D88B450EC797672A0A8148D5432F461DA0F3F117C73E12137D59FA",
+            "selected_snapshot_primary_path": "build/mir5/recovery/popular-mod-coverage-audit-r01/top50-1.1.110.json",
+            "selected_snapshot_sha256": "CA50F28B277882E50D2580ABA22B44AF0E724C8528D9C48211B1011EF070BC26",
+            "selected_count": 50
+          }
+        ],
+        "popular_mod_roots": [
+          {
+            "name": "alien-biomes",
+            "ranks_by_engine_filter": {
+              "2.1.23": 1,
+              "2.0.77": 1,
+              "1.1.110": 1
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "informatron",
+            "ranks_by_engine_filter": {
+              "2.1.23": 2,
+              "2.0.77": 2,
+              "1.1.110": 2
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "jetpack",
+            "ranks_by_engine_filter": {
+              "2.1.23": 3,
+              "2.0.77": 3,
+              "1.1.110": 3
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "aai-containers",
+            "ranks_by_engine_filter": {
+              "2.1.23": 4,
+              "2.0.77": 4,
+              "1.1.110": 4
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "aai-industry",
+            "ranks_by_engine_filter": {
+              "2.1.23": 5,
+              "2.0.77": 5,
+              "1.1.110": 5
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "aai-signal-transmission",
+            "ranks_by_engine_filter": {
+              "2.1.23": 6,
+              "2.0.77": 6,
+              "1.1.110": 6
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "shield-projector",
+            "ranks_by_engine_filter": {
+              "2.1.23": 7,
+              "2.0.77": 7,
+              "1.1.110": 7
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "robot_attrition",
+            "ranks_by_engine_filter": {
+              "2.1.23": 8,
+              "2.0.77": 8,
+              "1.1.110": 8
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "helmod",
+            "ranks_by_engine_filter": {
+              "2.1.23": 9,
+              "2.0.77": 9,
+              "1.1.110": 9
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "space-exploration",
+            "ranks_by_engine_filter": {
+              "2.1.23": 10,
+              "2.0.77": 10,
+              "1.1.110": 10
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "even-distribution",
+            "ranks_by_engine_filter": {
+              "2.1.23": 11,
+              "2.0.77": 11,
+              "1.1.110": 11
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bullet-trails",
+            "ranks_by_engine_filter": {
+              "2.1.23": 12,
+              "2.0.77": 12,
+              "1.1.110": 12
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "RateCalculator",
+            "ranks_by_engine_filter": {
+              "2.1.23": 13,
+              "2.0.77": 13,
+              "1.1.110": 14
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobinserters",
+            "ranks_by_engine_filter": {
+              "2.1.23": 14,
+              "2.0.77": 14,
+              "1.1.110": 15
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Krastorio2",
+            "ranks_by_engine_filter": {
+              "2.1.23": 15,
+              "2.0.77": 15,
+              "1.1.110": 16
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "AutoDeconstruct",
+            "ranks_by_engine_filter": {
+              "2.1.23": 16,
+              "2.0.77": 16,
+              "1.1.110": 17
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "FNEI",
+            "ranks_by_engine_filter": {
+              "2.1.23": 17,
+              "2.0.77": 17,
+              "1.1.110": 18
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "combat-mechanics-overhaul",
+            "ranks_by_engine_filter": {
+              "2.1.23": 18,
+              "2.0.77": 18,
+              "1.1.110": 19
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Milestones",
+            "ranks_by_engine_filter": {
+              "2.1.23": 19,
+              "2.0.77": 19,
+              "1.1.110": 20
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "textplates",
+            "ranks_by_engine_filter": {
+              "2.1.23": 20,
+              "2.0.77": 20,
+              "1.1.110": 21
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "boblogistics",
+            "ranks_by_engine_filter": {
+              "2.1.23": 21,
+              "2.0.77": 21,
+              "1.1.110": 22
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "factoryplanner",
+            "ranks_by_engine_filter": {
+              "2.1.23": 22,
+              "2.0.77": 22,
+              "1.1.110": 23
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "DiscoScience",
+            "ranks_by_engine_filter": {
+              "2.1.23": 23,
+              "2.0.77": 23,
+              "1.1.110": 24
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "grappling-gun",
+            "ranks_by_engine_filter": {
+              "2.1.23": 24,
+              "2.0.77": 24,
+              "1.1.110": 25
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobpower",
+            "ranks_by_engine_filter": {
+              "2.1.23": 25,
+              "2.0.77": 26,
+              "1.1.110": 27
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobwarfare",
+            "ranks_by_engine_filter": {
+              "2.1.23": 26,
+              "2.0.77": 27,
+              "1.1.110": 28
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Waterfill_v17",
+            "ranks_by_engine_filter": {
+              "2.1.23": 27,
+              "2.0.77": 28,
+              "1.1.110": 29
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobassembly",
+            "ranks_by_engine_filter": {
+              "2.1.23": 28,
+              "2.0.77": 29,
+              "1.1.110": 30
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobmining",
+            "ranks_by_engine_filter": {
+              "2.1.23": 29,
+              "2.0.77": 30,
+              "1.1.110": 31
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "equipment-gantry",
+            "ranks_by_engine_filter": {
+              "2.1.23": 30,
+              "2.0.77": 31,
+              "1.1.110": 32
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobores",
+            "ranks_by_engine_filter": {
+              "2.1.23": 31,
+              "2.0.77": 32,
+              "1.1.110": 33
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "VehicleSnap",
+            "ranks_by_engine_filter": {
+              "2.1.23": 32,
+              "2.0.77": 33,
+              "1.1.110": 34
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobplates",
+            "ranks_by_engine_filter": {
+              "2.1.23": 33,
+              "2.0.77": 34,
+              "1.1.110": 35
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "squeak-through-2",
+            "ranks_by_engine_filter": {
+              "2.1.23": 34,
+              "2.0.77": 35,
+              "1.1.110": 36
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "LogisticTrainNetwork",
+            "ranks_by_engine_filter": {
+              "2.1.23": 35,
+              "2.0.77": 36,
+              "1.1.110": 37
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobenemies",
+            "ranks_by_engine_filter": {
+              "2.1.23": 36,
+              "2.0.77": 37,
+              "1.1.110": 38
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "cargo-ships",
+            "ranks_by_engine_filter": {
+              "2.1.23": 37,
+              "2.0.77": 38,
+              "1.1.110": 39
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Todo-List",
+            "ranks_by_engine_filter": {
+              "2.1.23": 38,
+              "2.0.77": 39,
+              "1.1.110": 40
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobelectronics",
+            "ranks_by_engine_filter": {
+              "2.1.23": 39,
+              "2.0.77": 40,
+              "1.1.110": 41
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobmodules",
+            "ranks_by_engine_filter": {
+              "2.1.23": 40,
+              "2.0.77": 41,
+              "1.1.110": 42
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobtech",
+            "ranks_by_engine_filter": {
+              "2.1.23": 41,
+              "2.0.77": 42,
+              "1.1.110": 43
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobequipment",
+            "ranks_by_engine_filter": {
+              "2.1.23": 42,
+              "2.0.77": 43,
+              "1.1.110": 44
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "aai-vehicles-ironclad",
+            "ranks_by_engine_filter": {
+              "2.1.23": 43,
+              "2.0.77": 44,
+              "1.1.110": 45
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "FluidMustFlow",
+            "ranks_by_engine_filter": {
+              "2.1.23": 44,
+              "2.0.77": 45,
+              "1.1.110": 46
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "bobrevamp",
+            "ranks_by_engine_filter": {
+              "2.1.23": 45,
+              "2.0.77": 46,
+              "1.1.110": 47
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "far-reach",
+            "ranks_by_engine_filter": {
+              "2.1.23": 46,
+              "2.0.77": 47,
+              "1.1.110": 48
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Warehousing",
+            "ranks_by_engine_filter": {
+              "2.1.23": 47,
+              "2.0.77": 48,
+              "1.1.110": 49
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "BottleneckLite",
+            "ranks_by_engine_filter": {
+              "2.1.23": 48,
+              "2.0.77": 50
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Power Armor MK3",
+            "ranks_by_engine_filter": {
+              "2.1.23": 49
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "angelsrefining",
+            "ranks_by_engine_filter": {
+              "2.1.23": 50
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Bottleneck",
+            "ranks_by_engine_filter": {
+              "2.0.77": 25,
+              "1.1.110": 26
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "RecipeBook",
+            "ranks_by_engine_filter": {
+              "2.0.77": 49,
+              "1.1.110": 50
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          },
+          {
+            "name": "Squeak Through",
+            "ranks_by_engine_filter": {
+              "1.1.110": 13
+            },
+            "status": "exact-profile-and-current-evidence-reconciliation-required"
+          }
+        ],
+        "named_families": [
+          {
+            "family": "AAI",
+            "tracked_profiles": [
+              "tests/profiles/aai-industry-base-f210-2123.json",
+              "tests/profiles/aai-industry-space-age-f210-2123.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "New exact AAI Industry0.7.5 Base/Space Age input profiles are pinned; no native result exists yet. Complete the individual Industry and admitted full AAI-suite axes."
+          },
+          {
+            "family": "BZ",
+            "tracked_profiles": [],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "No active profile or native chain; qualify component mods individually and the complete admitted BZ suite."
+          },
+          {
+            "family": "Py",
+            "tracked_profiles": [
+              "tests/profiles/py-alienlife-hightech-f200-2077.json",
+              "tests/profiles/py-coal-f200-2077.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "Only two F200 selections exist; retained named data/gameplay receipts do not qualify the complete Py suite or current F210."
+          },
+          {
+            "family": "K2",
+            "tracked_profiles": [
+              "tests/profiles/k2-base-continuations-f200.json",
+              "tests/profiles/k2-base-f200-2077.json",
+              "tests/profiles/k2-imersite-transition-direct-f210.json",
+              "tests/profiles/k2-imersite-transition-mir5-f210.json",
+              "tests/profiles/k2-imersite-transition-predecessor-4.6-f210.json",
+              "tests/profiles/k2-imersite-transition-published-4.7-f210.json",
+              "tests/profiles/k2so-f210-2123.json",
+              "tests/profiles/k2so-observed-f210-2123.json",
+              "tests/profiles/materials-k2so-f210.json",
+              "tests/profiles/worker-caps-k2so-f210.json",
+              "tests/profiles/worker-caps-relaxed-k2so-f210.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "Retain exact K2 Base evidence separately from K2SO; current-package and transition applicability remains incomplete."
+          },
+          {
+            "family": "K2SO",
+            "tracked_profiles": [
+              "tests/profiles/k2-imersite-transition-direct-f210.json",
+              "tests/profiles/k2-imersite-transition-mir5-f210.json",
+              "tests/profiles/k2-imersite-transition-predecessor-4.6-f210.json",
+              "tests/profiles/k2-imersite-transition-published-4.7-f210.json",
+              "tests/profiles/k2so-f210-2123.json",
+              "tests/profiles/k2so-observed-f210-2123.json",
+              "tests/profiles/materials-k2so-f210.json",
+              "tests/profiles/worker-caps-k2so-f210.json",
+              "tests/profiles/worker-caps-relaxed-k2so-f210.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "Retain exact Space Age K2SO material/science/save evidence; this is not K2SE."
+          },
+          {
+            "family": "SE",
+            "tracked_profiles": [],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "No active profile or native chain."
+          },
+          {
+            "family": "K2SE",
+            "tracked_profiles": [],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "No active combined K2 and Space Exploration profile or native chain; K2SO evidence supplies no substitute."
+          },
+          {
+            "family": "Bob",
+            "tracked_profiles": [
+              "tests/profiles/armor-bobwarfare-f200-2077.json",
+              "tests/profiles/bob-angel-continuity-effect1-cap40-f200.json",
+              "tests/profiles/bob-angel-continuity-effect3-cap2-f200.json",
+              "tests/profiles/bob-angel-continuity-f200.json",
+              "tests/profiles/bob-angel-continuity-published-4.7-f200.json",
+              "tests/profiles/bob-angel-default-cap-f200-2077.json",
+              "tests/profiles/bob-angel-f200-2077.json",
+              "tests/profiles/bob-angel-prototype-cap125-f200.json",
+              "tests/profiles/bob-angel-prototype-cap400-f200.json",
+              "tests/profiles/bob-angel-published-reset-control-f200.json",
+              "tests/profiles/bob-core-f210-2123.json",
+              "tests/profiles/bob-core-gameplay-f210-2123.json",
+              "tests/profiles/bob-tech-f210-2123.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "Bob core, BobTech and Bob/Angel are distinct selections; they do not qualify the whole suite individually or every combined profile."
+          },
+          {
+            "family": "Angel",
+            "tracked_profiles": [
+              "tests/profiles/bob-angel-continuity-effect1-cap40-f200.json",
+              "tests/profiles/bob-angel-continuity-effect3-cap2-f200.json",
+              "tests/profiles/bob-angel-continuity-f200.json",
+              "tests/profiles/bob-angel-continuity-published-4.7-f200.json",
+              "tests/profiles/bob-angel-default-cap-f200-2077.json",
+              "tests/profiles/bob-angel-f200-2077.json",
+              "tests/profiles/bob-angel-prototype-cap125-f200.json",
+              "tests/profiles/bob-angel-prototype-cap400-f200.json",
+              "tests/profiles/bob-angel-published-reset-control-f200.json",
+              "tests/profiles/bob-tech-f210-2123.json"
+            ],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "Retain exact combined Bob/Angel evidence; no independent complete Angel or arbitrary mixed-profile verdict follows."
+          },
+          {
+            "family": "IR3/IR4",
+            "tracked_profiles": [],
+            "current_candidate_verdict": "not-established-for-full-family",
+            "coverage_gap": "No active profile or native chain; determine actual engine/dependency compatibility before qualification."
+          }
+        ],
+        "combined_profiles_required": [
+          {
+            "selection": "Complete dependency-valid AAI suite",
+            "status": "exact-closure-and-native-qualification-required"
+          },
+          {
+            "selection": "Complete dependency-valid BZ suite",
+            "status": "exact-closure-and-native-qualification-required"
+          },
+          {
+            "selection": "AAI Industry with BZ",
+            "status": "exact-upstream-admission-and-native-qualification-required"
+          },
+          {
+            "selection": "Complete dependency-valid Py suite",
+            "status": "exact-closure-and-native-qualification-required"
+          },
+          {
+            "selection": "K2 with Space Exploration and its AAI dependencies",
+            "status": "exact-closure-and-native-qualification-required"
+          },
+          {
+            "selection": "K2/SE/AAI with admitted BZ components",
+            "status": "exact-upstream-admission-and-native-qualification-required"
+          },
+          {
+            "selection": "Bob suite and Angel suite, separately and together",
+            "status": "retained-exact-evidence-plus-current-full-closure-qualification-required"
+          },
+          {
+            "selection": "AAI with Bob/Angel and admitted BZ components",
+            "status": "exact-upstream-admission-and-native-qualification-required"
+          },
+          {
+            "selection": "Popular UI, research, logistics and productivity mods combined with the admitted major overhauls",
+            "status": "ranked-root-selection-and-interaction-qualification-required"
+          }
+        ],
+        "per_profile_evidence_axes": [
+          "Dependency-valid exact engine/archive/settings closure and upstream-without-MIR control where valid.",
+          "Current MIR startup and complete relevant data/effect/science/prerequisite comparison.",
+          "Actual research and meaningful physical output for affected mechanisms; explicitly record an expected-inert case where the mod adds no affected MIR outcome.",
+          "Published MIR predecessor to current MIR with earned, current, queued, suspended and foreign state checks, save and two cold reloads.",
+          "Supported mod addition/removal/readdition and configuration/preference transitions with protected originals.",
+          "Applicable game-version and Base/Space Age save transitions recorded separately under CONT-11/CONT-13.",
+          "Affected client/join/rejoin/restart/UI and resource/stress observations; startup alone does not qualify those axes."
+        ],
+        "historical_incident_rule": "Every original request/incident and existing exact regression pack remains mandatory regardless of popularity. Preserve original IDs/decisions/receipts, including science failures, True Nukes, multiplayer join, optional-DLC artwork, K2 Imersite/carriers, Py foreign resets, Bob/Angel prerequisite/cap cases and mixed productivity providers. Unknown reporter inputs remain explicit missing inputs.",
+        "evidence_rule": "A tracked profile or available archive is not a native pass. Keep exact old evidence under its original identities, map consumed-input applicability, and record each unrun or failed axis visibly. Upstream incompatibility requires exact evidence and an explicit disposition; it is not a successful migration or a MIR completeness claim."
+      }
     },
     {
       "id": "CONT-13",
@@ -724,8 +1397,84 @@
       "remaining_implementation": [],
       "remaining_qualification": [
         "Run final current-package and affected native checks for every delivered target subset.",
-        "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts."
-      ]
+        "Prioritize exact current F2102.1.23 acceptance while preserving F2002.0.77 and all seven historical-edition obligations; report each tested subset and remaining gaps without relabelling earlier receipts.",
+        "Qualify actual game-version save hops and Base/Space Age transitions above; fresh worlds and same-engine MIR upgrades are separate evidence."
+      ],
+      "version_transition_coverage": {
+        "status": "not-established",
+        "distinction": "Existing historical published-MIR-to-MIR5 transitions use the same Factorio binary. They do not qualify any Factorio engine-version save hop.",
+        "adjacent_game_version_save_hops_required": [
+          {
+            "from": "0.13.20",
+            "to": "0.14.23",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "0.14.23",
+            "to": "0.15.40",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "0.15.40",
+            "to": "0.16.51",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "0.16.51",
+            "to": "0.17.79",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "0.17.79",
+            "to": "1.0.0",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "1.0.0",
+            "to": "1.1.110",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "1.1.110",
+            "to": "2.0.77",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          },
+          {
+            "from": "2.0.77",
+            "to": "2.1.23",
+            "status": "unrun-requires-supported-save-route-and-exact-profile"
+          }
+        ],
+        "official_mod_save_transitions_required": [
+          {
+            "engine": "2.0.77",
+            "from": "Base",
+            "to": "Space Age",
+            "status": "unrun-requires-supported-route-and-state-oracle"
+          },
+          {
+            "engine": "2.0.77",
+            "from": "Space Age",
+            "to": "Base",
+            "status": "unrun-requires-supported-route-and-state-oracle"
+          },
+          {
+            "engine": "2.1.23",
+            "from": "Base",
+            "to": "Space Age",
+            "status": "unrun-requires-supported-route-and-state-oracle"
+          },
+          {
+            "engine": "2.1.23",
+            "from": "Space Age",
+            "to": "Base",
+            "status": "unrun-requires-supported-route-and-state-oracle"
+          }
+        ],
+        "per_edition_worlds": "Base on every delivered edition; Base and Space Age plus relevant independently enabled official capabilities on F200/F210. Expansion-only cases are inapplicable on historical engines, not passed there.",
+        "required_state": "Preserve original saves and check earned effects/levels, current and queued/suspended work, carriers, foreign state, native capability changes, save and two cold reloads at each accepted hop.",
+        "upstream_limits": "Use the actual supported stepping route. A demonstrated engine/upstream refusal preserves the source and requires an explicit supported/unsupported disposition; never relabel it as a passed upgrade."
+      }
     },
     {
       "id": "CONT-14",
