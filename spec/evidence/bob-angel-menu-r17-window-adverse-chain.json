@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "kind": "MIR5R17WindowAdverseChainV1",
+  "status": "two-failed-preparations-zero-timing-samples",
+  "source": "eccbf09463db409abade3756bb93ca4cfe544a21",
+  "controller_commit": "39603fa185abc74d2d34a4b0e8a31d4bf54c2cd4",
+  "plan_commit": "97a0750b842136355feb6e0038c4ebb790008120",
+  "plan_path": "spec/evidence/bob-angel-menu-plan-r17.json",
+  "plan_sha256": "D1B2093CBC0E47130C91789D8359981D5D11AB5E5B0BF51D4A344FDE2543D790",
+  "candidate_sha256": "2BBDBA9A0B816AC383CEA116CDF86D587BC34EFF7E1C5ACE2583F1DA98F9E842",
+  "attempts": [
+    {
+      "run": 40146466972,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40146466972",
+      "status": "failed-retained",
+      "manifest": {
+        "members_verified": 100,
+        "sha256": "CA976CD6B9FF9609AC5FD662F7C02DF8B03E20B3164D2ED8973130492018CE69"
+      },
+      "failure_phase": "owned-window-actor-Add-Type-before-Factorio",
+      "longest_capture_dump_target_code_units_including_nul": 241,
+      "completed_native_capture_processes": 4,
+      "candidate_intent": "equal-intended-native-output",
+      "replay_equality": "equal-complete-native-output",
+      "captures": [
+        {
+          "arm": "control",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/control/result.json",
+          "sha256": "F54DFF68495C996173FAEE3C5EBB04DFF186DEE49C8DA376B90BD8A311FE7D0A",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "published",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/published/result.json",
+          "sha256": "C5ABEE51F1C8F1B28635B77A7534D2AE40C1D0FF685EE1E30C79157B04BE08C1",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/candidate/result.json",
+          "sha256": "2A1822130ADD11988D5891598146CD65B33C28F7AA79D81A461A68C56E514EC4",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "replay",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/replay/result.json",
+          "sha256": "D46B6F411FD8D1C74C960E4D6EF2B962B07D86E1221780E4965CCEB59B423B8B",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        }
+      ],
+      "actor": null,
+      "timing_samples_started": 0,
+      "performance_qualification": false,
+      "release_qualification": false
+    },
+    {
+      "run": 40149390804,
+      "run_url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40149390804",
+      "status": "failed-retained",
+      "manifest": {
+        "members_verified": 104,
+        "sha256": "FB57D992D5A0C69336CA0C7A35D330BA16D8D842E1820FD42B87169A8D54416B"
+      },
+      "failure_phase": "owned-window-occlusion-after-Factorio-launch",
+      "longest_capture_dump_target_code_units_including_nul": 197,
+      "completed_native_capture_processes": 4,
+      "candidate_intent": "equal-intended-native-output",
+      "replay_equality": "equal-complete-native-output",
+      "captures": [
+        {
+          "arm": "control",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/control/result.json",
+          "sha256": "386C54FAB947CE08A97E1E2BD466C6FB03A9BE0E8957AA3520AA9D2695F9BDC7",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "published",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/published/result.json",
+          "sha256": "5994892AB2F254DF771D1417765A7CCF8080C36818739D71E30EEBB6B5938138",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "candidate",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/candidate/result.json",
+          "sha256": "233072FB7311D01F088E4B58A40D4664052A896A0A123195493E645CC571D87D",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        },
+        {
+          "arm": "replay",
+          "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/captures/replay/result.json",
+          "sha256": "3A67C196C6F3181D45DAE3DF509764E1A6B1777027E7E03C923CFCC557ED5D13",
+          "status": "completed-data-stage-observation-only",
+          "native_processes": 1,
+          "library_controls_restored": true
+        }
+      ],
+      "actor": {
+        "result_path": "bob-angel-menu-r17/preparation/s/build/tmp/owned-window/control/responsive-menu-actor/actor-result.json",
+        "sha256": "A22FD88A00261C0CE58E00439B898426F033FA0264E4BAA6ADA1E172DB1400E2",
+        "failure": "[mir-menu-main-menu-not-observed]",
+        "captured_frames": 0,
+        "capture_requests": 2054,
+        "rejected_occluded": 2054,
+        "foreground_request_attempts": 0,
+        "last_occlusion": {
+          "probe_index": 4,
+          "probe_x": 1280,
+          "probe_y": 720,
+          "owned_x": 0,
+          "owned_y": 0,
+          "owned_width": 2560,
+          "owned_height": 1440,
+          "hit": "other-window"
+        },
+        "cleanup": "owned-process-closed"
+      },
+      "timing_samples_started": 0,
+      "performance_qualification": false,
+      "release_qualification": false
+    }
+  ],
+  "operational_change": {
+    "schema": 1,
+    "kind": "MIR5LocalRunnerWorkfolderReadbackV1",
+    "derived": true,
+    "derivation": "Root local settings transaction and independently hash-verified two-member smoke custody. This is an operational observation, not player/native performance evidence.",
+    "controller_commit": "39603fa185abc74d2d34a4b0e8a31d4bf54c2cd4",
+    "previous_work_folder": "_work",
+    "work_folder": "D:\\MIRw",
+    "actual_smoke_source_root": "D:\\MIRw\\mir-native-worker\\mir-native-worker\\source",
+    "old_work_preserved": true,
+    "unrelated_settings_unchanged": true,
+    "credentials_modified": false,
+    "settings_before_sha256": "59AEE164955CF892F9E2C0B0CF7E4F90F0CDBF9D1B7C248CF1C2F560E67C8DAD",
+    "settings_after_sha256": "BEF1179EF9D1C4D2FA878CA2CA7F58D2B7E330F9F815A0F348CF26F27C586E9B",
+    "smoke_run": 40148880505,
+    "smoke_manifest_sha256": "440C325D6D72A0A4FB5DBA6B053CF33AC861C1B3519297250D2CD653BE98F80F",
+    "smoke_members_verified": 2,
+    "all38_declared_paths_checked": true,
+    "longest_declared_actor_result_code_units_including_nul": 245,
+    "predicted_governor_temp_code_units_including_nul": 188,
+    "public_helpers_unchanged": 14,
+    "player_bytes_unchanged": true
+  },
+  "raw_evidence": {
+    "path": "spec/evidence/bob-angel-menu-r17-window-adverse-receipts.json.gz",
+    "members": 22,
+    "exact_original_members": 21,
+    "derived_members": 1,
+    "gzip_bytes": 67244,
+    "gzip_sha256": "0FEAADA5C3A12927A2534F8A64DFE4080AA4CC316582BBA562AAE16AAA1B950C",
+    "uncompressed_bytes": 383709,
+    "uncompressed_sha256": "D1EA7D18EADF5F234AAC3F60C95BBE501F598C509C16998CA5DDCD1F90080E7E"
+  },
+  "independent_readback": {
+    "reviewer": "root",
+    "result": "passed",
+    "original_members_verified": 204,
+    "complete_capture_processes": 8,
+    "actual_responsive_menu_timing_samples": 0
+  },
+  "limits": [
+    "These attempts validate four data/settings captures each and their named complete comparisons; neither passes the owned-window prerequisite or starts the38-launch timing campaign.",
+    "The shorter official runner work folder preserves old work, credentials, public helper bytes, player bytes, workload, thresholds and resource limits. The subsequent native actor passes compilation/launch but records only occluded frame rejections.",
+    "The actual occluding window and coordinate/focus cause remain under diagnosis. No accepted menu timing, speedup, latency, memory, gameplay, save, arbitrary-modpack or release qualification follows. Earlier first-R17 and R16 adverses retain their original status."
+  ],
+  "performance_qualification": false,
+  "release_qualification": false
+}
