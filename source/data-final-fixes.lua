@@ -6,7 +6,7 @@ if type(mods) == "table" and type(mods.base) == "string" and mods.base:match("^2
 end
 
 -- Published named prerequisite repairs are independent of research selection.
--- Only F200/F210 with their relevant active optional inputs import this body.
+-- Only F200/F210 with relevant optional inputs import their scoped bodies.
 local prerequisite_target = require("platform.target")
 if type(mods) == "table" and (prerequisite_target.id == "f200" or prerequisite_target.id == "f210")
     and ((type(mods.angelssmelting) == "string" and mods.angelssmelting ~= "")
