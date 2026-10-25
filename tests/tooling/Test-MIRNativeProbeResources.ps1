@@ -142,6 +142,40 @@ try {
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'zero') -ExpectedPeakMemoryMiB 0} '[mir441-resource-peak-budget-required]'
   $occupied=Join-Path $root 'occupied';[IO.Directory]::CreateDirectory($occupied)|Out-Null;[IO.File]::WriteAllText((Join-Path $occupied 'row'),'x')
   Refuses-Probe {New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $occupied -ExpectedPeakMemoryMiB 64 -UseExactOutputRoot} '[mir-native-probe-exact-output-not-empty]'
+  $admissionRoot=Join-Path $root 'eight-gib-admission-boundary';[IO.Directory]::CreateDirectory($admissionRoot)|Out-Null
+  $admissionPolicy=[pscustomobject]@{minimum_free_ram_gib=4}
+  $eightGiB=[int64]8GB
+  $boundarySnapshot=[pscustomobject]@{
+    observed_at='test';memory=[pscustomobject]@{total_bytes=[int64]64GB;free_bytes=[int64]64GB;commit_limit_bytes=[int64]64GB;committed_bytes=0L}
+    work_volume=[pscustomobject]@{name='W:';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
+    system_volume=[pscustomobject]@{name='S:';free_bytes=[int64]100GB;total_bytes=[int64]200GB}
+  }
+  $admissionLimits=Get-MIR441ResourceLimits -Policy $admissionPolicy -Snapshot $boundarySnapshot
+  $requiredDisk=[int64]$admissionLimits.work_bytes+2*$eightGiB
+  Assert-Probe ($requiredDisk-[int64]$admissionLimits.work_bytes-eq16GB) 'eight-gib-double-output-reserve'
+  $boundarySnapshot.work_volume.free_bytes=$requiredDisk;$boundarySnapshot.system_volume.free_bytes=$requiredDisk
+  $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
+  try {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot}.GetNewClosure()
+    $null=Assert-MIR441ResourceAdmission -Policy $admissionPolicy -WorkRoot $admissionRoot -EstimatedPeakBytes $eightGiB -ExpectedPeakMemoryBytes 1024MB
+    $boundarySnapshot.work_volume.free_bytes=$requiredDisk-1
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $admissionPolicy -WorkRoot $admissionRoot -EstimatedPeakBytes $eightGiB -ExpectedPeakMemoryBytes 1024MB} '[mir441-resource-admission-work-disk]'
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $admissionPolicy -WorkRoot $admissionRoot -EstimatedPeakBytes ($eightGiB+1) -ExpectedPeakMemoryBytes 1024MB} '[mir441-resource-staging-budget]'
+    Refuses-Probe {Assert-MIR441ResourceAdmission -Policy $admissionPolicy -WorkRoot $admissionRoot -EstimatedPeakBytes -1 -ExpectedPeakMemoryBytes 1024MB} '[mir441-resource-staging-budget]'
+  } finally {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value $priorSnapshot
+  }
+  $defaultBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'default-budget') -ExpectedPeakMemoryMiB 1024 -UseExactOutputRoot
+  Assert-Probe ([int64]$defaultBudget.max_new_output_bytes -eq [int64]120MB) 'default-output-budget'
+  $boundarySnapshot.work_volume.free_bytes=$requiredDisk;$boundarySnapshot.system_volume.free_bytes=$requiredDisk
+  $priorSnapshot=${function:Get-MIR441ResourceSnapshot}
+  try {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value {param([string]$WorkRoot) return $boundarySnapshot}.GetNewClosure()
+    $eightGiBBudget=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot (Join-Path $root 'eight-gib-budget') -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8192 -UseExactOutputRoot
+    Assert-Probe ([int64]$eightGiBBudget.max_new_output_bytes -eq [int64]8192MB) 'eight-gib-output-budget-admitted'
+  } finally {
+    Set-Item -Path Function:Get-MIR441ResourceSnapshot -Value $priorSnapshot
+  }
   $run=Join-Path $root 'run'
   $context=New-MIRNativeProbeResourceContext -RepoRoot $repo -OutputRoot $run -ExpectedPeakMemoryMiB 1024 -MaxNewOutputMiB 8 -UseExactOutputRoot
   [IO.Directory]::CreateDirectory($context.root)|Out-Null
