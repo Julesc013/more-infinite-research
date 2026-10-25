@@ -1501,6 +1501,44 @@ class ScienceTests(unittest.TestCase):
             "later missing unfamiliar input did not trigger one bounded recipe-only scan")
         ''')
 
+    def test_fresh_science_native_selections_change_only_the_frozen_mir_arm(self):
+        profiles = []
+        expected_arms = (
+            ("mir5", "5.0.21000", "C8E0C570213F41CA8C816A29D1556FD40A36896D31ED56B07856652B2DE7F32A"),
+            ("published", "4.7.21003", "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"),
+        )
+        for arm, version, digest in expected_arms:
+            profile = json.loads((ROOT / "tests/profiles" /
+                f"fresh-science-sources-{arm}-f210-2123.json").read_bytes())
+            self.assertEqual(profile["kind"], "mir5-fresh-science-sources-f210-native-selection")
+            self.assertEqual((profile["target"], profile["factorio_line"], profile["settings_mode"]),
+                ("f210", "2.1", "Defaults"))
+            self.assertEqual(profile["engine"], {
+                "version": "2.1.23",
+                "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+            })
+            self.assertEqual([(row["name"], row["version"], row["enabled"]) for row in profile["mods"]],
+                [(name, "2.1.23", True) for name in
+                    ("base", "elevated-rails", "quality", "recycler", "space-age")] + [
+                    ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                    ("more-infinite-research", version, True),
+                    ("mir-fixture-mir5-fresh-science-sources", "0.1.0", True),
+                ])
+            self.assertEqual(profile["archive_sha256"], {
+                "mir-fixture-mir5-active-mods-observer_0.1.0.zip":
+                    "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+                f"more-infinite-research_{version}.zip": digest,
+            })
+            profiles.append(profile)
+        # The independent oracles above pin both arms; this comparison also
+        # detects a new unmatched setting/selection field in either arm.
+        for profile in profiles:
+            profile["mods"] = [row for row in profile["mods"] if row["name"] != "more-infinite-research"]
+            profile["archive_sha256"] = {name: digest for name, digest in profile["archive_sha256"].items()
+                if not name.startswith("more-infinite-research_")}
+            profile.pop("scope")
+        self.assertEqual(*profiles)
+
     def test_fresh_science_fixture_executes_its_actual_data_stage_predicate(self):
         fixture = ROOT / "tests/fixtures/fresh-science-sources"
         info = json.loads((fixture / "info.json").read_text(encoding="utf-8"))
