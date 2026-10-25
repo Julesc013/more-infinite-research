@@ -39,6 +39,7 @@
     "source_reference": "d780e872f2417c93caddb726c44acbf8da312d40",
     "git_blob_sha256": [
       {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "ADC582E1CBA9C6A88DB5F244340FFE1C19FAE032E7EFDB07AB2C881BA0CCD4CE"},
+      {"path": "tools/commands/workspace/Test-MIRDevelopmentHealth.ps1", "sha256": "D610BE142BF948C2CE5C5BAE4FE29822D84C75114EC5A7BF0A9D6F719CB7CDE1"},
       {"path": "tools/lib/validation/NativeProbeCommon.ps1", "sha256": "CC8462A39DE12D0746C8F985D1F86F761CF3EF261B4FA551CFFD092F76D64D71"},
       {"path": "tools/lib/validation/NativeProbeResources.ps1", "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"},
       {"path": "tools/lib/validation/ResourceGovernor.ps1", "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"},
