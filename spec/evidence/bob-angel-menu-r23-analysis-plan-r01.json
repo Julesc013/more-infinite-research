@@ -30,12 +30,19 @@
     },
     "published": {
       "version": "4.7.20002",
-      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7"
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "name": "more-infinite-research",
+      "root": "more-infinite-research_4.7.20002",
+      "factorio_version": "2.0"
     },
     "candidate": {
       "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
       "bytes": 553231,
-      "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498"
+      "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498",
+      "name": "more-infinite-research",
+      "version": "5.0.21000",
+      "root": "more-infinite-research_5.0.21000",
+      "factorio_version": "2.0"
     },
     "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
     "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9"

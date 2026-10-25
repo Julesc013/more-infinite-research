@@ -60,13 +60,21 @@ def _raw_plan(plan: dict[str, object]) -> dict[str, object]:
     }
 
 
-def _execution_tolerance(plan: dict[str, object]) -> dict[str, float]:
+def _execution_tolerance(plan: dict[str, object]) -> dict[str, object]:
     tolerance = plan["tolerance_policy"]
     return {
         "aa_absolute_tolerance_seconds": tolerance["aa_absolute_seconds"],
         "aa_relative_tolerance_percent": tolerance["aa_relative_percent"],
         "control_regression_tolerance_seconds": tolerance["control_regression_seconds"],
         "minimum_mir_added_time_reduction_percent": tolerance["minimum_mir_added_time_reduction_percent"],
+        "same_version_aa_pilot": {
+            "arm": "published-4.7",
+            "observations": 2,
+            "absolute_tolerance_seconds": tolerance["aa_absolute_seconds"],
+            "relative_tolerance_percent": tolerance["aa_relative_percent"],
+        },
+        "primary_samples_per_arm": 8,
+        "counterbalanced_blocks": 8,
     }
 
 
@@ -89,9 +97,15 @@ def _result(
     inputs = {
         "factorio": {"base_version": identity["engine"]["version"], "sha256": identity["engine"]["sha256"]},
         "profile": {"path": identity["profile"]["path"], "sha256": identity["profile"]["sha256"]},
-        "published": {"version": identity["published"]["version"], "sha256": identity["published"]["sha256"]},
-        "replay": {"version": identity["published"]["version"], "sha256": "A" * 64},
-        "candidate": {"sha256": identity["candidate"]["sha256"], "bytes": identity["candidate"]["bytes"]},
+        "published": copy.deepcopy(identity["published"]),
+        "replay": {
+            "name": identity["published"]["name"],
+            "version": identity["published"]["version"],
+            "root": identity["published"]["root"],
+            "factorio_version": identity["published"]["factorio_version"],
+            "sha256": "A" * 64,
+        },
+        "candidate": copy.deepcopy(identity["candidate"]),
         "ordinary_player_config": {"sha256": identity["ordinary_config_sha256"]},
         "player_data": {"sha256": identity["player_data_sha256"]},
     }

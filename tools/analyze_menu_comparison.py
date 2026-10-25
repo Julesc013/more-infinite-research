@@ -132,6 +132,13 @@ def _expect_hash(actual: Any, expected: Any, label: str) -> None:
         raise MenuAnalysisError(f"{label} does not match the frozen R23 identity")
 
 
+def _matches_declared_relative_path(actual: Any, declared: Any, label: str) -> None:
+    observed = _string(actual, label).replace("\\", "/")
+    expected = _string(declared, f"{label} declared").replace("\\", "/")
+    if observed != expected and not observed.endswith("/" + expected):
+        raise MenuAnalysisError(f"{label} does not match the frozen R23 profile path")
+
+
 def _expected_schedule(schedule: dict[str, Any]) -> list[dict[str, Any]]:
     arms = [_string(value, "analysis schedule arm") for value in _array(schedule.get("arms"), "analysis schedule arms")]
     if arms != ["control-without-mir", "published-4.7", "replay", "candidate-mir5"]:
@@ -268,19 +275,25 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
     _expect_hash(factorio.get("sha256"), expected_engine.get("sha256"), "result Factorio SHA-256")
     profile = _mapping(inputs.get("profile"), "result profile")
     expected_profile = _mapping(identity.get("profile"), "analysis profile")
-    _same(_string(profile.get("path"), "result profile path"), _string(expected_profile.get("path"), "analysis profile path"), "result profile path")
+    _matches_declared_relative_path(profile.get("path"), expected_profile.get("path"), "result profile path")
     _expect_hash(profile.get("sha256"), expected_profile.get("sha256"), "result profile SHA-256")
     published = _mapping(inputs.get("published"), "result published archive")
     expected_published = _mapping(identity.get("published"), "analysis published archive")
     _same(_string(published.get("version"), "result published version"), _string(expected_published.get("version"), "analysis published version"), "result published version")
     _expect_hash(published.get("sha256"), expected_published.get("sha256"), "result published SHA-256")
+    for key in ("name", "root", "factorio_version"):
+        _same(_string(published.get(key), f"result published {key}"), _string(expected_published.get(key), f"analysis published {key}"), f"result published {key}")
     candidate = _mapping(inputs.get("candidate"), "result candidate archive")
     expected_candidate = _mapping(identity.get("candidate"), "analysis candidate")
     _expect_hash(candidate.get("sha256"), expected_candidate.get("sha256"), "result candidate SHA-256")
     _same(_integer(candidate.get("bytes"), "result candidate bytes"), _integer(expected_candidate.get("bytes"), "analysis candidate bytes"), "result candidate bytes")
+    for key in ("name", "version", "root", "factorio_version"):
+        _same(_string(candidate.get(key), f"result candidate {key}"), _string(expected_candidate.get(key), f"analysis candidate {key}"), f"result candidate {key}")
     replay = _mapping(inputs.get("replay"), "result replay archive")
     _same(_string(replay.get("version"), "result replay version"), _string(expected_published.get("version"), "analysis published version"), "result replay version")
     _expect_hash(replay.get("sha256"), replay.get("sha256"), "result replay SHA-256")
+    for key in ("name", "root", "factorio_version"):
+        _same(_string(replay.get(key), f"result replay {key}"), _string(expected_published.get(key), f"analysis published {key}"), f"result replay {key}")
     if _sha256(replay.get("sha256"), "result replay SHA-256") == _sha256(published.get("sha256"), "result published SHA-256"):
         raise MenuAnalysisError("result replay archive must remain byte-distinct from published")
     ordinary = _mapping(inputs.get("ordinary_player_config"), "result ordinary configuration")
@@ -289,10 +302,10 @@ def _validate_identity(result: dict[str, Any], analysis_plan: dict[str, Any]) ->
     _expect_hash(player_data.get("sha256"), identity.get("player_data_sha256"), "result player data SHA-256")
     return {
         "engine": {"version": factorio["base_version"], "sha256": factorio["sha256"]},
-        "profile": {"path": profile["path"], "sha256": profile["sha256"]},
-        "published": {"version": published["version"], "sha256": published["sha256"]},
-        "replay": {"version": replay["version"], "sha256": replay["sha256"]},
-        "candidate": {"sha256": candidate["sha256"], "bytes": candidate["bytes"]},
+        "profile": {"path": expected_profile["path"], "sha256": profile["sha256"]},
+        "published": {key: published[key] for key in ("name", "version", "root", "factorio_version", "sha256")},
+        "replay": {key: replay[key] for key in ("name", "version", "root", "factorio_version", "sha256")},
+        "candidate": {key: candidate[key] for key in ("name", "version", "root", "factorio_version", "sha256", "bytes")},
         "ordinary_config_sha256": ordinary["sha256"],
         "player_data_sha256": player_data["sha256"],
     }
@@ -325,6 +338,13 @@ def _validate_result(result: dict[str, Any], analysis_plan: dict[str, Any], expe
     }
     for actual_key, expected_key in policy_checks.items():
         _same(_number(policy.get(actual_key), f"result tolerance {actual_key}"), _number(expected_tolerance.get(expected_key), f"analysis tolerance {expected_key}"), f"result tolerance {actual_key}")
+    aa_policy = _mapping(policy.get("same_version_aa_pilot"), "result same-version AA policy")
+    _same(_string(aa_policy.get("arm"), "result same-version AA arm"), "published-4.7", "result same-version AA arm")
+    _same(_integer(aa_policy.get("observations"), "result same-version AA observations"), 2, "result same-version AA observations")
+    _same(_number(aa_policy.get("absolute_tolerance_seconds"), "result same-version AA absolute seconds"), _number(expected_tolerance.get("aa_absolute_seconds"), "analysis AA absolute seconds"), "result same-version AA absolute seconds")
+    _same(_number(aa_policy.get("relative_tolerance_percent"), "result same-version AA relative percent"), _number(expected_tolerance.get("aa_relative_percent"), "analysis AA relative percent"), "result same-version AA relative percent")
+    _same(_integer(policy.get("primary_samples_per_arm"), "result primary samples per arm"), 8, "result primary samples per arm")
+    _same(_integer(policy.get("counterbalanced_blocks"), "result counterbalanced blocks"), 8, "result counterbalanced blocks")
     plan_rows = _array(plan.get("samples"), "result execution plan samples")
     if len(plan_rows) != len(expected_schedule):
         raise MenuAnalysisError("result execution plan does not contain 38 rows")
