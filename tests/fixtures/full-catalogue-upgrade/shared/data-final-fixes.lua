@@ -26,6 +26,16 @@ if type(gear) ~= "table" or type(gear.unit) ~= "table" or gear.max_level ~= "inf
   fail("exact gear workload differs before " .. STAGE .. " acceleration")
 end
 local expected = space and {"casting-iron-gear-wheel", "iron-gear-wheel"} or {"iron-gear-wheel"}
+local science = {"automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack"}
+if type(gear.unit.ingredients) ~= "table" or #gear.unit.ingredients ~= #science then
+  fail("exact gear science cardinality differs before " .. STAGE .. " acceleration")
+end
+for index, name in ipairs(science) do
+  local ingredient = gear.unit.ingredients[index]
+  if type(ingredient) ~= "table" or ingredient[1] ~= name or ingredient[2] ~= 1 then
+    fail("exact gear science differs before " .. STAGE .. " acceleration")
+  end
+end
 if type(gear.effects) ~= "table" or #gear.effects ~= #expected then fail("exact gear effect cardinality differs") end
 for index, recipe in ipairs(expected) do
   local effect = gear.effects[index]

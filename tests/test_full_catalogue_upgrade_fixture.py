@@ -1,4 +1,5 @@
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,7 @@ FIXTURE = ROOT / "tests/fixtures/full-catalogue-upgrade"
 PROFILES = ROOT / "tests/profiles"
 ORACLE = ROOT / "spec/inventory/modern-f200-470.json"
 SHARED = FIXTURE / "shared"
+GEAR_SCIENCE = [[name, 1] for name in ("automation-science-pack", "logistic-science-pack", "chemical-science-pack", "production-science-pack")]
 F200_RUNTIME_API_CANDIDATES = (
     os.environ.get("MIR_F200_RUNTIME_API"),
     "D:/Games/Factorio/2.0/doc-html/runtime-api.json",
@@ -79,6 +81,9 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
         self.assertEqual({"recipe-prod-research_agricultural_growth_speed-1", "recipe-prod-research_spoilage_preservation-1"}, set(self.plan["space_age"]["scripted"]))
 
     def test_stage_data_guard_accelerates_exact_gear_only(self):
+        for profile in ("base-f200", "space-age-f200"):
+            gear = next(row for row in self.oracle[profile]["technology_owner_progression_facts"] if row["name"] == "recipe-prod-research_gears-1")
+            self.assertEqual(GEAR_SCIENCE, gear["science"])
         self.lua.execute("""
           function run_data(path, common, catalogue, raw, mods)
             local env = {data={raw=raw}, mods=mods}
@@ -100,7 +105,7 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
             for space in (False, True):
                 effects = [{"type":"change-recipe-productivity", "recipe":"iron-gear-wheel", "change":.1}]
                 if space: effects.insert(0, {"type":"change-recipe-productivity", "recipe":"casting-iron-gear-wheel", "change":.1})
-                gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":60}, "effects":effects}
+                gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":60, "ingredients":GEAR_SCIENCE}, "effects":effects}
                 raw = {"technology":{"recipe-prod-research_gears-1":gear}, "unchanged":{"value":17}}
                 mods = {"base":"2.0.77", "more-infinite-research":mir,
                         "mir-fixture-mir5-full-catalogue-upgrade":"0.1.0" if stage == "published-4.7" else "0.2.0"}
@@ -111,6 +116,23 @@ class FullCatalogueUpgradeFixtureTests(unittest.TestCase):
                     actual = py(result["raw"])["technology"]["recipe-prod-research_gears-1"]["unit"]
                     self.assertEqual((None, "1", 1), (actual.get("count"), actual["count_formula"], actual["time"]))
                     self.assertEqual(17, py(result["raw"])["unchanged"]["value"])
+                    self.assertEqual(GEAR_SCIENCE, actual["ingredients"])
+                wrong_amount = copy.deepcopy(GEAR_SCIENCE)
+                wrong_amount[0][1] = 2
+                wrong_name = copy.deepcopy(GEAR_SCIENCE)
+                wrong_name[0][0] = "foreign-science-pack"
+                duplicate = copy.deepcopy(GEAR_SCIENCE)
+                duplicate[1] = duplicate[0][:]
+                for ingredients in (None, [], GEAR_SCIENCE[:-1], wrong_amount, wrong_name, duplicate):
+                    altered = copy.deepcopy(gear)
+                    altered["unit"]["ingredients"] = ingredients
+                    with self.subTest(stage=stage, space=space, ingredients=ingredients):
+                        raw_input = lua(self.lua, {"technology": {"recipe-prod-research_gears-1": altered}})
+                        before = py(raw_input)
+                        result = self.lua.eval("run_data")((FIXTURE / stage / "data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / stage / "catalogue.lua").as_posix(), raw_input, lua(self.lua, mods))
+                        self.assertFalse(result["ok"])
+                        self.assertIn("gear science", str(result["message"]))
+                        self.assertEqual(before, py(result["raw"]))
         gear = {"max_level":"infinite", "unit":{"count_formula":"8000*2^(L-1)", "time":61}, "effects":[{"type":"change-recipe-productivity", "recipe":"iron-gear-wheel", "change":.1}]}
         result = self.lua.eval("run_data")((FIXTURE / "mir5/data-final-fixes.lua").as_posix(), (SHARED / "data-final-fixes.lua").as_posix(), (FIXTURE / "mir5/catalogue.lua").as_posix(), lua(self.lua, {"technology":{"recipe-prod-research_gears-1":gear}}), lua(self.lua, {"base":"2.0.77", "more-infinite-research":"5.0.20000", "mir-fixture-mir5-full-catalogue-upgrade":"0.2.0"}))
         self.assertFalse(result["ok"]); self.assertIn("workload differs", str(result["message"])); self.assertEqual(61, gear["unit"]["time"])
