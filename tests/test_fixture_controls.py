@@ -393,15 +393,24 @@ class FixtureControlHostStageTests(unittest.TestCase):
         )
 
     def test_primary_f210_consumers_select_both_existing_independent_consumers(self):
-        for fixture in ("api-alpha", "api-beta", "api-beta-production"):
+        expected = {
+            "api-alpha": ["base >= 2.1.23", "more-infinite-research >= 5.0.21000"],
+            "api-beta": ["base >= 2.1.23", "? more-infinite-research >= 5.0.21000"],
+            "api-beta-production": [
+                "base >= 2.1.23",
+                "more-infinite-research = 5.0.21000",
+                "mir-fixture-mir5-api-beta = 0.1.0",
+            ],
+        }
+        for fixture, dependencies in expected.items():
             with self.subTest(fixture=fixture):
                 info = json.loads((ROOT / "tests/fixtures" / fixture / "info.json").read_bytes())
                 self.assertEqual(info["name"], f"mir-fixture-mir5-{fixture}")
                 self.assertEqual(info["version"], "0.1.0")
                 self.assertEqual(info["factorio_version"], "2.1")
-                self.assertIn("base >= 2.1.23", info["dependencies"])
-                self.assertTrue(any("5.0.21000" in dependency for dependency in info["dependencies"]))
+                self.assertEqual(info["dependencies"], dependencies)
         profile = json.loads((ROOT / "tests/profiles/api-consumers-f210-2123.json").read_bytes())
+        self.assertEqual(profile["kind"], "mir5-api-consumers-f210-native-selection")
         self.assertEqual(profile["target"], "f210")
         self.assertEqual(profile["factorio_line"], "2.1")
         self.assertEqual(profile["engine"], {

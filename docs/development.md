@@ -39,7 +39,7 @@ Maintain the [existing community request ledger](../spec/programmes/community-re
 
 ## Work in small vertical slices
 
-Prioritize Factorio2.1.23 stable for MIR5 design, implementation and release qualification, following the [primary-target decision](../spec/targets.md#primary-target-and-earlier-editions). Earlier MIR4 families retain best-effort builds through the same capability-based source and version encoding. Preserve their exact existing evidence, qualify available subsets and state gaps by edition; schedule remaining F210 acceptance work before additional earlier-engine campaigns.
+Prioritize Factorio 2.1.23 for MIR5 design, implementation and qualification, following the [primary-target decision](../spec/targets.md#primary-target-and-earlier-editions). Preserve all nine editions through the same capability-based source and version encoding, with common feature, setting and presentation semantics wherever native capabilities permit. F210 scheduling priority does not waive final current-package and affected native checks for every delivered target subset. Reuse exact unchanged evidence under its original identity and state remaining gaps by edition; an unqualified edition remains an open release obligation.
 
 Make a native family work end to end, then exercise a different native effect, a staged/native-owner integration and stateful caps/runtime. Keep partial packages off production saves. A successful tiny package is not a full-product migration or performance claim.
 
