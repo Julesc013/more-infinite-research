@@ -1109,6 +1109,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
           $stringJoin=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$stringJoin[2].join_events='2';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $stringJoin) 'search' 'published'|Out-Null} 'string join count'
           $unknownStage=$rows|ForEach-Object {$_|ConvertTo-Json -Compress|ConvertFrom-Json -AsHashtable};$unknownStage[3].stage='unexpected';Assert-Rejects {Get-PairedBrowserStageMarker (MarkerText $unknownStage) 'ready' 'published'|Out-Null} 'unknown stage'
           Assert-Rejects {Get-PairedBrowserProfilerMarkers ($profiles+'[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms'+"`n") @('first_open','search','refresh','reopen')|Out-Null} 'duplicate profiler action'
+           Assert-Rejects {Get-PairedBrowserProfilerMarkers ($profiles -replace '\[MIR5_LIBRARY_PROFILE\] reopen[^\r\n]*\r?\n?', '') @('first_open','search','refresh','reopen')|Out-Null} 'missing profiler action'
           Assert-Rejects {Get-PairedBrowserProfilerMarkers '[MIR5_LIBRARY_PROFILE] first-open Duration: 1.000000ms' @('first_open')|Out-Null} 'hyphen profiler token'
           'PASS paired Browser reader'
         '''
@@ -1117,6 +1118,82 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             capture_output=True, text=True,
             env=dict(os.environ, MIR_TEST_SESSION=str(SESSION)), check=False,
         )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_paired_browser_restart_phase_snapshot_preserves_exact_scope(self):
+        script = r'''
+          $ErrorActionPreference='Stop'; Set-StrictMode -Version Latest
+          $tokens=$null; $errors=$null
+          $text=[IO.File]::ReadAllText($env:MIR_TEST_SESSION)
+          $ast=[Management.Automation.Language.Parser]::ParseInput($text,[ref]$tokens,[ref]$errors)
+          if($errors.Count){throw 'session parse failed'}
+          $names=@('Test-PairedBrowserBytePrefix','Save-PairedBrowserServerPhaseLog')
+          $definitions=@{}
+          foreach($name in $names){
+            $found=@($ast.FindAll({param($node)$node -is [Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq $name},$true))
+            if($found.Count-ne1){throw "missing paired phase snapshot definition: $name"}
+            $definitions[$name]=$found[0].Extent.Text
+          }
+          function Assert-Session([bool]$Condition,[string]$Message){if(-not$Condition){throw $Message}}
+          function Get-SessionHash([string]$Path){return (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.ToUpperInvariant()}
+          function Test-Within([string]$Root,[string]$Path){
+            $relative=[IO.Path]::GetRelativePath($Root,$Path)
+            return $relative-ne'..' -and -not$relative.StartsWith('..'+[IO.Path]::DirectorySeparatorChar) -and -not[IO.Path]::IsPathRooted($relative)
+          }
+          function Resolve-BuildInput([string]$Path,[string]$Type,[string]$Label){
+            if(-not(Test-Path -LiteralPath $Path -PathType $Type)){throw "$Label is absent"}
+            $resolved=(Resolve-Path -LiteralPath $Path).Path
+            if(-not(Test-Within $buildRoot $resolved)){throw "$Label is outside checkout build"}
+            return $resolved
+          }
+          function Resolve-BuildOutput([string]$Path,[string]$Label){
+            $full=[IO.Path]::GetFullPath($Path)
+            if(-not(Test-Within $buildRoot $full)){throw "$Label is outside checkout build"}
+            return $full
+          }
+          foreach($name in $names){Invoke-Expression $definitions[$name]}
+          function Assert-Rejects([scriptblock]$Block,[string]$Name){$rejected=$false;try{&$Block}catch{$rejected=$true};if(-not$rejected){throw "paired phase snapshot accepted invalid $Name"}}
+          $encoding=[Text.UTF8Encoding]::new($false)
+          $buildRoot=Join-Path $env:MIR_TEST_WORK 'build';$null=New-Item -ItemType Directory -Path $buildRoot
+          function New-Phase([string]$Name,[bool]$Append){
+            $workroot=Join-Path $buildRoot $Name;$null=New-Item -ItemType Directory -Path $workroot
+            $live=Join-Path $workroot 'factorio-current.log'
+            $initial='[MIR5_LIBRARY_PROFILE] first_open Duration: 1.000000ms' + "`n" +
+              '[MIR5_LIBRARY_PROFILE] search Duration: 1.000000ms' + "`n" +
+              '[MIR5_LIBRARY_PROFILE] refresh Duration: 1.000000ms' + "`n" + 'shutdown server-initial' + "`n"
+            $restart='Hosting game at 127.0.0.1' + "`n" +
+              '[MIR5_LIBRARY_PROFILE] reopen Duration: 1.000000ms' + "`n" + 'shutdown server-restart' + "`n"
+            [IO.File]::WriteAllText($live,$initial,$encoding)
+            $initialSnapshot=Save-PairedBrowserServerPhaseLog $live 'initial'
+            if($Append){[IO.File]::AppendAllText($live,$restart,$encoding)}else{[IO.File]::WriteAllText($live,$restart,$encoding)}
+            $restartSnapshot=Save-PairedBrowserServerPhaseLog $live 'restart' $initialSnapshot
+            $expected=if($Append){$restart}else{$restart}
+            $actual=[IO.File]::ReadAllText($restartSnapshot,$encoding)
+            if($actual-cne$expected -or $actual-match'first_open' -or $actual-notmatch'reopen'){throw 'restart phase snapshot is not exact'}
+            if((Get-SessionHash $restartSnapshot).Length-ne64){throw 'restart phase hash is unreadable'}
+            return [pscustomobject]@{workroot=$workroot;live=$live;initial=$initialSnapshot;restart=$restartSnapshot}
+          }
+          $appended=New-Phase 'appended' $true
+          $replacement=New-Phase 'replacement' $false
+          if(([IO.File]::ReadAllText($appended.live,$encoding)-notmatch'first_open') -or ([IO.File]::ReadAllText($appended.live,$encoding)-notmatch'reopen')){throw 'appended full log was not preserved'}
+          $workroot=Join-Path $buildRoot 'invalid';$null=New-Item -ItemType Directory -Path $workroot
+          $live=Join-Path $workroot 'factorio-current.log';[IO.File]::WriteAllText($live,'inside',$encoding)
+          $outside=Join-Path $env:MIR_TEST_WORK 'outside.log';[IO.File]::WriteAllText($outside,'outside',$encoding)
+          Assert-Rejects {Save-PairedBrowserServerPhaseLog $live 'restart' $outside|Out-Null} 'outside initial snapshot'
+          $workroot=Join-Path $buildRoot 'no-post-initial';$null=New-Item -ItemType Directory -Path $workroot
+          $live=Join-Path $workroot 'factorio-current.log';[IO.File]::WriteAllText($live,'initial',$encoding)
+          $initialSnapshot=Save-PairedBrowserServerPhaseLog $live 'initial'
+          Assert-Rejects {Save-PairedBrowserServerPhaseLog $live 'restart' $initialSnapshot|Out-Null} 'restart without post-initial bytes'
+          'PASS paired Browser restart phase snapshots'
+        '''
+        with tempfile.TemporaryDirectory(prefix="mir5-paired-phase-") as work:
+            result = subprocess.run(
+                ["pwsh", "-NoLogo", "-NoProfile", "-Command", script],
+                capture_output=True,
+                text=True,
+                env=dict(os.environ, MIR_TEST_SESSION=str(SESSION), MIR_TEST_WORK=work),
+                check=False,
+            )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_actual_client_starter_matches_each_fixture_join_protocol(self):
@@ -1284,11 +1361,22 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return ('a'*64)
           }
           function Read-LogText([string]$Path){if(Test-Path -LiteralPath $Path){return [IO.File]::ReadAllText($Path,[Text.UTF8Encoding]::new($false))};return ''}
-          function Save-PairedBrowserServerPhaseLog([string]$Source,[string]$Phase){
+          function Save-PairedBrowserServerPhaseLog([string]$Source,[string]$Phase,[string]$InitialLog=''){
             if(-not(Test-Path -LiteralPath $Source -PathType Leaf)){throw 'paired Browser phase log source is absent'}
             $destination=Join-Path $workroot ("paired-browser-server-$Phase.factorio-current.log")
             if(Test-Path -LiteralPath $destination){throw 'paired Browser phase log snapshot already exists'}
-            [IO.File]::Copy($Source,$destination,$false)
+            [byte[]]$sourceBytes=[IO.File]::ReadAllBytes($Source);[byte[]]$phaseBytes=$sourceBytes
+            if($Phase-ceq'restart' -and $InitialLog){
+              [byte[]]$initialBytes=[IO.File]::ReadAllBytes($InitialLog)
+              $isPrefix=$sourceBytes.Length-ge$initialBytes.Length
+              for($index=0;$isPrefix -and $index-lt$initialBytes.Length;$index++){if($sourceBytes[$index]-ne$initialBytes[$index]){$isPrefix=$false}}
+              if($isPrefix){
+                if($sourceBytes.Length-le$initialBytes.Length){throw 'paired Browser restart server log has no post-initial bytes'}
+                $phaseBytes=[byte[]]::new($sourceBytes.Length-$initialBytes.Length)
+                [Array]::Copy($sourceBytes,$initialBytes.Length,$phaseBytes,0,$phaseBytes.Length)
+              }
+            }
+            [IO.File]::WriteAllBytes($destination,$phaseBytes)
             return $destination
           }
           function Get-PairedBrowserStageMarker {
@@ -1342,7 +1430,11 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
                 '[MIR5_LIBRARY_PROFILE] reopen Duration: 1.000000ms'
               ) -join "`n"
             }
-            [IO.File]::WriteAllText($live,$text+"`n",[Text.UTF8Encoding]::new($false))
+            if($Name-ceq'server-restart' -and $script:mode-ceq'appended-phase'){
+              [IO.File]::AppendAllText($live,$text+"`n",[Text.UTF8Encoding]::new($false))
+            }else{
+              [IO.File]::WriteAllText($live,$text+"`n",[Text.UTF8Encoding]::new($false))
+            }
             $record=[pscustomobject]@{name=$Name;closed=$false;process=$null}
             $script:records.Add($record);return $record
           }
@@ -1391,7 +1483,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
             return $true
           }
           foreach($fixtureCase in @('library-multiplayer','library-paired-browser','scripted-effects-multiplayer')){
-            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','cleanup','primary-and-cleanup','missing-phase')}else{@('success','cleanup','primary-and-cleanup')}
+            $modes=if($fixtureCase-ceq'library-paired-browser'){@('success','appended-phase','cleanup','primary-and-cleanup','missing-phase')}else{@('success','cleanup','primary-and-cleanup')}
             foreach($script:mode in $modes){
               $output=Join-Path $env:MIR_TEST_WORK ($fixtureCase+'-'+$script:mode)
               $null=New-Item -ItemType Directory -Path $output
@@ -1409,7 +1501,7 @@ class LibraryMultiplayerFixtureTests(unittest.TestCase):
               $caught=$null
               try{& $execute|Out-Null}catch{$caught=$_}
               if(@($script:records|Where-Object {-not $_.closed}).Count){throw 'cleanup abandoned owned records'}
-              if($script:mode -eq 'success'){
+              if($script:mode -in @('success','appended-phase')){
                 if($null -ne $caught){throw $caught}
                 $receipt=Get-Content -LiteralPath $sessionPath -Raw|ConvertFrom-Json
                 $expectedStops=if($fixtureCase -ceq 'library-paired-browser'){6}else{8}
