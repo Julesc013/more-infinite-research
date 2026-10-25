@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import copy
+import base64
+import gzip
 import hashlib
 import importlib.util
 import json
@@ -117,7 +119,11 @@ def _marker(kind: str, stage: str, status: str, witnesses: dict[str, object]) ->
 def _prepared_witness(row: dict[str, object]) -> dict[str, object]:
     if row["kind"] == "repair-stress":
         return {"total_eligible_walls": 1000, "first_capacity_walls": 256, "eligible_overflow_walls": 744, "initial_changed": 0, "pending_physical_work": True}
-    return {"real_lab_agriculture_completions": 2, "native_planting_events_observed": 0, "pending_physical_work": True}
+    return {
+        "real_lab_agriculture_completions": 2,
+        "native_planting_events": {"observed": 0, "expected": 2 * int(row["tier"])},
+        "pending_physical_work": True,
+    }
 
 
 def _pilot_witness(row: dict[str, object], complete: bool) -> dict[str, object]:
@@ -176,11 +182,12 @@ def _capture_and_pilot(plan: dict[str, object], plan_sha: str) -> tuple[dict[str
     for index, active in enumerate(MODULE._active_rows(), start=1):
         scenario = "repair-active" if active["kind"] == "repair-stress" else "agriculture-active"
         profile = _profile_for(plan, scenario, int(active["tier"]), str(active["arm"]))
+        staged_profile = {**profile, "path": "D:/owned/pinned-source/" + profile["path"]}
         seed_hash = f"{index:X}" * 64
         prepared = _marker(str(active["kind"]), "prepared", "pending", _prepared_witness(active))
         capture = {
             **active,
-            "profile": profile,
+            "profile": staged_profile,
             "active_seed": {"path": f"D:/custody/{active['id']}/mir5-native-active.zip", "sha256": seed_hash, "bytes": 99 + index},
             "prepared_marker": prepared,
             "native_result_path": f"D:/custody/{active['id']}/result.json",
@@ -239,6 +246,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
     tier = int(schedule["tier"])
     arm = str(schedule["arm"])
     profile = _profile_for(plan, scenario, tier, arm)
+    staged_profile = {**profile, "path": "D:/owned/pinned-source/" + profile["path"]}
     capture_id = f"repair-{arm}" if scenario == "repair-active" else f"agriculture-{arm}-{tier}"
     capture = next(item for item in captures["record"]["captures"] if item["id"] == capture_id)
     value = _value(schedule)
@@ -256,13 +264,13 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
         "tier": tier,
         "arm": arm,
         "engine": {"version": "2.1.23", "sha256": MODULE.ENGINE_SHA256},
-        "profile": profile,
+        "profile": staged_profile,
         "archives": {selected_leaf: selected},
         "seed": {
             "source_path": capture["active_seed"]["path"],
             "source_sha256": capture["active_seed"]["sha256"],
-            "owned_leaf": "fresh-owned-seed.zip",
-            "owned_path": f"D:/owned/{schedule['id']}/fresh-owned-seed.zip",
+            "owned_leaf": "fresh-owned-active-seed.zip",
+            "owned_path": f"D:/owned/{schedule['id']}/fresh-owned-active-seed.zip",
             "owned_sha256": capture["active_seed"]["sha256"],
             "bytes": capture["active_seed"]["bytes"],
         },
@@ -272,7 +280,7 @@ def _observation(plan: dict[str, object], schedule: dict[str, object], captures:
             "source": {"expected_sha256": capture["active_seed"]["sha256"], "actual_sha256": capture["active_seed"]["sha256"], "unchanged": True},
             "owned": {"expected_sha256": capture["active_seed"]["sha256"], "actual_sha256": capture["active_seed"]["sha256"], "unchanged": True},
         },
-        "command": ["--benchmark", "<fresh-owned-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
+        "command": ["--benchmark", "<fresh-owned-active-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
         "timing": {"updates": 25000, "total_milliseconds": value * 25000, "average_milliseconds_per_tick": value, "minimum_milliseconds_per_tick": value - 0.1, "maximum_milliseconds_per_tick": value + 0.1},
         "native_process": {
             "stdout": f"{schedule['id']}/factorio-current.log",
@@ -326,6 +334,49 @@ def _result(plan: dict[str, object]) -> tuple[dict[str, object], str]:
 
 
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
+        capsule_commit = "1a0fdb3cda6ac33a7ce31971bded92f1040df569"
+        capsule_path = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
+        plan_revision = "7dcd6d6df9e02f66e5eb00965a36d08daf54a856"
+        plan_path = "spec/evidence/runtime-benchmark-active-plan-r06.json"
+
+        def read_git(revision_path: str) -> bytes:
+            return subprocess.check_output(["git", "show", revision_path], cwd=ROOT)
+
+        capsule_bytes = read_git(capsule_commit + ":" + capsule_path)
+        self.assertEqual(_hash(capsule_bytes), "23466064A3C2E376A93FAFD9D5772038186BF4FB5D993E56953F5B145AD5FE88")
+        capsule = json.loads(gzip.decompress(capsule_bytes))
+        raw_records = {
+            entry["path"]: base64.b64decode(entry["base64"])
+            for entry in capsule["files"]
+            if entry["path"] in {"original/active-seed-captures.json", "original/active-marker-pilots.json"}
+        }
+        capture_bytes = raw_records["original/active-seed-captures.json"]
+        pilot_bytes = raw_records["original/active-marker-pilots.json"]
+        self.assertEqual(_hash(capture_bytes), MODULE.ACTIVE_SEED_CAPTURE_SHA256)
+        self.assertEqual(_hash(pilot_bytes), MODULE.MARKER_PILOT_SHA256)
+        plan_bytes = read_git(plan_revision + ":" + plan_path)
+        plan = json.loads(plan_bytes)
+        plan_sha = _hash(plan_bytes)
+        capture = json.loads(capture_bytes)
+        pilot = json.loads(pilot_bytes)
+        capture_reference = {
+            "path": "original/active-seed-captures.json",
+            "sha256": MODULE.ACTIVE_SEED_CAPTURE_SHA256,
+            "kind": capture["kind"],
+            "status": capture["status"],
+            "record": capture,
+        }
+        captures = MODULE._validate_capture_reference(capture_reference, plan_sha, MODULE._profiles(plan))
+        pilot_reference = {
+            "path": "original/active-marker-pilots.json",
+            "sha256": MODULE.MARKER_PILOT_SHA256,
+            "kind": pilot["kind"],
+            "status": pilot["status"],
+            "record": pilot,
+        }
+        MODULE._validate_pilot_reference(pilot_reference, plan_sha, capture_reference, captures)
+
     def test_complete_r06_result_reports_known_medians_and_increment_rules(self) -> None:
         plan = _plan()
         result, plan_sha = _result(plan)
@@ -357,6 +408,8 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
             "wrong-seed-capture": lambda item: item["observations"][0]["seed"].__setitem__("source_sha256", "0" * 64),
             "wrong-accepted-capture-receipt": lambda item: item["active_seed_capture"].__setitem__("sha256", "0" * 64),
             "wrong-accepted-pilot-receipt": lambda item: item["unscored_marker_pilot"].__setitem__("sha256", "0" * 64),
+            "relative-capture-profile": lambda item: item["active_seed_capture"]["record"]["captures"][0]["profile"].__setitem__("path", "tests/profiles/repair-stress-active-published-f210-2123.json"),
+            "flat-prepared-planting": lambda item: item["active_seed_capture"]["record"]["captures"][2]["prepared_marker"]["witnesses"].__setitem__("native_planting_events", 0),
             "pilot-complete-witness": lambda item: item["unscored_marker_pilot"]["record"]["observations"][0]["complete_marker"]["witnesses"].__setitem__("initial_changed", 1),
             "sample-complete-witness": lambda item: item["observations"][0]["physical_markers"]["complete"]["witnesses"].__setitem__("initial_changed", 1),
             "nonrestored-library": lambda item: item["observations"][0]["library_control_restoration"].__setitem__("status", "not-restored"),

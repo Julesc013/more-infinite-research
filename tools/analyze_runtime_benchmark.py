@@ -201,6 +201,14 @@ def _profiles(plan: dict[str, Any]) -> dict[tuple[str, int, str], dict[str, str]
     return answer
 
 
+def _staged_profile_path(value: Any, expected_relative: str, label: str) -> None:
+    """Require a staged Windows profile locator ending in the fixed repo path."""
+    actual = _string(value, label).replace("\\", "/")
+    expected = expected_relative.replace("\\", "/")
+    if re.fullmatch(r"[A-Za-z]:/.*", actual) is None or not actual.endswith("/" + expected):
+        raise RuntimeBenchmarkAnalysisError(label + " differs from the staged fixed profile")
+
+
 def _validate_plan(plan: dict[str, Any]) -> dict[str, Any]:
     _same(_integer(plan.get("schema"), "plan schema"), 1, "plan schema")
     _same(_string(plan.get("kind"), "plan kind"), PLAN_KIND, "plan kind")
@@ -396,7 +404,8 @@ def _validate_prepared_witness(witnesses: dict[str, Any], row: dict[str, Any]) -
         _same(_integer(witnesses.get("initial_changed"), "repair prepared changed"), 0, "repair prepared changed")
     else:
         _same(_integer(witnesses.get("real_lab_agriculture_completions"), "agriculture prepared labs"), 2, "agriculture prepared labs")
-        _same(_integer(witnesses.get("native_planting_events_observed"), "agriculture prepared planting"), 0, "agriculture prepared planting")
+        planting = _mapping(witnesses.get("native_planting_events"), "agriculture prepared planting events")
+        _same(_integer(planting.get("observed"), "agriculture prepared planting"), 0, "agriculture prepared planting")
     _same(_boolean(witnesses.get("pending_physical_work"), "prepared pending physical work"), True, "prepared pending physical work")
 
 
@@ -438,7 +447,7 @@ def _validate_capture_reference(value: Any, plan_sha256: str, profiles: dict[tup
         scenario = "repair-active" if expected_row["kind"] == "repair-stress" else "agriculture-active"
         profile = _mapping(row.get("profile"), "active seed capture profile")
         expected_profile = profiles[(scenario, expected_row["tier"], expected_row["arm"])]
-        _same(_string(profile.get("path"), "active seed capture profile path"), expected_profile["path"], "active seed capture profile path")
+        _staged_profile_path(profile.get("path"), expected_profile["path"], "active seed capture profile path")
         _expect_hash(profile.get("sha256"), expected_profile["sha256"], "active seed capture profile SHA-256")
         seed = _mapping(row.get("active_seed"), "active seed")
         _string(seed.get("path"), "active seed path")
@@ -588,7 +597,7 @@ def _validate_sample(
     _expect_hash(engine.get("sha256"), ENGINE_SHA256, "observation engine SHA-256")
     expected_profile = profiles[(schedule["scenario"], schedule["tier"], schedule["arm"])]
     profile = _mapping(row.get("profile"), "observation profile")
-    _same(_string(profile.get("path"), "observation profile path"), expected_profile["path"], "observation profile path")
+    _staged_profile_path(profile.get("path"), expected_profile["path"], "observation profile path")
     _expect_hash(profile.get("sha256"), expected_profile["sha256"], "observation profile SHA-256")
     archives = _mapping(row.get("archives"), "observation archives")
     selected_leaf = "more-infinite-research_4.7.21002.zip" if schedule["arm"] == "published" else "more-infinite-research_5.0.21000.zip"
@@ -601,7 +610,7 @@ def _validate_sample(
     capture_seed = _mapping(captures[capture_id].get("active_seed"), "capture active seed")
     _expect_hash(seed_hash, capture_seed.get("sha256"), "seed source SHA-256")
     _string(seed.get("owned_path"), "owned seed path")
-    _same(_string(seed.get("owned_leaf"), "owned seed leaf"), "fresh-owned-seed.zip", "owned seed leaf")
+    _same(_string(seed.get("owned_leaf"), "owned seed leaf"), "fresh-owned-active-seed.zip", "owned seed leaf")
     _expect_hash(seed.get("owned_sha256"), seed_hash, "owned seed SHA-256")
     _integer(seed.get("bytes"), "owned seed bytes", minimum=1)
     integrity = _mapping(row.get("seed_integrity_after_sample"), "seed integrity")
@@ -614,7 +623,7 @@ def _validate_sample(
         _same(_boolean(integrity_row.get("unchanged"), "seed integrity " + key + " unchanged"), True, "seed integrity " + key + " unchanged")
     _same(
         _array(row.get("command"), "observation command"),
-        ["--benchmark", "<fresh-owned-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
+        ["--benchmark", "<fresh-owned-active-seed.zip>", "--benchmark-ticks", "25000", "--benchmark-runs", "1", "--benchmark-sanitize"],
         "observation command",
     )
     timing = _mapping(row.get("timing"), "observation timing")
