@@ -3,7 +3,7 @@
 local KEY = "mir5_full_catalogue_upgrade"
 local SAVE = "mir5-native-complete"
 local FIXTURE = "mir-fixture-mir5-full-catalogue-upgrade"
-local SOURCE = script.active_mods[FIXTURE] == "0.1.0"
+local SOURCE = script.active_mods[FIXTURE] == "0.1.0" or script.active_mods[FIXTURE] == "0.2.1"
 local MIR = script.active_mods["more-infinite-research"]
 local GEAR = "recipe-prod-research_gears-1"
 local PROBE = "braking-force-1"
@@ -12,6 +12,7 @@ local UINT32_MAX = 4294967295
 local loaded, reload_logged = nil, false
 local PLAN = require("__mir-fixture-mir5-full-catalogue-upgrade__/catalogue")
 local TARGET = PLAN.target
+local CROSS_FROM_F200 = script.active_mods[FIXTURE] == "0.3.0"
 
 local function fail(message) error("[mir5-full-catalogue-upgrade] " .. message) end
 local function close(left, right)
@@ -32,7 +33,7 @@ local function profile()
 end
 local function check_closure()
   local expected_mir = SOURCE and TARGET.published_mir or TARGET.mir5
-  local expected_fixture = SOURCE and "0.1.0" or "0.2.0"
+  local expected_fixture = SOURCE and (TARGET.source_fixture_version or "0.1.0") or (CROSS_FROM_F200 and "0.3.0" or "0.2.0")
   if script.active_mods.base ~= TARGET.version or MIR ~= expected_mir
       or script.active_mods[FIXTURE] ~= expected_fixture then
     fail("fixture stage closure differs")
