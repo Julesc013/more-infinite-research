@@ -49,6 +49,22 @@ local function create_lab(surface, position, force, packs)
   return lab, initial
 end
 
+local function capture_lab_packs(lab, items)
+  local inventory = lab.get_inventory(defines.inventory.lab_input)
+  if not inventory then fail("real lab input inventory is absent") end
+  local counts = {}
+  for _, name in ipairs(items) do counts[name] = inventory.get_item_count(name) end
+  return counts
+end
+
+local function report_direct_pack_counts(stage, counts)
+  local rows = {}
+  for _, name in ipairs(target.direct_science) do
+    rows[#rows + 1] = name .. "=" .. tostring(counts[name])
+  end
+  log("[MIR5_HISTORICAL_NATIVE] direct_lab_" .. stage .. " " .. table.concat(rows, ","))
+end
+
 local function energize(lab)
   if lab and lab.valid then lab.energy = 100000000 end
 end
@@ -59,9 +75,9 @@ local function assert_direct(state)
   if not direct.researched or not close(force.manual_mining_speed_modifier, state.before_mining + target.direct_effect) then
     fail("real direct lab completion did not apply its mining bonus")
   end
-  local inventory = state.direct_lab.get_inventory(defines.inventory.lab_input)
+  local counts = state.direct_next_tick_counts or capture_lab_packs(state.direct_lab, target.direct_science)
   for _, name in ipairs(target.direct_science) do
-    if state.direct_lab_initial[name] - inventory.get_item_count(name) < 1 then
+    if state.direct_lab_initial[name] - counts[name] < 1 then
       fail("real direct lab did not consume " .. name)
     end
   end
@@ -187,6 +203,12 @@ script.on_event(defines.events.on_research_finished, function(event)
   if event.research.name == target.direct then
     state.direct_finished = state.direct_finished + 1
     if state.direct_finished ~= 1 then fail("direct research completed more than once") end
+    if target.science_policy == "all" then
+      state.direct_event_counts = capture_lab_packs(state.direct_lab, target.direct_science)
+      report_direct_pack_counts("event", state.direct_event_counts)
+      state.phase = "direct-consumption-pending"
+      return
+    end
     assert_direct(state)
     if target.continuation_mode == "lab" then
       state.phase = "continuation-pending"
@@ -215,10 +237,23 @@ end)
 script.on_event(defines.events.on_tick, function()
   local state = global[KEY]
   if not state then fail("fixture state is absent") end
+  if state.phase == "direct-consumption-pending" then
+    state.direct_next_tick_counts = capture_lab_packs(state.direct_lab, target.direct_science)
+    report_direct_pack_counts("next_tick", state.direct_next_tick_counts)
+  end
   if state.phase ~= "complete" then
     energize(state.direct_lab)
     energize(state.continuation_lab)
     if game.tick > state.deadline then fail("real historical lab research missed its deadline") end
+    if state.phase == "direct-consumption-pending" then
+      assert_direct(state)
+      if target.continuation_mode == "lab" then
+        state.phase = "continuation-pending"
+      else
+        state.phase = "complete"
+        return
+      end
+    end
     if state.phase == "continuation-pending" then
       if game.forces.player.current_research ~= nil then return end
       state.phase = "continuation"
