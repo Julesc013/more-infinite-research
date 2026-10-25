@@ -5,7 +5,7 @@ applies_to: "MIR replacement development"
 audience: developer
 doc_type: how-to
 owner: mir-maintainers
-last_reviewed: 2026-10-24
+last_reviewed: 2026-10-25
 supersedes: []
 superseded_by: []
 source_of_truth_for:
@@ -38,6 +38,8 @@ For the first port, recover actual identity/tuning/settings from the pinned base
 Maintain the [existing community request ledger](../spec/programmes/community-requests.json) through `CONT-15`; preserve original IDs, MIR 4 crash/failure evidence, unresolved bugs and technology-tuning requests. Carry them into affected MIR 5 work and regression selection rather than closing them because the architecture changes. `SCI-UNLOCK-01` records the recurring approved science binding startup failures, the reported unsuccessful mod-removal attempts and missing reproduction evidence. It remains open until exact affected-package qualification supports closure. This intake does not claim a fix.
 
 ## Work in small vertical slices
+
+Prioritize Factorio2.1.23 stable for MIR5 design, implementation and release qualification, following the [primary-target decision](../spec/targets.md#primary-target-and-earlier-editions). Earlier MIR4 families retain best-effort builds through the same capability-based source and version encoding. Preserve their exact existing evidence, qualify available subsets and state gaps by edition; schedule remaining F210 acceptance work before additional earlier-engine campaigns.
 
 Make a native family work end to end, then exercise a different native effect, a staged/native-owner integration and stateful caps/runtime. Keep partial packages off production saves. A successful tiny package is not a full-product migration or performance claim.
 

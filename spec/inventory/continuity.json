@@ -388,16 +388,16 @@
           "scope": "Exact F2102.1.23 Defaults published4.7.21002 and candidateAF65 at fixture sourcea6ce2367 each pass1/32/128 towers per force, seven captured science packs, two actual lab levels,2N native planting events, trained17645 versus foreign18000 growth ticks, native spoilage baseline and two unchanged-byte cold reloads. Root verifies266 members and18 actual stage-log markers, counting12 unique lab completions and644 planting events. Ordinary tuning, elapsed/memory performance, mod removal/readdition and final coherent release remain unqualified."
         },
         {
-        "id": "current-player-native-repair-capacity-stress",
-        "source": [
-          "source/runtime/passive_repair.lua",
-          "tests/fixtures/repair-stress/control.lua"
-        ],
-        "evidence": "spec/evidence/repair-current-native-chain.json",
-        "scope": "Current2BBD F200 player and published4.7.20002 each pass1000 eligible native-damaged walls,256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600, and8 drained-entry reactivations. Root independently verifies66 artifact members, six actual native stage markers, raw Git profile/fixture hashes, protected seeds and four unchanged-byte cold reloads. This supplements the earlier run without a matched elapsed/memory, removal/readdition or complete release verdict."
-      },
-      {
-        "id": "native-repair-capacity-stress",
+          "id": "current-player-native-repair-capacity-stress",
+          "source": [
+            "source/runtime/passive_repair.lua",
+            "tests/fixtures/repair-stress/control.lua"
+          ],
+          "evidence": "spec/evidence/repair-current-native-chain.json",
+          "scope": "Current2BBD F200 player and published4.7.20002 each pass1000 eligible native-damaged walls,256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600, and8 drained-entry reactivations. Root independently verifies66 artifact members, six actual native stage markers, raw Git profile/fixture hashes, protected seeds and four unchanged-byte cold reloads. This supplements the earlier run without a matched elapsed/memory, removal/readdition or complete release verdict."
+        },
+        {
+          "id": "native-repair-capacity-stress",
           "evidence": "spec/mir5/evidence/repair-stress-native-chain.json",
           "scope": "Exact F2002.0.77 Base published4.7.2 and MIR5 each receive1000 native electric-damaged eligible walls:256 admitted evenly across player/friend,744 overflow unchanged,8 repairs per60ticks after quiet600. Redamage of8 drained entries reactivates; foreign/nonwall exclusions and save/two reloads pass. All66 members verified. No elapsed/memory or agriculture scaling claim."
         },
@@ -682,6 +682,15 @@
             "tests/mir5/test_package.py"
           ],
           "scope": "Temporary-Git staged/canonical layouts of the complete current player tree produce identical member hashes and ZIP bytes for all nine editions, preserving codec, exact patch floors, adapters, exclusions and migration filenames. Unsafe and dirty selected records reject before output. This is not the actual reviewed repository cutover or final-layout native qualification."
+        },
+        {
+          "id": "maintainer-f210-primary-target",
+          "source": [
+            "source/info.json",
+            "spec/targets.md",
+            "docs/support.md"
+          ],
+          "scope": "Maintainer direction2026-10-25: Factorio2.1.23 stable is the primary design, implementation, qualification and release target. Earlier MIR4 engine families retain best-effort builds/support through shared capability adapters and unchanged nine-edition version encoding. This records target priority, not new native qualification."
         }
       ],
       "test_subjects": [
@@ -690,7 +699,8 @@
       ],
       "remaining_implementation": [],
       "remaining_qualification": [
-        "Run final current-package and affected native checks for every delivered target subset."
+        "Complete exact current F2102.1.23 native, migration/client, performance and package acceptance before primary release.",
+        "Retain best-effort earlier-edition builds and available exact-engine qualification; report each tested subset and remaining gaps without relabelling earlier receipts."
       ]
     },
     {
