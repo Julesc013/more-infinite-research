@@ -1,4 +1,5 @@
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'OwnedProcessMemorySampler.ps1')
 
 function Get-MIR441PhysicalMemorySnapshot {
   if (-not $IsWindows) { throw '[mir441-resource-monitor-windows-required]' }
@@ -255,6 +256,7 @@ function Invoke-MIR441MonitoredProcess {
     [int64]$EstimatedPeakBytes=0,[int64]$ExpectedPeakMemoryBytes=0,
     [ValidateRange(1,5)][int]$SampleSeconds=1,[ValidateRange(1,86400)][int]$TimeoutSeconds=900,
     [ValidateSet(0,250)][int]$SampleMilliseconds=0,
+    $OwnedProcessMemorySampler=$null,
     [scriptblock]$OwnedProcessSampleCallback=$null,
     [scriptblock]$OwnedProcessExitCallback=$null,
     [string]$StdoutPath='',[string]$StderrPath='',[switch]$AllowNonZeroExit,
@@ -262,9 +264,17 @@ function Invoke-MIR441MonitoredProcess {
     $PreStartAdmissionWait=$null,
     [scriptblock]$CompletionPredicate=$null
   )
-  if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-callback-required]' }
-  if ($SampleMilliseconds -eq 0 -and $null -ne $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-cadence-required]' }
-  if ($null -ne $OwnedProcessExitCallback -and $null -eq $OwnedProcessSampleCallback) { throw '[mir441-resource-observation-exit-callback-requires-sample]' }
+  if ($SampleMilliseconds -eq 250 -and $null -eq $OwnedProcessSampleCallback -and $null -eq $OwnedProcessMemorySampler) { throw '[mir441-resource-observation-callback-required]' }
+  if ($SampleMilliseconds -eq 0 -and ($null -ne $OwnedProcessSampleCallback -or $null -ne $OwnedProcessMemorySampler)) { throw '[mir441-resource-observation-cadence-required]' }
+  if ($null -ne $OwnedProcessExitCallback -and $null -eq $OwnedProcessSampleCallback -and $null -eq $OwnedProcessMemorySampler) { throw '[mir441-resource-observation-exit-callback-requires-sample]' }
+  if ($null -ne $OwnedProcessMemorySampler) {
+    $context=$OwnedProcessMemorySampler.PSObject.Properties['context']
+    $expected=$OwnedProcessMemorySampler.PSObject.Properties['expected_slots']
+    if ($null -eq $context -or $context.Value -cne 'benchmark' -or $null -eq $expected -or
+        $expected.Value.Count -ne 1 -or -not $expected.Value.ContainsKey('benchmark/factorio')) {
+      throw '[mir441-resource-observation-sampler-contract]'
+    }
+  }
   $work=Resolve-MIR441RecoveryScratchPath -Path $WorkRoot;$ledger=Resolve-MIR441RecoveryScratchPath -Path $LedgerPath
   foreach($path in @($ledger,$StdoutPath,$StderrPath)|Where-Object {$_}){
     $resolved=Resolve-MIR441RecoveryScratchPath -Path $path
@@ -282,7 +292,7 @@ function Invoke-MIR441MonitoredProcess {
   $null=Resolve-MIR441RecoveryScratchPath -Path $lockPath
   New-Item -ItemType Directory -Force -Path (Split-Path -Parent $lockPath)|Out-Null
   try{$lock=[IO.File]::Open($lockPath,[IO.FileMode]::OpenOrCreate,[IO.FileAccess]::ReadWrite,[IO.FileShare]::None)}catch{throw '[mir441-resource-heavy-job-active]'}
-  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false
+  $process=$null;$streams=@();$copies=@();$children=@();$temp=Join-Path $work ('temp-'+[guid]::NewGuid().ToString('N'));$peak=0L;$privatePeak=0L;$started=$null;$timer=$null;$timedOut=$false;$completionObserved=$false;$memoryRegistration=$null
   try{
     # Check again under the lock, before any job output or worker is allocated.
     if($null -ne $PreStartAdmissionWait){
@@ -302,6 +312,10 @@ function Invoke-MIR441MonitoredProcess {
     $process=[Diagnostics.Process]::new();$process.StartInfo=$start
     if(-not$process.Start()){throw '[mir441-process-start]'}
     $started=$process.StartTime.ToUniversalTime();$timer=[Diagnostics.Stopwatch]::StartNew()
+    if($null-ne$OwnedProcessMemorySampler){
+      $memoryRegistration=Register-MIROwnedProcessMemoryProcess -Sampler $OwnedProcessMemorySampler -Phase benchmark -Role factorio -Process $process
+      if($null-eq$memoryRegistration){throw '[mir441-resource-observation-sampler-registration]'}
+    }
     # Streaming capture avoids retaining the complete child output in RAM.
     foreach($pair in @(@($StdoutPath,'StandardOutput'),@($StderrPath,'StandardError'))){if($pair[0]){$stream=[IO.File]::Create($pair[0]);$streams+=$stream;$copies+=$process.($pair[1]).BaseStream.CopyToAsync($stream)}}
     while($true){
@@ -317,6 +331,7 @@ function Invoke-MIR441MonitoredProcess {
       $usage=Get-MIR441TreeUsage -Path $work;if(-not$usage.complete){throw '[mir441-resource-output-scan-incomplete]'}
       if($usage.bytes-$before.bytes-gt$EstimatedPeakBytes){throw '[mir441-resource-output-budget]'}
       if($process.HasExited){
+        if($null-ne$memoryRegistration){Complete-MIROwnedProcessMemoryProcess -Sampler $OwnedProcessMemorySampler -Registration $memoryRegistration -NaturalExit}
         Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessExitCallback -Process $process -StartedUtc $started -Timer $timer -NaturalExit
         break
       }
@@ -326,6 +341,7 @@ function Invoke-MIR441MonitoredProcess {
         if($decision.Count-ne1-or$decision[0]-isnot[bool]){throw '[mir441-process-completion-predicate-invalid]'}
         if($decision[0]){$completionObserved=$true;break}
       }
+      if($null-ne$memoryRegistration){Add-MIROwnedProcessMemorySample -Sampler $OwnedProcessMemorySampler}
       Invoke-MIR441OwnedProcessObservation -Callback $OwnedProcessSampleCallback -Process $process -StartedUtc $started -Timer $timer
       $waitMilliseconds=if($SampleMilliseconds -eq 250){250}else{$SampleSeconds*1000}
       [void]$process.WaitForExit($waitMilliseconds)

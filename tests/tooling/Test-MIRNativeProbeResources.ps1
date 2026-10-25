@@ -62,19 +62,15 @@ try {
     $benchmarkSample={
       param($event)
       if($event.natural_exit){throw '[mir5-native-probe-unexpected-sample-exit]'}
-      if($null-eq$benchmarkState.registration){$benchmarkState.registration=Register-MIROwnedProcessMemoryProcess -Sampler $benchmarkSampler -Phase benchmark -Role factorio -Process $event.process}
-      if($null-eq$benchmarkState.registration){throw '[mir5-native-probe-benchmark-registration]'}
-      Add-MIROwnedProcessMemorySample -Sampler $benchmarkSampler
       $benchmarkState.sample_events++
     }.GetNewClosure()
     $benchmarkExit={
       param($event)
       if(-not$event.natural_exit){throw '[mir5-native-probe-missing-natural-exit]'}
-      Complete-MIROwnedProcessMemoryProcess -Sampler $benchmarkSampler -Registration $benchmarkState.registration -NaturalExit
       $benchmarkState.exit_events++
     }.GetNewClosure()
     $benchmarkLedger=Join-Path $benchmarkRoot 'resources.jsonl'
-    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessSampleCallback $benchmarkSample -OwnedProcessExitCallback $benchmarkExit
+    $benchmarkRun=Invoke-MIR441MonitoredProcess -FilePath $child -Arguments @('-NoProfile','-Command','Start-Sleep -Milliseconds 900') -WorkRoot $benchmarkRoot -LedgerPath $benchmarkLedger -Policy $context.policy -EstimatedPeakBytes 1MB -ExpectedPeakMemoryBytes 1024MB -TimeoutSeconds 20 -SampleMilliseconds 250 -OwnedProcessMemorySampler $benchmarkSampler -OwnedProcessSampleCallback $benchmarkSample -OwnedProcessExitCallback $benchmarkExit
     $benchmarkReceipt=Get-MIROwnedProcessMemoryObservationReceipt -Sampler $benchmarkSampler
     Assert-Probe ($benchmarkRun.status-ceq'passed'-and$benchmarkState.sample_events-ge2-and$benchmarkState.exit_events-eq1-and$benchmarkReceipt.status-ceq'complete-observation'-and$benchmarkReceipt.context-ceq'benchmark'-and$benchmarkReceipt.observations.Count-ge2) 'benchmark-natural-exit-observation'
     Assert-Probe (@($benchmarkReceipt.observations|Where-Object {$_.phase-cne'benchmark'-or$_.role-cne'factorio'-or$_.pid-le0-or$_.working_set_bytes-lt0-or$_.private_bytes-lt0}).Count-eq0) 'benchmark-observation-identity'
