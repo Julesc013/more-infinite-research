@@ -1,0 +1,220 @@
+{
+  "schema": 1,
+  "kind": "MIR5CurrentF200CatalogueCompositeNativeReadbackV1",
+  "derived": true,
+  "status": "four-exact-stages-passed-across-cancelled-campaign-and-distinct-tail",
+  "release_qualification": false,
+  "original_run": {
+    "id": 40182843842,
+    "url": "https://github.com/Julesc013/mir-native-worker/actions/runs/40182843842",
+    "workflow_conclusion": "cancelled",
+    "controller_commit": "5036c30fa5a999b9d6b8c21c437eed6ce5c2aab2",
+    "manifest": {
+      "sha256": "127173EBF0C78DFB565A19E3EA8873D9DFA143FACFA0187CD32D29769CB08924",
+      "verified_members": 102,
+      "bytes": 5870538
+    }
+  },
+  "tail": {
+    "execution": "direct-existing-Invoke-NativeFixture.ps1",
+    "manifest": {
+      "sha256": "A34F142517ACEEB2942CCEEBA8B2E2AA722E740A1174C48BD9628FFF14DB1CB5",
+      "verified_members": 18,
+      "bytes": 978670
+    },
+    "readback_sha256": "C31BB1D5B625EB25F61A4515A7C39D94205DEEEA7AAD02E5F3B287E893EE45AD",
+    "output_root": "build/tmp/full-catalogue-tail-40182843842-r01",
+    "guard_refused_prior_output_root_before_launch": true
+  },
+  "fixture_and_player_source": "fa1146e9778ecf7fc1b80449a2deec7ee0083ec3",
+  "player_tree": "41b78703f25bdceb1e05b57d7c725e0f6c9bef2c",
+  "candidate_sha256": "76D4D21B12EA8EA939DFFC599EC0746A1D9E13656326CACF5CB4A6D0303EB663",
+  "published_sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+  "engine_version": "2.0.77",
+  "engine_sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+  "actual_gear_lab_completions": 4,
+  "actual_cold_reloads": 8,
+  "fixture_source_members_verified_against_git_after_CRLF_normalization": 13,
+  "observer_metadata_exact_f200_adaptation_verified": true,
+  "profiles_verified_semantically_against_git_with_exact_owned_archive_pins": 4,
+  "stages": [
+    {
+      "profile": "base",
+      "role": "published",
+      "execution": "completed-stage-in-cancelled-workflow",
+      "receipt": "build/mir5/recovery-historical/full-catalogue-upgrade/40182843842/black-glass-full-catalogue-upgrade-40182843842-1/full-catalogue-upgrade/native/f200/base/published/result.json",
+      "receipt_sha256": "4CBA9C0726AAABF66C0976C12471646A54C4D368C116A88BDD958DB73DEBBC69",
+      "completed_save_sha256": "0682819891D9E22206832BA7771B011DF297DA19A9B6258E68FF8ABCE66F67A3",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "B3F80F9924C48972B35D086555A93170ACC9B006CEBB4ECA9FE573A0EB4A4C7E",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "0B1CA429EDD20307475EDB275697B2E7E727722839B8C70D3229BBCA12FB68C5",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "C160E0C17E4E33CAF233CA16614ED2E131308403D97647E7457D15D046F539E2",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "witnesses": {
+        "public_rows": 54,
+        "level_backed_rows": 54,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 0,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      }
+    },
+    {
+      "profile": "base",
+      "role": "mir5",
+      "execution": "completed-stage-in-cancelled-workflow",
+      "receipt": "build/mir5/recovery-historical/full-catalogue-upgrade/40182843842/black-glass-full-catalogue-upgrade-40182843842-1/full-catalogue-upgrade/native/f200/base/mir5/result.json",
+      "receipt_sha256": "E245F267461E0F96C5B0571509EBE8A01821C00A0FBB8F801729F5C7C3B938A6",
+      "completed_save_sha256": "F64EBE315BC68DAB7EB7133427B70F7C41F65E30C51DAB6FDEB65DDEE596F4AE",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "5ED86B5D503F199763683D225EDCEF1054F9536391E9FE21438A00CBE14C2727",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 1
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "893520573014B7D52757DB1E84A95A4EB2FC3B82A2D08F9981FC4616F55536F9",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "5476FC7E81F7D61AFD679EA43DF7BE7A1879C55FAC8004D0EE0C56837AFB8E46",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "witnesses": {
+        "public_rows": 54,
+        "level_backed_rows": 54,
+        "native_owner_rows": 0,
+        "scripted_rows_not_seeded": 0,
+        "zero_credit_rows": 20,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      }
+    },
+    {
+      "profile": "space-age",
+      "role": "published",
+      "execution": "completed-stage-in-cancelled-workflow",
+      "receipt": "build/mir5/recovery-historical/full-catalogue-upgrade/40182843842/black-glass-full-catalogue-upgrade-40182843842-1/full-catalogue-upgrade/native/f200/space-age/published/result.json",
+      "receipt_sha256": "FD678C40BF1B46F2CB5051748F51C6BA9C016864DE13DF57A52A913120467A8E",
+      "completed_save_sha256": "4B27A4141CAA7A50C391A9B402FFDB59621348871BBA27C2214EE8AA065B99A1",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "DFBF7D91D995618D79BC8C3D84D2F4BC6F8B855B333B692E83D8D77E775985BA",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "6D0C0A2A2AC71D3E0FBBA76AF7AF9E2A41FF29866DAE3F551F7D4D5AE2B046C1",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "48458B16B1785BAA18BDD23C4F8D41237D0B79B881D7D2AE1C40C29D2C989928",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "witnesses": {
+        "public_rows": 69,
+        "level_backed_rows": 67,
+        "native_owner_rows": 5,
+        "scripted_rows_not_seeded": 2,
+        "zero_credit_rows": 24,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 0,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      }
+    },
+    {
+      "profile": "space-age",
+      "role": "mir5",
+      "execution": "separate-native-tail",
+      "receipt": "build/mir5/recovery-historical/full-catalogue-upgrade/40182843842/tail-f200-space-age-mir5-r01/result.json",
+      "receipt_sha256": "F717E48A6395222F0C8CEE6E542246717553F14CF6EB0FE3838976305E94547B",
+      "completed_save_sha256": "4CCAEE0782123C57BB24566FEF4CB779CB9DD8B72421CCDFB0A351A7B8CF5586",
+      "native_logs": [
+        {
+          "path": "production.factorio.log",
+          "sha256": "2EF1E270C94476A1D1018ED877FB71016ED5DE1493EE196329EFEC5B55102585",
+          "stage": "initial",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 1
+        },
+        {
+          "path": "reload-1.factorio.log",
+          "sha256": "3FFEB82B83F292F53E8550370D9F4A52FFD523667440F5C058B59EA874089E5E",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        },
+        {
+          "path": "reload-2.factorio.log",
+          "sha256": "3C7DC7D5421B429D93F4B0447623C368FA3A975482EC17C94882CC2254162B98",
+          "stage": "reload",
+          "additional_same_process_markers_not_counted_as_cold_reloads": 0
+        }
+      ],
+      "cold_reloads": 2,
+      "library_controls_restored": true,
+      "witnesses": {
+        "public_rows": 69,
+        "level_backed_rows": 67,
+        "native_owner_rows": 5,
+        "scripted_rows_not_seeded": 2,
+        "zero_credit_rows": 24,
+        "source_gear_lab": 1,
+        "successor_gear_lab": 1,
+        "queued_progress": 0.42000000000000004,
+        "paused_progress": 0.27,
+        "save_name": "mir5-native-complete",
+        "on_load_read_only": false
+      }
+    }
+  ],
+  "limits": [
+    "The original workflow remains cancelled; its fourth prepared result is never counted as passed.",
+    "The distinct tail consumes the original protected Space Age published save unchanged; its own receipts and hashes remain separate.",
+    "Scripted rows are not seeded by this catalogue fixture. No client, overhaul, elapsed-time, memory or release verdict follows.",
+    "Complete native originals, adverse output-root refusal, saves and configurations remain in primary build/mir5/recovery-historical/full-catalogue-upgrade/40182843842."
+  ]
+}
