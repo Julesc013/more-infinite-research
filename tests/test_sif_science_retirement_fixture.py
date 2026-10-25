@@ -14,9 +14,9 @@ PROFILES = ROOT / 'tests/profiles'
 POLICIES = ('configured','space','space-and-promethium','space-age-progression','official-progression','mod-progression','all-official','all')
 TARGETS = {
  'f200': {'engine':'2.0.77','line':'2.0','engine_sha':'D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B','sif':'1.0.60','sif_sha':'860F2048A7E6F4C2ECD1A9CECA6ECDD340ECF797773EC582A6E60FFE6F8D87AC','commons':'1.0.27','commons_sha':'6F3622AE6270F9B365A9E2E07FA5E07B61B2BBFCAB3A4D930CC410EBDEB63B92','observer_sha':'723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87','published':'4.7.20002','candidate':'5.0.20000'},
- # The F210 profile/archive is named 1.0.01, but Factorio normalizes the
- # active_mods value parsed from that archive's info.json to 1.0.1.
- 'f210': {'engine':'2.1.23','line':'2.1','engine_sha':'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060','sif':'1.0.78','sif_sha':'3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13','commons':'1.0.33','commons_sha':'378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB','extras':'1.0.01','runtime_extras':'1.0.1','extras_sha':'874B204234446EBA9DD333D84569433A11E99D3C001FD853E26B13A01B2CBC82','observer_sha':'2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C','published':'4.7.21002','candidate':'5.0.21000'},
+ # F210 uses the independently filed 1.0.10 archive. Its active_mods value
+ # is the same semantic version declared by that archive's info.json.
+ 'f210': {'engine':'2.1.23','line':'2.1','engine_sha':'FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060','sif':'1.0.78','sif_sha':'3B5F2A381ADF1D9AECF048293E20035963A528720FBDC148CCC2B0418049FF13','commons':'1.0.33','commons_sha':'378D3114B09C872358088B33500BC4AB0B9B9EFD9E5650DBEA0E87B5914C29BB','extras':'1.0.10','runtime_extras':'1.0.10','extras_sha':'3AB74877E49FB245E62593B669EB4D5C762207C047CA6F70E4D0CC9B67DF0225','observer_sha':'2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C','published':'4.7.21002','candidate':'5.0.21000'},
 }
 
 # Independent published continuation rows and the separately derived corrected
@@ -142,7 +142,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if target == 'f200' then
               exact = {base='2.0.77', sif='1.0.60', commons='1.0.27', source='4.7.20002', successor='5.0.20000'}
             else
-              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.1', source='4.7.21002', successor='5.0.21000'}
+              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.10', source='4.7.21002', successor='5.0.21000'}
             end
             local contract = assert(loadfile(source_contract))()
             local callbacks, storage, reports, saves = {events={}}, {}, {}, 0
@@ -387,7 +387,7 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
             if target == 'f200' then
               exact = {base='2.0.77', sif='1.0.60', commons='1.0.27', successor='5.0.20000'}
             else
-              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.1', successor='5.0.21000'}
+              exact = {base='2.1.23', sif='1.0.78', commons='1.0.33', extras='1.0.10', successor='5.0.21000'}
             end
             local contract = assert(loadfile(contract_path))()
             local core = 'mir-fixture-mir5-sif-science-retirement-' .. target
@@ -519,13 +519,13 @@ class SIFScienceRetirementFixtureTests(unittest.TestCase):
         f200_missing_quality={'base':'2.0.77','elevated-rails':'2.0.77','space-age':'2.0.77','space-is-fake':'1.0.60','cr-commons':'1.0.27','more-infinite-research':'5.0.20000','mir-fixture-mir5-sif-science-retirement-f200':'0.2.0','mir-fixture-mir5-sif-policy-configured-f200':'0.1.0'}
         raw={'technology':raw_rows('configured')};missing=self.data('f200','mir5','configured',raw,f200_missing_quality);self.assertFalse(missing['ok']);self.assertIn('exact engine or native archive closure differs',missing['message'])
         for name in BASE:self.assertEqual((None,FORMULA,120),(missing['raw']['technology'][name]['unit'].get('count'),missing['raw']['technology'][name]['unit'].get('count_formula'),missing['raw']['technology'][name]['unit']['time']))
-        f210_missing_recycler={'base':'2.1.23','elevated-rails':'2.1.23','quality':'2.1.23','space-age':'2.1.23','space-is-fake':'1.0.78','cr-commons':'1.0.33','cr-extras':'1.0.1','more-infinite-research':'5.0.21000','mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
+        f210_missing_recycler={'base':'2.1.23','elevated-rails':'2.1.23','quality':'2.1.23','space-age':'2.1.23','space-is-fake':'1.0.78','cr-commons':'1.0.33','cr-extras':'1.0.10','more-infinite-research':'5.0.21000','mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
         raw={'technology':raw_rows('configured')};missing=self.data('f210','mir5','configured',raw,f210_missing_recycler);self.assertFalse(missing['ok']);self.assertIn('F210 closure differs',missing['message'])
         for name in BASE:self.assertEqual((None,FORMULA,120),(missing['raw']['technology'][name]['unit'].get('count'),missing['raw']['technology'][name]['unit'].get('count_formula'),missing['raw']['technology'][name]['unit']['time']))
     def test_f210_engine_runtime_version_is_canonical_and_rejects_fixed_opponents(self):
         meta=TARGETS['f210']
-        self.assertEqual(('1.0.01','1.0.1'),(meta['extras'],meta['runtime_extras']))
-        for wrong in ('1.0.0','1.0.01','1.0.2'):
+        self.assertEqual(('1.0.10','1.0.10'),(meta['extras'],meta['runtime_extras']))
+        for wrong in ('1.0.01','1.0.09','1.0.11'):
             mods={'base':meta['engine'],'elevated-rails':meta['engine'],'quality':meta['engine'],'space-age':meta['engine'],'recycler':meta['engine'],'space-is-fake':meta['sif'],'cr-commons':meta['commons'],'cr-extras':wrong,'more-infinite-research':meta['candidate'],'mir-fixture-mir5-sif-science-retirement-f210':'0.2.0','mir-fixture-mir5-sif-policy-configured-f210':'0.1.0'}
             raw={'technology':raw_rows('configured')};result=self.data('f210','mir5','configured',raw,mods)
             self.assertFalse(result['ok']);self.assertIn('F210 closure differs',result['message'])
