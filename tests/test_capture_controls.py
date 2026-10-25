@@ -108,6 +108,43 @@ $cases | ConvertTo-Json -Compress -Depth 6
     return json.loads(result.stdout)
 
 
+def native_fixture_active_selection_guard_cases() -> dict:
+    """Exercise the finite published/candidate repair selection rule only."""
+    escaped = str(NATIVE_FIXTURE).replace("'", "''")
+    command = rf"""
+$tokens=$null;$errors=$null
+$ast=[System.Management.Automation.Language.Parser]::ParseFile('{escaped}',[ref]$tokens,[ref]$errors)
+if($errors.Count){{throw ($errors | ForEach-Object {{$_.ToString()}})}}
+$definition=@($ast.Find({{param($node) $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -ceq 'Assert-ActiveFixtureSelection'}},$true))
+if($definition.Count -ne 1){{throw 'active selection helper missing or ambiguous'}}
+function Assert-Fixture([bool]$Condition,[string]$Message) {{if(-not$Condition){{throw "[mir5-native-fixture] $Message"}}}}
+. ([scriptblock]::Create($definition[0].Extent.Text))
+function Invoke-SelectionCase([object[]]$Rows,[object[]]$Mir) {{
+  try {{Assert-ActiveFixtureSelection 'repair-stress' $Rows $Mir;[ordered]@{{valid=$true}}}}
+  catch {{[ordered]@{{valid=$false;message=$_.Exception.Message}}}}
+}}
+function New-RepairRows([string]$Version) {{@(
+  [pscustomobject]@{{name='mir-fixture-mir5-repair-stress-active';version='0.1.0';enabled=$true}},
+  [pscustomobject]@{{name='mir-fixture-mir5-repair-stress';version=$Version;enabled=$true}}
+)}}
+$cases=[ordered]@{{
+  published=(Invoke-SelectionCase (New-RepairRows '0.1.0') @([pscustomobject]@{{name='more-infinite-research';version='4.7.21002'}}))
+  candidate=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21000'}}))
+  candidate_wrong_base=(Invoke-SelectionCase (New-RepairRows '0.1.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21000'}}))
+  unknown_mir=(Invoke-SelectionCase (New-RepairRows '0.2.0') @([pscustomobject]@{{name='more-infinite-research';version='5.0.21001'}}))
+}}
+$cases | ConvertTo-Json -Compress -Depth 6
+"""
+    result = subprocess.run(
+        ["pwsh", "-NoProfile", "-Command", command],
+        cwd=ROOT,
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    return json.loads(result.stdout)
+
+
 class CaptureControlTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -240,6 +277,15 @@ class CaptureControlTests(unittest.TestCase):
         self.assertTrue(cases["positive"]["valid"])
         self.assertEqual(cases["positive"]["value"]["stage"], "prepared")
         for name in ("duplicate", "wrong_kind", "wrong_status", "unsupported_stage"):
+            with self.subTest(name=name):
+                self.assertFalse(cases[name]["valid"])
+                self.assertIn("active", cases[name]["message"])
+
+    def test_active_repair_selection_allows_candidate_fixture_v020_and_refuses_drift(self):
+        cases = native_fixture_active_selection_guard_cases()
+        self.assertTrue(cases["published"]["valid"])
+        self.assertTrue(cases["candidate"]["valid"])
+        for name in ("candidate_wrong_base", "unknown_mir"):
             with self.subTest(name=name):
                 self.assertFalse(cases[name]["valid"])
                 self.assertIn("active", cases[name]["message"])
