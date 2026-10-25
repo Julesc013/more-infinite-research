@@ -4,8 +4,8 @@
   "status": "predeclared-active-save-capture-required-not-a-result",
   "host": "BLACKGLASS-WIN1",
   "plan_source": {
-    "commit": "672191d62be58e4463e6e31e75f76bb608966d0b",
-    "tree": "b2da67977751d4ee193fb09fb765626e7b67f2cd"
+    "commit": "9427bd28526030d059ddd6641166ca82f6e62e61",
+    "tree": "6a944e2c052d67e212a02590a1bc190a2d43a76f"
   },
   "supersedes_nothing": "runtime-benchmark-plan-r01.json remains the retained completed-idle/steady-state declaration and is not an active-work result.",
   "candidate": {
@@ -27,9 +27,9 @@
     "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
   },
   "public_harness": {
-    "source_reference": "672191d62be58e4463e6e31e75f76bb608966d0b",
+    "source_reference": "9427bd28526030d059ddd6641166ca82f6e62e61",
     "git_blob_sha256": [
-      {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "24DD5DF6B7E504AF75703B056F68D98B8CF820F7657CCFCADB54BA6D98650328"},
+      {"path": "tools/Invoke-NativeFixture.ps1", "sha256": "ADC582E1CBA9C6A88DB5F244340FFE1C19FAE032E7EFDB07AB2C881BA0CCD4CE"},
       {"path": "tools/lib/validation/NativeProbeResources.ps1", "sha256": "2826EF1D491615C10B39F6D05C6BDEE5D4317EB10BBA753AD0BA159ED95B9311"},
       {"path": "tools/lib/validation/ResourceGovernor.ps1", "sha256": "50E5172BF9836B2742A9857F7A0F86DFF3E5FD6C40A4E149F42334A199302A6E"},
       {"path": "tools/lib/validation/OwnedProcessMemorySampler.ps1", "sha256": "8786DC06671A7B6ED6F48BD211275C4DA783F65BBB0FCDCE5562104BC3B28124"},
