@@ -78,9 +78,9 @@ def _plan() -> dict[str, object]:
         },
         "comparison_rules": {
             "candidate_time_per_tick_limit": {"relative_fraction": 0.1, "absolute_milliseconds_per_tick": 0.25},
-            "candidate_memory_limits": {"relative_fraction": 0.1, "absolute_bytes": 64 * 1024 * 1024, "metrics": list(MODULE.METRICS[1:])},
+            "candidate_memory_limits": {"relative_fraction": 0.1, "absolute_bytes": 64 * 1024 * 1024, "metrics": ["operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"]},
             "agriculture_within_arm_increment_128_minus_1": {
-                "metrics": list(MODULE.METRICS),
+                "metrics": ["engine_reported_average_ms_per_tick", "operating_system_peak_working_set_bytes", "maximum_sampled_working_set_bytes", "maximum_sampled_private_bytes"],
                 "rule": "Report candidate and published 128-minus-1 raw differences separately. A percentage comparison is permitted only when the matching published incremental denominator is finite and strictly positive; otherwise report raw differences only, with no percentage or inferred non-regression conclusion from noise.",
             },
         },
@@ -352,6 +352,18 @@ def _prepared_inputs(result: dict[str, object]) -> bytes:
 
 
 class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
+    def test_accepts_exact_frozen_r06_plan_metric_labels(self) -> None:
+        payload = (ROOT / "spec/evidence/runtime-benchmark-active-plan-r06.json").read_bytes()
+        self.assertEqual(_hash(payload), "816BA8FE3589967CC456F189F5F3F584289FB553DAFADBB64ACAEF32DD306C4F")
+        plan = json.loads(payload)
+        contract = MODULE._validate_plan(plan)
+        self.assertEqual(len(contract["profiles"]), 8)
+        self.assertEqual(len(contract["helpers"]), 12)
+        wrong_label = copy.deepcopy(plan)
+        wrong_label["comparison_rules"]["agriculture_within_arm_increment_128_minus_1"]["metrics"][0] = "engine_reported_average_milliseconds_per_tick"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "agriculture increment metrics"):
+            MODULE._validate_plan(wrong_label)
+
     def test_consumes_exact_accepted_r06_capture_and_pilot_payloads(self) -> None:
         capsule_path = "spec/evidence/runtime-active-r06-physical-native-receipts.json.gz"
         plan_path = "spec/evidence/runtime-benchmark-active-plan-r06.json"
