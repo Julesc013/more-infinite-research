@@ -168,7 +168,7 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
                 self.assertFalse(result["ok"])
                 self.assertTrue(result["message"])
 
-    def test_published_profile_is_the_exact_f210_createonly_comparator_and_successor_is_deliberately_unbound(self):
+    def test_published_profile_is_the_exact_f210_createonly_comparator(self):
         profile = json.loads((PROFILES / "named-science-replacement-published-f210-2123.json").read_text(encoding="utf-8"))
         self.assertEqual((1, "mir5-named-science-replacement-f210-native-selection", "f210", "2.1", "Defaults"),
                          (profile["schema"], profile["kind"], profile["target"], profile["factorio_line"],
@@ -187,8 +187,7 @@ class NamedScienceReplacementFixtureTests(unittest.TestCase):
             "more-infinite-research_4.7.21003.zip":
                 "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852",
         }, profile["archive_sha256"])
-        self.assertFalse((PROFILES / "named-science-replacement-mir5-f210-2123.json").exists())
-        self.assertIn("intentionally uncreated", profile["scope"])
+        self.assertIn("CreateOnly comparator", profile["scope"])
 
 
 if __name__ == "__main__":
