@@ -130,11 +130,12 @@ class HostControlsTests(unittest.TestCase):
             "tests/test_recover_modern_catalogue.py",
             "tests/test_historical_sources.py",
             "tests/test_menu_comparison.py",
+            "tests/test_menu_comparison_analysis.py",
             "tests/test_pack.py",
             "tests/test_host_controls.py",
             "tools/check_repository.py",
         ])
-        self.assertEqual(len(paths), 96)
+        self.assertEqual(len(paths), 97)
         self.assertEqual(len(set(paths)), len(paths))
         self.assertEqual(paths[-1], "tools/check_repository.py")
         self.assertIn("tests/test_sdk.py", paths)
