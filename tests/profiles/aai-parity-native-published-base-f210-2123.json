@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "kind": "mir5-aai-parity-native-published-source",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {
+      "name": "base",
+      "version": "2.1.23",
+      "enabled": true
+    },
+    {
+      "name": "aai-industry",
+      "version": "0.7.5",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-active-mods-observer",
+      "version": "0.1.0",
+      "enabled": true
+    },
+    {
+      "name": "more-infinite-research",
+      "version": "4.7.21003",
+      "enabled": true
+    },
+    {
+      "name": "mir-fixture-mir5-aai-parity-native",
+      "version": "0.1.0",
+      "enabled": true
+    }
+  ],
+  "archive_sha256": {
+    "aai-industry_0.7.5.zip": "DFB734B8B9B8BF847C90759E8A63D2DB4C24B5DF871D49E2A230E1AE58E7E829",
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_4.7.21003.zip": "B6EB9430056ABD384DB00F94929FE7DAC0A37441ACF4BC277946689682628852"
+  },
+  "scope": "Exact published4.7.3 AAI same-closure source input: six actual AAI lab steps, one MIR lab, unmoduled10/11 electric-engine output, queued42%/paused27% state, save and two reloads. Input only; native results and protected successor hand-off remain required."
+}
