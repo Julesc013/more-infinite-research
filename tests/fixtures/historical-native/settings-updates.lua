@@ -4,6 +4,21 @@
 local target = require("target")
 if target.id == "f013" or target.id == "f014" then return end
 
+-- The additive historical all-policy fixture uses the shipped startup setting
+-- only for the three Base lines whose initial red recipe is independently
+-- preflighted below. The ordinary historical fixture retains Defaults.
+if target.science_policy ~= nil then
+  assert(target.science_policy == "all" and (target.id == "f017" or target.id == "f100" or target.id == "f110"),
+    "historical all science target differs")
+  local policy = assert(data.raw["string-setting"]["mir-science-pack-ingredient-policy"],
+    "historical all science setting is absent")
+  assert(policy.setting_type == "startup", "historical all science setting type differs")
+  local allowed = false
+  for _, value in ipairs(policy.allowed_values or {}) do allowed = allowed or value == "all" end
+  assert(allowed, "historical all science setting values differ")
+  policy.default_value = "all"
+end
+
 -- Accelerate only the shared direct probe. F015+ also accelerates its named
 -- generated continuation; F013/F014 retain their observed numeric rows as a
 -- non-researched finite witness because their delivered settings surface has
