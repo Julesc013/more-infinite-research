@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "kind": "MIR5ResponsiveMenuR23AnalysisPlanV1",
+  "status": "frozen-before-result-inspection",
+  "raw_plan": {
+    "path": "spec/evidence/bob-angel-menu-plan-r23.json",
+    "sha256": "5E4B44DBC8B0C8F9F102CE4B6C08C4C2E9F549D25C8151A07D9C6F3A44528970",
+    "schema": 1,
+    "kind": "MIR5PredeclaredResponsiveMenuExperimentV1"
+  },
+  "result_contract": {
+    "schema": 1,
+    "kind": "MIR5ResponsiveMenuComparisonObservationV1",
+    "status": "completed-observation-only",
+    "endpoint_class": "ordinary-responsive-menu",
+    "required_observation_status": "validated-recorded-menu-interaction-response",
+    "result_sha256_required_at_invocation": true,
+    "library_controls_restored": true
+  },
+  "identity": {
+    "source_reference": "b2cf4c2dac43727e2e93cb90b861d2301f7778cd",
+    "source_tree": "25442a5bd7838f124952507854426e3b8e868475",
+    "engine": {
+      "version": "2.0.77",
+      "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B"
+    },
+    "profile": {
+      "path": "tests/profiles/bob-angel-f200-2077.json",
+      "sha256": "A2F235B7CE1F18968E1D7D7913362694EA1916095852C1673300C68BA26DDE90"
+    },
+    "published": {
+      "version": "4.7.20002",
+      "sha256": "F3943EB4D69CCDAC41BD9F922AD03A5C78F34F22D8E7FA5A88A7A658AB1010B7",
+      "name": "more-infinite-research",
+      "root": "more-infinite-research_4.7.20002",
+      "factorio_version": "2.0"
+    },
+    "candidate": {
+      "sha256": "B67FF048860F2707579CF582C933ED46D7BF52769F5ABE1B0279DDCC2A0323BD",
+      "bytes": 553231,
+      "asset_inventory_sha256": "4FD1A20E6C2E3D3F27D6158D60C931333B0E5053926019BD6C59493A9AF88498",
+      "name": "more-infinite-research",
+      "version": "5.0.20000",
+      "root": "more-infinite-research_5.0.20000",
+      "factorio_version": "2.0"
+    },
+    "ordinary_config_sha256": "DA9A92AB9047EBD9F9640B34DC9EF6C084801DF85B8F75B1A490E786F40DD510",
+    "player_data_sha256": "B2BF04AD4E46C306BB9CFB2BFACF549307FD1E611B760C79F68080D79AC532A9"
+  },
+  "schedule": {
+    "total_rows": 38,
+    "warmups": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "same_version_aa_arm": "published-4.7",
+    "same_version_aa_observations": 2,
+    "counterbalanced_blocks": 8,
+    "arms": [
+      "control-without-mir",
+      "published-4.7",
+      "replay",
+      "candidate-mir5"
+    ],
+    "latin_rotations": [
+      ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
+      ["published-4.7", "replay", "candidate-mir5", "control-without-mir"],
+      ["replay", "candidate-mir5", "control-without-mir", "published-4.7"],
+      ["candidate-mir5", "control-without-mir", "published-4.7", "replay"],
+      ["control-without-mir", "published-4.7", "replay", "candidate-mir5"],
+      ["published-4.7", "replay", "candidate-mir5", "control-without-mir"],
+      ["replay", "candidate-mir5", "control-without-mir", "published-4.7"],
+      ["candidate-mir5", "control-without-mir", "published-4.7", "replay"]
+    ]
+  },
+  "tolerance_policy": {
+    "aa_absolute_seconds": 0.5,
+    "aa_relative_percent": 5,
+    "control_regression_seconds": 0.5,
+    "minimum_mir_added_time_reduction_percent": 50
+  },
+  "analysis": {
+    "scored_blocks": [1, 2, 3, 4, 5, 6, 7, 8],
+    "early_control_blocks": [1, 2, 3, 4],
+    "late_control_blocks": [5, 6, 7, 8],
+    "student_t_95_two_sided": 2.3646242510102993,
+    "student_t_degrees_of_freedom": 7,
+    "assumption": "The eight paired blocks are treated as independent and roughly symmetric for this Student-t interval. The small sample remains uncertain; no bootstrap or equivalence inference is made.",
+    "same_version_aa_rule": "abs(first-second) <= max(0.5 seconds, 5 percent of their arithmetic mean)",
+    "control_rule": "late control arithmetic mean minus early control arithmetic mean <= 0.5 seconds",
+    "objective_rule": "Report 100*(1-mean_d5/mean_d4) only when mean_d4 and its 95-percent lower interval bound are positive. Support the at-least-50-percent objective only when the 95-percent upper interval bound of q=d5-0.5*d4 is <= 0."
+  },
+  "claims": {
+    "native_execution": false,
+    "performance_measurement": false,
+    "performance_comparison": false,
+    "release_qualification": false
+  },
+  "limitations": [
+    "This is a frozen analysis protocol, not an observation or result. It supplements the unchanged R23 native plan and does not alter workload, helpers, tolerances, resources, or schedule.",
+    "Its verdict is limited to the ordinary responsive-menu endpoint. It is not a release, runtime, UI fidelity, or memory verdict."
+  ]
+}
