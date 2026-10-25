@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "kind": "mir5-named-science-replacement-f210-native-selection",
+  "target": "f210",
+  "factorio_line": "2.1",
+  "engine": {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060"
+  },
+  "settings_mode": "Defaults",
+  "mods": [
+    {"name": "base", "version": "2.1.23", "enabled": true},
+    {"name": "elevated-rails", "version": "2.1.23", "enabled": true},
+    {"name": "quality", "version": "2.1.23", "enabled": true},
+    {"name": "recycler", "version": "2.1.23", "enabled": true},
+    {"name": "space-age", "version": "2.1.23", "enabled": true},
+    {"name": "mir-fixture-mir5-active-mods-observer", "version": "0.1.0", "enabled": true},
+    {"name": "more-infinite-research", "version": "5.0.21000", "enabled": true},
+    {"name": "mir-fixture-mir5-named-science-replacement", "version": "0.1.0", "enabled": true}
+  ],
+  "archive_sha256": {
+    "mir-fixture-mir5-active-mods-observer_0.1.0.zip": "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C",
+    "more-infinite-research_5.0.21000.zip": "428A789CA03828D2F7F93EC65C49FD3157FD6D547CC569DDA2C0129D6504647A"
+  },
+  "scope": "Exact frozen MIR5 F210 CreateOnly comparator for the missing named electromagnetic-science recipe, circular producer, and independently seeded direct owner under all-official policy. It is bound to the accepted 5658246a archive identity; no native result, lab, save, gameplay, multiplayer, performance, or release claim is made."
+}
