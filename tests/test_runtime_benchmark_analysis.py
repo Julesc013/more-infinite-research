@@ -31,6 +31,23 @@ def _encode(value: object) -> bytes:
     return (json.dumps(value, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
 
 
+def _accepted_pilot_payload() -> bytes:
+    capsule = json.loads(gzip.decompress((ROOT / MODULE.ACTIVE_PREREQUISITES_CAPSULE).read_bytes()))
+    return next(
+        base64.b64decode(entry["base64"])
+        for entry in capsule["files"]
+        if entry["path"] == "original/active-marker-pilots.json"
+    )
+
+
+def _pilot_start_utc_values(record: dict[str, object]) -> list[str]:
+    return [
+        row["start_utc"]
+        for observation in record["observations"]
+        for row in observation["native_result"]["process_memory"]["observations"]
+    ]
+
+
 def _plan() -> dict[str, object]:
     return json.loads((ROOT / MODULE.PLAN_PATH).read_bytes())
 
@@ -317,6 +334,66 @@ class RuntimeBenchmarkAnalysisTests(unittest.TestCase):
         }
         MODULE._validate_pilot_reference(pilot_reference, plan_sha, capture_reference, captures, frozen_pilot)
         MODULE._validate_process_memory(pilot["observations"][0]["native_result"]["process_memory"], pilot["observations"][0]["native_result"]["native_process"])
+
+    def test_accepts_only_producer_datetime_zero_elision_in_the_frozen_pilot(self) -> None:
+        payload = _accepted_pilot_payload()
+        self.assertEqual(_hash(payload), MODULE.MARKER_PILOT_SHA256)
+        frozen_pilot = json.loads(payload)
+        command = (
+            "$ErrorActionPreference = 'Stop'; "
+            "[Console]::InputEncoding = [Text.UTF8Encoding]::new($false); "
+            "[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false); "
+            "$text = [Console]::In.ReadToEnd(); $text | ConvertFrom-Json | ConvertTo-Json -Depth 50"
+        )
+        roundtrip = subprocess.run(
+            ["pwsh", "-NoProfile", "-Command", command],
+            input=payload,
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(roundtrip.returncode, 0, roundtrip.stderr.decode("utf-8", errors="replace"))
+        producer_pilot = json.loads(roundtrip.stdout)
+        original_times = _pilot_start_utc_values(frozen_pilot)
+        producer_times = _pilot_start_utc_values(producer_pilot)
+        self.assertEqual(len(original_times), 102)
+        changed = [(before, after) for before, after in zip(original_times, producer_times, strict=True) if before != after]
+        self.assertEqual(len(changed), 11)
+        for before, after in changed:
+            self.assertTrue(before.endswith("0Z"))
+            self.assertFalse(after.endswith("0Z"))
+            self.assertEqual(MODULE._canonical_pilot_start_utc(before, "before"), MODULE._canonical_pilot_start_utc(after, "after"))
+        plan = _plan()
+        capture_reference, pilot_reference = _capture_and_pilot(plan, MODULE.PLAN_SHA256)
+        pilot_reference["record"] = producer_pilot
+        frozen_capture, expected_pilot = MODULE._frozen_active_prerequisites()
+        captures = MODULE._validate_capture_reference(capture_reference, MODULE.PLAN_SHA256, MODULE._profiles(plan), frozen_capture)
+        MODULE._validate_pilot_reference(pilot_reference, MODULE.PLAN_SHA256, capture_reference, captures, expected_pilot)
+
+        same_instant = copy.deepcopy(frozen_pilot)
+        target = next(
+            row
+            for observation in same_instant["observations"]
+            for row in observation["native_result"]["process_memory"]["observations"]
+            if row["start_utc"].endswith("0Z")
+        )
+        target["start_utc"] = target["start_utc"][:-2] + "Z"
+        MODULE._same_pilot_record(same_instant, frozen_pilot, "marker pilot record")
+
+        changed_instant = copy.deepcopy(frozen_pilot)
+        changed_target = next(
+            row
+            for observation in changed_instant["observations"]
+            for row in observation["native_result"]["process_memory"]["observations"]
+            if row["start_utc"].endswith("0Z")
+        )
+        changed_target["start_utc"] = changed_target["start_utc"][:-2] + "1Z"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "marker pilot record differs"):
+            MODULE._same_pilot_record(changed_instant, frozen_pilot, "marker pilot record")
+        non_time = copy.deepcopy(frozen_pilot)
+        non_time["observations"][0]["complete_marker"]["status"] = "altered"
+        with self.assertRaisesRegex(MODULE.RuntimeBenchmarkAnalysisError, "marker pilot record differs"):
+            MODULE._same_pilot_record(non_time, frozen_pilot, "marker pilot record")
 
     def test_complete_r06_result_reports_known_medians_and_increment_rules(self) -> None:
         plan = _plan()

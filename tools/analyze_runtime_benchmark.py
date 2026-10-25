@@ -52,6 +52,11 @@ MAX_ACTIVE_PREREQUISITES_CAPSULE_BYTES = 128 * 1024
 MAX_RESULT_BYTES = 68 * 8 * 1024 * 1024 + 1024 * 1024
 MAX_PREPARED_INPUTS_BYTES = 2 * 1024 * 1024
 SHA256 = re.compile(r"^[A-F0-9]{64}$")
+PILOT_START_UTC = re.compile(
+    r"^(?P<year>[0-9]{4})-(?P<month>[0-9]{2})-(?P<day>[0-9]{2})"
+    r"T(?P<hour>[0-9]{2}):(?P<minute>[0-9]{2}):(?P<second>[0-9]{2})"
+    r"(?:\.(?P<fraction>[0-9]{1,7}))?Z$"
+)
 METRICS = (
     "engine_reported_average_milliseconds_per_tick",
     "operating_system_peak_working_set_bytes",
@@ -151,6 +156,49 @@ def _frozen_active_prerequisites() -> tuple[dict[str, Any], dict[str, Any]]:
 def _same_json(actual: Any, expected: Any, label: str) -> None:
     if json.dumps(actual, sort_keys=True, separators=(",", ":"), allow_nan=False) != json.dumps(expected, sort_keys=True, separators=(",", ":"), allow_nan=False):
         raise RuntimeBenchmarkAnalysisError(label + " differs from the raw result")
+
+
+def _canonical_pilot_start_utc(value: Any, label: str) -> str:
+    """Preserve the producer's UTC instant while accepting only zero elision."""
+    text = _string(value, label)
+    match = PILOT_START_UTC.fullmatch(text)
+    if match is None:
+        raise RuntimeBenchmarkAnalysisError(label + " must be a strict UTC timestamp")
+    year, month, day, hour, minute, second = (int(match.group(name)) for name in ("year", "month", "day", "hour", "minute", "second"))
+    leap = year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+    month_days = (31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+    if year < 1 or not 1 <= month <= 12 or not 1 <= day <= month_days[month - 1] or hour > 23 or minute > 59 or second > 59:
+        raise RuntimeBenchmarkAnalysisError(label + " must be a valid UTC timestamp")
+    fraction = (match.group("fraction") or "").ljust(7, "0")
+    return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}.{fraction}Z"
+
+
+def _normalized_pilot_record(record: Any, label: str) -> dict[str, Any]:
+    """Normalize only the DateTime leaves re-emitted by the scheduled producer."""
+    normalized = dict(_mapping(record, label))
+    observations: list[dict[str, Any]] = []
+    for observation_index, observation_value in enumerate(_array(normalized.get("observations"), label + " observations")):
+        observation = dict(_mapping(observation_value, label + " observation"))
+        native = dict(_mapping(observation.get("native_result"), label + " native result"))
+        memory = dict(_mapping(native.get("process_memory"), label + " process memory"))
+        rows: list[dict[str, Any]] = []
+        for memory_index, memory_value in enumerate(_array(memory.get("observations"), label + " process-memory observations")):
+            row = dict(_mapping(memory_value, label + " process-memory observation"))
+            row["start_utc"] = _canonical_pilot_start_utc(
+                row.get("start_utc"),
+                f"{label} observations[{observation_index}].native_result.process_memory.observations[{memory_index}].start_utc",
+            )
+            rows.append(row)
+        memory["observations"] = rows
+        native["process_memory"] = memory
+        observation["native_result"] = native
+        observations.append(observation)
+    normalized["observations"] = observations
+    return normalized
+
+
+def _same_pilot_record(actual: Any, expected: Any, label: str) -> None:
+    _same_json(_normalized_pilot_record(actual, label), _normalized_pilot_record(expected, label), label)
 
 
 def _validate_prepared_inputs_sidecar(result_path: Path, result: dict[str, Any]) -> None:
@@ -571,7 +619,7 @@ def _validate_pilot_reference(
     _same(_string(reference.get("kind"), "marker pilot kind"), PILOT_KIND, "marker pilot kind")
     _same(_string(reference.get("status"), "marker pilot status"), "complete-unscored-not-a-performance-result", "marker pilot status")
     record = _mapping(reference.get("record"), "marker pilot record")
-    _same_json(record, frozen_record, "marker pilot record")
+    _same_pilot_record(record, frozen_record, "marker pilot record")
     _same(_integer(record.get("schema"), "marker pilot schema"), 1, "marker pilot schema")
     _same(_string(record.get("kind"), "marker pilot record kind"), PILOT_KIND, "marker pilot record kind")
     _same(_string(record.get("status"), "marker pilot record status"), "complete-unscored-not-a-performance-result", "marker pilot record status")
