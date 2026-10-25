@@ -5,6 +5,16 @@ if type(mods) == "table" and type(mods.base) == "string" and mods.base:match("^2
   require("overrides.recipe_schema").apply(data.raw, mods, log)
 end
 
+-- Published named prerequisite repairs are independent of research selection.
+-- Only F200/F210 with their relevant active optional inputs import this body.
+local prerequisite_target = require("platform.target")
+if type(mods) == "table" and (prerequisite_target.id == "f200" or prerequisite_target.id == "f210")
+    and ((type(mods.angelssmelting) == "string" and mods.angelssmelting ~= "")
+      or (type(mods.astroponics) == "string" and mods.astroponics ~= ""
+        and type(mods["planet-muluna"]) == "string" and mods["planet-muluna"] ~= "")) then
+  require("overrides.prerequisite_repairs").apply(data.raw, mods, prerequisite_target, log)
+end
+
 local configuration = require("research.settings")
 local values = configuration.resolve(settings.startup, helpers, log)
 local productivity = require("research.productivity")
