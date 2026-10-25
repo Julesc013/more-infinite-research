@@ -1,4 +1,4 @@
-"""Host controls for the private F200 passive-repair queue-bound fixture.
+"""Host controls for the private F200/F210 passive-repair queue-bound fixture.
 
 These controls exercise only the fixture's native-shaped boundary checks.  A
 Black Glass run is still required to establish native repair scheduling.
@@ -18,9 +18,58 @@ FIXTURE = ROOT / "tests" / "fixtures" / "repair-stress"
 CONTROL = FIXTURE / "control.lua"
 SETTINGS_UPDATE = FIXTURE / "settings-updates.lua"
 NAME = "mir-fixture-mir5-repair-stress"
+PROFILE_ROOT = ROOT / "tests" / "profiles"
+F200_ENGINE = {
+    "version": "2.0.77",
+    "sha256": "D3BCFCA4DBEE407D472013B745CE2445D34AF6F021AACC5753EE0DAC54B56B0B",
+}
+F210_ENGINE = {
+    "version": "2.1.23",
+    "sha256": "FE4A1DA30F322A0D0B8AEB3DF7276332222BAAA143E2352569B723E84B2B9060",
+}
+F200_OBSERVER = "723D1E7721449FC26040E5E6629416767BDC20AD79CF8723115846DB662A1F87"
+F210_OBSERVER = "2E1BE5952D2A4CC5C74A0D149E075D247BA110A3FAE5B6768D3EAEBABCEF989C"
+F210_PUBLISHED = "A4BB8F47232C689B267EF434F557187A8795C47280FA464169DE917FB579517F"
 VARIANTS = {
-    "published": ("4.7.20002", "0.1.0"),
-    "mir5": ("5.0.20000", "0.2.0"),
+    "f200": {
+        "published": {
+            "mir": "4.7.20002", "fixture": "0.1.0", "factorio": "2.0", "engine": F200_ENGINE,
+            "info": "info.json", "profile": "repair-stress-published-f200-2077.json",
+            "dependencies": ["base >= 2.0.77", "more-infinite-research = 4.7.20002"],
+            "official": [("base", "2.0.77", True)], "observer": F200_OBSERVER,
+            "archives": {"mir-fixture-mir5-active-mods-observer_0.1.0.zip": F200_OBSERVER},
+        },
+        "mir5": {
+            "mir": "5.0.20000", "fixture": "0.2.0", "factorio": "2.0", "engine": F200_ENGINE,
+            "info": "info.json", "profile": "repair-stress-mir5-f200-2077.json",
+            "dependencies": ["base >= 2.0.77", "more-infinite-research = 5.0.20000"],
+            "official": [("base", "2.0.77", True)], "observer": F200_OBSERVER,
+            "archives": {"mir-fixture-mir5-active-mods-observer_0.1.0.zip": F200_OBSERVER},
+        },
+    },
+    "f210": {
+        "published": {
+            "mir": "4.7.21002", "fixture": "0.1.0", "factorio": "2.1", "engine": F210_ENGINE,
+            "info": "info-f210.json", "profile": "repair-stress-published-f210-2123.json",
+            "dependencies": ["base = 2.1.23", "space-age = 2.1.23", "more-infinite-research = 4.7.21002"],
+            "official": [("base", "2.1.23", True), ("elevated-rails", "2.1.23", True),
+                         ("quality", "2.1.23", True), ("recycler", "2.1.23", True),
+                         ("space-age", "2.1.23", True)],
+            "observer": F210_OBSERVER,
+            "archives": {"more-infinite-research_4.7.21002.zip": F210_PUBLISHED,
+                         "mir-fixture-mir5-active-mods-observer_0.1.0.zip": F210_OBSERVER},
+        },
+        "mir5": {
+            "mir": "5.0.21000", "fixture": "0.2.0", "factorio": "2.1", "engine": F210_ENGINE,
+            "info": "info-f210.json", "profile": "repair-stress-mir5-f210-2123.json",
+            "dependencies": ["base = 2.1.23", "space-age = 2.1.23", "more-infinite-research = 5.0.21000"],
+            "official": [("base", "2.1.23", True), ("elevated-rails", "2.1.23", True),
+                         ("quality", "2.1.23", True), ("recycler", "2.1.23", True),
+                         ("space-age", "2.1.23", True)],
+            "observer": F210_OBSERVER,
+            "archives": {"mir-fixture-mir5-active-mods-observer_0.1.0.zip": F210_OBSERVER},
+        },
+    },
 }
 
 
@@ -72,6 +121,33 @@ function repair_stress_parse(path, mir, fixture, enabled, state)
   assert(chunk, message)
   local ok, result = pcall(chunk)
   return {ok = ok, message = tostring(result), callbacks = callbacks, reads = reads, writes = writes}
+end
+
+function repair_stress_mode_guard(path, base, rails, quality, recycler, space, mir, fixture)
+  local callbacks = {}
+  local active = {base = base, ['more-infinite-research'] = mir,
+    ['mir-fixture-mir5-repair-stress'] = fixture}
+  if rails ~= nil then active['elevated-rails'] = rails end
+  if quality ~= nil then active.quality = quality end
+  if recycler ~= nil then active.recycler = recycler end
+  if space ~= nil then active['space-age'] = space end
+  local env = {
+    script = {
+      active_mods = active,
+      on_init = function(callback) callbacks.init = callback end,
+      on_load = function() end,
+      on_event = function() end
+    },
+    defines = {events = {on_tick = 1}},
+    settings = {startup = {['mir-enable-passive-repair'] = {value = false}}},
+    storage = {}, helpers = {table_to_json = function() return '{}' end}, log = function() end
+  }
+  env._G = env
+  setmetatable(env, {__index = function(_, key) return _G[key] end})
+  local chunk, message = loadfile(path, 't', env)
+  assert(chunk, message); chunk()
+  local ok, result = pcall(callbacks.init)
+  return {ok = ok, message = tostring(result)}
 end
 
 function repair_stress_load(path)
@@ -182,14 +258,70 @@ function repair_stress_observer_opponent(path, opponent)
 end
 ''')
 
-    def test_metadata_variants_pin_the_same_fixture_identity_and_exact_f200_mir(self):
-        for directory, (mir, version) in VARIANTS.items():
-            with self.subTest(directory=directory):
-                info = json.loads((FIXTURE / directory / "info.json").read_text(encoding="utf-8"))
-                self.assertEqual((NAME, version, "2.0"), (info["name"], info["version"], info["factorio_version"]))
-                self.assertEqual(
-                    ["base >= 2.0.77", f"more-infinite-research = {mir}"], info["dependencies"]
-                )
+    def test_metadata_profiles_and_shared_control_pin_exact_target_arms(self):
+        for target, variants in VARIANTS.items():
+            for arm, expected in variants.items():
+                with self.subTest(target=target, arm=arm):
+                    info = json.loads((FIXTURE / arm / expected["info"]).read_text(encoding="utf-8"))
+                    self.assertEqual(
+                        (NAME, expected["fixture"], expected["factorio"]),
+                        (info["name"], info["version"], info["factorio_version"]),
+                    )
+                    self.assertEqual(expected["dependencies"], info["dependencies"])
+
+                    profile = json.loads((PROFILE_ROOT / expected["profile"]).read_text(encoding="utf-8"))
+                    self.assertEqual(
+                        ("mir5-repair-stress" + ("-f210" if target == "f210" else "") + "-native-selection", target,
+                         expected["factorio"], expected["engine"]),
+                        (profile["kind"], profile["target"], profile["factorio_line"], profile["engine"]),
+                    )
+                    self.assertEqual("Defaults", profile["settings_mode"])
+                    self.assertEqual(expected["archives"], profile["archive_sha256"])
+                    mods = [(entry["name"], entry["version"], entry["enabled"]) for entry in profile["mods"]]
+                    self.assertEqual(
+                        expected["official"] + [
+                            ("mir-fixture-mir5-active-mods-observer", "0.1.0", True),
+                            ("more-infinite-research", expected["mir"], True),
+                            (NAME, expected["fixture"], True),
+                        ],
+                        mods,
+                    )
+
+        # A single shared runtime body must expose both accepted target arms;
+        # the engine-specific info adapters choose the active-mod closure.
+        source = CONTROL.read_text(encoding="utf-8")
+        for token in (
+            'active.base == "2.0.77"', 'active.base == "2.1.23"',
+            'active["space-age"] == "2.1.23"', '"f210-published-4.7.21002"',
+            '"f210-mir5-5.0.21000"',
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, source)
+
+    def test_target_selector_admits_only_exact_f200_or_f210_metadata(self):
+        guard = self.lua.eval("repair_stress_mode_guard")
+        f210 = ("2.1.23", "2.1.23", "2.1.23", "2.1.23", "2.1.23")
+        for args in (
+            ("2.0.77", None, None, None, None, "4.7.20002", "0.1.0"),
+            ("2.0.77", None, None, None, None, "5.0.20000", "0.2.0"),
+            (*f210, "4.7.21002", "0.1.0"),
+            (*f210, "5.0.21000", "0.2.0"),
+        ):
+            with self.subTest(args=args):
+                observed = guard(str(CONTROL), *args)
+                self.assertFalse(observed["ok"])
+                self.assertIn("runtime setting is not enabled", observed["message"])
+
+        for args, phrase in (
+            (("2.1.23", "2.1.23", None, "2.1.23", "2.1.23", "5.0.21000", "0.2.0"), "official closure"),
+            (("2.0.77", None, None, None, "2.1.23", "4.7.20002", "0.1.0"), "official closure"),
+            ((*f210, "5.0.20000", "0.2.0"), "target-matched"),
+            (("2.0.77", None, None, None, None, "4.7.21002", "0.1.0"), "target-matched"),
+        ):
+            with self.subTest(args=args):
+                observed = guard(str(CONTROL), *args)
+                self.assertFalse(observed["ok"])
+                self.assertIn(phrase, observed["message"])
 
     def test_native_shaped_settings_stage_precedes_runtime_setting_and_rejects_absence_or_drift(self):
         path = str(SETTINGS_UPDATE)
